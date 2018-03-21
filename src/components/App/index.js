@@ -3,7 +3,7 @@ import createBrowserHistory from 'history/createBrowserHistory';
 import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { Router } from 'react-router';
-import Route from 'components/Route';
+import Route from 'components/App/Route';
 import Stores from 'stores';
 
 const browserHistory = createBrowserHistory();
