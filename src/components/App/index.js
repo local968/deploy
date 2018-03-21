@@ -4,7 +4,10 @@ import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { Router } from 'react-router';
 import Route from 'components/App/Route';
+import Sider from 'components/Layout/Sider';
+import Header from 'components/Layout/Header';
 import Stores from 'stores';
+import styles from './styles.module.css';
 
 const browserHistory = createBrowserHistory();
 const routingStore = new RouterStore();
@@ -19,7 +22,13 @@ class App extends Component {
     return (
       <Provider {...stores}>
         <Router history={history}>
-          <Route />
+          <div className={styles.app}>
+            <Sider />
+            <div className={styles.main}>
+              <Header />
+              <Route />
+            </div>
+          </div>
         </Router>
       </Provider>
     );

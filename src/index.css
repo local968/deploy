@@ -1,7 +1,16 @@
 /* global css file */
 
+html,
 body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  color: #4a4a4a;
+  min-width: 1000px;
+  word-break: normal !important;
   margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+}
+
+@font-face {
+  font-family: ShareTech-Regular;
+  src: url('./ShareTech-Regular.ttf');
 }
