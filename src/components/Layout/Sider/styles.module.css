@@ -23,17 +23,53 @@
   font-family: ShareTech-Regular;
 }
 
+.nav {
+  margin: 0;
+  font-size: 1.3125rem;
+}
+
 .menus {
-  flex: 1 0 0;
+  flex: 1 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .home {
+  font-family: ShareTech-Regular;
+  color: #31c4e9;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 1.2em;
+  justify-content: center;
+  cursor: pointer;
 }
 
+.bottom,
 .support {
+  font-family: ShareTech-Regular;
+  color: #aeb1b7;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 1.2em;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.home img,
+.support img {
+  margin-bottom: 0.07em;
+}
+
+.bottom img {
+  margin-bottom: 0.18em;
 }
 
 .bottom {
+  cursor: pointer;
   flex: 0 0 1.2em;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.bottom .nav {
+  font-size: 1.25rem;
 }
