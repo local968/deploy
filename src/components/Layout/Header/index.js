@@ -3,9 +3,10 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { Icon } from 'antd';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
-import more from './combined-shape-copy.svg';
+import down from './combined-shape-copy.svg';
+import more from './btn-more-option.svg';
 
-export default () => (
+const NormalHeader = () => (
   <div className={styles.header}>
     <div className={classnames(styles.block, styles.total)}>
       <span className={styles.number}>115</span>
@@ -33,8 +34,18 @@ export default () => (
       <img src={mockAvatar} alt="avatar" className={styles.avatar} />
       <div className={styles.userBottom}>
         <span className={styles.name}>Newton Barley</span>
-        <img className={styles.down} src={more} alt={more} />
+        <img className={styles.down} src={down} alt="down" />
       </div>
     </div>
   </div>
 );
+
+const WelcomeHeader = () => (
+  <div className={styles.wheader}>
+    <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
+    <span className={styles.welcome}>Welcome, Newton Barley!</span>
+    <img className={styles.more} src={more} alt="more" />
+  </div>
+);
+
+export default WelcomeHeader;
