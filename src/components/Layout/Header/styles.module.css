@@ -2,4 +2,82 @@
   background: white;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   flex: 0 0 1.2em;
+  display: flex;
+}
+
+.block {
+  color: #1d2b3c;
+  flex: 0 0 1.5em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin-top: 0.2em;
+  margin-bottom: 0.1em;
+}
+
+.number {
+  font-size: 2.8125rem;
+  display: block;
+  font-family: HelveticaNeue;
+}
+
+.text {
+  font-size: 1.3125rem;
+  display: block;
+  font-family: shareTech-Regular;
+}
+
+.disabled .number {
+  opacity: 0.5;
+}
+
+.issue .number {
+  color: #ff3151;
+}
+
+.gap {
+  flex: 0 0 0.5em;
+}
+
+.empty {
+  flex: 1 1 auto;
+}
+
+.user {
+  flex: 0 0 1.4em;
+  display: flex;
+  flex-direction: column;
+  padding: 0.17em 0.4em;
+}
+
+.avatar {
+  display: block;
+  height: 0.6em;
+  width: 0.6em;
+  border-radius: 50%;
+  border: 1px solid #979797;
+  flex: 0 0 0.6em;
+  margin: 0 auto;
+}
+
+.userBottom {
+  position: relative;
+}
+
+.down {
+  position: absolute;
+  right: -0.2em;
+  top: 0.1em;
+}
+
+.name {
+  font-size: 1.3125rem;
+  line-height: 1.5rem;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+  font-family: shareTech-Regular;
 }
