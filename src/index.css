@@ -8,6 +8,7 @@ body {
   min-width: 1000px;
   word-break: normal !important;
   margin: 0;
+  font-family: HelveticaNeue, Arial, Helvetica, sans-serif;
 }
 
 @font-face {

@@ -14,11 +14,12 @@ export default () => (
     <Route
       path="/create"
       render={() => (
-        <CreateBackground>
+        <React.Fragment>
+          <CreateBackground />
           <Route exact path="/create" component={Create} />
           <Route exact path="/create/new" component={New} />
           <Route exact path="/create/replace" component={Replace} />
-        </CreateBackground>
+        </React.Fragment>
       )}
     />
   </div>
