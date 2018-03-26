@@ -18,7 +18,7 @@ export default () => (
       </a>
       <a className={styles.support}>
         <img alt="support" src={help} />
-        <h4 className={styles.nav}>support</h4>
+        <h4 className={styles.nav}>Support</h4>
       </a>
     </div>
     <a className={styles.bottom}>

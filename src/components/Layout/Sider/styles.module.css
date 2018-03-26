@@ -35,8 +35,6 @@
 }
 
 .home {
-  font-family: ShareTech-Regular;
-  color: #31c4e9;
   display: flex;
   flex-direction: column;
   flex: 0 0 1.2em;
@@ -44,16 +42,25 @@
   cursor: pointer;
 }
 
+.home .nav {
+  font-family: ShareTech-Regular;
+  color: #31c4e9;
+}
+
 .bottom,
 .support {
-  font-family: ShareTech-Regular;
-  color: white;
   opacity: 0.6;
   display: flex;
   flex-direction: column;
   flex: 0 0 1.2em;
   justify-content: center;
   cursor: pointer;
+}
+
+.support .nav,
+.bottom .nav {
+  font-family: ShareTech-Regular;
+  color: white;
 }
 
 .home img,
