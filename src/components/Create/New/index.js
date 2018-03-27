@@ -1,13 +1,14 @@
 import React from 'react';
-import styles from './styles.module.css';
+import { Link } from 'react-router-dom';
 import { Icon } from 'antd';
+import styles from './styles.module.css';
 import { BlackButton } from 'components/Common';
 
 export default () => (
   <div className={styles.new}>
-    <a className={styles.back}>
+    <Link className={styles.back} to="/create">
       <Icon className={styles.icon} type="arrow-left" />
-    </a>
+    </Link>
     <h2 className={styles.title}>Create a Deployment Project</h2>
     <div className={styles.selected}>
       <span className={styles.selectedText}>Selected Model:</span>

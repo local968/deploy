@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './styles.module.css';
 import New from './New';
 import Replace from './Replace';
@@ -37,18 +38,18 @@ const Create = () => (
         <span className={styles.modelName}>RandomForect.auto23</span>
       </div>
       <div className={styles.selections}>
-        <a className={styles.new}>
+        <Link className={styles.new} to="/create/new">
           <div className={styles.iconWrapper}>
             <img className={styles.icon} src={createIcon} alt="create" />
           </div>
           <span className={styles.text}>Create a New Project</span>
-        </a>
-        <a className={styles.modify}>
+        </Link>
+        <Link className={styles.modify} to="/create/replace">
           <div className={styles.iconWrapper}>
             <img className={styles.icon} src={replaceIcon} alt="replace" />
           </div>
           <span className={styles.text}>Modify an Existing Deployment</span>
-        </a>
+        </Link>
       </div>
       <a className={styles.back}>Back to The Training Project</a>
     </div>

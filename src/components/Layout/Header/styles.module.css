@@ -3,11 +3,13 @@
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   flex: 0 0 1.2em;
   display: flex;
+  z-index: 1;
+  overflow-x: auto;
 }
 
 .block {
   color: #1d2b3c;
-  flex: 0 0 1.5em;
+  flex: 0 1 1.5em;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -37,7 +39,7 @@
 }
 
 .gap {
-  flex: 0 0 0.5em;
+  flex: 0 2 0.5em;
 }
 
 .empty {
@@ -45,7 +47,7 @@
 }
 
 .user {
-  flex: 0 0 1.4em;
+  flex: 0 1 1.4em;
   display: flex;
   flex-direction: column;
   padding: 0.17em 0.4em;
@@ -90,6 +92,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1;
+  overflow-x: auto;
 }
 
 .wavatar {

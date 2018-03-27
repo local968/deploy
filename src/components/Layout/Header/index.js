@@ -47,4 +47,4 @@ const WelcomeHeader = () => (
   </div>
 );
 
-export default NormalHeader;
+export default WelcomeHeader;

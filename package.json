@@ -13,6 +13,7 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.1"
   },
   "scripts": {
@@ -25,8 +26,7 @@
     "babel-plugin-import": "^1.6.7",
     "mobx-react-devtools": "^5.0.0",
     "node-sass": "^4.7.2",
-    "react-app-rewire-css-modules":
-      "github:codebandits/react-app-rewire-css-modules",
+    "react-app-rewire-css-modules": "github:codebandits/react-app-rewire-css-modules",
     "react-app-rewire-less": "^2.1.1",
     "react-app-rewire-mobx": "^1.0.7",
     "react-app-rewired": "^1.5.0",

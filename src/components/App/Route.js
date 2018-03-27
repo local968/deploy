@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route } from 'react-router';
+import { Route, Redirect } from 'react-router-dom';
 import styles from './styles.module.css';
 import { Create, New, Replace, CreateBackground } from 'components/Create';
 
@@ -9,7 +9,7 @@ console.log(CreateBackground);
 
 export default () => (
   <div className={styles.route}>
-    <Route exact path="/" component={() => 'test'} />
+    <Route exact path="/" component={() => <Redirect to="/create" />} />
     <Route exact path="/test" component={() => 'test/test'} />
     <Route
       path="/create"

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import createBrowserHistory from 'history/createBrowserHistory';
 import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import { Router } from 'react-router';
+import { Router } from 'react-router-dom';
 import Route from 'components/App/Route';
 import Sider from 'components/Layout/Sider';
 import Header from 'components/Layout/Header';
