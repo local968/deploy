@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Icon } from 'antd';
 import styles from './styles.module.css';
 import { BlackButton } from 'components/Common';
+import List from './list';
 
 export default () => (
   <div className={styles.replace}>
@@ -14,7 +15,10 @@ export default () => (
       <span className={styles.selectedText}>Selected Model:</span>
       <span className={styles.modelName}>RandomForect.auto23</span>
     </div>
+    <List />
     <div className={styles.gap} />
-    <BlackButton>Modify the Project</BlackButton>
+    <div className={styles.confirm}>
+      <BlackButton>Modify the Project</BlackButton>
+    </div>
   </div>
 );

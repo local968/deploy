@@ -10,6 +10,13 @@ body {
   font-family: HelveticaNeue, Arial, Helvetica, sans-serif;
 }
 
+@media only screen and (max-width: 1440px) {
+  html,
+  body {
+    font-size: 12.8px;
+  }
+}
+
 @font-face {
   font-family: ShareTech-Regular;
   src: url('./ShareTech-Regular.ttf');
