@@ -1,15 +1,19 @@
 .background {
-  background: url(./graph.svg) no-repeat fixed bottom;
-  background-size: contain;
-  position: absolute;
+  position: fixed;
   display: flex;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  height: 100%;
   flex-direction: row;
   align-items: flex-end;
   overflow: hidden;
+}
+
+.bgImage {
+  background: url(./graph.svg) no-repeat fixed bottom;
+  background-size: contain;
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 100%;
 }
 
 .column {

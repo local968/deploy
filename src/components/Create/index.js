@@ -24,6 +24,7 @@ const CreateBackground = ({ children }) => (
         75<span className={styles.percent}>%</span>
       </span>
     </div>
+    <div className={styles.bgImage} />
   </div>
 );
 
