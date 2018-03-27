@@ -16,7 +16,8 @@ module.exports = function override(config, env) {
   config.resolve = {
     alias: {
       components: path.join(__dirname, 'src/components'),
-      stores: path.join(__dirname, 'src/stores')
+      stores: path.join(__dirname, 'src/stores'),
+      style: path.join(__dirname, 'src/components/Common/basic.module.css')
     }
   };
   return config;

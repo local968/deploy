@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { Icon } from 'antd';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
 import down from './combined-shape-copy.svg';
 import more from './btn-more-option.svg';
@@ -48,4 +47,4 @@ const WelcomeHeader = () => (
   </div>
 );
 
-export default WelcomeHeader;
+export default NormalHeader;

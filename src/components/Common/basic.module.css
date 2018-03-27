@@ -1,0 +1,19 @@
+.test {
+  background: green;
+}
+
+.hover:after {
+  opacity: 0;
+  content: '';
+  position: absolute;
+  background: #fff;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.1s ease;
+}
+
+.hover:hover:after {
+  opacity: 0.08;
+}

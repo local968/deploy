@@ -20,11 +20,16 @@
   left: -0.5em;
   text-align: right;
   border-bottom-right-radius: 50%;
-  background: linear-gradient(to bottom, #5b657b, #243448);
+  background: linear-gradient(to bottom, #5b657b 50%, #243448 100%);
   display: flex;
   flex-direction: column-reverse;
   padding: 0.13em;
   cursor: pointer;
+  composes: hover from 'style';
+}
+
+.back:active {
+  background: linear-gradient(to bottom, #243448 50%, #5b657b 100%);
 }
 
 .icon {

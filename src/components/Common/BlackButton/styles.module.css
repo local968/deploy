@@ -10,6 +10,9 @@
   height: 3rem;
   width: 100%;
   padding: 0;
+  cursor: pointer;
+  position: relative;
+  composes: hover from 'style';
 }
 
 .blackButton:active {
