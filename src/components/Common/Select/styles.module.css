@@ -1,20 +1,42 @@
-.sort {
+.select {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+}
+.selector {
   flex: 1 1 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.sortTitle {
+.selectTitle {
   font-size: 1.125rem;
   display: block;
 }
-.sortSelect {
+.selectSelect {
   display: block;
   margin-left: 0.625em;
   height: 100%;
-  composes: select from 'style';
+  composes: select;
 }
 .selectWrapper {
   width: 1.88em;
   height: 100%;
+}
+
+.select :global(.ant-select-selection--single) {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  background: linear-gradient(to bottom, #5b657b, #243448);
+  color: white;
+  height: 100%;
+  display: block;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+.select :global(.ant-select-arrow) {
+  color: rgba(255, 255, 255, 0.8);
+}
+.select :global(.ant-select-selection__rendered) {
+  margin-left: 20px;
 }

@@ -10,17 +10,17 @@ import normalIcon from './success.svg';
 const deploymentStatus = {
   normal: (
     <span className={styles.normal}>
-      <img className={styles.statusIcon} src={normalIcon} />Normal
+      <img className={styles.statusIcon} src={normalIcon} alt="normal" />Normal
     </span>
   ),
   issue: (
     <span className={styles.issue}>
-      <img className={styles.statusIcon} src={issueIcon} />Issue
+      <img className={styles.statusIcon} src={issueIcon} alt="issue" />Issue
     </span>
   ),
   running: (
     <span className={styles.running}>
-      <img className={styles.statusIcon} src={runningIcon} />Running
+      <img className={styles.statusIcon} src={runningIcon} alt="running" />Running
     </span>
   ),
   na: <span className={styles.na}>N/A</span>
