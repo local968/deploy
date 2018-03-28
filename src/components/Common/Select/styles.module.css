@@ -1,0 +1,20 @@
+.sort {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sortTitle {
+  font-size: 1.125rem;
+  display: block;
+}
+.sortSelect {
+  display: block;
+  margin-left: 0.625em;
+  height: 100%;
+  composes: select from 'style';
+}
+.selectWrapper {
+  width: 1.88em;
+  height: 100%;
+}

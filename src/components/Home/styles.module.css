@@ -1,0 +1,114 @@
+.home {
+  composes: content from 'style';
+}
+
+.filter {
+  height: 0.4em;
+  display: flex;
+  margin-top: 0.2em;
+}
+
+.search {
+  display: flex;
+  height: 0.4em;
+  flex: 2 1 0;
+}
+
+.searchName {
+  font-size: 1rem;
+  border: none;
+  outline: none;
+  height: 100%;
+  flex: 1 1 0;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  padding: 0 0.5em;
+}
+
+.submit {
+  display: flex;
+  padding: 0 0.12em;
+  flex: 0 0 0;
+  background: linear-gradient(to bottom, #5b657b, #243448);
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  position: relative;
+  composes: hover from 'style';
+}
+
+.submit:active {
+  background: linear-gradient(to top, #5b657b, #243448);
+}
+
+.searchButton {
+}
+
+.listWrapper {
+  padding: 0.12em;
+  box-sizing: border-box;
+  border: 1px solid #b5bec6;
+  border-radius: 4px;
+  background: #e0e3e9;
+  margin-top: 0.2em;
+}
+
+.list {
+  max-height: 8.4em;
+  overflow-y: auto;
+}
+
+.head,
+.project {
+  display: flex;
+  padding: 0 0.2em;
+}
+
+.head {
+  padding: 0.1em 0.2em 0.2em 0.2em;
+}
+
+.project {
+  min-height: 0.8em;
+  background: white;
+  margin-bottom: 0.04em;
+  border-radius: 4px;
+  align-items: center;
+}
+
+.head span,
+.project span {
+  font-size: 1.125rem;
+  margin-right: 0.5rem;
+}
+
+.head span {
+  font-weight: bold;
+}
+
+.projectName,
+.modelName {
+  flex: 2 1 0;
+}
+
+.enable,
+.deploymentStatus,
+.operationAlert,
+.performanceAlert,
+.craetedDate,
+.owner {
+  flex: 1 1 0;
+}
+
+.statusIcon {
+  margin-right: 0.5rem;
+  vertical-align: bottom;
+}
+
+.na {
+  color: #9b9b9b;
+}
+
+.warning {
+  color: #ff3151;
+}

@@ -1,0 +1,26 @@
+.switch {
+}
+
+.switch:global(.ant-switch:before),
+.switch:global(.ant-switch:after) {
+  width: 20px;
+  height: 20px;
+  left: 0px;
+  top: 0px;
+  border-radius: 20px;
+}
+
+.switch:global(.ant-switch-checked:before),
+.switch:global(.ant-switch-checked:after) {
+  margin-left: -20px;
+}
+
+.switch:global(.ant-switch-checked) {
+  background-color: #243448;
+}
+
+.switch:global(.ant-switch-checked:before),
+.switch:global(.ant-switch-checked:after) {
+  left: 100%;
+  margin-left: -20px;
+}

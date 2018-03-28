@@ -2,6 +2,10 @@
   background: green;
 }
 
+.hover {
+  position: relative;
+}
+
 .hover:after {
   opacity: 0;
   content: '';
@@ -16,4 +20,26 @@
 
 .hover:hover:after {
   opacity: 0.08;
+}
+.select :global(.ant-select-selection--single) {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  background: linear-gradient(to bottom, #5b657b, #243448);
+  color: white;
+  height: 100%;
+  display: block;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+.select :global(.ant-select-arrow) {
+  color: rgba(255, 255, 255, 0.8);
+}
+.select :global(.ant-select-selection__rendered) {
+  margin-left: 20px;
+}
+
+.content {
+  padding: 0.3em 0.4em;
 }
