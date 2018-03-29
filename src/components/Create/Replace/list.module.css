@@ -40,7 +40,7 @@
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   max-height: 3.08em;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .head {
   border: 1px solid #b5bec6;
@@ -58,6 +58,7 @@
 .head span {
   font-size: 1.125rem;
   font-weight: bold;
+  margin-right: 5px;
 }
 .select {
   flex: 0.5 1 0;
@@ -86,6 +87,7 @@
 .project span {
   font-size: 1.125rem;
   line-height: 1.2;
+  margin-right: 5px;
 }
 .pot {
   width: 1.5rem;

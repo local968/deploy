@@ -16,9 +16,9 @@ export default () => (
       render={() => (
         <React.Fragment>
           <CreateBackground />
-          <Route exact path="/create" component={Create} />
-          <Route exact path="/create/new" component={New} />
-          <Route exact path="/create/replace" component={Replace} />
+          <Route exact path="/create/:id" component={Create} />
+          <Route exact path="/create/:id/new" component={New} />
+          <Route exact path="/create/:id/replace" component={Replace} />
         </React.Fragment>
       )}
     />

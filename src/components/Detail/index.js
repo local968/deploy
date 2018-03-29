@@ -7,9 +7,7 @@ import deploymentIcon from './icon-tab-deployment.svg';
 import operationIcon from './icon-tab-operation.svg';
 import performanceIcon from './icon-tab-performance.svg';
 import styles from './styles.module.css';
-import { withRouter } from 'react-router-dom';
 
-@withRouter
 @inject('routing')
 export default class Detail extends Component {
   render() {
@@ -62,7 +60,7 @@ export default class Detail extends Component {
         </div>
         <div className={styles.content}>
           <Route
-            path="/:id"
+            path="/project/:id"
             exact
             render={() => (
               <Redirect to={`/project/${match.params.id}/deployment`} />

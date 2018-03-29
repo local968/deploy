@@ -1,21 +1,67 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { inject, observer } from 'mobx-react';
+import { observable } from 'mobx';
 import { Link } from 'react-router-dom';
 import { Icon } from 'antd';
 import styles from './styles.module.css';
 import { BlackButton } from 'components/Common';
 
-export default () => (
-  <div className={styles.new}>
-    <Link className={styles.back} to="/create">
-      <Icon className={styles.icon} type="arrow-left" />
-    </Link>
-    <h2 className={styles.title}>Create a Deployment Project</h2>
-    <div className={styles.selected}>
-      <span className={styles.selectedText}>Selected Model:</span>
-      <span className={styles.modelName}>RandomForect.auto23</span>
-    </div>
-    <input className={styles.name} type="text" placeholder="Project Name" />
-    <div className={styles.gap} />
-    <BlackButton>Create the Project</BlackButton>
-  </div>
-);
+const ENTER_KEY = 13;
+
+@inject('approachStore', 'deployStore')
+@observer
+export default class New extends Component {
+  @observable projectName = '';
+
+  handleChange = event => {
+    this.projectName = event.target.value;
+  };
+
+  handleKeyDown = event => {
+    if (event.which === ENTER_KEY) {
+      this.handleSubmit();
+    }
+  };
+
+  handleSubmit = () => {
+    const { approachStore, match, deployStore, history } = this.props;
+    const currentApproach = approachStore.approaches[match.params.id - 1];
+    const modelName = currentApproach && currentApproach.modelDeploy[0];
+    deployStore
+      .create({
+        modelName,
+        name: this.projectName
+      })
+      .then(({ id }) => history.push(`/project/${id}`));
+  };
+
+  render() {
+    const { approachStore, match } = this.props;
+    const currentApproach = approachStore.approaches[match.params.id - 1];
+    const modelName = currentApproach && currentApproach.modelDeploy[0];
+    return (
+      <div className={styles.new}>
+        <Link className={styles.back} to={`/create/${match.params.id}`}>
+          <Icon className={styles.icon} type="arrow-left" />
+        </Link>
+        <h2 className={styles.title}>Create a Deployment Project</h2>
+        <div className={styles.selected}>
+          <span className={styles.selectedText}>Selected Model:</span>
+          <span className={styles.modelName}>{modelName}</span>
+        </div>
+        <input
+          className={styles.name}
+          type="text"
+          placeholder="Project Name"
+          value={this.projectName}
+          onChange={this.handleChange}
+          onKeyDown={this.handleKeyDown}
+        />
+        <div className={styles.gap} />
+        <BlackButton onClick={this.handleSubmit}>
+          Create the Project
+        </BlackButton>
+      </div>
+    );
+  }
+}
