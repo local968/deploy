@@ -23,3 +23,5 @@ yarn-error.log*
 
 # vscode
 .vscode
+
+config.js

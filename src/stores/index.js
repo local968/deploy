@@ -1,3 +1,4 @@
 import viewStore from './viewStore';
+import deployStore from './deployStore';
 
-export default { viewStore };
+export default { viewStore, deployStore };

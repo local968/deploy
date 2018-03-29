@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@horizon/client": "^2.0.0",
+    "@horizon/server": "^2.0.0",
     "antd": "^3.3.0",
     "axios": "^0.18.0",
     "classnames": "^2.2.5",
@@ -16,8 +18,14 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.1"
   },
+  "proxy": {
+    "/horizon": {
+      "target": "ws://localhost:4000",
+      "ws": true
+    }
+  },
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "react-app-rewired start & node './server/index.js'",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject"
@@ -26,7 +34,8 @@
     "babel-plugin-import": "^1.6.7",
     "mobx-react-devtools": "^5.0.0",
     "node-sass": "^4.7.2",
-    "react-app-rewire-css-modules": "github:codebandits/react-app-rewire-css-modules",
+    "react-app-rewire-css-modules":
+      "github:codebandits/react-app-rewire-css-modules",
     "react-app-rewire-less": "^2.1.1",
     "react-app-rewire-mobx": "^1.0.7",
     "react-app-rewired": "^1.5.0",

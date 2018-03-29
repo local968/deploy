@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Bread } from 'components/Common';
 import { Route, Redirect } from 'react-router-dom';
-import { inject, observer } from 'mobx-react';
+import { inject } from 'mobx-react';
 import classnames from 'classnames';
 import deploymentIcon from './icon-tab-deployment.svg';
 import operationIcon from './icon-tab-operation.svg';
@@ -12,9 +12,6 @@ import { withRouter } from 'react-router-dom';
 @withRouter
 @inject('routing')
 export default class Detail extends Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     const { routing, match, location } = this.props;
     return (
