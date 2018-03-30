@@ -1,0 +1,180 @@
+.deployment {
+  padding: 0.2em 0.6em;
+  display: flex;
+  flex-direction: column;
+}
+.info {
+  display: flex;
+  padding: 0.2em 0;
+  border-bottom: 1px dashed #d7d7d7;
+}
+.model,
+.data,
+.email {
+  font-size: 1.125rem;
+  margin-right: 3em;
+  line-height: 1.5rem;
+}
+.mark {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  font-style: normal;
+  color: white;
+  background: #c4cbd7;
+  margin-left: 2px;
+}
+.change,
+.download,
+.edit {
+  margin-left: 20px;
+  color: #1d2b3c;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.deploymentOption {
+  margin-top: 0.37em;
+  display: flex;
+}
+.label {
+  display: flex;
+  width: 3.5em;
+  color: #4a4a4a;
+  text-align: right;
+  justify-content: flex-end;
+  line-height: 0.48em;
+  flex: 0 0 3em;
+}
+
+.selections {
+  display: flex;
+  margin-left: 0.3em;
+  flex: 3 1 0;
+}
+
+.selection {
+  display: flex;
+  line-height: 0.48em;
+  padding: 0 0.2em;
+  margin-right: 0.3em;
+  justify-content: center;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, white, #f1f3f5);
+  box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  cursor: pointer;
+  composes: hover from 'style';
+}
+
+.selection:active {
+  background: linear-gradient(to top, white, #f1f3f5);
+}
+
+.selectionIcon {
+  margin-right: 1rem;
+}
+.text {
+  font-size: 1.125rem;
+}
+
+.selected {
+  display: flex;
+  font-weight: 500;
+  line-height: 0.48em;
+  position: relative;
+  min-width: 3em;
+  margin-right: 0.2em;
+  border-right: 1px solid #979797;
+}
+.or {
+  position: absolute;
+  right: -0.06em;
+  top: 0.15em;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.orText {
+  font-size: 1rem;
+  line-height: 1rem;
+}
+.row {
+  display: flex;
+}
+.holder {
+  flex: 0 0 3em;
+}
+.apiInstruction {
+  flex: 3 1 0;
+  margin-top: 0.3em;
+  margin-left: 0.3em;
+  max-width: 75%;
+}
+.block {
+  margin-top: 0.1em;
+  position: relative;
+}
+.line {
+  position: absolute;
+  height: 94%;
+  width: 3px;
+  left: 0.14em;
+  top: 0.3em;
+  background: #9b9b9b;
+}
+.title {
+  display: flex;
+}
+.no {
+  display: flex;
+  width: 0.3em;
+  height: 0.3em;
+  border-radius: 50%;
+  color: white;
+  background: #9b9b9b;
+  justify-content: center;
+  align-items: center;
+}
+.noText {
+  font-size: 1.125rem;
+}
+.titleText {
+  font-size: 1.125rem;
+  color: #4a4a4a;
+  line-height: 1.825rem;
+  margin-left: 1.2rem;
+}
+.other {
+  font-size: 1.25rem;
+  line-height: 1.825rem;
+}
+.boldText {
+  font-size: 1.125rem;
+  color: #4a4a4a;
+  line-height: 1.825rem;
+  font-weight: bold;
+  margin-left: 3rem;
+}
+.codeWrapper {
+  padding: 0.1em;
+  border: 1px solid #d8d8d8;
+  background: #f9fafc;
+  margin-left: 0.5em;
+}
+.content {
+  font-size: 1rem;
+  line-height: 2rem;
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.fixWidth {
+  display: inline-block;
+  width: 5rem;
+}

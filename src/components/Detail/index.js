@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import deploymentIcon from './icon-tab-deployment.svg';
 import operationIcon from './icon-tab-operation.svg';
 import performanceIcon from './icon-tab-performance.svg';
+import Deployment from './Deployment';
 import styles from './styles.module.css';
 
 @inject('routing')
@@ -66,7 +67,7 @@ export default class Detail extends Component {
               <Redirect to={`/project/${match.params.id}/deployment`} />
             )}
           />
-          <Route path="/project/:id/deployment" render={() => 'deployment'} />
+          <Route path="/project/:id/deployment" component={Deployment} />
           <Route path="/project/:id/operation" render={() => 'operation'} />
           <Route path="/project/:id/performance" render={() => 'performance'} />
         </div>
