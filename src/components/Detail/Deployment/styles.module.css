@@ -36,6 +36,9 @@
   font-weight: bold;
 }
 
+.deployFrequency,
+.resultLocation,
+.dataSource,
 .deploymentOption {
   margin-top: 0.37em;
   display: flex;
@@ -76,6 +79,14 @@
 
 .selectionIcon {
   margin-right: 1rem;
+  width: 2rem;
+  height: 2rem;
+}
+.antdIcon {
+  font-size: 2rem;
+  vertical-align: middle;
+  margin-right: 1rem;
+  color: #9a9b9b;
 }
 .text {
   font-size: 1.125rem;

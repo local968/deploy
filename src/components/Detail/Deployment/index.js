@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
+import { Icon } from 'antd';
 import { runInAction, action } from 'mobx';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
 import sourceIcon from './icon-data-source.svg';
+import databaseIcon from './icon-database.svg';
+import fileIcon from './icon-file-local.svg';
+import serverIcon from './icon-server.svg';
+import upDatabaseIcon from './icon-upload-to-server.svg';
+import appIcon from './icon-inapp.svg';
+import onceIcon from './icon-once.svg';
 import ApiInstruction from './apiInstruction';
 
 @inject('deployStore')
@@ -41,6 +48,18 @@ export default class Deployment extends Component {
         </div>
         <DeploymentOption cd={cd} selectionOption={this.selectionOption} />
         {cd.option === 'api' && <ApiInstruction cd={cd} />}
+        {cd.option === 'data' && (
+          <DataSource cd={cd} selectionOption={this.selectionOption} />
+        )}
+        {cd.option !== 'api' &&
+          cd.source && (
+            <ResultLocation cd={cd} selectionOption={this.selectionOption} />
+          )}
+        {cd.option !== 'api' &&
+          cd.source &&
+          cd.location && (
+            <DeployFrequency cd={cd} selectionOption={this.selectionOption} />
+          )}
       </div>
     );
   }
@@ -99,6 +118,209 @@ const DeploymentOption = observer(({ cd, selectionOption }) => (
           <span className={styles.text}>
             <img alt="api" src={apiIcon} className={styles.selectionIcon} />Predict
             with API
+          </span>
+        </div>
+      )}
+    </div>
+  </div>
+));
+
+const DataSource = observer(({ cd, selectionOption }) => (
+  <div className={styles.dataSource}>
+    <span className={styles.label}>
+      <span className={styles.text}>Data Source:</span>
+    </span>
+    <div className={styles.selections}>
+      {cd.source === 'database' && (
+        <div className={styles.selected}>
+          <span className={styles.text}>
+            <img
+              alt="database"
+              src={databaseIcon}
+              className={styles.selectionIcon}
+            />Database
+          </span>
+          <span className={styles.or}>
+            <span className={styles.orText}>or</span>
+          </span>
+        </div>
+      )}
+
+      {cd.source === 'file' && (
+        <div className={styles.selected}>
+          <span className={styles.text}>
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
+            File
+          </span>
+          <span className={styles.or}>
+            <span className={styles.orText}>or</span>
+          </span>
+        </div>
+      )}
+
+      {cd.source === 'server' && (
+        <div className={styles.selected}>
+          <span className={styles.text}>
+            <img
+              alt="server"
+              src={serverIcon}
+              className={styles.selectionIcon}
+            />File Server
+          </span>
+          <span className={styles.or}>
+            <span className={styles.orText}>or</span>
+          </span>
+        </div>
+      )}
+
+      {cd.source !== 'database' && (
+        <div
+          className={styles.selection}
+          onClick={selectionOption('source', 'database')}
+        >
+          <span className={styles.text}>
+            <img
+              alt="database"
+              src={databaseIcon}
+              className={styles.selectionIcon}
+            />Database
+          </span>
+        </div>
+      )}
+      {cd.source !== 'file' && (
+        <div
+          className={styles.selection}
+          onClick={selectionOption('source', 'file')}
+        >
+          <span className={styles.text}>
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
+            File
+          </span>
+        </div>
+      )}
+      {cd.source !== 'server' && (
+        <div
+          className={styles.selection}
+          onClick={selectionOption('source', 'server')}
+        >
+          <span className={styles.text}>
+            <img
+              alt="server"
+              src={serverIcon}
+              className={styles.selectionIcon}
+            />File Server
+          </span>
+        </div>
+      )}
+    </div>
+  </div>
+));
+
+const ResultLocation = observer(({ cd, selectionOption }) => (
+  <div className={styles.resultLocation}>
+    <span className={styles.label}>
+      <span className={styles.text}>Result Location:</span>
+    </span>
+    <div className={styles.selections}>
+      {cd.location === 'app' && (
+        <div className={styles.selected}>
+          <span className={styles.text}>
+            <img alt="app" src={appIcon} className={styles.selectionIcon} />In
+            App
+          </span>
+          <span className={styles.or}>
+            <span className={styles.orText}>or</span>
+          </span>
+        </div>
+      )}
+      {cd.location === 'database' && (
+        <div className={styles.selected}>
+          <span className={styles.text}>
+            <img
+              alt="database"
+              src={upDatabaseIcon}
+              className={styles.selectionIcon}
+            />Upload to Database
+          </span>
+          <span className={styles.or}>
+            <span className={styles.orText}>or</span>
+          </span>
+        </div>
+      )}
+      {cd.location !== 'database' && (
+        <div
+          className={styles.selection}
+          onClick={selectionOption('location', 'database')}
+        >
+          <span className={styles.text}>
+            <img
+              alt="database"
+              src={upDatabaseIcon}
+              className={styles.selectionIcon}
+            />Upload to Database
+          </span>
+        </div>
+      )}
+      {cd.location !== 'app' && (
+        <div
+          className={styles.selection}
+          onClick={selectionOption('location', 'app')}
+        >
+          <span className={styles.text}>
+            <img alt="app" src={appIcon} className={styles.selectionIcon} />In
+            App
+          </span>
+        </div>
+      )}
+    </div>
+  </div>
+));
+
+const DeployFrequency = observer(({ cd, selectionOption }) => (
+  <div className={styles.deployFrequency}>
+    <span className={styles.label}>
+      <span className={styles.text}>Deploy Frequency:</span>
+    </span>
+    <div className={styles.selections}>
+      {cd.frequency === 'once' && (
+        <div className={styles.selected}>
+          <span className={styles.text}>
+            <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
+            Time
+          </span>
+          <span className={styles.or}>
+            <span className={styles.orText}>or</span>
+          </span>
+        </div>
+      )}
+      {cd.frequency === 'repeat' && (
+        <div className={styles.selected}>
+          <span className={styles.text}>
+            <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+          </span>
+          <span className={styles.or}>
+            <span className={styles.orText}>or</span>
+          </span>
+        </div>
+      )}
+      {cd.frequency !== 'once' && (
+        <div
+          className={styles.selection}
+          onClick={selectionOption('frequency', 'once')}
+        >
+          <span className={styles.text}>
+            <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
+            Time
+          </span>
+        </div>
+      )}
+      {cd.frequency !== 'repeat' && (
+        <div
+          className={styles.selection}
+          onClick={selectionOption('frequency', 'repeat')}
+        >
+          <span className={styles.text}>
+            <Icon type="sync" className={styles.antdIcon} />Auto Repeat
           </span>
         </div>
       )}
