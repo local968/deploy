@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon } from 'antd';
+import { Icon, Checkbox } from 'antd';
 import { runInAction, action } from 'mobx';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
@@ -60,6 +60,13 @@ export default class Deployment extends Component {
           cd.location && (
             <DeployFrequency cd={cd} selectionOption={this.selectionOption} />
           )}
+        {cd.option !== 'api' && (
+          <div className={styles.save}>
+            <span className={styles.saveText}>
+              SAVE & SETUP {!cd.frequency && 'LATER'}
+            </span>
+          </div>
+        )}
       </div>
     );
   }
@@ -277,53 +284,65 @@ const ResultLocation = observer(({ cd, selectionOption }) => (
 ));
 
 const DeployFrequency = observer(({ cd, selectionOption }) => (
-  <div className={styles.deployFrequency}>
-    <span className={styles.label}>
-      <span className={styles.text}>Deploy Frequency:</span>
-    </span>
-    <div className={styles.selections}>
-      {cd.frequency === 'once' && (
-        <div className={styles.selected}>
-          <span className={styles.text}>
-            <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
-            Time
-          </span>
-          <span className={styles.or}>
-            <span className={styles.orText}>or</span>
-          </span>
-        </div>
-      )}
-      {cd.frequency === 'repeat' && (
-        <div className={styles.selected}>
-          <span className={styles.text}>
-            <Icon type="sync" className={styles.antdIcon} />Auto Repeat
-          </span>
-          <span className={styles.or}>
-            <span className={styles.orText}>or</span>
-          </span>
-        </div>
-      )}
-      {cd.frequency !== 'once' && (
-        <div
-          className={styles.selection}
-          onClick={selectionOption('frequency', 'once')}
-        >
-          <span className={styles.text}>
-            <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
-            Time
-          </span>
-        </div>
-      )}
-      {cd.frequency !== 'repeat' && (
-        <div
-          className={styles.selection}
-          onClick={selectionOption('frequency', 'repeat')}
-        >
-          <span className={styles.text}>
-            <Icon type="sync" className={styles.antdIcon} />Auto Repeat
-          </span>
-        </div>
-      )}
+  <React.Fragment>
+    <div className={styles.deployFrequency}>
+      <span className={styles.label}>
+        <span className={styles.text}>Deploy Frequency:</span>
+      </span>
+      <div className={styles.selections}>
+        {cd.frequency === 'once' && (
+          <div className={styles.selected}>
+            <span className={styles.text}>
+              <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
+              Time
+            </span>
+            <span className={styles.or}>
+              <span className={styles.orText}>or</span>
+            </span>
+          </div>
+        )}
+        {cd.frequency === 'repeat' && (
+          <div className={styles.selected}>
+            <span className={styles.text}>
+              <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+            </span>
+            <span className={styles.or}>
+              <span className={styles.orText}>or</span>
+            </span>
+          </div>
+        )}
+        {cd.frequency !== 'once' && (
+          <div
+            className={styles.selection}
+            onClick={selectionOption('frequency', 'once')}
+          >
+            <span className={styles.text}>
+              <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
+              Time
+            </span>
+          </div>
+        )}
+        {cd.frequency !== 'repeat' && (
+          <div
+            className={styles.selection}
+            onClick={selectionOption('frequency', 'repeat')}
+          >
+            <span className={styles.text}>
+              <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+            </span>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
+    <div className={styles.row}>
+      <div className={styles.holder} />
+      <div className={styles.checkbox}>
+        <Checkbox>
+          <span className={styles.checkboxText}>
+            Auto disable if any issue occurs
+          </span>
+        </Checkbox>
+      </div>
+    </div>
+  </React.Fragment>
 ));

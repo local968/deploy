@@ -2,6 +2,7 @@
   padding: 0.2em 0.6em;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 .info {
   display: flex;
@@ -188,4 +189,43 @@
 .fixWidth {
   display: inline-block;
   width: 5rem;
+}
+
+.checkbox {
+  display: flex;
+  margin-top: 0.18em;
+  margin-left: 0.3em;
+}
+
+.checkbox :global(.ant-checkbox-wrapper:hover .ant-checkbox-inner),
+.checkbox :global(.ant-checkbox-inner) {
+  border-color: #4a4a4a;
+}
+
+.checkbox :global(.ant-checkbox-checked .ant-checkbox-inner) {
+  background-color: #4a4a4a;
+}
+
+.checkboxText {
+  font-size: 1rem;
+}
+
+.save {
+  width: 3em;
+  height: 0.5em;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #1d2b3c;
+  cursor: pointer;
+  position: absolute;
+  bottom: 1em;
+  left: 4em;
+  composes: hover from 'style';
+}
+
+.saveText {
+  font-size: 1.25rem;
+  font-weight: bold;
 }
