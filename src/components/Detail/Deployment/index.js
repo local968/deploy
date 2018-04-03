@@ -13,6 +13,8 @@ import appIcon from './icon-inapp.svg';
 import onceIcon from './icon-once.svg';
 import ApiInstruction from './apiInstruction';
 import SourceDatabase from './SourceDatabase';
+import OneTime from './OneTime';
+import AutoRepeat from './AutoRepeat';
 
 @inject('deployStore')
 @observer
@@ -69,6 +71,8 @@ export default class Deployment extends Component {
           </div>
         )}
         <SourceDatabase />
+        <OneTime />
+        <AutoRepeat />
       </div>
     );
   }

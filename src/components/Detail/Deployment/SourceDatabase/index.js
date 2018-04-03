@@ -6,7 +6,7 @@ export default class SourceDatabase extends Component {
   render() {
     const { visible } = this.props;
     return (
-      <Modal closable={false} visible footer={null}>
+      <Modal closable={false} visible={visible} footer={null}>
         <div className={styles.title}>Data Source - Database</div>
         asddsa
       </Modal>
