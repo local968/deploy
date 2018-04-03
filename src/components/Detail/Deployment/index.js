@@ -12,6 +12,7 @@ import upDatabaseIcon from './icon-upload-to-server.svg';
 import appIcon from './icon-inapp.svg';
 import onceIcon from './icon-once.svg';
 import ApiInstruction from './apiInstruction';
+import SourceDatabase from './SourceDatabase';
 
 @inject('deployStore')
 @observer
@@ -67,6 +68,7 @@ export default class Deployment extends Component {
             </span>
           </div>
         )}
+        <SourceDatabase />
       </div>
     );
   }
