@@ -24,6 +24,7 @@
 .options {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 .pot {
   width: 1.5rem;
@@ -36,6 +37,7 @@
   align-items: center;
   justify-content: center;
   margin-right: 1rem;
+  cursor: pointer;
 }
 
 .pot.active:after {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox } from 'antd';
-import { runInAction, action } from 'mobx';
+import { runInAction, action, observable } from 'mobx';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
 import sourceIcon from './icon-data-source.svg';
@@ -19,6 +19,7 @@ import AutoRepeat from './AutoRepeat';
 @inject('deployStore')
 @observer
 export default class Deployment extends Component {
+  @observable dialog = null;
   constructor(props) {
     super(props);
     const { match, deployStore } = this.props;
@@ -29,6 +30,8 @@ export default class Deployment extends Component {
     if (!this.props.deployStore.currentDeployment) return;
     this.props.deployStore.currentDeployment[key] = value;
   };
+  show = key => action(() => (this.dialog = key));
+  closeDialog = action(() => (this.dialog = null));
   render() {
     const { deployStore } = this.props;
     const cd = deployStore.currentDeployment || {};
@@ -61,18 +64,40 @@ export default class Deployment extends Component {
         {cd.option !== 'api' &&
           cd.source &&
           cd.location && (
-            <DeployFrequency cd={cd} selectionOption={this.selectionOption} />
+            <DeployFrequency
+              show={this.show}
+              cd={cd}
+              selectionOption={this.selectionOption}
+            />
           )}
         {cd.option !== 'api' && (
-          <div className={styles.save}>
+          <div className={styles.save} onClick={cd.save}>
             <span className={styles.saveText}>
               SAVE & SETUP {!cd.frequency && 'LATER'}
             </span>
           </div>
         )}
         <SourceDatabase />
-        <OneTime />
-        <AutoRepeat />
+        <OneTime
+          options={cd.frequencyOptions}
+          visible={this.dialog === 'onetime'}
+          onClose={this.closeDialog}
+          onSubmit={options => {
+            this.selectionOption('frequency', 'once')();
+            this.selectionOption('frequencyOptions', options)();
+            this.closeDialog();
+          }}
+        />
+        <AutoRepeat
+          options={cd.frequencyOptions}
+          visible={this.dialog === 'autorepeat'}
+          onClose={this.closeDialog}
+          onSubmit={options => {
+            this.selectionOption('frequency', 'repeat')();
+            this.selectionOption('frequencyOptions', options)();
+            this.closeDialog();
+          }}
+        />
       </div>
     );
   }
@@ -289,7 +314,7 @@ const ResultLocation = observer(({ cd, selectionOption }) => (
   </div>
 ));
 
-const DeployFrequency = observer(({ cd, selectionOption }) => (
+const DeployFrequency = observer(({ cd, selectionOption, show }) => (
   <React.Fragment>
     <div className={styles.deployFrequency}>
       <span className={styles.label}>
@@ -318,10 +343,7 @@ const DeployFrequency = observer(({ cd, selectionOption }) => (
           </div>
         )}
         {cd.frequency !== 'once' && (
-          <div
-            className={styles.selection}
-            onClick={selectionOption('frequency', 'once')}
-          >
+          <div className={styles.selection} onClick={show('onetime')}>
             <span className={styles.text}>
               <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
               Time
@@ -329,10 +351,7 @@ const DeployFrequency = observer(({ cd, selectionOption }) => (
           </div>
         )}
         {cd.frequency !== 'repeat' && (
-          <div
-            className={styles.selection}
-            onClick={selectionOption('frequency', 'repeat')}
-          >
+          <div className={styles.selection} onClick={show('autorepeat')}>
             <span className={styles.text}>
               <Icon type="sync" className={styles.antdIcon} />Auto Repeat
             </span>
@@ -343,7 +362,10 @@ const DeployFrequency = observer(({ cd, selectionOption }) => (
     <div className={styles.row}>
       <div className={styles.holder} />
       <div className={styles.checkbox}>
-        <Checkbox>
+        <Checkbox
+          checked={cd.autoDisable}
+          onChange={e => selectionOption('autoDisable', e.target.checked)()}
+        >
           <span className={styles.checkboxText}>
             Auto disable if any issue occurs
           </span>
