@@ -29,22 +29,22 @@ const NormalHeader = () => (
       <span className={styles.text}>Issue</span>
     </div>
     <div className={styles.empty} />
-    <div className={styles.user}>
+    {/* <div className={styles.user}>
       <img src={mockAvatar} alt="avatar" className={styles.avatar} />
       <div className={styles.userBottom}>
         <span className={styles.name}>Newton Barley</span>
         <img className={styles.down} src={down} alt="down" />
       </div>
-    </div>
+    </div> */}
   </div>
 );
 
 const WelcomeHeader = () => (
   <div className={styles.wheader}>
     <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
-    <span className={styles.welcome}>Welcome, Newton Barley!</span>
-    <img className={styles.more} src={more} alt="more" />
+    <span className={styles.welcome}>Welcome!</span>
+    {/* <img className={styles.more} src={more} alt="more" /> */}
   </div>
 );
 
-export default NormalHeader;
+export default WelcomeHeader;
