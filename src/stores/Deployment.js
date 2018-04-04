@@ -22,6 +22,7 @@ export default class Deployment {
   @observable frequencyOptions;
 
   @observable autoDisable;
+  @observable enable;
 
   constructor(deploy) {
     this.id = deploy.id;
@@ -37,6 +38,7 @@ export default class Deployment {
     this.frequency = deploy.frequency;
     this.frequencyOptions = deploy.frequencyOptions;
     this.autoDisable = deploy.autoDisable;
+    this.enable = deploy.enable;
   }
 
   save = () => {
@@ -56,6 +58,7 @@ export default class Deployment {
           frequency: this.frequency,
           frequencyOptions: this.frequencyOptions,
           autoDisable: this.autoDisable,
+          enable: this.enable,
           updatedDate: moment().unix()
         })
         .subscribe(resolve);
@@ -77,6 +80,7 @@ export default class Deployment {
       frequency: this.frequency,
       frequencyOptions: this.frequencyOptions,
       autoDisable: this.autoDisable,
+      enable: this.enable,
       updatedDate: moment().unix()
     });
 }

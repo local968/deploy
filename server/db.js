@@ -10,18 +10,19 @@ const setup = () => {
 };
 
 module.exports.deploymentChanges = cb => {
-  setup().then(() => {
-    r
-      .table('deployments')
-      .changes()
-      .run(conn)
-      .then(cursor => {
-        cursor.each((err, data) => {
-          if (err) throw err;
-          cb(data);
-        });
+  setup()
+    .then(conn =>
+      r
+        .table('deployments')
+        .changes()
+        .run(conn)
+    )
+    .then(cursor => {
+      cursor.each((err, data) => {
+        if (err) throw err;
+        if (cb && typeof cb === 'function') cb(data);
       });
-  });
+    });
 };
 
 // class R {

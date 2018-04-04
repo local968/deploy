@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { observable, action, runInAction } from 'mobx';
+import { observable, action, runInAction, autorun } from 'mobx';
 import moment from 'moment';
 import styles from './styles.module.css';
-import { Modal, DatePicker, Select, InputNumber } from 'antd';
+import { Modal, DatePicker, TimePicker, Select, InputNumber } from 'antd';
 import classnames from 'classnames';
 
 const Option = Select.Option;
 
 const bound = 10000;
+
+const ordinalNumberPostFix = number => {
+  if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
+  return { 0: 'th', 1: 'st', 2: 'nd', 3: 'rd' }[number % 10];
+};
 
 @observer
 export default class AutoRepeat extends Component {
@@ -17,7 +22,7 @@ export default class AutoRepeat extends Component {
     repeatPeriod: 'week',
     repeatFrequency: 1,
     repeatOn: 1,
-    starts: 'completed',
+    starts: moment().unix(),
     ends: 'never'
   };
   @action
@@ -29,6 +34,20 @@ export default class AutoRepeat extends Component {
   t = k => event => this.changeState(k, event.target.value);
   numberChange = k => v => this.changeState(k, parseInt(v, 10) || 0);
 
+  fixRepeatOn = autorun(() => {
+    switch (this.localState.repeatPeriod) {
+      case 'day':
+        if (this.localState.repeatOn > 28 || this.localState.repeatOn < 1)
+          return this.changeState('repeatOn', 1);
+      case 'week':
+        if (this.localState.repeatOn > 7 || this.localState.repeatOn < 1)
+          return this.changeState('repeatOn', 1);
+      case 'month':
+        if (this.localState.repeatOn > 28 || this.localState.repeatOn < 1)
+          return this.changeState('repeatOn', 1);
+    }
+  });
+
   constructor(props) {
     super(props);
     runInAction(
@@ -39,6 +58,7 @@ export default class AutoRepeat extends Component {
   render() {
     const { visible, onClose, onSubmit } = this.props;
     const state = this.localState;
+    const max = { day: 365, week: 52, month: 12 }[state['repeatPeriod']];
     return (
       <Modal
         className={styles.modal}
@@ -52,7 +72,7 @@ export default class AutoRepeat extends Component {
           <div className={styles.options}>
             <InputNumber
               min={1}
-              max={99}
+              max={max}
               formatter={v => (isNaN(parseInt(v, 10)) ? 1 : parseInt(v, 10))}
               value={state['repeatFrequency']}
               onChange={this.numberChange('repeatFrequency')}
@@ -64,6 +84,7 @@ export default class AutoRepeat extends Component {
             >
               <Option value="day">day</Option>
               <Option value="week">week</Option>
+              <Option value="month">month</Option>
             </Select>
           </div>
         </div>
@@ -131,30 +152,44 @@ export default class AutoRepeat extends Component {
           </div>
         )}
 
+        {state.repeatPeriod === 'month' && (
+          <div className={styles.line}>
+            <span className={styles.label}>Repeat On</span>
+            <div className={styles.options}>
+              <InputNumber
+                min={1}
+                max={28}
+                formatter={v => (isNaN(parseInt(v, 10)) ? 1 : parseInt(v, 10))}
+                value={state['repeatOn']}
+                onChange={this.numberChange('repeatOn')}
+              />
+              <span className={styles.text}>
+                {ordinalNumberPostFix(state.repeatOn)}
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className={styles.line}>
           <span className={styles.label}>Starts</span>
           <div className={styles.options}>
-            <i
+            {/* <i
               className={classnames(styles.pot, {
                 [styles.active]: state.starts !== 'completed'
               })}
               onClick={this.c('starts', moment().unix())}
-            />
-            <DatePicker
-              showTime={{
-                use12Hours: true,
-                format: 'h:mma'
-              }}
-              value={
-                state.starts === 'completed' ? null : moment.unix(state.starts)
-              }
-              format="MM/DD/YYYY HH:mma"
+            /> */}
+            <TimePicker
+              use12Hours
+              format="h:mma"
+              value={moment.unix(state.starts)}
+              format="h:mma"
               placeholder="Select Time"
               onChange={date => this.changeState('starts', date.unix())}
             />
           </div>
         </div>
-        <div className={styles.line}>
+        {/* <div className={styles.line}>
           <span className={styles.label} />
           <div
             className={styles.options}
@@ -167,7 +202,7 @@ export default class AutoRepeat extends Component {
             />
             <span className={styles.text}>Start after settings completed</span>
           </div>
-        </div>
+        </div> */}
         <div className={styles.line}>
           <span className={styles.label}>Ends</span>
           <div className={styles.options} onClick={this.c('ends', 'never')}>
