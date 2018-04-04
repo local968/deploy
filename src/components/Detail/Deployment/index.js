@@ -23,7 +23,6 @@ export default class Deployment extends Component {
   constructor(props) {
     super(props);
     const { match, deployStore } = this.props;
-    runInAction(() => (deployStore.currentId = match.params.id));
   }
   @action
   selectionOption = (key, value) => () => {

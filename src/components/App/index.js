@@ -23,9 +23,9 @@ class App extends Component {
       <Provider {...stores}>
         <Router history={history}>
           <div className={styles.app}>
-            <Sider />
+            <Sider history={history} />
             <div className={styles.main}>
-              <Header />
+              <Header history={history} />
               <Route />
             </div>
           </div>

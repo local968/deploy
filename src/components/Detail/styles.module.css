@@ -49,3 +49,28 @@
   display: flex;
   flex-direction: column;
 }
+
+.enable {
+  font-size: 1.125rem;
+}
+
+.enableWrap {
+  position: absolute;
+  top: 0.3em;
+  right: 0;
+  display: flex;
+  width: 2em;
+  height: 0.5em;
+  justify-content: space-evenly;
+  align-items: center;
+  background: linear-gradient(to bottom, white, #f1f3f5);
+  border-top-left-radius: 0.25em;
+  border-bottom-left-radius: 0.25em;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  padding-left: 0.2em;
+}
+
+.enableText {
+  font-size: 1.125rem;
+  color: #4a4a4a;
+}

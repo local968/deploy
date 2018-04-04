@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Bread } from 'components/Common';
+import { Bread, Switch } from 'components/Common';
 import { Route, Redirect } from 'react-router-dom';
-import { inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
+import { runInAction } from 'mobx';
 import classnames from 'classnames';
 import deploymentIcon from './icon-tab-deployment.svg';
 import operationIcon from './icon-tab-operation.svg';
@@ -9,10 +10,13 @@ import performanceIcon from './icon-tab-performance.svg';
 import Deployment from './Deployment';
 import styles from './styles.module.css';
 
-@inject('routing')
+@inject('routing', 'deployStore')
+@observer
 export default class Detail extends Component {
   render() {
-    const { routing, match, location } = this.props;
+    const { routing, match, location, deployStore } = this.props;
+    runInAction(() => (deployStore.currentId = match.params.id));
+    const cd = deployStore.currentDeployment || {};
     return (
       <div className={styles.detail}>
         <Bread list={['Home']} />
@@ -70,6 +74,16 @@ export default class Detail extends Component {
           <Route path="/project/:id/deployment" component={Deployment} />
           <Route path="/project/:id/operation" render={() => 'operation'} />
           <Route path="/project/:id/performance" render={() => 'performance'} />
+        </div>
+        <div className={styles.enableWrap}>
+          <span className={styles.enableText}>Enable</span>
+          <span className={styles.enable}>
+            <Switch
+              checked={cd.enable}
+              onChange={deployStore.change.bind(deployStore, cd.id, 'enable')}
+            />
+          </span>
+          <span className={styles.enableText}>{cd.enable ? 'On' : 'Off'}</span>
         </div>
       </div>
     );

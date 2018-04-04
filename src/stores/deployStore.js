@@ -29,6 +29,13 @@ class DeployStore {
         .subscribe(resolve);
     });
   }
+
+  @action
+  change(id, key, value) {
+    const _d = new Deployment(this.deployments.find(_d => _d.id === id));
+    _d[key] = value;
+    return _d.save();
+  }
 }
 
 export default new DeployStore();

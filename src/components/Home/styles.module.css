@@ -86,9 +86,16 @@
   font-weight: bold;
 }
 
-.projectName,
+.projectName {
+  flex: 1 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .modelName {
   flex: 2 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .createdDate,
@@ -99,6 +106,8 @@
 .craetedDate,
 .owner {
   flex: 1 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .statusIcon {
