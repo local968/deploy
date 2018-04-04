@@ -322,7 +322,7 @@ const DeployFrequency = observer(({ cd, selectionOption, show }) => (
       </span>
       <div className={styles.selections}>
         {cd.frequency === 'once' && (
-          <div className={styles.selected}>
+          <div className={styles.selected} onClick={show('onetime')}>
             <span className={styles.text}>
               <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
               Time
@@ -333,7 +333,7 @@ const DeployFrequency = observer(({ cd, selectionOption, show }) => (
           </div>
         )}
         {cd.frequency === 'repeat' && (
-          <div className={styles.selected}>
+          <div className={styles.selected} onClick={show('autorepeat')}>
             <span className={styles.text}>
               <Icon type="sync" className={styles.antdIcon} />Auto Repeat
             </span>

@@ -32,3 +32,5 @@ const horizonServer = horizon(httpServer, {
     token_secret: config.token_secret
   }
 });
+
+require('./schedule');

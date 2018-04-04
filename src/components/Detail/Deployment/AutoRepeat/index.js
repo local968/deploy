@@ -13,7 +13,7 @@ const bound = 10000;
 @observer
 export default class AutoRepeat extends Component {
   @observable
-  state = {
+  localState = {
     repeatPeriod: 'week',
     repeatFrequency: 1,
     repeatOn: 1,
@@ -22,21 +22,23 @@ export default class AutoRepeat extends Component {
   };
   @action
   changeState = (key, value) => {
-    this.state[key] = value;
+    this.localState[key] = value;
   };
   w = k => v => this.changeState(k, v);
   c = (k, v) => () => this.changeState(k, v);
   t = k => event => this.changeState(k, event.target.value);
-  numberChange = k => v => this.changeState(k, parseInt(v) || 0);
+  numberChange = k => v => this.changeState(k, parseInt(v, 10) || 0);
 
   constructor(props) {
     super(props);
-    runInAction(() => (this.state = { ...props.options, ...this.state }));
+    runInAction(
+      () => (this.localState = { ...props.options, ...this.localState })
+    );
   }
 
   render() {
     const { visible, onClose, onSubmit } = this.props;
-    const state = this.state;
+    const state = this.localState;
     return (
       <Modal
         className={styles.modal}
@@ -51,7 +53,7 @@ export default class AutoRepeat extends Component {
             <InputNumber
               min={1}
               max={99}
-              formatter={v => (isNaN(parseInt(v)) ? 1 : parseInt(v))}
+              formatter={v => (isNaN(parseInt(v, 10)) ? 1 : parseInt(v, 10))}
               value={state['repeatFrequency']}
               onChange={this.numberChange('repeatFrequency')}
             />
@@ -221,7 +223,7 @@ export default class AutoRepeat extends Component {
               min={1}
               max={9999}
               value={state.ends < bound ? state.ends : 1}
-              formatter={v => (isNaN(parseInt(v)) ? 1 : parseInt(v))}
+              formatter={v => (isNaN(parseInt(v, 10)) ? 1 : parseInt(v, 10))}
               onChange={this.numberChange('ends')}
             />
             <div className={styles.vgap} />
@@ -232,7 +234,7 @@ export default class AutoRepeat extends Component {
           <a className={styles.cancel} onClick={onClose}>
             CANCEL
           </a>
-          <a className={styles.done} onClick={() => onSubmit(this.state)}>
+          <a className={styles.done} onClick={() => onSubmit(this.localState)}>
             DONE
           </a>
         </div>
