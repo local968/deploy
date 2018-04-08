@@ -1,5 +1,5 @@
 import React from 'react';
-import { inject, observer } from 'mobx-react';
+// import { inject, observer } from 'mobx-react';
 import styles from './styles.module.css';
 import logo from './mr-one-logo-blue.svg';
 import home from './icon-home.svg';

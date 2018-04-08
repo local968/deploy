@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox } from 'antd';
-import { runInAction, action, observable } from 'mobx';
+import { action, observable } from 'mobx';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
 import sourceIcon from './icon-data-source.svg';
@@ -20,10 +20,7 @@ import AutoRepeat from './AutoRepeat';
 @observer
 export default class Deployment extends Component {
   @observable dialog = null;
-  constructor(props) {
-    super(props);
-    const { match, deployStore } = this.props;
-  }
+
   @action
   selectionOption = (key, value) => () => {
     if (!this.props.deployStore.currentDeployment) return;

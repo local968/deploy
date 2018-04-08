@@ -39,12 +39,17 @@ export default class AutoRepeat extends Component {
       case 'day':
         if (this.localState.repeatOn > 28 || this.localState.repeatOn < 1)
           return this.changeState('repeatOn', 1);
+        break;
       case 'week':
         if (this.localState.repeatOn > 7 || this.localState.repeatOn < 1)
           return this.changeState('repeatOn', 1);
+        break;
       case 'month':
         if (this.localState.repeatOn > 28 || this.localState.repeatOn < 1)
           return this.changeState('repeatOn', 1);
+        break;
+      default:
+        return this.changeState('repeatOn', 1);
     }
   });
 
@@ -183,7 +188,6 @@ export default class AutoRepeat extends Component {
               use12Hours
               format="h:mma"
               value={moment.unix(state.starts)}
-              format="h:mma"
               placeholder="Select Time"
               onChange={date => this.changeState('starts', date.unix())}
             />

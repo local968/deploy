@@ -9,6 +9,7 @@ export default class Deployment {
   @observable modelName = '';
   @observable createdDate;
   @observable email = '';
+  @observable owner = '';
 
   @observable option;
 
@@ -30,6 +31,7 @@ export default class Deployment {
     this.modelName = deploy.modelName;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
+    this.owner = deploy.owner;
     this.option = deploy.option;
     this.source = deploy.source;
     this.sourceOptions = deploy.sourceOptions;

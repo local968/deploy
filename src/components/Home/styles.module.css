@@ -76,6 +76,11 @@
   align-items: center;
 }
 
+.project:hover .projectName,
+.project:hover .modelName {
+  text-decoration: underline;
+}
+
 .head span,
 .project span {
   font-size: 1.125rem;
@@ -90,12 +95,14 @@
   flex: 1 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
 
 .modelName {
   flex: 2 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
 
 .createdDate,

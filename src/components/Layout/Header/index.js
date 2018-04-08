@@ -2,8 +2,8 @@ import React from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
-import down from './combined-shape-copy.svg';
-import more from './btn-more-option.svg';
+// import down from './combined-shape-copy.svg';
+// import more from './btn-more-option.svg';
 
 const NormalHeader = () => (
   <div className={styles.header}>
@@ -47,4 +47,4 @@ const WelcomeHeader = () => (
   </div>
 );
 
-export default NormalHeader;
+export default NormalHeader || WelcomeHeader;

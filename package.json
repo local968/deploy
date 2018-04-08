@@ -22,7 +22,7 @@
   },
   "proxy": {
     "/horizon": {
-      "target": "ws://localhost:4000",
+      "target": "ws://localhost:52002",
       "ws": true
     }
   },
