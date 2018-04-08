@@ -1,6 +1,7 @@
 const express = require('express');
 const horizon = require('@horizon/server');
 const config = require('../config.js');
+const path = require('path');
 const db = config.db;
 
 const app = express();
@@ -9,7 +10,7 @@ app.get('/test', (req, res) => {
   res.send('ok');
 });
 
-const port = 4000;
+const port = parseInt(process.env.httpPort) + 2;
 httpServer = app.listen(port, '0.0.0.0', err => {
   if (err) {
     console.log(err, port); // eslint-disable-line
@@ -31,6 +32,13 @@ const horizonServer = horizon(httpServer, {
     allow_unauthenticated: true,
     token_secret: config.token_secret
   }
+});
+
+app.use(express.static(path.join(process.cwd(), 'build')));
+
+// CRA routing
+app.get('/*', function(req, res) {
+  res.sendFile(path.join(process.cwd(), 'build', 'index.html'));
 });
 
 require('./schedule');
