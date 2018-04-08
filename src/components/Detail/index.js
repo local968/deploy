@@ -8,6 +8,8 @@ import deploymentIcon from './icon-tab-deployment.svg';
 import operationIcon from './icon-tab-operation.svg';
 import performanceIcon from './icon-tab-performance.svg';
 import Deployment from './Deployment';
+import Operation from './Operation';
+import Performance from './Performance';
 import styles from './styles.module.css';
 
 @inject('routing', 'deployStore')
@@ -72,8 +74,8 @@ export default class Detail extends Component {
             )}
           />
           <Route path="/project/:id/deployment" component={Deployment} />
-          <Route path="/project/:id/operation" render={() => 'operation'} />
-          <Route path="/project/:id/performance" render={() => 'performance'} />
+          <Route path="/project/:id/operation" component={Operation} />
+          <Route path="/project/:id/performance" component={Performance} />
         </div>
         <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>

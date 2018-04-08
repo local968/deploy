@@ -76,6 +76,10 @@
   align-items: center;
 }
 
+.project:hover {
+  background: #f6f6f8;
+}
+
 .project:hover .projectName,
 .project:hover .modelName {
   text-decoration: underline;

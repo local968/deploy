@@ -6,7 +6,7 @@
 }
 .info {
   display: flex;
-  padding: 0.2em 0;
+  padding: 0.2em;
   border-bottom: 1px dashed #d7d7d7;
 }
 .model,
@@ -27,6 +27,7 @@
   color: white;
   background: #c4cbd7;
   margin-left: 2px;
+  cursor: pointer;
 }
 .change,
 .download,
