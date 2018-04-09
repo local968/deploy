@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "name": "deploy2",
+      "script": "npm",
+      "args": "start",
+      "watch": false,
+      "interpreter": "node",
+      "exec_mode": "fork"
+    }
+  ]
+}

@@ -12,7 +12,9 @@ import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
 class NormalHeader extends Component {
   @computed
   get enabledProjectsCount() {
-    return this.props.deployStore.deployments.filter(_d => _d.enable).length;
+    return this.props.deployStore.deployments.filter(
+      _d => _d.deploymentOptions && _d.deploymentOptions.enable
+    ).length;
   }
 
   @computed
