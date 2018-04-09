@@ -45,3 +45,74 @@
   color: #c4cbd7;
   margin-top: 1.5rem;
 }
+.table {
+  background: #e0e3e9;
+  border: 1px solid #b5bec6;
+  border-radius: 5px;
+  margin-top: 0.3em;
+  padding: 0.25em;
+}
+.head {
+  display: flex;
+  margin-bottom: 0.25em;
+  padding: 0 0.2em;
+}
+.head span {
+  flex: 1 1 0;
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-right: 1rem;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+}
+.project {
+  display: flex;
+  padding: 0.2em 0.2em;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+  background: white;
+  margin-bottom: 0.04em;
+  border-radius: 4px;
+}
+.project:hover {
+  background: #f6f6f8;
+}
+.project span {
+  flex: 1 1 0;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 1rem;
+}
+span.modelName,
+span.deploymentTime,
+span.deploymentStyle {
+  flex: 2 1 0;
+}
+.project .results {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.issue {
+  color: #ff3151;
+  cursor: pointer;
+}
+.alert {
+  width: 400px;
+}
+.alertHead {
+  font-size: 1.125rem;
+  color: #ff3151;
+  font-weight: bold;
+}
+.alertIcon {
+  margin-right: 0.5rem;
+  vertical-align: text-bottom;
+}
+.alertContent {
+  font-size: 1.125rem;
+}
+.path {
+  text-decoration: underline;
+}
