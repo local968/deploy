@@ -9,9 +9,8 @@ import classnames from 'classnames';
 @observer
 export default class OneTime extends Component {
   @observable time = 'completed';
-  constructor(props) {
-    super(props);
-    runInAction(() => (this.time = props.options || 'completed'));
+  componentWillReceiveProps(props) {
+    runInAction(() => (this.time = props.options.time || 'completed'));
   }
   render() {
     const { visible, onClose, onSubmit } = this.props;

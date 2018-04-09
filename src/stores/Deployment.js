@@ -2,6 +2,29 @@ import { observable } from 'mobx';
 import moment from 'moment';
 import db from './db.js';
 
+const defaultDeploymentOptions = {
+  option: null,
+  source: null,
+  sourceOptions: {},
+  location: null,
+  locationOptions: {},
+  frequency: null,
+  frequencyOptions: {},
+  autoDisable: null,
+  enable: null
+};
+
+const defaultPerformanceOptions = {
+  source: null,
+  sourceOptions: {},
+  measurementMetric: 'AUC',
+  metricThreshold: 85,
+  frequency: null,
+  frequencyOptions: {},
+  autoDisable: null,
+  enable: null
+};
+
 export default class Deployment {
   @observable id = '';
 
@@ -11,19 +34,8 @@ export default class Deployment {
   @observable email = '';
   @observable owner = '';
 
-  @observable option;
-
-  @observable source;
-  @observable sourceOptions;
-
-  @observable location;
-  @observable locationOptions;
-
-  @observable frequency;
-  @observable frequencyOptions;
-
-  @observable autoDisable;
-  @observable enable;
+  @observable deploymentOptions = { ...defaultDeploymentOptions };
+  @observable performanceOptions = { ...defaultPerformanceOptions };
 
   constructor(deploy) {
     this.id = deploy.id;
@@ -32,15 +44,12 @@ export default class Deployment {
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
     this.owner = deploy.owner;
-    this.option = deploy.option;
-    this.source = deploy.source;
-    this.sourceOptions = deploy.sourceOptions;
-    this.location = deploy.location;
-    this.locationOptions = deploy.locationOptions;
-    this.frequency = deploy.frequency;
-    this.frequencyOptions = deploy.frequencyOptions;
-    this.autoDisable = deploy.autoDisable;
-    this.enable = deploy.enable;
+    this.deploymentOptions = deploy.deploymentOptions || {
+      ...defaultDeploymentOptions
+    };
+    this.performanceOptions = deploy.performanceOptions || {
+      ...defaultPerformanceOptions
+    };
   }
 
   save = () => {
@@ -52,15 +61,8 @@ export default class Deployment {
           modelName: this.modelName,
           createdDate: this.createdDate,
           email: this.email,
-          option: this.option,
-          source: this.source,
-          sourceOptions: this.sourceOptions,
-          location: this.location,
-          locationOptions: this.locationOptions,
-          frequency: this.frequency,
-          frequencyOptions: this.frequencyOptions,
-          autoDisable: this.autoDisable,
-          enable: this.enable,
+          deploymentOptions: this.deploymentOptions,
+          performanceOptions: this.performanceOptions,
           updatedDate: moment().unix()
         })
         .subscribe(resolve);
@@ -74,15 +76,8 @@ export default class Deployment {
       modelName: this.modelName,
       createdDate: this.createdDate,
       email: this.email,
-      option: this.option,
-      source: this.source,
-      sourceOptions: this.sourceOptions,
-      location: this.location,
-      locationOptions: this.locationOptions,
-      frequency: this.frequency,
-      frequencyOptions: this.frequencyOptions,
-      autoDisable: this.autoDisable,
-      enable: this.enable,
+      deploymentOptions: this.deploymentOptions,
+      performanceOptions: this.performanceOptions,
       updatedDate: moment().unix()
     });
 }

@@ -96,7 +96,7 @@ class DeployStore {
     const _deployment = this.deployments.find(
       ({ id }) => id === this.currentId
     );
-    return _deployment ? new Deployment(_deployment) : null;
+    return new Deployment(_deployment || {});
   }
 
   constructor() {
@@ -120,6 +120,13 @@ class DeployStore {
   change(id, key, value) {
     const _d = new Deployment(this.deployments.find(_d => _d.id === id));
     _d[key] = value;
+    return _d.save();
+  }
+
+  @action
+  toggleEnable(id) {
+    const _d = new Deployment(this.deployments.find(_d => _d.id === id));
+    _d.deploymentOptions.enable = !_d.deploymentOptions.enable;
     return _d.save();
   }
 

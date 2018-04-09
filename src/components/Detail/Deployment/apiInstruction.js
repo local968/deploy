@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './styles.module.css';
 
-export default ({ cd }) => (
+export default ({ cddo }) => (
   <div className={styles.row}>
     <span className={styles.holder} />
     <div className={styles.apiInstruction}>
@@ -69,8 +69,8 @@ export default ({ cd }) => (
               POST method.
             </div>
             <div>
-              Fill in your user_name, project_name(e.g., {cd.name}),
-              model_name(e.g., {cd.modelName}) and api_key to get predictions.
+              Fill in your user_name, project_name(e.g., {cddo.name}),
+              model_name(e.g., {cddo.modelName}) and api_key to get predictions.
             </div>
             <div>
               The ‘api_key’ in the API call is an unique key we assigned to you

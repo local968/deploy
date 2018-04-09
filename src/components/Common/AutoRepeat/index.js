@@ -53,11 +53,10 @@ export default class AutoRepeat extends Component {
     }
   });
 
-  constructor(props) {
-    super(props);
-    runInAction(
-      () => (this.localState = { ...props.options, ...this.localState })
-    );
+  componentWillReceiveProps(props) {
+    runInAction(() => {
+      this.localState = { ...this.localState, ...props.options };
+    });
   }
 
   render() {

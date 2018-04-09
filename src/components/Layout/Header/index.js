@@ -22,7 +22,6 @@ class NormalHeader extends Component {
 
   render() {
     const { deployStore } = this.props;
-    console.log(deployStore);
     return (
       <div className={styles.header}>
         <div className={classnames(styles.block, styles.total)}>

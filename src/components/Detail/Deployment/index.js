@@ -13,8 +13,8 @@ import appIcon from './icon-inapp.svg';
 import onceIcon from './icon-once.svg';
 import ApiInstruction from './apiInstruction';
 import SourceDatabase from './SourceDatabase';
-import OneTime from './OneTime';
-import AutoRepeat from './AutoRepeat';
+import OneTime from 'components/Common/OneTime';
+import AutoRepeat from 'components/Common/AutoRepeat';
 
 @inject('deployStore')
 @observer
@@ -23,14 +23,14 @@ export default class Deployment extends Component {
 
   @action
   selectionOption = (key, value) => () => {
-    if (!this.props.deployStore.currentDeployment) return;
-    this.props.deployStore.currentDeployment[key] = value;
+    this.props.deployStore.currentDeployment.deploymentOptions[key] = value;
   };
   show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
   render() {
     const { deployStore } = this.props;
-    const cd = deployStore.currentDeployment || {};
+    const cd = deployStore.currentDeployment;
+    const cddo = cd.deploymentOptions;
     return (
       <div className={styles.deployment}>
         <div className={styles.info}>
@@ -48,34 +48,37 @@ export default class Deployment extends Component {
             <a className={styles.edit}>Edit</a>
           </span>
         </div>
-        <DeploymentOption cd={cd} selectionOption={this.selectionOption} />
-        {cd.option === 'api' && <ApiInstruction cd={cd} />}
-        {cd.option === 'data' && (
-          <DataSource cd={cd} selectionOption={this.selectionOption} />
+        <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
+        {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}
+        {cddo.option === 'data' && (
+          <DataSource cddo={cddo} selectionOption={this.selectionOption} />
         )}
-        {cd.option !== 'api' &&
-          cd.source && (
-            <ResultLocation cd={cd} selectionOption={this.selectionOption} />
-          )}
-        {cd.option !== 'api' &&
-          cd.source &&
-          cd.location && (
-            <DeployFrequency
-              show={this.show}
-              cd={cd}
+        {cddo.option !== 'api' &&
+          cddo.source && (
+            <ResultLocation
+              cddo={cddo}
               selectionOption={this.selectionOption}
             />
           )}
-        {cd.option !== 'api' && (
+        {cddo.option !== 'api' &&
+          cddo.source &&
+          cddo.location && (
+            <DeployFrequency
+              show={this.show}
+              cddo={cddo}
+              selectionOption={this.selectionOption}
+            />
+          )}
+        {cddo.option !== 'api' && (
           <div className={styles.save} onClick={cd.save}>
             <span className={styles.saveText}>
-              SAVE & SETUP {!cd.frequency && 'LATER'}
+              SAVE & SETUP {!cddo.frequency && 'LATER'}
             </span>
           </div>
         )}
         <SourceDatabase />
         <OneTime
-          options={cd.frequencyOptions}
+          options={cddo.frequencyOptions}
           visible={this.dialog === 'onetime'}
           onClose={this.closeDialog}
           onSubmit={options => {
@@ -85,7 +88,7 @@ export default class Deployment extends Component {
           }}
         />
         <AutoRepeat
-          options={cd.frequencyOptions}
+          options={cddo.frequencyOptions}
           visible={this.dialog === 'autorepeat'}
           onClose={this.closeDialog}
           onSubmit={options => {
@@ -99,13 +102,13 @@ export default class Deployment extends Component {
   }
 }
 
-const DeploymentOption = observer(({ cd, selectionOption }) => (
+const DeploymentOption = observer(({ cddo, selectionOption }) => (
   <div className={styles.deploymentOption}>
     <span className={styles.label}>
       <span className={styles.text}>Deployment Option:</span>
     </span>
     <div className={styles.selections}>
-      {cd.option === 'api' && (
+      {cddo.option === 'api' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img alt="api" src={apiIcon} className={styles.selectionIcon} />Predict
@@ -116,7 +119,7 @@ const DeploymentOption = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.option === 'data' && (
+      {cddo.option === 'data' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img
@@ -130,7 +133,7 @@ const DeploymentOption = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.option !== 'data' && (
+      {cddo.option !== 'data' && (
         <div
           className={styles.selection}
           onClick={selectionOption('option', 'data')}
@@ -144,7 +147,7 @@ const DeploymentOption = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.option !== 'api' && (
+      {cddo.option !== 'api' && (
         <div
           className={styles.selection}
           onClick={selectionOption('option', 'api')}
@@ -159,13 +162,13 @@ const DeploymentOption = observer(({ cd, selectionOption }) => (
   </div>
 ));
 
-const DataSource = observer(({ cd, selectionOption }) => (
+const DataSource = observer(({ cddo, selectionOption }) => (
   <div className={styles.dataSource}>
     <span className={styles.label}>
       <span className={styles.text}>Data Source:</span>
     </span>
     <div className={styles.selections}>
-      {cd.source === 'database' && (
+      {cddo.source === 'database' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img
@@ -180,7 +183,7 @@ const DataSource = observer(({ cd, selectionOption }) => (
         </div>
       )}
 
-      {cd.source === 'file' && (
+      {cddo.source === 'file' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
@@ -192,7 +195,7 @@ const DataSource = observer(({ cd, selectionOption }) => (
         </div>
       )}
 
-      {cd.source === 'server' && (
+      {cddo.source === 'server' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img
@@ -207,7 +210,7 @@ const DataSource = observer(({ cd, selectionOption }) => (
         </div>
       )}
 
-      {cd.source !== 'database' && (
+      {cddo.source !== 'database' && (
         <div
           className={styles.selection}
           onClick={selectionOption('source', 'database')}
@@ -221,7 +224,7 @@ const DataSource = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.source !== 'file' && (
+      {cddo.source !== 'file' && (
         <div
           className={styles.selection}
           onClick={selectionOption('source', 'file')}
@@ -232,7 +235,7 @@ const DataSource = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.source !== 'server' && (
+      {cddo.source !== 'server' && (
         <div
           className={styles.selection}
           onClick={selectionOption('source', 'server')}
@@ -250,13 +253,13 @@ const DataSource = observer(({ cd, selectionOption }) => (
   </div>
 ));
 
-const ResultLocation = observer(({ cd, selectionOption }) => (
+const ResultLocation = observer(({ cddo, selectionOption }) => (
   <div className={styles.resultLocation}>
     <span className={styles.label}>
       <span className={styles.text}>Result Location:</span>
     </span>
     <div className={styles.selections}>
-      {cd.location === 'app' && (
+      {cddo.location === 'app' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img alt="app" src={appIcon} className={styles.selectionIcon} />In
@@ -267,7 +270,7 @@ const ResultLocation = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.location === 'database' && (
+      {cddo.location === 'database' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img
@@ -281,7 +284,7 @@ const ResultLocation = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.location !== 'database' && (
+      {cddo.location !== 'database' && (
         <div
           className={styles.selection}
           onClick={selectionOption('location', 'database')}
@@ -295,7 +298,7 @@ const ResultLocation = observer(({ cd, selectionOption }) => (
           </span>
         </div>
       )}
-      {cd.location !== 'app' && (
+      {cddo.location !== 'app' && (
         <div
           className={styles.selection}
           onClick={selectionOption('location', 'app')}
@@ -310,14 +313,14 @@ const ResultLocation = observer(({ cd, selectionOption }) => (
   </div>
 ));
 
-const DeployFrequency = observer(({ cd, selectionOption, show }) => (
+const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
   <React.Fragment>
     <div className={styles.deployFrequency}>
       <span className={styles.label}>
         <span className={styles.text}>Deploy Frequency:</span>
       </span>
       <div className={styles.selections}>
-        {cd.frequency === 'once' && (
+        {cddo.frequency === 'once' && (
           <div className={styles.selected} onClick={show('onetime')}>
             <span className={styles.text}>
               <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
@@ -328,7 +331,7 @@ const DeployFrequency = observer(({ cd, selectionOption, show }) => (
             </span>
           </div>
         )}
-        {cd.frequency === 'repeat' && (
+        {cddo.frequency === 'repeat' && (
           <div className={styles.selected} onClick={show('autorepeat')}>
             <span className={styles.text}>
               <Icon type="sync" className={styles.antdIcon} />Auto Repeat
@@ -338,7 +341,7 @@ const DeployFrequency = observer(({ cd, selectionOption, show }) => (
             </span>
           </div>
         )}
-        {cd.frequency !== 'once' && (
+        {cddo.frequency !== 'once' && (
           <div className={styles.selection} onClick={show('onetime')}>
             <span className={styles.text}>
               <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
@@ -346,7 +349,7 @@ const DeployFrequency = observer(({ cd, selectionOption, show }) => (
             </span>
           </div>
         )}
-        {cd.frequency !== 'repeat' && (
+        {cddo.frequency !== 'repeat' && (
           <div className={styles.selection} onClick={show('autorepeat')}>
             <span className={styles.text}>
               <Icon type="sync" className={styles.antdIcon} />Auto Repeat
@@ -359,7 +362,7 @@ const DeployFrequency = observer(({ cd, selectionOption, show }) => (
       <div className={styles.holder} />
       <div className={styles.checkbox}>
         <Checkbox
-          checked={cd.autoDisable}
+          checked={cddo.autoDisable}
           onChange={e => selectionOption('autoDisable', e.target.checked)()}
         >
           <span className={styles.checkboxText}>

@@ -4,3 +4,165 @@
   flex-direction: column;
   flex: 1;
 }
+
+.block {
+  margin-top: 0.37em;
+  display: flex;
+}
+
+.label {
+  display: flex;
+  width: 3.5em;
+  color: #4a4a4a;
+  text-align: right;
+  justify-content: flex-end;
+  line-height: 0.48em;
+  flex: 0 0 3em;
+  align-items: center;
+}
+
+.selections {
+  display: flex;
+  margin-left: 0.3em;
+  flex: 3 1 0;
+  align-items: center;
+}
+
+.selection {
+  display: flex;
+  line-height: 0.48em;
+  padding: 0 0.2em;
+  margin-right: 0.3em;
+  justify-content: center;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, white, #f1f3f5);
+  box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  cursor: pointer;
+  composes: hover from 'style';
+}
+
+.selection:active {
+  background: linear-gradient(to top, white, #f1f3f5);
+}
+
+.selectionIcon {
+  margin-right: 1rem;
+  width: 2rem;
+  height: 2rem;
+}
+.antdIcon {
+  font-size: 2rem;
+  vertical-align: middle;
+  margin-right: 1rem;
+  color: #9a9b9b;
+}
+.text {
+  font-size: 1.125rem;
+}
+
+.selected {
+  display: flex;
+  font-weight: 500;
+  line-height: 0.48em;
+  position: relative;
+  min-width: 3em;
+  margin-right: 0.2em;
+  border-right: 1px solid #979797;
+}
+.or {
+  position: absolute;
+  right: -0.06em;
+  top: 0.15em;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.orText {
+  font-size: 1rem;
+  line-height: 1rem;
+}
+.row {
+  display: flex;
+}
+.holder {
+  flex: 0 0 3em;
+}
+.save {
+  width: 3em;
+  height: 0.5em;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #1d2b3c;
+  cursor: pointer;
+  position: absolute;
+  bottom: 1em;
+  left: 4em;
+  composes: hover from 'style';
+}
+
+.saveText {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.modelName {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+.infoIcon {
+  margin-left: 0.1em;
+}
+.helpIcon {
+  margin-left: 0.1em;
+}
+.downloadIcon {
+  margin-right: 0.2em;
+}
+.download {
+  font-size: 1.125rem;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.select {
+  font-size: 1.125rem;
+}
+
+.select :global(.ant-select-selection--single) {
+  height: 3rem;
+}
+
+.select :global(.ant-select-selection__rendered) {
+  line-height: 2.875rem;
+}
+
+.inputNumber {
+  height: 3rem;
+  font-size: 1.125rem;
+}
+.inputNumber :global(.ant-input-number-input) {
+  height: 2.875rem;
+}
+.checkbox {
+  display: flex;
+  margin-top: 0.18em;
+  margin-left: 0.3em;
+}
+
+.checkbox :global(.ant-checkbox-wrapper:hover .ant-checkbox-inner),
+.checkbox :global(.ant-checkbox-inner) {
+  border-color: #4a4a4a;
+}
+
+.checkbox :global(.ant-checkbox-checked .ant-checkbox-inner) {
+  background-color: #4a4a4a;
+}
+
+.checkboxText {
+  font-size: 1rem;
+}

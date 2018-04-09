@@ -137,11 +137,13 @@ export default class Home extends Component {
                 </span>
                 <span className={styles.enable}>
                   <Switch
-                    checked={deployment.enable}
-                    onChange={deployStore.change.bind(
+                    checked={
+                      deployment.deploymentOptions &&
+                      deployment.deploymentOptions.enable
+                    }
+                    onChange={deployStore.toggleEnable.bind(
                       deployStore,
-                      deployment.id,
-                      'enable'
+                      deployment.id
                     )}
                   />
                 </span>
