@@ -3,6 +3,7 @@ import { Checkbox } from 'antd';
 import { observer, inject } from 'mobx-react';
 import { observable, action } from 'mobx';
 import { Select, InputNumber, Icon } from 'antd';
+import moment from 'moment';
 import styles from './styles.module.css';
 import downloadIcon from './icon-download.svg';
 import helpIcon from './icon-help.svg';
@@ -16,6 +17,27 @@ import List from './list';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 
 const Option = Select.Option;
+
+const ordinalNumberPostFix = number => {
+  if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
+  return { 0: 'th', 1: 'st', 2: 'nd', 3: 'rd' }[number % 10];
+};
+
+const dateFormat = {
+  day: () => '',
+  week: number =>
+    [
+      '',
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ][number],
+  month: number => `${number}${ordinalNumberPostFix(number)}`
+};
 
 @inject('deployStore')
 @observer
@@ -144,12 +166,16 @@ const DataSource = observer(({ cdpo, selectionOption, show }) => (
     <div className={styles.selections}>
       {cdpo.source === 'database' && (
         <div className={styles.selected} onClick={show('databasesource')}>
-          <span className={styles.text}>
+          <span className={styles.result}>
             <img
               alt="database"
               src={databaseIcon}
               className={styles.selectionIcon}
-            />Database
+            />
+            <span className={styles.resultText}>
+              Database
+              <span className={styles.path}>{cdpo.sourceOptions.hostname}</span>
+            </span>
           </span>
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
@@ -247,9 +273,18 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
       <div className={styles.selections}>
         {cdpo.frequency === 'once' && (
           <div className={styles.selected} onClick={show('onetime')}>
-            <span className={styles.text}>
-              <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
-              Time
+            <span className={styles.result}>
+              <img alt="once" src={onceIcon} className={styles.selectionIcon} />
+              <span className={styles.resultText}>
+                One Time<span className={styles.detail}>
+                  <span className={styles.bold}>time:</span>
+                  {cdpo.frequencyOptions.time === 'completed'
+                    ? ' After completed'
+                    : moment
+                        .unix(cdpo.frequencyOptions.time)
+                        .format('DD/MM/YYYY h:mma')}
+                </span>
+              </span>
             </span>
             <span className={styles.or}>
               <span className={styles.orText}>or</span>
@@ -258,8 +293,33 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
         )}
         {cdpo.frequency === 'repeat' && (
           <div className={styles.selected} onClick={show('autorepeat')}>
-            <span className={styles.text}>
-              <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+            <span className={styles.result}>
+              <Icon type="sync" className={styles.antdIcon} />
+              <span className={styles.resultText}>
+                Redeploy every{' '}
+                {`${cdpo.frequencyOptions.repeatFrequency} ${
+                  cdpo.frequencyOptions.repeatPeriod
+                } ${
+                  cdpo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
+                } ${dateFormat[cdpo.frequencyOptions.repeatPeriod](
+                  cdpo.frequencyOptions.repeatOn
+                )}`}
+                <small className={styles.detail}>
+                  <span className={styles.bold}>Starts:</span>
+                  {moment
+                    .unix(cdpo.frequencyOptions.starts)
+                    .format('DD/MM/YYYY h:mma')}
+                  <br />
+                  <span className={styles.bold}>Ends:</span>
+                  {cdpo.frequencyOptions.ends === 'never'
+                    ? 'never'
+                    : cdpo.frequencyOptions.ends > 10000
+                      ? moment
+                          .unix(cdpo.frequencyOptions.ends)
+                          .format('DD/MM/YYYY h:mma')
+                      : `after ${cdpo.frequencyOptions.ends} occurrences`}
+                </small>
+              </span>
             </span>
             <span className={styles.or}>
               <span className={styles.orText}>or</span>

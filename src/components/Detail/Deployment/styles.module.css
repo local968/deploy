@@ -72,6 +72,7 @@
   box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.2);
   font-weight: 500;
   cursor: pointer;
+  height: 3rem;
   composes: hover from 'style';
 }
 
@@ -99,7 +100,7 @@
   font-weight: 500;
   line-height: 0.48em;
   position: relative;
-  min-width: 3em;
+  min-width: 3.8em;
   margin-right: 0.2em;
   border-right: 1px solid #979797;
 }
@@ -228,5 +229,25 @@
 
 .saveText {
   font-size: 1.25rem;
+  font-weight: bold;
+}
+.result {
+  display: flex;
+  align-items: center;
+}
+.resultText {
+  font-size: 1.125rem;
+  line-height: 1.25rem;
+}
+.path {
+  display: block;
+  text-decoration: underline;
+  font-weight: bold;
+}
+.detail {
+  display: block;
+  margin-top: 0.5rem;
+}
+.bold {
   font-weight: bold;
 }

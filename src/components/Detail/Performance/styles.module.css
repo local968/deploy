@@ -66,9 +66,10 @@
   font-weight: 500;
   line-height: 0.48em;
   position: relative;
-  min-width: 3em;
+  min-width: 4em;
   margin-right: 0.2em;
   border-right: 1px solid #979797;
+  height: 100%;
 }
 .or {
   position: absolute;
@@ -165,4 +166,24 @@
 
 .checkboxText {
   font-size: 1rem;
+}
+.result {
+  display: flex;
+  align-items: center;
+}
+.resultText {
+  font-size: 1.125rem;
+  line-height: 1.25rem;
+}
+.path {
+  display: block;
+  text-decoration: underline;
+  font-weight: bold;
+}
+.detail {
+  display: block;
+  margin-top: 0.5rem;
+}
+.bold {
+  font-weight: bold;
 }

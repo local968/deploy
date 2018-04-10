@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox } from 'antd';
 import { action, observable } from 'mobx';
+import moment from 'moment';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
 import sourceIcon from './icon-data-source.svg';
@@ -15,6 +16,27 @@ import ApiInstruction from './apiInstruction';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
+
+const ordinalNumberPostFix = number => {
+  if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
+  return { 0: 'th', 1: 'st', 2: 'nd', 3: 'rd' }[number % 10];
+};
+
+const dateFormat = {
+  day: () => '',
+  week: number =>
+    [
+      '',
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ][number],
+  month: number => `${number}${ordinalNumberPostFix(number)}`
+};
 
 @inject('deployStore')
 @observer
@@ -197,12 +219,16 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
     <div className={styles.selections}>
       {cddo.source === 'database' && (
         <div className={styles.selected} onClick={show('databasesource')}>
-          <span className={styles.text}>
+          <span className={styles.result}>
             <img
               alt="database"
               src={databaseIcon}
               className={styles.selectionIcon}
-            />Database
+            />
+            <span className={styles.resultText}>
+              Database
+              <span className={styles.path}>{cddo.sourceOptions.hostname}</span>
+            </span>
           </span>
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
@@ -296,12 +322,17 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
       )}
       {cddo.location === 'database' && (
         <div className={styles.selected} onClick={show('databaselocation')}>
-          <span className={styles.text}>
+          <span className={styles.result}>
             <img
               alt="database"
               src={upDatabaseIcon}
               className={styles.selectionIcon}
-            />Upload to Database
+            />
+            <span className={styles.resultText}>
+              Upload to Database<span className={styles.path}>
+                {cddo.locationOptions.hostname}
+              </span>
+            </span>
           </span>
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
@@ -343,9 +374,18 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
       <div className={styles.selections}>
         {cddo.frequency === 'once' && (
           <div className={styles.selected} onClick={show('onetime')}>
-            <span className={styles.text}>
-              <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
-              Time
+            <span className={styles.result}>
+              <img alt="once" src={onceIcon} className={styles.selectionIcon} />
+              <span className={styles.resultText}>
+                One Time<span className={styles.detail}>
+                  <span className={styles.bold}>time:</span>
+                  {cddo.frequencyOptions.time === 'completed'
+                    ? ' After completed'
+                    : moment
+                        .unix(cddo.frequencyOptions.time)
+                        .format('DD/MM/YYYY h:mma')}
+                </span>
+              </span>
             </span>
             <span className={styles.or}>
               <span className={styles.orText}>or</span>
@@ -354,8 +394,33 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
         )}
         {cddo.frequency === 'repeat' && (
           <div className={styles.selected} onClick={show('autorepeat')}>
-            <span className={styles.text}>
-              <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+            <span className={styles.result}>
+              <Icon type="sync" className={styles.antdIcon} />
+              <span className={styles.resultText}>
+                Redeploy every{' '}
+                {`${cddo.frequencyOptions.repeatFrequency} ${
+                  cddo.frequencyOptions.repeatPeriod
+                } ${
+                  cddo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
+                } ${dateFormat[cddo.frequencyOptions.repeatPeriod](
+                  cddo.frequencyOptions.repeatOn
+                )}`}
+                <small className={styles.detail}>
+                  <span className={styles.bold}>Starts:</span>
+                  {moment
+                    .unix(cddo.frequencyOptions.starts)
+                    .format('DD/MM/YYYY h:mma')}
+                  <br />
+                  <span className={styles.bold}>Ends:</span>
+                  {cddo.frequencyOptions.ends === 'never'
+                    ? 'never'
+                    : cddo.frequencyOptions.ends > 10000
+                      ? moment
+                          .unix(cddo.frequencyOptions.ends)
+                          .format('DD/MM/YYYY h:mma')
+                      : `after ${cddo.frequencyOptions.ends} occurrences`}
+                </small>
+              </span>
             </span>
             <span className={styles.or}>
               <span className={styles.orText}>or</span>

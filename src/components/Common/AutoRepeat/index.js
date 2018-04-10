@@ -245,7 +245,7 @@ export default class AutoRepeat extends Component {
                   ? null
                   : moment.unix(state.ends)
               }
-              format="MM/DD/YYYY HH:mma"
+              format="MM/DD/YYYY h:mma"
               placeholder="Select Time"
               onChange={date => this.changeState('ends', date.unix())}
             />
