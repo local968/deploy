@@ -13,6 +13,7 @@ import onceIcon from './icon-once.svg';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 import List from './list';
+import DatabaseSource from 'components/Common/DatabaseSource';
 
 const Option = Select.Option;
 
@@ -61,7 +62,11 @@ export default class Performance extends Component {
                 <span className={styles.download}>Download</span>
               </div>
             </div>
-            <DataSource cdpo={cdpo} selectionOption={this.selectionOption} />
+            <DataSource
+              cdpo={cdpo}
+              selectionOption={this.selectionOption}
+              show={this.show}
+            />
             {cdpo.source && (
               <MeasurementMetric
                 cdpo={cdpo}
@@ -92,6 +97,18 @@ export default class Performance extends Component {
                 SAVE & SETUP {!cdpo.frequency && 'LATER'}
               </span>
             </div>
+            <DatabaseSource
+              options={cdpo.sourceOptions}
+              visible={this.dialog === 'databasesource'}
+              validation
+              onClose={this.closeDialog}
+              title="Validation Data Source - Database"
+              onSubmit={options => {
+                this.selectionOption('source', 'database')();
+                this.selectionOption('sourceOptions', options)();
+                this.closeDialog();
+              }}
+            />
             <OneTime
               options={cdpo.frequencyOptions}
               visible={this.dialog === 'onetime'}
@@ -119,14 +136,14 @@ export default class Performance extends Component {
   }
 }
 
-const DataSource = observer(({ cdpo, selectionOption }) => (
+const DataSource = observer(({ cdpo, selectionOption, show }) => (
   <div className={styles.block}>
     <span className={styles.label}>
       <span className={styles.text}>Data Source:</span>
     </span>
     <div className={styles.selections}>
       {cdpo.source === 'database' && (
-        <div className={styles.selected}>
+        <div className={styles.selected} onClick={show('databasesource')}>
           <span className={styles.text}>
             <img
               alt="database"
@@ -153,10 +170,7 @@ const DataSource = observer(({ cdpo, selectionOption }) => (
       )}
 
       {cdpo.source !== 'database' && (
-        <div
-          className={styles.selection}
-          onClick={selectionOption('source', 'database')}
-        >
+        <div className={styles.selection} onClick={show('databasesource')}>
           <span className={styles.text}>
             <img
               alt="database"

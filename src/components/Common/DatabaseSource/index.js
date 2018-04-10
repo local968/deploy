@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, action } from 'mobx';
-import moment from 'moment';
 import styles from './styles.module.css';
 import { Modal, Select, Checkbox } from 'antd';
 import classnames from 'classnames';
@@ -22,12 +21,21 @@ export default class OneTime extends Component {
     username: '',
     password: '',
     rememberMyPassword: false,
-    rememberMyConnectionProfile: false
+    rememberMyConnectionProfile: false,
+
+    period: '',
+    start: '',
+    finish: ''
   };
 
   @action
   changeState = (key, value) => {
     this.localState[key] = value;
+  };
+
+  @action
+  toggleState = (key, value) => {
+    this.localState[key] = this.localState[key] === value ? '' : value;
   };
 
   @action
@@ -43,7 +51,7 @@ export default class OneTime extends Component {
   }
 
   render() {
-    const { visible, onClose, onSubmit, title } = this.props;
+    const { visible, onClose, onSubmit, title, validation } = this.props;
     const state = this.localState;
     return (
       <Modal
@@ -51,6 +59,7 @@ export default class OneTime extends Component {
         closable={false}
         visible={visible}
         footer={null}
+        width={'37.5rem'}
       >
         <div className={styles.title}>
           <img
@@ -121,6 +130,62 @@ export default class OneTime extends Component {
             />
           </div>
         </div>
+        {validation && (
+          <div className={styles.line}>
+            <div className={styles.label} />
+            <div className={styles.options}>
+              <i
+                className={classnames([styles.pot], {
+                  [styles.active]: state.period === 'id'
+                })}
+                onClick={this.toggleState.bind(this, 'period', 'id')}
+              />
+              <span
+                className={styles.text}
+                onClick={this.toggleState.bind(this, 'period', 'id')}
+              >
+                Record ID
+              </span>
+              <i
+                className={classnames([styles.pot], {
+                  [styles.active]: state.period === 'time'
+                })}
+                onClick={this.toggleState.bind(this, 'period', 'time')}
+              />
+              <span
+                className={styles.text}
+                onClick={this.toggleState.bind(this, 'period', 'time')}
+              >
+                Timestamp
+              </span>
+            </div>
+          </div>
+        )}
+        {validation && (
+          <div className={styles.line}>
+            <div className={styles.label} />
+            <div className={styles.options}>
+              <div className={styles.periodInputs}>
+                <div className={styles.start}>
+                  Start {state.period.toLocaleUpperCase()}:<input
+                    className={styles.input}
+                    type="text"
+                    value={state['start']}
+                    onChange={this.inputChange('start')}
+                  />
+                </div>
+                <div className={styles.finish}>
+                  Finish {state.period.toLocaleUpperCase()}:<input
+                    className={styles.input}
+                    type="text"
+                    value={state['finish']}
+                    onChange={this.inputChange('finish')}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <div className={styles.line}>
           <div className={styles.label}>
             Database Encoding:<br />(optional)
