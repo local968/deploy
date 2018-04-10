@@ -14,7 +14,7 @@ import onceIcon from './icon-once.svg';
 import ApiInstruction from './apiInstruction';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
-import DatabaseSource from 'components/Common/DatabaseSource';
+import DatabaseConfig from 'components/Common/DatabaseConfig';
 
 @inject('deployStore')
 @observer
@@ -62,6 +62,7 @@ export default class Deployment extends Component {
             <ResultLocation
               cddo={cddo}
               selectionOption={this.selectionOption}
+              show={this.show}
             />
           )}
         {cddo.option !== 'api' &&
@@ -80,7 +81,7 @@ export default class Deployment extends Component {
             </span>
           </div>
         )}
-        <DatabaseSource
+        <DatabaseConfig
           options={cddo.sourceOptions}
           visible={this.dialog === 'databasesource'}
           onClose={this.closeDialog}
@@ -88,6 +89,18 @@ export default class Deployment extends Component {
           onSubmit={options => {
             this.selectionOption('source', 'database')();
             this.selectionOption('sourceOptions', options)();
+            this.closeDialog();
+          }}
+        />
+        <DatabaseConfig
+          options={cddo.locationOptions}
+          visible={this.dialog === 'databaselocation'}
+          onClose={this.closeDialog}
+          result
+          title="Deployment Result Location - Database"
+          onSubmit={options => {
+            this.selectionOption('location', 'database')();
+            this.selectionOption('locationOptions', options)();
             this.closeDialog();
           }}
         />
@@ -264,7 +277,7 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
   </div>
 ));
 
-const ResultLocation = observer(({ cddo, selectionOption }) => (
+const ResultLocation = observer(({ cddo, selectionOption, show }) => (
   <div className={styles.resultLocation}>
     <span className={styles.label}>
       <span className={styles.text}>Result Location:</span>
@@ -282,7 +295,7 @@ const ResultLocation = observer(({ cddo, selectionOption }) => (
         </div>
       )}
       {cddo.location === 'database' && (
-        <div className={styles.selected}>
+        <div className={styles.selected} onClick={show('databaselocation')}>
           <span className={styles.text}>
             <img
               alt="database"
@@ -296,10 +309,7 @@ const ResultLocation = observer(({ cddo, selectionOption }) => (
         </div>
       )}
       {cddo.location !== 'database' && (
-        <div
-          className={styles.selection}
-          onClick={selectionOption('location', 'database')}
-        >
+        <div className={styles.selection} onClick={show('databaselocation')}>
           <span className={styles.text}>
             <img
               alt="database"

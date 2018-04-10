@@ -5,11 +5,12 @@ import styles from './styles.module.css';
 import { Modal, Select, Checkbox } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
+import helpIcon from './icon-help.svg';
 
 const Option = Select.Option;
 
 @observer
-export default class OneTime extends Component {
+export default class DatabaseConfig extends Component {
   @observable
   localState = {
     hostname: '',
@@ -25,7 +26,9 @@ export default class OneTime extends Component {
 
     period: '',
     start: '',
-    finish: ''
+    finish: '',
+
+    tableType: 'new'
   };
 
   @action
@@ -51,7 +54,14 @@ export default class OneTime extends Component {
   }
 
   render() {
-    const { visible, onClose, onSubmit, title, validation } = this.props;
+    const {
+      visible,
+      onClose,
+      onSubmit,
+      title,
+      validation,
+      result
+    } = this.props;
     const state = this.localState;
     return (
       <Modal
@@ -118,6 +128,76 @@ export default class OneTime extends Component {
             />
           </div>
         </div>
+        {result && (
+          <div className={styles.line}>
+            <div className={styles.label}>Table Type:</div>
+            <div className={styles.options}>
+              <div className={styles.types}>
+                <div className={styles.type}>
+                  <i
+                    className={classnames([styles.pot], {
+                      [styles.active]: state.tableType === 'existing'
+                    })}
+                    onClick={this.toggleState.bind(
+                      this,
+                      'tableType',
+                      'existing'
+                    )}
+                  />
+                  <span
+                    className={styles.text}
+                    onClick={this.toggleState.bind(
+                      this,
+                      'tableType',
+                      'existing'
+                    )}
+                  >
+                    an existing table
+                  </span>
+                  <img className={styles.helpIcon} src={helpIcon} alt="help" />
+                </div>
+                <div className={styles.type}>
+                  <i
+                    className={classnames([styles.pot], {
+                      [styles.active]: state.tableType === 'temporary'
+                    })}
+                    onClick={this.toggleState.bind(
+                      this,
+                      'tableType',
+                      'temporary'
+                    )}
+                  />
+                  <span
+                    className={styles.text}
+                    onClick={this.toggleState.bind(
+                      this,
+                      'tableType',
+                      'temporary'
+                    )}
+                  >
+                    a new temporary table
+                  </span>
+                  <img className={styles.helpIcon} src={helpIcon} alt="help" />
+                </div>
+                <div className={styles.type}>
+                  <i
+                    className={classnames([styles.pot], {
+                      [styles.active]: state.tableType === 'new'
+                    })}
+                    onClick={this.toggleState.bind(this, 'tableType', 'new')}
+                  />
+                  <span
+                    className={styles.text}
+                    onClick={this.toggleState.bind(this, 'tableType', 'new')}
+                  >
+                    a new table
+                  </span>
+                  <img className={styles.helpIcon} src={helpIcon} alt="help" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <div className={styles.line}>
           <div className={styles.label}>Table Name:</div>
           <div className={styles.options}>

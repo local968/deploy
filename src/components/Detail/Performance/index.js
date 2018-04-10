@@ -13,7 +13,7 @@ import onceIcon from './icon-once.svg';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 import List from './list';
-import DatabaseSource from 'components/Common/DatabaseSource';
+import DatabaseConfig from 'components/Common/DatabaseConfig';
 
 const Option = Select.Option;
 
@@ -97,7 +97,7 @@ export default class Performance extends Component {
                 SAVE & SETUP {!cdpo.frequency && 'LATER'}
               </span>
             </div>
-            <DatabaseSource
+            <DatabaseConfig
               options={cdpo.sourceOptions}
               visible={this.dialog === 'databasesource'}
               validation

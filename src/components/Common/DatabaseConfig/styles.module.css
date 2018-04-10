@@ -140,3 +140,11 @@
 }
 .finish {
 }
+.types {
+  margin-bottom: -1em;
+}
+.type {
+  display: flex;
+  margin-bottom: 1.2rem;
+  margin-top: 0.3rem;
+}
