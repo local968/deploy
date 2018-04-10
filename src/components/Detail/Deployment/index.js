@@ -15,6 +15,7 @@ import ApiInstruction from './apiInstruction';
 import SourceDatabase from './SourceDatabase';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
+import DatabaseSource from 'components/Common/DatabaseSource';
 
 @inject('deployStore')
 @observer
@@ -51,7 +52,11 @@ export default class Deployment extends Component {
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
         {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}
         {cddo.option === 'data' && (
-          <DataSource cddo={cddo} selectionOption={this.selectionOption} />
+          <DataSource
+            cddo={cddo}
+            selectionOption={this.selectionOption}
+            show={this.show}
+          />
         )}
         {cddo.option !== 'api' &&
           cddo.source && (
@@ -76,7 +81,17 @@ export default class Deployment extends Component {
             </span>
           </div>
         )}
-        <SourceDatabase />
+        <DatabaseSource
+          options={cddo.sourceOptions}
+          visible={this.dialog === 'databasesource'}
+          onClose={this.closeDialog}
+          title="Data Source - Database"
+          onSubmit={options => {
+            this.selectionOption('source', 'database')();
+            this.selectionOption('sourceOptions', options)();
+            this.closeDialog();
+          }}
+        />
         <OneTime
           options={cddo.frequencyOptions}
           visible={this.dialog === 'onetime'}
@@ -162,14 +177,14 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
   </div>
 ));
 
-const DataSource = observer(({ cddo, selectionOption }) => (
+const DataSource = observer(({ cddo, selectionOption, show }) => (
   <div className={styles.dataSource}>
     <span className={styles.label}>
       <span className={styles.text}>Data Source:</span>
     </span>
     <div className={styles.selections}>
       {cddo.source === 'database' && (
-        <div className={styles.selected}>
+        <div className={styles.selected} onClick={show('databasesource')}>
           <span className={styles.text}>
             <img
               alt="database"
@@ -211,10 +226,7 @@ const DataSource = observer(({ cddo, selectionOption }) => (
       )}
 
       {cddo.source !== 'database' && (
-        <div
-          className={styles.selection}
-          onClick={selectionOption('source', 'database')}
-        >
+        <div className={styles.selection} onClick={show('databasesource')}>
           <span className={styles.text}>
             <img
               alt="database"

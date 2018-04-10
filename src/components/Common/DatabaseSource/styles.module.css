@@ -1,0 +1,136 @@
+.modal :global(.ant-modal-body) {
+  padding: 0;
+  font-size: 1rem;
+}
+.title {
+  padding: 1rem 0;
+  text-align: center;
+  background: #455267;
+  color: white;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  margin-bottom: 2rem;
+}
+.line {
+  padding: 1rem 0;
+  display: flex;
+}
+.label {
+  flex: 0 0 12rem;
+  text-align: right;
+  margin-right: 2rem;
+  line-height: 2rem;
+  color: #232323;
+}
+.options {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex: 1 1 0;
+}
+.pot {
+  width: 1.5rem;
+  height: 1.5rem;
+  box-sizing: border-box;
+  border: 1px solid #455267;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.pot.active:after {
+  content: '';
+  display: inline-block;
+  width: 0.875rem;
+  height: 0.875rem;
+  background: #455267;
+  border-radius: 50%;
+  line-height: 1.5rem;
+}
+
+.btns {
+  padding: 1rem 0rem 3rem 3rem;
+}
+
+.cancel {
+  width: 8.75rem;
+  height: 2.5rem;
+  display: inline-block;
+  text-align: center;
+  line-height: 2.5rem;
+  border: 1px solid #1d2b3c;
+  border-radius: 4px;
+  color: #1d2b3c;
+  font-weight: bold;
+  composes: hover from 'style';
+}
+
+.cancel:hover {
+  color: #1d2b3c;
+}
+
+.done {
+  width: 8.75rem;
+  height: 2.5rem;
+  display: inline-block;
+  text-align: center;
+  line-height: 2.5rem;
+  border: 1px solid #1d2b3c;
+  border-radius: 4px;
+  color: #1d2b3c;
+  font-weight: bold;
+  margin-left: 2rem;
+  background: linear-gradient(to bottom, #5b657b, #243448);
+  color: white;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  composes: hover from 'style';
+}
+
+.done:active {
+  background: linear-gradient(to top, #5b657b, #243448);
+}
+
+.done:hover {
+  color: white;
+}
+
+.input {
+  border: 0;
+  outline: none;
+  color: #232323;
+  border-bottom: 1px solid #9b9b9b;
+  width: 85%;
+}
+.input::placeholder {
+  color: #9b9b9b;
+}
+
+.separate {
+  width: 100%;
+  border-bottom: 1px dashed #d5d5d5;
+}
+.checkbox {
+  display: flex;
+  margin-top: 0.18em;
+  margin-left: 0.3em;
+}
+
+.checkbox :global(.ant-checkbox-wrapper:hover .ant-checkbox-inner),
+.checkbox :global(.ant-checkbox-inner) {
+  border-color: #4a4a4a;
+}
+
+.checkbox :global(.ant-checkbox-checked .ant-checkbox-inner) {
+  background-color: #4a4a4a;
+}
+
+.checkboxText {
+  font-size: 1rem;
+}
+.databaseIcon {
+  margin-right: 1rem;
+}
