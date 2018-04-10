@@ -47,7 +47,9 @@ export default class New extends Component {
         <h2 className={styles.title}>Create a Deployment Project</h2>
         <div className={styles.selected}>
           <span className={styles.selectedText}>Selected Model:</span>
-          <span className={styles.modelName}>{modelName}</span>
+          <span className={styles.modelName} title={modelName}>
+            {modelName}
+          </span>
         </div>
         <input
           className={styles.name}

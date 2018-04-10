@@ -141,10 +141,11 @@ export default class Home extends Component {
                       deployment.deploymentOptions &&
                       deployment.deploymentOptions.enable
                     }
-                    onChange={deployStore.toggleEnable.bind(
-                      deployStore,
-                      deployment.id
-                    )}
+                    onChange={() => {
+                      if (deployment.deploymentOptions.frequency) {
+                        deployStore.toggleEnable(deployment.id);
+                      }
+                    }}
                   />
                 </span>
                 <span

@@ -43,10 +43,10 @@ export default class Deployment extends Component {
             Deployment Data Definition<i className={styles.mark}>?</i>
             <a className={styles.download}>Download</a>
           </span>
-          <span className={styles.email}>
+          {/* <span className={styles.email}>
             Email to Receive Alert:{cd.email}
             <a className={styles.edit}>Edit</a>
-          </span>
+          </span> */}
         </div>
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
         {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}

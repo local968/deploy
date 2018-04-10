@@ -22,7 +22,7 @@ const defaultPerformanceOptions = {
   frequency: null,
   frequencyOptions: {},
   autoDisable: null,
-  enable: null
+  enable: false
 };
 
 export default class Deployment {
