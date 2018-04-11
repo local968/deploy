@@ -99,6 +99,17 @@ class DeployStore {
     return new Deployment(_deployment || {});
   }
 
+  @computed
+  get currentModel() {
+    console.log(this.currentDeployment.modelName);
+    const model = db('models')
+      .find({ id: this.currentDeployment.modelName })
+      .fetch()
+      // .watch()
+      .subscribe(console.log, console.log, console.log);
+    return model;
+  }
+
   constructor() {
     db('deployments')
       .watch()
@@ -127,6 +138,7 @@ class DeployStore {
   toggleEnable(id) {
     const _d = new Deployment(this.deployments.find(_d => _d.id === id));
     _d.deploymentOptions.enable = !_d.deploymentOptions.enable;
+    console.log(this.currentModel);
     return _d.save();
   }
 

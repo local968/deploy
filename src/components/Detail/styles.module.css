@@ -20,6 +20,7 @@
   background: linear-gradient(to bottom, white, #f1f3f5);
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   position: relative;
+  cursor: pointer;
 }
 .tab.active {
   border-color: #1d2b3c;

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
+import { observable } from 'mobx';
 import { Link } from 'react-router-dom';
 import { Icon } from 'antd';
 import styles from './styles.module.css';
@@ -9,11 +10,20 @@ import List from './list';
 @inject('approachStore', 'deployStore')
 @observer
 export default class Replace extends Component {
+  @observable approach;
+
+  constructor(props) {
+    super(props);
+    const { approachStore, match } = this.props;
+    approachStore
+      .getApproach(match.params.id)
+      .then(approach => (this.approach = approach));
+    approachStore.getApproach(match.params.id).then(console.log);
+  }
+
   render() {
-    const { approachStore, deployStore, match } = this.props;
-    console.log(deployStore);
-    const currentApproach = approachStore.approaches[match.params.id - 1];
-    const modelName = currentApproach && currentApproach.modelDeploy[0];
+    const { match } = this.props;
+    const modelName = this.approach && this.approach.modelDeploy[0];
     return (
       <div className={styles.replace}>
         <Link className={styles.back} to={`/create/${match.params.id}`}>

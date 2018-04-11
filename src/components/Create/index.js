@@ -6,6 +6,7 @@ import New from './New';
 import Replace from './Replace';
 import createIcon from './icon-create.svg';
 import replaceIcon from './icon-replace.svg';
+import { observable } from 'mobx';
 
 const CreateBackground = ({ children }) => (
   <div className={styles.background}>
@@ -33,10 +34,19 @@ const CreateBackground = ({ children }) => (
 @inject('approachStore')
 @observer
 class Create extends Component {
-  render() {
+  @observable approach;
+
+  constructor(props) {
+    super(props);
     const { approachStore, match } = this.props;
-    const currentApproach = approachStore.approaches[match.params.id - 1];
-    const modelName = currentApproach && currentApproach.modelDeploy[0];
+    approachStore
+      .getApproach(match.params.id)
+      .then(approach => (this.approach = approach));
+  }
+
+  render() {
+    const { match } = this.props;
+    const modelName = this.approach && this.approach.modelDeploy[0];
     return (
       <div className={styles.create}>
         <div className={styles.panel}>

@@ -11,7 +11,15 @@ const ENTER_KEY = 13;
 @inject('approachStore', 'deployStore')
 @observer
 export default class New extends Component {
-  @observable projectName = '';
+  @observable approach;
+
+  constructor(props) {
+    super(props);
+    const { approachStore, match } = this.props;
+    approachStore
+      .getApproach(match.params.id)
+      .then(approach => (this.approach = approach));
+  }
 
   handleChange = event => {
     this.projectName = event.target.value;
@@ -24,21 +32,20 @@ export default class New extends Component {
   };
 
   handleSubmit = () => {
-    const { approachStore, match, deployStore, history } = this.props;
-    const currentApproach = approachStore.approaches[match.params.id - 1];
-    const modelName = currentApproach && currentApproach.modelDeploy[0];
+    const { deployStore, history } = this.props;
+    const modelName = this.approach.modelDeploy[0];
     deployStore
       .create({
         modelName,
+        modelId: `${this.approach.id}-${modelName}`,
         name: this.projectName
       })
       .then(({ id }) => history.push(`/project/${id}`));
   };
 
   render() {
-    const { approachStore, match } = this.props;
-    const currentApproach = approachStore.approaches[match.params.id - 1];
-    const modelName = currentApproach && currentApproach.modelDeploy[0];
+    const { match } = this.props;
+    const modelName = this.approach && this.approach.modelDeploy[0];
     return (
       <div className={styles.new}>
         <Link className={styles.back} to={`/create/${match.params.id}`}>
