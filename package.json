@@ -28,7 +28,8 @@
   },
   "scripts": {
     "start": "react-app-rewired build & node ./server/index.js",
-    "dev": "react-app-rewired start & node './server/index.js'",
+    "dev": "react-app-rewired start & pm2 start deploy2-dev.json",
+    "server": "node ./server/index.js",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject"

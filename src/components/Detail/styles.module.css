@@ -1,4 +1,7 @@
 .detail {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
   composes: content from 'style';
 }
 .tabs {
@@ -40,7 +43,6 @@
 }
 .content {
   width: 100%;
-  min-height: 10em;
   background: white;
   position: relative;
   z-index: 1;
@@ -49,6 +51,7 @@
   border-top-left-radius: 0;
   display: flex;
   flex-direction: column;
+  flex: 1 1 0;
 }
 
 .enable {
@@ -69,6 +72,7 @@
   border-bottom-left-radius: 0.25em;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   padding-left: 0.2em;
+  z-index: 1;
 }
 
 .enableText {

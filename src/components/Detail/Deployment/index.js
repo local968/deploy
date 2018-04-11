@@ -46,6 +46,7 @@ export default class Deployment extends Component {
   @action
   selectionOption = (key, value) => () => {
     this.props.deployStore.currentDeployment.deploymentOptions[key] = value;
+    this.props.deployStore.currentDeployment.save();
   };
 
   show = key => action(() => (this.dialog = key));
@@ -100,13 +101,13 @@ export default class Deployment extends Component {
               selectionOption={this.selectionOption}
             />
           )}
-        {cddo.option !== 'api' && (
+        {/* {cddo.option !== 'api' && (
           <div className={styles.save} onClick={cd.save}>
             <span className={styles.saveText}>
               SAVE & SETUP {!cddo.frequency && 'LATER'}
             </span>
           </div>
-        )}
+        )} */}
         <DatabaseConfig
           options={cddo.sourceOptions}
           visible={this.dialog === 'databasesource'}

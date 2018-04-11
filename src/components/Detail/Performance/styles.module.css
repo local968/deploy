@@ -151,7 +151,7 @@
   font-size: 1.125rem;
 }
 .inputNumber :global(.ant-input-number-input) {
-  height: 2.875rem;
+  height: 2.75rem;
 }
 .checkbox {
   display: flex;

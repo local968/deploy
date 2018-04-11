@@ -47,6 +47,7 @@ export default class Performance extends Component {
   @action
   selectionOption = (key, value) => () => {
     this.props.deployStore.currentDeployment.performanceOptions[key] = value;
+    this.props.deployStore.currentDeployment.save();
   };
   show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
@@ -115,7 +116,7 @@ export default class Performance extends Component {
                 show={this.show}
               />
             )}
-            <div
+            {/* <div
               className={styles.save}
               onClick={() => {
                 if (cdpo.frequency) this.selectionOption('enable', true)();
@@ -125,7 +126,7 @@ export default class Performance extends Component {
               <span className={styles.saveText}>
                 SAVE & SETUP {!cdpo.frequency && 'LATER'}
               </span>
-            </div>
+            </div> */}
             <DatabaseConfig
               options={cdpo.sourceOptions}
               visible={this.dialog === 'databasesource'}

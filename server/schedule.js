@@ -2,7 +2,9 @@ const schedule = require('node-schedule');
 const moment = require('moment');
 const r = require('./db');
 
-r.deploymentChanges(console.log);
+r.deploymentChanges(({ new_val, old_val }) => {
+  console.log(new_val);
+});
 
 const daily = deployments => {
   const now = moment().unix();
