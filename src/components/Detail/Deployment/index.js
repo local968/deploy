@@ -47,8 +47,11 @@ export default class Deployment extends Component {
   selectionOption = (key, value) => () => {
     this.props.deployStore.currentDeployment.deploymentOptions[key] = value;
   };
+
   show = key => action(() => (this.dialog = key));
+
   closeDialog = action(() => (this.dialog = null));
+
   render() {
     const { deployStore } = this.props;
     const cd = deployStore.currentDeployment;
@@ -63,7 +66,9 @@ export default class Deployment extends Component {
           </span>
           <span className={styles.data}>
             Deployment Data Definition<i className={styles.mark}>?</i>
-            <a className={styles.download}>Download</a>
+            <a className={styles.download} href={deployStore.dataDefinition}>
+              Download
+            </a>
           </span>
           {/* <span className={styles.email}>
             Email to Receive Alert:{cd.email}

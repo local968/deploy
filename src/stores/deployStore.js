@@ -1,4 +1,4 @@
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, autorun } from 'mobx';
 import Deployment from './Deployment';
 import moment from 'moment';
 import db from './db.js';
@@ -64,6 +64,7 @@ class DeployStore {
     perPage: 10,
     currentPage: 1
   };
+  @observable currentModel;
 
   @computed
   get totalCount() {
@@ -99,23 +100,32 @@ class DeployStore {
     return new Deployment(_deployment || {});
   }
 
-  @computed
-  get currentModel() {
-    console.log(this.currentDeployment.modelName);
-    const model = db('models')
-      .find({ id: this.currentDeployment.modelName })
-      .fetch()
-      // .watch()
-      .subscribe(console.log, console.log, console.log);
-    return model;
-  }
-
   constructor() {
     db('deployments')
       .watch()
       .subscribe(deployments => {
         this.deployments = deployments;
       });
+
+    autorun(() => {
+      if (
+        this.currentId &&
+        this.currentDeployment &&
+        this.currentDeployment.modelId
+      )
+        db('models')
+          .find({ id: this.currentDeployment.modelId })
+          .fetch()
+          .subscribe(model => (this.currentModel = model));
+    });
+  }
+
+  @computed
+  get dataDefinition() {
+    if (!this.currentModel) return '';
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += this.currentModel.variableList.join(',');
+    return encodeURI(csvContent);
   }
 
   @action
@@ -138,7 +148,6 @@ class DeployStore {
   toggleEnable(id) {
     const _d = new Deployment(this.deployments.find(_d => _d.id === id));
     _d.deploymentOptions.enable = !_d.deploymentOptions.enable;
-    console.log(this.currentModel);
     return _d.save();
   }
 

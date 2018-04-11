@@ -129,6 +129,10 @@
   font-weight: bold;
   text-decoration: underline;
   cursor: pointer;
+  color: #1d2b3c;
+}
+.download:hover {
+  color: #1d2b3c;
 }
 .select {
   font-size: 1.125rem;

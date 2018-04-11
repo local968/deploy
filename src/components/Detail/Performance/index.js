@@ -81,7 +81,12 @@ export default class Performance extends Component {
                   src={downloadIcon}
                   alt="download"
                 />
-                <span className={styles.download}>Download</span>
+                <a
+                  className={styles.download}
+                  href={deployStore.dataDefinition}
+                >
+                  Download
+                </a>
               </div>
             </div>
             <DataSource

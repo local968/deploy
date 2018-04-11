@@ -29,6 +29,7 @@ export default class Deployment {
   @observable id = '';
 
   @observable name = '';
+  @observable modelId = '';
   @observable modelName = '';
   @observable createdDate;
   @observable email = '';
@@ -40,6 +41,7 @@ export default class Deployment {
   constructor(deploy) {
     this.id = deploy.id;
     this.name = deploy.name;
+    this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
