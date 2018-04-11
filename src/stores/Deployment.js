@@ -18,7 +18,7 @@ const defaultPerformanceOptions = {
   source: null,
   sourceOptions: {},
   measurementMetric: 'AUC',
-  metricThreshold: 85,
+  metricThreshold: 70,
   frequency: null,
   frequencyOptions: {},
   autoDisable: null,
@@ -26,14 +26,15 @@ const defaultPerformanceOptions = {
 };
 
 export default class Deployment {
-  @observable id = '';
+  @observable id;
 
-  @observable name = '';
-  @observable modelId = '';
-  @observable modelName = '';
+  @observable name;
+  @observable modelId;
+  @observable modelName;
+  @observable modelType;
   @observable createdDate;
-  @observable email = '';
-  @observable owner = '';
+  @observable email;
+  @observable owner;
 
   @observable deploymentOptions = { ...defaultDeploymentOptions };
   @observable performanceOptions = { ...defaultPerformanceOptions };
@@ -43,6 +44,7 @@ export default class Deployment {
     this.name = deploy.name;
     this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
+    this.modelType = deploy.modelType;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
     this.owner = deploy.owner;
@@ -50,7 +52,8 @@ export default class Deployment {
       ...defaultDeploymentOptions
     };
     this.performanceOptions = deploy.performanceOptions || {
-      ...defaultPerformanceOptions
+      ...defaultPerformanceOptions,
+      metricThreshold: deploy.modelType === 'Classification' ? 70 : 50
     };
   }
 
@@ -61,6 +64,7 @@ export default class Deployment {
           id: this.id,
           name: this.name,
           modelName: this.modelName,
+          modelType: this.modelType,
           createdDate: this.createdDate,
           email: this.email,
           deploymentOptions: this.deploymentOptions,
@@ -76,6 +80,7 @@ export default class Deployment {
       id: this.id,
       name: this.name,
       modelName: this.modelName,
+      modelType: this.modelType,
       createdDate: this.createdDate,
       email: this.email,
       deploymentOptions: this.deploymentOptions,

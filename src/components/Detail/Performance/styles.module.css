@@ -191,3 +191,10 @@
 .bold {
   font-weight: bold;
 }
+.rmse {
+  font-size: 1.125rem;
+}
+.compare {
+  font-size: 1.125rem;
+  margin-right: 1rem;
+}

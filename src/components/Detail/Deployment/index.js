@@ -61,11 +61,10 @@ export default class Deployment extends Component {
         <div className={styles.info}>
           <span className={styles.model}>
             Model:{cd.modelName}
-            <i className={styles.mark}>!</i>
             <a className={styles.change}>Change</a>
           </span>
           <span className={styles.data}>
-            Deployment Data Definition<i className={styles.mark}>?</i>
+            Deployment Data Definition
             <a className={styles.download} href={deployStore.dataDefinition}>
               Download
             </a>

@@ -34,10 +34,12 @@ export default class New extends Component {
   handleSubmit = () => {
     const { deployStore, history } = this.props;
     const modelName = this.approach.modelDeploy[0];
+    const modelType = this.approach.typeOfProblem;
     deployStore
       .create({
         modelName,
         modelId: `${this.approach.id}-${modelName}`,
+        modelType,
         name: this.projectName
       })
       .then(({ id }) => history.push(`/project/${id}`));

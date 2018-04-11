@@ -18,7 +18,7 @@ export default class List extends Component {
             <span className={styles.topModelName} title={cd.modelName}>
               {cd.modelName}
             </span>
-            <img className={styles.infoIcon} src={infoIcon} alt="info" />
+            {/* <img className={styles.infoIcon} src={infoIcon} alt="info" /> */}
           </span>
           <div className={styles.items}>
             <div className={styles.item}>
@@ -32,16 +32,19 @@ export default class List extends Component {
             <div className={styles.item}>
               <span className={styles.label}>Threshold</span>
               <span className={styles.text}>
-                {cdpo.measurementMetric} {cdpo.metricThreshold}%
+                {cdpo.measurementMetric}{' '}
+                {cd.modelType === 'Classification' ? ' < ' : ' > '}
+                {cdpo.metricThreshold}%
               </span>
             </div>
             <div className={styles.item}>
               <span className={styles.label}>
-                Validation Data Definition<img
+                Validation Data Definition
+                {/* <img
                   className={styles.helpIcon}
                   src={helpIcon}
                   alt="help"
-                />
+                /> */}
               </span>
               <span className={classnames(styles.text, styles.download)}>
                 download

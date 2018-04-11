@@ -73,7 +73,7 @@ export default class Performance extends Component {
             <div className={styles.block}>
               <span className={styles.label}>
                 <span className={styles.text}>Validation Data Definition</span>
-                <img src={helpIcon} alt="help" className={styles.helpIcon} />
+                {/* <img src={helpIcon} alt="help" className={styles.helpIcon} /> */}
               </span>
               <div className={styles.selections}>
                 <img
@@ -97,12 +97,14 @@ export default class Performance extends Component {
             {cdpo.source && (
               <MeasurementMetric
                 cdpo={cdpo}
+                type={cd.modelType}
                 selectionOption={this.selectionOption}
               />
             )}
             {cdpo.source && (
               <MetricThreshold
                 cdpo={cdpo}
+                type={cd.modelType}
                 selectionOption={this.selectionOption}
               />
             )}
@@ -226,35 +228,36 @@ const DataSource = observer(({ cdpo, selectionOption, show }) => (
   </div>
 ));
 
-const MeasurementMetric = observer(({ cdpo, selectionOption }) => (
+const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
   <div className={styles.block}>
     <span className={styles.label}>
       <span className={styles.text}>Measurement Metric</span>
     </span>
     <div className={styles.selections}>
-      <Select
-        className={styles.select}
-        value={cdpo.measurementMetric}
-        onChange={value => selectionOption('measurementMetric', value)()}
-      >
-        <Option value="AUC">AUC</Option>
-        <Option value="jack">Jack</Option>
-        <Option value="lucy">Lucy</Option>
-        <Option value="disabled" disabled>
-          Disabled
-        </Option>
-        <Option value="Yiminghe">yiminghe</Option>
-      </Select>
+      {type === 'Classification' && (
+        <Select
+          className={styles.select}
+          value={cdpo.measurementMetric}
+          onChange={value => selectionOption('measurementMetric', value)()}
+        >
+          <Option value="AUC">AUC</Option>
+          <Option value="Accuracy">Accuracy</Option>
+        </Select>
+      )}
+      {type === 'Regression' && <span className={styles.rmse}>RMSE</span>}
     </div>
   </div>
 ));
 
-const MetricThreshold = observer(({ cdpo, selectionOption }) => (
+const MetricThreshold = observer(({ cdpo, selectionOption, type }) => (
   <div className={styles.block}>
     <span className={styles.label}>
       <span className={styles.text}>Metric Threshold</span>
     </span>
     <div className={styles.selections}>
+      <span className={styles.compare}>
+        {type === 'Classification' ? '<' : '>'}
+      </span>
       <InputNumber
         className={styles.inputNumber}
         min={1}

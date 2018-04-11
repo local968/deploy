@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, action } from 'mobx';
 import styles from './styles.module.css';
-import { Modal, Select, Checkbox } from 'antd';
+import { Modal, Select, Checkbox, Popover } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
 import helpIcon from './icon-help.svg';
@@ -154,7 +154,6 @@ export default class DatabaseConfig extends Component {
                   >
                     an existing table
                   </span>
-                  <img className={styles.helpIcon} src={helpIcon} alt="help" />
                 </div>
                 <div className={styles.type}>
                   <i
@@ -177,7 +176,6 @@ export default class DatabaseConfig extends Component {
                   >
                     a new temporary table
                   </span>
-                  <img className={styles.helpIcon} src={helpIcon} alt="help" />
                 </div>
                 <div className={styles.type}>
                   <i
@@ -192,7 +190,24 @@ export default class DatabaseConfig extends Component {
                   >
                     a new table
                   </span>
-                  <img className={styles.helpIcon} src={helpIcon} alt="help" />
+                  <Popover
+                    placement="right"
+                    overlayClassName={styles.popover}
+                    content={
+                      <p>
+                        Create a new table and put the<br />
+                        results in it. Every time the new<br />
+                        results are generated, they will<br />
+                        be added to the old results.
+                      </p>
+                    }
+                  >
+                    <img
+                      className={styles.helpIcon}
+                      src={helpIcon}
+                      alt="help"
+                    />
+                  </Popover>
                 </div>
               </div>
             </div>

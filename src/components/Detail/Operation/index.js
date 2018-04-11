@@ -15,10 +15,7 @@ export default class Operation extends Component {
     return (
       <div className={styles.operation}>
         <div className={styles.info}>
-          <span className={styles.model}>
-            Model:{cd.modelName}
-            <i className={styles.mark}>!</i>
-          </span>
+          <span className={styles.model}>Model:{cd.modelName}</span>
         </div>
 
         <div className={styles.table}>
