@@ -82,7 +82,10 @@ export default class Detail extends Component {
           <span className={styles.enable}>
             <Switch
               checked={cd.deploymentOptions.enable}
-              onChange={deployStore.toggleEnable.bind(deployStore, cd.id)}
+              onChange={() => {
+                if (cd.deploymentOptions.frequency)
+                  deployStore.toggleEnable(cd.id);
+              }}
             />
           </span>
           <span className={styles.enableText}>

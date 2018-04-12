@@ -253,7 +253,7 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
         </div>
       )}
 
-      {cddo.source === 'server' && (
+      {/* {cddo.source === 'server' && (
         <div className={styles.selected}>
           <span className={styles.text}>
             <img
@@ -266,7 +266,7 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
             <span className={styles.orText}>or</span>
           </span>
         </div>
-      )}
+      )} */}
 
       {cddo.source !== 'database' && (
         <div className={styles.selection} onClick={show('databasesource')}>
@@ -290,7 +290,7 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
           </span>
         </div>
       )}
-      {cddo.source !== 'server' && (
+      {/* {cddo.source !== 'server' && (
         <div
           className={styles.selection}
           onClick={selectionOption('source', 'server')}
@@ -303,7 +303,7 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
             />File Server
           </span>
         </div>
-      )}
+      )} */}
     </div>
   </div>
 ));

@@ -68,7 +68,7 @@ export default class Performance extends Component {
               </span>
               <div className={styles.selections}>
                 <span className={styles.modelName}>{cd.modelName}</span>
-                <img alt="model" src={infoIcon} className={styles.infoIcon} />
+                {/* <img alt="model" src={infoIcon} className={styles.infoIcon} /> */}
               </div>
             </div>
             <div className={styles.block}>
