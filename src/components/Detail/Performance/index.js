@@ -133,31 +133,34 @@ export default class Performance extends Component {
               validation
               onClose={this.closeDialog}
               title="Validation Data Source - Database"
-              onSubmit={options => {
-                this.selectionOption('source', 'database')();
-                this.selectionOption('sourceOptions', options)();
+              onSubmit={action(options => {
+                cdpo['source'] = 'database';
+                cdpo['sourceOptions'] = options;
+                cd.save();
                 this.closeDialog();
-              }}
+              })}
             />
             <OneTime
               options={cdpo.frequencyOptions}
               visible={this.dialog === 'onetime'}
               onClose={this.closeDialog}
-              onSubmit={options => {
-                this.selectionOption('frequency', 'once')();
-                this.selectionOption('frequencyOptions', options)();
+              onSubmit={action(options => {
+                cdpo['frequency'] = 'once';
+                cdpo['frequencyOptions'] = options;
+                cd.save();
                 this.closeDialog();
-              }}
+              })}
             />
             <AutoRepeat
               options={cdpo.frequencyOptions}
               visible={this.dialog === 'autorepeat'}
               onClose={this.closeDialog}
-              onSubmit={options => {
-                this.selectionOption('frequency', 'repeat')();
-                this.selectionOption('frequencyOptions', options)();
+              onSubmit={action(options => {
+                cdpo['frequency'] = 'repeat';
+                cdpo['frequencyOptions'] = options;
+                cd.save();
                 this.closeDialog();
-              }}
+              })}
             />
           </React.Fragment>
         )}
@@ -304,15 +307,17 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
           <div className={styles.selected} onClick={show('autorepeat')}>
             <span className={styles.result}>
               <Icon type="sync" className={styles.antdIcon} />
+              {console.log(cdpo.frequencyOptions)}
               <span className={styles.resultText}>
                 Redeploy every{' '}
                 {`${cdpo.frequencyOptions.repeatFrequency} ${
                   cdpo.frequencyOptions.repeatPeriod
                 } ${
                   cdpo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
-                } ${dateFormat[cdpo.frequencyOptions.repeatPeriod](
-                  cdpo.frequencyOptions.repeatOn
-                )}`}
+                } ${cdpo.frequencyOptions.repeatPeriod &&
+                  dateFormat[cdpo.frequencyOptions.repeatPeriod](
+                    cdpo.frequencyOptions.repeatOn
+                  )}`}
                 <small className={styles.detail}>
                   <span className={styles.bold}>Starts:</span>
                   {moment

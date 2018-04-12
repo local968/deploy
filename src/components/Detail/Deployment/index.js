@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox } from 'antd';
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import moment from 'moment';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
@@ -113,11 +113,12 @@ export default class Deployment extends Component {
           visible={this.dialog === 'databasesource'}
           onClose={this.closeDialog}
           title="Data Source - Database"
-          onSubmit={options => {
-            this.selectionOption('source', 'database')();
-            this.selectionOption('sourceOptions', options)();
+          onSubmit={action(options => {
+            cddo['source'] = 'database';
+            cddo['sourceOptions'] = options;
+            cd.save();
             this.closeDialog();
-          }}
+          })}
         />
         <DatabaseConfig
           options={cddo.locationOptions}
@@ -125,31 +126,34 @@ export default class Deployment extends Component {
           onClose={this.closeDialog}
           result
           title="Deployment Result Location - Database"
-          onSubmit={options => {
-            this.selectionOption('location', 'database')();
-            this.selectionOption('locationOptions', options)();
+          onSubmit={action(options => {
+            cddo['location'] = 'database';
+            cddo['locationOptions'] = options;
+            cd.save();
             this.closeDialog();
-          }}
+          })}
         />
         <OneTime
           options={cddo.frequencyOptions}
           visible={this.dialog === 'onetime'}
           onClose={this.closeDialog}
-          onSubmit={options => {
-            this.selectionOption('frequency', 'once')();
-            this.selectionOption('frequencyOptions', options)();
+          onSubmit={action(options => {
+            cddo['frequency'] = 'once';
+            cddo['frequencyOptions'] = options;
+            cd.save();
             this.closeDialog();
-          }}
+          })}
         />
         <AutoRepeat
           options={cddo.frequencyOptions}
           visible={this.dialog === 'autorepeat'}
           onClose={this.closeDialog}
-          onSubmit={options => {
-            this.selectionOption('frequency', 'repeat')();
-            this.selectionOption('frequencyOptions', options)();
+          onSubmit={action(options => {
+            cddo['frequency'] = 'repeat';
+            cddo['frequencyOptions'] = options;
+            cd.save();
             this.closeDialog();
-          }}
+          })}
         />
       </div>
     );
@@ -407,9 +411,10 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                   cddo.frequencyOptions.repeatPeriod
                 } ${
                   cddo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
-                } ${dateFormat[cddo.frequencyOptions.repeatPeriod](
-                  cddo.frequencyOptions.repeatOn
-                )}`}
+                } ${cddo.frequencyOptions.repeatPeriod &&
+                  dateFormat[cddo.frequencyOptions.repeatPeriod](
+                    cddo.frequencyOptions.repeatOn
+                  )}`}
                 <small className={styles.detail}>
                   <span className={styles.bold}>Starts:</span>
                   {moment
