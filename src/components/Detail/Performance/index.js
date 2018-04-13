@@ -307,7 +307,6 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
           <div className={styles.selected} onClick={show('autorepeat')}>
             <span className={styles.result}>
               <Icon type="sync" className={styles.antdIcon} />
-              {console.log(cdpo.frequencyOptions)}
               <span className={styles.resultText}>
                 Redeploy every{' '}
                 {`${cdpo.frequencyOptions.repeatFrequency} ${
