@@ -24,6 +24,7 @@ async function scheduleHandler() {
       nextTime,
       schedule.type
     );
+
     if (has) {
       const nextSchedule = generateSchedule(
         schedule.deploymentId,
@@ -43,7 +44,7 @@ const hasNext = (deploymentId, ends, nextTime, type) =>
   new Promise((resolve, reject) => {
     if (ends === 'never') return resolve(true);
     if (ends === 'completed') return resolve(false);
-    if (ends > 10000) return nextTime > ends ? resolve(false) : resolve(true);
+    if (ends > 10000) return nextTime >= ends ? resolve(false) : resolve(true);
     const count = r
       .getScheduleCount(deploymentId, type)
       .then(count => (ends >= count ? resolve(false) : resolve(true)));
@@ -74,14 +75,8 @@ r.deploymentChanges(({ new_val, old_val }) => {
   const cdpo =
     new_val && new_val.performanceOptions ? new_val.performanceOptions : {};
 
-  const needDeploymentRedeploy =
-    (cddo.frequency !== ocddo.frequency ||
-      !compare(cddo.frequencyOptions, ocddo.frequencyOptions)) &&
-    cddo.enable;
-  const needPerformanceRedeploy =
-    (cdpo.frequency !== ocdpo.frequency ||
-      !compare(cdpo.frequencyOptions, ocdpo.frequencyOptions)) &&
-    cdpo.enable;
+  const needDeploymentRedeploy = cddo.enable;
+  const needPerformanceRedeploy = cdpo.enable;
 
   // performance
   needPerformanceRedeploy &&

@@ -127,7 +127,6 @@ export default class Performance extends Component {
                     onClick={() => {
                       if (cdpo.frequency)
                         this.selectionOption('enable', true)();
-                      cd.save();
                     }}
                   >
                     <span className={styles.saveText}>DONE</span>
