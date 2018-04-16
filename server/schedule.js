@@ -9,20 +9,22 @@ async function scheduleHandler() {
     schedule.actualTime = now;
     schedule.status = 'progressing';
     await r.scheduleUpsert(schedule);
+
+    const deployment = await r.getDeployment(schedule.deploymentId);
+    const cdo = deployment[`${schedule.type}Options`];
+    const nextTime = generateNextScheduleTime(
+      cdo.frequency,
+      cdo.frequencyOptions,
+      now - 1
+    );
+
     const has = await hasNext(
       schedule.deploymentId,
       schedule.ends,
-      now,
+      nextTime,
       schedule.type
     );
     if (has) {
-      const deployment = await r.getDeployment(schedule.deploymentId);
-      const cdo = deployment[`${schedule.type}Options`];
-      const nextTime = generateNextScheduleTime(
-        cdo.frequency,
-        cdo.frequencyOptions,
-        now - 1
-      );
       const nextSchedule = generateSchedule(
         schedule.deploymentId,
         schedule.type,
@@ -35,19 +37,19 @@ async function scheduleHandler() {
   });
 }
 
-const hasNext = (deploymentId, ends, now, type) =>
+const scheduleInterval = setInterval(scheduleHandler, 10 * 1000);
+
+const hasNext = (deploymentId, ends, nextTime, type) =>
   new Promise((resolve, reject) => {
     if (ends === 'never') return resolve(true);
     if (ends === 'completed') return resolve(false);
-    if (ends > 10000) return now > ends ? resolve(false) : resolve(true);
+    if (ends > 10000) return nextTime > ends ? resolve(false) : resolve(true);
     const count = r
       .getScheduleCount(deploymentId, type)
       .then(count => (ends >= count ? resolve(false) : resolve(true)));
   });
 
 const catchError = console.error;
-
-const scheduleInterval = setInterval(scheduleHandler, 10 * 1000);
 
 const compare = (a, b) => {
   if (!a || !b) return false;
