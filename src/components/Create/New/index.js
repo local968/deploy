@@ -32,12 +32,13 @@ export default class New extends Component {
   };
 
   handleSubmit = () => {
-    const { deployStore, history } = this.props;
+    const { deployStore, history, match } = this.props;
     const modelName = this.approach.modelDeploy[0];
     const modelType = this.approach.typeOfProblem;
     deployStore
       .create({
         modelName,
+        projectId: match.params.id,
         modelId: `${this.approach.id}-${modelName}`,
         modelType,
         name: this.projectName

@@ -2,6 +2,8 @@ const r = require('rethinkdb');
 
 const SCHEDULE_TABLE = 'schedules';
 const DEPLOYMENT_TABLE = 'deployments';
+const APPROACH_TABLE = 'approaches';
+const MODEL_TABLE = 'models';
 const DB = 'newa';
 
 let conn;
@@ -70,6 +72,32 @@ module.exports.getDeployment = id =>
         .table(DEPLOYMENT_TABLE)
         .get(id)
         .run(conn)
+    )
+    .catch(catchError);
+
+module.exports.getModel = id =>
+  setup()
+    .then(conn =>
+      r
+        .table(MODEL_TABLE)
+        .get(id)
+        .run(conn)
+    )
+    .catch(catchError);
+
+module.exports.getApproach = projectId =>
+  setup()
+    .then(
+      conn =>
+        new Promise((resolve, reject) =>
+          r
+            .table(APPROACH_TABLE)
+            .filter({ projectId })
+            .run(conn, (err, cursor) => {
+              if (err) return reject(err);
+              cursor.toArray(errHandler(resolve, reject));
+            })
+        )
     )
     .catch(catchError);
 

@@ -1,4 +1,5 @@
 .list {
+  flex: 1 1 0;
 }
 .top {
   border: 1px solid #b5bec6;
