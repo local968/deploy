@@ -75,11 +75,13 @@ r.deploymentChanges(({ new_val, old_val }) => {
     new_val && new_val.performanceOptions ? new_val.performanceOptions : {};
 
   const needDeploymentRedeploy =
-    cddo.frequency !== ocddo.frequency ||
-    !compare(cddo.frequencyOptions, ocddo.frequencyOptions);
+    (cddo.frequency !== ocddo.frequency ||
+      !compare(cddo.frequencyOptions, ocddo.frequencyOptions)) &&
+    cddo.enable;
   const needPerformanceRedeploy =
-    cdpo.frequency !== ocdpo.frequency ||
-    !compare(cdpo.frequencyOptions, ocdpo.frequencyOptions);
+    (cdpo.frequency !== ocdpo.frequency ||
+      !compare(cdpo.frequencyOptions, ocdpo.frequencyOptions)) &&
+    cdpo.enable;
 
   // performance
   needPerformanceRedeploy &&
@@ -243,7 +245,9 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
 
   const nextTime =
     frequency === 'once'
-      ? options.time === 'completed' ? now : options.time
+      ? options.time === 'completed'
+        ? now
+        : options.time
       : lastTime
         ? nextTimeStrategies[options.repeatPeriod]()
         : startTimeStrategies[options.repeatPeriod]();

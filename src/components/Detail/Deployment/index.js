@@ -42,10 +42,30 @@ const dateFormat = {
 @observer
 export default class Deployment extends Component {
   @observable dialog = null;
+  @observable localEmail = '';
+  @observable emailEditing = false;
 
   @action
   selectionOption = (key, value) => () => {
     this.props.deployStore.currentDeployment.deploymentOptions[key] = value;
+    this.props.deployStore.currentDeployment.save();
+  };
+
+  @action
+  toggleEdit = () => {
+    this.localEmail = this.props.deployStore.currentDeployment.email;
+    this.emailEditing = !this.emailEditing;
+  };
+
+  @action
+  changeEmail = e => {
+    this.localEmail = e.target.value;
+  };
+
+  @action
+  submitEmail = e => {
+    this.emailEditing = false;
+    this.props.deployStore.currentDeployment.email = this.localEmail;
     this.props.deployStore.currentDeployment.save();
   };
 
@@ -60,20 +80,38 @@ export default class Deployment extends Component {
     return (
       <div className={styles.deployment}>
         <div className={styles.info}>
-          <span className={styles.model}>
-            Model:{cd.modelName}
-            <a className={styles.change}>Change</a>
+          <span className={styles.model}>Model:{cd.modelName}</span>
+          <a className={styles.change}>Change</a>
+          <span className={styles.data}>Deployment Data Definition</span>
+          <a className={styles.download} href={deployStore.dataDefinition}>
+            Download
+          </a>
+          <span className={styles.email}>
+            Email to Receive Alert:{!this.emailEditing && (cd.email || 'empty')}
+            {this.emailEditing && (
+              <input
+                type="text"
+                className={styles.emailInput}
+                value={this.localEmail}
+                onChange={this.changeEmail}
+              />
+            )}
           </span>
-          <span className={styles.data}>
-            Deployment Data Definition
-            <a className={styles.download} href={deployStore.dataDefinition}>
-              Download
+          {!this.emailEditing && (
+            <a className={styles.edit} onClick={this.toggleEdit}>
+              Edit
             </a>
-          </span>
-          {/* <span className={styles.email}>
-            Email to Receive Alert:{cd.email}
-            <a className={styles.edit}>Edit</a>
-          </span> */}
+          )}
+          {this.emailEditing && (
+            <div className={styles.emailEdit}>
+              <a className={styles.edit} onClick={this.submitEmail}>
+                Save
+              </a>
+              <a className={styles.cancel} onClick={this.toggleEdit}>
+                Cancel
+              </a>
+            </div>
+          )}
         </div>
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
         {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}

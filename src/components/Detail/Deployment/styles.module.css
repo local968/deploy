@@ -8,13 +8,16 @@
   display: flex;
   padding: 0.2em;
   border-bottom: 1px dashed #d7d7d7;
+  align-items: center;
 }
 .model,
 .data,
 .email {
   font-size: 1.125rem;
-  margin-right: 3em;
   line-height: 1.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .mark {
   display: inline-flex;
@@ -32,10 +35,33 @@
 .change,
 .download,
 .edit {
-  margin-left: 20px;
+  font-size: 1.125rem;
+  margin-left: 10px;
+  margin-right: 20px;
   color: #1d2b3c;
   text-decoration: underline;
   font-weight: bold;
+  flex: 1 1 0;
+}
+
+.cancel {
+  font-size: 1.125rem;
+  color: #1d2b3c;
+  text-decoration: underline;
+  flex: 1 1 0;
+}
+
+.emailEdit {
+  flex: 1 1 0;
+  font-size: 1.125rem;
+}
+
+.emailInput {
+  border: 0;
+  outline: none;
+  color: #232323;
+  border-bottom: 1px solid #9b9b9b;
+  width: 85%;
 }
 
 .deployFrequency,
