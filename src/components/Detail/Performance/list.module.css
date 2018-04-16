@@ -113,6 +113,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-right: 1rem;
+  line-height: 1.2;
 }
 .issue {
   color: #ff3151;

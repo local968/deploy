@@ -116,17 +116,25 @@ export default class Performance extends Component {
                 show={this.show}
               />
             )}
-            {/* <div
-              className={styles.save}
-              onClick={() => {
-                if (cdpo.frequency) this.selectionOption('enable', true)();
-                cd.save();
-              }}
-            >
-              <span className={styles.saveText}>
-                SAVE & SETUP {!cdpo.frequency && 'LATER'}
-              </span>
-            </div> */}
+            {cdpo.frequency && (
+              <div className={styles.block}>
+                <div className={styles.selections}>
+                  <span className={styles.label}>
+                    <span className={styles.text} />
+                  </span>
+                  <div
+                    className={styles.save}
+                    onClick={() => {
+                      if (cdpo.frequency)
+                        this.selectionOption('enable', true)();
+                      cd.save();
+                    }}
+                  >
+                    <span className={styles.saveText}>DONE</span>
+                  </div>
+                </div>
+              </div>
+            )}
             <DatabaseConfig
               options={cdpo.sourceOptions}
               visible={this.dialog === 'databasesource'}

@@ -85,6 +85,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-right: 1rem;
+  line-height: 1.2;
 }
 span.modelName,
 span.deploymentTime,
