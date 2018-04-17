@@ -18,6 +18,8 @@ async function scheduleHandler() {
       now - 1
     );
 
+    if (!nextTime) return;
+
     const has = await hasNext(
       schedule.deploymentId,
       schedule.ends,
@@ -75,8 +77,23 @@ r.deploymentChanges(({ new_val, old_val }) => {
   const cdpo =
     new_val && new_val.performanceOptions ? new_val.performanceOptions : {};
 
-  const needDeploymentRedeploy = cddo.enable;
-  const needPerformanceRedeploy = cdpo.enable;
+  let needDeploymentRedeploy = cddo.enable;
+  let needPerformanceRedeploy = cdpo.enable;
+
+  if (cddo.enable === ocddo.enable) {
+    needDeploymentRedeploy =
+      cddo.frequency !== ocddo.frequency ||
+      !compare(cddo.frequencyOptions, ocddo.frequencyOptions);
+  } else {
+    needDeploymentRedeploy = cddo.enable;
+  }
+  if (cdpo.enable === ocdpo.enable) {
+    needPerformanceRedeploy =
+      cdpo.frequency !== ocdpo.frequency ||
+      !compare(cdpo.frequencyOptions, ocdpo.frequencyOptions);
+  } else {
+    needPerformanceRedeploy = cdpo.enable;
+  }
 
   // performance
   needPerformanceRedeploy &&
@@ -91,9 +108,7 @@ r.deploymentChanges(({ new_val, old_val }) => {
         schedule.estimatedTime = performanceNextScheduleTime;
         schedule.updatedDate = moment().unix();
         schedule.ends =
-          cdpo.frequency === 'once'
-            ? cdpo.frequencyOptions.time
-            : cdpo.frequencyOptions.ends;
+          cdpo.frequency === 'once' ? 1 : cdpo.frequencyOptions.ends;
         r.scheduleUpsert(schedule).catch(catchError);
       } else {
         r
@@ -177,6 +192,7 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
     now > options.ends
   )
     return;
+  if (frequency === 'once' && lastTime) return;
 
   const startTimeStrategies = {
     day: () => {
