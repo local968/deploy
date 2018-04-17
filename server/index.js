@@ -2,6 +2,7 @@ const express = require('express');
 const horizon = require('@horizon/server');
 const config = require('../config.js');
 const path = require('path');
+const upload = require('./uploader');
 const db = config.db;
 
 const app = express();
@@ -35,6 +36,7 @@ const horizonServer = horizon(httpServer, {
 });
 
 app.use(express.static(path.join(process.cwd(), 'build')));
+app.use('/upload', upload);
 
 // CRA routing
 app.get('/*', function(req, res) {

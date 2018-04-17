@@ -13,6 +13,7 @@
     "mobx": "^4.1.0",
     "mobx-react": "^5.0.0",
     "mobx-react-router": "^4.0.1",
+    "multer": "^1.3.0",
     "node-schedule": "^1.3.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

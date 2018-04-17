@@ -117,6 +117,7 @@ export default class Deployment extends Component {
         {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}
         {cddo.option === 'data' && (
           <DataSource
+            cd={cd}
             cddo={cddo}
             selectionOption={this.selectionOption}
             show={this.show}
@@ -258,7 +259,7 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
   </div>
 ));
 
-const DataSource = observer(({ cddo, selectionOption, show }) => (
+const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
   <div className={styles.dataSource}>
     <span className={styles.label}>
       <span className={styles.text}>Data Source:</span>
@@ -285,10 +286,16 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
 
       {cddo.source === 'file' && (
         <div className={styles.selected}>
-          <span className={styles.text}>
+          <label htmlFor={`do-${cd.id}-2`} className={styles.text}>
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
-          </span>
+          </label>
+          <input
+            id={`do-${cd.id}-2`}
+            type="file"
+            onChange={e => console.log(e.target.files)}
+            style={{ display: 'none' }}
+          />
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
           </span>
@@ -326,10 +333,16 @@ const DataSource = observer(({ cddo, selectionOption, show }) => (
           className={styles.selection}
           onClick={selectionOption('source', 'file')}
         >
-          <span className={styles.text}>
+          <label htmlFor={`do-${cd.id}-1`} className={styles.text}>
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
-          </span>
+          </label>
+          <input
+            id={`do-${cd.id}-1`}
+            type="file"
+            onChange={e => console.log(e.target.files)}
+            style={{ display: 'none' }}
+          />
         </div>
       )}
       {/* {cddo.source !== 'server' && (
