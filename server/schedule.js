@@ -1,18 +1,22 @@
 const moment = require('moment');
+const config = require('../config');
 const r = require('./db');
 
-let queue = [];
-
 // schedule handle
-const scheduleInterval = setInterval(scheduleHandler, 10 * 1000);
+const scheduleInterval = setInterval(
+  scheduleHandler,
+  config.schedulePeriod * 1000
+);
+
+// queue handle
+const queueInterval = setInterval(scheduleHandler, config.queuePeriod * 1000);
 
 async function scheduleHandler() {
-  const schedules = await r.getTimeUpSchedules(moment().unix());
   const now = moment().unix();
+  const schedules = await r.getTimeUpSchedules(now);
   schedules.map(async schedule => {
     schedule.updatedDate = now;
-    schedule.actualTime = now;
-    schedule.status = 'progressing';
+    schedule.status = 'queue';
     await r.scheduleUpsert(schedule);
 
     const deployment = await r.getDeployment(schedule.deploymentId);
@@ -45,7 +49,21 @@ async function scheduleHandler() {
   });
 }
 
-async function scheduleQueue() {}
+async function scheduleQueue() {
+  const count = await db.getProgressingScheduleCount();
+  if (count >= config.maxConcurrencySchedule) return;
+  const schedules = await db.getQueueSchedules(
+    config.maxConcurrencySchedule - count
+  );
+  const now = moment().unix();
+
+  schedules.map(async schedule => {
+    schedule.updatedDate = now;
+    schedule.actualTime = now;
+    schedule.status = 'progressing';
+    await r.scheduleUpsert(schedule);
+  });
+}
 
 const hasNext = (deploymentId, ends, nextTime, type) =>
   new Promise((resolve, reject) => {
@@ -59,6 +77,7 @@ const hasNext = (deploymentId, ends, nextTime, type) =>
 
 const catchError = console.error;
 
+// deep compare
 const compare = (a, b) => {
   if (!a || !b) return false;
   let result = true;
@@ -232,6 +251,11 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
     }
   };
 
+  // 1. after restart server, it will immidiatly execute all time up schedules(put into a queue),
+  // next schedule will be generated based on this time(so every delayed schedule will only execute once)
+  // 2. if the next time is wrong(PS:schedule options is every monday, but estimated time is tuesday.
+  // Since next time generator is based on actual execution time or server restart time in some circumstance)
+  // It need a repair mechanism. For the moment it is same to start time calculation algorithm
   const nextTimeStrategies = {
     day: () => {
       const startTime = moment.unix(options.starts);

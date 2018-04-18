@@ -205,3 +205,31 @@ module.exports.getScheduleCount = (deploymentId, type) =>
       .count()
       .run(conn)
   );
+
+module.exports.getProgressingScheduleCount = () =>
+  setup().then(conn =>
+    r
+      .db('newa')
+      .table(SCHEDULE_TABLE)
+      .filter(r.row('status').ne('progressing'))
+      .count()
+      .run(conn)
+  );
+
+module.exports.getQueueSchedules = limit =>
+  new Promise((resolve, reject) => {
+    setup()
+      .then(conn =>
+        r
+          .db('newa')
+          .table(SCHEDULE_TABLE)
+          .filter({ status: 'queue' })
+          .orderBy(r.asc('updatedDate'))
+          .limit(limit)
+          .run(conn, (err, cursor) => {
+            if (err) return reject(err);
+            cursor.toArray(errHandler(resolve, reject));
+          })
+      )
+      .catch(catchError);
+  }).catch(catchError);
