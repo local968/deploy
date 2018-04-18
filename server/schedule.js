@@ -9,7 +9,7 @@ const scheduleInterval = setInterval(
 );
 
 // queue handle
-const queueInterval = setInterval(scheduleHandler, config.queuePeriod * 1000);
+const queueInterval = setInterval(scheduleQueue, config.queuePeriod * 1000);
 
 async function scheduleHandler() {
   const now = moment().unix();

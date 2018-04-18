@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox } from 'antd';
-import { action, observable, runInAction } from 'mobx';
+import { action, observable } from 'mobx';
 import moment from 'moment';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
 import sourceIcon from './icon-data-source.svg';
 import databaseIcon from './icon-database.svg';
 import fileIcon from './icon-file-local.svg';
-import serverIcon from './icon-server.svg';
+// import serverIcon from './icon-server.svg';
 import upDatabaseIcon from './icon-upload-to-server.svg';
 import appIcon from './icon-inapp.svg';
 import onceIcon from './icon-once.svg';
@@ -16,6 +16,7 @@ import ApiInstruction from './apiInstruction';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
+import Uploader from 'components/Common/Uploader';
 
 const ordinalNumberPostFix = number => {
   if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
@@ -286,16 +287,10 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
 
       {cddo.source === 'file' && (
         <div className={styles.selected}>
-          <label htmlFor={`do-${cd.id}-2`} className={styles.text}>
+          <Uploader className={styles.text}>
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
-          </label>
-          <input
-            id={`do-${cd.id}-2`}
-            type="file"
-            onChange={e => console.log(e.target.files)}
-            style={{ display: 'none' }}
-          />
+          </Uploader>
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
           </span>
@@ -330,19 +325,13 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
       )}
       {cddo.source !== 'file' && (
         <div
-          className={styles.selection}
-          onClick={selectionOption('source', 'file')}
+          className={styles.selectionWithoutHover}
+          // onClick={selectionOption('source', 'file')}
         >
-          <label htmlFor={`do-${cd.id}-1`} className={styles.text}>
+          <Uploader className={styles.text}>
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
-          </label>
-          <input
-            id={`do-${cd.id}-1`}
-            type="file"
-            onChange={e => console.log(e.target.files)}
-            style={{ display: 'none' }}
-          />
+          </Uploader>
         </div>
       )}
       {/* {cddo.source !== 'server' && (

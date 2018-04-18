@@ -36,7 +36,7 @@ const horizonServer = horizon(httpServer, {
 });
 
 app.use(express.static(path.join(process.cwd(), 'build')));
-app.use('/upload', upload);
+app.use('/api/upload', upload);
 
 // CRA routing
 app.get('/*', function(req, res) {

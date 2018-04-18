@@ -3,5 +3,6 @@ import Bread from './Bread';
 import Select from './Select';
 import Pagination from './Pagination';
 import Switch from './Switch';
+import Uploader from './Uploader';
 
-export { BlackButton, Bread, Select, Pagination, Switch };
+export { BlackButton, Bread, Select, Pagination, Switch, Uploader };
