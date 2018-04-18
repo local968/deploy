@@ -1,6 +1,11 @@
 const moment = require('moment');
 const r = require('./db');
 
+let queue = [];
+
+// schedule handle
+const scheduleInterval = setInterval(scheduleHandler, 10 * 1000);
+
 async function scheduleHandler() {
   const schedules = await r.getTimeUpSchedules(moment().unix());
   const now = moment().unix();
@@ -40,7 +45,7 @@ async function scheduleHandler() {
   });
 }
 
-const scheduleInterval = setInterval(scheduleHandler, 10 * 1000);
+async function scheduleQueue() {}
 
 const hasNext = (deploymentId, ends, nextTime, type) =>
   new Promise((resolve, reject) => {
@@ -80,19 +85,15 @@ r.deploymentChanges(({ new_val, old_val }) => {
   let needDeploymentRedeploy = cddo.enable;
   let needPerformanceRedeploy = cdpo.enable;
 
-  if (cddo.enable === ocddo.enable) {
+  if (cddo.enable === ocddo.enable && cddo.enable === true) {
     needDeploymentRedeploy =
       cddo.frequency !== ocddo.frequency ||
       !compare(cddo.frequencyOptions, ocddo.frequencyOptions);
-  } else {
-    needDeploymentRedeploy = cddo.enable;
   }
-  if (cdpo.enable === ocdpo.enable) {
+  if (cdpo.enable === ocdpo.enable && cdpo.enable === true) {
     needPerformanceRedeploy =
       cdpo.frequency !== ocdpo.frequency ||
       !compare(cdpo.frequencyOptions, ocdpo.frequencyOptions);
-  } else {
-    needPerformanceRedeploy = cdpo.enable;
   }
 
   // performance
@@ -233,22 +234,57 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
 
   const nextTimeStrategies = {
     day: () => {
+      const startTime = moment.unix(options.starts);
       let _time = moment.unix(lastTime);
       while (_time.unix() < now)
         _time = _time.add(options.repeatFrequency, 'days');
-      return _time.unix();
+      // fix start time
+      const rightTime = moment(
+        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+      );
+      if (rightTime.unix() < now) rightTime.add(1, 'days');
+      return rightTime.unix();
     },
     week: () => {
+      const startTime = moment.unix(options.starts);
       let _time = moment.unix(lastTime);
       while (_time.unix() < now)
         _time = _time.add(options.repeatFrequency, 'weeks');
-      return _time.unix();
+      if (_time.day() !== options.repeatOn - 1) {
+        // fix day to the right day of week
+        const __time = moment(_time);
+        if (__time.day(options.repeatOn - 1).unix() < now) {
+          _time.day(7 + options.repeatOn - 1);
+        } else {
+          _time.day(options.repeatOn - 1);
+        }
+      }
+      const rightTime = moment(
+        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+      );
+      if (rightTime.unix() < now) rightTime.add(1, 'weeks');
+      return rightTime.unix();
     },
     month: () => {
+      const startTime = moment.unix(options.starts);
       let _time = moment.unix(lastTime);
       while (_time.unix() < now)
         _time = _time.add(options.repeatFrequency, 'months');
-      return _time.unix();
+      if (_time.format('D') !== options.repeatOn) {
+        if (_time.format('D') > options.repeatOn) {
+          const difference = _time.format('D') - options.repeatOn;
+          _time.subtract(difference, 'days');
+          _time.add(1, 'months');
+        } else if (_time.format('D') < options.repeatOn) {
+          const difference = options.repeatOn - _time.format('D');
+          _time.add(difference, 'days');
+        }
+      }
+      const rightTime = moment(
+        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+      );
+      if (rightTime.unix() < now) rightTime.add(1, 'months');
+      return rightTime.unix();
     }
   };
 
