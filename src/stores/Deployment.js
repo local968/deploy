@@ -8,6 +8,7 @@ const defaultDeploymentOptions = {
   sourceOptions: {},
   location: null,
   locationOptions: {},
+  file: {},
   frequency: null,
   frequencyOptions: {},
   autoDisable: null,
@@ -17,6 +18,7 @@ const defaultDeploymentOptions = {
 const defaultPerformanceOptions = {
   source: null,
   sourceOptions: {},
+  file: {},
   measurementMetric: 'AUC',
   metricThreshold: 70,
   frequency: null,
@@ -48,11 +50,13 @@ export default class Deployment {
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
     this.owner = deploy.owner;
-    this.deploymentOptions = deploy.deploymentOptions || {
-      ...defaultDeploymentOptions
+    this.deploymentOptions = {
+      ...defaultDeploymentOptions,
+      ...deploy.deploymentOptions
     };
-    this.performanceOptions = deploy.performanceOptions || {
+    this.performanceOptions = {
       ...defaultPerformanceOptions,
+      ...deploy.performanceOptions,
       metricThreshold: deploy.modelType === 'Classification' ? 70 : 50
     };
   }

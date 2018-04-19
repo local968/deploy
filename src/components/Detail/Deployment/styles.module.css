@@ -284,6 +284,9 @@
   display: block;
   text-decoration: underline;
   font-weight: bold;
+  max-width: 20rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .detail {
   display: block;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Checkbox } from 'antd';
 import { observer, inject } from 'mobx-react';
-import { observable, action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import { Select, InputNumber, Icon } from 'antd';
 import moment from 'moment';
 import styles from './styles.module.css';
@@ -15,6 +15,7 @@ import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 import List from './list';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
+import Uploader from 'components/Common/Uploader';
 
 const Option = Select.Option;
 
@@ -55,6 +56,7 @@ export default class Performance extends Component {
     const { deployStore } = this.props;
     const cd = deployStore.currentDeployment;
     const cdpo = cd.performanceOptions;
+
     return (
       <div className={styles.performance}>
         {cdpo.enable && (
@@ -91,6 +93,7 @@ export default class Performance extends Component {
               </div>
             </div>
             <DataSource
+              cd={cd}
               cdpo={cdpo}
               selectionOption={this.selectionOption}
               show={this.show}
@@ -176,7 +179,7 @@ export default class Performance extends Component {
   }
 }
 
-const DataSource = observer(({ cdpo, selectionOption, show }) => (
+const DataSource = observer(({ cd, cdpo, selectionOption, show }) => (
   <div className={styles.block}>
     <span className={styles.label}>
       <span className={styles.text}>Data Source:</span>
@@ -203,10 +206,16 @@ const DataSource = observer(({ cdpo, selectionOption, show }) => (
 
       {cdpo.source === 'file' && (
         <div className={styles.selected}>
-          <span className={styles.text}>
+          <Uploader
+            className={styles.resultText}
+            onChange={file => selectionOption('file', file)()}
+          >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
-          </span>
+            <span className={styles.path} title={cdpo.file.originalName}>
+              {cdpo.file.originalName}
+            </span>
+          </Uploader>
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
           </span>
@@ -225,14 +234,20 @@ const DataSource = observer(({ cdpo, selectionOption, show }) => (
         </div>
       )}
       {cdpo.source !== 'file' && (
-        <div
-          className={styles.selection}
-          onClick={selectionOption('source', 'file')}
-        >
-          <span className={styles.text}>
+        <div className={styles.selectionWithoutHover}>
+          <Uploader
+            className={styles.text}
+            onChange={file => {
+              runInAction(() => {
+                cd.performanceOptions['source'] = 'file';
+                cd.performanceOptions['file'] = file;
+                cd.save();
+              });
+            }}
+          >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
-          </span>
+          </Uploader>
         </div>
       )}
     </div>

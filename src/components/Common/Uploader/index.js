@@ -9,10 +9,11 @@ export default ({ children, className, onChange }) => {
     const files = e.target.files;
     if (files.length === 0) return [];
     const file = files[0];
-    console.log(file);
     const formData = new FormData();
     formData.append('data', file);
-    axios.post('/api/upload', formData);
+    axios.post('/api/upload', formData).then(res => {
+      onChange(res.data);
+    });
   };
 
   return (

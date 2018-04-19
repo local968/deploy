@@ -50,9 +50,9 @@ async function scheduleHandler() {
 }
 
 async function scheduleQueue() {
-  const count = await db.getProgressingScheduleCount();
+  const count = await r.getProgressingScheduleCount();
   if (count >= config.maxConcurrencySchedule) return;
-  const schedules = await db.getQueueSchedules(
+  const schedules = await r.getQueueSchedules(
     config.maxConcurrencySchedule - count
   );
   const now = moment().unix();

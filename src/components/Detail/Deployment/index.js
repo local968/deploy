@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox } from 'antd';
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import moment from 'moment';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
@@ -287,9 +287,15 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
 
       {cddo.source === 'file' && (
         <div className={styles.selected}>
-          <Uploader className={styles.text}>
+          <Uploader
+            className={styles.resultText}
+            onChange={file => selectionOption('file', file)()}
+          >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
+            <span className={styles.path} title={cddo.file.originalName}>
+              {cddo.file.originalName}
+            </span>
           </Uploader>
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
@@ -328,7 +334,16 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
           className={styles.selectionWithoutHover}
           // onClick={selectionOption('source', 'file')}
         >
-          <Uploader className={styles.text}>
+          <Uploader
+            className={styles.text}
+            onChange={file => {
+              runInAction(() => {
+                cd.deploymentOptions['source'] = 'file';
+                cd.deploymentOptions['file'] = file;
+                cd.save();
+              });
+            }}
+          >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
           </Uploader>
