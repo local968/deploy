@@ -1,7 +1,7 @@
 import React from 'react';
 // import { inject, observer } from 'mobx-react';
 import styles from './styles.module.css';
-import logo from './mr-one-logo-blue.svg';
+import logo from './rsquared_logo_color.svg';
 import home from './icon-home.svg';
 import help from './icon-help.svg';
 import switchIcon from './switch.svg';
@@ -9,8 +9,8 @@ import switchIcon from './switch.svg';
 export default ({ history }) => (
   <aside className={styles.sider}>
     <div className={styles.logo}>
-      <img src={logo} alt="logo" />
-      <h2 className={styles.mrone}>Mr.one</h2>
+      <img className={styles.logoImg} src={logo} alt="logo" />
+      {/* <h2 className={styles.mrone}>Mr.one</h2> */}
     </div>
     <div className={styles.menus}>
       <a className={styles.home} onClick={() => history.push('/')}>
