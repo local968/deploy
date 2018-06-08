@@ -43,7 +43,7 @@ export default class New extends Component {
         modelType,
         name: this.projectName
       })
-      .then(({ id }) => history.push(`/project/${id}`));
+      .then(({ id }) => history.push(`/deploy/project/${id}`));
   };
 
   render() {
@@ -51,7 +51,7 @@ export default class New extends Component {
     const modelName = this.approach && this.approach.modelDeploy[0];
     return (
       <div className={styles.new}>
-        <Link className={styles.back} to={`/create/${match.params.id}`}>
+        <Link className={styles.back} to={`/deploy/create/${match.params.id}`}>
           <Icon className={styles.icon} type="arrow-left" />
         </Link>
         <h2 className={styles.title}>Create a Deployment Project</h2>

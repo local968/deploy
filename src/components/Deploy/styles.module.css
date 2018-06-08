@@ -1,0 +1,99 @@
+.home {
+  composes: content from 'style';
+}
+
+.filter {
+  height: 0.4em;
+  display: flex;
+  margin-top: 0.2em;
+}
+
+.listWrapper {
+  padding: 0.12em;
+  box-sizing: border-box;
+  border: 1px solid #b5bec6;
+  border-radius: 4px;
+  background: #e0e3e9;
+  margin-top: 0.2em;
+}
+
+.list {
+  max-height: 8.4em;
+  overflow-y: auto;
+}
+
+.head,
+.project {
+  display: flex;
+  padding: 0 0.2em;
+}
+
+.head {
+  padding: 0.1em 0.2em 0.2em 0.2em;
+}
+
+.project {
+  min-height: 0.8em;
+  background: white;
+  margin-bottom: 0.04em;
+  border-radius: 4px;
+  align-items: center;
+}
+
+.project:hover {
+  background: #f6f6f8;
+}
+
+.project:hover .projectName,
+.project:hover .modelName {
+  text-decoration: underline;
+}
+
+.head span,
+.project span {
+  font-size: 1.125rem;
+  margin-right: 0.5rem;
+}
+
+.head span {
+  font-weight: bold;
+}
+
+.projectName {
+  flex: 1 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.modelName {
+  flex: 2 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.createdDate,
+.enable,
+.deploymentStatus,
+.operationAlert,
+.performanceAlert,
+.craetedDate,
+.owner {
+  flex: 1 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusIcon {
+  margin-right: 0.5rem;
+  vertical-align: bottom;
+}
+
+.na {
+  color: #9b9b9b;
+}
+
+.warning {
+  color: #ff3151;
+}

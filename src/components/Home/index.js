@@ -1,188 +1,277 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
+import classnames from 'classnames';
+import addProjectIcon from './combined-shape-copy.svg';
+import deleteIcon from './delete.svg';
+import duplicateIcon from './duplicate.svg';
+import shareIcon from './share.svg';
+import deleteDarkIcon from './delete-dark.svg';
+import duplicateDarkIcon from './duplicate-dark.svg';
+import shareDarkIcon from './share-dark.svg';
+import checkedIcon from './checked.svg';
+import { Search, Select, Pagination } from 'components/Common';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
-import { Bread, Select, Pagination, Switch } from 'components/Common';
-import searchButton from './search-icon.svg';
-import issueIcon from './fail.svg';
-import runningIcon from './running.svg';
-import normalIcon from './success.svg';
+import {Modal, Button} from 'antd';
 
-const deploymentStatus = {
-  normal: (
-    <span className={styles.normal}>
-      <img className={styles.statusIcon} src={normalIcon} alt="normal" />Normal
-    </span>
-  ),
-  issue: (
-    <span className={styles.issue}>
-      <img className={styles.statusIcon} src={issueIcon} alt="issue" />Issue
-    </span>
-  ),
-  running: (
-    <span className={styles.running}>
-      <img className={styles.statusIcon} src={runningIcon} alt="running" />Running
-    </span>
-  ),
-  na: <span className={styles.na}>N/A</span>
-};
+import axios from 'axios';
 
-@inject('deployStore')
+@inject('userStore')
 @observer
 export default class Home extends Component {
-  toggle = (currentType, targetType) => () => {
-    if (currentType === targetType) {
-      this.props.deployStore.changeSort(
-        'sortBy',
-        targetType.startsWith('r')
-          ? targetType.slice(1, targetType.length)
-          : 'r' + targetType
-      );
-    } else {
-      this.props.deployStore.changeSort('sortBy', targetType);
+    constructor(props){
+        super(props);
+        //设置为英文
+        moment.locale('en');
+        this.acts = {
+            share: (ids) => {
+                return;
+            },
+            duplicate: (ids) => {
+                return;
+            },
+            delete: (ids) => {
+                const deleteNames = this.props.userStore.projects.filter(project => {
+                    return ids.includes(project.projectId);
+                }).map(project => project.name);
+                this.setState({
+                    deleteNames: deleteNames,
+                    deleteIds: ids,
+                    visible: true
+                })
+            }
+        };
+        window.axios = axios;
     }
-  };
-  render() {
-    const { deployStore, history } = this.props;
-    return (
-      <div className={styles.home}>
-        <Bread list={['Home']} />
-        <div className={styles.filter}>
-          <div className={styles.search}>
-            <input
-              type="text"
-              className={styles.searchName}
-              value={deployStore.sortOptions.keywords}
-              onChange={event =>
-                deployStore.changeSort('keywords', event.target.value)
-              }
-            />
-            <a className={styles.submit}>
-              <img
-                className={styles.searchButton}
-                src={searchButton}
-                alt="search"
-              />
-            </a>
-          </div>
-          <Select
+
+    
+
+    state = {
+        ids: [],
+        isShow: false,
+        isScorll: false,
+        selected: false,
+        deleteNames: [],
+        deleteIds: [],
+        visible: false
+    }
+
+    componentDidUpdate() {
+        //重置滚动条
+        this.resetScorll();
+    }
+
+    resetScorll = () => {
+        const projectsDom = document.getElementsByClassName(styles.projects)[0];
+        if(!this.state.isScorll && projectsDom.clientHeight < projectsDom.scrollHeight){
+            this.setState({
+                isScorll: true
+            })
+        }
+        if(this.state.isScorll && projectsDom.clientHeight >= projectsDom.scrollHeight){
+            this.setState({
+                isScorll: false
+            })
+        }
+    }
+
+    selectId = (isSelect, id) => {
+        let ids;
+        if(isSelect){
+            ids = this.state.ids.filter(v => v!==id);
+        }else{
+            ids = [...this.state.ids,id];
+        }
+        this.setState({
+            ids: ids,
+            isShow: !!ids.length
+        })
+    }
+
+    toggleSelect = () => {
+        this.setState({
+            selected: !this.state.selected,
+        })
+    }
+
+    actions = (act, ids) => {
+        if(!Array.isArray(ids)){
+            ids = [ids]
+        }
+
+        console.log(act, ids);
+        this.acts[act](ids);
+    }
+
+    handleOk = (e) => {
+        console.log("delete",this.state.deleteIds)
+        this.setState({
+            visible: false,
+        });
+    }
+
+    handleCancel = (e) => {
+        this.setState({
+            visible: false,
+        });
+    }
+
+    handleAdd = () => {
+        const projectId = this.props.userStore.userSetting.nextProjectId || this.props.userStore.getNextId();
+        this.props.userStore.addProject();
+        this.props.history.push(`/project/${projectId}`);
+    }
+
+    render() {
+        const {userStore} = this.props;
+        const {toolsOption, total, sortProjects, changeOption} = userStore;
+        return <div className={classnames(styles.home)} >
+            <Tools toolsOption={toolsOption} total={total} changeOption={changeOption.bind(userStore)} />
+            <div className={classnames(styles.projects, {
+                [styles.scrollY]: this.state.isScorll
+            })}>
+                <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
+                    <img src={addProjectIcon} alt="New Project" />
+                    <span>Create New Project</span>
+                </div>
+                {sortProjects.map((project) => {
+                    return <Project project={project} selectId={this.selectId} actions={this.actions} history={this.props.history} key={project.projectId} />
+                })}
+            </div>
+            {this.state.isShow && <Bar toggleSelect={this.toggleSelect} ids={this.state.ids} actions={this.actions} selected={this.state.selected} />}
+            <Modal
+                title={`Delete Project${this.state.deleteIds.length>1?"s":""}: ${this.state.deleteNames.join(" , ")}`}
+                visible={this.state.visible && this.state.deleteIds.length}
+                onOk={this.handleOk}
+                onCancel={this.handleCancel}
+                footer={<div style={{textAlign: "center"}}>
+                    <Button onClick={this.handleCancel}>No, thanks</Button>,
+                    <Button type="primary" onClick={this.handleOk}>Yes, delete</Button>,
+                </div>}
+                >
+                <h4 style={{padding: '3em'}} >Are you sure to delete project{this.state.deleteIds.length>1?"s":""} : {this.state.deleteNames.join(" , ")} ?</h4>
+            </Modal>
+        </div>
+    }
+}
+
+class Project extends Component{
+    state = {
+        cover: false,
+        selected: false
+    }
+
+    toggleCover = () => {
+        this.setState({
+            cover: !this.state.cover,
+        })
+    }
+
+    toggleSelect = () => {
+        //统计总数
+        this.props.selectId(this.state.selected, this.props.project.projectId);
+
+        this.setState({
+            selected: !this.state.selected,
+        })
+    }
+
+    handleOpen = () => {
+        this.props.history.push("/project/"+this.props.project.projectId);
+    }
+
+    render(){
+        const {project,actions} = this.props;
+        return <div className={styles.project} onMouseEnter={this.toggleCover} onMouseLeave={this.toggleCover}>
+            <div className={styles.info}>
+                <div className={styles.name}>{project.name}</div>
+                <div className={styles.description}>{project.description}</div>
+            </div>
+            <div className={styles.sub}>
+                <div className={styles.partner}>5 participator</div>
+                <div className={styles.time}>Create Date: {moment(+new Date(project.createdAt)).fromNow()}</div>
+            </div>
+            <div className={classnames(styles.cover,{
+                [styles.active]: this.state.cover
+            })}>
+                <div className={styles.actionBox}>
+                    <div className={styles.select}>
+                        {
+                            this.state.selected?
+                            <img className={styles.checked} onClick={this.toggleSelect} src={checkedIcon} alt="checked"/> :
+                            <div className={styles.circle} onClick={this.toggleSelect}></div>
+                        }
+                    </div>
+                    <div className={styles.action}>
+                        <img onClick={actions.bind(null, "share", project.projectId)} src={shareIcon} alt="share"/>
+                        <img onClick={actions.bind(null, "duplicate", project.projectId)} src={duplicateIcon} alt="duplicate"/>
+                        <img onClick={actions.bind(null, "delete", project.projectId)} src={deleteIcon} alt="delete"/>
+                    </div>
+                </div>
+                <div className={styles.openBox}>
+                    <div className={styles.open} onClick={this.handleOpen}>
+                        <span>OPEN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+const Tools = ({toolsOption, total, changeOption}) => {
+    return <div className={styles.tools}>
+        <Search 
+            value={toolsOption.keywords}
+            onChange={changeOption.bind(null,"keywords")}
+        /> 
+        <Select
             title="Sort by"
+            autoWidth={null}
+            options={{
+                createdDate: 'Last Created',
+                updatedDate: 'Last Modified',
+                progressUp: 'Progress 1 - 4',
+                progressDown: 'Progress 4 - 1',
+                aToz: 'A - Z',
+                zToa: 'Z - A'
+            }}
+            value={toolsOption.sort}
+            onChange={changeOption.bind(null,"sort")}
+        />
+        <Select
+            title="Projects  perpage"
             autoWidth
-            options={deployStore.sortByOptions}
-            value={deployStore.sortOptions.sortBy}
-            onChange={deployStore.changeSort.bind(null, 'sortBy')}
-          />
-          <Select
-            title="Projects per page"
-            autoWidth
-            options={deployStore.perPageOptions}
-            value={parseInt(deployStore.sortOptions.perPage, 10)}
-            onChange={deployStore.changeSort.bind(null, 'perPage')}
-          />
-          <Pagination
-            current={deployStore.sortOptions.currentPage}
-            pageSize={parseInt(deployStore.sortOptions.perPage, 10)}
-            total={deployStore.totalCount}
-            onChange={deployStore.changeSort.bind(null, 'currentPage')}
-          />
+            options={{
+                5: '5',
+                10: '10',
+                20: '20'
+            }}
+            value={toolsOption.perPage}
+            onChange={changeOption.bind(null,"perPage")}
+        />
+        <Pagination
+            current={toolsOption.currentPage}
+            pageSize={toolsOption.perPage}
+            total={total}
+            onChange={changeOption.bind(null,"currentPage")}
+        />
+    </div>
+}
+
+const Bar = ({ toggleSelect, ids, actions, selected }) => {
+    return <div className={styles.bar}>
+        <div className={styles.select}>
+            {
+                selected?
+                <img className={styles.checked} onClick={toggleSelect} src={checkedIcon} alt="checked"/> :
+                <div className={styles.circle} onClick={toggleSelect}></div>
+            }
+            <span><span className={styles.count}>{ids.length}</span> Screen Selected</span>
         </div>
-        <div className={styles.listWrapper}>
-          <div className={styles.head}>
-            <span
-              className={styles.projectName}
-              onClick={this.toggle(
-                deployStore.sortOptions.sortBy,
-                'projectName'
-              )}
-            >
-              Project Name
-            </span>
-            <span
-              className={styles.modelName}
-              onClick={this.toggle(deployStore.sortOptions.sortBy, 'modelName')}
-            >
-              Model Name
-            </span>
-            <span className={styles.enable}>Enable</span>
-            <span className={styles.deploymentStatus}>Deployment Status</span>
-            <span className={styles.operationAlert}>Operation Alert</span>
-            <span className={styles.performanceAlert}>Performance Alert</span>
-            <span
-              className={styles.createdDate}
-              onClick={this.toggle(
-                deployStore.sortOptions.sortBy,
-                'createdDate'
-              )}
-            >
-              Created Date
-            </span>
-            <span className={styles.owner}>Owner</span>
-          </div>
-          <div className={styles.list}>
-            {deployStore.sortedDeployments.map(deployment => (
-              <div key={deployment.id} className={styles.project}>
-                <span
-                  className={styles.projectName}
-                  title={deployment.name}
-                  onClick={() => history.push(`/project/${deployment.id}`)}
-                >
-                  {deployment.name}
-                </span>
-                <span
-                  className={styles.modelName}
-                  title={deployment.modelName}
-                  onClick={() => history.push(`/project/${deployment.id}`)}
-                >
-                  {deployment.modelName}
-                </span>
-                <span className={styles.enable}>
-                  <Switch
-                    checked={
-                      deployment.deploymentOptions &&
-                      deployment.deploymentOptions.enable
-                    }
-                    onChange={() => {
-                      if (deployment.deploymentOptions.frequency) {
-                        deployStore.toggleEnable(deployment.id);
-                      }
-                    }}
-                  />
-                </span>
-                <span
-                  className={styles.deploymentStatus}
-                  title={deploymentStatus[deployment.status || 'normal']}
-                >
-                  {deploymentStatus[deployment.status || 'normal']}
-                </span>
-                <span
-                  className={styles.operationAlert}
-                  title={deployment.operationAlert || 0}
-                  onClick={() => history.push(`/project/${deployment.id}`)}
-                >
-                  {deployment.operationAlert || 0}
-                </span>
-                <span
-                  className={styles.performanceAlert}
-                  title={deployment.performanceAlert || 0}
-                  onClick={() => history.push(`/project/${deployment.id}`)}
-                >
-                  {deployment.performanceAlert || 0}
-                </span>
-                <span
-                  className={styles.createdDate}
-                  title={moment.unix(deployment.createdDate).format('M/D/YYYY')}
-                  onClick={() => history.push(`/project/${deployment.id}`)}
-                >
-                  {moment.unix(deployment.createdDate).format('M/D/YYYY')}
-                </span>
-                <span className={styles.owner} title={deployment.owner}>
-                  {deployment.owner}
-                </span>
-              </div>
-            ))}
-          </div>
+        <div className={styles.action}>
+            <img onClick={actions.bind(null, "share", ids)} src={shareDarkIcon} alt="share"/>
+            <img onClick={actions.bind(null, "duplicate", ids)} src={duplicateDarkIcon} alt="duplicate"/>
+            <img onClick={actions.bind(null, "delete", ids)} src={deleteDarkIcon} alt="delete"/>
         </div>
-      </div>
-    );
-  }
+    </div>
 }

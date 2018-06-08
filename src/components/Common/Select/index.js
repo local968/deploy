@@ -1,21 +1,29 @@
 import React from 'react';
 import styles from './styles.module.css';
 import { Select } from 'antd';
+import classnames from 'classnames';
 const Option = Select.Option;
 
-export default ({ title, autoWidth, options, onChange, value }) => {
+export default ({ title, width, options, onChange, value, dropdownClassName, selectOption }) => {
   if (options) {
     return (
-      <div className={styles.selector}>
+      <div className={classnames(styles.selector,{
+        [styles.notAuto] : width!=="auto"
+      })}>
         <span className={styles.selectTitle}>{title}</span>
         <div
-          style={autoWidth ? { width: 'auto' } : {}}
+          style={{ width }}
           className={styles.selectWrapper}
         >
           <Select
-            className={styles.selectSelect}
+            className={classnames(styles.selectSelect,{
+              [styles[dropdownClassName]]:!!dropdownClassName
+            })}
             onChange={onChange}
             value={value}
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            optionFilterProp="children"
+            {...selectOption}
           >
             {Object.entries(options).map(([value, label], index) => (
               <Option key={value} value={value}>
@@ -31,7 +39,7 @@ export default ({ title, autoWidth, options, onChange, value }) => {
       <div className={styles.selector}>
         <span className={styles.selectTitle}>{title}</span>
         <div
-          style={autoWidth ? { width: 'auto' } : {}}
+          style={width ? { width: 'auto' } : {}}
           className={styles.selectWrapper}
         >
           <Select className={styles.selectSelect} defaultValue="lucy">

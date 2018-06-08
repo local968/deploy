@@ -13,7 +13,7 @@ export default ({ history }) => (
       {/* <h2 className={styles.mrone}>Mr.one</h2> */}
     </div>
     <div className={styles.menus}>
-      <a className={styles.home} onClick={() => history.push('/')}>
+      <a className={styles.home} onClick={() => history.push('/deploy')}>
         <img alt="home" src={home} />
         <h4 className={styles.nav}>Home</h4>
       </a>
@@ -22,7 +22,7 @@ export default ({ history }) => (
         <h4 className={styles.nav}>Support</h4>
       </a>
     </div>
-    <a className={styles.bottom}>
+    <a className={styles.bottom} onClick={() => history.push('/')}>
       <img alt="switch" src={switchIcon} />
       <h4 className={styles.nav}>
         Model<br />Training

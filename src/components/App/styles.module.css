@@ -25,4 +25,5 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  font-family: HelveticaNeue;
 }

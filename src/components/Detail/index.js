@@ -28,7 +28,7 @@ export default class Detail extends Component {
               [styles.active]: location.pathname.indexOf('deployment') >= 0
             })}
             onClick={() =>
-              routing.push(`/project/${match.params.id}/deployment`)
+              routing.push(`/deploy/project/${match.params.id}/deployment`)
             }
           >
             <img
@@ -43,7 +43,7 @@ export default class Detail extends Component {
               [styles.active]: location.pathname.indexOf('operation') >= 0
             })}
             onClick={() =>
-              routing.push(`/project/${match.params.id}/operation`)
+              routing.push(`/deploy/project/${match.params.id}/operation`)
             }
           >
             <img className={styles.icon} src={operationIcon} alt="operation" />
@@ -54,7 +54,7 @@ export default class Detail extends Component {
               [styles.active]: location.pathname.indexOf('performance') >= 0
             })}
             onClick={() =>
-              routing.push(`/project/${match.params.id}/performance`)
+              routing.push(`/deploy/project/${match.params.id}/performance`)
             }
           >
             <img
@@ -70,12 +70,12 @@ export default class Detail extends Component {
             path="/project/:id"
             exact
             render={() => (
-              <Redirect to={`/project/${match.params.id}/deployment`} />
+              <Redirect to={`/deploy/project/${match.params.id}/deployment`} />
             )}
           />
-          <Route path="/project/:id/deployment" component={Deployment} />
-          <Route path="/project/:id/operation" component={Operation} />
-          <Route path="/project/:id/performance" component={Performance} />
+          <Route path="/deploy/project/:id/deployment" component={Deployment} />
+          <Route path="/deploy/project/:id/operation" component={Operation} />
+          <Route path="/deploy/project/:id/performance" component={Performance} />
         </div>
         <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>

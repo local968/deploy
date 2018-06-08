@@ -26,7 +26,7 @@ export default class Replace extends Component {
     const modelName = this.approach && this.approach.modelDeploy[0];
     return (
       <div className={styles.replace}>
-        <Link className={styles.back} to={`/create/${match.params.id}`}>
+        <Link className={styles.back} to={`/deploy/create/${match.params.id}`}>
           <Icon className={styles.icon} type="arrow-left" />
         </Link>
         <h2 className={styles.title}>Replace an Existing Project</h2>

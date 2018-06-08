@@ -4,6 +4,7 @@ import { computed } from 'mobx';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
+import notificationIcon from './notification.svg';
 // import down from './combined-shape-copy.svg';
 // import more from './btn-more-option.svg';
 
@@ -66,12 +67,63 @@ class NormalHeader extends Component {
   }
 }
 
-const WelcomeHeader = () => (
-  <div className={styles.wheader}>
-    <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
-    <span className={styles.welcome}>Welcome!</span>
-    {/* <img className={styles.more} src={more} alt="more" /> */}
-  </div>
-);
+class ProjectHeader extends Component {
+  render() {
+    return <div className={styles.header}>
+      <div className={styles.menu}>
+        <div className={classnames(styles.item,styles.active)}>
+          <div>
+            1
+          </div>
+        </div>
+        <div className={styles.item}>
+          <div>
+            1
+          </div>
+        </div>
+        <div className={styles.item}>
+          <div>
+            1
+          </div>
+        </div>
+        <div className={styles.item}>
+          <div>
+            1
+          </div>
+        </div>
+      </div>
+      <div className={styles.tools}>
+        <div>2</div>
+        <div>2</div>
+      </div>
+    </div>
+  }
+}
 
-export default NormalHeader || WelcomeHeader;
+class WelcomeHeader extends Component{
+  render() {
+    return <div className={styles.header}>
+      <div className={styles.wheader}>
+        <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
+        <span className={styles.welcome}>Welcome!</span>
+        {/* <img className={styles.more} src={more} alt="more" /> */}
+      </div>
+      <div className={styles.notification}>
+        <img src={notificationIcon} alt="notification"/>
+        <span>
+          <span className={styles.num}>1</span> Notification
+        </span>
+        <div className={styles.pot}></div>
+      </div>
+    </div>
+  }
+}
+
+export default class Header extends Component {
+
+  render() {
+    const isHome = this.props.history.location.pathname === "/" || false;
+    const isDeploy = this.props.history.location.pathname.startsWith("/deploy");
+    return (isHome && <WelcomeHeader />) || (isDeploy && <NormalHeader />) || <ProjectHeader />;
+  }
+} 

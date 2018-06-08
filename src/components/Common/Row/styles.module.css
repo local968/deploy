@@ -1,0 +1,19 @@
+.row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.cell {
+    padding: 0.2em;
+    border: 0.5px solid #d8d8d8;
+    height: 3em;
+    min-width: 10em;
+    max-width: 10em;
+    padding: 0 0.5em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 3em;
+}
+  

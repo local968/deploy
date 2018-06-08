@@ -40,3 +40,12 @@
 .select :global(.ant-select-selection__rendered) {
   margin-left: 20px;
 }
+.notAuto{
+  flex:none 
+}
+.targetSelect {
+  border-radius: 5px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+  background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+  border: solid 1px #c4cbd7;
+}

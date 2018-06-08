@@ -56,7 +56,7 @@ class Create extends Component {
             <span className={styles.modelName}>{modelName}</span>
           </div>
           <div className={styles.selections}>
-            <Link className={styles.new} to={`/create/${match.params.id}/new`}>
+            <Link className={styles.new} to={`/deploy/create/${match.params.id}/new`}>
               <div className={styles.iconWrapper}>
                 <img className={styles.icon} src={createIcon} alt="create" />
               </div>
@@ -64,7 +64,7 @@ class Create extends Component {
             </Link>
             <Link
               className={styles.modify}
-              to={`/create/${match.params.id}/replace`}
+              to={`/deploy/create/${match.params.id}/replace`}
             >
               <div className={styles.iconWrapper}>
                 <img className={styles.icon} src={replaceIcon} alt="replace" />

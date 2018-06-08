@@ -1,6 +1,4 @@
 @import 'style';
-.listWrapper {
-}
 .filter {
   display: flex;
   height: 0.4em;
@@ -29,9 +27,7 @@
 .iconDelete {
   cursor: pointer;
 }
-.pagination {
-  composes: pagination from 'style';
-}
+
 .list {
   background: #e0e3e9;
   border: 1px solid #b5bec6;
