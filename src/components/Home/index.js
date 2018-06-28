@@ -94,6 +94,13 @@ export default class Home extends Component {
         })
     }
 
+    removeSelected = () => {
+        this.setState({
+            ids: [],
+            isShow: false
+        })
+    }
+
     actions = (act, ids) => {
         if(!Array.isArray(ids)){
             ids = [ids]
@@ -103,21 +110,26 @@ export default class Home extends Component {
         this.acts[act](ids);
     }
 
-    handleOk = (e) => {
-        console.log("delete",this.state.deleteIds)
+    handleOk = () => {
+        const {ids, deleteIds} = this.state;
+        const newIds = ids.filter(id => !deleteIds.includes(id));
+        this.props.userStore.deleteProjects(deleteIds)
         this.setState({
             visible: false,
+            deleteIds: [],
+            ids: newIds,
+            isShow: !!newIds.length
         });
     }
 
-    handleCancel = (e) => {
+    handleCancel = () => {
         this.setState({
             visible: false,
         });
     }
 
     handleAdd = () => {
-        const projectId = this.props.userStore.userSetting.nextProjectId || this.props.userStore.getNextId();
+        const projectId = this.props.userStore.getNextId();
         this.props.userStore.addProject();
         this.props.history.push(`/project/${projectId}`);
     }
@@ -135,13 +147,13 @@ export default class Home extends Component {
                     <span>Create New Project</span>
                 </div>
                 {sortProjects.map((project) => {
-                    return <Project project={project} selectId={this.selectId} actions={this.actions} history={this.props.history} key={project.projectId} />
+                    return <Project project={project} selectId={this.selectId} actions={this.actions} history={this.props.history} key={"project-"+project.projectId} selected={this.state.ids.includes(project.projectId)} />
                 })}
             </div>
-            {this.state.isShow && <Bar toggleSelect={this.toggleSelect} ids={this.state.ids} actions={this.actions} selected={this.state.selected} />}
+            {this.state.isShow && <Bar toggleSelect={this.removeSelected} ids={this.state.ids} actions={this.actions} selected={this.state.selected} />}
             <Modal
                 title={`Delete Project${this.state.deleteIds.length>1?"s":""}: ${this.state.deleteNames.join(" , ")}`}
-                visible={this.state.visible && this.state.deleteIds.length}
+                visible={this.state.visible && !!this.state.deleteIds.length}
                 onOk={this.handleOk}
                 onCancel={this.handleCancel}
                 footer={<div style={{textAlign: "center"}}>
@@ -158,12 +170,18 @@ export default class Home extends Component {
 class Project extends Component{
     state = {
         cover: false,
-        selected: false
+        // selected: false
     }
 
-    toggleCover = () => {
+    hideCover = () => {
         this.setState({
-            cover: !this.state.cover,
+            cover: false
+        })
+    }
+
+    showCover = () => {
+        this.setState({
+            cover: true
         })
     }
 
@@ -171,9 +189,9 @@ class Project extends Component{
         //统计总数
         this.props.selectId(this.state.selected, this.props.project.projectId);
 
-        this.setState({
-            selected: !this.state.selected,
-        })
+        // this.setState({
+        //     selected: !this.state.selected,
+        // })
     }
 
     handleOpen = () => {
@@ -182,7 +200,7 @@ class Project extends Component{
 
     render(){
         const {project,actions} = this.props;
-        return <div className={styles.project} onMouseEnter={this.toggleCover} onMouseLeave={this.toggleCover}>
+        return <div className={styles.project} onMouseEnter={this.showCover} onMouseLeave={this.hideCover}>
             <div className={styles.info}>
                 <div className={styles.name}>{project.name}</div>
                 <div className={styles.description}>{project.description}</div>
@@ -197,7 +215,7 @@ class Project extends Component{
                 <div className={styles.actionBox}>
                     <div className={styles.select}>
                         {
-                            this.state.selected?
+                            this.props.selected?
                             <img className={styles.checked} onClick={this.toggleSelect} src={checkedIcon} alt="checked"/> :
                             <div className={styles.circle} onClick={this.toggleSelect}></div>
                         }
@@ -258,14 +276,10 @@ const Tools = ({toolsOption, total, changeOption}) => {
     </div>
 }
 
-const Bar = ({ toggleSelect, ids, actions, selected }) => {
+const Bar = ({ toggleSelect, ids, actions }) => {
     return <div className={styles.bar}>
         <div className={styles.select}>
-            {
-                selected?
-                <img className={styles.checked} onClick={toggleSelect} src={checkedIcon} alt="checked"/> :
-                <div className={styles.circle} onClick={toggleSelect}></div>
-            }
+            <img className={styles.checked} onClick={toggleSelect} src={checkedIcon} alt="checked"/>
             <span><span className={styles.count}>{ids.length}</span> Screen Selected</span>
         </div>
         <div className={styles.action}>

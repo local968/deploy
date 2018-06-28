@@ -1,4 +1,4 @@
-local queue = require('queue')
+queue = require('queue')
 
 local tables = {
     --  userId,projectId,{...args}
@@ -6,18 +6,27 @@ local tables = {
         table = "js_projects",
         indexs = {
             {
-                name = "un_projects",
+                name = "primary",
                 parts = {1,"string",2,"unsigned"}
             }
         }
     },
-    --  userId,projectId,approachId,{...args}
+    --  userId,projectId,{...args}
     {
-        table = "js_approaches",
+        table = "models_info",
         indexs = {
             {
-                name = "un_approaches",
-                parts = {1,"string",2,"unsigned",3,"unsigned"}
+                name = "primary",
+                parts = {1,"string",2,"unsigned"}
+            }
+        }
+    },
+    {
+        table = "js_usersetting",
+        indexs = {
+            {
+                name = "primary",
+                parts = {1,"string"}
             }
         }
     },
@@ -25,7 +34,7 @@ local tables = {
         table = "modeling_request",
         indexs = {
             {
-                name = "pk_request",
+                name = "primary",
                 parts = {1,"string"}
             }
         }
@@ -34,8 +43,32 @@ local tables = {
         table = "modeling_result",
         indexs = {
             {
-                name = "pk_result",
+                name = "primary",
                 parts = {1,"string"}
+            }
+        }
+    },
+    {
+        table = "js_connids",
+        indexs = {
+            {
+                name = "primary",
+                parts = {1,"string"}
+            },
+            {
+                name = "index_conn",
+                parts = {2,"string"},
+                unique = false
+            }
+        }
+    },
+    -- userId, timestamp, type 1 login 2 logout
+    {
+        table = "js_authlog",
+        indexs = {
+            {
+                name = "primary",
+                parts = {1, "string", 2, 'unsigned', 3, 'unsigned'}
             }
         }
     }
@@ -54,7 +87,7 @@ local function initTables()
                 -- box.schema.sequence.create("pk_"..v1.table)
                 -- table:create_index('id',{sequence="pk_"..v1.table})
                 -- print("primary ".."pk_"..v1.table.." created")
-                table:create_index(v2.name, {type=v2.type, parts=v2.parts});
+                table:create_index(v2.name, {type=v2.type, parts=v2.parts, unique=v2.unique});
                 print("index "..v2.name.." created")
             end
         end
@@ -72,8 +105,21 @@ local function cleanTables()
     return true
 end
 
+local function cleanQueue() 
+    if queue.tube.taskQueue then
+        queue.tube.taskQueue:drop()
+    end
+end
+
+local function initQueue() 
+    queue.create_tube('taskQueue','fifo',{if_not_exists=true})
+end
+
 return function()
-    cleanTables()
+    -- cleanTables()
     initTables()
     
+    -- cleanQueue()
+    -- initQueue()
+
 end

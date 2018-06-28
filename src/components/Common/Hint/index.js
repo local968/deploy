@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import {Popover, Icon} from 'antd';
 
 import styles from './styles.module.css';

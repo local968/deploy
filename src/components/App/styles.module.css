@@ -27,3 +27,20 @@
   flex-direction: column;
   font-family: HelveticaNeue;
 }
+
+.warp {
+  display: flex;
+}
+
+.load {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #fff;
+  z-index: 2;
+  justify-content: center;
+  align-items: center;
+}

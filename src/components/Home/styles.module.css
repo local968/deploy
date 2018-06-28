@@ -9,7 +9,7 @@
 
 .projects {
     display: flex;
-    padding: 0.12em;
+    padding: 0.1em;
     flex-wrap: wrap;
     flex-direction: row;
     overflow: hidden;
@@ -96,6 +96,7 @@
     display: flex;
     flex: auto;
     font-size: 1.125rem;
+    display: none;
 }
 
 .time {

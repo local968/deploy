@@ -126,11 +126,11 @@ Copyright  R2.AI, Inc.
             }
 
             if (typeof(type) !== "string") {
-                throw 'INVALID_ARGUEMNT_ERR : messageEncode typeof (type) err';
+                throw new Error('INVALID_ARGUEMNT_ERR : messageEncode typeof (type) err');
             }
 
             if (type.length > 255 || type.length === 0) {
-                throw 'INVALID_ARGUEMNT_ERR : messageEncode length of type is zero or too long';
+                throw new Error('INVALID_ARGUEMNT_ERR : messageEncode length of type is zero or too long');
             }
 
             // if (typeof(data) !== "string") {
@@ -152,15 +152,15 @@ Copyright  R2.AI, Inc.
         function uuid() {
             var chars = CHARS, uuid = new Array(36), rnd=0, r;
             for (var i = 0; i < 36; i++) {
-                if (i==8 || i==13 ||  i==18 || i==23) {
+                if (i===8 || i===13 ||  i===18 || i===23) {
                     uuid[i] = '-';
-                } else if (i==14) {
+                } else if (i===14) {
                     uuid[i] = '4';
                 } else {
                     if (rnd <= 0x02) rnd = 0x2000000 + (Math.random()*0x1000000)|0;
                     r = rnd & 0xf;
                     rnd = rnd >> 4;
-                    uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+                    uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
                 }
             }
             return uuid.join('').toLowerCase();
@@ -241,11 +241,11 @@ Copyright  R2.AI, Inc.
                         eventTarget.dispatchEvent(generateEvent('close'));
                     }
 
-                    var timeout = self.reconnectInterval * Math.pow(self.reconnectDecay, self.reconnectAttempts);
+                    var timeOut = self.reconnectInterval * Math.pow(self.reconnectDecay, self.reconnectAttempts);
                     setTimeout(function() {
                         self.reconnectAttempts++;
                         self.open(true);
-                    }, timeout > self.maxReconnectInterval ? self.maxReconnectInterval : timeout);
+                    }, timeOut > self.maxReconnectInterval ? self.maxReconnectInterval : timeOut);
                 }
             };
             ws.onmessage = function(event) {
@@ -259,13 +259,13 @@ Copyright  R2.AI, Inc.
                 var message = messageDecode(event.data);
                 if (message != null)
                 {
-                    if (SET_SESSION_ID_TYPE == message.type) {
+                    if (SET_SESSION_ID_TYPE === message.type) {
                         var data = JSON.parse(message.data)
-                        if ('object' === typeof(data) && 0 == data.errno) {
+                        if ('object' === typeof(data) && 0 === data.errno) {
                             clearTimeout(timeout);
 
-                            var e = generateEvent('ready');
-                            eventTarget.dispatchEvent(e);
+                            var e1 = generateEvent('ready');
+                            eventTarget.dispatchEvent(e1);
 
                             if (self.debug || R2WSClient.debugAll) {
                                 console.debug('R2WSClient', 'onready', self.url);
@@ -276,17 +276,17 @@ Copyright  R2.AI, Inc.
                         return
                     }
 
-                    var e = generateEvent('message');
-                    e.data = message;
-                    eventTarget.dispatchEvent(e);
+                    var e2 = generateEvent('message');
+                    e2.data = message;
+                    eventTarget.dispatchEvent(e2);
 
-                    var e = generateEvent('_ev_' + message.type);
-                    e.data = message.data;
-                    eventTarget.dispatchEvent(e);
+                    var e3 = generateEvent('_ev_' + message.type);
+                    e3.data = message.data;
+                    eventTarget.dispatchEvent(e3);
                 }
                 else
                 {
-                    throw 'INVALID_FORMATE : message decode failed';
+                    throw new Error('INVALID_FORMATE : message decode failed');
                 }
             };
             ws.onerror = function(event) {
@@ -298,7 +298,7 @@ Copyright  R2.AI, Inc.
         }
 
         // Whether or not to create a websocket upon instantiation
-        if (this.automaticOpen == true) {
+        if (this.automaticOpen === true) {
             this.open(false);
         }
 
@@ -314,7 +314,7 @@ Copyright  R2.AI, Inc.
                 }
                 return ws.send(data);
             } else {
-                throw 'INVALID_STATE_ERR : Pausing to reconnect websocket';
+                throw new Error('INVALID_STATE_ERR : Pausing to reconnect websocket');
             }
         };
 
@@ -324,7 +324,7 @@ Copyright  R2.AI, Inc.
          */
         this.close = function(code, reason) {
             // Default CLOSE_NORMAL code
-            if (typeof code == 'undefined') {
+            if (typeof code === 'undefined') {
                 code = 1000;
             }
             forcedClose = true;

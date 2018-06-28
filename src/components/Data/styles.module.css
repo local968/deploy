@@ -1,21 +1,17 @@
-.warpper {
-    display: flex;
-    overflow-x: scroll;
-    overflow-y: hidden;
-}
-
 .data {
     display: flex;
-    flex-direction: column;
     flex: auto;
-    padding: 0 1.85em;
     background-color: #fff;
+    position: relative;
+    overflow: auto;
 }
 
 .connect {
     display: flex;
     margin-top: 0.3em;
     flex-direction: column;
+    padding: 0 1.85em;
+    flex: auto;
 }
 
 .uploadRow {
@@ -135,6 +131,8 @@
     display: flex;
     margin-top: 0.25em;
     flex-direction: column;
+    flex: auto;
+    padding: 0 1.85em;
 }
 
 .schemaInfo {
@@ -178,6 +176,7 @@
     margin-top: 0.25em;
     display: flex;
     flex-direction: column;
+    flex: auto;
 }
 
 .schemaTools {
@@ -188,21 +187,150 @@
     margin-bottom: -1px;
 }
 
-.content {
-    font-size: 18px;
-}
-
-.rowHead {
+.schemaSelect {
     display: flex;
-    flex: none;
-    flex-wrap: wrap;
+    align-items: center;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    border: solid 1px #c4cbd7;
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    padding: 0 0.2em;
+    margin-left: 0.85em;
+    cursor: pointer;
 }
 
-.rowData {
+.schemaSelect span {
+    font-size: 0.875rem;
+}
+
+.content {
     display: flex;
     flex: auto;
-    flex-wrap: wrap;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    max-height: 300px;
+}
+
+.grid {
+    border: 1px solid #ccc;
+}
+
+.cell {
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 0 0.1em;
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.content span {
+    font-size: 0.875rem;
+    overflow: hidden;
+    padding: 0.5em 0;
+    white-space: nowrap;
+    text-decoration: none;
+    text-overflow: ellipsis;
+}
+
+.target {
+    background-color: #daefe4;
+}
+
+.continue {
+    font-size: 1rem;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.button {
+    display: flex;
+    margin-top: 0.3em;
+    width: 1.1em;
+    height: 0.4em;
+    margin-bottom: 0.6em;
+}
+
+.check {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.checked {
+    color: #9b9b9b;
+}
+
+.content select {
+    display: flex;
+    flex: auto;
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    overflow: hidden;
+    /* margin: 0.5em; */
+    white-space: nowrap;
+    text-decoration: none;
+    text-overflow: ellipsis;
+}
+
+.dataSide {
+    display: flex;
+    width: 1.3em;
+    flex: none;
+    flex-direction: column;
+    margin-top: 0.2em;
+}
+
+.sideBox {
+    display: flex;
+    border: solid 1px #c4cbd7;
+    border-right: none;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sideBlock {
+    display: flex;
+    flex: none;
+    margin: 0.8em 0;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sideBlock span{
+    font-size: 0.875rem;
+    color: #9b9b9b;
+    text-align: center;
+}
+
+.sideLine {
+    position: absolute;
+    top: -1.4em;
+    max-height: 1.2em;
+    overflow: hidden;
+    display: flex;
+}
+
+.sideLine span {
+    writing-mode: tb-rl;
+    white-space: nowrap;
+}
+
+.sideBlock.active span{
+    color: #1d2b3c;
+}
+
+.sideIcon {
+    display: flex;
+    margin: 0.1em;
 }

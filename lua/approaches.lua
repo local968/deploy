@@ -6,7 +6,7 @@ end
 
 local function _query(userId,projectId,approachId)
     local query = {userId,projectId}
-    if(approachId) then 
+    if approachId then 
         query[3] = approachId
     end
     local result = index:select(query)
@@ -91,7 +91,7 @@ end
 
 return function(server)
     table = box.space["js_approaches"];
-    index = box.space["js_approaches"].index["un_approaches"];
+    index = box.space["js_approaches"].index["primary"];
     -- insertTestRow()
     server:addMessage({type='queryApproach'},singleQuery)
     server:addMessage({type='queryApproaches'},query)

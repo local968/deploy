@@ -49,3 +49,8 @@
   background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
   border: solid 1px #c4cbd7;
 }
+
+.selectSelect div{
+  display: flex;
+  flex: auto;
+}

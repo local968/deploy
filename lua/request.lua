@@ -1,16 +1,15 @@
-queue = require('queue')
-local table, index, server
-local temp = {}
+local reqTable, reqIndex, resTable, resIndex, server
+local conn = require('deploy2.lua.conn')
 
 local function _upsert(id,params)
-    table:upsert({id,params},{{"=",2,params}});
+    reqTable:upsert({id,params},{{"=",2,params}});
     queue.tube.taskQueue:put(id)
 end
 
 local function _query(id)
     local query = {id}
 
-    local result = index:select(query)
+    local result = resIndex:select(query)
     local list = {}
     for k, v in pairs(result) do
         list[k] = {id=v[1],params=v[2]}
@@ -22,25 +21,8 @@ local function change(self)
     -- {id,params}
     local data = self.data
 
-    -- userId 绑定 connid
-    temp[data.params.userId] = self.connid
-
-    local result = _query(data.id)
-
-    if #result == 0 then 
-        _upsert(data.id,data.params)
-    else
-        for k, v in pairs(result) do
-            local params = data.params;
-            for key, value in pairs(v.params) do
-                if not (params[key]) then
-                    params[key] = value
-                end
-            end
-            _upsert(data.id,params)
-        end
-    end
- 
+    _upsert(data.id,data.params)
+    
     return self:render{
         data = {
             status = 200,
@@ -51,40 +33,29 @@ end
 
 local function onModelingResult(old, new)
     if new then
-        dump(new)
-        local userId = new[2].userId
-        local connid = temp[userId]
-
-        print(connid)
-        print("onModelingResult")
-        print(new[1])
-
-        server:sendMessageTo(connid, "onModelingResult", new[1])
-        -- app.webServer._r2wsd:writebyid(connid)
+        local data = new[2]
+        local userId = data.userId
+        local connids = conn.getConnids(userId);
+        for k, connid in pairs(connids) do
+            local connect = server._r2wsd:get_conn(connid);
+            if connect then
+                server:sendMessageTo(connid, "onModelingResult", data)
+            end
+        end
     end
 end
 
 local function initTrigger() 
-    box.space["modeling_result"]:on_replace(onModelingResult)
-end
-
-local function initQueue() 
-    queue.create_tube('taskQueue','fifo',{if_not_exists=true})
-end
-
-local function cleanQueue() 
-    if queue.tube.taskQueue then
-        queue.tube.taskQueue:drop()
-    end
+    resTable:on_replace(onModelingResult)
 end
 
 return function(_server)
     server = _server;
-    table = box.space["modeling_request"]
-    index = box.space["modeling_request"].index["pk_request"]
+    reqTable = box.space["modeling_request"]
+    reqIndex = box.space["modeling_request"].index["primary"]
+    resTable = box.space["modeling_result"]
+    resIndex = box.space["modeling_result"].index["primary"]
 
-    -- cleanQueue()
-    initQueue()
     initTrigger()
 
     -- insertTestRow()

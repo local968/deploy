@@ -6,8 +6,6 @@ import { Select, InputNumber, Icon } from 'antd';
 import moment from 'moment';
 import styles from './styles.module.css';
 import downloadIcon from './icon-download.svg';
-import helpIcon from './icon-help.svg';
-import infoIcon from './icon-info.svg';
 import databaseIcon from './icon-database.svg';
 import fileIcon from './icon-file-local.svg';
 import onceIcon from './icon-once.svg';

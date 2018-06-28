@@ -5,6 +5,5 @@ import Pagination from './Pagination';
 import Switch from './Switch';
 import Uploader from './Uploader';
 import Search from './Search';
-import Row, {RowCell} from './Row';
 
-export { BlackButton, Bread, Select, Pagination, Switch, Uploader, Search, Row, RowCell };
+export { BlackButton, Bread, Select, Pagination, Switch, Uploader, Search };

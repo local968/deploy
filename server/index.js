@@ -58,42 +58,82 @@ app.post('/api/sample', (req, res) => {
 
 app.post('/api/upload', (req, res) => {
   // locate file path
-  const {userId, projectId, approachId} = req.query;
+  const {userId, projectId, start, filename, size, isFirst} = req.query;
   // const projPath = path.resolve(__dirname, '../..');
-  const approach = approachId || '';
-  const filePath = path.join(config.projPath, 'data', userId, projectId, approach);
+  const filePath = path.join(config.projPath, 'data', userId, projectId);
+  const uploadFile = path.join(filePath, filename);
+
+  //创建文件夹
   if (!fs.existsSync(filePath)) {
     createFilePath(filePath)
   }
 
-  const form = new multiparty.Form({uploadDir: filePath});
-  form.parse(req, function(err) {
-    
-  });
-  form.on('file', function(name, file) {
-    fs.rename(file.path, path.join(filePath, file.originalFilename), err => {
-      if (err) {
-        return res.status(500).json({message: err});
+  let n, filesize
+  try{
+    n = parseInt(start, 10);
+    filesize = parseInt(size, 10);
+  }catch(e){
+    res.status(500).json({message: e});
+  }
+
+  if (isFirst && fs.existsSync(uploadFile)){
+    const stat = fs.statSync(uploadFile);
+    //大于文件大小的块才开始写入
+    if(stat.size > n){
+      let returnData = {
+        status: 200,
+        msg: "ok",
+        size: stat.size,
+        isFirst: false
       }
-      return res.json({message: 'upload finished'});
-    });
+      res.json(returnData);
+      return 
+    }
+  }
+
+  const form = new multiparty.Form({uploadDir: filePath});
+ 
+  form.parse(req)
+
+  form.on('file', function(name, file) {
+    try{
+       //读取文件数据
+      fs.readFile(file.path, (err, data) => {
+        if (err) return res.status(500).json({message: err});
+        //写入文件最后
+        fs.appendFileSync(uploadFile, data);
+        //删除块文件
+        fs.unlinkSync(file.path);
+        let returnData = {
+          status: 200,
+          msg: "ok",
+          size: n + filesize,
+          isFirst: false
+        }
+        res.json(returnData);
+        return 
+      })
+    }catch(e){
+     res.status(500).json({message: e});
+      return
+    }
   });
+
+  
 });
 
 app.get('/api/download', (req,res) => {
-  const {userId, projectId, approachId, csvLocation} = req.query;
-  const approach = approachId || '';
-  const file = path.join(config.projPath, 'data', userId, projectId, approach, csvLocation);
-  const download = Download(req ,res);
+  const {userId, projectId, csvLocation} = req.query;
+  const file = path.join(config.projPath, 'data', userId, projectId, csvLocation);
+  const download = new Download(req ,res);
   download.download(file, csvLocation);
 })
 
-app.get('/api/sign', (req,res) => {
-  const {userId, projectId, approachId, csvLocation} = req.query;
-  const approach = approachId || '';
-  const file = path.join(config.projPath, 'data', userId, projectId, approach, csvLocation);
-  const download = Download(req ,res);
-  download.sign(file, csvLocation);
+app.get('/api/makemd5', (req,res) => {
+  const {userId, projectId, csvLocation} = req.query;
+  const file = path.join(config.projPath, 'data', userId, projectId, csvLocation);
+  const download = new Download(req ,res);
+  download.makemd5(file, csvLocation);
 })
 
 const createFilePath = (filePath) => {

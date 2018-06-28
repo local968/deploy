@@ -1,70 +1,97 @@
-import db from './db.js';
-import { observable, action, computed, autorun, when } from 'mobx';
+// import db from './db.js';
+import { observable, action, when } from 'mobx';
 import Project from './Project.js';
 import socketStore from './SocketStore';
-import config from '../config.js';
-import Approach from './Approach.js';
+// import config from '../config.js';
+import Model from './Model.js';
 
-class ProjectStore{
+class ProjectStore {
+    @observable userId;
     @observable project = null;
-    @observable approaches =[];
-    @observable currentId;
-    
-    constructor(){
-        this.projectTable = db('projects');
+    @observable models = [];
+    @observable isFirst = true;
+
+    constructor() {
         this.initCallback();
     }
 
     @action
-    init(projectId) {
+    init(userId, projectId) {
+        //同一project不用加载
+        if (this.userId === userId && this.projectId === projectId) return;
+        this.userId = userId;
         this.projectId = projectId;
-        if(config.database === "tarantool"){
-            when(
-                () => socketStore.isready,
-                () => {
-                    socketStore.send("queryProject", {userId: this.userId, projectId: projectId})
-                    socketStore.send("queryApproaches", { userId: this.userId, projectId: projectId })
-                }
-            )
-        }else{
-            this.projectTable
-                .find({userId: this.userId, projectId: projectId})
-                .fetch()
-                .subscribe( project => {
-                    this.project = new Project(this.userId, projectId, project);
-                })
+
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("queryProject", { userId: userId, projectId: projectId })
+                socketStore.send("queryModels", { userId: userId, projectId: projectId })
+            }
+        )
+    }
+
+    recommendModel() {
+        let model;
+        for (let m of this.models) {
+            if (!model) {
+                model = m;
+                continue;
+            }
+            if (model.score.auc < m.score.auc) {
+                model = m;
+            }
+        }
+        if (model) {
+            model.recommend = true;
         }
     }
 
-    @computed
-    get userId() {
-        return "devUser";
-    }
+    @action
+    modelimgError(command, result) {
 
-    @computed
-    get currentApproach() {
-        return this.approaches.find((approach) => {
-            return approach.approachId === this.currentId;
-        })
     }
 
     initCallback() {
         const callback = {
-            queryProject : action(data => {
-                const project = data.list[0]; 
+            queryProject: action(data => {
+                const project = data.list[0];
                 this.project = new Project(this.userId, project.projectId, project.args)
             }),
-            queryApproaches: action(data => {
-                const approaches = data.list;
-                if (approaches.length === 0) {
-                    approaches.push(null);
+            queryModels: action(data => {
+                const result = data.data;
+                const models = result.args;
+                this.models = [];
+                for (let key in models) {
+                    let backend = key.split("-")[2]
+                    this.models.push(new Model(this.userId, this.projectId, backend, models[key]))
                 }
-                this.approaches = approaches.map(approach => {
-                    const approachId = approach ? approach.approachId : 0;
-                    const args = approach ? approach.args : null;
-                    this.currentId = approachId;
-                    return new Approach(this.userId, this.projectId, approachId, args);
-                });
+                this.recommendModel()
+            }),
+            onModelingResult: action(data => {
+                console.log(data, "onModelingResult");
+                const { userId, projectId, command, result, status, time } = data;
+                if (status < 0) {
+                    this.modelimgError(command, result)
+                }
+                let info = {
+                    userId,
+                    projectId,
+                    args: {}
+                }
+                for (let row of result) {
+                    info.args[`${command}-${row.backend}-result`] = row
+                    this.models = result.map(row => new Model(userId, projectId, row.backend, row));
+                }
+                this.recommendModel()
+                switch (command) {
+                    case 'train2':
+                        this.project.finishTrain2();
+                        break;
+                    default:
+                        break;
+                }
+                this.project.saveModel(info, time);
             })
         }
 

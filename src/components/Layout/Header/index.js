@@ -1,12 +1,34 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
+import { withRouter } from 'react-router';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
+import config from "../../../config.js";
 import notificationIcon from './notification.svg';
-// import down from './combined-shape-copy.svg';
+import loginIcon from "./login.svg";
+import projectActiveIcon from './project-d1.svg';
+import problemIcon from './icon_business_problem_d.svg';
+import problemActiveIcon from './icon_business_problem_a.svg';
+import dataIcon from './icon_data_d.svg';
+import dataActiveIcon from './icon_data_prograss_a.svg';
+import modelingIcon from './icon_modeling_d.svg';
+import modelingActiveIcon from './icon_modeling_a.svg';
+import down from './combined-shape-copy.svg';
 // import more from './btn-more-option.svg';
+
+const imgs = {
+  problem : <img src={problemIcon} alt="problem"/>,
+  data: <img src={dataIcon} alt="data"/>,
+  modeling : <img src={modelingIcon} alt="modeling"/>,
+  projectActive : <img src={projectActiveIcon} alt="project"/>,
+  problemActive : <img src={problemActiveIcon} alt="problem"/>,
+  dataActive: <img src={dataActiveIcon} alt="data"/>,
+  modelingActive : <img src={modelingActiveIcon} alt="modeling"/>
+}
+
+const step = ["project", "problem", "data", "modeling"];
 
 @inject('deployStore')
 @observer
@@ -67,46 +89,86 @@ class NormalHeader extends Component {
   }
 }
 
+@inject('userStore', 'projectStore')
+@observer
 class ProjectHeader extends Component {
+  logout = () => {
+    this.props.history.push("/");
+    this.props.userStore.logout();
+  }
+
+  enter = (index) => {
+    const {history, projectStore} = this.props;
+    let maxStep = projectStore.project.mainStep;
+    if(index > maxStep) return;
+    projectStore.project.nextMainStep(index)
+    history.push("/"+step[index]+"/"+projectStore.project.projectId)
+  }
+
   render() {
+    const {pathname, userStore} = this.props;
+    
+    const current = step.findIndex(v => pathname.includes(v));
+
     return <div className={styles.header}>
       <div className={styles.menu}>
-        <div className={classnames(styles.item,styles.active)}>
-          <div>
-            1
+        {step.map((v, k) => {
+          let str = v.split("");
+          let text = str.shift().toUpperCase() + str.join("");
+          let line = "";
+          if(k!==0){
+            line = <div className={styles.line}><span>-----------------------------------------------</span></div>
+          }
+          return <div key={k} onClick={this.enter.bind(this,k)} className={classnames(styles.item,{
+            [styles.current]: current===k,
+            [styles.active]: current>=k
+          })}>
+            <div className={styles.iconBlock}>
+              <div className={styles.icon}>
+                {imgs[v+(current>=k?"Active":"")]}
+              </div>
+              {line}
+              <div className={styles.iconText}>
+                <span>{text}</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className={styles.item}>
-          <div>
-            1
-          </div>
-        </div>
-        <div className={styles.item}>
-          <div>
-            1
-          </div>
-        </div>
-        <div className={styles.item}>
-          <div>
-            1
-          </div>
-        </div>
+        })}
       </div>
       <div className={styles.tools}>
-        <div>2</div>
-        <div>2</div>
+        <div className={styles.notification}>
+          <img src={notificationIcon} alt="notification"/>
+          <span>
+            <span className={styles.num}>1</span> Notification
+          </span>
+          <div className={styles.pot}></div>
+        </div>
+        <div className={styles.user}>
+          <img src={mockAvatar} alt="avatar" className={styles.avatar} />
+          <div className={styles.userBottom}>
+            <span className={styles.name}>{userStore.userId}</span>
+            <div className={styles.down} onClick={this.logout}><img src={down} alt="down" /></div>
+          </div>
+        </div>
       </div>
     </div>
   }
 }
 
+@inject('userStore')
+@observer
 class WelcomeHeader extends Component{
+  logout = () => {
+    this.props.history.push("/");
+    this.props.userStore.logout();
+  }
+
   render() {
     return <div className={styles.header}>
       <div className={styles.wheader}>
         <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
-        <span className={styles.welcome}>Welcome!</span>
-        {/* <img className={styles.more} src={more} alt="more" /> */}
+        <span className={styles.welcome}>Welcome , {this.props.userStore.userId}</span>
+        <div className={styles.down}  onClick={this.logout}><img src={down} alt="down" /></div>
       </div>
       <div className={styles.notification}>
         <img src={notificationIcon} alt="notification"/>
@@ -119,11 +181,27 @@ class WelcomeHeader extends Component{
   }
 }
 
+const LoginHeader = (props) => (
+  <div className={styles.header}>
+    <div className={styles.wheader}><span className={styles.welcome}>Welcome to R2.ai</span></div>
+    {config.openResiger && <div className={styles.auth} onClick={() => props.pathname==="/"?
+          props.history.push("/signup"):
+          props.history.push("/")}>
+            <div className={styles.loginIcon}><img src={loginIcon} alt='login' /></div>
+            <span>{props.pathname==="/"?"Sign Up":"Sign In"}</span>
+    </div>}
+  </div>
+)
+
+@withRouter
+@inject('userStore')
+@observer
 export default class Header extends Component {
 
   render() {
     const isHome = this.props.history.location.pathname === "/" || false;
     const isDeploy = this.props.history.location.pathname.startsWith("/deploy");
-    return (isHome && <WelcomeHeader />) || (isDeploy && <NormalHeader />) || <ProjectHeader />;
+    const userId = this.props.userStore.userId;
+    return (!userId&&<LoginHeader pathname={this.props.history.location.pathname} history={this.props.history} />) ||(isHome && <WelcomeHeader history={this.props.history} />) || (isDeploy && <NormalHeader />) || <ProjectHeader history={this.props.history} pathname={this.props.history.location.pathname} />;
   }
 } 

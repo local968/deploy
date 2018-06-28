@@ -3,7 +3,7 @@ import createBrowserHistory from 'history/createBrowserHistory';
 import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { Router } from 'react-router-dom';
-import Route from 'components/App/Route';
+import Layout from 'components/App/Layout';
 import Sider from 'components/Layout/Sider';
 import Header from 'components/Layout/Header';
 import Stores from 'stores';
@@ -26,7 +26,7 @@ class App extends Component {
             <Sider history={history} />
             <div className={styles.main}>
               <Header history={history} />
-              <Route />
+              <Layout history={history} />
             </div>
           </div>
         </Router>

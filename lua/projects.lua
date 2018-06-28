@@ -1,4 +1,6 @@
 local table, index
+local userSetting = require('deploy2.lua.usersetting')
+local clean = require('deploy2.lua.clean')
 
 local function _query(userId,projectId)
     local query = {userId}
@@ -34,10 +36,12 @@ local function query(self)
     local data = self.data
 
     local result = _query(data.userId)
+    local setting = userSetting.query(data.userId)
 
     return self:render{
         data = {
             list = result,
+            setting = setting,
             status = 200,
             msg = "ok"
         }
@@ -58,6 +62,21 @@ local function singleQuery(self)
     }
 end
 
+local function delete(self)
+    local data = self.data
+
+    for k, v in pairs(data.ids) do
+        clean.delete(data.userId, v)
+    end
+
+    return self:render{
+        data = {
+            status = 200,
+            msg = "ok"
+        }
+    }
+end
+
 local function change(self)
     -- {userId,projectId,args}
     local data = self.data
@@ -66,6 +85,7 @@ local function change(self)
     
     if #result == 0 then 
         _upsert(data.userId,data.projectId,data.args)
+        userSetting.upsert(data.userId,data.projectId)
     else
         for k, v in pairs(result) do
             local args = data.args;
@@ -88,10 +108,10 @@ end
 
 return function(server)
     table = box.space["js_projects"]
-    index = box.space["js_projects"].index["un_projects"]
-
+    index = box.space["js_projects"].index["primary"]
     -- insertTestRow()
     server:addMessage({type='queryProject'},singleQuery)
     server:addMessage({type='queryProjects'},query)
+    server:addMessage({type='deleteProjects'},delete)
     server:addMessage({type='changeProject'},change)
 end

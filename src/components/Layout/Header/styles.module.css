@@ -5,6 +5,7 @@
   display: flex;
   z-index: 1;
   overflow-x: auto;
+  position: relative;
 }
 
 .block {
@@ -50,38 +51,42 @@
   flex: 0 1 1.4em;
   display: flex;
   flex-direction: column;
-  padding: 0.17em 0.4em;
+  padding: 0.24em 0.3em;
 }
 
 .avatar {
   display: block;
-  height: 0.6em;
-  width: 0.6em;
+  height: 0.5em;
+  width: 0.5em;
   border-radius: 50%;
   border: 1px solid #979797;
-  flex: 0 0 0.6em;
+  flex: 0 0 0.5em;
   margin: 0 auto;
 }
 
 .userBottom {
   position: relative;
+  margin-top: 0.15em;
+  display: flex;
+  align-items: center;
 }
 
 .down {
-  position: absolute;
-  right: -0.2em;
-  top: 0.1em;
+  display: flex;
+  margin-left: 0.1em;
+  margin-top: 0.05em;
+  cursor: pointer;
 }
 
 .name {
-  font-size: 1.3125rem;
+  font-size: 0.875rem;
   line-height: 1.5rem;
   max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
   display: block;
   text-align: center;
-  font-family: shareTech-Regular;
+  font-family: HelveticaNeue;
 }
 
 .wheader {
@@ -89,19 +94,20 @@
   align-items: center;
   display: flex;
   flex: auto;
+  position: relative;
 }
 
 .wavatar {
   border: 1px solid #979797;
-  width: 0.8em;
-  height: 0.8em;
-  flex: 0 0 0.8em;
+  width: 0.7em;
+  height: 0.7em;
+  flex: 0 0 0.7em;
   border-radius: 50%;
   margin-right: 0.2em;
 }
 
 .welcome {
-  font-size: 1.875rem;
+  font-size: 1.125rem;
   font-family: HelveticaNeue;
 }
 
@@ -172,6 +178,81 @@ span.num {
   flex: auto;
 }
 
-.item.active{
+.item.current{
   border-bottom: 0.04em solid #1d2b3c;
+}
+
+.item span{
+  font-size: 1.125rem;
+  font-family: SanFranciscoText;
+  color: #979797;
+}
+
+.item.active span{
+  color: #1d2b3c;
+}
+
+.item.current span{
+  font-family: HelveticaNeue;
+  font-weight: bold;
+}
+
+.icon{
+  display: flex;
+  justify-content: center;
+  margin: 0.3em auto 0.15em;
+}
+
+.iconBlock{
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.iconText {
+  display: flex;
+}
+
+.line {
+  position: absolute;
+  display: flex;
+  top: 0.5em;
+  left: -0.96em;
+  max-width: 1.92em;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+
+.item .line span{
+  font-weight: normal;
+  font-size: 0.875rem;
+  font-family: HelveticaNeue;
+  white-space: nowrap;
+  color: #c6c6c6;
+}
+
+.item.active .line span{
+  color: #1d2b3c
+}
+
+.auth {
+  position: absolute;
+  right: 0;
+  display: flex;
+  height: 1.2em;
+  align-items: center;
+  margin-right: 0.5em;
+}
+
+.auth span {
+  color: #1d2b3c;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+
+.loginIcon {
+  display: flex;
+  margin: 0.1em;
 }

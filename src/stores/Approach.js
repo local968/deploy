@@ -1,10 +1,9 @@
 import db from './db.js';
-import { observable, action, computed, autorun, when } from 'mobx';
+import { observable, action, when } from 'mobx';
 import requestStore from './RequestStore.js';
 import config from '../config.js';
-import socketStore from './SocketStore.js'
-import { request } from 'http';
-import command from './command.js';
+import socketStore from './SocketStore.js';
+import moment from 'moment';
 
 export default class Approach{
     @observable deployFileName = '';
@@ -28,19 +27,22 @@ export default class Approach{
     @observable uploadData = [];
     @observable rawHeader = [];
     @observable varNameMap = [];
+    @observable dataType = [];
 
-    @observable maxStep = 0;
     @observable mainStep = 0;
     @observable curStep = 0;
     @observable lastSubStep = 1;
     @observable subStepActive = 1;
 
+    @observable overfit = 5;
+    @observable speed = 5;
 
     constructor(userId, projectId, approachId, approach=null) {
         this.userId = userId;
         this.projectId = projectId;
         this.approachId = approachId;
         this.id = `${this.userId}-${this.projectId}-${this.approachId}`;
+        this.trainStartTime = 0;
         if(config.database === "tarantool"){
             this.initCallback()
         }else{
@@ -68,31 +70,6 @@ export default class Approach{
         const callback = {
             changeApproach : data => {
                 console.log(data,"changeApproach")    
-            },
-            onModelingResult: data => {
-                console.log(data, "onModelingResult")
-                when(
-                    () => socketStore.isready,
-                    () => {
-                        // command(record, model, listening)
-                        // if (status < 0) {
-                        //     this.errorProcess(record, model, listening);
-                        //     return;
-                        // }
-                        // const train2Info = this.parseFastTrack(result);
-                        //     this.updateApproach({
-                        //     train2ing: false,
-                        //     train2Info,
-                        //     train2Finished: true,
-                        //     train2Error: false
-                        // });
-                        // this.updateApproach({
-                        //     train2Error: true,
-                        //     train2ing: false,
-                        // });
-                        console.log(data)
-                    }
-                )
             }
         }
         socketStore.addMessageArr(callback);
@@ -224,6 +201,7 @@ export default class Approach{
     @action
     newFileInit(uploadData) {
         const header = uploadData[0];
+        const data = uploadData.slice(1);
 
         const temp = {};
         const rawHeader = header.map((h, i) => {
@@ -240,12 +218,27 @@ export default class Approach{
             return h
         })
 
+        let type = new Array(header.length).fill("numerical");
+        for(var row of data){
+            for(var [k ,v] of row.entries()){
+                if(type[k] === "categorical"){
+                    continue;
+                }
+                if(!!v && isNaN(parseFloat(v))){
+                    type[k] = "categorical"
+                }
+            }
+        }
+
         this.updateApproach({
-            uploadData,
+            uploadData: data,
             dataHeader: header,
             rawHeader,
             varNameMap: header,
+            dataType: type
         });
+
+        this.nextSubStep(2, 2);
     }
 
     cleanDB(table, object, cb) {
@@ -257,7 +250,7 @@ export default class Approach{
         );
     }
 
-    fastTrain() {
+    fastTrain(banList) {
         const {
             userId, 
             projectId, 
@@ -265,15 +258,23 @@ export default class Approach{
             problemType,
             target,
             dataHeader,
-            uploadFileName
+            uploadFileName,
+            speed,
+            overfit,
+            dataType
         } = this;
-        const command = 'train2'
+        this.trainStartTime = moment().valueOf();
+        const command = 'train2';
+        const newDataHeader = dataHeader.filter(d => !banList.includes(d))
     
         this.updateApproach({
             train2Finished: false,
-            train2ing: true
+            train2ing: true,
+            dataHeader: newDataHeader,
+            dataType: dataType
         });
         const id = `${command}-${userId}-${projectId}-${approachId}`;
+        const featureLabel = newDataHeader.filter(d => d !== target)
         // this.cleanResultByCommand(this.modelingResultTable, { command: 'train2' });
 
         // id: request ID
@@ -285,20 +286,26 @@ export default class Approach{
         // feature_label: 特征列名
         // target_label:  目标列
         // fill_method:  无效值
+        // speed:  1-10  默认5
+        // overfit:   1-10 默认5
         // model_option: model的额外参数，不同model参数不同
         // version: 控制选择何种model，目前有gbm，cat，默认两种全部使用。
         // kwargs:
         requestStore.sendRequest(id,{
             csvLocation: uploadFileName,
             problemType,
-            featureLabel: dataHeader.filter(d => d !== target),
+            featureLabel,
             targetLabel: target,
             projectId,
             userId,
             approachId,
-            time: +new Date(),
+            speed,
+            overfit,
+            time: this.trainStartTime,
             command
         });
+
+        this.nextSubStep(3, 2);
     }
 
     initDeployFile(filename) {
@@ -312,7 +319,7 @@ export default class Approach{
             userId, 
             projectId, 
             approachId, 
-            deployFileName
+            uploadFileName
         } = this;
 
         const command = 'deploy2'
@@ -331,12 +338,33 @@ export default class Approach{
         // csv_location: csv 文件相对路径
         // kwargs:
         requestStore.sendRequest(id,{
-            csvLocation: deployFileName,
+            csvLocation: uploadFileName,
             projectId,
             userId,
             approachId,
             time: +new Date(),
             command
         });
+    }
+
+    finishTrain2() {
+        this.updateApproach({
+            train2Finished: true,
+            train2ing: false
+        });
+    }
+
+    saveModel(data, time) {
+        console.log(data,time,moment().valueOf(),this.trainStartTime)
+        const endTime = moment().valueOf();
+        for(let key in data.args){
+            data.args[key].executeTime = endTime - this.trainStartTime;
+        }
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("changeModel", data)
+            }
+        )
     }
 }

@@ -1,0 +1,319 @@
+.modeling {
+    display: flex;
+    flex: auto;
+    background-color: #fff;
+    overflow: auto;
+}
+
+.modelResult {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    margin: 0 1.85em;
+}
+
+.modelResult span {
+    font-size: 1.125rem;
+    display: flex;  
+    flex: none;
+    font-family: SanFranciscoText;
+    line-height: normal;
+    align-items: baseline;
+    color: #1d2b3c;
+}
+
+.result {
+    display: flex;
+    flex: none;
+    margin-top: 0.4em;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+}
+
+.title {
+    display: flex;
+}
+
+.title span {
+    font-size: 1.25rem;
+}
+
+.text {
+    display: flex;
+}
+
+.row {
+    display: flex;
+    margin-top: 0.15em;
+}
+
+.row span {
+    color: #000;
+}
+
+.status {
+    display: flex;
+    font-size: 1.5rem;
+    color: #f5a623;
+    font-weight: bold;
+}
+
+.line {
+    border-bottom: 3px solid #c4cbd7;
+    margin: 0.2em 0;
+    display: flex;
+}
+
+.selectBlock {
+    display: flex;
+}
+
+.buttonBlock {
+    display: flex;
+    margin-top: 0.3em;
+    margin-bottom: 0.6em;
+    align-items: baseline;
+}
+
+.button {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.1em 0.25em;
+}
+
+.button span {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: normal;
+}
+
+.or {
+    display: flex;
+    margin: 0 0.25em;
+}
+
+.or span {
+    font-size: 1.125rem;
+    font-family: HelveticaNeue;
+    color: #000;
+}
+
+.selectText {
+    margin-right: 0.5em;
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.radio {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.radio label {
+    font-size: 1.125rem;
+    color: #000;
+    font-family: SanFranciscoText;
+    cursor: pointer;
+}
+
+.radio input {
+    width: 0.16em;
+    height: 0.16em;
+    margin-right: 0.1em;
+    cursor: pointer;
+}
+
+.performanceBox {
+    display: flex;
+}
+
+.performance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 0.9em; 
+    margin-top: 0.2em;
+}
+
+.performance path:last-child {
+    stroke: #ff8000;
+}
+
+.performanceText {
+    color: #000;
+    margin-top: 0.15em;
+    white-space: nowrap;
+}
+
+.progressBox {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.25em;
+    margin-left: 0.3em;
+}
+
+.progressBlock {
+    margin-top: 0.05em;
+}
+
+.progressLine {
+    display: flex;
+}
+
+.progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress span {
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.success {
+    background-color: #9be44b;
+}
+
+.predicted {
+    background-color: #adaafc;
+}
+
+.different {
+    background-color: #f9cf37;
+}
+
+.progressTitle {
+    margin-right: 0.1em;
+}
+
+.progressTitle span{
+    font-size: 1.25rem;
+    font-family: SanFranciscoText;
+    color: #000;
+}
+
+.progressMeans {
+    display: flex;
+    margin-top: 0.2em;
+}
+
+.progressMeans span {
+    font-size: 0.875rem;
+    color: #000;
+    white-space: nowrap;
+}
+
+.progressBlock {
+    display: flex;
+    align-items: center;
+}
+
+.progressSquare {
+    width: 0.16em;
+    height: 0.16em;
+    margin: 0 0.15em;
+}
+
+.table {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    border: solid 0.5px #979797;
+    max-height: 3.3em;
+}
+
+.rowData {
+    display: flex;
+    padding: 0 0.2em;
+    position: relative;
+    align-items: center;
+}
+
+.cell span {
+    font-size: 0.875rem;
+    max-width: 100%;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rowHeader {
+    padding: 0.2em 0;
+    border-bottom: solid 1px #9b9b9b;
+}
+
+.data {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em 0;
+}
+
+.cell {
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+    padding: 0.08em 0;
+    border-bottom: 1px solid #979797;
+    min-width: 1.3em;
+    margin: 0 0.1em;
+}
+
+.cell .progress span {
+    font-size: 0.75rem;
+    color: #000;
+    font-weight: normal;
+}
+
+.cellHeader {
+    border: none;
+}
+
+.name {
+    width: 1.5em;
+}
+
+.predict {
+    width: 3.7em;
+    border: none;
+}
+
+.space {
+    margin-left: 0.1em;
+}
+
+.compute {
+    border: none;
+    cursor: pointer;
+}
+
+.compute span {
+    color: #448eed;
+    text-decoration: underline;
+}
+
+.modelSelect {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 0.05em;
+}

@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Popover } from 'antd';
 import classnames from 'classnames';
 import moment from 'moment';
 import styles from './list.module.css';
-import infoIcon from './icon-info.svg';
-import helpIcon from './icon-help.svg';
 import emptyIcon from './icon-no-report.svg';
-import alertIcon from './fail.svg';
+// import alertIcon from './fail.svg';
 
 @inject('scheduleStore')
 @observer
@@ -125,18 +122,18 @@ export default class List extends Component {
   }
 }
 
-const Alert = () => (
-  <div className={styles.alert}>
-    <div className={styles.alertHead}>
-      <img className={styles.alertIcon} src={alertIcon} alt="alert" />Alert
-    </div>
-    <div className={styles.alertContent}>
-      Can not find the data source file from the path{' '}
-      <span className={styles.path}>D://user/deployment/results</span>
-      <br />Please check the file if it has been moved.
-    </div>
-  </div>
-);
+// const Alert = () => (
+//   <div className={styles.alert}>
+//     <div className={styles.alertHead}>
+//       <img className={styles.alertIcon} src={alertIcon} alt="alert" />Alert
+//     </div>
+//     <div className={styles.alertContent}>
+//       Can not find the data source file from the path{' '}
+//       <span className={styles.path}>D://user/deployment/results</span>
+//       <br />Please check the file if it has been moved.
+//     </div>
+//   </div>
+// );
 
 const Empty = () => (
   <div className={styles.emptyTable}>

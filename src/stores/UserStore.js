@@ -1,10 +1,14 @@
-import db from './db.js';
-import { observable, action, computed, autorun, when } from 'mobx';
+// import db from './db.js';
+import { observable, action, computed, when } from 'mobx';
 import Project from './Project.js'
 import config from '../config.js'
 import socketStore from './SocketStore';
+import { message } from 'antd';
 
 class UserStore{
+    @observable isLoad = true;
+    @observable isInit = true;
+    @observable user = {};
     @observable projects = [];
     @observable userSetting = {};
     @observable toolsOption = {
@@ -13,6 +17,8 @@ class UserStore{
         keywords: '',
         sort: 'createdDate',
     }
+    @observable hasToken = !!window.localStorage.getItem("deploy2-token");
+
     sortFunction = {
         createdDate: (a, b) => a.createdAt < b.createdAt ? 1 : -1,
         updatedDate: (a, b) => a.updatedAt < b.updatedAt ? 1 : -1,
@@ -23,20 +29,16 @@ class UserStore{
     };
 
     constructor(){
-        if(config.database === "tarantool"){
-            this.initCallback();
-            
+        this.initCallback();
+
+        if(!this.userId && this.hasToken){
             when(
                 () => socketStore.isready,
-                () => this.initProjects()
+                () => this.tryLoginByToken()
             )
         }else{
-            this.initProjects()
+            this.isInit = false
         }
-
-        this.projectTable = db('projects');
-        this.userSettingTable = db('userSetting');
-        this.startWatch();
     }
 
     @computed
@@ -46,7 +48,7 @@ class UserStore{
 
     @computed
     get userId() {
-        return "devUser"
+        return this.user?this.user.email:"";
     }
 
     @computed
@@ -65,6 +67,7 @@ class UserStore{
     @action
     initProjects() {
         if(config.database === "tarantool"){
+            this.isLoad = true;
             when(
                 () => socketStore.isready,
                 () => socketStore.send("queryProjects", {userId: this.userId})
@@ -79,7 +82,6 @@ class UserStore{
                 });
             })
         }
-        
     }
     
     @action
@@ -89,13 +91,24 @@ class UserStore{
 
     @action
     addProject() {
-        const projectId = this.userSetting.nextProjectId || this.getNextId();
+        const projectId = this.getNextId();
+        this.userSetting.projectId = projectId + 1;
         this.projects.push(new Project(this.userId, projectId));
-        Object.assign(this.userSetting, { nextProjectId: projectId + 1 });
-        this.userSettingTable.update(this.userSetting);
+    }
+
+    @action
+    deleteProjects(ids) {
+        this.projects = this.projects.filter(project => !ids.includes(project.projectId))
+        when(
+            () => socketStore.isready,
+            () => socketStore.send("deleteProjects", {userId:this.userId, ids})
+        )
     }
 
     getNextId() {
+        if(this.userSetting.projectId) {
+            return this.userSetting.projectId;
+        }
         let maxId = 0;
         for(let project of this.projects){
             maxId = project.projectId > maxId ? project.projectId : maxId;
@@ -143,34 +156,93 @@ class UserStore{
                 }
             }
         })
-
-        this.userSettingTable
-        .find({userId: this.userId})
-        .watch()
-        .subscribe(data => {
-            if (!data) {
-                this.userSetting = {
-                    userId: this.userId,
-                    nextProjectId: this.getNextId()
-                }
-                this.userSettingTable.upsert(this.userSetting);
-            } else {
-                Object.assign(this.userSetting, data);
-            }
-        });
     }
 
     initCallback() {
         const callback = {
             queryProjects : data => {
                 const projects = data.list;
+                this.userSetting = data.setting || {};
                 this.projects = projects.map(project => {
                     return new Project(this.userId, project.projectId, project.args);
                 });
+                this.isLoad = false;
+                this.isInit = false;
+            },
+            login : data => {
+                console.log(data,"login")
+                const {status, err, user} = data;
+                if(status !== 200){
+                    this.clearToken();
+                    this.isInit = false;
+                    this.isLoad = false;
+                    return message.error(err);
+                }
+                this.user = user;
+                this.setCache(user)
+                this.initProjects();
+            },
+            register: data => {
+                const {status, err, user} = data;
+                if(status !== 200){
+                    this.clearToken();
+                    this.isLoad = false;
+                    return message.error(err);
+                }
+                this.user = user;
+                this.setCache(user)
+                this.initProjects();
             }
         }
 
         socketStore.addMessageArr(callback);
+    }
+
+    tryLoginByToken() {
+        let token = window.localStorage.getItem("deploy2-token");
+        this.login({token});
+    }
+
+    setCache(user) {
+        this.hasToken = true;
+        window.localStorage.setItem("deploy2-token", user.id);
+        window.localStorage.setItem("deploy2-email", user.email)
+    }
+
+    clearToken() {
+        this.hasToken = false;
+        window.localStorage.removeItem("deploy2-token");
+    }
+
+    login(data) {
+        this.isLoad = true;
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("login", data)
+            }
+        )
+    }
+
+    register(data) {
+        this.isLoad = true;
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("register", data)
+            }
+        )
+    }
+
+    logout() {
+        when(
+            () => socketStore.isready&&this.userId,
+            () => {
+                socketStore.send("logout")
+                this.clearToken();
+                this.user = null;
+            }
+        )
     }
 }
 

@@ -1,33 +1,36 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
-import Hint from '../Common/Hint';
+import { when } from 'mobx';
 import { Input } from 'antd';
 const { TextArea } = Input;
+const step = ["project", "problem", 'data', 'modeling']
 
 
-@inject('projectStore')
+@inject('userStore', 'projectStore')
 @observer
 export default class Project extends Component {
     constructor(props) {
         super(props);
         const {pid} = props.match.params || {};
-        this.pid = pid?parseInt(pid):0;
+        this.pid = pid ? parseInt(pid, 10) : 0;
         
-        //实际只修改approach
-        //project下对应多个approach，目前暂时只有一个
-        props.projectStore.init(this.pid);
+        when(
+            () => props.userStore.userId && !props.userStore.isLoad,
+            () => props.projectStore.init(props.userStore.userId, this.pid)
+        )
+        when(
+            () => props.projectStore.project,
+            () => {
+                const {curStep, isFirst, mainStep} = props.projectStore.project;
+                const currStep = isFirst?mainStep:curStep;
+                if(currStep == 0){
+                    return;
+                }
+                props.history.push("/"+step[currStep]+"/"+this.pid)
+            }
+        )
     }
-
-    // componentDidUpdate() {
-    //     if(this.props.projectStore.project){
-    //         this.setState({
-    //             name: this.props.projectStore.project.name,
-    //             description: this.props.projectStore.project.description
-    //         })
-    //     }
-    // }
 
     onChange = (k, e) => {
         const {project} = this.props.projectStore;
@@ -40,6 +43,7 @@ export default class Project extends Component {
             name: project.name,
             description: project.description
         })
+        project.nextMainStep(1);
         this.props.history.push(`/problem/${this.pid}`);
     }
 

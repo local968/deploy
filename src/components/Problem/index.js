@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import classnames from 'classnames';
+// import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import { Radio } from 'antd';
 import Hint from '../Common/Hint';
-import { observable, autorun } from 'mobx';
+import { when } from 'mobx';
 
 const RadioGroup = Radio.Group;
 const selectable = [
@@ -12,39 +12,52 @@ const selectable = [
     {value: 'Regression', type: 'Continuous Values (Regression)', detail: (<p>To predict a continuous/numeric value (e.g. cost of a purchase)</p>)},
 ];
 
-@inject('projectStore')
+@inject('userStore', 'projectStore')
 @observer
 class Problem extends Component {
 
     constructor(props) {
         super(props);
-        const {pid, aid} = props.match.params || {};
-        this.pid = pid?parseInt(pid):0;
-        // this.aid = aid?parseInt(aid):0;
+        const {pid} = props.match.params || {};
+        this.pid = pid ? parseInt(pid, 10) : 0;
         
-        //实际只修改approach
-        //project下对应多个approach，目前暂时只有一个
-        props.projectStore.init(this.pid);
+        when(
+            () => props.userStore.userId && !props.userStore.isLoad,
+            () => props.projectStore.init(props.userStore.userId, this.pid)
+        )
     }
 
     problemTypeChange = e => {
-        this.props.projectStore.currentApproach.updateApproach({problemType: e.target.value});
+        this.props.projectStore.project.updateProject({problemType: e.target.value});
     
     }
 
     nextStep = () => {
-        this.props.projectStore.currentApproach.nextMainStep(2);
+        this.props.projectStore.project.nextMainStep(2);
         this.props.history.push(`/data/${this.pid}`);
     }
 
     test = () => {
-        this.props.currentApproach.sendTest();
+        this.props.project.sendTest();
     }
 
     render() {
-        const {problemType} = this.props.projectStore.currentApproach || {};
-        return <div>
+        const {problemType} = this.props.projectStore.project || {};
+        return <div className={styles.problem}>
             <div>
+                <div><span>Describe your business problem.</span></div>
+                <div>
+                    <span>Industry</span>
+                </div>
+                <div>
+                    <span>Business Function</span>
+                </div>
+                <div>
+                    <span>Problem Statement</span>
+                </div>
+                <div>
+                    <span>Business Value</span>
+                </div>
                 <RadioGroup value={problemType} onChange={this.problemTypeChange}>
                 {selectable.map((content, index) => (
                     <Radio key={index} value={content.value}>
@@ -53,9 +66,6 @@ class Problem extends Component {
                     </Radio>
                 ))}
                 </RadioGroup>
-                <div>
-                    <button onClick={this.nextStep}>Continue</button>
-                </div>
                 <div>
                     <button onClick={this.nextStep}>Continue</button>
                 </div>

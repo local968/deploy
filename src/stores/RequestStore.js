@@ -1,5 +1,5 @@
 import db from './db.js';
-import { observable, action, computed, autorun, when } from 'mobx';
+import { action, computed, when } from 'mobx';
 import config from '../config.js';
 import socketStore from './SocketStore.js'
 
