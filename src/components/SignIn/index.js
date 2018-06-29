@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import styles from "./styles.module.css";
 import warnIcon from "./fail.svg";
-import config from '../../config.js';
 
 @inject('userStore')
 @observer
@@ -72,7 +71,7 @@ export default class SignIn extends Component{
                 <button className={styles.button} onClick={this.login}>
                     <span>Sign In</span>
                 </button>
-                {config.openResiger&&<div className={styles.signup} onClick={this.register}><span>Sign Up</span></div>}
+                <div className={styles.signup} onClick={this.register}><span>Sign Up</span></div>
             </div>
         </div>
     }

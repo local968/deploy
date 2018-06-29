@@ -1,35 +1,26 @@
-local function getConnids(userId)
-    local index = box.space["js_connids"].index["index_conn"]
-    local result = index:select({userId})
+-- connid -> userid
+local conn_cache = {}
 
+local function getConnids(userId)
     local list = {}
-    for k, v in pairs(result) do
-        list[k] = v[1]
+    for k, v in pairs(conn_cache) do
+        if v[2] == userId then
+            list[#list + 1] = v
+        end
     end
     return list;
 end
 
 local function getConnid(connid)
-    local index = box.space["js_connids"].index["primary"]
-    local tuple = {connid}
-    local result = index:select(tuple)
-    return result[1]
+    return conn_cache[connid]
 end
 
 local function delete(connid)
-    local index = box.space["js_connids"].index["primary"]
-    local tuple = {connid}
-    index:delete(tuple)
+    conn_cache[connid] = nil
 end
 
 local function save(userId, connid)
-    local result = getConnid(connid)
-
-    if not result then
-        local table = box.space["js_connids"]
-        local tuple = {connid, userId}
-        table:insert(tuple)
-    end
+    conn_cache[connid] = {connid, userId}
 end
 
 return {

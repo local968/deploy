@@ -36,10 +36,10 @@ local function onModelingResult(old, new)
         local data = new[2]
         local userId = data.userId
         local connids = conn.getConnids(userId);
-        for k, connid in pairs(connids) do
-            local connect = server._r2wsd:get_conn(connid);
+        for k, conn in pairs(connids) do
+            local connect = server._r2wsd:get_conn(conn[1]);
             if connect then
-                server:sendMessageTo(connid, "onModelingResult", data)
+                server:sendMessageTo(conn[1], "onModelingResult", data)
             end
         end
     end

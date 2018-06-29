@@ -2,18 +2,11 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import styles from "./styles.module.css";
 import warnIcon from "./fail.svg";
-import config from "../../config.js";
 import { Checkbox, Icon } from 'antd';
 
 @inject('userStore')
 @observer
 export default class SignUp extends Component{
-    componentWillMount() {
-        if(!config.openResiger){
-            return this.props.history.push("/")
-        }
-    }
-
     state = {
         email: '',
         password: '',

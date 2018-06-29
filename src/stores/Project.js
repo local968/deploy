@@ -1,7 +1,6 @@
 // import db from './db.js';
 import { observable, action, when } from 'mobx';
 import socketStore from './SocketStore';
-import config from '../config.js'
 import requestStore from './RequestStore.js';
 import moment from 'moment';
 
@@ -10,8 +9,14 @@ export default class Project {
 
     @observable deployFileName = '';
     @observable uploadFileName = '';
+
+    //problem
     @observable problemType = '';
+    @observable statement = "";
+    @observable business = '';
+
     @observable target = "";
+
     // fast track
     @observable fastTrackUploadProgress = 0;
     @observable fasttrack = false;
@@ -81,16 +86,14 @@ export default class Project {
             initObservedKeys[k] = this[k];
         });
         Object.assign(this, item, initObservedKeys);
-        if (config.database === "tarantool") {
-            when(
-                () => socketStore.isready,
-                () => {
-                    socketStore.send("changeProject", { userId: this.userId, projectId: this.projectId, args: item })
-                }
-            )
-        } else {
-            this.projectTable.store(item);
-        }
+
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("changeProject", { userId: this.userId, projectId: this.projectId, args: item })
+            }
+        )
+
     }
 
     nextMainStep(routeIndex) {
@@ -131,6 +134,13 @@ export default class Project {
         }
         // this.projectShare(obj);
         this.updateProject(obj);
+    }
+
+    saveProblem() {
+        this.updateProject({
+            statement: this.statement, 
+            business: this.business
+        });
     }
 
     @action
@@ -294,6 +304,7 @@ export default class Project {
     }
 
     finishTrain2() {
+        console.log("finish")
         this.updateProject({
             train2Finished: true,
             train2ing: false

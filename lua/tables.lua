@@ -1,7 +1,7 @@
 queue = require('queue')
 
 local tables = {
-    --  userId,projectId,{...args}
+    --  id,userId,projectId,{...args}
     {
         table = "js_projects",
         indexs = {
@@ -11,7 +11,7 @@ local tables = {
             }
         }
     },
-    --  userId,projectId,{...args}
+    --  id,userId,projectId,{...args}
     {
         table = "models_info",
         indexs = {
@@ -45,20 +45,6 @@ local tables = {
             {
                 name = "primary",
                 parts = {1,"string"}
-            }
-        }
-    },
-    {
-        table = "js_connids",
-        indexs = {
-            {
-                name = "primary",
-                parts = {1,"string"}
-            },
-            {
-                name = "index_conn",
-                parts = {2,"string"},
-                unique = false
             }
         }
     },

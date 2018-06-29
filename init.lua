@@ -8,9 +8,9 @@ local auth = require('deploy2.lua.auth')
 
 -- 更新单个字段
 local function updateField(userId,projectId,updateTable)
-    ts = box.space.models_info.index.primary:select{userId,projectId}
+    local ts = box.space.models_info.index.primary:select{userId,projectId}
     if ts[1] ~= nil then
-        t=ts[1][3]
+        local t=ts[1][3]
         for k,v in pairs(updateTable) do t[k]=v end
         box.space.models_info:update({userId,projectId},{{'=',3,t}})
         return t

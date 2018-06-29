@@ -1,7 +1,6 @@
 // import db from './db.js';
 import { observable, action, computed, when } from 'mobx';
 import Project from './Project.js'
-import config from '../config.js'
 import socketStore from './SocketStore';
 import { message } from 'antd';
 
@@ -66,22 +65,11 @@ class UserStore{
 
     @action
     initProjects() {
-        if(config.database === "tarantool"){
-            this.isLoad = true;
-            when(
-                () => socketStore.isready,
-                () => socketStore.send("queryProjects", {userId: this.userId})
-            )
-        }else{
-            this.projectTable
-            .findAll({userId: this.userId})
-            .fetch()
-            .subscribe( projects => {
-                this.projects = projects.map(project => {
-                    return new Project(this.userId, project.projectId, project);
-                });
-            })
-        }
+        this.isLoad = true;
+        when(
+            () => socketStore.isready,
+            () => socketStore.send("queryProjects", {userId: this.userId})
+        )
     }
     
     @action

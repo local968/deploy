@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import {Uploader, Select} from '../Common';
 import Papa from 'papaparse';
 import sampleIcon from './sample.svg';
@@ -10,7 +10,7 @@ import sqlIcon from './sql.svg';
 import defileIcon from './define.svg';
 import { AutoSizer, MultiGrid } from 'react-virtualized';
 import { Checkbox } from 'antd';
-import { when } from 'mobx';
+// import { when } from 'mobx';
 
 import dataConnectActive from './data_schema_a.svg';
 import dataSchemaActive from './data_schema_a.svg';
@@ -26,23 +26,25 @@ const imgs = {
     dataQualityActive: <img src={dataQualityActive} alt="quality" />
 }
 
-@inject('userStore', 'projectStore')
+
+// @inject('userStore', 'projectStore')
 @observer
 export default class Data extends Component {
     constructor(props) {
         super(props);
-        const {pid} = props.match.params || {};
-        this.pid = pid ? parseInt(pid, 10) : 0;
+    //     const {pid} = props.match.params || {};
+    //     this.pid = pid ? parseInt(pid, 10) : 0;
         this.step = ['Connect', 'Schema', 'Quality']
         
-        when(
-            () => props.userStore.userId && !props.userStore.isLoad,
-            () => props.projectStore.init(props.userStore.userId, this.pid)
-        )
+    //     when(
+    //         () => props.userStore.userId && !props.userStore.isLoad,
+    //         () => props.projectStore.init(props.userStore.userId, this.pid)
+    //     )
     }
+    // static step = ['Connect', 'Schema', 'Quality'];
 
     enter = (step) => {
-        const {mainStep, lastSubStep, subStepActive} = this.props.projectStore.project;
+        const {mainStep, lastSubStep, subStepActive} = this.props.project;
 
         if(step === subStepActive) return false;
 
@@ -50,29 +52,29 @@ export default class Data extends Component {
 
         if(step > maxStep) return false;
 
-        this.props.projectStore.project.nextSubStep(step, 2)
+        this.props.project.nextSubStep(step, 2)
     }
 
     getChild = () => {
-        const {userId, project} = this.props.projectStore;
-        const {mainStep, subStepActive} = project || {};
+        const {userId, project} = this.props;
+        const {curStep, subStepActive} = project || {};
         
-        let subStep = mainStep > 2 ? 3 : subStepActive;
+        let subStep = curStep !== 2 ? 3 : subStepActive;
 
         switch(subStep) {
             case 1:
-                return <DataConnect projectId={this.pid} userId={userId} project={project} />;
+                return <DataConnect userId={userId} project={project} />;
             case 2:
                 return <DataSchema project={project} />;
             case 3:
-                return <DataDeploy projectId={this.pid} userId={userId} project={project} />;
+                return <DataDeploy userId={userId} project={project} />;
             default:
                 return;
         }
     }
 
     render() {
-        const {project} = this.props.projectStore;
+        const {project} = this.props;
         return <div className={styles.data}>
             {project&&this.getChild()}
             {project&&<ProjectSide enter={this.enter} list={this.step} step={project.subStepActive} />}
@@ -83,10 +85,7 @@ export default class Data extends Component {
 @observer
 class DataConnect extends Component{
     upload = (data) => {
-        const {file, err} = data;
-        if(err){
-           return false; 
-        }
+        const {file} = data;
 
         this.props.project.fastTrackInit(file.name);
 
@@ -116,13 +115,13 @@ class DataConnect extends Component{
     }
 
     render() {
-        const {userId, projectId} = this.props;
+        const {userId, project} = this.props;
         return <div className={styles.connect}>
             <div className={styles.title}><span>If your data is ready, choose a data source to connect.</span></div>
             <div className={styles.maxRow}><span>Maximum Data Size</span><div className={styles.mark}><span>?</span></div><span> : 50000 (rows) </span><a>Edit</a></div>
             <div className={styles.uploadRow}>
                 {this.block("From Mr.One",sampleIcon)}
-                <Uploader children={this.block("From Computer",localFileIcon)} onChange={this.upload} params={{userId, projectId}} onProgress={this.onProgress} />
+                <Uploader children={this.block("From Computer",localFileIcon)} onChange={this.upload} params={{userId, projectId: project.projectId}} onProgress={this.onProgress} />
                 {this.block("From SQL",sqlIcon)}
             </div>
             <div className={styles.cutoff}>
@@ -366,24 +365,21 @@ class DataDeploy extends Component{
     }
 
     upload = (data) => {
-        const {file, err} = data;
-        if(err){
-           return false; 
-        }
+        const {file} = data;
 
         this.props.project.initDeployFile(file.name)
     }
 
     render() {
-        const {userId, projectId, project} = this.props;
+        const {userId, project} = this.props;
         return project && <div>
-            <Uploader children={"file upload"} onChange={this.upload} params={{userId, projectId}} />
+            <Uploader children={"file upload"} onChange={this.upload} params={{userId, projectId: project.projectId}} />
             <div><button onClick={this.deploy}>Continue</button></div>
         </div>
     }
 }
 
-@inject('projectStore')
+// @inject('projectStore')
 @observer
 class ProjectSide extends Component{
     enter = (step) => {

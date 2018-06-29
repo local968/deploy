@@ -24,10 +24,11 @@ export default ({ children, className, params, onChange, onProgress }) => {
       }
       retryCount = 0;
       if(file.size === res.data.size){
-        return onChange(Object.assign({},res.data,{file}));
+        return 
       }
       _upload(file, res.data.size, res.data.isFirst);
     });
+    
   }
 
   const _onChange = (e) => {
@@ -37,6 +38,7 @@ export default ({ children, className, params, onChange, onProgress }) => {
     const file = files[0];
     if (!!file) {
       _upload(file);
+      onChange({file});
     }
   };
 

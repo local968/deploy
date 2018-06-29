@@ -9,16 +9,18 @@ class ProjectStore {
     @observable userId;
     @observable project = null;
     @observable models = [];
-    @observable isFirst = true;
+    @observable isLoad = true;
 
     constructor() {
         this.initCallback();
+        this.finish = {}
     }
 
     @action
     init(userId, projectId) {
         //同一project不用加载
         if (this.userId === userId && this.projectId === projectId) return;
+        this.isLoad = true;
         this.userId = userId;
         this.projectId = projectId;
 
@@ -32,18 +34,35 @@ class ProjectStore {
     }
 
     recommendModel() {
+        const {problemType} = this.project
+
         let model;
         for (let m of this.models) {
             if (!model) {
                 model = m;
                 continue;
             }
-            if (model.score.auc < m.score.auc) {
-                model = m;
+            if(problemType === "Classification"){
+                if (model.score.auc < m.score.auc) {
+                    model = m;
+                }
+            }else{
+                if (1 - model.score.rmse + model.score.r2 < 1 - m.score.rmse + m.score.r2) {
+                    model = m;
+                }
             }
         }
+        console.log(model)
         if (model) {
             model.recommend = true;
+        }
+    }
+
+    loaded(type){
+        this.finish[type] = true;
+        if(this.finish.project && this.finish.model){
+            this.isLoad = false;
+            this.finish = {};
         }
     }
 
@@ -57,6 +76,7 @@ class ProjectStore {
             queryProject: action(data => {
                 const project = data.list[0];
                 this.project = new Project(this.userId, project.projectId, project.args)
+                this.loaded("project")
             }),
             queryModels: action(data => {
                 const result = data.data;
@@ -67,6 +87,7 @@ class ProjectStore {
                     this.models.push(new Model(this.userId, this.projectId, backend, models[key]))
                 }
                 this.recommendModel()
+                this.loaded("model")
             }),
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");

@@ -7,6 +7,64 @@
     color: #4a4a4a;
 }
 
+.title {
+    margin: 0.25em 0;
+    display: flex;
+}
+
+.title span {
+    font-size: 1.25rem;
+}
+
+.textBox {
+    display: flex;
+    flex-direction: column;
+}
+
+.textarea {
+    resize: none;
+}
+
+.text {
+    margin: 0.2em 0;
+    display: flex;
+    width: 1.6em;
+}
+
+.text span {
+    font-size: 1rem;
+}
+
+.radioBox {
+    display: flex;
+}
+
+.radio {
+    display: flex;
+    align-items: center;
+}
+
+.btn {
+    display: flex;
+    margin-top: 0.3em;
+    width: 1.1em;
+    height: 0.4em;
+    margin-bottom: 0.6em;
+}
+
+.continue {
+    font-size: 1rem;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    cursor: pointer;
+}
+
 
 
 
