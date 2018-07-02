@@ -82,7 +82,7 @@ class ModelResult extends Component {
                         <span>Modeling Results : <div className={styles.status}>&nbsp;&nbsp;OK</div></span>
                     </div>
                     <div className={styles.row}>
-                        <span>Selected Model :<a>&nbsp;{current.backend}</a></span>
+                        <span>Selected Model :<a>&nbsp;{current.name}</a></span>
                     </div>
                     <div className={styles.row}>
                         <span>Target :<a>&nbsp;{project.target}</a></span>
@@ -159,19 +159,19 @@ class Performance extends Component {
         return problemType === "Classification" ?
             <div className={styles.performanceBox}>
                 <div className={styles.performance}>
-                    <Progress width={84} type="circle" percent={model.score.auc * 100} format={percent => (percent / 100).toFixed(2)} />
+                    <Progress width={84} type="circle" percent={model.score.trainScore.auc * 100} format={percent => (percent / 100).toFixed(2)} />
                     <div className={styles.performanceText}><span>Performance (AUC)</span></div>
                 </div>
                 <Predicted model={model} />
             </div> :
             <div className={styles.performanceBox}>
                 <div className={styles.performance}>
-                    <div className={styles.rmsePerformance}><span>{model.score.rmse.toFixed(4)}</span></div>
+                    <div className={styles.rmsePerformance}><span>{model.score.trainScore.rmse.toFixed(4)}</span></div>
                     <div className={styles.performanceText}><span>Normalized RMSE</span></div>
                 </div>
                 <div className={styles.space}></div>
                 <div className={styles.performance}>
-                    <div className={styles.r2Performance}><span>{model.score.r2.toFixed(4)}</span></div>
+                    <div className={styles.r2Performance}><span>{model.score.trainScore.r2.toFixed(4)}</span></div>
                     <div className={styles.performanceText}><span>Goodness of Fit (R<sup>2</sup>)</span></div>
                 </div>
             </div>
@@ -198,14 +198,14 @@ class ClassificationTable extends Component{
                     const rand = ((Math.random() * 0.2) + 0.4) * 3;
                     return <div key={key} className={styles.rowData}>
                         <div className={styles.modelSelect}><input type="radio" name="modelSelect" defaultChecked={model.recommend} onChange={selectModel.bind(null, model)} /></div>
-                        <div className={classnames(styles.cell, styles.name)}><span>{model.backend}</span></div>
+                        <div className={classnames(styles.cell, styles.name)}><span>{model.name}</span></div>
                         <div className={classnames(styles.cell, styles.predict)}>
                             <PredictedProgress predicted={0.55} width={rand} height={0.2} type={"success"} />
                             <div className={styles.space}></div>
                             <PredictedProgress predicted={0.75} width={3 - rand} height={0.2} type={"predicted"} />
                         </div>
-                        <div className={styles.cell}><span>{model.score.auc.toFixed(2)}</span></div>
-                        <div className={styles.cell}><span>{model.score.auc.toFixed(2)}</span></div>
+                        <div className={styles.cell}><span>{model.score.trainScore.auc.toFixed(2)}</span></div>
+                        <div className={styles.cell}><span>{model.score.trainScore.auc.toFixed(2)}</span></div>
                         <div className={styles.cell}><span>{model.executeTime + "ms"/*/1000rows*/}</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
@@ -234,9 +234,9 @@ class RegressionTable extends Component {
                 {models.map((model, key) => {
                     return <div key={key} className={styles.rowData}>
                         <div className={styles.modelSelect}><input type="radio" name="modelSelect" defaultChecked={model.recommend} onChange={selectModel.bind(null, model)} /></div>
-                        <div className={classnames(styles.cell, styles.name)}><span>{model.backend}</span></div>
-                        <div className={styles.cell}><span>{model.score.rmse.toFixed(4)}</span></div>
-                        <div className={styles.cell}><span>{model.score.r2.toFixed(4)}</span></div>
+                        <div className={classnames(styles.cell, styles.name)}><span>{model.name}</span></div>
+                        <div className={styles.cell}><span>{model.score.trainScore.rmse.toFixed(4)}</span></div>
+                        <div className={styles.cell}><span>{model.score.trainScore.r2.toFixed(4)}</span></div>
                         <div className={styles.cell}><span>{model.executeTime + "ms"/*/1000rows*/}</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>

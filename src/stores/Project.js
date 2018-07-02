@@ -43,6 +43,7 @@ export default class Project {
 
     @observable overfit = 5;
     @observable speed = 5;
+    @observable version = 2;
 
     @observable criteria = 'defualt';
 
@@ -250,6 +251,7 @@ export default class Project {
         // overfit:   1-10 默认5
         // model_option: model的额外参数，不同model参数不同
         // version: 控制选择何种model，目前有gbm，cat，默认两种全部使用。
+        // projectName: 名称
         // kwargs:
         requestStore.sendRequest(id,{
             csvLocation: uploadFileName,
@@ -261,7 +263,9 @@ export default class Project {
             speed,
             overfit,
             time: this.trainStartTime,
-            command
+            command,
+            projectName: this.name,
+            version: this.version
         });
 
         // this.nextSubStep(3, 2);

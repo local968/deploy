@@ -11,6 +11,18 @@ export default class Model{
         this.userId = userId;
         this.projectId = projectId;
         this.backend = backend;
+        this.setName()
         Object.assign(this, model);
+    }
+
+    setName() {
+        switch(this.backend){
+            case "gbm":
+                this.name = "solution1"
+                break;
+            case "cat":
+                this.name = "solution2"
+                break;
+        }
     }
 }

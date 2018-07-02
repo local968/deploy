@@ -22,7 +22,7 @@ local tables = {
         }
     },
     {
-        table = "js_usersetting",
+        table = "model_user_setting",
         indexs = {
             {
                 name = "primary",
@@ -106,6 +106,6 @@ return function()
     initTables()
     
     -- cleanQueue()
-    -- initQueue()
+    initQueue()
 
 end
