@@ -82,8 +82,7 @@ class ProjectStore {
                 const models = result.args;
                 this.models = [];
                 for (let key in models) {
-                    let backend = key.split("-")[2]
-                    this.models.push(new Model(this.userId, this.projectId, backend, models[key]))
+                    this.models.push(new Model(this.userId, this.projectId, models[key]))
                 }
                 this.recommendModel()
                 this.loaded("model")
@@ -104,8 +103,7 @@ class ProjectStore {
                 }
                 const models = this.project.saveModel(info)
                 for (let key in models) {
-                    let backend = key.split("-")[2]
-                    this.models.push(new Model(this.userId, this.projectId, backend, models[key]))
+                    this.models.push(new Model(this.userId, this.projectId, models[key]))
                 }
                 this.recommendModel()
                 switch (command) {

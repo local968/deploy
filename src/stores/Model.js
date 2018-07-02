@@ -6,23 +6,19 @@ export default class Model{
     @observable featureImportance;
     @observable recommend = false;
     @observable executeTime = 0;
+    @observable name = "";
 
-    constructor(userId, projectId, backend, model) {
+    constructor(userId, projectId, model) {
         this.userId = userId;
         this.projectId = projectId;
-        this.backend = backend;
-        this.setName()
-        Object.assign(this, model);
-    }
-
-    setName() {
-        switch(this.backend){
+        switch(model.backend){
             case "gbm":
-                this.name = "solution1"
+                this.name = model.problemType + "_solution1"
                 break;
             case "cat":
-                this.name = "solution2"
+                this.name = model.problemType + "_solution2"
                 break;
         }
+        Object.assign(this, model);
     }
 }
