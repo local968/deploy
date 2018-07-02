@@ -52,7 +52,6 @@ class ProjectStore {
                 }
             }
         }
-        console.log(model)
         if (model) {
             model.recommend = true;
         }
@@ -91,7 +90,7 @@ class ProjectStore {
             }),
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
-                const { userId, projectId, command, result, status, time } = data;
+                const { userId, projectId, command, result, status } = data;
                 if (status < 0) {
                     this.modelimgError(command, result)
                 }
@@ -102,7 +101,11 @@ class ProjectStore {
                 }
                 for (let row of result) {
                     info.args[`${command}-${row.backend}-result`] = row
-                    this.models = result.map(row => new Model(userId, projectId, row.backend, row));
+                }
+                const models = this.project.saveModel(info)
+                for (let key in models) {
+                    let backend = key.split("-")[2]
+                    this.models.push(new Model(this.userId, this.projectId, backend, models[key]))
                 }
                 this.recommendModel()
                 switch (command) {
@@ -112,7 +115,7 @@ class ProjectStore {
                     default:
                         break;
                 }
-                this.project.saveModel(info, time);
+                // let models =  this.project.saveModel(info, time);
             })
         }
 

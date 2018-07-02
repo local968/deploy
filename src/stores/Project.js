@@ -311,8 +311,7 @@ export default class Project {
         });
     }
 
-    saveModel(data, time) {
-        console.log(data,time,moment().valueOf(),this.trainStartTime)
+    saveModel(data) {
         const endTime = moment().valueOf();
         for(let key in data.args){
             data.args[key].executeTime = endTime - this.trainStartTime;
@@ -323,6 +322,7 @@ export default class Project {
                 socketStore.send("changeModel", data)
             }
         )
+        return data.args
     }
 
     initCallback() {

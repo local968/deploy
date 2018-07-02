@@ -90,7 +90,7 @@ local function change(self)
         for k, v in pairs(result) do
             local args = data.args;
             for key, value in pairs(v.args) do
-                if args[key] ~= nil then
+                if args[key] == nil then
                     args[key] = value
                 end
             end
