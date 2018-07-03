@@ -43,11 +43,11 @@ class ProjectStore {
                 continue;
             }
             if(problemType === "Classification"){
-                if (model.score.auc < m.score.auc) {
+                if (model.score.holdoutScore.auc < m.score.holdoutScore.auc) {
                     model = m;
                 }
             }else{
-                if (1 - model.score.rmse + model.score.r2 < 1 - m.score.rmse + m.score.r2) {
+                if (1 - model.score.holdoutScore.rmse + model.score.holdoutScore.r2 < 1 - m.score.holdoutScore.rmse + m.score.holdoutScore.r2) {
                     model = m;
                 }
             }
@@ -67,7 +67,7 @@ class ProjectStore {
 
     @action
     modelimgError(command, result) {
-
+        
     }
 
     initCallback() {
@@ -92,6 +92,7 @@ class ProjectStore {
                 const { userId, projectId, command, result, status } = data;
                 if (status < 0) {
                     this.modelimgError(command, result)
+                    return;
                 }
                 let info = {
                     userId,

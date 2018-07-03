@@ -159,19 +159,19 @@ class Performance extends Component {
         return problemType === "Classification" ?
             <div className={styles.performanceBox}>
                 <div className={styles.performance}>
-                    <Progress width={84} type="circle" percent={model.score.trainScore.auc * 100} format={percent => (percent / 100).toFixed(2)} />
+                    <Progress width={84} type="circle" percent={model.score.holdoutScore.auc * 100} format={percent => (percent / 100).toFixed(2)} />
                     <div className={styles.performanceText}><span>Performance (AUC)</span></div>
                 </div>
                 <Predicted model={model} />
             </div> :
             <div className={styles.performanceBox}>
                 <div className={styles.performance}>
-                    <div className={styles.rmsePerformance}><span>{model.score.trainScore.rmse.toFixed(4)}</span></div>
+                    <div className={styles.rmsePerformance}><span>{model.score.holdoutScore.rmse.toFixed(4)}</span></div>
                     <div className={styles.performanceText}><span>Normalized RMSE</span></div>
                 </div>
                 <div className={styles.space}></div>
                 <div className={styles.performance}>
-                    <div className={styles.r2Performance}><span>{model.score.trainScore.r2.toFixed(4)}</span></div>
+                    <div className={styles.r2Performance}><span>{model.score.holdoutScore.r2.toFixed(4)}</span></div>
                     <div className={styles.performanceText}><span>Goodness of Fit (R<sup>2</sup>)</span></div>
                 </div>
             </div>
@@ -204,8 +204,8 @@ class ClassificationTable extends Component{
                             <div className={styles.space}></div>
                             <PredictedProgress predicted={0.75} width={3 - rand} height={0.2} type={"predicted"} />
                         </div>
-                        <div className={styles.cell}><span>{model.score.trainScore.auc.toFixed(2)}</span></div>
-                        <div className={styles.cell}><span>{model.score.trainScore.auc.toFixed(2)}</span></div>
+                        <div className={styles.cell}><span>{model.score.holdoutScore.auc.toFixed(2)}</span></div>
+                        <div className={styles.cell}><span>{model.score.holdoutScore.auc.toFixed(2)}</span></div>
                         <div className={styles.cell}><span>{model.executeTime + "ms"/*/1000rows*/}</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
@@ -235,8 +235,8 @@ class RegressionTable extends Component {
                     return <div key={key} className={styles.rowData}>
                         <div className={styles.modelSelect}><input type="radio" name="modelSelect" defaultChecked={model.recommend} onChange={selectModel.bind(null, model)} /></div>
                         <div className={classnames(styles.cell, styles.name)}><span>{model.name}</span></div>
-                        <div className={styles.cell}><span>{model.score.trainScore.rmse.toFixed(4)}</span></div>
-                        <div className={styles.cell}><span>{model.score.trainScore.r2.toFixed(4)}</span></div>
+                        <div className={styles.cell}><span>{model.score.holdoutScore.rmse.toFixed(4)}</span></div>
+                        <div className={styles.cell}><span>{model.score.holdoutScore.r2.toFixed(4)}</span></div>
                         <div className={styles.cell}><span>{model.executeTime + "ms"/*/1000rows*/}</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
                         <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
