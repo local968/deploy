@@ -97,3 +97,7 @@
 .warning {
   color: #ff3151;
 }
+
+.selector {
+  margin: 0 0.1em;
+}

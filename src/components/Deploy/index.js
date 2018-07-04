@@ -47,13 +47,14 @@ export default class Home extends Component {
       <div className={styles.home}>
         <Bread list={['Home']} />
         <div className={styles.filter}>
-          <Search 
+          <Search
             value={deployStore.sortOptions.keywords}
             onChange={event =>
               deployStore.changeSort('keywords', event.target.value)
             }
           />
           <Select
+            className={styles.selector}
             title="Sort by"
             autoWidth
             options={deployStore.sortByOptions}
@@ -61,7 +62,8 @@ export default class Home extends Component {
             onChange={deployStore.changeSort.bind(null, 'sortBy')}
           />
           <Select
-            title="Projects per page"
+            className={styles.selector}
+            title="per page"
             autoWidth
             options={deployStore.perPageOptions}
             value={parseInt(deployStore.sortOptions.perPage, 10)}
@@ -112,14 +114,18 @@ export default class Home extends Component {
                 <span
                   className={styles.projectName}
                   title={deployment.name}
-                  onClick={() => history.push(`/deploy/project/${deployment.id}`)}
+                  onClick={() =>
+                    history.push(`/deploy/project/${deployment.id}`)
+                  }
                 >
                   {deployment.name}
                 </span>
                 <span
                   className={styles.modelName}
                   title={deployment.modelName}
-                  onClick={() => history.push(`/deploy/project/${deployment.id}`)}
+                  onClick={() =>
+                    history.push(`/deploy/project/${deployment.id}`)
+                  }
                 >
                   {deployment.modelName}
                 </span>
@@ -145,21 +151,27 @@ export default class Home extends Component {
                 <span
                   className={styles.operationAlert}
                   title={deployment.operationAlert || 0}
-                  onClick={() => history.push(`/deploy/project/${deployment.id}`)}
+                  onClick={() =>
+                    history.push(`/deploy/project/${deployment.id}`)
+                  }
                 >
                   {deployment.operationAlert || 0}
                 </span>
                 <span
                   className={styles.performanceAlert}
                   title={deployment.performanceAlert || 0}
-                  onClick={() => history.push(`/deploy/project/${deployment.id}`)}
+                  onClick={() =>
+                    history.push(`/deploy/project/${deployment.id}`)
+                  }
                 >
                   {deployment.performanceAlert || 0}
                 </span>
                 <span
                   className={styles.createdDate}
                   title={moment.unix(deployment.createdDate).format('M/D/YYYY')}
-                  onClick={() => history.push(`/deploy/project/${deployment.id}`)}
+                  onClick={() =>
+                    history.push(`/deploy/project/${deployment.id}`)
+                  }
                 >
                   {moment.unix(deployment.createdDate).format('M/D/YYYY')}
                 </span>

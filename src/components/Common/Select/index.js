@@ -4,24 +4,36 @@ import { Select } from 'antd';
 import classnames from 'classnames';
 const Option = Select.Option;
 
-export default ({ title, width, options, onChange, value, dropdownClassName, selectOption }) => {
+export default ({
+  title,
+  width,
+  options,
+  onChange,
+  value,
+  dropdownClassName,
+  selectOption,
+  className
+}) => {
   if (options) {
     return (
-      <div className={classnames(styles.selector,{
-        [styles.notAuto] : width!=="auto"
-      })}>
+      <div
+        className={classnames(styles.selector, className, {
+          [styles.notAuto]: width !== 'auto'
+        })}
+      >
         <span className={styles.selectTitle}>{title}</span>
-        <div
-          style={{ width }}
-          className={styles.selectWrapper}
-        >
+        <div style={{ width }} className={styles.selectWrapper}>
           <Select
-            className={classnames(styles.selectSelect,{
-              [styles[dropdownClassName]]:!!dropdownClassName
+            className={classnames(styles.selectSelect, {
+              [styles[dropdownClassName]]: !!dropdownClassName
             })}
             onChange={onChange}
             value={value}
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={(input, option) =>
+              option.props.children
+                .toLowerCase()
+                .indexOf(input.toLowerCase()) >= 0
+            }
             optionFilterProp="children"
             {...selectOption}
           >
@@ -36,7 +48,7 @@ export default ({ title, width, options, onChange, value, dropdownClassName, sel
     );
   } else {
     return (
-      <div className={styles.selector}>
+      <div className={classnames(styles.selector, className)}>
         <span className={styles.selectTitle}>{title}</span>
         <div
           style={width ? { width: 'auto' } : {}}
