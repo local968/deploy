@@ -256,7 +256,8 @@ export default class Project {
             command,
             fillMethod: {},
             validationRate: this.validationRate,
-            holdoutRate: this.holdoutRate 
+            holdoutRate: this.holdoutRate,
+            version: this.version
         });
     }
 
