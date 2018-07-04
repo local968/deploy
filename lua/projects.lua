@@ -21,17 +21,6 @@ local function _upsert(userId,projectId,args)
     table:upsert({userId,projectId,args},{{"=",3,args}});
 end
 
-local function insertTestRow()
-    local test_data = {
-        {'ty',4,{a=1,b=2,c=3,d=4}},
-        {'cc',4,{a=1,b=2,c=3,d=4}},
-    }
-    for k,v in pairs(test_data) do
-        table:insert(v)
-    end
-    return true
-end
-
 local function query(self)
     local data = self.data
 

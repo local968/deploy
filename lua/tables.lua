@@ -7,7 +7,7 @@ local tables = {
         indexs = {
             {
                 name = "primary",
-                parts = {1,"string",2,"unsigned"}
+                parts = {1,"string",2,"string"}
             }
         }
     },
@@ -17,7 +17,7 @@ local tables = {
         indexs = {
             {
                 name = "primary",
-                parts = {1,"string",2,"unsigned"}
+                parts = {1,"string",2,"string"}
             }
         }
     },

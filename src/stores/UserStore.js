@@ -81,7 +81,7 @@ class UserStore{
     addProject() {
         const projectId = this.getNextId();
         this.userSetting.projectId = projectId + 1;
-        this.projects.push(new Project(this.userId, projectId));
+        this.projects.push(new Project(this.userId, projectId.toString()));
     }
 
     @action
@@ -104,55 +104,13 @@ class UserStore{
         return maxId + 1;
     }
 
-    startWatch() {
-        this.projectTable
-        .findAll({userId: this.userId})
-        .watch({rawChanges: true})
-        .subscribe(data => {
-            const {new_val, type, old_val} = data;
-            // if (type === 'state') {
-            //     if (data.state === 'synced') {
-            //         this.loaded = true;
-            //     } else {
-            //         console.warn(`Unknown state ${data.state}`);
-            //     }
-            // }
-            if (type === 'change') {
-                const changedProject = this.projects.find(p => {
-                    return p.userId === new_val.userId && p.projectId === new_val.projectId;
-                });
-                if (changedProject) {
-                    this.projects.remove(changedProject);
-                }
-                this.projects.push(new Project(this.userId, new_val.projectId, new_val));
-            }
-            if (type === 'add') {
-                const addedProject = this.projects.find(p => {
-                    return p.userId === new_val.userId && p.projectId === new_val.projectId;
-                });
-                if (!addedProject) {
-                    this.projects.push(new Project(this.userId, new_val.projectId, new_val));
-                }
-            }
-            if (type === 'remove') {
-                const removedProject = this.projects.find(p => {
-                    return p.userId === old_val.userId && p.projectId === old_val.projectId;
-                });
-                if (removedProject) {
-                    removedProject.destroy();
-                    this.projects.remove(removedProject);
-                }
-            }
-        })
-    }
-
     initCallback() {
         const callback = {
             queryProjects : data => {
                 const projects = data.list;
                 this.userSetting = data.setting || {};
                 this.projects = projects.map(project => {
-                    return new Project(this.userId, project.projectId, project.args);
+                    return new Project(this.userId, project.projectId.toString(), project.args);
                 });
                 this.isLoad = false;
                 this.isInit = false;

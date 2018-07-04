@@ -12,7 +12,7 @@ export default class Main extends Component{
     constructor(props) {
         super(props);
         const {pid} = props.match.params || {};
-        this.pid = pid ? parseInt(pid, 10) : 0;
+        this.pid = pid
         
         when(
             () => props.userStore.userId && !props.userStore.isLoad,
