@@ -350,10 +350,6 @@ local function setProfile(self)
     end
 end
 
-local function logout(self)
-    logout_handler(nil, self)
-end
-
 local function logout_handler(self, req)
     local result = conn.getConnid(req.connid)
 
@@ -369,6 +365,10 @@ local function logout_handler(self, req)
             authlog.logout(userId)
         end
     end
+end
+
+local function logout(self)
+    logout_handler(nil, self)
 end
 
 return function(server)
