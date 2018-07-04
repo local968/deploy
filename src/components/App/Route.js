@@ -23,35 +23,22 @@ export default () => (
     <Route path="/problem/:pid" component={Problem} />
     <Route path="/data/:pid" component={Data} />
     <Route path="/modeling/:pid" component={Modeling} />
-    <Route
-      path="/deploy/create"
-      render={() => (
-        <React.Fragment>
-          <CreateBackground />
-          <Route exact path="/deploy/create/:id" component={Create} />
-          <Route exact path="/deploy/create/:id/new" component={New} />
-          <Route exact path="/deploy/create/:id/replace" component={Replace} />
-        </React.Fragment>
-      )}
-    />
     <Route path="/deploy/project/:id" component={Detail} />
-    <Route path="" render={() => (
-      <Redirect to="/"/>
-    )} />
+    <Route path="" render={() => <Redirect to="/" />} />
   </Switch>
 );
 
 export class LoginRouter extends Component {
   render() {
-    return <div className={styles.warp}>
-      <CreateBackground />
-      <Switch>
-        <Route exact path="/" component={SignIn} />
-        <Route exact path="/signup" component={SignUp} />
-        <Route path="" render={() => (
-          <Redirect to="/"/>
-        )} />
-      </Switch>
-    </div>
+    return (
+      <div className={styles.warp}>
+        <CreateBackground />
+        <Switch>
+          <Route exact path="/" component={SignIn} />
+          <Route exact path="/signup" component={SignUp} />
+          <Route path="" render={() => <Redirect to="/" />} />
+        </Switch>
+      </div>
+    );
   }
 }

@@ -67,7 +67,7 @@ export default class Detail extends Component {
         </div>
         <div className={styles.content}>
           <Route
-            path="/project/:id"
+            path="/deploy/project/:id"
             exact
             render={() => (
               <Redirect to={`/deploy/project/${match.params.id}/deployment`} />
@@ -75,7 +75,10 @@ export default class Detail extends Component {
           />
           <Route path="/deploy/project/:id/deployment" component={Deployment} />
           <Route path="/deploy/project/:id/operation" component={Operation} />
-          <Route path="/deploy/project/:id/performance" component={Performance} />
+          <Route
+            path="/deploy/project/:id/performance"
+            component={Performance}
+          />
         </div>
         <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>
