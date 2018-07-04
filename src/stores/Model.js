@@ -5,8 +5,9 @@ export default class Model{
     @observable backend;
     @observable featureImportance;
     @observable recommend = false;
-    @observable executeTime = 0;
+    @observable executeSpeed = 0;
     @observable name = "";
+    @observable predicted = [];
 
     constructor(userId, projectId, model) {
         this.userId = userId;

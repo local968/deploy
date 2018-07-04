@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import {Uploader, Select} from '../Common';
+import {Uploader, Select, ContinueButton} from '../Common';
 import Papa from 'papaparse';
 import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
@@ -147,13 +147,12 @@ class DataSchema extends Component{
     //更改flag使表格重新加载
     state = {
         flag: false,
-        checkList: [],
+        checkList: this.props.project.rawHeader.filter(r=>!this.props.project.dataHeader.includes(r)),
         showSelect: false
     }
 
-    fastTrain = () => {
-        this.props.project.nextMainStep(3);
-        this.props.project.fastTrain(this.state.checkList);
+    doEtl = () => {
+        this.props.project.doEtl(this.state.checkList);
     }
 
     targetSelect = (value) => {
@@ -196,7 +195,7 @@ class DataSchema extends Component{
     }
 
     cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-        const {uploadData, target, dataType, dataHeader} = this.props.project;
+        const {uploadData, target, dataType, rawHeader} = this.props.project;
         const {checkList, showSelect} = this.state;
 
         /**
@@ -229,14 +228,14 @@ class DataSchema extends Component{
             if(columnIndex === 0){
                 content = "";
             }else{
-                content = <Checkbox onChange={this.checked.bind(this, dataHeader[realColumn])} checked={false}></Checkbox>
-                if(target === dataHeader[realColumn]){
+                content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={false}></Checkbox>
+                if(target === rawHeader[realColumn]){
                     cn = classnames(styles.check, styles.target);
                     content = "";
                 }
-                if(checkList.includes(dataHeader[realColumn])){
+                if(checkList.includes(rawHeader[realColumn])){
                     cn = classnames(styles.check, styles.checked);
-                    content = <Checkbox onChange={this.checked.bind(this, dataHeader[realColumn])} checked={true}></Checkbox>
+                    content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={true}></Checkbox>
                 }
             }
         //标题行
@@ -246,12 +245,12 @@ class DataSchema extends Component{
                 content = <span>row/header</span>;
                 title = '';
             }else{
-                content = <span>{dataHeader[realColumn]}</span>;
-                title = dataHeader[realColumn];
-                if(target === dataHeader[realColumn]){
+                content = <span>{rawHeader[realColumn]}</span>;
+                title = rawHeader[realColumn];
+                if(target === rawHeader[realColumn]){
                     cn = classnames(cn, styles.target);
                 }
-                if(checkList.includes(dataHeader[realColumn])){
+                if(checkList.includes(rawHeader[realColumn])){
                     cn = classnames(cn, styles.checked);
                 }
             }
@@ -278,10 +277,10 @@ class DataSchema extends Component{
             }else {
                 content = <span>{uploadData[realRow][realColumn]}</span>;
                 title = uploadData[realRow][realColumn];
-                if(target === dataHeader[realColumn]){
+                if(target === rawHeader[realColumn]){
                     cn = classnames(cn, styles.target);
                 }
-                if(this.state.checkList.includes(dataHeader[realColumn])){
+                if(this.state.checkList.includes(rawHeader[realColumn])){
                     cn = classnames(cn, styles.checked);
                 }
             }
@@ -301,7 +300,7 @@ class DataSchema extends Component{
 
     render() {
         const {project} = this.props;
-        const {uploadData, rawHeader, target} = project;
+        const {uploadData, rawHeader, target, version} = project;
         const targetOption = {};
 
         //target选择列表
@@ -352,29 +351,32 @@ class DataSchema extends Component{
                         </AutoSizer>
                     </div>
                 </div>
-            <div className={styles.button}>
-                <button onClick={this.fastTrain} className={styles.continue}>Continue</button>
-            </div>
+            <ContinueButton onClick={this.doEtl} disabled={!target} text="Continue" />
         </div>
     }
 }
 
 class DataDeploy extends Component{
-    deploy = () => {
-        this.props.project.deploy();
-    }
+    // deploy = () => {
+    //     this.props.project.deploy();
+    // }
 
-    upload = (data) => {
-        const {file} = data;
+    // upload = (data) => {
+    //     const {file} = data;
 
-        this.props.project.initDeployFile(file.name)
+    //     this.props.project.initDeployFile(file.name)
+    // }
+
+    fastTrain = () => {
+        this.props.project.nextMainStep(3);
+        this.props.project.fastTrain();
     }
 
     render() {
         const {userId, project} = this.props;
         return project && <div>
-            <Uploader children={"file upload"} onChange={this.upload} params={{userId, projectId: project.projectId}} />
-            <div><button onClick={this.deploy}>Continue</button></div>
+            {/* <Uploader children={"file upload"} onChange={this.upload} params={{userId, projectId: project.projectId}} /> */}
+            <div><button onClick={this.fastTrain}>Continue</button></div>
         </div>
     }
 }

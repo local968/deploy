@@ -1,5 +1,5 @@
 import db from './db.js';
-import { observable, action, computed, autorun } from 'mobx';
+import { observable } from 'mobx';
 
 const _cache = {};
 

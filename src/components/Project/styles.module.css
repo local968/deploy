@@ -24,24 +24,3 @@
     flex-direction: column;
     margin-top: 0.4em;
 }
-
-.btn {
-    display: flex;
-    margin-top: 0.3em;
-    width: 1.1em;
-    height: 0.4em;
-    margin-bottom: 0.6em;
-}
-
-.continue {
-    font-size: 1rem;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-    background-image: linear-gradient(to bottom, #5b657b, #243448);
-    color: #fff;
-    border: 0;
-    border-radius: 5px;
-    display: flex;
-    flex: auto;
-    justify-content: center;
-    cursor: pointer;
-}

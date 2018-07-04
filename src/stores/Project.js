@@ -33,7 +33,6 @@ export default class Project {
     @observable dataHeader = [];
     @observable uploadData = [];
     @observable rawHeader = [];
-    @observable varNameMap = [];
     @observable dataType = [];
 
     @observable mainStep = 0;
@@ -44,6 +43,9 @@ export default class Project {
     @observable overfit = 5;
     @observable speed = 5;
     @observable version = 2;
+
+    @observable validationRate = 0.1;
+    @observable holdoutRate = 0.1;
 
     @observable criteria = 'defualt';
 
@@ -195,9 +197,8 @@ export default class Project {
 
         this.updateProject({
             uploadData: data,
-            dataHeader: header,
+            dataHeader: rawHeader,
             rawHeader,
-            varNameMap: header,
             dataType: type
         });
 
@@ -213,7 +214,53 @@ export default class Project {
         );
     }
 
-    fastTrain(banList) {
+    doEtl(banList) {
+        const {
+            userId, 
+            projectId, 
+            problemType,
+            target,
+            rawHeader,
+            uploadFileName
+        } = this;
+        
+        const command = "etl";
+        const id = `${command}-${userId}-${projectId}`;
+
+        const newDataHeader = rawHeader.filter(d => !banList.includes(d))
+    
+        this.updateProject({
+            dataHeader: newDataHeader,
+            dataType: this.dataType
+        });
+
+        const featureLabel = newDataHeader.filter(d => d !== target)
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // problem_type: 预测类型 Classification , Regression
+        // feature_label: 特征列名
+        // target_label:  目标列
+        // fill_method:  无效值
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            problemType,
+            featureLabel,
+            targetLabel: target,
+            projectId,
+            userId,
+            time: moment().valueOf(),
+            command,
+            fillMethod: {},
+            validationRate: this.validationRate,
+            holdoutRate: this.holdoutRate 
+        });
+    }
+
+    fastTrain() {
         const {
             userId, 
             projectId, 
@@ -222,21 +269,18 @@ export default class Project {
             dataHeader,
             uploadFileName,
             speed,
-            overfit,
-            dataType
+            overfit
         } = this;
         this.trainStartTime = moment().valueOf();
         const command = 'train2';
-        const newDataHeader = dataHeader.filter(d => !banList.includes(d))
     
         this.updateProject({
             train2Finished: false,
             train2ing: true,
-            dataHeader: newDataHeader,
-            dataType: dataType
         });
+
         const id = `${command}-${userId}-${projectId}`;
-        const featureLabel = newDataHeader.filter(d => d !== target)
+        const featureLabel = dataHeader.filter(d => d !== target)
         // this.cleanResultByCommand(this.modelingResultTable, { command: 'train2' });
 
         // id: request ID

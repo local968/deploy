@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-// import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Radio } from 'antd';
 import Hint from '../Common/Hint';
+import ContinueButton from '../Common/ContinueButton';
 // import { when } from 'mobx';
 import { Input } from 'antd';
 const { TextArea } = Input;
@@ -82,9 +82,7 @@ class Problem extends Component {
                         ))}
                     </RadioGroup>
                 </div>
-                <div className={styles.btn}>
-                    <button onClick={this.nextStep} className={styles.continue}>Continue</button>
-                </div>
+                <ContinueButton onClick={this.nextStep} disabled={!problemType} text="Continue" />
             </div>
         </div>
     }

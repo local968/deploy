@@ -1,5 +1,5 @@
 local function query(id)
-    local index = box.space["js_usersetting"].index["primary"]
+    local index = box.space["model_user_setting"].index["primary"]
     local result = index:select({id})
 
     if #result == 1 then
@@ -10,7 +10,7 @@ local function query(id)
 end
 
 local function upsert(userId, projectId)
-    local table = box.space["js_usersetting"]
+    local table = box.space["model_user_setting"]
     local newProjectId = projectId + 1;
     local tuple = {userId, newProjectId}
     table:upsert(tuple,{{'=',2,newProjectId}})

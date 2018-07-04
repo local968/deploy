@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
+import ContinueButton from '../Common/ContinueButton';
 import { Input } from 'antd';
 const { TextArea } = Input;
 
@@ -47,9 +48,7 @@ export default class Project extends Component {
                 <label >Project Description</label>
                 <TextArea rows={8} placeholder="project description" value={project?project.description:""} onChange={this.onChange.bind(this,"description")} />
             </div>
-            <div className={styles.btn}>
-                <button onClick={this.nextStep} className={styles.continue}>Continue</button>
-            </div>
+            <ContinueButton onClick={this.nextStep} disabled={false} text="Continue" />
         </div>
     }
 }

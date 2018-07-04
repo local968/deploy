@@ -1,5 +1,5 @@
 // import db from './db.js';
-import { observable, action, when } from 'mobx';
+import { observable, action, when, computed } from 'mobx';
 import Project from './Project.js';
 import socketStore from './SocketStore';
 // import config from '../config.js';
@@ -57,6 +57,34 @@ class ProjectStore {
         }
     }
 
+    @computed
+    get sortModels() {
+        const {problemType} = this.project
+
+        let models = [...this.models]
+        for (let m of models) {
+            if(problemType === "Classification"){
+                let actual0 = [0, 0], actual1 = [0, 0];
+                // if(criteria==="defualt"){
+                    actual0 = m.confusionMatrix[0]
+                    actual1 = m.confusionMatrix[1]
+                // }else{
+                //     for(let row of m.confusionMatrixDataDetail[0]){
+                        
+                //     }
+                //     for(let row of m.confusionMatrixDataDetail[1]){
+                        
+                //     }
+                //     actual0 = [1, 1];
+                //     actual1 = [1, 1];
+                // }
+                m.predicted = [actual0[0] / (actual0[0] + actual0[1]), actual1[1] / (actual1[0] + actual1[1])];
+            }
+        }
+
+        return models;
+    }
+
     loaded(type){
         this.finish[type] = true;
         if(this.finish.project && this.finish.model){
@@ -67,7 +95,7 @@ class ProjectStore {
 
     @action
     modelimgError(command, result) {
-        
+        console.log("error!!",command, result)
     }
 
     initCallback() {
@@ -94,21 +122,26 @@ class ProjectStore {
                     this.modelimgError(command, result)
                     return;
                 }
-                let info = {
-                    userId,
-                    projectId,
-                    args: {}
-                }
-                for (let row of result) {
-                    info.args[`${command}-${row.backend}-result`] = row
-                }
-                const models = this.project.saveModel(info)
-                for (let key in models) {
-                    this.models.push(new Model(this.userId, this.projectId, models[key]))
-                }
-                this.recommendModel()
                 switch (command) {
+                    case 'etl':
+                        this.project.nextMainStep(3);
+                        console.log(userId, projectId, command, result, status)
+                        break;
                     case 'train2':
+                        let info = {
+                            userId,
+                            projectId,
+                            args: {}
+                        }
+                        for (let row of result) {
+                            info.args[`${command}-${row.backend}-result`] = row
+                        }
+                        const models = this.project.saveModel(info)
+                        this.models = [];
+                        for (let key in models) {
+                            this.models.push(new Model(this.userId, this.projectId, models[key]))
+                        }
+                        this.recommendModel()
                         this.project.finishTrain2();
                         break;
                     default:
