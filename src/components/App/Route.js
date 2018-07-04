@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import styles from './styles.module.css';
-import { Create, New, Replace, CreateBackground } from 'components/Create';
+import { Background } from 'components/Common';
 import Detail from 'components/Detail';
 import Deploy from 'components/Deploy';
 import Project from 'components/Project';
@@ -32,7 +32,7 @@ export class LoginRouter extends Component {
   render() {
     return (
       <div className={styles.warp}>
-        <CreateBackground />
+        <Background />
         <Switch>
           <Route exact path="/" component={SignIn} />
           <Route exact path="/signup" component={SignUp} />

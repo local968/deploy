@@ -22,7 +22,7 @@ end
 
 exportapi.export('deploy2', nil, {updateField= updateField})
 
-return function(server)
+function init(server)
     tables()
     auth(server)
     projects(server)
@@ -30,4 +30,6 @@ return function(server)
     request(server)
     model(server)
 end
+
+init(app.webServer)
 

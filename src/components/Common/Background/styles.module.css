@@ -1,0 +1,53 @@
+.background {
+  position: fixed;
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.bgImage {
+  background: url(./graph.svg) no-repeat fixed bottom;
+  background-size: contain;
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.column {
+  width: 0.6em;
+  background: rgba(30, 99, 165, 0.2);
+  opacity: 0.1;
+  margin-right: 0.05em;
+  flex: 0 0 0.6em;
+}
+
+.circle {
+  position: absolute;
+  top: 50%;
+  width: 4em;
+  height: 4em;
+  text-align: center;
+  line-height: 4em;
+  border-radius: 50%;
+  border: 0.08em solid #1d2b3c;
+  border-left: 0.08em solid #c4cbd7;
+  opacity: 0.04;
+  color: #1d2b3c;
+  margin-top: -2em;
+  margin-left: 1em;
+  font-family: HelveticaNeue-UltraLight;
+  transform: rotate(45deg);
+}
+
+.number {
+  font-size: 9rem;
+  display: inline-block;
+  transform: rotate(-45deg);
+}
+
+.percent {
+  font-size: 4.5rem;
+}

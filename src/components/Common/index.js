@@ -5,5 +5,15 @@ import Pagination from './Pagination';
 import Switch from './Switch';
 import Uploader from './Uploader';
 import Search from './Search';
+import Background from './Background';
 
-export { BlackButton, Bread, Select, Pagination, Switch, Uploader, Search };
+export {
+  BlackButton,
+  Bread,
+  Select,
+  Pagination,
+  Switch,
+  Uploader,
+  Search,
+  Background
+};
