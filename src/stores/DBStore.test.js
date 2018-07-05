@@ -2,7 +2,8 @@ import db from './DBStore';
 
 Object.keys(db).map(async key => {
   const unwatch = db[key].watch(console.log);
-  const result = await db[key].insert([3, 2, 3, 4, 5]);
+  const result = await db[key].insert({ id: 1, test: 2 });
+  console.log(result);
   db[key].select('primary', result[0]).then(console.log);
   db[key]
     .update('primary', result[0], [['=', 2, 3], ['+', 3, 1], ['-', 4, 1]])

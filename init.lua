@@ -5,7 +5,9 @@ local projects = require("deploy2.lua.projects")
 local request = require("deploy2.lua.request")
 local model = require("deploy2.lua.model")
 local auth = require("deploy2.lua.auth")
-local deploymentsInit = require("deploy2.lua.deployments")
+local operatesInit = require("deploy2.lua.operates")
+
+require("deploy2.lua.test")
 
 local operators = {
   "select",
@@ -39,14 +41,15 @@ local function requestGenerator(type, channel)
     local request = {
       connid = self.connid,
       type = type,
-      data = self.data
+      data = self.data,
+      space = self.data.space
     }
     channel:put(request)
   end
 end
 
-local function deployInit(server)
-  local channel = deploymentsInit(server)
+local function opInit(server)
+  local channel = operatesInit(server)
   for k, v in pairs(operators) do
     server:addMessage({type = v}, requestGenerator(v, channel))
   end
@@ -61,7 +64,7 @@ local function init(server)
   -- approaches(server)
   request(server)
   model(server)
-  deployInit(server)
+  opInit(server)
 end
 
 init(app.webServer)
