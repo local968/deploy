@@ -1,9 +1,9 @@
 import R2WSClient from '../r2ws-client';
 
-const debug = false;
+const debug = true;
 
 const operators = [
-  'get',
+  'select',
   'insert',
   'update',
   'upsert',
@@ -30,8 +30,6 @@ class DB {
       }, {});
       return prev;
     }, {});
-
-    db._DB = this;
 
     return db;
   }
@@ -68,7 +66,7 @@ class DB {
   }
 
   async send(type, data) {
-    // type: get, insert, update, upsert, delete, watch, unwatch
+    // type: select, insert, update, upsert, delete, watch, unwatch
     const conn = await this.connect();
     if (type === 'watch') {
       conn.sendmessage({ type, data });
@@ -84,9 +82,9 @@ class DB {
     }
   }
 
-  async get(space, index, args) {
-    if (!Array.isArray(args)) args = [args];
-    return await this.send('get', { space, index, args });
+  async select(space, index, args = null) {
+    if (args && !Array.isArray(args)) args = [args];
+    await this.send('select', { space, index, args });
   }
 
   async insert(space, tuple) {
