@@ -110,6 +110,7 @@ class ProjectStore {
                 const models = result.args;
                 this.models = [];
                 for (let key in models) {
+                    if(key.includes("train"))
                     this.models.push(new Model(this.userId, this.projectId, models[key]))
                 }
                 this.recommendModel()
