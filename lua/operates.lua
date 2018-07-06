@@ -130,11 +130,11 @@ local strategies = {
     local result = request.data
     result.message = "space not exist."
     result.status = 404
-    if box.space[result.space] then
+    if box.space[result.space] and box.space[result.space].index[result.index] then
       local ok, returnval =
         pcall(
         function()
-          return box.space[result.space]:delete(result.key)
+          return box.space[result.space].index[result.index]:delete(result.key)
         end
       )
       if ok then
@@ -164,7 +164,7 @@ local strategies = {
     if watcher[result.space] then
       for k, v in pairs(watcher[result.space]) do
         if v == request.connid then
-          watcher[result.space]:remove(k)
+          table.remove(watcher[result.space], k)
         end
       end
     end
@@ -180,8 +180,13 @@ return function(server)
     function()
       while channel do
         local request = channel:get()
+        local result
         request = before.trigger(request)
-        local result = strategies[request.type](request)
+        if request then
+          result = strategies[request.type](request)
+        else
+          result = request
+        end
         result = after.trigger(request, result, watcher[request.space])
         server:sendMessageTo(request.connid, request.type, result)
       end

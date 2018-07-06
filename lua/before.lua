@@ -15,17 +15,28 @@ return {
     end
     return request
   end,
-  register = function(space, type, fn)
-    local index = 1
-    local name = space .. ":" .. type
-    if listener[name] then
-      listener[name][#listener[name] + 1] = fn
-      index = #listener[name] + 1
-    else
-      listener[name] = {fn}
+  register = function(space, types, fn)
+    local unregisters = {}
+    if type(types) == "string" then
+      types = {types}
+    end
+    for k, t in pairs(types) do
+      local index = 1
+      local name = space .. ":" .. t
+      if listener[name] then
+        listener[name][#listener[name] + 1] = fn
+        index = #listener[name] + 1
+      else
+        listener[name] = {fn}
+      end
+      unregisters[#unregisters + 1] = function()
+        table.remove(listener[name], index)
+      end
     end
     return function()
-      table.remove(listener[name], index)
+      for k, fn in pairs(unregisters) do
+        fn()
+      end
     end
   end
 }

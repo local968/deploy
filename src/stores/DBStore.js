@@ -84,7 +84,7 @@ class DB {
 
   async select(space, index, args = null) {
     if (args && !Array.isArray(args)) args = [args];
-    await this.send('select', { space, index, args });
+    return await this.send('select', { space, index, args });
   }
 
   async insert(space, tuple) {
@@ -103,8 +103,8 @@ class DB {
     return await this.send('upsert', { space, tuple, modifier });
   }
 
-  async delete(space, key) {
-    return await this.send('delete', { space, key });
+  async delete(space, index, key) {
+    return await this.send('delete', { space, index, key });
   }
 
   watch(space, listener) {
