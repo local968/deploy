@@ -7,7 +7,7 @@ local model = require("deploy2.lua.model")
 local auth = require("deploy2.lua.auth")
 local operatesInit = require("deploy2.lua.operates")
 
-require("deploy2.lua.test")
+local testInit = require("deploy2.lua.test")
 
 local operators = {
   "select",
@@ -53,6 +53,7 @@ local function opInit(server)
   for k, v in pairs(operators) do
     server:addMessage({type = v}, requestGenerator(v, channel))
   end
+  testInit(server, channel)
 end
 
 exportapi.export("deploy2", nil, {updateField = updateField})
