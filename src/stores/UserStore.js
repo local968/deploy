@@ -116,7 +116,6 @@ class UserStore{
                 this.isInit = false;
             },
             login : data => {
-                console.log(data,"login")
                 const {status, err, user} = data;
                 if(status !== 200){
                     this.clearToken();

@@ -313,3 +313,137 @@
     display: flex;
     margin: 0.1em;
 }
+
+.sample {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    font-family: Arial;
+}
+
+.cover {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.sampleBlock {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    width: 12em;
+    border-radius: 4px;
+    box-shadow: 0 12px 20px 0 rgba(0, 0, 0, 0.3);
+}
+
+.sampleTitle {
+    display: flex;
+    justify-content: center;
+    flex: auto;
+    background-color: #445167;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 0.1em 0;
+}
+
+.sampleTitle span {
+    font-size: 1.125rem;
+    color: #fff;
+}
+
+.sampleTop {
+    display: flex;
+    justify-content: center;
+    flex: auto;
+    margin-top: 0.4em;
+}
+
+.sampleTop span {
+    font-size: 1.125rem;
+}
+
+.sampleTable {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    margin: 0.5em 0.4em;
+}
+
+.sampleHeader {
+    display: flex;
+    padding: 0.15em 0;
+    padding-left: 0.3em;
+    border-bottom: solid 1px #c4cbd7;
+}
+
+.sampleHeader span {
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.sampleRow {
+    display: flex;
+    border: solid 1px #c4cbd7;
+    border-top: none;
+    flex: 0 0 0.4em;
+    align-items: center;
+}
+
+.sampleRow span {
+    font-size: 0.75rem;
+}
+
+.sampleCell {
+    display: flex;
+    flex: 1 1 0;
+    width: 0;
+}
+
+.sampleDesc {
+    flex: 2 1 0;
+}
+
+.sampleCell span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.sampleRadio {
+    display: flex;
+    flex: 0 0 0.3em;
+}
+
+.sampleButton {
+    display: flex;
+    margin-top: 0.3em;
+    justify-content: center;
+}
+
+.submit {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    padding: 0.1em 0.2em;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.submit span {
+    font-size: 1rem;
+}

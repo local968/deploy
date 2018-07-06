@@ -239,7 +239,6 @@
     flex-direction: column;
     flex: none;
     border: solid 0.5px #979797;
-    max-height: 3.3em;
 }
 
 .rowData {
@@ -247,6 +246,12 @@
     padding: 0 0.2em;
     position: relative;
     align-items: center;
+}
+
+.rowBox {
+    display: flex;
+    flex-direction: column;
+    flex: none;
 }
 
 .cell span {
@@ -264,6 +269,8 @@
     display: flex;
     flex-direction: column;
     padding: 0.2em 0;
+    overflow: auto;
+    max-height: 5em;
 }
 
 .cell {
@@ -275,6 +282,7 @@
     border-bottom: 1px solid #979797;
     min-width: 1.4em;
     margin: 0 0.05em;
+    position: relative;
 }
 
 .cell .progress span {
@@ -338,6 +346,36 @@
     flex: auto;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+}
+
+.error {
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.error span {
+    font-size: 3rem;
+}
+
+.training {
+    display: flex;
+    width: 8em;
+}
+
+.trainingProgress {
+    text-align: center;
+}
+
+.trainingText {
+    display: flex;
+}
+
+.trainingText span {
+    font-size: 1.5rem;
 }
 
 .modelStart {
@@ -437,4 +475,37 @@
     display: flex;
     line-height: 1.43;
     color: #747473;
+}
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    padding: 0.1em 0;
+}
+
+.detailRow {
+    display: flex;
+    padding: 0 0.25em;
+    flex: none;
+    align-items: center;
+}
+
+.detailRow span {
+    font-size: 0.875rem;
+}
+
+.detailName {
+    display: flex;
+    flex: 0 0 1em;
+}
+
+.detailNum {
+    display: flex;
+    flex: 0 0 1em;
+}
+
+.detailProcess {
+    height: 0.875rem;
+    background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
+    border-radius: 0.875rem;
 }

@@ -42,11 +42,11 @@ export default class Project extends Component {
             </div>
             <div className={styles.row}>
                 <label>Project Name</label>
-                <Input placeholder={"project name"} value={project?project.name:""} onChange={this.onChange.bind(this,"name")} />
+                <Input placeholder={"project name"} defaultValue={project?project.name:""} onChange={this.onChange.bind(this,"name")} />
             </div>
             <div className={styles.row}>
                 <label >Project Description</label>
-                <TextArea rows={8} placeholder="project description" value={project?project.description:""} onChange={this.onChange.bind(this,"description")} />
+                <TextArea rows={8} placeholder="project description" defaultValue={project?project.description:""} onChange={this.onChange.bind(this,"description")} />
             </div>
             <ContinueButton onClick={this.nextStep} disabled={false} text="Continue" />
         </div>

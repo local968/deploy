@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress, Spin } from 'antd';
 import autoIcon from './mr-one-logo-blue.svg';
+import config from '../../config.js'
 // import r2Loading from './Mr.OneLoading2.gif';
 // import { when } from 'mobx';
 
@@ -11,6 +12,9 @@ import autoIcon from './mr-one-logo-blue.svg';
 //     defualt: 'defualt',
 //     costBased: 'costBased'
 // }
+
+const Classification = 'Classification';
+const Regression = 'Regression';
 
 // @inject('userStore', 'projectStore')
 @observer
@@ -30,7 +34,7 @@ export default class Modeling extends Component {
         const { models, project } = this.props;
         const { train2ing, train2Finished, train2Error } = project;
 
-        if (train2ing) return <Loading />;
+        if (train2ing) return <Loading project={project}/>;
         if (train2Finished) return <ModelResult models={models} project={project} />;
         if (train2Error) return <ModelError />;
         return <StartTrain project={project} />
@@ -43,6 +47,7 @@ export default class Modeling extends Component {
     }
 }
 
+@observer
 class StartTrain extends Component {
     fastTrain = () => {
         this.props.project.nextMainStep(3);
@@ -67,15 +72,56 @@ class StartTrain extends Component {
     }
 }
 
+@observer
 class Loading extends Component {
+    timer = null
+    state = {
+        progress: 0
+    }
+    componentDidMount() {
+        const {project} = this.props;
+        const {totalLines, rawHeader} = project || {}
+        //暂定
+        const rowRatio = (Math.max(totalLines / 50000,1) - 1) * 0.1 + 1;
+        const colRatio = Math.max(rawHeader.length / 20,1) * 1;
+        const time = rowRatio * colRatio * config.trainTimeDefault * 1000;
+        const perTime = time / 90 * 5
+        this.clearTimer()
+        this.timer = setInterval(this.autoIncrease, perTime)
+    }
+
+    componentWillUnmount() {
+        this.clearTimer()
+    }
+
+    autoIncrease = () => {
+        const {progress} = this.state;
+        if(progress === 90) return this.clearTimer();
+        this.setState({
+            progress: progress + 5
+        })
+    }
+
+    clearTimer = () => {
+        if(this.timer){
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    }
+
     render() {
-        return <div className={styles.loading}><Spin tip="Training..." size="large"></Spin></div>
+        return <div className={styles.loading}>
+            <div className={styles.training}>
+                <Progress className={styles.trainingProgress} percent={this.state.progress} status="active" />
+            </div>
+            <div className={styles.trainingText}><span>Training</span></div>
+        </div>
     }
 }
 
 class ModelError extends Component {
     render() {
-        return <div className={styles.loading}><Spin tip="Training..." size="large"></Spin></div>
+        return <div className={styles.loading}><span>Training Failed</span></div>
     }
 }
 
@@ -127,9 +173,7 @@ class ModelResult extends Component {
                     <div className={styles.radio}><input type="radio" name="criteria" value={Criteria.costBased} id={Criteria.costBased} onChange={this.onChange} defaultChecked={criteria === Criteria.costBased} /><label htmlFor={Criteria.costBased}>Cost Based</label></div>
                 </div>
             </div> */}
-            {problemType === "Classification" ?
-                <ClassificationTable models={models} selectModel={this.selectModel} /> :
-                <RegressionTable models={models} selectModel={this.selectModel} />}
+            <ModelTable models={models} selectModel={this.selectModel} problemType={problemType} />
             <div className={styles.buttonBlock}>
                 <button className={styles.button}><span>Check Model Insights</span></button>
                 <div className={styles.or}><span>or</span></div>
@@ -183,7 +227,7 @@ class PredictedProgress extends Component {
 class Performance extends Component {
     render() {
         const { problemType, model } = this.props;
-        return problemType === "Classification" ?
+        return problemType === Classification ?
             <div className={styles.performanceBox}>
                 <div className={styles.performance}>
                     <Progress width={84} type="circle" percent={model.score.holdoutScore.auc * 100} format={percent => (percent / 100).toFixed(2)} />
@@ -193,7 +237,7 @@ class Performance extends Component {
             </div> :
             <div className={styles.performanceBox}>
                 <div className={styles.performance}>
-                    <div className={styles.rmsePerformance}><span>{model.score.holdoutScore.rmse.toFixed(4)}</span></div>
+                    <div className={styles.rmsePerformance}><span>{model.score.holdoutScore.nrmse.toFixed(4)}</span></div>
                     <div className={styles.performanceText}><span>Normalized RMSE</span></div>
                 </div>
                 <div className={styles.space}></div>
@@ -205,16 +249,16 @@ class Performance extends Component {
     }
 }
 
-class ClassificationTable extends Component {
+class ModelTable extends Component {
     render() {
-        const { models, selectModel } = this.props;
+        const { models, selectModel, problemType } = this.props;
         return <div className={styles.table}>
             <div className={styles.rowHeader}>
                 <div className={styles.rowData}>
                     <div className={classnames(styles.cell, styles.name, styles.cellHeader)}><span>Model Name</span></div>
-                    <div className={classnames(styles.cell, styles.predict, styles.cellHeader)}></div>
-                    <div className={classnames(styles.cell, styles.cellHeader)}><span>Performance(AUC)</span></div>
-                    <div className={classnames(styles.cell, styles.cellHeader)}><span>Holdout</span></div>
+                    {problemType === Classification&&<div className={classnames(styles.cell, styles.predict, styles.cellHeader)}></div>}
+                    <div className={classnames(styles.cell, styles.cellHeader)}><span>{problemType === Classification? 'Performance(AUC)' : 'RMSE'}</span></div>
+                    <div className={classnames(styles.cell, styles.cellHeader)}>{problemType === Classification? <span>Holdout</span> : <span>R<sup>2</sup></span>}</div>
                     <div className={classnames(styles.cell, styles.cellHeader)}><span>Execution Speed</span></div>
                     <div className={classnames(styles.cell, styles.cellHeader)}><span>Variable Impact</span></div>
                     {/* <div className={classnames(styles.cell, styles.cellHeader)}><span>Process Flow</span></div> */}
@@ -222,54 +266,61 @@ class ClassificationTable extends Component {
             </div>
             <div className={styles.data}>
                 {models.map((model, key) => {
-                    const rand = ((Math.random() * 0.2) + 0.4) * 3;
-                    return <div key={key} className={styles.rowData}>
-                        <div className={styles.modelSelect}><input type="radio" name="modelSelect" defaultChecked={model.recommend} onChange={selectModel.bind(null, model)} /></div>
-                        <div className={classnames(styles.cell, styles.name)}><span>{model.name}</span></div>
-                        <div className={classnames(styles.cell, styles.predict)}>
-                            <PredictedProgress predicted={model.predicted[0]} width={rand} height={0.2} type={"success"} />
-                            <div className={styles.space}></div>
-                            <PredictedProgress predicted={model.predicted[1]} width={3 - rand} height={0.2} type={"predicted"} />
-                        </div>
-                        <div className={styles.cell}><span>{model.score.validateScore.auc.toFixed(2)}</span></div>
-                        <div className={styles.cell}><span>{model.score.holdoutScore.auc.toFixed(2)}</span></div>
-                        <div className={styles.cell}><span>{model.executeSpeed + "ms/1000rows"}</span></div>
-                        <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
-                        {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-                    </div>
+                    return <ModelDetail key={key} model={model} selectModel={selectModel} problemType={problemType} />
                 })}
             </div>
         </div>
     }
 }
 
-class RegressionTable extends Component {
+class ModelDetail extends Component {
+    state = {
+        type: '',
+        visible: false
+    }
+
+    toggleImpact = () => {
+        this.setState({
+            type: 'impact',
+            visible: !this.state.visible
+        })
+    }
+
+    detail = () => {
+        const {model} = this.props;
+        const {featureImportanceDetail} = model;
+        const arr = Object.entries(featureImportanceDetail).sort((a, b) => b[1] - a[1])
+        return <div className={styles.detail}>
+            {arr.map((row, index) => {
+                return <div key={index} className={styles.detailRow}>
+                    <div className={styles.detailName}><span>{row[0]}</span></div>
+                    <div className={styles.detailProcess} style={{width: row[1] * 7 +"em"}}></div>
+                    <div className={styles.detailNum}><span>{row[1].toFixed(4)}</span></div>
+                </div>
+            })}
+        </div>
+    }
+
     render() {
-        const { models, selectModel } = this.props;
-        return <div className={styles.table}>
-            <div className={styles.rowHeader}>
-                <div className={styles.rowData}>
-                    <div className={classnames(styles.cell, styles.name, styles.cellHeader)}><span>Model Name</span></div>
-                    <div className={classnames(styles.cell, styles.cellHeader)}><span>RMSE</span></div>
-                    <div className={classnames(styles.cell, styles.cellHeader)}><span>R2</span></div>
-                    <div className={classnames(styles.cell, styles.cellHeader)}><span>Execution Speed</span></div>
-                    <div className={classnames(styles.cell, styles.cellHeader)}><span>Variable Impact</span></div>
-                    {/* <div className={classnames(styles.cell, styles.cellHeader)}><span>Model Process Flow</span></div> */}
+        const {model, selectModel, problemType} = this.props;
+        return <div className={styles.rowBox}>
+            <div className={styles.rowData}>
+                <div className={styles.modelSelect}><input type="radio" name="modelSelect" defaultChecked={model.recommend} onChange={selectModel.bind(null, model)} /></div>
+                <div className={classnames(styles.cell, styles.name)}><span>{model.name}</span></div>
+                {problemType === Classification&&<div className={classnames(styles.cell, styles.predict)}>
+                    <PredictedProgress predicted={model.predicted[0]} width={1.5} height={0.2} type={"success"} />
+                    <div className={styles.space}></div>
+                    <PredictedProgress predicted={model.predicted[1]} width={1.5} height={0.2} type={"predicted"} />
+                </div>}
+                <div className={styles.cell}><span>{problemType === Classification?model.score.validateScore.auc.toFixed(2):model.score.holdoutScore.nrmse.toFixed(4)}</span></div>
+                <div className={styles.cell}><span>{problemType === Classification?model.score.holdoutScore.auc.toFixed(2):model.score.holdoutScore.r2.toFixed(4)}</span></div>
+                <div className={styles.cell}><span>{model.executeSpeed + "ms/1000rows"}</span></div>
+                <div className={classnames(styles.cell, styles.compute)}>
+                    <span onClick={this.toggleImpact}>Compute</span>
                 </div>
             </div>
-            <div className={styles.data}>
-                {models.map((model, key) => {
-                    return <div key={key} className={styles.rowData}>
-                        <div className={styles.modelSelect}><input type="radio" name="modelSelect" defaultChecked={model.recommend} onChange={selectModel.bind(null, model)} /></div>
-                        <div className={classnames(styles.cell, styles.name)}><span>{model.name}</span></div>
-                        <div className={styles.cell}><span>{model.score.holdoutScore.rmse.toFixed(4)}</span></div>
-                        <div className={styles.cell}><span>{model.score.holdoutScore.r2.toFixed(4)}</span></div>
-                        <div className={styles.cell}><span>{model.executeSpeed + "ms/1000rows"}</span></div>
-                        <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div>
-                        {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-                    </div>
-                })}
-            </div>
+            {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
+            {this.state.visible && this.detail()}
         </div>
     }
 }

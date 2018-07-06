@@ -353,7 +353,6 @@ export default class Project {
     }
 
     finishTrain2() {
-        console.log("finish")
         this.updateProject({
             train2Finished: true,
             train2ing: false
@@ -372,6 +371,13 @@ export default class Project {
             }
         )
         return data.args
+    }
+
+    modelingError() {
+        this.updateProject({
+            train2Error: true,
+            train2ing: false
+        });
     }
 
     initCallback() {
