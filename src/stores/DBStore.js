@@ -2,36 +2,17 @@ import R2WSClient from '../r2ws-client';
 
 const debug = true;
 
-const operators = [
-  'select',
-  'insert',
-  'update',
-  'upsert',
-  'replace',
-  'delete',
-  'watch'
-];
-
-const spaces = ['test'];
-
 class DB {
   status = 'init';
   _listeners = {};
   connection;
   reqNo = 1;
+  db = {};
 
   constructor(connect = true) {
     if (connect) this.connect();
 
-    const db = spaces.reduce((prev, space) => {
-      prev[space] = operators.reduce((prev, operator) => {
-        prev[operator] = this[operator].bind(this, space);
-        return prev;
-      }, {});
-      return prev;
-    }, {});
-
-    return db;
+    return this.db;
   }
 
   async connect() {
@@ -52,6 +33,7 @@ class DB {
       this.on('message', data => {
         data = data.data;
         if (debug) console.log('receive message:', data);
+        if (data.type === 'api') return this.initApi(data);
         if (data.data.reqNo) return this.emit(data.data.reqNo, data.data);
         if (data.data.eventName)
           return this.emit(data.data.eventName, data.data);
@@ -60,8 +42,20 @@ class DB {
       this.once('ready', conn => {
         this.connection = conn;
         this.status = 'ready';
+        conn.sendmessage({ type: 'api' });
         resolve(conn);
       });
+    });
+  }
+
+  initApi(data) {
+    const apiList = data.data;
+    Object.entries(apiList).map(([apiName, rule]) => {
+      this.db[apiName] = inputArg => {
+        const errors = checkArg(inputArg, rule);
+        if (errors.length > 0) return console.error(errors);
+        return this.send(apiName, inputArg);
+      };
     });
   }
 
@@ -80,31 +74,6 @@ class DB {
         });
       });
     }
-  }
-
-  async select(space, index, args = null) {
-    if (args && !Array.isArray(args)) args = [args];
-    return await this.send('select', { space, index, args });
-  }
-
-  async insert(space, tuple) {
-    return await this.send('insert', { space, tuple });
-  }
-
-  async replace(space, tuple) {
-    return await this.send('replace', { space, tuple });
-  }
-
-  async update(space, index, key, modifier) {
-    return await this.send('update', { space, index, key, modifier });
-  }
-
-  async upsert(space, tuple, modifier) {
-    return await this.send('upsert', { space, tuple, modifier });
-  }
-
-  async delete(space, index, key) {
-    return await this.send('delete', { space, index, key });
   }
 
   watch(space, listener) {
@@ -149,5 +118,42 @@ class DB {
     return this._listeners[eventName] || [];
   }
 }
+
+const checkArg = (inputArg, rule) => {
+  const errors = [];
+  Object.entries(rule).map(([key, defines]) => {
+    const keys = key.split('.');
+    let currentLevelArg = inputArg;
+    if (defines[0] && !currentLevelArg) {
+      const error = `need argument.`;
+      if (errors.indexOf(error) === -1) errors.push(error);
+    }
+    keys.map((_key, level) => {
+      if (currentLevelArg) {
+        const value = currentLevelArg[_key];
+        const currentKey = [...keys].splice(0, level + 1).join('.');
+        if (level < keys.length - 1) {
+          if (value) return (currentLevelArg = value);
+          if (rule[currentKey] && rule[currentKey][0] === false)
+            return (currentLevelArg = false);
+          const error = `${currentKey} not exists.`;
+          if (errors.indexOf(error) === -1) errors.push(error);
+          return;
+        }
+        if (defines[0] && value === undefined) {
+          const error = `${currentKey} not exists.`;
+          if (errors.indexOf(error) === -1) errors.push(error);
+        }
+        if (value !== undefined && typeof value !== defines[1]) {
+          const error = `${currentKey} type error. expact ${
+            defines[1]
+          } get ${typeof value}`;
+          if (errors.indexOf(error) === -1) errors.push(error);
+        }
+      }
+    });
+  });
+  return errors;
+};
 
 export default new DB();

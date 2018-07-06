@@ -5,20 +5,9 @@ local projects = require("deploy2.lua.projects")
 local request = require("deploy2.lua.request")
 local model = require("deploy2.lua.model")
 local auth = require("deploy2.lua.auth")
-local operatesInit = require("deploy2.lua.operates")
-
 local testInit = require("deploy2.lua.test")
-
-local operators = {
-  "select",
-  "insert",
-  "update",
-  "upsert",
-  "replace",
-  "delete",
-  "watch",
-  "unwatch"
-}
+local deploymentsInit = require("deploy2.lua.deployments")
+local api = {}
 
 -- 更新单个字段
 local function updateField(userId, projectId, updateTable)
@@ -36,26 +25,6 @@ local function updateField(userId, projectId, updateTable)
   end
 end
 
-local function requestGenerator(type, channel)
-  return function(self)
-    local request = {
-      connid = self.connid,
-      type = type,
-      data = self.data,
-      space = self.data.space
-    }
-    channel:put(request)
-  end
-end
-
-local function opInit(server)
-  local channel = operatesInit(server)
-  for k, v in pairs(operators) do
-    server:addMessage({type = v}, requestGenerator(v, channel))
-  end
-  testInit(server, channel)
-end
-
 exportapi.export("deploy2", nil, {updateField = updateField})
 
 local function init(server)
@@ -65,7 +34,15 @@ local function init(server)
   -- approaches(server)
   request(server)
   model(server)
-  opInit(server)
+
+  testInit(server, api)
+  deploymentsInit(server, api)
+  server:addMessage(
+    {type = "api"},
+    function(self)
+      return self:render({data = api})
+    end
+  )
 end
 
 init(app.webServer)

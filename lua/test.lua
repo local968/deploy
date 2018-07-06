@@ -1,11 +1,12 @@
 local after = require("deploy2.lua.after")
 local before = require("deploy2.lua.before")
 local commonInit = require("deploy2.lua.common")
+local operate = require("deploy2.lua.operate")
 local space = "test"
 local fields = {"id", "test"}
 local common = commonInit(fields)
 
-return function(server, channel)
+return function(server, api)
   if not box.space[space] then
     box.schema.space.create(space)
     box.space[space]:create_index(
@@ -39,9 +40,6 @@ return function(server, channel)
     space,
     {"insert", "replace", "delete"},
     function(req, res, watchers)
-      for k, w in pairs(watchers) do
-        generateRequest(w, channel)
-      end
       res.result = common.mapArrayToObject(res.result)
       return res
     end
@@ -56,17 +54,21 @@ return function(server, channel)
     end
   )
 
-  local function generateRequest(connid, channel)
-    local request = {
-      connid = connid,
-      type = "select",
-      data = {
+  server:addMessage(
+    {type = "addTest"},
+    function(self)
+      local request = {
         space = space,
-        args = {},
-        index = "primary"
-      },
-      space = space
-    }
-    channel:put(request)
-  end
+        type = "insert",
+        data = self.data
+      }
+      return self:render({data = operate(request)})
+    end
+  )
+
+  api["addTest"] = {
+    ["tuple"] = {true, "object"},
+    ["tuple.id"] = {true, "number"},
+    ["tuple.test"] = {true, "number"}
+  }
 end

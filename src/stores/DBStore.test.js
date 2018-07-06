@@ -8,3 +8,5 @@ db[key].select('test', 7).then(console.log);
 db[key].replace({ id, test: 7 }).then(console.log);
 // db[key].delete('primary', id).then(console.log);
 unwatch();
+
+
