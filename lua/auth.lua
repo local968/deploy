@@ -371,8 +371,17 @@ local function logout(self)
     logout_handler(nil, self)
 end
 
+local function accessable(self, req)
+    if req.type == 'register' or req.type == 'login' then
+        return true 
+    else
+        return true
+    end
+ end
+
 return function(server)
     server:setEventHandler(server.EVENT_HANDLER_TYPE.ONCLOSE, "logout_log", logout_handler)
+    server:setEventHandler(server.EVENT_HANDLER_TYPE.ONMESSAGE_ACCESSABLE, "accessable", accessable)
     server:addMessage({type='login'},login)
     server:addMessage({type='register'},register)
     server:addMessage({type='setProfile'},setProfile)

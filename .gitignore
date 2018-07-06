@@ -26,6 +26,6 @@ yarn-error.log*
 
 package-lock.json
 
-config.js
+local_config.js
 
 uploads

@@ -20,7 +20,35 @@ local function updateField(userId,projectId,updateTable)
     end
 end
 
+local function addToSet(table, query, index, data)
+    local result = box.space[table].index.primary:select(query)
+    if result[1] ~= nil then
+        local tuple = result[1];
+        if #tuple+1 < index-1 then
+            for i=#tuple+1, index-1, 1 do
+                tuple[i] = nil
+            end
+        end
+        local list = tuple[index]
+        if list == nil then
+            list = {}
+        end
+        list[#list + 1] = data;
+        box.space[table]:update(query,{{'=', index, list}})
+    else
+        local tuple = query;
+        if #tuple+1 < index-1 then
+            for i=#tuple+1, index-1, 1 do
+                tuple[i] = nil
+            end
+        end
+        tuple[index] = {data}
+        box.space[table]:insert(tuple)
+    end
+end
+
 exportapi.export('deploy2', nil, {updateField= updateField})
+exportapi.export('deploy2', nil, {addToSet= addToSet})
 
 -- return function(server)
     local server = app.webServer

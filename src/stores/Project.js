@@ -168,8 +168,19 @@ export default class Project {
         const header = uploadData[0];
         const data = uploadData.slice(1);
 
+        this.updateProject({
+            uploadData: data,
+            dataHeader: header,
+            rawHeader: header
+        });
+
+        this.nextSubStep(2, 2);
+    }
+
+    autoFixHeader() {
+        const {rawHeader} = this;
         const temp = {};
-        const rawHeader = header.map((h, i) => {
+        const header = rawHeader.map((h, i) => {
             h = h.trim();
             if (/^$/.test(h)){
                 h = `Unnamed: ${i}`;
@@ -183,26 +194,10 @@ export default class Project {
             return h
         })
 
-        let type = new Array(header.length).fill("numerical");
-        for(var row of data){
-            for(var [k ,v] of row.entries()){
-                if(type[k] === "categorical"){
-                    continue;
-                }
-                if(!!v && isNaN(parseFloat(v))){
-                    type[k] = "categorical"
-                }
-            }
-        }
-
         this.updateProject({
-            uploadData: data,
-            dataHeader: rawHeader,
-            rawHeader,
-            dataType: type
+            dataHeader: header,
+            rawHeader: header
         });
-
-        this.nextSubStep(2, 2);
     }
 
     cleanDB(table, object, cb) {
