@@ -26,6 +26,14 @@ return function(server, api)
         parts = {1, "string", 2, "string"}
       }
     )
+
+    space:create_index(
+      "userId",
+      {
+        parts = {2, "string"},
+        unique = false
+      }
+    )
   end
 
   before.register(
@@ -42,18 +50,22 @@ return function(server, api)
   after.register(
     space,
     {"insert", "replace", "delete"},
-    function(req, res, watchers)
-      res.result = common.mapArrayToObject(res.result)
-      return res
+    function(request, response, watchers)
+      if request.data.originTuple then
+        request.data.tuple = request.data.originTuple
+        request.data.originTuple = nil
+      end
+      response.result = common.mapArrayToObject(response.result)
+      return response
     end
   )
 
   after.register(
     space,
     "select",
-    function(req, res, watchers)
-      res.result = common.mapArrayArrayToArrayObject(res.result)
-      return res
+    function(request, response, watchers)
+      response.result = common.mapArrayArrayToArrayObject(response.result)
+      return response
     end
   )
 
@@ -61,7 +73,7 @@ return function(server, api)
     {type = "newDeploy"},
     function(self)
       -- local userResult = conn.getConnid(self.connid)
-      local userResult = "tytytytytyt"
+      local userResult = {1, "tytytytytyt"}
       if not userResult then
         local result = self.data
         result.message = "need login."
@@ -70,6 +82,7 @@ return function(server, api)
       end
       local userId = userResult[2]
       self.data.tuple.userId = userId
+      self.data.tuple.id = common.createUUID()
       local request = {
         space = space,
         type = "insert",
@@ -84,7 +97,7 @@ return function(server, api)
     {type = "updateDeploy"},
     function(self)
       -- local userResult = conn.getConnid(self.connid)
-      local userResult = "tytytytytyt"
+      local userResult = {1, "tytytytytyt"}
       if not userResult then
         local result = self.data
         result.message = "need login."
@@ -106,10 +119,54 @@ return function(server, api)
   server:addMessage(
     {type = "searchDeploy"},
     function(self)
+      -- local userResult = conn.getConnid(self.connid)
+      local userResult = {1, "tytytytytyt"}
+      if not userResult then
+        local result = self.data
+        result.message = "need login."
+        result.status = 401
+        return self:render({data = result})
+      end
+      local userId = userResult[2]
+      local args = {userId}
+      local index = "userId"
+      if self.data.id then
+        args = {self.data.id, userId}
+        index = "primary"
+      end
       local request = {
         space = space,
         type = "select",
-        data = self.data
+        data = self.data,
+        userId = userId,
+        args = args,
+        index = index
+      }
+      return self:render({data = operate(request)})
+    end
+  )
+
+  server:addMessage(
+    {type = "watchDeploy"},
+    function(self)
+      local request = {
+        space = space,
+        type = "watch",
+        data = self.data,
+        connId = self.connid
+      }
+      return self:render({data = operate(request)})
+    end
+  )
+
+  server:addMessage(
+    {type = "unwatchDeploy"},
+    function(self)
+      local request = {
+        space = space,
+        type = "unwatch",
+        data = self.data,
+        connId = self.connid
       }
       return self:render({data = operate(request)})
     end
@@ -124,23 +181,23 @@ return function(server, api)
     ["tuple.deploymentOptions"] = {true, "object"},
     ["tuple.performanceOptions"] = {true, "object"}
   }
-
   api["updateDeploy"] = {
     ["tuple"] = {true, "object"},
-    ["tuple.id"] = {true, "number"},
+    ["tuple.id"] = {true, "string"},
     ["tuple.projectName"] = {true, "string"},
     ["tuple.modelName"] = {true, "string"},
     ["tuple.modelType"] = {true, "string"},
     ["tuple.deploymentOptions"] = {true, "object"},
     ["tuple.performanceOptions"] = {true, "object"}
   }
-
   -- todo pager
   api["searchDeploy"] = {
-    ["id"] = {false, "number"},
+    ["id"] = {false, "string"},
     ["keyword"] = {false, "string"},
     ["sort"] = {false, "string"}
   }
+  api["watchDeploy"] = {}
+  api["unwatchDeploy"] = {}
 end
 
 -- local unregister = before.register()

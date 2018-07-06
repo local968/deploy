@@ -11,6 +11,7 @@ local watcher = {}
 --   [index],
 --   data,
 --   user,
+--   [args]   (just for select)
 --   ...
 -- }
 
@@ -28,11 +29,11 @@ local strategies = {
     local response = request.data
     response.message = "space or index not exist."
     response.status = 404
-    if box.space[response.space] and box.space[request.space].index[request.index] then
+    if box.space[request.space] and box.space[request.space].index[request.index] then
       local ok, returnval =
         pcall(
         function()
-          return box.space[request.space].index[request.index]:select(request.data.args)
+          return box.space[request.space].index[request.index]:select(request.args)
         end
       )
       if ok then
@@ -128,7 +129,7 @@ local strategies = {
     if watcher[request.space] then
       for k, v in pairs(watcher[request.space]) do
         if v == request.connid then
-          table.remove(watcher[request.space], k)
+          watcher[request.space][k] = nil
         end
       end
     end

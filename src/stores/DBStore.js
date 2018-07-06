@@ -1,6 +1,6 @@
 import R2WSClient from '../r2ws-client';
 
-const debug = true;
+const debug = false;
 
 class DB {
   status = 'init';
