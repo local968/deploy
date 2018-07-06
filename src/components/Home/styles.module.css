@@ -59,6 +59,7 @@
     display: flex;
     flex: 0 0 0.88em;
     padding: .24em;
+    justify-content: space-between;
 }
 
 .info {

@@ -13,11 +13,11 @@ import { Checkbox } from 'antd';
 import axios from 'axios';
 // import { when } from 'mobx';
 
-import dataConnectActive from './data_schema_a.svg';
+import dataConnectActive from './data_prograss_a.svg';
 import dataSchemaActive from './data_schema_a.svg';
 import dataSchema from './data_schema.svg';
-import dataQualityActive from './data_schema_a.svg';
-import dataQuality from './data_schema.svg';
+import dataQualityActive from './data_quality_a.svg';
+import dataQuality from './data_quality_d.svg';
 
 // sample data
 import bankSmall from '../../../sample/bank.train.small.csv';
@@ -97,7 +97,7 @@ export default class Data extends Component {
             case 2:
                 return <DataSchema project={project} />;
             case 3:
-                return <DataDeploy userId={userId} project={project} />;
+                return <DataQuality project={project} />;
             default:
                 return;
         }
@@ -138,6 +138,10 @@ class DataConnect extends Component {
         }
         const blob = file.slice(0, 5000000);
         reader.readAsText(blob);
+    }
+
+    doEtl = () => {
+        this.props.project.doEtl();
     }
 
     showSample = () => {
@@ -193,7 +197,7 @@ class DataConnect extends Component {
             <div className={styles.maxRow}><span>Maximum Data Size</span><div className={styles.mark}><span>?</span></div><span> : 50000 (rows) </span><a>Edit</a></div>
             <div className={styles.uploadRow}>
                 {this.block("From Mr.One", sampleIcon, this.showSample)}
-                <Uploader children={this.block("From Computer", localFileIcon)} onChange={this.upload} params={{ userId, projectId: project.projectId }} onProgress={this.onProgress} />
+                <Uploader children={this.block("From Computer", localFileIcon)} onChange={this.upload} OnComplete={this.doEtl} params={{ userId, projectId: project.projectId }} onProgress={this.onProgress} />
                 {this.block("From SQL", sqlIcon, this.showSql)}
             </div>
             <div className={styles.cutoff}>
@@ -426,7 +430,7 @@ class DataSchema extends Component {
 
     render() {
         const { project } = this.props;
-        const { uploadData, rawHeader, target, version } = project;
+        const { uploadData, rawHeader, target } = project;
         const targetOption = {};
 
         //target选择列表
@@ -482,7 +486,7 @@ class DataSchema extends Component {
     }
 }
 
-class DataDeploy extends Component {
+class DataQuality extends Component {
     // deploy = () => {
     //     this.props.project.deploy();
     // }
@@ -499,7 +503,7 @@ class DataDeploy extends Component {
     }
 
     render() {
-        const { userId, project } = this.props;
+        const { project } = this.props;
         return project && <div>
             {/* <Uploader children={"file upload"} onChange={this.upload} params={{userId, projectId: project.projectId}} /> */}
             <div><button onClick={this.fastTrain}>Continue</button></div>

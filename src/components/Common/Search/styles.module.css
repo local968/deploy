@@ -1,7 +1,7 @@
 .search {
   display: flex;
   height: 0.4em;
-  flex: 2 1 0;
+  flex: 0 1 4em;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
 }
 

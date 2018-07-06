@@ -509,3 +509,10 @@
     background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
     border-radius: 0.875rem;
 }
+
+.center {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-top: 0.1em;
+}

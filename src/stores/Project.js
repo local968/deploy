@@ -18,12 +18,8 @@ export default class Project {
     @observable target = "";
 
     // fast track
-    @observable fastTrackUploadProgress = 0;
-    @observable fasttrack = false;
-    @observable fastTrackDeployUploadProgress = 0;
     @observable train2Finished = false;
     @observable deploy2Finished = false;
-    @observable fasttrackPredictResult;
     @observable train2ing = false;
     @observable deploy2ing = false;
     @observable deploy2Error = false;
@@ -149,16 +145,12 @@ export default class Project {
     @action
     fastTrackInit(name) {
         this.updateProject({
-            fasttrack: true,
             deploy2ing: false,
             train2ing: false,
             deploy2Finished: false,
             train2Error: false,
             deploy2Error: false,
             train2Finished: false,
-            fastTrackDeployUploadProgress: 0,
-            fastTrackUploadProgress: 0,
-            fileUploaded: true,
             uploadFileName: name
         });
     }
@@ -354,18 +346,84 @@ export default class Project {
         });
     }
 
-    saveModel(data) {
-        const endTime = moment().valueOf();
-        for(let key in data.args){
-            data.args[key].executeTime = endTime - this.trainStartTime;
-        }
-        when(
-            () => socketStore.isready,
-            () => {
-                socketStore.send("changeModel", data)
-            }
-        )
-        return data.args
+    correlationMatrix() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName,
+            dataHeader
+        } = this;
+
+        const command = 'correlationMatrix';
+
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version,
+            featureLabel: [...dataHeader]
+        });
+    }
+
+    fitPlotAndResidualPlot() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'fitPlotAndResidualPlot';
+
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    pointToShow() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'pointToShow';
+
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
     }
 
     modelingError() {

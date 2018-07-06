@@ -10,10 +10,11 @@ class ProjectStore {
     @observable project = null;
     @observable models = [];
     @observable isLoad = true;
+    @observable charts = {}
 
     constructor() {
         this.initCallback();
-        this.finish = {}
+        console.log(this)
     }
 
     @action
@@ -85,14 +86,6 @@ class ProjectStore {
         return models;
     }
 
-    loaded(type) {
-        this.finish[type] = true;
-        if (this.finish.project && this.finish.model) {
-            this.isLoad = false;
-            this.finish = {};
-        }
-    }
-
     @action
     modelimgError(command, result) {
         console.log("error!!", command, result)
@@ -102,7 +95,29 @@ class ProjectStore {
             case 'train2':
                 this.project.modelingError()
                 break;
+            default:
+                break;
         }
+    }
+
+    setCharts(type, result) {
+        this.charts[type] = result
+        // img : `/api/download?userId=${this.userId}&projectId=${this.projectId}&csvLocation=${imageSavePath}`
+        // axios("/api/download",{
+        //     params:{userId: this.userId, projectId: this.projectId, csvLocation: imageSavePath}
+        // }, (res) => {
+        //     console.log(res)
+        // })
+    }
+
+    saveModel(data) {
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("changeModel", data)
+            }
+        )
+        return data.args;
     }
 
     initCallback() {
@@ -110,21 +125,41 @@ class ProjectStore {
             queryProject: action(data => {
                 const project = data.list[0];
                 this.project = new Project(this.userId, project.projectId, project.args)
-                this.loaded("project")
             }),
             queryModels: action(data => {
                 const result = data.data;
                 const models = result.args;
                 this.models = [];
                 for (let key in models) {
-                    if (key.includes("train")){
-                        if(!Object.keys(models[key]).find(k => k.includes("error"))){
-                            this.models.push(new Model(this.userId, this.projectId, models[key]))
+                    if (!Object.keys(models[key]).find(k => k.includes("error"))) {
+                        let [command] = key.split("-");
+                        switch (command) {
+                            case 'etl':
+                                break;
+                            case 'train2':
+                                this.models.push(new Model(this.userId, this.projectId, models[key]))
+                                break;
+                            case 'correlationMatrix':
+                                this.setCharts("correlationMatrix", models[key])
+                                break;
+                            case 'fitPlotAndResidualPlot':
+                                this.setCharts("fitPlotAndResidualPlot", models[key])
+                                break;
+                            case 'pointToShow':
+                                this.setCharts("pointToShow", models[key]);
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }
-                this.recommendModel()
-                this.loaded("model")
+                when(
+                    () => !!this.project,
+                    () => {
+                        this.isLoad = false;
+                        this.recommendModel();
+                    }
+                )
             }),
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
@@ -147,26 +182,37 @@ class ProjectStore {
                         for (let row of result) {
                             info.args[`${command}-${row.backend}-result`] = row
                         }
-                        const models = this.project.saveModel(info)
+                        const models = this.saveModel(info)
                         for (let key in models) {
                             let index = this.models.findIndex(m => {
-                                return models[key].userId === m.userId && models[key].projectId === m.projectId && models[key].name === m.name
+                                return models[key].name === m.name
                             })
                             if (index === -1) {
                                 this.models.push(new Model(this.userId, this.projectId, models[key]))
-                            }else{
+                            } else {
                                 this.models[index] = new Model(this.userId, this.projectId, models[key])
                             }
                         }
-                        // if(status === 1){
-                            this.recommendModel()
+                        this.recommendModel()
+                        if(status === 100){
                             this.project.finishTrain2();
-                        // }
+                        }
+                        break;
+                    case 'correlationMatrix':
+                        this.setCharts("correlationMatrix", result)
+                        break;
+                    case 'fitPlotAndResidualPlot':
+                        this.setCharts("fitPlotAndResidualPlot", result)
+                        break;
+                    case 'pointToShow':
+                        this.setCharts("pointToShow", result);
                         break;
                     default:
                         break;
                 }
-                // let models =  this.project.saveModel(info, time);
+            }),
+            changeModel: action((data) => {
+                console.log(data)
             })
         }
 

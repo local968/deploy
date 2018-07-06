@@ -14,7 +14,6 @@ import config from '../../config.js'
 // }
 
 const Classification = 'Classification';
-const Regression = 'Regression';
 
 // @inject('userStore', 'projectStore')
 @observer
@@ -32,12 +31,23 @@ export default class Modeling extends Component {
 
     getChild = () => {
         const { models, project } = this.props;
-        const { train2ing, train2Finished, train2Error } = project;
+        const { train2Error, train2ing, subStepActive } = project;
 
-        if (train2ing) return <Loading project={project}/>;
-        if (train2Finished) return <ModelResult models={models} project={project} />;
+        if(subStepActive === 1) return <StartTrain project={project} />
+        
         if (train2Error) return <ModelError />;
-        return <StartTrain project={project} />
+        if (!models.length && train2ing) return <Loading project={project}/>;
+        return <ModelResult models={models} project={project} />;
+    }
+
+    enter = (step) => {
+        const { lastSubStep, subStepActive } = this.props.project;
+
+        if (step === subStepActive) return false;
+
+        if (step > lastSubStep) return false;
+
+        this.props.project.nextSubStep(step, 3)
     }
 
     render() {
@@ -50,7 +60,7 @@ export default class Modeling extends Component {
 @observer
 class StartTrain extends Component {
     fastTrain = () => {
-        this.props.project.nextMainStep(3);
+        this.props.project.nextSubStep(2, 3);
         this.props.project.fastTrain();
     }
 
@@ -140,7 +150,7 @@ class ModelResult extends Component {
 
     render() {
         const { models, project } = this.props;
-        const { problemType } = project
+        const { problemType, train2Finished } = project
         const current = models.find((model) => model.recommend);
         return <div className={styles.modelResult}>
             <div className={styles.result}>
@@ -173,7 +183,7 @@ class ModelResult extends Component {
                     <div className={styles.radio}><input type="radio" name="criteria" value={Criteria.costBased} id={Criteria.costBased} onChange={this.onChange} defaultChecked={criteria === Criteria.costBased} /><label htmlFor={Criteria.costBased}>Cost Based</label></div>
                 </div>
             </div> */}
-            <ModelTable models={models} selectModel={this.selectModel} problemType={problemType} />
+            <ModelTable models={models} selectModel={this.selectModel} problemType={problemType} train2Finished={train2Finished} />
             <div className={styles.buttonBlock}>
                 <button className={styles.button}><span>Check Model Insights</span></button>
                 <div className={styles.or}><span>or</span></div>
@@ -251,7 +261,7 @@ class Performance extends Component {
 
 class ModelTable extends Component {
     render() {
-        const { models, selectModel, problemType } = this.props;
+        const { models, selectModel, problemType, train2Finished } = this.props;
         return <div className={styles.table}>
             <div className={styles.rowHeader}>
                 <div className={styles.rowData}>
@@ -268,6 +278,7 @@ class ModelTable extends Component {
                 {models.map((model, key) => {
                     return <ModelDetail key={key} model={model} selectModel={selectModel} problemType={problemType} />
                 })}
+                {!train2Finished && <div className={styles.center}><Spin size="large" /></div>}
             </div>
         </div>
     }

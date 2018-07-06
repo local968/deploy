@@ -1,12 +1,13 @@
 import R2WSClient from "../r2ws-client";
 import { observable } from "mobx";
+import config from "../config.js";
 
 class SocketStore{
     @observable isready = false;
 
     constructor() {
         this.messageArr = {};
-        this.ws = new R2WSClient("ws://localhost:18000/");  
+        this.ws = new R2WSClient(`ws://${config.host}:${config.port}/`);  
         this.ws.onready = evt => {
             console.log('ws connected.');
             this.isready = true;
