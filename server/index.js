@@ -54,7 +54,7 @@ app.post('/api/sample', (req, res) => {
   }
 
   fs.link(samplePath, path.join(filePath, filename), err => {
-    if (err.name === "EEXIST") return res.status(500).json({message: err});
+    if (!err.message.startsWith('EEXIST')) return res.status(500).json({message: err});
     return res.json({message: 'sample copy finished'});
   })
 });

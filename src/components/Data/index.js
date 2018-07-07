@@ -141,7 +141,7 @@ class DataConnect extends Component {
     }
 
     doEtl = () => {
-        this.props.project.doEtl();
+        this.props.project.firstEtl();
     }
 
     showSample = () => {
@@ -161,6 +161,8 @@ class DataConnect extends Component {
         axios("/api/sample", {
             method: "post",
             params: { userId, projectId: project.projectId, type: project.problemType.toLowerCase(), filename: filename }
+        }).then(() => {
+            this.doEtl();
         })
 
         this.props.project.fastTrackInit(filename);
@@ -242,7 +244,7 @@ class DataSample extends Component {
         return <div className={styles.sample}>
             <div className={styles.cover} onClick={onClose}></div>
             <div className={styles.sampleBlock}>
-                <div className={styles.sampleTitle}><span>Choose Sample Data</span></div>
+                <div className={styles.sampleTitle}><span>Choose Sample Data</span><div className={styles.close} onClick={onClose}><span>X</span></div></div>
                 <div className={styles.sampleTop}><span>Select a sample data if you don’t have a dataset yet and want to try out the application.</span></div>
                 <div className={styles.sampleTable}>
                     <div className={styles.sampleHeader}>
@@ -310,8 +312,7 @@ class DataSchema extends Component {
     }
 
     select = (key, e) => {
-        this.props.project.dataType[key] = e.target.value
-        // console.log(key, e.target.value)
+        this.props.project.colType[key] = e.target.value
         this.setState({
             flag: !this.state.flag
         })
@@ -325,9 +326,8 @@ class DataSchema extends Component {
     }
 
     cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-        const { uploadData, target, dataType, rawHeader } = this.props.project;
+        const { uploadData, target, colType, rawHeader } = this.props.project;
         const { checkList, showSelect } = this.state;
-
         /**
          * 根据showSelect变化
          * showSelect: true  显示勾选框
@@ -391,9 +391,9 @@ class DataSchema extends Component {
             if (columnIndex === 0) {
                 content = "";
             } else {
-                content = <select value={dataType[realColumn]} onChange={this.select.bind(this, realColumn)}>
-                    <option value="categorical">Categorical</option>
-                    <option value="numerical">Numerical</option>
+                content = <select value={colType[rawHeader[realColumn]]} onChange={this.select.bind(this, realColumn)}>
+                    <option value="Categorical">Categorical</option>
+                    <option value="Numerical">Numerical</option>
                 </select>
             }
             //其他为数据行
@@ -525,7 +525,7 @@ class ProjectSide extends Component {
                 {list.map((v, k) => {
                     return <div className={classnames(styles.sideBlock, {
                         [styles.active]: step > k
-                    })}>
+                    })} key={v}>
                         {k !== 0 && <div className={styles.sideLine}><span>-------------------------</span></div>}
                         <div className={styles.sideIcon} onClick={this.enter.bind(this, k + 1)}>{imgs["data" + v + (step > k ? "Active" : "")]}</div>
                         <span onClick={this.enter.bind(this, k + 1)}>Data<br />{v}</span>

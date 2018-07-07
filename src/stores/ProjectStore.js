@@ -120,6 +120,18 @@ class ProjectStore {
         return data.args;
     }
 
+    next() {
+        const {curStep, subStepActive} = this.project
+        const nextStep = subStepActive + 1;
+        if(curStep === 2 && nextStep > 2){
+            this.project.nextMainStep(3)
+        }else if(curStep === 3) {
+            return false;
+        }else {
+            this.project.nextSubStep(curStep, nextStep)
+        }
+    }
+
     initCallback() {
         const callback = {
             queryProject: action(data => {
@@ -135,6 +147,10 @@ class ProjectStore {
                         let [command] = key.split("-");
                         switch (command) {
                             case 'etl':
+                                when(
+                                    () => this.project,
+                                    () => this.project.setProperty(models[key])
+                                )
                                 break;
                             case 'train2':
                                 this.models.push(new Model(this.userId, this.projectId, models[key]))
@@ -170,8 +186,9 @@ class ProjectStore {
                 }
                 switch (command) {
                     case 'etl':
+                        // this.project.setProperty(result)
                         this.project.updateProject(result)
-                        this.project.nextMainStep(3);
+                        this.next()
                         break;
                     case 'train2':
                         let info = {
@@ -213,6 +230,11 @@ class ProjectStore {
             }),
             changeModel: action((data) => {
                 console.log(data)
+            }),
+            changeProblemType: action(() => {
+                this.models = [];
+                this.charts = [];
+                this.project.backToProblemStep();
             })
         }
 

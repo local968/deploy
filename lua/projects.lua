@@ -95,6 +95,18 @@ local function change(self)
     }
 end
 
+local function changeProblemType(self)
+    local data = self.data;
+    clean.backToProblemType(data.userId, data.projectId)
+
+    return self:render{
+        data = {
+            status = 200,
+            msg = "ok"
+        }
+    }
+end
+
 return function(server)
     table = box.space["js_projects"]
     index = box.space["js_projects"].index["primary"]
@@ -103,4 +115,5 @@ return function(server)
     server:addMessage({type='queryProjects'},query)
     server:addMessage({type='deleteProjects'},delete)
     server:addMessage({type='changeProject'},change)
+    server:addMessage({type='changeProblemType'},changeProblemType)
 end

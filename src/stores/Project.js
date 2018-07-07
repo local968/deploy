@@ -15,6 +15,12 @@ export default class Project {
     @observable statement = "";
     @observable business = '';
 
+    //changeproblem
+    //初始化时与problemType相同，作为展示值
+    //修改并点击下一步时  表示确认修改type
+    //删除上传文件，model 及其相关数据
+    @observable changeProjectType = '';
+
     @observable target = "";
 
     // fast track
@@ -29,7 +35,8 @@ export default class Project {
     @observable dataHeader = [];
     @observable uploadData = [];
     @observable rawHeader = [];
-    @observable dataType = [];
+    @observable colType = [];
+    @observable totalLines = 0;
 
     @observable mainStep = 0;
     @observable curStep = 0;
@@ -40,6 +47,8 @@ export default class Project {
     @observable speed = 5;
     @observable version = 2;
 
+    // etl
+    @observable fillMethod= {};
     @observable validationRate = 0.1;
     @observable holdoutRate = 0.1;
 
@@ -61,6 +70,8 @@ export default class Project {
             this.createProject();
         } else {
             Object.assign(this, project);
+            //初始化赋值为相同值
+            this.changeProjectType = this.problemType;
         }
     }
 
@@ -136,10 +147,58 @@ export default class Project {
     }
 
     saveProblem() {
-        this.updateProject({
+        if(this.problemType && this.changeProjectType !== this.problemType) {
+            this.changeType()
+        }else{
+            this.updateProject({
+                statement: this.statement, 
+                business: this.business,
+                problemType: this.changeProjectType
+            });
+            this.nextMainStep(2);
+        }
+    }
+
+    // 修改problemType后执行删除
+    changeType() {
+        console.log("changeType")
+        when(
+            () => socketStore.isready,
+            () => socketStore.send("changeProblemType", {userId: this.userId, projectId: this.projectId})
+        )
+    }
+
+    backToProblemStep() {
+        //全部恢复到problem步骤
+        const problemStepData = {
             statement: this.statement, 
-            business: this.business
-        });
+            business: this.business,
+            problemType: this.changeProjectType,
+            target: "",
+            train2Finished: false,
+            deploy2Finished: false,
+            train2ing: false,
+            deploy2ing: false,
+            deploy2Error: false,
+            train2Error: false,
+            dataHeader: [],
+            uploadData: [],
+            rawHeader: [],
+            colType: [],
+            totalLines: 0,
+            mainStep: 2,
+            curStep: 2,
+            lastSubStep: 1,
+            subStepActive: 1,
+            overfit: 5,
+            speed: 5,
+            version: 2,
+            fillMetho: {},
+            validationRate: 0.1,
+            holdoutRate: 0.1
+        }
+        this.updateProject(problemStepData);
+        Object.assign(this, problemStepData)
     }
 
     @action
@@ -165,8 +224,7 @@ export default class Project {
             dataHeader: header,
             rawHeader: header
         });
-
-        this.nextSubStep(2, 2);
+        // this.nextSubStep(2, 2);
     }
 
     autoFixHeader() {
@@ -192,13 +250,39 @@ export default class Project {
         });
     }
 
-    cleanDB(table, object, cb) {
-        table.findAll(object).fetch().subscribe(
-            items => {
-                items.forEach(item => table.remove(item));
-                if (cb) cb();
-            }
-        );
+    firstEtl() {
+        const {
+            userId, 
+            projectId, 
+            problemType,
+            dataHeader,
+            uploadFileName
+        } = this;
+
+        const command = "etl";
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // problem_type: 预测类型 Classification , Regression
+        // feature_label: 特征列名
+        // fill_method:  无效值
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            problemType,
+            featureLabel: dataHeader,
+            projectId,
+            userId,
+            time: moment().valueOf(),
+            command,
+            fillMethod: {},
+            validationRate: this.validationRate,
+            holdoutRate: this.holdoutRate,
+            version: this.version
+        });
     }
 
     doEtl(banList) {
@@ -218,7 +302,7 @@ export default class Project {
     
         this.updateProject({
             dataHeader: newDataHeader,
-            dataType: this.dataType
+            colType: this.colType
         });
 
         const featureLabel = newDataHeader.filter(d => d !== target)
@@ -241,11 +325,28 @@ export default class Project {
             userId,
             time: moment().valueOf(),
             command,
-            fillMethod: {},
+            fillMethod: this.fillMethod,
             validationRate: this.validationRate,
             holdoutRate: this.holdoutRate,
             version: this.version
         });
+    }
+
+    setProperty(data) {
+        if(typeof data !== "object"){
+            return false;
+        }
+        if(Array.isArray(data)){
+            return false;
+        }
+        delete data.userId;
+        delete data.projectId;
+        for(let key in data) {
+            if(typeof data[key] === 'function'){
+                delete data[key]
+            }
+        }
+        Object.assign(this, data)
     }
 
     fastTrain() {
@@ -265,6 +366,7 @@ export default class Project {
         this.updateProject({
             train2Finished: false,
             train2ing: true,
+            train2Error:false
         });
 
         const id = `${command}-${userId}-${projectId}`;

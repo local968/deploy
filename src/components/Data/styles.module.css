@@ -346,6 +346,7 @@
     width: 12em;
     border-radius: 4px;
     box-shadow: 0 12px 20px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
 .sampleTitle {
@@ -446,4 +447,12 @@
 
 .submit span {
     font-size: 1rem;
+}
+
+.close {
+    display: flex;
+    position: absolute;
+    right: 0;
+    padding: 0 0.2em;
+    cursor: pointer;
 }

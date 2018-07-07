@@ -30,12 +30,11 @@ class Problem extends Component {
     // }
 
     problemTypeChange = e => {
-        this.props.project.updateProject({problemType: e.target.value});
+        this.props.project.changeProjectType = e.target.value;
     }
 
     nextStep = () => {
         this.props.project.saveProblem();
-        this.props.project.nextMainStep(2);
         // this.props.history.push(`/data/${this.pid}`);
     }
 
@@ -48,7 +47,7 @@ class Problem extends Component {
     }
 
     render() {
-        const {problemType, statement, business} = this.props.project || {};
+        const {changeProjectType, statement, business} = this.props.project || {};
         return <div className={styles.problem}>
             <div>
                 <div className={styles.title}><span>Describe your business problem.</span></div>
@@ -59,7 +58,7 @@ class Problem extends Component {
                         className={styles.textarea} 
                         onChange={this.onChange.bind(this,"statement")} 
                         rows={6} 
-                        Placeholder='<Problem statement>  e.g. Predict important customers who might churn in the next 30 days so that customer service department can take effectively target and retain these customers.'/>
+                        placeholder='<Problem statement>  e.g. Predict important customers who might churn in the next 30 days so that customer service department can take effectively target and retain these customers.'/>
                 </div>
                 <div className={styles.textBox}>
                     <div className={styles.text}><span>Business Value</span></div>
@@ -68,12 +67,12 @@ class Problem extends Component {
                         className={styles.textarea} 
                         onChange={this.onChange.bind(this,"business")} 
                         rows={6} 
-                        Placeholder='<Business value> e.g. This will help proactively retain important customers. Acquiring a new customer is not costlier than retain an existing customer. It is critial to maintain customer satisfaction and loyalty to sustain good revenue opportunity and a strong market presence.'/>
+                        placeholder='<Business value> e.g. This will help proactively retain important customers. Acquiring a new customer is not costlier than retain an existing customer. It is critial to maintain customer satisfaction and loyalty to sustain good revenue opportunity and a strong market presence.'/>
                 </div>
                 <div className={styles.title}><span>Choose Problem Type</span></div>
                 <div className={styles.radioBox}>
                     <div className={styles.text}><span>Prediction</span></div>
-                    <RadioGroup className={styles.radio} value={problemType} onChange={this.problemTypeChange}>
+                    <RadioGroup className={styles.radio} value={changeProjectType} onChange={this.problemTypeChange}>
                         {selectable.map((content, index) => (
                             <Radio key={index} value={content.value}>
                             {content.type}
@@ -82,7 +81,7 @@ class Problem extends Component {
                         ))}
                     </RadioGroup>
                 </div>
-                <ContinueButton onClick={this.nextStep} disabled={!problemType} text="Continue" />
+                <ContinueButton onClick={this.nextStep} disabled={!changeProjectType} text="Continue" />
             </div>
         </div>
     }

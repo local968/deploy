@@ -16,6 +16,11 @@ local function delete(userId, projectId)
     return
 end
 
+local function backToProblemType(userId, projectId)
+    box.space.models_info:upsert({userId, projectId, {}},{{'=', 3, {}}})
+end
+
 return {
-    delete = delete
+    delete = delete,
+    backToProblemType = backToProblemType
 }
