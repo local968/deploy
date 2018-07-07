@@ -219,10 +219,12 @@ export default class Project {
         const header = uploadData[0];
         const data = uploadData.slice(1);
 
+        // 上传文件，target为空
         this.updateProject({
             uploadData: data,
             dataHeader: header,
-            rawHeader: header
+            rawHeader: header,
+            target: ""
         });
         // this.nextSubStep(2, 2);
     }
@@ -325,7 +327,7 @@ export default class Project {
             userId,
             time: moment().valueOf(),
             command,
-            fillMethod: this.fillMethod,
+            fillMethod: {},
             validationRate: this.validationRate,
             holdoutRate: this.holdoutRate,
             version: this.version

@@ -5,6 +5,10 @@ import { observer } from 'mobx-react';
 import { Progress, Spin } from 'antd';
 import autoIcon from './mr-one-logo-blue.svg';
 import config from '../../config.js'
+import { ProjectSide } from '../Common'
+import modelSelectionIcon from './model_selection_d.svg';
+import startModelingActiveIcon from './start_modeling_a.svg';
+import modelSelectionActiveIcon from './model_selection_a.svg';
 // import r2Loading from './Mr.OneLoading2.gif';
 // import { when } from 'mobx';
 
@@ -14,6 +18,11 @@ import config from '../../config.js'
 // }
 
 const Classification = 'Classification';
+const imgs = {
+    modelSelection: <img src={modelSelectionIcon} alt="selection" />,
+    startModelingActive: <img src={startModelingActiveIcon} alt="start" />,
+    modelSelectionActive: <img src={modelSelectionActiveIcon} alt="selection" />,
+}
 
 // @inject('userStore', 'projectStore')
 @observer
@@ -29,13 +38,22 @@ export default class Modeling extends Component {
     //     )
     // }
 
+    constructor(props) {
+        super(props);
+        this.step = [
+            {label:'Start Modeling',value:"startModeling"},
+            {label:'Model Selection',value:"modelSelection"},
+        ]
+    }
+
     getChild = () => {
         const { models, project } = this.props;
         const { train2Error, train2ing, subStepActive } = project;
-
+        console.log(subStepActive)
         if(subStepActive === 1) return <StartTrain project={project} />
         
         if (train2Error) return <ModelError />;
+        console.log(!models.length, train2ing)
         if (!models.length && train2ing) return <Loading project={project}/>;
         return <ModelResult models={models} project={project} />;
     }
@@ -51,8 +69,10 @@ export default class Modeling extends Component {
     }
 
     render() {
+        const {project} = this.props;
         return <div className={styles.modeling}>
-            {this.getChild()}
+            {project && this.getChild()}
+            {project && <ProjectSide enter={this.enter} list={this.step} step={project.subStepActive} imgs={imgs} />}
         </div>
     }
 }
@@ -304,9 +324,9 @@ class ModelDetail extends Component {
         return <div className={styles.detail}>
             {arr.map((row, index) => {
                 return <div key={index} className={styles.detailRow}>
-                    <div className={styles.detailName}><span>{row[0]}</span></div>
+                    <div className={styles.detailName}><span title={row[0]}>{row[0]}</span></div>
                     <div className={styles.detailProcess} style={{width: row[1] * 7 +"em"}}></div>
-                    <div className={styles.detailNum}><span>{row[1].toFixed(4)}</span></div>
+                    <div className={styles.detailNum}><span title={row[1].toFixed(4)}>{row[1].toFixed(4)}</span></div>
                 </div>
             })}
         </div>

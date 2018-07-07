@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Uploader, Select, ContinueButton } from '../Common';
+import { Uploader, Select, ContinueButton, ProjectSide } from '../Common';
 import Papa from 'papaparse';
 import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
 import sqlIcon from './sql.svg';
 import defileIcon from './define.svg';
 import { AutoSizer, MultiGrid } from 'react-virtualized';
-import { Checkbox } from 'antd';
+import { Checkbox, message } from 'antd';
 import axios from 'axios';
 // import { when } from 'mobx';
 
@@ -64,7 +64,11 @@ export default class Data extends Component {
         super(props);
         //     const {pid} = props.match.params || {};
         //     this.pid = pid ? parseInt(pid, 10) : 0;
-        this.step = ['Connect', 'Schema', 'Quality']
+        this.step = [
+            {label:'Data Connect',value:"dataConnect"},
+            {label:'Data Schema',value:"dataSchema"},
+            {label:'Data Quality',value:"dataQuality"}
+        ]
 
         //     when(
         //         () => props.userStore.userId && !props.userStore.isLoad,
@@ -107,7 +111,7 @@ export default class Data extends Component {
         const { project } = this.props;
         return <div className={styles.data}>
             {project && this.getChild()}
-            {project && <ProjectSide enter={this.enter} list={this.step} step={project.subStepActive} />}
+            {project && <ProjectSide enter={this.enter} list={this.step} step={project.subStepActive} imgs={imgs} />}
         </div>
     }
 }
@@ -163,6 +167,8 @@ class DataConnect extends Component {
             params: { userId, projectId: project.projectId, type: project.problemType.toLowerCase(), filename: filename }
         }).then(() => {
             this.doEtl();
+        }, () => {
+            message.error("sample file error, please choose again")
         })
 
         this.props.project.fastTrackInit(filename);
@@ -507,31 +513,6 @@ class DataQuality extends Component {
         return project && <div>
             {/* <Uploader children={"file upload"} onChange={this.upload} params={{userId, projectId: project.projectId}} /> */}
             <div><button onClick={this.fastTrain}>Continue</button></div>
-        </div>
-    }
-}
-
-// @inject('projectStore')
-@observer
-class ProjectSide extends Component {
-    enter = (step) => {
-        this.props.enter(step)
-    }
-
-    render() {
-        const { list, step } = this.props;
-        return <div className={styles.dataSide}>
-            <div className={styles.sideBox}>
-                {list.map((v, k) => {
-                    return <div className={classnames(styles.sideBlock, {
-                        [styles.active]: step > k
-                    })} key={v}>
-                        {k !== 0 && <div className={styles.sideLine}><span>-------------------------</span></div>}
-                        <div className={styles.sideIcon} onClick={this.enter.bind(this, k + 1)}>{imgs["data" + v + (step > k ? "Active" : "")]}</div>
-                        <span onClick={this.enter.bind(this, k + 1)}>Data<br />{v}</span>
-                    </div>
-                })}
-            </div>
         </div>
     }
 }

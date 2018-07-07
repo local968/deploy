@@ -30,6 +30,8 @@ export default ({ children, className, params, onChange, onProgress, OnComplete 
         return
       }
       _upload(file, res.data.size, res.data.isFirst);
+    }, () => {
+      console.log("upload error")
     });
 
   }
