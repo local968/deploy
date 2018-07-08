@@ -54,7 +54,8 @@ app.post('/api/sample', (req, res) => {
   }
 
   fs.link(samplePath, path.join(filePath, filename), err => {
-    if (!err.message.startsWith('EEXIST')) return res.status(500).json({message: err});
+    console.log(err, "sample error")
+    if (err && !err.message.startsWith('EEXIST')) return res.status(500).json({message: err});
     return res.json({message: 'sample copy finished'});
   })
 });
