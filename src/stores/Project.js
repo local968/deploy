@@ -1,5 +1,5 @@
 // import db from './db.js';
-import { observable, action, when } from 'mobx';
+import { observable, action, when, computed } from 'mobx';
 import socketStore from './SocketStore';
 import requestStore from './RequestStore.js';
 import moment from 'moment';
@@ -227,6 +227,32 @@ export default class Project {
             target: ""
         });
         // this.nextSubStep(2, 2);
+    }
+
+    @computed
+    get headerTemp() {
+        //查看是否存在相同名称的header
+        let temp = {};
+        let isMissed = false;
+        let isDuplicated = false;
+        this.rawHeader.forEach((h, i) => {
+            h = h.trim();
+            if (!h){
+                isMissed = true;
+                return;
+            }
+            if(!temp[h]){
+                temp[h] = [i]
+            }else{
+                isDuplicated = true;
+                temp[h].push(i);
+            }
+        })
+        return {
+            temp,
+            isMissed,
+            isDuplicated
+        }
     }
 
     autoFixHeader() {

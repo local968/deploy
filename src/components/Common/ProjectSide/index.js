@@ -11,8 +11,7 @@ export default class ProjectSide extends Component {
 
     render() {
         const { list, step, imgs } = this.props;
-        console.log(this.props)
-        return <div className={styles.dataSide}>
+        return <div className={styles.projectSide}>
             <div className={styles.sideBox}>
                 {list.map((v, k) => {
                     return <div className={classnames(styles.sideBlock, {

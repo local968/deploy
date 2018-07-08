@@ -4,7 +4,7 @@ import { Select } from 'antd';
 import classnames from 'classnames';
 const Option = Select.Option;
 
-export default ({ title, width, options, onChange, value, dropdownClassName, selectOption }) => {
+export default ({ title, width, options, onChange, value, dropdownClassName, disabled, selectOption }) => {
   if (options) {
     return (
       <div className={classnames(styles.selector,{
@@ -21,6 +21,7 @@ export default ({ title, width, options, onChange, value, dropdownClassName, sel
             })}
             onChange={onChange}
             value={value}
+            disabled={disabled}
             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             optionFilterProp="children"
             {...selectOption}

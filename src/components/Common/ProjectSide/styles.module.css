@@ -1,9 +1,11 @@
-.dataSide {
+.projectSide {
     display: flex;
     width: 1.3em;
     flex: none;
     flex-direction: column;
     margin-top: 0.2em;
+    position: absolute;
+    right: 0;
 }
 
 .sideBox {

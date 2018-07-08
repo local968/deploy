@@ -286,7 +286,8 @@ class DataSchema extends Component {
     state = {
         flag: false,
         checkList: this.props.project.rawHeader.filter(r => !this.props.project.dataHeader.includes(r)),
-        showSelect: false
+        showSelect: false,
+        error: false
     }
 
     doEtl = () => {
@@ -331,8 +332,15 @@ class DataSchema extends Component {
         })
     }
 
+    hasError = () => {
+        this.setState({
+            flag: !this.state.flag,
+            error: true
+        })
+    }
+
     cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-        const { uploadData, target, colType, rawHeader } = this.props.project;
+        const { uploadData, target, colType, rawHeader, headerTemp: {temp} } = this.props.project;
         const { checkList, showSelect } = this.state;
         /**
          * 根据showSelect变化
@@ -365,7 +373,7 @@ class DataSchema extends Component {
                 content = "";
             } else {
                 content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={false}></Checkbox>
-                if (target === rawHeader[realColumn]) {
+                if (target && target === rawHeader[realColumn]) {
                     cn = classnames(styles.check, styles.target);
                     content = "";
                 }
@@ -376,18 +384,24 @@ class DataSchema extends Component {
             }
             //标题行
         } else if (rowIndex === index.headerRow) {
-            cn = styles.cell;
+            cn = styles.titleCell;
             if (columnIndex === 0) {
                 content = <span>row/header</span>;
                 title = '';
             } else {
                 content = <span>{rawHeader[realColumn]}</span>;
                 title = rawHeader[realColumn];
-                if (target === rawHeader[realColumn]) {
+                if (target && target === rawHeader[realColumn]) {
                     cn = classnames(cn, styles.target);
                 }
                 if (checkList.includes(rawHeader[realColumn])) {
                     cn = classnames(cn, styles.checked);
+                }
+                if (!rawHeader[realColumn]) {
+                    cn = classnames(cn, styles.missed);
+                }
+                if (rawHeader[realColumn] && temp[rawHeader[realColumn]].length > 1) {
+                    cn = classnames(cn, styles.duplicated);
                 }
             }
             //类型选择行
@@ -397,7 +411,16 @@ class DataSchema extends Component {
             if (columnIndex === 0) {
                 content = "";
             } else {
-                content = <select value={colType[rawHeader[realColumn]]} onChange={this.select.bind(this, realColumn)}>
+                let value = colType[rawHeader[realColumn]];
+                if(!rawHeader[realColumn]) {
+                    value = colType[`Unnamed: ${realColumn}`]
+                }
+                if (rawHeader[realColumn] && temp[rawHeader[realColumn]].length > 1) {
+                    const tempIndex = temp[rawHeader[realColumn]].findIndex(c => c===realColumn);
+                    const suffix = tempIndex===0?"":'.'+tempIndex;
+                    value = colType[rawHeader[realColumn]+suffix]
+                }
+                content = <select value={value} onChange={this.select.bind(this, realColumn)}>
                     <option value="Categorical">Categorical</option>
                     <option value="Numerical">Numerical</option>
                 </select>
@@ -413,7 +436,7 @@ class DataSchema extends Component {
             } else {
                 content = <span>{uploadData[realRow][realColumn]}</span>;
                 title = uploadData[realRow][realColumn];
-                if (target === rawHeader[realColumn]) {
+                if (target && target === rawHeader[realColumn]) {
                     cn = classnames(cn, styles.target);
                 }
                 if (this.state.checkList.includes(rawHeader[realColumn])) {
@@ -436,7 +459,7 @@ class DataSchema extends Component {
 
     render() {
         const { project } = this.props;
-        const { uploadData, rawHeader, target } = project;
+        const { uploadData, rawHeader, target, headerTemp: {isMissed, isDuplicated} } = project;
         const targetOption = {};
 
         //target选择列表
@@ -461,11 +484,25 @@ class DataSchema extends Component {
                         options={targetOption}
                         onChange={this.targetSelect}
                         value={target}
+                        disabled={isMissed || isDuplicated}
                         selectOption={{ showSearch: true }}
                     />
+                    {(isMissed || isDuplicated) ?
+                    <div className={classnames(styles.schemaSelect,styles.disabled)}>
+                        <span>Select Undesirable Variables</span>
+                    </div>:
                     <div className={styles.schemaSelect} onClick={this.toggleSelect}>
                         <span>Select Undesirable Variables</span>
                     </div>
+                    }
+                    {isMissed && <div className={styles.schemaMissed} >
+                        <div className={styles.errorBlock}></div>
+                        <span>Missing</span>
+                    </div>}
+                    {isDuplicated && <div className={styles.schemaDuplicated} >
+                        <div className={styles.errorBlock}></div>
+                        <span>Duplicated Header</span>
+                    </div>}
                 </div>
                 <div className={styles.content}>
                     <AutoSizer>

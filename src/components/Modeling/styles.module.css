@@ -15,7 +15,6 @@
 .modelResult span {
     font-size: 1.125rem;
     display: flex;  
-    flex: none;
     font-family: SanFranciscoText;
     line-height: normal;
     align-items: baseline;
@@ -31,7 +30,7 @@
 .box {
     display: flex;
     flex-direction: column;
-    flex: none;
+    flex: 1 0;
 }
 
 .title {
@@ -139,7 +138,7 @@
 
 .performanceBox {
     display: flex;
-    flex: auto;
+    flex: 1 0;
     justify-content: center;
 }
 
