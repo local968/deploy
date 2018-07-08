@@ -62,6 +62,10 @@ tuple = {
 };
 
 (async () => {
+  watchResult = await db.watchDeploy(
+    console.log.bind(console, 'watch callback:')
+  );
+  console.log('watchResult:', watchResult);
   insertResult = await db.newDeploy({ tuple });
   console.log('insertResult:', insertResult);
   updateResult = await db.updateDeploy({
@@ -72,4 +76,6 @@ tuple = {
   console.log('searchResult:', searchResult);
   idSearchResult = await db.searchDeploy({ id: insertResult.result.id });
   console.log('idSearchResult:', idSearchResult);
+  unwatchResult = await db.unwatchDeploy();
+  console.log('unwatchResult:', unwatchResult);
 })();

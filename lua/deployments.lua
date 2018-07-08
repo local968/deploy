@@ -3,6 +3,8 @@ local before = require("deploy2.lua.before")
 local operate = require("deploy2.lua.operate")
 local commonInit = require("deploy2.lua.common")
 local conn = require("deploy2.lua.conn")
+local fiber = require("fiber")
+local channel = fiber.channel(1000)
 local space = "deployments"
 local fields = {
   "id",
@@ -17,7 +19,46 @@ local fields = {
 }
 local common = commonInit(fields)
 
+-- easy version currently
+-- todo: delta mode
+-- event
+-- {
+--    watchers,
+--    userId
+-- }
+
 return function(server, api)
+  local function watcherHandler()
+    while channel do
+      local event = channel:get()
+      local watchers = event.watchers
+      local userId = event.userId
+      if not watchers or not userId then
+        return
+      end
+      -- local connIds = conn.getConnids(userId)
+      local connIds = watchers
+      for k, watcherConnId in pairs(watchers) do
+        for _k, connId in pairs(connIds) do
+          if watcherConnId == connId then
+            local request = {
+              space = space,
+              type = "select",
+              userId = userId,
+              data = {},
+              args = {userId},
+              index = "userId"
+            }
+            local result = operate(request)
+            server:sendMessageTo(connId, "watchDeploy", result)
+          end
+        end
+      end
+    end
+  end
+
+  fiber.create(watcherHandler)
+
   if not box.space[space] then
     local space = box.schema.space.create(space)
     space:create_index(
@@ -51,6 +92,9 @@ return function(server, api)
     space,
     {"insert", "replace", "delete"},
     function(request, response, watchers)
+      if watchers then
+        channel:put({watchers = watchers, userId = request.userId})
+      end
       if request.data.originTuple then
         request.data.tuple = request.data.originTuple
         request.data.originTuple = nil
@@ -196,7 +240,7 @@ return function(server, api)
     ["keyword"] = {false, "string"},
     ["sort"] = {false, "string"}
   }
-  api["watchDeploy"] = {}
+  api["watchDeploy"] = "watch"
   api["unwatchDeploy"] = {}
 end
 

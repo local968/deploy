@@ -5,7 +5,7 @@ return {
     local name = request.space .. ":" .. request.type
     if listener[name] then
       for k, fn in pairs(listener[name]) do
-        local ok, returnval = pcall(fn, request, result)
+        local ok, returnval = pcall(fn, request, result, watchers)
         if not ok then
           dump(returnval)
         else

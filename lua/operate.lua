@@ -1,7 +1,7 @@
 local after = require("deploy2.lua.after")
 local before = require("deploy2.lua.before")
 
--- key = space name, value = connid[]
+-- key = space name, value = connId[]
 local watcher = {}
 
 -- request
@@ -116,9 +116,9 @@ local strategies = {
   watch = function(request)
     local response = request.data
     if watcher[request.space] then
-      watcher[request.space][#watcher[request.space] + 1] = request.connid
+      watcher[request.space][#watcher[request.space] + 1] = request.connId
     else
-      watcher[request.space] = {request.connid}
+      watcher[request.space] = {request.connId}
     end
     response.status = 200
     response.message = "ok"
@@ -128,7 +128,7 @@ local strategies = {
     local response = request.data
     if watcher[request.space] then
       for k, v in pairs(watcher[request.space]) do
-        if v == request.connid then
+        if v == request.connId then
           watcher[request.space][k] = nil
         end
       end

@@ -35,9 +35,7 @@ class DB {
         if (debug) console.log('receive message:', data);
         if (data.type === 'api') return this.initApi(data);
         if (data.data.reqNo) return this.emit(data.data.reqNo, data.data);
-        if (data.data.eventName)
-          return this.emit(data.data.eventName, data.data);
-        console.error('message error:', data);
+        if (data.type) return this.emit(data.type, data.data);
       });
       this.once('ready', conn => {
         this.connection = conn;
@@ -54,35 +52,31 @@ class DB {
       this.db[apiName] = inputArg => {
         const errors = checkArg(inputArg, rule);
         if (errors.length > 0) return console.error(errors);
-        return this.send(apiName, inputArg);
+        if (rule === 'watch') this.on(apiName, inputArg);
+        return this.send(
+          apiName,
+          rule === 'watch' ? {} : inputArg,
+          rule === 'watch' &&
+            (() => {
+              this.removeListener(apiName, inputArg);
+            })
+        );
       };
     });
   }
 
-  async send(type, data) {
+  async send(type, data, unwatch) {
     // type: select, insert, update, upsert, delete, watch, unwatch
     const conn = await this.connect();
-    if (type === 'watch') {
-      conn.sendmessage({ type, data });
-    } else {
-      this.reqNo++;
-      conn.sendmessage({ type, data: { reqNo: this.reqNo, ...data } });
-      return await new Promise((resolve, reject) => {
-        this.once(this.reqNo, (...args) => {
-          if (args.length === 1) args = args[0];
-          resolve(args);
-        });
+    this.reqNo++;
+    conn.sendmessage({ type, data: { reqNo: this.reqNo, ...data } });
+    return await new Promise((resolve, reject) => {
+      this.once(this.reqNo, (...args) => {
+        if (args.length === 1) args = args[0];
+        if (unwatch) args.unwatch = unwatch;
+        resolve(args);
       });
-    }
-  }
-
-  watch(space, listener) {
-    this.on(space, listener);
-    if (this.listeners(space).length > 0) this.send('watch', { space });
-    return async () => {
-      this.removeListener(space);
-      if (this.listeners(space).length === 0) this.send('unwatch', { space });
-    };
+    });
   }
 
   once(eventName, listener) {
@@ -121,6 +115,13 @@ class DB {
 
 const checkArg = (inputArg, rule) => {
   const errors = [];
+  if (rule === 'watch') {
+    if (typeof inputArg !== 'function') {
+      errors.push('watch api need a callback function.');
+    }
+    return errors;
+  }
+
   Object.entries(rule).map(([key, defines]) => {
     const keys = key.split('.');
     let currentLevelArg = inputArg;
