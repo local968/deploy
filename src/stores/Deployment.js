@@ -1,6 +1,7 @@
 import { observable } from 'mobx';
 import moment from 'moment';
-import db from './db.js';
+// import db from './db.js';
+import DBStore from 'stores/DBStore';
 
 const defaultDeploymentOptions = {
   option: null,
@@ -43,7 +44,7 @@ export default class Deployment {
 
   constructor(deploy) {
     this.id = deploy.id;
-    this.name = deploy.name;
+    this.projectName = deploy.projectName;
     this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
     this.modelType = deploy.modelType;
@@ -63,26 +64,28 @@ export default class Deployment {
 
   save = () => {
     return new Promise((resolve, reject) => {
-      db('deployments')
-        .store({
-          id: this.id,
-          name: this.name,
-          modelName: this.modelName,
-          modelType: this.modelType,
-          createdDate: this.createdDate,
-          email: this.email,
-          deploymentOptions: this.deploymentOptions,
-          performanceOptions: this.performanceOptions,
-          updatedDate: moment().unix()
-        })
-        .subscribe(resolve);
+      DBStore.ready().then(db => {
+        db.updateDeploy({
+          tuple: {
+            id: this.id,
+            projectName: this.projectName,
+            modelName: this.modelName,
+            modelType: this.modelType,
+            createdDate: this.createdDate,
+            email: this.email,
+            deploymentOptions: this.deploymentOptions,
+            performanceOptions: this.performanceOptions,
+            updatedDate: moment().unix()
+          }
+        });
+      });
     });
   };
 
   log = () =>
     console.log({
       id: this.id,
-      name: this.name,
+      projectName: this.projectName,
       modelName: this.modelName,
       modelType: this.modelType,
       createdDate: this.createdDate,

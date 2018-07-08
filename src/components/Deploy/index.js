@@ -110,15 +110,19 @@ export default class Home extends Component {
           </div>
           <div className={styles.list}>
             {deployStore.sortedDeployments.map(deployment => (
-              <div key={deployment.id} className={styles.project}>
+              <div
+                key={deployment.id}
+                data-id={deployment.id}
+                className={styles.project}
+              >
                 <span
                   className={styles.projectName}
-                  title={deployment.name}
+                  title={deployment.projectName}
                   onClick={() =>
                     history.push(`/deploy/project/${deployment.id}`)
                   }
                 >
-                  {deployment.name}
+                  {deployment.projectName}
                 </span>
                 <span
                   className={styles.modelName}

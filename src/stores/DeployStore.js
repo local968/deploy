@@ -1,19 +1,24 @@
 import { observable, action, computed, autorun } from 'mobx';
 import Deployment from './Deployment';
 import moment from 'moment';
-import db from './db.js';
+// import db from './db.js';
+import DBStore from 'stores/DBStore';
 
 const sortStrategies = {
   createdDate: (a, b) =>
     a.createdDate === b.createdDate
       ? 0
-      : a.createdDate > b.createdDate ? -1 : 1,
+      : a.createdDate > b.createdDate
+        ? -1
+        : 1,
   rcreatedDate: (a, b) =>
     a.createdDate === b.createdDate
       ? 0
-      : a.createdDate < b.createdDate ? -1 : 1,
-  projectName: (a, b) => a.name.localeCompare(b.name),
-  rprojectName: (a, b) => a.name.localeCompare(b.name) * -1,
+      : a.createdDate < b.createdDate
+        ? -1
+        : 1,
+  projectName: (a, b) => a.projectName.localeCompare(b.projectName),
+  rprojectName: (a, b) => a.projectName.localeCompare(b.projectName) * -1,
   modelName: (a, b) => a.modelName.localeCompare(b.modelName),
   rmodelName: (a, b) => a.modelName.localeCompare(b.modelName) * -1
 };
@@ -26,7 +31,7 @@ const filter = (keywords, deployments) => {
       .split(' ')
       .map(
         word =>
-          (_d.name && _d.name.indexOf(word) >= 0) ||
+          (_d.projectName && _d.projectName.indexOf(word) >= 0) ||
           (_d.owner && _d.owner.indexOf(word) >= 0) ||
           (_d.modelName && _d.modelName.indexOf(word) >= 0)
             ? true
@@ -101,23 +106,26 @@ class DeployStore {
   }
 
   constructor() {
-    db('deployments')
-      .watch()
-      .subscribe(deployments => {
-        this.deployments = deployments;
+    DBStore.ready().then(db => {
+      db.searchDeploy().then(response => {
+        this.deployments = response.result;
       });
-
-    autorun(() => {
-      if (
-        this.currentId &&
-        this.currentDeployment &&
-        this.currentDeployment.modelId
-      )
-        db('models')
-          .find({ id: this.currentDeployment.modelId })
-          .fetch()
-          .subscribe(model => (this.currentModel = model));
+      db.watchDeploy(response => {
+        this.deployments = response.result;
+      });
     });
+
+    // autorun(() => {
+    //   if (
+    //     this.currentId &&
+    //     this.currentDeployment &&
+    //     this.currentDeployment.modelId
+    //   )
+    //     db('models')
+    //       .find({ id: this.currentDeployment.modelId })
+    //       .fetch()
+    //       .subscribe(model => (this.currentModel = model));
+    // });
   }
 
   @computed
@@ -131,9 +139,7 @@ class DeployStore {
   @action
   create(project) {
     return new Promise((resolve, reject) => {
-      db('deployments')
-        .store({ ...project, createdDate: moment().unix() })
-        .subscribe(resolve);
+      DBStore.ready().then(db => db.newDeploy({ tuple: project }));
     });
   }
 

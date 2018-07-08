@@ -1,19 +1,32 @@
 import R2WSClient from '../r2ws-client';
 
-const debug = false;
+const debug = true;
 
 class DB {
   status = 'init';
   _listeners = {};
   connection;
   reqNo = 1;
-  db = {};
+
+  isReady = false;
 
   constructor(connect = true) {
     if (connect) this.connect();
 
     return this.db;
   }
+
+  ready = () => {
+    if (this.isReady) return Promise.resolve(this.db);
+    return new Promise((resolve, reject) => {
+      this.once('apiReady', () => {
+        this.isReady = true;
+        resolve(this.db);
+      });
+    });
+  };
+
+  db = { ready: this.ready.bind(this) };
 
   async connect() {
     if (this.connection) return this.connection;
@@ -63,6 +76,8 @@ class DB {
         );
       };
     });
+    this.isReady = true;
+    this.emit('apiReady');
   }
 
   async send(type, data, unwatch) {
