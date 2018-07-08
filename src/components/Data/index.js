@@ -411,16 +411,16 @@ class DataSchema extends Component {
             if (columnIndex === 0) {
                 content = "";
             } else {
-                let value = colType[rawHeader[realColumn]];
+                let key = rawHeader[realColumn];
                 if(!rawHeader[realColumn]) {
-                    value = colType[`Unnamed: ${realColumn}`]
+                    key = `Unnamed: ${realColumn}`
                 }
                 if (rawHeader[realColumn] && temp[rawHeader[realColumn]].length > 1) {
                     const tempIndex = temp[rawHeader[realColumn]].findIndex(c => c===realColumn);
                     const suffix = tempIndex===0?"":'.'+tempIndex;
-                    value = colType[rawHeader[realColumn]+suffix]
+                    key = rawHeader[realColumn]+suffix
                 }
-                content = <select value={value} onChange={this.select.bind(this, realColumn)}>
+                content = <select value={colType[key]} onChange={this.select.bind(this, key)}>
                     <option value="Categorical">Categorical</option>
                     <option value="Numerical">Numerical</option>
                 </select>
