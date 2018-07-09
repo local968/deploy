@@ -106,6 +106,10 @@ class DeployStore {
     return new Deployment(_deployment || {});
   }
 
+  async newDeploy(projectId, projectName, modelName) {
+    return 'lsdfi23j20jfdlks';
+  }
+
   constructor() {
     when(
       () => userStore.userId && !userStore.isLoad,

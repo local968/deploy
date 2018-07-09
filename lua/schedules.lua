@@ -5,16 +5,17 @@ local commonInit = require("deploy2.lua.common")
 local conn = require("deploy2.lua.conn")
 local fiber = require("fiber")
 local channel = fiber.channel(1000)
-local space = "deployments"
+local space = "schedules"
 local fields = {
   "id",
   "userId",
-  "projectId",
-  "projectName",
-  "modelName",
-  "modelType",
-  "deploymentOptions",
-  "performanceOptions",
+  "deploymentId",
+  "type",
+  "status",
+  "estimatedTime",
+  "actualTime",
+  "ends",
+  "prevSchedule",
   "updatedDate",
   "createdDate"
 }
@@ -51,7 +52,7 @@ return function(server, api)
               index = "userId"
             }
             local result = operate(request)
-            server:sendMessageTo(connId, "watchDeploy", result)
+            server:sendMessageTo(connId, "watchSchedule", result)
           end
         end
       end
@@ -66,6 +67,14 @@ return function(server, api)
       "primary",
       {
         parts = {1, "string", 2, "string"}
+      }
+    )
+
+    space:create_index(
+      "deploymentId",
+      {
+        parts = {3, "string", 2, "string"},
+        unique = false
       }
     )
 
@@ -115,57 +124,7 @@ return function(server, api)
   )
 
   server:addMessage(
-    {type = "newDeploy"},
-    function(self)
-      local userResult = conn.getConnid(self.connid)
-      -- local userResult = {1, "tytytytytyt"}
-      if not userResult then
-        local result = self.data
-        result.message = "need login."
-        result.status = 401
-        return self:render({data = result})
-      end
-      local userId = userResult[2]
-      self.data.tuple.userId = userId
-      self.data.tuple.id = common.createUUID()
-      self.data.tuple.createdDate = os.time()
-      self.data.tuple.updatedDate = os.time()
-      local request = {
-        space = space,
-        type = "insert",
-        data = self.data,
-        userId = userId
-      }
-      return self:render({data = operate(request)})
-    end
-  )
-
-  server:addMessage(
-    {type = "updateDeploy"},
-    function(self)
-      local userResult = conn.getConnid(self.connid)
-      -- local userResult = {1, "tytytytytyt"}
-      if not userResult then
-        local result = self.data
-        result.message = "need login."
-        result.status = 401
-        return self:render({data = result})
-      end
-      local userId = userResult[2]
-      self.data.tuple.userId = userId
-      self.data.tuple.updatedDate = os.time()
-      local request = {
-        space = space,
-        type = "replace",
-        data = self.data,
-        userId = userId
-      }
-      return self:render({data = operate(request)})
-    end
-  )
-
-  server:addMessage(
-    {type = "searchDeploy"},
+    {type = "searchSchedule"},
     function(self)
       local userResult = conn.getConnid(self.connid)
       -- local userResult = {1, "tytytytytyt"}
@@ -195,7 +154,69 @@ return function(server, api)
   )
 
   server:addMessage(
-    {type = "watchDeploy"},
+    {type = "deploySchedule"},
+    function(self)
+      local userResult = conn.getConnid(self.connid)
+      -- local userResult = {1, "tytytytytyt"}
+      if not userResult then
+        local result = self.data
+        result.message = "need login."
+        result.status = 401
+        return self:render({data = result})
+      end
+      local userId = userResult[2]
+
+      self.data.tuple = {
+        id = common.createUUID(),
+        userId = userId,
+        deploymentId = self.data.deploymentId,
+        estimatedTime = os.time(),
+        type = self.data.type,
+        ends = "completed",
+        status = "waiting",
+        createdDate = os.time(),
+        updatedDate = os.time()
+      }
+
+      local options
+      local deployments = box.space["deployments"].index["primary"]:select({self.data.deploymentId, userId})
+      if #deployments > 0 then
+        local d = deployments[1]
+        if self.data.type == "performance" then
+          options = d[8]
+        else
+          options = d[7]
+        end
+      else
+        local result = self.data
+        result.message = "deployment not found."
+        result.status = 404
+        return self:render({data = result})
+      end
+
+      local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, userId})
+      if #schedules > 0 then
+        local s = schedules[1]
+        self.data.tuple.id = s[1]
+        self.data.tuple.createdDate = s[11]
+      end
+
+      if options.frequencyOptions and options.frequencyOptions.time then
+        self.data.tuple.estimatedTime = options.frequencyOptions.time
+      end
+
+      local request = {
+        space = space,
+        type = "replace",
+        data = self.data,
+        userId = userId
+      }
+      return self:render({data = operate(request)})
+    end
+  )
+
+  server:addMessage(
+    {type = "watchSchedule"},
     function(self)
       local request = {
         space = space,
@@ -208,7 +229,7 @@ return function(server, api)
   )
 
   server:addMessage(
-    {type = "unwatchDeploy"},
+    {type = "unwatchSchedule"},
     function(self)
       local request = {
         space = space,
@@ -221,31 +242,15 @@ return function(server, api)
   )
 
   -- rule {isRequired, type}
-  api["newDeploy"] = {
-    ["tuple"] = {true, "object"},
-    ["tuple.projectId"] = {true, "string"},
-    ["tuple.projectName"] = {true, "string"},
-    ["tuple.modelName"] = {true, "string"},
-    ["tuple.modelType"] = {true, "string"},
-    ["tuple.deploymentOptions"] = {true, "object"},
-    ["tuple.performanceOptions"] = {true, "object"}
+  api["deploySchedule"] = {
+    ["type"] = {true, "string"},
+    ["deploymentId"] = {true, "string"}
   }
-  api["updateDeploy"] = {
-    ["tuple"] = {true, "object"},
-    ["tuple.id"] = {true, "string"},
-    ["tuple.projectId"] = {true, "string"},
-    ["tuple.projectName"] = {true, "string"},
-    ["tuple.modelName"] = {true, "string"},
-    ["tuple.modelType"] = {true, "string"},
-    ["tuple.deploymentOptions"] = {true, "object"},
-    ["tuple.performanceOptions"] = {true, "object"}
-  }
-  -- todo pager
-  api["searchDeploy"] = {
+  api["searchSchedule"] = {
     ["id"] = {false, "string"}
   }
-  api["watchDeploy"] = "watch"
-  api["unwatchDeploy"] = {}
+  api["watchSchedule"] = "watch"
+  api["unwatchSchedule"] = {}
 end
 
 -- local unregister = before.register()

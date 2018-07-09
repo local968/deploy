@@ -15,6 +15,7 @@ import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from 'components/Common/Uploader';
 import BButton from 'components/Common/BlackButton';
+import DBStore from 'stores/DBStore';
 
 const Option = Select.Option;
 
@@ -127,6 +128,10 @@ export default class Performance extends Component {
                   if (cdpo.frequency) {
                     this.selectionOption('enable', true)();
                     routing.push(`/deploy/project/${match.params.id}/status`);
+                    DBStore.deploySchedule({
+                      deploymentId: match.params.id,
+                      type: 'performance'
+                    });
                   }
                 }}
               >

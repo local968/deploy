@@ -7,6 +7,7 @@ local model = require("deploy2.lua.model")
 local auth = require("deploy2.lua.auth")
 local testInit = require("deploy2.lua.test")
 local deploymentsInit = require("deploy2.lua.deployments")
+local schedulesInit = require("deploy2.lua.schedules")
 local api = {}
 
 -- 更新单个字段
@@ -37,6 +38,7 @@ local function init(server)
 
   testInit(server, api)
   deploymentsInit(server, api)
+  schedulesInit(server, api)
   server:addMessage(
     {type = "api"},
     function(self)

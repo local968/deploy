@@ -31,7 +31,7 @@ tuple = {
   modelName: 'RandomForestClassifier4.custom.03.26.2018_17:46:51',
   modelType: 'Classification',
   projectId: '23',
-  projectName: 'teas',
+  projectName: 'sssss',
   performanceOptions: {
     autoDisable: null,
     enable: true,

@@ -1,6 +1,7 @@
-import { observable, computed } from 'mobx';
+import { observable, computed, when } from 'mobx';
+import DBStore from 'stores/DBStore';
+import userStore from 'stores/UserStore';
 import deployStore from './DeployStore.js';
-import db from './db.js';
 
 const sortStrategies = {
   createdDate: (a, b) =>
@@ -60,11 +61,18 @@ class ScheduleStore {
   };
 
   constructor() {
-    db('schedules')
-      .watch()
-      .subscribe(schedules => {
-        this.schedules = schedules;
-      });
+    when(
+      () => userStore.userId && !userStore.isLoad,
+      () =>
+        DBStore.ready().then(db => {
+          db.searchSchedule().then(response => {
+            this.schedules = response.result;
+          });
+          db.watchSchedule(response => {
+            this.schedules = response.result;
+          });
+        })
+    );
   }
 
   @computed

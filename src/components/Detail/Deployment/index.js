@@ -18,6 +18,7 @@ import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from 'components/Common/Uploader';
 import BButton from 'components/Common/BlackButton';
+import DBStore from 'stores/DBStore';
 
 const ordinalNumberPostFix = number => {
   if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
@@ -152,9 +153,14 @@ export default class Deployment extends Component {
                 className={styles.save}
                 onClick={() => {
                   if (cddo.frequency) {
+                    this.selectionOption('enable', true)();
                     routing.push(
                       `/deploy/project/${match.params.id}/operation`
                     );
+                    DBStore.deploySchedule({
+                      deploymentId: match.params.id,
+                      type: 'deployment'
+                    });
                   }
                 }}
               >

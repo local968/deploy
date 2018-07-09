@@ -31,7 +31,8 @@ const defaultPerformanceOptions = {
 export default class Deployment {
   @observable id;
 
-  @observable name;
+  @observable projectId;
+  @observable projectName;
   @observable modelId;
   @observable modelName;
   @observable modelType;
@@ -44,6 +45,7 @@ export default class Deployment {
 
   constructor(deploy) {
     this.id = deploy.id;
+    this.projectId = deploy.projectId;
     this.projectName = deploy.projectName;
     this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
@@ -68,6 +70,7 @@ export default class Deployment {
         db.updateDeploy({
           tuple: {
             id: this.id,
+            projectId: this.projectId,
             projectName: this.projectName,
             modelName: this.modelName,
             modelType: this.modelType,
