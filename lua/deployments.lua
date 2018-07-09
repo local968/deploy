@@ -36,8 +36,8 @@ return function(server, api)
       if not watchers or not userId then
         return
       end
-      -- local connIds = conn.getConnids(userId)
-      local connIds = watchers
+      local connIds = conn.getConnids(userId)
+      -- local connIds = watchers
       for k, watcherConnId in pairs(watchers) do
         for _k, connId in pairs(connIds) do
           if watcherConnId == connId then
@@ -116,8 +116,8 @@ return function(server, api)
   server:addMessage(
     {type = "newDeploy"},
     function(self)
-      -- local userResult = conn.getConnid(self.connid)
-      local userResult = {1, "tytytytytyt"}
+      local userResult = conn.getConnid(self.connid)
+      -- local userResult = {1, "tytytytytyt"}
       if not userResult then
         local result = self.data
         result.message = "need login."
@@ -140,8 +140,8 @@ return function(server, api)
   server:addMessage(
     {type = "updateDeploy"},
     function(self)
-      -- local userResult = conn.getConnid(self.connid)
-      local userResult = {1, "tytytytytyt"}
+      local userResult = conn.getConnid(self.connid)
+      -- local userResult = {1, "tytytytytyt"}
       if not userResult then
         local result = self.data
         result.message = "need login."
@@ -163,8 +163,9 @@ return function(server, api)
   server:addMessage(
     {type = "searchDeploy"},
     function(self)
-      -- local userResult = conn.getConnid(self.connid)
-      local userResult = {1, "tytytytytyt"}
+      local userResult = conn.getConnid(self.connid)
+      dump(userResult)
+      -- local userResult = {1, "tytytytytyt"}
       if not userResult then
         local result = self.data
         result.message = "need login."

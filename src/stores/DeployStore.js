@@ -1,4 +1,5 @@
-import { observable, action, computed, autorun } from 'mobx';
+import { observable, action, computed, autorun, when } from 'mobx';
+import userStore from 'stores/UserStore';
 import Deployment from './Deployment';
 import moment from 'moment';
 // import db from './db.js';
@@ -106,15 +107,14 @@ class DeployStore {
   }
 
   constructor() {
-    DBStore.ready().then(db => {
-      db.searchDeploy().then(response => {
-        this.deployments = response.result;
-      });
-      db.watchDeploy(response => {
-        this.deployments = response.result;
-      });
-    });
-
+    // DBStore.ready().then(db => {
+    //   db.searchDeploy().then(response => {
+    //     this.deployments = response.result;
+    //   });
+    //   db.watchDeploy(response => {
+    //     this.deployments = response.result;
+    //   });
+    // });
     // autorun(() => {
     //   if (
     //     this.currentId &&
@@ -126,6 +126,21 @@ class DeployStore {
     //       .fetch()
     //       .subscribe(model => (this.currentModel = model));
     // });
+  }
+
+  init() {
+    when(
+      () => userStore.userId && !userStore.isLoad,
+      () =>
+        DBStore.ready().then(db => {
+          db.searchDeploy().then(response => {
+            this.deployments = response.result;
+          });
+          db.watchDeploy(response => {
+            this.deployments = response.result;
+          });
+        })
+    );
   }
 
   @computed

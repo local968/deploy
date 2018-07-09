@@ -5,28 +5,24 @@ const debug = true;
 class DB {
   status = 'init';
   _listeners = {};
+  _onceListeners = {};
   connection;
   reqNo = 1;
-
   isReady = false;
 
   constructor(connect = true) {
     if (connect) this.connect();
-
     return this.db;
   }
 
-  ready = () => {
+  ready() {
     if (this.isReady) return Promise.resolve(this.db);
     return new Promise((resolve, reject) => {
-      this.once('apiReady', () => {
-        this.isReady = true;
-        resolve(this.db);
-      });
+      this.once('apiReady', resolve.bind(null, this.db));
     });
-  };
+  }
 
-  db = { ready: this.ready.bind(this) };
+  db = { ready: this.ready.bind(this), _db: this };
 
   async connect() {
     if (this.connection) return this.connection;
@@ -95,13 +91,9 @@ class DB {
   }
 
   once(eventName, listener) {
-    if (!this._listeners.hasOwnProperty(eventName))
-      this._listeners[eventName] = [];
-    const _listener = (...args) => {
-      listener(...args);
-      this.removeListener(eventName, _listener);
-    };
-    this._listeners[eventName].push(_listener);
+    if (!this._onceListeners.hasOwnProperty(eventName))
+      this._onceListeners[eventName] = [];
+    this._onceListeners[eventName].push(listener);
   }
 
   on(eventName, listener) {
@@ -115,6 +107,12 @@ class DB {
     arr.map(listener => {
       return listener(...args);
     });
+
+    const onceArr = this.onceListeners(eventName);
+    const length = onceArr.length;
+    for (let i = 0; i < length; i++) {
+      onceArr.pop()(...args);
+    }
   }
 
   removeListener(eventName, listener) {
@@ -125,6 +123,10 @@ class DB {
 
   listeners(eventName) {
     return this._listeners[eventName] || [];
+  }
+
+  onceListeners(eventName) {
+    return this._onceListeners[eventName] || [];
   }
 }
 

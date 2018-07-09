@@ -29,6 +29,10 @@ const deploymentStatus = {
 @inject('deployStore')
 @observer
 export default class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.props.deployStore.init();
+  }
   toggle = (currentType, targetType) => () => {
     if (currentType === targetType) {
       this.props.deployStore.changeSort(
