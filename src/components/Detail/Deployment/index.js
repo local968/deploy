@@ -313,12 +313,15 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
         <div className={styles.selected}>
           <Uploader
             className={styles.resultText}
-            onChange={file => selectionOption('file', file)()}
+            onComplete={file => {
+              selectionOption('file', file.name)();
+            }}
+            params={{ projectId: cd.projectId, userId: cd.userId }}
           >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
-            <span className={styles.path} title={cddo.file.originalName}>
-              {cddo.file.originalName}
+            <span className={styles.path} title={cddo.file}>
+              {cddo.file}
             </span>
           </Uploader>
           <span className={styles.or}>
@@ -360,13 +363,14 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
         >
           <Uploader
             className={styles.text}
-            onChange={file => {
+            onComplete={file => {
               runInAction(() => {
                 cd.deploymentOptions['source'] = 'file';
-                cd.deploymentOptions['file'] = file;
+                cd.deploymentOptions['file'] = file.name;
                 cd.save();
               });
             }}
+            params={{ projectId: cd.projectId, userId: cd.userId }}
           >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File

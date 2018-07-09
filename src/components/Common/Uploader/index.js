@@ -8,7 +8,7 @@ export default ({
   params,
   onChange,
   onProgress,
-  OnComplete
+  onComplete
 }) => {
   const id = `uploader-${Math.floor(Math.random() * 1000)}`;
   const blobSlice =
@@ -47,8 +47,8 @@ export default ({
           }
           retryCount = 0;
           if (file.size === res.data.size) {
-            if (OnComplete && typeof OnComplete === 'function') {
-              OnComplete(file);
+            if (onComplete && typeof onComplete === 'function') {
+              onComplete(file);
             }
             return;
           }
@@ -67,7 +67,7 @@ export default ({
     const file = files[0];
     if (!!file) {
       _upload(file);
-      onChange({ file });
+      typeof onChange === 'function' && onChange({ file });
     }
   };
 

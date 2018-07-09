@@ -5,7 +5,11 @@ return function(fields)
     end
     local arr = {}
     for k, v in pairs(fields) do
-      arr[k] = obj[v]
+      if type(obj[v]) == "cdata" then
+        arr[k] = nil
+      else
+        arr[k] = obj[v]
+      end
     end
     return arr
   end
@@ -17,7 +21,11 @@ return function(fields)
     local obj = {}
     for k, v in pairs(array) do
       if (fields[k]) then
-        obj[fields[k]] = v
+        if type(v) == "cdata" then
+          obj[fields[k]] = nil
+        else
+          obj[fields[k]] = v
+        end
       end
     end
     return obj
@@ -59,11 +67,31 @@ return function(fields)
     )
   end
 
+  local function deepCopy(object)
+    local SearchTable = {}
+
+    local function Func(object)
+      if type(object) ~= "table" then
+        return object
+      end
+      local NewTable = {}
+      SearchTable[object] = NewTable
+      for k, v in pairs(object) do
+        NewTable[Func(k)] = Func(v)
+      end
+
+      return setmetatable(NewTable, getmetatable(object))
+    end
+
+    return Func(object)
+  end
+
   return {
     mapObjectToArray = mapObjectToArray,
     mapArrayToObject = mapArrayToObject,
     mapArrayArrayToArrayObject = mapArrayArrayToArrayObject,
     mapArrayObjectToArrayArray = mapArrayObjectToArrayArray,
-    createUUID = createUUID
+    createUUID = createUUID,
+    deepCopy = deepCopy
   }
 end

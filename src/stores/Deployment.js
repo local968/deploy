@@ -31,6 +31,7 @@ const defaultPerformanceOptions = {
 export default class Deployment {
   @observable id;
 
+  @observable userId;
   @observable projectId;
   @observable projectName;
   @observable modelId;
@@ -45,6 +46,7 @@ export default class Deployment {
 
   constructor(deploy) {
     this.id = deploy.id;
+    this.userId = deploy.userId;
     this.projectId = deploy.projectId;
     this.projectName = deploy.projectName;
     this.modelId = deploy.modelId;
@@ -77,8 +79,7 @@ export default class Deployment {
             createdDate: this.createdDate,
             email: this.email,
             deploymentOptions: this.deploymentOptions,
-            performanceOptions: this.performanceOptions,
-            updatedDate: moment().unix()
+            performanceOptions: this.performanceOptions
           }
         });
       });
@@ -88,6 +89,8 @@ export default class Deployment {
   log = () =>
     console.log({
       id: this.id,
+      userId: this.userId,
+      projectId: this.projectId,
       projectName: this.projectName,
       modelName: this.modelName,
       modelType: this.modelType,

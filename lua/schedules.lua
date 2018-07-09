@@ -21,6 +21,8 @@ local fields = {
 }
 local common = commonInit(fields)
 
+local maxProgressing = 2
+
 -- easy version currently
 -- todo: delta mode
 -- event
@@ -61,6 +63,60 @@ return function(server, api)
 
   fiber.create(watcherHandler)
 
+  local function checkQueue()
+    -- push into queue
+    local timeUpSchedules = box.space[space].index["estimatedTime"]:select({"waiting"})
+    for k, _tuple in pairs(timeUpSchedules) do
+      local tuple = common.mapArrayToObject(_tuple)
+      if (tuple.estimatedTime < os.time()) then
+        tuple.status = "queue"
+        tuple.updatedDate = os.time()
+        local request = {
+          space = space,
+          type = "replace",
+          data = {tuple = tuple},
+          userId = tuple.userId
+        }
+        local result = operate(request)
+      end
+    end
+  end
+
+  local function executeQueue()
+    local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
+    if (#progressingSchedules >= maxProgressing) then
+      return
+    end
+    local queueSchedules = box.space[space].index["estimatedTime"]:select({"queue"})
+
+    for i = 1, maxProgressing - #progressingSchedules, 1 do
+      local _tuple = queueSchedules[i]
+      local tuple = common.mapArrayToObject(_tuple)
+      tuple.status = "progressing"
+      tuple.updatedDate = os.time()
+
+      -- todo: send request
+
+      local request = {
+        space = space,
+        type = "replace",
+        data = {tuple = tuple},
+        userId = tuple.userId
+      }
+      local result = operate(request)
+    end
+  end
+
+  local function queueHandler()
+    while true do
+      checkQueue()
+      executeQueue()
+      fiber.sleep(10)
+    end
+  end
+
+  fiber.create(queueHandler)
+
   if not box.space[space] then
     local space = box.schema.space.create(space)
     space:create_index(
@@ -82,6 +138,14 @@ return function(server, api)
       "userId",
       {
         parts = {2, "string"},
+        unique = false
+      }
+    )
+
+    space:create_index(
+      "estimatedTime",
+      {
+        parts = {5, "string", 6, "number"},
         unique = false
       }
     )
@@ -179,6 +243,7 @@ return function(server, api)
       }
 
       local options
+      -- fetch schedule options from deployment
       local deployments = box.space["deployments"].index["primary"]:select({self.data.deploymentId, userId})
       if #deployments > 0 then
         local d = deployments[1]
@@ -194,6 +259,7 @@ return function(server, api)
         return self:render({data = result})
       end
 
+      -- get deployment and specific type related schedules
       local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
         local s = schedules[1]
@@ -201,8 +267,19 @@ return function(server, api)
         self.data.tuple.createdDate = s[11]
       end
 
-      if options.frequencyOptions and options.frequencyOptions.time then
-        self.data.tuple.estimatedTime = options.frequencyOptions.time
+      -- only for once
+      if options.frequency == "once" and options.frequencyOptions and options.frequencyOptions.time then
+        if options.frequencyOptions.time == "completed" then
+          self.data.tuple.estimatedTime = os.time()
+        else
+          self.data.tuple.estimatedTime = options.frequencyOptions.time
+        end
+        self.data.tuple.ends = self.data.tuple.estimatedTime
+      else
+        local result = self.data
+        result.message = "not support yet."
+        result.status = 500
+        return self:render({data = result})
       end
 
       local request = {
