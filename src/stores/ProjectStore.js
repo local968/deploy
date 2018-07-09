@@ -142,6 +142,7 @@ class ProjectStore {
             }),
             queryModels: action(data => {
                 const result = data.data;
+                if(!result) return;
                 const models = result.args;
                 this.models = [];
                 for (let key in models) {
