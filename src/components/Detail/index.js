@@ -15,10 +15,6 @@ import styles from './styles.module.css';
 @inject('routing', 'deployStore')
 @observer
 export default class Detail extends Component {
-  constructor(props) {
-    super(props);
-    this.props.deployStore.init();
-  }
   render() {
     const { routing, match, location, deployStore } = this.props;
     runInAction(() => (deployStore.currentId = match.params.id));

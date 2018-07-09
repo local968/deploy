@@ -107,28 +107,6 @@ class DeployStore {
   }
 
   constructor() {
-    // DBStore.ready().then(db => {
-    //   db.searchDeploy().then(response => {
-    //     this.deployments = response.result;
-    //   });
-    //   db.watchDeploy(response => {
-    //     this.deployments = response.result;
-    //   });
-    // });
-    // autorun(() => {
-    //   if (
-    //     this.currentId &&
-    //     this.currentDeployment &&
-    //     this.currentDeployment.modelId
-    //   )
-    //     db('models')
-    //       .find({ id: this.currentDeployment.modelId })
-    //       .fetch()
-    //       .subscribe(model => (this.currentModel = model));
-    // });
-  }
-
-  init() {
     when(
       () => userStore.userId && !userStore.isLoad,
       () =>
