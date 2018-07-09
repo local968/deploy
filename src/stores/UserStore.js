@@ -1,11 +1,11 @@
 // import db from './db.js';
 import { observable, action, computed, when } from 'mobx';
 import Project from './Project.js'
-import config from '../config.js'
 import socketStore from './SocketStore';
 import { message } from 'antd';
+// import config from '../config.js';
 
-class UserStore{
+class UserStore {
     @observable isLoad = true;
     @observable isInit = true;
     @observable user = {};
@@ -28,15 +28,20 @@ class UserStore{
         zToa: (a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? 1 : -1
     };
 
-    constructor(){
+    constructor() {
         this.initCallback();
+        // if (config.auth === "local") {
+        //     this.isLoad =false;
+        //     this.hasToken = true;
+        //     this.initProjects();
+        // }
 
-        if(!this.userId && this.hasToken){
+        if (!this.userId && this.hasToken) {
             when(
                 () => socketStore.isready,
                 () => this.tryLoginByToken()
             )
-        }else{
+        } else {
             this.isInit = false
         }
     }
@@ -48,42 +53,32 @@ class UserStore{
 
     @computed
     get userId() {
-        return this.user?this.user.email:"";
+        // if (config.auth === "local") return 'devUser'
+        return this.user ? this.user.email : "";
     }
 
     @computed
     get sortProjects() {
-        const {perPage, currentPage, keywords, sort} = this.toolsOption;
+        const { perPage, currentPage, keywords, sort } = this.toolsOption;
         let result = [...this.projects];
         // console.log(result)
         result = result.filter(row => {
-            return row&&row.name.includes(keywords);
+            return row && row.name.includes(keywords);
         })
         result = result.sort(this.sortFunction[sort])
         const start = (currentPage - 1) * perPage;
-        return result.slice(start,start + perPage);
+        return result.slice(start, start + perPage);
     }
 
     @action
     initProjects() {
-        if(config.database === "tarantool"){
-            this.isLoad = true;
-            when(
-                () => socketStore.isready,
-                () => socketStore.send("queryProjects", {userId: this.userId})
-            )
-        }else{
-            this.projectTable
-            .findAll({userId: this.userId})
-            .fetch()
-            .subscribe( projects => {
-                this.projects = projects.map(project => {
-                    return new Project(this.userId, project.projectId, project);
-                });
-            })
-        }
+        this.isLoad = true;
+        when(
+            () => socketStore.isready,
+            () => socketStore.send("queryProjects", { userId: this.userId })
+        )
     }
-    
+
     @action
     changeOption(k, v) {
         this.toolsOption[k] = v;
@@ -93,7 +88,7 @@ class UserStore{
     addProject() {
         const projectId = this.getNextId();
         this.userSetting.projectId = projectId + 1;
-        this.projects.push(new Project(this.userId, projectId));
+        this.projects.push(new Project(this.userId, projectId.toString()));
     }
 
     @action
@@ -101,78 +96,35 @@ class UserStore{
         this.projects = this.projects.filter(project => !ids.includes(project.projectId))
         when(
             () => socketStore.isready,
-            () => socketStore.send("deleteProjects", {userId:this.userId, ids})
+            () => socketStore.send("deleteProjects", { userId: this.userId, ids })
         )
     }
 
     getNextId() {
-        if(this.userSetting.projectId) {
+        if (this.userSetting.projectId) {
             return this.userSetting.projectId;
         }
         let maxId = 0;
-        for(let project of this.projects){
+        for (let project of this.projects) {
             maxId = project.projectId > maxId ? project.projectId : maxId;
         }
         return maxId + 1;
     }
 
-    startWatch() {
-        this.projectTable
-        .findAll({userId: this.userId})
-        .watch({rawChanges: true})
-        .subscribe(data => {
-            const {new_val, type, old_val} = data;
-            // if (type === 'state') {
-            //     if (data.state === 'synced') {
-            //         this.loaded = true;
-            //     } else {
-            //         console.warn(`Unknown state ${data.state}`);
-            //     }
-            // }
-            if (type === 'change') {
-                const changedProject = this.projects.find(p => {
-                    return p.userId === new_val.userId && p.projectId === new_val.projectId;
-                });
-                if (changedProject) {
-                    this.projects.remove(changedProject);
-                }
-                this.projects.push(new Project(this.userId, new_val.projectId, new_val));
-            }
-            if (type === 'add') {
-                const addedProject = this.projects.find(p => {
-                    return p.userId === new_val.userId && p.projectId === new_val.projectId;
-                });
-                if (!addedProject) {
-                    this.projects.push(new Project(this.userId, new_val.projectId, new_val));
-                }
-            }
-            if (type === 'remove') {
-                const removedProject = this.projects.find(p => {
-                    return p.userId === old_val.userId && p.projectId === old_val.projectId;
-                });
-                if (removedProject) {
-                    removedProject.destroy();
-                    this.projects.remove(removedProject);
-                }
-            }
-        })
-    }
-
     initCallback() {
         const callback = {
-            queryProjects : data => {
+            queryProjects: data => {
                 const projects = data.list;
                 this.userSetting = data.setting || {};
                 this.projects = projects.map(project => {
-                    return new Project(this.userId, project.projectId, project.args);
+                    return new Project(this.userId, project.projectId.toString(), project.args);
                 });
                 this.isLoad = false;
                 this.isInit = false;
             },
-            login : data => {
-                console.log(data,"login")
-                const {status, err, user} = data;
-                if(status !== 200){
+            login: data => {
+                const { status, err, user } = data;
+                if (status !== 200) {
                     this.clearToken();
                     this.isInit = false;
                     this.isLoad = false;
@@ -183,8 +135,8 @@ class UserStore{
                 this.initProjects();
             },
             register: data => {
-                const {status, err, user} = data;
-                if(status !== 200){
+                const { status, err, user } = data;
+                if (status !== 200) {
                     this.clearToken();
                     this.isLoad = false;
                     return message.error(err);
@@ -200,7 +152,7 @@ class UserStore{
 
     tryLoginByToken() {
         let token = window.localStorage.getItem("deploy2-token");
-        this.login({token});
+        this.login({ token });
     }
 
     setCache(user) {
@@ -236,7 +188,7 @@ class UserStore{
 
     logout() {
         when(
-            () => socketStore.isready&&this.userId,
+            () => socketStore.isready && this.userId,
             () => {
                 socketStore.send("logout")
                 this.clearToken();

@@ -3,6 +3,7 @@ local authlog = require('deploy2.lua.authlog')
 local auth = require('authman').api({})
 local Expired = 14*24*60*60
 local BadDomain = require('deploy2.lua.domain')
+local _init, _server
 
 local function bindConnid(userId, connid)
     local result = conn.getConnid(connid);
@@ -349,13 +350,13 @@ local function setProfile(self)
     end
 end
 
-local function logout(self)
-    local result = conn.getConnid(self.connid)
+local function logout_handler(self, req)
+    local result = conn.getConnid(req.connid)
 
     if result then
         local userId = result[2]
         -- 删除当前用户链接数据
-        conn.delete(self.connid)
+        conn.delete(req.connid)
 
         -- 如果当前用户没有任何链接  认为用户下线
         local connects = conn.getConnids(userId)
@@ -366,12 +367,21 @@ local function logout(self)
     end
 end
 
-local function logout_handler(self, req)
-    logout(req)
+local function logout(self)
+    logout_handler(nil, self)
 end
 
+local function accessable(self, req)
+    if req.type == 'register' or req.type == 'login' then
+        return true 
+    else
+        return true
+    end
+ end
+
 return function(server)
-    server._r2wsd:hook('websocket_onclose_handler', logout_handler)
+    server:setEventHandler(server.EVENT_HANDLER_TYPE.ONCLOSE, "logout_log", logout_handler)
+    server:setEventHandler(server.EVENT_HANDLER_TYPE.ONMESSAGE_ACCESSABLE, "accessable", accessable)
     server:addMessage({type='login'},login)
     server:addMessage({type='register'},register)
     server:addMessage({type='setProfile'},setProfile)

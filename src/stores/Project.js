@@ -1,7 +1,6 @@
 // import db from './db.js';
-import { observable, action, when } from 'mobx';
+import { observable, action, when, computed } from 'mobx';
 import socketStore from './SocketStore';
-import config from '../config.js'
 import requestStore from './RequestStore.js';
 import moment from 'moment';
 
@@ -10,15 +9,23 @@ export default class Project {
 
     @observable deployFileName = '';
     @observable uploadFileName = '';
+
+    //problem
     @observable problemType = '';
+    @observable statement = "";
+    @observable business = '';
+
+    //changeproblem
+    //初始化时与problemType相同，作为展示值
+    //修改并点击下一步时  表示确认修改type
+    //删除上传文件，model 及其相关数据
+    @observable changeProjectType = '';
+
     @observable target = "";
+
     // fast track
-    @observable fastTrackUploadProgress = 0;
-    @observable fasttrack = false;
-    @observable fastTrackDeployUploadProgress = 0;
     @observable train2Finished = false;
     @observable deploy2Finished = false;
-    @observable fasttrackPredictResult;
     @observable train2ing = false;
     @observable deploy2ing = false;
     @observable deploy2Error = false;
@@ -28,8 +35,8 @@ export default class Project {
     @observable dataHeader = [];
     @observable uploadData = [];
     @observable rawHeader = [];
-    @observable varNameMap = [];
-    @observable dataType = [];
+    @observable colType = [];
+    @observable totalLines = 0;
 
     @observable mainStep = 0;
     @observable curStep = 0;
@@ -38,6 +45,12 @@ export default class Project {
 
     @observable overfit = 5;
     @observable speed = 5;
+    @observable version = 2;
+
+    // etl
+    @observable fillMethod= {};
+    @observable validationRate = 0.1;
+    @observable holdoutRate = 0.1;
 
     @observable criteria = 'defualt';
 
@@ -57,6 +70,8 @@ export default class Project {
             this.createProject();
         } else {
             Object.assign(this, project);
+            //初始化赋值为相同值
+            this.changeProjectType = this.problemType;
         }
     }
 
@@ -81,23 +96,22 @@ export default class Project {
             initObservedKeys[k] = this[k];
         });
         Object.assign(this, item, initObservedKeys);
-        if (config.database === "tarantool") {
-            when(
-                () => socketStore.isready,
-                () => {
-                    socketStore.send("changeProject", { userId: this.userId, projectId: this.projectId, args: item })
-                }
-            )
-        } else {
-            this.projectTable.store(item);
-        }
+
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("changeProject", { userId: this.userId, projectId: this.projectId, args: item })
+            }
+        )
+
     }
 
     nextMainStep(routeIndex) {
         let obj;
         if (routeIndex <= this.mainStep) {
             obj = {
-                curStep: routeIndex
+                curStep: routeIndex,
+                subStepActive: 1
             };
         } else (
             obj = {
@@ -133,19 +147,69 @@ export default class Project {
         this.updateProject(obj);
     }
 
+    saveProblem() {
+        if(this.problemType && this.changeProjectType !== this.problemType) {
+            this.changeType()
+        }else{
+            this.updateProject({
+                statement: this.statement, 
+                business: this.business,
+                problemType: this.changeProjectType
+            });
+            this.nextMainStep(2);
+        }
+    }
+
+    // 修改problemType后执行删除
+    changeType() {
+        when(
+            () => socketStore.isready,
+            () => socketStore.send("changeProblemType", {userId: this.userId, projectId: this.projectId})
+        )
+    }
+
+    backToProblemStep() {
+        //全部恢复到problem步骤
+        const problemStepData = {
+            statement: this.statement, 
+            business: this.business,
+            problemType: this.changeProjectType,
+            target: "",
+            train2Finished: false,
+            deploy2Finished: false,
+            train2ing: false,
+            deploy2ing: false,
+            deploy2Error: false,
+            train2Error: false,
+            dataHeader: [],
+            uploadData: [],
+            rawHeader: [],
+            colType: [],
+            totalLines: 0,
+            mainStep: 2,
+            curStep: 2,
+            lastSubStep: 1,
+            subStepActive: 1,
+            overfit: 5,
+            speed: 5,
+            version: 2,
+            fillMetho: {},
+            validationRate: 0.1,
+            holdoutRate: 0.1
+        }
+        this.updateProject(problemStepData);
+        Object.assign(this, problemStepData)
+    }
+
     @action
     fastTrackInit(name) {
         this.updateProject({
-            fasttrack: true,
             deploy2ing: false,
             train2ing: false,
             deploy2Finished: false,
             train2Error: false,
             deploy2Error: false,
             train2Finished: false,
-            fastTrackDeployUploadProgress: 0,
-            fastTrackUploadProgress: 0,
-            fileUploaded: true,
             uploadFileName: name
         });
     }
@@ -155,8 +219,46 @@ export default class Project {
         const header = uploadData[0];
         const data = uploadData.slice(1);
 
+        // 上传文件，target为空
+        this.updateProject({
+            uploadData: data,
+            dataHeader: header,
+            rawHeader: header,
+            target: ""
+        });
+        // this.nextSubStep(2, 2);
+    }
+
+    @computed
+    get headerTemp() {
+        //查看是否存在相同名称的header
+        let temp = {};
+        let isMissed = false;
+        let isDuplicated = false;
+        this.rawHeader.forEach((h, i) => {
+            h = h.trim();
+            if (!h){
+                isMissed = true;
+                return;
+            }
+            if(!temp[h]){
+                temp[h] = [i]
+            }else{
+                isDuplicated = true;
+                temp[h].push(i);
+            }
+        })
+        return {
+            temp,
+            isMissed,
+            isDuplicated
+        }
+    }
+
+    autoFixHeader() {
+        const {rawHeader} = this;
         const temp = {};
-        const rawHeader = header.map((h, i) => {
+        const header = rawHeader.map((h, i) => {
             h = h.trim();
             if (/^$/.test(h)){
                 h = `Unnamed: ${i}`;
@@ -170,39 +272,112 @@ export default class Project {
             return h
         })
 
-        let type = new Array(header.length).fill("numerical");
-        for(var row of data){
-            for(var [k ,v] of row.entries()){
-                if(type[k] === "categorical"){
-                    continue;
-                }
-                if(!!v && isNaN(parseFloat(v))){
-                    type[k] = "categorical"
-                }
-            }
-        }
-
         this.updateProject({
-            uploadData: data,
             dataHeader: header,
+            rawHeader: header
+        });
+    }
+
+    firstEtl() {
+        const {
+            userId, 
+            projectId, 
+            problemType,
+            dataHeader,
+            uploadFileName
+        } = this;
+
+        const command = "etl";
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // problem_type: 预测类型 Classification , Regression
+        // feature_label: 特征列名
+        // fill_method:  无效值
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            problemType,
+            featureLabel: dataHeader,
+            projectId,
+            userId,
+            time: moment().valueOf(),
+            command,
+            fillMethod: {},
+            validationRate: this.validationRate,
+            holdoutRate: this.holdoutRate,
+            version: this.version
+        });
+    }
+
+    doEtl(banList) {
+        const {
+            userId, 
+            projectId, 
+            problemType,
+            target,
             rawHeader,
-            varNameMap: header,
-            dataType: type
+            uploadFileName
+        } = this;
+        
+        const command = "etl";
+        const id = `${command}-${userId}-${projectId}`;
+
+        const newDataHeader = rawHeader.filter(d => !banList.includes(d))
+    
+        this.updateProject({
+            dataHeader: newDataHeader,
+            colType: this.colType
         });
 
-        this.nextSubStep(2, 2);
+        const featureLabel = newDataHeader.filter(d => d !== target)
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // problem_type: 预测类型 Classification , Regression
+        // feature_label: 特征列名
+        // target_label:  目标列
+        // fill_method:  无效值
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            problemType,
+            featureLabel,
+            targetLabel: target,
+            projectId,
+            userId,
+            time: moment().valueOf(),
+            command,
+            fillMethod: {},
+            validationRate: this.validationRate,
+            holdoutRate: this.holdoutRate,
+            version: this.version
+        });
     }
 
-    cleanDB(table, object, cb) {
-        table.findAll(object).fetch().subscribe(
-            items => {
-                items.forEach(item => table.remove(item));
-                if (cb) cb();
+    setProperty(data) {
+        if(typeof data !== "object"){
+            return false;
+        }
+        if(Array.isArray(data)){
+            return false;
+        }
+        delete data.userId;
+        delete data.projectId;
+        for(let key in data) {
+            if(typeof data[key] === 'function'){
+                delete data[key]
             }
-        );
+        }
+        Object.assign(this, data)
     }
 
-    fastTrain(banList) {
+    fastTrain() {
         const {
             userId, 
             projectId, 
@@ -211,21 +386,24 @@ export default class Project {
             dataHeader,
             uploadFileName,
             speed,
-            overfit,
-            dataType
+            overfit
         } = this;
         this.trainStartTime = moment().valueOf();
         const command = 'train2';
-        const newDataHeader = dataHeader.filter(d => !banList.includes(d))
     
         this.updateProject({
             train2Finished: false,
             train2ing: true,
-            dataHeader: newDataHeader,
-            dataType: dataType
+            train2Error:false
         });
+
+        when(
+            () => socketStore.isready,
+            () => socketStore.send("train", {userId, projectId})
+        )
+
         const id = `${command}-${userId}-${projectId}`;
-        const featureLabel = newDataHeader.filter(d => d !== target)
+        const featureLabel = dataHeader.filter(d => d !== target)
         // this.cleanResultByCommand(this.modelingResultTable, { command: 'train2' });
 
         // id: request ID
@@ -240,6 +418,7 @@ export default class Project {
         // overfit:   1-10 默认5
         // model_option: model的额外参数，不同model参数不同
         // version: 控制选择何种model，目前有gbm，cat，默认两种全部使用。
+        // projectName: 名称
         // kwargs:
         requestStore.sendRequest(id,{
             csvLocation: uploadFileName,
@@ -251,7 +430,9 @@ export default class Project {
             speed,
             overfit,
             time: this.trainStartTime,
-            command
+            command,
+            projectName: this.name,
+            version: this.version
         });
 
         // this.nextSubStep(3, 2);
@@ -300,18 +481,216 @@ export default class Project {
         });
     }
 
-    saveModel(data, time) {
-        console.log(data,time,moment().valueOf(),this.trainStartTime)
-        const endTime = moment().valueOf();
-        for(let key in data.args){
-            data.args[key].executeTime = endTime - this.trainStartTime;
-        }
-        when(
-            () => socketStore.isready,
-            () => {
-                socketStore.send("changeModel", data)
-            }
-        )
+    correlationMatrix() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName,
+            dataHeader
+        } = this;
+
+        const command = 'correlationMatrix';
+
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version,
+            featureLabel: [...dataHeader]
+        });
+    }
+
+    fitPlotAndResidualPlot() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'fitPlotAndResidualPlot';
+
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    pointToShow() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'pointToShow';
+
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    preTrainImportance() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'preTrainImportance';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    univariatePlot() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'univariatePlot';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    histgramPlot() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'histgramPlot';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    modelInsights() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'modelInsights';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    dataView() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'dataView';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    modelingError() {
+        this.updateProject({
+            train2Error: true,
+            train2ing: false
+        });
     }
 
     initCallback() {

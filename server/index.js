@@ -7,6 +7,7 @@ const upload = require('./uploader');
 const Download = require('./download');
 const db = config.db;
 const multiparty = require('multiparty');
+const exec = require('child_process').exec;
 
 const app = express();
 
@@ -46,14 +47,16 @@ app.post('/api/sample', (req, res) => {
   const {type, filename, userId, projectId} = req.query;
   // const projPath = path.resolve(__dirname, '../..');
   const samplePath = path.join(config.projPath, 'sample', type, filename);
-  const destDir = path.join(config.projPath, 'data', userId, projectId);
-  if (!fs.existsSync(destDir)) {
+  const filePath = path.join(config.projPath, 'data', userId, projectId);
+
+  if (!fs.existsSync(filePath)) {
     createFilePath(filePath)
   }
-  fs.copyFile(samplePath, path.join(destDir, filename), err => {
-    if (err) return res.status(500).json({message: err});
+
+  fs.link(samplePath, path.join(filePath, filename), err => {
+    if (err && !err.message.startsWith('EEXIST')) return res.status(500).json({message: err});
     return res.json({message: 'sample copy finished'});
-  });
+  })
 });
 
 app.post('/api/upload', (req, res) => {

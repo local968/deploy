@@ -1,28 +1,28 @@
 queue = require('queue')
 
 local tables = {
-    --  userId,projectId,{...args}
+    --  id,userId,projectId,{...args}
     {
         table = "js_projects",
         indexs = {
             {
                 name = "primary",
-                parts = {1,"string",2,"unsigned"}
+                parts = {1,"string",2,"string"}
             }
         }
     },
-    --  userId,projectId,{...args}
+    --  id,userId,projectId,{...args}
     {
         table = "models_info",
         indexs = {
             {
                 name = "primary",
-                parts = {1,"string",2,"unsigned"}
+                parts = {1,"string",2,"string"}
             }
         }
     },
     {
-        table = "js_usersetting",
+        table = "model_user_setting",
         indexs = {
             {
                 name = "primary",
@@ -45,20 +45,6 @@ local tables = {
             {
                 name = "primary",
                 parts = {1,"string"}
-            }
-        }
-    },
-    {
-        table = "js_connids",
-        indexs = {
-            {
-                name = "primary",
-                parts = {1,"string"}
-            },
-            {
-                name = "index_conn",
-                parts = {2,"string"},
-                unique = false
             }
         }
     },
@@ -120,6 +106,6 @@ return function()
     initTables()
     
     -- cleanQueue()
-    -- initQueue()
+    initQueue()
 
 end

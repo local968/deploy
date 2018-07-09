@@ -2,9 +2,46 @@
     display: flex;
     flex: auto;
     overflow: auto;
-    padding: 0 1.85em;
+    padding: 0 10%;
     font-family: HelveticaNeue;
     color: #4a4a4a;
+}
+
+.title {
+    margin: 0.25em 0;
+    display: flex;
+}
+
+.title span {
+    font-size: 1.25rem;
+}
+
+.textBox {
+    display: flex;
+    flex-direction: column;
+}
+
+.textarea {
+    resize: none;
+}
+
+.text {
+    margin: 0.2em 0;
+    display: flex;
+    width: 1.6em;
+}
+
+.text span {
+    font-size: 1rem;
+}
+
+.radioBox {
+    display: flex;
+}
+
+.radio {
+    display: flex;
+    align-items: center;
 }
 
 

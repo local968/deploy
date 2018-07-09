@@ -6,6 +6,8 @@ import Switch from './Switch';
 import Uploader from './Uploader';
 import Search from './Search';
 import Background from './Background';
+import ContinueButton from './ContinueButton';
+import ProjectSide from './ProjectSide';
 
 export {
   BlackButton,
@@ -15,5 +17,7 @@ export {
   Switch,
   Uploader,
   Search,
+  ContinueButton,
+  ProjectSide,
   Background
 };

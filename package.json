@@ -23,7 +23,7 @@
     "react-dom": "^16.2.0",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.1",
+    "react-scripts": "^1.1.4",
     "react-virtualized": "^9.19.1",
     "rethinkdb": "^2.3.3",
     "spark-md5": "^3.0.0",
@@ -50,9 +50,9 @@
   "devDependencies": {
     "babel-plugin-import": "^1.6.7",
     "mobx-react-devtools": "^5.0.0",
-    "node-sass": "^4.7.2",
+    "node-sass": "^4.9.0",
     "react-app-rewire-css-modules": "github:codebandits/react-app-rewire-css-modules",
-    "react-app-rewire-less": "^2.1.1",
+    "react-app-rewire-less": "^2.1.2",
     "react-app-rewire-mobx": "^1.0.7",
     "react-app-rewired": "^1.5.0",
     "sass-loader": "^6.0.7"

@@ -10,7 +10,7 @@
     display: flex;
     margin-top: 0.3em;
     flex-direction: column;
-    padding: 0 1.85em;
+    padding: 0 10%;
     flex: auto;
 }
 
@@ -132,7 +132,7 @@
     margin-top: 0.25em;
     flex-direction: column;
     flex: auto;
-    padding: 0 1.85em;
+    padding: 0 10%;
 }
 
 .schemaInfo {
@@ -177,6 +177,7 @@
     display: flex;
     flex-direction: column;
     flex: auto;
+    overflow: hidden;
 }
 
 .schemaTools {
@@ -196,7 +197,7 @@
     background-image: linear-gradient(to bottom, #5b657b, #243448);
     color: #fff;
     padding: 0 0.2em;
-    margin-left: 0.85em;
+    margin-left: 0.4em;
     cursor: pointer;
 }
 
@@ -222,6 +223,16 @@
     border-right: 1px solid #ccc;
 }
 
+.titleCell {
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 0 0.1em;
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    padding-top: 3px;
+}
+
 .content span {
     font-size: 0.875rem;
     overflow: hidden;
@@ -235,27 +246,6 @@
     background-color: #daefe4;
 }
 
-.continue {
-    font-size: 1rem;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-    background-image: linear-gradient(to bottom, #5b657b, #243448);
-    color: #fff;
-    border: 0;
-    border-radius: 5px;
-    display: flex;
-    flex: auto;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.button {
-    display: flex;
-    margin-top: 0.3em;
-    width: 1.1em;
-    height: 0.4em;
-    margin-bottom: 0.6em;
-}
-
 .check {
     display: flex;
     justify-content: center;
@@ -265,6 +255,51 @@
 
 .checked {
     color: #9b9b9b;
+}
+
+.missed {
+    padding-top: 0px;
+    border-top: 3px solid #ff3151;
+}
+
+.duplicated {
+    padding-top: 0px;
+    border-top: 3px solid #f19400;
+}
+
+.schemaMissed,
+.schemaDuplicated {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 0.2em;
+}
+
+.schemaMissed span {
+    font-size: 0.875rem;
+    color: #ff3151;
+ }
+
+.schemaMissed .errorBlock{
+    background: #ff3151;
+    width: 0.1em;
+    height: 0.1em;
+    display: flex;
+    margin: 0 0.08em;
+}
+
+.schemaDuplicated span {
+    font-size: 0.875rem;
+    color: #f19400;
+    white-space: nowrap;
+}
+
+.schemaDuplicated .errorBlock{
+    background: #f19400;
+    width: 0.1em;
+    height: 0.1em;
+    display: flex;
+    margin: 0 0.08em;
 }
 
 .content select {
@@ -280,57 +315,151 @@
     text-overflow: ellipsis;
 }
 
-.dataSide {
+.sample {
     display: flex;
-    width: 1.3em;
-    flex: none;
-    flex-direction: column;
-    margin-top: 0.2em;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    font-family: Arial;
 }
 
-.sideBox {
+.cover {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.sampleBlock {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    width: 12em;
+    border-radius: 4px;
+    box-shadow: 0 12px 20px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.sampleTitle {
+    display: flex;
+    justify-content: center;
+    flex: auto;
+    background-color: #445167;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 0.1em 0;
+}
+
+.sampleTitle span {
+    font-size: 1.125rem;
+    color: #fff;
+}
+
+.sampleTop {
+    display: flex;
+    justify-content: center;
+    flex: auto;
+    margin-top: 0.4em;
+}
+
+.sampleTop span {
+    font-size: 1.125rem;
+}
+
+.sampleTable {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    margin: 0.5em 0.4em;
+}
+
+.sampleHeader {
+    display: flex;
+    padding: 0.15em 0;
+    padding-left: 0.3em;
+    border-bottom: solid 1px #c4cbd7;
+}
+
+.sampleHeader span {
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.sampleRow {
     display: flex;
     border: solid 1px #c4cbd7;
-    border-right: none;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.sideBlock {
-    display: flex;
-    flex: none;
-    margin: 0.8em 0;
-    justify-content: center;
-    position: relative;
-    cursor: pointer;
-    flex-direction: column;
+    border-top: none;
+    flex: 0 0 0.4em;
     align-items: center;
+    cursor: pointer;
 }
 
-.sideBlock span{
-    font-size: 0.875rem;
-    color: #9b9b9b;
-    text-align: center;
+.sampleRow span {
+    font-size: 0.75rem;
 }
 
-.sideLine {
-    position: absolute;
-    top: -1.4em;
-    max-height: 1.2em;
-    overflow: hidden;
+.sampleCell {
     display: flex;
+    flex: 1 1 0;
+    width: 0;
 }
 
-.sideLine span {
-    writing-mode: tb-rl;
+.sampleDesc {
+    flex: 2 1 0;
+}
+
+.sampleCell span {
     white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-.sideBlock.active span{
-    color: #1d2b3c;
-}
-
-.sideIcon {
+.sampleRadio {
     display: flex;
-    margin: 0.1em;
+    flex: 0 0 0.3em;
+    justify-content: center;
+}
+
+.sampleButton {
+    display: flex;
+    margin-top: 0.3em;
+    justify-content: center;
+}
+
+.submit {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    padding: 0.1em 0.2em;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.submit span {
+    font-size: 1rem;
+}
+
+.close {
+    display: flex;
+    position: absolute;
+    right: 0;
+    padding: 0 0.2em;
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: not-allowed;
 }

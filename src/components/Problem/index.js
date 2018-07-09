@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-// import classnames from 'classnames';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Radio } from 'antd';
 import Hint from '../Common/Hint';
-import { when } from 'mobx';
+import ContinueButton from '../Common/ContinueButton';
+// import { when } from 'mobx';
+import { Input } from 'antd';
+const { TextArea } = Input;
 
 const RadioGroup = Radio.Group;
 const selectable = [
@@ -12,63 +14,74 @@ const selectable = [
     {value: 'Regression', type: 'Continuous Values (Regression)', detail: (<p>To predict a continuous/numeric value (e.g. cost of a purchase)</p>)},
 ];
 
-@inject('userStore', 'projectStore')
+// @inject('userStore', 'projectStore')
 @observer
 class Problem extends Component {
 
-    constructor(props) {
-        super(props);
-        const {pid} = props.match.params || {};
-        this.pid = pid ? parseInt(pid, 10) : 0;
+    // constructor(props) {
+    //     super(props);
+    //     const {pid} = props.match.params || {};
+    //     this.pid = pid ? parseInt(pid, 10) : 0;
         
-        when(
-            () => props.userStore.userId && !props.userStore.isLoad,
-            () => props.projectStore.init(props.userStore.userId, this.pid)
-        )
-    }
+    //     when(
+    //         () => props.userStore.userId && !props.userStore.isLoad,
+    //         () => props.projectStore.init(props.userStore.userId, this.pid)
+    //     )
+    // }
 
     problemTypeChange = e => {
-        this.props.projectStore.project.updateProject({problemType: e.target.value});
-    
+        this.props.project.changeProjectType = e.target.value;
     }
 
     nextStep = () => {
-        this.props.projectStore.project.nextMainStep(2);
-        this.props.history.push(`/data/${this.pid}`);
+        this.props.project.saveProblem();
+        // this.props.history.push(`/data/${this.pid}`);
     }
 
     test = () => {
         this.props.project.sendTest();
     }
 
+    onChange = (type, e) => {
+        this.props.project[type] = e.target.value;
+    }
+
     render() {
-        const {problemType} = this.props.projectStore.project || {};
+        const {changeProjectType, statement, business} = this.props.project || {};
         return <div className={styles.problem}>
             <div>
-                <div><span>Describe your business problem.</span></div>
-                <div>
-                    <span>Industry</span>
+                <div className={styles.title}><span>Describe your business problem.</span></div>
+                <div className={styles.textBox}>
+                    <div className={styles.text}><span>Problem Statement</span></div>
+                    <TextArea 
+                        defaultValue={statement}
+                        className={styles.textarea} 
+                        onChange={this.onChange.bind(this,"statement")} 
+                        rows={6} 
+                        placeholder='<Problem statement>  e.g. Predict important customers who might churn in the next 30 days so that customer service department can take effectively target and retain these customers.'/>
                 </div>
-                <div>
-                    <span>Business Function</span>
+                <div className={styles.textBox}>
+                    <div className={styles.text}><span>Business Value</span></div>
+                    <TextArea 
+                        defaultValue={business}
+                        className={styles.textarea} 
+                        onChange={this.onChange.bind(this,"business")} 
+                        rows={6} 
+                        placeholder='<Business value> e.g. This will help proactively retain important customers. Acquiring a new customer is not costlier than retain an existing customer. It is critial to maintain customer satisfaction and loyalty to sustain good revenue opportunity and a strong market presence.'/>
                 </div>
-                <div>
-                    <span>Problem Statement</span>
+                <div className={styles.title}><span>Choose Problem Type</span></div>
+                <div className={styles.radioBox}>
+                    <div className={styles.text}><span>Prediction</span></div>
+                    <RadioGroup className={styles.radio} value={changeProjectType} onChange={this.problemTypeChange}>
+                        {selectable.map((content, index) => (
+                            <Radio key={index} value={content.value}>
+                            {content.type}
+                            <Hint content={content.detail} placement="right" />
+                            </Radio>
+                        ))}
+                    </RadioGroup>
                 </div>
-                <div>
-                    <span>Business Value</span>
-                </div>
-                <RadioGroup value={problemType} onChange={this.problemTypeChange}>
-                {selectable.map((content, index) => (
-                    <Radio key={index} value={content.value}>
-                    {content.type}
-                    <Hint content={content.detail} placement="right" />
-                    </Radio>
-                ))}
-                </RadioGroup>
-                <div>
-                    <button onClick={this.nextStep}>Continue</button>
-                </div>
+                <ContinueButton onClick={this.nextStep} disabled={!changeProjectType} text="Continue" />
             </div>
         </div>
     }

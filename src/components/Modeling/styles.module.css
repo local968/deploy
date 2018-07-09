@@ -9,13 +9,12 @@
     display: flex;
     flex: auto;
     flex-direction: column;
-    margin: 0 1.85em;
+    padding: 0 10%;
 }
 
 .modelResult span {
     font-size: 1.125rem;
     display: flex;  
-    flex: none;
     font-family: SanFranciscoText;
     line-height: normal;
     align-items: baseline;
@@ -31,7 +30,7 @@
 .box {
     display: flex;
     flex-direction: column;
-    flex: none;
+    flex: 1 0;
 }
 
 .title {
@@ -139,14 +138,17 @@
 
 .performanceBox {
     display: flex;
+    flex: 1 0;
+    justify-content: center;
 }
 
 .performance {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-left: 0.9em; 
+    margin-left: 0.2em; 
     margin-top: 0.2em;
+    justify-content: center;
 }
 
 .performance path:last-child {
@@ -236,7 +238,6 @@
     flex-direction: column;
     flex: none;
     border: solid 0.5px #979797;
-    max-height: 3.3em;
 }
 
 .rowData {
@@ -246,12 +247,15 @@
     align-items: center;
 }
 
+.rowBox {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+}
+
 .cell span {
     font-size: 0.875rem;
-    max-width: 100%;
-    overflow: hidden;
-    display: block;
-    text-overflow: ellipsis;
+    text-overflow: clip;
     white-space: nowrap;
 }
 
@@ -264,6 +268,8 @@
     display: flex;
     flex-direction: column;
     padding: 0.2em 0;
+    overflow: auto;
+    max-height: 5em;
 }
 
 .cell {
@@ -273,8 +279,9 @@
     align-items: center;
     padding: 0.08em 0;
     border-bottom: 1px solid #979797;
-    min-width: 1.3em;
-    margin: 0 0.1em;
+    min-width: 1.4em;
+    margin: 0 0.05em;
+    position: relative;
 }
 
 .cell .progress span {
@@ -292,7 +299,7 @@
 }
 
 .predict {
-    width: 3.7em;
+    width: 3.1em;
     border: none;
 }
 
@@ -316,4 +323,203 @@
     align-items: center;
     position: absolute;
     left: 0.05em;
+}
+
+.rmsePerformance,
+.r2Performance {
+    display: flex
+}
+
+.rmsePerformance span {
+    font-size: 2.2rem;
+    color: #adaafc;
+}
+
+.r2Performance span {
+    font-size: 2.2rem;
+    color: #9be44b;
+}
+
+.loading {
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.error {
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.error span {
+    font-size: 3rem;
+}
+
+.training {
+    display: flex;
+    width: 8em;
+}
+
+.trainingProgress {
+    text-align: center;
+}
+
+.trainingText {
+    display: flex;
+}
+
+.trainingText span {
+    font-size: 1.5rem;
+}
+
+.modelStart {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    padding: 0 10%;
+}
+
+.startTitle {
+    display: flex;
+    margin: 0.45em 0;
+    font-family: HelveticaNeue;
+}
+
+.startTitle span {
+    font-size: 1.5rem;
+}
+
+.trainBox {
+    display: flex;
+    flex-direction: column;
+    width: 4.5em;
+    height: 4.5em;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    border: solid 1px #c4cbd7;
+    position: relative;
+}
+
+.train {
+    display: flex;
+    flex: 0 0 0.4em;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    width: 100%;
+    border: none;
+    outline: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.train span {
+    font-family: Arial;
+    font-size: 1rem;
+    color: #ffffff;
+    display: flex;
+}
+
+.trainBlock {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    align-items: center;
+}
+
+.trainRecommend {
+    display: flex;
+    position: absolute;
+    left: 0.3em;
+    top: 0.2em;
+}
+
+.trainRecommend span {
+    font-size: 0.875rem;
+}
+
+.trainImg {
+    display: flex;
+    margin-top: 1.1em;
+    flex: none;
+}
+
+.trainName {
+    display: flex;
+    justify-content: center;
+    margin: 0.2em 0;
+}
+
+.trainName span {
+    display: flex;
+    font-size: 1.5rem;
+}
+
+.trainDesc {
+    display: flex;
+    justify-content: center;
+    margin: 0.13em 0.5em;
+}
+
+.trainDesc span {
+    font-size: 0.875rem;
+    display: flex;
+    line-height: 1.43;
+    color: #747473;
+}
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    padding: 0.1em 0;
+}
+
+.detailRow {
+    display: flex;
+    padding: 0 0.25em;
+    flex: none;
+    align-items: center;
+}
+
+.detailRow span {
+    font-size: 0.875rem;
+    overflow: hidden;
+    max-width: 100%;
+    display: block;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.detailName {
+    display: flex;
+    flex: 0 0 1em;
+    width: 1em;
+}
+
+.detailNum {
+    display: flex;
+    flex: 0 0 1em;
+    margin-left: 0.1em;
+}
+
+.detailProcess {
+    height: 0.875rem;
+    background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
+    border-radius: 0.875rem;
+}
+
+.center {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-top: 0.1em;
 }

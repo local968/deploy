@@ -5,7 +5,6 @@ import { withRouter } from 'react-router';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
-import config from "../../../config.js";
 import notificationIcon from './notification.svg';
 import loginIcon from "./login.svg";
 import projectActiveIcon from './project-d1.svg';
@@ -98,17 +97,17 @@ class ProjectHeader extends Component {
   }
 
   enter = (index) => {
-    const {history, projectStore} = this.props;
+    const {projectStore} = this.props;
     let maxStep = projectStore.project.mainStep;
     if(index > maxStep) return;
     projectStore.project.nextMainStep(index)
-    history.push("/"+step[index]+"/"+projectStore.project.projectId)
+    // history.push("/"+step[index]+"/"+projectStore.project.projectId)
   }
 
   render() {
-    const {pathname, userStore} = this.props;
+    const {userStore, projectStore} = this.props;
     
-    const current = step.findIndex(v => pathname.includes(v));
+    const {curStep} = projectStore.project || {}
 
     return <div className={styles.header}>
       <div className={styles.menu}>
@@ -120,12 +119,12 @@ class ProjectHeader extends Component {
             line = <div className={styles.line}><span>-----------------------------------------------</span></div>
           }
           return <div key={k} onClick={this.enter.bind(this,k)} className={classnames(styles.item,{
-            [styles.current]: current===k,
-            [styles.active]: current>=k
+            [styles.current]: curStep===k,
+            [styles.active]: curStep>=k
           })}>
             <div className={styles.iconBlock}>
               <div className={styles.icon}>
-                {imgs[v+(current>=k?"Active":"")]}
+                {imgs[v+(curStep>=k?"Active":"")]}
               </div>
               {line}
               <div className={styles.iconText}>
@@ -184,12 +183,12 @@ class WelcomeHeader extends Component{
 const LoginHeader = (props) => (
   <div className={styles.header}>
     <div className={styles.wheader}><span className={styles.welcome}>Welcome to R2.ai</span></div>
-    {config.openResiger && <div className={styles.auth} onClick={() => props.pathname==="/"?
+    <div className={styles.auth} onClick={() => props.pathname==="/"?
           props.history.push("/signup"):
           props.history.push("/")}>
             <div className={styles.loginIcon}><img src={loginIcon} alt='login' /></div>
             <span>{props.pathname==="/"?"Sign Up":"Sign In"}</span>
-    </div>}
+    </div>
   </div>
 )
 
@@ -199,9 +198,13 @@ const LoginHeader = (props) => (
 export default class Header extends Component {
 
   render() {
-    const isHome = this.props.history.location.pathname === "/" || false;
+    const isHome = this.props.history.location.pathname === "/";
     const isDeploy = this.props.history.location.pathname.startsWith("/deploy");
     const userId = this.props.userStore.userId;
-    return (!userId&&<LoginHeader pathname={this.props.history.location.pathname} history={this.props.history} />) ||(isHome && <WelcomeHeader history={this.props.history} />) || (isDeploy && <NormalHeader />) || <ProjectHeader history={this.props.history} pathname={this.props.history.location.pathname} />;
+
+    if(!userId) return <LoginHeader pathname={this.props.history.location.pathname} history={this.props.history} />
+    if(isHome) return <WelcomeHeader history={this.props.history} />
+    if(isDeploy) return <NormalHeader />
+    return <ProjectHeader history={this.props.history} />;
   }
 } 

@@ -12,7 +12,7 @@ local function _query(userId, projectId)
     if #result == 1 then
         return {userId=result[1][1],projectId=result[1][2],args=result[1][3]}
     else
-        return {};
+        return nil;
     end
 end
 
@@ -35,19 +35,17 @@ local function change(self)
     local data = self.data
 
     local result = _query(data.userId, data.projectId)
-    
-    if #result == 0 then 
+
+    if result == nil then 
         _upsert(data.userId, data.projectId, data.args)
     else
-        for k, v in pairs(result) do
-            local args = data.args;
-            for key, value in pairs(v.args) do
-                if not (args[key]) then
-                    args[key] = value
-                end
+        local args = data.args;
+        for key, value in pairs(result.args) do
+            if args[key] == nil then
+                args[key] = value
             end
-            _upsert(data.userId, data.projectId, args)
         end
+        _upsert(data.userId, data.projectId, args)
     end
 
     return self:render{

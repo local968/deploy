@@ -11,13 +11,13 @@ export default ({
   onChange,
   value,
   dropdownClassName,
-  selectOption,
-  className
+  disabled,
+  selectOption
 }) => {
   if (options) {
     return (
       <div
-        className={classnames(styles.selector, className, {
+        className={classnames(styles.selector, {
           [styles.notAuto]: width !== 'auto'
         })}
       >
@@ -29,6 +29,7 @@ export default ({
             })}
             onChange={onChange}
             value={value}
+            disabled={disabled}
             filterOption={(input, option) =>
               option.props.children
                 .toLowerCase()
@@ -48,7 +49,7 @@ export default ({
     );
   } else {
     return (
-      <div className={classnames(styles.selector, className)}>
+      <div className={classnames(styles.selector)}>
         <span className={styles.selectTitle}>{title}</span>
         <div
           style={width ? { width: 'auto' } : {}}

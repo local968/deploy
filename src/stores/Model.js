@@ -5,11 +5,13 @@ export default class Model{
     @observable backend;
     @observable featureImportance;
     @observable recommend = false;
+    @observable executeSpeed = 0;
+    @observable name = "";
+    @observable predicted = [];
 
-    constructor(userId, projectId, backend, model) {
+    constructor(userId, projectId, model) {
         this.userId = userId;
         this.projectId = projectId;
-        this.backend = backend;
         Object.assign(this, model);
     }
 }

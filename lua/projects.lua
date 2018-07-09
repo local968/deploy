@@ -21,17 +21,6 @@ local function _upsert(userId,projectId,args)
     table:upsert({userId,projectId,args},{{"=",3,args}});
 end
 
-local function insertTestRow()
-    local test_data = {
-        {'ty',4,{a=1,b=2,c=3,d=4}},
-        {'cc',4,{a=1,b=2,c=3,d=4}},
-    }
-    for k,v in pairs(test_data) do
-        table:insert(v)
-    end
-    return true
-end
-
 local function query(self)
     local data = self.data
 
@@ -90,7 +79,7 @@ local function change(self)
         for k, v in pairs(result) do
             local args = data.args;
             for key, value in pairs(v.args) do
-                if not (args[key]) then
+                if args[key] == nil then
                     args[key] = value
                 end
             end
@@ -98,6 +87,27 @@ local function change(self)
         end
     end
 
+    return self:render{
+        data = {
+            status = 200,
+            msg = "ok"
+        }
+    }
+end
+
+local function changeProblemType(self)
+    local data = self.data;
+    clean.backToProblemType(data.userId, data.projectId)
+
+    return self:render{
+        data = {
+            status = 200,
+            msg = "ok"
+        }
+    }
+end
+
+local function train(self)
     return self:render{
         data = {
             status = 200,
@@ -114,4 +124,6 @@ return function(server)
     server:addMessage({type='queryProjects'},query)
     server:addMessage({type='deleteProjects'},delete)
     server:addMessage({type='changeProject'},change)
+    server:addMessage({type='changeProblemType'},changeProblemType)
+    server:addMessage({type='train'},train)
 end

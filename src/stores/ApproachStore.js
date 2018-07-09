@@ -1,8 +1,5 @@
 import db from './db.js';
-import { observable, action, computed, autorun } from 'mobx';
-import Approach from './Approach.js';
-import config from '../config.js';
-import socketStore from './SocketStore.js'
+import { observable } from 'mobx';
 
 const _cache = {};
 
@@ -11,41 +8,6 @@ class ApproachStore {
 
   constructor(){
     this.approachTable = db('approaches');
-    this.initCallback();
-  }
-
-  @action
-  init(projectId, approachId) {
-    if(config.database === "tarantool"){
-        autorun(reaction => {
-            if (!socketStore.isready) return;
-            socketStore.send("queryApproach", {userId: this.userId, projectId: projectId, approachId:approachId})
-            reaction.dispose();
-        })
-    }else{
-        this.approachTable
-            .find({userId: this.userId, projectId: projectId, approachId:approachId})
-            .fetch()
-            .subscribe( approach => {
-                this.approach = new Approach(this.userId, projectId, approachId, approach);
-            })
-    }
-  }
-
-  @computed
-  get userId() {
-      return "devUser";
-  }
-
-  initCallback() {
-    const callback = {
-      queryApproach: data => {
-        const approach = data.list[0];
-        this.approaches = new Approach(this.userId, this.projectId, approach.approachId, approach.args);
-      }
-    }
-
-    socketStore.addMessageArr(callback);
   }
 
   getApproach = projectId =>
