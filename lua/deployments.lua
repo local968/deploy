@@ -9,6 +9,7 @@ local space = "deployments"
 local fields = {
   "id",
   "userId",
+  "projectId",
   "projectName",
   "modelName",
   "modelType",
@@ -127,6 +128,8 @@ return function(server, api)
       local userId = userResult[2]
       self.data.tuple.userId = userId
       self.data.tuple.id = common.createUUID()
+      self.data.tuple.createdDate = os.time()
+      self.data.tuple.updatedDate = os.time()
       local request = {
         space = space,
         type = "insert",
@@ -150,6 +153,7 @@ return function(server, api)
       end
       local userId = userResult[2]
       self.data.tuple.userId = userId
+      self.data.tuple.updatedDate = os.time()
       local request = {
         space = space,
         type = "replace",
@@ -164,7 +168,6 @@ return function(server, api)
     {type = "searchDeploy"},
     function(self)
       local userResult = conn.getConnid(self.connid)
-      dump(userResult)
       -- local userResult = {1, "tytytytytyt"}
       if not userResult then
         local result = self.data
@@ -220,6 +223,7 @@ return function(server, api)
   -- rule {isRequired, type}
   api["newDeploy"] = {
     ["tuple"] = {true, "object"},
+    ["tuple.projectId"] = {true, "string"},
     ["tuple.projectName"] = {true, "string"},
     ["tuple.modelName"] = {true, "string"},
     ["tuple.modelType"] = {true, "string"},
@@ -229,6 +233,7 @@ return function(server, api)
   api["updateDeploy"] = {
     ["tuple"] = {true, "object"},
     ["tuple.id"] = {true, "string"},
+    ["tuple.projectId"] = {true, "string"},
     ["tuple.projectName"] = {true, "string"},
     ["tuple.modelName"] = {true, "string"},
     ["tuple.modelType"] = {true, "string"},
