@@ -11,9 +11,10 @@ import fileIcon from './icon-file-local.svg';
 import onceIcon from './icon-once.svg';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
-import List from './list';
+// import List from './list';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from 'components/Common/Uploader';
+import BButton from 'components/Common/BlackButton';
 
 const Option = Select.Option;
 
@@ -38,7 +39,7 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-@inject('deployStore')
+@inject('deployStore', 'routing')
 @observer
 export default class Performance extends Component {
   @observable dialog = null;
@@ -51,127 +52,126 @@ export default class Performance extends Component {
   show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
   render() {
-    const { deployStore } = this.props;
+    const { deployStore, routing, match } = this.props;
     const cd = deployStore.currentDeployment;
     const cdpo = cd.performanceOptions;
 
     return (
       <div className={styles.performance}>
-        {cdpo.enable && (
+        {/* {cdpo.enable && (
           <List cd={cd} cdpo={cdpo} selectionOption={this.selectionOption} />
+        )} */}
+        {/* {!cdpo.enable && (
+          <React.Fragment> */}
+        <div className={styles.block}>
+          <span className={styles.label}>
+            <span className={styles.text}>Model</span>
+          </span>
+          <div className={styles.selections}>
+            <span className={styles.modelName}>{cd.modelName}</span>
+            {/* <img alt="model" src={infoIcon} className={styles.infoIcon} /> */}
+          </div>
+        </div>
+        <div className={styles.block}>
+          <span className={styles.label}>
+            <span className={styles.text}>Validation Data Definition</span>
+            {/* <img src={helpIcon} alt="help" className={styles.helpIcon} /> */}
+          </span>
+          <div className={styles.selections}>
+            <img
+              className={styles.downloadIcon}
+              src={downloadIcon}
+              alt="download"
+            />
+            <a className={styles.download} href={deployStore.dataDefinition}>
+              Download
+            </a>
+          </div>
+        </div>
+        <DataSource
+          cd={cd}
+          cdpo={cdpo}
+          selectionOption={this.selectionOption}
+          show={this.show}
+        />
+        {cdpo.source && (
+          <MeasurementMetric
+            cdpo={cdpo}
+            type={cd.modelType}
+            selectionOption={this.selectionOption}
+          />
         )}
-        {!cdpo.enable && (
-          <React.Fragment>
-            <div className={styles.block}>
+        {cdpo.source && (
+          <MetricThreshold
+            cdpo={cdpo}
+            type={cd.modelType}
+            selectionOption={this.selectionOption}
+          />
+        )}
+        {cdpo.source && (
+          <DeployFrequency
+            cdpo={cdpo}
+            selectionOption={this.selectionOption}
+            show={this.show}
+          />
+        )}
+        {cdpo.frequency && (
+          <div className={styles.block}>
+            <div className={styles.selections}>
               <span className={styles.label}>
-                <span className={styles.text}>Model</span>
+                <span className={styles.text} />
               </span>
-              <div className={styles.selections}>
-                <span className={styles.modelName}>{cd.modelName}</span>
-                {/* <img alt="model" src={infoIcon} className={styles.infoIcon} /> */}
+              <div
+                className={styles.save}
+                onClick={() => {
+                  if (cdpo.frequency) {
+                    this.selectionOption('enable', true)();
+                    routing.push(`/deploy/project/${match.params.id}/status`);
+                  }
+                }}
+              >
+                <BButton className={styles.saveText}>DONE</BButton>
               </div>
             </div>
-            <div className={styles.block}>
-              <span className={styles.label}>
-                <span className={styles.text}>Validation Data Definition</span>
-                {/* <img src={helpIcon} alt="help" className={styles.helpIcon} /> */}
-              </span>
-              <div className={styles.selections}>
-                <img
-                  className={styles.downloadIcon}
-                  src={downloadIcon}
-                  alt="download"
-                />
-                <a
-                  className={styles.download}
-                  href={deployStore.dataDefinition}
-                >
-                  Download
-                </a>
-              </div>
-            </div>
-            <DataSource
-              cd={cd}
-              cdpo={cdpo}
-              selectionOption={this.selectionOption}
-              show={this.show}
-            />
-            {cdpo.source && (
-              <MeasurementMetric
-                cdpo={cdpo}
-                type={cd.modelType}
-                selectionOption={this.selectionOption}
-              />
-            )}
-            {cdpo.source && (
-              <MetricThreshold
-                cdpo={cdpo}
-                type={cd.modelType}
-                selectionOption={this.selectionOption}
-              />
-            )}
-            {cdpo.source && (
-              <DeployFrequency
-                cdpo={cdpo}
-                selectionOption={this.selectionOption}
-                show={this.show}
-              />
-            )}
-            {cdpo.frequency && (
-              <div className={styles.block}>
-                <div className={styles.selections}>
-                  <span className={styles.label}>
-                    <span className={styles.text} />
-                  </span>
-                  <div
-                    className={styles.save}
-                    onClick={() => {
-                      if (cdpo.frequency)
-                        this.selectionOption('enable', true)();
-                    }}
-                  >
-                    <span className={styles.saveText}>DONE</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            <DatabaseConfig
-              options={cdpo.sourceOptions}
-              visible={this.dialog === 'databasesource'}
-              validation
-              onClose={this.closeDialog}
-              title="Validation Data Source - Database"
-              onSubmit={action(options => {
-                cdpo['source'] = 'database';
-                cdpo['sourceOptions'] = options;
-                cd.save();
-                this.closeDialog();
-              })}
-            />
-            <OneTime
-              options={cdpo.frequencyOptions}
-              visible={this.dialog === 'onetime'}
-              onClose={this.closeDialog}
-              onSubmit={action(options => {
-                cdpo['frequency'] = 'once';
-                cdpo['frequencyOptions'] = options;
-                cd.save();
-                this.closeDialog();
-              })}
-            />
-            <AutoRepeat
-              options={cdpo.frequencyOptions}
-              visible={this.dialog === 'autorepeat'}
-              onClose={this.closeDialog}
-              onSubmit={action(options => {
-                cdpo['frequency'] = 'repeat';
-                cdpo['frequencyOptions'] = options;
-                cd.save();
-                this.closeDialog();
-              })}
-            />
-          </React.Fragment>
+          </div>
         )}
+        <DatabaseConfig
+          options={cdpo.sourceOptions}
+          visible={this.dialog === 'databasesource'}
+          validation
+          onClose={this.closeDialog}
+          title="Validation Data Source - Database"
+          onSubmit={action(options => {
+            cdpo['source'] = 'database';
+            cdpo['sourceOptions'] = options;
+            cd.save();
+            this.closeDialog();
+          })}
+        />
+        <OneTime
+          options={cdpo.frequencyOptions}
+          visible={this.dialog === 'onetime'}
+          onClose={this.closeDialog}
+          onSubmit={action(options => {
+            cdpo['frequency'] = 'once';
+            cdpo['frequencyOptions'] = options;
+            cd.save();
+            this.closeDialog();
+          })}
+        />
+        <AutoRepeat
+          options={cdpo.frequencyOptions}
+          visible={this.dialog === 'autorepeat'}
+          onClose={this.closeDialog}
+          onSubmit={action(options => {
+            cdpo['frequency'] = 'repeat';
+            cdpo['frequencyOptions'] = options;
+            cd.save();
+            this.closeDialog();
+          })}
+        />
+        {/* </React.Fragment>
+        )} */}
       </div>
     );
   }

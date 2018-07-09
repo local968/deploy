@@ -25,6 +25,9 @@
   position: relative;
   cursor: pointer;
 }
+.tab:last-child {
+  margin-right: 0;
+}
 .tab.active {
   border-color: #1d2b3c;
   background: white;

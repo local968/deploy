@@ -17,6 +17,7 @@ import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from 'components/Common/Uploader';
+import BButton from 'components/Common/BlackButton';
 
 const ordinalNumberPostFix = number => {
   if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
@@ -39,7 +40,7 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-@inject('deployStore')
+@inject('deployStore', 'routing')
 @observer
 export default class Deployment extends Component {
   @observable dialog = null;
@@ -75,7 +76,7 @@ export default class Deployment extends Component {
   closeDialog = action(() => (this.dialog = null));
 
   render() {
-    const { deployStore } = this.props;
+    const { deployStore, routing, match } = this.props;
     const cd = deployStore.currentDeployment;
     const cddo = cd.deploymentOptions;
     return (
@@ -141,13 +142,27 @@ export default class Deployment extends Component {
               selectionOption={this.selectionOption}
             />
           )}
-        {/* {cddo.option !== 'api' && (
-          <div className={styles.save} onClick={cd.save}>
-            <span className={styles.saveText}>
-              SAVE & SETUP {!cddo.frequency && 'LATER'}
-            </span>
+        {cddo.option !== 'api' && (
+          <div className={styles.done}>
+            <div className={styles.selections}>
+              <span className={styles.label}>
+                <span className={styles.text} />
+              </span>
+              <div
+                className={styles.save}
+                onClick={() => {
+                  if (cddo.frequency) {
+                    routing.push(
+                      `/deploy/project/${match.params.id}/operation`
+                    );
+                  }
+                }}
+              >
+                <BButton className={styles.saveText}>DONE</BButton>
+              </div>
+            </div>
           </div>
-        )} */}
+        )}
         <DatabaseConfig
           options={cddo.sourceOptions}
           visible={this.dialog === 'databasesource'}

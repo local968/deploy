@@ -7,9 +7,11 @@ import classnames from 'classnames';
 import deploymentIcon from './icon-tab-deployment.svg';
 import operationIcon from './icon-tab-operation.svg';
 import performanceIcon from './icon-tab-performance.svg';
+import statusIcon from './icon-tab-performance.svg';
 import Deployment from './Deployment';
 import Operation from './Operation';
 import Performance from './Performance';
+import Status from './Status';
 import styles from './styles.module.css';
 
 @inject('routing', 'deployStore')
@@ -64,6 +66,17 @@ export default class Detail extends Component {
             />
             <span className={styles.text}>Performance Monitor</span>
           </div>
+          <div
+            className={classnames([styles.tab, styles.status], {
+              [styles.active]: location.pathname.indexOf('status') >= 0
+            })}
+            onClick={() =>
+              routing.push(`/deploy/project/${match.params.id}/status`)
+            }
+          >
+            <img className={styles.icon} src={statusIcon} alt="status" />
+            <span className={styles.text}>Performance Status</span>
+          </div>
         </div>
         <div className={styles.content}>
           <Route
@@ -79,6 +92,7 @@ export default class Detail extends Component {
             path="/deploy/project/:id/performance"
             component={Performance}
           />
+          <Route path="/deploy/project/:id/status" component={Status} />
         </div>
         <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>

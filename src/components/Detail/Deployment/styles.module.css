@@ -253,6 +253,10 @@
   font-size: 1rem;
 }
 
+.done {
+  margin-top: 0.37em;
+}
+
 .save {
   width: 3em;
   height: 0.5em;
@@ -262,9 +266,9 @@
   align-items: center;
   border: 1px solid #1d2b3c;
   cursor: pointer;
-  position: absolute;
+  /* position: absolute;
   bottom: 1em;
-  left: 4em;
+  left: 4em; */
   composes: hover from 'style';
 }
 
