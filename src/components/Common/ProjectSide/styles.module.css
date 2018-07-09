@@ -1,6 +1,6 @@
 .projectSide {
     display: flex;
-    width: 1.3em;
+    width: 8%;
     flex: none;
     flex-direction: column;
     margin-top: 0.2em;
@@ -38,6 +38,7 @@
     word-wrap: break-word;
     word-spacing: 5em;
     overflow: hidden;
+    max-width: 80px;
 }
 
 .sideLine {

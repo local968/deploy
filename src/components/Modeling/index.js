@@ -49,11 +49,9 @@ export default class Modeling extends Component {
     getChild = () => {
         const { models, project } = this.props;
         const { train2Error, train2ing, subStepActive } = project;
-        console.log(subStepActive)
         if(subStepActive === 1) return <StartTrain project={project} />
         
         if (train2Error) return <ModelError />;
-        console.log(!models.length, train2ing)
         if (!models.length && train2ing) return <Loading project={project}/>;
         return <ModelResult models={models} project={project} />;
     }

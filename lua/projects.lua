@@ -107,6 +107,15 @@ local function changeProblemType(self)
     }
 end
 
+local function train(self)
+    return self:render{
+        data = {
+            status = 200,
+            msg = "ok"
+        }
+    }
+end
+
 return function(server)
     table = box.space["js_projects"]
     index = box.space["js_projects"].index["primary"]
@@ -116,4 +125,5 @@ return function(server)
     server:addMessage({type='deleteProjects'},delete)
     server:addMessage({type='changeProject'},change)
     server:addMessage({type='changeProblemType'},changeProblemType)
+    server:addMessage({type='train'},train)
 end

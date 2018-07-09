@@ -3,8 +3,9 @@ import { observable, action, computed, when } from 'mobx';
 import Project from './Project.js'
 import socketStore from './SocketStore';
 import { message } from 'antd';
+// import config from '../config.js';
 
-class UserStore{
+class UserStore {
     @observable isLoad = true;
     @observable isInit = true;
     @observable user = {};
@@ -27,15 +28,20 @@ class UserStore{
         zToa: (a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? 1 : -1
     };
 
-    constructor(){
+    constructor() {
         this.initCallback();
+        // if (config.auth === "local") {
+        //     this.isLoad =false;
+        //     this.hasToken = true;
+        //     this.initProjects();
+        // }
 
-        if(!this.userId && this.hasToken){
+        if (!this.userId && this.hasToken) {
             when(
                 () => socketStore.isready,
                 () => this.tryLoginByToken()
             )
-        }else{
+        } else {
             this.isInit = false
         }
     }
@@ -47,20 +53,21 @@ class UserStore{
 
     @computed
     get userId() {
-        return this.user?this.user.email:"";
+        // if (config.auth === "local") return 'devUser'
+        return this.user ? this.user.email : "";
     }
 
     @computed
     get sortProjects() {
-        const {perPage, currentPage, keywords, sort} = this.toolsOption;
+        const { perPage, currentPage, keywords, sort } = this.toolsOption;
         let result = [...this.projects];
         // console.log(result)
         result = result.filter(row => {
-            return row&&row.name.includes(keywords);
+            return row && row.name.includes(keywords);
         })
         result = result.sort(this.sortFunction[sort])
         const start = (currentPage - 1) * perPage;
-        return result.slice(start,start + perPage);
+        return result.slice(start, start + perPage);
     }
 
     @action
@@ -68,10 +75,10 @@ class UserStore{
         this.isLoad = true;
         when(
             () => socketStore.isready,
-            () => socketStore.send("queryProjects", {userId: this.userId})
+            () => socketStore.send("queryProjects", { userId: this.userId })
         )
     }
-    
+
     @action
     changeOption(k, v) {
         this.toolsOption[k] = v;
@@ -89,16 +96,16 @@ class UserStore{
         this.projects = this.projects.filter(project => !ids.includes(project.projectId))
         when(
             () => socketStore.isready,
-            () => socketStore.send("deleteProjects", {userId:this.userId, ids})
+            () => socketStore.send("deleteProjects", { userId: this.userId, ids })
         )
     }
 
     getNextId() {
-        if(this.userSetting.projectId) {
+        if (this.userSetting.projectId) {
             return this.userSetting.projectId;
         }
         let maxId = 0;
-        for(let project of this.projects){
+        for (let project of this.projects) {
             maxId = project.projectId > maxId ? project.projectId : maxId;
         }
         return maxId + 1;
@@ -106,7 +113,7 @@ class UserStore{
 
     initCallback() {
         const callback = {
-            queryProjects : data => {
+            queryProjects: data => {
                 const projects = data.list;
                 this.userSetting = data.setting || {};
                 this.projects = projects.map(project => {
@@ -115,9 +122,9 @@ class UserStore{
                 this.isLoad = false;
                 this.isInit = false;
             },
-            login : data => {
-                const {status, err, user} = data;
-                if(status !== 200){
+            login: data => {
+                const { status, err, user } = data;
+                if (status !== 200) {
                     this.clearToken();
                     this.isInit = false;
                     this.isLoad = false;
@@ -128,8 +135,8 @@ class UserStore{
                 this.initProjects();
             },
             register: data => {
-                const {status, err, user} = data;
-                if(status !== 200){
+                const { status, err, user } = data;
+                if (status !== 200) {
                     this.clearToken();
                     this.isLoad = false;
                     return message.error(err);
@@ -145,7 +152,7 @@ class UserStore{
 
     tryLoginByToken() {
         let token = window.localStorage.getItem("deploy2-token");
-        this.login({token});
+        this.login({ token });
     }
 
     setCache(user) {
@@ -181,7 +188,7 @@ class UserStore{
 
     logout() {
         when(
-            () => socketStore.isready&&this.userId,
+            () => socketStore.isready && this.userId,
             () => {
                 socketStore.send("logout")
                 this.clearToken();

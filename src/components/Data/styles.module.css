@@ -10,7 +10,7 @@
     display: flex;
     margin-top: 0.3em;
     flex-direction: column;
-    padding: 0 1.85em;
+    padding: 0 10%;
     flex: auto;
 }
 
@@ -132,7 +132,7 @@
     margin-top: 0.25em;
     flex-direction: column;
     flex: auto;
-    padding: 0 1.85em;
+    padding: 0 10%;
 }
 
 .schemaInfo {
@@ -401,6 +401,7 @@
     border-top: none;
     flex: 0 0 0.4em;
     align-items: center;
+    cursor: pointer;
 }
 
 .sampleRow span {
@@ -426,6 +427,7 @@
 .sampleRadio {
     display: flex;
     flex: 0 0 0.3em;
+    justify-content: center;
 }
 
 .sampleButton {

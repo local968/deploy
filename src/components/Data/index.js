@@ -228,12 +228,12 @@ class DataConnect extends Component {
 
 class DataSample extends Component {
     state = {
-        select: 0
+        select: -1
     }
 
-    select = (e) => {
+    select = (index) => {
         this.setState({
-            select: e.target.value
+            select: index
         })
     }
 
@@ -241,6 +241,7 @@ class DataSample extends Component {
         const { project, selectSample } = this.props
         const sample = files[project.problemType + "Sample"];
         const file = sample[this.state.select]
+        if(!file) return;
         selectSample(file.filename);
     }
 
@@ -261,13 +262,13 @@ class DataSample extends Component {
                         <div className={styles.sampleCell}><span>Data Size</span></div>
                     </div>
                     {sample.map((row, index) => {
-                        return <div className={styles.sampleRow} key={index}>
-                            <div className={styles.sampleRadio}><input type="radio" name="sampleSelect" onChange={this.select} value={index} /></div>
-                            <div className={styles.sampleCell}><span>{row.usecase}</span></div>
-                            <div className={classnames(styles.sampleCell, styles.sampleDesc)}><span>{row.desc}</span></div>
-                            <div className={styles.sampleCell}><span>{row.filename}</span></div>
-                            <div className={styles.sampleCell}><span>{row.target}</span></div>
-                            <div className={styles.sampleCell}><span>{row.size}</span></div>
+                        return <div className={styles.sampleRow} key={index} onClick={this.select.bind(null, index)}>
+                            <div className={styles.sampleRadio}><input type="radio" name="sampleSelect" checked={this.state.select === index} onChange={this.select.bind(null, index)} /></div>
+                            <div className={styles.sampleCell} title={row.usecase}><span>{row.usecase}</span></div>
+                            <div className={classnames(styles.sampleCell, styles.sampleDesc)} title={row.desc}><span>{row.desc}</span></div>
+                            <div className={styles.sampleCell} title={row.filename}><span>{row.filename}</span></div>
+                            <div className={styles.sampleCell} title={row.target}><span>{row.target}</span></div>
+                            <div className={styles.sampleCell} title={row.size}><span>{row.size}</span></div>
                         </div>
                     })}
                     <div className={styles.sampleButton}>
@@ -305,7 +306,7 @@ class DataSchema extends Component {
     }
 
     checked = (key, e) => {
-        if (e.target.checked) {
+        if (!e.target.checked) {
             this.setState({
                 flag: !this.state.flag,
                 checkList: [...this.state.checkList, key]
@@ -372,14 +373,14 @@ class DataSchema extends Component {
             if (columnIndex === 0) {
                 content = "";
             } else {
-                content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={false}></Checkbox>
+                content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={true}></Checkbox>
                 if (target && target === rawHeader[realColumn]) {
                     cn = classnames(styles.check, styles.target);
                     content = "";
                 }
                 if (checkList.includes(rawHeader[realColumn])) {
                     cn = classnames(styles.check, styles.checked);
-                    content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={true}></Checkbox>
+                    content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={false}></Checkbox>
                 }
             }
             //标题行

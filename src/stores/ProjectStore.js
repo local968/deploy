@@ -88,6 +88,7 @@ class ProjectStore {
 
     @action
     modelimgError(command, result) {
+        // message.error(`${command} error!`)
         console.log("error!!", command, result)
         switch (command) {
             case 'etl':
@@ -101,7 +102,8 @@ class ProjectStore {
     }
 
     setCharts(type, result) {
-        this.charts[type] = result
+        const data = this.charts[type] || [];
+        this.charts[type] = [...(data.filter(i => i.name !== result.name)), result];
         // img : `/api/download?userId=${this.userId}&projectId=${this.projectId}&csvLocation=${imageSavePath}`
         // axios("/api/download",{
         //     params:{userId: this.userId, projectId: this.projectId, csvLocation: imageSavePath}
@@ -147,6 +149,7 @@ class ProjectStore {
                         let [command] = key.split("-");
                         switch (command) {
                             case 'etl':
+                                delete models[key].name
                                 when(
                                     () => this.project,
                                     () => this.project.setProperty(models[key])
@@ -179,13 +182,14 @@ class ProjectStore {
             }),
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
-                const { userId, projectId, command, result, status } = data;
+                let { userId, projectId, command, result, status } = data;
                 if (status < 0) {
                     this.modelimgError(command, result)
                     return;
                 }
                 switch (command) {
                     case 'etl':
+                        delete result.name
                         // this.project.setProperty(result)
                         this.project.updateProject(result)
                         this.next()
@@ -196,9 +200,12 @@ class ProjectStore {
                             projectId,
                             args: {}
                         }
-                        for (let row of result) {
-                            info.args[`${command}-${row.backend}-result`] = row
+                        if(Array.isArray(result)){
+                            [result] = result
                         }
+                        // for (let row of result) {
+                            info.args[`${command}-${result.name}-result`] = result
+                        // }
                         const models = this.saveModel(info)
                         for (let key in models) {
                             let index = this.models.findIndex(m => {
@@ -224,6 +231,17 @@ class ProjectStore {
                     case 'pointToShow':
                         this.setCharts("pointToShow", result);
                         break;
+                    case 'preTrainImportance':
+                        break;
+                    case 'univariatePlot':
+                        this.setCharts("univariatePlot", result);
+                        break;
+                    case 'histgramPlot':
+                        this.setCharts("histgramPlot", result);
+                        break;
+                    case 'modelInsights':
+                        this.setCharts("modelInsights", result);
+                        break;
                     default:
                         break;
                 }
@@ -235,6 +253,9 @@ class ProjectStore {
                 this.models = [];
                 this.charts = [];
                 this.project.backToProblemStep();
+            }),
+            train: action(() => {
+                this.models = [];
             })
         }
 

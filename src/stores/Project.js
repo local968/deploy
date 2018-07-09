@@ -110,7 +110,8 @@ export default class Project {
         let obj;
         if (routeIndex <= this.mainStep) {
             obj = {
-                curStep: routeIndex
+                curStep: routeIndex,
+                subStepActive: 1
             };
         } else (
             obj = {
@@ -161,7 +162,6 @@ export default class Project {
 
     // 修改problemType后执行删除
     changeType() {
-        console.log("changeType")
         when(
             () => socketStore.isready,
             () => socketStore.send("changeProblemType", {userId: this.userId, projectId: this.projectId})
@@ -397,6 +397,11 @@ export default class Project {
             train2Error:false
         });
 
+        when(
+            () => socketStore.isready,
+            () => socketStore.send("train", {userId, projectId})
+        )
+
         const id = `${command}-${userId}-${projectId}`;
         const featureLabel = dataHeader.filter(d => d !== target)
         // this.cleanResultByCommand(this.modelingResultTable, { command: 'train2' });
@@ -539,6 +544,131 @@ export default class Project {
 
         const command = 'pointToShow';
 
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    preTrainImportance() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'preTrainImportance';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    univariatePlot() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'univariatePlot';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    histgramPlot() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'histgramPlot';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    modelInsights() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'modelInsights';
+        const id = `${command}-${userId}-${projectId}`;
+
+        // id: request ID
+        // userId: user ID
+        // projectId: project ID
+        // csv_location: csv 文件相对路径
+        // kwargs:
+        requestStore.sendRequest(id,{
+            csvLocation: uploadFileName,
+            projectId,
+            userId,
+            time: +new Date(),
+            command,
+            version: this.version.toString()
+        });
+    }
+
+    dataView() {
+        const {
+            userId, 
+            projectId, 
+            uploadFileName
+        } = this;
+
+        const command = 'dataView';
         const id = `${command}-${userId}-${projectId}`;
 
         // id: request ID

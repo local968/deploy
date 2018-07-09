@@ -2,7 +2,7 @@
     display: flex;
     flex: auto;
     overflow: auto;
-    padding: 0 1.85em;
+    padding: 0 10%;
     font-family: HelveticaNeue;
     color: #4a4a4a;
 }
