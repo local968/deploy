@@ -39,9 +39,9 @@ return function(server, api)
       end
       local connIds = conn.getConnids(userId)
       -- local connIds = watchers
-      for k, watcherConnId in pairs(watchers) do
-        for _k, connId in pairs(connIds) do
-          if watcherConnId == connId then
+      for _k, connId in pairs(connIds) do
+        for k, watcherConnId in pairs(watchers) do
+          if watcherConnId == connId[1] then
             local request = {
               space = space,
               type = "select",
@@ -51,7 +51,7 @@ return function(server, api)
               index = "userId"
             }
             local result = operate(request)
-            server:sendMessageTo(connId, "watchDeploy", result)
+            server:sendMessageTo(connId[1], "watchDeploy", result)
           end
         end
       end
