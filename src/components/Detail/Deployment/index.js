@@ -143,32 +143,35 @@ export default class Deployment extends Component {
               selectionOption={this.selectionOption}
             />
           )}
-        {cddo.option !== 'api' && (
-          <div className={styles.done}>
-            <div className={styles.selections}>
-              <span className={styles.label}>
-                <span className={styles.text} />
-              </span>
-              <div
-                className={styles.save}
-                onClick={() => {
-                  if (cddo.frequency) {
-                    this.selectionOption('enable', true)();
-                    routing.push(
-                      `/deploy/project/${match.params.id}/operation`
-                    );
-                    DBStore.deploySchedule({
-                      deploymentId: match.params.id,
-                      type: 'deployment'
-                    });
-                  }
-                }}
-              >
-                <BButton className={styles.saveText}>DONE</BButton>
+        {cddo.option !== 'api' &&
+          cddo.source &&
+          cddo.location &&
+          cddo.frequency && (
+            <div className={styles.done}>
+              <div className={styles.selections}>
+                <span className={styles.label}>
+                  <span className={styles.text} />
+                </span>
+                <div
+                  className={styles.save}
+                  onClick={() => {
+                    if (cddo.frequency) {
+                      this.selectionOption('enable', true)();
+                      routing.push(
+                        `/deploy/project/${match.params.id}/operation`
+                      );
+                      DBStore.deploySchedule({
+                        deploymentId: match.params.id,
+                        type: 'deployment'
+                      });
+                    }
+                  }}
+                >
+                  <BButton className={styles.saveText}>DONE</BButton>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         <DatabaseConfig
           options={cddo.sourceOptions}
           visible={this.dialog === 'databasesource'}

@@ -106,8 +106,21 @@ class DeployStore {
     return new Deployment(_deployment || {});
   }
 
-  async newDeploy(projectId, projectName, modelName) {
-    return 'lsdfi23j20jfdlks';
+  async newDeploy(projectId, projectName, modelName, modelType) {
+    const tuple = {
+      deploymentOptions: {},
+      modelName,
+      modelType,
+      projectId,
+      projectName,
+      performanceOptions: {}
+    };
+    const db = await DBStore.ready();
+    const response = await db.newDeploy({ tuple });
+    if (response.status !== 200) {
+      throw new Error(response.message);
+    }
+    return response.result.id;
   }
 
   constructor() {
