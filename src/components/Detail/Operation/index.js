@@ -41,9 +41,13 @@ export default class Operation extends Component {
                     {s.deployment.modelName}
                   </span>
                   <span className={styles.deploymentTime}>
-                    {moment
-                      .unix(s.schedule.actualTime || s.schedule.estimatedTime)
-                      .format('DD/MM/YYYY-hh:mma')}
+                    {isNaN(s.schedule.actualTime || s.schedule.estimatedTime)
+                      ? s.schedule.actualTime || s.schedule.estimatedTime
+                      : moment
+                          .unix(
+                            s.schedule.actualTime || s.schedule.estimatedTime
+                          )
+                          .format('DD/MM/YYYY-hh:mma')}
                   </span>
                   <span className={styles.deploymentStyle}>
                     Predict with{' '}

@@ -73,7 +73,7 @@ return function(server, api)
     space:create_index(
       "deploymentId",
       {
-        parts = {3, "string", 2, "string"},
+        parts = {3, "string", 4, "string", 2, "string"},
         unique = false
       }
     )
@@ -194,7 +194,7 @@ return function(server, api)
         return self:render({data = result})
       end
 
-      local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, userId})
+      local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
         local s = schedules[1]
         self.data.tuple.id = s[1]
