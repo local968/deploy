@@ -71,6 +71,7 @@ class DB {
             })
         );
       };
+      return null;
     });
     this.isReady = true;
     this.emit('apiReady');
@@ -156,7 +157,7 @@ const checkArg = (inputArg, rule) => {
             return (currentLevelArg = false);
           const error = `${currentKey} not exists.`;
           if (errors.indexOf(error) === -1) errors.push(error);
-          return;
+          return null;
         }
         if (defines[0] && value === undefined) {
           const error = `${currentKey} not exists.`;
@@ -169,7 +170,9 @@ const checkArg = (inputArg, rule) => {
           if (errors.indexOf(error) === -1) errors.push(error);
         }
       }
+      return null;
     });
+    return null;
   });
   return errors;
 };

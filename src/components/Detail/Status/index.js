@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { observable, action, runInAction } from 'mobx';
+import { action } from 'mobx';
 import classnames from 'classnames';
 import moment from 'moment';
 import styles from './list.module.css';
@@ -14,9 +14,6 @@ export default class List extends Component {
     this.props.deployStore.currentDeployment.performanceOptions[key] = value;
     this.props.deployStore.currentDeployment.save();
   };
-  constructor(props) {
-    super(props);
-  }
   render() {
     const { deployStore, scheduleStore, routing, match } = this.props;
     const cd = deployStore.currentDeployment;
