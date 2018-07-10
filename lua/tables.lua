@@ -44,7 +44,7 @@ local tables = {
         indexs = {
             {
                 name = "primary",
-                parts = {1,"string"}
+                parts = {1,"string",2,"string"}
             }
         }
     },
@@ -102,7 +102,7 @@ local function initQueue()
 end
 
 return function()
-    -- cleanTables()
+    cleanTables()
     initTables()
     
     -- cleanQueue()

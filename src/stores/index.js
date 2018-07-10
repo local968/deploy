@@ -1,5 +1,5 @@
 import viewStore from './ViewStore';
-import deployStore from './DeployStore';
+import deployStore from './deployStore';
 import scheduleStore from './ScheduleStore';
 import approachStore from './ApproachStore';
 import userStore from './UserStore';

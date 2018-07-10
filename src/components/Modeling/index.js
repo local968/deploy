@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { Progress, Spin } from 'antd';
 import autoIcon from './mr-one-logo-blue.svg';
 import config from '../../config.js'
@@ -153,6 +153,7 @@ class ModelError extends Component {
     }
 }
 
+@inject('DeployStore')
 @observer
 class ModelResult extends Component {
     // onChange = (e) => {
@@ -164,6 +165,13 @@ class ModelResult extends Component {
     selectModel = (model) => {
         this.props.models.forEach(m => m.recommend = false);
         model.recommend = true;
+    }
+
+    deploy = () => {
+        const { models, project } = this.props;
+        const current = models.find((model) => model.recommend);
+        DeployStore.newDeploy(project.projectId,project.name,current.name,current.backend)
+            .then(id =>this.history.push('/deploy/'+id))
     }
 
     render() {
@@ -205,7 +213,7 @@ class ModelResult extends Component {
             <div className={styles.buttonBlock}>
                 <button className={styles.button}><span>Check Model Insights</span></button>
                 <div className={styles.or}><span>or</span></div>
-                <button className={styles.button}><span>Deploy the Model</span></button>
+                <button className={styles.button} onClick={this.deploy}><span>Deploy the Model</span></button>
             </div>
         </div>
     }
