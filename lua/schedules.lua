@@ -20,7 +20,8 @@ local fields = {
   "updatedDate",
   "createdDate",
   "requestId",
-  "result"
+  "result",
+  "solution"
 }
 local common = commonInit(fields)
 
@@ -124,12 +125,14 @@ return function(server, api)
               projectId = deployment[3],
               userId = deployment[2],
               csvLocation = deployment[7].file,
-              command = "deploy2"
+              command = "deploy2",
+              solution = deployment[5]
             }
           }
         )
         queue.tube.taskQueue:put(id)
         tuple.requestId = id
+        tuple.solution = deployment[5]
       end
 
       -- todo: send request
@@ -148,11 +151,10 @@ return function(server, api)
     local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
     for k, _tuple in pairs(progressingSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
-      local results = box.space["modeling_result"]:select({tuple.requestId})
-      if #results > 0 then
-        tuple.result = results[1]
+      local result = box.space["modeling_result"]:select({tuple.requestId, tuple.solution})
+      if #result > 0 then
+        tuple.result = result[1][3].result
         tuple.status = "finished"
-
         local request = {
           space = space,
           type = "replace",
@@ -321,8 +323,10 @@ return function(server, api)
       local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
         local s = schedules[1]
-        self.data.tuple.id = s[1]
-        self.data.tuple.createdDate = s[11]
+        if s[5] == "waiting" or s[5] == "queue" then
+          self.data.tuple.id = s[1]
+          self.data.tuple.createdDate = s[11]
+        end
       end
 
       -- only for once

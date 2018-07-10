@@ -5,7 +5,7 @@ return function(fields)
     end
     local arr = {}
     for k, v in pairs(fields) do
-      if type(obj[v]) == "cdata" then
+      if type(obj[v]) == box.NULL then
         arr[k] = nil
       else
         arr[k] = obj[v]
@@ -21,7 +21,7 @@ return function(fields)
     local obj = {}
     for k, v in pairs(array) do
       if (fields[k]) then
-        if type(v) == "cdata" then
+        if type(v) == box.NULL then
           obj[fields[k]] = nil
         else
           obj[fields[k]] = v
