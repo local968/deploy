@@ -57,12 +57,12 @@ export default class Operation extends Component {
                   </span>
                   <span className={styles.exeuctionSpeed}>
                     {s.schedule.status === 'finished'
-                      ? s.schedule.result.executeSpeed
+                      ? s.schedule.result && s.schedule.result.executeSpeed
                       : ' - '}
                   </span>
                   <span className={styles.dataSize}>
                     {s.schedule.status === 'finished'
-                      ? s.schedule.result.totalLines
+                      ? s.schedule.result && s.schedule.result.totalLines
                       : ' - '}
                   </span>
                   <span className={styles.status}>{s.schedule.status}</span>
