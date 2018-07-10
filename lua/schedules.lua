@@ -123,7 +123,8 @@ return function(server, api)
             {
               projectId = deployment[3],
               userId = deployment[2],
-              csvLocation = deployment[7].file
+              csvLocation = deployment[7].file,
+              command = "deploy"
             }
           }
         )
