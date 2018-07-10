@@ -1,4 +1,5 @@
 import R2WSClient from '../r2ws-client';
+import config from '../config.js';
 
 const debug = true;
 
@@ -31,7 +32,7 @@ class DB {
         this.once('ready', resolve);
       });
     }
-    const _conn = new R2WSClient('ws://localhost:18000/');
+    const _conn = new R2WSClient(`ws://${config.host}:${config.port}/`);
 
     _conn.onready = this.emit.bind(this, 'ready', _conn);
     _conn.onmessage = this.emit.bind(this, 'message');

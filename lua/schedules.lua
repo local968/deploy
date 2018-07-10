@@ -124,7 +124,7 @@ return function(server, api)
               projectId = deployment[3],
               userId = deployment[2],
               csvLocation = deployment[7].file,
-              command = "deploy"
+              command = "deploy2"
             }
           }
         )
@@ -148,7 +148,7 @@ return function(server, api)
     local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
     for k, _tuple in pairs(progressingSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
-      local results = box.space["modeling_request"]:select({tuple.requestId})
+      local results = box.space["modeling_result"]:select({tuple.requestId})
       if #results > 0 then
         tuple.result = results[1]
         tuple.status = "finished"
