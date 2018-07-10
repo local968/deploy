@@ -1,6 +1,5 @@
 import { observable } from 'mobx';
 import moment from 'moment';
-// import db from './db.js';
 import DBStore from 'stores/DBStore';
 
 const defaultDeploymentOptions = {

@@ -23,7 +23,6 @@ export default class Main extends Component{
     getChild = () => {
         const {project, sortModels} = this.props.projectStore;
         const { curStep } = project || {};
-        console.log(this.props)
         switch(curStep){
             case 1:
                 return <Problem project={project}/>

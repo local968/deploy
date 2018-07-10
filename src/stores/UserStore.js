@@ -1,4 +1,3 @@
-// import db from './db.js';
 import { observable, action, computed, when } from 'mobx';
 import Project from './Project.js'
 import socketStore from './SocketStore';

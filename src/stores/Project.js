@@ -1,4 +1,3 @@
-// import db from './db.js';
 import { observable, action, when, computed } from 'mobx';
 import socketStore from './SocketStore';
 import requestStore from './RequestStore.js';
@@ -54,8 +53,6 @@ export default class Project {
 
   @observable criteria = 'defualt';
 
-  observedKeys = ['description'];
-
   constructor(userId, projectId, project = null) {
     this.userId = userId;
     this.projectId = projectId;
@@ -90,11 +87,8 @@ export default class Project {
       createdAt: +now,
       updatedAt: +now
     };
-    const initObservedKeys = {};
-    this.observedKeys.forEach(k => {
-      initObservedKeys[k] = this[k];
-    });
-    Object.assign(this, item, initObservedKeys);
+
+    Object.assign(this, item);
 
     when(
       () => socketStore.isready,

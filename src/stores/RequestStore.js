@@ -1,11 +1,9 @@
-import db from './db.js';
 import { action, computed, when } from 'mobx';
 import socketStore from './SocketStore.js'
 
  class RequestStore {
 
     constructor() {
-        this.modelRequestTable = db('modeling_request');
         this.initCallback();
     }
 
