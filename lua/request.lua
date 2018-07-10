@@ -12,7 +12,7 @@ local function _query(id)
     local result = resIndex:select(query)
     local list = {}
     for k, v in pairs(result) do
-        list[k] = {id=v[1],params=v[2]}
+        list[k] = {reqId=v[1], resId=v[2], params=v[3]}
     end
     return list;
 end
@@ -33,7 +33,8 @@ end
 
 local function onModelingResult(old, new)
     if new then
-        local data = new[2]
+        local reqId = new[1]
+        local data = new[3]
         local userId = data.userId
         local connids = conn.getConnids(userId);
         for k, conn in pairs(connids) do

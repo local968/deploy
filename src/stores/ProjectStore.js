@@ -141,8 +141,7 @@ class ProjectStore {
                 this.project = new Project(this.userId, project.projectId, project.args)
             }),
             queryModels: action(data => {
-                const result = data.data;
-                if(!result) return;
+                const result = data.data || {};
                 const models = result.args;
                 this.models = [];
                 for (let key in models) {
@@ -205,20 +204,21 @@ class ProjectStore {
                             [result] = result
                         }
                         // for (let row of result) {
+                        if(result&&result.name){
                             info.args[`${command}-${result.name}-result`] = result
-                        // }
-                        const models = this.saveModel(info)
-                        for (let key in models) {
-                            let index = this.models.findIndex(m => {
-                                return models[key].name === m.name
-                            })
-                            if (index === -1) {
-                                this.models.push(new Model(this.userId, this.projectId, models[key]))
-                            } else {
-                                this.models[index] = new Model(this.userId, this.projectId, models[key])
+                            const models = this.saveModel(info)
+                            for (let key in models) {
+                                let index = this.models.findIndex(m => {
+                                    return models[key].name === m.name
+                                })
+                                if (index === -1) {
+                                    this.models.push(new Model(this.userId, this.projectId, models[key]))
+                                } else {
+                                    this.models[index] = new Model(this.userId, this.projectId, models[key])
+                                }
                             }
+                            this.recommendModel()
                         }
-                        this.recommendModel()
                         if(status === 100){
                             this.project.finishTrain2();
                         }

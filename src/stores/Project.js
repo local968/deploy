@@ -2,6 +2,7 @@
 import { observable, action, when, computed } from 'mobx';
 import socketStore from './SocketStore';
 import requestStore from './RequestStore.js';
+import DeployStore from 'stores/DeployStore'
 import moment from 'moment';
 
 export default class Project {
@@ -301,12 +302,12 @@ export default class Project {
         requestStore.sendRequest(id,{
             csvLocation: uploadFileName,
             problemType,
-            featureLabel: dataHeader,
+            featureLabel: [...dataHeader],
             projectId,
             userId,
             time: moment().valueOf(),
             command,
-            fillMethod: {},
+            fillMethod: {...this.fillMethod},
             validationRate: this.validationRate,
             holdoutRate: this.holdoutRate,
             version: this.version
@@ -353,7 +354,7 @@ export default class Project {
             userId,
             time: moment().valueOf(),
             command,
-            fillMethod: {},
+            fillMethod: {...this.fillMethod},
             validationRate: this.validationRate,
             holdoutRate: this.holdoutRate,
             version: this.version
@@ -442,36 +443,6 @@ export default class Project {
         this.updateProject({
             deployFileName: filename
         })
-    }
-
-    deploy() {
-        const {
-            userId, 
-            projectId, 
-            uploadFileName
-        } = this;
-
-        const command = 'deploy2'
-    
-        this.updateProject({
-            deploy2Finished: false,
-            deploy2ing: true,
-        });
-
-        const id = `${command}-${userId}-${projectId}`;
-
-        // id: request ID
-        // userId: user ID
-        // projectId: project ID
-        // csv_location: csv 文件相对路径
-        // kwargs:
-        requestStore.sendRequest(id,{
-            csvLocation: uploadFileName,
-            projectId,
-            userId,
-            time: +new Date(),
-            command
-        });
     }
 
     finishTrain2() {
