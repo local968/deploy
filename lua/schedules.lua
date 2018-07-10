@@ -6,6 +6,7 @@ local conn = require("deploy2.lua.conn")
 local fiber = require("fiber")
 local channel = fiber.channel(1000)
 local space = "schedules"
+local queue = require("queue")
 local fields = {
   "id",
   "userId",
@@ -17,7 +18,9 @@ local fields = {
   "ends",
   "prevSchedule",
   "updatedDate",
-  "createdDate"
+  "createdDate",
+  "requestId",
+  "result"
 }
 local common = commonInit(fields)
 
@@ -65,6 +68,9 @@ return function(server, api)
 
   local function checkQueue()
     -- push into queue
+    if not box.space[space] then
+      return
+    end
     local timeUpSchedules = box.space[space].index["estimatedTime"]:select({"waiting"})
     for k, _tuple in pairs(timeUpSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
@@ -77,23 +83,53 @@ return function(server, api)
           data = {tuple = tuple},
           userId = tuple.userId
         }
-        local result = operate(request)
+        operate(request)
       end
     end
   end
 
   local function executeQueue()
+    if not box.space[space] or not box.space["deployments"] then
+      return
+    end
     local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
     if (#progressingSchedules >= maxProgressing) then
       return
     end
     local queueSchedules = box.space[space].index["estimatedTime"]:select({"queue"})
 
-    for i = 1, maxProgressing - #progressingSchedules, 1 do
+    local max = maxProgressing - #progressingSchedules
+    if (#queueSchedules < max) then
+      max = #queueSchedules
+    end
+    for i = 1, max, 1 do
       local _tuple = queueSchedules[i]
       local tuple = common.mapArrayToObject(_tuple)
       tuple.status = "progressing"
       tuple.updatedDate = os.time()
+
+      local deployment = box.space["deployments"].index.primary:select({tuple.deploymentId, tuple.userId})
+      if (#deployment == 1) then
+        deployment = deployment[1]
+      else
+        deployment = nil
+      end
+      if deployment then
+        local id = common.createUUID()
+        local result =
+          box.space["modeling_request"]:replace(
+          {
+            id,
+            {
+              projectId = deployment[3],
+              userId = deployment[2],
+              csvLocation = deployment[7].file
+            }
+          }
+        )
+        queue.tube.taskQueue:put(id)
+        tuple.requestId = id
+      end
 
       -- todo: send request
 
@@ -103,7 +139,27 @@ return function(server, api)
         data = {tuple = tuple},
         userId = tuple.userId
       }
-      local result = operate(request)
+      operate(request)
+    end
+  end
+
+  local function checkResult()
+    local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
+    for k, _tuple in pairs(progressingSchedules) do
+      local tuple = common.mapArrayToObject(_tuple)
+      local results = box.space["modeling_request"]:select({tuple.requestId})
+      if #results > 0 then
+        tuple.result = results[1]
+        tuple.status = "finished"
+
+        local request = {
+          space = space,
+          type = "replace",
+          data = {tuple = tuple},
+          userId = tuple.userId
+        }
+        operate(request)
+      end
     end
   end
 
@@ -111,6 +167,7 @@ return function(server, api)
     while true do
       checkQueue()
       executeQueue()
+      checkResult()
       fiber.sleep(10)
     end
   end
