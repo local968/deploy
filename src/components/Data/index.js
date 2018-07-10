@@ -205,7 +205,7 @@ class DataConnect extends Component {
             <div className={styles.maxRow}><span>Maximum Data Size</span><div className={styles.mark}><span>?</span></div><span> : 50000 (rows) </span><a>Edit</a></div>
             <div className={styles.uploadRow}>
                 {this.block("From Mr.One", sampleIcon, this.showSample)}
-                <Uploader children={this.block("From Computer", localFileIcon)} onChange={this.upload} OnComplete={this.doEtl} params={{ userId, projectId: project.projectId }} onProgress={this.onProgress} />
+                <Uploader children={this.block("From Computer", localFileIcon)} onChange={this.upload} onComplete={this.doEtl} params={{ userId, projectId: project.projectId }} onProgress={this.onProgress} />
                 {this.block("From SQL", sqlIcon, this.showSql)}
             </div>
             <div className={styles.cutoff}>
