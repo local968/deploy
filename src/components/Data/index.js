@@ -20,12 +20,12 @@ import dataQualityActive from './data_quality_a.svg';
 import dataQuality from './data_quality_d.svg';
 
 // sample data
-import bankSmall from '../../../sample/bank.train.small.csv';
-import titanic from '../../../sample/titanic.train.csv';
-import houseSmall from '../../../sample/regression.house.small.csv';
-import gameSmall from '../../../sample/game.small.csv';
-import dma1cSmall from '../../../sample/dma1c_dirty.small.csv';
-import givemecreditSmall from '../../../sample/givemecredit_dirty.small.csv';
+import bankSmall from '../../../csv/bank.train.small.csv';
+import titanic from '../../../csv/titanic.train.csv';
+import houseSmall from '../../../csv/regression.house.small.csv';
+import gameSmall from '../../../csv/game.small.csv';
+import dma1cSmall from '../../../csv/dma1c_dirty.small.csv';
+import givemecreditSmall from '../../../csv/givemecredit_dirty.small.csv';
 
 const fileMap = {
   'titanic.train.csv': titanic,

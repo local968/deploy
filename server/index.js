@@ -45,8 +45,8 @@ app.use(express.static(path.join(process.cwd(), 'build')));
 
 app.post('/api/sample', (req, res) => {
   const {type, filename, userId, projectId} = req.query;
-  // const projPath = path.resolve(__dirname, '../..');
-  const samplePath = path.join(config.projPath, 'sample', type, filename);
+  const projPath = path.resolve(__dirname, '..');
+  const samplePath = path.join(projPath, 'sample', type, filename);
   const filePath = path.join(config.projPath, 'data', userId, projectId);
 
   if (!fs.existsSync(filePath)) {
