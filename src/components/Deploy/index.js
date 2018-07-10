@@ -49,9 +49,7 @@ export default class Home extends Component {
         <div className={styles.filter}>
           <Search
             value={deployStore.sortOptions.keywords}
-            onChange={event =>
-              deployStore.changeSort('keywords', event.target.value)
-            }
+            onChange={value => deployStore.changeSort('keywords', value)}
           />
           <Select
             className={styles.selector}
