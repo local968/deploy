@@ -66,7 +66,7 @@ export default class Operation extends Component {
                       : ' - '}
                   </span>
                   <span className={styles.status}>{s.schedule.status}</span>
-                  {s.schedule.status === 'finished' ? (
+                  {s.schedule.status === 'finished' && s.schedule.result ? (
                     <a
                       className={styles.results}
                       target="_blank"
