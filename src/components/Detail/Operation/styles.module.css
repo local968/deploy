@@ -79,6 +79,8 @@
 .project:hover {
   background: #f6f6f8;
 }
+
+.project .results,
 .project span {
   flex: 1 1 0;
   font-size: 1rem;

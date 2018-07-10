@@ -55,10 +55,30 @@ export default class Operation extends Component {
                       ? 'DataSource'
                       : 'API Source'}
                   </span>
-                  <span className={styles.exeuctionSpeed}> - </span>
-                  <span className={styles.dataSize}> - </span>
+                  <span className={styles.exeuctionSpeed}>
+                    {s.schedule.status === 'finished'
+                      ? s.schedule.result.executeSpeed
+                      : ' - '}
+                  </span>
+                  <span className={styles.dataSize}>
+                    {s.schedule.status === 'finished'
+                      ? s.schedule.result.totalLines
+                      : ' - '}
+                  </span>
                   <span className={styles.status}>{s.schedule.status}</span>
-                  <span className={styles.results} />
+                  {s.schedule.status === 'finished' ? (
+                    <a
+                      className={styles.results}
+                      target="_blank"
+                      href={`/api/download?userId=${cd.userId}&projectId=${
+                        cd.projectId
+                      }&csvLocation=${s.schedule.result.resultPath}`}
+                    >
+                      Download
+                    </a>
+                  ) : (
+                    <span className={styles.results}> - </span>
+                  )}
                 </div>
               ))}
 
