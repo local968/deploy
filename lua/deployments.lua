@@ -196,6 +196,39 @@ return function(server, api)
   )
 
   server:addMessage(
+    {type = "removeDeploy"},
+    function(self)
+      local userResult = conn.getConnid(self.connid)
+      -- local userResult = {1, "tytytytytyt"}
+      if not userResult then
+        local result = self.data
+        result.message = "need login."
+        result.status = 401
+        return self:render({data = result})
+      end
+      local userId = userResult[2]
+      local request = {
+        space = space,
+        type = "delete",
+        userId = userId,
+        data = {key = {self.data.id, userId}},
+        index = "primary"
+      }
+
+      local deleteScheduleRequest = {
+        space = "schedules",
+        type = "delete",
+        userId = userId,
+        data = {key = {self.data.id, userId}},
+        index = "deleteSchedule"
+      }
+      operate(request)
+      box.space["schedules"].index["deleteSchedule"]:delete()
+      return self:render({data = operate(request)})
+    end
+  )
+
+  server:addMessage(
     {type = "watchDeploy"},
     function(self)
       local request = {
@@ -240,6 +273,9 @@ return function(server, api)
     ["tuple.modelType"] = {true, "string"},
     ["tuple.deploymentOptions"] = {true, "object"},
     ["tuple.performanceOptions"] = {true, "object"}
+  }
+  api["removeDeploy"] = {
+    ["id"] = {true, "string"}
   }
   -- todo pager
   api["searchDeploy"] = {

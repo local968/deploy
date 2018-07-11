@@ -71,7 +71,7 @@
 }
 
 .modelName {
-  flex: 2 1 0;
+  flex: 1 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
@@ -83,10 +83,16 @@
 .operationAlert,
 .performanceAlert,
 .craetedDate,
-.owner {
+.owner,
+.delete {
   flex: 1 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.delete {
+  cursor: pointer;
+  text-align: center;
 }
 
 .statusIcon {

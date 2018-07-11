@@ -6,7 +6,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
 import notificationIcon from './notification.svg';
-import loginIcon from "./login.svg";
+import loginIcon from './login.svg';
 import projectActiveIcon from './project-d1.svg';
 import problemIcon from './icon_business_problem_d.svg';
 import problemActiveIcon from './icon_business_problem_a.svg';
@@ -18,25 +18,23 @@ import down from './combined-shape-copy.svg';
 // import more from './btn-more-option.svg';
 
 const imgs = {
-  problem : <img src={problemIcon} alt="problem"/>,
-  data: <img src={dataIcon} alt="data"/>,
-  modeling : <img src={modelingIcon} alt="modeling"/>,
-  projectActive : <img src={projectActiveIcon} alt="project"/>,
-  problemActive : <img src={problemActiveIcon} alt="problem"/>,
-  dataActive: <img src={dataActiveIcon} alt="data"/>,
-  modelingActive : <img src={modelingActiveIcon} alt="modeling"/>
-}
+  problem: <img src={problemIcon} alt="problem" />,
+  data: <img src={dataIcon} alt="data" />,
+  modeling: <img src={modelingIcon} alt="modeling" />,
+  projectActive: <img src={projectActiveIcon} alt="project" />,
+  problemActive: <img src={problemActiveIcon} alt="problem" />,
+  dataActive: <img src={dataActiveIcon} alt="data" />,
+  modelingActive: <img src={modelingActiveIcon} alt="modeling" />
+};
 
-const step = ["project", "problem", "data", "modeling"];
+const step = ['project', 'problem', 'data', 'modeling'];
 
 @inject('deployStore')
 @observer
 class NormalHeader extends Component {
   @computed
   get enabledProjectsCount() {
-    return this.props.deployStore.deployments.filter(
-      _d => _d.deploymentOptions && _d.deploymentOptions.enable
-    ).length;
+    return this.props.deployStore.deployments.filter(_d => _d.enable).length;
   }
 
   @computed
@@ -92,119 +90,153 @@ class NormalHeader extends Component {
 @observer
 class ProjectHeader extends Component {
   logout = () => {
-    this.props.history.push("/");
+    this.props.history.push('/');
     this.props.userStore.logout();
-  }
+  };
 
-  enter = (index) => {
-    const {projectStore} = this.props;
+  enter = index => {
+    const { projectStore } = this.props;
     let maxStep = projectStore.project.mainStep;
-    if(index > maxStep) return;
-    projectStore.project.nextMainStep(index)
+    if (index > maxStep) return;
+    projectStore.project.nextMainStep(index);
     // history.push("/"+step[index]+"/"+projectStore.project.projectId)
-  }
+  };
 
   render() {
-    const {userStore, projectStore} = this.props;
-    
-    const {curStep} = projectStore.project || {}
+    const { userStore, projectStore } = this.props;
 
-    return <div className={styles.header}>
-      <div className={styles.menu}>
-        {step.map((v, k) => {
-          let str = v.split("");
-          let text = str.shift().toUpperCase() + str.join("");
-          let line = "";
-          if(k!==0){
-            line = <div className={styles.line}><span>-----------------------------------------------</span></div>
-          }
-          return <div key={k} onClick={this.enter.bind(this,k)} className={classnames(styles.item,{
-            [styles.current]: curStep===k,
-            [styles.active]: curStep>=k
-          })}>
-            <div className={styles.iconBlock}>
-              <div className={styles.icon}>
-                {imgs[v+(curStep>=k?"Active":"")]}
+    const { curStep } = projectStore.project || {};
+
+    return (
+      <div className={styles.header}>
+        <div className={styles.menu}>
+          {step.map((v, k) => {
+            let str = v.split('');
+            let text = str.shift().toUpperCase() + str.join('');
+            let line = '';
+            if (k !== 0) {
+              line = (
+                <div className={styles.line}>
+                  <span>-----------------------------------------------</span>
+                </div>
+              );
+            }
+            return (
+              <div
+                key={k}
+                onClick={this.enter.bind(this, k)}
+                className={classnames(styles.item, {
+                  [styles.current]: curStep === k,
+                  [styles.active]: curStep >= k
+                })}
+              >
+                <div className={styles.iconBlock}>
+                  <div className={styles.icon}>
+                    {imgs[v + (curStep >= k ? 'Active' : '')]}
+                  </div>
+                  {line}
+                  <div className={styles.iconText}>
+                    <span>{text}</span>
+                  </div>
+                </div>
               </div>
-              {line}
-              <div className={styles.iconText}>
-                <span>{text}</span>
+            );
+          })}
+        </div>
+        <div className={styles.tools}>
+          <div className={styles.notification}>
+            <img src={notificationIcon} alt="notification" />
+            <span>
+              <span className={styles.num}>1</span> Notification
+            </span>
+            <div className={styles.pot} />
+          </div>
+          <div className={styles.user}>
+            <img src={mockAvatar} alt="avatar" className={styles.avatar} />
+            <div className={styles.userBottom}>
+              <span className={styles.name}>{userStore.userId}</span>
+              <div className={styles.down} onClick={this.logout}>
+                <img src={down} alt="down" />
               </div>
             </div>
           </div>
-        })}
-      </div>
-      <div className={styles.tools}>
-        <div className={styles.notification}>
-          <img src={notificationIcon} alt="notification"/>
-          <span>
-            <span className={styles.num}>1</span> Notification
-          </span>
-          <div className={styles.pot}></div>
-        </div>
-        <div className={styles.user}>
-          <img src={mockAvatar} alt="avatar" className={styles.avatar} />
-          <div className={styles.userBottom}>
-            <span className={styles.name}>{userStore.userId}</span>
-            <div className={styles.down} onClick={this.logout}><img src={down} alt="down" /></div>
-          </div>
         </div>
       </div>
-    </div>
+    );
   }
 }
 
 @inject('userStore')
 @observer
-class WelcomeHeader extends Component{
+class WelcomeHeader extends Component {
   logout = () => {
-    this.props.history.push("/");
+    this.props.history.push('/');
     this.props.userStore.logout();
-  }
+  };
 
   render() {
-    return <div className={styles.header}>
-      <div className={styles.wheader}>
-        <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
-        <span className={styles.welcome}>Welcome , {this.props.userStore.userId}</span>
-        <div className={styles.down}  onClick={this.logout}><img src={down} alt="down" /></div>
+    return (
+      <div className={styles.header}>
+        <div className={styles.wheader}>
+          <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
+          <span className={styles.welcome}>
+            Welcome , {this.props.userStore.userId}
+          </span>
+          <div className={styles.down} onClick={this.logout}>
+            <img src={down} alt="down" />
+          </div>
+        </div>
+        <div className={styles.notification}>
+          <img src={notificationIcon} alt="notification" />
+          <span>
+            <span className={styles.num}>1</span> Notification
+          </span>
+          <div className={styles.pot} />
+        </div>
       </div>
-      <div className={styles.notification}>
-        <img src={notificationIcon} alt="notification"/>
-        <span>
-          <span className={styles.num}>1</span> Notification
-        </span>
-        <div className={styles.pot}></div>
-      </div>
-    </div>
+    );
   }
 }
 
-const LoginHeader = (props) => (
+const LoginHeader = props => (
   <div className={styles.header}>
-    <div className={styles.wheader}><span className={styles.welcome}>Welcome to R2.ai</span></div>
-    <div className={styles.auth} onClick={() => props.pathname==="/"?
-          props.history.push("/signup"):
-          props.history.push("/")}>
-            <div className={styles.loginIcon}><img src={loginIcon} alt='login' /></div>
-            <span>{props.pathname==="/"?"Sign Up":"Sign In"}</span>
+    <div className={styles.wheader}>
+      <span className={styles.welcome}>Welcome to R2.ai</span>
+    </div>
+    <div
+      className={styles.auth}
+      onClick={() =>
+        props.pathname === '/'
+          ? props.history.push('/signup')
+          : props.history.push('/')
+      }
+    >
+      <div className={styles.loginIcon}>
+        <img src={loginIcon} alt="login" />
+      </div>
+      <span>{props.pathname === '/' ? 'Sign Up' : 'Sign In'}</span>
     </div>
   </div>
-)
+);
 
 @withRouter
 @inject('userStore')
 @observer
 export default class Header extends Component {
-
   render() {
-    const isHome = this.props.history.location.pathname === "/";
-    const isDeploy = this.props.history.location.pathname.startsWith("/deploy");
+    const isHome = this.props.history.location.pathname === '/';
+    const isDeploy = this.props.history.location.pathname.startsWith('/deploy');
     const userId = this.props.userStore.userId;
 
-    if(!userId) return <LoginHeader pathname={this.props.history.location.pathname} history={this.props.history} />
-    if(isHome) return <WelcomeHeader history={this.props.history} />
-    if(isDeploy) return <NormalHeader />
+    if (!userId)
+      return (
+        <LoginHeader
+          pathname={this.props.history.location.pathname}
+          history={this.props.history}
+        />
+      );
+    if (isHome) return <WelcomeHeader history={this.props.history} />;
+    if (isDeploy) return <NormalHeader />;
     return <ProjectHeader history={this.props.history} />;
   }
-} 
+}

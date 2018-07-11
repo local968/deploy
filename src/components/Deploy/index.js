@@ -3,6 +3,7 @@ import styles from './styles.module.css';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import { Bread, Select, Pagination, Switch, Search } from 'components/Common';
+import { Icon } from 'antd';
 import issueIcon from './fail.svg';
 import runningIcon from './running.svg';
 import normalIcon from './success.svg';
@@ -105,6 +106,7 @@ export default class Home extends Component {
               Created Date
             </span>
             <span className={styles.owner}>Owner</span>
+            <span className={styles.delete} />
           </div>
           <div className={styles.list}>
             {deployStore.sortedDeployments.map(deployment => (
@@ -174,6 +176,14 @@ export default class Home extends Component {
                 </span>
                 <span className={styles.owner} title={deployment.owner}>
                   {deployment.userId}
+                </span>
+                <span
+                  className={styles.delete}
+                  onClick={() => {
+                    deployStore.delete(deployment.id);
+                  }}
+                >
+                  <Icon type="delete" />
                 </span>
               </div>
             ))}

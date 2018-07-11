@@ -195,6 +195,13 @@ return function(server, api)
     )
 
     space:create_index(
+      "deleteSchedule",
+      {
+        parts = {3, "string", 2, "string"}
+      }
+    )
+
+    space:create_index(
       "userId",
       {
         parts = {2, "string"},
