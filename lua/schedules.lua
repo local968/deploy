@@ -195,9 +195,10 @@ return function(server, api)
     )
 
     space:create_index(
-      "deleteSchedule",
+      "deleteSchedules",
       {
-        parts = {3, "string", 2, "string"}
+        parts = {3, "string", 2, "string"},
+        unique = false
       }
     )
 

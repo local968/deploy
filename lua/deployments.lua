@@ -215,15 +215,18 @@ return function(server, api)
         index = "primary"
       }
 
-      local deleteScheduleRequest = {
-        space = "schedules",
-        type = "delete",
-        userId = userId,
-        data = {key = {self.data.id, userId}},
-        index = "deleteSchedule"
-      }
-      operate(request)
-      box.space["schedules"].index["deleteSchedule"]:delete()
+      local schedules = box.space["schedules"].index["deleteSchedules"]:select({self.data.id, userId})
+      for k, schedule in pairs(schedules) do
+        local deleteScheduleRequest = {
+          space = "schedules",
+          type = "delete",
+          userId = userId,
+          data = {key = {schedule[1], userId}},
+          index = "primary"
+        }
+        operate(deleteScheduleRequest)
+      end
+
       return self:render({data = operate(request)})
     end
   )
