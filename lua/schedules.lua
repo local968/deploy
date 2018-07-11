@@ -152,9 +152,17 @@ return function(server, api)
     for k, _tuple in pairs(progressingSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
       local result = box.space["modeling_result"]:select({tuple.requestId, tuple.solution})
+      local errorResult = box.space["modeling_result"]:select({tuple.requestId, "error"})
+      dump(errorResult)
+      if #errorResult > 0 then
+        result = errorResult
+      end
       if #result > 0 then
         tuple.result = result[1][3].result
         tuple.status = "finished"
+        if #errorResult > 0 then
+          tuple.status = "issue"
+        end
         local request = {
           space = space,
           type = "replace",
@@ -331,6 +339,7 @@ return function(server, api)
       local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
         local s = schedules[1]
+        dump(s)
         if s[5] == "waiting" or s[5] == "queue" then
           self.data.tuple.id = s[1]
           self.data.tuple.createdDate = s[11]

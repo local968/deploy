@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
+import classnames from 'classnames';
+import { Popover } from 'antd';
 import emptyIcon from './icon-no-report.svg';
-// import alertIcon from './fail.svg';
+import alertIcon from './fail.svg';
 
 @inject('deployStore', 'scheduleStore')
 @observer
@@ -65,7 +67,22 @@ export default class Operation extends Component {
                       ? s.schedule.result && s.schedule.result.totalLines
                       : ' - '}
                   </span>
-                  <span className={styles.status}>{s.schedule.status}</span>
+                  {s.schedule.status !== 'issue' && (
+                    <span className={styles.status}>{s.schedule.status}</span>
+                  )}
+                  {s.schedule.status === 'issue' && (
+                    <Popover
+                      placement="left"
+                      overlayClassName={styles.popover}
+                      content={
+                        <Alert text={s.schedule.result['process error']} />
+                      }
+                    >
+                      <span className={classnames(styles.status, styles.issue)}>
+                        Issue
+                      </span>
+                    </Popover>
+                  )}
                   {s.schedule.status === 'finished' && s.schedule.result ? (
                     <a
                       className={styles.results}
@@ -120,18 +137,19 @@ export default class Operation extends Component {
   }
 }
 
-// const Alert = () => (
-//   <div className={styles.alert}>
-//     <div className={styles.alertHead}>
-//       <img className={styles.alertIcon} src={alertIcon} alt="alert" />
-//     </div>
-//     <div className={styles.alertContent}>
-//       Can not find the data source file from the path{' '}
-//       <span className={styles.path}>D://user/deployment/results</span>
-//       <br />Please check the file if it has been moved.
-//     </div>
-//   </div>
-// );
+const Alert = ({ text }) => (
+  <div className={styles.alert}>
+    <div className={styles.alertHead}>
+      <img className={styles.alertIcon} src={alertIcon} alt="alert" />
+    </div>
+    <div className={styles.alertContent}>
+      {text}
+      {/* Can not find the data source file from the path{' '}
+      <span className={styles.path}>D://user/deployment/results</span>
+      <br />Please check the file if it has been moved. */}
+    </div>
+  </div>
+);
 
 const Empty = () => (
   <div className={styles.emptyTable}>
