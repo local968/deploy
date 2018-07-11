@@ -19,7 +19,7 @@ const deploymentStatus = {
       <img className={styles.statusIcon} src={issueIcon} alt="issue" />Issue
     </span>
   ),
-  running: (
+  progressing: (
     <span className={styles.running}>
       <img className={styles.statusIcon} src={runningIcon} alt="running" />Running
     </span>
@@ -27,7 +27,7 @@ const deploymentStatus = {
   na: <span className={styles.na}>N/A</span>
 };
 
-@inject('deployStore')
+@inject('deployStore', 'scheduleStore')
 @observer
 export default class Home extends Component {
   toggle = (currentType, targetType) => () => {
@@ -43,7 +43,7 @@ export default class Home extends Component {
     }
   };
   render() {
-    const { deployStore, history } = this.props;
+    const { deployStore, history, scheduleStore } = this.props;
     return (
       <div className={styles.home}>
         <Bread list={['Home']} />
@@ -94,8 +94,9 @@ export default class Home extends Component {
             </span>
             <span className={styles.enable}>Enable</span>
             <span className={styles.deploymentStatus}>Deployment Status</span>
-            <span className={styles.operationAlert}>Operation Alert</span>
-            <span className={styles.performanceAlert}>Performance Alert</span>
+            <span className={styles.performanceStatus}>Performance Status</span>
+            {/* <span className={styles.operationAlert}>Operation Alert</span>
+            <span className={styles.performanceAlert}>Performance Alert</span> */}
             <span
               className={styles.createdDate}
               onClick={this.toggle(
@@ -143,11 +144,35 @@ export default class Home extends Component {
                 </span>
                 <span
                   className={styles.deploymentStatus}
-                  title={deploymentStatus[deployment.status || 'normal']}
+                  title={
+                    scheduleStore.schedules &&
+                    scheduleStore.getLastSchedule(deployment.id, 'deployment')
+                      .status
+                  }
                 >
-                  {deploymentStatus[deployment.status || 'normal']}
+                  {deploymentStatus[
+                    scheduleStore.schedules &&
+                      scheduleStore.getLastSchedule(deployment.id, 'deployment')
+                        .status
+                  ] || deploymentStatus['normal']}
                 </span>
                 <span
+                  className={styles.performanceStatus}
+                  title={
+                    scheduleStore.schedules &&
+                    scheduleStore.getLastSchedule(deployment.id, 'performance')
+                      .status
+                  }
+                >
+                  {deploymentStatus[
+                    scheduleStore.schedules &&
+                      scheduleStore.getLastSchedule(
+                        deployment.id,
+                        'performance'
+                      ).status
+                  ] || deploymentStatus['normal']}
+                </span>
+                {/* <span
                   className={styles.operationAlert}
                   title={deployment.operationAlert || 0}
                   onClick={() =>
@@ -164,7 +189,7 @@ export default class Home extends Component {
                   }
                 >
                   {deployment.performanceAlert || 0}
-                </span>
+                </span> */}
                 <span
                   className={styles.createdDate}
                   title={moment.unix(deployment.createdDate).format('M/D/YYYY')}
