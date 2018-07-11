@@ -13,6 +13,7 @@ local fields = {
   "projectName",
   "modelName",
   "modelType",
+  "enable",
   "deploymentOptions",
   "performanceOptions",
   "updatedDate",

@@ -124,7 +124,7 @@ return function(server, api)
             {
               projectId = deployment[3],
               userId = deployment[2],
-              csvLocation = deployment[7].file,
+              csvLocation = deployment[8].file,
               command = "deploy2",
               solution = deployment[5]
             }
@@ -308,9 +308,9 @@ return function(server, api)
       if #deployments > 0 then
         local d = deployments[1]
         if self.data.type == "performance" then
-          options = d[8]
+          options = d[9]
         else
-          options = d[7]
+          options = d[8]
         end
       else
         local result = self.data

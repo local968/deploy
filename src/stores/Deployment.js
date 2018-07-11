@@ -12,8 +12,7 @@ const defaultDeploymentOptions = {
   file: {},
   frequency: null,
   frequencyOptions: {},
-  autoDisable: null,
-  enable: null
+  autoDisable: null
 };
 
 const defaultPerformanceOptions = {
@@ -24,8 +23,7 @@ const defaultPerformanceOptions = {
   metricThreshold: 70,
   frequency: null,
   frequencyOptions: {},
-  autoDisable: null,
-  enable: false
+  autoDisable: null
 };
 
 export default class Deployment {
@@ -38,8 +36,8 @@ export default class Deployment {
   @observable modelName;
   @observable modelType;
   @observable createdDate;
+  @observable enable;
   @observable email;
-  @observable owner;
 
   @observable deploymentOptions = { ...defaultDeploymentOptions };
   @observable performanceOptions = { ...defaultPerformanceOptions };
@@ -52,9 +50,9 @@ export default class Deployment {
     this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
     this.modelType = deploy.modelType;
+    this.enable = deploy.enable;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
-    this.owner = deploy.owner;
     this.deploymentOptions = {
       ...defaultDeploymentOptions,
       ...deploy.deploymentOptions
@@ -78,6 +76,7 @@ export default class Deployment {
             modelType: this.modelType,
             createdDate: this.createdDate,
             email: this.email,
+            enable: this.enable,
             deploymentOptions: this.deploymentOptions,
             performanceOptions: this.performanceOptions
           }
@@ -96,6 +95,7 @@ export default class Deployment {
       modelType: this.modelType,
       createdDate: this.createdDate,
       email: this.email,
+      enable: this.enable,
       deploymentOptions: this.deploymentOptions,
       performanceOptions: this.performanceOptions,
       updatedDate: moment().unix()

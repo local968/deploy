@@ -133,14 +133,9 @@ export default class Home extends Component {
                 </span>
                 <span className={styles.enable}>
                   <Switch
-                    checked={
-                      deployment.deploymentOptions &&
-                      deployment.deploymentOptions.enable
-                    }
+                    checked={deployment && deployment.enable}
                     onChange={() => {
-                      if (deployment.deploymentOptions.frequency) {
-                        deployStore.toggleEnable(deployment.id);
-                      }
+                      deployStore.toggleEnable(deployment.id);
                     }}
                   />
                 </span>
@@ -178,7 +173,7 @@ export default class Home extends Component {
                   {moment.unix(deployment.createdDate).format('M/D/YYYY')}
                 </span>
                 <span className={styles.owner} title={deployment.owner}>
-                  {deployment.owner}
+                  {deployment.userId}
                 </span>
               </div>
             ))}
