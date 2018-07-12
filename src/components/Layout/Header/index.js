@@ -29,7 +29,7 @@ const imgs = {
 
 const step = ['project', 'problem', 'data', 'modeling'];
 
-@inject('deployStore')
+@inject('deployStore', 'scheduleStore')
 @observer
 class NormalHeader extends Component {
   @computed
@@ -39,7 +39,11 @@ class NormalHeader extends Component {
 
   @computed
   get normalProjectsCount() {
-    return this.props.deployStore.deployments.filter(_d => !_d.issue).length;
+    const { deployStore, scheduleStore } = this.props;
+    const isNormal = id =>
+      scheduleStore.getLastSchedule(id, 'deployment').status !== 'issue' &&
+      scheduleStore.getLastSchedule(id, 'performance').status !== 'issue';
+    return deployStore.deployments.filter(_d => isNormal(_d.id)).length;
   }
 
   render() {
