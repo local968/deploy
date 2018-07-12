@@ -94,7 +94,7 @@ export default class Detail extends Component {
           />
           <Route path="/deploy/project/:id/status" component={Status} />
         </div>
-        <div className={styles.enableWrap}>
+        {/* <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>
           <span className={styles.enable}>
             <Switch
@@ -105,7 +105,7 @@ export default class Detail extends Component {
             />
           </span>
           <span className={styles.enableText}>{cd.enable ? 'On' : 'Off'}</span>
-        </div>
+        </div> */}
       </div>
     );
   }
