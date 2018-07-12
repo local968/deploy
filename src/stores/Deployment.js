@@ -20,7 +20,7 @@ const defaultPerformanceOptions = {
   sourceOptions: {},
   file: {},
   measurementMetric: 'AUC',
-  metricThreshold: 70,
+  metricThreshold: 0.7,
   frequency: null,
   frequencyOptions: {},
   autoDisable: null
@@ -59,8 +59,9 @@ export default class Deployment {
     };
     this.performanceOptions = {
       ...defaultPerformanceOptions,
-      ...deploy.performanceOptions,
-      metricThreshold: deploy.modelType === 'Classification' ? 70 : 50
+      metricThreshold: deploy.modelType === 'Classification' ? 0.7 : 0.5,
+      measurementMetric: deploy.modelType === 'Classification' ? 'AUC' : 'R2',
+      ...deploy.performanceOptions
     };
   }
 

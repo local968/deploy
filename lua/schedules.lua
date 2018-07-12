@@ -21,7 +21,8 @@ local fields = {
   "createdDate",
   "requestId",
   "result",
-  "solution"
+  "solution",
+  "threshold"
 }
 local common = commonInit(fields)
 
@@ -117,6 +118,12 @@ return function(server, api)
       end
       if deployment then
         local id = common.createUUID()
+        local file
+        if tuple.type == "performance" then
+          file = deployment[9].file
+        else
+          file = deployment[8].file
+        end
         local result =
           box.space["modeling_request"]:replace(
           {
@@ -124,7 +131,7 @@ return function(server, api)
             {
               projectId = deployment[3],
               userId = deployment[2],
-              csvLocation = deployment[8].file,
+              csvLocation = file,
               command = "deploy2",
               solution = deployment[5]
             }
@@ -153,7 +160,6 @@ return function(server, api)
       local tuple = common.mapArrayToObject(_tuple)
       local result = box.space["modeling_result"]:select({tuple.requestId, tuple.solution})
       local errorResult = box.space["modeling_result"]:select({tuple.requestId, "error"})
-      dump(errorResult)
       if #errorResult > 0 then
         result = errorResult
       end
@@ -339,7 +345,6 @@ return function(server, api)
       local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
         local s = schedules[1]
-        dump(s)
         if s[5] == "waiting" or s[5] == "queue" then
           self.data.tuple.id = s[1]
           self.data.tuple.createdDate = s[11]
@@ -359,6 +364,11 @@ return function(server, api)
         result.message = "not support yet."
         result.status = 500
         return self:render({data = result})
+      end
+
+      -- add threshold for performance
+      if self.data.type == "performance" then
+        self.data.tuple.threshold = self.data.threshold
       end
 
       local request = {

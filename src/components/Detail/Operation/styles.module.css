@@ -51,11 +51,14 @@
   border-radius: 5px;
   margin-top: 0.3em;
   padding: 0.25em;
+  display: flex;
+  flex-direction: column;
 }
 .head {
   display: flex;
   margin-bottom: 0.25em;
   padding: 0 0.2em;
+  flex: 0 0 0.4em;
 }
 .head span {
   flex: 1 1 0;
@@ -67,6 +70,7 @@
 .list {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 .project {
   display: flex;
@@ -75,6 +79,7 @@
   background: white;
   margin-bottom: 0.04em;
   border-radius: 4px;
+  flex: 1 0 auto;
 }
 .project:hover {
   background: #f6f6f8;

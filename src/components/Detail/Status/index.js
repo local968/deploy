@@ -5,6 +5,8 @@ import classnames from 'classnames';
 import moment from 'moment';
 import styles from './list.module.css';
 import emptyIcon from './icon-no-report.svg';
+import alertIcon from './fail.svg';
+import { Popover } from 'antd';
 
 @inject('scheduleStore', 'deployStore', 'routing')
 @observer
@@ -30,10 +32,10 @@ export default class List extends Component {
               </span>
             </span>
             <div className={styles.items}>
-              <div className={styles.item}>
+              {/* <div className={styles.item}>
                 <span className={styles.label}>Next Monitor Date</span>
                 <span className={styles.text}>01/07/2018</span>
-              </div>
+              </div> */}
               <div className={styles.item}>
                 <span className={styles.label}>Validation Data Source</span>
                 <span className={styles.text}>{cdpo.source}</span>
@@ -41,9 +43,7 @@ export default class List extends Component {
               <div className={styles.item}>
                 <span className={styles.label}>Threshold</span>
                 <span className={styles.text}>
-                  {cdpo.measurementMetric}{' '}
-                  {cd.modelType === 'Classification' ? ' < ' : ' > '}
-                  {cdpo.metricThreshold}%
+                  {cdpo.measurementMetric} {cdpo.metricThreshold}
                 </span>
               </div>
               <div className={styles.item}>
@@ -73,6 +73,8 @@ export default class List extends Component {
                 </span>
                 <span className={styles.performance}>Performance</span>
                 <span className={styles.threshold}>Threshold</span>
+                <span className={styles.status}>Status</span>
+                <span className={styles.results}>Results</span>
               </div>
               <div className={styles.list}>
                 {scheduleStore.sortedPerformanceSchedules.map(s => (
@@ -92,14 +94,60 @@ export default class List extends Component {
                             )
                             .format('DD/MM/YYYY-hh:mma')}
                     </span>
-                    <span className={styles.performance}>
-                      {s.schedule.status}
+                    <span
+                      className={classnames(styles.performance, {
+                        [styles.issue]: isExcessThreshold(s.schedule)
+                      })}
+                    >
+                      {s.schedule.result &&
+                        s.schedule.status === 'finished' &&
+                        (s.schedule.result.problemType === 'Classification'
+                          ? `Accuracy:${s.schedule.result.score &&
+                              s.schedule.result.score.acc.toFixed(2)} AUC:${s
+                              .schedule.result.score &&
+                              s.schedule.result.score.auc.toFixed(2)}`
+                          : `RMSE:${s.schedule.result.score &&
+                              s.schedule.result.score.nrmse.toFixed(2)} R2:${s
+                              .schedule.result.score &&
+                              s.schedule.result.score.r2.toFixed(2)}`)}
                     </span>
                     <span className={styles.threshold}>
-                      {cdpo.measurementMetric}{' '}
-                      {cd.modelType === 'Classification' ? ' < ' : ' > '}
-                      {cdpo.metricThreshold}%
+                      {s.schedule.threshold &&
+                        `${s.schedule.threshold.type} ${
+                          s.schedule.threshold.value
+                        }`}
                     </span>
+                    {s.schedule.status !== 'issue' && (
+                      <span className={styles.status}>{s.schedule.status}</span>
+                    )}
+                    {s.schedule.status === 'issue' && (
+                      <Popover
+                        placement="left"
+                        overlayClassName={styles.popover}
+                        content={
+                          <Alert text={s.schedule.result['process error']} />
+                        }
+                      >
+                        <span
+                          className={classnames(styles.status, styles.issue)}
+                        >
+                          Issue
+                        </span>
+                      </Popover>
+                    )}
+                    {s.schedule.status === 'finished' && s.schedule.result ? (
+                      <a
+                        className={styles.results}
+                        target="_blank"
+                        href={`/api/download?userId=${cd.userId}&projectId=${
+                          cd.projectId
+                        }&csvLocation=${s.schedule.result.resultPath}`}
+                      >
+                        Download
+                      </a>
+                    ) : (
+                      <span className={styles.results}> - </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -117,3 +165,32 @@ const Empty = () => (
     <span className={styles.emptyText}>No deployment report yet</span>
   </div>
 );
+
+const Alert = ({ text }) => (
+  <div className={styles.alert}>
+    <div className={styles.alertHead}>
+      <img className={styles.alertIcon} src={alertIcon} alt="alert" />
+    </div>
+    <div className={styles.alertContent}>
+      {text}
+      {/* Can not find the data source file from the path{' '}
+      <span className={styles.path}>D://user/deployment/results</span>
+      <br />Please check the file if it has been moved. */}
+    </div>
+  </div>
+);
+
+const isExcessThreshold = schedule => {
+  if (!schedule.result || !schedule.result.score) return false;
+  const nameMap = { R2: 'r2', RMSE: 'nrmse', AUC: 'auc', Accurancy: 'acc' };
+  console.log(schedule);
+  return {
+    R2: (threshold, real) => threshold > real,
+    RMSE: (threshold, real) => threshold < real,
+    Accurancy: (threshold, real) => threshold > real,
+    AUC: (threshold, real) => threshold > real
+  }[schedule.threshold.type](
+    schedule.threshold.value,
+    schedule.result.score[nameMap[schedule.threshold.type]]
+  );
+};
