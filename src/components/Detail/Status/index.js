@@ -118,7 +118,10 @@ export default class List extends Component {
                         }`}
                     </span>
                     {s.schedule.status !== 'issue' && (
-                      <span className={styles.status}>{s.schedule.status}</span>
+                      <span className={styles.status}>
+                        {s.schedule.status[0].toUpperCase() +
+                          s.schedule.status.substr(1, s.schedule.status.lenght)}
+                      </span>
                     )}
                     {s.schedule.status === 'issue' && (
                       <Popover
