@@ -19,7 +19,7 @@ const deploymentStatus = {
       <img className={styles.statusIcon} src={issueIcon} alt="issue" />Issue
     </span>
   ),
-  progressing: (
+  processing: (
     <span className={styles.running}>
       <img className={styles.statusIcon} src={runningIcon} alt="running" />Running
     </span>

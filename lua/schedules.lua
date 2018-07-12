@@ -26,7 +26,7 @@ local fields = {
 }
 local common = commonInit(fields)
 
-local maxProgressing = 2
+local maxProcessing = 2
 
 -- easy version currently
 -- todo: delta mode
@@ -73,7 +73,7 @@ return function(server, api)
     if not box.space[space] then
       return
     end
-    local timeUpSchedules = box.space[space].index["estimatedTime"]:select({"waiting"})
+    local timeUpSchedules = box.space[space].index["estimatedTime"]:select({"pending"})
     for k, _tuple in pairs(timeUpSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
       if (tuple.estimatedTime < os.time()) then
@@ -94,20 +94,20 @@ return function(server, api)
     if not box.space[space] or not box.space["deployments"] then
       return
     end
-    local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
-    if (#progressingSchedules >= maxProgressing) then
+    local processingSchedules = box.space[space].index["estimatedTime"]:select({"processing"})
+    if (#processingSchedules >= maxProcessing) then
       return
     end
     local queueSchedules = box.space[space].index["estimatedTime"]:select({"queue"})
 
-    local max = maxProgressing - #progressingSchedules
+    local max = maxProcessing - #processingSchedules
     if (#queueSchedules < max) then
       max = #queueSchedules
     end
     for i = 1, max, 1 do
       local _tuple = queueSchedules[i]
       local tuple = common.mapArrayToObject(_tuple)
-      tuple.status = "progressing"
+      tuple.status = "processing"
       tuple.updatedDate = os.time()
 
       local deployment = box.space["deployments"].index.primary:select({tuple.deploymentId, tuple.userId})
@@ -155,8 +155,8 @@ return function(server, api)
   end
 
   local function checkResult()
-    local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
-    for k, _tuple in pairs(progressingSchedules) do
+    local processingSchedules = box.space[space].index["estimatedTime"]:select({"processing"})
+    for k, _tuple in pairs(processingSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
       local result = box.space["modeling_result"]:select({tuple.requestId, tuple.solution})
       local errorResult = box.space["modeling_result"]:select({tuple.requestId, "error"})
@@ -319,7 +319,7 @@ return function(server, api)
         estimatedTime = os.time(),
         type = self.data.type,
         ends = "completed",
-        status = "waiting",
+        status = "pending",
         createdDate = os.time(),
         updatedDate = os.time()
       }
@@ -345,7 +345,7 @@ return function(server, api)
       local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
         local s = schedules[1]
-        if s[5] == "waiting" or s[5] == "queue" then
+        if s[5] == "pending" or s[5] == "queue" then
           self.data.tuple.id = s[1]
           self.data.tuple.createdDate = s[11]
         end
