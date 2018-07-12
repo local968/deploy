@@ -55,7 +55,7 @@
 
 .head span,
 .project span {
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-right: 0.5rem;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .modelName {
-  flex: 2 1 0;
+  flex: 1 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
@@ -80,13 +80,20 @@
 .createdDate,
 .enable,
 .deploymentStatus,
+.performanceStatus,
 .operationAlert,
 .performanceAlert,
 .craetedDate,
-.owner {
+.owner,
+.delete {
   flex: 1 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.delete {
+  cursor: pointer;
+  text-align: center;
 }
 
 .statusIcon {

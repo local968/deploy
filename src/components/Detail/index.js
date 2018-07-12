@@ -98,16 +98,13 @@ export default class Detail extends Component {
           <span className={styles.enableText}>Enable</span>
           <span className={styles.enable}>
             <Switch
-              checked={cd.deploymentOptions.enable}
+              checked={cd.enable}
               onChange={() => {
-                if (cd.deploymentOptions.frequency)
-                  deployStore.toggleEnable(cd.id);
+                deployStore.toggleEnable(cd.id);
               }}
             />
           </span>
-          <span className={styles.enableText}>
-            {cd.deploymentOptions.enable ? 'On' : 'Off'}
-          </span>
+          <span className={styles.enableText}>{cd.enable ? 'On' : 'Off'}</span>
         </div>
       </div>
     );

@@ -53,7 +53,13 @@ export default class Modeling extends Component {
 
     if (train2Error) return <ModelError />;
     if (!models.length && train2ing) return <Loading project={project} />;
-    return <ModelResult models={models} project={project} history={this.props.history} />;
+    return (
+      <ModelResult
+        models={models}
+        project={project}
+        history={this.props.history}
+      />
+    );
   };
 
   enter = step => {
@@ -207,7 +213,7 @@ class ModelResult extends Component {
     const { models, project } = this.props;
     const current = models.find(model => model.recommend);
     this.props.deployStore
-      .newDeploy(project.projectId, project.name, current.name, current.backend)
+      .newDeploy(project.projectId, project.name, current.name, current.problemType)
       .then(id => this.props.history.push('/deploy/project/' + id));
   };
 

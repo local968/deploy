@@ -21,11 +21,12 @@ local fields = {
   "createdDate",
   "requestId",
   "result",
-  "solution"
+  "solution",
+  "threshold"
 }
 local common = commonInit(fields)
 
-local maxProgressing = 2
+local maxProcessing = 2
 
 -- easy version currently
 -- todo: delta mode
@@ -72,7 +73,7 @@ return function(server, api)
     if not box.space[space] then
       return
     end
-    local timeUpSchedules = box.space[space].index["estimatedTime"]:select({"waiting"})
+    local timeUpSchedules = box.space[space].index["estimatedTime"]:select({"pending"})
     for k, _tuple in pairs(timeUpSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
       if (tuple.estimatedTime < os.time()) then
@@ -93,20 +94,20 @@ return function(server, api)
     if not box.space[space] or not box.space["deployments"] then
       return
     end
-    local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
-    if (#progressingSchedules >= maxProgressing) then
+    local processingSchedules = box.space[space].index["estimatedTime"]:select({"processing"})
+    if (#processingSchedules >= maxProcessing) then
       return
     end
     local queueSchedules = box.space[space].index["estimatedTime"]:select({"queue"})
 
-    local max = maxProgressing - #progressingSchedules
+    local max = maxProcessing - #processingSchedules
     if (#queueSchedules < max) then
       max = #queueSchedules
     end
     for i = 1, max, 1 do
       local _tuple = queueSchedules[i]
       local tuple = common.mapArrayToObject(_tuple)
-      tuple.status = "progressing"
+      tuple.status = "processing"
       tuple.updatedDate = os.time()
 
       local deployment = box.space["deployments"].index.primary:select({tuple.deploymentId, tuple.userId})
@@ -117,6 +118,12 @@ return function(server, api)
       end
       if deployment then
         local id = common.createUUID()
+        local file
+        if tuple.type == "performance" then
+          file = deployment[9].file
+        else
+          file = deployment[8].file
+        end
         local result =
           box.space["modeling_request"]:replace(
           {
@@ -124,7 +131,7 @@ return function(server, api)
             {
               projectId = deployment[3],
               userId = deployment[2],
-              csvLocation = deployment[7].file,
+              csvLocation = file,
               command = "deploy2",
               solution = deployment[5]
             }
@@ -148,13 +155,20 @@ return function(server, api)
   end
 
   local function checkResult()
-    local progressingSchedules = box.space[space].index["estimatedTime"]:select({"progressing"})
-    for k, _tuple in pairs(progressingSchedules) do
+    local processingSchedules = box.space[space].index["estimatedTime"]:select({"processing"})
+    for k, _tuple in pairs(processingSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
       local result = box.space["modeling_result"]:select({tuple.requestId, tuple.solution})
+      local errorResult = box.space["modeling_result"]:select({tuple.requestId, "error"})
+      if #errorResult > 0 then
+        result = errorResult
+      end
       if #result > 0 then
         tuple.result = result[1][3].result
         tuple.status = "finished"
+        if #errorResult > 0 then
+          tuple.status = "issue"
+        end
         local request = {
           space = space,
           type = "replace",
@@ -190,6 +204,14 @@ return function(server, api)
       "deploymentId",
       {
         parts = {3, "string", 4, "string", 2, "string"},
+        unique = false
+      }
+    )
+
+    space:create_index(
+      "deleteSchedules",
+      {
+        parts = {3, "string", 2, "string"},
         unique = false
       }
     )
@@ -297,7 +319,7 @@ return function(server, api)
         estimatedTime = os.time(),
         type = self.data.type,
         ends = "completed",
-        status = "waiting",
+        status = "pending",
         createdDate = os.time(),
         updatedDate = os.time()
       }
@@ -308,9 +330,9 @@ return function(server, api)
       if #deployments > 0 then
         local d = deployments[1]
         if self.data.type == "performance" then
-          options = d[8]
+          options = d[9]
         else
-          options = d[7]
+          options = d[8]
         end
       else
         local result = self.data
@@ -323,7 +345,7 @@ return function(server, api)
       local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
         local s = schedules[1]
-        if s[5] == "waiting" or s[5] == "queue" then
+        if s[5] == "pending" or s[5] == "queue" then
           self.data.tuple.id = s[1]
           self.data.tuple.createdDate = s[11]
         end
@@ -342,6 +364,11 @@ return function(server, api)
         result.message = "not support yet."
         result.status = 500
         return self:render({data = result})
+      end
+
+      -- add threshold for performance
+      if self.data.type == "performance" then
+        self.data.tuple.threshold = self.data.threshold
       end
 
       local request = {

@@ -113,6 +113,18 @@ class ScheduleStore {
 
     return result;
   };
+
+  getLastSchedule = (deploymentId, type = 'deployment') =>
+    this.schedules
+      .filter(
+        schedule =>
+          schedule.deploymentId === deploymentId && schedule.type === type
+      )
+      .reduce(
+        (prev, curr, index) =>
+          (prev.updatedDate || 0) < curr.updatedDate ? curr : prev,
+        {}
+      );
 }
 
 export default new ScheduleStore();

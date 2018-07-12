@@ -11,8 +11,7 @@ const defaultDeploymentOptions = {
   file: {},
   frequency: null,
   frequencyOptions: {},
-  autoDisable: null,
-  enable: null
+  autoDisable: null
 };
 
 const defaultPerformanceOptions = {
@@ -20,11 +19,10 @@ const defaultPerformanceOptions = {
   sourceOptions: {},
   file: {},
   measurementMetric: 'AUC',
-  metricThreshold: 70,
+  metricThreshold: 0.7,
   frequency: null,
   frequencyOptions: {},
-  autoDisable: null,
-  enable: false
+  autoDisable: null
 };
 
 export default class Deployment {
@@ -37,8 +35,8 @@ export default class Deployment {
   @observable modelName;
   @observable modelType;
   @observable createdDate;
+  @observable enable;
   @observable email;
-  @observable owner;
 
   @observable deploymentOptions = { ...defaultDeploymentOptions };
   @observable performanceOptions = { ...defaultPerformanceOptions };
@@ -51,17 +49,18 @@ export default class Deployment {
     this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
     this.modelType = deploy.modelType;
+    this.enable = deploy.enable;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
-    this.owner = deploy.owner;
     this.deploymentOptions = {
       ...defaultDeploymentOptions,
       ...deploy.deploymentOptions
     };
     this.performanceOptions = {
       ...defaultPerformanceOptions,
-      ...deploy.performanceOptions,
-      metricThreshold: deploy.modelType === 'Classification' ? 70 : 50
+      metricThreshold: deploy.modelType === 'Classification' ? 0.7 : 0.5,
+      measurementMetric: deploy.modelType === 'Classification' ? 'AUC' : 'R2',
+      ...deploy.performanceOptions
     };
   }
 
@@ -77,6 +76,7 @@ export default class Deployment {
             modelType: this.modelType,
             createdDate: this.createdDate,
             email: this.email,
+            enable: this.enable,
             deploymentOptions: this.deploymentOptions,
             performanceOptions: this.performanceOptions
           }
@@ -95,6 +95,7 @@ export default class Deployment {
       modelType: this.modelType,
       createdDate: this.createdDate,
       email: this.email,
+      enable: this.enable,
       deploymentOptions: this.deploymentOptions,
       performanceOptions: this.performanceOptions,
       updatedDate: moment().unix()
