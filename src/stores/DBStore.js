@@ -32,7 +32,7 @@ class DB {
         this.once('ready', resolve);
       });
     }
-    const _conn = new R2WSClient(`ws://${config.host}:${config.port}/`);
+    const _conn = new R2WSClient(`ws://${window.location.hostname}:${config.port}/`);
 
     _conn.onready = this.emit.bind(this, 'ready', _conn);
     _conn.onmessage = this.emit.bind(this, 'message');

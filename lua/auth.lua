@@ -5,6 +5,22 @@ local Expired = 14*24*60*60
 local BadDomain = require('deploy2.lua.domain')
 local _init, _server
 
+local function checkLogin(req)
+    local connid = req.connid
+    local info = conn.getConnid(connid)
+    if info == nil then
+        return false
+    end
+    if info[2] == nil then
+        return false
+    end
+    if req.data == box.NULL then
+        req.data = {}
+    end
+    req.data.userId = info[2]
+    return true
+end
+
 local function bindConnid(userId, connid)
     local result = conn.getConnid(connid);
     if not result then
@@ -372,10 +388,10 @@ local function logout(self)
 end
 
 local function accessable(self, req)
-    if req.type == 'register' or req.type == 'login' then
+    if req.type == 'register' or req.type == 'login' or req.type == 'api' then
         return true 
     else
-        return true
+        return checkLogin(req)
     end
  end
 

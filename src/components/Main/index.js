@@ -16,7 +16,7 @@ export default class Main extends Component{
         
         when(
             () => props.userStore.userId && !props.userStore.isLoad,
-            () => props.projectStore.init(props.userStore.userId, this.pid)
+            () => props.projectStore.init(this.pid)
         )
     }
 
