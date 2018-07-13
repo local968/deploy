@@ -130,7 +130,11 @@ export default class Performance extends Component {
                     routing.push(`/deploy/project/${match.params.id}/status`);
                     DBStore.deploySchedule({
                       deploymentId: match.params.id,
-                      type: 'performance'
+                      type: 'performance',
+                      threshold: {
+                        type: cdpo.measurementMetric,
+                        value: cdpo.metricThreshold
+                      }
                     });
                   }
                 }}
@@ -275,7 +279,16 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           <Option value="Accuracy">Accuracy</Option>
         </Select>
       )}
-      {type === 'Regression' && <span className={styles.rmse}>RMSE</span>}
+      {type === 'Regression' && (
+        <Select
+          className={styles.select}
+          value={cdpo.measurementMetric}
+          onChange={value => selectionOption('measurementMetric', value)()}
+        >
+          <Option value="R2">R2</Option>
+          <Option value="RMSE">RMSE</Option>
+        </Select>
+      )}
     </div>
   </div>
 ));
@@ -286,18 +299,18 @@ const MetricThreshold = observer(({ cdpo, selectionOption, type }) => (
       <span className={styles.text}>Metric Threshold</span>
     </span>
     <div className={styles.selections}>
-      <span className={styles.compare}>
+      {/* <span className={styles.compare}>
         {type === 'Classification' ? '<' : '>'}
-      </span>
+      </span> */}
       <InputNumber
         className={styles.inputNumber}
-        min={1}
-        max={100}
+        min={0}
+        max={1}
+        step={0.1}
         value={cdpo.metricThreshold}
         onChange={value => {
           selectionOption('metricThreshold', value || 0)();
         }}
-        formatter={value => `${value}%`}
       />
     </div>
   </div>

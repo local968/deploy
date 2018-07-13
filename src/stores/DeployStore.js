@@ -31,7 +31,7 @@ const filter = (keywords, deployments) => {
       .map(
         word =>
           (_d.projectName && _d.projectName.indexOf(word) >= 0) ||
-          (_d.owner && _d.owner.indexOf(word) >= 0) ||
+          (_d.userId && _d.userId.indexOf(word) >= 0) ||
           (_d.modelName && _d.modelName.indexOf(word) >= 0)
             ? true
             : false
@@ -161,8 +161,13 @@ class DeployStore {
   @action
   toggleEnable(id) {
     const _d = new Deployment(this.deployments.find(_d => _d.id === id));
-    _d.deploymentOptions.enable = !_d.deploymentOptions.enable;
+    _d.enable = !_d.enable;
     return _d.save();
+  }
+
+  @action
+  delete(id) {
+    DBStore.ready().then(db => db.removeDeploy({ id }));
   }
 
   @action

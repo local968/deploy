@@ -20,7 +20,7 @@
 }
 
 .number {
-  font-size: 2.8125rem;
+  font-size: 2.5rem;
   display: block;
   font-family: HelveticaNeue;
 }
@@ -133,7 +133,7 @@
   width: 0.28em;
 }
 
-.notification span{
+.notification span {
   font-size: 0.875rem;
   font-family: HelveticaNeue;
   font-weight: normal;
@@ -178,32 +178,32 @@ span.num {
   flex: auto;
 }
 
-.item.current{
+.item.current {
   border-bottom: 0.04em solid #1d2b3c;
 }
 
-.item span{
+.item span {
   font-size: 1.125rem;
   font-family: SanFranciscoText;
   color: #979797;
 }
 
-.item.active span{
+.item.active span {
   color: #1d2b3c;
 }
 
-.item.current span{
+.item.current span {
   font-family: HelveticaNeue;
   font-weight: bold;
 }
 
-.icon{
+.icon {
   display: flex;
   justify-content: center;
   margin: 0.3em auto 0.15em;
 }
 
-.iconBlock{
+.iconBlock {
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -224,7 +224,7 @@ span.num {
   align-items: center;
 }
 
-.item .line span{
+.item .line span {
   font-weight: normal;
   font-size: 0.875rem;
   font-family: HelveticaNeue;
@@ -232,8 +232,8 @@ span.num {
   color: #c6c6c6;
 }
 
-.item.active .line span{
-  color: #1d2b3c
+.item.active .line span {
+  color: #1d2b3c;
 }
 
 .auth {
@@ -250,7 +250,6 @@ span.num {
   font-size: 1.5rem;
   cursor: pointer;
 }
-
 
 .loginIcon {
   display: flex;

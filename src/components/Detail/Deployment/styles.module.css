@@ -13,7 +13,7 @@
 .model,
 .data,
 .email {
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -35,7 +35,7 @@
 .change,
 .download,
 .edit {
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-left: 10px;
   margin-right: 20px;
   color: #1d2b3c;
@@ -45,7 +45,7 @@
 }
 
 .cancel {
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: #1d2b3c;
   text-decoration: underline;
   flex: 1 1 0;
@@ -53,7 +53,7 @@
 
 .emailEdit {
   flex: 1 1 0;
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
 .emailInput {
@@ -133,7 +133,7 @@
   color: #9a9b9b;
 }
 .text {
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
 .selected {

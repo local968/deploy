@@ -94,21 +94,18 @@ export default class Detail extends Component {
           />
           <Route path="/deploy/project/:id/status" component={Status} />
         </div>
-        <div className={styles.enableWrap}>
+        {/* <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>
           <span className={styles.enable}>
             <Switch
-              checked={cd.deploymentOptions.enable}
+              checked={cd.enable}
               onChange={() => {
-                if (cd.deploymentOptions.frequency)
-                  deployStore.toggleEnable(cd.id);
+                deployStore.toggleEnable(cd.id);
               }}
             />
           </span>
-          <span className={styles.enableText}>
-            {cd.deploymentOptions.enable ? 'On' : 'Off'}
-          </span>
-        </div>
+          <span className={styles.enableText}>{cd.enable ? 'On' : 'Off'}</span>
+        </div> */}
       </div>
     );
   }

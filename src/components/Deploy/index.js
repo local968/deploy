@@ -3,6 +3,7 @@ import styles from './styles.module.css';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import { Bread, Select, Pagination, Switch, Search } from 'components/Common';
+import { Icon } from 'antd';
 import issueIcon from './fail.svg';
 import runningIcon from './running.svg';
 import normalIcon from './success.svg';
@@ -18,7 +19,7 @@ const deploymentStatus = {
       <img className={styles.statusIcon} src={issueIcon} alt="issue" />Issue
     </span>
   ),
-  running: (
+  processing: (
     <span className={styles.running}>
       <img className={styles.statusIcon} src={runningIcon} alt="running" />Running
     </span>
@@ -26,7 +27,7 @@ const deploymentStatus = {
   na: <span className={styles.na}>N/A</span>
 };
 
-@inject('deployStore')
+@inject('deployStore', 'scheduleStore')
 @observer
 export default class Home extends Component {
   toggle = (currentType, targetType) => () => {
@@ -42,7 +43,7 @@ export default class Home extends Component {
     }
   };
   render() {
-    const { deployStore, history } = this.props;
+    const { deployStore, history, scheduleStore } = this.props;
     return (
       <div className={styles.home}>
         <Bread list={['Home']} />
@@ -93,8 +94,9 @@ export default class Home extends Component {
             </span>
             <span className={styles.enable}>Enable</span>
             <span className={styles.deploymentStatus}>Deployment Status</span>
-            <span className={styles.operationAlert}>Operation Alert</span>
-            <span className={styles.performanceAlert}>Performance Alert</span>
+            <span className={styles.performanceStatus}>Performance Status</span>
+            {/* <span className={styles.operationAlert}>Operation Alert</span>
+            <span className={styles.performanceAlert}>Performance Alert</span> */}
             <span
               className={styles.createdDate}
               onClick={this.toggle(
@@ -105,6 +107,7 @@ export default class Home extends Component {
               Created Date
             </span>
             <span className={styles.owner}>Owner</span>
+            <span className={styles.delete} />
           </div>
           <div className={styles.list}>
             {deployStore.sortedDeployments.map(deployment => (
@@ -133,24 +136,43 @@ export default class Home extends Component {
                 </span>
                 <span className={styles.enable}>
                   <Switch
-                    checked={
-                      deployment.deploymentOptions &&
-                      deployment.deploymentOptions.enable
-                    }
+                    checked={deployment && deployment.enable}
                     onChange={() => {
-                      if (deployment.deploymentOptions.frequency) {
-                        deployStore.toggleEnable(deployment.id);
-                      }
+                      deployStore.toggleEnable(deployment.id);
                     }}
                   />
                 </span>
                 <span
                   className={styles.deploymentStatus}
-                  title={deploymentStatus[deployment.status || 'normal']}
+                  title={
+                    scheduleStore.schedules &&
+                    scheduleStore.getLastSchedule(deployment.id, 'deployment')
+                      .status
+                  }
                 >
-                  {deploymentStatus[deployment.status || 'normal']}
+                  {deploymentStatus[
+                    scheduleStore.schedules &&
+                      scheduleStore.getLastSchedule(deployment.id, 'deployment')
+                        .status
+                  ] || deploymentStatus['normal']}
                 </span>
                 <span
+                  className={styles.performanceStatus}
+                  title={
+                    scheduleStore.schedules &&
+                    scheduleStore.getLastSchedule(deployment.id, 'performance')
+                      .status
+                  }
+                >
+                  {deploymentStatus[
+                    scheduleStore.schedules &&
+                      scheduleStore.getLastSchedule(
+                        deployment.id,
+                        'performance'
+                      ).status
+                  ] || deploymentStatus['normal']}
+                </span>
+                {/* <span
                   className={styles.operationAlert}
                   title={deployment.operationAlert || 0}
                   onClick={() =>
@@ -167,7 +189,7 @@ export default class Home extends Component {
                   }
                 >
                   {deployment.performanceAlert || 0}
-                </span>
+                </span> */}
                 <span
                   className={styles.createdDate}
                   title={moment.unix(deployment.createdDate).format('M/D/YYYY')}
@@ -178,7 +200,15 @@ export default class Home extends Component {
                   {moment.unix(deployment.createdDate).format('M/D/YYYY')}
                 </span>
                 <span className={styles.owner} title={deployment.owner}>
-                  {deployment.owner}
+                  {deployment.userId}
+                </span>
+                <span
+                  className={styles.delete}
+                  onClick={() => {
+                    deployStore.delete(deployment.id);
+                  }}
+                >
+                  <Icon type="delete" />
                 </span>
               </div>
             ))}
