@@ -220,6 +220,11 @@ class ProjectStore {
                     case 'modelInsights':
                         this.setCharts("modelInsights", result);
                         break;
+                    case 'dataView':
+                        this.project.updateProject({
+                            dataViews: result.data
+                        })
+                        break;
                     default:
                         break;
                 }

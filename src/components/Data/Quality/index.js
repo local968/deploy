@@ -3,11 +3,14 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { ContinueButton } from '../../Common';
+import { when, remove } from 'mobx';
+import * as d3 from 'd3';
 
 @observer
 export default class DataQuality extends Component {
     state = {
-        visible: false
+        visible: false,
+        isLoad: false
     }
 
     startTrain = () => {
@@ -23,9 +26,26 @@ export default class DataQuality extends Component {
     }
 
     editFixes = () => {
-        this.setState({
-            visible: true
-        })
+        if(this.props.project.dataViews){
+            this.setState({
+                visible: true
+            })
+        }else{
+            this.setState({
+                isLoad: true
+            })
+            this.props.project.dataView()
+            when(
+                () => this.props.project.dataViews,
+                () => {
+                    this.setState({
+                        visible: true,
+                        isLoad: false
+                    })
+                }
+            )
+        }
+        
     }
 
     closeFixes = () => {
@@ -274,7 +294,10 @@ class DataIssue extends Component {
 class FixIssue extends Component {
     state = {
         checked: [],
-        canSave: false
+        canSave: false,
+        visible: false,
+        editKey: "",
+        fillMethod: {}
     }
 
     check = (e) => {
@@ -295,8 +318,19 @@ class FixIssue extends Component {
         })
     }
 
-    editRange = () => {
+    editRange = (key) => {
+        console.log(key)
+        this.setState({
+            visible: true,
+            editKey: key
+        })
+    }
 
+    closeEdit = () => {
+        this.setState({
+            visible: false,
+            editKey: ''
+        })
     }
 
     select = (type, key, e) => {
@@ -336,8 +370,7 @@ class FixIssue extends Component {
                 </div>
             </div>
         }else{
-            const {issueRows, colType, target, mismatchIndex, nullIndex, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalLines} = project
-            const total = totalLines + issueRows.errorRow.length;
+            const {issueRows, colType, target, mismatchIndex, nullIndex, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews} = project
             return <div className={styles.fixesContent}>
                 {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
                     <div className={styles.typeBox}>
@@ -363,21 +396,20 @@ class FixIssue extends Component {
                                 }
                                 return <div className={styles.fixesRow} key={i}>
                                     <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
-                                    <div className={styles.fixesCell}><select value={colType[target]} readOnly={true}>
+                                    <div className={styles.fixesCell}><select value={colType[k]} readOnly={true}>
                                         <option value="Categorical">Categorical</option>
                                         <option value="Numerical">Numerical</option>
                                     </select></div>
-                                    <div className={styles.fixesCell}><span>{mismatchIndex[k].length} ({(mismatchIndex[k].length / total).toFixed(4)}%)</span></div>
-                                    <div className={styles.fixesCell}><span>4567</span></div>
-                                    <div className={styles.fixesCell}><span>5644</span></div>
+                                    <div className={styles.fixesCell}><span>{mismatchIndex[k].length} ({(mismatchIndex[k].length / (totalRawLines||1)).toFixed(4)}%)</span></div>
+                                    <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].mean:'N/A'}>{dataViews[k]?dataViews[k].mean:'N/A'}</span></div>
+                                    <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].median:'N/A'}>{dataViews[k]?dataViews[k].median:'N/A'}</span></div>
                                     <div className={styles.fixesCell}><span>5644</span></div>
                                     <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.select.bind(null,'missing',k)}>
-                                        <option value="Categorical">Categorical</option>
-                                        <option value="Numerical">Numerical</option>
+                                        <option value="drop">Delete the row</option>
                                     </select></div>
                                 </div>
                             })}
-                        </div>
+                        </div>  
                     </div>
                 </div>}
                 {!!issueRows.nullRow.length && <div className={styles.fixesArea}>
@@ -405,18 +437,17 @@ class FixIssue extends Component {
                             }
                             return <div className={styles.fixesRow} key={i}>
                                 <div className={styles.fixesCell}><span>{k}</span></div>
-                                <div className={styles.fixesCell}><span>1867 - 8976</span></div>
-                                <div className={styles.fixesCell}><select value={colType[target]} readOnly={true}>
+                                <div className={styles.fixesCell}><span>I don`t know</span></div>
+                                <div className={styles.fixesCell}><select value={colType[k]} readOnly={true}>
                                     <option value="Categorical">Categorical</option>
                                     <option value="Numerical">Numerical</option>
                                 </select></div>
-                                <div className={styles.fixesCell}><span>{nullIndex[k].length} ({(nullIndex[k].length / total).toFixed(4)}%)</span></div>
-                                <div className={styles.fixesCell}><span>4567</span></div>
-                                <div className={styles.fixesCell}><span>5644</span></div>
+                                <div className={styles.fixesCell}><span>{nullIndex[k].length} ({(nullIndex[k].length / (totalRawLines||1)).toFixed(4)}%)</span></div>
+                                <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].mean:'N/A'}>{dataViews[k]?dataViews[k].mean:'N/A'}</span></div>
+                                <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].median:'N/A'}>{dataViews[k]?dataViews[k].median:'N/A'}</span></div>
                                 <div className={styles.fixesCell}><span>5644</span></div>
                                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.select.bind(null,'missing',k)}>
-                                    <option value="Categorical">Categorical</option>
-                                    <option value="Numerical">Numerical</option>
+                                    <option value="drop">Delete the row</option>
                                 </select></div>
                             </div>
                         })}
@@ -448,18 +479,17 @@ class FixIssue extends Component {
                             return <div className={styles.fixesRow} key={i}>
                                 <div className={styles.fixesCell}><span>{k}</span></div>
                                 <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
-                                    <span>1867 - 8976</span><span className={styles.fixesEdit} onClick={this.editRange}>edit</span>
+                                    <span>1867 - 8976</span><span className={styles.fixesEdit} onClick={this.editRange.bind(null,k)}>edit</span>
                                 </div>
-                                <div className={styles.fixesCell}><select value={colType[target]} readOnly={true}>
+                                <div className={styles.fixesCell}><select value={colType[k]} readOnly={true}>
                                     <option value="Categorical">Categorical</option>
                                     <option value="Numerical">Numerical</option>
                                 </select></div>
-                                <div className={styles.fixesCell}><span>{outlierIndex[k].length} ({(outlierIndex[k].length / total).toFixed(4)}%)</span></div>
-                                <div className={styles.fixesCell}><span>4567</span></div>
-                                <div className={styles.fixesCell}><span>5644</span></div>
+                                <div className={styles.fixesCell}><span>{outlierIndex[k].length} ({(outlierIndex[k].length / (totalRawLines||1)).toFixed(4)}%)</span></div>
+                                <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].mean:'N/A'} >{dataViews[k]?dataViews[k].mean:'N/A'}</span></div>
+                                <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].median:'N/A'}>{dataViews[k]?dataViews[k].median:'N/A'}</span></div>
                                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={outlierFillMethod[k]} onChange={this.select.bind(null,'missing',k)}>
-                                    <option value="Categorical">Categorical</option>
-                                    <option value="Numerical">Numerical</option>
+                                    <option value="drop">Delete the row</option>>
                                 </select></div>
                             </div>
                         })}
@@ -470,18 +500,245 @@ class FixIssue extends Component {
         }
     }
 
+    drag = (type, num) => {
+
+    }
+    // renderEdit = () => {
+    //     const {outlierIndex} = this.props.project;
+    //     const outlier = outlierIndex[this.state.editKey]
+    //     console.log(outlier)
+    //     return <div className={styles.fixesContent}>
+    //         <div className={styles.d3Chart}>
+                
+    //         </div>
+    //     </div>
+    // }
+
     render() {
-        const {closeFixes} = this.props;
+        const {closeFixes, project} = this.props;
         return <div className={styles.fixes}>
             <div className={styles.cover} onClick={closeFixes}></div>
             <div className={styles.fixesBlock}>
-                <div className={styles.fixesTitle}><span>Fixing data issue</span><div className={styles.close}><span>X</span></div></div>
+                <div className={styles.fixesTitle}><span>How Mr.One Will Fix the Issues</span><div className={styles.close} onClick={closeFixes}><span>X</span></div></div>
                 {this.renderContent()}
                 <div className={styles.fixesBottom}>
                     <button className={classnames(styles.save, {
                         [styles.disabled]: !this.state.canSave
                     })} onClick={this.save} disabled={!this.state.canSave} ><span>save</span></button>
                     <button className={styles.cancel} onClick={closeFixes}><span>cancel</span></button>
+                </div>
+            </div>
+            {this.state.visible && <EditOutLier width={800} height={400} closeEdit={this.closeEdit} data={project.colMap.date} outlierRange={project.outlierRange[this.state.editKey]} numberBins={project.numberBins[this.state.editKey]}/>}
+        </div>
+    }
+}
+
+class EditOutLier extends Component{
+
+    state = {
+        min: this.props.outlierRange[0], 
+        max: this.props.outlierRange[1]
+    }
+
+    componentDidMount() {
+        this.d3Chart()
+    }    
+
+    componentDidUpdate() {
+        this.d3Chart()
+    }
+
+    d3Chart = () => {
+        d3.select(`.${styles.d3Chart} svg`).remove();
+        const {width, height, numberBins} = this.props;
+        const [y, x] = numberBins;
+        const padding = {left: 50, bottom: 30, right: 5, top: 50};
+
+        const realHeight = height - padding.bottom - padding.top;
+        const realWidth = width - padding.left - padding.right;
+        //在 body 里添加一个 SVG 画布   
+        const svg = d3.select(`.${styles.d3Chart}`)
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr('transform', `translate(${padding.left}, 0)`);
+
+        const maxH = d3.max(y);
+        const minX = x[0];
+        const maxX = x[x.length-1];
+        const dataset = [];
+        const rectWidth = x[1] - x[0];
+
+        // for(let  i = 0;i<100;i++) {
+        //     let rand = Math.random() * 100;
+        //     maxH = typeof maxH !== 'undefined'?Math.max(rand, maxH):rand;
+        //     minX = typeof minX !== 'undefined'?Math.min(i, minX):i;
+        //     maxX = typeof maxX !== 'undefined'?Math.max(i, maxX):i;
+        //     dataset.push({x: i, y: rand})
+        // }
+        const offset = (maxX - minX)/4;
+
+        //x轴的比例尺
+        var xScale = d3.scaleLinear()
+            .range([0, realWidth])
+            .domain([minX - offset, maxX + offset])
+            .clamp(true);
+
+        //y轴的比例尺
+        var yScale = d3.scaleLinear()
+            .range([realHeight, 0])
+            .domain([0, maxH])
+            .clamp(true);
+        
+        //定义x轴
+        var xAxis = d3.axisBottom(xScale);
+
+        //定义y轴
+        var yAxis = d3.axisLeft(yScale);
+
+        //添加x轴
+        svg.append("g")
+        .attr("class",`${styles.axis}`)
+        .attr("transform",`translate(0, ${realHeight + padding.top})`)
+        .call(xAxis); 
+
+        //添加y轴
+        svg.append("g")
+        .attr("class",`${styles.axis}`)
+        .attr("transform",`translate(0, ${padding.top})`)
+        .call(yAxis);
+
+        const drawDrag = () => {
+            let {min, max} = this.state
+            const minDrag = d3.drag()
+                // .container(minDrag)
+                .on('start', function () {
+                    console.log(d3.event.x)
+                    console.log('start',d3.event)
+                })
+                .on('drag', () => {
+                    minRect.attr('width', xScale(xScale.invert(d3.event.x)))
+                    minLine.attr('x1', xScale(xScale.invert(d3.event.x)))
+                    minLine.attr('x2', xScale(xScale.invert(d3.event.x)))
+                    minCircle.attr('cx', xScale(xScale.invert(d3.event.x)))
+                })
+                .on('end', () => {
+                    this.setState({
+                        min: xScale.invert(d3.event.x)
+                    })
+                });
+
+            let minDragBlock = svg.append('g');    
+            let minRect = minDragBlock.append('rect')
+                .attr('class', `${styles.dragRect}`)
+                .attr('x', xScale(minX - offset))
+                .attr('y', yScale(maxH) + padding.top)
+                .attr('width', xScale(min) - xScale(minX - offset))
+                .attr('height', realHeight)
+
+            let minLine = minDragBlock.append('line')
+                .attr('class', `${styles.dragLine}`)
+                .attr('x1', xScale(min)- xScale(minX - offset))
+                .attr('y1', yScale(maxH) + padding.top)
+                .attr('x2', xScale(min)- xScale(minX - offset))
+                .attr('y2', realHeight + padding.top)
+
+            let minCircle = minDragBlock.append('circle')
+                .attr('class', `${styles.dragCircle}`)
+                .attr('cx', xScale(min))
+                .attr('cy', padding.top-8)
+                .attr('r', 10)
+                .attr('fill', '#c7f1ee')
+                .call(minDrag);
+
+            const maxDrag = d3.drag()
+                .on('start', function () {
+                    console.log('start',d3.event)
+                })
+                .on('drag', () => {
+                    maxRect.attr('x', xScale(xScale.invert(d3.event.x)))
+                    maxRect.attr('width', xScale(maxX + offset) - xScale(xScale.invert(d3.event.x)))
+                    maxLine.attr('x1', xScale(xScale.invert(d3.event.x)))
+                    maxLine.attr('x2', xScale(xScale.invert(d3.event.x)))
+                    maxCircle.attr('cx', xScale(xScale.invert(d3.event.x)))
+                })
+                .on('end', () => {                 
+                    this.setState({
+                        max: xScale.invert(d3.event.x)
+                    })
+                });
+
+            let maxDragBlock = svg.append('g');    
+            let maxRect = maxDragBlock.append('rect')
+                .attr('class', `${styles.dragRect}`)
+                .attr('x', xScale(max))
+                .attr('y', yScale(maxH) + padding.top)
+                .attr('width', xScale(maxX + offset) - xScale(max))
+                .attr('height', realHeight)
+
+            let maxLine = maxDragBlock.append('line')
+                .attr('class', `${styles.dragLine}`)
+                .attr('x1', xScale(max))
+                .attr('y1', yScale(maxH) + padding.top)
+                .attr('x2', xScale(max))
+                .attr('y2', realHeight + padding.top);
+
+            let maxCircle = maxDragBlock.append('circle')
+                .attr('class', `${styles.dragCircle}`)
+                .attr('cx', xScale(max))
+                .attr('cy', padding.top-8)
+                .attr('r', 10)
+                .attr('fill', '#ffd287')
+                .call(maxDrag);
+        }
+
+        //初始化拖动
+        drawDrag()
+
+        //添加矩形元素
+        const drawRect = () => {
+            // const {min, max} = this.state;
+            // if(min >= max) {
+                for(let i = 1; i < x.length;i++){
+                    dataset.push({
+                        x: (x[i] + x[i-1])/2,
+                        y: y[i-1],
+                        // width: 1,
+                        // class: styles.outer
+                    })
+                }
+            // }else{
+
+            // }
+
+            var rects = svg.selectAll(`.${styles.rect}`);
+            rects.remove();
+            rects.data(dataset)
+                .enter()
+                .append("rect")
+                .attr("class",(d) => d.class)
+                // .attr("transform",`translate(0,${padding.top})`)
+                .attr("x", (d) => xScale(d.x))
+                .attr("y", (d) => yScale(d.y) + padding.top)
+                .attr("width", () => xScale(rectWidth) - xScale(0))
+                .attr("height", (d) => realHeight - yScale(d.y));
+        }
+
+        //添加矩形元素
+        drawRect()
+    }
+
+    render() {
+        const {closeEdit} = this.props;
+        return <div className={styles.fixes}>
+            <div className={styles.cover} onClick={closeEdit}></div>
+            <div className={styles.fixesBlock}>
+                <div className={styles.fixesTitle}><span>Outlier</span><div className={styles.close} onClick={closeEdit}><span>X</span></div></div>
+                <div className={styles.fixesContent}>
+                    <div className={styles.d3Chart}>
+                        
+                    </div>
                 </div>
             </div>
         </div>

@@ -20,7 +20,13 @@ export default class DataSchema extends Component {
     }
 
     doEtl = () => {
-        this.props.project.doEtl(this.state.checkList);
+        const {colType, rawHeader} = this.props.project;
+        const newDataHeader = rawHeader.filter(d => !this.state.checkList.includes(d));
+        this.props.project.updateProject({
+			dataHeader: newDataHeader,
+			colType: colType
+		});
+        this.props.project.etl();
     }
 
     targetSelect = (value) => {

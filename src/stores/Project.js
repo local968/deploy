@@ -5,10 +5,6 @@ import moment from 'moment';
 
 const Classification = 'Classification';
 const MinRow = 1000;
-const MinUnique = {
-	Classification: 2,
-	Regression: 10
-}
 
 export default class Project {
 	@observable description;
@@ -64,6 +60,8 @@ export default class Project {
 	@observable nullIndexes = {}
 	@observable outlierFillMethod = {}
 	@observable outlierIndex = {}
+	@observable dataViews = null
+
 
 	@observable criteria = 'defualt';
 
@@ -204,9 +202,15 @@ export default class Project {
 			overfit: 5,
 			speed: 5,
 			version: 2,
-			fillMetho: {},
 			validationRate: 0.1,
-			holdoutRate: 0.1
+			holdoutRate: 0.1,
+			mismatchFillMethod: {},
+			mismatchIndex: {},
+			nullFillMethod: {},
+			nullIndexes: {},
+			outlierFillMethod: {},
+			outlierIndex: {},
+			dataViews: null
 		};
 		this.updateProject(problemStepData);
 		Object.assign(this, problemStepData);
@@ -332,83 +336,13 @@ export default class Project {
 			data.targetMap = {...this.targetMap};
 		}
 
+		console.log(data)
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// problem_type: 预测类型 Classification , Regression
 		// feature_label: 特征列名
-		// fill_method:  无效值
-		// kwargs:
-		requestStore.sendRequest(id, );
-	}
-
-	doEtl(banList) {
-		const {
-			userId,
-			projectId,
-			problemType,
-			target,
-			rawHeader,
-			uploadFileName
-		} = this;
-
-		const command = 'etl';
-		const id = `${command}-${userId}-${projectId}`;
-
-		const newDataHeader = rawHeader.filter(d => !banList.includes(d));
-
-		this.updateProject({
-			dataHeader: newDataHeader,
-			colType: this.colType
-		});
-
-		const featureLabel = newDataHeader.filter(d => d !== target);
-
-		const data = {
-			csvLocation: uploadFileName,
-			problemType,
-			featureLabel,
-			projectId,
-			userId,
-			time: moment().valueOf(),
-			command,
-			validationRate: this.validationRate,
-			holdoutRate: this.holdoutRate,
-			version: this.version
-		}
-
-		if(this.colType.length) {
-			data.colType= [...this.colType];
-		}
-
-		if(this.target) {
-			data.targetLabel = target;
-		}
-
-		if(this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
-			data.mismatchFillMethod = {...this.mismatchFillMethod};
-		}
-
-		if(this.nullFillMethod && Object.keys(this.nullFillMethod).length) {
-			data.nullFillMethod = {...this.nullFillMethod};
-		}
-
-		if(this.outlierFillMethod && Object.keys(this.outlierFillMethod).length) {
-			data.outlierFillMethod = {...this.outlierFillMethod};
-		}
-
-		if(this.targetMap && Object.keys(this.targetMap).length) {
-			data.targetMap = {...this.targetMap};
-		}
-
-		// id: request ID
-		// userId: user ID
-		// projectId: project ID
-		// csv_location: csv 文件相对路径
-		// problem_type: 预测类型 Classification , Regression
-		// feature_label: 特征列名
-		// target_label:  目标列
 		// fill_method:  无效值
 		// kwargs:
 		requestStore.sendRequest(id, data);
@@ -457,9 +391,16 @@ export default class Project {
 		}
 		const {problemType, totalRawLines, target,  colMap, issueRows, colType} = this;
 
-		const unique = colType[target] === 'Categorical' ? Object.keys(colMap[target]).length : 50;
-		if(unique < MinUnique[problemType]) {
-			data.targetIssue = true
+		if(problemType === Classification) {
+			if(colType[target] === 'Categorical') {
+				data.targetIssue = Object.keys(colMap[target]).length > 2;
+			}else{
+				data.targetIssue = true
+			}
+		}else{
+			if(colType[target] === 'Categorical') {
+				data.targetIssue = Object.keys(colMap[target]).length < 10;
+			}
 		}
 
 		if(totalRawLines < MinRow) {

@@ -446,12 +446,13 @@
 .fixesBox {
     display: flex;
     flex: none;
+    flex-wrap: wrap;
 }
 
 .fixesCheck{
     display: flex;
     flex: none;
-    margin-right: 0.5em;
+    margin: 0.1em 0.5em 0.1em 0;
 }
 
 .fixesBottom .disabled {
@@ -516,6 +517,8 @@
 .fixesCell span {
     font-size: 0.75rem;
     color: #636166;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .fixesLarge {
@@ -554,4 +557,58 @@ span.fixesEdit {
     position: absolute;
     right: 0;
     margin-right: 0.1em;
+    cursor: pointer;
+}
+
+.editBlock {
+    
+}
+
+.editTitle {
+
+}
+
+.d3Chart {
+    position: relative;
+}
+
+.d3Chart g{
+    position: relative;
+}
+
+.rect {
+    fill: #a4cbed;
+}
+.text {
+
+}
+
+.outer {
+    fill: #bdbdbd;
+}
+
+.axis {
+
+}
+
+.axis path,
+.axis line{
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.dragRect {
+    fill: #f5f5f5
+}
+
+.dragLine {
+    stroke: #124d8e;
+    stroke-width:2;
+    cursor: pointer;
 }
