@@ -12,7 +12,7 @@ app.get('/test', (req, res) => {
   res.send('ok');
 });
 
-const port = parseInt(process.env.httpPort) + 2;
+const port = parseInt(config.port);
 httpServer = app.listen(port, '0.0.0.0', err => {
   if (err) {
     console.log(err, port); // eslint-disable-line
@@ -48,7 +48,7 @@ app.post('/api/upload', (req, res) => {
   // const projPath = path.resolve(__dirname, '../..');
   const filePath = path.join(config.projPath, 'data', userId, projectId);
   const uploadFile = path.join(filePath, filename);
-
+  console.log("start upload")
   //创建文件夹
   if (!fs.existsSync(filePath)) {
     createFilePath(filePath)
@@ -108,7 +108,14 @@ app.post('/api/upload', (req, res) => {
   
 });
 
+
 app.get('/api/download', (req,res) => {
+  const {userId, projectId, csvLocation} = req.query;
+  const file = path.join(config.projPath, 'data', userId, projectId, csvLocation);
+  res.download(file)
+})
+
+app.get('/api/read', (req,res) => {
   const {userId, projectId, csvLocation} = req.query;
   const file = path.join(config.projPath, 'data', userId, projectId, csvLocation);
   const download = new Download(req ,res);

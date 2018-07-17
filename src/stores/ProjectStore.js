@@ -1,4 +1,3 @@
-// import db from './db.js';
 import { observable, action, when, computed } from 'mobx';
 import Project from './Project.js';
 import socketStore from './SocketStore';
@@ -18,18 +17,17 @@ class ProjectStore {
     }
 
     @action
-    init(userId, projectId) {
+    init(projectId) {
         //同一project不用加载
-        if (this.userId === userId && this.projectId === projectId) return;
+        if (this.projectId === projectId) return;
         this.isLoad = true;
-        this.userId = userId;
         this.projectId = projectId;
 
         when(
             () => socketStore.isready,
             () => {
-                socketStore.send("queryProject", { userId: userId, projectId: projectId })
-                socketStore.send("queryModels", { userId: userId, projectId: projectId })
+                socketStore.send("queryProject", { projectId: projectId })
+                socketStore.send("queryModels", { projectId: projectId })
             }
         )
     }
@@ -112,25 +110,13 @@ class ProjectStore {
         // })
     }
 
-    saveModel(data) {
-        when(
-            () => socketStore.isready,
-            () => {
-                socketStore.send("changeModel", data)
-            }
-        )
-        return data.args;
-    }
-
     next() {
-        const {curStep, subStepActive} = this.project
-        const nextStep = subStepActive + 1;
-        if(curStep === 2 && nextStep > 2){
-            this.project.nextMainStep(3)
-        }else if(curStep === 3) {
-            return false;
-        }else {
-            this.project.nextSubStep(curStep, nextStep)
+        const {curStep, subStepActive} = this.project;
+        if(curStep === 2 && subStepActive < 3){
+            const nextStep = subStepActive + 1;
+            this.project.nextSubStep(nextStep, curStep)
+        }else{
+            return false
         }
     }
 
@@ -182,40 +168,31 @@ class ProjectStore {
             }),
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
-                let { userId, projectId, command, result, status } = data;
+                let { command, result, status } = data;
                 if (status < 0) {
                     this.modelimgError(command, result)
                     return;
                 }
                 switch (command) {
                     case 'etl':
-                        delete result.name
+                        delete result.name;
                         // this.project.setProperty(result)
                         this.project.updateProject(result)
                         this.next()
                         break;
                     case 'train2':
-                        let info = {
-                            userId,
-                            projectId,
-                            args: {}
-                        }
                         if(Array.isArray(result)){
                             [result] = result
                         }
                         // for (let row of result) {
                         if(result&&result.name){
-                            info.args[`${command}-${result.name}-result`] = result
-                            const models = this.saveModel(info)
-                            for (let key in models) {
-                                let index = this.models.findIndex(m => {
-                                    return models[key].name === m.name
-                                })
-                                if (index === -1) {
-                                    this.models.push(new Model(this.userId, this.projectId, models[key]))
-                                } else {
-                                    this.models[index] = new Model(this.userId, this.projectId, models[key])
-                                }
+                            let index = this.models.findIndex(m => {
+                                return result.name === m.name
+                            })
+                            if (index === -1) {
+                                this.models.push(new Model(this.userId, this.projectId, result))
+                            } else {
+                                this.models[index] = new Model(this.userId, this.projectId, result)
                             }
                             this.recommendModel()
                         }
@@ -242,6 +219,11 @@ class ProjectStore {
                         break;
                     case 'modelInsights':
                         this.setCharts("modelInsights", result);
+                        break;
+                    case 'dataView':
+                        this.project.updateProject({
+                            dataViews: result.data
+                        })
                         break;
                     default:
                         break;

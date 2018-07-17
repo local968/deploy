@@ -28,7 +28,7 @@
   },
   "proxy": {
     "/api/*": {
-      "target": "http://localhost:52002"
+      "target": "http://localhost:53002"
     }
   },
   "scripts": {

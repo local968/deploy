@@ -1,0 +1,614 @@
+.quality {
+    display: flex;
+    margin-top: 0.25em;
+    flex-direction: column;
+    flex: auto;
+    padding: 0 10%;
+}
+
+.quality span {
+    font-family: Arial;
+    font-size: 0.875rem;
+    color: #4a4a4a;
+    line-height: 1.1;
+}
+
+.issue {
+    background-color: #f1f4f6;
+    border: solid 1px #c4cbd7;
+    display: flex;
+    flex-direction: column;
+    padding: 0.15em;
+    flex: none;
+}
+
+.issueTitle {
+    display: flex;
+    margin-bottom: 0.06em;
+}
+
+.issueTitle span {
+    color: #ff3151;
+    font-size: 1.125rem;
+    line-height: 1.2;
+    font-weight: bold;
+    font-family: HelveticaNeue;
+}
+
+.cleanTitle {
+    display: flex;
+    margin-bottom: 0.06em;
+}
+
+.cleanTitle span {
+    font-size: 1.125rem;
+    line-height: 1.2;
+    font-weight: bold;
+    font-family: HelveticaNeue;
+}
+
+.issueBox {
+    display: flex;
+    flex-direction: column;
+}
+
+.issueText {
+    display: flex;
+    align-items: center;
+    margin: 0.01em 0;
+}
+.issueText span {
+    font-weight: bold;
+}
+
+.point {
+    width: 0.05em;
+    height: 0.05em;
+    background: #4a4a4a;
+    border-radius: 50%;
+    margin-left: 0.1em;
+    margin-right: 0.25em;
+}
+
+.typeBox {
+    display: flex;
+    margin: 0.1em 0;
+    flex: none;
+}
+
+.type {
+    display: flex;
+    margin-right: 0.3em;
+}
+
+.typeBlock {
+    width: 10px;
+    height: 10px;
+    display: flex;
+    margin-right: 0.1em;
+}
+
+.contentBox {
+    display: flex;
+    margin-top: 0.05em;
+    flex: auto;
+}
+
+.list {
+    display: flex;
+    flex: 0 0 15%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.table {
+    display: flex;
+    border: solid 1px #00b570;
+    flex-direction: column;
+    width: 100%;
+    flex: auto;
+}
+
+.cell {
+    display: flex;
+    padding: 0.1em;
+    border-bottom: solid 1px #c4cbd7;
+    flex: 0 0 0.4em;
+    align-items: center;
+}
+
+.target {
+    display: flex;
+    background-color: #daefe4;
+}
+
+.label {
+    display: flex;
+    border-bottom: 2px solid #4a4a4a;
+}
+
+.label span {
+    font-weight: bold;
+}
+
+.select {
+    display: flex;
+}
+
+.select select {
+    display: flex;
+    flex: auto;
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    font-weight: bold;
+    font-family: Arial;
+    color: #4a4a4a;
+}
+
+.error {
+    display: flex;
+}
+
+.tableBody {
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+}
+
+.content {
+    display: flex;
+    flex: 1 0;
+    margin-left: 0.5em;
+    flex-direction: column;
+}
+
+.block {
+    display: flex;
+    flex: none;
+    margin-top: 0.25em;
+    border-bottom: dashed 1px #979797;
+    flex-direction: column;
+}
+
+.name {
+    display: flex;
+    flex: none;
+}
+
+.name span{
+    font-size: 1.5rem;
+}
+
+.desc {
+    display: flex;
+    flex: auto;
+}
+
+.methods {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0.35em;
+    flex: 1 1;
+}
+
+.reasonTitle {
+    display: flex;
+    margin-top: 0.25em;
+}
+
+.reasonTitle span {
+    font-size: 1.125rem;
+    color: #9b9b9b;
+}
+
+.methodBox {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+}
+
+.method {
+    display: flex;
+    margin: 0.2em 0;
+    align-items: center;
+    flex: auto;
+}
+
+.reason {
+    display: flex;
+    width: 0;
+    flex: 1 1;
+}
+
+.button {
+    display: flex;
+    width: 0;
+    flex: 1 1;
+}
+
+.button button {
+    display: flex;
+    border-radius: 5px;
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    outline: none;
+    border: none;
+    padding: 0.1em 0;
+    cursor: pointer;
+    flex: auto;
+    justify-content: center;
+}
+
+.button span {
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.info {
+    display: flex;
+    width: 40%;
+    flex: none;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.infoBox {
+    display: flex;
+    flex: auto;
+}
+
+.infoBlock {
+    display: flex;
+    margin: 0.35em 0;
+    flex-direction: column;
+    margin-right: 0.4em;
+    align-items: center;
+}
+
+.num {
+    display: flex;
+    margin-bottom: 0.35em;
+}
+
+.num span {
+    font-size: 3rem;
+}
+
+.text {
+    display: flex;
+}
+
+.text span {
+    color: #636166;
+}
+
+.progressBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: auto;
+    margin: 0.2em 0;
+}
+
+.progressText {
+    display: flex;
+    padding: 0.05em 0;
+    justify-content: space-between;
+    width: 100%;
+    border-bottom: 2px solid #00c855;
+}
+
+.progress {
+    display: flex;
+    background-color: #00c855;
+    height: 0.1em;
+}
+
+.issueRow {
+    display: flex;
+    padding: 0.05em 0;
+}
+
+.issueBlock {
+    display: flex;
+    flex: auto;
+    margin-top: 0.1em;
+}
+
+.left {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.right {
+    display: flex;
+    flex: none;
+    align-items: center
+}
+
+.right span {
+    font-weight: bold;
+}
+
+.mismatch {
+    background-color: #93b0f5;
+}
+
+.missing {
+    background-color: #ff97a7;
+}
+
+.outlier {
+    background-color: #fed900;
+}
+
+.fixes {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    font-family: Arial;
+}
+
+.cover {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.fixesBlock {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    width: 12em;
+    flex: none;
+    border-radius: 4px;
+    box-shadow: 0 12px 20px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.fixesTitle {
+    display: flex;
+    justify-content: center;
+    flex: 0 0;
+    background-color: #445167;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 0.1em 0;
+}
+
+.fixesTitle span {
+    font-size: 1.125rem;
+    color: #fff;
+}
+
+.fixesBottom {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.2em;
+    flex: none;
+}
+
+.fixesBottom button {
+    display: flex;
+    padding: 0.1em 0;
+    width: 1.1em;
+    outline: none;
+    border: none;
+    margin: 0 0.1em;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #4a4a4a;
+    border-radius: 5px;
+}
+
+.save {
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+}
+
+.save span {
+    color: #fff;
+}
+
+.cancel {
+    background: #fff;
+}
+
+.cancel {
+    color: #4a4a4a;
+}
+
+.fixesContent {
+    display: flex;
+    flex: none;
+    margin: 0.2em 0.5em;
+    flex-direction: column;
+}
+
+.fixesBox {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+}
+
+.fixesCheck{
+    display: flex;
+    flex: none;
+    margin: 0.1em 0.5em 0.1em 0;
+}
+
+.fixesBottom .disabled {
+    cursor: not-allowed;
+    background-color: #d3d3d3;
+    color: #aaaaaa;
+    background-image: none;
+    border-color: #d3d3d3;
+}
+
+.fixesArea {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    margin-bottom: 0.3em;
+}
+
+.fixesTable {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    border: solid 1px #c4cbd7;
+    overflow: auto;
+}
+
+.fixesRow {
+    display: flex;
+    flex: none;
+    padding: 0 0.1em;
+}
+
+.fixesHeader {
+    border-bottom: solid 1px #c4cbd7;
+    margin-right: 0.15em;
+}
+
+.fixesCell {
+    display: flex;
+    flex: 1 1;
+    width: 0;
+    padding: 0.15em 0;
+    margin: 0 0.05em;
+    margin-bottom: -1px;
+    border-bottom: solid 1px #c4cbd7;
+}
+
+.fixesTd {
+    display: flex;
+    flex: 1 1;
+    width: 0;
+    padding: 0.15em 0;
+    margin: 0 0.05em;
+    margin-bottom: -1px;
+}
+
+.fixesTd span {
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #4a4a4a;
+}
+
+.fixesCell span {
+    font-size: 0.75rem;
+    color: #636166;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.fixesLarge {
+    flex: 2 1;
+}
+
+.fixesBwtween {
+    justify-content: space-between;
+}
+
+.fixesCell select {
+    display: flex;
+    flex: auto;
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    font-family: Arial;
+    color: #4a4a4a;
+}
+
+span.fixesEdit {
+    color: #448eed;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.fixesBody {
+    display: flex;
+    flex: 0 0 1.6em;
+    overflow-y: scroll;
+    flex-direction: column;
+}
+
+.close {
+    display: flex;
+    position: absolute;
+    right: 0;
+    margin-right: 0.1em;
+    cursor: pointer;
+}
+
+.editBlock {
+    
+}
+
+.editTitle {
+
+}
+
+.d3Chart {
+    position: relative;
+}
+
+.d3Chart g{
+    position: relative;
+}
+
+.rect {
+    fill: #a4cbed;
+}
+.text {
+
+}
+
+.outer {
+    fill: #bdbdbd;
+}
+
+.axis {
+
+}
+
+.axis path,
+.axis line{
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.dragRect {
+    fill: #f5f5f5
+}
+
+.dragLine {
+    stroke: #124d8e;
+    stroke-width:2;
+    cursor: pointer;
+}

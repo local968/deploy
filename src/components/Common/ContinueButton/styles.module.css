@@ -1,9 +1,9 @@
 .button {
     display: flex;
     margin-top: 0.3em;
-    width: 1.1em;
     height: 0.4em;
     margin-bottom: 0.6em;
+    flex: none;
 }
 
 .continue {

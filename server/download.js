@@ -30,6 +30,7 @@ class Download {
         }
         //206, 'Partial Content', 
         res.set(206, 'Partial Content', {
+            // 'Content-Type' : 'application/force-download',
             'Content-Type' : 'application/octet-stream',
             "Content-Disposition":"attachment;filename="+encodeURI(filename)
         });

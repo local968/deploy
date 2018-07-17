@@ -74,7 +74,7 @@ class UserStore {
         this.isLoad = true;
         when(
             () => socketStore.isready,
-            () => socketStore.send("queryProjects", { userId: this.userId })
+            () => socketStore.send("queryProjects")
         )
     }
 
@@ -95,7 +95,7 @@ class UserStore {
         this.projects = this.projects.filter(project => !ids.includes(project.projectId))
         when(
             () => socketStore.isready,
-            () => socketStore.send("deleteProjects", { userId: this.userId, ids })
+            () => socketStore.send("deleteProjects", { ids })
         )
     }
 
