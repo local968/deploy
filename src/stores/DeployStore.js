@@ -165,7 +165,26 @@ class DeployStore {
       _d.enable = value;
     } else {
       _d.enable = !_d.enable;
+      DBStore.ready().then(db => {
+        if (_d.enable === false) {
+          db.suspendDeployment({ id });
+        } else if (_d.enable === true) {
+          DBStore.deploySchedule({
+            deploymentId: id,
+            type: 'deployment'
+          });
+          DBStore.deploySchedule({
+            deploymentId: id,
+            type: 'performance',
+            threshold: {
+              type: _d.performanceOptions.measurementMetric,
+              value: _d.performanceOptions.metricThreshold
+            }
+          });
+        }
+      });
     }
+
     return _d.save();
   }
 

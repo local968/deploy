@@ -581,6 +581,28 @@ return function(server, api)
     end
   )
 
+  server:addMessage(
+    {type = "suspendDeployment"},
+    function(self)
+      local schedules = box.space[space].index["deploymentId"]:select({self.data.id})
+      for k, s in pairs(common.mapArrayArrayToArrayObject(schedules)) do
+        if s.status == "pending" or s.status == "queue" then
+          local request = {
+            space = space,
+            type = "delete",
+            userId = s.userId,
+            data = {key = {s.id, s.userId}},
+            index = "primary"
+          }
+          operate(request)
+          local name = "deployment" .. ":" .. s.type .. ":" .. s.deploymentId
+          Schedule.unregister(name)
+        end
+      end
+      return self:render({data = 1})
+    end
+  )
+
   -- rule {isRequired, type}
   api["deploySchedule"] = {
     ["type"] = {true, "string"},
@@ -590,6 +612,9 @@ return function(server, api)
     ["id"] = {false, "string"}
   }
   api["watchSchedule"] = "watch"
+  api["suspendDeployment"] = {
+    ["id"] = {true, "string"}
+  }
   api["unwatchSchedule"] = {}
 end
 
