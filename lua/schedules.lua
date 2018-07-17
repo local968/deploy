@@ -79,7 +79,6 @@ return function(server, api)
     local tuple = common.mapArrayToObject(_tuple[1])
     tuple.status = "queue"
     tuple.updatedDate = os.time()
-    tuple.createdDate = os.time()
     local request = {
       space = space,
       type = "replace",
@@ -93,6 +92,7 @@ return function(server, api)
       tuple.status = "pending"
       tuple.estimatedTime = tonumber(new.nexttime)
       tuple.prevSchedule = tuple.id
+      tuple.createdDate = os.time()
       tuple.id = common.createUUID()
       local request = {
         space = space,
@@ -229,7 +229,7 @@ return function(server, api)
         tuple.status = "finished"
         if #errorResult > 0 then
           tuple.status = "issue"
-          if (tuple.autoDisable) then
+          if tuple.autoDisable ~= box.NULL or tuple.autoDisable == true then
             cancelSchedule(tuple)
           end
         end

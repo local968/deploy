@@ -159,9 +159,13 @@ class DeployStore {
   }
 
   @action
-  toggleEnable(id) {
+  toggleEnable(id, value) {
     const _d = new Deployment(this.deployments.find(_d => _d.id === id));
-    _d.enable = !_d.enable;
+    if (value) {
+      _d.enable = value;
+    } else {
+      _d.enable = !_d.enable;
+    }
     return _d.save();
   }
 

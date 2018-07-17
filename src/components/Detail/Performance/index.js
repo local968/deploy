@@ -126,7 +126,7 @@ export default class Performance extends Component {
                 className={styles.save}
                 onClick={() => {
                   if (cdpo.frequency) {
-                    this.selectionOption('enable', true)();
+                    deployStore.toggleEnable(cd.id, true);
                     routing.push(`/deploy/project/${match.params.id}/status`);
                     DBStore.deploySchedule({
                       deploymentId: match.params.id,
