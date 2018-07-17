@@ -7,7 +7,7 @@ export default Object.assign(
   {
     trainTimeDefault: 40,
     host: 'localhost',
-    port: 18000
+    port: 54000
   },
   localConfig
 );

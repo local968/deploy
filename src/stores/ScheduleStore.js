@@ -16,6 +16,18 @@ const sortStrategies = {
       : a.createdDate < b.createdDate
         ? -1
         : 1,
+  updatedDate: (a, b) =>
+    a.updatedDate === b.updatedDate
+      ? 0
+      : a.updatedDate > b.updatedDate
+        ? -1
+        : 1,
+  rupdatedDate: (a, b) =>
+    a.updatedDate === b.updatedDate
+      ? 0
+      : a.updatedDate < b.updatedDate
+        ? -1
+        : 1,
   projectName: (a, b) => a.name.localeCompare(b.name),
   rprojectName: (a, b) => a.name.localeCompare(b.name) * -1,
   modelName: (a, b) => a.modelName.localeCompare(b.modelName),
