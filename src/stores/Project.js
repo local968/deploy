@@ -424,7 +424,7 @@ export default class Project {
 
 	@computed
 	get issueRows(){
-		const {dataHeader, mismatchIndex, nullIndex, outlierIndex, colMap} = this;
+		const {dataHeader, mismatchIndex, nullIndex, outlierIndex, colType} = this;
 		const arr = {
 			mismatchRow: [],
 			nullRow: [],
