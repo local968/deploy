@@ -441,7 +441,7 @@ export default class Project {
 				arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndex[h]])));
 			}
-			if(colMap[h]!=="Categorical"&&outlierIndex[h]&&!!outlierIndex[h].length) {
+			if(colType[h]!=="Categorical"&&outlierIndex[h]&&!!outlierIndex[h].length) {
 				arr.outlierRow = Array.from(new Set(arr.outlierRow.concat([...outlierIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...outlierIndex[h]])));
 			}
