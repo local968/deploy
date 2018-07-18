@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { ContinueButton } from '../../Common';
-import { when, remove } from 'mobx';
+import { when } from 'mobx';
 import * as d3 from 'd3';
 
 @observer
@@ -32,6 +32,7 @@ export default class DataQuality extends Component {
                 visible: true
             })
         }else{
+            if(this.state.isLoad) return false;
             this.setState({
                 isLoad: true
             })
@@ -67,30 +68,25 @@ export default class DataQuality extends Component {
         })
     }
 
-    saveTargetFixes = (targetMap) => {
-        this.props.project.fixClassification(targetMap)
+    saveTargetFixes = () => {
+        this.props.project.fixTarget()
         this.closeTarget();
     }
 
-    saveClassificationFixes = () => {
-        this.props.project.fixClassification()
-        this.closeFixes();
-    }
-
-    saveRegressionFixes = () => {
-        this.props.project.fixRegression()
+    saveDataFixes = () => {
+        this.props.project.fixFillMethod()
         this.closeFixes();
     }
 
     render() {
         const { project } = this.props;
-        const { issues, uploadData, target, colType, colMap, rawHeader, mismatchIndex, nullIndex, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, problemType, totalLines, issueRows, totalRawLines} = project;
+        const { issues, uploadData, target, colType, colMap, rawHeader, mismatchIndex, nullIndex, outlierIndex, problemType, totalLines, issueRows, totalRawLines} = project;
         const targetIndex = rawHeader.findIndex(h => h===target);
         const recomm = problemType === 'Classification' ? '2' : '10+';
-        const fixMethod = {
-            missing: nullFillMethod[target] === 'drop' ? 'deleted' : 'fixed',
-            mismatch: mismatchFillMethod[target] === 'drop' ? 'deleted' : 'fixed',
-            outlier: outlierFillMethod[target] === 'drop' ? 'deleted' : 'fixed',
+        const percent = {
+            missing: issueRows.nullRow.length * 100 / (totalRawLines || 1),
+            mismatch: issueRows.mismatchRow.length * 100 / (totalRawLines || 1),
+            outlier: issueRows.outlierRow.length * 100 / (totalRawLines || 1),
         }
         let num = 0;
         let arr = [];
@@ -104,7 +100,7 @@ export default class DataQuality extends Component {
             num++;
         }
         if(issues.dataIssue) {
-            arr.push(<DataIssue num={num} backToConnect={this.backToConnect} editFixes={this.editFixes} issueRows={issueRows} totalLines={totalLines} totalRawLines={totalRawLines} fixMethod={fixMethod} type={colType[target]} key={num}/>);
+            arr.push(<DataIssue num={num} backToConnect={this.backToConnect} editFixes={this.editFixes} issueRows={issueRows} totalLines={totalLines} percent={percent} key={num}/>);
             num++;
         }
 
@@ -151,7 +147,11 @@ export default class DataQuality extends Component {
                             <option value="Categorical">Categorical</option>
                             <option value="Numerical">Numerical</option>
                         </select></div>
-                        <div className={classnames(styles.cell, styles.error)}><span>123123</span></div>
+                        <div className={classnames(styles.cell, styles.error)}>
+                            <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{percent.mismatch.toFixed(2)}%</span></div>
+                            <div className={classnames(styles.errorBlock, styles.missing)}><span>{percent.missing.toFixed(2)}%</span></div>
+                            <div className={classnames(styles.errorBlock, styles.outlier)}><span>{percent.outlier.toFixed(2)}%</span></div>
+                        </div>
                         <div className={styles.tableBody}>
                             {uploadData.map((v, k) => <div key={k} className={classnames(styles.cell, {
                                 [styles.mismatch]: mismatchIndex[target].includes(k),
@@ -166,7 +166,7 @@ export default class DataQuality extends Component {
                     {arr}
                 </div>
             </div>
-            {this.state.visible && <FixIssue project={project} closeFixes={this.closeFixes} saveClassificationFixes={this.saveClassificationFixes} saveRegressionFixes={this.saveRegressionFixes}/>}
+            {this.state.visible && <FixIssue project={project} closeFixes={this.closeFixes} saveDataFixes={this.saveDataFixes}/>}
             {this.state.edit && <SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes}/>}
         </div>
     }
@@ -248,13 +248,9 @@ class RowIssue extends Component {
 
 class DataIssue extends Component {
     render() {
-        const {num, backToConnect, editFixes, issueRows, totalLines, fixMethod, type, totalRawLines} = this.props;
+        const {num, backToConnect, editFixes, issueRows, totalLines, percent} = this.props;
         // const cleanRows = totalLines - issueRows.errorRow.length;
-        const percent = {
-            missing: issueRows.nullRow.length * 100 / (totalRawLines || 1),
-            mismatch: issueRows.mismatchRow.length * 100 / (totalRawLines || 1),
-            outlier: issueRows.outlierRow.length * 100 / (totalRawLines || 1),
-        }
+        
         return <div className={styles.block}>
             <div className={styles.name}><span>Data issues are found</span></div>
             <div className={styles.desc}>
@@ -266,7 +262,7 @@ class DataIssue extends Component {
                                 <div className={classnames(styles.progress, styles.missing)} style={{width: percent.missing<1?1:percent.missing + "%"}}></div>
                             </div>
                             <div className={styles.right}>
-                                <span>Will be {fixMethod.missing}</span>
+                                <span>Will be fixed</span>
                             </div>
                         </div>}
                         {!!issueRows.mismatchRow.length && <div className={styles.issueBlock}>
@@ -275,16 +271,16 @@ class DataIssue extends Component {
                                 <div className={classnames(styles.progress, styles.mismatch)} style={{width: percent.mismatch<1?1:percent.mismatch + "%"}}></div>
                             </div>
                             <div className={styles.right}>
-                                <span>Will be {fixMethod.mismatch}</span>
+                                <span>Will be fixed</span>
                             </div>
                         </div>}
-                        {type!=='Categorical' && !!issueRows.outlierRow.length && <div className={styles.issueBlock}>
+                        {!!issueRows.outlierRow.length && <div className={styles.issueBlock}>
                             <div className={styles.left}>
                                 <div className={styles.issueRow}><span>Outlier ({issueRows.outlierRow.length} rows) {percent.outlier.toFixed(4)}%</span></div>
                                 <div className={classnames(styles.progress, styles.outlier)} style={{width: percent.outlier<1?1:percent.outlier + "%"}}></div>
                             </div>
                             <div className={styles.right}>
-                                <span>Will be {fixMethod.outlier}</span>
+                                <span>Will be ignore</span>
                             </div>
                         </div>}
                     </div>
@@ -319,7 +315,8 @@ class DataIssue extends Component {
 class SelectTarget extends Component {
     state = {
         checked: [],
-        canSave: false
+        canSave: false,
+        map:{}
     }
 
     check = (e) => {
@@ -341,11 +338,55 @@ class SelectTarget extends Component {
     }
 
     save = () => {
-        let data = {}
-        this.state.checked.forEach((k, i) => {
-            data[k] = i
-        });
-        this.props.saveTargetFixes(data)
+        const {checked, map} = this.state;
+        const {target, colMap} = this.props.project;
+        let min,max;
+        for(let key in colMap[target]) {
+            if(checked.includes(key)) {
+                if(!max){
+                    max = {
+                        k:key,
+                        v:colMap[target][key]
+                    }
+                }else{
+                    if(max.v > colMap[target][key]) {
+                        min = {
+                            k:key,
+                            v:colMap[target][key]
+                        }
+                    }else{
+                        min = max;
+                        max = {
+                            k:key,
+                            v:colMap[target][key]
+                        }
+                    }
+                }
+            }
+        }
+        if(!max || !min){
+            return false;
+        }
+        let targetMap = this.props.project.targetMap || {}
+        targetMap[min.k] = 0;
+        targetMap[max.k] = 1;
+        for(let key in map) {
+            if(map[key] === max.k) {
+                targetMap[key] = 1
+            }else if(map[key] === min.k) {
+                targetMap[key] = 0
+            }
+        }
+        this.props.project.targetMap = targetMap;
+        this.props.saveTargetFixes()
+    }
+
+    changeBind = (key, e) => {
+        let map = this.state.map;
+        map[key] = e.target.value;
+        this.setState({
+            map: map
+        })
     }
 
     render() {
@@ -358,15 +399,31 @@ class SelectTarget extends Component {
                 <div className={styles.fixesTitle}><span>How Mr.One Will Fix the Issues</span><div className={styles.close} onClick={closeTarget}><span>X</span></div></div>
                 <div className={styles.fixesContent}>
                     <div className={styles.fixesBox}>
-                        {Object.keys(colMap[target]).map((t, i) => {
-                            return <div className={styles.fixesCheck} key={i}>
-                                <input type='checkbox' value={t} checked={this.state.checked.includes(t)} onChange={this.check}/>
-                                <span>{t}</span>
-                            </div>
-                        })}
+                        <div className={styles.fixesText}><span>Please select two valid values from all unique values in your target variable</span></div>
+                        <div className={styles.fixesCheckBox}>
+                            {Object.keys(colMap[target]).map((t, i) => {
+                                return <div className={styles.fixesCheck} key={i}>
+                                    <input type='checkbox' value={t} checked={this.state.checked.includes(t)} onChange={this.check}/>
+                                    <span>{t}</span>
+                                </div>
+                            })}
+                        </div>
                     </div>
                     {this.state.canSave && <div className={styles.fixesBox}>
-                        
+                        <div className={styles.fixesText}><span>Please map the other values to valid ones if they are equivalent. The rest will be deleted</span></div>
+                        <div className={styles.fixesSelectBox}>
+                            {Object.keys(colMap[target]).map((t, i) => {
+                                if(this.state.checked.includes(t)) return null;
+                                return <div className={styles.fixesSelect} key={i}>
+                                    <span title={t}>{t}: </span>
+                                    <select value={this.state.map[t]} onChange={this.changeBind.bind(null, t)}>
+                                        <option value="drop">Drop</option>
+                                        <option value={this.state.checked[0]}>{this.state.checked[0]}</option>
+                                        <option value={this.state.checked[1]}>{this.state.checked[1]}</option>
+                                    </select>
+                                </div>
+                            })}
+                        </div>
                     </div>}
                 </div>
                 <div className={styles.fixesBottom}>
@@ -385,12 +442,10 @@ class FixIssue extends Component {
     state = {
         canSave: false,
         visible: false,
-        editKey: "",
-        fillMethod: {}
+        editKey: ""
     }
 
     editRange = (key) => {
-        console.log(key)
         this.setState({
             visible: true,
             editKey: key
@@ -406,7 +461,7 @@ class FixIssue extends Component {
 
     saveEdit = (data) => {
         const {editKey} = this.state;
-        this.props.project.setOutlier(editKey, data)
+        this.props.project.outlierDict[editKey] = data;
         this.setState({
             visible: false,
             editKey: '',
@@ -414,25 +469,25 @@ class FixIssue extends Component {
         })
     }
 
-    select = (type, key, e) => {
-        console.log(type, key, e.target.value)
+    nullSelect = (key, e) => {
+        this.props.project.nullFillMethod[key] = e.target.value;
+        this.setState({
+            canSave: true
+        })
     }
 
-    save = () => {
-        const {project, saveClassificationFixes, saveRegressionFixes} = this.props;
-        const {problemType} = project;
-        if(!this.state.canSave){
-            return false;
-        }
-        if(problemType === 'Classification'){
-            let data = {}
-            this.state.checked.forEach((k, i) => {
-                data[k] = i
-            });
-            saveClassificationFixes(data)
-        }else{
-            saveRegressionFixes()
-        }
+    mismatchSelect = (key, e) => {
+        this.props.project.mismatchFillMethod[key] = e.target.value;
+        this.setState({
+            canSave: true
+        })
+    }
+
+    outlierSelect = (key, e) => {
+        this.props.project.outlierFillMethod[key] = e.target.value;
+        this.setState({
+            canSave: true
+        })
     }
 
     renderContent = () => {
@@ -468,11 +523,17 @@ class FixIssue extends Component {
                                     <option value="Numerical">Numerical</option>
                                 </select></div>
                                 <div className={styles.fixesCell}><span>{mismatchIndex[k].length} ({(mismatchIndex[k].length / (totalRawLines||1)).toFixed(4)}%)</span></div>
-                                <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].mean:'N/A'}>{dataViews[k]?dataViews[k].mean:'N/A'}</span></div>
-                                <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].median:'N/A'}>{dataViews[k]?dataViews[k].median:'N/A'}</span></div>
-                                <div className={styles.fixesCell}><span>5644</span></div>
-                                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.select.bind(null,'missing',k)}>
+                                <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
+                                <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
+                                <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
+                                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.mismatchSelect.bind(null,k)}>
                                     <option value="drop">Delete the row</option>
+                                    <option value="min">Replace with min value</option>
+                                    <option value="max">Replace with max value</option>
+                                    <option value="max+1">Replace with max+1 value</option>
+                                    <option value="mean">Replace with mean value</option>
+                                    <option value="median">Replace with median value</option>
+                                    <option value="mode">Replace with most frequent value</option>
                                 </select></div>
                             </div>
                         })}
@@ -510,11 +571,17 @@ class FixIssue extends Component {
                                 <option value="Numerical">Numerical</option>
                             </select></div>
                             <div className={styles.fixesCell}><span>{nullIndex[k].length} ({(nullIndex[k].length / (totalRawLines||1)).toFixed(4)}%)</span></div>
-                            <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].mean:'N/A'}>{dataViews[k]?dataViews[k].mean:'N/A'}</span></div>
-                            <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].median:'N/A'}>{dataViews[k]?dataViews[k].median:'N/A'}</span></div>
-                            <div className={styles.fixesCell}><span>5644</span></div>
-                            <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.select.bind(null,'missing',k)}>
+                            <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
+                            <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
+                            <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
+                            <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.nullSelect.bind(null,k)}>
                                 <option value="drop">Delete the row</option>
+                                <option value="min">Replace with min value</option>
+                                <option value="max">Replace with max value</option>
+                                <option value="max+1">Replace with max+1 value</option>
+                                <option value="mean">Replace with mean value</option>
+                                <option value="median">Replace with median value</option>
+                                <option value="mode">Replace with most frequent value</option>
                             </select></div>
                         </div>
                     })}
@@ -544,7 +611,8 @@ class FixIssue extends Component {
                             return null;
                         }
                         const outlier = outlierDict[k]?outlierDict[k]:outlierRange[k];
-                        return <div className={styles.fixesRow} key={i}>
+                        const isShow = colType[k]==='Numerical';
+                        return isShow && <div className={styles.fixesRow} key={i}>
                             <div className={styles.fixesCell}><span>{k}</span></div>
                             <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                                 <span title={outlier[0].toFixed(2)+"-"+outlier[1].toFixed(2)}>
@@ -556,10 +624,16 @@ class FixIssue extends Component {
                                 <option value="Numerical">Numerical</option>
                             </select></div>
                             <div className={styles.fixesCell}><span>{outlierIndex[k].length} ({(outlierIndex[k].length / (totalRawLines||1)).toFixed(4)}%)</span></div>
-                            <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].mean:'N/A'} >{dataViews[k]?dataViews[k].mean:'N/A'}</span></div>
-                            <div className={styles.fixesCell}><span title={dataViews[k]?dataViews[k].median:'N/A'}>{dataViews[k]?dataViews[k].median:'N/A'}</span></div>
-                            <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={outlierFillMethod[k]} onChange={this.select.bind(null,'missing',k)}>
-                                <option value="drop">Delete the row</option>>
+                            <div className={styles.fixesCell}><span title={dataViews[k].mean} >{dataViews[k].mean}</span></div>
+                            <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
+                            <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={outlierFillMethod[k]} onChange={this.outlierSelect.bind(null,k)}>
+                                <option value="drop">Delete the row</option>
+                                <option value="min">Replace with min value</option>
+                                <option value="max">Replace with max value</option>
+                                <option value="max+1">Replace with max+1 value</option>
+                                <option value="mean">Replace with mean value</option>
+                                <option value="median">Replace with median value</option>
+                                <option value="mode">Replace with most frequent value</option>
                             </select></div>
                         </div>
                     })}
@@ -570,7 +644,7 @@ class FixIssue extends Component {
     }
 
     render() {
-        const {closeFixes, project} = this.props;
+        const {closeFixes, project, saveDataFixes} = this.props;
         return <div className={styles.fixes}>
             <div className={styles.cover} onClick={closeFixes}></div>
             <div className={styles.fixesBlock}>
@@ -579,7 +653,7 @@ class FixIssue extends Component {
                 <div className={styles.fixesBottom}>
                     <button className={classnames(styles.save, {
                         [styles.disabled]: !this.state.canSave
-                    })} onClick={this.save} disabled={!this.state.canSave} ><span>save</span></button>
+                    })} onClick={saveDataFixes} disabled={!this.state.canSave} ><span>save</span></button>
                     <button className={styles.cancel} onClick={closeFixes}><span>cancel</span></button>
                 </div>
             </div>

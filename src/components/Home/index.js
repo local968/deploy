@@ -188,10 +188,6 @@ class Project extends Component{
     toggleSelect = () => {
         //统计总数
         this.props.selectId(this.state.selected, this.props.project.projectId);
-
-        // this.setState({
-        //     selected: !this.state.selected,
-        // })
     }
 
     handleOpen = () => {
@@ -206,7 +202,7 @@ class Project extends Component{
                 <div className={styles.description}>{project.description}</div>
             </div>
             <div className={styles.sub}>
-                <div className={styles.partner}>5 participator</div>
+                <div className={styles.partner}>{project.projectId} {project.uploadFileName}</div>
                 <div className={styles.time}>Create Date: {moment(+new Date(project.createdAt)).fromNow()}</div>
             </div>
             <div className={classnames(styles.cover,{

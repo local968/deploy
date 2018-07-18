@@ -16,7 +16,8 @@ export default class DataSchema extends Component {
         flag: false,
         checkList: this.props.project.rawHeader.filter(r => !this.props.project.dataHeader.includes(r)),
         showSelect: false,
-        error: false
+        error: false,
+        load: false
     }
 
     doEtl = () => {
@@ -27,6 +28,9 @@ export default class DataSchema extends Component {
 			colType: colType
 		});
         this.props.project.etl();
+        this.setState({
+            load: true
+        })
     }
 
     targetSelect = (value) => {
@@ -259,7 +263,7 @@ export default class DataSchema extends Component {
                     </AutoSizer>
                 </div>
             </div>
-            <ContinueButton onClick={this.doEtl} disabled={!target} text="Continue" />
+            <ContinueButton onClick={this.doEtl} disabled={this.state.load || !target} text="Continue" />
         </div>
     }
 }

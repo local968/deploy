@@ -148,6 +148,14 @@
 
 .error {
     display: flex;
+    justify-content: center;
+}
+
+.errorBlock {
+    display: flex;
+    flex: none;
+    padding: 0 0.1em;
+    border-radius: 0.15em;
 }
 
 .tableBody {
@@ -266,6 +274,7 @@
     flex-direction: column;
     margin-right: 0.4em;
     align-items: center;
+    justify-content: center;
 }
 
 .num {
@@ -446,6 +455,12 @@
 .fixesBox {
     display: flex;
     flex: none;
+    flex-direction: column;
+}
+
+.fixesCheckBox{
+    display: flex;
+    flex: none;
     flex-wrap: wrap;
 }
 
@@ -453,6 +468,45 @@
     display: flex;
     flex: none;
     margin: 0.1em 0.5em 0.1em 0;
+}
+
+.fixesSelectBox {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+}
+
+.fixesSelect {
+    display: flex;
+    flex: none;
+    align-items: center;
+    width: 50%;
+    padding: 0.05em 0;
+}
+
+.fixesSelect select {
+    display: flex;
+    flex: auto;
+    outline: none;
+    font-size: 0.875rem;
+    font-family: Arial;
+    color: #4a4a4a;
+    width: 0;
+}
+
+.fixesSelect span {
+    display: block;
+    flex: auto;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 0;
+}
+
+.fixesText {
+    display: flex;
+    flex: none;
 }
 
 .fixesBottom .disabled {
@@ -497,6 +551,7 @@
     margin: 0 0.05em;
     margin-bottom: -1px;
     border-bottom: solid 1px #c4cbd7;
+    align-items: center;
 }
 
 .fixesTd {

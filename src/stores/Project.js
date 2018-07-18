@@ -375,17 +375,20 @@ export default class Project {
 	}
 
 	@action
-	fixClassification(targetMap) {
+	fixTarget() {
 		this.updateProject({
-			targetMap: targetMap
+			targetMap: this.targetMap
 		})
 		this.etl();
 	}
 
 	@action
-	fixRegression() {
+	fixFillMethod() {
 		this.updateProject({
-			outlierDict: this.outlierDict
+			outlierDict: this.outlierDict,
+			nullFillMethod: this.nullFillMethod,
+			mismatchFillMethod: this.mismatchFillMethod,
+			outlierFillMethod: this.outlierFillMethod
 		})
 		this.etl();
 	}

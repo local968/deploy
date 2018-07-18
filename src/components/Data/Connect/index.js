@@ -8,8 +8,10 @@ import localFileIcon from './local-file.svg';
 import sqlIcon from './sql.svg';
 import defileIcon from './define.svg';
 import axios from 'axios';
-import { message } from 'antd';
+import { message, Progress } from 'antd';
 import { Uploader } from '../../Common';
+
+import r2LoadGif from './R2Loading.gif';
 
 // sample data
 import bankSmall from '../../../../sample/classification/bank.train.csv';
@@ -76,12 +78,10 @@ export default class DataConnect extends Component {
         reader.readAsText(blob);
     }
 
-    onProgress = (e) => {
-        if(e.lengthComputable) {
-            this.setState({
-                progress:(e.loaded / e.total) * 0.9
-            })
-        }
+    onProgress = (loaded, size) => {
+        this.setState({
+            progress:(loaded / size) * 90
+        })
     }
 
     doEtl = () => {
@@ -101,6 +101,7 @@ export default class DataConnect extends Component {
     }
 
     selectSample = (filename) => {
+        if(!!this.state.progress) return false;
         const { userId, project } = this.props;
         axios("/api/sample", {
             method: "post",
@@ -146,7 +147,9 @@ export default class DataConnect extends Component {
             <div className={styles.maxRow}><span>Maximum Data Size</span><div className={styles.mark}><span>?</span></div><span> : 50000 (rows) </span><a>Edit</a></div>
             <div className={styles.uploadRow}>
                 {this.block("From Mr.One", sampleIcon, this.showSample)}
-                <Uploader children={this.block("From Computer", localFileIcon)} onChange={this.upload} onComplete={this.doEtl} params={{ userId, projectId: project.projectId }} onProgress={this.onProgress} />
+                {!!this.state.progress?
+                this.block("From Computer", localFileIcon):
+                <Uploader children={this.block("From Computer", localFileIcon)} onChange={this.upload} onComplete={this.doEtl} params={{ userId, projectId: project.projectId }} onProgress={this.onProgress} />}
                 {this.block("From SQL", sqlIcon, this.showSql)}
             </div>
             <div className={styles.cutoff}>
@@ -163,6 +166,21 @@ export default class DataConnect extends Component {
                 {this.block("From Mr.One", defileIcon)}
             </div>
             {this.state.sample && <DataSample project={project} onClose={this.hideSample} selectSample={this.selectSample} />}
+            {!!this.state.progress && <div className={styles.sample}>
+                <div className={styles.cover}></div>
+                <div className={styles.progressBlock}>
+                    <div className={styles.progressTitle}><span>Connect Data File</span></div>
+                    <div className={styles.progressContent}>
+                        <div className={styles.progressLoad}>
+                            <img src={r2LoadGif} alt='loading' />
+                        </div>
+                        <div className={styles.progressing}>
+                            <Progress percent={this.state.progress} status="active" strokeWidth={12} showInfo={false} />
+                        </div >
+                        <div className={styles.progressText}><span>Load modeling data and detect data type…</span></div>
+                    </div>
+                </div>
+            </div>}
         </div>;
     }
 }

@@ -176,6 +176,7 @@ class ProjectStore {
                 switch (command) {
                     case 'etl':
                         delete result.name;
+                        result.dataViews = null;
                         // this.project.setProperty(result)
                         this.project.updateProject(result)
                         when(

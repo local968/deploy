@@ -30,10 +30,7 @@ export default ({
           filename: file.name,
           size: chunk.size,
           isFirst
-        }),
-        onUploadProgress: function(progressEvent){
-          if(onProgress && typeof onProgress === "function") onProgress(progressEvent);
-        }
+        })
       })
       .then(
         res => {
@@ -46,6 +43,9 @@ export default ({
             );
           }
           retryCount = 0;
+          if (onProgress && typeof onProgress === 'function') {
+            onProgress(res.data.size, file.size)
+          }
           if (file.size === res.data.size) {
             if (onComplete && typeof onComplete === 'function') {
               onComplete(file);
