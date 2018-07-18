@@ -433,15 +433,15 @@ export default class Project {
 		}
 
 		dataHeader.forEach(h => {
-			if(!!mismatchIndex[h].length) {
+			if(mismatchIndex[h]&&!!mismatchIndex[h].length) {
 				arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));
 			}
-			if(!!nullIndex[h].length) {
+			if(nullIndex[h]&&!!nullIndex[h].length) {
 				arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndex[h]])));
 			}
-			if(colMap[h]!=="Categorical"&&!!outlierIndex[h].length) {
+			if(colMap[h]!=="Categorical"&&outlierIndex[h]&&!!outlierIndex[h].length) {
 				arr.outlierRow = Array.from(new Set(arr.outlierRow.concat([...outlierIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...outlierIndex[h]])));
 			}
