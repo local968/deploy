@@ -44,7 +44,14 @@ const files = {
 @observer
 export default class DataConnect extends Component {
     state = {
-        sample: false
+        sample: false,
+        progress: 0,
+    }
+
+    componentWillUnmount() {
+        this.setState({
+            progress: 0
+        })
     }
 
     upload = (data) => {
@@ -67,6 +74,14 @@ export default class DataConnect extends Component {
         }
         const blob = file.slice(0, 5000000);
         reader.readAsText(blob);
+    }
+
+    onProgress = (e) => {
+        if(e.lengthComputable) {
+            this.setState({
+                progress:(e.loaded / e.total) * 0.9
+            })
+        }
     }
 
     doEtl = () => {

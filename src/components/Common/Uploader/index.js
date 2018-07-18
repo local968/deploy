@@ -30,10 +30,10 @@ export default ({
           filename: file.name,
           size: chunk.size,
           isFirst
-        })
-        // onUploadProgress: function(progressEvent){
-        //   if(onProgress && typeof onProgress === "function") onProgress(progressEvent);
-        // }
+        }),
+        onUploadProgress: function(progressEvent){
+          if(onProgress && typeof onProgress === "function") onProgress(progressEvent);
+        }
       })
       .then(
         res => {

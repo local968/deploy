@@ -178,7 +178,10 @@ class ProjectStore {
                         delete result.name;
                         // this.project.setProperty(result)
                         this.project.updateProject(result)
-                        this.next()
+                        when(
+                            () => !!this.project.uploadData.length,
+                            () => this.next()
+                        )
                         break;
                     case 'train2':
                         if(Array.isArray(result)){

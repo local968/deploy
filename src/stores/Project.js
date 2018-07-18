@@ -61,6 +61,7 @@ export default class Project {
 	@observable outlierFillMethod = {}
 	@observable outlierIndex = {}
 	@observable dataViews = null
+	@observable outlierDict = {}
 
 
 	@observable criteria = 'defualt';
@@ -225,7 +226,10 @@ export default class Project {
 			train2Error: false,
 			deploy2Error: false,
 			train2Finished: false,
-			uploadFileName: name
+			uploadFileName: name,
+			dataHeader: [],
+			uploadData: [],
+			rawHeader: []
 		});
 	}
 
@@ -336,6 +340,10 @@ export default class Project {
 			data.targetMap = {...this.targetMap};
 		}
 
+		if(this.outlierDict && Object.keys(this.outlierDict).length) {
+			data.outlierDict = {...this.outlierDict};
+		}
+
 		console.log(data)
 		// id: request ID
 		// userId: user ID
@@ -376,10 +384,10 @@ export default class Project {
 
 	@action
 	fixRegression() {
-		// this.updateProject({
-		// 	targetMap: targetMap
-		// })
-		// this.etl();
+		this.updateProject({
+			outlierDict: this.outlierDict
+		})
+		this.etl();
 	}
 
 	@computed
@@ -416,7 +424,7 @@ export default class Project {
 
 	@computed
 	get issueRows(){
-		const {dataHeader, mismatchIndex, nullIndex, outlierIndex} = this;
+		const {dataHeader, mismatchIndex, nullIndex, outlierIndex, colMap} = this;
 		const arr = {
 			mismatchRow: [],
 			nullRow: [],
@@ -433,12 +441,16 @@ export default class Project {
 				arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndex[h]])));
 			}
-			if(!!outlierIndex[h].length) {
+			if(colMap[h]!=="Categorical"&&!!outlierIndex[h].length) {
 				arr.outlierRow = Array.from(new Set(arr.outlierRow.concat([...outlierIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...outlierIndex[h]])));
 			}
 		})
 		return arr
+	}
+
+	setOutlier(key, data) {
+		this.outlierDict[key] = data;
 	}
 
 	fastTrain() {

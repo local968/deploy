@@ -519,6 +519,8 @@
     color: #636166;
     text-overflow: ellipsis;
     overflow: hidden;
+    max-width: 80%;
+    white-space: nowrap;
 }
 
 .fixesLarge {
@@ -560,16 +562,60 @@ span.fixesEdit {
     cursor: pointer;
 }
 
-.editBlock {
-    
+.outlierBox {
+    display: flex;
+    flex: none;
+    justify-content: space-evenly;
 }
 
-.editTitle {
+.outlierBlock {
+    display: flex;
+    flex:none;
+    align-items: center;
+    border: solid 1px #c4cbd7;
+    line-height: 1.5;
+    border-radius: 4px;
+}
 
+.input {
+    display: flex;
+    flex: none;
+    background-color: #f0f0f0;
+    width: 0.7em;
+    padding: 0.05em 0.1em;
+}
+
+.input input {
+    outline: none;
+    border: none;
+    font-size: 0.875rem;
+    width: 100%;
+    background-color: #f0f0f0;
+}
+
+.outliertext {
+    display: flex;
+    flex: none;
+    padding: 0.05em 0.1em;
+}
+
+.outlierBlock button {
+    display: flex;
+    flex: none;
+    outline: none;
+    background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+    border: none;
+    height: 100%;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .d3Chart {
     position: relative;
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-bottom: 0.2em;
 }
 
 .d3Chart g{
@@ -579,16 +625,9 @@ span.fixesEdit {
 .rect {
     fill: #a4cbed;
 }
-.text {
-
-}
 
 .outer {
     fill: #bdbdbd;
-}
-
-.axis {
-
 }
 
 .axis path,
@@ -610,5 +649,16 @@ span.fixesEdit {
 .dragLine {
     stroke: #124d8e;
     stroke-width:2;
+}
+
+.dragText {
+    font-size: 0.875rem;
+    color: #4a4a4a;
+    font-weight: bold;
+    text-anchor: middle;
+    cursor: pointer;
+}
+
+.Circle {
     cursor: pointer;
 }
