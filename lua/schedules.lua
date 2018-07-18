@@ -22,9 +22,11 @@ local fields = {
   "requestId",
   "result",
   "solution",
-  "threshold"
+  "threshold",
+  "autoDisable"
 }
 local common = commonInit(fields)
+local Schedule = require("module.Schedule")
 
 local maxProcessing = 2
 
@@ -68,6 +70,59 @@ return function(server, api)
 
   fiber.create(watcherHandler)
 
+  local function cronHandler(old, new, arg)
+    -- handle
+    local _tuple = box.space[space].index["deploymentStatus"]:select({arg.deploymentId, arg.type, "pending"})
+    if (#_tuple < 1) then
+      return
+    end
+    local tuple = common.mapArrayToObject(_tuple[1])
+    tuple.status = "queue"
+    tuple.updatedDate = os.time()
+    local request = {
+      space = space,
+      type = "replace",
+      data = {tuple = tuple},
+      userId = tuple.userId
+    }
+    operate(request)
+
+    if (new and new.nexttime) then
+      -- generate next schedule
+      tuple.status = "pending"
+      tuple.estimatedTime = tonumber(new.nexttime)
+      tuple.prevSchedule = tuple.id
+      tuple.createdDate = os.time()
+      tuple.id = common.createUUID()
+      local request = {
+        space = space,
+        type = "replace",
+        data = {tuple = tuple},
+        userId = tuple.userId
+      }
+      operate(request)
+    end
+  end
+
+  local function cancelSchedule(schedule)
+    local schedules = box.space[space].index["deploymentId"]:select({schedule.deploymentId, schedule.type})
+    for k, s in pairs(common.mapArrayArrayToArrayObject(schedules)) do
+      if s.status == "pending" or s.status == "queue" then
+        local request = {
+          space = space,
+          type = "delete",
+          userId = s.userId,
+          data = {key = {s.id, s.userId}},
+          index = "primary"
+        }
+        operate(request)
+        local name = "deployment" .. ":" .. schedule.type .. ":" .. schedule.deploymentId
+        Schedule.unregister(name)
+      end
+    end
+  end
+
+  -- Deprecated
   local function checkQueue()
     -- push into queue
     if not box.space[space] then
@@ -140,6 +195,9 @@ return function(server, api)
         queue.tube.taskQueue:put(id)
         tuple.requestId = id
         tuple.solution = deployment[5]
+      else
+        tuple.status = "issue"
+        tuple.result["process error"] = "deployment not found."
       end
 
       -- todo: send request
@@ -155,6 +213,9 @@ return function(server, api)
   end
 
   local function checkResult()
+    if not box.space[space] then
+      return
+    end
     local processingSchedules = box.space[space].index["estimatedTime"]:select({"processing"})
     for k, _tuple in pairs(processingSchedules) do
       local tuple = common.mapArrayToObject(_tuple)
@@ -168,6 +229,9 @@ return function(server, api)
         tuple.status = "finished"
         if #errorResult > 0 then
           tuple.status = "issue"
+          if tuple.autoDisable ~= box.NULL or tuple.autoDisable == true then
+            cancelSchedule(tuple)
+          end
         end
         local request = {
           space = space,
@@ -182,10 +246,10 @@ return function(server, api)
 
   local function queueHandler()
     while true do
-      checkQueue()
+      -- checkQueue()
       executeQueue()
       checkResult()
-      fiber.sleep(10)
+      fiber.sleep(2)
     end
   end
 
@@ -204,6 +268,14 @@ return function(server, api)
       "deploymentId",
       {
         parts = {3, "string", 4, "string", 2, "string"},
+        unique = false
+      }
+    )
+
+    space:create_index(
+      "deploymentStatus",
+      {
+        parts = {3, "string", 4, "string", 5, "string"},
         unique = false
       }
     )
@@ -232,6 +304,18 @@ return function(server, api)
       }
     )
   end
+
+  local function registerSchedule(schedules)
+    for k, s in pairs(schedules) do
+      s = common.mapArrayToObject(s)
+      Schedule.setcallback("deployment:" .. s.type .. ":" .. s.deploymentId, cronHandler)
+    end
+  end
+
+  local pendingSchedules = box.space[space].index["estimatedTime"]:select({"pending"})
+  local queueSchedules = box.space[space].index["estimatedTime"]:select({"queue"})
+  registerSchedule(pendingSchedules)
+  registerSchedule(queueSchedules)
 
   before.register(
     space,
@@ -325,10 +409,11 @@ return function(server, api)
       }
 
       local options
+      local d
       -- fetch schedule options from deployment
       local deployments = box.space["deployments"].index["primary"]:select({self.data.deploymentId, userId})
       if #deployments > 0 then
-        local d = deployments[1]
+        d = deployments[1]
         if self.data.type == "performance" then
           options = d[9]
         else
@@ -341,28 +426,116 @@ return function(server, api)
         return self:render({data = result})
       end
 
+      -- autoDisable
+      self.data.tuple.autoDisable = options.autoDisable
+
       -- get deployment and specific type related schedules
       local schedules = box.space[space].index["deploymentId"]:select({self.data.deploymentId, self.data.type, userId})
       if #schedules > 0 then
-        local s = schedules[1]
-        if s[5] == "pending" or s[5] == "queue" then
-          self.data.tuple.id = s[1]
-          self.data.tuple.createdDate = s[11]
+        local schedule
+        for k, s in pairs(schedules) do
+          if s[5] == "pending" or s[5] == "queue" then
+            schedule = s
+          end
+        end
+        if schedule then
+          self.data.tuple.id = schedule[1]
+          self.data.tuple.createdDate = schedule[11]
         end
       end
 
       -- only for once
-      if options.frequency == "once" and options.frequencyOptions and options.frequencyOptions.time then
-        if options.frequencyOptions.time == "completed" then
-          self.data.tuple.estimatedTime = os.time()
+      if options.frequency == "once" then
+        -- once
+
+        if options.frequencyOptions and options.frequencyOptions.time then
+          if options.frequencyOptions.time == "completed" then
+            self.data.tuple.estimatedTime = os.time()
+          else
+            self.data.tuple.estimatedTime = tonumber(options.frequencyOptions.time)
+          end
+          self.data.tuple.ends = self.data.tuple.estimatedTime
+          local cron = "* * * * * *"
+          local starts = self.data.tuple.estimatedTime
+          local startsSecond = os.date("%S", starts)
+          local startsMinute = os.date("%M", starts)
+          local startsHour = os.date("%H", starts)
+          cron = "* * * * * *"
+          local describe = {
+            cron = cron,
+            starttime = self.data.tuple.estimatedTime,
+            times = 1
+          }
+          local name = "deployment" .. ":" .. self.data.type .. ":" .. d[1]
+          local ok, schedule =
+            Schedule.register(
+            name,
+            describe,
+            cronHandler,
+            {
+              deploymentId = d[1],
+              type = self.data.type
+            }
+          )
         else
-          self.data.tuple.estimatedTime = options.frequencyOptions.time
+          local result = self.data
+          result.message = "time not set."
+          result.status = 400
+          return self:render({data = result})
         end
-        self.data.tuple.ends = self.data.tuple.estimatedTime
+      elseif options.frequency == "repeat" then
+        -- repeat
+
+        local repeatPeriod = options.frequencyOptions.repeatPeriod
+        local repeatFrequency = options.frequencyOptions.repeatFrequency
+        local repeatOn = options.frequencyOptions.repeatOn
+        local starts = options.frequencyOptions.starts
+        local ends = options.frequencyOptions.ends
+
+        local startsSecond = os.date("%S", starts)
+        local startsMinute = os.date("%M", starts)
+        local startsHour = os.date("%H", starts)
+
+        local cron = "* * * * * *"
+        local frequency = repeatFrequency
+        cron = tonumber(startsSecond) .. " " .. tonumber(startsMinute) .. " " .. tonumber(startsHour) .. " "
+        if (repeatPeriod == "day") then
+          cron = cron .. "* * *"
+        elseif (repeatPeriod == "week") then
+          cron = cron .. "* * " .. tonumber(repeatOn - 1)
+        elseif (repeatPeriod == "month") then
+          cron = cron .. tonumber(repeatOn) .. " * *"
+        end
+
+        local describe = {
+          cron = cron,
+          frequency = frequency
+        }
+
+        if (ends == "never") then
+          -- dont do anything
+        elseif (ends < 10000) then
+          describe.times = ends
+        else
+          describe.endtime = ends
+        end
+
+        local name = "deployment" .. ":" .. self.data.type .. ":" .. d[1]
+        local ok, schedule =
+          Schedule.register(
+          name,
+          describe,
+          cronHandler,
+          {
+            deploymentId = d[1],
+            type = self.data.type
+          }
+        )
+        self.data.tuple.estimatedTime = tonumber(schedule.nexttime)
       else
         local result = self.data
-        result.message = "not support yet."
-        result.status = 500
+        result.message = "not support request."
+        result.status = 400
         return self:render({data = result})
       end
 
@@ -377,6 +550,7 @@ return function(server, api)
         data = self.data,
         userId = userId
       }
+
       return self:render({data = operate(request)})
     end
   )
@@ -407,6 +581,28 @@ return function(server, api)
     end
   )
 
+  server:addMessage(
+    {type = "suspendDeployment"},
+    function(self)
+      local schedules = box.space[space].index["deploymentId"]:select({self.data.id})
+      for k, s in pairs(common.mapArrayArrayToArrayObject(schedules)) do
+        if s.status == "pending" or s.status == "queue" then
+          local request = {
+            space = space,
+            type = "delete",
+            userId = s.userId,
+            data = {key = {s.id, s.userId}},
+            index = "primary"
+          }
+          operate(request)
+          local name = "deployment" .. ":" .. s.type .. ":" .. s.deploymentId
+          Schedule.unregister(name)
+        end
+      end
+      return self:render({data = 1})
+    end
+  )
+
   -- rule {isRequired, type}
   api["deploySchedule"] = {
     ["type"] = {true, "string"},
@@ -416,6 +612,9 @@ return function(server, api)
     ["id"] = {false, "string"}
   }
   api["watchSchedule"] = "watch"
+  api["suspendDeployment"] = {
+    ["id"] = {true, "string"}
+  }
   api["unwatchSchedule"] = {}
 end
 

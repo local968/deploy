@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Bread, Switch } from 'components/Common';
+import { Bread } from 'components/Common';
 import { Route, Redirect } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import { runInAction } from 'mobx';
@@ -20,7 +20,7 @@ export default class Detail extends Component {
   render() {
     const { routing, match, location, deployStore } = this.props;
     runInAction(() => (deployStore.currentId = match.params.id));
-    const cd = deployStore.currentDeployment || {};
+    // const cd = deployStore.currentDeployment || {};
     return (
       <div className={styles.detail}>
         <Bread list={['Home']} />

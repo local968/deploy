@@ -156,7 +156,7 @@ export default class Deployment extends Component {
                   className={styles.save}
                   onClick={() => {
                     if (cddo.frequency) {
-                      deployStore.toggleEnable(cd.id);
+                      deployStore.toggleEnable(cd.id, true);
                       routing.push(
                         `/deploy/project/${match.params.id}/operation`
                       );

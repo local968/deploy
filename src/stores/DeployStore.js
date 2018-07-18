@@ -159,9 +159,32 @@ class DeployStore {
   }
 
   @action
-  toggleEnable(id) {
+  toggleEnable(id, value) {
     const _d = new Deployment(this.deployments.find(_d => _d.id === id));
-    _d.enable = !_d.enable;
+    if (value) {
+      _d.enable = value;
+    } else {
+      _d.enable = !_d.enable;
+      DBStore.ready().then(db => {
+        if (_d.enable === false) {
+          db.suspendDeployment({ id });
+        } else if (_d.enable === true) {
+          DBStore.deploySchedule({
+            deploymentId: id,
+            type: 'deployment'
+          });
+          DBStore.deploySchedule({
+            deploymentId: id,
+            type: 'performance',
+            threshold: {
+              type: _d.performanceOptions.measurementMetric,
+              value: _d.performanceOptions.metricThreshold
+            }
+          });
+        }
+      });
+    }
+
     return _d.save();
   }
 
