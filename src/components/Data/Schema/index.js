@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { Select, ContinueButton } from '../../Common';
 
 import { AutoSizer, MultiGrid } from 'react-virtualized';
-import { Checkbox } from 'antd';
+import { Checkbox, Spin } from 'antd';
 
 @observer
 export default class DataSchema extends Component {
@@ -264,6 +264,9 @@ export default class DataSchema extends Component {
                 </div>
             </div>
             <ContinueButton onClick={this.doEtl} disabled={this.state.load || !target} text="Continue" />
+            {this.state.load && <div className={styles.load}>
+                <Spin tip="Loading..." size="large"></Spin>
+            </div>}
         </div>
     }
 }
