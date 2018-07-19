@@ -204,7 +204,7 @@ export default class DataSchema extends Component {
 
         //target选择列表
         rawHeader.forEach((h, i) => {
-            targetOption[h] = h
+            targetOption[h] = h.trim()
         });
 
         return project && <div className={styles.schema}>
