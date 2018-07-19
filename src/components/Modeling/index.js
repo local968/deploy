@@ -134,7 +134,7 @@ class StartTrain extends Component {
 class Loading extends Component {
   timer = null;
   state = {
-    progress: 0
+    progress: 1
   };
   componentDidMount() {
     const { project } = this.props;
@@ -156,7 +156,7 @@ class Loading extends Component {
     const { progress } = this.state;
     if (progress === 90) return this.clearTimer();
     this.setState({
-      progress: progress + 5
+      progress: Math.min(progress + 5, 90)
     });
   };
 

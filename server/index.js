@@ -145,5 +145,8 @@ const createFilePath = (filePath) => {
 
 // CRA routing
 app.get('/*', function(req, res) {
-  res.sendFile(path.join(process.cwd(), 'build', 'index.html'));
+  const index = path.join(process.cwd(), 'build', 'index.html');
+  if(fs.existsSync(index)) {
+    res.sendFile(index);
+  }
 });
