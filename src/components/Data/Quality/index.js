@@ -532,13 +532,13 @@ class FixIssue extends Component {
                                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                                 <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
                                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.mismatchSelect.bind(null,k)}>
+                                    {colType[k]==='Categorical'?<option value="mode">Replace with most frequent value</option>:<option value="mean">Replace with mean value</option>}
                                     <option value="drop">Delete the row</option>
                                     <option value="min">Replace with min value</option>
                                     <option value="max">Replace with max value</option>
                                     <option value="max+1">Replace with max+1 value</option>
-                                    <option value="mean">Replace with mean value</option>
+                                    {colType[k]==='Categorical'?<option value="mean">Replace with mean value</option>:<option value="mode">Replace with most frequent value</option>}
                                     <option value="median">Replace with median value</option>
-                                    <option value="mode">Replace with most frequent value</option>
                                 </select></div>
                             </div>
                         })}
@@ -580,13 +580,14 @@ class FixIssue extends Component {
                             <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                             <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
                             <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.nullSelect.bind(null,k)}>
+                                {colType[k]==='Categorical'?<option value="mode">Replace with most frequent value</option>:<option value="mean">Replace with mean value</option>}
                                 <option value="drop">Delete the row</option>
+                                <option value="ignore">Do Nothing</option>
                                 <option value="min">Replace with min value</option>
                                 <option value="max">Replace with max value</option>
                                 <option value="max+1">Replace with max+1 value</option>
-                                <option value="mean">Replace with mean value</option>
+                                {colType[k]==='Categorical'?<option value="mean">Replace with mean value</option>:<option value="mode">Replace with most frequent value</option>}
                                 <option value="median">Replace with median value</option>
-                                <option value="mode">Replace with most frequent value</option>
                             </select></div>
                         </div>
                     })}
@@ -632,6 +633,7 @@ class FixIssue extends Component {
                             <div className={styles.fixesCell}><span title={dataViews[k].mean} >{dataViews[k].mean}</span></div>
                             <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                             <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={outlierFillMethod[k]} onChange={this.outlierSelect.bind(null,k)}>
+                                <option value="ignore">Do Nothing</option>
                                 <option value="drop">Delete the row</option>
                                 <option value="min">Replace with min value</option>
                                 <option value="max">Replace with max value</option>

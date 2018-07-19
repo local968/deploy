@@ -594,6 +594,7 @@
     font-size: 0.875rem;
     font-family: Arial;
     color: #4a4a4a;
+    width: 100%;
 }
 
 span.fixesEdit {
@@ -607,6 +608,7 @@ span.fixesEdit {
     flex: 0 0 1.6em;
     overflow-y: scroll;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 .close {
