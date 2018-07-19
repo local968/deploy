@@ -103,15 +103,7 @@ export default class DataConnect extends Component {
     selectSample = (filename) => {
         if(!!this.state.progress) return false;
         const { userId, project } = this.props;
-        axios("/api/sample", {
-            method: "post",
-            params: { userId, projectId: project.projectId, type: project.problemType.toLowerCase(), filename: filename }
-        }).then(() => {
-            this.doEtl();
-        }, () => {
-            message.error("sample file error, please choose again")
-        })
-
+        
         this.props.project.fastTrackInit(filename);
 
         Papa.parse(fileMap[filename], {
@@ -125,6 +117,15 @@ export default class DataConnect extends Component {
                 this.props.project.newFileInit(result.data);
             } 
         });
+
+        axios("/api/sample", {
+            method: "post",
+            params: { userId, projectId: project.projectId, type: project.problemType.toLowerCase(), filename: filename }
+        }).then(() => {
+            this.doEtl();
+        }, () => {
+            message.error("sample file error, please choose again")
+        })
         this.hideSample();
     }
 

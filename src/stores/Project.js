@@ -229,7 +229,8 @@ export default class Project {
 			uploadFileName: name,
 			dataHeader: [],
 			uploadData: [],
-			rawHeader: []
+			rawHeader: [],
+			target: ''
 		});
 	}
 
@@ -243,7 +244,6 @@ export default class Project {
 			uploadData: data,
 			dataHeader: header,
 			rawHeader: header,
-			target: ''
 		});
 		// this.nextSubStep(2, 2);
 	}
