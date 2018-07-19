@@ -167,6 +167,7 @@ export default class Home extends Component {
     }
 }
 
+@observer
 class Project extends Component{
     state = {
         cover: false,

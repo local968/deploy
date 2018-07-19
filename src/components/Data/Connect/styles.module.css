@@ -330,3 +330,33 @@
     line-height: 1.1;
     font-size: 0.875rem;
 }
+
+.progressButton {
+    display: flex;
+    flex: none;
+    justify-content: center;
+}
+
+.progressButton button {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    flex: none;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.1em 0.2em;
+}
+
+.progressButton button span{
+    font-size: 1rem;
+}
+
+.disabled {
+    cursor: not-allowed;
+    background-color: #d3d3d3;
+    color: #aaaaaa;
+    background-image: none;
+}

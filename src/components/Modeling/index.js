@@ -24,20 +24,8 @@ const imgs = {
   modelSelectionActive: <img src={modelSelectionActiveIcon} alt="selection" />
 };
 
-// @inject('userStore', 'projectStore')
 @observer
 export default class Modeling extends Component {
-  // constructor(props) {
-  //     super(props);
-  //     const { pid } = props.match.params || {};
-  //     this.pid = pid ? parseInt(pid, 10) : 0;
-
-  //     when(
-  //         () => props.userStore.userId && !props.userStore.isLoad,
-  //         () => props.projectStore.init(props.userStore.userId, this.pid)
-  //     )
-  // }
-
   constructor(props) {
     super(props);
     this.step = [

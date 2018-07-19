@@ -14,21 +14,8 @@ const selectable = [
     {value: 'Regression', type: 'Continuous Values (Regression)', detail: (<p>To predict a continuous/numeric value (e.g. cost of a purchase)</p>)},
 ];
 
-// @inject('userStore', 'projectStore')
 @observer
 class Problem extends Component {
-
-    // constructor(props) {
-    //     super(props);
-    //     const {pid} = props.match.params || {};
-    //     this.pid = pid ? parseInt(pid, 10) : 0;
-        
-    //     when(
-    //         () => props.userStore.userId && !props.userStore.isLoad,
-    //         () => props.projectStore.init(props.userStore.userId, this.pid)
-    //     )
-    // }
-
     problemTypeChange = e => {
         this.props.project.changeProjectType = e.target.value;
     }

@@ -21,32 +21,23 @@ const imgs = {
     dataQualityActive: <img src={dataQualityActive} alt="quality" />
 }
 
-// @inject('userStore', 'projectStore')
 @observer
 export default class Data extends Component {
     constructor(props) {
         super(props);
-        //     const {pid} = props.match.params || {};
-        //     this.pid = pid ? parseInt(pid, 10) : 0;
         this.step = [
             {label:'Data Connect',value:"dataConnect"},
             {label:'Data Schema',value:"dataSchema"},
             {label:'Data Quality',value:"dataQuality"}
         ]
-
-        //     when(
-        //         () => props.userStore.userId && !props.userStore.isLoad,
-        //         () => props.projectStore.init(props.userStore.userId, this.pid)
-        //     )
     }
-    // static step = ['Connect', 'Schema', 'Quality'];
 
     enter = (step) => {
-        const { mainStep, lastSubStep, subStepActive } = this.props.project;
+        const { mainStep, lastSubStep, subStepActive, no_compute } = this.props.project;
 
         if (step === subStepActive) return false;
 
-        let maxStep = mainStep > 2 ? 3 : lastSubStep;
+        let maxStep = no_compute? 2 : (mainStep > 2 ? 3 : lastSubStep);
 
         if (step > maxStep) return false;
 

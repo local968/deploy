@@ -5,20 +5,8 @@ import ContinueButton from '../Common/ContinueButton';
 import { Input } from 'antd';
 const { TextArea } = Input;
 
-// @inject('userStore', 'projectStore')
 @observer
 export default class Project extends Component {
-    // constructor(props) {
-    //     super(props);
-    //     // const {pid} = props.match.params || {};
-    //     // this.pid = pid ? parseInt(pid, 10) : 0;
-        
-    //     // when(
-    //     //     () => props.userStore.userId && !props.userStore.isLoad,
-    //     //     () => props.projectStore.init(props.userStore.userId, this.pid)
-    //     // )
-    // }
-
     onChange = (k, e) => {
         const {project} = this.props;
         project[k] = e.target.value;

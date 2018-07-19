@@ -17,11 +17,15 @@ class ProjectStore {
     }
 
     @action
-    init(projectId) {
+    init(userId ,projectId) {
         //同一project不用加载
-        if (this.projectId === projectId) return;
+        if (this.userId === userId && this.projectId === projectId) return;
         this.isLoad = true;
+        this.userId = userId
         this.projectId = projectId;
+        this.project = null;
+        this.models = [];
+        this.charts = {}
 
         when(
             () => socketStore.isready,
@@ -111,8 +115,12 @@ class ProjectStore {
     }
 
     next() {
-        const {curStep, subStepActive} = this.project;
+        const {curStep, subStepActive, no_compute} = this.project;
         if(curStep === 2 && subStepActive < 3){
+            if(no_compute && subStepActive !== 1) {
+                this.project.nextMainStep(3)
+                return;
+            }
             const nextStep = subStepActive + 1;
             this.project.nextSubStep(nextStep, curStep)
         }else{
@@ -169,6 +177,10 @@ class ProjectStore {
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
                 let { command, result, status } = data;
+                const {userId, projectId} = result;
+                if(this.userId !== userId || this.projectId !== projectId) {
+                    return false;
+                }
                 if (status < 0) {
                     this.modelimgError(command, result)
                     return;
@@ -177,6 +189,7 @@ class ProjectStore {
                     case 'etl':
                         delete result.name;
                         result.dataViews = null;
+                        result.firstEtl = false;
                         // this.project.setProperty(result)
                         this.project.updateProject(result)
                         when(
