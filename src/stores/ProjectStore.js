@@ -176,8 +176,7 @@ class ProjectStore {
             }),
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
-                let { command, result, status } = data;
-                const {userId, projectId} = result;
+                let { command, result, status, userId, projectId } = data;
                 if(this.userId !== userId || this.projectId !== projectId) {
                     return false;
                 }

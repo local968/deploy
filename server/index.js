@@ -63,7 +63,9 @@ app.post('/api/upload', (req, res) => {
   }
 
   if (isFirst && fs.existsSync(uploadFile)){
+    console.log("check upload")
     const stat = fs.statSync(uploadFile);
+    
     //大于文件大小的块才开始写入
     if(stat.size > n){
       let returnData = {
