@@ -382,7 +382,7 @@ class SelectTarget extends Component {
                 targetMap[key] = 0
             }
         }
-        this.props.project.targetMap = targetMap;
+        this.props.project.targetMapTemp = targetMap;
         this.props.saveTargetFixes()
     }
 

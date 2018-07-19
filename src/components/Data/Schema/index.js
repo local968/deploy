@@ -104,7 +104,7 @@ export default class DataSchema extends Component {
         const header = rawHeader[realColumn] && rawHeader[realColumn].trim();
         //内容, 标题, class
         let content, title, cn;
-        console.log({...temp}, header)
+
         //勾选框行
         if (rowIndex === index.checkRow) {
             cn = styles.check;
@@ -140,7 +140,6 @@ export default class DataSchema extends Component {
                 if (!header) {
                     cn = classnames(cn, styles.missed);
                 }
-                console.log(temp[header])
                 if (header && temp[header].length > 1) {
                     cn = classnames(cn, styles.duplicated);
                 }

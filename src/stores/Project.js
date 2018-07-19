@@ -62,6 +62,8 @@ export default class Project {
 	@observable outlierIndex = {}
 	@observable dataViews = null
 	@observable outlierDict = {}
+	@observable targetMapTemp = {};
+	@observable targetMap = {};
 
 
 	@observable criteria = 'defualt';
@@ -377,7 +379,7 @@ export default class Project {
 	@action
 	fixTarget() {
 		this.updateProject({
-			targetMap: this.targetMap
+			targetMap: this.targetMapTemp
 		})
 		this.etl();
 	}
@@ -404,7 +406,7 @@ export default class Project {
 
 		if(problemType === Classification) {
 			if(colType[target] === 'Categorical') {
-				data.targetIssue = Object.keys(colMap[target]).length > 2;
+				data.targetIssue = Object.keys(this.targetMap).length < 2 && Object.keys(colMap[target]).length > 2;
 			}else{
 				data.targetIssue = true
 			}
