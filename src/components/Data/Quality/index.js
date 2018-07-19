@@ -88,6 +88,11 @@ export default class DataQuality extends Component {
             mismatch: issueRows.mismatchRow.length * 100 / (totalRawLines || 1),
             outlier: issueRows.outlierRow.length * 100 / (totalRawLines || 1),
         }
+        const targetPercent = {
+            missing: nullIndex[target].length * 100 / (totalRawLines || 1),
+            mismatch: mismatchIndex[target].length * 100 / (totalRawLines || 1),
+            outlier: colType[target]==='Numerical'?outlierIndex[target].length * 100:0 / (totalRawLines || 1),
+        }
         let num = 0;
         let arr = [];
         if(issues.targetIssue) {
@@ -148,9 +153,9 @@ export default class DataQuality extends Component {
                             <option value="Numerical">Numerical</option>
                         </select></div>
                         <div className={classnames(styles.cell, styles.error)}>
-                            <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{percent.mismatch.toFixed(2)}%</span></div>
-                            <div className={classnames(styles.errorBlock, styles.missing)}><span>{percent.missing.toFixed(2)}%</span></div>
-                            <div className={classnames(styles.errorBlock, styles.outlier)}><span>{percent.outlier.toFixed(2)}%</span></div>
+                            {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch.toFixed(2)}%</span></div>}
+                            {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing.toFixed(2)}%</span></div>}
+                            {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier.toFixed(2)}%</span></div>}
                         </div>
                         <div className={styles.tableBody}>
                             {uploadData.map((v, k) => <div key={k} className={classnames(styles.cell, {
