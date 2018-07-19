@@ -65,6 +65,7 @@ export default class Project {
 	@observable outlierDict = {}
 	@observable targetMapTemp = {};
 	@observable targetMap = {};
+	@observable firstEtl = true;
 
 	@observable no_compute = false;
 
@@ -348,8 +349,8 @@ export default class Project {
 			data.outlierDict = {...this.outlierDict};
 		}
 
-		if(this.no_compute) {
-			data.no_compute = this.no_compute;
+		if(this.no_compute || this.firstEtl) {
+			data.no_compute = true;
 		}
 
 		console.log(data)
