@@ -65,6 +65,7 @@ export default class Project {
 	@observable targetMapTemp = {};
 	@observable targetMap = {};
 
+	@observable no_compute = false;
 
 	@observable criteria = 'defualt';
 
@@ -238,7 +239,7 @@ export default class Project {
 
 	@action
 	newFileInit(uploadData) {
-		const header = uploadData[0];
+		const header = uploadData[0].map((h) => h.trim());
 		const data = uploadData.slice(1);
 
 		// 上传文件，target为空
@@ -344,6 +345,10 @@ export default class Project {
 
 		if(this.outlierDict && Object.keys(this.outlierDict).length) {
 			data.outlierDict = {...this.outlierDict};
+		}
+
+		if(this.no_compute) {
+			data.no_compute = this.no_compute;
 		}
 
 		console.log(data)
