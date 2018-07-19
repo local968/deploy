@@ -39,6 +39,7 @@ export default class Project {
 	@observable rawHeader = [];
 	@observable colType = [];
 	@observable totalLines = 0;
+	@observable totalRawLines = 0;
 
 	@observable mainStep = 0;
 	@observable curStep = 0;
