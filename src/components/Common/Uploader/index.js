@@ -66,15 +66,20 @@ export default ({
 
     const file = files[0];
     if (!!file) {
+      if(onChange && typeof onChange === 'function') {
+        onChange({ file })
+      }
       _upload(file);
-      typeof onChange === 'function' && onChange({ file });
     }
   };
 
   const retry = (file, start, isFirst, message = 'upload error') => {
     retryCount++;
     if (retryCount === 3) {
-      return onChange({ err: message });
+      if(onChange && typeof onChange === 'function') {
+        onChange({ err: message });
+      }
+      return 
     }
     setTimeout(_upload(file, start, isFirst), retryCount * 500);
   };
