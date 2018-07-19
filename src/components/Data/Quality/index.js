@@ -93,7 +93,6 @@ export default class DataQuality extends Component {
             mismatch: mismatchIndex[target].length * 100 / (totalRawLines || 1),
             outlier: colType[target]==='Numerical'?outlierIndex[target].length * 100 / (totalRawLines || 1):0 ,
         }
-        console.log(targetPercent, totalRawLines)
         let num = 0;
         let arr = [];
         if(issues.targetIssue) {
