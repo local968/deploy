@@ -57,6 +57,10 @@ export default class DataConnect extends Component {
     }
 
     upload = (data) => {
+        //progress设为1
+        this.setState({
+            progress: 1
+        })
         const { file } = data;
 
         this.props.project.fastTrackInit(file.name);
