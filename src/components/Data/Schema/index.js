@@ -100,10 +100,11 @@ export default class DataSchema extends Component {
 
         //真实的数据行 && 真实的数据列
         const realRow = rowIndex - index.rowHeader
-        const realColumn = columnIndex - index.columnHeader
+        const realColumn = columnIndex - index.columnHeader;
+        const header = rawHeader[realColumn] && rawHeader[realColumn].trim();
         //内容, 标题, class
         let content, title, cn;
-
+        console.log({...temp}, header)
         //勾选框行
         if (rowIndex === index.checkRow) {
             cn = styles.check;
@@ -111,14 +112,14 @@ export default class DataSchema extends Component {
             if (columnIndex === 0) {
                 content = "";
             } else {
-                content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={true}></Checkbox>
-                if (target && target === rawHeader[realColumn]) {
+                content = <Checkbox onChange={this.checked.bind(this, header)} checked={true}></Checkbox>
+                if (target && target === header) {
                     cn = classnames(styles.check, styles.target);
                     content = "";
                 }
-                if (checkList.includes(rawHeader[realColumn])) {
+                if (checkList.includes(header)) {
                     cn = classnames(styles.check, styles.checked);
-                    content = <Checkbox onChange={this.checked.bind(this, rawHeader[realColumn])} checked={false}></Checkbox>
+                    content = <Checkbox onChange={this.checked.bind(this, header)} checked={false}></Checkbox>
                 }
             }
             //标题行
@@ -128,18 +129,19 @@ export default class DataSchema extends Component {
                 content = <span>row/header</span>;
                 title = '';
             } else {
-                content = <span>{rawHeader[realColumn]}</span>;
-                title = rawHeader[realColumn];
-                if (target && target === rawHeader[realColumn]) {
+                content = <span>{header}</span>;
+                title = header;
+                if (target && target === header) {
                     cn = classnames(cn, styles.target);
                 }
-                if (checkList.includes(rawHeader[realColumn])) {
+                if (checkList.includes(header)) {
                     cn = classnames(cn, styles.checked);
                 }
-                if (!rawHeader[realColumn]) {
+                if (!header) {
                     cn = classnames(cn, styles.missed);
                 }
-                if (rawHeader[realColumn] && temp[rawHeader[realColumn]].length > 1) {
+                console.log(temp[header])
+                if (header && temp[header].length > 1) {
                     cn = classnames(cn, styles.duplicated);
                 }
             }
@@ -150,14 +152,14 @@ export default class DataSchema extends Component {
             if (columnIndex === 0) {
                 content = "";
             } else {
-                let key = rawHeader[realColumn];
-                if(!rawHeader[realColumn]) {
+                let key = header;
+                if(!header) {
                     key = `Unnamed: ${realColumn}`
                 }
-                if (rawHeader[realColumn] && temp[rawHeader[realColumn]].length > 1) {
-                    const tempIndex = temp[rawHeader[realColumn]].findIndex(c => c===realColumn);
+                if (header && temp[header].length > 1) {
+                    const tempIndex = temp[header].findIndex(c => c===realColumn);
                     const suffix = tempIndex===0?"":'.'+tempIndex;
-                    key = rawHeader[realColumn]+suffix
+                    key = header+suffix
                 }
                 content = <select value={colType[key]} onChange={this.select.bind(this, key)}>
                     <option value="Categorical">Categorical</option>
@@ -175,10 +177,10 @@ export default class DataSchema extends Component {
             } else {
                 content = <span>{uploadData[realRow][realColumn]}</span>;
                 title = uploadData[realRow][realColumn];
-                if (target && target === rawHeader[realColumn]) {
+                if (target && target === header) {
                     cn = classnames(cn, styles.target);
                 }
-                if (this.state.checkList.includes(rawHeader[realColumn])) {
+                if (this.state.checkList.includes(header)) {
                     cn = classnames(cn, styles.checked);
                 }
             }
