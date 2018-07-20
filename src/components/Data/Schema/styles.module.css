@@ -203,3 +203,23 @@
     justify-content: center;
     align-items: center;
 }
+
+.bottom {
+    display: flex;
+    flex:none;
+}
+
+.checkBox {
+    display: flex;
+    flex: none;
+    line-height: 0.4em;
+    align-items: center;
+    margin: 0.3em 0 0.6em 0.3em;
+}
+
+.checkBox span {
+    font-size: 0.875rem;
+    line-height: 1.1;
+    font-family: SanFranciscoText;
+    color: #1d2b3c;
+}

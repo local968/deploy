@@ -222,6 +222,7 @@ export default class Project {
 		Object.assign(this, problemStepData);
 	}
 
+	//修改上传文件
 	@action
 	fastTrackInit(name) {
 		this.updateProject({
@@ -235,10 +236,12 @@ export default class Project {
 			dataHeader: [],
 			uploadData: [],
 			rawHeader: [],
-			target: ''
+			target: '',
+			firstEtl: true
 		});
 	}
 
+	//读取预览文件
 	@action
 	newFileInit(uploadData) {
 		const header = uploadData[0].map((h) => h.trim());

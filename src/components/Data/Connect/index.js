@@ -92,18 +92,6 @@ export default class DataConnect extends Component {
         this.props.project.etl();
     }
 
-    skipEtl = () => {
-        this.props.project.updateProject({
-            no_compute: true
-        })
-    }
-
-    useEtl = () => {
-        this.props.project.updateProject({
-            no_compute: false
-        })
-    }
-
     showSample = () => {
         this.setState({
             sample: true
@@ -185,7 +173,6 @@ export default class DataConnect extends Component {
             <div className={styles.uploadRow}>
                 {this.block("From Mr.One", defileIcon)}
             </div>
-            {/* <div className={styles.progressButton}><button onClick={this.skipEtl}><span>Skip Etl</span></button></div> */}
             {this.state.sample && <DataSample project={project} onClose={this.hideSample} selectSample={this.selectSample} />}
             {!!this.state.progress && <div className={styles.sample}>
                 <div className={styles.cover}></div>
