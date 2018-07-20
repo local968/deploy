@@ -66,7 +66,7 @@ export default class Project {
 	@observable targetMap = {};
 	@observable firstEtl = true;
 
-	@observable no_compute = false;
+	@observable noCompute = false;
 
 	@observable criteria = 'defualt';
 
@@ -304,15 +304,13 @@ export default class Project {
 	}
 
 	etl() {
-		const { userId, projectId, problemType, dataHeader, uploadFileName } = this;
+		const { userId, projectId, problemType, dataHeader, uploadFileName, rawHeader } = this;
 
 		const command = 'etl';
 		const id = `${command}-${userId}-${projectId}`;
 
 		const data = {
 			csvLocation: uploadFileName,
-			problemType,
-			featureLabel: [...dataHeader],
 			projectId,
 			userId,
 			time: moment().valueOf(),
@@ -322,11 +320,16 @@ export default class Project {
 		}
 
 		if(this.colType.length) {
-			data.colType= [...this.colType];
+			data.colType = [...this.colType];
 		}
 
 		if(this.target) {
 			data.targetLabel = this.target;
+			data.problemType = problemType;
+		}
+
+		if(dataHeader.length !== rawHeader.length) {
+			data.featureLabel = [...dataHeader]
 		}
 
 		if(this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
@@ -349,8 +352,8 @@ export default class Project {
 			data.outlierDict = {...this.outlierDict};
 		}
 
-		if(this.no_compute || this.firstEtl) {
-			data.no_compute = true;
+		if(this.noCompute || this.firstEtl) {
+			data.noCompute = true;
 		}
 
 		console.log(data)

@@ -20,12 +20,12 @@ export default class DataSchema extends Component {
     }
 
     doEtl = () => {
-        const {colType, rawHeader, no_compute} = this.props.project;
+        const {colType, rawHeader, noCompute} = this.props.project;
         const newDataHeader = rawHeader.filter(d => !this.state.checkList.includes(d));
         this.props.project.updateProject({
 			dataHeader: newDataHeader,
             colType: colType,
-            no_compute: no_compute
+            noCompute: noCompute
 		});
         this.props.project.etl();
         this.setState({
@@ -72,7 +72,7 @@ export default class DataSchema extends Component {
     }
 
     checkNoCompute = (e) => {
-        this.props.project.no_compute = e.target.checked;
+        this.props.project.noCompute = e.target.checked;
     }
 
     cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
@@ -196,7 +196,7 @@ export default class DataSchema extends Component {
 
     render() {
         const { project } = this.props;
-        const { uploadData, rawHeader, no_compute, target, headerTemp: {isMissed, isDuplicated} } = project;
+        const { uploadData, rawHeader, noCompute, target, headerTemp: {isMissed, isDuplicated} } = project;
         const targetOption = {};
 
         //target选择列表
@@ -264,7 +264,7 @@ export default class DataSchema extends Component {
             </div>
             <div className={styles.bottom}>
                 <ContinueButton onClick={this.doEtl} disabled={this.state.load || !target} text="Continue" />
-                <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={no_compute} /><span>Skip Etl</span></div>
+                <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noCompute} /><span>Skip Etl</span></div>
             </div>
             {this.state.load && <ProjectLoading />}
         </div>
