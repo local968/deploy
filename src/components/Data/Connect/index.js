@@ -239,9 +239,7 @@ class DataSample extends Component {
                         </div>
                     })}
                     <div className={styles.sampleButton}>
-                        <button onClick={this.submit} className={classnames(styles.submit, {
-                            [styles.disabled]: project.no_compute
-                        })} disabled={project.no_compute}><span>Load Sample Data</span></button>
+                        <button onClick={this.submit} className={styles.submit}><span>Load Sample Data</span></button>
                     </div>
                 </div>
             </div>

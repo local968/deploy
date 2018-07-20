@@ -48,7 +48,6 @@ export default class Project {
 
 	@observable overfit = 5;
 	@observable speed = 5;
-	@observable version = 2;
 
 	// etl
 	// @observable fillMethod = {};
@@ -207,7 +206,6 @@ export default class Project {
 			subStepActive: 1,
 			overfit: 5,
 			speed: 5,
-			version: 2,
 			validationRate: 0.1,
 			holdoutRate: 0.1,
 			mismatchFillMethod: {},
@@ -320,8 +318,7 @@ export default class Project {
 			time: moment().valueOf(),
 			command,
 			validationRate: this.validationRate,
-			holdoutRate: this.holdoutRate,
-			version: this.version
+			holdoutRate: this.holdoutRate
 		}
 
 		if(this.colType.length) {
@@ -508,7 +505,6 @@ export default class Project {
 		// speed:  1-10  默认5
 		// overfit:   1-10 默认5
 		// model_option: model的额外参数，不同model参数不同
-		// version: 控制选择何种model，目前有gbm，cat，默认两种全部使用。
 		// projectName: 名称
 		// kwargs:
 		requestStore.sendRequest(id, {
@@ -522,8 +518,7 @@ export default class Project {
 			overfit,
 			time: this.trainStartTime,
 			command,
-			projectName: this.name,
-			version: this.version
+			projectName: this.name
 		});
 
 		// this.nextSubStep(3, 2);
@@ -560,7 +555,6 @@ export default class Project {
 			userId,
 			time: +new Date(),
 			command,
-			version: this.version,
 			featureLabel: [...dataHeader]
 		});
 	}
@@ -582,8 +576,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -604,8 +597,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -625,8 +617,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -646,8 +637,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -667,8 +657,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -688,8 +677,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -709,8 +697,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 

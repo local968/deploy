@@ -3,10 +3,10 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 
-import { Select, ContinueButton } from '../../Common';
+import { Select, ContinueButton, ProjectLoading } from '../../Common';
 
 import { AutoSizer, MultiGrid } from 'react-virtualized';
-import { Checkbox, Spin } from 'antd';
+import { Checkbox } from 'antd';
 
 @observer
 export default class DataSchema extends Component {
@@ -16,7 +16,6 @@ export default class DataSchema extends Component {
         flag: false,
         checkList: this.props.project.rawHeader.filter(r => !this.props.project.dataHeader.includes(r)),
         showSelect: false,
-        error: false,
         load: false
     }
 
@@ -69,13 +68,6 @@ export default class DataSchema extends Component {
         this.setState({
             flag: !this.state.flag,
             showSelect: !this.state.showSelect
-        })
-    }
-
-    hasError = () => {
-        this.setState({
-            flag: !this.state.flag,
-            error: true
         })
     }
 
@@ -274,9 +266,7 @@ export default class DataSchema extends Component {
                 <ContinueButton onClick={this.doEtl} disabled={this.state.load || !target} text="Continue" />
                 <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={no_compute} /><span>Skip Etl</span></div>
             </div>
-            {this.state.load && <div className={styles.load}>
-                <Spin tip="Loading..." size="large"></Spin>
-            </div>}
+            {this.state.load && <ProjectLoading />}
         </div>
     }
 }

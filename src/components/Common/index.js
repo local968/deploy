@@ -8,6 +8,7 @@ import Search from './Search';
 import Background from './Background';
 import ContinueButton from './ContinueButton';
 import ProjectSide from './ProjectSide';
+import ProjectLoading from './ProjectLoading';
 
 export {
   BlackButton,
@@ -19,5 +20,6 @@ export {
   Search,
   ContinueButton,
   ProjectSide,
+  ProjectLoading,
   Background
 };

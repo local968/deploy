@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { ContinueButton } from '../../Common';
+import { ContinueButton, ProjectLoading } from '../../Common';
 import { when } from 'mobx';
 import * as d3 from 'd3';
 
@@ -171,6 +171,7 @@ export default class DataQuality extends Component {
                     {arr}
                 </div>
             </div>
+            {this.state.isLoad && <ProjectLoading />}
             {this.state.visible && <FixIssue project={project} closeFixes={this.closeFixes} saveDataFixes={this.saveDataFixes}/>}
             {this.state.edit && <SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes}/>}
         </div>
@@ -441,7 +442,6 @@ class SelectTarget extends Component {
         </div>
     }
 }
-
 
 class FixIssue extends Component {
     state = {
