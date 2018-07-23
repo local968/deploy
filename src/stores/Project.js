@@ -48,7 +48,6 @@ export default class Project {
 
 	@observable overfit = 5;
 	@observable speed = 5;
-	@observable version = 2;
 
 	// etl
 	// @observable fillMethod = {};
@@ -67,7 +66,7 @@ export default class Project {
 	@observable targetMap = {};
 	@observable firstEtl = true;
 
-	@observable no_compute = false;
+	@observable noCompute = false;
 
 	@observable criteria = 'defualt';
 
@@ -207,7 +206,6 @@ export default class Project {
 			subStepActive: 1,
 			overfit: 5,
 			speed: 5,
-			version: 2,
 			validationRate: 0.1,
 			holdoutRate: 0.1,
 			mismatchFillMethod: {},
@@ -222,6 +220,7 @@ export default class Project {
 		Object.assign(this, problemStepData);
 	}
 
+	//修改上传文件
 	@action
 	fastTrackInit(name) {
 		this.updateProject({
@@ -235,10 +234,12 @@ export default class Project {
 			dataHeader: [],
 			uploadData: [],
 			rawHeader: [],
-			target: ''
+			target: '',
+			firstEtl: true
 		});
 	}
 
+	//读取预览文件
 	@action
 	newFileInit(uploadData) {
 		const header = uploadData[0].map((h) => h.trim());
@@ -303,30 +304,32 @@ export default class Project {
 	}
 
 	etl() {
-		const { userId, projectId, problemType, dataHeader, uploadFileName } = this;
+		const { userId, projectId, problemType, dataHeader, uploadFileName, rawHeader } = this;
 
 		const command = 'etl';
 		const id = `${command}-${userId}-${projectId}`;
 
 		const data = {
 			csvLocation: uploadFileName,
-			problemType,
-			featureLabel: [...dataHeader],
 			projectId,
 			userId,
 			time: moment().valueOf(),
 			command,
 			validationRate: this.validationRate,
-			holdoutRate: this.holdoutRate,
-			version: this.version
+			holdoutRate: this.holdoutRate
 		}
 
 		if(this.colType.length) {
-			data.colType= [...this.colType];
+			data.colType = [...this.colType];
 		}
 
 		if(this.target) {
 			data.targetLabel = this.target;
+			data.problemType = problemType;
+		}
+
+		if(dataHeader.length !== rawHeader.length) {
+			data.featureLabel = [...dataHeader]
 		}
 
 		if(this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
@@ -349,8 +352,8 @@ export default class Project {
 			data.outlierDict = {...this.outlierDict};
 		}
 
-		if(this.no_compute || this.firstEtl) {
-			data.no_compute = true;
+		if(this.noCompute || this.firstEtl) {
+			data.noCompute = true;
 		}
 
 		console.log(data)
@@ -505,7 +508,6 @@ export default class Project {
 		// speed:  1-10  默认5
 		// overfit:   1-10 默认5
 		// model_option: model的额外参数，不同model参数不同
-		// version: 控制选择何种model，目前有gbm，cat，默认两种全部使用。
 		// projectName: 名称
 		// kwargs:
 		requestStore.sendRequest(id, {
@@ -519,8 +521,7 @@ export default class Project {
 			overfit,
 			time: this.trainStartTime,
 			command,
-			projectName: this.name,
-			version: this.version
+			projectName: this.name
 		});
 
 		// this.nextSubStep(3, 2);
@@ -557,7 +558,6 @@ export default class Project {
 			userId,
 			time: +new Date(),
 			command,
-			version: this.version,
 			featureLabel: [...dataHeader]
 		});
 	}
@@ -579,8 +579,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -601,8 +600,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -622,8 +620,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -643,8 +640,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -664,8 +660,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -685,8 +680,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 
@@ -706,8 +700,7 @@ export default class Project {
 			projectId,
 			userId,
 			time: +new Date(),
-			command,
-			version: this.version.toString()
+			command
 		});
 	}
 

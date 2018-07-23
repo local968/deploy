@@ -115,9 +115,9 @@ class ProjectStore {
     }
 
     next() {
-        const {curStep, subStepActive, no_compute} = this.project;
+        const {curStep, subStepActive, noCompute} = this.project;
         if(curStep === 2 && subStepActive < 3){
-            if(no_compute && subStepActive !== 1) {
+            if(noCompute && subStepActive !== 1) {
                 this.project.nextMainStep(3)
                 return;
             }
