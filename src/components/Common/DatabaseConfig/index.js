@@ -2,43 +2,85 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, action } from 'mobx';
 import styles from './styles.module.css';
-import { Modal, Select, Checkbox, Popover } from 'antd';
+import { Modal, Select, Checkbox, Message } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
-import helpIcon from './icon-help.svg';
+import db from 'stores/DBStore.js';
 
 const Option = Select.Option;
+const database = ['mysql', 'oracle'];
+
+const rules = {};
+const errorMessages = {};
+const setRule = (key, errorMessage, neccessary, rule) => {
+  rules[key] = value => {
+    if (neccessary && (!value || value === '')) return false;
+    if (rule) return rule(value);
+    return true;
+  };
+  errorMessages[key] = errorMessage;
+};
+
+setRule('sqlHostName', 'place enter your host name', true);
+setRule('sqlPort', 'invalid host port', true, value => !isNaN(value));
+setRule(
+  'databaseType',
+  'invalid database type',
+  true,
+  value => database.indexOf(value) !== -1
+);
+setRule('sqlDatabase', 'place enter your database name', true);
+setRule('sqlTable', 'place enter your table name', true);
+setRule('sqlQueryStr', false);
+setRule('sqlEncoding', false, value => ['utf8'].indexOf(value) !== -1);
+setRule('sqlUserName', 'place enter your databse username', true);
+setRule('sqlPassword', 'place enter your databse password', true);
 
 @observer
 export default class DatabaseConfig extends Component {
   @observable
   localState = {
-    hostname: '',
-    port: '',
+    sqlHostName: '',
+    sqlPort: '',
     databaseType: 'mysql',
-    databaseName: '',
-    tableName: '',
-    databaseEncoding: 'utf8',
-    username: '',
-    password: '',
+    sqlDatabase: '',
+    sqlTable: '',
+    sqlQueryStr: '',
+    sqlEncoding: 'utf8',
+    sqlUserName: '',
+    sqlPassword: '',
     rememberMyPassword: false,
-    rememberMyConnectionProfile: false,
+    rememberMyConnectionProfile: false
 
-    period: '',
-    start: '',
-    finish: '',
-
-    tableType: 'new'
+    // tableType: 'new'
   };
+
+  @observable errorField = '';
 
   @action
   changeState = (key, value) => {
     this.localState[key] = value;
   };
 
+  checkForm = () => {
+    let failed = false;
+    Object.entries(rules).map(([key, fn]) => {
+      if (failed) return false;
+      if (!fn(this.localState[key])) {
+        Message.error(errorMessages[key]);
+        failed = true;
+        runInAction(() => {
+          this.errorField = key;
+        });
+      }
+      return true;
+    });
+    return failed;
+  };
+
   @action
   toggleState = (key, value) => {
-    this.localState[key] = this.localState[key] === value ? '' : value;
+    this.changeState(key, this.localState[key] === value ? '' : value);
   };
 
   @action
@@ -54,15 +96,22 @@ export default class DatabaseConfig extends Component {
   }
 
   render() {
-    const {
-      visible,
-      onClose,
-      onSubmit,
-      title,
-      validation,
-      result
-    } = this.props;
+    const { visible, onClose, onSubmit: submit, title } = this.props;
     const state = this.localState;
+    window.db = db;
+    const onSubmit = () => {
+      if (this.checkForm()) return;
+      db.checkDatabase({
+        projectId: '1',
+        ...this.localState
+      }).then(resp => {
+        console.log(resp);
+        const result = this.localState;
+        delete result['rememberMyPassword'];
+        delete result['rememberMyConnectionProfile'];
+        // submit(result);
+      });
+    };
     return (
       <Modal
         className={styles.modal}
@@ -84,10 +133,12 @@ export default class DatabaseConfig extends Component {
           <div className={styles.options}>
             <input
               type="text"
-              className={styles.input}
+              className={classnames(styles.input, {
+                [styles.error]: this.errorField === 'sqlHostName'
+              })}
               placeholder="eg., db.abc.com"
-              value={state['hostname']}
-              onChange={this.inputChange('hostname')}
+              value={state['sqlHostName']}
+              onChange={this.inputChange('sqlHostName')}
             />
           </div>
         </div>
@@ -96,10 +147,12 @@ export default class DatabaseConfig extends Component {
           <div className={styles.options}>
             <input
               type="text"
-              className={styles.input}
+              className={classnames(styles.input, {
+                [styles.error]: this.errorField === 'sqlPort'
+              })}
               placeholder="eg., 12345"
-              value={state['port']}
-              onChange={this.inputChange('port')}
+              value={state['sqlPort']}
+              onChange={this.inputChange('sqlPort')}
             />
           </div>
         </div>
@@ -121,174 +174,51 @@ export default class DatabaseConfig extends Component {
           <div className={styles.options}>
             <input
               type="text"
-              className={styles.input}
+              className={classnames(styles.input, {
+                [styles.error]: this.errorField === 'sqlHostName'
+              })}
               placeholder="Your database name"
-              value={state['databaseName']}
-              onChange={this.inputChange('databaseName')}
+              value={state['sqlDatabase']}
+              onChange={this.inputChange('sqlDatabase')}
             />
           </div>
         </div>
-        {result && (
-          <div className={styles.line}>
-            <div className={styles.label}>Table Type:</div>
-            <div className={styles.options}>
-              <div className={styles.types}>
-                <div className={styles.type}>
-                  <i
-                    className={classnames([styles.pot], {
-                      [styles.active]: state.tableType === 'existing'
-                    })}
-                    onClick={this.toggleState.bind(
-                      this,
-                      'tableType',
-                      'existing'
-                    )}
-                  />
-                  <span
-                    className={styles.text}
-                    onClick={this.toggleState.bind(
-                      this,
-                      'tableType',
-                      'existing'
-                    )}
-                  >
-                    an existing table
-                  </span>
-                </div>
-                <div className={styles.type}>
-                  <i
-                    className={classnames([styles.pot], {
-                      [styles.active]: state.tableType === 'temporary'
-                    })}
-                    onClick={this.toggleState.bind(
-                      this,
-                      'tableType',
-                      'temporary'
-                    )}
-                  />
-                  <span
-                    className={styles.text}
-                    onClick={this.toggleState.bind(
-                      this,
-                      'tableType',
-                      'temporary'
-                    )}
-                  >
-                    a new temporary table
-                  </span>
-                </div>
-                <div className={styles.type}>
-                  <i
-                    className={classnames([styles.pot], {
-                      [styles.active]: state.tableType === 'new'
-                    })}
-                    onClick={this.toggleState.bind(this, 'tableType', 'new')}
-                  />
-                  <span
-                    className={styles.text}
-                    onClick={this.toggleState.bind(this, 'tableType', 'new')}
-                  >
-                    a new table
-                  </span>
-                  <Popover
-                    placement="right"
-                    overlayClassName={styles.popover}
-                    content={
-                      <p>
-                        Create a new table and put the<br />
-                        results in it. Every time the new<br />
-                        results are generated, they will<br />
-                        be added to the old results.
-                      </p>
-                    }
-                  >
-                    <img
-                      className={styles.helpIcon}
-                      src={helpIcon}
-                      alt="help"
-                    />
-                  </Popover>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
         <div className={styles.line}>
           <div className={styles.label}>Table Name:</div>
           <div className={styles.options}>
             <input
               type="text"
-              className={styles.input}
+              className={classnames(styles.input, {
+                [styles.error]: this.errorField === 'sqlTable'
+              })}
               placeholder="Your table name"
-              value={state['tableName']}
-              onChange={this.inputChange('tableName')}
+              value={state['sqlTable']}
+              onChange={this.inputChange('sqlTable')}
             />
           </div>
         </div>
-        {validation && (
-          <div className={styles.line}>
-            <div className={styles.label} />
-            <div className={styles.options}>
-              <i
-                className={classnames([styles.pot], {
-                  [styles.active]: state.period === 'id'
-                })}
-                onClick={this.toggleState.bind(this, 'period', 'id')}
-              />
-              <span
-                className={styles.text}
-                onClick={this.toggleState.bind(this, 'period', 'id')}
-              >
-                Record ID
-              </span>
-              <i
-                className={classnames([styles.pot], {
-                  [styles.active]: state.period === 'time'
-                })}
-                onClick={this.toggleState.bind(this, 'period', 'time')}
-              />
-              <span
-                className={styles.text}
-                onClick={this.toggleState.bind(this, 'period', 'time')}
-              >
-                Timestamp
-              </span>
-            </div>
+        <div className={styles.line}>
+          <div className={styles.label}>SQL(optional):</div>
+          <div className={styles.options}>
+            <input
+              type="text"
+              className={classnames(styles.input, {
+                [styles.error]: this.errorField === 'sqlQueryStr'
+              })}
+              placeholder="SQL for query"
+              value={state['sqlQueryStr']}
+              onChange={this.inputChange('sqlQueryStr')}
+            />
           </div>
-        )}
-        {validation && (
-          <div className={styles.line}>
-            <div className={styles.label} />
-            <div className={styles.options}>
-              <div className={styles.periodInputs}>
-                <div className={styles.start}>
-                  Start {state.period.toLocaleUpperCase()}:<input
-                    className={styles.input}
-                    type="text"
-                    value={state['start']}
-                    onChange={this.inputChange('start')}
-                  />
-                </div>
-                <div className={styles.finish}>
-                  Finish {state.period.toLocaleUpperCase()}:<input
-                    className={styles.input}
-                    type="text"
-                    value={state['finish']}
-                    onChange={this.inputChange('finish')}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
         <div className={styles.line}>
           <div className={styles.label}>
             Database Encoding:<br />(optional)
           </div>
           <div className={styles.options}>
             <Select
-              value={state.databaseEncoding}
-              onChange={this.changeState.bind(this, 'databaseEncoding')}
+              value={state.sqlEncoding}
+              onChange={this.changeState.bind(this, 'sqlEncoding')}
             >
               <Option value="utf8">utf8</Option>
               <Option value="gb2312">gb2312</Option>
@@ -301,10 +231,12 @@ export default class DatabaseConfig extends Component {
           <div className={styles.options}>
             <input
               type="text"
-              className={styles.input}
+              className={classnames(styles.input, {
+                [styles.error]: this.errorField === 'sqlUserName'
+              })}
               placeholder="Your database username"
-              value={state['username']}
-              onChange={this.inputChange('username')}
+              value={state['sqlUserName']}
+              onChange={this.inputChange('sqlUserName')}
             />
           </div>
         </div>
@@ -313,10 +245,12 @@ export default class DatabaseConfig extends Component {
           <div className={styles.options}>
             <input
               type="text"
-              className={styles.input}
+              className={classnames(styles.input, {
+                [styles.error]: this.errorField === 'sqlPassword'
+              })}
               placeholder="Your database password"
-              value={state['password']}
-              onChange={this.inputChange('password')}
+              value={state['sqlPassword']}
+              onChange={this.inputChange('sqlPassword')}
             />
           </div>
         </div>
@@ -349,7 +283,7 @@ export default class DatabaseConfig extends Component {
           <a className={styles.cancel} onClick={onClose}>
             CANCEL
           </a>
-          <a className={styles.done} onClick={() => onSubmit(this.localState)}>
+          <a className={styles.done} onClick={onSubmit}>
             CONNECT
           </a>
         </div>

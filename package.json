@@ -24,11 +24,11 @@
     "react-scripts": "^1.1.4",
     "react-virtualized": "^9.19.1",
     "spark-md5": "^3.0.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.3.2"
   },
   "proxy": {
     "/api/*": {
-      "target": "http://localhost:29002"
+      "target": "http://localhost:29000"
     }
   },
   "scripts": {

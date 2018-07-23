@@ -192,6 +192,9 @@ return function(server, api)
             }
           }
         )
+        -- todo
+        -- sql_user_name, sql_password, sql_host_name, sql_port, sql_database, sql_table, sql_encoding:str='utf8',
+        -- database_type:str='MySql',sql_query_str:str=''
         queue.tube.taskQueue:put(id)
         tuple.requestId = id
         tuple.solution = deployment[5]
@@ -603,6 +606,59 @@ return function(server, api)
     end
   )
 
+  server:addMessage(
+    {type = "checkDatabase"},
+    function(self)
+      local userResult = conn.getConnid(self.connid)
+      -- local userResult = {1, "tytytytytyt"}
+      if not userResult then
+        local result = self.data
+        result.message = "need login."
+        result.status = 401
+        return self:render({data = result})
+      end
+      local userId = userResult[2]
+      box.space["modeling_request"]:replace(
+        {
+          self.data.reqNo,
+          {
+            projectId = self.data.projectId,
+            userId = userId,
+            command = "deploy2",
+            sqlHostName = self.data.sqlHostName,
+            sqlPort = self.data.sqlPort,
+            sqlDatabase = self.data.sqlDatabase,
+            sqlTable = self.data.sqlTable,
+            sqlQueryStr = self.data.sqlQueryStr or "",
+            sqlEncoding = self.data.sqlEncoding,
+            sqlUserName = self.data.sqlUserName,
+            sqlPassword = self.data.sqlPassword
+          }
+        }
+      )
+
+      local f =
+        fiber.create(
+        function()
+          local finished = false
+          while not finished do
+            local result = box.space["modeling_result"]:select({self.data.reqNo})
+            if (#result > 0) then
+              finished = true
+              local result = self.data
+              result.status = 200
+              result.message = "ok"
+              result.result = result
+              self:render({data = result[0]})
+              return f.kill()
+            end
+            fiber.sleep(2)
+          end
+        end
+      )
+    end
+  )
+
   -- rule {isRequired, type}
   api["deploySchedule"] = {
     ["type"] = {true, "string"},
@@ -616,6 +672,19 @@ return function(server, api)
     ["id"] = {true, "string"}
   }
   api["unwatchSchedule"] = {}
+
+  api["checkDatabase"] = {
+    ["projectId"] = {true, "string"},
+    ["sqlHostName"] = {true, "string"},
+    ["sqlPort"] = {true, "string"},
+    ["sqlDatabase"] = {true, "string"},
+    ["sqlTable"] = {true, "string"},
+    ["sqlQueryStr"] = {false, "string"},
+    ["sqlEncoding"] = {true, "string"},
+    ["sqlUserName"] = {true, "string"},
+    ["sqlPassword"] = {false, "string"},
+    ["projectId"] = {true, "string"}
+  }
 end
 
 -- local unregister = before.register()

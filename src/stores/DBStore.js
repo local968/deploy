@@ -1,6 +1,8 @@
 import R2WSClient from '../r2ws-client';
 import config from '../config.js';
+import moment from 'moment';
 
+const uuidv4 = require('uuid/v4');
 const debug = true;
 
 class DB {
@@ -8,7 +10,6 @@ class DB {
   _listeners = {};
   _onceListeners = {};
   connection;
-  reqNo = 1;
   isReady = false;
 
   constructor(connect = true) {
@@ -32,7 +33,9 @@ class DB {
         this.once('ready', resolve);
       });
     }
-    const _conn = new R2WSClient(`ws://${window.location.hostname}:${config.port}/`);
+    const _conn = new R2WSClient(
+      `ws://${window.location.hostname}:${config.port}/`
+    );
 
     _conn.onready = this.emit.bind(this, 'ready', _conn);
     _conn.onmessage = this.emit.bind(this, 'message');
@@ -81,10 +84,10 @@ class DB {
   async send(type, data, unwatch) {
     // type: select, insert, update, upsert, delete, watch, unwatch
     const conn = await this.connect();
-    this.reqNo++;
-    conn.sendmessage({ type, data: { reqNo: this.reqNo, ...data } });
+    const reqNo = uuidv4();
+    conn.sendmessage({ type, data: { reqNo, ...data } });
     return await new Promise((resolve, reject) => {
-      this.once(this.reqNo, (...args) => {
+      this.once(reqNo, (...args) => {
         if (args.length === 1) args = args[0];
         if (unwatch) args.unwatch = unwatch;
         resolve(args);
