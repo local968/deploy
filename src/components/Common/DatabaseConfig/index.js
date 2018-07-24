@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, action } from 'mobx';
 import styles from './styles.module.css';
-import { Modal, Select, Checkbox, Message } from 'antd';
+import { Modal, Select, Checkbox, Message, Icon } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
 import db from 'stores/DBStore.js';
 
 const Option = Select.Option;
 const database = ['mysql', 'oracle'];
+
+const storage = window.localStorage;
 
 const rules = {};
 const errorMessages = {};
@@ -36,26 +38,28 @@ setRule('sqlEncoding', false, value => ['utf8'].indexOf(value) !== -1);
 setRule('sqlUserName', 'place enter your databse username', true);
 setRule('sqlPassword', 'place enter your databse password', true);
 
+const defaultState = {
+  sqlHostName: '',
+  sqlPort: '',
+  databaseType: 'mysql',
+  sqlDatabase: '',
+  sqlTable: '',
+  sqlQueryStr: '',
+  sqlEncoding: 'utf8',
+  sqlUserName: '',
+  sqlPassword: '',
+  rememberMyPassword: false,
+  rememberMyConnectionProfile: false
+
+  // tableType: 'new'
+};
+
 @observer
 export default class DatabaseConfig extends Component {
-  @observable
-  localState = {
-    sqlHostName: '',
-    sqlPort: '',
-    databaseType: 'mysql',
-    sqlDatabase: '',
-    sqlTable: '',
-    sqlQueryStr: '',
-    sqlEncoding: 'utf8',
-    sqlUserName: '',
-    sqlPassword: '',
-    rememberMyPassword: false,
-    rememberMyConnectionProfile: false
-
-    // tableType: 'new'
-  };
+  @observable localState = defaultState;
 
   @observable errorField = '';
+  @observable loading = false;
 
   @action
   changeState = (key, value) => {
@@ -91,7 +95,31 @@ export default class DatabaseConfig extends Component {
 
   componentWillReceiveProps(props) {
     runInAction(() => {
-      this.localState = { ...this.localState, ...props.options };
+      let storedProfile = storage.getItem('DatabaseConnectionProfile');
+      const storedPassword = storage.getItem('DatabaseConnectionPassword');
+
+      try {
+        storedProfile = JSON.parse(storedProfile);
+      } catch (e) {
+        storedProfile = {};
+        storage.setItem('DatabaseConnectionProfile', '{}');
+      }
+
+      const filter = obj =>
+        obj && typeof obj === 'object'
+          ? Object.keys(obj).reduce((prev, curr) => {
+              if (defaultState[curr] === undefined) return prev;
+              if (obj[curr] === undefined) return prev;
+              return { ...prev, [curr]: obj[curr] };
+            }, {})
+          : {};
+
+      this.localState = {
+        ...defaultState,
+        ...filter(storedProfile),
+        sqlPassword: storedPassword,
+        ...filter(props.options)
+      };
     });
   }
 
@@ -100,6 +128,7 @@ export default class DatabaseConfig extends Component {
     const state = this.localState;
     const onSubmit = () => {
       if (this.checkForm()) return;
+      this.loading = true;
       db.checkDatabase({
         ...state,
         projectId
@@ -107,8 +136,17 @@ export default class DatabaseConfig extends Component {
         if (resp.result.status === -1) {
           Message.error(resp.result.result['process error']);
         } else {
+          if (state.rememberMyPassword) {
+            storage.setItem('DatabaseConnectionPassword', state.sqlPassword);
+          }
+          if (state.rememberMyConnectionProfile) {
+            const profile = { ...state };
+            delete profile.sqlPassword;
+            storage.setItem('DatabaseConnectionProfile', JSON.stringify(state));
+          }
           submit(resp);
         }
+        this.loading = false;
       });
     };
     return (
@@ -243,7 +281,7 @@ export default class DatabaseConfig extends Component {
           <div className={styles.label}>Password:</div>
           <div className={styles.options}>
             <input
-              type="text"
+              type="password"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlPassword'
               })}
@@ -259,6 +297,7 @@ export default class DatabaseConfig extends Component {
             <Checkbox
               checked={state.rememberMyPassword}
               onChange={this.checkboxChange('rememberMyPassword')}
+              disabled={!state.rememberMyConnectionProfile}
             >
               <span className={styles.checkboxText}>Remember My Password</span>
             </Checkbox>
@@ -282,9 +321,15 @@ export default class DatabaseConfig extends Component {
           <a className={styles.cancel} onClick={onClose}>
             CANCEL
           </a>
-          <a className={styles.done} onClick={onSubmit}>
-            CONNECT
-          </a>
+          {this.loading ? (
+            <a className={styles.done}>
+              <Icon type="loading" />
+            </a>
+          ) : (
+            <a className={styles.done} onClick={onSubmit}>
+              CONNECT
+            </a>
+          )}
         </div>
       </Modal>
     );
