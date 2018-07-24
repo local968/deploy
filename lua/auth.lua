@@ -154,17 +154,14 @@ local function _loginBySession(sessionId)
 end
 
 local function _setExpired(id, type)
-    local data = {
-        type = type
-    }
-
+    local expired
     if type ~= 'free' then
-        data.expired = 0
+        expired = 0
     else
-        data.expired = os.time() + Expired
+        expired = os.time() + Expired
     end
 
-    local ok3, result = auth.set_profile(id, {last_name={data}})
+    local ok3, result = auth.set_profile({id, expired, type})
 
     if ok3 then
         return {
@@ -192,9 +189,24 @@ local function _register(email, password)
         local code = reg.code
         local ok2, user = auth.complete_registration(email, code, password)
         if ok then
-            -- 修改为未激活
-            index:update(user.id, {{'=', 4, false}})
-            box.commit()
+            local result = _loginByEmail(email, password)
+
+            if result.err then
+                box.rollback_to_savepoint(s)
+                box.commit()
+                return {
+                    err = result.err
+                }
+            else 
+                -- 修改为未激活
+                index:update(user.id, {{'=', 4, false}})
+                box.commit()
+
+                sendRegCode(email, code, result.user.id, )
+            end
+
+            
+
 
             return {
                 code = code
@@ -281,8 +293,6 @@ local function register(self)
             }
         }
     else
-        sendRegCode(email, reg.code)
-
         return self:render{
             data = {
                 status = 200,
@@ -293,8 +303,10 @@ local function register(self)
 end
 
 local function completeReg(self) 
-    local code = self.data.code
-    local email = self.data.email
+    local data = self.data
+    local email = data[1]
+    local email = data[1]
+    local email = data[1]
 
     dump({
         code = code,

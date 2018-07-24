@@ -11,15 +11,7 @@ export default class SignActive extends Component{
 
     componentDidMount() {
         const {search} = this.props.location
-        const arr = search.substr(1).split("&");
-        let params = {}
-        for(let row of arr) {
-            const [key, value] = row.split("=")
-            if(!key  || !value) {
-                continue;
-            }
-            params[key] = value
-        }
+        const params = search.substr(1).split("&");
         this.props.userStore.completeReg(params)
     }
 

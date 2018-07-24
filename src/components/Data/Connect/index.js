@@ -85,7 +85,9 @@ const files = {
 export default class DataConnect extends Component {
   state = {
     sample: false,
-    progress: 0
+    progress: 0,
+    sql: false,
+    options: {}
   };
 
   componentWillUnmount() {
@@ -185,7 +187,17 @@ export default class DataConnect extends Component {
     this.hideSample();
   };
 
-  showSql = () => {};
+  showSql = () => {
+    this.setState({
+      sql: true
+    })
+  };
+
+  hideSql = () => {
+    this.setState({
+      sql: false
+    })
+  }
 
   block = (label, img, onClick) => {
     return (
@@ -280,14 +292,33 @@ export default class DataConnect extends Component {
           </div>
         )}
         <DatabaseConfig
-          options={this.options}
-          visible={this.visible}
-          onClose={this.closeDialog}
+          options={this.state.options}
+          visible={this.state.sql}
+          onClose={this.hideSql}
           title="Data Source - Database"
-          projectId={this.props.project.projectId}
+          projectId={project.projectId}
           onSubmit={options => {
-            options.csvLocation = options.result.result.csvLocation;
-            this.closeDialog();
+            const csvLocation = options.result.result.csvLocation;
+            project.fastTrackInit(csvLocation);
+
+            Papa.parse(`/api/download?csvLocation=${csvLocation}&userId=${userId}&projectId=${project.projectId}`, {
+              download: true,
+              preview: 100,
+              complete: result => {
+                if (result.errors.length !== 0) {
+                  console.error('parse error: ', result.errors[0].message);
+                  return;
+                }
+                project.newFileInit(result.data);
+              }
+            });
+
+            this.setState({
+              progress: 90
+            });
+            this.doEtl();
+            
+            this.hideSql();
           }}
         />
       </div>
