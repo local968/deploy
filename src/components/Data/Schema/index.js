@@ -3,10 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 
-import { Select, ContinueButton, ProjectLoading } from '../../Common';
-
-import { AutoSizer, MultiGrid } from 'react-virtualized';
-import { Checkbox } from 'antd';
+import { Select, ContinueButton, ProjectLoading, Table } from '../../Common';
 
 @observer
 export default class DataSchema extends Component {
@@ -43,8 +40,8 @@ export default class DataSchema extends Component {
         }))
     }
 
-    checked = (key, e) => {
-        if (!e.target.checked) {
+    checked = (key, checked) => {
+        if (!checked) {
             this.setState({
                 flag: !this.state.flag,
                 checkList: [...this.state.checkList, key]
@@ -57,8 +54,8 @@ export default class DataSchema extends Component {
         }
     }
 
-    select = (key, e) => {
-        this.props.project.colType[key] = e.target.value
+    select = (key, v) => {
+        this.props.project.colType[key] = v
         this.setState({
             flag: !this.state.flag
         })
@@ -75,128 +72,11 @@ export default class DataSchema extends Component {
         this.props.project.noCompute = e.target.checked;
     }
 
-    cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-        const { uploadData, target, colType, rawHeader, headerTemp: {temp} } = this.props.project;
-        const { checkList, showSelect } = this.state;
-        /**
-         * 根据showSelect变化
-         * showSelect: true  显示勾选框
-         * checkRow: 勾选框的行数
-         * headerRow: 标题的行数
-         * selectRow: 类型选择的行数
-         * columnHeader: 表头的列数
-         * rowHeader: 表头的行数
-         */
-        const index = {
-            checkRow: showSelect ? 0 : -1,
-            headerRow: showSelect ? 1 : 0,
-            selectRow: showSelect ? 2 : 1,
-            columnHeader: 1,
-            rowHeader: showSelect ? 3 : 2
-        }
-
-        //真实的数据行 && 真实的数据列
-        const realRow = rowIndex - index.rowHeader
-        const realColumn = columnIndex - index.columnHeader;
-        const header = rawHeader[realColumn] && rawHeader[realColumn].trim();
-        //内容, 标题, class
-        let content, title, cn;
-
-        //勾选框行
-        if (rowIndex === index.checkRow) {
-            cn = styles.check;
-            title = "";
-            if (columnIndex === 0) {
-                content = "";
-            } else {
-                content = <Checkbox onChange={this.checked.bind(this, header)} checked={true}></Checkbox>
-                if (target && target === header) {
-                    cn = classnames(styles.check, styles.target);
-                    content = "";
-                }
-                if (checkList.includes(header)) {
-                    cn = classnames(styles.check, styles.checked);
-                    content = <Checkbox onChange={this.checked.bind(this, header)} checked={false}></Checkbox>
-                }
-            }
-            //标题行
-        } else if (rowIndex === index.headerRow) {
-            cn = styles.titleCell;
-            if (columnIndex === 0) {
-                content = <span>row/header</span>;
-                title = '';
-            } else {
-                content = <span>{header}</span>;
-                title = header;
-                if (target && target === header) {
-                    cn = classnames(cn, styles.target);
-                }
-                if (checkList.includes(header)) {
-                    cn = classnames(cn, styles.checked);
-                }
-                if (!header) {
-                    cn = classnames(cn, styles.missed);
-                }
-                if (header && temp[header].length > 1) {
-                    cn = classnames(cn, styles.duplicated);
-                }
-            }
-            //类型选择行
-        } else if (rowIndex === index.selectRow) {
-            cn = styles.check;
-            title = "";
-            if (columnIndex === 0) {
-                content = "";
-            } else {
-                let key = header;
-                if(!header) {
-                    key = `Unnamed: ${realColumn}`
-                }
-                if (header && temp[header].length > 1) {
-                    const tempIndex = temp[header].findIndex(c => c===realColumn);
-                    const suffix = tempIndex===0?"":'.'+tempIndex;
-                    key = header+suffix
-                }
-                content = <select value={colType[key]} onChange={this.select.bind(this, key)}>
-                    <option value="Categorical">Categorical</option>
-                    <option value="Numerical">Numerical</option>
-                </select>
-            }
-            //其他为数据行
-        } else {
-            cn = styles.cell;
-            //第一列为排序
-            if (columnIndex === 0) {
-                //排序从1开始
-                content = <span>{realRow + 1}</span>;
-                title = realRow + 1;
-            } else {
-                content = <span>{uploadData[realRow][realColumn]}</span>;
-                title = uploadData[realRow][realColumn];
-                if (target && target === header) {
-                    cn = classnames(cn, styles.target);
-                }
-                if (this.state.checkList.includes(header)) {
-                    cn = classnames(cn, styles.checked);
-                }
-            }
-        }
-
-        return (
-            <div
-                className={cn}
-                key={key}
-                style={style}
-                title={title}
-            >
-                {content}
-            </div>
-        )
-    }
+  
 
     render() {
         const { project } = this.props;
-        const { uploadData, rawHeader, noCompute, target, headerTemp: {isMissed, isDuplicated} } = project;
+        const { uploadData, rawHeader, noCompute, target, colType, headerTemp: {temp, isMissed, isDuplicated} } = project;
         const targetOption = {};
 
         //target选择列表
@@ -243,23 +123,20 @@ export default class DataSchema extends Component {
                     </div>}
                 </div>
                 <div className={styles.content}>
-                    <AutoSizer>
-                        {({ height, width }) => {
-                            return <MultiGrid
-                                columnCount={uploadData[0].length + 1}
-                                columnWidth={110}
-                                height={height}
-                                rowCount={uploadData.length + 1}
-                                rowHeight={34}
-                                width={width}
-                                cellRenderer={this.cellRenderer}
-                                scrollToAlignment={this.state.flag}
-                                fixedRowCount={this.state.showSelect ? 3 : 2}
-                                fixedColumnCount={1}
-                                style={{ border: "1px solid #ccc" }}
-                            />
-                        }}
-                    </AutoSizer>
+                    <Table 
+                        uploadData={uploadData}
+                        target={target}
+                        colType={colType}
+                        rawHeader={rawHeader}
+                        temp={temp}
+                        checkList={this.state.checkList}
+                        showSelect={this.state.showSelect} 
+                        columnWidth={110} 
+                        rowHeight={34} 
+                        fixedColumnCount={1} 
+                        fixedRowCount={this.state.showSelect ? 3 : 2}
+                        checked={this.checked} 
+                        select={this.select} />
                 </div>
             </div>
             <div className={styles.bottom}>

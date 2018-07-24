@@ -9,11 +9,11 @@ import {Spin} from 'antd';
 @inject('userStore')
 @observer
 export default class Layout extends Component { 
-    componentWillMount() {
-        if(!this.props.userStore.hasToken){
-            this.props.history.push("/")
-        }
-    }
+    // componentWillMount() {
+        // if(!this.props.userStore.hasToken){
+        //     this.props.history.push("/")
+        // }
+    // }
 
     render() {
         const {hasToken, isInit} = this.props.userStore;

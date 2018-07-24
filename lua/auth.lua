@@ -1,9 +1,11 @@
+local config = require('deploy2.lua.config')
 local conn = require('deploy2.lua.conn')
 local authlog = require('deploy2.lua.authlog')
-local auth = require('authman').api({})
+local auth = require('authman').api(config.authman)
 local Expired = 14*24*60*60
 local BadDomain = require('deploy2.lua.domain')
-local _init, _server
+local Email = require('module.Email')
+local table, index, emailIndex
 
 local function checkLogin(req)
     local connid = req.connid
@@ -175,27 +177,28 @@ local function _setExpired(id, type)
     end
 end
 
+local function sendRegCode(email, code)
+    dump(email)
+    local opt = config.email or {}
+    opt.subject = '激活邮件'
+    Email.request('congcong.dai@r2.ai', 'test <br/><a href="localhost:3000/active?emai='..email..'&code='..code..'"></a>', opt)
+end
+
 local function _register(email, password)
     box.begin()
     local s = box.savepoint()
     local ok, reg = auth.registration(email)
     if ok then
-        local ok2, user = auth.complete_registration(email, reg.code, password)
+        local code = reg.code
+        local ok2, user = auth.complete_registration(email, code, password)
         if ok then
-            local result = _setExpired(user.id, "free")
+            -- 修改为未激活
+            index:update(user.id, {{'=', 4, false}})
+            box.commit()
 
-            if result.err then
-                box.rollback_to_savepoint(s)
-                box.commit()
-                return {
-                    err = result.err
-                }
-            else
-                box.commit()
-                return {
-                    user = result.user
-                }
-            end
+            return {
+                code = code
+            }
         else
             box.rollback_to_savepoint(s)
             box.commit()
@@ -278,36 +281,55 @@ local function register(self)
             }
         }
     else
-        local result = _loginByEmail(email, password)
+        sendRegCode(email, reg.code)
 
-        local connects = conn.getConnids(result.user.email)
-
-        -- 如果该用户没有任何链接   
-        -- 认为用户登陆
-        if #connects == 0 then
-            authlog.login(result.user.email)
-        end
-
-        -- 登陆后  userId 绑定 connid
-        bindConnid(result.user.email, self.connid)
-
-        if result.err then
-            return self:render{
-                data = {
-                    status = 202,
-                    msg = 'register err',
-                    err = result.user
-                }
+        return self:render{
+            data = {
+                status = 200,
+                msg = 'ok',
             }
-        else 
-            return self:render{
-                data = {
-                    status = 200,
-                    msg = 'ok',
-                    user = result.user
-                }
+        }
+    end
+end
+
+local function completeReg(self) 
+    local code = self.data.code
+    local email = self.data.email
+
+    dump({
+        code = code,
+        email = email
+    })
+
+    local result = _loginByEmail(email, password)
+
+    local connects = conn.getConnids(result.user.email)
+
+    -- 如果该用户没有任何链接   
+    -- 认为用户登陆
+    if #connects == 0 then
+        authlog.login(result.user.email)
+    end
+
+    -- 登陆后  userId 绑定 connid
+    bindConnid(result.user.email, self.connid)
+
+    if result.err then
+        return self:render{
+            data = {
+                status = 202,
+                msg = 'register err',
+                err = result.user
             }
-        end
+        }
+    else 
+        return self:render{
+            data = {
+                status = 200,
+                msg = 'ok',
+                user = result.user
+            }
+        }
     end
 end
 
@@ -396,10 +418,14 @@ local function accessable(self, req)
  end
 
 return function(server)
+    table = box.space['auth_user']
+    index = box.space['auth_user'].index['primary']
+    emailIndex = box.space['auth_user'].index['email_index']
     server:setEventHandler(server.EVENT_HANDLER_TYPE.ONCLOSE, "logout_log", logout_handler)
     server:setEventHandler(server.EVENT_HANDLER_TYPE.ONMESSAGE_ACCESSABLE, "accessable", accessable)
     server:addMessage({type='login'},login)
     server:addMessage({type='register'},register)
     server:addMessage({type='setProfile'},setProfile)
     server:addMessage({type='logout'},logout)
+    server:addMessage({type='completeReg'},completeReg)
 end
