@@ -85,7 +85,7 @@ class DB {
     // type: select, insert, update, upsert, delete, watch, unwatch
     const conn = await this.connect();
     const reqNo = uuidv4();
-    conn.sendmessage({ type, data: { reqNo, ...data } });
+    conn.sendmessage({ type, data: { ...data, reqNo } });
     return await new Promise((resolve, reject) => {
       this.once(reqNo, (...args) => {
         if (args.length === 1) args = args[0];

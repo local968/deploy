@@ -177,7 +177,9 @@ export default class Deployment extends Component {
           visible={this.dialog === 'databasesource'}
           onClose={this.closeDialog}
           title="Data Source - Database"
+          projectId={cd.projectId}
           onSubmit={action(options => {
+            options.csvLocation = options.result.result.csvLocation;
             cddo['source'] = 'database';
             cddo['sourceOptions'] = options;
             cd.save();
@@ -189,6 +191,7 @@ export default class Deployment extends Component {
           visible={this.dialog === 'databaselocation'}
           onClose={this.closeDialog}
           result
+          projectId={cd.projectId}
           title="Deployment Result Location - Database"
           onSubmit={action(options => {
             cddo['location'] = 'database';

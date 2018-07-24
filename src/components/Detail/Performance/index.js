@@ -148,9 +148,11 @@ export default class Performance extends Component {
           options={cdpo.sourceOptions}
           visible={this.dialog === 'databasesource'}
           validation
+          projectId={cd.projectId}
           onClose={this.closeDialog}
           title="Validation Data Source - Database"
           onSubmit={action(options => {
+            options.csvLocation = options.result.result.csvLocation;
             cdpo['source'] = 'database';
             cdpo['sourceOptions'] = options;
             cd.save();

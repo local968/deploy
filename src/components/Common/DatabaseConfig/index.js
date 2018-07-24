@@ -96,20 +96,19 @@ export default class DatabaseConfig extends Component {
   }
 
   render() {
-    const { visible, onClose, onSubmit: submit, title } = this.props;
+    const { visible, onClose, onSubmit: submit, title, projectId } = this.props;
     const state = this.localState;
-    window.db = db;
     const onSubmit = () => {
       if (this.checkForm()) return;
       db.checkDatabase({
-        projectId: '1',
-        ...this.localState
+        ...state,
+        projectId
       }).then(resp => {
-        console.log(resp);
-        const result = this.localState;
-        delete result['rememberMyPassword'];
-        delete result['rememberMyConnectionProfile'];
-        // submit(result);
+        if (resp.result.status === -1) {
+          Message.error(resp.result.result['process error']);
+        } else {
+          submit(resp);
+        }
       });
     };
     return (

@@ -171,33 +171,44 @@ return function(server, api)
       else
         deployment = nil
       end
+
+      local file
       if deployment then
         local id = common.createUUID()
-        local file
         if tuple.type == "performance" then
-          file = deployment[9].file
+          if deployment[9].source == "file" then
+            file = deployment[9].file
+          else
+            file = deployment[9].sourceOptions.csvLocation
+          end
         else
-          file = deployment[8].file
+          if deployment[8].source == "file" then
+            file = deployment[8].file
+          else
+            file = deployment[8].sourceOptions.csvLocation
+          end
         end
-        local result =
-          box.space["modeling_request"]:replace(
-          {
-            id,
+        if file then
+          local result =
+            box.space["modeling_request"]:replace(
             {
-              projectId = deployment[3],
-              userId = deployment[2],
-              csvLocation = file,
-              command = "deploy2",
-              solution = deployment[5]
+              id,
+              {
+                projectId = deployment[3],
+                userId = deployment[2],
+                csvLocation = file,
+                command = "deploy2",
+                solution = deployment[5]
+              }
             }
-          }
-        )
-        -- todo
-        -- sql_user_name, sql_password, sql_host_name, sql_port, sql_database, sql_table, sql_encoding:str='utf8',
-        -- database_type:str='MySql',sql_query_str:str=''
-        queue.tube.taskQueue:put(id)
-        tuple.requestId = id
-        tuple.solution = deployment[5]
+          )
+          queue.tube.taskQueue:put(id)
+          tuple.requestId = id
+          tuple.solution = deployment[5]
+        else
+          tuple.status = "issue"
+          tuple.result["process error"] = "csvLocation not found."
+        end
       else
         tuple.status = "issue"
         tuple.result["process error"] = "deployment not found."
@@ -624,7 +635,7 @@ return function(server, api)
           {
             projectId = self.data.projectId,
             userId = userId,
-            command = "deploy2",
+            command = "sqlData",
             sqlHostName = self.data.sqlHostName,
             sqlPort = self.data.sqlPort,
             sqlDatabase = self.data.sqlDatabase,
@@ -632,25 +643,33 @@ return function(server, api)
             sqlQueryStr = self.data.sqlQueryStr or "",
             sqlEncoding = self.data.sqlEncoding,
             sqlUserName = self.data.sqlUserName,
-            sqlPassword = self.data.sqlPassword
+            sqlPassword = self.data.sqlPassword,
+            databaseType = self.data.databaseType
           }
         }
       )
-
+      queue.tube.taskQueue:put(self.data.reqNo)
+      local connId = self.connid
+      local reqNo = self.data.reqNo
       local f =
         fiber.create(
         function()
           local finished = false
           while not finished do
-            local result = box.space["modeling_result"]:select({self.data.reqNo})
+            local result = box.space["modeling_result"]:select({reqNo})
             if (#result > 0) then
-              finished = true
-              local result = self.data
-              result.status = 200
-              result.message = "ok"
-              result.result = result
-              self:render({data = result[0]})
-              return f.kill()
+              for k, r in pairs(result) do
+                local _r = r[3]
+                if _r.status == 100 or _r.status == -1 then
+                  finished = true
+                  local result = self.data
+                  result.status = 200
+                  result.message = "ok"
+                  result.result = _r
+                  server:sendMessageTo(connId, "checkDatabase", result)
+                  return f.kill()
+                end
+              end
             end
             fiber.sleep(2)
           end
