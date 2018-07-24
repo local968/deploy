@@ -11,6 +11,7 @@ import Main from 'components/Main';
 import Home from 'components/Home';
 import SignIn from 'components/SignIn';
 import SignUp from 'components/SignUp';
+import SignActive from 'components/SignActive';
 
 // const { Create, New, Replace, CreateBackground } = require('components/Create');
 
@@ -33,6 +34,7 @@ export class LoginRouter extends Component {
         <Switch>
           <Route exact path="/" component={SignIn} />
           <Route exact path="/signup" component={SignUp} />
+          <Route exact path="/active" component={SignActive} />
           <Route path="" render={() => <Redirect to="/" />} />
         </Switch>
       </div>
