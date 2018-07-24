@@ -29,3 +29,4 @@ package-lock.json
 local_config.js
 
 uploads
+config.lua

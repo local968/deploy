@@ -57,6 +57,31 @@ local tables = {
                 parts = {1, "string", 2, "unsigned", 3, "unsigned"}
             }
         }
+    },
+    -- userId, timestamp, type
+    {
+        table = "js_auth_free",
+        indexs = {
+            {
+                name = "primary",
+                parts = {1, "string"}
+            },
+            {
+                name = "time_index",
+                parts = {2, "unsigned"},
+                unique = false
+            }
+        }
+    }
+    -- code, userId, session, timestamp
+    {
+        table = "js_email_code",
+        indexs = {
+            {
+                name = "primary",
+                parts = {1, "string"}
+            }
+        }
     }
 }
 

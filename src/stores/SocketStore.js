@@ -24,9 +24,13 @@ class SocketStore {
     // this.ws.onerror = evt => {
     //     console.log("onerror",evt)
     // }
-    DBStore.ready().then(db => {
-      db._db.on('message', this.cb.bind(this));
+    DBStore._db.on('ready', () => {
+      DBStore._db.on('message', this.cb.bind(this));
       this.isready = true;
+    });
+    DBStore._db.on('close', () => {
+      DBStore._db.removeListener('message', this.cb.bind(this));
+      this.isready = false;
     });
   }
 

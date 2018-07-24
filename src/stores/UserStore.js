@@ -45,6 +45,13 @@ class UserStore {
         }
     }
 
+    reConnect() {
+        when(
+            () => socketStore.isready,
+            () => this.tryLoginByToken()
+        )
+    }
+
     @computed
     get total() {
         return this.projects.length;
@@ -132,6 +139,10 @@ class UserStore {
                 this.user = user;
                 this.setCache(user)
                 this.initProjects();
+                when(
+                    () => !socketStore.isready,
+                    () => this.reConnect()
+                )
             },
             register: data => {
                 const { status, err, user } = data;
@@ -143,6 +154,13 @@ class UserStore {
                 this.user = user;
                 this.setCache(user)
                 this.initProjects();
+                when(
+                    () => !socketStore.isready,
+                    () => this.reConnect()
+                )
+            },
+            completeReg: data => {
+
             }
         }
 
@@ -192,6 +210,15 @@ class UserStore {
                 socketStore.send("logout")
                 this.clearToken();
                 this.user = null;
+            }
+        )
+    }
+
+    completeReg(params) {
+        when(
+            () => socketStore.isready,
+            () => {
+                socketStore.send("completeReg", params)
             }
         )
     }

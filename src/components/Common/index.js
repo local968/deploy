@@ -9,6 +9,7 @@ import Background from './Background';
 import ContinueButton from './ContinueButton';
 import ProjectSide from './ProjectSide';
 import ProjectLoading from './ProjectLoading';
+import Table from './Table';
 
 export {
   BlackButton,
@@ -21,5 +22,6 @@ export {
   ContinueButton,
   ProjectSide,
   ProjectLoading,
-  Background
+  Background,
+  Table
 };
