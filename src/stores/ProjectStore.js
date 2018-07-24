@@ -198,6 +198,7 @@ class ProjectStore {
                         })
                         result.dataViews = null;
                         result.firstEtl = false;
+                        this.project.etling = false
                         // this.project.setProperty(result)
                         this.project.updateProject(result)
                         when(

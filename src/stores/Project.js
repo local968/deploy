@@ -50,6 +50,7 @@ export default class Project {
 	@observable speed = 5;
 
 	// etl
+	@observable etling = false;
 	// @observable fillMethod = {};
 	@observable validationRate = 0.1;
 	@observable holdoutRate = 0.1;
@@ -355,7 +356,7 @@ export default class Project {
 		if(this.noCompute || this.firstEtl) {
 			data.noCompute = true;
 		}
-
+		this.etling =true
 		console.log(data)
 		// id: request ID
 		// userId: user ID

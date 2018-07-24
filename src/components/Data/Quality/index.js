@@ -80,7 +80,7 @@ export default class DataQuality extends Component {
 
     render() {
         const { project } = this.props;
-        const { issues, uploadData, target, colType, colMap, rawHeader, mismatchIndex, nullIndex, outlierIndex, problemType, totalLines, issueRows, totalRawLines} = project;
+        const { issues, uploadData, target, colType, colMap, rawHeader, mismatchIndex, nullIndex, outlierIndex, problemType, totalLines, issueRows, totalRawLines, etling} = project;
         const targetIndex = rawHeader.findIndex(h => h===target);
         const recomm = problemType === 'Classification' ? '2' : '10+';
         const percent = {
@@ -171,7 +171,7 @@ export default class DataQuality extends Component {
                     {arr}
                 </div>
             </div>
-            {this.state.isLoad && <ProjectLoading />}
+            {(this.state.isLoad || etling) && <ProjectLoading />}
             {this.state.visible && <FixIssue project={project} closeFixes={this.closeFixes} saveDataFixes={this.saveDataFixes}/>}
             {this.state.edit && <SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes}/>}
         </div>
