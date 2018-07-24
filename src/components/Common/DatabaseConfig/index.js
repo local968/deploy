@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, action } from 'mobx';
 import styles from './styles.module.css';
-import { Modal, Select, Checkbox, Message } from 'antd';
+import { Modal, Select, Checkbox, Message, Icon } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
 import db from 'stores/DBStore.js';
@@ -59,6 +59,7 @@ export default class DatabaseConfig extends Component {
   @observable localState = defaultState;
 
   @observable errorField = '';
+  @observable loading = false;
 
   @action
   changeState = (key, value) => {
@@ -127,6 +128,7 @@ export default class DatabaseConfig extends Component {
     const state = this.localState;
     const onSubmit = () => {
       if (this.checkForm()) return;
+      this.loading = true;
       db.checkDatabase({
         ...state,
         projectId
@@ -144,6 +146,7 @@ export default class DatabaseConfig extends Component {
           }
           submit(resp);
         }
+        this.loading = false;
       });
     };
     return (
@@ -318,9 +321,15 @@ export default class DatabaseConfig extends Component {
           <a className={styles.cancel} onClick={onClose}>
             CANCEL
           </a>
-          <a className={styles.done} onClick={onSubmit}>
-            CONNECT
-          </a>
+          {this.loading ? (
+            <a className={styles.done}>
+              <Icon type="loading" />
+            </a>
+          ) : (
+            <a className={styles.done} onClick={onSubmit}>
+              CONNECT
+            </a>
+          )}
         </div>
       </Modal>
     );
