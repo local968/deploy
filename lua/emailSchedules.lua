@@ -1,7 +1,7 @@
 local Schedule = require('module.Schedule')
 
 local function getUsers(startTime, endTime) 
-    local index = box.space['js_free_user'].index['time_index'];
+    local index = box.space['js_auth_free'].index['time_index'];
     for k,v in index:pairs(endTime, {iterator = 'LE'}) do 
         if(v[2] <= startTime) then
             break;

@@ -5,7 +5,9 @@ local auth = require('authman').api(config.authman)
 local Expired = 14*24*60*60
 local BadDomain = require('deploy2.lua.domain')
 local Email = require('module.Email')
-local table, index, emailIndex
+local regCode = require('deploy2.lua.regCode')
+local userExpired = require('deploy2.lua.userExpired')
+local table, index
 
 local function checkLogin(req)
     local connid = req.connid
@@ -85,19 +87,9 @@ local function _loginByEmail(email, password)
     local ok, user = auth.auth(email, password)
 
     if ok then
-        if user.profile and user.profile ~= box.NULL then
-            local time = os.time()
-            local lastName = user.profile.last_name
-            if lastName.type == 'free' and time > lastName.expired then
-                return {
-                    err = 'Your account is expired. Please upgrade to paid account.'
-                }
-            else
-                user.expired = lastName.expired
-                user.type = lastName.type
-            end
-        else
-            -- 不存在设置为空table
+        local info = userExpired.find(email)
+
+        if user.profile == box.NULL then
             user.profile = {}
         end
 
@@ -106,8 +98,8 @@ local function _loginByEmail(email, password)
                 id = user.session,
                 profile = user.profile.first_name,
                 email = user.email,
-                expired = user.expired,
-                type = user.type
+                expired = info.expired,
+                type = info.type
             } 
         }
     else
@@ -121,29 +113,19 @@ local function _loginBySession(sessionId)
     local ok, user = auth.check_auth(sessionId)
 
     if ok then
-        if user.profile and user.profile ~= box.NULL then
-            local time = os.time()
-            local lastName = user.profile.last_name
-            if lastName.type == 'free' and time > lastName.expired then
-                return {
-                    err = 'Your account is expired. Please upgrade to paid account.'
-                }
-            else
-                user.expired = lastName.expired
-                user.type = lastName.type
-            end
-        else
-            -- 不存在设置为空table
+        local info = userExpired.find(user.email)
+        
+        if user.profile == box.NULL then
             user.profile = {}
         end
-        
+
         return {
             user = {
                 id = user.session,
                 profile = user.profile.first_name,
                 email = user.email,
-                expired = user.expired,
-                type = user.type
+                expired = info.expired,
+                type = info.type
             } 
         }
     else
@@ -153,7 +135,7 @@ local function _loginBySession(sessionId)
     end
 end
 
-local function _setExpired(id, type)
+local function _setExpired(email, type)
     local expired
     if type ~= 'free' then
         expired = 0
@@ -161,24 +143,19 @@ local function _setExpired(id, type)
         expired = os.time() + Expired
     end
 
-    local ok3, result = auth.set_profile({id, expired, type})
+    userExpired.upsert(email, expired, type)
 
-    if ok3 then
-        return {
-            user = result
-        }
-    else
-        return {
-            err = formatError(result)
-        }
-    end
+    return {
+        expired = expired,
+        type= type
+    }
 end
 
-local function sendRegCode(email, code)
-    dump(email)
+local function sendRegCode(email, code, id, session)
     local opt = config.email or {}
     opt.subject = '激活邮件'
-    Email.request('congcong.dai@r2.ai', 'test <br/><a href="localhost:3000/active?emai='..email..'&code='..code..'"></a>', opt)
+    regCode.insert(code, id, session, email)
+    Email.request('congcong.dai@r2.ai', 'test <br/><a target="_blank" href="localhost:3000/active?'..code..'">点击激活</a>或复制下方链接<br/>localhost:3000/active?'..code..'', opt)
 end
 
 local function _register(email, password)
@@ -189,28 +166,24 @@ local function _register(email, password)
         local code = reg.code
         local ok2, user = auth.complete_registration(email, code, password)
         if ok then
+            box.commit()
+            local id = user.id
             local result = _loginByEmail(email, password)
 
             if result.err then
-                box.rollback_to_savepoint(s)
-                box.commit()
                 return {
                     err = result.err
                 }
-            else 
+            else
                 -- 修改为未激活
-                index:update(user.id, {{'=', 4, false}})
-                box.commit()
+                index:update(id, {{'=', 4, false}})
 
-                sendRegCode(email, code, result.user.id, )
+                sendRegCode(email, code, id, result.user.id)
+
+                return {
+                    id = id
+                }
             end
-
-            
-
-
-            return {
-                code = code
-            }
         else
             box.rollback_to_savepoint(s)
             box.commit()
@@ -303,46 +276,38 @@ local function register(self)
 end
 
 local function completeReg(self) 
-    local data = self.data
-    local email = data[1]
-    local email = data[1]
-    local email = data[1]
+    local code = self.data.code
 
-    dump({
-        code = code,
-        email = email
-    })
+    local info = regCode.find(code)
 
-    local result = _loginByEmail(email, password)
-
-    local connects = conn.getConnids(result.user.email)
-
-    -- 如果该用户没有任何链接   
-    -- 认为用户登陆
-    if #connects == 0 then
-        authlog.login(result.user.email)
-    end
-
-    -- 登陆后  userId 绑定 connid
-    bindConnid(result.user.email, self.connid)
-
-    if result.err then
+    if not info then
         return self:render{
             data = {
-                status = 202,
-                msg = 'register err',
-                err = result.user
-            }
-        }
-    else 
-        return self:render{
-            data = {
-                status = 200,
+                status = 204,
                 msg = 'ok',
-                user = result.user
+                err = 'code not find'
             }
         }
     end
+
+    local id = info.id
+    local email = info.email
+    local session = info.session
+    -- 修改为激活
+    index:update(id, {{'=', 4, true}})
+
+    _setExpired(email, 'free')
+
+    return self:render{
+        data = {
+            status = 200,
+            msg = 'ok',
+            user = {
+                id = session,
+                email = email
+            }
+        }
+    }
 end
 
 local function setProfile(self)
@@ -362,6 +327,9 @@ local function setProfile(self)
     local ok, user = auth.check_auth(token)
 
     if ok then
+        if user.profile == box.NULL then
+            user.profile = {}
+        end
         local _profile = user.profile.first_name
         for k, v in pairs(profile) do
             _profile[k] = v
@@ -422,7 +390,7 @@ local function logout(self)
 end
 
 local function accessable(self, req)
-    if req.type == 'register' or req.type == 'login' or req.type == 'api' then
+    if req.type == 'register' or req.type == 'login' or req.type == 'api' or req.type == 'completeReg' then
         return true 
     else
         return checkLogin(req)
@@ -432,12 +400,11 @@ local function accessable(self, req)
 return function(server)
     table = box.space['auth_user']
     index = box.space['auth_user'].index['primary']
-    emailIndex = box.space['auth_user'].index['email_index']
     server:setEventHandler(server.EVENT_HANDLER_TYPE.ONCLOSE, "logout_log", logout_handler)
     server:setEventHandler(server.EVENT_HANDLER_TYPE.ONMESSAGE_ACCESSABLE, "accessable", accessable)
     server:addMessage({type='login'},login)
     server:addMessage({type='register'},register)
     server:addMessage({type='setProfile'},setProfile)
     server:addMessage({type='logout'},logout)
-    server:addMessage({type='completeReg'},completeReg)
+    server:addMessage({type='completeReg'}, completeReg)
 end

@@ -1,0 +1,10 @@
+.signActive {
+    display: flex;
+    justify-content: center;
+    flex: auto;
+    margin-top: 15%;
+}
+
+.signActive span {
+    font-size: 3rem
+}

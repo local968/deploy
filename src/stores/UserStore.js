@@ -5,6 +5,8 @@ import { message } from 'antd';
 // import config from '../config.js';
 
 class UserStore {
+    @observable reg = false;
+    @observable regErr = false;
     @observable isLoad = true;
     @observable isInit = true;
     @observable user = {};
@@ -136,6 +138,7 @@ class UserStore {
                     this.isLoad = false;
                     return message.error(err);
                 }
+                this.reg = true;
                 this.user = user;
                 this.setCache(user)
                 this.initProjects();
@@ -145,22 +148,31 @@ class UserStore {
                 )
             },
             register: data => {
-                const { status, err, user } = data;
+                const { status, err } = data;
                 if (status !== 200) {
-                    this.clearToken();
                     this.isLoad = false;
                     return message.error(err);
                 }
-                this.user = user;
-                this.setCache(user)
-                this.initProjects();
-                when(
-                    () => !socketStore.isready,
-                    () => this.reConnect()
-                )
+                message.info("邮件已发送，请尽快激活")
             },
             completeReg: data => {
-
+                const { status, err, user } = data;
+                this.reg = true
+                if (status !== 200) {
+                    this.clearToken();
+                    this.isLoad = false;
+                    this.regErr = true
+                    return message.error(err);
+                }
+                setTimeout(() => {
+                    this.user = user;
+                    this.setCache(user)
+                    this.initProjects();
+                    when(
+                        () => !socketStore.isready,
+                        () => this.reConnect()
+                    )
+                }, 2000);
             }
         }
 
@@ -214,11 +226,12 @@ class UserStore {
         )
     }
 
-    completeReg(params) {
+    completeReg(code) {
+        this.isLoad = true;
         when(
             () => socketStore.isready,
             () => {
-                socketStore.send("completeReg", params)
+                socketStore.send("completeReg", {code: code})
             }
         )
     }

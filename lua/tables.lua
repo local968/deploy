@@ -72,8 +72,8 @@ local tables = {
                 unique = false
             }
         }
-    }
-    -- code, userId, session, timestamp
+    },
+    -- code, userId, session, email, timestamp
     {
         table = "js_email_code",
         indexs = {

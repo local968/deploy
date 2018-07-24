@@ -5,19 +5,17 @@ import styles from "./styles.module.css";
 @inject('userStore')
 @observer
 export default class SignActive extends Component{
-    state = {
-        msg: '正在激活'
-    }
-
     componentDidMount() {
         const {search} = this.props.location
-        const params = search.substr(1).split("&");
-        this.props.userStore.completeReg(params)
+        const code = search.substr(1);
+        if(!code) return this.props.history.push("/")
+        this.props.userStore.completeReg(code)
     }
 
     render() {
-        return <div>
-            {this.state.msg}
+        const {reg, regErr} = this.props.userStore
+        return <div className={styles.signActive}>
+            <span>{reg?(regErr?'激活失败,请重新注册':'激活成功, 2秒后跳转'):'正在激活'}</span>
         </div>
     }
 }
