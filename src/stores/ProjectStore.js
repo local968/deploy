@@ -186,7 +186,16 @@ class ProjectStore {
                 }
                 switch (command) {
                     case 'etl':
-                        delete result.name;
+                        Object.keys(result).forEach(k => {
+                            if(k === "name") {
+                                delete result[k];
+                            }
+                            if(k.includes("FillMethod")){
+                                Object.keys(result[k]).forEach(key => {
+                                    if(result[k][key] === "ignore") delete result[k][key]
+                                })
+                            }
+                        })
                         result.dataViews = null;
                         result.firstEtl = false;
                         // this.project.setProperty(result)

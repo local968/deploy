@@ -475,21 +475,27 @@ class FixIssue extends Component {
     }
 
     nullSelect = (key, e) => {
-        this.props.project.nullFillMethod[key] = e.target.value;
+        let value = e.target.value
+        if(value === "ignore") value = null
+        this.props.project.nullFillMethod[key] = value;
         this.setState({
             canSave: true
         })
     }
 
     mismatchSelect = (key, e) => {
-        this.props.project.mismatchFillMethod[key] = e.target.value;
+        let value = e.target.value
+        if(value === "ignore") value = null
+        this.props.project.mismatchFillMethod[key] = value;
         this.setState({
             canSave: true
         })
     }
 
     outlierSelect = (key, e) => {
-        this.props.project.outlierFillMethod[key] = e.target.value;
+        let value = e.target.value
+        if(value === "ignore") value = null
+        this.props.project.outlierFillMethod[key] = value;
         this.setState({
             canSave: true
         })
