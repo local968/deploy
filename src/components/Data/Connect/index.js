@@ -280,18 +280,15 @@ export default class DataConnect extends Component {
           </div>
         )}
         <DatabaseConfig
-          options={cddo.sourceOptions}
-          visible={this.dialog === 'databasesource'}
+          options={this.options}
+          visible={this.visible}
           onClose={this.closeDialog}
           title="Data Source - Database"
           projectId={this.props.project.projectId}
-          onSubmit={action(options => {
+          onSubmit={options => {
             options.csvLocation = options.result.result.csvLocation;
-            cddo['source'] = 'database';
-            cddo['sourceOptions'] = options;
-            cd.save();
             this.closeDialog();
-          })}
+          }}
         />
       </div>
     );
