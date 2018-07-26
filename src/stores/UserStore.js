@@ -231,7 +231,7 @@ class UserStore {
         when(
             () => socketStore.isready,
             () => {
-                socketStore.send("completeReg", {code: code})
+                socketStore.send("completeReg", { code: code })
             }
         )
     }

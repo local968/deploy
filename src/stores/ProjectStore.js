@@ -3,6 +3,7 @@ import Project from './Project.js';
 import socketStore from './SocketStore';
 // import config from '../config.js';
 import Model from './Model.js';
+import Item from 'antd/lib/list/Item';
 
 class ProjectStore {
     @observable userId;
@@ -17,7 +18,7 @@ class ProjectStore {
     }
 
     @action
-    init(userId ,projectId) {
+    init(userId, projectId) {
         //同一project不用加载
         if (this.userId === userId && this.projectId === projectId) return;
         this.isLoad = true;
@@ -62,26 +63,31 @@ class ProjectStore {
 
     @computed
     get sortModels() {
-        const { problemType } = this.project
+        const { problemType, targetMap } = this.project
 
         let models = [...this.models]
         for (let m of models) {
             if (problemType === "Classification") {
-                let actual0 = [0, 0], actual1 = [0, 0];
-                // if(criteria==="defualt"){
-                actual0 = m.confusionMatrix[0]
-                actual1 = m.confusionMatrix[1]
-                // }else{
-                //     for(let row of m.confusionMatrixDataDetail[0]){
-
-                //     }
-                //     for(let row of m.confusionMatrixDataDetail[1]){
-
-                //     }
-                //     actual0 = [1, 1];
-                //     actual1 = [1, 1];
-                // }
-                m.predicted = [actual0[0] / (actual0[0] + actual0[1]), actual1[1] / (actual1[0] + actual1[1])];
+                let actual = [[0, 0], [0, 0]]
+                Object.keys(m.targetMap).forEach(k => {
+                    //映射的index
+                    const actualIndex = targetMap[k];
+                    if(actualIndex !== 0 && actualIndex!== 1){
+                        return;
+                    }
+                    //返回数组的index
+                    const confusionMatrixIndex = m.targetMap[k];
+                    //遍历当前那一列数组
+                    m.confusionMatrix[confusionMatrixIndex].forEach((Item, i) => {
+                        const key = Object.keys(m.targetMap).find(t => m.targetMap[t] === i);
+                        const pridict = targetMap[key];
+                        if(pridict !== 0 && pridict !== 1){
+                            return;
+                        }
+                        actual[actualIndex][pridict] += Item;
+                    })
+                })
+                m.predicted = [actual[0][0] / (actual[0][0] + actual[0][1]), actual[1][1] / (actual[1][0] + actual[1][1])];
             }
         }
 
@@ -115,15 +121,15 @@ class ProjectStore {
     }
 
     next() {
-        const {curStep, subStepActive, noCompute} = this.project;
-        if(curStep === 2 && subStepActive < 3){
-            if(noCompute && subStepActive !== 1) {
+        const { curStep, subStepActive, noCompute } = this.project;
+        if (curStep === 2 && subStepActive < 3) {
+            if (noCompute && subStepActive !== 1) {
                 this.project.nextMainStep(3)
                 return;
             }
             const nextStep = subStepActive + 1;
             this.project.nextSubStep(nextStep, curStep)
-        }else{
+        } else {
             return false
         }
     }
@@ -177,7 +183,7 @@ class ProjectStore {
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
                 let { command, result, status, userId, projectId } = data;
-                if(this.userId !== userId || this.projectId !== projectId) {
+                if (this.userId !== userId || this.projectId !== projectId) {
                     return false;
                 }
                 if (status < 0) {
@@ -187,12 +193,12 @@ class ProjectStore {
                 switch (command) {
                     case 'etl':
                         Object.keys(result).forEach(k => {
-                            if(k === "name") {
+                            if (k === "name") {
                                 delete result[k];
                             }
-                            if(k.includes("FillMethod")){
+                            if (k.includes("FillMethod")) {
                                 Object.keys(result[k]).forEach(key => {
-                                    if(result[k][key] === "ignore") delete result[k][key]
+                                    if (result[k][key] === "ignore") delete result[k][key]
                                 })
                             }
                         })
@@ -207,11 +213,11 @@ class ProjectStore {
                         )
                         break;
                     case 'train2':
-                        if(Array.isArray(result)){
+                        if (Array.isArray(result)) {
                             [result] = result
                         }
                         // for (let row of result) {
-                        if(result&&result.name){
+                        if (result && result.name) {
                             let index = this.models.findIndex(m => {
                                 return result.name === m.name
                             })
@@ -222,7 +228,7 @@ class ProjectStore {
                             }
                             this.recommendModel()
                         }
-                        if(status === 100){
+                        if (status === 100) {
                             this.project.finishTrain2();
                         }
                         break;

@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 
-export default class Model{
+export default class Model {
     @observable score;
     @observable backend;
     @observable featureImportance;

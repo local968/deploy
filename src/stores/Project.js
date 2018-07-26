@@ -243,8 +243,23 @@ export default class Project {
 	//读取预览文件
 	@action
 	newFileInit(uploadData) {
-		const header = uploadData[0].map((h) => h.trim());
+		const rawHeader = uploadData[0].map((h) => h.trim());
 		const data = uploadData.slice(1);
+
+		const temp = {};
+		const header = rawHeader.map((h, i) => {
+			h = h.trim();
+			if (/^$/.test(h)) {
+				h = `Unnamed: ${i}`;
+			}
+			if (!temp[h]) {
+				temp[h] = 1;
+			} else {
+				h = h + '.' + temp[h];
+				temp[h]++;
+			}
+			return h;
+		});
 
 		// 上传文件，target为空
 		this.updateProject({
@@ -281,29 +296,6 @@ export default class Project {
 		};
 	}
 
-	autoFixHeader() {
-		const { rawHeader } = this;
-		const temp = {};
-		const header = rawHeader.map((h, i) => {
-			h = h.trim();
-			if (/^$/.test(h)) {
-				h = `Unnamed: ${i}`;
-			}
-			if (!temp[h]) {
-				temp[h] = 1;
-			} else {
-				h = h + '.' + temp[h];
-				temp[h]++;
-			}
-			return h;
-		});
-
-		this.updateProject({
-			dataHeader: header,
-			rawHeader: header
-		});
-	}
-
 	etl() {
 		const { userId, projectId, problemType, dataHeader, uploadFileName, rawHeader } = this;
 
@@ -320,43 +312,43 @@ export default class Project {
 			holdoutRate: this.holdoutRate
 		}
 
-		if(this.colType.length) {
+		if (this.colType.length) {
 			data.colType = [...this.colType];
 		}
 
-		if(this.target) {
+		if (this.target) {
 			data.targetLabel = this.target;
 			data.problemType = problemType;
 		}
 
-		if(dataHeader.length !== rawHeader.length) {
+		if (dataHeader.length !== rawHeader.length) {
 			data.featureLabel = [...dataHeader]
 		}
 
-		if(this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
-			data.mismatchFillMethod = {...this.mismatchFillMethod};
+		if (this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
+			data.mismatchFillMethod = { ...this.mismatchFillMethod };
 		}
 
-		if(this.nullFillMethod && Object.keys(this.nullFillMethod).length) {
-			data.nullFillMethod = {...this.nullFillMethod};
+		if (this.nullFillMethod && Object.keys(this.nullFillMethod).length) {
+			data.nullFillMethod = { ...this.nullFillMethod };
 		}
 
-		if(this.outlierFillMethod && Object.keys(this.outlierFillMethod).length) {
-			data.outlierFillMethod = {...this.outlierFillMethod};
+		if (this.outlierFillMethod && Object.keys(this.outlierFillMethod).length) {
+			data.outlierFillMethod = { ...this.outlierFillMethod };
 		}
 
-		if(this.targetMap && Object.keys(this.targetMap).length) {
-			data.targetMap = {...this.targetMap};
+		if (this.targetMap && Object.keys(this.targetMap).length) {
+			data.targetMap = { ...this.targetMap };
 		}
 
-		if(this.outlierDict && Object.keys(this.outlierDict).length) {
-			data.outlierDict = {...this.outlierDict};
+		if (this.outlierDict && Object.keys(this.outlierDict).length) {
+			data.outlierDict = { ...this.outlierDict };
 		}
 
-		if(this.noCompute || this.firstEtl) {
+		if (this.noCompute || this.firstEtl) {
 			data.noCompute = true;
 		}
-		this.etling =true
+		this.etling = true
 		console.log(data)
 		// id: request ID
 		// userId: user ID
@@ -413,34 +405,34 @@ export default class Project {
 			dataIssue: false,
 			targetIssue: false
 		}
-		const {problemType, totalRawLines, target,  colMap, issueRows, colType} = this;
+		const { problemType, totalRawLines, target, colMap, issueRows, colType } = this;
 
-		if(problemType === Classification) {
-			if(colType[target] === 'Categorical') {
+		if (problemType === Classification) {
+			if (colType[target] === 'Categorical') {
 				data.targetIssue = Object.keys(this.targetMap).length < 2 && Object.keys(colMap[target]).length > 2;
-			}else{
+			} else {
 				data.targetIssue = true
 			}
-		}else{
-			if(colType[target] === 'Categorical') {
+		} else {
+			if (colType[target] === 'Categorical') {
 				data.targetIssue = Object.keys(colMap[target]).length < 10;
 			}
 		}
 
-		if(totalRawLines < MinRow) {
+		if (totalRawLines < MinRow) {
 			data.rowIssue = true;
 		}
 
-		if(issueRows.errorRow.length) {
+		if (issueRows.errorRow.length) {
 			data.dataIssue = true
 		}
-		
+
 		return data
 	}
 
 	@computed
-	get issueRows(){
-		const {dataHeader, mismatchIndex, nullIndex, outlierIndex, colType} = this;
+	get issueRows() {
+		const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType } = this;
 		const arr = {
 			mismatchRow: [],
 			nullRow: [],
@@ -449,15 +441,15 @@ export default class Project {
 		}
 
 		dataHeader.forEach(h => {
-			if(mismatchIndex[h]&&!!mismatchIndex[h].length) {
+			if (mismatchIndex[h] && !!mismatchIndex[h].length) {
 				arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));
 			}
-			if(nullIndex[h]&&!!nullIndex[h].length) {
+			if (nullIndex[h] && !!nullIndex[h].length) {
 				arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndex[h]])));
 			}
-			if(colType[h]!=="Categorical"&&outlierIndex[h]&&!!outlierIndex[h].length) {
+			if (colType[h] !== "Categorical" && outlierIndex[h] && !!outlierIndex[h].length) {
 				arr.outlierRow = Array.from(new Set(arr.outlierRow.concat([...outlierIndex[h]])));
 				arr.errorRow = Array.from(new Set(arr.errorRow.concat([...outlierIndex[h]])));
 			}

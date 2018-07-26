@@ -1,7 +1,7 @@
 import { action, computed, when } from 'mobx';
 import socketStore from './SocketStore.js'
 
- class RequestStore {
+class RequestStore {
 
     constructor() {
         this.initCallback();
@@ -14,10 +14,10 @@ import socketStore from './SocketStore.js'
 
     @action
     sendRequest(id, request) {
-        when( () => socketStore.isready,
+        when(() => socketStore.isready,
             () => {
-            socketStore.send("changeRequest", {id, params: request})
-        })
+                socketStore.send("changeRequest", { id, params: request })
+            })
     }
 
     initCallback() {
@@ -33,5 +33,5 @@ import socketStore from './SocketStore.js'
         socketStore.addMessageArr(callback);
     }
 }
-  
+
 export default new RequestStore();
