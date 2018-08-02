@@ -339,3 +339,44 @@
     justify-content: center;
     margin-top: 0.1em;
 }
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    padding: 0.1em 0;
+}
+
+.detailRow {
+    display: flex;
+    padding: 0 0.25em;
+    flex: none;
+    align-items: center;
+}
+
+.detailRow span {
+    font-size: 0.875rem;
+    overflow: hidden;
+    max-width: 100%;
+    display: block;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.detailName {
+    display: flex;
+    flex: 0 0 1em;
+    width: 1em;
+}
+
+.detailNum {
+    display: flex;
+    flex: 0 0 1em;
+    margin-left: 0.1em;
+}
+
+.detailProcess {
+    height: 0.875rem;
+    background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
+    border-radius: 0.875rem;
+}
