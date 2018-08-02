@@ -362,7 +362,7 @@ class DataSample extends Component {
 						<span>
 							Select a sample data if you don’t have a dataset yet and want to
 							try out the application.
-            </span>
+            		</span>
 					</div>
 					<div className={styles.sampleTable}>
 						<div className={styles.sampleHeader}>

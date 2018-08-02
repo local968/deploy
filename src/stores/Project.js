@@ -7,10 +7,8 @@ const Classification = 'Classification';
 const MinRow = 1000;
 
 export default class Project {
+	//project
 	@observable description;
-
-	@observable deployFileName = '';
-	@observable uploadFileName = '';
 
 	//problem
 	@observable problemType = '';
@@ -23,53 +21,52 @@ export default class Project {
 	//删除上传文件，model 及其相关数据
 	@observable changeProjectType = '';
 
-	@observable target = '';
+	@observable mainStep = 0;
+	@observable curStep = 0;
+	@observable lastSubStep = 1;
+	@observable subStepActive = 1;
 
-	// fast track
-	@observable train2Finished = false;
-	@observable deploy2Finished = false;
-	@observable train2ing = false;
-	@observable deploy2ing = false;
-	@observable deploy2Error = false;
-	@observable train2Error = false;
-
-	// observed values from other tabs
+	// etl
+	@observable etling = false;
+	// @observable fillMethod = {};
+	
+	// upload data
 	@observable dataHeader = [];
 	@observable uploadData = [];
 	@observable rawHeader = [];
 	@observable colType = [];
 	@observable totalLines = 0;
 	@observable totalRawLines = 0;
-
-	@observable mainStep = 0;
-	@observable curStep = 0;
-	@observable lastSubStep = 1;
-	@observable subStepActive = 1;
-
-	@observable overfit = 5;
-	@observable speed = 5;
-
-	// etl
-	@observable etling = false;
-	// @observable fillMethod = {};
+	@observable firstEtl = true;
+	@observable target = '';
+	@observable noCompute = false;
 	@observable validationRate = 0.1;
 	@observable holdoutRate = 0.1;
+	@observable uploadFileName = '';
 
+	//data quality
 	@observable mismatchFillMethod = {}
 	@observable mismatchIndex = {}
 	@observable nullFillMethod = {}
 	@observable nullIndexes = {}
 	@observable outlierFillMethod = {}
 	@observable outlierIndex = {}
-	@observable dataViews = null
 	@observable outlierDict = {}
 	@observable targetMapTemp = {};
 	@observable targetMap = {};
-	@observable firstEtl = true;
+	@observable dataViews = null;
+	@observable preImportance = null;
+	//not save
+	@observable dataViewing = false;
+	@observable preImportanceing = false;
 
-	@observable noCompute = false;
-
+	// train
+	@observable train2Finished = false;
+	@observable train2ing = false;
+	@observable train2Error = false;
 	@observable criteria = 'defualt';
+	@observable overfit = 5;
+	@observable speed = 5;
 
 	constructor(userId, projectId, project = null) {
 		this.userId = userId;
@@ -85,6 +82,59 @@ export default class Project {
 			Object.assign(this, project);
 			//初始化赋值为相同值
 			this.changeProjectType = this.problemType;
+		}
+	}
+
+	@computed
+	get defaultUploadFile() {
+		this.etling = false;
+
+		return {
+			uploadFileName: '',
+			dataHeader: [],
+			uploadData: [],
+			rawHeader: [],
+			colType: [],
+			totalLines: 0,
+			totalRawLines: 0,
+			firstEtl: true,
+			target: '',
+			noCompute: false,
+			validationRate: 0.1,
+			holdoutRate: 0.1
+		}
+	}
+
+	@computed
+	get defaultDataQuality() {
+		this.dataViewing = false;
+		this.preImportanceing = false;
+		this.targetMapTemp = {};
+
+		return {
+			mismatchFillMethod: {},
+			mismatchIndex: {},
+			nullFillMethod: {},
+			nullIndexes: {},
+			outlierFillMethod: {},
+			outlierIndex: {},
+			dataViews: null,
+			outlierDict: {},
+			targetMap: {}
+		}
+
+		
+	}
+
+	@computed
+	get defaultTarin() {
+		return {
+			train2Finished: false,
+			train2ing: false,
+			train2Error: false,
+			criteria: 'defualt',
+			overfit: 5,
+			speed: 5
 		}
 	}
 
@@ -160,14 +210,14 @@ export default class Project {
 	}
 
 	saveProblem() {
+		this.updateProject({
+			statement: this.statement,
+			business: this.business,
+			problemType: this.changeProjectType
+		});
 		if (this.problemType && this.changeProjectType !== this.problemType) {
 			this.changeType();
 		} else {
-			this.updateProject({
-				statement: this.statement,
-				business: this.business,
-				problemType: this.changeProjectType
-			});
 			this.nextMainStep(2);
 		}
 	}
@@ -176,68 +226,34 @@ export default class Project {
 	changeType() {
 		when(
 			() => socketStore.isready,
-			() =>
-				socketStore.send('changeProblemType', {
-					projectId: this.projectId
-				})
+			() => socketStore.send('changeProblemType', {
+				projectId: this.projectId
+			})
 		);
 	}
 
 	backToProblemStep() {
 		//全部恢复到problem步骤
-		const problemStepData = {
-			statement: this.statement,
-			business: this.business,
-			problemType: this.changeProjectType,
-			target: '',
-			train2Finished: false,
-			deploy2Finished: false,
-			train2ing: false,
-			deploy2ing: false,
-			deploy2Error: false,
-			train2Error: false,
-			dataHeader: [],
-			uploadData: [],
-			rawHeader: [],
-			colType: [],
-			totalLines: 0,
+		const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, {
 			mainStep: 2,
 			curStep: 2,
 			lastSubStep: 1,
-			subStepActive: 1,
-			overfit: 5,
-			speed: 5,
-			validationRate: 0.1,
-			holdoutRate: 0.1,
-			mismatchFillMethod: {},
-			mismatchIndex: {},
-			nullFillMethod: {},
-			nullIndexes: {},
-			outlierFillMethod: {},
-			outlierIndex: {},
-			dataViews: null
-		};
-		this.updateProject(problemStepData);
-		Object.assign(this, problemStepData);
+			subStepActive: 1
+		})
+		this.updateProject(backData);
+		Object.assign(this, backData);
 	}
 
 	//修改上传文件
 	@action
 	fastTrackInit(name) {
-		this.updateProject({
-			deploy2ing: false,
-			train2ing: false,
-			deploy2Finished: false,
-			train2Error: false,
-			deploy2Error: false,
-			train2Finished: false,
-			uploadFileName: name,
-			dataHeader: [],
-			uploadData: [],
-			rawHeader: [],
-			target: '',
-			firstEtl: true
-		});
+		const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, {uploadFileName: name}, {
+			mainStep: 2,
+			curStep: 2,
+			lastSubStep: 1,
+			subStepActive: 1
+		})
+		this.updateProject(backData);
 	}
 
 	//读取预览文件
@@ -520,12 +536,6 @@ export default class Project {
 		// this.nextSubStep(3, 2);
 	}
 
-	initDeployFile(filename) {
-		this.updateProject({
-			deployFileName: filename
-		});
-	}
-
 	finishTrain2() {
 		this.updateProject({
 			train2Finished: true,
@@ -603,6 +613,7 @@ export default class Project {
 		const command = 'preTrainImportance';
 		const id = `${command}-${userId}-${projectId}`;
 
+		this.preImportanceing = true;
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
@@ -682,6 +693,8 @@ export default class Project {
 
 		const command = 'dataView';
 		const id = `${command}-${userId}-${projectId}`;
+
+		this.dataViewing = true;
 
 		// id: request ID
 		// userId: user ID

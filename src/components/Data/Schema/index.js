@@ -13,7 +13,6 @@ export default class DataSchema extends Component {
         flag: false,
         checkList: this.props.project.rawHeader.filter(r => !this.props.project.dataHeader.includes(r)),
         showSelect: false,
-        load: false
     }
 
     doEtl = () => {
@@ -25,9 +24,6 @@ export default class DataSchema extends Component {
             noCompute: noCompute
 		});
         this.props.project.etl();
-        this.setState({
-            load: true
-        })
     }
 
     targetSelect = (value) => {
@@ -76,7 +72,7 @@ export default class DataSchema extends Component {
 
     render() {
         const { project } = this.props;
-        const { uploadData, rawHeader, noCompute, target, colType, headerTemp: {temp, isMissed, isDuplicated} } = project;
+        const { etling, uploadData, rawHeader, noCompute, target, colType, headerTemp: {temp, isMissed, isDuplicated} } = project;
         const targetOption = {};
 
         //target选择列表
@@ -140,10 +136,10 @@ export default class DataSchema extends Component {
                 </div>
             </div>
             <div className={styles.bottom}>
-                <ContinueButton onClick={this.doEtl} disabled={this.state.load || !target} text="Continue" />
+                <ContinueButton onClick={this.doEtl} disabled={etling || !target} text="Continue" />
                 <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noCompute} /><span>Skip Etl</span></div>
             </div>
-            {this.state.load && <ProjectLoading />}
+            {etling && <ProjectLoading />}
         </div>
     }
 }

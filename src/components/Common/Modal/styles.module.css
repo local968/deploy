@@ -1,0 +1,66 @@
+.modal {
+    display: flex;
+    flex: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+}
+
+.cover {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    background-color: rgba(0, 0, 0, 0.7)
+}
+
+.block {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    width: 12em;
+    border-radius: 4px;
+    box-shadow: 0 12px 20px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+    flex: 0 0;
+    background-color: #445167;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 0.1em 0;
+}
+
+#titleText {
+    font-size: 1.125rem;
+    color: #fff;
+    line-height: 1.1;
+    font-family: Arial;
+}
+
+.close {
+    display: flex;
+    position: absolute;
+    right: 0;
+    margin-right: 0.1em;
+    cursor: pointer;
+}
+
+.content {
+    display: flex;
+    flex: none;
+    margin: 0.2em 0.5em;
+    flex-direction: column;
+}

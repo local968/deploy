@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { ContinueButton, ProjectLoading } from '../../Common';
+import { ContinueButton, ProjectLoading, Modal } from '../../Common';
 import { when } from 'mobx';
 import * as d3 from 'd3';
 
@@ -172,8 +172,18 @@ export default class DataQuality extends Component {
                 </div>
             </div>
             {(this.state.isLoad || etling) && <ProjectLoading />}
-            {this.state.visible && <FixIssue project={project} closeFixes={this.closeFixes} saveDataFixes={this.saveDataFixes}/>}
-            {this.state.edit && <SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes}/>}
+            <Modal content={<FixIssue project={project} closeFixes={this.closeFixes} saveDataFixes={this.saveDataFixes}/>}
+                visible={this.state.visible}
+                width='12em'
+                title='How Mr.One Will Fix the Issues'
+                onClose={this.closeFixes}
+                />
+            <Modal content={<SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes}/>}
+                visible={this.state.edit}
+                width='12em'
+                title='How Mr.One Will Fix the Issues'
+                onClose={this.closeTarget}
+                />
         </div>
     }
 }
@@ -399,45 +409,39 @@ class SelectTarget extends Component {
         const {closeTarget} = this.props;
         const {target, colMap} = this.props.project;
 
-        return <div className={styles.fixes}>
-            <div className={styles.cover} onClick={closeTarget}></div>
-            <div className={styles.fixesBlock}>
-                <div className={styles.fixesTitle}><span>How Mr.One Will Fix the Issues</span><div className={styles.close} onClick={closeTarget}><span>X</span></div></div>
-                <div className={styles.fixesContent}>
-                    <div className={styles.fixesBox}>
-                        <div className={styles.fixesText}><span>Please select two valid values from all unique values in your target variable</span></div>
-                        <div className={styles.fixesCheckBox}>
-                            {Object.keys(colMap[target]).map((t, i) => {
-                                return <div className={styles.fixesCheck} key={i}>
-                                    <input type='checkbox' value={t} checked={this.state.checked.includes(t)} onChange={this.check}/>
-                                    <span>{t}</span>
-                                </div>
-                            })}
+        return <div className={styles.fixesContent}>
+            <div className={styles.fixesBox}>
+                <div className={styles.fixesText}><span>Please select two valid values from all unique values in your target variable</span></div>
+                <div className={styles.fixesCheckBox}>
+                    {Object.keys(colMap[target]).map((t, i) => {
+                        return <div className={styles.fixesCheck} key={i}>
+                            <input type='checkbox' value={t} checked={this.state.checked.includes(t)} onChange={this.check}/>
+                            <span>{t}</span>
                         </div>
-                    </div>
-                    {this.state.canSave && <div className={styles.fixesBox}>
-                        <div className={styles.fixesText}><span>Please map the other values to valid ones if they are equivalent. The rest will be deleted</span></div>
-                        <div className={styles.fixesSelectBox}>
-                            {Object.keys(colMap[target]).map((t, i) => {
-                                if(this.state.checked.includes(t)) return null;
-                                return <div className={styles.fixesSelect} key={i}>
-                                    <span title={t}>{t}: </span>
-                                    <select value={this.state.map[t]} onChange={this.changeBind.bind(null, t)}>
-                                        <option value="drop">Drop</option>
-                                        <option value={this.state.checked[0]}>{this.state.checked[0]}</option>
-                                        <option value={this.state.checked[1]}>{this.state.checked[1]}</option>
-                                    </select>
-                                </div>
-                            })}
+                    })}
+                </div>
+            </div>
+            {this.state.canSave && <div className={styles.fixesBox}>
+                <div className={styles.fixesText}><span>Please map the other values to valid ones if they are equivalent. The rest will be deleted</span></div>
+                <div className={styles.fixesSelectBox}>
+                    {Object.keys(colMap[target]).map((t, i) => {
+                        if(this.state.checked.includes(t)) return null;
+                        return <div className={styles.fixesSelect} key={i}>
+                            <span title={t}>{t}: </span>
+                            <select value={this.state.map[t]} onChange={this.changeBind.bind(null, t)}>
+                                <option value="drop">Drop</option>
+                                <option value={this.state.checked[0]}>{this.state.checked[0]}</option>
+                                <option value={this.state.checked[1]}>{this.state.checked[1]}</option>
+                            </select>
                         </div>
-                    </div>}
+                    })}
                 </div>
-                <div className={styles.fixesBottom}>
-                    <button className={classnames(styles.save, {
-                        [styles.disabled]: !this.state.canSave
-                    })} onClick={this.save} disabled={!this.state.canSave} ><span>save</span></button>
-                    <button className={styles.cancel} onClick={closeTarget}><span>cancel</span></button>
-                </div>
+            </div>}
+            <div className={styles.fixesBottom}>
+                <button className={classnames(styles.save, {
+                    [styles.disabled]: !this.state.canSave
+                })} onClick={this.save} disabled={!this.state.canSave} ><span>save</span></button>
+                <button className={styles.cancel} onClick={closeTarget}><span>cancel</span></button>
             </div>
         </div>
     }
@@ -501,8 +505,8 @@ class FixIssue extends Component {
         })
     }
 
-    renderContent = () => {
-        const {project} = this.props;
+    render = () => {
+        const {closeFixes, project, saveDataFixes} = this.props;
         const {issueRows, colType, mismatchIndex, nullIndex, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict} = project
         return <div className={styles.fixesContent}>
             {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
@@ -622,7 +626,8 @@ class FixIssue extends Component {
                         if(!outlierIndex[k].length){
                             return null;
                         }
-                        const outlier = outlierDict[k]?outlierDict[k]:outlierRange[k];
+                        const outlier = outlierDict[k] && outlierDict[k].length===2?outlierDict[k]:outlierRange[k];
+                        console.log(outlier)
                         const isShow = colType[k]==='Numerical';
                         return isShow && <div className={styles.fixesRow} key={i}>
                             <div className={styles.fixesCell}><span>{k}</span></div>
@@ -653,24 +658,23 @@ class FixIssue extends Component {
                     </div>
                 </div>
             </div>}
-        </div>
-    }
-
-    render() {
-        const {closeFixes, project, saveDataFixes} = this.props;
-        return <div className={styles.fixes}>
-            <div className={styles.cover} onClick={closeFixes}></div>
-            <div className={styles.fixesBlock}>
-                <div className={styles.fixesTitle}><span>How Mr.One Will Fix the Issues</span><div className={styles.close} onClick={closeFixes}><span>X</span></div></div>
-                {this.renderContent()}
-                <div className={styles.fixesBottom}>
+            <div className={styles.fixesBottom}>
                     <button className={classnames(styles.save, {
                         [styles.disabled]: !this.state.canSave
                     })} onClick={saveDataFixes} disabled={!this.state.canSave} ><span>save</span></button>
                     <button className={styles.cancel} onClick={closeFixes}><span>cancel</span></button>
-                </div>
             </div>
-            {this.state.visible && <EditOutLier width={800} height={400} saveEdit={this.saveEdit} closeEdit={this.closeEdit} outlierRange={project.outlierRange[this.state.editKey]} outlierDict={project.outlierDict[this.state.editKey]} numberBins={project.numberBins[this.state.editKey]} />}
+            <Modal content={<EditOutLier width={800} 
+                                height={400} saveEdit={this.saveEdit} 
+                                closeEdit={this.closeEdit} 
+                                outlierRange={project.outlierRange[this.state.editKey]} 
+                                outlierDict={project.outlierDict[this.state.editKey]} 
+                                numberBins={project.numberBins[this.state.editKey]} />}
+                visible={this.state.visible}
+                width='12em'
+                title='Outlier'
+                onClose={this.closeTarget}
+                />
         </div>
     }
 }
@@ -678,8 +682,8 @@ class FixIssue extends Component {
 class EditOutLier extends Component{
 
     state = {
-        min: this.props.outlierDict?this.props.outlierDict[0]:this.props.outlierRange[0], 
-        max: this.props.outlierDict?this.props.outlierDict[1]:this.props.outlierRange[1]
+        min: this.props.outlierDict && this.props.outlierDict.length === 2?this.props.outlierDict[0]:this.props.outlierRange[0], 
+        max: this.props.outlierDict && this.props.outlierDict.length === 2?this.props.outlierDict[1]:this.props.outlierRange[1]
     }
 
     componentDidMount() {
@@ -998,28 +1002,22 @@ class EditOutLier extends Component{
 
     render() {
         const {closeEdit} = this.props;
-        return <div className={styles.fixes}>
-            <div className={styles.cover} onClick={closeEdit}></div>
-            <div className={styles.fixesBlock}>
-                <div className={styles.fixesTitle}><span>Outlier</span><div className={styles.close} onClick={closeEdit}><span>X</span></div></div>
-                <div className={styles.fixesContent}>
-                    <div className={styles.outlierBox}>
-                        <div className={styles.outlierBlock}>
-                            <div className={styles.outliertext}><span>min</span></div>
-                            <div className={styles.input}><input value={this.state.min.toFixed(2)} onChange={this.changeMin}/></div>
-                        </div>
-                        <div className={styles.outlierBlock}>
-                            <div className={styles.outliertext}><span>max</span></div>
-                            <div className={styles.input}><input value={this.state.max.toFixed(2)} onChange={this.changeMax}/></div>
-                        </div>
-                        <div className={styles.outlierBlock}><button onClick={this.reset}><span>Reset to default</span></button></div>
-                    </div>
-                    <div className={styles.d3Chart}></div>
-                    <div className={styles.fixesBottom}>
-                        <button className={styles.save} onClick={this.apply} ><span>Apply</span></button>
-                        <button className={styles.cancel} onClick={closeEdit}><span>cancel</span></button>
-                    </div>
+        return <div className={styles.fixesContent}>
+            <div className={styles.outlierBox}>
+                <div className={styles.outlierBlock}>
+                    <div className={styles.outliertext}><span>min</span></div>
+                    <div className={styles.input}><input value={this.state.min.toFixed(2)} onChange={this.changeMin}/></div>
                 </div>
+                <div className={styles.outlierBlock}>
+                    <div className={styles.outliertext}><span>max</span></div>
+                    <div className={styles.input}><input value={this.state.max.toFixed(2)} onChange={this.changeMax}/></div>
+                </div>
+                <div className={styles.outlierBlock}><button onClick={this.reset}><span>Reset to default</span></button></div>
+            </div>
+            <div className={styles.d3Chart}></div>
+            <div className={styles.fixesBottom}>
+                <button className={styles.save} onClick={this.apply} ><span>Apply</span></button>
+                <button className={styles.cancel} onClick={closeEdit}><span>cancel</span></button>
             </div>
         </div>
     }

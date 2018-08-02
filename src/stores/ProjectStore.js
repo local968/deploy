@@ -3,7 +3,6 @@ import Project from './Project.js';
 import socketStore from './SocketStore';
 // import config from '../config.js';
 import Model from './Model.js';
-import Item from 'antd/lib/list/Item';
 
 class ProjectStore {
     @observable userId;
@@ -55,23 +54,26 @@ class ProjectStore {
                     model = m;
                 }
             }
+            m.recommend = false;
         }
         if (model) {
             model.recommend = true;
         }
+
+        this.sortModels()
     }
 
-    @computed
-    get sortModels() {
-        const { problemType, targetMap } = this.project
-
+    sortModels() {
+        const { problemType, targetMap, colMap, target } = this.project;
+        const targetCol = colMap?colMap[target]:{}
+        const map = Object.assign({}, targetCol, targetMap);
         let models = [...this.models]
         for (let m of models) {
             if (problemType === "Classification") {
                 let actual = [[0, 0], [0, 0]]
                 Object.keys(m.targetMap).forEach(k => {
                     //映射的index
-                    const actualIndex = targetMap[k];
+                    const actualIndex = map[k];
                     if(actualIndex !== 0 && actualIndex!== 1){
                         return;
                     }
@@ -80,7 +82,7 @@ class ProjectStore {
                     //遍历当前那一列数组
                     m.confusionMatrix[confusionMatrixIndex].forEach((Item, i) => {
                         const key = Object.keys(m.targetMap).find(t => m.targetMap[t] === i);
-                        const pridict = targetMap[key];
+                        const pridict = map[key];
                         if(pridict !== 0 && pridict !== 1){
                             return;
                         }
@@ -156,7 +158,7 @@ class ProjectStore {
                                 )
                                 break;
                             case 'train2':
-                                this.models.push(new Model(this.userId, this.projectId, models[key]))
+                                this.models.push(new Model(this.userId, this.projectId, models[key]));
                                 break;
                             case 'correlationMatrix':
                                 this.setCharts("correlationMatrix", models[key])
@@ -192,6 +194,7 @@ class ProjectStore {
                 }
                 switch (command) {
                     case 'etl':
+                        if(!this.project.etling) return false;
                         Object.keys(result).forEach(k => {
                             if (k === "name") {
                                 delete result[k];
@@ -242,6 +245,11 @@ class ProjectStore {
                         this.setCharts("pointToShow", result);
                         break;
                     case 'preTrainImportance':
+                        if(!this.project.preImportanceing) return false;
+                        this.project.setProperty({
+                            preImportance: result.data,
+                            preImportanceing: false
+                        })
                         break;
                     case 'univariatePlot':
                         this.setCharts("univariatePlot", result);
@@ -253,8 +261,10 @@ class ProjectStore {
                         this.setCharts("modelInsights", result);
                         break;
                     case 'dataView':
-                        this.project.updateProject({
-                            dataViews: result.data
+                        if(!this.project.dataViewing) return false;
+                        this.project.setProperty({
+                            dataViews: result.data,
+                            dataViewing: false
                         })
                         break;
                     default:

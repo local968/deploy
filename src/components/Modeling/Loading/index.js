@@ -1,0 +1,60 @@
+import React, { Component } from 'react';
+import styles from './styles.module.css';
+import { observer } from 'mobx-react';
+import { Progress } from 'antd';
+import config from '../../../config.js';
+
+@observer
+export default class Loading extends Component {
+    timer = null;
+    state = {
+        progress: 1
+    };
+    componentDidMount() {
+        const { project } = this.props;
+        const { totalLines, rawHeader } = project || {};
+        //暂定
+        const rowRatio = (Math.max(totalLines / 50000, 1) - 1) * 0.1 + 1;
+        const colRatio = Math.max(rawHeader.length / 20, 1) * 1;
+        const time = rowRatio * colRatio * config.trainTimeDefault * 1000;
+        const perTime = (time / 90) * 5;
+        this.clearTimer();
+        this.timer = setInterval(this.autoIncrease, perTime);
+    }
+
+    componentWillUnmount() {
+        this.clearTimer();
+    }
+
+    autoIncrease = () => {
+        const { progress } = this.state;
+        if (progress === 90) return this.clearTimer();
+        this.setState({
+            progress: Math.min(progress + 5, 90)
+        });
+    };
+
+    clearTimer = () => {
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    };
+
+    render() {
+        return (
+            <div className={styles.loading}>
+                <div className={styles.training}>
+                    <Progress
+                        className={styles.trainingProgress}
+                        percent={this.state.progress}
+                        status="active"
+                    />
+                </div>
+                <div className={styles.trainingText}>
+                    <span>Training</span>
+                </div>
+            </div>
+        );
+    }
+}

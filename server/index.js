@@ -88,17 +88,22 @@ app.post('/api/upload', (req, res) => {
        //读取文件数据
       fs.readFile(file.path, (err, data) => {
         if (err) return res.status(500).json({message: err});
+        fs.open(uploadFile, 'w', (err2, fd) => {
+          if(err2) return res.status(500).json({message: err2});
+          fs.writeSync(fd, data, 0, filesize, n);
+          //删除块文件
+          fs.unlinkSync(file.path);
+
+          let returnData = {
+            status: 200,
+            msg: "ok",
+            size: n + filesize,
+            isFirst: false
+          }
+          res.json(returnData);
+        })
         //写入文件最后
-        fs.appendFileSync(uploadFile, data);
-        //删除块文件
-        fs.unlinkSync(file.path);
-        let returnData = {
-          status: 200,
-          msg: "ok",
-          size: n + filesize,
-          isFirst: false
-        }
-        res.json(returnData);
+        // fs.appendFileSync(uploadFile, data);
         return 
       })
     }catch(e){

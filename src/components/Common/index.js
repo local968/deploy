@@ -10,6 +10,7 @@ import ContinueButton from './ContinueButton';
 import ProjectSide from './ProjectSide';
 import ProjectLoading from './ProjectLoading';
 import Table from './Table';
+import Modal from './Modal';
 
 export {
   BlackButton,
@@ -23,5 +24,6 @@ export {
   ProjectSide,
   ProjectLoading,
   Background,
-  Table
+  Table,
+  Modal
 };

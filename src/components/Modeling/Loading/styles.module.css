@@ -1,0 +1,24 @@
+.loading {
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.training {
+    display: flex;
+    width: 8em;
+}
+
+.trainingProgress {
+    text-align: center;
+}
+
+.trainingText {
+    display: flex;
+}
+
+.trainingText span {
+    font-size: 1.5rem;
+}
