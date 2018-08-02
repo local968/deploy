@@ -149,6 +149,9 @@ class ProjectStore {
                                     () => this.project.setProperty(models[key])
                                 )
                                 break;
+                            case 'chartData':
+                                // this.models.push(new Model(this.userId, this.projectId, models[key]))
+                                break;
                             case 'train2':
                                 this.models.push(new Model(this.userId, this.projectId, models[key]))
                                 break;

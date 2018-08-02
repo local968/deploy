@@ -186,6 +186,10 @@ class ModelError extends Component {
 @inject('deployStore')
 @observer
 class ModelResult extends Component {
+  // componentWillMount() {
+  //   this.props.project.chartData()
+  // }
+  
   // onChange = (e) => {
   //     this.props.project.updateProject({
   //         criteria: e.target.value

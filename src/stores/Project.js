@@ -690,6 +690,22 @@ export default class Project {
 		});
 	}
 
+	chartData() {
+		const { userId, projectId, uploadFileName } = this;
+
+		const command = 'chartData';
+		const id = `${command}-${userId}-${projectId}`;
+
+		requestStore.sendRequest(id, {
+			csvLocation: uploadFileName,
+			projectId,
+			userId,
+			command,
+			time: +new Date(),
+			version: this.version.toString()
+		})
+	}
+
 	dataView() {
 		const { userId, projectId, uploadFileName } = this;
 
