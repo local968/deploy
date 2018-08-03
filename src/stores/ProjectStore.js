@@ -138,9 +138,6 @@ class ProjectStore {
 
     initCallback() {
         const callback = {
-            changeProject: action(data => {
-				console.log(data);
-            }),
             onProjectChange: action(result => {
                 const {projectId, data} = result;
                 if(projectId === this.projectId) {
@@ -297,9 +294,6 @@ class ProjectStore {
                 this.models = [];
                 this.charts = [];
                 this.project.backToProblemStep();
-            }),
-            train: action(() => {
-                this.models = [];
             })
         }
 

@@ -1,6 +1,5 @@
 import { observable, action, when, computed } from 'mobx';
 import socketStore from './SocketStore';
-import requestStore from './RequestStore.js';
 import moment from 'moment';
 
 const Classification = 'Classification';
@@ -373,7 +372,7 @@ export default class Project {
 		// feature_label: 特征列名
 		// fill_method:  无效值
 		// kwargs:
-		requestStore.sendRequest(id, data);
+		this.sendRequest(id, data);
 	}
 
 	setProperty(data) {
@@ -525,7 +524,7 @@ export default class Project {
 		// model_option: model的额外参数，不同model参数不同
 		// projectName: 名称
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			problemType,
 			featureLabel,
@@ -561,7 +560,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -583,7 +582,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -604,7 +603,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -625,7 +624,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -645,7 +644,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -665,7 +664,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -685,7 +684,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -707,7 +706,7 @@ export default class Project {
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -722,6 +721,14 @@ export default class Project {
 			train2ing: false
 		});
 	}
+
+	@action
+    sendRequest(id, request) {
+        when(() => socketStore.isready,
+            () => {
+                socketStore.send("changeRequest", { id, params: request })
+            })
+    }
 
 	@action
 	updateProject(item) {

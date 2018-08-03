@@ -5,6 +5,7 @@ import Project from '../Project';
 import Problem from '../Problem';
 import Data from '../Data';
 import Modeling from '../Modeling';
+import {message} from 'antd';
 
 @inject('userStore', 'projectStore')
 @observer
@@ -26,7 +27,10 @@ export default class Main extends Component{
 
         when(
             () => !project.exist,
-            () => this.props.history.push("/")
+            () => {
+                message.warn("project not exist")
+                this.props.history.push("/")
+            }
         )
 
         switch(curStep){
