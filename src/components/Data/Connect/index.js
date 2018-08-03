@@ -87,21 +87,23 @@ export default class DataConnect extends Component {
 		sample: false,
 		progress: 0,
 		sql: false,
-		options: {}
+		options: {},
+		file: null
 	};
 
-	componentWillUnmount() {
-		this.setState({
-			progress: 0
-		});
-	}
-
 	upload = data => {
+		const { file, checkd } = data;
+
+		if(checkd.err) {
+			return this.setState({
+				file: null
+			})
+		}
 		//progress设为1
 		this.setState({
-			progress: 1
+			progress: 1,
+			file: null
 		});
-		const { file } = data;
 
 		this.props.project.fastTrackInit(file.name);
 
@@ -113,10 +115,6 @@ export default class DataConnect extends Component {
 			});
 			if (result.errors.length !== 0) {
 				console.error('parse error: ', result.errors[0].message);
-				return;
-			}
-			if (file.name.split('.').slice(-1)[0] !== 'csv') {
-				console.error('extension is not csv');
 				return;
 			}
 			this.props.project.newFileInit(result.data);
@@ -212,10 +210,23 @@ export default class DataConnect extends Component {
 		);
 	};
 
+	handleDrop = (e) => {
+		e.preventDefault();
+		if(this.state.progress) return false;
+		let file = e.dataTransfer.files[0];
+		this.setState({
+			file: file
+		})
+	}
+
+	handleDragOver = (e) => {
+		e.preventDefault();
+	}
+
 	render() {
 		const { userId, project } = this.props;
 		return (
-			<div className={styles.connect}>
+			<div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
 				<div className={styles.title}>
 					<span>If your data is ready, choose a data source to connect.</span>
 				</div>
@@ -238,6 +249,7 @@ export default class DataConnect extends Component {
 								onComplete={this.doEtl}
 								params={{ userId, projectId: project.projectId }}
 								onProgress={this.onProgress}
+								file={this.state.file}
 							/>
 						)}
 					{this.block('From SQL', sqlIcon, this.showSql)}
