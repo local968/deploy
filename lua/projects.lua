@@ -1,6 +1,7 @@
-local table, index
+local table, index, server
 local userSetting = require('deploy2.lua.usersetting')
 local clean = require('deploy2.lua.clean')
+local conn = require('deploy2.lua.conn')
 
 local function _query(userId,projectId)
     local query = {userId}
@@ -116,9 +117,33 @@ local function train(self)
     }
 end
 
-return function(server)
+local function onProjectChange(old, new)
+    new = new or {}
+    local userId = new[1] or old[1]
+    local projectId = new[2] or old[2]
+    local data = new[3]
+    local connids = conn.getConnids(userId);
+    for k, connid in pairs(connids) do
+        local connect = server._r2wsd:get_conn(connid[1]);
+        if connect then
+            server:sendMessageTo(connid[1], "onProjectChange", {
+                projectId = projectId,
+                data = data
+            })
+        end
+    end
+end
+
+local function initTrigger() 
+    table:on_replace(onProjectChange)
+end
+
+return function(_server)
     table = box.space["js_projects"]
     index = box.space["js_projects"].index["primary"]
+    server = _server
+
+    initTrigger()
     -- insertTestRow()
     server:addMessage({type='queryProject'},singleQuery)
     server:addMessage({type='queryProjects'},query)

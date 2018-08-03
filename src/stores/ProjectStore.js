@@ -138,9 +138,28 @@ class ProjectStore {
 
     initCallback() {
         const callback = {
+            changeProject: action(data => {
+				console.log(data);
+            }),
+            onProjectChange: action(result => {
+                const {projectId, data} = result;
+                if(projectId === this.projectId) {
+                    when(
+                        () => this.project,
+                        () => {
+                            this.project.setProperty(data);
+                            if(!data) {
+                                this.project.setProperty({exist: false})
+                            }
+                        }
+                    )
+                }
+            }),
             queryProject: action(data => {
                 const project = data.list[0];
-                this.project = new Project(this.userId, project.projectId, project.args)
+                const {args} = project || {args: {exist: false}}
+                console.log(args)
+                this.project = new Project(this.userId, this.projectId, args)
             }),
             queryModels: action(data => {
                 const result = data.data || {};

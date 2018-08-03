@@ -9,6 +9,7 @@ const MinRow = 1000;
 export default class Project {
 	//project
 	@observable description;
+	@observable exist = true;
 
 	//problem
 	@observable problemType = '';
@@ -52,11 +53,11 @@ export default class Project {
 	@observable outlierFillMethod = {}
 	@observable outlierIndex = {}
 	@observable outlierDict = {}
-	@observable targetMapTemp = {};
 	@observable targetMap = {};
 	@observable dataViews = null;
 	@observable preImportance = null;
 	//not save
+	@observable targetMapTemp = {};
 	@observable dataViewing = false;
 	@observable preImportanceing = false;
 
@@ -73,8 +74,6 @@ export default class Project {
 		this.projectId = projectId;
 		this.id = `${this.userId}-${this.projectId}`;
 		this.trainStartTime = 0;
-
-		this.initCallback();
 
 		if (!project) {
 			this.createProject();
@@ -390,6 +389,13 @@ export default class Project {
 			if (typeof data[key] === 'function') {
 				delete data[key];
 				continue;
+			}
+			if (key === 'problemType') {
+				data.changeProjectType = data[key]
+			}
+
+			if (key === 'targetMap') {
+				data.targetMapTemp = data[key];
 			}
 		}
 		Object.assign(this, data)
@@ -715,16 +721,6 @@ export default class Project {
 			train2Error: true,
 			train2ing: false
 		});
-	}
-
-	initCallback() {
-		const callback = {
-			changeProject: data => {
-				console.log(data);
-			}
-		};
-
-		socketStore.addMessageArr(callback);
 	}
 
 	@action

@@ -41,15 +41,22 @@ class SocketStore {
 
   cb(evt) {
     // console.log(this.messageArr);
-    const fn = this.messageArr[evt.data.type];
-    if (typeof fn === 'function') {
-      //   console.log(evt.data.type + ' callback');
-      fn(evt.data.data);
+    let fns = this.messageArr[evt.data.type];
+    if(!fns) return;
+    for(let fn of fns) {
+      if (typeof fn === 'function') {
+        //   console.log(evt.data.type + ' callback');
+        fn(evt.data.data);
+      }
     }
   }
 
   addMessageArr(obj) {
-    Object.assign(this.messageArr, obj);
+    for(let key in obj) {
+      this.messageArr[key] = this.messageArr[key] || [];
+      this.messageArr[key].push(obj[key])
+    }
+    console.log(this.messageArr)
   }
 }
 

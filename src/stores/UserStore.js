@@ -121,7 +121,21 @@ class UserStore {
 
     initCallback() {
         const callback = {
-            queryProjects: data => {
+            onProjectChange: action(result => {
+                const {projectId, data} = result;
+                if(!data) {
+                    this.projects = this.projects.filter(p => p.projectId !== projectId);
+                }else{
+                    let index = this.projects.findIndex(p => p.projectId === projectId);
+                    if(index !== -1) {
+                        this.projects[index] = new Project(this.userId, projectId.toString(), data);
+                    }else {
+                        this.projects.push(new Project(this.userId, projectId.toString(), data))
+                    }
+                }
+                
+            }),
+            queryProjects: action(data => {
                 const projects = data.list;
                 this.userSetting = data.setting || {};
                 this.projects = projects.map(project => {
@@ -129,8 +143,8 @@ class UserStore {
                 });
                 this.isLoad = false;
                 this.isInit = false;
-            },
-            login: data => {
+            }),
+            login: action(data => {
                 const { status, err, user } = data;
                 if (status !== 200) {
                     this.clearToken();
@@ -146,16 +160,16 @@ class UserStore {
                     () => !socketStore.isready,
                     () => this.reConnect()
                 )
-            },
-            register: data => {
+            }),
+            register: action(data => {
                 const { status, err } = data;
                 if (status !== 200) {
                     this.isLoad = false;
                     return message.error(err);
                 }
                 message.info("邮件已发送，请尽快激活")
-            },
-            completeReg: data => {
+            }),
+            completeReg: action(data => {
                 const { status, err, user } = data;
                 this.reg = true
                 if (status !== 200) {
@@ -173,7 +187,7 @@ class UserStore {
                         () => this.reConnect()
                     )
                 }, 2000);
-            }
+            })
         }
 
         socketStore.addMessageArr(callback);

@@ -23,6 +23,12 @@ export default class Main extends Component{
     getChild = () => {
         const {project, models} = this.props.projectStore;
         const { curStep } = project || {};
+
+        when(
+            () => !project.exist,
+            () => this.props.history.push("/")
+        )
+
         switch(curStep){
             case 1:
                 return <Problem project={project}/>
