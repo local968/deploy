@@ -62,7 +62,7 @@ class UserStore {
         let result = [...this.projects];
         // console.log(result)
         result = result.filter(row => {
-            return row && row.name.includes(keywords);
+            return row && row.name && row.name.includes(keywords);
         })
         result = result.sort(this.sortFunction[sort])
         const start = (currentPage - 1) * perPage;
