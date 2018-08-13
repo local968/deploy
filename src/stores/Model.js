@@ -9,9 +9,14 @@ export default class Model{
     @observable name = "";
     @observable predicted = [];
 
-    constructor(userId, projectId, model) {
+    constructor(userId, projectId, model, name) {
         this.userId = userId;
         this.projectId = projectId;
+        this.id = name;
         Object.assign(this, model);
+    }
+
+    updateModel(data) {
+        Object.assign(this, data);
     }
 }

@@ -1,6 +1,6 @@
 import { observable, action, when, computed } from 'mobx';
 import socketStore from './SocketStore';
-import requestStore from './RequestStore.js';
+import requestStore from './RequestStore';
 import moment from 'moment';
 
 const Classification = 'Classification';

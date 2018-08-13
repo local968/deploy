@@ -78,6 +78,19 @@
     align-items: baseline;
 }
 
+.viewWrapper {
+    width: 100%;
+}
+
+.navButton {
+    display: flex;
+    margin-top: 0.5em;
+    justify-content: center;
+}
+.navButton .button {
+    margin-right: 0.3em;
+}
+
 .button {
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
     background-image: linear-gradient(to bottom, #5b657b, #243448);

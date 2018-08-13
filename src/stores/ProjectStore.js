@@ -1,6 +1,6 @@
 import { observable, action, when, computed } from 'mobx';
 import Project from './Project.js';
-import socketStore from './SocketStore';
+import socketStore from './SocketStore.js';
 // import config from '../config.js';
 import Model from './Model.js';
 
@@ -128,6 +128,15 @@ class ProjectStore {
         }
     }
 
+    createOrUpdateModel(data, name) {
+        const m = this.models.find(m => m.id === name);
+        if (m) {
+            m.updateModel(data);
+        } else {
+            this.models.push(new Model(this.userId, this.projectId, data, name));
+        }
+    }
+
     initCallback() {
         const callback = {
             queryProject: action(data => {
@@ -150,10 +159,12 @@ class ProjectStore {
                                 )
                                 break;
                             case 'chartData':
-                                // this.models.push(new Model(this.userId, this.projectId, models[key]))
+                                const chartResult = models[key];
+                                this.createOrUpdateModel({chartData: chartResult.data}, chartResult.name.replace('-chartData', ''));
                                 break;
                             case 'train2':
-                                this.models.push(new Model(this.userId, this.projectId, models[key]))
+                                const trainResult = models[key];
+                                this.createOrUpdateModel(trainResult, trainResult.backend);
                                 break;
                             case 'correlationMatrix':
                                 this.setCharts("correlationMatrix", models[key])

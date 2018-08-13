@@ -9,6 +9,8 @@ import { ProjectSide } from '../Common';
 import modelSelectionIcon from './model_selection_d.svg';
 import startModelingActiveIcon from './start_modeling_a.svg';
 import modelSelectionActiveIcon from './model_selection_a.svg';
+
+import AdvancedView from './AdvancedView';
 // import r2Loading from './Mr.OneLoading2.gif';
 // import { when } from 'mobx';
 
@@ -190,16 +192,15 @@ class ModelResult extends Component {
   //   this.props.project.chartData()
   // }
   
-  // onChange = (e) => {
-  //     this.props.project.updateProject({
-  //         criteria: e.target.value
-  //     })
-  // }
-
-  selectModel = model => {
-    this.props.models.forEach(m => (m.recommend = false));
-    model.recommend = true;
-  };
+  state = {
+    view: 'simple'
+  }
+  handleSimple = () => {
+    this.setState({view: 'simple'});
+  }
+  handleAdvanced = () => {
+    this.setState({view: 'advanced'});
+  }
 
   deploy = () => {
     const { models, project } = this.props;
@@ -211,8 +212,37 @@ class ModelResult extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { problemType, train2Finished } = project;
+    const {view} = this.state;
+    // return <SimpleView models={models} project={project} />;
+    return (
+      <div className={styles.viewWrapper} >
+        <div className={styles.navButton}>
+          <button className={styles.button} onClick={this.handleSimple} >
+            <span>Simplified View</span>
+          </button>
+          <button className={styles.button} onClick={this.handleAdvanced} >
+            <span>Advanced View</span>
+          </button>
+        </div>
+        {view === 'simple' ?
+          <SimpleView models={models} project={project} /> :
+          <AdvancedView models={models} project={project} />
+        }
+      </div>
+    )
+  }
+}
+
+class SimpleView extends Component {
+  selectModel = model => {
+    this.props.models.forEach(m => (m.recommend = false));
+    model.recommend = true;
+  };
+
+  render() {
+    const {models, project: {target, problemType, train2Finished}} = this.props;
     const current = models.find(model => model.recommend);
+
     return (
       <div className={styles.modelResult}>
         <div className={styles.result}>
@@ -239,7 +269,7 @@ class ModelResult extends Component {
             </div>
             <div className={styles.row}>
               <span>
-                Target :<a>&nbsp;{project.target}</a>
+                Target :<a>&nbsp;{target}</a>
               </span>
             </div>
           </div>
