@@ -58,6 +58,7 @@ export default class Project {
 	@observable preImportance = null;
 	@observable histgramPlots = null;
 	@observable univariatePlots = null;
+	@observable correlationMatrixImg = '';
 	//not save
 	@observable targetMapTemp = {};
 
@@ -508,7 +509,7 @@ export default class Project {
 
 		when(
 			() => socketStore.isready,
-			() => socketStore.send('train', { projectId })
+			() => socketStore.send('train', { id: projectId })
 		);
 
 		const featureLabel = dataHeader.filter(d => d !== target);
@@ -690,6 +691,7 @@ export default class Project {
 
 		const command = 'univariatePlot';
 
+		this.univariatePlots = {};
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
@@ -708,6 +710,8 @@ export default class Project {
 		const { userId, projectId, uploadFileName } = this;
 
 		const command = 'histgramPlot';
+
+		this.histgramPlots = {};
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID

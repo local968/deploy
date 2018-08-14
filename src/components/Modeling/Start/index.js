@@ -158,11 +158,34 @@ class SimplifiedView extends Component {
         })
     }
 
+    sort = () => {
+        this.setState({
+            sort: this.state.sort * -1
+        })
+    }
+
+    showCorrelationMatrix = () => {
+        when(
+            () => !this.props.project.correlationMatrixImg,
+            () => this.props.project.correlationMatrix()
+        )
+        this.setState({
+            showCorrelation: true
+        })
+    }
+
+    hideCorrelationMatrix = e => {
+        e && e.stopPropagation();
+        this.setState({
+            showCorrelation: false
+        })
+    }
+
     render() {
         const {project} = this.props;
         const {target, colType, colMap, targetMap, dataViews, rawHeader, preImportance} = project;
         const targetUnique = Object.values(Object.assign({}, colMap[target], targetMap)).length;
-        const targetData = colType[target]!=='Categorical' && dataViews ? dataViews[target] : {}
+        const targetData = (colType[target]!=='Categorical' && dataViews) ? dataViews[target] : {}
         return <div className={styles.simplified}>
             <div className={styles.targetTable}>
                 <div className={styles.targetHead}>
@@ -175,27 +198,31 @@ class SimplifiedView extends Component {
                     <div className={styles.targetCell}><span>Max</span></div>
                 </div>
                 <div className={styles.targetRow}>
-                    <div className={classnames(styles.targetCell, styles.targetName)}><span>{target}</span></div>
+                    <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
                     <div className={classnames(styles.targetCell, styles.targetHistogram)} onClick={this.show}>
                         <img src={histogramIcon} alt='histogram'/>
                         {<Popover placement='bottomLeft' 
                             visible={this.state.show} 
                             onVisibleChange={this.hide} 
                             trigger="click" 
-                            content={<SimplifiedViewPlot onClose={this.hide} value={target} project={project} type='histograms'/>}/>}
+                            content={<SimplifiedViewPlot onClose={this.hide} 
+                                            type='histogram'
+                                            path={project.histgramPlots?project.histgramPlots.target:''} 
+                                            userId={project.userId} 
+                                            projectId={project.projectId} />}/>}
                         <span>Compute</span>
                     </div>
                     <div className={styles.targetCell}><span>{colType[target]}</span></div>
                     <div className={classnames(styles.targetCell, {
                         [styles.none]: colType[target]==='Categorical'
-                    })}><span>{targetData.mean || 'N/A'}</span></div>
+                    })} title={targetData.mean || 'N/A'}><span>{targetData.mean || 'N/A'}</span></div>
                     <div className={styles.targetCell}><span>{targetUnique}</span></div>
                     <div className={classnames(styles.targetCell, {
                         [styles.none]: colType[target]==='Categorical'
-                    })}><span>{targetData.min || 'N/A'}</span></div>
+                    })} title={targetData.min || 'N/A'}><span>{targetData.min || 'N/A'}</span></div>
                     <div className={classnames(styles.targetCell, {
                         [styles.none]: colType[target]==='Categorical'
-                    })}><span>{targetData.max || 'N/A'}</span></div>
+                    })} title={targetData.max || 'N/A'}><span>{targetData.max || 'N/A'}</span></div>
                 </div>
             </div>
             <div className={styles.simplifiedText}><span>You can use check box to create your own variable list.</span></div>
@@ -207,7 +234,18 @@ class SimplifiedView extends Component {
                     </select>
                 </div>
                 <div className={styles.toolButton}><span>Create a New Variable</span></div>
-                <div className={classnames(styles.toolButton, styles.toolCheck)}><span>Check Correlation Matric</span></div>
+                <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
+                    {this.state.showCorrelation && <Popover placement='left' 
+                        visible={this.state.showCorrelation} 
+                        onVisibleChange={this.hideCorrelationMatrix} 
+                        trigger="click" 
+                        content={<SimplifiedViewPlot onClose={this.hideCorrelationMatrix} 
+                                        type='correlationMatrix'
+                                        path={project.correlationMatrixImg} 
+                                        userId={project.userId} 
+                                        projectId={project.projectId}/>}/>}
+                    <span>Check Correlation Matric</span>
+                </div>
             </div>
             <div className={styles.table}>
                 <div className={styles.tableHeader}>
@@ -215,7 +253,10 @@ class SimplifiedView extends Component {
                     <div className={styles.tableTh}><span>Name</span></div>
                     <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Histogram</span></div>
                     <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Univariant Plot</span></div>
-                    <div className={classnames(styles.tableTh, styles.tableImportance)}><span>Importance</span></div>
+                    <div className={classnames(styles.tableTh, styles.tableImportance)}>
+                        <div className={styles.tableSort} onClick={this.sort}><span>sort</span></div>
+                        <span>Importance</span>
+                    </div>
                     <div className={styles.tableTh}><span>Data type</span></div>
                     <div className={styles.tableTh}><span>Mean</span></div>
                     <div className={styles.tableTh}><span>Unique Value</span></div>
@@ -291,20 +332,28 @@ class SimplifiedViewRow extends Component {
             <div className={styles.tableTd} title={value}><span>{value}</span></div>
             <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showHistograms}>
                 <img src={histogramIcon} alt='histogram'/>
-                {<Popover placement='topLeft' 
+                {this.state.showHistograms && <Popover placement='topLeft' 
                         visible={this.state.showHistograms} 
                         onVisibleChange={this.hideHistograms} 
                         trigger="click" 
-                        content={<SimplifiedViewPlot onClose={this.hideHistograms} value={value} project={project} type='histgramPlots'/>}/>}
+                        content={<SimplifiedViewPlot onClose={this.hideHistograms} 
+                                        type='histgram'
+                                        path={project.histgramPlots?project.histgramPlots[value]:''} 
+                                        userId={project.userId} 
+                                        projectId={project.projectId}/>}/>}
                 <span>Compute</span>
             </div>
             <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showUnivariant}>
                 <img src={univariantIcon} alt='univariant'/>
-                {<Popover placement='topLeft' 
+                {this.state.showUnivariant && <Popover placement='topLeft' 
                         visible={this.state.showUnivariant} 
                         onVisibleChange={this.hideUnivariant} 
                         trigger="click" 
-                        content={<SimplifiedViewPlot onClose={this.hideUnivariant} value={value} project={project} type='univariatePlots'/>}/>}
+                        content={<SimplifiedViewPlot onClose={this.hideUnivariant} 
+                                        type='univariate'
+                                        path={project.univariatePlots?project.univariatePlots[value]:''} 
+                                        userId={project.userId} 
+                                        projectId={project.projectId} />}/>}
                 <span>Compute</span>
             </div>
             <div className={classnames(styles.tableTd, styles.tableImportance)}>
@@ -336,12 +385,11 @@ class SimplifiedViewRow extends Component {
 @observer
 class SimplifiedViewPlot extends Component {
     render() {
-        const {onClose, project, value, type} = this.props;
-        const hasImg = project[type]&&project[type][value];
-        const imgPath = hasImg?`/api/read?userId=${project.userId}&projectId=${project.projectId}&csvLocation=${project[type][value]}`:''
+        const {onClose, path, type, userId, projectId} = this.props;
+        const imgPath = path?`/api/read?userId=${userId}&projectId=${projectId}&csvLocation=${path}`:''
         return <div className={styles.plot}>
             <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-            {hasImg?<img src={imgPath} alt={value} />:<div className={styles.plotLoad}><Spin size="large" /></div>}
+            {path?<img src={imgPath} alt={type} />:<div className={styles.plotLoad}><Spin size="large" /></div>}
         </div>
     }
 }

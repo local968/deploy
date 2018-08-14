@@ -417,6 +417,13 @@
     justify-content: flex-start;
 }
 
+.tableSort {
+    display: flex;
+    margin-right: 0.1em;
+    flex: none;
+    cursor: pointer;
+}
+
 .none span{
     color: #9b9b9b;
 }
@@ -740,9 +747,12 @@ span.advancedDesc {
 }
 
 .plot {
-    width: 300px;
+    width: 400px;
     height: 300px;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
 .plot img{
@@ -762,7 +772,8 @@ span.advancedDesc {
     position: absolute;
     right: 0;
     top: 0;
-    margin: 20px 10px;
+    cursor: pointer;
+    flex: none;
 }
 
 .plotClose span{

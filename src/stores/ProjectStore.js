@@ -222,6 +222,7 @@ class ProjectStore {
                 
                 switch (command) {
                     case 'etl':
+                        if(!this.project.etling) return;
                         if (status === 100) {
                             this.project.etling = false;
                             return;
@@ -267,7 +268,7 @@ class ProjectStore {
                         }
                         break;
                     case 'correlationMatrix':
-                        this.setCharts("correlationMatrix", result)
+                        this.project.correlationMatrixImg = result.imageSavePath
                         break;
                     case 'fitPlotAndResidualPlot':
                         this.setCharts("fitPlotAndResidualPlot", result)
@@ -308,6 +309,11 @@ class ProjectStore {
                 this.models = [];
                 this.charts = [];
                 this.project.backToProblemStep();
+            }),
+            train : action((data) => {
+                if(data.id !== this.projectId) return;
+                this.models = [];
+                this.charts = [];
             })
         }
 

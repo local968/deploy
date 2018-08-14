@@ -109,10 +109,12 @@ local function changeProblemType(self)
 end
 
 local function train(self)
+    local id = self.data.id
     return self:render{
         data = {
             status = 200,
-            msg = "ok"
+            msg = "ok",
+            id = id
         }
     }
 end
