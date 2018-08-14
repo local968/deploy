@@ -56,7 +56,6 @@ class SocketStore {
       this.messageArr[key] = this.messageArr[key] || [];
       this.messageArr[key].push(obj[key])
     }
-    console.log(this.messageArr)
   }
 }
 

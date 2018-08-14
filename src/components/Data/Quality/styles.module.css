@@ -610,6 +610,10 @@ span.fixesEdit {
     margin-bottom: 0.2em;
 }
 
+.d3Chart svg{
+    overflow: visible;
+}
+
 .d3Chart g{
     position: relative;
 }

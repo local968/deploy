@@ -627,7 +627,6 @@ class FixIssue extends Component {
                             return null;
                         }
                         const outlier = outlierDict[k] && outlierDict[k].length===2?outlierDict[k]:outlierRange[k];
-                        console.log(outlier)
                         const isShow = colType[k]==='Numerical';
                         return isShow && <div className={styles.fixesRow} key={i}>
                             <div className={styles.fixesCell}><span>{k}</span></div>
@@ -664,26 +663,39 @@ class FixIssue extends Component {
                     })} onClick={saveDataFixes} disabled={!this.state.canSave} ><span>save</span></button>
                     <button className={styles.cancel} onClick={closeFixes}><span>cancel</span></button>
             </div>
-            <Modal content={<EditOutLier width={800} 
+            {this.state.editKey && <Modal content={<EditOutLier width={800} 
                                 height={400} saveEdit={this.saveEdit} 
                                 closeEdit={this.closeEdit} 
                                 outlierRange={project.outlierRange[this.state.editKey]} 
                                 outlierDict={project.outlierDict[this.state.editKey]} 
-                                numberBins={project.numberBins[this.state.editKey]} />}
+                                x={project.numberBins[this.state.editKey][1]}
+                                y={project.numberBins[this.state.editKey][0]} />}
                 visible={this.state.visible}
                 width='12em'
                 title='Outlier'
                 onClose={this.closeTarget}
-                />
+                />}
         </div>
     }
 }
 
 class EditOutLier extends Component{
+    constructor(props) {
+        super(props)
+        const {x} = props
+        const minX = x[0];
+        const maxX = x[x.length-1];
+        const offset = (maxX - minX)/4;
+        this.minX = minX - offset;
+        this.maxX = maxX + offset;
+        this.count = 4;
+    }
 
     state = {
         min: this.props.outlierDict && this.props.outlierDict.length === 2?this.props.outlierDict[0]:this.props.outlierRange[0], 
-        max: this.props.outlierDict && this.props.outlierDict.length === 2?this.props.outlierDict[1]:this.props.outlierRange[1]
+        max: this.props.outlierDict && this.props.outlierDict.length === 2?this.props.outlierDict[1]:this.props.outlierRange[1],
+        temp: '',
+        focus: ''
     }
 
     componentDidMount() {
@@ -696,9 +708,8 @@ class EditOutLier extends Component{
 
     d3Chart = () => {
         d3.select(`.${styles.d3Chart} svg`).remove();
-        const {width, height, numberBins} = this.props;
+        const {width, height, x, y} = this.props;
         let {min, max} = this.state;
-        const [y, x] = numberBins;
         const padding = {left: 50, bottom: 30, right: 5, top: 100};
 
         const realHeight = height - padding.bottom - padding.top;
@@ -712,16 +723,12 @@ class EditOutLier extends Component{
             .attr('transform', `translate(${padding.left}, 0)`);
 
         const maxH = d3.max(y);
-        const minX = x[0];
-        const maxX = x[x.length-1];
         const dataset = [];
-
-        const offset = (maxX - minX)/4;
 
         //x轴的比例尺
         var xScale = d3.scaleLinear()
             .range([0, realWidth])
-            .domain([minX - offset, maxX + offset])
+            .domain([this.minX, this.maxX])
             .clamp(true);
 
         //y轴的比例尺
@@ -751,13 +758,17 @@ class EditOutLier extends Component{
         const drawDrag = () => {
             const minDrag = d3.drag()
                 .on('drag', () => {
-                    min = xScale.invert(d3.event.x)
+                    let minTemp = xScale.invert(d3.event.x)
+                    if(minTemp > max) minTemp = max;
+                    if(minTemp < this.minX) minTemp = this.minX;
+                    if(minTemp === min) return;
+                    min = minTemp;
                     minRect.attr('width', xScale(min))
                     minLine.attr('x1', xScale(min))
                         .attr('x2', xScale(min))
                     minCircle.attr('cx', xScale(min))
                     minText.attr('x', xScale(min))
-                        .text(min.toFixed(2))
+                        .text(this.renderNum(min))
                     if(Math.abs(xScale(max) - xScale(min)) < 40) {
                         maxCircle.attr('cy', padding.top-57)
                         maxText.attr('y', padding.top-53)
@@ -769,24 +780,22 @@ class EditOutLier extends Component{
                     drawRect()
                 })
                 .on('end', () => {
-                    this.setState({
-                        min: xScale.invert(d3.event.x)
-                    })
+                    this.setState({min})
                 });
 
             let minDragBlock = svg.append('g');    
             let minRect = minDragBlock.append('rect')
                 .attr('class', `${styles.dragRect}`)
-                .attr('x', xScale(minX - offset))
+                .attr('x', xScale(this.minX))
                 .attr('y', yScale(maxH) + padding.top)
-                .attr('width', xScale(min) - xScale(minX - offset))
+                .attr('width', xScale(min) - xScale(this.minX))
                 .attr('height', realHeight)
 
             let minLine = minDragBlock.append('line')
                 .attr('class', `${styles.dragLine}`)
-                .attr('x1', xScale(min)- xScale(minX - offset))
+                .attr('x1', xScale(min)- xScale(this.minX))
                 .attr('y1', yScale(maxH) + padding.top)
-                .attr('x2', xScale(min)- xScale(minX - offset))
+                .attr('x2', xScale(min)- xScale(this.minX))
                 .attr('y2', realHeight + padding.top)
 
             let minCircle = minDragBlock.append('circle')
@@ -799,21 +808,25 @@ class EditOutLier extends Component{
 
             let minText = minDragBlock.append('text')
                 .attr('class', `${styles.dragText}`)
-                .text(min.toFixed(2))
+                .text(this.renderNum(min))
                 .attr('x', xScale(min))
                 .attr('y', padding.top-13)
                 .call(minDrag);
 
             const maxDrag = d3.drag()
                 .on('drag', () => {
-                    max = xScale.invert(d3.event.x)
+                    let maxTemp = xScale.invert(d3.event.x)
+                    if(maxTemp < min) maxTemp = min;
+                    if(maxTemp > this.maxX) maxTemp = this.maxX;
+                    if(maxTemp === max) return;
+                    max = maxTemp;
                     maxRect.attr('x', xScale(max))
-                        .attr('width', xScale(maxX + offset) - xScale(max))
+                        .attr('width', xScale(this.maxX) - xScale(max))
                     maxLine.attr('x1', xScale(max))
                         .attr('x2', xScale(max))
                     maxCircle.attr('cx', xScale(max))
                     maxText.attr('x', xScale(max))
-                        .text(max.toFixed(2))
+                        .text(this.renderNum(max))
                     if(Math.abs(xScale(max) - xScale(min)) < 40) {
                         maxCircle.attr('cy', padding.top-57)
                         maxText.attr('y', padding.top-53)
@@ -824,9 +837,7 @@ class EditOutLier extends Component{
                     drawRect()
                 })
                 .on('end', () => {               
-                    this.setState({
-                        max: xScale.invert(d3.event.x)
-                    })
+                    this.setState({max})
                 });
 
             let maxDragBlock = svg.append('g');    
@@ -834,7 +845,7 @@ class EditOutLier extends Component{
                 .attr('class', `${styles.dragRect}`)
                 .attr('x', xScale(max))
                 .attr('y', yScale(maxH) + padding.top)
-                .attr('width', xScale(maxX + offset) - xScale(max))
+                .attr('width', xScale(this.maxX) - xScale(max))
                 .attr('height', realHeight)
 
             let maxLine = maxDragBlock.append('line')
@@ -859,7 +870,7 @@ class EditOutLier extends Component{
 
             let maxText = maxDragBlock.append('text')
                 .attr('class', `${styles.dragText}`)
-                .text(max.toFixed(2))
+                .text(this.renderNum(max))
                 .attr('x', xScale(max))
                 .attr('y', () => {
                     if(Math.abs(xScale(max) - xScale(min))<40){
@@ -970,21 +981,40 @@ class EditOutLier extends Component{
         drawRect()
     }
 
-    changeMin = (e) => {
-        let num = e.target.value;
-        if((num || num === 0) && !isNaN(num)){
-            this.setState({
-                min: parseFloat(num)
-            })
-        }
+    change = e => {
+        this.setState({
+            temp: e.target.value
+        })
     }
 
-    changeMax = (e) => {
-        let num = e.target.value;
-        if((num || num === 0) && !isNaN(num)){
-            this.setState({
-                max: parseFloat(num)
-            })
+    focus = type => {
+        if(!type) return;
+        this.setState({
+            focus: type,
+            temp: this.renderNum(this.state[type])
+        })
+    }
+
+    blur = () => {
+        const {focus, temp, min, max} = this.state;
+        if(!focus) return;
+        if((temp || temp === '0') && !isNaN(temp)) {
+            let num = parseFloat(temp);
+            if(focus === 'min') {
+                if(num > max) num = max;
+                if(num < this.minX) num = this.minX;
+                if(min === num) return;
+            }else{
+                if(num < min) num = min;
+                if(num > this.maxX) num = this.maxX;
+                if(max === num) return;
+            }
+            const obj = {
+                temp: '',
+                focus: ''
+            };
+            obj[focus] = num;
+            this.setState(obj)
         }
     }
 
@@ -1000,17 +1030,26 @@ class EditOutLier extends Component{
         this.props.saveEdit([min, max])
     }
 
+    renderNum = num =>  {
+        if(num && !isNaN(num)) {
+            const n = Math.pow(10, this.count)
+            return parseInt(num * n, 10) / n;
+        }
+        return 0;
+    }
+
     render() {
         const {closeEdit} = this.props;
+        const {min, max, temp, focus} = this.state;
         return <div className={styles.fixesContent}>
             <div className={styles.outlierBox}>
                 <div className={styles.outlierBlock}>
                     <div className={styles.outliertext}><span>min</span></div>
-                    <div className={styles.input}><input value={this.state.min.toFixed(2)} onChange={this.changeMin}/></div>
+                    <div className={styles.input}><input value={focus==='min'?temp:this.renderNum(min)} onChange={this.change} onFocus={this.focus.bind(null, 'min')} onBlur={this.blur}/></div>
                 </div>
                 <div className={styles.outlierBlock}>
                     <div className={styles.outliertext}><span>max</span></div>
-                    <div className={styles.input}><input value={this.state.max.toFixed(2)} onChange={this.changeMax}/></div>
+                    <div className={styles.input}><input value={focus==='max'?temp:this.renderNum(max)} onChange={this.change} onFocus={this.focus.bind(null, 'max')} onBlur={this.blur}/></div>
                 </div>
                 <div className={styles.outlierBlock}><button onClick={this.reset}><span>Reset to default</span></button></div>
             </div>

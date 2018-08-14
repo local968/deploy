@@ -206,12 +206,16 @@
     width: 0;
     padding: 0 0.05em;
     align-items: center;
+    position: relative;
 }
 
 .targetCell span {
     font-family: SanFranciscoText;
     color: #4a4a4a;
     font-size: 0.875rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.2;
 }
 
 .large {
@@ -334,6 +338,7 @@
     flex: none;
     padding: 0.15em 0;
     border-bottom: 1px solid #757575;
+    padding-right: 0.2em;
 }
 
 .tableTh {
@@ -350,9 +355,9 @@
     flex: none;
     flex-direction: column;
     margin: 0.1em 0;
-    max-height: 3em;
+    max-height: 2.6em;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 .tableRow {
@@ -422,12 +427,14 @@
     height: 0.15em;
     background: #ddd;
     border-radius: 0.15em;
+    overflow: hidden;
 }
 
 .preImpotanceActive {
+    display: flex;
+    flex: none;
+    height: 0.15em;
     background: #5cca71;
-    position: absolute;
-    z-index: 2;
     width: 100%;
 }
 
@@ -472,4 +479,294 @@
     font-size: 0.875rem;
     color: #4a4a4a;
     line-height: 1.1;
+}
+
+.advanced {
+    display: flex;
+    flex: none;
+    padding: 0.2em 0.65em;
+    flex-direction: column;
+    position: relative;
+}
+
+.advancedRow {
+    display: flex;
+    flex: none;
+    border-bottom: dashed 1px #c4cbd7;
+}
+
+.advancedRow:last-child {
+    border-bottom-style: solid;
+}
+
+.advancedLeft {
+    display: flex;
+    flex: 1 1;
+    width: 0;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    margin-right: 0.15em;
+}
+
+.advancedRight {
+    display: flex;
+    flex: 1 1;
+    width: 0;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    margin-left: 0.15em;
+}
+
+.advancedTitle {
+    display: flex;
+    flex: none;
+}
+
+.advancedTitle span{
+    font-family: SanFranciscoText;
+    font-size: 1.125rem;
+    color: #000000;
+    line-height: 1.2;
+}
+
+.advancedOption {
+    display: flex;
+    flex: 1 1;
+    margin-left: 0.2em;
+    align-items: center;
+}
+
+.advancedOption select{
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000000;
+    line-height: 1.2;
+    padding: 5px 10px;
+    width: 100%;
+}
+
+.advancedOption span {
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000000;
+    line-height: 1.2;
+}
+
+.advancedOption input[type='text']{
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000000;
+    line-height: 1.2;
+    padding: 5px 10px;
+    width: 100%;
+    outline: none;
+    border: solid 1px #979797;
+}
+
+.advancedBlock {
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin: 0.15em 0;
+}
+
+.advancedOptionBox {
+    display: flex;
+    flex: none;
+    margin-right: auto;
+    align-items: center;
+}
+
+.advancedOptionBox label{
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000000;
+    line-height: 1.2;
+}
+
+.limit {
+    width: 2.4em;
+    flex-direction: column;
+    flex: none;
+}
+
+span.advancedDesc {
+  font-size: 0.75rem;
+  line-height: 1.33;
+}
+
+.advancedSize {
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000000;
+    line-height: 1.2;
+    padding: 5px 10px;
+    width: 25%;
+    text-align: center;
+}
+
+.advancedBox {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+}
+
+.advancedPercentBlock {
+    display: flex;
+    flex: none;
+    margin: 0.15em 0;
+    position: relative;
+    align-items: center;
+}
+
+.advancedPercent {
+    display: flex;
+    flex: none;
+    width: 100%;
+    align-items: center;
+    height: 0.2em;
+    border-radius: 0.2em;
+    overflow: hidden;
+}
+
+.advancedPercentTrain {
+    height: 0.2em;
+    background-color: #9be44b;
+    border-right: 1px solid #000
+}
+
+.advancedPercentValidation {
+    height: 0.2em;
+    background-color: #f9cf37;
+    border-right: 1px solid #000
+}
+
+.advancedPercentHoldout {
+    height: 0.2em;
+    background-color: #31c4e9
+}
+
+.advancedPercentCross {
+    height: 0.2em;
+    background-color: #f9cf37;
+    border-right: 1px solid #000
+}
+
+.advancedDrag {
+    position: absolute;
+    height: 0.3em;
+    width: 0.3em;
+    border-radius: 0.3em;
+    margin-right: -0.15em; 
+    background-image: radial-gradient(circle at 50% 0, #ffffff, #cdcdcd);
+    border: solid 1px #9b9b9b;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.advancedDragMini {
+    background-image: radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd);
+    width: 0.15em;
+    height: 0.15em;
+    border-radius: 0.15em;
+}
+
+.advancedPercentBox {
+    display: flex;
+    flex: none;
+    justify-content: space-between;
+}
+
+.advancedPercentInput {
+    display: flex;
+    flex: none;
+    align-items: center;
+}
+
+.advancedPercentInput input {
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000;
+    line-height: 1.2;
+    display: flex;
+    flex: none;
+    width: 35px;
+    text-align: center;
+}
+
+.advancedPercentInput span {
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000;
+    line-height: 1.2;
+    display: flex;
+    flex: none;
+}
+
+.advancedPercentText {
+    display: flex;
+    flex: none;
+    margin-right: 0.1em;
+}
+
+.advancedPercentText span {
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000;
+    line-height: 1.2;
+}
+
+.advancedPercetColor {
+    display: flex;
+    flex: none;
+    width: 0.2em;
+    margin-right: 0.15em;
+    border: 0;
+}
+
+.inputLarge {
+    width: 50%;
+}
+
+.advancedResampling {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    margin: 0.2em 0;
+    justify-content: space-between;
+}
+
+.plot {
+    width: 300px;
+    height: 300px;
+    display: flex;
+}
+
+.plot img{
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.plotLoad{
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+}
+
+.plotClose {
+    display: flex;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 20px 10px;
+}
+
+.plotClose span{
+    font-size: 1.125rem;
+    line-height: 1.1;
+    font-family: Arial;
 }

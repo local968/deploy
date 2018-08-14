@@ -5,10 +5,9 @@ import { observer } from 'mobx-react';
 import autoIcon from './mr-one-logo-blue.svg';
 import { Modal } from '../../Common';
 import { when } from 'mobx';
-import { Spin } from 'antd';
+import { Spin, Popover } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
-
 
 @observer
 export default class StartTrain extends Component {
@@ -83,19 +82,19 @@ export default class StartTrain extends Component {
                         </button>
                     </div>
                 </div>
-                <Modal width='12em' content={<AdvancedModel project={project} closeAdvanced={this.closeAdvanced}/>} title='Advanced Modeling' onClose={this.closeAdvanced} visible={this.state.visible} />
+                <Modal width='13em' content={<AdvancedModel project={project} closeAdvanced={this.closeAdvanced}/>} title='Advanced Modeling' onClose={this.closeAdvanced} visible={this.state.visible} />
             </div>
         );
     }
 }
 
-
+@observer
 class AdvancedModel extends Component {
     state = {
         tab: 1
     }
 
-    switchTab= (num) => {
+    switchTab = (num) => {
         if(num !== 1 && num !== 2) return false;
         this.setState({
             tab: num
@@ -114,9 +113,9 @@ class AdvancedModel extends Component {
                         [styles.active]: this.state.tab === 2
                     })} onClick={this.switchTab.bind(null, 2)}><span>Advanced View</span></div>
                 </div>
-                {this.state.tab === 1 ? <SimplifiedView project={project} closeAdvanced={closeAdvanced}/> : <AdvancedView project={project} closeAdvanced={closeAdvanced}/>}
+                {this.state.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
                 <div className={styles.bottom}>
-                    <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
+                    <button className={styles.save} onClick={project.advancedModeling} ><span>modeling</span></button>
                     <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
                 </div>
             </div>
@@ -127,7 +126,8 @@ class AdvancedModel extends Component {
 @observer
 class SimplifiedView extends Component {
     state = {
-        sort: -1
+        sort: -1,
+        show: false
     }
 
     componentDidMount() {
@@ -141,9 +141,26 @@ class SimplifiedView extends Component {
         )
     }
 
+    show = () => {
+        when(
+            () => !this.props.project.histograms,
+            () => this.props.project.histgramPlot()
+        )
+        this.setState({
+            show: true
+        })
+    }
+
+    hide = e => {
+        e && e.stopPropagation();
+        this.setState({
+            show: false
+        })
+    }
+
     render() {
-        const {project, closeAdvanced} = this.props;
-        const {target, colType, colMap, targetMap, dataViewing, dataViews, rawHeader, preImportance, preImportanceing} = project;
+        const {project} = this.props;
+        const {target, colType, colMap, targetMap, dataViews, rawHeader, preImportance} = project;
         const targetUnique = Object.values(Object.assign({}, colMap[target], targetMap)).length;
         const targetData = colType[target]!=='Categorical' && dataViews ? dataViews[target] : {}
         return <div className={styles.simplified}>
@@ -159,7 +176,15 @@ class SimplifiedView extends Component {
                 </div>
                 <div className={styles.targetRow}>
                     <div className={classnames(styles.targetCell, styles.targetName)}><span>{target}</span></div>
-                    <div className={classnames(styles.targetCell, styles.targetHistogram)}><img src={histogramIcon} alt='histogram'/><span>Compute</span></div>
+                    <div className={classnames(styles.targetCell, styles.targetHistogram)} onClick={this.show}>
+                        <img src={histogramIcon} alt='histogram'/>
+                        {<Popover placement='bottomLeft' 
+                            visible={this.state.show} 
+                            onVisibleChange={this.hide} 
+                            trigger="click" 
+                            content={<SimplifiedViewPlot onClose={this.hide} value={target} project={project} type='histograms'/>}/>}
+                        <span>Compute</span>
+                    </div>
                     <div className={styles.targetCell}><span>{colType[target]}</span></div>
                     <div className={classnames(styles.targetCell, {
                         [styles.none]: colType[target]==='Categorical'
@@ -207,49 +232,418 @@ class SimplifiedView extends Component {
                         const data = colType[h]!=='Categorical' && dataViews ? dataViews[h] : {}
                         const map = targetMap || {};
                         const importance = preImportance?preImportance[h]:0.01;
-                        return <div className={styles.tableRow} key={i}>
-                            <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' defaultChecked={true} /></div>
-                            <div className={styles.tableTd} title={h}><span>{h}</span></div>
-                            <div className={classnames(styles.tableTd, styles.tableChart)}><img src={histogramIcon} alt='histogram'/><span>Compute</span></div>
-                            <div className={classnames(styles.tableTd, styles.tableChart)}><img src={univariantIcon} alt='univariant'/><span>Compute</span></div>
-                            <div className={classnames(styles.tableTd, styles.tableImportance)}>
-                                <div className={styles.preImpotance}></div>
-                                <div className={classnames(styles.preImpotance, styles.preImpotanceActive)} style={{width: (importance * 100) + '%'}}></div>
-                            </div>
-                            <div className={styles.tableTd}  title={colType[h]}><span>{colType[h]}</span></div>
-                            <div className={classnames(styles.tableTd,{
-                                [styles.none]: colType[h]==='Categorical'
-                            })} title={data.mean || 'N/A'}><span>{data.mean || 'N/A'}</span></div>
-                            <div className={styles.tableTd} title={Object.values(map).length}><span>{Object.values(map).length}</span></div>
-                            <div className={classnames(styles.tableTd,{
-                                [styles.none]: colType[h]==='Categorical'
-                            })} title={data.std || 'N/A'}><span>{data.std || 'N/A'}</span></div>
-                            <div className={classnames(styles.tableTd,{
-                                [styles.none]: colType[h]==='Categorical'
-                            })} title={data.median || 'N/A'}><span>{data.median || 'N/A'}</span></div>
-                            <div className={classnames(styles.tableTd,{
-                                [styles.none]: colType[h]==='Categorical'
-                            })} title={data.min || 'N/A'}><span>{data.min || 'N/A'}</span></div>
-                            <div className={classnames(styles.tableTd,{
-                                [styles.none]: colType[h]==='Categorical'
-                            })} title={data.max || 'N/A'}><span>{data.max || 'N/A'}</span></div>
-                        </div>
+                        return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project}/>
                     })}
                 </div>
             </div>
-            {(dataViewing || preImportanceing) && <div className={styles.simplifiedLoad}>
+            {(!dataViews || !preImportance) && <div className={styles.simplifiedLoad}>
                 <Spin size="large" />
             </div>}
         </div>
     }
 }
 
-class AdvancedView extends Component {
+@observer
+class SimplifiedViewRow extends Component {
+    state = {
+        showHistograms: false,
+        showUnivariant: false
+    }
+
+    showHistograms = () => {
+        when(
+            () => !this.props.project.histgramPlots,
+            () => this.props.project.histgramPlot()
+        )
+        this.setState({
+            showHistograms: true
+        })
+    }
+
+    showUnivariant = () => {
+        when(
+            () => !this.props.project.univariatePlots,
+            () => this.props.project.univariatePlot()
+        )
+        this.setState({
+            showUnivariant: true
+        })
+    }
+
+    hideHistograms = e => {
+        e && e.stopPropagation();
+        this.setState({
+            showHistograms: false
+        })
+    }
+
+    hideUnivariant = e => {
+        e && e.stopPropagation();
+        this.setState({
+            showUnivariant: false
+        })
+    }
+
     render() {
-        return <div>
-            <div>target</div>
-            <div>tool</div>
-            <div>table</div>
+        const {data, map, importance, colType, value, project} = this.props;   
+        return <div className={styles.tableRow}>
+            <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' defaultChecked={true} /></div>
+            <div className={styles.tableTd} title={value}><span>{value}</span></div>
+            <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showHistograms}>
+                <img src={histogramIcon} alt='histogram'/>
+                {<Popover placement='topLeft' 
+                        visible={this.state.showHistograms} 
+                        onVisibleChange={this.hideHistograms} 
+                        trigger="click" 
+                        content={<SimplifiedViewPlot onClose={this.hideHistograms} value={value} project={project} type='histgramPlots'/>}/>}
+                <span>Compute</span>
+            </div>
+            <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showUnivariant}>
+                <img src={univariantIcon} alt='univariant'/>
+                {<Popover placement='topLeft' 
+                        visible={this.state.showUnivariant} 
+                        onVisibleChange={this.hideUnivariant} 
+                        trigger="click" 
+                        content={<SimplifiedViewPlot onClose={this.hideUnivariant} value={value} project={project} type='univariatePlots'/>}/>}
+                <span>Compute</span>
+            </div>
+            <div className={classnames(styles.tableTd, styles.tableImportance)}>
+                <div className={styles.preImpotance}>
+                    <div className={styles.preImpotanceActive} style={{width: (importance * 100) + '%'}}></div>
+                </div>
+            </div>
+            <div className={styles.tableTd}  title={colType[value]}><span>{colType[value]}</span></div>
+            <div className={classnames(styles.tableTd,{
+                [styles.none]: colType[value]==='Categorical'
+            })} title={data.mean || 'N/A'}><span>{data.mean || 'N/A'}</span></div>
+            <div className={styles.tableTd} title={Object.values(map).length}><span>{Object.values(map).length}</span></div>
+            <div className={classnames(styles.tableTd,{
+                [styles.none]: colType[value]==='Categorical'
+            })} title={data.std || 'N/A'}><span>{data.std || 'N/A'}</span></div>
+            <div className={classnames(styles.tableTd,{
+                [styles.none]: colType[value]==='Categorical'
+            })} title={data.median || 'N/A'}><span>{data.median || 'N/A'}</span></div>
+            <div className={classnames(styles.tableTd,{
+                [styles.none]: colType[value]==='Categorical'
+            })} title={data.min || 'N/A'}><span>{data.min || 'N/A'}</span></div>
+            <div className={classnames(styles.tableTd,{
+                [styles.none]: colType[value]==='Categorical'
+            })} title={data.max || 'N/A'}><span>{data.max || 'N/A'}</span></div>
+        </div>
+    }
+}
+
+@observer
+class SimplifiedViewPlot extends Component {
+    render() {
+        const {onClose, project, value, type} = this.props;
+        const hasImg = project[type]&&project[type][value];
+        const imgPath = hasImg?`/api/read?userId=${project.userId}&projectId=${project.projectId}&csvLocation=${project[type][value]}`:''
+        return <div className={styles.plot}>
+            <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+            {hasImg?<img src={imgPath} alt={value} />:<div className={styles.plotLoad}><Spin size="large" /></div>}
+        </div>
+    }
+}
+
+@observer
+class AdvancedView extends Component {
+    handleName = (e) => {
+        this.props.project.advancedName = e.target.value;
+    }
+
+    handleSize = (e) => {
+        let value = e.target.value;
+        if(value && !isNaN(value)) {
+            value = parseInt(value, 10)
+            if(value < 1 || value > 30) return;
+            this.props.project.advancedSize = value;
+        }
+    }
+
+    dragValidation = e => {
+        const {holdoutRate} = this.props.project;
+        const dom = e.currentTarget.parentElement;
+        const offsetLeft = document.getElementsByClassName(styles.advancedModel)[0].parentElement.parentElement.offsetLeft;
+        if(!e.clientX) return;
+        const left = Math.max(e.clientX - dom.offsetLeft - offsetLeft, 0);
+        const percent = parseInt(100 - Math.min(left / dom.offsetWidth, 1) * 100, 10);
+        if(percent < holdoutRate * 100) return;
+        this.props.project.validationRate = (percent - holdoutRate * 100) / 100;
+    }
+
+    dragHoldout = e => {
+        const {validationRate, holdoutRate, runWith} = this.props.project;
+        const dom = e.currentTarget.parentElement;
+        const offsetLeft = document.getElementsByClassName(styles.advancedModel)[0].parentElement.parentElement.offsetLeft;
+        if(!e.clientX) return;
+        const left = Math.max(e.clientX - dom.offsetLeft - offsetLeft, 0);
+        const percent = parseInt(100 - Math.min(left / dom.offsetWidth, 1) * 100, 10);
+        if(runWith==='holdout' && percent > validationRate * 100 + holdoutRate * 100) return;
+        if(runWith==='holdout') this.props.project.validationRate = (validationRate * 100 + holdoutRate * 100 - percent) / 100;
+        this.props.project.holdoutRate = percent / 100;
+    }
+
+    changeValidationRate = e => {
+        let value = e.target.value;
+        if(value && !isNaN(value)) {
+            const {holdoutRate} = this.props.project;
+            value = parseInt(value, 10)
+            if(value < 0) return;
+            if(value + holdoutRate*100 > 100) value = 100 - holdoutRate*100;
+            this.props.project.validationRate = value / 100;
+        }
+    }
+
+    changeHoldoutRate = e => {
+        let value = e.target.value;
+        if(value && !isNaN(value)) {
+            const {validationRate, runWith} = this.props.project;
+            const num = runWith==='holdout' ? validationRate * 100 : 0;
+            value = parseInt(value, 10);
+            if(value < 0) return;
+            if( value + num > 100) value = 100 - num;
+            this.props.project.holdoutRate = value / 100;
+        }
+    }
+
+    changeCrossCount = e => {
+        let value = e.target.value;
+        if(value && !isNaN(value)) {
+            value = parseInt(value, 10);
+            if(value > 10 || value < 1) return;
+            this.props.project.crossCount = value;
+        }
+    }
+
+    handleMaxTime = e => {
+        let value = e.target.value;
+        if(value && !isNaN(value)) {
+            value = parseFloat(value)
+            if(value < 3) return;
+            this.props.project.maxTime = value;
+        }
+    }
+
+    handleRandSeed = e => {
+        let value = e.target.value;
+        if(value && !isNaN(value)) {
+            value = parseInt(value, 10)
+            if(value < 0 || value > 99999999) return;
+            this.props.project.randSeed = value;
+        }
+    }
+
+    handleMeasurement = e => {
+
+    }
+
+    handleRunWith = v => {
+        this.props.project.runWith = v;
+    }
+
+    handleResampling = v => {
+        this.props.project.resampling = v;
+    }
+
+    crossPercent = () => {
+        const {crossCount, holdoutRate} = this.props.project;
+        const percent = 100 - holdoutRate * 100;
+        const arr = [];
+        for(let i = 0; i < crossCount; i++) {
+            arr.push(<div className={styles.advancedPercentCross} style={{width: (percent / crossCount) + '%'}} key={i}></div>)
+        }
+        return arr
+    }
+
+    render() {
+        const {advancedName, advancedSize, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount} = this.props.project;
+        return <div className={styles.advanced}>
+            <div className={styles.advancedRow}>
+                <div className={styles.advancedLeft}>
+                    <div className={styles.advancedBlock}>
+                        <div className={styles.advancedTitle}>
+                            <span>Select From Previous Settings:</span>
+                        </div>
+                        <div className={classnames(styles.advancedOption, styles.limit)}>
+                            <select>
+                                <option value={advancedName || 1}>{advancedName||'custom.03.07.2018_23:14:40'}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.advancedRight}>
+                    <div className={styles.advancedBlock}>
+                        <div className={classnames(styles.advancedTitle, styles.limit)}>
+                            <span>Name Your Model Settings:</span>
+                        </div>
+                        <div className={classnames(styles.advancedOption, styles.limit)}>
+                            <input type="text" value={advancedName} onChange={this.handleName} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className={styles.advancedRow}>
+                <div className={styles.advancedLeft}>
+                    <div className={styles.advancedBlock}>
+                        <div className={styles.advancedTitle}>
+                            <span>Select Algorithm:</span>
+                        </div>
+                        <div className={styles.advancedOption}>
+                            <div className={styles.advancedOptionBox}><input type='checkbox' name="algorithm" defaultChecked={true}/><label>solution-a</label></div>
+                            <div className={styles.advancedOptionBox}><input type='checkbox' name="algorithm" defaultChecked={true}/><label>solution-b</label></div>
+                            {/* <div className={styles.advancedOptionBox}><input type='checkbox' name="algorithm" /><label>other</label></div> */}
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.advancedRight}>
+                    <div className={styles.advancedBlock}>
+                        <div className={classnames(styles.advancedTitle, styles.limit)}>
+                            <span>Set Model Ensemble Size:</span>
+                            <span className={styles.advancedDesc}>Actual number of ensemble models may be less than this number.</span>
+                        </div>
+                        <div className={styles.advancedOption}>
+                            <input className={styles.advancedSize} value={advancedSize} onChange={this.handleSize} />
+                            <span>(1~30)</span>
+                        </div>
+                    </div>
+                    <div className={styles.advancedBlock}>
+                        <div className={styles.advancedTitle}>
+                            <span>Run models with:</span>
+                        </div>
+                        <div className={styles.advancedOption}>
+                            <div className={styles.advancedOptionBox}>
+                                <input type='radio' name="runWith" checked={runWith==="cross"} onChange={this.handleRunWith.bind(null, 'cross')}/>
+                                <label>Cross Validation</label>
+                            </div>
+                            <div className={styles.advancedOptionBox}>
+                                <input type='radio' name="runWith" checked={runWith==="holdout"} onChange={this.handleRunWith.bind(null, 'holdout')}/>
+                                <label>Train / Validation / Holdout</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={styles.advancedBlock}>
+                        <div className={styles.advancedBox}>
+                            <div className={styles.advancedTitle}>
+                                <span>Set Percentage of Each Part:</span>
+                            </div>
+                            {runWith==="holdout" ? <div className={styles.advancedPercentBlock}>
+                                <div className={styles.advancedPercent}>
+                                    <div className={styles.advancedPercentTrain} style={{width: (100-validationRate*100-holdoutRate*100) + '%'}}></div>
+                                    <div className={styles.advancedPercentValidation} style={{width: validationRate*100 + "%"}}></div>
+                                    <div className={styles.advancedPercentHoldout} style={{width: holdoutRate*100 + '%'}}></div>
+                                </div>
+                                <div className={styles.advancedDrag} style={{right: (validationRate*100+holdoutRate*100) + '%'}} onDrag={this.dragValidation}>
+                                    <div className={styles.advancedDragMini}></div>
+                                </div>
+                                <div className={styles.advancedDrag} style={{right: holdoutRate*100 + '%'}} onDragCapture={this.dragHoldout}>
+                                    <div className={styles.advancedDragMini}></div>
+                                </div>
+                            </div> : <div className={styles.advancedPercentBlock}>
+                                <div className={styles.advancedPercent}>
+                                    {this.crossPercent()}
+                                    <div className={styles.advancedPercentHoldout} style={{width: holdoutRate*100 + '%'}}></div>
+                                </div>
+                                <div className={styles.advancedDrag} style={{right: holdoutRate*100 + '%'}} onDragCapture={this.dragHoldout}>
+                                    <div className={styles.advancedDragMini}></div>
+                                </div>
+                            </div>}
+                            {runWith==="holdout" ? <div className={styles.advancedPercentBox}>
+                                <div className={styles.advancedPercentInput}>
+                                    <div className={styles.advancedPercentText}>
+                                        <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)}></div>
+                                        <span>Training</span>
+                                    </div>
+                                    <input disabled={true} value={parseInt(100-validationRate*100-holdoutRate*100, 10)}/>
+                                    <span>%</span>
+                                </div>
+                                <div className={styles.advancedPercentInput}>
+                                    <div className={styles.advancedPercentText}>
+                                        <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)}></div>
+                                        <span>Validation</span>
+                                    </div>
+                                    <input value={parseInt(validationRate*100, 10)} onChange={this.changeValidationRate}/>
+                                    <span>%</span>
+                                </div>
+                                <div className={styles.advancedPercentInput}>
+                                    <div className={styles.advancedPercentText}>
+                                        <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
+                                        <span>Holdout</span>
+                                    </div>
+                                    <input value={parseInt(holdoutRate*100, 10)} onChange={this.changeHoldoutRate}/>
+                                    <span>%</span>
+                                </div>
+                            </div> : <div className={styles.advancedPercentBox}>
+                                <div className={styles.advancedPercentInput}>
+                                    <div className={styles.advancedPercentText}>
+                                        <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
+                                        <span>Select Number of CV folds</span>
+                                    </div>
+                                    <input value={crossCount} onChange={this.changeCrossCount}/>
+                                </div>
+                                <div className={styles.advancedPercentInput}>
+                                    <div className={styles.advancedPercentText}>
+                                        <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
+                                        <span>Holdout</span>
+                                    </div>
+                                    <input value={parseInt(holdoutRate*100, 10)} onChange={this.changeHoldoutRate}/>
+                                    <span>%</span>
+                                </div>
+                            </div>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className={styles.advancedRow}>
+                <div className={styles.advancedLeft}>
+                        <div className={styles.advancedResampling}>
+                            <div className={styles.advancedTitle}>
+                                <span>Resampling Setting:</span>
+                            </div>
+                            <div className={styles.advancedOptionBox}>
+                                <input type='radio' name="resampling" checked={resampling==="up"} onChange={this.handleResampling.bind(null, 'up')}/>
+                                <label>Upsampling</label>
+                            </div>
+                            <div className={styles.advancedOptionBox}>
+                                <input type='radio' name="resampling" checked={resampling==="down"} onChange={this.handleResampling.bind(null, 'down')}/>
+                                <label>Downsampling</label>
+                            </div>
+                            <div className={styles.advancedOptionBox}>
+                                <input type='radio' name="resampling" checked={resampling==="no"} onChange={this.handleResampling.bind(null, 'no')}/>
+                                <label>No resampling</label>
+                            </div>
+                        </div>
+                </div>
+                <div className={styles.advancedRight}>
+                    <div className={styles.advancedBlock}>
+                        <div className={classnames(styles.advancedTitle, styles.limit)}>
+                            <span>Set Measurement Metric:</span>
+                        </div>
+                        <div className={styles.advancedOption}>
+                            <input className={classnames(styles.advancedSize, styles.inputLarge)} value={measurement} onChange={this.handleMeasurement} />
+                        </div>
+                    </div>
+                    <div className={styles.advancedBlock}>
+                        <div className={classnames(styles.advancedTitle, styles.limit)}>
+                            <span>Set Max Training Time:</span>
+                            <span className={styles.advancedDesc}>Max amount of time to evaluate different modules.</span>
+                        </div>
+                        <div className={styles.advancedOption}>
+                            <input className={styles.advancedSize} value={maxTime} onChange={this.handleMaxTime} />
+                            <span>Minutes (3 minutes or longer)</span>
+                        </div>
+                    </div>
+                    <div className={styles.advancedBlock}>
+                        <div className={classnames(styles.advancedTitle, styles.limit)}>
+                            <span>Random Seed:</span>
+                            <span className={styles.advancedDesc}>Value between 0 - 99999999</span>
+                        </div>
+                        <div className={styles.advancedOption}>
+                            <input className={classnames(styles.advancedSize, styles.inputLarge)} value={randSeed} onChange={this.handleRandSeed} />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 }

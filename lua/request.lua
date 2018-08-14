@@ -35,6 +35,7 @@ local function onModelingResult(old, new)
     if new then
         local reqId = new[1]
         local data = new[3]
+        data.id = reqId
         local userId = data.userId
         local connids = conn.getConnids(userId);
         for k, connid in pairs(connids) do

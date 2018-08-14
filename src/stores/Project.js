@@ -1,6 +1,7 @@
-import { observable, action, when, computed } from 'mobx';
+import { observable, action, when, computed, toJS } from 'mobx';
 import socketStore from './SocketStore';
 import moment from 'moment';
+import {v4 as uuid} from 'uuid';
 
 const Classification = 'Classification';
 const MinRow = 1000;
@@ -26,7 +27,7 @@ export default class Project {
 	@observable lastSubStep = 1;
 	@observable subStepActive = 1;
 
-	// etl
+	//etl
 	@observable etling = false;
 	// @observable fillMethod = {};
 	
@@ -55,10 +56,10 @@ export default class Project {
 	@observable targetMap = {};
 	@observable dataViews = null;
 	@observable preImportance = null;
+	@observable histgramPlots = null;
+	@observable univariatePlots = null;
 	//not save
 	@observable targetMapTemp = {};
-	@observable dataViewing = false;
-	@observable preImportanceing = false;
 
 	// train
 	@observable train2Finished = false;
@@ -67,6 +68,16 @@ export default class Project {
 	@observable criteria = 'defualt';
 	@observable overfit = 5;
 	@observable speed = 5;
+	@observable advancedSize = 0;
+	@observable maxTime = 0;
+	@observable randSeed = 0;
+	@observable measurement = '';
+	@observable resampling = "no";
+	@observable runWith = 'holdout';
+	@observable crossCount = 5;
+
+	//req
+	@observable reqs = []
 
 	constructor(userId, projectId, project = null) {
 		this.userId = userId;
@@ -105,8 +116,6 @@ export default class Project {
 
 	@computed
 	get defaultDataQuality() {
-		this.dataViewing = false;
-		this.preImportanceing = false;
 		this.targetMapTemp = {};
 
 		return {
@@ -314,7 +323,6 @@ export default class Project {
 		const { userId, projectId, problemType, dataHeader, uploadFileName, rawHeader } = this;
 
 		const command = 'etl';
-		const id = `${command}-${userId}-${projectId}`;
 
 		const data = {
 			csvLocation: uploadFileName,
@@ -336,33 +344,33 @@ export default class Project {
 		}
 
 		if (dataHeader.length !== rawHeader.length) {
-			data.featureLabel = [...dataHeader]
+			data.featureLabel = toJS(...dataHeader)
 		}
 
 		if (this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
-			data.mismatchFillMethod = { ...this.mismatchFillMethod };
+			data.mismatchFillMethod = toJS(this.mismatchFillMethod);
 		}
 
 		if (this.nullFillMethod && Object.keys(this.nullFillMethod).length) {
-			data.nullFillMethod = { ...this.nullFillMethod };
+			data.nullFillMethod = toJS(this.nullFillMethod);
 		}
 
 		if (this.outlierFillMethod && Object.keys(this.outlierFillMethod).length) {
-			data.outlierFillMethod = { ...this.outlierFillMethod };
+			data.outlierFillMethod = toJS(this.outlierFillMethod);
 		}
 
 		if (this.targetMap && Object.keys(this.targetMap).length) {
-			data.targetMap = { ...this.targetMap };
+			data.targetMap = toJS(this.targetMap);
 		}
 
 		if (this.outlierDict && Object.keys(this.outlierDict).length) {
-			data.outlierDict = { ...this.outlierDict };
+			data.outlierDict = toJS(this.outlierDict);
 		}
 
 		if (this.noCompute || this.firstEtl) {
 			data.noCompute = true;
 		}
-		this.etling = true
+		this.etling = true;
 		console.log(data)
 		// id: request ID
 		// userId: user ID
@@ -372,7 +380,7 @@ export default class Project {
 		// feature_label: 特征列名
 		// fill_method:  无效值
 		// kwargs:
-		this.sendRequest(id, data);
+		this.sendRequest(data);
 	}
 
 	setProperty(data) {
@@ -411,10 +419,10 @@ export default class Project {
 	@action
 	fixFillMethod() {
 		this.updateProject({
-			outlierDict: this.outlierDict,
-			nullFillMethod: this.nullFillMethod,
-			mismatchFillMethod: this.mismatchFillMethod,
-			outlierFillMethod: this.outlierFillMethod
+			outlierDict: toJS(this.outlierDict),
+			nullFillMethod:toJS(this.nullFillMethod),
+			mismatchFillMethod: toJS(this.mismatchFillMethod),
+			outlierFillMethod: toJS(this.outlierFillMethod)
 		})
 		this.etl();
 	}
@@ -478,10 +486,6 @@ export default class Project {
 		return arr
 	}
 
-	setOutlier(key, data) {
-		this.outlierDict[key] = data;
-	}
-
 	fastTrain() {
 		const {
 			userId,
@@ -507,7 +511,6 @@ export default class Project {
 			() => socketStore.send('train', { projectId })
 		);
 
-		const id = `${command}-${userId}-${projectId}`;
 		const featureLabel = dataHeader.filter(d => d !== target);
 		// this.cleanResultByCommand(this.modelingResultTable, { command: 'train2' });
 
@@ -524,7 +527,7 @@ export default class Project {
 		// model_option: model的额外参数，不同model参数不同
 		// projectName: 名称
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			problemType,
 			featureLabel,
@@ -541,6 +544,64 @@ export default class Project {
 		// this.nextSubStep(3, 2);
 	}
 
+	advancedModeling() {
+		const {
+			userId,
+			projectId,
+			problemType,
+			target,
+			dataHeader,
+			uploadFileName,
+			speed,
+			overfit
+		} = this;
+		this.trainStartTime = moment().valueOf();
+		const command = 'train2';
+
+		this.updateProject({
+			train2Finished: false,
+			train2ing: true,
+			train2Error: false,
+			validationRate: this.validationRate,
+			holdoutRate: this.holdoutRate
+		});
+
+		when(
+			() => socketStore.isready,
+			() => socketStore.send('train', { projectId })
+		);
+
+		const featureLabel = dataHeader.filter(d => d !== target);
+		// this.cleanResultByCommand(this.modelingResultTable, { command: 'train2' });
+
+		// id: request ID
+		// userId: user ID
+		// projectId: project ID
+		// csv_location: csv 文件相对路径
+		// problem_type: 预测类型 Classification , Regression
+		// feature_label: 特征列名
+		// target_label:  目标列
+		// fill_method:  无效值
+		// speed:  1-10  默认5
+		// overfit:   1-10 默认5
+		// model_option: model的额外参数，不同model参数不同
+		// projectName: 名称
+		// kwargs:
+		this.sendRequest({
+			csvLocation: uploadFileName,
+			problemType,
+			featureLabel,
+			targetLabel: target,
+			projectId,
+			userId,
+			speed,
+			overfit,
+			time: this.trainStartTime,
+			command,
+			projectName: this.name
+		});
+	}
+
 	finishTrain2() {
 		this.updateProject({
 			train2Finished: true,
@@ -553,20 +614,18 @@ export default class Project {
 
 		const command = 'correlationMatrix';
 
-		const id = `${command}-${userId}-${projectId}`;
-
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
 			time: +new Date(),
 			command,
-			featureLabel: [...dataHeader]
+			featureLabel: toJS(dataHeader)
 		});
 	}
 
@@ -575,14 +634,12 @@ export default class Project {
 
 		const command = 'fitPlotAndResidualPlot';
 
-		const id = `${command}-${userId}-${projectId}`;
-
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -596,14 +653,12 @@ export default class Project {
 
 		const command = 'pointToShow';
 
-		const id = `${command}-${userId}-${projectId}`;
-
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -616,15 +671,12 @@ export default class Project {
 		const { userId, projectId, uploadFileName } = this;
 
 		const command = 'preTrainImportance';
-		const id = `${command}-${userId}-${projectId}`;
-
-		this.preImportanceing = true;
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -637,14 +689,13 @@ export default class Project {
 		const { userId, projectId, uploadFileName } = this;
 
 		const command = 'univariatePlot';
-		const id = `${command}-${userId}-${projectId}`;
 
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -657,14 +708,12 @@ export default class Project {
 		const { userId, projectId, uploadFileName } = this;
 
 		const command = 'histgramPlot';
-		const id = `${command}-${userId}-${projectId}`;
-
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -673,18 +722,21 @@ export default class Project {
 		});
 	}
 
+	setPlot(type, obj) {
+		this[type] = Object.assign({}, {...this[type]}, obj)
+	}
+
 	modelInsights() {
 		const { userId, projectId, uploadFileName } = this;
 
 		const command = 'modelInsights';
-		const id = `${command}-${userId}-${projectId}`;
 
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -697,16 +749,12 @@ export default class Project {
 		const { userId, projectId, uploadFileName } = this;
 
 		const command = 'dataView';
-		const id = `${command}-${userId}-${projectId}`;
-
-		this.dataViewing = true;
-
 		// id: request ID
 		// userId: user ID
 		// projectId: project ID
 		// csv_location: csv 文件相对路径
 		// kwargs:
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
@@ -723,12 +771,22 @@ export default class Project {
 	}
 
 	@action
-    sendRequest(id, request) {
-        when(() => socketStore.isready,
-            () => {
-                socketStore.send("changeRequest", { id, params: request })
-            })
-    }
+    sendRequest(request) {
+		const id = uuid();
+		this.reqs.push(id)
+        when(
+			() => socketStore.isready,
+            () => socketStore.send("changeRequest", { id, params: request })
+		)
+	}
+
+	hasReq(id) {
+		return this.reqs.includes(id);
+	}
+
+	removeReq(id) {
+		this.reqs = this.reqs.filter(req => req!==id);
+	}
 
 	@action
 	updateProject(item) {

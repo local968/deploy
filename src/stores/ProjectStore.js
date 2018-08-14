@@ -1,4 +1,4 @@
-import { observable, action, when, computed } from 'mobx';
+import { observable, action, when } from 'mobx';
 import Project from './Project.js';
 import socketStore from './SocketStore';
 // import config from '../config.js';
@@ -97,18 +97,22 @@ class ProjectStore {
     }
 
     @action
-    modelimgError(command, result) {
+    modelimgError(id, command, result) {
         // message.error(`${command} error!`)
-        console.log("error!!", command, result)
-        switch (command) {
-            case 'etl':
-                break;
-            case 'train2':
-                this.project.modelingError()
-                break;
-            default:
-                break;
+        const {reqs} = this.project;
+        if(reqs.includes(id)) {
+            console.log("error!!", command, result)
+            switch (command) {
+                case 'etl':
+                    break;
+                case 'train2':
+                    this.project.modelingError()
+                    break;
+                default:
+                    break;
+            }
         }
+        
     }
 
     setCharts(type, result) {
@@ -155,7 +159,6 @@ class ProjectStore {
             queryProject: action(data => {
                 const project = data.list[0];
                 const {args} = project || {args: {exist: false}}
-                console.log(args)
                 this.project = new Project(this.userId, this.projectId, args)
             }),
             queryModels: action(data => {
@@ -200,17 +203,29 @@ class ProjectStore {
             }),
             onModelingResult: action(data => {
                 console.log(data, "onModelingResult");
-                let { command, result, status, userId, projectId } = data;
+                let { id, command, result, status, userId, projectId } = data;
                 if (this.userId !== userId || this.projectId !== projectId) {
                     return false;
                 }
-                if (status < 0) {
-                    this.modelimgError(command, result)
+                //是否是自己发出的req
+                const hasId = this.project.hasReq(id)
+                if(!hasId) {
                     return;
                 }
+                if (status< 0 || status === 100) {
+                    this.project.removeReq(id)
+                }
+                if (status < 0) {
+                    this.modelimgError(id, command, result)
+                    return;
+                }
+                
                 switch (command) {
                     case 'etl':
-                        if(!this.project.etling) return false;
+                        if (status === 100) {
+                            this.project.etling = false;
+                            return;
+                        }
                         Object.keys(result).forEach(k => {
                             if (k === "name") {
                                 delete result[k];
@@ -223,7 +238,6 @@ class ProjectStore {
                         })
                         result.dataViews = null;
                         result.firstEtl = false;
-                        this.project.etling = false
                         // this.project.setProperty(result)
                         this.project.updateProject(result)
                         when(
@@ -232,6 +246,10 @@ class ProjectStore {
                         )
                         break;
                     case 'train2':
+                        if (status === 100) {
+                            this.project.finishTrain2()
+                            return;
+                        }
                         if (Array.isArray(result)) {
                             [result] = result
                         }
@@ -247,9 +265,6 @@ class ProjectStore {
                             }
                             this.recommendModel()
                         }
-                        if (status === 100) {
-                            this.project.finishTrain2();
-                        }
                         break;
                     case 'correlationMatrix':
                         this.setCharts("correlationMatrix", result)
@@ -261,26 +276,25 @@ class ProjectStore {
                         this.setCharts("pointToShow", result);
                         break;
                     case 'preTrainImportance':
-                        if(!this.project.preImportanceing) return false;
                         this.project.setProperty({
-                            preImportance: result.data,
-                            preImportanceing: false
+                            preImportance: result.data
                         })
                         break;
                     case 'univariatePlot':
-                        this.setCharts("univariatePlot", result);
-                        break;
                     case 'histgramPlot':
-                        this.setCharts("histgramPlot", result);
+                        if(status === 100) return;
+                        //const {action, field, imageSavePath, name, type} = result;
+                        const {field, imageSavePath} = result;
+                        const obj = {};
+                        obj[field] = imageSavePath
+                        this.project.setPlot(command+"s", obj)
                         break;
                     case 'modelInsights':
                         this.setCharts("modelInsights", result);
                         break;
                     case 'dataView':
-                        if(!this.project.dataViewing) return false;
                         this.project.setProperty({
-                            dataViews: result.data,
-                            dataViewing: false
+                            dataViews: result.data
                         })
                         break;
                     default:
