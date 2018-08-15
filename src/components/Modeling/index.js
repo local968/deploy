@@ -75,6 +75,3 @@ export default class Modeling extends Component {
     );
   }
 }
-
-
-

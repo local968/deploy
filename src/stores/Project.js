@@ -507,6 +507,8 @@ export default class Project {
 			train2Error: false
 		});
 
+		this.nextSubStep(2, 3);
+
 		when(
 			() => socketStore.isready,
 			() => socketStore.send('train', { id: projectId })

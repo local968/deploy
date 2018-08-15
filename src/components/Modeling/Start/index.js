@@ -16,7 +16,6 @@ export default class StartTrain extends Component {
     }
 
     fastTrain = () => {
-        this.props.project.nextSubStep(2, 3);
         this.props.project.fastTrain();
     };
 

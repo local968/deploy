@@ -225,7 +225,6 @@ class ProjectStore {
                         if(!this.project.etling) return;
                         if (status === 100) {
                             this.project.etling = false;
-                            return;
                         }
                         Object.keys(result).forEach(k => {
                             if (k === "name") {
@@ -249,7 +248,6 @@ class ProjectStore {
                     case 'train2':
                         if (status === 100) {
                             this.project.finishTrain2()
-                            return;
                         }
                         if (Array.isArray(result)) {
                             [result] = result

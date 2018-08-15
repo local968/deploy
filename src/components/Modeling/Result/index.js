@@ -33,7 +33,7 @@ export default class ModelResult extends Component {
     const { problemType, train2Finished } = project;
     const current = models.find(model => model.recommend);
     return (
-      <div className={styles.modelResult}>
+    <div className={styles.modelResult}>
         <div className={styles.result}>
           <div className={styles.box}>
             <div className={styles.title}>
