@@ -3,12 +3,17 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { Progress, Spin } from 'antd';
+import { Modal } from  '../../Common';
+import { when } from 'mobx';
 
 const Classification = 'Classification';
 
 @inject('deployStore')
 @observer
 export default class ModelResult extends Component {
+  state = {
+    show: false
+  }
   // onChange = (e) => {
   //     this.props.project.updateProject({
   //         criteria: e.target.value
@@ -28,10 +33,23 @@ export default class ModelResult extends Component {
       .then(id => this.props.history.push('/deploy/project/' + id));
   };
 
+  showInsights = () => {
+    this.setState({
+      show: true
+    })
+  }
+
+  hideInsights = () => {
+    this.setState({
+      show: false
+    })
+  }
+
   render() {
     const { models, project } = this.props;
     const { problemType, train2Finished } = project;
     const current = models.find(model => model.recommend);
+    if(!models.length) return null;
     return (
     <div className={styles.modelResult}>
         <div className={styles.result}>
@@ -81,7 +99,7 @@ export default class ModelResult extends Component {
           train2Finished={train2Finished}
         />
         <div className={styles.buttonBlock}>
-          <button className={styles.button}>
+          <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
           </button>
           <div className={styles.or}>
@@ -91,6 +109,10 @@ export default class ModelResult extends Component {
             <span>Deploy the Model</span>
           </button>
         </div>
+        <Modal title='Model Insights'
+              visible={this.state.show}
+              onClose={this.hideInsights} 
+              content={<ModelInsights project={project}/>}/>
       </div>
     );
   }
@@ -409,5 +431,21 @@ class ModelDetail extends Component {
         {this.state.visible && this.detail()}
       </div>
     );
+  }
+}
+
+@observer
+class ModelInsights extends Component {
+  componentDidMount() {
+    when(
+      () => !this.props.project.a,
+      () => this.props.project.modelInsights()
+    )
+  }
+
+  render() {
+    return <div>
+      1111
+    </div>
   }
 }

@@ -142,6 +142,30 @@ class ProjectStore {
 
     initCallback() {
         const callback = {
+            onModelChange: action(result => {
+                const {projectId, data} = result;
+                if(projectId === this.projectId) {
+                    when(
+                        () => this.project,
+                        () => {
+                            Object.keys(data).forEach(key => {
+                                if(!key.includes("train2")) return;
+                                if (data[key] && data[key].name) {
+                                    let index = this.models.findIndex(m => {
+                                        return data[key].name === m.name
+                                    })
+                                    if (index === -1) {
+                                        this.models.push(new Model(this.userId, this.projectId, data[key]))
+                                    } else {
+                                        this.models[index] = new Model(this.userId, this.projectId, data[key])
+                                    }
+                                    this.recommendModel()
+                                }
+                            })
+                        }
+                    )
+                }
+            }),
             onProjectChange: action(result => {
                 const {projectId, data} = result;
                 if(projectId === this.projectId) {
