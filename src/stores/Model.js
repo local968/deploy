@@ -8,6 +8,7 @@ export default class Model{
     @observable executeSpeed = 0;
     @observable name = "";
     @observable predicted = [];
+    @observable fitIndex = 0;
 
     constructor(userId, projectId, model, name) {
         this.userId = userId;

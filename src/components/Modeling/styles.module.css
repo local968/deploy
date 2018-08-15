@@ -536,3 +536,42 @@
     justify-content: center;
     margin-top: 0.1em;
 }
+
+.advancedModelResult {
+    font-size: 1rem;
+    padding: 0 10%;
+}
+
+.advancedModelTable {
+    font-size: 0.875rem;
+    border: 0.5px solid #d8d8d8;
+}
+
+.advancedModelTable .modelName {
+    display: inline-block;
+    width: 100px;
+    text-align: center;
+}
+
+.adrow {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+
+.advancedModelTable .adrow .adcell {
+    padding: 0.2em;
+    border: 0.5px solid #d8d8d8;
+    height: 3em;
+    flex: 1;
+    padding: 0 0.5em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 3em;
+}
+.advancedModelTable .adrow .hasotherCell {
+    display: inline-block;
+    width: 8em;
+}
