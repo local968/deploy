@@ -415,7 +415,8 @@ class AdvancedView extends Component {
         if(!e.clientX) return;
         const left = Math.max(e.clientX - dom.offsetLeft - offsetLeft, 0);
         const percent = parseInt(100 - Math.min(left / dom.offsetWidth, 1) * 100, 10);
-        if(percent < holdoutRate * 100) return;
+        if(percent - 1 < holdoutRate * 100) return;
+        if(percent > 99) return;
         this.props.project.validationRate = (percent - holdoutRate * 100) / 100;
     }
 
@@ -426,7 +427,8 @@ class AdvancedView extends Component {
         if(!e.clientX) return;
         const left = Math.max(e.clientX - dom.offsetLeft - offsetLeft, 0);
         const percent = parseInt(100 - Math.min(left / dom.offsetWidth, 1) * 100, 10);
-        if(runWith==='holdout' && percent > validationRate * 100 + holdoutRate * 100) return;
+        if(percent < 1) return;
+        if(runWith==='holdout' && percent - 1 > validationRate * 100 + holdoutRate * 100) return;
         if(runWith==='holdout') this.props.project.validationRate = (validationRate * 100 + holdoutRate * 100 - percent) / 100;
         this.props.project.holdoutRate = percent / 100;
     }
@@ -434,10 +436,11 @@ class AdvancedView extends Component {
     changeValidationRate = e => {
         let value = e.target.value;
         if(value && !isNaN(value)) {
-            const {holdoutRate} = this.props.project;
+            const {validationRate, holdoutRate} = this.props.project;
             value = parseInt(value, 10)
-            if(value < 0) return;
+            if(value < 1) value = 1;
             if(value + holdoutRate*100 > 100) value = 100 - holdoutRate*100;
+            if(validationRate * 100 === value) return;
             this.props.project.validationRate = value / 100;
         }
     }
@@ -445,11 +448,12 @@ class AdvancedView extends Component {
     changeHoldoutRate = e => {
         let value = e.target.value;
         if(value && !isNaN(value)) {
-            const {validationRate, runWith} = this.props.project;
+            const {holdoutRate, validationRate, runWith} = this.props.project;
             const num = runWith==='holdout' ? validationRate * 100 : 0;
             value = parseInt(value, 10);
-            if(value < 0) return;
+            if(value < 1) value = 1;
             if( value + num > 100) value = 100 - num;
+            if(holdoutRate * 100 === value) return;
             this.props.project.holdoutRate = value / 100;
         }
     }
@@ -457,8 +461,11 @@ class AdvancedView extends Component {
     changeCrossCount = e => {
         let value = e.target.value;
         if(value && !isNaN(value)) {
+            const {crossCount} = this.props.project;
             value = parseInt(value, 10);
-            if(value > 10 || value < 1) return;
+            if(value > 15) value = 15;
+            if(value < 2) value = 2;
+            if(value === crossCount) return;
             this.props.project.crossCount = value;
         }
     }
@@ -601,7 +608,7 @@ class AdvancedView extends Component {
                                         <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)}></div>
                                         <span>Training</span>
                                     </div>
-                                    <input disabled={true} value={parseInt(100-validationRate*100-holdoutRate*100, 10)}/>
+                                    <input disabled={true} value={100-parseInt(validationRate*100, 10)-parseInt(holdoutRate*100, 10)}/>
                                     <span>%</span>
                                 </div>
                                 <div className={styles.advancedPercentInput}>

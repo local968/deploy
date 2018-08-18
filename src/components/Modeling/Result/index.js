@@ -189,19 +189,21 @@ class PredictedProgress extends Component {
             <span>{label}</span>
           </div>
         );
+    const predictedPercent = parseInt(predicted * 100, 10);
+    const failedPercent = parseInt((1 - predicted) * 100, 10);
     return (
       <div className={styles.progressLine}>
         {title}
-        <div
+        {!!predictedPercent && <div
           className={classnames(styles.progress, styles[type])}
           style={{
             width: width * predicted + 'em',
             height: (height || 0.27) + 'em'
           }}
         >
-          <span>{(predicted * 100).toFixed(0) + '%'}</span>
-        </div>
-        <div
+          <span>{predictedPercent + '%'}</span>
+        </div>}
+        {!!failedPercent && <div
           className={classnames(styles.progress, styles.different)}
           style={{
             width: width * (1 - predicted) + 'em',
@@ -209,7 +211,7 @@ class PredictedProgress extends Component {
           }}
         >
           <span>{((1 - predicted) * 100).toFixed(0) + '%'}</span>
-        </div>
+        </div>}
       </div>
     );
   }
@@ -445,7 +447,7 @@ class ModelInsights extends Component {
 
   render() {
     return <div>
-      1111
+      <div>123123</div>
     </div>
   }
 }

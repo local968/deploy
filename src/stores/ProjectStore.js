@@ -100,17 +100,15 @@ class ProjectStore {
     modelimgError(id, command, result) {
         // message.error(`${command} error!`)
         const {reqs} = this.project;
-        if(reqs.includes(id)) {
-            console.log("error!!", command, result)
-            switch (command) {
-                case 'etl':
-                    break;
-                case 'train2':
-                    this.project.modelingError()
-                    break;
-                default:
-                    break;
-            }
+        console.log("error!!", command, result)
+        switch (command) {
+            case 'etl':
+                break;
+            case 'train2':
+                this.project.modelingError()
+                break;
+            default:
+                break;
         }
         
     }
