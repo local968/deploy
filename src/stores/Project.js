@@ -728,7 +728,7 @@ export default class Project {
 		});
 	}
 
-	setPlot(type, obj) {
+	setData(type, obj) {
 		this[type] = Object.assign({}, {...this[type]}, obj)
 	}
 

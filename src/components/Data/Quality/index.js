@@ -726,22 +726,22 @@ class EditOutLier extends Component{
         const dataset = [];
 
         //x轴的比例尺
-        var xScale = d3.scaleLinear()
+        const xScale = d3.scaleLinear()
             .range([0, realWidth])
             .domain([this.minX, this.maxX])
             .clamp(true);
 
         //y轴的比例尺
-        var yScale = d3.scaleLinear()
+        const yScale = d3.scaleLinear()
             .range([realHeight, 0])
             .domain([0, maxH])
             .clamp(true);
         
         //定义x轴
-        var xAxis = d3.axisBottom(xScale);
+        const xAxis = d3.axisBottom(xScale);
 
         //定义y轴
-        var yAxis = d3.axisLeft(yScale);
+        const yAxis = d3.axisLeft(yScale);
 
         //添加x轴
         svg.append("g")
@@ -964,7 +964,7 @@ class EditOutLier extends Component{
                 }
             }
 
-            var rects = svg.selectAll(`.${styles.rect}`);
+            const rects = svg.selectAll(`.${styles.rect}`);
             rects.remove();
             rects.data(dataset)
                 .enter()

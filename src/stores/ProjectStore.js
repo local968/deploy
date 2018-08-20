@@ -155,7 +155,7 @@ class ProjectStore {
                                     if (index === -1) {
                                         this.models.push(new Model(this.userId, this.projectId, data[key]))
                                     } else {
-                                        this.models[index] = new Model(this.userId, this.projectId, data[key])
+                                        this.models[index].setProperty(data[key])
                                     }
                                     this.recommendModel()
                                 }
@@ -305,13 +305,29 @@ class ProjectStore {
                     case 'histgramPlot':
                         if(status === 100) return;
                         //const {action, field, imageSavePath, name, type} = result;
-                        const {field, imageSavePath} = result;
-                        const obj = {};
-                        obj[field] = imageSavePath
-                        this.project.setPlot(command+"s", obj)
+                        const {field: plotKey, imageSavePath} = result;
+                        const plotObj = {};
+                        plotObj[plotKey] = imageSavePath
+                        this.project.setData(command+"s", plotObj)
                         break;
                     case 'modelInsights':
-                        this.setCharts("modelInsights", result);
+                        if(status === 100) return;
+                        const {actual, field: insightKey, freq, partial, pred, x, name} = result;
+                        const solution = name.split("-")[1];
+                        if(!solution) break;
+                        const insightObj = {};
+                        insightObj[insightKey] = {
+                            x,
+                            freq,
+                            partial,
+                            pred,
+                            actual
+                        }
+                        this.models.forEach(m => {
+                            if(m.backend === solution) {
+                                m.setData('modelInsightsData', insightObj);
+                            }
+                        })
                         break;
                     case 'dataView':
                         this.project.setProperty({
