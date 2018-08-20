@@ -459,15 +459,15 @@ class ModelInsights extends Component {
   }
 
   render() {
-    const {model} = this.props;
-    const {featureImportanceDetail, modelInsightsData} = model;
+    const {project, model} = this.props;
+    const {featureImportanceDetail, modelInsightsData, name} = model;
     const {active} = this.state;
     const arr = Object.entries(featureImportanceDetail).sort(
       (a, b) => b[1] - a[1]
     );
     return <div className={styles.modelInsights}>
       <div className={styles.modelInsightsBlock}><span>Click each predictors to see its value effect.</span></div>
-      <div className={styles.modelInsightsBlock}><span>Selected Model:  ensemble0.custom.08.18.2018_11:30:04</span><span>Target Variable: y</span></div>
+      <div className={styles.modelInsightsBlock}><span>Selected Model:  {model.name}</span><span>Target Variable: {project.target}</span></div>
       <div className={styles.modelInsightsTable}>
         <div className={styles.modelInsightsCol}>
           <div className={styles.modelInsightsHeader}><span>Based on Variable Impact</span></div>
