@@ -155,7 +155,7 @@ local function sendRegCode(email, code, id, session)
     local opt = config.email or {}
     opt.subject = '激活邮件'
     regCode.insert(code, id, session, email)
-    Email.request('congcong.dai@r2.ai', 'test <br/><a target="_blank" href="localhost:3000/active?'..code..'">点击激活</a>或复制下方链接<br/>localhost:3000/active?'..code..'', opt)
+    Email.request(email, 'test <br/><a target="_blank" href="localhost:3000/active?'..code..'">点击激活</a>或复制下方链接<br/>localhost:3000/active?'..code..'', opt)
 end
 
 local function _register(email, password)
