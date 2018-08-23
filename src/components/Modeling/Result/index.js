@@ -467,7 +467,7 @@ class ModelInsights extends Component {
     );
     return <div className={styles.modelInsights}>
       <div className={styles.modelInsightsBlock}><span>Click each predictors to see its value effect.</span></div>
-      <div className={styles.modelInsightsBlock}><span>Selected Model:  {model.name}</span><span>Target Variable: {project.target}</span></div>
+      <div className={styles.modelInsightsBlock}><span>Selected Model:  {name}</span><span>Target Variable: {project.target}</span></div>
       <div className={styles.modelInsightsTable}>
         <div className={styles.modelInsightsCol}>
           <div className={styles.modelInsightsHeader}><span>Based on Variable Impact</span></div>

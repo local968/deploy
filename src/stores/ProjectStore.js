@@ -99,7 +99,6 @@ class ProjectStore {
     @action
     modelimgError(id, command, result) {
         // message.error(`${command} error!`)
-        const {reqs} = this.project;
         console.log("error!!", command, result)
         switch (command) {
             case 'etl':

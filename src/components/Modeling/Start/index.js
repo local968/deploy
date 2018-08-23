@@ -412,18 +412,22 @@ class AdvancedView extends Component {
         }
     }
 
+    notAllow = () => {
+        return false
+    }
+
     setActive = type => {
         this.setState({type});
-        if(type === 'validation') window.document.addEventListener("mousemove", this.dragValidation, false)
-        if(type === 'holdout') window.document.addEventListener("mousemove", this.dragHoldout, false)
-        window.document.addEventListener("mouseup", this.cancelActive, false)
+        if(type === 'validation') document.addEventListener("mousemove", this.dragValidation, false)
+        if(type === 'holdout') document.addEventListener("mousemove", this.dragHoldout, false)
+        document.addEventListener("mouseup", this.cancelActive, false)
     }
 
     cancelActive = () => {
         const {type} = this.state;
-        if(type === 'validation') window.document.removeEventListener("mousemove", this.dragValidation, false)
-        if(type === 'holdout') window.document.removeEventListener("mousemove", this.dragHoldout, false)
-        window.document.removeEventListener("mouseup", this.cancelActive, false)
+        if(type === 'validation') document.removeEventListener("mousemove", this.dragValidation, false)
+        if(type === 'holdout') document.removeEventListener("mousemove", this.dragHoldout, false)
+        document.removeEventListener("mouseup", this.cancelActive, false)
         this.setState({type: ''});
     }
 
@@ -540,7 +544,7 @@ class AdvancedView extends Component {
 
     render() {
         const {advancedName, advancedSize, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount} = this.props.project;
-        return <div className={styles.advanced}>
+        return <div className={styles.advanced} onSelect={this.notAllow}>
             <div className={styles.advancedRow}>
                 <div className={styles.advancedLeft}>
                     <div className={styles.advancedBlock}>
