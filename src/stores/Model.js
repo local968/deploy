@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 
 export default class Model{
     @observable score;
@@ -17,6 +17,10 @@ export default class Model{
         Object.assign(this, model);
     }
 
+    @action
+    setFitIndex(index) {
+        this.fitIndex = index;
+    }
     updateModel(data) {
         Object.assign(this, data);
     }

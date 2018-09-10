@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import {Radio} from 'antd';
+import { Radio } from 'antd';
+import { observer } from 'mobx-react';
 import styles from './styles.module.css';
+import RocChart from '../D3Chart/RocChart';
 
 export default class AdvancedView extends Component {
   render() {
-    const {models, project} = this.props;
+    const { models, project } = this.props;
     return (
       <div className={styles.advancedModelResult}>
         <div className={styles.row}>
@@ -22,7 +24,7 @@ export default class AdvancedView extends Component {
 
 class AdvancedModelTable extends Component {
   render() {
-    const {models, project} = this.props;
+    const { models, project } = this.props;
     const texts = ['Model Name', 'F1-Score', 'Precision', 'Recall', 'Cutoff Threshold'];
     const header = (
       <Row>
@@ -47,48 +49,89 @@ class AdvancedModelTable extends Component {
   }
 }
 
+@observer
 class ModelRow extends Component {
+  state = {
+    detail: false
+  }
   handleClick = e => {
     e.stopPropagation();
   }
+  handleResult = () => {
+    this.setState({ detail: true });
+  }
   render() {
-    const {model, texts, checked} = this.props;
-    const {id, fitIndex, chartData: {roc}} = model;
+    const { model, texts, checked } = this.props;
+    const { id, fitIndex, chartData: { roc } } = model;
+    const { detail } = this.state;
     return (
-      <Row>
-        {texts.map(t => {
-          switch (t) {
-            case 'Model Name':
-              return (
-                <RowCell key={1} data={<div key={1} >
-                  <span onClick={this.handleClick} >
+      <div onClick={this.handleResult} >
+        <Row >
+          {texts.map(t => {
+            switch (t) {
+              case 'Model Name':
+                return (
+                  <RowCell key={1} data={<div key={1} >
+                    <span onClick={this.handleClick} >
                       <Radio checked={checked} onClick={this.props.onClickCheckbox} />
                     </span>
                     <span className={styles.modelName} >{id}</span>
                   </div>}
-                />
-              )
-            case 'F1-Score':
-              return <RowCell data={roc.F1[fitIndex]} />;
-            case 'Precision':
-              return <RowCell data={roc.Precision[fitIndex]} />;
-            case 'Recall':
-              return <RowCell data={roc.Recall[fitIndex]} />;
-            case 'Cutoff Threshold':
-              return <RowCell data={roc.Threshold[fitIndex]} />;
-          }
+                  />
+                )
+              case 'F1-Score':
+                return <RowCell data={roc.F1[fitIndex]} />;
+              case 'Precision':
+                return <RowCell data={roc.Precision[fitIndex]} />;
+              case 'Recall':
+                return <RowCell data={roc.Recall[fitIndex]} />;
+              case 'Cutoff Threshold':
+                return <RowCell data={roc.Threshold[fitIndex]} />;
+            }
 
-        })}
-      </Row>
+          })}
+        </Row>
+        {detail && <DetailCurves model={model} />}
+      </div>
+    )
+  }
+}
+
+class DetailCurves extends Component {
+  state = {
+    curve: "roc"
+  }
+  handleClick = e => {
+    this.setState({ curve: e.target.value });
+  }
+  render() {
+    const { model, model: {id} } = this.props;
+    let curComponent;
+    switch (this.state.curve) {
+      case 'roc':
+        curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
+    }
+    return (
+      <div className={styles.detailCurves} >
+        <div className={styles.leftPanel} >
+          <button onClick={this.handleClick} value="roc" >Roc Curve</button>
+          <button onClick={this.handleClick} value="pd" >Prediction Distribution</button>
+          <button onClick={this.handleClick} value="prt" >Precision Recall Tradeoff</button>
+          <button onClick={this.handleClick} value="lift" >Lift Chart</button>
+        </div>
+        <div className={styles.rightPanel} >
+          {curComponent}
+        </div>
+      </div>
     )
   }
 }
 
 class Row extends Component {
   render() {
-    const {children, rowStyle} = this.props;
+    const { children, rowStyle, ...other } = this.props;
     return (
-      <div className={styles.adrow} style={rowStyle} >
+      <div className={styles.adrow} style={rowStyle} {...other} >
         {children}
       </div>
     );
@@ -97,8 +140,8 @@ class Row extends Component {
 
 class RowCell extends Component {
   render() {
-    const {data, cellStyle, other, cellClassName, ...rest} = this.props;
-    
+    const { data, cellStyle, other, cellClassName, ...rest } = this.props;
+
     return (
       <div
         {...rest}

@@ -571,7 +571,23 @@
     overflow: hidden;
     line-height: 3em;
 }
+
 .advancedModelTable .adrow .hasotherCell {
     display: inline-block;
     width: 8em;
+}
+
+.detailCurves {
+    display: flex;
+}
+
+.detailCurves .leftPanel {
+    min-width: 300px;
+    padding: 0.5em 3em;
+    background-color: #f0f0f0;
+    min-height: 200px;
+}
+
+.detailCurves .leftPanel button {
+    margin-right: 0.2em;
 }
