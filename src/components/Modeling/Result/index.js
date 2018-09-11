@@ -6,6 +6,7 @@ import { Progress, Spin } from 'antd';
 import { Modal } from  '../../Common';
 import { when } from 'mobx';
 import * as d3 from 'd3';
+import AdvancedView from '../AdvancedView';
 
 const Classification = 'Classification';
 
@@ -13,18 +14,14 @@ const Classification = 'Classification';
 @observer
 export default class ModelResult extends Component {
   state = {
-    show: false
+    show: false,
+    view: 'simple'
   }
   // onChange = (e) => {
   //     this.props.project.updateProject({
   //         criteria: e.target.value
   //     })
   // }
-
-  selectModel = model => {
-    this.props.models.forEach(m => (m.recommend = false));
-    model.recommend = true;
-  };
 
   deploy = () => {
     const { models, project } = this.props;
@@ -46,13 +43,64 @@ export default class ModelResult extends Component {
     })
   }
 
+  changeView = view => {
+    this.setState({view});
+  }
+
   render() {
     const { models, project } = this.props;
     const { problemType, train2Finished } = project;
     const current = models.find(model => model.recommend);
     if(!models.length) return null;
+    const {view} = this.state;
+    // return (
+    //   <div className={styles.modelResult}>
+    //     <AdvancedView models={models} project={project} />
+    //   </div>
+    // )
     return (
-    <div className={styles.modelResult}>
+      <div className={styles.modelResult}>
+        <div className={styles.buttonBlock} >
+          <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
+            <span>Simple View</span>
+          </button>
+          <button className={styles.button} onClick={this.changeView.bind(this, 'advanced')}>
+            <span>Advanced View</span>
+          </button>
+        </div>
+        {view === 'simple' ? <SimpleView models={models} project={project} /> : <AdvancedView models={models} project={project} />}
+        <div className={styles.buttonBlock}>
+          <button className={styles.button} onClick={this.showInsights}>
+            <span>Check Model Insights</span>
+          </button>
+          <div className={styles.or}>
+            <span>or</span>
+          </div>
+          <button className={styles.button} onClick={this.deploy}>
+            <span>Deploy the Model</span>
+          </button>
+        </div>
+        <Modal title='Model Insights'
+              visible={current && this.state.show}
+              onClose={this.hideInsights} 
+              content={<ModelInsights model={current} project={project}/>}/>
+      </div>
+    );
+  }
+}
+
+class SimpleView extends Component {
+  selectModel = model => {
+    this.props.models.forEach(m => (m.recommend = false));
+    model.recommend = true;
+  };
+
+  render() {
+    const { models, project } = this.props;
+    const { problemType, train2Finished } = project;
+    const current = models.find(model => model.recommend);
+    return (
+      <div>
         <div className={styles.result}>
           <div className={styles.box}>
             <div className={styles.title}>
@@ -99,23 +147,8 @@ export default class ModelResult extends Component {
           problemType={problemType}
           train2Finished={train2Finished}
         />
-        <div className={styles.buttonBlock}>
-          <button className={styles.button} onClick={this.showInsights}>
-            <span>Check Model Insights</span>
-          </button>
-          <div className={styles.or}>
-            <span>or</span>
-          </div>
-          <button className={styles.button} onClick={this.deploy}>
-            <span>Deploy the Model</span>
-          </button>
-        </div>
-        <Modal title='Model Insights'
-              visible={current && this.state.show}
-              onClose={this.hideInsights} 
-              content={<ModelInsights model={current} project={project}/>}/>
       </div>
-    );
+    )
   }
 }
 

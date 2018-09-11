@@ -61,7 +61,7 @@ class ModelRow extends Component {
     e.stopPropagation();
   }
   handleResult = () => {
-    this.setState({ detail: true });
+    this.setState({ detail: !this.state.detail });
   }
   render() {
     const { model, texts, checked } = this.props;
@@ -105,6 +105,7 @@ class DetailCurves extends Component {
     curve: "roc"
   }
   handleClick = e => {
+    e.stopPropagation();
     this.setState({ curve: e.target.value });
   }
   render() {

@@ -540,6 +540,7 @@
 .advancedModelResult {
     font-size: 1rem;
     padding: 0 10%;
+    /* width: 90%; */
 }
 
 .advancedModelTable {
@@ -555,6 +556,7 @@
 
 .adrow {
     display: flex;
+    cursor: pointer;
     justify-content: space-around;
     align-items: center;
     text-align: center;
