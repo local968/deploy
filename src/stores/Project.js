@@ -1,6 +1,5 @@
 import { observable, action, when, computed, toJS } from 'mobx';
 import socketStore from './SocketStore';
-import requestStore from './RequestStore';
 import moment from 'moment';
 import {v4 as uuid} from 'uuid';
 
@@ -758,7 +757,7 @@ export default class Project {
 		const command = 'chartData';
 		const id = `${command}-${userId}-${projectId}`;
 
-		requestStore.sendRequest(id, {
+		this.sendRequest(id, {
 			csvLocation: uploadFileName,
 			projectId,
 			userId,

@@ -3,8 +3,6 @@
     flex: auto;
     background-color: #fff;
     overflow: auto;
-<<<<<<< HEAD
-=======
 }
 
 .modelResult {
@@ -592,5 +590,4 @@
 
 .detailCurves .leftPanel button {
     margin-right: 0.2em;
->>>>>>> ljy
 }
