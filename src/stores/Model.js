@@ -9,10 +9,12 @@ export default class Model {
     @observable name = "";
     @observable predicted = [];
     @observable modelInsightsData = null;
+    @observable fitIndex = 0;
 
-    constructor(userId, projectId, model) {
+    constructor(userId, projectId, model, name) {
         this.userId = userId;
         this.projectId = projectId;
+        this.id = name;
         Object.assign(this, model);
     }
 
@@ -37,5 +39,12 @@ export default class Model {
 			}
 		}
 		Object.assign(this, data)
-	}
+    }
+    @action
+    setFitIndex(index) {
+        this.fitIndex = index;
+    }
+    updateModel(data) {
+        Object.assign(this, data);
+    }
 }

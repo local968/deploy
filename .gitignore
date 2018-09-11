@@ -29,4 +29,8 @@ package-lock.json
 local_config.js
 
 uploads
+<<<<<<< HEAD
 config.lua
+=======
+/data
+>>>>>>> ljy
