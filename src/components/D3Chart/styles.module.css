@@ -18,3 +18,9 @@
   fill: none;
   stroke: steelblue;
 }
+
+.thresholdLine {
+  fill: none;
+  stroke: black;
+  stroke-width: 3px;
+}

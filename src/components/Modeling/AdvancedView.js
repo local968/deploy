@@ -4,6 +4,9 @@ import { Radio } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './styles.module.css';
 import RocChart from '../D3Chart/RocChart';
+import PRChart from '../D3Chart/PRChart';
+import PredictionDistribution from '../D3Chart/PredictionDistribution';
+import LiftChart from '../D3Chart/LiftChart';
 
 export default class AdvancedView extends Component {
   render() {
@@ -80,13 +83,13 @@ class ModelRow extends Component {
                   />
                 )
               case 'F1-Score':
-                return <RowCell data={roc.F1[fitIndex]} />;
+                return <RowCell key={2} data={roc.F1[fitIndex]} />;
               case 'Precision':
-                return <RowCell data={roc.Precision[fitIndex]} />;
+                return <RowCell key={3} data={roc.Precision[fitIndex]} />;
               case 'Recall':
-                return <RowCell data={roc.Recall[fitIndex]} />;
+                return <RowCell key={4} data={roc.Recall[fitIndex]} />;
               case 'Cutoff Threshold':
-                return <RowCell data={roc.Threshold[fitIndex]} />;
+                return <RowCell key={5} data={roc.Threshold[fitIndex]} />;
             }
 
           })}
@@ -110,6 +113,16 @@ class DetailCurves extends Component {
     switch (this.state.curve) {
       case 'roc':
         curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
+        break;
+      case 'pd':
+        curComponent = <PredictionDistribution height={190} width={500} className={`roc${id}`} model={model} />
+        break;
+      case 'prt':
+        curComponent = <PRChart height={190} width={500} className={`precisionrecall${id}`} model={model} />
+        break;
+      case 'lift':
+        curComponent = <LiftChart height={190} width={500} className={`lift${id}`} model={model} />;
+        break;
     }
     return (
       <div className={styles.detailCurves} >
