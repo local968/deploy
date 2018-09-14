@@ -1,0 +1,1 @@
+docker run -it --name r2ws --mount type=bind,source=D:\newa\community,target=/root/engine/webserver/src/plugins/community -p 18000:18000 -p 3301:3301 -p 28000:28000 -p 54000:54000 tarantool bashws
