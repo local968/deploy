@@ -9,6 +9,7 @@ import { ProjectSide } from '../Common';
 import modelSelectionIcon from './model_selection_d.svg';
 import startModelingActiveIcon from './start_modeling_a.svg';
 import modelSelectionActiveIcon from './model_selection_a.svg';
+
 // import r2Loading from './Mr.OneLoading2.gif';
 // import { when } from 'mobx';
 

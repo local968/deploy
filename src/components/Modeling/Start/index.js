@@ -395,6 +395,10 @@ class SimplifiedViewPlot extends Component {
 
 @observer
 class AdvancedView extends Component {
+    state = {
+        type: ''
+    }
+
     handleName = (e) => {
         this.props.project.advancedName = e.target.value;
     }
@@ -408,9 +412,28 @@ class AdvancedView extends Component {
         }
     }
 
+    notAllow = () => {
+        return false
+    }
+
+    setActive = type => {
+        this.setState({type});
+        if(type === 'validation') document.addEventListener("mousemove", this.dragValidation, false)
+        if(type === 'holdout') document.addEventListener("mousemove", this.dragHoldout, false)
+        document.addEventListener("mouseup", this.cancelActive, false)
+    }
+
+    cancelActive = () => {
+        const {type} = this.state;
+        if(type === 'validation') document.removeEventListener("mousemove", this.dragValidation, false)
+        if(type === 'holdout') document.removeEventListener("mousemove", this.dragHoldout, false)
+        document.removeEventListener("mouseup", this.cancelActive, false)
+        this.setState({type: ''});
+    }
+
     dragValidation = e => {
         const {holdoutRate} = this.props.project;
-        const dom = e.currentTarget.parentElement;
+        const dom = document.getElementsByClassName(styles.advancedPercentBlock)[0]
         const offsetLeft = document.getElementsByClassName(styles.advancedModel)[0].parentElement.parentElement.offsetLeft;
         if(!e.clientX) return;
         const left = Math.max(e.clientX - dom.offsetLeft - offsetLeft, 0);
@@ -422,13 +445,16 @@ class AdvancedView extends Component {
 
     dragHoldout = e => {
         const {validationRate, holdoutRate, runWith} = this.props.project;
-        const dom = e.currentTarget.parentElement;
+
+        const dom = document.getElementsByClassName(styles.advancedPercentBlock)[0]
         const offsetLeft = document.getElementsByClassName(styles.advancedModel)[0].parentElement.parentElement.offsetLeft;
+
         if(!e.clientX) return;
         const left = Math.max(e.clientX - dom.offsetLeft - offsetLeft, 0);
         const percent = parseInt(100 - Math.min(left / dom.offsetWidth, 1) * 100, 10);
         if(percent < 1) return;
-        if(runWith==='holdout' && percent - 1 > validationRate * 100 + holdoutRate * 100) return;
+        if(percent + 1 > 100) return;
+        if(runWith==='holdout' && percent + 1 > validationRate * 100 + holdoutRate * 100) return;
         if(runWith==='holdout') this.props.project.validationRate = (validationRate * 100 + holdoutRate * 100 - percent) / 100;
         this.props.project.holdoutRate = percent / 100;
     }
@@ -493,6 +519,12 @@ class AdvancedView extends Component {
     }
 
     handleRunWith = v => {
+        if(v === 'holdout') {
+            const {validationRate, holdoutRate} = this.props.project;
+            if(validationRate * 100 + holdoutRate * 100 > 99) {
+                this.props.project.holdoutRate = Math.min((99 - validationRate * 100) / 100, 0.1);
+            }
+        }
         this.props.project.runWith = v;
     }
 
@@ -512,7 +544,7 @@ class AdvancedView extends Component {
 
     render() {
         const {advancedName, advancedSize, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount} = this.props.project;
-        return <div className={styles.advanced}>
+        return <div className={styles.advanced} onSelect={this.notAllow}>
             <div className={styles.advancedRow}>
                 <div className={styles.advancedLeft}>
                     <div className={styles.advancedBlock}>
@@ -587,18 +619,18 @@ class AdvancedView extends Component {
                                     <div className={styles.advancedPercentValidation} style={{width: validationRate*100 + "%"}}></div>
                                     <div className={styles.advancedPercentHoldout} style={{width: holdoutRate*100 + '%'}}></div>
                                 </div>
-                                <div className={styles.advancedDrag} style={{right: (validationRate*100+holdoutRate*100) + '%'}} onDrag={this.dragValidation}>
+                                <div className={styles.advancedDrag} style={{right: (validationRate*100+holdoutRate*100) + '%'}} onMouseDown={this.setActive.bind(null, 'validation')}>
                                     <div className={styles.advancedDragMini}></div>
                                 </div>
-                                <div className={styles.advancedDrag} style={{right: holdoutRate*100 + '%'}} onDragCapture={this.dragHoldout}>
+                                <div className={styles.advancedDrag} style={{right: holdoutRate*100 + '%'}} onMouseDown={this.setActive.bind(null, 'holdout')}>
                                     <div className={styles.advancedDragMini}></div>
                                 </div>
-                            </div> : <div className={styles.advancedPercentBlock}>
+                            </div> : <div className={styles.advancedPercentBlock} >
                                 <div className={styles.advancedPercent}>
                                     {this.crossPercent()}
                                     <div className={styles.advancedPercentHoldout} style={{width: holdoutRate*100 + '%'}}></div>
                                 </div>
-                                <div className={styles.advancedDrag} style={{right: holdoutRate*100 + '%'}} onDragCapture={this.dragHoldout}>
+                                <div className={styles.advancedDrag} style={{right: holdoutRate*100 + '%'}} onMouseDown={this.setActive.bind(null, 'holdout')}>
                                     <div className={styles.advancedDragMini}></div>
                                 </div>
                             </div>}

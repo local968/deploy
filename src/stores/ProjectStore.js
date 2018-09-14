@@ -1,8 +1,26 @@
 import { observable, action, when } from 'mobx';
 import Project from './Project.js';
-import socketStore from './SocketStore';
+import socketStore from './SocketStore.js';
 // import config from '../config.js';
 import Model from './Model.js';
+
+function indexOfMax(arr) {
+    if (arr.length === 0) {
+        return -1;
+    }
+
+    let max = arr.Youden[0];
+    let maxIndex = 0;
+
+    for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
+        if (arr.Youden[i] > max) {
+        maxIndex = i;
+        max = arr.Youden[i];
+        }
+    }
+
+    return maxIndex;
+}
 
 class ProjectStore {
     @observable userId;
@@ -99,7 +117,6 @@ class ProjectStore {
     @action
     modelimgError(id, command, result) {
         // message.error(`${command} error!`)
-        const {reqs} = this.project;
         console.log("error!!", command, result)
         switch (command) {
             case 'etl':
@@ -138,6 +155,15 @@ class ProjectStore {
         }
     }
 
+    createOrUpdateModel(data, name) {
+        const m = this.models.find(m => m.id === name);
+        if (m) {
+            m.updateModel(data);
+        } else {
+            this.models.push(new Model(this.userId, this.projectId, data, name));
+        }
+    }
+
     initCallback() {
         const callback = {
             onModelChange: action(result => {
@@ -155,7 +181,7 @@ class ProjectStore {
                                     if (index === -1) {
                                         this.models.push(new Model(this.userId, this.projectId, data[key]))
                                     } else {
-                                        this.models[index] = new Model(this.userId, this.projectId, data[key])
+                                        this.models[index].setProperty(data[key])
                                     }
                                     this.recommendModel()
                                 }
@@ -198,8 +224,14 @@ class ProjectStore {
                                     () => this.project.setProperty(models[key])
                                 )
                                 break;
+                            case 'chartData':
+                                const chartResult = models[key];
+                                const { fitIndex, chart } = this.parseChartData(chartResult.data)
+                                this.createOrUpdateModel({chartData: chart, fitIndex}, chartResult.name.replace('-chartData', ''));
+                                break;
                             case 'train2':
-                                this.models.push(new Model(this.userId, this.projectId, models[key]));
+                                const trainResult = models[key];
+                                this.createOrUpdateModel(trainResult, trainResult.backend);
                                 break;
                             case 'correlationMatrix':
                                 this.setCharts("correlationMatrix", models[key])
@@ -305,13 +337,29 @@ class ProjectStore {
                     case 'histgramPlot':
                         if(status === 100) return;
                         //const {action, field, imageSavePath, name, type} = result;
-                        const {field, imageSavePath} = result;
-                        const obj = {};
-                        obj[field] = imageSavePath
-                        this.project.setPlot(command+"s", obj)
+                        const {field: plotKey, imageSavePath} = result;
+                        const plotObj = {};
+                        plotObj[plotKey] = imageSavePath
+                        this.project.setData(command+"s", plotObj)
                         break;
                     case 'modelInsights':
-                        this.setCharts("modelInsights", result);
+                        if(status === 100) return;
+                        const {actual, field: insightKey, freq, partial, pred, x, name} = result;
+                        const solution = name.split("-")[1];
+                        if(!solution) break;
+                        const insightObj = {};
+                        insightObj[insightKey] = {
+                            x,
+                            freq,
+                            partial,
+                            pred,
+                            actual
+                        }
+                        this.models.forEach(m => {
+                            if(m.backend === solution) {
+                                m.setData('modelInsightsData', insightObj);
+                            }
+                        })
                         break;
                     case 'dataView':
                         this.project.setProperty({
@@ -339,6 +387,40 @@ class ProjectStore {
 
         socketStore.addMessageArr(callback);
     }
+    parseChartData(result) {
+        if (!result) return { chart: null, fitIndex: null };
+        let fitIndex;
+        const charts = ['density', 'lift', 'roc'];
+        charts.map(chart => result[chart] = this.parseJson(result[chart]));
+        if (result.roc) {
+            fitIndex = indexOfMax(result.roc);
+            this.roundN(result.roc);
+          }
+        return { chart: result, fitIndex };
+    }
+
+    roundN(data, n = 2) {
+        if (!data) return;
+        const pow = Math.pow(10, n);
+        if (typeof data === 'number') {
+          return Math.floor(data * pow) / pow;
+        }
+        Object.keys(data).forEach(key => {
+          const num = data[key];
+          if (typeof num === 'number') {
+            data[key] = Math.floor(num * pow) / pow;
+          } else if (typeof num === 'object') {
+            return this.roundN(num, n);
+          } else {
+            data[key] = num;
+          }
+        });
+      }
+
+    parseJson(json_string) {
+        if (!json_string) return null;
+        return JSON.parse(json_string);
+      }
 }
 
 export default new ProjectStore();

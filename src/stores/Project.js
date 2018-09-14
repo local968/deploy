@@ -728,7 +728,7 @@ export default class Project {
 		});
 	}
 
-	setPlot(type, obj) {
+	setData(type, obj) {
 		this[type] = Object.assign({}, {...this[type]}, obj)
 	}
 
@@ -749,6 +749,22 @@ export default class Project {
 			time: +new Date(),
 			command
 		});
+	}
+
+	chartData() {
+		const { userId, projectId, uploadFileName } = this;
+
+		const command = 'chartData';
+		const id = `${command}-${userId}-${projectId}`;
+
+		this.sendRequest(id, {
+			csvLocation: uploadFileName,
+			projectId,
+			userId,
+			command,
+			time: +new Date(),
+			version: this.version.toString()
+		})
 	}
 
 	dataView() {

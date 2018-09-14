@@ -380,3 +380,154 @@
     background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
     border-radius: 0.875rem;
 }
+
+/**modelInsights*/
+.modelInsights {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.modelInsightsBlock {
+    display: flex;
+    flex: none;
+    margin: 0.05em 0;
+}
+
+.modelInsightsBlock span {
+    font-size: 1.125rem;
+    display: flex;
+    font-family: SanFranciscoText;
+    line-height: 1.2;
+    color: #1d2b3c;
+    margin-right: 1em;
+}
+
+.modelInsightsTable {
+    display: flex;
+    flex: none;
+    margin: 0.05em 0;
+    max-height: 5em;
+}
+
+.modelInsightsCol {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.modelInsightsHeader {
+    display: flex;
+    flex: none;
+    background-color: #13ce66;
+    justify-content: center;
+    align-items: center;
+    padding: 0.1em 0;
+    border-radius: 2px;
+}
+
+.modelInsightsHeader span {
+    color: #fff;
+}
+
+.modelInsightsList {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.modelInsightsRow {
+    display: flex;
+    flex: none;
+    padding: 0 0.05em;
+    align-items: center;
+    width: 3em;
+    height: 0.5em;
+    cursor: pointer;
+}
+
+.modelInsightsActive {
+    background-color: rgb(233, 242, 253);
+}
+
+.modelInsightsText {
+    display: flex;
+    flex: none;
+    width: 0.8em;
+}
+
+.modelInsightsText span {
+    font-size: 1.125rem;
+    display: block;
+    font-family: SanFranciscoText;
+    line-height: 1.2;
+    color: #1d2b3c;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.modelInsightsProgressBg {
+    display: flex;
+    height: 0.875rem;
+    flex: auto;
+    border-radius: 0.875rem;
+    overflow: hidden;
+    background-color: #ddd;
+}
+
+.modelInsightsProgress {
+    display: flex;
+    flex: none;;
+    background-color: #13ce66;
+}
+
+.modelInsightsImage {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modelInsightsImageTitle {
+    display: flex;
+    flex: none;
+    margin-top: 0.3em;
+}
+
+.modelInsightsImageTitle span {
+    font-size: 1rem;
+    display: block;
+    font-family: SanFranciscoText;
+    line-height: 1.2;
+    color: rgb(68, 142, 237);
+}
+
+.modelInsightsChart {
+    display: flex;
+    flex: auto;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.rect {
+    fill: #b0d9f4;
+}
+
+.circle {
+    fill: rgb(68, 142, 237);
+}
+
+.line {
+    stroke: rgb(68, 142, 237);
+    stroke-width: 1.5px;
+}
+
+.modelInsightsLoading {
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+}
