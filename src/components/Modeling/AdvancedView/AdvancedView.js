@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Radio } from 'antd';
+import { Table } from 'antd';
 import { observer } from 'mobx-react';
-import styles from './styles.module.css';
-import RocChart from '../D3Chart/RocChart';
-import PRChart from '../D3Chart/PRChart';
-import PredictionDistribution from '../D3Chart/PredictionDistribution';
-import LiftChart from '../D3Chart/LiftChart';
+import styles from './AdvancedView.module.less';
+import RocChart from '../../D3Chart/RocChart';
+import PRChart from '../../D3Chart/PRChart';
+import PredictionDistribution from '../../D3Chart/PredictionDistribution';
+import LiftChart from '../../D3Chart/LiftChart';
 
 export default class AdvancedView extends Component {
   render() {
@@ -75,9 +75,9 @@ class ModelRow extends Component {
               case 'Model Name':
                 return (
                   <RowCell key={1} data={<div key={1} >
-                    <span onClick={this.handleClick} >
+                    {/* <span onClick={this.handleClick} >
                       <Radio checked={checked} onClick={this.props.onClickCheckbox} />
-                    </span>
+                    </span> */}
                     <span className={styles.modelName} >{id}</span>
                   </div>}
                   />
@@ -128,10 +128,13 @@ class DetailCurves extends Component {
     return (
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} >
-          <button onClick={this.handleClick} value="roc" >Roc Curve</button>
-          <button onClick={this.handleClick} value="pd" >Prediction Distribution</button>
-          <button onClick={this.handleClick} value="prt" >Precision Recall Tradeoff</button>
-          <button onClick={this.handleClick} value="lift" >Lift Chart</button>
+          <div>
+            <button onClick={this.handleClick} value="roc" >Roc Curve</button>
+            <button onClick={this.handleClick} value="pd" >Prediction Distribution</button>
+            <button onClick={this.handleClick} value="prt" >Precision Recall Tradeoff</button>
+            <button onClick={this.handleClick} value="lift" >Lift Chart</button>
+          </div>
+          <PredictTable model={model} />
         </div>
         <div className={styles.rightPanel} >
           {curComponent}
@@ -169,3 +172,61 @@ class RowCell extends Component {
     );
   }
 }
+
+
+@observer
+class PredictTable extends Component {
+  render () {
+    const {model} = this.props;
+    const {fitIndex, chartData} = model;
+    let TN = chartData.roc.TN[fitIndex];
+    let FP = chartData.roc.FP[fitIndex];
+    let TP = chartData.roc.TP[fitIndex];
+    let FN = chartData.roc.FN[fitIndex];
+    const column = [{
+      title: '',
+      dataIndex: 'rowName',
+      className: styles.actual
+    }, {
+      title: 'Predict: Yes',
+      dataIndex: 'col1'
+    }, {
+      title: 'Predict: No',
+      dataIndex: 'col2',
+    }, {
+      title: '',
+      dataIndex: 'sum'
+    }];
+
+    // set default value
+
+    const data = [{
+      rowName: 'Actual: Yes',
+      col2: `${Math.round(FN)}(FN)`,
+      col1: `${Math.round(TP)}(TP)`,
+      sum: Number(FN) + +TP
+    }, {
+      rowName: 'Actual: No',
+      col2: `${Math.round(TN)}(TN)`,
+      col1: `${Math.round(FP)}(FP)` ,
+      sum: +TN + +FP,
+    }, {
+      rowName: '',
+      col2: +TN + +FN,
+      col1: +FP + +TP,
+      sum: +TN + +FN + +FP + +TP
+    }];
+    return (
+      <Table
+        className={styles.predictTable}
+        columns={column}
+        bordered
+        rowKey={re => {
+          return re.rowName;
+        }}
+        dataSource={data}
+        pagination={false} />
+    );
+  }
+}
+

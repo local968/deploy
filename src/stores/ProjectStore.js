@@ -227,11 +227,11 @@ class ProjectStore {
                             case 'chartData':
                                 const chartResult = models[key];
                                 const { fitIndex, chart } = this.parseChartData(chartResult.data)
-                                this.createOrUpdateModel({chartData: chart, fitIndex}, chartResult.name.replace('-chartData', ''));
+                                this.createOrUpdateModel({chartData: chart, fitIndex}, chartResult.model);
                                 break;
                             case 'train2':
                                 const trainResult = models[key];
-                                this.createOrUpdateModel(trainResult, trainResult.backend);
+                                this.createOrUpdateModel(trainResult, trainResult.name);
                                 break;
                             case 'correlationMatrix':
                                 this.setCharts("correlationMatrix", models[key])
@@ -391,7 +391,9 @@ class ProjectStore {
         if (!result) return { chart: null, fitIndex: null };
         let fitIndex;
         const charts = ['density', 'lift', 'roc'];
-        charts.map(chart => result[chart] = this.parseJson(result[chart]));
+        charts.forEach(chart => {
+            result[chart] = this.parseJson(result[chart])
+        });
         if (result.roc) {
             fitIndex = indexOfMax(result.roc);
             this.roundN(result.roc);

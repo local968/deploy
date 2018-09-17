@@ -28,7 +28,7 @@
   },
   "proxy": {
     "/api/*": {
-      "target": "http://localhost:29000"
+      "target": "http://localhost:29002"
     }
   },
   "scripts": {
