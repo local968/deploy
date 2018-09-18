@@ -130,8 +130,6 @@ export default class Project {
 			outlierDict: {},
 			targetMap: {}
 		}
-
-		
 	}
 
 	@computed

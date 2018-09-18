@@ -1,6 +1,18 @@
 .advancedModelResult {
     font-size: 1rem;
     padding: 0 10%;
+    .modelResult {
+        display: inline-block;
+        .status {
+            color: #f5a623;
+            display: inline-block;
+        }
+    }
+    .modelComp {
+        margin-left: 10em;
+        cursor: pointer;
+        display: inline-block;
+    }
 }
 
 .advancedModelTable {
@@ -38,6 +50,13 @@
         padding: 0.5em 3em;
         background-color: #f0f0f0;
         min-height: 200px;
+        .thumbnails {
+            display: flex;
+            .thumbnail {
+                flex-basis: 200px;
+                text-align: center;
+            }
+        }
         button {
             margin-right: 0.2em;
         }

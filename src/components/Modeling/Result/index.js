@@ -18,6 +18,10 @@ export default class ModelResult extends Component {
     view: 'simple'
   }
 
+  componentWillMount() {
+    this.props.project.chartData();
+  }
+
   deploy = () => {
     const { models, project } = this.props;
     const current = models.find(model => model.recommend);
