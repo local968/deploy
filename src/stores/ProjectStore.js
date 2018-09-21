@@ -98,7 +98,7 @@ class ProjectStore {
                     //返回数组的index
                     const confusionMatrixIndex = m.targetMap[k];
                     //遍历当前那一列数组
-                    m.confusionMatrix[confusionMatrixIndex].forEach((Item, i) => {
+                    m.confusionMatrix[confusionMatrixIndex] && m.confusionMatrix[confusionMatrixIndex].forEach((Item, i) => {
                         const key = Object.keys(m.targetMap).find(t => m.targetMap[t] === i);
                         const pridict = map[key];
                         if(pridict !== 0 && pridict !== 1){
