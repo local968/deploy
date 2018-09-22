@@ -130,8 +130,6 @@ export default class Project {
 			outlierDict: {},
 			targetMap: {}
 		}
-
-		
 	}
 
 	@computed
@@ -755,15 +753,13 @@ export default class Project {
 		const { userId, projectId, uploadFileName } = this;
 
 		const command = 'chartData';
-		const id = `${command}-${userId}-${projectId}`;
 
-		this.sendRequest(id, {
+		this.sendRequest({
 			csvLocation: uploadFileName,
 			projectId,
 			userId,
 			command,
 			time: +new Date(),
-			version: this.version.toString()
 		})
 	}
 

@@ -1,0 +1,228 @@
+
+.checkBoxCommon {
+  position: absolute;
+  overflow: scroll;
+  max-height: 400px;
+}
+
+.chart,
+.prchart {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  user-select: none;
+  :global(.ant-checkbox-wrapper) {
+    display: block;
+    margin-left: 0 !important;
+  }
+  .checkbox {
+    top: 27px;
+    right: 10px;
+    .checkBoxCommon
+  }
+}
+
+.speedComp {
+  .checkbox {
+    top: 27px;
+    right: 250px;
+    .checkBoxCommon
+  }
+}
+
+.learningComp {
+  .checkbox {
+    top: 27px;
+    right: 250px;
+    .checkBoxCommon
+  }
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  // stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.grid line {
+  stroke: grey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}
+
+.text {
+  font-size:  18px;
+  paint-order: stroke;
+  stroke: #000000;
+  stroke-width: 1px;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  font-weight: 800;
+}
+
+.loading {
+  height: 400px;
+  text-align: center;
+}
+
+.loadingIcon {
+  font-size: 40px;
+  line-height: 400px;
+}
+
+.liftHoverPanel,
+.rocHoverPanel,
+.hoverPanel {
+  display: block;
+  line-height: 1;
+  padding: 6px;
+  background-color: white;
+  color: black;
+  box-shadow: 0px 0px 1px #888888;
+  border-radius: 4px;
+  font-size: 12px;
+  div {
+    margin-top: 0.4em;
+  }
+}
+
+.historgram {
+  display: inline-block;
+  margin: 2em;
+  height: 100%;
+  svg {
+    overflow: unset !important;
+  }
+  // width: 85%;
+  .line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+  }
+
+  .barInside {
+    fill: rgb(143, 198, 248);
+  }
+
+  .barOutside {
+    fill: rgba(105, 105, 105, 0.6);
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .axis text {
+    user-select: none;
+    cursor: default;
+  }
+
+  .focus circle {
+    fill: none;
+    stroke: steelblue;
+  }
+}
+
+.dependenceChart {
+  width: 100%;
+  height: 100%;
+  .axisy1 {
+    line {
+      stroke: #b0d9f4
+    }
+    path {
+      stroke: #b0d9f4
+    } 
+  }
+  .axisy2 {
+    line {
+      stroke: #448eed;
+    }
+    path {
+      stroke: #448eed;
+    }
+  }
+  .bar {
+    fill: #b0d9f4;
+  }
+  .line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+  }
+}
+
+.areaChart {
+  height: 100%;
+  width: 100%;
+  .area {
+    fill: steelblue;
+  }
+  .line {
+    opacity: 0.6;
+  }
+  .thresholdLine {
+    fill: none;
+    stroke: black;
+    stroke-width: 3px;
+  }
+  .dragCircle {
+    fill: black;
+    // stroke: steelblue;
+  }
+  
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  
+  .overlay {
+    fill: none;
+    pointer-events: all;
+  }
+  
+  .focus circle {
+    fill: none;
+    stroke: steelblue;
+  }
+}
+
+.regressionPredictActualChart {
+  height: 100%;
+  width: 100%;  
+}
+
+.groupSize {
+  border-top: 5px solid #5e88fc;
+  text-align: center;
+}

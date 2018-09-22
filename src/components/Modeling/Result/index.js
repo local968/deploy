@@ -6,7 +6,7 @@ import { Progress, Spin } from 'antd';
 import { Modal } from  '../../Common';
 import { when } from 'mobx';
 import * as d3 from 'd3';
-import AdvancedView from '../AdvancedView';
+import AdvancedView from '../AdvancedView/AdvancedView';
 
 const Classification = 'Classification';
 
@@ -17,11 +17,10 @@ export default class ModelResult extends Component {
     show: false,
     view: 'simple'
   }
-  // onChange = (e) => {
-  //     this.props.project.updateProject({
-  //         criteria: e.target.value
-  //     })
-  // }
+
+  componentWillMount() {
+    this.props.project.chartData();
+  }
 
   deploy = () => {
     const { models, project } = this.props;
@@ -49,15 +48,9 @@ export default class ModelResult extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { problemType, train2Finished } = project;
     const current = models.find(model => model.recommend);
     if(!models.length) return null;
     const {view} = this.state;
-    // return (
-    //   <div className={styles.modelResult}>
-    //     <AdvancedView models={models} project={project} />
-    //   </div>
-    // )
     return (
       <div className={styles.modelResult}>
         <div className={styles.buttonBlock} >
