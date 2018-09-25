@@ -19,7 +19,8 @@ module.exports = function override(config, env) {
     alias: {
       components: path.join(__dirname, 'src/components'),
       stores: path.join(__dirname, 'src/stores'),
-      style: path.join(__dirname, 'src/components/Common/basic.module.css')
+      style: path.join(__dirname, 'src/components/Common/basic.module.css'),
+      sample: path.join(__dirname, 'sample')
     }
   };
   return config;
