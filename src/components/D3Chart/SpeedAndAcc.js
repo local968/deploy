@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Checkbox } from 'antd';
-import styles from './styles.less';
-import './d3-tip';
+import styles from './D3Chart.module.less';
+import d3tips from './d3-tip';
 
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
 
 export default class SpeedAndAcc extends Component {
   state = {
-    options: this.props.models.map(m => m.modelName),
+    options: this.props.models.map(m => m.id),
   }
   componentDidMount () {
     this.renderD3();
@@ -30,10 +30,10 @@ export default class SpeedAndAcc extends Component {
   }
 
   resolveData(models) {
-    return models.filter(function ({executeTime}) {
-      return executeTime !== undefined;
-    }).map(({executeTime, accuracy, modelName}) => {
-      return {speed: executeTime, acc: accuracy, name: modelName };
+    return models.filter(function ({executeSpeed}) {
+      return executeSpeed !== undefined;
+    }).map(({executeSpeed, score, id}) => {
+      return {speed: executeSpeed, acc: score.validateScore.auc, name: id };
     });
   }
 
@@ -70,7 +70,7 @@ export default class SpeedAndAcc extends Component {
   }
 
   drawHoverCircle = (data, svg, x, y, color) => {
-    const tool_tip = d3.tip(`.${styles.hoverPanel}`)
+    const tool_tip = d3tips(`.${styles.hoverPanel}`)
       .offset(d => ([y(d.acc), x(d.speed) + 60]))
       .html(function(d) {
         return (
@@ -157,7 +157,7 @@ export default class SpeedAndAcc extends Component {
   }
 
   render() {
-    const names = this.props.models.map(m => m.modelName);
+    const names = this.props.models.map(m => m.id);
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
         <div className={styles.hoverPanel}></div>
