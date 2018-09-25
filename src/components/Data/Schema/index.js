@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 
-import { Select, ContinueButton, ProjectLoading, Table } from '../../Common';
+import { Select, ContinueButton, ProjectLoading, Table } from 'components/Common';
 
 @observer
 export default class DataSchema extends Component {

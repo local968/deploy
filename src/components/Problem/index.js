@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import { Radio } from 'antd';
-import Hint from '../Common/Hint';
-import ContinueButton from '../Common/ContinueButton';
+import Hint from 'components/Common/Hint';
+import ContinueButton from 'components/Common/ContinueButton';
 // import { when } from 'mobx';
 import { Input } from 'antd';
 const { TextArea } = Input;
@@ -22,7 +22,6 @@ class Problem extends Component {
 
     nextStep = () => {
         this.props.project.saveProblem();
-        // this.props.history.push(`/data/${this.pid}`);
     }
 
     test = () => {

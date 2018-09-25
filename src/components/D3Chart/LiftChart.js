@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import styles from './styles.module.css';
+import { Checkbox } from 'antd';
+import styles from './D3Chart.module.less';
+import d3tips from './d3-tip';
 
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
 
@@ -17,9 +19,11 @@ function parseData(chartData) {
 export default class PRChart extends Component {
   static defaultProps = {
     isFocus: false,
+    compareChart: false
   }
 
   state = {
+    options: this.props.compareChart && this.props.models.map(m => m.id),
     movable: true
   }
 
@@ -29,6 +33,27 @@ export default class PRChart extends Component {
   componentDidUpdate () {
     d3.select(`.${this.props.className} svg`).remove();
     this.renderD3();
+  }
+  handleCheck = (val, {target: {checked}}) => {
+    const op = new Set(this.state.options);
+    if (checked)
+      op.add(val);
+    else
+      op.delete(val);
+
+    this.setState({options: [...op]});
+  }
+
+  drawPoints = (data, x, y, svg, color, tool_tip, name) => {
+    svg.selectAll(`${name.replace(/[:.]/g, '')}circle`)
+      .data(data)
+      .enter().append('circle')
+      .attr('r', 6)
+      .attr('cx', d => x(d.PERCENTAGE))
+      .attr('cy', d => y(d.LIFT))
+      .style('fill', color)
+      .on('mouseover', tool_tip.show)
+      .on('mouseout', tool_tip.hide);
   }
 
   drawChart = (data, x, y, svg, height, line, index, color, lineEnable = true, width) => {
@@ -70,11 +95,13 @@ export default class PRChart extends Component {
         .attr('fill', '#000')
         .text('lift');
     }
-    svg.append('path')
-      .datum(data)
-      .attr('class', styles.line)
-      .attr('d', line)
-      .style('stroke', color[index]);
+    if (lineEnable) {
+      svg.append('path')
+        .datum(data)
+        .attr('class', styles.line)
+        .attr('d', line)
+        .style('stroke', color[index]);
+    }
     return data;
   }
 
@@ -90,6 +117,7 @@ export default class PRChart extends Component {
     }
     focus.attr('transform', 'translate(' + x(d.PERCENTAGE) + ',' + y(d.LIFT) + ')');
     model.setFitIndex(index);
+    // this.props.view.panel.models[panelIndex].getMouseOverData(d);
   }
 
   getNearestPoint (val, data, key) {
@@ -106,15 +134,21 @@ export default class PRChart extends Component {
   }
 
   render () {
+    const {compareChart} = this.props;
+    const names = compareChart && this.props.models.map(m => m.id);
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
+        {compareChart && <div className={styles.liftHoverPanel} ></div>}
+        {compareChart && <div className={styles.checkbox} >
+          {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{color: d3ColorsCategory20[i]}} key={o} >{o}</Checkbox>)}
+        </div>}
       </div>
     );
   }
 
   renderD3 = () => {
     let {height, width} = this.props;
-    const {model, isFocus} = this.props;
+    const {model, isFocus, compareChart, models} = this.props;
     const {chartData} = model;
     if (!chartData) return null;
 
@@ -151,7 +185,30 @@ export default class PRChart extends Component {
     x.domain([0, d3.max(data, function (d) {return d.PERCENTAGE;})]);
     y.domain([0, d3.max(data, function (d) {return d.LIFT;})]);
 
-    data = this.drawChart(data, x, y, svg, height, line, 0, color, true, width);
+    if (compareChart) {
+      models.forEach((m, index) => {
+        const modelData = parseData(m.chartData.lift);
+        const lineEnable = this.state.options.indexOf(m.id) >= 0;
+        this.drawChart(modelData, x, y, svg, height, line, index, color, lineEnable, width);
+        if (lineEnable) {
+          const tool_tip = d3tips(`.${styles.liftHoverPanel}`)
+            .offset(d => ([y(d.LIFT), x(d.PERCENTAGE) + 60]))
+            .html(function(d) {
+              return (
+                `
+                  <h4 >${m.id}</h4>
+                  <div>percentage: ${d.PERCENTAGE}</div>
+                  <div>lift: ${d.LIFT}</div>
+                `
+              );
+            });
+          svg.call(tool_tip);
+          this.drawPoints(modelData, x, y, svg, color[index], tool_tip, m.id);
+        }
+      });
+    } else {
+      data = this.drawChart(data, x, y, svg, height, line, 0, color, true, width);
+    }
 
     if (isFocus) {
       const {fitIndex} = model;

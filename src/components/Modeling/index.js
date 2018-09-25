@@ -5,7 +5,7 @@ import StartTrain from './Start';
 import Loading from './Loading';
 import ModelError from './Error';
 import ModelResult from './Result';
-import { ProjectSide } from '../Common';
+import { ProjectSide } from 'components/Common';
 import modelSelectionIcon from './model_selection_d.svg';
 import startModelingActiveIcon from './start_modeling_a.svg';
 import modelSelectionActiveIcon from './model_selection_a.svg';
@@ -44,7 +44,6 @@ export default class Modeling extends Component {
       <ModelResult
         models={models}
         project={project}
-        history={this.props.history}
       />
     );
   };

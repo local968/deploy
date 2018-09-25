@@ -10,13 +10,6 @@ import Stores from 'stores';
 import styles from './styles.module.css';
 import DeployStore from 'stores/DeployStore';
 
-const ws = new WebSocket("ws://localhost:8080/")
-
-ws.addEventListener("message",a=>console.log(a,2))
-ws.addEventListener("message",a=>console.log(a,1))
-
-window.ws = ws;
-
 window.ds = DeployStore;
 
 const browserHistory = createBrowserHistory();
@@ -33,10 +26,10 @@ class App extends Component {
       <Provider {...stores}>
         <Router history={history}>
           <div className={styles.app}>
-            <Sider history={history} />
+            <Sider/>
             <div className={styles.main}>
-              <Header history={history} />
-              <Layout history={history} />
+              <Header/>
+              <Layout/>
             </div>
           </div>
         </Router>

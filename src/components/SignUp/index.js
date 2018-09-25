@@ -4,7 +4,7 @@ import styles from "./styles.module.css";
 import warnIcon from "./fail.svg";
 import { Checkbox, Icon } from 'antd';
 
-@inject('userStore')
+@inject('userStore', 'routing')
 @observer
 export default class SignUp extends Component{
     state = {
@@ -69,7 +69,7 @@ export default class SignUp extends Component{
     }
 
     login = () => {
-        this.props.history.push("/")
+        this.props.routing.push("/")
     }
 
     show = () => {

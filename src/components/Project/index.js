@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
-import ContinueButton from '../Common/ContinueButton';
+import ContinueButton from 'components/Common/ContinueButton';
 import { Input } from 'antd';
 const { TextArea } = Input;
 
@@ -19,7 +19,6 @@ export default class Project extends Component {
             description: project.description
         })
         project.nextMainStep(1);
-        // this.props.history.push(`/problem/${this.pid}`);
     }
 
     render() {

@@ -16,7 +16,7 @@ import {Modal, Button} from 'antd';
 
 import axios from 'axios';
 
-@inject('userStore')
+@inject('userStore', 'routing')
 @observer
 export default class Home extends Component {
     constructor(props){
@@ -131,7 +131,7 @@ export default class Home extends Component {
     handleAdd = () => {
         const projectId = this.props.userStore.getNextId();
         this.props.userStore.addProject();
-        this.props.history.push(`/project/${projectId}`);
+        this.props.routing.push(`/project/${projectId}`);
     }
 
     render() {
@@ -147,7 +147,7 @@ export default class Home extends Component {
                     <span>Create New Project</span>
                 </div>
                 {sortProjects.map((project) => {
-                    return <Project project={project} selectId={this.selectId} actions={this.actions} history={this.props.history} key={"project-"+project.projectId} selected={this.state.ids.includes(project.projectId)} />
+                    return <Project project={project} selectId={this.selectId} actions={this.actions} key={"project-"+project.projectId} selected={this.state.ids.includes(project.projectId)} />
                 })}
             </div>
             {this.state.isShow && <Bar toggleSelect={this.removeSelected} ids={this.state.ids} actions={this.actions} selected={this.state.selected} />}
@@ -167,6 +167,7 @@ export default class Home extends Component {
     }
 }
 
+@inject('routing')
 @observer
 class Project extends Component{
     state = {
@@ -192,7 +193,7 @@ class Project extends Component{
     }
 
     handleOpen = () => {
-        this.props.history.push("/project/"+this.props.project.projectId);
+        this.props.routing.push("/project/"+this.props.project.projectId);
     }
 
     render(){

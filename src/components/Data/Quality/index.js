@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { ContinueButton, ProjectLoading, Modal } from '../../Common';
+import { ContinueButton, ProjectLoading, Modal } from 'components/Common';
 import { when } from 'mobx';
 import * as d3 from 'd3';
 

@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import styles from "./styles.module.css";
 import warnIcon from "./fail.svg";
 
-@inject('userStore')
+@inject('userStore', 'routing')
 @observer
 export default class SignIn extends Component{
     state = {
@@ -53,7 +53,7 @@ export default class SignIn extends Component{
     }
 
     register = () => {
-        this.props.history.push("/signup")
+        this.props.routing.push("/signup")
     }
 
     render() {

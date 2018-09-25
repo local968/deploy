@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
-import { ProjectSide } from '../Common';
+import { ProjectSide } from 'components/Common';
 
 import DataConnect from './Connect';
 import DataSchema from './Schema';

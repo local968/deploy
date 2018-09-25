@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import styles from './styles.module.css';
+import { Checkbox } from 'antd';
+import styles from './D3Chart.module.less';
+// import d3tips from './d3-tip';
 
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
 
@@ -17,6 +19,11 @@ function parseData(chartData) {
 export default class RocChart extends Component {
   state = {
     movable: false,
+    options: this.props.compareChart && this.props.models.map(m => m.id),
+  }
+  static defaultProps = {
+    isFocus: true,
+    compareChart: false
   }
 
   componentDidMount () {
@@ -26,11 +33,17 @@ export default class RocChart extends Component {
     d3.select(`.${this.props.className} svg`).remove();
     this.renderD3();
   }
+  handleCheck = (val, {target: {checked}}) => {
+    const op = new Set(this.state.options);
+    if (checked)
+      op.add(val);
+    else
+      op.delete(val);
 
+    this.setState({options: [...op]});
+  }
 
   drawChart = (data, x, y, svg, height, line, index, color, lineEnable = true, width) => {
-    const {model} = this.props;
-
     const lastEl = data[data.length - 1];
 
     if (index === 0) {
@@ -107,10 +120,19 @@ export default class RocChart extends Component {
     return index;
   }
 
-  render() {
+  render () {
+    const {compareChart} = this.props;
+    const names = compareChart && this.props.models.map(m => m.id);
+    // observe for fitIndex
+    const {fitIndex, isChangable} = this.props.model;
+
     return (
-      <div className={`${styles.chart} ${this.props.className}`}></div>
-    )
+      <div className={`${styles.chart} ${this.props.className}`}>
+        {compareChart && <div className={styles.checkbox} >
+          {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{color: d3ColorsCategory20[i]}} key={o} >{o}</Checkbox>)}
+        </div>}
+      </div>
+    );
   }
 
   renderD3 = () => {
@@ -118,7 +140,6 @@ export default class RocChart extends Component {
     const {model, isFocus, compareChart} = this.props;
     const {chartData} = model;
     if (!chartData) return null;
-
     let data = parseData(chartData.roc);
 
     const margin = {top: 20, right: 20, bottom: 20, left: 50};
@@ -143,37 +164,44 @@ export default class RocChart extends Component {
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    // let data = chartData.roc;
-    // x.domain(_.min(data.FPR), _.max(data.FPR));
-    // y.domain(_.min(data.TPR), _.max(data.TPR));
     x.domain([d3.min(data, d => d.FPR), d3.max(data, function (d) {return d.FPR;})]);
     y.domain([d3.min(data, d => d.TPR), d3.max(data, function (d) {return d.TPR;})]);
     
-    data = this.drawChart(data, x, y, svg, height, line, 0, color, true, width);
-
-    const {fitIndex} = model;
-    const initalData = data[fitIndex];
-    const focus = svg.append('g')
-      .attr('class', styles.focus)
-      .attr('transform', 'translate(' + x(initalData.FPR) + ',' + y(initalData.TPR) + ')');
-
-    focus.append('circle')
-      .attr('r', 4.5);
-
-    const _this = this;
-    svg.append('rect')
-      .attr('class', styles.overlay)
-      .attr('width', width)
-      .attr('height', height)
-      .on('mousedown', function () {
-        _this.setState({movable: true});
-      })
-      .on('mousemove', function () {
-        if (!_this.state.movable) return;
-        _this.drawFocus(this, x, y, data, focus);
-      })
-      .on('mouseup', function() {
-        _this.setState({movable: false});
+    if (compareChart) {
+      const {models} = this.props;
+      models.forEach((m, index) => {
+        const lineEnable = this.state.options.indexOf(m.id) >= 0;
+        this.drawChart(parseData(m.chartData.roc), x, y, svg, height, line, index, color, lineEnable, width);
       });
+    } else {
+      data = this.drawChart(data, x, y, svg, height, line, 0, color, true, width);
+    }
+
+    if (isFocus) {
+      const {fitIndex, isChangable} = model;
+      const initalData = data[fitIndex];
+      const focus = svg.append('g')
+        .attr('class', styles.focus)
+        .attr('transform', 'translate(' + x(initalData.FPR) + ',' + y(initalData.TPR) + ')');
+
+      focus.append('circle')
+        .attr('r', 4.5);
+
+      const _this = this;
+      svg.append('rect')
+        .attr('class', styles.overlay)
+        .attr('width', width)
+        .attr('height', height)
+        .on('mousedown', function () {
+          _this.setState({movable: true});
+        })
+        .on('mousemove', function () {
+          if (!_this.state.movable) return;
+          _this.drawFocus(this, x, y, data, focus);
+        })
+        .on('mouseup', function() {
+          _this.setState({movable: false});
+        });
+    }
   }
 }
