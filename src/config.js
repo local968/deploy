@@ -1,7 +1,7 @@
 let localConfig = {};
 try {
   localConfig = require('../local_config.js').client;
-} catch (e) {}
+} catch (e) { }
 
 export default Object.assign(
   {
