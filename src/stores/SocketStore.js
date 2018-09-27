@@ -14,6 +14,7 @@ class Socket extends EventEmitter {
   timeout = 10000
   heartbeatTimeout = null
   serverTimeout = null
+  messageList = []
 
   constructor() {
     super()
@@ -86,10 +87,18 @@ class Socket extends EventEmitter {
     this.errorTimes = 0
     this.start();      //reset client heartbeat check
     console.info('websocket connect succesful. ' + new Date().toUTCString())
+    for (let i = 0; i < this.messageList.length; i++) {
+      const message = this.messageList.shift()
+      this.send(message)
+    }
   }
 
   send(message) {
-    this.ws.send(message)
+    if (this.ws.readyState === 1) {
+      this.ws.send(message)
+    } else {
+      this.messageList.push(message)
+    }
   }
 
   terminate() {
