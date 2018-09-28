@@ -111,7 +111,7 @@ class Socket extends EventEmitter {
 class SocketStore extends EventEmitter {
 
   status = 'init';
-  api = {};
+  api = { on: this.on.bind(this) };
   socket = null;
 
   connect() {
@@ -153,12 +153,6 @@ class SocketStore extends EventEmitter {
   initApi(data) {
     data.api.map(eventName => {
       this.api[eventName] = (data = {}) => {
-        if (data.listener) {
-          const listener = data.listener
-          this.on(eventName, listener)
-          delete data.listener
-          return () => this.removeListener(eventName.data, listener)
-        }
         const _id = uuid.v4()
         data._id = _id
         data.type = eventName

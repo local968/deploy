@@ -2,6 +2,8 @@ const WebSocket = require('ws')
 const { redis, pubsub } = require('redis')
 
 const _apis = []
+const _subscribes = []
+const _publishes = []
 
 const init = (server, sessionParser) => {
   const wss = new WebSocket.Server({
@@ -71,19 +73,23 @@ const init = (server, sessionParser) => {
   }
 
   redis.on('message', (channel, message) => {
-    wss.emit('channel:' + channel, message)
+    wss.emit('channel:' + channel, JSON.parse(message))
   })
 
   wss.subscribe = function (channel, listener, socket) {
-    const callback = (...args) => {
-      if (!socket) return listener(...args)
-      if (socket && socket.readyState === WebSocket.OPEN) return listener(...args)
+    const callback = (message) => {
+      if (!socket) return listener(message)
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        const result = listener(message)
+        result.type = channel
+        return socket.send(JSON.stringify(result))
+      }
       wss.removeListener('channel:' + channel, callback)
     }
     wss.addListener('channel:' + channel, callback)
   }
   wss.publish = function (channel, message) {
-    redis.publish('channel:' + channel, message)
+    redis.publish('channel:' + channel, JSON.stringify(message))
   }
 
   // server side heartbeat interval
@@ -95,13 +101,21 @@ const init = (server, sessionParser) => {
       socket.ping();
     });
   }, 10000);
+
+  init.register = wss.register
   _apis.map(args => wss.register(...args))
+
+  init.subscribe = wss.subscribe
+  _subscribes.map(args => wss.subscribe(...args))
+
+  init.publish = wss.publish
+  _publishes.map(args => wss._publishes(...args))
+
   return wss;
 }
 
-
-init.register = (...args) => {
-  _apis.push(args)
-}
+init.register = (...args) => _apis.push(args)
+init.subscribe = (...args) => _subscribes.push(args)
+init.publish = (...args) => _publishes.push(args)
 
 module.exports = init

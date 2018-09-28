@@ -52,8 +52,6 @@ register('status', (data) => {
   return data
 })
 
-
-
 router.post('/register', (req, res) => {
   const email = req.body.email
   const password = sha256(req.body.password)
