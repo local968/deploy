@@ -153,9 +153,15 @@ class SocketStore extends EventEmitter {
   initApi(data) {
     data.api.map(eventName => {
       this.api[eventName] = (data = {}) => {
+        if (data.listener) {
+          const listener = data.listener
+          this.on(eventName, listener)
+          delete data.listener
+          return () => this.removeListener(eventName.data, listener)
+        }
         const _id = uuid.v4()
-        data.type = eventName
         data._id = _id
+        data.type = eventName
         return new Promise((resolve, reject) => {
           this.once(_id, resolve)
           this.socket.send(JSON.stringify(data))
