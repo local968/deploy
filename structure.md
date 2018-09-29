@@ -142,7 +142,10 @@ after:
 * 结果字段筛选
 * 发送通知(将数据更新结果返回给之前注册过的watcher)   
    
-### 3.4 架构图
+### 3.4 redis 数据结构
+onlineUsers  
+   
+### 3.5 架构图
    
 ![Backend Architecture](https://vcing.net/static/Backend-Architecture.jpg)
 

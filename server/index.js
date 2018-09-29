@@ -1,9 +1,6 @@
+require('module-alias/register')
 const { server, sessionParser } = require('./http')
 const wssInit = require('./webSocket')
-const logger = require('./logger')
-const { redis } = require('./redis')
-
-global.logger = logger(() => "", redis)
 
 wssInit(server, sessionParser)
 

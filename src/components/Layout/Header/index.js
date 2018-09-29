@@ -157,7 +157,7 @@ class ProjectHeader extends Component {
           <div className={styles.user}>
             <img src={mockAvatar} alt="avatar" className={styles.avatar} />
             <div className={styles.userBottom}>
-              <span className={styles.name}>{userStore.userId}</span>
+              <span className={styles.name}>{userStore.info.email}</span>
               <div className={styles.down} onClick={this.logout}>
                 <img src={down} alt="down" />
               </div>
@@ -183,7 +183,7 @@ class WelcomeHeader extends Component {
         <div className={styles.wheader}>
           <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
           <span className={styles.welcome}>
-            Welcome , {this.props.userStore.userId}
+            Welcome , {this.props.userStore.info.email}
           </span>
           <div className={styles.down} onClick={this.logout}>
             <img src={down} alt="down" />
@@ -227,11 +227,11 @@ const LoginHeader = props => (
 @observer
 export default class Header extends Component {
   render() {
-    const isHome = this.props.routing.location.pathname === '/';
-    const isDeploy = this.props.routing.location.pathname.startsWith('/deploy');
-    const userId = this.props.userStore.userId;
+    const isHome = this.props.history.location.pathname === '/';
+    const isDeploy = this.props.history.location.pathname.startsWith('/deploy');
+    const isLogin = this.props.userStore.status === 'login';
 
-    if (!userId)
+    if (!isLogin)
       return (
         <LoginHeader
           pathname={this.props.routing.location.pathname}

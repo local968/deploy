@@ -8,9 +8,12 @@ import Sider from 'components/Layout/Sider';
 import Header from 'components/Layout/Header';
 import Stores from 'stores';
 import styles from './styles.module.css';
+<<<<<<< HEAD
 import DeployStore from 'stores/DeployStore';
 
 window.ds = DeployStore;
+=======
+>>>>>>> next
 
 const browserHistory = createBrowserHistory();
 const routingStore = new RouterStore();

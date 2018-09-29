@@ -1,13 +1,11 @@
-import viewStore from './ViewStore';
-import deployStore from './DeployStore';
-import scheduleStore from './ScheduleStore';
-import userStore from './UserStore';
-import projectStore from './ProjectStore';
+import socketStore from './SocketStore'
+import userStore from './UserStore'
+import projectStore from './ProjectStore'
+import deployStore from './DeployStore'
 
 export default {
-  viewStore,
-  deployStore,
-  scheduleStore,
+  socketStore,
   userStore,
-  projectStore
+  projectStore,
+  deployStore
 };

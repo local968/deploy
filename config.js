@@ -1,7 +1,7 @@
 let localConfig = {};
 try {
   localConfig = require('./local_config.js').server;
-} catch (e) {}
+} catch (e) { }
 
 module.exports = Object.assign(
   {
@@ -11,7 +11,9 @@ module.exports = Object.assign(
     maxConcurrencySchedule: 2,
     projPath: '/Users/vcing',
     port: 29000,
+    secret: 'adslkjfhoquhfjLKAHLK',
     redisUri: 'redis://:@ty.dnnmind.com:6379/10',
+    pubsubUri: 'redis://:@ty.dnnmind.com:6379/0',
     secret: 'adslkjfhoquhfjLKAHLK'
   },
   localConfig
