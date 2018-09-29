@@ -39,6 +39,7 @@ const init = (server, sessionParser) => {
       socket.isAlive = false;
       console.error('socket error:' + error)
     })
+    socket.session = req.session
   });
 
   wss.on('message', (socket, message) => {
