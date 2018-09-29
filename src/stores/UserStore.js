@@ -1,6 +1,5 @@
 import { observable, action } from 'mobx';
-
-const axios = require('axios')
+import axios from 'axios';
 
 class UserStore {
 
