@@ -2,8 +2,8 @@
   "apps": [
     {
       "name": "deploy2-dev",
-      "script": "npm",
-      "args": "run server",
+      "script": "node",
+      "args": "server",
       "watch": ["server"],
       "exec_mode": "fork"
     }
