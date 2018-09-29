@@ -39,6 +39,7 @@ const init = (server, sessionParser) => {
       socket.isAlive = false;
       console.error('socket error:' + error)
     })
+    socket.session = req.session
   });
 
   wss.on('message', (socket, message) => {
@@ -62,7 +63,7 @@ const init = (server, sessionParser) => {
       if (returnValue.then && typeof returnValue.then === 'function') {
         returnValue.then(result => {
           result.request = message
-          return socket.send(JSON.stringify({ ...returnValue, request: message }))
+          return socket.send(JSON.stringify({ ...result, request: message }))
         })
       } else {
         return socket.send(JSON.stringify({ ...returnValue, request: message }))
@@ -72,9 +73,9 @@ const init = (server, sessionParser) => {
     wss.api.push(eventName)
   }
 
-  redis.on('message', (channel, message) => {
-    wss.emit('channel:' + channel, JSON.parse(message))
-  })
+  // redis.on('message', (channel, message) => {
+  //   wss.emit(channel, JSON.parse(message))
+  // })
 
   wss.subscribe = function (channel, listener, socket) {
     const callback = (message) => {
@@ -85,11 +86,13 @@ const init = (server, sessionParser) => {
         return socket.send(JSON.stringify(result))
       }
       wss.removeListener('channel:' + channel, callback)
+      // redis.unsubscribe('channel:' + channel)
     }
     wss.addListener('channel:' + channel, callback)
+    // redis.subscribe('channel:' + channel)
   }
   wss.publish = function (channel, message) {
-    redis.publish('channel:' + channel, JSON.stringify(message))
+    wss.emit('channel:' + channel, JSON.stringify(message))
   }
 
   // server side heartbeat interval
@@ -115,7 +118,7 @@ const init = (server, sessionParser) => {
 }
 
 init.register = (...args) => _apis.push(args)
-init.subscribe = (...args) => _subscribes.push(args)
-init.publish = (...args) => _publishes.push(args)
+// init.subscribe = (...args) => _subscribes.push(args)
+// init.publish = (...args) => _publishes.push(args)
 
 module.exports = init
