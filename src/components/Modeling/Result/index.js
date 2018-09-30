@@ -3,14 +3,14 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { Progress, Spin } from 'antd';
-import { Modal } from  '../../Common';
+import { Modal } from  'components/Common';
 import { when } from 'mobx';
 import * as d3 from 'd3';
 import AdvancedView from '../AdvancedView/AdvancedView';
 
 const Classification = 'Classification';
 
-@inject('deploymentStore')
+@inject('deploymentStore', 'routing')
 @observer
 export default class ModelResult extends Component {
   state = {
@@ -27,7 +27,7 @@ export default class ModelResult extends Component {
     const current = models.find(model => model.recommend);
     this.props.deploymentStore
       .newDeploy(project.projectId, project.name, current.name, current.problemType)
-      .then(id => this.props.history.push('/deploy/project/' + id));
+      .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 
   showInsights = () => {

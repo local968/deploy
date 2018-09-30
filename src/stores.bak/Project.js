@@ -1,7 +1,7 @@
 import { observable, action, when, computed, toJS } from 'mobx';
 import socketStore from './SocketStore';
 import moment from 'moment';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 const Classification = 'Classification';
 const MinRow = 1000;
@@ -30,7 +30,7 @@ export default class Project {
 	//etl
 	@observable etling = false;
 	// @observable fillMethod = {};
-	
+
 	// upload data
 	@observable dataHeader = [];
 	@observable uploadData = [];
@@ -253,7 +253,7 @@ export default class Project {
 	//修改上传文件
 	@action
 	fastTrackInit(name) {
-		const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, {uploadFileName: name}, {
+		const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: name }, {
 			mainStep: 2,
 			curStep: 2,
 			lastSubStep: 1,
@@ -419,7 +419,7 @@ export default class Project {
 	fixFillMethod() {
 		this.updateProject({
 			outlierDict: toJS(this.outlierDict),
-			nullFillMethod:toJS(this.nullFillMethod),
+			nullFillMethod: toJS(this.nullFillMethod),
 			mismatchFillMethod: toJS(this.mismatchFillMethod),
 			outlierFillMethod: toJS(this.outlierFillMethod)
 		})
@@ -727,7 +727,7 @@ export default class Project {
 	}
 
 	setData(type, obj) {
-		this[type] = Object.assign({}, {...this[type]}, obj)
+		this[type] = Object.assign({}, { ...this[type] }, obj)
 	}
 
 	modelInsights() {
@@ -789,12 +789,12 @@ export default class Project {
 	}
 
 	@action
-    sendRequest(request) {
+	sendRequest(request) {
 		const id = uuid();
 		this.reqs.push(id)
-        when(
+		when(
 			() => socketStore.isready,
-            () => socketStore.send("changeRequest", { id, params: request })
+			() => socketStore.send("changeRequest", { id, params: request })
 		)
 	}
 
@@ -803,7 +803,7 @@ export default class Project {
 	}
 
 	removeReq(id) {
-		this.reqs = this.reqs.filter(req => req!==id);
+		this.reqs = this.reqs.filter(req => req !== id);
 	}
 
 	@action

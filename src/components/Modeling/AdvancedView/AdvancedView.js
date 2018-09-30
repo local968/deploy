@@ -3,11 +3,11 @@ import classnames from 'classnames';
 import { Table, Tabs, Modal } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './AdvancedView.module.less';
-import RocChart from '../../D3Chart/RocChart';
-import PRChart from '../../D3Chart/PRChart';
-import PredictionDistribution from '../../D3Chart/PredictionDistribution';
-import LiftChart from '../../D3Chart/LiftChart';
-// import Modal from '../../Common/Modal'
+import RocChart from 'components/D3Chart/RocChart';
+import PRChart from 'components/D3Chart/PRChart';
+import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
+import LiftChart from 'components/D3Chart/LiftChart';
+import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
 import modelComp from './Btn-ModelComparison-normal.svg';
 import ROCCurve from './icon-roc-curve-normal.svg';
 import liftChart from './icon-lift-chart-normal.svg';
@@ -333,17 +333,17 @@ class ModelComp extends Component {
             <h4>Model Comparison Charts</h4>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Speed vs Accuracy" key="1">
-                {/* <SpeedAndAcc models={models} width={600} height={400} className="speedComp" /> */}
+                <SpeedAndAcc models={models} width={600} height={400} className="speedComp" />
               </TabPane>
               <TabPane tab="Lifts Charts" key="3">
-                {/* <LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} model={modelsAfterFilterd[0]} /> */}
+                <LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
               </TabPane>
               <TabPane tab="ROC Curves" key="4">
-                {/* <LineChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} model={modelsAfterFilterd[0]} /> */}
+                <RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
               </TabPane>
-              <TabPane tab="Learning Curves" key="2">
-                {/* <Learning width={600} height={400} className="learningComp" model={modelsAfterFilterd[0]} /> */}
-              </TabPane>
+              {/* <TabPane tab="Learning Curves" key="2">
+                <Learning width={600} height={400} className="learningComp" models={models} model={models[0]} />
+              </TabPane> */}
             </Tabs>
           </div>
         </Modal>

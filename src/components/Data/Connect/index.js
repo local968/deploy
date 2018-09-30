@@ -9,18 +9,18 @@ import sqlIcon from './sql.svg';
 import defileIcon from './define.svg';
 import axios from 'axios';
 import { message, Progress } from 'antd';
-import { Uploader } from '../../Common';
+import { Uploader } from 'components/Common';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 
 import r2LoadGif from './R2Loading.gif';
 
 // sample data
-import bankSmall from '../../../../sample/classification/bank.train.csv';
-import titanic from '../../../../sample/classification/titanic.train.csv';
-import houseSmall from '../../../../sample/regression/regression.house.csv';
-import gameSmall from '../../../../sample/regression/game.csv';
-import dma1cSmall from '../../../../sample/classification/dma1c_dirty.csv';
-import givemecreditSmall from '../../../../sample/classification/givemecredit_dirty.csv';
+import bankSmall from 'sample/classification/bank.train.csv';
+import titanic from 'sample/classification/titanic.train.csv';
+import houseSmall from 'sample/regression/regression.house.csv';
+import gameSmall from 'sample/regression/game.csv';
+import dma1cSmall from 'sample/classification/dma1c_dirty.csv';
+import givemecreditSmall from 'sample/classification/givemecredit_dirty.csv';
 
 const fileMap = {
 	'titanic.train.csv': titanic,

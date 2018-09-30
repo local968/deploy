@@ -23,10 +23,10 @@ class App extends Component {
       <Provider {...stores}>
         <Router history={history}>
           <div className={styles.app}>
-            <Sider history={history} />
+            <Sider/>
             <div className={styles.main}>
-              <Header history={history} />
-              <Layout history={history} />
+              <Header/>
+              <Layout/>
             </div>
           </div>
         </Router>

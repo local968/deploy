@@ -27,7 +27,7 @@ const deploymentStatus = {
   na: <span className={styles.na}>N/A</span>
 };
 
-@inject('deploymentStore', 'scheduleStore')
+@inject('deploymentStore', 'scheduleStore', 'routing')
 @observer
 export default class Home extends Component {
   toggle = (currentType, targetType) => () => {
@@ -43,7 +43,7 @@ export default class Home extends Component {
     }
   };
   render() {
-    const { deploymentStore, history, scheduleStore } = this.props;
+    const { deploymentStore, routing, scheduleStore } = this.props;
     return (
       <div className={styles.home}>
         <Bread list={['Home']} />
@@ -120,7 +120,7 @@ export default class Home extends Component {
                   className={styles.projectName}
                   title={deployment.projectName}
                   onClick={() =>
-                    history.push(`/deploy/project/${deployment.id}`)
+                    routing.push(`/deploy/project/${deployment.id}`)
                   }
                 >
                   {deployment.projectName}
@@ -129,7 +129,7 @@ export default class Home extends Component {
                   className={styles.modelName}
                   title={deployment.modelName}
                   onClick={() =>
-                    history.push(`/deploy/project/${deployment.id}`)
+                    routing.push(`/deploy/project/${deployment.id}`)
                   }
                 >
                   {deployment.modelName}
@@ -194,7 +194,7 @@ export default class Home extends Component {
                   className={styles.createdDate}
                   title={moment.unix(deployment.createdDate).format('M/D/YYYY')}
                   onClick={() =>
-                    history.push(`/deploy/project/${deployment.id}`)
+                    routing.push(`/deploy/project/${deployment.id}`)
                   }
                 >
                   {moment.unix(deployment.createdDate).format('M/D/YYYY')}

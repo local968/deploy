@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import styles from "./styles.module.css";
 
-@inject('userStore')
+@inject('userStore', 'routing')
 @observer
 export default class SignActive extends Component{
     componentDidMount() {
         const {search} = this.props.location
         const code = search.substr(1);
-        if(!code) return this.props.history.push("/")
+        if(!code) return this.props.routing.push("/")
         this.props.userStore.completeReg(code)
     }
 

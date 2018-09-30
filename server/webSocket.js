@@ -118,7 +118,7 @@ const init = (server, sessionParser) => {
 }
 
 init.register = (...args) => _apis.push(args)
-// init.subscribe = (...args) => _subscribes.push(args)
-// init.publish = (...args) => _publishes.push(args)
+init.subscribe = (...args) => _subscribes.push(args)
+init.publish = (...args) => _publishes.push(args)
 
 module.exports = init

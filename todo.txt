@@ -1,0 +1,31 @@
+history => @inject('routing')
+
+App/Layout.js => components/Layout/index.js
+
+../ => components/
+
+remove notification
+
+Headers' function => Observer + class
+
+editorConfig eslint config
+
+
+register
+
+fill form -> submit form -> send email to user -> click email's url -> complete register
+        keep form information                  ->                    write to user database        
+        temp save to database
+        form = {
+            username: 'a',
+            password: 'b'
+        }
+
+        form = {
+            username: 'a',
+            password: 'ALSKJDHSLAKDJLKSAJDLKJOWIUE'
+        }
+
+setState => @observable
+
+拆分 Data/Quality/index.js

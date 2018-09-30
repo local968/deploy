@@ -8,13 +8,13 @@ import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router';
 
 @withRouter
-@inject('userStore', 'deploymentStore')
+@inject('userStore', 'deploymentStore', 'routing')
 @observer
 export default class Sider extends Component {
   render() {
-    const { history, userStore } = this.props;
+    const { userStore, routing } = this.props;
     const { userId } = userStore;
-    const isDeploy = history.location.pathname.includes('deploy');
+    const isDeploy = routing.location.pathname.includes('deploy');
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
@@ -25,7 +25,7 @@ export default class Sider extends Component {
           <a
             className={styles.home}
             onClick={() =>
-              isDeploy && userId ? history.push('/deploy') : history.push('/')
+              isDeploy && userId ? routing.push('/deploy') : routing.push('/')
             }
           >
             <img alt="home" src={home} />
@@ -53,17 +53,17 @@ export default class Sider extends Component {
   }
 
   switchClick = () => {
-    const { location, deploymentStore, userStore, history } = this.props;
-    const isDeploy = history.location.pathname.includes('deploy');
+    const { location, deploymentStore, userStore, routing } = this.props;
+    const isDeploy = routing.location.pathname.includes('deploy');
     const { userId } = userStore;
     if (location.pathname.indexOf('/deploy/project/') !== -1) {
       const deploymentId = location.pathname.split('/')[3];
       const projectId = deploymentStore.deployments.find(d => d.id === deploymentId)
         .projectId;
-      history.push('/project/' + projectId);
+        routing.push('/project/' + projectId);
       return;
     }
 
-    isDeploy || !userId ? history.push('/') : history.push('/deploy');
+    isDeploy || !userId ? routing.push('/') : routing.push('/deploy');
   };
 }

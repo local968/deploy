@@ -6,14 +6,13 @@
 // Tooltips for d3.js SVG visualizations
 import * as d3 from 'd3';
 
-d3.functor = function functor(v) {
+function functor(v) {
   return typeof v === 'function' ? v : function() {
     return v;
   };
 };
 
-d3.tip = function(location) {
-
+export default function(location) {
   let direction = d3_tip_direction,
     offset = d3_tip_offset,
     html = d3_tip_html,
@@ -117,7 +116,7 @@ d3.tip = function(location) {
   // Returns tip or direction
   tip.direction = function(v) {
     if (!arguments.length) return direction;
-    direction = v == null ? v : d3.functor(v);
+    direction = v == null ? v : functor(v);
 
     return tip;
   };
@@ -129,7 +128,7 @@ d3.tip = function(location) {
   // Returns offset or
   tip.offset = function(v) {
     if (!arguments.length) return offset;
-    offset = v == null ? v : d3.functor(v);
+    offset = v == null ? v : functor(v);
 
     return tip;
   };
@@ -141,7 +140,7 @@ d3.tip = function(location) {
   // Returns html value or tip
   tip.html = function(v) {
     if (!arguments.length) return html;
-    html = v == null ? v : d3.functor(v);
+    html = v == null ? v : functor(v);
 
     return tip;
   };

@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import autoIcon from './mr-one-logo-blue.svg';
-import { Modal } from '../../Common';
+import { Modal } from 'components/Common';
 import { when } from 'mobx';
 import { Spin, Popover } from 'antd';
 import histogramIcon from './histogramIcon.svg';

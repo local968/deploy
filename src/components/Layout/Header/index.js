@@ -90,11 +90,11 @@ class NormalHeader extends Component {
   }
 }
 
-@inject('userStore', 'projectStore')
+@inject('userStore', 'projectStore', 'routing')
 @observer
 class ProjectHeader extends Component {
   logout = () => {
-    this.props.history.push('/');
+    this.props.routing.push('/');
     this.props.userStore.logout();
   };
 
@@ -103,14 +103,12 @@ class ProjectHeader extends Component {
     let maxStep = projectStore.project.mainStep;
     if (index > maxStep) return;
     projectStore.project.nextMainStep(index);
-    // history.push("/"+step[index]+"/"+projectStore.project.projectId)
   };
 
   render() {
     const { userStore, projectStore } = this.props;
 
     const { curStep } = projectStore.project || {};
-
     return (
       <div className={styles.header}>
         <div className={styles.menu}>
@@ -170,11 +168,11 @@ class ProjectHeader extends Component {
   }
 }
 
-@inject('userStore')
+@inject('userStore', 'routing')
 @observer
 class WelcomeHeader extends Component {
   logout = () => {
-    this.props.history.push('/');
+    this.props.routing.push('/');
     this.props.userStore.logout();
   };
 
@@ -211,8 +209,8 @@ const LoginHeader = props => (
       className={styles.auth}
       onClick={() =>
         props.pathname === '/'
-          ? props.history.push('/signup')
-          : props.history.push('/')
+          ? props.routing.push('/signup')
+          : props.routing.push('/')
       }
     >
       <div className={styles.loginIcon}>
@@ -224,7 +222,7 @@ const LoginHeader = props => (
 );
 
 @withRouter
-@inject('userStore')
+@inject('userStore', 'routing')
 @observer
 export default class Header extends Component {
   render() {
@@ -235,12 +233,12 @@ export default class Header extends Component {
     if (!isLogin)
       return (
         <LoginHeader
-          pathname={this.props.history.location.pathname}
-          history={this.props.history}
+          pathname={this.props.routing.location.pathname}
+          routing={this.props.routing}
         />
       );
-    if (isHome) return <WelcomeHeader history={this.props.history} />;
+    if (isHome) return <WelcomeHeader />;
     if (isDeploy) return <NormalHeader />;
-    return <ProjectHeader history={this.props.history} />;
+    return <ProjectHeader />;
   }
 }

@@ -5,8 +5,8 @@ import { inject } from "mobx-react";
 import { Background } from 'components/Common';
 // import Detail from 'components/Detail';
 // import Deploy from 'components/Deploy';
-// import Main from 'components/Main';
-// import Home from 'components/Home';
+import Main from 'components/Main';
+import Home from 'components/Home';
 import SignIn from 'components/SignIn';
 import SignUp from 'components/SignUp';
 import SignActive from 'components/SignActive';
@@ -21,11 +21,11 @@ class defaultRouter extends Component {
   render() {
     return (
       <Switch>
-        {/* <Route exact path="/" component={Home} />
-      <Route exact path="/deploy" component={Deploy} />
+        <Route exact path="/" component={Home} />
+      {/* <Route exact path="/deploy" component={Deploy} /> */}
       <Route exact path="/test" component={() => 'test/test'} />
       <Route path="/project/:pid" component={Main} />
-      <Route path="/deploy/project/:id" component={Detail} /> */}
+      {/* <Route path="/deploy/project/:id" component={Detail} /> */}
         <Route path="" render={() => <Redirect to="/" />} />
       </Switch>
     )

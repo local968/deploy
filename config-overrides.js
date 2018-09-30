@@ -20,6 +20,7 @@ module.exports = function override(config, env) {
       components: path.join(__dirname, 'src/components'),
       stores: path.join(__dirname, 'src/stores'),
       style: path.join(__dirname, 'src/components/Common/basic.module.css'),
+      sample: path.join(__dirname, 'sample'),
       config: path.join(__dirname, 'src/config')
     }
   };
