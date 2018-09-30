@@ -121,9 +121,13 @@ class DeploymentStore {
             console.log(response)
             this.deployments = response.result;
           });
-          api.watchDeployment(response => {
+          api.watchDeployment().then(response => {
             this.deployments = response.result;
           });
+
+          api.on('watchDeployment', response => {
+
+          })
         })
     );
   }
