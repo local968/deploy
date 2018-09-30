@@ -41,7 +41,7 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-@inject('deployStore', 'routing')
+@inject('deploymentStore', 'routing')
 @observer
 export default class Deployment extends Component {
   @observable dialog = null;
@@ -50,13 +50,13 @@ export default class Deployment extends Component {
 
   @action
   selectionOption = (key, value) => () => {
-    this.props.deployStore.currentDeployment.deploymentOptions[key] = value;
-    this.props.deployStore.currentDeployment.save();
+    this.props.deploymentStore.currentDeployment.deploymentOptions[key] = value;
+    this.props.deploymentStore.currentDeployment.save();
   };
 
   @action
   toggleEdit = () => {
-    this.localEmail = this.props.deployStore.currentDeployment.email;
+    this.localEmail = this.props.deploymentStore.currentDeployment.email;
     this.emailEditing = !this.emailEditing;
   };
 
@@ -68,8 +68,8 @@ export default class Deployment extends Component {
   @action
   submitEmail = e => {
     this.emailEditing = false;
-    this.props.deployStore.currentDeployment.email = this.localEmail;
-    this.props.deployStore.currentDeployment.save();
+    this.props.deploymentStore.currentDeployment.email = this.localEmail;
+    this.props.deploymentStore.currentDeployment.save();
   };
 
   show = key => action(() => (this.dialog = key));
@@ -77,8 +77,8 @@ export default class Deployment extends Component {
   closeDialog = action(() => (this.dialog = null));
 
   render() {
-    const { deployStore, routing, match } = this.props;
-    const cd = deployStore.currentDeployment;
+    const { deploymentStore, routing, match } = this.props;
+    const cd = deploymentStore.currentDeployment;
     const cddo = cd.deploymentOptions;
     return (
       <div className={styles.deployment}>
@@ -86,7 +86,7 @@ export default class Deployment extends Component {
           <span className={styles.model}>Model:{cd.modelName}</span>
           <a className={styles.change}>Change</a>
           <span className={styles.data}>Deployment Data Definition</span>
-          <a className={styles.download} href={deployStore.dataDefinition}>
+          <a className={styles.download} href={deploymentStore.dataDefinition}>
             Download
           </a>
           <span className={styles.email}>
@@ -156,7 +156,7 @@ export default class Deployment extends Component {
                   className={styles.save}
                   onClick={() => {
                     if (cddo.frequency) {
-                      deployStore.toggleEnable(cd.id, true);
+                      deploymentStore.toggleEnable(cd.id, true);
                       routing.push(
                         `/deploy/project/${match.params.id}/operation`
                       );

@@ -7,12 +7,12 @@ import { Popover } from 'antd';
 import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 
-@inject('deployStore', 'scheduleStore')
+@inject('deploymentStore', 'scheduleStore')
 @observer
 export default class Operation extends Component {
   render() {
-    const { deployStore, scheduleStore } = this.props;
-    const cd = deployStore.currentDeployment || {};
+    const { deploymentStore, scheduleStore } = this.props;
+    const cd = deploymentStore.currentDeployment || {};
 
     return (
       <div className={styles.operation}>

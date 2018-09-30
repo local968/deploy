@@ -29,30 +29,30 @@ const imgs = {
 
 const step = ['project', 'problem', 'data', 'modeling'];
 
-@inject('deployStore', 'scheduleStore')
+@inject('deploymentStore', 'scheduleStore')
 @observer
 class NormalHeader extends Component {
   @computed
   get enabledProjectsCount() {
-    return this.props.deployStore.deployments.filter(_d => _d.enable).length;
+    return this.props.deploymentStore.deployments.filter(_d => _d.enable).length;
   }
 
   @computed
   get normalProjectsCount() {
-    const { deployStore, scheduleStore } = this.props;
+    const { deploymentStore, scheduleStore } = this.props;
     const isNormal = id =>
       scheduleStore.getLastSchedule(id, 'deployment').status !== 'issue' &&
       scheduleStore.getLastSchedule(id, 'performance').status !== 'issue';
-    return deployStore.deployments.filter(_d => isNormal(_d.id)).length;
+    return deploymentStore.deployments.filter(_d => isNormal(_d.id)).length;
   }
 
   render() {
-    const { deployStore } = this.props;
+    const { deploymentStore } = this.props;
     return (
       <div className={styles.header}>
         <div className={classnames(styles.block, styles.total)}>
           <span className={styles.number}>
-            {deployStore.deployments.length}
+            {deploymentStore.deployments.length}
           </span>
           <span className={styles.text}>Total Project</span>
         </div>
@@ -62,7 +62,7 @@ class NormalHeader extends Component {
         </div>
         <div className={classnames(styles.block, styles.disabled)}>
           <span className={styles.number}>
-            {deployStore.deployments.length - this.enabledProjectsCount}
+            {deploymentStore.deployments.length - this.enabledProjectsCount}
           </span>
           <span className={styles.text}>Disabled</span>
         </div>
@@ -73,7 +73,7 @@ class NormalHeader extends Component {
         </div>
         <div className={classnames(styles.block, styles.issue)}>
           <span className={styles.number}>
-            {deployStore.deployments.length - this.normalProjectsCount}
+            {deploymentStore.deployments.length - this.normalProjectsCount}
           </span>
           <span className={styles.text}>Issue</span>
         </div>

@@ -14,13 +14,13 @@ import Performance from './Performance';
 import Status from './Status';
 import styles from './styles.module.css';
 
-@inject('routing', 'deployStore')
+@inject('routing', 'deploymentStore')
 @observer
 export default class Detail extends Component {
   render() {
-    const { routing, match, location, deployStore } = this.props;
-    runInAction(() => (deployStore.currentId = match.params.id));
-    // const cd = deployStore.currentDeployment || {};
+    const { routing, match, location, deploymentStore } = this.props;
+    runInAction(() => (deploymentStore.currentId = match.params.id));
+    // const cd = deploymentStore.currentDeployment || {};
     return (
       <div className={styles.detail}>
         <Bread list={['Home']} />
@@ -100,7 +100,7 @@ export default class Detail extends Component {
             <Switch
               checked={cd.enable}
               onChange={() => {
-                deployStore.toggleEnable(cd.id);
+                deploymentStore.toggleEnable(cd.id);
               }}
             />
           </span>

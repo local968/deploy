@@ -10,7 +10,7 @@ import AdvancedView from '../AdvancedView/AdvancedView';
 
 const Classification = 'Classification';
 
-@inject('deployStore')
+@inject('deploymentStore')
 @observer
 export default class ModelResult extends Component {
   state = {
@@ -25,7 +25,7 @@ export default class ModelResult extends Component {
   deploy = () => {
     const { models, project } = this.props;
     const current = models.find(model => model.recommend);
-    this.props.deployStore
+    this.props.deploymentStore
       .newDeploy(project.projectId, project.name, current.name, current.problemType)
       .then(id => this.props.history.push('/deploy/project/' + id));
   };
@@ -75,7 +75,7 @@ export default class ModelResult extends Component {
         </div>
         <Modal title='Model Insights'
               visible={current && this.state.show}
-              onClose={this.hideInsights} 
+              onClose={this.hideInsights}
               content={<ModelInsights model={current} project={project}/>}/>
       </div>
     );
@@ -244,7 +244,7 @@ class PredictedProgress extends Component {
   }
 }
 
-@observer 
+@observer
 class Performance extends Component {
   render() {
     const { problemType, model } = this.props;
@@ -525,7 +525,7 @@ class ModelInsights extends Component {
 class ModelInsightsChart extends Component {
   componentDidMount() {
     this.renderD3()
-  }    
+  }
 
   componentDidUpdate() {
     this.renderD3()
@@ -552,7 +552,7 @@ class ModelInsightsChart extends Component {
         y2: partial[k]
       }
     })
-    //添加一个 SVG 画布   
+    //添加一个 SVG 画布
     const svg = d3.select(`.${styles.modelInsightsChart}`)
         .append("svg")
         .attr("width", width)
@@ -593,7 +593,7 @@ class ModelInsightsChart extends Component {
     svg.append("g")
         // .attr("class",`${styles.axis}`)
         .attr("transform",`translate(0, ${realHeight + padding.top})`)
-        .call(xAxis); 
+        .call(xAxis);
 
     //添加y轴
     svg.append("g")

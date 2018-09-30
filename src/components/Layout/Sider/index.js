@@ -8,7 +8,7 @@ import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router';
 
 @withRouter
-@inject('userStore', 'deployStore')
+@inject('userStore', 'deploymentStore')
 @observer
 export default class Sider extends Component {
   render() {
@@ -53,12 +53,12 @@ export default class Sider extends Component {
   }
 
   switchClick = () => {
-    const { location, deployStore, userStore, history } = this.props;
+    const { location, deploymentStore, userStore, history } = this.props;
     const isDeploy = history.location.pathname.includes('deploy');
     const { userId } = userStore;
     if (location.pathname.indexOf('/deploy/project/') !== -1) {
       const deploymentId = location.pathname.split('/')[3];
-      const projectId = deployStore.deployments.find(d => d.id === deploymentId)
+      const projectId = deploymentStore.deployments.find(d => d.id === deploymentId)
         .projectId;
       history.push('/project/' + projectId);
       return;

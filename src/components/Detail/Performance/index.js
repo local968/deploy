@@ -40,21 +40,21 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-@inject('deployStore', 'routing')
+@inject('deploymentStore', 'routing')
 @observer
 export default class Performance extends Component {
   @observable dialog = null;
 
   @action
   selectionOption = (key, value) => () => {
-    this.props.deployStore.currentDeployment.performanceOptions[key] = value;
-    this.props.deployStore.currentDeployment.save();
+    this.props.deploymentStore.currentDeployment.performanceOptions[key] = value;
+    this.props.deploymentStore.currentDeployment.save();
   };
   show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
   render() {
-    const { deployStore, routing, match } = this.props;
-    const cd = deployStore.currentDeployment;
+    const { deploymentStore, routing, match } = this.props;
+    const cd = deploymentStore.currentDeployment;
     const cdpo = cd.performanceOptions;
 
     return (
@@ -84,7 +84,7 @@ export default class Performance extends Component {
               src={downloadIcon}
               alt="download"
             />
-            <a className={styles.download} href={deployStore.dataDefinition}>
+            <a className={styles.download} href={deploymentStore.dataDefinition}>
               Download
             </a>
           </div>
@@ -126,7 +126,7 @@ export default class Performance extends Component {
                 className={styles.save}
                 onClick={() => {
                   if (cdpo.frequency) {
-                    deployStore.toggleEnable(cd.id, true);
+                    deploymentStore.toggleEnable(cd.id, true);
                     routing.push(`/deploy/project/${match.params.id}/status`);
                     DBStore.deploySchedule({
                       deploymentId: match.params.id,

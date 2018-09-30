@@ -1,7 +1,7 @@
 import { observable, computed, when } from 'mobx';
 import DBStore from 'stores/DBStore';
 import userStore from 'stores/UserStore';
-import deployStore from './DeployStore.js';
+import deploymentStore from './DeploymentStore.js';
 
 const sortStrategies = {
   createdDate: (a, b) =>
@@ -99,7 +99,7 @@ class ScheduleStore {
 
   sortSchedules = type => {
     const _schedules = this.schedules.filter(
-      s => s.type === type && s.deploymentId === deployStore.currentId
+      s => s.type === type && s.deploymentId === deploymentStore.currentId
     );
     let result = [];
 
@@ -118,7 +118,7 @@ class ScheduleStore {
 
     result = result.map(schedule => ({
       schedule,
-      deployment: deployStore.deployments.find(
+      deployment: deploymentStore.deployments.find(
         deployment => deployment.id === schedule.deploymentId
       )
     }));

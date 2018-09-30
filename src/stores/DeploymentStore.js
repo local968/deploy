@@ -104,6 +104,30 @@ class DeploymentStore {
     return new Deployment(_deployment || {});
   }
 
+  @computed
+  get dataDefinition() {
+    if (!this.currentModel) return '';
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += this.currentModel.variableList.join(',');
+    return encodeURI(csvContent);
+  }
+
+  constructor() {
+    when(
+      () => userStore.userId && userStore.status === 'login',
+      () =>
+        socketStore.ready().then(api => {
+          api.searchDeployment().then(response => {
+            console.log(response)
+            this.deployments = response.result;
+          });
+          api.watchDeployment(response => {
+            this.deployments = response.result;
+          });
+        })
+    );
+  }
+
   async addDeployment(projectId, projectName, modelName, modelType) {
     const tuple = {
       deploymentOptions: {},
@@ -119,29 +143,6 @@ class DeploymentStore {
       throw new Error(response.message);
     }
     return response.result.id;
-  }
-
-  constructor() {
-    when(
-      () => userStore.userId && userStore.status === 'login',
-      () =>
-        socketStore.ready().then(api => {
-          api.searchDeployment().then(response => {
-            this.deployments = response.result;
-          });
-          api.watchDeployment(response => {
-            this.deployments = response.result;
-          });
-        })
-    );
-  }
-
-  @computed
-  get dataDefinition() {
-    if (!this.currentModel) return '';
-    let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += this.currentModel.variableList.join(',');
-    return encodeURI(csvContent);
   }
 
   @action

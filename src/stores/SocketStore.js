@@ -152,7 +152,7 @@ class SocketStore extends EventEmitter {
 
   initApi(data) {
     data.api.map(eventName => {
-      this.api[eventName] = (data = {}) => {
+      return this.api[eventName] = (data = {}) => {
         const _id = uuid.v4()
         data._id = _id
         data.type = eventName

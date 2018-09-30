@@ -8,17 +8,17 @@ import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 import { Popover } from 'antd';
 
-@inject('scheduleStore', 'deployStore', 'routing')
+@inject('scheduleStore', 'deploymentStore', 'routing')
 @observer
 export default class List extends Component {
   @action
   selectionOption = (key, value) => () => {
-    this.props.deployStore.currentDeployment.performanceOptions[key] = value;
-    this.props.deployStore.currentDeployment.save();
+    this.props.deploymentStore.currentDeployment.performanceOptions[key] = value;
+    this.props.deploymentStore.currentDeployment.save();
   };
   render() {
-    const { deployStore, scheduleStore, routing, match } = this.props;
-    const cd = deployStore.currentDeployment;
+    const { deploymentStore, scheduleStore, routing, match } = this.props;
+    const cd = deploymentStore.currentDeployment;
     const cdpo = cd.performanceOptions;
     const selectionOption = this.selectionOption;
     return (

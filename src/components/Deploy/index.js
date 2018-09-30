@@ -27,52 +27,52 @@ const deploymentStatus = {
   na: <span className={styles.na}>N/A</span>
 };
 
-@inject('deployStore', 'scheduleStore')
+@inject('deploymentStore', 'scheduleStore')
 @observer
 export default class Home extends Component {
   toggle = (currentType, targetType) => () => {
     if (currentType === targetType) {
-      this.props.deployStore.changeSort(
+      this.props.deploymentStore.changeSort(
         'sortBy',
         targetType.startsWith('r')
           ? targetType.slice(1, targetType.length)
           : 'r' + targetType
       );
     } else {
-      this.props.deployStore.changeSort('sortBy', targetType);
+      this.props.deploymentStore.changeSort('sortBy', targetType);
     }
   };
   render() {
-    const { deployStore, history, scheduleStore } = this.props;
+    const { deploymentStore, history, scheduleStore } = this.props;
     return (
       <div className={styles.home}>
         <Bread list={['Home']} />
         <div className={styles.filter}>
           <Search
-            value={deployStore.sortOptions.keywords}
-            onChange={value => deployStore.changeSort('keywords', value)}
+            value={deploymentStore.sortOptions.keywords}
+            onChange={value => deploymentStore.changeSort('keywords', value)}
           />
           <Select
             className={styles.selector}
             title="Sort by"
             autoWidth
-            options={deployStore.sortByOptions}
-            value={deployStore.sortOptions.sortBy}
-            onChange={deployStore.changeSort.bind(null, 'sortBy')}
+            options={deploymentStore.sortByOptions}
+            value={deploymentStore.sortOptions.sortBy}
+            onChange={deploymentStore.changeSort.bind(null, 'sortBy')}
           />
           <Select
             className={styles.selector}
             title="per page"
             autoWidth
-            options={deployStore.perPageOptions}
-            value={parseInt(deployStore.sortOptions.perPage, 10)}
-            onChange={deployStore.changeSort.bind(null, 'perPage')}
+            options={deploymentStore.perPageOptions}
+            value={parseInt(deploymentStore.sortOptions.perPage, 10)}
+            onChange={deploymentStore.changeSort.bind(null, 'perPage')}
           />
           <Pagination
-            current={deployStore.sortOptions.currentPage}
-            pageSize={parseInt(deployStore.sortOptions.perPage, 10)}
-            total={deployStore.totalCount}
-            onChange={deployStore.changeSort.bind(null, 'currentPage')}
+            current={deploymentStore.sortOptions.currentPage}
+            pageSize={parseInt(deploymentStore.sortOptions.perPage, 10)}
+            total={deploymentStore.totalCount}
+            onChange={deploymentStore.changeSort.bind(null, 'currentPage')}
           />
         </div>
         <div className={styles.listWrapper}>
@@ -80,7 +80,7 @@ export default class Home extends Component {
             <span
               className={styles.projectName}
               onClick={this.toggle(
-                deployStore.sortOptions.sortBy,
+                deploymentStore.sortOptions.sortBy,
                 'projectName'
               )}
             >
@@ -88,7 +88,7 @@ export default class Home extends Component {
             </span>
             <span
               className={styles.modelName}
-              onClick={this.toggle(deployStore.sortOptions.sortBy, 'modelName')}
+              onClick={this.toggle(deploymentStore.sortOptions.sortBy, 'modelName')}
             >
               Model Name
             </span>
@@ -100,7 +100,7 @@ export default class Home extends Component {
             <span
               className={styles.createdDate}
               onClick={this.toggle(
-                deployStore.sortOptions.sortBy,
+                deploymentStore.sortOptions.sortBy,
                 'createdDate'
               )}
             >
@@ -110,7 +110,7 @@ export default class Home extends Component {
             <span className={styles.delete} />
           </div>
           <div className={styles.list}>
-            {deployStore.sortedDeployments.map(deployment => (
+            {deploymentStore.sortedDeployments.map(deployment => (
               <div
                 key={deployment.id}
                 data-id={deployment.id}
@@ -138,7 +138,7 @@ export default class Home extends Component {
                   <Switch
                     checked={deployment && deployment.enable}
                     onChange={() => {
-                      deployStore.toggleEnable(deployment.id);
+                      deploymentStore.toggleEnable(deployment.id);
                     }}
                   />
                 </span>
@@ -205,7 +205,7 @@ export default class Home extends Component {
                 <span
                   className={styles.delete}
                   onClick={() => {
-                    deployStore.delete(deployment.id);
+                    deploymentStore.delete(deployment.id);
                   }}
                 >
                   <Icon type="delete" />
