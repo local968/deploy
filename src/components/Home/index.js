@@ -98,6 +98,7 @@ export default class Home extends Component {
 
     handleAdd = () => {
         this.props.projectStore.addProject().then(data => {
+            console.log(data)
             if (data.error) return alert(data.error)
             this.props.routing.push(`/project/${data.id}`);
         });

@@ -40,15 +40,16 @@ export default class Main extends Component{
             //     return <Data userId={this.props.userStore.userId} project={project}/>
             // case 3:
             //     return <Modeling project={project} models={models} />
-            // case 0:
+            case 0:
             default:
                 return <Project project={project}/>
         }
     }
 
     render() {
+        console.log({...this.props.projectStore.project})
         return <React.Fragment>
-            {this.props.projectStore.project&&this.getChild()}
+            {this.getChild()}
         </React.Fragment>
     }
 }
