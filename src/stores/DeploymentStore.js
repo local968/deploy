@@ -114,7 +114,7 @@ class DeploymentStore {
 
   constructor() {
     when(
-      () => userStore.userId && userStore.status === 'login',
+      () => userStore.status === 'login',
       () =>
         socketStore.ready().then(api => {
           api.searchDeployment().then(response => {

@@ -4,8 +4,7 @@ const uuid = require('uuid')
 const moment = require('moment')
 
 wss.register('searchDeployment', (message, socket) => {
-  console.log(message)
-  return message
+  return { list: [] }
 })
 
 wss.register('watchDeployment', (message, socket) => {
