@@ -109,7 +109,6 @@ class ProjectHeader extends Component {
     const { userStore, projectStore } = this.props;
 
     const { curStep } = projectStore.project || {};
-
     return (
       <div className={styles.header}>
         <div className={styles.menu}>

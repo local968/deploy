@@ -9,17 +9,11 @@ import { Spin } from 'antd';
 @inject('userStore')
 @observer
 export default class Layout extends Component {
-  // componentWillMount() {
-  // if(!this.props.userStore.hasToken){
-  //     this.props.history.push("/")
-  // }
-  // }
-
   render() {
     const { status } = this.props.userStore;
     return <div className={styles.route}>
       {status === 'init' && <Mask />}
-      {status === 'login' ? <Route /> : <LoginRouter />}
+      {status === 'unlogin' ? <LoginRouter /> : <Route />}
     </div>
   }
 }

@@ -12,14 +12,22 @@ import checkedIcon from './checked.svg';
 import { Search, Select, Pagination } from 'components/Common';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
-import {Modal, Button} from 'antd';
+import { Modal, Button } from 'antd';
 
 import axios from 'axios';
+import { observable } from 'mobx';
 
-@inject('userStore', 'routing')
+@inject('routing', 'projectStore')
 @observer
 export default class Home extends Component {
-    constructor(props){
+    @observable ids = []
+    @observable isShow = false
+    @observable selected = false
+    @observable deleteNames = []
+    @observable deleteIds = []
+    @observable visible = false
+
+    constructor(props) {
         super(props);
         //设置为英文
         moment.locale('en');
@@ -31,8 +39,8 @@ export default class Home extends Component {
                 return;
             },
             delete: (ids) => {
-                const deleteNames = this.props.userStore.projects.filter(project => {
-                    return ids.includes(project.projectId);
+                const deleteNames = this.props.projectStore.list.filter(project => {
+                    return ids.includes(project.id);
                 }).map(project => project.name);
                 this.setState({
                     deleteNames: deleteNames,
@@ -44,65 +52,28 @@ export default class Home extends Component {
         window.axios = axios;
     }
 
-    
-
-    state = {
-        ids: [],
-        isShow: false,
-        isScorll: false,
-        selected: false,
-        deleteNames: [],
-        deleteIds: [],
-        visible: false
-    }
-
-    componentDidUpdate() {
-        //重置滚动条
-        this.resetScorll();
-    }
-
-    resetScorll = () => {
-        const projectsDom = document.getElementsByClassName(styles.projects)[0];
-        if(!this.state.isScorll && projectsDom.clientHeight < projectsDom.scrollHeight){
-            this.setState({
-                isScorll: true
-            })
-        }
-        if(this.state.isScorll && projectsDom.clientHeight >= projectsDom.scrollHeight){
-            this.setState({
-                isScorll: false
-            })
-        }
-    }
-
     selectId = (isSelect, id) => {
         let ids;
-        if(isSelect){
-            ids = this.state.ids.filter(v => v!==id);
-        }else{
-            ids = [...this.state.ids,id];
+        if (isSelect) {
+            ids = this.ids.filter(v => v !== id);
+        } else {
+            ids = [...this.ids, id];
         }
-        this.setState({
-            ids: ids,
-            isShow: !!ids.length
-        })
+        this.ids = ids
+        this.isShow = !!ids.length
     }
 
     toggleSelect = () => {
-        this.setState({
-            selected: !this.state.selected,
-        })
+        this.selected = !this.selected
     }
 
     removeSelected = () => {
-        this.setState({
-            ids: [],
-            isShow: false
-        })
+        this.ids = []
+        this.isShow = false
     }
 
     actions = (act, ids) => {
-        if(!Array.isArray(ids)){
+        if (!Array.isArray(ids)) {
             ids = [ids]
         }
 
@@ -111,57 +82,53 @@ export default class Home extends Component {
     }
 
     handleOk = () => {
-        const {ids, deleteIds} = this.state;
+        const { ids, deleteIds } = this;
         const newIds = ids.filter(id => !deleteIds.includes(id));
-        this.props.userStore.deleteProjects(deleteIds)
-        this.setState({
-            visible: false,
-            deleteIds: [],
-            ids: newIds,
-            isShow: !!newIds.length
-        });
+        this.props.projectStore.deleteProjects(deleteIds)
+
+        this.visible = false
+        this.deleteIds = []
+        this.ids = newIds
+        this.isShow = !!newIds.length
     }
 
     handleCancel = () => {
-        this.setState({
-            visible: false,
-        });
+        this.visible = false
     }
 
     handleAdd = () => {
-        const projectId = this.props.userStore.getNextId();
-        this.props.userStore.addProject();
-        this.props.routing.push(`/project/${projectId}`);
+        this.props.projectStore.addProject().then(data => {
+            if (data.error) return alert(data.error)
+            this.props.routing.push(`/project/${data.id}`);
+        });
     }
 
     render() {
-        const {userStore} = this.props;
-        const {toolsOption, total, sortProjects, changeOption} = userStore;
+        const { projectStore } = this.props;
+        const { toolsOption, total, list: sortProjects, changeOption, changePage } = projectStore;
         return <div className={classnames(styles.home)} >
-            <Tools toolsOption={toolsOption} total={total} changeOption={changeOption.bind(userStore)} />
-            <div className={classnames(styles.projects, {
-                [styles.scrollY]: this.state.isScorll
-            })}>
+            <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} />
+            <div className={classnames(styles.projects)}>
                 <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
                     <img src={addProjectIcon} alt="New Project" />
                     <span>Create New Project</span>
                 </div>
                 {sortProjects.map((project) => {
-                    return <Project project={project} selectId={this.selectId} actions={this.actions} key={"project-"+project.projectId} selected={this.state.ids.includes(project.projectId)} />
+                    return <Project project={project} selectId={this.selectId} actions={this.actions} key={"project-" + project.id} selected={this.ids.includes(project.id)} />
                 })}
             </div>
-            {this.state.isShow && <Bar toggleSelect={this.removeSelected} ids={this.state.ids} actions={this.actions} selected={this.state.selected} />}
+            {this.isShow && <Bar toggleSelect={this.removeSelected} ids={this.ids} actions={this.actions} selected={this.selected} />}
             <Modal
-                title={`Delete Project${this.state.deleteIds.length>1?"s":""}: ${this.state.deleteNames.join(" , ")}`}
-                visible={this.state.visible && !!this.state.deleteIds.length}
+                title={`Delete Project${this.deleteIds.length > 1 ? "s" : ""}: ${this.deleteNames.join(" , ")}`}
+                visible={this.visible && !!this.deleteIds.length}
                 onOk={this.handleOk}
                 onCancel={this.handleCancel}
-                footer={<div style={{textAlign: "center"}}>
+                footer={<div style={{ textAlign: "center" }}>
                     <Button onClick={this.handleCancel}>No, thanks</Button>,
                     <Button type="primary" onClick={this.handleOk}>Yes, delete</Button>,
                 </div>}
-                >
-                <h4 style={{padding: '3em'}} >Are you sure to delete project{this.state.deleteIds.length>1?"s":""} : {this.state.deleteNames.join(" , ")} ?</h4>
+            >
+                <h4 style={{ padding: '3em' }} >Are you sure to delete project{this.deleteIds.length > 1 ? "s" : ""} : {this.deleteNames.join(" , ")} ?</h4>
             </Modal>
         </div>
     }
@@ -169,59 +136,52 @@ export default class Home extends Component {
 
 @inject('routing')
 @observer
-class Project extends Component{
-    state = {
-        cover: false,
-        // selected: false
-    }
+class Project extends Component {
+    @observable cover = false
 
     hideCover = () => {
-        this.setState({
-            cover: false
-        })
+        this.cover = false
     }
 
     showCover = () => {
-        this.setState({
-            cover: true
-        })
+        this.cover = true
     }
 
     toggleSelect = () => {
         //统计总数
-        this.props.selectId(this.state.selected, this.props.project.projectId);
+        this.props.selectId(this.props.selected, this.props.project.id);
     }
 
     handleOpen = () => {
-        this.props.routing.push("/project/"+this.props.project.projectId);
+        this.props.routing.push("/project/" + this.props.project.id);
     }
 
-    render(){
-        const {project,actions} = this.props;
+    render() {
+        const { project, actions } = this.props;
         return <div className={styles.project} onMouseEnter={this.showCover} onMouseLeave={this.hideCover}>
             <div className={styles.info}>
                 <div className={styles.name}>{project.name}</div>
                 <div className={styles.description}>{project.description}</div>
             </div>
             <div className={styles.sub}>
-                <div className={styles.partner}>{project.projectId} {project.uploadFileName}</div>
-                <div className={styles.time}>Create Date: {moment(+new Date(project.createdAt)).fromNow()}</div>
+                <div className={styles.partner}>{project.id} {project.uploadFileName}</div>
+                <div className={styles.time}>Create Date: {moment.unix(project.createTime).fromNow()}</div>
             </div>
-            <div className={classnames(styles.cover,{
-                [styles.active]: this.state.cover
+            <div className={classnames(styles.cover, {
+                [styles.active]: this.cover
             })}>
                 <div className={styles.actionBox}>
                     <div className={styles.select}>
                         {
-                            this.props.selected?
-                            <img className={styles.checked} onClick={this.toggleSelect} src={checkedIcon} alt="checked"/> :
-                            <div className={styles.circle} onClick={this.toggleSelect}></div>
+                            this.props.selected ?
+                                <img className={styles.checked} onClick={this.toggleSelect} src={checkedIcon} alt="checked" /> :
+                                <div className={styles.circle} onClick={this.toggleSelect}></div>
                         }
                     </div>
                     <div className={styles.action}>
-                        <img onClick={actions.bind(null, "share", project.projectId)} src={shareIcon} alt="share"/>
-                        <img onClick={actions.bind(null, "duplicate", project.projectId)} src={duplicateIcon} alt="duplicate"/>
-                        <img onClick={actions.bind(null, "delete", project.projectId)} src={deleteIcon} alt="delete"/>
+                        <img onClick={actions.bind(null, "share", project.id)} src={shareIcon} alt="share" />
+                        <img onClick={actions.bind(null, "duplicate", project.id)} src={duplicateIcon} alt="duplicate" />
+                        <img onClick={actions.bind(null, "delete", project.id)} src={deleteIcon} alt="delete" />
                     </div>
                 </div>
                 <div className={styles.openBox}>
@@ -234,56 +194,64 @@ class Project extends Component{
     }
 }
 
-const Tools = ({toolsOption, total, changeOption}) => {
-    return <div className={styles.tools}>
-        <Search 
-            value={toolsOption.keywords}
-            onChange={changeOption.bind(null,"keywords")}
-        /> 
-        <Select
-            title="Sort by"
-            autoWidth={null}
-            options={{
-                createdDate: 'Last Created',
-                updatedDate: 'Last Modified',
-                progressUp: 'Progress 1 - 4',
-                progressDown: 'Progress 4 - 1',
-                aToz: 'A - Z',
-                zToa: 'Z - A'
-            }}
-            value={toolsOption.sort}
-            onChange={changeOption.bind(null,"sort")}
-        />
-        <Select
-            title="Projects  perpage"
-            autoWidth
-            options={{
-                5: '5',
-                10: '10',
-                20: '20'
-            }}
-            value={toolsOption.perPage}
-            onChange={changeOption.bind(null,"perPage")}
-        />
-        <Pagination
-            current={toolsOption.currentPage}
-            pageSize={toolsOption.perPage}
-            total={total}
-            onChange={changeOption.bind(null,"currentPage")}
-        />
-    </div>
+@observer
+class Tools extends Component {
+    render() {
+        const { toolsOption, total, changeOption, changePage } = this.props;
+        return <div className={styles.tools}>
+            <Search
+                value={toolsOption.keywords}
+                onChange={changeOption.bind(null, "keywords")}
+            />
+            <Select
+                title="Sort by"
+                autoWidth={null}
+                options={{
+                    createTime: 'Last Created',
+                    updateTime: 'Last Modified',
+                    // progressUp: 'Progress 1 - 4',
+                    // progressDown: 'Progress 4 - 1',
+                    // aToz: 'A - Z',
+                    // zToa: 'Z - A'
+                }}
+                value={toolsOption.sort}
+                onChange={changeOption.bind(null, "sort")}
+            />
+            <Select
+                title="Projects  perpage"
+                autoWidth
+                options={{
+                    5: 5,
+                    10: 10,
+                    20: 20
+                }}
+                value={toolsOption.limit}
+                onChange={changeOption.bind(null, "limit")}
+            />
+            <Pagination
+                current={toolsOption.current}
+                pageSize={toolsOption.limit}
+                total={total}
+                onChange={changePage}
+            />
+        </div>
+    }
 }
 
-const Bar = ({ toggleSelect, ids, actions }) => {
-    return <div className={styles.bar}>
-        <div className={styles.select}>
-            <img className={styles.checked} onClick={toggleSelect} src={checkedIcon} alt="checked"/>
-            <span><span className={styles.count}>{ids.length}</span> Screen Selected</span>
+@observer
+class Bar extends Component {
+    render() {
+        const { toggleSelect, ids, actions } = this.props
+        return <div className={styles.bar}>
+            <div className={styles.select}>
+                <img className={styles.checked} onClick={toggleSelect} src={checkedIcon} alt="checked" />
+                <span><span className={styles.count}>{ids.length}</span> Screen Selected</span>
+            </div>
+            <div className={styles.action}>
+                <img onClick={actions.bind(null, "share", ids)} src={shareDarkIcon} alt="share" />
+                <img onClick={actions.bind(null, "duplicate", ids)} src={duplicateDarkIcon} alt="duplicate" />
+                <img onClick={actions.bind(null, "delete", ids)} src={deleteDarkIcon} alt="delete" />
+            </div>
         </div>
-        <div className={styles.action}>
-            <img onClick={actions.bind(null, "share", ids)} src={shareDarkIcon} alt="share"/>
-            <img onClick={actions.bind(null, "duplicate", ids)} src={duplicateDarkIcon} alt="duplicate"/>
-            <img onClick={actions.bind(null, "delete", ids)} src={deleteDarkIcon} alt="delete"/>
-        </div>
-    </div>
+    }
 }

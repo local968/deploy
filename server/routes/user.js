@@ -28,7 +28,7 @@ router.post('/login', (req, res) => {
         Promise.reject({ status: 400, message: 'incorrect password.' })
       }
     })
-    .catch(error => res.send(error))
+    .catch(error => res.send(error))  
 });
 
 router.delete('/logout', (req, res) => {
