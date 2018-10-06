@@ -19,7 +19,7 @@ export default class Project {
 	@observable problemType = '';
 	@observable statement = '';
   @observable business = '';
-  
+
   //etl
 	@observable etling = false;
 
@@ -167,7 +167,7 @@ export default class Project {
   updateProject = data => {
     this.loading = true;
     data.id = this.id
-    
+
     return socketStore.ready().then(api => {
       return api.updateProject(data).then(result => {
         const { status, message, id } = result

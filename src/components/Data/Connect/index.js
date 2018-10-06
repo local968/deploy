@@ -147,7 +147,7 @@ export default class DataConnect extends Component {
 
 	selectSample = filename => {
 		if (!!this.state.progress) return false;
-		const { userId, project } = this.props;
+		const { userId = 0, project } = this.props;
 
 		this.props.project.fastTrackInit(filename);
 

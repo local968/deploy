@@ -7,35 +7,35 @@ const { TextArea } = Input;
 
 @observer
 export default class Project extends Component {
-    onChange = (k, e) => {
-        const {project} = this.props;
-        project[k] = e.target.value;
-    }
+  onChange = (k, e) => {
+    const { project } = this.props;
+    project[k] = e.target.value;
+  }
 
-    nextStep = () => {
-        const {project} = this.props;
-        project.updateProject({
-            name: project.name,
-            description: project.description
-        })
-        project.nextMainStep(1);
-    }
+  nextStep = () => {
+    const { project } = this.props;
+    project.updateProject({
+      name: project.name,
+      description: project.description
+    })
+    project.nextMainStep(1);
+  }
 
-    render() {
-        const {project} = this.props;
-        return <div className={styles.project}>
-            <div className={styles.title}>
-                <span>Please name your project and give it a description</span>
-            </div>
-            <div className={styles.row}>
-                <label>Project Name</label>
-                <Input placeholder={"project name"} defaultValue={project?project.name:""} onChange={this.onChange.bind(this,"name")} />
-            </div>
-            <div className={styles.row}>
-                <label >Project Description</label>
-                <TextArea rows={8} placeholder="project description" defaultValue={project?project.description:""} onChange={this.onChange.bind(this,"description")} />
-            </div>
-            <ContinueButton onClick={this.nextStep} disabled={false} text="Continue" />
-        </div>
-    }
+  render() {
+    const { project } = this.props;
+    return <div className={styles.project}>
+      <div className={styles.title}>
+        <span>Please name your project and give it a description</span>
+      </div>
+      <div className={styles.row}>
+        <label>Project Name</label>
+        <Input placeholder={"project name"} defaultValue={project ? project.name : ""} onChange={this.onChange.bind(this, "name")} />
+      </div>
+      <div className={styles.row}>
+        <label >Project Description</label>
+        <TextArea rows={8} placeholder="project description" defaultValue={project ? project.description : ""} onChange={this.onChange.bind(this, "description")} />
+      </div>
+      <ContinueButton onClick={this.nextStep} disabled={false} text="Continue" />
+    </div>
+  }
 }

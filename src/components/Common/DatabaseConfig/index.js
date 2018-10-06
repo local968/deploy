@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 import { Modal, Select, Checkbox, Message, Icon } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
-import db from 'stores/DBStore.js';
+import socketStore from "stores/SocketStore";
 
 const Option = Select.Option;
 const database = ['mysql', 'oracle'];
@@ -108,10 +108,10 @@ export default class DatabaseConfig extends Component {
       const filter = obj =>
         obj && typeof obj === 'object'
           ? Object.keys(obj).reduce((prev, curr) => {
-              if (defaultState[curr] === undefined) return prev;
-              if (obj[curr] === undefined) return prev;
-              return { ...prev, [curr]: obj[curr] };
-            }, {})
+            if (defaultState[curr] === undefined) return prev;
+            if (obj[curr] === undefined) return prev;
+            return { ...prev, [curr]: obj[curr] };
+          }, {})
           : {};
 
       this.localState = {
@@ -129,25 +129,27 @@ export default class DatabaseConfig extends Component {
     const onSubmit = () => {
       if (this.checkForm()) return;
       this.loading = true;
-      db.checkDatabase({
-        ...state,
-        projectId
-      }).then(resp => {
-        if (resp.result.status === -1) {
-          Message.error(resp.result.result['process error']);
-        } else {
-          if (state.rememberMyPassword) {
-            storage.setItem('DatabaseConnectionPassword', state.sqlPassword);
+      socketStore.ready().then(api => {
+        api.checkDatabase({
+          ...state,
+          projectId
+        }).then(resp => {
+          if (resp.result.status === -1) {
+            Message.error(resp.result.result['process error']);
+          } else {
+            if (state.rememberMyPassword) {
+              storage.setItem('DatabaseConnectionPassword', state.sqlPassword);
+            }
+            if (state.rememberMyConnectionProfile) {
+              const profile = { ...state };
+              delete profile.sqlPassword;
+              storage.setItem('DatabaseConnectionProfile', JSON.stringify(state));
+            }
+            submit(resp);
           }
-          if (state.rememberMyConnectionProfile) {
-            const profile = { ...state };
-            delete profile.sqlPassword;
-            storage.setItem('DatabaseConnectionProfile', JSON.stringify(state));
-          }
-          submit(resp);
-        }
-        this.loading = false;
-      });
+          this.loading = false;
+        });
+      })
     };
     return (
       <Modal
@@ -326,10 +328,10 @@ export default class DatabaseConfig extends Component {
               <Icon type="loading" />
             </a>
           ) : (
-            <a className={styles.done} onClick={onSubmit}>
-              CONNECT
+              <a className={styles.done} onClick={onSubmit}>
+                CONNECT
             </a>
-          )}
+            )}
         </div>
       </Modal>
     );

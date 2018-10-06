@@ -14,59 +14,59 @@ import dataQualityActive from './data_quality_a.svg';
 import dataQuality from './data_quality_d.svg';
 
 const imgs = {
-    dataSchema: <img src={dataSchema} alt="schema" />,
-    dataQuality: <img src={dataQuality} alt="quality" />,
-    dataConnectActive: <img src={dataConnectActive} alt="connect" />,
-    dataSchemaActive: <img src={dataSchemaActive} alt="schema" />,
-    dataQualityActive: <img src={dataQualityActive} alt="quality" />
+  dataSchema: <img src={dataSchema} alt="schema" />,
+  dataQuality: <img src={dataQuality} alt="quality" />,
+  dataConnectActive: <img src={dataConnectActive} alt="connect" />,
+  dataSchemaActive: <img src={dataSchemaActive} alt="schema" />,
+  dataQualityActive: <img src={dataQualityActive} alt="quality" />
 }
 
 @observer
 export default class Data extends Component {
-    constructor(props) {
-        super(props);
-        this.step = [
-            {label:'Data Connect',value:"dataConnect"},
-            {label:'Data Schema',value:"dataSchema"},
-            {label:'Data Quality',value:"dataQuality"}
-        ]
+  constructor(props) {
+    super(props);
+    this.step = [
+      { label: 'Data Connect', value: "dataConnect" },
+      { label: 'Data Schema', value: "dataSchema" },
+      { label: 'Data Quality', value: "dataQuality" }
+    ]
+  }
+
+  enter = (step) => {
+    const { mainStep, lastSubStep, subStepActive, noCompute } = this.props.project;
+
+    if (step === subStepActive) return false;
+
+    let maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
+
+    if (step > maxStep) return false;
+
+    this.props.project.nextSubStep(step, 2)
+  }
+
+  getChild = () => {
+    const { project } = this.props;
+    const { curStep, subStepActive } = project || {};
+
+    let subStep = curStep !== 2 ? 3 : subStepActive;
+
+    switch (subStep) {
+      case 1:
+        return <DataConnect project={project} />;
+      case 2:
+        return <DataSchema project={project} />;
+      case 3:
+        return <DataQuality project={project} />;
+      default:
+        return;
     }
+  }
 
-    enter = (step) => {
-        const { mainStep, lastSubStep, subStepActive, noCompute } = this.props.project;
-
-        if (step === subStepActive) return false;
-
-        let maxStep = noCompute? 2 : (mainStep > 2 ? 3 : lastSubStep);
-
-        if (step > maxStep) return false;
-
-        this.props.project.nextSubStep(step, 2)
-    }
-
-    getChild = () => {
-        const { userId, project } = this.props;
-        const { curStep, subStepActive } = project || {};
-
-        let subStep = curStep !== 2 ? 3 : subStepActive;
-        
-        switch (subStep) {
-            case 1:
-                return <DataConnect userId={userId} project={project} />;
-            case 2:
-                return <DataSchema project={project} />;
-            case 3:
-                return <DataQuality project={project} />;
-            default:
-                return;
-        }
-    }
-
-    render() {
-        const { project } = this.props;
-        return <div className={styles.data}>
-            {project && this.getChild()}
-            {project && <ProjectSide enter={this.enter} list={this.step} step={project.subStepActive} imgs={imgs} />}
-        </div>
-    }
+  render() {
+    const { project } = this.props;
+    return <div className={styles.data}>
+      {project && this.getChild()}
+      {project && <ProjectSide enter={this.enter} list={this.step} step={project.subStepActive} imgs={imgs} />}
+    </div>
+  }
 }
