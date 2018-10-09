@@ -23,10 +23,6 @@ class Problem extends Component {
     project.saveProblem()
   }
 
-  test = () => {
-    this.props.project.sendTest();
-  }
-
   onChange = action((type, e) => {
     this.props.project[type] = e.target.value;
   })

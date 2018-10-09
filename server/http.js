@@ -119,11 +119,6 @@ app.post('/api/upload', (req, res) => {
   
 });
 
-app.get('/test11111', (req,res) => {
-  console.log("eteaetaetaetaeta")
-  res.send("test")
-})
-
 const createFilePath = (filePath) => {
   let dirArr = filePath.split(path.sep);
   dirArr.reduce((prev, current) => {
