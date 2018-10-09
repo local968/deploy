@@ -84,7 +84,7 @@ class ProjectStore {
         if (status !== 200) {
           return alert(message)
         }
-        this.list = list.map(row => new Project(row.id, row))
+        this.list = list.map(row => new Project(row.id+"", row))
         this.total = count
       })
     })
@@ -100,7 +100,7 @@ class ProjectStore {
         if (status !== 200) {
           return { error: message }
         }
-        this.list.push(new Project(id))
+        this.list.push(new Project(id+""))
         return { id }
       })
     })
@@ -112,7 +112,9 @@ class ProjectStore {
       () => this.list.length,
       () => {
         this.currentId = id
-        const project = this.list.find(row => row.id === id)
+        const project = this.list.find(row => {
+          return row.id === id
+        })
         if (project) {
           !this.watch.includes(id) && this.watch.push(id)
           project.queryProject()

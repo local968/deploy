@@ -114,6 +114,8 @@ const init = (server, sessionParser) => {
   init.publish = wss.publish
   _publishes.map(args => wss._publishes(...args))
 
+  init.clients = wss.clients
+
   return wss;
 }
 

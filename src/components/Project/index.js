@@ -14,11 +14,11 @@ export default class Project extends Component {
 
   nextStep = () => {
     const { project } = this.props;
-    project.updateProject({
+    project.updateProject(Object.assign({
       name: project.name,
       description: project.description
-    })
-    project.nextMainStep(1);
+    }, project.nextMainStep(1)))
+    ;
   }
 
   render() {

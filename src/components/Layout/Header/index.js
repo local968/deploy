@@ -102,7 +102,8 @@ class ProjectHeader extends Component {
     const { projectStore } = this.props;
     let maxStep = projectStore.project.mainStep;
     if (index > maxStep) return;
-    projectStore.project.nextMainStep(index);
+    const {nextMainStep, updateProject} = projectStore.project
+    updateProject(nextMainStep(index));
   };
 
   render() {

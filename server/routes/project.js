@@ -1,4 +1,5 @@
 const { redis, pubsub } = require('redis')
+const config = require("../../config")
 const wss = require('../webSocket')
 const uuid = require('uuid')
 const moment = require('moment')
@@ -55,17 +56,19 @@ function createOrUpdate(id, userId, params, isCreate = false) {
 
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
-  const id = uuid.v4()
 
-  const params = mapObjectToArray({ id, userId });
-
-  return createOrUpdate(id, userId, params, true)
+  return redis.incr("node:user:"+userId).then(id => {
+    const requestId = uuid.v4()
+    pubsub.lpush(config.requestQueue, JSON.stringify({command: "create", projectId: id.trString(), userId, requestId}))
+    const params = mapObjectToArray({ id, userId });
+    return createOrUpdate(id, userId, params, true)
+  })
 })
 
 wss.register("updateProject", (message, socket) => {
   const userId = socket.session.userId;
   const data = Object.assign({}, message);
-  const {id} = data
+  const { id } = data
   delete data.id
   delete data._id
   delete data.type
@@ -99,10 +102,10 @@ wss.register("queryProject", message => {
   const key = `project:${id}`;
 
   return redis.hgetall(key).then(result => {
-    for(let key in result) {
-      try{
+    for (let key in result) {
+      try {
         result[key] = JSON.parse(result[key])
-      }catch(e){}
+      } catch (e) { }
     }
     return {
       status: 200,
@@ -112,10 +115,27 @@ wss.register("queryProject", message => {
   })
 })
 
+wss.register("changeRequest", (message, socket) => {
+  const userId = socket.session.userId;
+  const id = message.id;
+  const params = message.params;
+
+  const data = JSON.stringify(Object.assign({}, params, { requestId: id, userId }))
+  console.log(data, "changeRequest")
+  // redis.select(0).then(() => {
+  pubsub.lpush(config.requestQueue, data)
+  // })
+
+  return {
+    status: 200,
+    message: "ok"
+  }
+})
+
 wss.register("watchProject", (message, socket) => {
   const userId = socket.session.userId;
   const id = message.id;
-  if(!id) return { status: 500, message: "empty id" }
+  if (!id) return { status: 500, message: "empty id" }
   const key = "user:" + userId + ":project:" + id
   wss.subscribe(key, (data) => {
     try {
@@ -145,7 +165,7 @@ wss.register("watchProjectList", (message, socket) => {
 
 wss.register("testPub", (message, socket) => {
   const userId = socket.session.userId;
-  ws.publish("user:" + userId + "projects", { a: 1 })
+  wss.publish("user:" + userId + "projects", { a: 1 })
   return { status: 200, message: "ok" }
 })
 
@@ -159,3 +179,33 @@ function mapObjectToArray(obj) {
   })
   return arr
 }
+
+function watchResult() {
+  // console.log(redis)
+  // redis.select(0).then(() => {
+  pubsub.rpop(config.resultQueue).then(data => {
+    if (data) {
+      try {
+        data = JSON.parse(data)
+      } catch (e) { }
+      console.log(data, "result")
+      try {
+        const userId = data.userId
+        let isActive = false
+        wss.clients.forEach(c => {
+          if(c.session.userId === userId) isActive = true;
+        })
+        if(!isActive) throw new Error("user:" + userId + " is not active")
+        wss.publish("user:" + userId + ":projects", data)
+      }catch(err) {
+        console.log(err.message)
+        pubsub.lpush(config.resultQueue, JSON.stringify(data))
+      }
+      
+    }
+  })
+  // })
+
+}
+
+setInterval(watchResult, 2000)

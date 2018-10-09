@@ -8,7 +8,7 @@ wss.register('searchDeployment', (message, socket) => {
 })
 
 wss.register('watchDeployment', (message, socket) => {
-
+  return { list: [] }
 })
 
 wss.register('addDeployment', (message, socket) => {

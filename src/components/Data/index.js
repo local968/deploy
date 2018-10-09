@@ -33,7 +33,7 @@ export default class Data extends Component {
   }
 
   enter = (step) => {
-    const { mainStep, lastSubStep, subStepActive, noCompute } = this.props.project;
+    const { mainStep, lastSubStep, subStepActive, noCompute, nextSubStep, updateProject } = this.props.project;
 
     if (step === subStepActive) return false;
 
@@ -41,7 +41,7 @@ export default class Data extends Component {
 
     if (step > maxStep) return false;
 
-    this.props.project.nextSubStep(step, 2)
+    updateProject(nextSubStep(step, 2))
   }
 
   getChild = () => {
