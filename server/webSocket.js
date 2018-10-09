@@ -59,7 +59,7 @@ const init = (server, sessionParser) => {
       if (args.length < 2 || !args[0].type) return listener(...args)
       const message = args[0]
       const socket = args[1]
-      const returnValue = listener(message, socket)
+      const returnValue = listener(message, socket) || {}
       if (returnValue.then && typeof returnValue.then === 'function') {
         returnValue.then(result => {
           result.request = message
