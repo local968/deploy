@@ -15,15 +15,18 @@ export default class DataQuality extends Component {
     }
 
     startTrain = () => {
-        this.props.project.nextMainStep(3);
+        const {nextMainStep, updateProject} = this.props.project
+        updateProject(nextMainStep(3));
     }
 
     backToConnect = () => {
-        this.props.project.nextSubStep(1, 2)
+        const {updateProject, nextSubStep} = this.props.project
+        updateProject(nextSubStep(1, 2))
     }
 
     backToSchema = () => {
-        this.props.project.nextSubStep(2, 2)
+        const {updateProject, nextSubStep} = this.props.project
+        updateProject(nextSubStep(2, 2))
     }
 
     editFixes = () => {

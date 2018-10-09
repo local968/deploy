@@ -1,7 +1,7 @@
 const config = require('../config')
 const Redis = require('ioredis')
-const redis = new Redis(config.redisUri)
-const pubsub = new Redis(config.pubsubUri)
+const redis = new Redis({...config.redis, db: 10})
+const pubsub = new Redis({...config.redis, db: 0})
 
 redis.on('connect', () => {
   console.log('redis connected')

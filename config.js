@@ -14,7 +14,8 @@ module.exports = Object.assign(
     secret: 'adslkjfhoquhfjLKAHLK',
     redisUri: 'redis://:@ty.dnnmind.com:6379/10',
     pubsubUri: 'redis://:@ty.dnnmind.com:6379/0',
-    secret: 'adslkjfhoquhfjLKAHLK'
+    requestQueue: 'taskQueue',
+    resultQueue: 'resultDataQueue'
   },
   localConfig
 );

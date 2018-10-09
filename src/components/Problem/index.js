@@ -20,12 +20,7 @@ class Problem extends Component {
 
   nextStep = () => {
     const { project } = this.props;
-    project.updateProject({
-      problemType: project.problemType,
-      statement: project.statement,
-      business: project.business
-    })
-    project.nextMainStep(2);
+    project.saveProblem()
   }
 
   test = () => {
@@ -37,7 +32,7 @@ class Problem extends Component {
   })
 
   render() {
-    const { problemType, statement, business } = this.props.project || {}
+    const { changeProjectType, statement, business } = this.props.project || {}
     return <div className={styles.problem}>
       <div>
         <div className={styles.title}><span>Describe your business problem.</span></div>
@@ -62,7 +57,7 @@ class Problem extends Component {
         <div className={styles.title}><span>Choose Problem Type</span></div>
         <div className={styles.radioBox}>
           <div className={styles.text}><span>Prediction</span></div>
-          <RadioGroup className={styles.radio} value={problemType} onChange={this.onChange.bind(this, "problemType")}>
+          <RadioGroup className={styles.radio} value={changeProjectType} onChange={this.onChange.bind(this, "changeProjectType")}>
             {selectable.map((content, index) => (
               <Radio key={index} value={content.value}>
                 {content.type}
@@ -71,7 +66,7 @@ class Problem extends Component {
             ))}
           </RadioGroup>
         </div>
-        <ContinueButton onClick={this.nextStep} disabled={!problemType || problemType.length === 0} text="Continue" />
+        <ContinueButton onClick={this.nextStep} disabled={!changeProjectType} text="Continue" />
       </div>
     </div>
   }

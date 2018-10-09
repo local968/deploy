@@ -100,7 +100,7 @@ class ProjectStore {
         if (status !== 200) {
           return { error: message }
         }
-        this.list.push(new Project(id))
+        this.list.push(new Project(""+id))
         return { id }
       })
     })

@@ -49,13 +49,13 @@ export default class Modeling extends Component {
   };
 
   enter = step => {
-    const { lastSubStep, subStepActive } = this.props.project;
+    const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.project;
 
     if (step === subStepActive) return false;
 
     if (step > lastSubStep) return false;
 
-    this.props.project.nextSubStep(step, 3);
+    updateProject(nextSubStep(step, 3))
   };
 
   render() {

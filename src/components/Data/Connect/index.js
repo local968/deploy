@@ -96,8 +96,8 @@ export default class DataConnect extends Component {
     if (checkd.err) {
       return this.file = null
     }
-    //progress设为1
-    this.progress = 1
+    //process设为1
+    this.process = 1
     this.file = null
 
     this.props.project.fastTrackInit(file.name);
@@ -119,7 +119,7 @@ export default class DataConnect extends Component {
   })
 
   onProgress = action((loaded, size) => {
-    this.progress = (loaded / size) * 90
+    this.process = (loaded / size) * 90
   })
 
   doEtl = () => {
@@ -135,7 +135,7 @@ export default class DataConnect extends Component {
   })
 
   selectSample = filename => {
-    if (!!this.progress) return false;
+    if (!!this.process) return false;
     const { userStore, project } = this.props;
 
     this.props.project.fastTrackInit(filename);
@@ -156,13 +156,13 @@ export default class DataConnect extends Component {
       method: 'post',
       params: {
         userId: userStore.info.id,
-        projectId: project.projectId,
+        projectId: project.id,
         type: project.problemType.toLowerCase(),
         filename: filename
       }
     }).then(
       action(() => {
-        this.progress = 90
+        this.process = 90
         this.doEtl();
       }),
       () => {
@@ -195,7 +195,7 @@ export default class DataConnect extends Component {
 
   handleDrop = action((e) => {
     e.preventDefault();
-    if (this.progress) return false;
+    if (this.process) return false;
     let file = e.dataTransfer.files[0];
     this.file = file
   })
@@ -221,14 +221,14 @@ export default class DataConnect extends Component {
         </div>
         <div className={styles.uploadRow}>
           {this.block('From Mr.One', sampleIcon, this.showSample)}
-          {!!this.progress ? (
+          {!!this.process ? (
             this.block('From Computer', localFileIcon)
           ) : (
               <Uploader
                 children={this.block('From Computer', localFileIcon)}
                 onChange={this.upload}
                 onComplete={this.doEtl}
-                params={{ userId: userStore.info.id, projectId: project.projectId }}
+                params={{ userId: userStore.info.id, projectId: project.id }}
                 onProgress={this.onProgress}
                 file={this.file}
               />
@@ -258,7 +258,7 @@ export default class DataConnect extends Component {
             selectSample={this.selectSample}
           />
         )}
-        {!!this.progress && (
+        {!!this.process && (
           <div className={styles.sample}>
             <div className={styles.cover} />
             <div className={styles.progressBlock}>
@@ -271,7 +271,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressing}>
                   <Progress
-                    percent={this.progress}
+                    percent={this.process}
                     status="active"
                     strokeWidth={12}
                     showInfo={false}
@@ -289,12 +289,12 @@ export default class DataConnect extends Component {
           visible={this.sql}
           onClose={this.hideSql}
           title="Data Source - Database"
-          projectId={project.projectId}
+          projectId={project.id}
           onSubmit={action(options => {
             const csvLocation = options.result.result.csvLocation;
             project.fastTrackInit(csvLocation);
 
-            Papa.parse(`/api/download?csvLocation=${csvLocation}&userId=${userStore.info.id}&projectId=${project.projectId}`, {
+            Papa.parse(`/api/download?csvLocation=${csvLocation}&userId=${userStore.info.id}&projectId=${project.id}`, {
               download: true,
               preview: 100,
               complete: result => {
@@ -306,7 +306,7 @@ export default class DataConnect extends Component {
               }
             });
 
-            this.progress = 90
+            this.process = 90
             this.doEtl();
 
             this.hideSql();
