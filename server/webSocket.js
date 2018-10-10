@@ -61,6 +61,7 @@ const init = (server, sessionParser) => {
       const socket = args[1]
       const returnValue = listener(message, socket) || {}
       if (returnValue.then && typeof returnValue.then === 'function') {
+        returnValue.progress = (result) => socket.send(JSON.stringify({ ...result, request: { ...message, progress: true } }))
         returnValue.then(result => {
           result.request = message
           return socket.send(JSON.stringify({ ...result, request: message }))

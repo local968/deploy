@@ -127,7 +127,8 @@ class SocketStore extends EventEmitter {
         console.warn('unknown message:', message.data)
       }
       if (data.type === 'api') return this.initApi(data);
-      if (data.request && data.request._id) return this.emit(data.request._id, data);
+      if (data.request && data.request._id && data.request.progress !== true) return this.emit(data.request._id, data);
+      if (data.request && data.request._id && data.request.progress === true) return this.emit('progress' + data.request._id, data);
       if (data.type) return this.emit(data.type, data);
     })
     if (debug) {
@@ -152,12 +153,16 @@ class SocketStore extends EventEmitter {
 
   initApi(data) {
     data.api.map(eventName => {
-      return this.api[eventName] = (data = {}) => {
+      return this.api[eventName] = (data = {}, callback) => {
         const _id = uuid.v4()
         data._id = _id
         data.type = eventName
+        if (callback) this.on('progress' + _id, callback)
         return new Promise((resolve, reject) => {
-          this.once(_id, resolve)
+          this.once(_id, (...args) => {
+            if (callback) this.removeListener('progress' + _id, callback)
+            resolve(...args)
+          })
           this.socket.send(JSON.stringify(data))
         })
       }

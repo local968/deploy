@@ -1,126 +1,11 @@
 import moment from 'moment';
-import React, { Component } from 'react';
-import * as ReactDOM from 'react-dom';
 import axios from 'axios';
-import { Modal, Progress, Button } from 'antd';
 
-export default async (file, config) => {
-  let div = document.createElement('div');
-  document.body.appendChild(div);
-  function close(...args) {
-    render({
-      close,
-      visible: false,
-      afterClose: destroy.bind(this, ...args)
-    });
-  }
-  function destroy(...args) {
-    const unmountResult = ReactDOM.unmountComponentAtNode(div);
-    if (unmountResult && div.parentNode) {
-      div.parentNode.removeChild(div);
-    }
-    const triggerCancel =
-      args && args.length && args.some(param => param && param.triggerCancel);
-  }
-  function render(props) {
-    ReactDOM.render(<ProgressModal {...props} />, div);
-  }
-
-  return new Promise((resolve, reject) => {
-    render({ visible: true, close, resolve, reject, file, config });
-  });
-};
-
-class ProgressModal extends Component {
-  state = {
-    isPaused: false,
-    speed: '0 bytes/s',
-    percentage: 0
-  };
-  constructor(props) {
-    super(props);
-    const { resolve, reject, file, config } = props;
-    this.uploader = new Uploader(file, config);
-    this.uploader.onError(error => {
-      this.setState({ isPaused: true, error });
-    });
-    this.uploader.onFinished(response => {
-      clearInterval(this.speedInterval);
-      this.uploader.pause();
-      this.props.close();
-      resolve();
-    });
-
-    this.uploader.upload();
-
-    this.speedInterval = setInterval(() => {
-      const progress = this.uploader.progress;
-      const percentage =
-        (progress.split('/')[0] / progress.split('/')[1]).toFixed(2) * 100;
-      this.setState({
-        speed: this.uploader.speedText,
-        percentage,
-        errorTimes: this.uploader.errorTimes
-      });
-    }, 500);
-  }
-  render() {
-    const { close, afterClose, visible, file } = this.props;
-    const { speed, percentage, isPaused, error, errorTimes } = this.state;
-
-    return (
-      <Modal
-        destroyOnClose={true}
-        closable={false}
-        footer={null}
-        keyboard={false}
-        maskClosable={false}
-        title="Data Loading"
-        visible={visible}
-        afterClose={afterClose}
-      >
-        <span>{file && file.name}</span>
-        <div style={{ paddingRight: 10, overflow: 'hidden' }}>
-          <Progress percent={parseInt(percentage)} />
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <span>{speed}</span>
-          {error &&
-            isPaused && (
-              <span style={{ float: 'left', color: 'red' }}>
-                {error.message}
-              </span>
-            )}
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <Button
-            onClick={this.togglePause.bind(this)}
-            style={{ marginRight: 10 }}
-          >
-            {isPaused
-              ? 'Resume' + (error && errorTimes ? `(${errorTimes})` : '')
-              : 'Pause'}
-          </Button>
-          <Button type="danger" onClick={this.cancel.bind(this)}>
-            Cancel
-          </Button>
-        </div>
-      </Modal>
-    );
-  }
-
-  togglePause() {
-    this.uploader.isPause ? this.uploader.resume() : this.uploader.pause();
-    this.setState({ isPaused: !this.state.isPaused, error: null });
-  }
-
-  cancel() {
-    clearInterval(this.speedInterval);
-    this.uploader.pause();
-    Modal.error({ content: 'Upload failed. Please reselect a file.' });
-    this.props.close();
-    this.props.reject('cancel');
-  }
+export default (file, config) => {
+  const uploader = new Uploader(file, config)
+  uploader.onError(config.onError)
+  uploader.onFinished(config.onFinished)
+  uploader.onProgress = config.onProgress
 }
 
 class Uploader {
@@ -221,6 +106,9 @@ class Uploader {
       this.progress = this.totalLoaded + '/' + this.file.size;
       latestCalculateTime = currentTime;
       latestLoadedSize = currentLoadedSize;
+      if (this.onProgress && typeof this.onProgress === 'function') {
+        this.onProgress(this.progress, this.speedText, this.speed)
+      }
     }, 500);
   }
 
@@ -348,7 +236,7 @@ class Uploader {
           'content-type': 'application/octet-stream',
           'content-range': `bytes ${index * this.CHUNK_SIZE}-${rangeEnd}/${
             this.file.size
-          }`,
+            }`,
           'session-id': this.sessionId,
           ...this.headers
         },

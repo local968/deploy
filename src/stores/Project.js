@@ -396,7 +396,7 @@ export default class Project {
     // fill_method:  无效值
     // kwargs:
     socketStore.ready()
-      .then(api => api.etl(data))
+      .then(api => api.etl(data, console.log.bind(console, 'etl progress:')))
       .then(console.log.bind(console, 'etl result:'))
     // this.sendRequest(data);
 

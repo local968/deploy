@@ -118,7 +118,10 @@ wss.register("queryProject", message => {
 
 wss.register('etl', (message, socket) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
-  return command(data)
+  return command(data, (result) => {
+    const status = Math.random() > 0.9 ? command.FINISH : command.SEND
+    return { ...result, progressStatus: status } // command.FINISH
+  })
   // .then(result => ({ status: 200, message: 'ok', result })).catch(error => ({status:}))
 })
 
