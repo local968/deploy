@@ -3,6 +3,7 @@ const config = require("../../config")
 const wss = require('../webSocket')
 const uuid = require('uuid')
 const moment = require('moment')
+const command = require('../command')
 
 function query(key, params) {
   const Field = ["id", "name", "createTime", "curStep"]
@@ -57,9 +58,9 @@ function createOrUpdate(id, userId, params, isCreate = false) {
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
-  return redis.incr("node:user:"+userId).then(id => {
+  return redis.incr("node:user:" + userId).then(id => {
     const requestId = uuid.v4()
-    pubsub.lpush(config.requestQueue, JSON.stringify({command: "create", projectId: id.trString(), userId, requestId}))
+    pubsub.lpush(config.requestQueue, JSON.stringify({ command: "create", projectId: id.toString(), userId, requestId }))
     const params = mapObjectToArray({ id, userId });
     return createOrUpdate(id, userId, params, true)
   })
@@ -115,22 +116,29 @@ wss.register("queryProject", message => {
   })
 })
 
-wss.register("changeRequest", (message, socket) => {
-  const userId = socket.session.userId;
-  const id = message.id;
-  const params = message.params;
-
-  const data = JSON.stringify(Object.assign({}, params, { requestId: id, userId }))
-  console.log(data, "changeRequest")
-  // redis.select(0).then(() => {
-  pubsub.lpush(config.requestQueue, data)
-  // })
-
-  return {
-    status: 200,
-    message: "ok"
-  }
+wss.register('etl', (message, socket) => {
+  const data = { ...message, userId: socket.session.userId, requestId: message._id }
+  return command(data)
+  // .then(result => ({ status: 200, message: 'ok', result })).catch(error => ({status:}))
 })
+
+// wss.register("changeRequest", (message, socket) => {
+//   const userId = socket.session.userId;
+//   const id = message.id;
+//   const params = message.params;
+
+//   const data = JSON.stringify(Object.assign({}, params, { requestId: id, userId }))
+//   console.log(data, "changeRequest")
+//   return command(data)
+//   // redis.select(0).then(() => {
+//   pubsub.lpush(config.requestQueue, data)
+//   // })
+
+//   return {
+//     status: 200,
+//     message: "ok"
+//   }
+// })
 
 wss.register("watchProject", (message, socket) => {
   const userId = socket.session.userId;
@@ -180,32 +188,32 @@ function mapObjectToArray(obj) {
   return arr
 }
 
-function watchResult() {
-  // console.log(redis)
-  // redis.select(0).then(() => {
-  pubsub.rpop(config.resultQueue).then(data => {
-    if (data) {
-      try {
-        data = JSON.parse(data)
-      } catch (e) { }
-      console.log(data, "result")
-      try {
-        const userId = data.userId
-        let isActive = false
-        wss.clients.forEach(c => {
-          if(c.session.userId === userId) isActive = true;
-        })
-        if(!isActive) throw new Error("user:" + userId + " is not active")
-        wss.publish("user:" + userId + ":projects", data)
-      }catch(err) {
-        console.log(err.message)
-        pubsub.lpush(config.resultQueue, JSON.stringify(data))
-      }
-      
-    }
-  })
-  // })
+// function watchResult() {
+//   // console.log(redis)
+//   // redis.select(0).then(() => {
+//   pubsub.rpop(config.resultQueue).then(data => {
+//     if (data) {
+//       try {
+//         data = JSON.parse(data)
+//       } catch (e) { }
+//       console.log(data, "result")
+//       try {
+//         const userId = data.userId
+//         let isActive = false
+//         wss.clients.forEach(c => {
+//           if (c.session.userId === userId) isActive = true;
+//         })
+//         if (!isActive) throw new Error("user:" + userId + " is not active")
+//         wss.publish("user:" + userId + ":projects", data)
+//       } catch (err) {
+//         console.log(err.message)
+//         pubsub.lpush(config.resultQueue, JSON.stringify(data))
+//       }
 
-}
+//     }
+//   })
+//   // })
 
-setInterval(watchResult, 2000)
+// }
+
+// setInterval(watchResult, 2000)

@@ -73,7 +73,7 @@ export default class Project {
   @observable crossCount = 5;
 
   //req
-	@observable reqs = []
+  @observable reqs = []
 
   constructor(id, args) {
     this.id = id
@@ -198,14 +198,14 @@ export default class Project {
     })
   }
 
-	sendRequest = (request) => {
-		const id = uuid();
-		this.reqs.push(id)
-		// when(
-		// 	() => socketStore.isready,
-		// 	() => socketStore.send("changeRequest", { id, params: request })
+  sendRequest = (request) => {
+    const id = uuid();
+    this.reqs.push(id)
+    // when(
+    // 	() => socketStore.isready,
+    // 	() => socketStore.send("changeRequest", { id, params: request })
     // )
-    
+
     return socketStore.ready().then(api => {
       return api.changeRequest({ id, params: request }).then(result => {
         const { status, message } = result
@@ -214,7 +214,7 @@ export default class Project {
         }
       })
     })
-	}
+  }
 
   @action
   setProperty = (data) => {
@@ -266,135 +266,139 @@ export default class Project {
 
   /**---------------------------------------------data-------------------------------------------------*/
   //修改上传文件
-	@action
-	fastTrackInit = (name) => {
-		const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: name }, {
-			mainStep: 2,
-			curStep: 2,
-			lastSubStep: 1,
-			subStepActive: 1
-		})
-		this.updateProject(backData);
-	}
-
-	//读取预览文件
-	@action
-	newFileInit = (uploadData) => {
-		const rawHeader = uploadData[0].map((h) => h.trim());
-		const data = uploadData.slice(1);
-
-		const temp = {};
-		const header = rawHeader.map((h, i) => {
-			h = h.trim();
-			if (/^$/.test(h)) {
-				h = `Unnamed: ${i}`;
-			}
-			if (!temp[h]) {
-				temp[h] = 1;
-			} else {
-				h = h + '.' + temp[h];
-				temp[h]++;
-			}
-			return h;
-		});
-
-		// 上传文件，target为空
-		this.updateProject({
-			uploadData: data,
-			dataHeader: header,
-			rawHeader: header,
-		});
-		// this.nextSubStep(2, 2);
-	}
-
-	@computed
-	get headerTemp (){
-		//查看是否存在相同名称的header
-		let temp = {};
-		let isMissed = false;
-		let isDuplicated = false;
-		this.rawHeader.forEach((h, i) => {
-			h = h.trim();
-			if (!h) {
-				isMissed = true;
-				return;
-			}
-			if (!temp[h]) {
-				temp[h] = [i];
-			} else {
-				isDuplicated = true;
-				temp[h].push(i);
-			}
-		});
-		return {
-			temp,
-			isMissed,
-			isDuplicated
-		};
+  @action
+  fastTrackInit = (name) => {
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: name }, {
+      mainStep: 2,
+      curStep: 2,
+      lastSubStep: 1,
+      subStepActive: 1
+    })
+    this.updateProject(backData);
   }
-  
+
+  //读取预览文件
+  @action
+  newFileInit = (uploadData) => {
+    const rawHeader = uploadData[0].map((h) => h.trim());
+    const data = uploadData.slice(1);
+
+    const temp = {};
+    const header = rawHeader.map((h, i) => {
+      h = h.trim();
+      if (/^$/.test(h)) {
+        h = `Unnamed: ${i}`;
+      }
+      if (!temp[h]) {
+        temp[h] = 1;
+      } else {
+        h = h + '.' + temp[h];
+        temp[h]++;
+      }
+      return h;
+    });
+
+    // 上传文件，target为空
+    this.updateProject({
+      uploadData: data,
+      dataHeader: header,
+      rawHeader: header,
+    });
+    // this.nextSubStep(2, 2);
+  }
+
+  @computed
+  get headerTemp() {
+    //查看是否存在相同名称的header
+    let temp = {};
+    let isMissed = false;
+    let isDuplicated = false;
+    this.rawHeader.forEach((h, i) => {
+      h = h.trim();
+      if (!h) {
+        isMissed = true;
+        return;
+      }
+      if (!temp[h]) {
+        temp[h] = [i];
+      } else {
+        isDuplicated = true;
+        temp[h].push(i);
+      }
+    });
+    return {
+      temp,
+      isMissed,
+      isDuplicated
+    };
+  }
+
 
   /**---------------------------------------------data-------------------------------------------------*/
   etl = () => {
-		const { userId, id, problemType, dataHeader, uploadFileName, rawHeader } = this;
+    const { userId, id, problemType, dataHeader, uploadFileName, rawHeader } = this;
 
-		const command = 'etl';
+    const command = 'etl';
 
-		const data = {
-			csvLocation: uploadFileName,
-			projectId: id,
-			time: moment().valueOf(),
-			command,
-			validationRate: this.validationRate,
-			holdoutRate: this.holdoutRate
-		}
+    const data = {
+      csvLocation: uploadFileName,
+      projectId: id,
+      time: moment().valueOf(),
+      command,
+      validationRate: this.validationRate,
+      holdoutRate: this.holdoutRate
+    }
 
-		if (this.colType.length) {
-			data.colType = [...this.colType];
-		}
+    if (this.colType.length) {
+      data.colType = [...this.colType];
+    }
 
-		if (this.target) {
-			data.targetLabel = this.target;
-			data.problemType = problemType;
-		}
+    if (this.target) {
+      data.targetLabel = this.target;
+      data.problemType = problemType;
+    }
 
-		if (dataHeader.length !== rawHeader.length) {
-			data.featureLabel = toJS(...dataHeader)
-		}
+    if (dataHeader.length !== rawHeader.length) {
+      data.featureLabel = toJS(...dataHeader)
+    }
 
-		if (this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
-			data.mismatchFillMethod = toJS(this.mismatchFillMethod);
-		}
+    if (this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
+      data.mismatchFillMethod = toJS(this.mismatchFillMethod);
+    }
 
-		if (this.nullFillMethod && Object.keys(this.nullFillMethod).length) {
-			data.nullFillMethod = toJS(this.nullFillMethod);
-		}
+    if (this.nullFillMethod && Object.keys(this.nullFillMethod).length) {
+      data.nullFillMethod = toJS(this.nullFillMethod);
+    }
 
-		if (this.outlierFillMethod && Object.keys(this.outlierFillMethod).length) {
-			data.outlierFillMethod = toJS(this.outlierFillMethod);
-		}
+    if (this.outlierFillMethod && Object.keys(this.outlierFillMethod).length) {
+      data.outlierFillMethod = toJS(this.outlierFillMethod);
+    }
 
-		if (this.targetMap && Object.keys(this.targetMap).length) {
-			data.targetMap = toJS(this.targetMap);
-		}
+    if (this.targetMap && Object.keys(this.targetMap).length) {
+      data.targetMap = toJS(this.targetMap);
+    }
 
-		if (this.outlierDict && Object.keys(this.outlierDict).length) {
-			data.outlierDict = toJS(this.outlierDict);
-		}
+    if (this.outlierDict && Object.keys(this.outlierDict).length) {
+      data.outlierDict = toJS(this.outlierDict);
+    }
 
-		if (this.noCompute || this.firstEtl) {
-			data.noCompute = true;
-		}
-		this.etling = true;
-		console.log(data)
-		// id: request ID
-		// userId: user ID
-		// projectId: project ID
-		// csv_location: csv 文件相对路径
-		// problem_type: 预测类型 Classification , Regression
-		// feature_label: 特征列名
-		// fill_method:  无效值
-		// kwargs:
-		this.sendRequest(data);
+    if (this.noCompute || this.firstEtl) {
+      data.noCompute = true;
+    }
+    this.etling = true;
+    console.log(data)
+    // id: request ID
+    // userId: user ID
+    // projectId: project ID
+    // csv_location: csv 文件相对路径
+    // problem_type: 预测类型 Classification , Regression
+    // feature_label: 特征列名
+    // fill_method:  无效值
+    // kwargs:
+    socketStore.ready()
+      .then(api => api.etl(data))
+      .then(console.log.bind(console, 'etl result:'))
+    // this.sendRequest(data);
+
   }
 }
