@@ -44,9 +44,9 @@ class ProjectStore {
 
   @action
   changeOption = (k, v) => {
-    try {
+    if (!isNaN(v)) {
       v = parseInt(v, 10)
-    } catch (e) { }
+    }
     this.toolsOption[k] = v;
     this.queryProjectList()
   }
@@ -84,7 +84,7 @@ class ProjectStore {
         if (status !== 200) {
           return alert(message)
         }
-        this.list = list.map(row => new Project(row.id+"", row))
+        this.list = list.map(row => new Project(row.id + "", row))
         this.total = count
       })
     })
@@ -100,7 +100,7 @@ class ProjectStore {
         if (status !== 200) {
           return { error: message }
         }
-        this.list.push(new Project(id+""))
+        this.list.push(new Project(id + ""))
         return { id }
       })
     })

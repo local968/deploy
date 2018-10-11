@@ -59,10 +59,11 @@ wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
   return redis.incr("node:user:" + userId).then(id => {
-    const requestId = uuid.v4()
-    pubsub.lpush(config.requestQueue, JSON.stringify({ command: "create", projectId: id.toString(), userId, requestId }))
-    const params = mapObjectToArray({ id, userId });
-    return createOrUpdate(id, userId, params, true)
+    // return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
+      // console.log(result)
+      const params = mapObjectToArray({ id, userId });
+      return createOrUpdate(id, userId, params, true)
+    // })
   })
 })
 
@@ -119,7 +120,7 @@ wss.register("queryProject", message => {
 wss.register('etl', (message, socket) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
   return command(data, (result) => {
-    const status = Math.random() > 0.9 ? command.FINISH : command.SEND
+    const status = result.status===100 ? command.FINISH : command.SEND
     return { ...result, progressStatus: status } // command.FINISH
   })
   // .then(result => ({ status: 200, message: 'ok', result })).catch(error => ({status:}))

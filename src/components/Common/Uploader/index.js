@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import axios from 'axios';
+// import axios from 'axios';
+import NginxUploader from '../NginxUploader';
 
 export default class Uploader extends Component {
-  constructor(props) {
-    super(props);
-    this.id = `uploader-${Math.floor(Math.random() * 1000)}`;
-    this.blobSlice =
-      File.prototype.mozSlice ||
-      File.prototype.webkitSlice ||
-      File.prototype.slice;
-    this.chunkSize = 2097152;
-    this.retryCount = 0;
-  }
+  // constructor(props) {
+  //   super(props);
+  //   // this.id = `uploader-${Math.floor(Math.random() * 1000)}`;
+  //   // this.blobSlice =
+  //   //   File.prototype.mozSlice ||
+  //   //   File.prototype.webkitSlice ||
+  //   //   File.prototype.slice;
+  //   // this.chunkSize = 2097152;
+  //   // this.retryCount = 0;
+  // }
 
   componentDidUpdate() {
     const { file, onChange } = this.props;
@@ -42,48 +43,48 @@ export default class Uploader extends Component {
     }
   }
 
-  _upload = (file, start = 0, isFirst = true) => {
-    const { params, onProgress, onComplete } = this.props;
-    const end = start + this.chunkSize >= file.size ? file.size : start + this.chunkSize;
-    const chunk = this.blobSlice.call(file, start, end);
-    const formData = new FormData();
-    formData.append('data', chunk);
-    axios
-      .post('/api/upload', formData, {
-        params: Object.assign(params, {
-          start: start,
-          filename: file.name,
-          size: chunk.size,
-          isFirst
-        })
-      })
-      .then(
-        res => {
-          if (res.status !== 200) {
-            return this.retry(
-              file,
-              start,
-              isFirst,
-              res.data ? res.data.message : 'upload error'
-            );
-          }
-          this.retryCount = 0;
-          if (onProgress && typeof onProgress === 'function') {
-            onProgress(res.data.size, file.size)
-          }
-          if (file.size === res.data.size) {
-            if (onComplete && typeof onComplete === 'function') {
-              onComplete(file);
-            }
-            return;
-          }
-          this._upload(file, res.data.size, res.data.isFirst);
-        },
-        () => {
-          console.log('upload error');
-        }
-      );
-  }
+  // _upload = (file, start = 0, isFirst = true) => {
+  //   const { params, onProgress, onComplete } = this.props;
+  //   const end = start + this.chunkSize >= file.size ? file.size : start + this.chunkSize;
+  //   const chunk = this.blobSlice.call(file, start, end);
+  //   const formData = new FormData();
+  //   formData.append('data', chunk);
+  //   axios
+  //     .post('/api/upload', formData, {
+  //       params: Object.assign(params, {
+  //         start: start,
+  //         filename: file.name,
+  //         size: chunk.size,
+  //         isFirst
+  //       })
+  //     })
+  //     .then(
+  //       res => {
+  //         if (res.status !== 200) {
+  //           return this.retry(
+  //             file,
+  //             start,
+  //             isFirst,
+  //             res.data ? res.data.message : 'upload error'
+  //           );
+  //         }
+  //         this.retryCount = 0;
+  //         if (onProgress && typeof onProgress === 'function') {
+  //           onProgress(res.data.size, file.size)
+  //         }
+  //         if (file.size === res.data.size) {
+  //           if (onComplete && typeof onComplete === 'function') {
+  //             onComplete(file);
+  //           }
+  //           return;
+  //         }
+  //         this._upload(file, res.data.size, res.data.isFirst);
+  //       },
+  //       () => {
+  //         console.log('upload error');
+  //       }
+  //     );
+  // }
 
   _onChange = e => {
     const files = e.target.files;
@@ -98,32 +99,37 @@ export default class Uploader extends Component {
         onChange({ file, checkd })
       }
       if (!checkd.err) {
-        this._upload(file);
+        const { onProgress, onComplete } = this.props;
+        NginxUploader(file, {
+          onProgress,
+          onFinished: onComplete
+        })
       }
     }
   };
 
-  retry = (file, start, isFirst, message = 'upload error') => {
-    const { onChange } = this.props;
-    this.retryCount++;
-    if (this.retryCount === 3) {
-      if (onChange && typeof onChange === 'function') {
-        onChange({ err: message });
-      }
-      return
-    }
-    setTimeout(this._upload.bind(null, file, start, isFirst), this.retryCount * 500);
-  };
+  // retry = (file, start, isFirst, message = 'upload error') => {
+  //   const { onChange } = this.props;
+  //   this.retryCount++;
+  //   if (this.retryCount === 3) {
+  //     if (onChange && typeof onChange === 'function') {
+  //       onChange({ err: message });
+  //     }
+  //     return
+  //   }
+  //   setTimeout(this._upload.bind(null, file, start, isFirst), this.retryCount * 500);
+  // };
 
   render() {
     const { className, children } = this.props;
+    const id = `uploader-${Math.floor(Math.random() * 1000)}`;
     return (
       <React.Fragment>
-        <label className={className} htmlFor={this.id}>
+        <label className={className} htmlFor={id}>
           {children}
         </label>
         <input
-          id={this.id}
+          id={id}
           className={styles.input}
           type="file"
           onChange={this._onChange}

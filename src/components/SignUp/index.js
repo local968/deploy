@@ -17,17 +17,6 @@ export default class SignUp extends Component {
     confirmPassword: ''
   }
   @observable showLicense = false
-  state = {
-    email: '',
-    password: '',
-    confirmPassword: '',
-    warning: {
-      email: '',
-      password: '',
-      confirmPassword: ''
-    },
-    showLicense: false
-  }
 
   onChangeEmail = action(e => {
     this.email = e.target.value.toLowerCase()

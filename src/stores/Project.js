@@ -38,7 +38,7 @@ export default class Project {
   @observable noCompute = false;
   @observable validationRate = 0.1;
   @observable holdoutRate = 0.1;
-  @observable uploadFileName = '';
+  @observable uploadFileName = [];
 
   //data quality
   @observable mismatchFillMethod = {}
@@ -85,7 +85,7 @@ export default class Project {
     this.etling = false;
 
     return {
-      uploadFileName: '',
+      uploadFileName: [],
       dataHeader: [],
       uploadData: [],
       rawHeader: [],
@@ -176,7 +176,7 @@ export default class Project {
 
     return socketStore.ready().then(api => {
       return api.updateProject(data).then(result => {
-        const { status, message, id } = result
+        const { status, message } = result
         this.loading = false;
         if (status !== 200) {
           return alert(message)
@@ -268,7 +268,9 @@ export default class Project {
   //修改上传文件
   @action
   fastTrackInit = (name) => {
-    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: name }, {
+    const {uploadFileName} = this
+    uploadFileName.push(name)
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: [...uploadFileName] }, {
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
@@ -336,12 +338,12 @@ export default class Project {
 
   /**---------------------------------------------data-------------------------------------------------*/
   etl = () => {
-    const { userId, id, problemType, dataHeader, uploadFileName, rawHeader } = this;
+    const { id, problemType, dataHeader, uploadFileName, rawHeader } = this;
 
     const command = 'etl';
 
     const data = {
-      csvLocation: uploadFileName,
+      csvLocation: [...uploadFileName],
       projectId: id,
       time: moment().valueOf(),
       command,
@@ -396,9 +398,56 @@ export default class Project {
     // fill_method:  无效值
     // kwargs:
     socketStore.ready()
-      .then(api => api.etl(data, console.log.bind(console, 'etl progress:')))
-      .then(console.log.bind(console, 'etl result:'))
-    // this.sendRequest(data);
+      .then(api => api.etl(data, progressResult => {
+        let { result } = progressResult;
+        if (!this.etling) return;
+        Object.keys(result).forEach(k => {
+          if (k === "name") {
+            delete result[k];
+          }
+          if (k.includes("FillMethod")) {
+            Object.keys(result[k]).forEach(key => {
+              if (result[k][key] === "ignore") delete result[k][key]
+            })
+          }
+        })
+        console.log(result, "etl progress")
+        // this.project.setProperty(result)
+        this.updateProject(result)
+      }))
+      .then(returnValue => {
+        this.etling = false;
+        let { result } = returnValue;
+        Object.keys(result).forEach(k => {
+          if (k === "name") {
+            delete result[k];
+          }
+          if (k.includes("FillMethod")) {
+            Object.keys(result[k]).forEach(key => {
+              if (result[k][key] === "ignore") delete result[k][key]
+            })
+          }
+        })
+        result.dataViews = null;
+        result.firstEtl = false;
+        console.log(result, "etl result")
+        when(
+          () => !!this.uploadData.length,
+          () => this.updateProject(Object.assign(result, this.next()))
+        )
+      })
+  }
 
+  next = () => {
+    const { curStep, subStepActive, noCompute } = this.project;
+    if (curStep === 2 && subStepActive < 3) {
+      if (noCompute && subStepActive !== 1) {
+        return this.nextMainStep(3)
+      }
+      const nextStep = subStepActive + 1;
+      return this.nextSubStep(nextStep, curStep)
+    } else {
+      return false
+    }
   }
 }

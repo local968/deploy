@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
+import { observable } from 'mobx';
 import { Progress } from 'antd';
 import config from '../../../config.js';
 
 @observer
 export default class Loading extends Component {
     timer = null;
-    state = {
-        progress: 1
-    };
+    @observable progress = 1
+
     componentDidMount() {
         const { project } = this.props;
         const { totalLines, rawHeader } = project || {};
@@ -27,11 +27,9 @@ export default class Loading extends Component {
     }
 
     autoIncrease = () => {
-        const { progress } = this.state;
+        const { progress } = this;
         if (progress === 90) return this.clearTimer();
-        this.setState({
-            progress: Math.min(progress + 5, 90)
-        });
+        this.progress = Math.min(progress + 5, 90)
     };
 
     clearTimer = () => {
@@ -47,7 +45,7 @@ export default class Loading extends Component {
                 <div className={styles.training}>
                     <Progress
                         className={styles.trainingProgress}
-                        percent={this.state.progress}
+                        percent={this.progress}
                         status="active"
                     />
                 </div>

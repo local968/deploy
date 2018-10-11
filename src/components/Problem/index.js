@@ -6,7 +6,7 @@ import Hint from 'components/Common/Hint';
 import ContinueButton from 'components/Common/ContinueButton';
 // import { when } from 'mobx';
 import { Input } from 'antd';
-import { observable, runInAction, action } from 'mobx';
+import { action } from 'mobx';
 const { TextArea } = Input;
 
 const RadioGroup = Radio.Group;

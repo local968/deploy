@@ -2,27 +2,23 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
+import { observable } from 'mobx'
 
 import { Select, ContinueButton, ProjectLoading, Table } from 'components/Common';
 
 @observer
 export default class DataSchema extends Component {
-
-    //更改flag使表格重新加载
-    state = {
-        flag: false,
-        checkList: this.props.project.rawHeader.filter(r => !this.props.project.dataHeader.includes(r)),
-        showSelect: false,
-    }
+    @observable checkList = this.props.project.rawHeader.filter(r => !this.props.project.dataHeader.includes(r))
+    @observable showSelect = false
 
     doEtl = () => {
-        const {colType, rawHeader, noCompute} = this.props.project;
-        const newDataHeader = rawHeader.filter(d => !this.state.checkList.includes(d));
+        const { colType, rawHeader, noCompute } = this.props.project;
+        const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
         this.props.project.updateProject({
-			dataHeader: newDataHeader,
+            dataHeader: newDataHeader,
             colType: colType,
             noCompute: noCompute
-		});
+        });
         this.props.project.etl();
     }
 
@@ -30,49 +26,32 @@ export default class DataSchema extends Component {
         this.props.project.updateProject({
             target: value
         })
-        this.setState(Object.assign({}, this.state, {
-            flag: !this.state.flag,
-            checkList: [...this.state.checkList.filter(v => v !== value)]
-        }))
+        this.checkList = [...this.checkList.filter(v => v !== value)]
     }
 
     checked = (key, checked) => {
         if (!checked) {
-            this.setState({
-                flag: !this.state.flag,
-                checkList: [...this.state.checkList, key]
-            })
+            this.checkList = [...this.checkList, key]
         } else {
-            this.setState({
-                flag: !this.state.flag,
-                checkList: [...this.state.checkList.filter(v => v !== key)]
-            })
+            this.checkList = [...this.checkList.filter(v => v !== key)]
         }
     }
 
     select = (key, v) => {
         this.props.project.colType[key] = v
-        this.setState({
-            flag: !this.state.flag
-        })
     }
 
     toggleSelect = () => {
-        this.setState({
-            flag: !this.state.flag,
-            showSelect: !this.state.showSelect
-        })
+        this.showSelect = !this.showSelect
     }
 
     checkNoCompute = (e) => {
         this.props.project.noCompute = e.target.checked;
     }
 
-  
-
     render() {
         const { project } = this.props;
-        const { etling, uploadData, rawHeader, noCompute, target, colType, headerTemp: {temp, isMissed, isDuplicated} } = project;
+        const { etling, uploadData, rawHeader, noCompute, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
         const targetOption = {};
 
         //target选择列表
@@ -102,12 +81,12 @@ export default class DataSchema extends Component {
                         selectOption={{ showSearch: true }}
                     />
                     {(isMissed || isDuplicated) ?
-                    <div className={classnames(styles.schemaSelect,styles.disabled)}>
-                        <span>Select Undesirable Variables</span>
-                    </div>:
-                    <div className={styles.schemaSelect} onClick={this.toggleSelect}>
-                        <span>Select Undesirable Variables</span>
-                    </div>
+                        <div className={classnames(styles.schemaSelect, styles.disabled)}>
+                            <span>Select Undesirable Variables</span>
+                        </div> :
+                        <div className={styles.schemaSelect} onClick={this.toggleSelect}>
+                            <span>Select Undesirable Variables</span>
+                        </div>
                     }
                     {isMissed && <div className={styles.schemaMissed} >
                         <div className={styles.errorBlock}></div>
@@ -119,19 +98,19 @@ export default class DataSchema extends Component {
                     </div>}
                 </div>
                 <div className={styles.content}>
-                    <Table 
+                    <Table
                         uploadData={uploadData}
                         target={target}
                         colType={colType}
                         rawHeader={rawHeader}
                         temp={temp}
-                        checkList={this.state.checkList}
-                        showSelect={this.state.showSelect} 
-                        columnWidth={110} 
-                        rowHeight={34} 
-                        fixedColumnCount={1} 
-                        fixedRowCount={this.state.showSelect ? 3 : 2}
-                        checked={this.checked} 
+                        checkList={this.checkList}
+                        showSelect={this.showSelect}
+                        columnWidth={110}
+                        rowHeight={34}
+                        fixedColumnCount={1}
+                        fixedRowCount={this.showSelect ? 3 : 2}
+                        checked={this.checked}
                         select={this.select} />
                 </div>
             </div>
