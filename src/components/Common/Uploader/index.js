@@ -92,13 +92,21 @@ export default class Uploader extends Component {
 
     const { onChange } = this.props;
     const file = files[0];
-    console.log('file change')
     const { params, onProgress, onComplete } = this.props;
-    const uploader = NginxUploader(file, {
-      onProgress: console.log,
-      onError: console.log,
-      onFinished: console.log,
-      params: params
+
+    axios.post('/upload/check', { fileSize: file.size }).then(response => {
+      const token = response.data.token
+      const uploader = NginxUploader(file, {
+        onProgress: console.log,
+        onError: console.log,
+        onFinished: console.log,
+        params: {
+          ...params,
+          userId: '95b1e501-3ada-4571-a33a-28e230ed8b63',
+          fileSize: file.size,
+          token
+        }
+      })
     })
     return
 
