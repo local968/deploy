@@ -103,7 +103,6 @@ export default class Uploader extends Component {
         params: {
           ...params,
           userId: '95b1e501-3ada-4571-a33a-28e230ed8b63',
-          fileSize: file.size,
           token
         }
       })
