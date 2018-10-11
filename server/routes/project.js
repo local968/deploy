@@ -60,9 +60,9 @@ wss.register("addProject", (message, socket) => {
 
   return redis.incr("node:user:" + userId).then(id => {
     // return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
-      // console.log(result)
-      const params = mapObjectToArray({ id, userId });
-      return createOrUpdate(id, userId, params, true)
+    // console.log(result)
+    const params = mapObjectToArray({ id, userId });
+    return createOrUpdate(id, userId, params, true)
     // })
   })
 })
@@ -118,11 +118,28 @@ wss.register("queryProject", message => {
 })
 
 wss.register('etl', (message, socket) => {
-  const data = { ...message, userId: socket.session.userId, requestId: message._id }
-  return command(data, (result) => {
-    const status = result.status===100 ? command.FINISH : command.SEND
-    return { ...result, progressStatus: status } // command.FINISH
+  const pipeline = redis.pipeline();
+  const files = message.csvLocation || []
+  files.forEach(f => {
+    pipeline.get("file:" + f)
   })
+  return pipeline.exec().then(list => {
+    const error = list.find(i => !!i[0])
+    if(error) return error
+    const csvLocation = list.map(item => {
+      let file = item[1]
+      try{
+        file = JSON.parse(file)
+      }catch(e){}
+      return file.path
+    })
+    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation: csvLocation }
+    return command(data, (result) => {
+      const status = result.status === 100 ? command.FINISH : command.SEND
+      return { ...result, progressStatus: status } // command.FINISH
+    })
+  })
+    
   // .then(result => ({ status: 200, message: 'ok', result })).catch(error => ({status:}))
 })
 

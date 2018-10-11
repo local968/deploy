@@ -268,15 +268,13 @@ export default class Project {
   //修改上传文件
   @action
   fastTrackInit = (name) => {
-    const {uploadFileName} = this
-    uploadFileName.push(name)
-    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: [...uploadFileName] }, {
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: [name] }, {
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
       subStepActive: 1
     })
-    this.updateProject(backData);
+    this.updateProject(backData).then(() => this.etl())
   }
 
   //读取预览文件

@@ -91,16 +91,10 @@ export default class DataConnect extends Component {
   @observable process = 0
 
   upload = action((file, data) => {
-    // const { file, checkd } = data;
-
-    // if (checkd.err) {
-    //   return this.file = null
-    // }
-    //process设为1
-    this.process = 1
+    this.process = 90
     this.file = null
 
-    this.props.project.fastTrackInit(file.name);
+    this.props.project.fastTrackInit(data.fileId);
 
     const reader = new FileReader();
     reader.onload = e => {
@@ -116,8 +110,6 @@ export default class DataConnect extends Component {
     };
     const blob = file.slice(0, 5000000);
     reader.readAsText(blob);
-
-    this.doEtl()
   })
 
   onError = action((error, times) => {
@@ -149,20 +141,6 @@ export default class DataConnect extends Component {
     if (!!this.process) return false;
     const { userStore, project } = this.props;
 
-    this.props.project.fastTrackInit(filename);
-
-    Papa.parse(fileMap[filename], {
-      download: true,
-      preview: 100,
-      complete: result => {
-        if (result.errors.length !== 0) {
-          console.error('parse error: ', result.errors[0].message);
-          return;
-        }
-        this.props.project.newFileInit(result.data);
-      }
-    });
-
     axios('/api/sample', {
       method: 'post',
       params: {
@@ -174,7 +152,19 @@ export default class DataConnect extends Component {
     }).then(
       action(() => {
         this.process = 90
-        this.doEtl();
+        this.props.project.fastTrackInit(filename);
+
+        Papa.parse(fileMap[filename], {
+          download: true,
+          preview: 100,
+          complete: result => {
+            if (result.errors.length !== 0) {
+              console.error('parse error: ', result.errors[0].message);
+              return;
+            }
+            this.props.project.newFileInit(result.data);
+          }
+        });
       }),
       () => {
         message.error('sample file error, please choose again');
@@ -318,7 +308,6 @@ export default class DataConnect extends Component {
             });
 
             this.process = 90
-            this.doEtl();
 
             this.hideSql();
           })}
