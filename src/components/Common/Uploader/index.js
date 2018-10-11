@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-// import axios from 'axios';
+import axios from 'axios';
 import NginxUploader from '../NginxUploader';
 
 export default class Uploader extends Component {
@@ -32,11 +32,18 @@ export default class Uploader extends Component {
 
   upload = file => {
     const { params, onProgress, onComplete } = this.props;
-    this.uploader = NginxUploader(file, {
-      onProgress: onProgress,
-      onFinished: onComplete.bind(null, file),
-      onError: this.retry,
-      params
+
+    axios.post('/upload/check', { fileSize: file.size }).then(response => {
+      const token = response.data.token
+      this.uploader = NginxUploader(file, {
+        onProgress: onProgress,
+        onFinished: onComplete.bind(null, file),
+        onError: this.retry,
+        params: {
+          ...params,
+          token
+        }
+      })
     })
   }
 
@@ -45,15 +52,6 @@ export default class Uploader extends Component {
     if (files.length === 0) return [];
 
     const file = files[0];
-    // console.log('file change')
-    // const { params, onProgress, onComplete } = this.props;
-    // const uploader = NginxUploader(file, {
-    //   onProgress: console.log,
-    //   onError: console.log,
-    //   onFinished: console.log,
-    //   params: params
-    // })
-    // return
 
     if (!!file) {
       const { onError } = this.props;
