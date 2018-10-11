@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import axios from 'axios';
+import NginxUploader from '../NginxUploader';
 
 export default class Uploader extends Component {
   constructor(props) {
@@ -91,6 +92,15 @@ export default class Uploader extends Component {
 
     const { onChange } = this.props;
     const file = files[0];
+    console.log('file change')
+    const { params, onProgress, onComplete } = this.props;
+    const uploader = NginxUploader(file, {
+      onProgress: console.log,
+      onError: console.log,
+      onFinished: console.log,
+      params: params
+    })
+    return
 
     if (!!file) {
       const checkd = this.check(file)
