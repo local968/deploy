@@ -90,12 +90,12 @@ export default class DataConnect extends Component {
   @observable file = null
   @observable process = 0
 
-  upload = action(data => {
-    const { file, checkd } = data;
+  upload = action((file, data) => {
+    // const { file, checkd } = data;
 
-    if (checkd.err) {
-      return this.file = null
-    }
+    // if (checkd.err) {
+    //   return this.file = null
+    // }
     //process设为1
     this.process = 1
     this.file = null
@@ -116,10 +116,21 @@ export default class DataConnect extends Component {
     };
     const blob = file.slice(0, 5000000);
     reader.readAsText(blob);
+
+    this.doEtl()
   })
 
-  onProgress = action((loaded, size) => {
-    this.process = (loaded / size) * 90
+  onError = action((error, times) => {
+    this.file = null
+    this.process = 0
+    console.log(error, times)
+  })
+
+  onProgress = action((progress, speed) => {
+    const [loaded, size] = progress.split("/")
+    try {
+      this.process = (parseFloat(loaded) / parseFloat(size)) * 90
+    } catch (e) { }
   })
 
   doEtl = () => {
@@ -226,8 +237,8 @@ export default class DataConnect extends Component {
           ) : (
               <Uploader
                 children={this.block('From Computer', localFileIcon)}
-                onChange={this.upload}
-                onComplete={this.doEtl}
+                // onChange={this.upload}
+                onComplete={this.upload}
                 params={{ userId: userStore.info.id, projectId: project.id }}
                 onProgress={this.onProgress}
                 file={this.file}
