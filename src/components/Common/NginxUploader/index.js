@@ -1,11 +1,19 @@
 import moment from 'moment';
 import axios from 'axios';
-
-export default (file, config) => {
+import _config from 'config'
+window.axios = axios
+export default (file, config = {}) => {
+  config = {
+    headers: { backend: _config.uploadBackend },
+    path: 'http://' + _config.uploadServer + '/upload',
+    ...config
+  }
   const uploader = new Uploader(file, config)
   uploader.onError(config.onError)
   uploader.onFinished(config.onFinished)
-  uploader.onProgress = config.onProgress
+  uploader.onProgress(config.onProgress)
+  uploader.upload()
+  return { pause: uploader.pause, resume: uploader.resume }
 }
 
 class Uploader {
@@ -106,8 +114,8 @@ class Uploader {
       this.progress = this.totalLoaded + '/' + this.file.size;
       latestCalculateTime = currentTime;
       latestLoadedSize = currentLoadedSize;
-      if (this.onProgress && typeof this.onProgress === 'function') {
-        this.onProgress(this.progress, this.speedText, this.speed)
+      if (this.onProgressCallback && typeof this.onProgressCallback === 'function') {
+        this.onProgressCallback(this.progress, this.speedText, this.speed)
       }
     }, 500);
   }
@@ -219,6 +227,10 @@ class Uploader {
 
   onFinished(fn) {
     this.onFinishedCallback = fn;
+  }
+
+  onProgress(fn) {
+    this.onProgressCallback = fn
   }
 
   uploadChunk(chunk, index, processingIndex = 0) {

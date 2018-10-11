@@ -45,6 +45,15 @@ export default class Uploader extends Component {
     if (files.length === 0) return [];
 
     const file = files[0];
+    console.log('file change')
+    const { params, onProgress, onComplete } = this.props;
+    const uploader = NginxUploader(file, {
+      onProgress: console.log,
+      onError: console.log,
+      onFinished: console.log,
+      params: params
+    })
+    return
 
     if (!!file) {
       const { onError } = this.props;
