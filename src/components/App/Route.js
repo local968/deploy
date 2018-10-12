@@ -13,10 +13,6 @@ import SignActive from 'components/SignActive';
 
 @inject('socketStore')
 class defaultRouter extends Component {
-  constructor(props) {
-    super(props)
-    props.socketStore.connect()
-  }
 
   render() {
     return (

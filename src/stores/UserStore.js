@@ -1,5 +1,6 @@
-import { observable, action } from 'mobx';
+import { observable, action, when } from 'mobx';
 import axios from 'axios';
+import socketStore from './SocketStore';
 
 class UserStore {
 
@@ -18,6 +19,7 @@ class UserStore {
         this.status = 'unlogin'
       }
     }))
+    when(() => this.status === 'login', socketStore.connect.bind(socketStore))
   }
 
   login(params) {
