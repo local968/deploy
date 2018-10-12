@@ -14,7 +14,7 @@ const Classification = 'Classification';
 @observer
 export default class ModelResult extends Component {
   @observable show = false
-  @observable view = simple
+  @observable view = "simple"
 
   componentWillMount() {
     this.props.project.chartData();

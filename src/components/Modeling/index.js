@@ -34,7 +34,8 @@ export default class Modeling extends Component {
   }
 
   getChild = () => {
-    const { models, project } = this.props;
+    const { project } = this.props;
+    const { models } = project;
     const { train2Error, train2ing, subStepActive } = project;
     if (subStepActive === 1) return <StartTrain project={project} />;
 

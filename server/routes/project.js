@@ -137,29 +137,16 @@ wss.register('etl', (message, socket, progress) => {
     const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation: csvLocation }
     return command(data, (result) => {
       return (result.status < 0 || result.status === 100) ? result : progress(result)
-      // return { ...result, progressStatus: status } // command.FINISH
     })
   })
-  // .then(result => ({ status: 200, message: 'ok', result })).catch(error => ({status:}))
 })
 
-// wss.register("changeRequest", (message, socket) => {
-//   const userId = socket.session.userId;
-//   const id = message.id;
-//   const params = message.params;
-
-//   const data = JSON.stringify(Object.assign({}, params, { requestId: id, userId }))
-//   console.log(data, "changeRequest")
-//   return command(data)
-//   // redis.select(0).then(() => {
-//   pubsub.lpush(config.requestQueue, data)
-//   // })
-
-//   return {
-//     status: 200,
-//     message: "ok"
-//   }
-// })
+wss.register('train', (message, socket, progress) => {
+  const data = { ...message, userId: socket.session.userId, requestId: message._id }
+  return command(data, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
 
 wss.register("watchProject", (message, socket) => {
   const userId = socket.session.userId;

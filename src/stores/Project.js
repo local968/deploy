@@ -1,9 +1,11 @@
 import { observable, action, computed, toJS, when } from "mobx";
 import socketStore from "./SocketStore";
-import { v4 as uuid } from 'uuid';
+import Model from "./Model";
 import moment from 'moment';
 
 export default class Project {
+  @observable models = []
+
   @observable id = "";
   @observable exist = true;
   @observable loading = false;
@@ -71,9 +73,6 @@ export default class Project {
   @observable resampling = "no";
   @observable runWith = 'holdout';
   @observable crossCount = 5;
-
-  //req
-  @observable reqs = []
 
   constructor(id, args) {
     this.id = id
@@ -194,24 +193,6 @@ export default class Project {
         this.loading = false;
         if (result.status === 200) return this.setProperty(result.data)
         alert(result.message)
-      })
-    })
-  }
-
-  sendRequest = (request) => {
-    const id = uuid();
-    this.reqs.push(id)
-    // when(
-    // 	() => socketStore.isready,
-    // 	() => socketStore.send("changeRequest", { id, params: request })
-    // )
-
-    return socketStore.ready().then(api => {
-      return api.changeRequest({ id, params: request }).then(result => {
-        const { status, message } = result
-        if (status !== 200) {
-          return alert(message)
-        }
       })
     })
   }
@@ -449,5 +430,78 @@ export default class Project {
     } else {
       return false
     }
+  }
+
+  /**---------------------------------------------train------------------------------------------------*/
+  @action
+  fastTrain = () => {
+    const {
+      userId,
+      projectId,
+      problemType,
+      target,
+      dataHeader,
+      uploadFileName,
+      speed,
+      overfit
+    } = this;
+    const command = 'train2';
+
+    this.updateProject(Object.assign({
+      train2Finished: false,
+      train2ing: true,
+      train2Error: false
+    }, this.nextSubStep(2, 3)));
+
+    this.models = []
+
+    const featureLabel = dataHeader.filter(d => d !== target);
+
+    // id: request ID
+    // userId: user ID
+    // projectId: project ID
+    // csv_location: csv 文件相对路径
+    // problem_type: 预测类型 Classification , Regression
+    // feature_label: 特征列名
+    // target_label:  目标列
+    // fill_method:  无效值
+    // speed:  1-10  默认5
+    // overfit:   1-10 默认5
+    // model_option: model的额外参数，不同model参数不同
+    // kwargs:
+    const trainData = {
+      csvLocation: uploadFileName,
+      problemType,
+      featureLabel,
+      targetLabel: target,
+      projectId,
+      userId,
+      speed,
+      overfit,
+      command
+    };
+
+    socketStore.ready().then(api => api.train(trainData, progressResult => {
+      console.log(progressResult, "train progressResult")
+      if (Array.isArray(progressResult)) {
+        [progressResult] = progressResult
+      }
+      if (progressResult && progressResult.name) {
+        let index = this.models.findIndex(m => {
+          return progressResult.name === m.name
+        })
+        if (index === -1) {
+          this.models.push(new Model(this.userId, this.projectId, progressResult))
+        } else {
+          this.models[index] = new Model(this.userId, this.projectId, progressResult)
+        }
+      }
+    })).then(returnValue => {
+      console.log(returnValue, "train result")
+      this.updateProject({
+        train2Finished: true,
+        train2ing: false
+      });
+    })
   }
 }

@@ -7,6 +7,10 @@ import { Checkbox } from 'antd';
 
 @observer
 export default class Table extends Component {
+    updateGrids = () => {
+        this.grid.forceUpdateGrids()
+    }
+
     cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
         const {checkList, showSelect, uploadData, target, colType, rawHeader, temp} = this.props;
         // const { uploadData, target, colType, rawHeader, headerTemp: {temp} } = this.props.project;
@@ -129,12 +133,12 @@ export default class Table extends Component {
 
     select = (key, e) => {
         this.props.select(key, e.target.value)
-        this.grid.forceUpdateGrids()
+        this.updateGrids()
     }
 
     checked = (key, e) => {
         this.props.checked(key, e.target.checked)
-        this.grid.forceUpdateGrids()
+        this.updateGrids()
     }
 
     MultiGridCb = (grid) => {

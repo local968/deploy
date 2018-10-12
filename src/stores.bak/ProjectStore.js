@@ -107,7 +107,7 @@ class ProjectStore {
                         actual[actualIndex][pridict] += Item;
                     })
                 })
-                m.predicted = [actual[0][0] / (actual[0][0] + actual[0][1]), actual[1][1] / (actual[1][0] + actual[1][1])];
+                m.predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
             }
         }
 
