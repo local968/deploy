@@ -4,17 +4,15 @@ export default class Model {
   @observable score;
   @observable backend;
   @observable featureImportance;
-  @observable recommend = false;
   @observable executeSpeed = 0;
   @observable name = "";
   @observable predicted = [];
   @observable modelInsightsData = null;
   @observable fitIndex = 0;
 
-  constructor(userId, projectId, model, name) {
-    this.userId = userId;
+  constructor(projectId, model, name) {
     this.projectId = projectId;
-    this.id = name;
+    this._id = name;
     Object.assign(this, model);
   }
 

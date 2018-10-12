@@ -118,6 +118,7 @@ class ProjectStore {
         if (project) {
           !this.watch.includes(id) && this.watch.push(id)
           project.queryProject()
+          project.initModels()
         }
       }
     )

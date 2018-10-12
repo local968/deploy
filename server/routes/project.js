@@ -55,6 +55,37 @@ function createOrUpdate(id, userId, params, isCreate = false) {
     })
 }
 
+function createModel(id, params) {
+  const modelId = uuid.v4()
+  const pipeline = redis.pipeline();
+  pipeline.hmset("model:" + modelId, mapObjectToArray({ ...params, id: modelId }))
+  pipeline.sadd("project:" + id + ":models", modelId)
+  return pipeline.exec().then(result => {
+    const err = result.find(([error]) => !!error);
+    const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
+    return { ...data, result: { ...params, id: modelId } }
+  })
+}
+
+function deleteModels(id) {
+  return redis.smembers("project:" + id + ":models").then(ids => {
+    const pipeline = redis.pipeline();
+    ids.forEach(id => {
+      pipeline.del("model:" + id)
+    })
+    pipeline.del("project:" + id + ":models")
+    return pipeline.exec().then(list => {
+      const error = list.find(i => !!i[0])
+      if (error) return { status: 414, message: "delete models error", error }
+      return {
+        status: 200,
+        message: 'ok'
+      }
+    })
+
+  })
+}
+
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
@@ -117,6 +148,37 @@ wss.register("queryProject", message => {
   })
 })
 
+wss.register("queryModelList", message => {
+  const id = message.id;
+  const key = `project:${id}:models`;
+
+  return redis.smembers(key).then(ids => {
+    const pipeline = redis.pipeline();
+    ids.forEach(id => {
+      pipeline.hgetall("model:" + id)
+    })
+    return pipeline.exec().then(list => {
+      const error = list.find(i => !!i[0])
+      if (error) return { status: 413, message: "query models error", error }
+      const result = list.map(item => {
+        let data = item[1]
+        for (let key in data) {
+          try {
+            data[key] = JSON.parse(data[key])
+          } catch (e) { }
+        }
+        return data
+      })
+      return {
+        status: 200,
+        message: 'ok',
+        list: result
+      }
+    })
+
+  })
+})
+
 wss.register('etl', (message, socket, progress) => {
   const pipeline = redis.pipeline();
   const files = message.csvLocation || []
@@ -143,9 +205,18 @@ wss.register('etl', (message, socket, progress) => {
 
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
-  return command(data, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
+
+  return deleteModels(message.projectId)
+    .then(() => {
+      return command(data, queueValue => {
+        const isFinish = queueValue.status < 0 || queueValue.status === 100
+        if (isFinish) return queueValue
+        const { result, projectId, userId } = queueValue
+        if (userId !== socket.session.userId) return null
+        if (result.progress === "start") return progress(result)
+        return createModel(projectId, result).then(progress)
+      })
+    })
 })
 
 wss.register("watchProject", (message, socket) => {
@@ -196,32 +267,3 @@ function mapObjectToArray(obj) {
   return arr
 }
 
-// function watchResult() {
-//   // console.log(redis)
-//   // redis.select(0).then(() => {
-//   pubsub.rpop(config.resultQueue).then(data => {
-//     if (data) {
-//       try {
-//         data = JSON.parse(data)
-//       } catch (e) { }
-//       console.log(data, "result")
-//       try {
-//         const userId = data.userId
-//         let isActive = false
-//         wss.clients.forEach(c => {
-//           if (c.session.userId === userId) isActive = true;
-//         })
-//         if (!isActive) throw new Error("user:" + userId + " is not active")
-//         wss.publish("user:" + userId + ":projects", data)
-//       } catch (err) {
-//         console.log(err.message)
-//         pubsub.lpush(config.resultQueue, JSON.stringify(data))
-//       }
-
-//     }
-//   })
-//   // })
-
-// }
-
-// setInterval(watchResult, 2000)
