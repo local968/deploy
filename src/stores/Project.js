@@ -17,6 +17,7 @@ export default class Project {
   @observable subStepActive = 1;
 
   //project
+  @observable name;
   @observable description;
 
   //problem
@@ -73,6 +74,8 @@ export default class Project {
   @observable resampling = "no";
   @observable runWith = 'holdout';
   @observable crossCount = 5;
+
+  @observable selectId = '';
 
   constructor(id, args) {
     this.id = id
@@ -316,6 +319,65 @@ export default class Project {
 
 
   /**---------------------------------------------data-------------------------------------------------*/
+  @computed
+  get issues() {
+    const data = {
+      rowIssue: false,
+      dataIssue: false,
+      targetIssue: false
+    }
+    const { problemType, totalRawLines, target, colMap, issueRows, colType } = this;
+
+    if (problemType === "Classification") {
+      if (colType[target] === 'Categorical') {
+        data.targetIssue = Object.keys(this.targetMap).length < 2 && Object.keys(colMap[target]).length > 2;
+      } else {
+        data.targetIssue = true
+      }
+    } else {
+      if (colType[target] === 'Categorical') {
+        data.targetIssue = Object.keys(colMap[target]).length < 10;
+      }
+    }
+
+    if (totalRawLines < 1000) {
+      data.rowIssue = true;
+    }
+
+    if (issueRows.errorRow.length) {
+      data.dataIssue = true
+    }
+
+    return data
+  }
+
+  @computed
+  get issueRows() {
+    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType } = this;
+    const arr = {
+      mismatchRow: [],
+      nullRow: [],
+      outlierRow: [],
+      errorRow: []
+    }
+
+    dataHeader.forEach(h => {
+      if (mismatchIndex[h] && !!mismatchIndex[h].length) {
+        arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
+        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));
+      }
+      if (nullIndex[h] && !!nullIndex[h].length) {
+        arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndex[h]])));
+        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndex[h]])));
+      }
+      if (colType[h] !== "Categorical" && outlierIndex[h] && !!outlierIndex[h].length) {
+        arr.outlierRow = Array.from(new Set(arr.outlierRow.concat([...outlierIndex[h]])));
+        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...outlierIndex[h]])));
+      }
+    })
+    return arr
+  }
+
   etl = () => {
     const { id, problemType, dataHeader, uploadFileName, rawHeader } = this;
 
@@ -433,11 +495,37 @@ export default class Project {
   }
 
   /**---------------------------------------------train------------------------------------------------*/
+  @computed
+  get selectModel() {
+    const { problemType, selectId } = this
+    if (selectId) {
+      const model = this.models.find(m => m.id === selectId)
+      if (model) return model
+    }
+    let model;
+    for (let m of this.models) {
+      if (!model) {
+        model = m;
+        continue;
+      }
+      if (problemType === "Classification") {
+        if (model.score.holdoutScore.auc < m.score.holdoutScore.auc) {
+          model = m;
+        }
+      } else {
+        if (1 - model.score.holdoutScore.rmse + model.score.holdoutScore.r2 < 1 - m.score.holdoutScore.rmse + m.score.holdoutScore.r2) {
+          model = m;
+        }
+      }
+    }
+    return model
+  }
+
   @action
   fastTrain = () => {
     const {
       userId,
-      projectId,
+      id,
       problemType,
       target,
       dataHeader,
@@ -445,12 +533,13 @@ export default class Project {
       speed,
       overfit
     } = this;
-    const command = 'train2';
+    const command = 'train';
 
     this.updateProject(Object.assign({
       train2Finished: false,
       train2ing: true,
-      train2Error: false
+      train2Error: false,
+      selectId: ''
     }, this.nextSubStep(2, 3)));
 
     this.models = []
@@ -474,7 +563,7 @@ export default class Project {
       problemType,
       featureLabel,
       targetLabel: target,
-      projectId,
+      projectId: id,
       userId,
       speed,
       overfit,
@@ -482,25 +571,65 @@ export default class Project {
     };
 
     socketStore.ready().then(api => api.train(trainData, progressResult => {
-      console.log(progressResult, "train progressResult")
-      if (Array.isArray(progressResult)) {
-        [progressResult] = progressResult
+      if (progressResult.progress === "start") return;
+      if (progressResult.status !== 200) return
+      let result = progressResult.result
+      let index = this.models.findIndex(m => {
+        return result.id === m.id
+      })
+      if (this.problemType === "Classification") result.predicted = this.calcPredicted(result)
+      if (index === -1) {
+        this.models.push(new Model(this.id, result))
+      } else {
+        this.models[index] = new Model(this.id, result)
       }
-      if (progressResult && progressResult.name) {
-        let index = this.models.findIndex(m => {
-          return progressResult.name === m.name
-        })
-        if (index === -1) {
-          this.models.push(new Model(this.userId, this.projectId, progressResult))
-        } else {
-          this.models[index] = new Model(this.userId, this.projectId, progressResult)
-        }
-      }
-    })).then(returnValue => {
-      console.log(returnValue, "train result")
+    })).then(() => {
       this.updateProject({
         train2Finished: true,
         train2ing: false
+      });
+    })
+  }
+
+  calcPredicted = model => {
+    const { targetMap, colMap, target } = this;
+    const targetCol = colMap ? colMap[target] : {}
+    const map = Object.assign({}, targetCol, targetMap);
+    let actual = [[0, 0], [0, 0]]
+    Object.keys(model.targetMap).forEach(k => {
+      //映射的index
+      const actualIndex = map[k];
+      if (actualIndex !== 0 && actualIndex !== 1) {
+        return;
+      }
+      //返回数组的index
+      const confusionMatrixIndex = model.targetMap[k];
+      //遍历当前那一列数组
+      model.confusionMatrix[confusionMatrixIndex] && model.confusionMatrix[confusionMatrixIndex].forEach((item, i) => {
+        const key = Object.keys(model.targetMap).find(t => model.targetMap[t] === i);
+        const pridict = map[key];
+        if (pridict !== 0 && pridict !== 1) {
+          return;
+        }
+        actual[actualIndex][pridict] += item;
+      })
+    })
+    const predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
+    return predicted
+  }
+
+  setSelectModel = id => {
+    this.updateProject({ selectId: id })
+  }
+
+  initModels = () => {
+    socketStore.ready().then(api => api.queryModelList({id: this.id})).then(result => {
+      const {status, message, list} = result
+      if(status !== 200) return alert(message)
+      this.models = []
+      list.forEach(m => {
+        if (this.problemType === "Classification") m.predicted = this.calcPredicted(m)
+        this.models.push(new Model(this.id, m))
       });
     })
   }

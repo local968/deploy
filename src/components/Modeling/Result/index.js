@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
+import { withRouter } from 'react-router'
 import { Progress, Spin } from 'antd';
 import { Modal } from 'components/Common';
 import { when, observable } from 'mobx';
@@ -16,15 +17,15 @@ export default class ModelResult extends Component {
   @observable show = false
   @observable view = "simple"
 
-  componentWillMount() {
-    this.props.project.chartData();
-  }
+  // componentWillMount() {
+  //   this.props.project.chartData();
+  // }
 
   deploy = () => {
-    const { models, project } = this.props;
-    const current = models.find(model => model.recommend);
+    const { project } = this.props;
+    const current = project.selectModel;
     this.props.deploymentStore
-      .newDeploy(project.projectId, project.name, current.name, current.problemType)
+      .addDeployment(project.id, project.name, current.name, current.problemType)
       .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 
@@ -42,7 +43,7 @@ export default class ModelResult extends Component {
 
   render() {
     const { models, project } = this.props;
-    const current = models.find(model => model.recommend);
+    const current = project.selectModel
     if (!models.length) return null;
     const { view } = this;
     return (
@@ -76,16 +77,17 @@ export default class ModelResult extends Component {
   }
 }
 
+@withRouter
+@observer
 class SimpleView extends Component {
-  selectModel = model => {
-    this.props.models.forEach(m => (m.recommend = false));
-    model.recommend = true;
+  onSelect = model => {
+    this.props.project.setSelectModel(model.id)
   };
 
   render() {
     const { models, project } = this.props;
     const { problemType, train2Finished } = project;
-    const current = models.find(model => model.recommend);
+    const current = project.selectModel
     return (
       <div>
         <div className={styles.result}>
@@ -116,7 +118,7 @@ class SimpleView extends Component {
               </span>
             </div>
           </div>
-          <Performance problemType={problemType} model={current} />
+          <Performance current={current} problemType={problemType} />
         </div>
         <div className={styles.line} />
         {/* <div className={styles.selectBlock}>
@@ -130,7 +132,8 @@ class SimpleView extends Component {
             </div> */}
         <ModelTable
           models={models}
-          selectModel={this.selectModel}
+          current={current}
+          onSelect={this.onSelect}
           problemType={problemType}
           train2Finished={train2Finished}
         />
@@ -241,27 +244,27 @@ class PredictedProgress extends Component {
 @observer
 class Performance extends Component {
   render() {
-    const { problemType, model } = this.props;
+    const { problemType, current } = this.props;
     return problemType === Classification ? (
       <div className={styles.performanceBox}>
         <div className={styles.performance}>
           <Progress
             width={84}
             type="circle"
-            percent={model.score.holdoutScore.auc * 100}
+            percent={current.score.holdoutScore.auc * 100}
             format={percent => (percent / 100).toFixed(2)}
           />
           <div className={styles.performanceText}>
             <span>Performance (AUC)</span>
           </div>
         </div>
-        <Predicted model={model} />
+        <Predicted model={current} />
       </div>
     ) : (
         <div className={styles.performanceBox}>
           <div className={styles.performance}>
             <div className={styles.rmsePerformance}>
-              <span>{model.score.holdoutScore.nrmse.toFixed(4)}</span>
+              <span>{current.score.holdoutScore.nrmse.toFixed(4)}</span>
             </div>
             <div className={styles.performanceText}>
               <span>Normalized RMSE</span>
@@ -270,7 +273,7 @@ class Performance extends Component {
           <div className={styles.space} />
           <div className={styles.performance}>
             <div className={styles.r2Performance}>
-              <span>{model.score.holdoutScore.r2.toFixed(4)}</span>
+              <span>{current.score.holdoutScore.r2.toFixed(4)}</span>
             </div>
             <div className={styles.performanceText}>
               <span>
@@ -286,7 +289,7 @@ class Performance extends Component {
 @observer
 class ModelTable extends Component {
   render() {
-    const { models, selectModel, problemType, train2Finished } = this.props;
+    const { models, onSelect, problemType, train2Finished, current } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -338,7 +341,8 @@ class ModelTable extends Component {
               <ModelDetail
                 key={key}
                 model={model}
-                selectModel={selectModel}
+                current={current}
+                onSelect={onSelect}
                 problemType={problemType}
               />
             );
@@ -393,7 +397,7 @@ class ModelDetail extends Component {
   };
 
   render() {
-    const { model, selectModel, problemType } = this.props;
+    const { model, onSelect, problemType, current } = this.props;
     return (
       <div className={styles.rowBox}>
         <div className={styles.rowData}>
@@ -401,8 +405,8 @@ class ModelDetail extends Component {
             <input
               type="radio"
               name="modelSelect"
-              defaultChecked={model.recommend}
-              onChange={selectModel.bind(null, model)}
+              defaultChecked={model.id === current.id}
+              onChange={onSelect.bind(null, model)}
             />
           </div>
           <div className={classnames(styles.cell, styles.name)}>

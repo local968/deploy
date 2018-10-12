@@ -15,7 +15,7 @@ export default class Project extends Component {
   nextStep = () => {
     const { project } = this.props;
     project.updateProject(Object.assign({
-      name: project.name,
+      name: project.name || "project " + new Date().toLocaleString(),
       description: project.description
     }, project.nextMainStep(1)))
     ;
