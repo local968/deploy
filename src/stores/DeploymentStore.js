@@ -202,6 +202,10 @@ class DeploymentStore {
   changeSort = (key, value) => {
     this.sortOptions[key] = value;
   };
+
+  deploySchedule = schedule => {
+    // todo
+  }
 }
 
 export default new DeploymentStore();
