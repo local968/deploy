@@ -117,12 +117,12 @@ class DeploymentStore {
       () => userStore.status === 'login',
       () =>
         socketStore.ready().then(api => {
-          api.searchDeployment().then(response => {
-            console.log(response)
-            this.deployments = response.result;
-          });
+          // api.searchDeployment().then(response => {
+          //   console.log(response)
+          //   this.deployments = response.list;
+          // });
           api.watchDeployment().then(response => {
-            this.deployments = response.result;
+            this.deployments = response.list;
           });
 
           api.on('watchDeployment', response => {
