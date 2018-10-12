@@ -11,12 +11,12 @@ const command = (command, callback) => {
     if (!callback) return pubsub.once(requestId, resolve)
 
     const _callback = async (result) => {
-      const returnValue = await callback(result) || {}
-      if (returnValue.progressStatus === FINISH) {
+      const returnValue = await callback(result)
+      if (returnValue) {
         pubsub.removeListener(requestId, _callback)
         return resolve(returnValue)
       }
-      if (returnValue.progressStatus === SEND) return returnPromise.progress(returnValue)
+      // if (returnValue.progressStatus === SEND) return returnPromise.progress(returnValue)
     }
     pubsub.on(requestId, _callback)
   })

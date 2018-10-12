@@ -33,7 +33,7 @@ router.post('/', (req, res) => {
       message: 'missing params',
       error: 'missing params'
     })
-    const validationToken = crypto.createHash('md5').update(params.userId + fields.size + config.secret).digest('hex')
+    const validationToken = crypto.createHash('md5').update(params.userId + params.size + config.secret).digest('hex')
     if (validationToken !== params.token) return res.json({
       status: 401,
       message: 'token error',
@@ -46,6 +46,7 @@ router.post('/', (req, res) => {
     })
     const fileId = uuid.v4()
     fields.createdTime = moment().unix()
+    fields.params = params
     redis.set('file:' + fileId, JSON.stringify(fields))
     res.json({ fileId, status: 200, message: 'ok' })
   });

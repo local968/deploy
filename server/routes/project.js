@@ -59,11 +59,11 @@ wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
   return redis.incr("node:user:" + userId).then(id => {
-    // return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
-    // console.log(result)
-    const params = mapObjectToArray({ id, userId });
-    return createOrUpdate(id, userId, params, true)
-    // })
+    return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
+      console.log(result)
+      const params = mapObjectToArray({ id, userId });
+      return createOrUpdate(id, userId, params, true)
+    })
   })
 })
 
@@ -117,7 +117,7 @@ wss.register("queryProject", message => {
   })
 })
 
-wss.register('etl', (message, socket) => {
+wss.register('etl', (message, socket, progress) => {
   const pipeline = redis.pipeline();
   const files = message.csvLocation || []
   files.forEach(f => {
@@ -125,21 +125,21 @@ wss.register('etl', (message, socket) => {
   })
   return pipeline.exec().then(list => {
     const error = list.find(i => !!i[0])
-    if(error) return error
+    if (error) return error
     const csvLocation = list.map(item => {
       let file = item[1]
-      try{
+      if (!file) return ""
+      try {
         file = JSON.parse(file)
-      }catch(e){}
-      return file.path
-    })
+      } catch (e) { }
+      return file.path || ""
+    }).filter(v => !!v)
     const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation: csvLocation }
     return command(data, (result) => {
-      const status = result.status === 100 ? command.FINISH : command.SEND
-      return { ...result, progressStatus: status } // command.FINISH
+      return (result.status < 0 || result.status === 100) ? result : progress(result)
+      // return { ...result, progressStatus: status } // command.FINISH
     })
   })
-    
   // .then(result => ({ status: 200, message: 'ok', result })).catch(error => ({status:}))
 })
 

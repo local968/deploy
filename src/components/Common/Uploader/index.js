@@ -7,11 +7,12 @@ export default class Uploader extends Component {
   componentDidUpdate() {
     const { file } = this.props;
     if (file) {
-      const { onError } = this.props;
+      const { onError, onStart } = this.props;
       const checkd = this.check(file)
       if (checkd.err) {
         return onError(new Error(checkd.msg), 1)
       }
+      if (onStart && typeof onStart === 'function') onStart() 
       this.upload()
     }
   }
@@ -41,7 +42,8 @@ export default class Uploader extends Component {
         onError: this.retry,
         params: {
           ...params,
-          token
+          token,
+          size: file.size
         }
       })
     })
@@ -54,11 +56,12 @@ export default class Uploader extends Component {
     const file = files[0];
 
     if (!!file) {
-      const { onError } = this.props;
+      const { onError, onStart } = this.props;
       const checkd = this.check(file)
       if (checkd.err) {
         return onError(new Error(checkd.msg), 1)
       }
+      if (onStart && typeof onStart === 'function') onStart() 
       this.upload(file)
     }
   };

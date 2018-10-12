@@ -90,6 +90,10 @@ export default class DataConnect extends Component {
   @observable file = null
   @observable process = 0
 
+  onUpload = () => {
+    this.process = 1
+  }
+
   upload = action((file, data) => {
     this.process = 90
     this.file = null
@@ -140,6 +144,8 @@ export default class DataConnect extends Component {
   selectSample = filename => {
     if (!!this.process) return false;
     const { userStore, project } = this.props;
+
+    this.process = 1
 
     axios('/api/sample', {
       method: 'post',
@@ -227,7 +233,7 @@ export default class DataConnect extends Component {
           ) : (
               <Uploader
                 children={this.block('From Computer', localFileIcon)}
-                // onChange={this.upload}
+                onStart={this.onUpload}
                 onComplete={this.upload}
                 params={{ userId: userStore.info.id, projectId: project.id }}
                 onProgress={this.onProgress}

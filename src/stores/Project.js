@@ -397,23 +397,25 @@ export default class Project {
     // kwargs:
     socketStore.ready()
       .then(api => api.etl(data, progressResult => {
-        let { result } = progressResult;
-        if (!this.etling) return;
-        Object.keys(result).forEach(k => {
-          if (k === "name") {
-            delete result[k];
-          }
-          if (k.includes("FillMethod")) {
-            Object.keys(result[k]).forEach(key => {
-              if (result[k][key] === "ignore") delete result[k][key]
-            })
-          }
-        })
-        console.log(result, "etl progress")
-        // this.project.setProperty(result)
-        this.updateProject(result)
+        console.log(progressResult, "progressResult")
+        // let { result } = progressResult;
+        // if (!this.etling) return;
+        // Object.keys(result).forEach(k => {
+        //   if (k === "name") {
+        //     delete result[k];
+        //   }
+        //   if (k.includes("FillMethod")) {
+        //     Object.keys(result[k]).forEach(key => {
+        //       if (result[k][key] === "ignore") delete result[k][key]
+        //     })
+        //   }
+        // })
+        // console.log(result, "etl progress")
+        // // this.project.setProperty(result)
+        // this.updateProject(result)
       }))
       .then(returnValue => {
+        console.log(returnValue, "etl result")
         this.etling = false;
         let { result } = returnValue;
         Object.keys(result).forEach(k => {
@@ -428,7 +430,7 @@ export default class Project {
         })
         result.dataViews = null;
         result.firstEtl = false;
-        console.log(result, "etl result")
+
         when(
           () => !!this.uploadData.length,
           () => this.updateProject(Object.assign(result, this.next()))
@@ -437,7 +439,7 @@ export default class Project {
   }
 
   next = () => {
-    const { curStep, subStepActive, noCompute } = this.project;
+    const { curStep, subStepActive, noCompute } = this;
     if (curStep === 2 && subStepActive < 3) {
       if (noCompute && subStepActive !== 1) {
         return this.nextMainStep(3)

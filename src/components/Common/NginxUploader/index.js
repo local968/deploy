@@ -29,8 +29,8 @@ class Uploader {
   constructor(file, config = {}) {
     this.path = config.path || '/upload';
     this.headers = config.headers || {};
-    this.CHUNK_SIZE = parseInt(config.chunkSize) || 4194304;
-    this.concurrency = parseInt(config.concurrency) || 4;
+    this.CHUNK_SIZE = parseInt(config.chunkSize, 10) || 4194304;
+    this.concurrency = parseInt(config.concurrency, 10) || 4;
     this.file = file;
     if (config.params) {
       this.path += Object.entries(config.params).reduce(
@@ -52,7 +52,7 @@ class Uploader {
   splitFile() {
     this.status = 'splitting';
     const totalSize = this.file.size;
-    this.chunkCount = parseInt(totalSize / this.CHUNK_SIZE) + 1;
+    this.chunkCount = parseInt(totalSize / this.CHUNK_SIZE, 10) + 1;
   }
 
   getNextChunk(increase = true, index) {
@@ -133,7 +133,7 @@ class Uploader {
     this.status = 'uploading';
     this.isPause = false;
     Promise.all(this.processing).then(results => {
-      results.map(({ res, error, index, processingIndex }) => {
+      results.forEach(({ res, error, index, processingIndex }) => {
         if (res && res.data) {
           this.latestResponse = res.data;
           if (this.nextIndex < this.chunkCount) {
@@ -145,7 +145,7 @@ class Uploader {
             );
           } else {
             this.processing.splice(processingIndex, 1);
-            this.processing.map((promise, index) =>
+            this.processing.forEach((promise, index) =>
               promise.then(result => {
                 result.processingIndex = index;
                 return result;
