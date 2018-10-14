@@ -28,7 +28,7 @@ router.post('/login', (req, res) => {
         Promise.reject({ status: 400, message: 'incorrect password.' })
       }
     })
-    .catch(error => res.send(error))  
+    .catch(error => res.send(error))
 });
 
 router.delete('/logout', (req, res) => {
@@ -38,7 +38,7 @@ router.delete('/logout', (req, res) => {
 });
 
 router.get('/status', (req, res) => {
-  if (!req.session.userId) return res.send({ status: 401, message: 'not login' })
+  if (!req.session || !req.session.userId) return res.send({ status: 401, message: 'not login' })
   redis.hmget('user:' + req.session.userId, 'id', 'email').then(info =>
     res.send({
       status: 200,
