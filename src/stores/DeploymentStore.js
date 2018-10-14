@@ -122,6 +122,7 @@ class DeploymentStore {
           //   this.deployments = response.list;
           // });
           api.watchDeployment().then(response => {
+            console.log(response)
             this.deployments = response.list;
           });
 
@@ -133,7 +134,7 @@ class DeploymentStore {
   }
 
   async addDeployment(projectId, projectName, modelName, modelType) {
-    const tuple = {
+    const data = {
       deploymentOptions: {},
       modelName,
       modelType,
@@ -141,12 +142,12 @@ class DeploymentStore {
       projectName,
       performanceOptions: {}
     };
-    const db = await socketStore.ready();
-    const response = await db.addDeployment({ tuple });
+    const api = await socketStore.ready();
+    const response = await api.addDeployment({ data });
     if (response.status !== 200) {
       throw new Error(response.message);
     }
-    return response.result.id;
+    return response.id;
   }
 
   @action
