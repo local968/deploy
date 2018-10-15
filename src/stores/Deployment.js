@@ -2,7 +2,7 @@ import { observable } from 'mobx';
 import moment from 'moment';
 import socketStore from 'stores/SocketStore';
 
-const defaultDeployOptions = {
+const defaultDeploymentOptions = {
   option: null,
   source: null,
   sourceOptions: {},
@@ -38,7 +38,7 @@ export default class Deploy {
   @observable enable;
   @observable email;
 
-  @observable deployOptions = { ...defaultDeployOptions };
+  @observable deploymentOptions = { ...defaultDeploymentOptions };
   @observable performanceOptions = { ...defaultPerformanceOptions };
 
   constructor(deploy) {
@@ -52,9 +52,9 @@ export default class Deploy {
     this.enable = deploy.enable;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
-    this.deployOptions = {
-      ...defaultDeployOptions,
-      ...deploy.deployOptions
+    this.deploymentOptions = {
+      ...defaultDeploymentOptions,
+      ...deploy.deploymentOptions
     };
     this.performanceOptions = {
       ...defaultPerformanceOptions,
@@ -67,8 +67,8 @@ export default class Deploy {
   save = () => {
     return new Promise((resolve, reject) => {
       socketStore.ready().then(api => {
-        api.updateDeploy({
-          tuple: {
+        api.updateDeployment({
+          data: {
             id: this.id,
             projectId: this.projectId,
             projectName: this.projectName,
@@ -77,7 +77,7 @@ export default class Deploy {
             createdDate: this.createdDate,
             email: this.email,
             enable: this.enable,
-            deployOptions: this.deployOptions,
+            deploymentOptions: this.deploymentOptions,
             performanceOptions: this.performanceOptions
           }
         });
@@ -96,7 +96,7 @@ export default class Deploy {
       createdDate: this.createdDate,
       email: this.email,
       enable: this.enable,
-      deployOptions: this.deployOptions,
+      deploymentOptions: this.deploymentOptions,
       performanceOptions: this.performanceOptions,
       updatedDate: moment().unix()
     });

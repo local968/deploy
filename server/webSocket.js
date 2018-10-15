@@ -80,11 +80,12 @@ const init = (server, sessionParser) => {
   // })
 
   wss.subscribe = function (channel, listener, socket) {
-    const callback = (message) => {
-      if (!socket) return listener(message)
+    const callback = async (message) => {
+      if (!socket) return await listener(message)
       if (socket && socket.readyState === WebSocket.OPEN) {
-        const result = listener(message)
-        result.type = channel
+        const result = await listener(message)
+        result.type = result.type || channel
+        result.trigger = message
         return socket.send(JSON.stringify(result))
       }
       wss.removeListener('channel:' + channel, callback)
@@ -94,7 +95,7 @@ const init = (server, sessionParser) => {
     // redis.subscribe('channel:' + channel)
   }
   wss.publish = function (channel, message) {
-    wss.emit('channel:' + channel, JSON.stringify(message))
+    wss.emit('channel:' + channel, message)
   }
 
   // server side heartbeat interval

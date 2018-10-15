@@ -361,7 +361,7 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
       {cddo.source !== 'file' && (
         <div
           className={styles.selectionWithoutHover}
-          // onClick={selectionOption('source', 'file')}
+        // onClick={selectionOption('source', 'file')}
         >
           <Uploader
             className={styles.text}
@@ -476,8 +476,8 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                   {cddo.frequencyOptions.time === 'completed'
                     ? ' After completed'
                     : moment
-                        .unix(cddo.frequencyOptions.time)
-                        .format('DD/MM/YYYY h:mma')}
+                      .unix(cddo.frequencyOptions.time)
+                      .format('DD/MM/YYYY h:mma')}
                 </span>
               </span>
             </span>
@@ -494,9 +494,9 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                 Redeploy every{' '}
                 {`${cddo.frequencyOptions.repeatFrequency} ${
                   cddo.frequencyOptions.repeatPeriod
-                } ${
+                  } ${
                   cddo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
-                } ${cddo.frequencyOptions.repeatPeriod &&
+                  } ${cddo.frequencyOptions.repeatPeriod &&
                   dateFormat[cddo.frequencyOptions.repeatPeriod](
                     cddo.frequencyOptions.repeatOn
                   )}`}
@@ -511,8 +511,8 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                     ? 'never'
                     : cddo.frequencyOptions.ends > 10000
                       ? moment
-                          .unix(cddo.frequencyOptions.ends)
-                          .format('DD/MM/YYYY h:mma')
+                        .unix(cddo.frequencyOptions.ends)
+                        .format('DD/MM/YYYY h:mma')
                       : `after ${cddo.frequencyOptions.ends} occurrences`}
                 </small>
               </span>
