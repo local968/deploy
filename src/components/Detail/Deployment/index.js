@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Checkbox } from 'antd';
+import { Icon, Checkbox, Progress } from 'antd';
 import { action, observable, runInAction } from 'mobx';
 import moment from 'moment';
 import styles from './styles.module.css';
@@ -16,7 +16,7 @@ import ApiInstruction from './apiInstruction';
 import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
-import Uploader from 'components/Common/Uploader';
+import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 
 const ordinalNumberPostFix = number => {
@@ -40,12 +40,16 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-@inject('deploymentStore', 'routing')
+@inject('deploymentStore', 'userStore', 'routing')
 @observer
 export default class Deployment extends Component {
   @observable dialog = null;
   @observable localEmail = '';
   @observable emailEditing = false;
+  @observable errorTimes = 0;
+  @observable uploadStatus = false;
+  @observable uploadPercentage = 0;
+  @observable uploadSpeed = '0 Kb/s';
 
   @action
   selectionOption = (key, value) => () => {
@@ -75,10 +79,56 @@ export default class Deployment extends Component {
 
   closeDialog = action(() => (this.dialog = null));
 
+  pause = action(() => {
+    if (!this.uploadOperator) return
+    if (this.uploadStatus === 'uploading') {
+      console.log('pause')
+      this.uploadOperator.pause()
+      this.uploadStatus = 'paused'
+      return
+    }
+    this.uploadOperator.resume()
+    this.uploadStatus = 'uploading'
+  })
+
   render() {
-    const { deploymentStore, routing, match } = this.props;
+    const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
     const cddo = cd.deploymentOptions;
+    const uploader = {
+      onError: action((error, times) => {
+        console.error(error)
+        this.errorTimes = times
+        this.uploadStatus = 'error'
+        this.uploadError = error
+      }),
+      onFinished: action((response, file) => {
+        if (response.status === 200) {
+          cddo.file = file.name
+          cddo.fileId = response.fileId
+          cddo.source = 'file'
+          cd.save()
+          this.uploadPercentage = 100
+          this.uploadStatus = false
+        } else {
+          this.uploadError = response.message
+          console.error(response)
+        }
+      }),
+      onProgress: action((progress, speed) => {
+        const done = progress.split('/')[0]
+        const total = progress.split('/')[1]
+        this.uploadSpeed = speed
+        this.uploadPercentage = parseFloat(((done / total) * 100).toFixed(2))
+      }),
+      onStart: action(() => {
+        this.uploadStatus = 'uploading'
+      }),
+      operator: (opeartor) => {
+        this.uploadOperator = opeartor
+      },
+      params: { projectId: cd.projectId, userId: userStore.info.id }
+    }
     return (
       <div className={styles.deployment}>
         <div className={styles.info}>
@@ -119,12 +169,19 @@ export default class Deployment extends Component {
         {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}
         {cddo.option === 'data' && (
           <DataSource
-            cd={cd}
             cddo={cddo}
-            selectionOption={this.selectionOption}
             show={this.show}
+            uploader={uploader}
           />
         )}
+        {this.uploadStatus && <div className={styles.uploading}>
+          <Progress percent={this.uploadPercentage} />
+          <span className={styles.speed}>{this.uploadSpeed}</span>
+          <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
+            ? <span><Icon type="pause" theme="outlined" />Pause</span>
+            : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+        </div>}
+        {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
         {cddo.option !== 'api' &&
           cddo.source && (
             <ResultLocation
@@ -286,7 +343,7 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
   </div>
 ));
 
-const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
+const DataSource = observer(({ cddo, show, uploader }) => (
   <div className={styles.dataSource}>
     <span className={styles.label}>
       <span className={styles.text}>Data Source:</span>
@@ -315,10 +372,7 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
         <div className={styles.selected}>
           <Uploader
             className={styles.resultText}
-            onComplete={file => {
-              selectionOption('file', file.name)();
-            }}
-            params={{ projectId: cd.projectId, userId: cd.userId }}
+            {...uploader}
           >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
@@ -365,14 +419,7 @@ const DataSource = observer(({ cd, cddo, selectionOption, show }) => (
         >
           <Uploader
             className={styles.text}
-            onComplete={file => {
-              runInAction(() => {
-                cd.deploymentOptions['source'] = 'file';
-                cd.deploymentOptions['file'] = file.name;
-                cd.save();
-              });
-            }}
-            params={{ projectId: cd.projectId, userId: cd.userId }}
+            {...uploader}
           >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File

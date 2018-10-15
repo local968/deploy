@@ -13,7 +13,7 @@ import OneTime from 'components/Common/OneTime';
 import AutoRepeat from 'components/Common/AutoRepeat';
 // import List from './list';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
-import Uploader from 'components/Common/Uploader';
+import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 
 const Option = Select.Option;

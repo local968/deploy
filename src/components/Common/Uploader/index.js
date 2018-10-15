@@ -12,7 +12,7 @@ export default class Uploader extends Component {
       if (checkd.err) {
         return onError(new Error(checkd.msg), 1)
       }
-      if (onStart && typeof onStart === 'function') onStart() 
+      if (onStart && typeof onStart === 'function') onStart()
       this.upload()
     }
   }
@@ -33,7 +33,6 @@ export default class Uploader extends Component {
 
   upload = file => {
     const { params, onProgress, onComplete } = this.props;
-
     axios.post('/upload/check', { fileSize: file.size }).then(response => {
       const token = response.data.token
       this.uploader = NginxUploader(file, {
@@ -43,7 +42,7 @@ export default class Uploader extends Component {
         params: {
           ...params,
           token,
-          size: file.size
+          fileSize: file.size
         }
       })
     })
@@ -61,7 +60,7 @@ export default class Uploader extends Component {
       if (checkd.err) {
         return onError(new Error(checkd.msg), 1)
       }
-      if (onStart && typeof onStart === 'function') onStart() 
+      if (onStart && typeof onStart === 'function') onStart()
       this.upload(file)
     }
   };

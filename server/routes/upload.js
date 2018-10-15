@@ -33,7 +33,7 @@ router.post('/', (req, res) => {
       message: 'missing params',
       error: 'missing params'
     })
-    const validationToken = crypto.createHash('md5').update(params.userId + params.size + config.secret).digest('hex')
+    const validationToken = crypto.createHash('md5').update(params.userId + params.fileSize + config.secret).digest('hex')
     if (validationToken !== params.token) return res.json({
       status: 401,
       message: 'token error',
