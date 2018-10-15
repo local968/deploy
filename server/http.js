@@ -69,7 +69,7 @@ app.post('/api/upload', (req, res) => {
   if (isFirst && fs.existsSync(uploadFile)){
     console.log("check upload")
     const stat = fs.statSync(uploadFile);
-    
+
     //大于文件大小的块才开始写入
     if(stat.size > n){
       let returnData = {
@@ -79,12 +79,12 @@ app.post('/api/upload', (req, res) => {
         isFirst: false
       }
       res.json(returnData);
-      return 
+      return
     }
   }
 
   const form = new multiparty.Form({uploadDir: filePath});
- 
+
   form.parse(req)
 
   form.on('file', function(name, file) {
@@ -108,7 +108,7 @@ app.post('/api/upload', (req, res) => {
         })
         //写入文件最后
         // fs.appendFileSync(uploadFile, data);
-        return 
+        return
       })
     }catch(e){
      res.status(500).json({message: e});
@@ -116,7 +116,7 @@ app.post('/api/upload', (req, res) => {
     }
   });
 
-  
+
 });
 
 const createFilePath = (filePath) => {
@@ -137,6 +137,7 @@ app.use(routes)
 
 // Serve static files from the 'public' folder.
 app.use(express.static('public'));
+app.use(express.static('build'));
 
 // Create HTTP server by ourselves.
 const server = http.createServer(app);
