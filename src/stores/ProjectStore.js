@@ -92,6 +92,7 @@ class ProjectStore {
 
   @action
   addProject = () => {
+    if (this.loading) return
     this.loading = true;
     return socketStore.ready().then(api => {
       return api.addProject().then(result => {
@@ -102,6 +103,26 @@ class ProjectStore {
         }
         this.list.push(new Project(id + ""))
         return { id }
+      })
+    })
+  }
+
+  @action
+  deleteProjects = ids => {
+    if (this.loading) return
+    this.loading = true;
+    return socketStore.ready().then(api => {
+      return api.deleteProjects({ ids }).then(result => {
+        const { status, message } = result
+        this.loading = false;
+        if (status !== 200) {
+          alert(message)
+          // return { error: message }
+        }
+        this.list = this.list.filter(i => {
+          return !ids.includes(i.id)
+        })
+        // return this.queryProjectList()
       })
     })
   }
@@ -122,7 +143,6 @@ class ProjectStore {
         }
       }
     )
-
   }
 }
 

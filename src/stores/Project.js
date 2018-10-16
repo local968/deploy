@@ -235,6 +235,7 @@ export default class Project {
       problemType: this.changeProjectType
     };
     if (this.problemType && this.changeProjectType !== this.problemType) {
+      this.models = []
       //全部恢复到problem步骤
       const backData = Object.assign({}, updObj, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, {
         mainStep: 2,
@@ -317,8 +318,6 @@ export default class Project {
     };
   }
 
-
-  /**---------------------------------------------data-------------------------------------------------*/
   @computed
   get issues() {
     const data = {
@@ -494,6 +493,35 @@ export default class Project {
     }
   }
 
+  @action
+  dataView = () => {
+    socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'dataView'
+      };
+
+      api.dataView(command, progressResult => {
+        console.log(progressResult, "dataview progress")
+        // let { result } = progressResult;
+        // if (!this.etling) return;
+        // Object.keys(result).forEach(k => {
+        //   if (k === "name") {
+        //     delete result[k];
+        //   }
+        //   if (k.includes("FillMethod")) {
+        //     Object.keys(result[k]).forEach(key => {
+        //       if (result[k][key] === "ignore") delete result[k][key]
+        //     })
+        //   }
+        // })
+        // console.log(result, "etl progress")
+        // // this.project.setProperty(result)
+        // this.updateProject(result))
+      }).then(returnValue => {
+        console.log(returnValue, "dataview result")})
+    })
+  }
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
@@ -623,9 +651,9 @@ export default class Project {
   }
 
   initModels = () => {
-    socketStore.ready().then(api => api.queryModelList({id: this.id})).then(result => {
-      const {status, message, list} = result
-      if(status !== 200) return alert(message)
+    socketStore.ready().then(api => api.queryModelList({ id: this.id })).then(result => {
+      const { status, message, list } = result
+      if (status !== 200) return alert(message)
       this.models = []
       list.forEach(m => {
         if (this.problemType === "Classification") m.predicted = this.calcPredicted(m)

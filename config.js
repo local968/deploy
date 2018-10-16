@@ -12,8 +12,8 @@ module.exports = Object.assign(
     projPath: '/Users/vcing',
     port: 29000,
     secret: 'adslkjfhoquhfjLKAHLK',
-    redisUri: 'redis://:@ty.dnnmind.com:6379/10',
-    pubsubUri: 'redis://:@ty.dnnmind.com:6379/0',
+    // redisUri: 'redis://:@ty.dnnmind.com:6379/10',
+    // pubsubUri: 'redis://:@ty.dnnmind.com:6379/0',
     requestQueue: 'taskQueue',
     resultQueue: 'resultDataQueue'
   },
