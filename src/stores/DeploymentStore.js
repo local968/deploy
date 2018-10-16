@@ -115,18 +115,11 @@ class DeploymentStore {
       () => userStore.status === 'login',
       () =>
         socketStore.ready().then(api => {
-          // api.searchDeployment().then(response => {
-          //   console.log(response)
-          //   this.deployments = response.list;
-          // });
-          api.watchDeployments().then(response => {
-            console.log(response)
+          const callback = response => {
             this.deployments = response.list;
-          });
-
-          api.on('watchDeployments', response => {
-            console.log(response, 'from watch')
-          })
+          }
+          api.watchDeployments().then(callback);
+          api.on('watchDeployments', callback)
         })
     );
   }
@@ -202,8 +195,8 @@ class DeploymentStore {
     this.sortOptions[key] = value;
   };
 
-  deploySchedule = schedule => {
-    // todo
+  deploySchedule = (deploymentId, threshold) => {
+    socketStore.ready().then(api => api.deploySchedule({ deploymentId, threshold }));
   }
 }
 

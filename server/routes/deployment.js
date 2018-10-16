@@ -2,9 +2,14 @@ const { redis, pubsub } = require('redis')
 const wss = require('../webSocket')
 const uuid = require('uuid')
 const moment = require('moment')
+const scheduleApi = require('../scheduleApi')
+const deploy = require('../schedule')
 
 wss.register('watchSchedule', (message, socket) => {
-  return { list: [] }
+  const userId = socket.session.userId
+  const callback = list => ({ status: 200, message: 'ok', list, type: 'watchSchedule' })
+  wss.subscribe(`user:${userId}:schedules`, () => scheduleApi.getAllSchedule(userId).then(callback), socket)
+  return scheduleApi.getAllSchedule(userId).then(callback)
 })
 
 wss.register('watchDeployments', (message, socket) => {
@@ -45,24 +50,35 @@ wss.register('addDeployment', (message, socket) => {
   })
 })
 
-wss.register('deploySchedule', (message, socket) => {
-
-})
+wss.register('deploySchedule', (message, socket) =>
+  scheduleApi.getDeployment(message.deploymentId)
+    .then(deployment => deploy(deployment, message.threshold))
+    .then(() => ({ status: 200, message: 'ok' }))
+)
 
 wss.register('suspendDeployment', (message, socket) => {
 
 })
 
 wss.register('removeDeployment', (message, socket) => {
-
+  const pipeline = redis.pipeline()
+  pipeline.zrem(`user:${socket.session.userId}:deployments:createdDate`, message.id)
+  pipeline.del(`deployment:${message.id}`)
+  return pipeline.exec().then(result => {
+    wss.publish(`user:${socket.session.userId}:deployments`, `remove deployment:${message.id}`)
+    return scheduleApi.deleteDeploymentSchedules(message.id)
+  }).then(() => ({ status: 200, message: 'ok' }))
 })
 
 wss.register('updateDeployment', (message, socket) => {
+  const userId = socket.session.userId
   const data = message.data
-  return redis.set(`deployment:${data.id}`, JSON.stringify(data)).then(result => {
-    return { status: 200, message: 'ok' }
-  }, error => {
-    console.error(error)
-    return { status: 500, message: 'update deployment error', error }
-  })
+  scheduleApi.getDeployment(data.id).then(deployment =>
+    redis.set(`deployment:${data.id}`, JSON.stringify({ ...deployment, ...data })).then(result => {
+      wss.publish(`user:${userId}:deployments`, { type: 'add', data })
+      return { status: 200, message: 'ok' }
+    }, error => {
+      console.error(error)
+      return { status: 500, message: 'update deployment error', error }
+    }))
 })

@@ -94,7 +94,7 @@ const init = (server, sessionParser) => {
     wss.addListener('channel:' + channel, callback)
     // redis.subscribe('channel:' + channel)
   }
-  wss.publish = function (channel, message) {
+  wss.publish = function (channel, message = null) {
     wss.emit('channel:' + channel, message)
   }
 

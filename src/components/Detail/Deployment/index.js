@@ -216,10 +216,7 @@ export default class Deployment extends Component {
                       routing.push(
                         `/deploy/project/${match.params.id}/operation`
                       );
-                      deploymentStore.deploySchedule({
-                        deploymentId: match.params.id,
-                        type: 'deployment'
-                      });
+                      deploymentStore.deploySchedule(match.params.id);
                     }
                   }}
                 >

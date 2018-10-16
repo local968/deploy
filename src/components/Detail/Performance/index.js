@@ -127,13 +127,9 @@ export default class Performance extends Component {
                   if (cdpo.frequency) {
                     deploymentStore.toggleEnable(cd.id, true);
                     routing.push(`/deploy/project/${match.params.id}/status`);
-                    deploymentStore.deploySchedule({
-                      deploymentId: match.params.id,
-                      type: 'performance',
-                      threshold: {
-                        type: cdpo.measurementMetric,
-                        value: cdpo.metricThreshold
-                      }
+                    deploymentStore.deploySchedule(match.params.id, {
+                      type: cdpo.measurementMetric,
+                      value: cdpo.metricThreshold
                     });
                   }
                 }}
@@ -334,8 +330,8 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
                   {cdpo.frequencyOptions.time === 'completed'
                     ? ' After completed'
                     : moment
-                        .unix(cdpo.frequencyOptions.time)
-                        .format('DD/MM/YYYY h:mma')}
+                      .unix(cdpo.frequencyOptions.time)
+                      .format('DD/MM/YYYY h:mma')}
                 </span>
               </span>
             </span>
@@ -352,9 +348,9 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
                 Redeploy every{' '}
                 {`${cdpo.frequencyOptions.repeatFrequency} ${
                   cdpo.frequencyOptions.repeatPeriod
-                } ${
+                  } ${
                   cdpo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
-                } ${cdpo.frequencyOptions.repeatPeriod &&
+                  } ${cdpo.frequencyOptions.repeatPeriod &&
                   dateFormat[cdpo.frequencyOptions.repeatPeriod](
                     cdpo.frequencyOptions.repeatOn
                   )}`}
@@ -369,8 +365,8 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
                     ? 'never'
                     : cdpo.frequencyOptions.ends > 10000
                       ? moment
-                          .unix(cdpo.frequencyOptions.ends)
-                          .format('DD/MM/YYYY h:mma')
+                        .unix(cdpo.frequencyOptions.ends)
+                        .format('DD/MM/YYYY h:mma')
                       : `after ${cdpo.frequencyOptions.ends} occurrences`}
                 </small>
               </span>

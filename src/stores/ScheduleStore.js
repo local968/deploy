@@ -74,13 +74,13 @@ class ScheduleStore {
 
   constructor() {
     when(
-      () => userStore.userId && !userStore.isLoad,
+      () => userStore.status === 'login' && userStore.info.id,
       () =>
         socketStore.ready().then(api => {
           const callback = response => {
             this.schedules = response.list;
           }
-          api.watchSchedule(callback);
+          api.watchSchedule().then(callback);
           api.on('watchSchedule', callback)
         })
     );
@@ -88,18 +88,20 @@ class ScheduleStore {
 
   @computed
   get sortedDeploymentSchedules() {
-    return this.sortSchedules('deployment');
+    return this.sortSchedules('deployment', this.schedules, deploymentStore.deployments);
   }
 
   @computed
   get sortedPerformanceSchedules() {
-    return this.sortSchedules('performance');
+    return this.sortSchedules('performance', this.schedules, deploymentStore.deployments);
   }
 
-  sortSchedules = type => {
-    const _schedules = this.schedules.filter(
-      s => s.type === type && s.deploymentId === deploymentStore.currentId
+  sortSchedules = (type, schedules, deployments) => {
+    if (deployments.length === 0) return []
+    const _schedules = schedules.filter(
+      s => s.type === type && parseInt(s.deploymentId) === parseInt(deploymentStore.currentId)
     );
+
     let result = [];
 
     // keywords
@@ -114,10 +116,9 @@ class ScheduleStore {
       parseInt(this.sortOptions.perPage, 10);
     const end = start + parseInt(this.sortOptions.perPage, 10);
     result = result.slice(start, end);
-
     result = result.map(schedule => ({
       schedule,
-      deployment: deploymentStore.deployments.find(
+      deployment: deployments.find(
         deployment => deployment.id === schedule.deploymentId
       )
     }));

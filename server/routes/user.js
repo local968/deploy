@@ -5,6 +5,7 @@ const { register } = require('../webSocket')
 const moment = require('moment')
 const crypto = require('crypto')
 const config = require('config')
+const api = require('../scheduleApi')
 
 const sha256 = password => crypto.createHmac('sha256', config.secret)
   .update(password)
@@ -73,4 +74,15 @@ router.post('/register', (req, res) => {
     }, error => res.send(error))
 })
 
+router.get('/schedules', (req, res) => {
+  api.getAllSchedule(req.session.userId).then(res.json.bind(res))
+})
+
+router.get('/deployment', (req, res) => {
+  api.getDeployment(req.query.id).then(res.json.bind(res))
+})
+
+router.get('/delete', (req, res) => {
+  api.deleteDeploymentSchedules(req.query.id).then(res.json.bind(res))
+})
 module.exports = router

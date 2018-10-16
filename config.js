@@ -15,7 +15,8 @@ module.exports = Object.assign(
     redisUri: 'redis://:@ty.dnnmind.com:6379/10',
     pubsubUri: 'redis://:@ty.dnnmind.com:6379/0',
     requestQueue: 'taskQueue',
-    resultQueue: 'resultDataQueue'
+    resultQueue: 'resultDataQueue',
+    schedulePeriod: 1
   },
   localConfig
 );

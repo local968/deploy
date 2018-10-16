@@ -1,6 +1,6 @@
 const moment = require('moment');
 const config = require('../config');
-const r = require('./db');
+const api = require('./scheduleApi');
 
 // schedule handle
 const scheduleInterval = setInterval(
@@ -9,24 +9,25 @@ const scheduleInterval = setInterval(
 );
 
 // queue handle
-const queueInterval = setInterval(scheduleQueue, config.queuePeriod * 1000);
+// const queueInterval = setInterval(scheduleQueue, config.queuePeriod * 1000);
 
 async function scheduleHandler() {
   const now = moment().unix();
-  const schedules = await r.getTimeUpSchedules(now);
+  const schedules = await api.getTimeUpSchedules(now);
+  console.log(schedules.length)
   schedules.map(async schedule => {
     schedule.updatedDate = now;
-    schedule.status = 'queue';
-    await r.scheduleUpsert(schedule);
+    schedule.status = 'progressing';
+    await api.upsertSchedule(schedule);
 
-    const deployment = await r.getDeployment(schedule.deploymentId);
+    const deployment = await api.getDeployment(schedule.deploymentId);
+    if (!deployment) return
     const cdo = deployment[`${schedule.type}Options`];
     const nextTime = generateNextScheduleTime(
       cdo.frequency,
       cdo.frequencyOptions,
       now - 1
     );
-
     if (!nextTime) return;
 
     const has = await hasNext(
@@ -42,37 +43,36 @@ async function scheduleHandler() {
         schedule.type,
         cdo ? nextTime : null,
         schedule.ends,
+        schedule.threshold,
         schedule.id
       );
-      await r.scheduleUpsert(nextSchedule);
+      await api.upsertSchedule(nextSchedule);
     }
   });
 }
 
-async function scheduleQueue() {
-  const count = await r.getProgressingScheduleCount();
-  if (count >= config.maxConcurrencySchedule) return;
-  const schedules = await r.getQueueSchedules(
-    config.maxConcurrencySchedule - count
-  );
-  const now = moment().unix();
+// async function scheduleQueue() {
+//   const count = await api.getProgressingScheduleCount();
+//   if (count >= config.maxConcurrencySchedule) return;
+//   const schedules = await api.getQueueSchedules(
+//     config.maxConcurrencySchedule - count
+//   );
+//   const now = moment().unix();
 
-  schedules.map(async schedule => {
-    schedule.updatedDate = now;
-    schedule.actualTime = now;
-    schedule.status = 'progressing';
-    await r.scheduleUpsert(schedule);
-  });
-}
+//   schedules.map(async schedule => {
+//     schedule.updatedDate = now;
+//     schedule.actualTime = now;
+//     schedule.status = 'progressing';
+//     await api.upsertSchedule(schedule);
+//   });
+// }
 
 const hasNext = (deploymentId, ends, nextTime, type) =>
   new Promise((resolve, reject) => {
     if (ends === 'never') return resolve(true);
     if (ends === 'completed') return resolve(false);
     if (ends > 10000) return nextTime >= ends ? resolve(false) : resolve(true);
-    const count = r
-      .getScheduleCount(deploymentId, type)
-      .then(count => (ends >= count ? resolve(false) : resolve(true)));
+    const count = api.getScheduleCount(deploymentId, type).then(count => (ends >= count ? resolve(false) : resolve(true)));
   });
 
 const catchError = console.error;
@@ -91,99 +91,67 @@ const compare = (a, b) => {
   return result;
 };
 
-r.deploymentChanges(({ new_val, old_val }) => {
-  const ocddo =
-    old_val && old_val.deploymentOptions ? old_val.deploymentOptions : {};
-  const ocdpo =
-    old_val && old_val.performanceOptions ? old_val.performanceOptions : {};
-  const cddo =
-    new_val && new_val.deploymentOptions ? new_val.deploymentOptions : {};
-  const cdpo =
-    new_val && new_val.performanceOptions ? new_val.performanceOptions : {};
-
-  let needDeploymentRedeploy = cddo.enable;
-  let needPerformanceRedeploy = cdpo.enable;
-
-  if (cddo.enable === ocddo.enable && cddo.enable === true) {
-    needDeploymentRedeploy =
-      cddo.frequency !== ocddo.frequency ||
-      !compare(cddo.frequencyOptions, ocddo.frequencyOptions);
-  }
-  if (cdpo.enable === ocdpo.enable && cdpo.enable === true) {
-    needPerformanceRedeploy =
-      cdpo.frequency !== ocdpo.frequency ||
-      !compare(cdpo.frequencyOptions, ocdpo.frequencyOptions);
-  }
-
-  // performance
-  needPerformanceRedeploy &&
-    r.lastWaitingSchedule(new_val.id, 'performance').then(schedule => {
-      schedule = schedule.length > 0 ? schedule[0] : null;
-      const performanceNextScheduleTime =
-        cdpo && generateNextScheduleTime(cdpo.frequency, cdpo.frequencyOptions);
-      // timeout
-      if (!schedule && !performanceNextScheduleTime) return;
-      if (schedule) {
-        // update estimated time
-        schedule.estimatedTime = performanceNextScheduleTime;
-        schedule.updatedDate = moment().unix();
-        schedule.ends =
-          cdpo.frequency === 'once' ? 1 : cdpo.frequencyOptions.ends;
-        r.scheduleUpsert(schedule).catch(catchError);
-      } else {
-        r
-          .scheduleUpsert(
-            generateSchedule(
-              new_val.id,
-              'performance',
-              performanceNextScheduleTime,
-              cdpo.frequency === 'once'
-                ? cdpo.frequencyOptions.time
-                : cdpo.frequencyOptions.ends
-            )
-          )
-          .catch(catchError);
-      }
-    });
-
-  // deployment
-  needDeploymentRedeploy &&
-    r.lastWaitingSchedule(new_val.id, 'deployment').then(schedule => {
-      schedule = schedule.length > 0 ? schedule[0] : null;
-      const deploymentNextScheduleTime =
-        cddo && generateNextScheduleTime(cddo.frequency, cddo.frequencyOptions);
-      // timeout
-      if (!schedule && !deploymentNextScheduleTime) return;
-      if (schedule) {
-        // update estimated time
-        schedule.ends =
+const deploy = (deployment, threshold = null) => {
+  if (!deployment) throw new Error('no deployment')
+  const cddo = deployment.deploymentOptions;
+  const cdpo = deployment.performanceOptions;
+  cddo && api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
+    const nextScheduleTime = generateNextScheduleTime(cddo.frequency, cddo.frequencyOptions);
+    if (!schedule && !nextScheduleTime) return;
+    console.log(schedule)
+    if (schedule) {
+      // update estimated time
+      schedule.estimatedTime = nextScheduleTime;
+      schedule.updatedDate = moment().unix();
+      schedule.ends =
+        cddo.frequency === 'once' ? 1 : cddo.frequencyOptions.ends;
+      if (threshold) schedule.threshold = threshold
+      api.upsertSchedule(schedule).catch(catchError);
+    } else {
+      api.upsertSchedule(
+        generateSchedule(
+          deployment.id,
+          'deployment',
+          nextScheduleTime,
           cddo.frequency === 'once'
             ? cddo.frequencyOptions.time
-            : cddo.frequencyOptions.ends;
-        schedule.estimatedTime = deploymentNextScheduleTime;
-        r.scheduleUpsert(schedule).catch(catchError);
-      } else {
-        r
-          .scheduleUpsert(
-            generateSchedule(
-              new_val.id,
-              'deployment',
-              deploymentNextScheduleTime,
-              cddo.frequency === 'once'
-                ? cddo.frequencyOptions.time
-                : cddo.frequencyOptions.ends
-            )
-          )
-          .catch(catchError);
-      }
-    });
-});
+            : cddo.frequencyOptions.ends,
+          threshold)
+      ).catch(catchError);
+    }
+  })
+
+  cdpo && api.getLastWaitingSchedule(deployment.id, 'proformance').then(schedule => {
+    const nextScheduleTime = generateNextScheduleTime(cdpo.frequency, cdpo.frequencyOptions);
+    if (!schedule && !nextScheduleTime) return;
+    if (schedule) {
+      // update estimated time
+      schedule.estimatedTime = nextScheduleTime;
+      schedule.updatedDate = moment().unix();
+      schedule.ends =
+        cdpo.frequency === 'once' ? 1 : cdpo.frequencyOptions.ends;
+      api.upsertSchedule(schedule).catch(catchError);
+    } else {
+      api.upsertSchedule(
+        generateSchedule(
+          deployment.id,
+          'performance',
+          nextScheduleTime,
+          cdpo.frequency === 'once'
+            ? cdpo.frequencyOptions.time
+            : cdpo.frequencyOptions.ends,
+          threshold)
+      ).catch(catchError);
+    }
+  })
+}
 
 const generateSchedule = (
   deploymentId,
   type,
   estimatedTime,
   ends,
+  threshold = null,
   prevSchedule = null,
   status = 'waiting',
   actualTime = null,
@@ -194,6 +162,7 @@ const generateSchedule = (
   type,
   estimatedTime,
   ends,
+  threshold,
   prevSchedule,
   status,
   actualTime,
@@ -325,3 +294,5 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
 
   return nextTime;
 };
+
+module.exports = deploy
