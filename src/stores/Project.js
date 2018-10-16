@@ -500,7 +500,7 @@ export default class Project {
         projectId: this.id,
         command: 'dataView'
       };
-
+      console.log(command)
       api.dataView(command, progressResult => {
         console.log(progressResult, "dataview progress")
         // let { result } = progressResult;
@@ -519,7 +519,13 @@ export default class Project {
         // // this.project.setProperty(result)
         // this.updateProject(result))
       }).then(returnValue => {
-        console.log(returnValue, "dataview result")})
+        console.log(returnValue, "dataview result")
+        const { status, result } = returnValue
+        if (status < 0) return alert("dataview error")
+        this.setProperty({
+          dataViews: result.data
+        })
+      })
     })
   }
   /**---------------------------------------------train------------------------------------------------*/
@@ -659,6 +665,100 @@ export default class Project {
         if (this.problemType === "Classification") m.predicted = this.calcPredicted(m)
         this.models.push(new Model(this.id, m))
       });
+    })
+  }
+
+  preTrainImportance() {
+    socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'preTrainImportance'
+      };
+      console.log(command)
+      api.preTrainImportance(command, progressResult => {
+        console.log(progressResult, "preTrainImportance progress")
+        // let { result } = progressResult;
+        // if (!this.etling) return;
+        // Object.keys(result).forEach(k => {
+        //   if (k === "name") {
+        //     delete result[k];
+        //   }
+        //   if (k.includes("FillMethod")) {
+        //     Object.keys(result[k]).forEach(key => {
+        //       if (result[k][key] === "ignore") delete result[k][key]
+        //     })
+        //   }
+        // })
+        // console.log(result, "etl progress")
+        // // this.project.setProperty(result)
+        // this.updateProject(result))
+      }).then(returnValue => {
+        console.log(returnValue, "preTrainImportance result")
+        const { status, result } = returnValue
+        if (status < 0) return alert("preTrainImportance error")
+        this.project.setProperty({
+          preImportance: result.data
+        })
+      })
+    })
+  }
+
+  /**------------------------------------------------chart---------------------------------------------------------*/
+  correlationMatrix() {
+    socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'correlationMatrix',
+        featureLabel: toJS(this.dataHeader)
+      };
+      api.correlationMatrix(command, progressResult => {
+        console.log(progressResult, "correlationMatrix progress")
+      }).then(returnValue => {
+        console.log(returnValue, "correlationMatrix result")
+        const {status, result} = returnValue
+        if(status < 0) return alert("correlationMatrix error")
+        this.correlationMatrixImg = result.imageSavePath
+      })
+    })
+  }
+
+  univariatePlot() {
+    socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'univariatePlot',
+      };
+      api.univariatePlot(command, progressResult => {
+        console.log(progressResult, "univariatePlot progress")
+        const { result } = progressResult
+        const { field: plotKey, imageSavePath, progress } = result;
+        if (progress && progress === "start") return
+        const { univariatePlots } = this;
+        univariatePlots[plotKey] = imageSavePath
+        this.setProperty("univariatePlots", univariatePlots)
+      }).then(returnValue => {
+        console.log(returnValue, "univariatePlot result")
+      })
+    })
+  }
+
+  histgramPlot() {
+    socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'histgramPlot',
+      };
+      api.histgramPlot(command, progressResult => {
+        console.log(progressResult, "histgramPlot progress")
+        const { result } = progressResult
+        const { field: plotKey, imageSavePath, progress } = result;
+        if (progress && progress === "start") return
+        const { histgramPlots } = this;
+        histgramPlots[plotKey] = imageSavePath
+        this.setProperty("histgramPlots", histgramPlots)
+      }).then(returnValue => {
+        console.log(returnValue, "histgramPlot result")
+      })
     })
   }
 }

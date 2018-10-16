@@ -238,8 +238,8 @@ wss.register('etl', (message, socket, progress) => {
     const csvLocation = []
     const ext = []
     for (let n = 0; n < list.length; n++) {
-      let { err, file } = list[n][1]
-      if (err || !file) continue;
+      let file = list[n][1]
+      if (!file) continue;
       try {
         file = JSON.parse(file)
       } catch (e) { }
@@ -248,7 +248,7 @@ wss.register('etl', (message, socket, progress) => {
       const fileext = file.name.split(".").pop()
       ext.push("." + fileext)
     }
-    if (csvLocation.length) return { status: 416, message: "file not exist" }
+    if (!csvLocation.length) return { status: 416, message: "file not exist" }
     const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation, ext }
     return command(data, (result) => {
       return (result.status < 0 || result.status === 100) ? result : progress(result)
@@ -257,7 +257,30 @@ wss.register('etl', (message, socket, progress) => {
 })
 
 wss.register('dataView', (message, socket, progress) => {
-  console.log("dataView")
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('correlationMatrix', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('preTrainImportance', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('histgramPlot', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('univariatePlot', (message, socket, progress) => {
   return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
     return (result.status < 0 || result.status === 100) ? result : progress(result)
   })

@@ -55,7 +55,7 @@ export default class StartTrain extends Component {
             </button>
           </div>
           <div className={styles.trainSep}></div>
-          {/* <div className={styles.trainBox}>
+          <div className={styles.trainBox}>
             <div className={styles.trainBlock}>
               <div className={styles.trainImg}>
                 <img src={autoIcon} alt="auto" />
@@ -72,9 +72,9 @@ export default class StartTrain extends Component {
             <button className={styles.train} onClick={this.advanced}>
               <span>Advanced Modeling</span>
             </button>
-          </div> */}
+          </div>
         </div>
-        {/* <Modal width='13em' content={<AdvancedModel project={project} closeAdvanced={this.closeAdvanced} />} title='Advanced Modeling' onClose={this.closeAdvanced} visible={this.visible} /> */}
+        <Modal width='13em' content={<AdvancedModel project={this.props.project} closeAdvanced={this.closeAdvanced} />} title='Advanced Modeling' onClose={this.closeAdvanced} visible={this.visible} />
       </div>
     );
   }
@@ -114,7 +114,7 @@ class AdvancedModel extends Component {
 @observer
 class SimplifiedView extends Component {
   @observable sort = -1
-  @observable show = false
+  @observable showHistograms = false
   @observable showCorrelation = false
 
   componentDidMount() {
@@ -133,12 +133,12 @@ class SimplifiedView extends Component {
       () => !this.props.project.histograms,
       () => this.props.project.histgramPlot()
     )
-    this.show = true
+    this.showHistograms = true
   }
 
   hide = e => {
     e && e.stopPropagation();
-    this.show = false
+    this.showHistograms = false
   }
 
   sort = () => {
@@ -179,7 +179,7 @@ class SimplifiedView extends Component {
           <div className={classnames(styles.targetCell, styles.targetHistogram)} onClick={this.show}>
             <img src={histogramIcon} alt='histogram' />
             {<Popover placement='bottomLeft'
-              visible={this.show}
+              visible={this.showHistograms}
               onVisibleChange={this.hide}
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
@@ -263,15 +263,15 @@ class SimplifiedView extends Component {
 
 @observer
 class SimplifiedViewRow extends Component {
-  @observable showHistograms = false
-  @observable showUnivariant = false
+  @observable histograms = false
+  @observable univariant = false
 
   showHistograms = () => {
     when(
       () => !this.props.project.histgramPlots,
       () => this.props.project.histgramPlot()
     )
-    this.showHistograms = true
+    this.histograms = true
   }
 
   showUnivariant = () => {
@@ -279,17 +279,17 @@ class SimplifiedViewRow extends Component {
       () => !this.props.project.univariatePlots,
       () => this.props.project.univariatePlot()
     )
-    this.showUnivariant = true
+    this.univariant = true
   }
 
   hideHistograms = e => {
     e && e.stopPropagation();
-    this.showHistograms = false
+    this.histograms = false
   }
 
   hideUnivariant = e => {
     e && e.stopPropagation();
-    this.showUnivariant = false
+    this.univariant = false
   }
 
   render() {
@@ -299,8 +299,8 @@ class SimplifiedViewRow extends Component {
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
       <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showHistograms}>
         <img src={histogramIcon} alt='histogram' />
-        {this.showHistograms && <Popover placement='topLeft'
-          visible={this.showHistograms}
+        {this.histograms && <Popover placement='topLeft'
+          visible={this.histograms}
           onVisibleChange={this.hideHistograms}
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
@@ -312,8 +312,8 @@ class SimplifiedViewRow extends Component {
       </div>
       <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showUnivariant}>
         <img src={univariantIcon} alt='univariant' />
-        {this.showUnivariant && <Popover placement='topLeft'
-          visible={this.showUnivariant}
+        {this.univariant && <Popover placement='topLeft'
+          visible={this.univariant}
           onVisibleChange={this.hideUnivariant}
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideUnivariant}

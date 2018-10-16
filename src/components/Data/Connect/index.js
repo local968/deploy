@@ -88,10 +88,15 @@ export default class DataConnect extends Component {
   @observable sample = false
   @observable sql = false
   @observable file = null
+  @observable uploading = false
   @observable process = 0
+  @observable isPause = false
 
-  onUpload = () => {
-    this.process = 1
+  onUpload = ({ pause, resume }) => {
+    this.uploading = true
+    console.log(pause, resume)
+    this.pause = pause
+    this.resume = resume
   }
 
   upload = action((file, data) => {
@@ -145,7 +150,7 @@ export default class DataConnect extends Component {
     if (!!this.process) return false;
     const { userStore, project } = this.props;
 
-    this.process = 1
+    this.uploading = true
 
     axios('/api/sample', {
       method: 'post',
@@ -211,6 +216,18 @@ export default class DataConnect extends Component {
     e.preventDefault();
   }
 
+  handleParse = () => {
+    if (this.isPause) return
+    this.pause && this.pause()
+    this.isPause = true
+  }
+
+  handleResume = () => {
+    if (!this.isPause) return
+    this.resume && this.resume()
+    this.isPause = false
+  }
+
   render() {
     const { project, userStore } = this.props;
     return (
@@ -265,7 +282,7 @@ export default class DataConnect extends Component {
             selectSample={this.selectSample}
           />
         )}
-        {!!this.process && (
+        {!!this.uploading && (
           <div className={styles.sample}>
             <div className={styles.cover} />
             <div className={styles.progressBlock}>
@@ -286,6 +303,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressText}>
                   <span>Load modeling data and detect data type…</span>
+                  {(this.process < 90 && this.process > 0) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
                 </div>
               </div>
             </div>
