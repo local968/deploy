@@ -11,3 +11,11 @@ export default {
   deploymentStore,
   scheduleStore
 };
+
+window.stores = {
+  socketStore,
+  userStore,
+  projectStore,
+  deploymentStore,
+  scheduleStore
+};

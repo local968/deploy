@@ -13,7 +13,7 @@ export default (file, config = {}) => {
   uploader.onFinished(config.onFinished)
   uploader.onProgress(config.onProgress)
   uploader.upload()
-  return { pause: uploader.pause, resume: uploader.resume }
+  return { pause: uploader.pause.bind(uploader), resume: uploader.resume.bind(uploader) }
 }
 
 class Uploader {
@@ -173,7 +173,7 @@ class Uploader {
       this.stopSpeedCalculate();
       this.onFinishedCallback &&
         typeof this.onFinishedCallback === 'function' &&
-        this.onFinishedCallback(this.latestResponse);
+        this.onFinishedCallback(this.latestResponse, this.file);
       return;
     }
     Promise.race(this.processing).then(
@@ -214,7 +214,7 @@ class Uploader {
             this.stopSpeedCalculate();
             this.onFinishedCallback &&
               typeof this.onFinishedCallback === 'function' &&
-              this.onFinishedCallback(this.latestResponse);
+              this.onFinishedCallback(this.latestResponse, this.file);
           }
         }
       }

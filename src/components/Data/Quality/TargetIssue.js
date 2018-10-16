@@ -310,7 +310,7 @@ export class FixIssue extends Component {
 
   render = () => {
     const { closeFixes, project, saveDataFixes } = this.props;
-    const { issueRows, colType, mismatchIndex, nullIndex, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict } = project
+    const { issueRows, colType, mismatchIndex, nullIndexes, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict } = project
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -377,8 +377,8 @@ export class FixIssue extends Component {
             <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
           </div>
           <div className={styles.fixesBody}>
-            {Object.keys(nullIndex).map((k, i) => {
-              if (!nullIndex[k].length) {
+            {Object.keys(nullIndexes).map((k, i) => {
+              if (!nullIndexes[k].length) {
                 return null;
               }
               return <div className={styles.fixesRow} key={i}>
@@ -388,7 +388,7 @@ export class FixIssue extends Component {
                   <option value="Categorical">Categorical</option>
                   <option value="Numerical">Numerical</option>
                 </select></div>
-                <div className={styles.fixesCell}><span>{nullIndex[k].length} ({(nullIndex[k].length / (totalRawLines || 1)).toFixed(4)}%)</span></div>
+                <div className={styles.fixesCell}><span>{nullIndexes[k].length} ({(nullIndexes[k].length / (totalRawLines || 1)).toFixed(4)}%)</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
@@ -516,7 +516,7 @@ class EditOutLier extends Component {
 
     const realHeight = height - padding.bottom - padding.top;
     const realWidth = width - padding.left - padding.right;
-    //添加一个 SVG 画布   
+    //添加一个 SVG 画布
     const svg = d3.select(`.${styles.d3Chart}`)
       .append("svg")
       .attr("width", width)

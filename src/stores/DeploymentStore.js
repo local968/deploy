@@ -98,9 +98,7 @@ class DeploymentStore {
 
   @computed
   get currentDeployment() {
-    const _deployment = this.deployments.find(
-      ({ id }) => id === this.currentId
-    );
+    const _deployment = this.deployments.find(({ id }) => id === parseInt(this.currentId));
     return new Deployment(_deployment || {});
   }
 
@@ -121,19 +119,20 @@ class DeploymentStore {
           //   console.log(response)
           //   this.deployments = response.list;
           // });
-          api.watchDeployment().then(response => {
+          api.watchDeployments().then(response => {
+            console.log(response)
             this.deployments = response.list;
           });
 
-          api.on('watchDeployment', response => {
-
+          api.on('watchDeployments', response => {
+            console.log(response, 'from watch')
           })
         })
     );
   }
 
   async addDeployment(projectId, projectName, modelName, modelType) {
-    const tuple = {
+    const data = {
       deploymentOptions: {},
       modelName,
       modelType,
@@ -141,12 +140,12 @@ class DeploymentStore {
       projectName,
       performanceOptions: {}
     };
-    const db = await socketStore.ready();
-    const response = await db.addDeployment({ tuple });
+    const api = await socketStore.ready();
+    const response = await api.addDeployment({ data });
     if (response.status !== 200) {
       throw new Error(response.message);
     }
-    return response.result.id;
+    return response.id;
   }
 
   @action
