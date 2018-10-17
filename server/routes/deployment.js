@@ -38,6 +38,7 @@ wss.register('addDeployment', (message, socket) => {
     const data = message.data
     data.id = id
     data.userId = userId
+    data.createdDate = createdDate
     pipeline.set('deployment:' + id, JSON.stringify(data))
     pipeline.zadd(`user:${userId}:deployments:createdDate`, createdDate, id)
     return pipeline.exec().then(result => {

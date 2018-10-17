@@ -27,7 +27,7 @@ const deploymentStatus = {
   na: <span className={styles.na}>N/A</span>
 };
 
-@inject('deploymentStore', 'scheduleStore', 'routing')
+@inject('deploymentStore', 'scheduleStore', 'userStore', 'routing')
 @observer
 export default class Home extends Component {
   toggle = (currentType, targetType) => () => {
@@ -43,7 +43,7 @@ export default class Home extends Component {
     }
   };
   render() {
-    const { deploymentStore, routing, scheduleStore } = this.props;
+    const { deploymentStore, routing, scheduleStore, userStore } = this.props;
     return (
       <div className={styles.home}>
         <Bread list={['Home']} />
@@ -152,8 +152,8 @@ export default class Home extends Component {
                 >
                   {deploymentStatus[
                     scheduleStore.schedules &&
-                      scheduleStore.getLastSchedule(deployment.id, 'deployment')
-                        .status
+                    scheduleStore.getLastSchedule(deployment.id, 'deployment')
+                      .status
                   ] || deploymentStatus['normal']}
                 </span>
                 <span
@@ -166,10 +166,10 @@ export default class Home extends Component {
                 >
                   {deploymentStatus[
                     scheduleStore.schedules &&
-                      scheduleStore.getLastSchedule(
-                        deployment.id,
-                        'performance'
-                      ).status
+                    scheduleStore.getLastSchedule(
+                      deployment.id,
+                      'performance'
+                    ).status
                   ] || deploymentStatus['normal']}
                 </span>
                 {/* <span
@@ -200,7 +200,7 @@ export default class Home extends Component {
                   {moment.unix(deployment.createdDate).format('M/D/YYYY')}
                 </span>
                 <span className={styles.owner} title={deployment.owner}>
-                  {deployment.userId}
+                  {userStore.info.email}
                 </span>
                 <span
                   className={styles.delete}

@@ -767,7 +767,7 @@ export default class Project {
         if (progress && progress === "start") return
         const univariatePlots = Object.assign({}, this.univariatePlots);
         univariatePlots[plotKey] = imageSavePath
-        this.setProperty("univariatePlots", univariatePlots)
+        this.setProperty({univariatePlots})
       }).then(returnValue => {
       })
     })
@@ -785,7 +785,7 @@ export default class Project {
         if (progress && progress === "start") return
         const histgramPlots = Object.assign({}, this.histgramPlots);
         histgramPlots[plotKey] = imageSavePath
-        this.setProperty("histgramPlots", histgramPlots)
+        this.setProperty({histgramPlots})
       }).then(returnValue => {
       })
     })
