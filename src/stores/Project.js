@@ -528,6 +528,25 @@ export default class Project {
       })
     })
   }
+
+  @action
+	fixTarget() {
+		this.updateProject({
+			targetMap: this.targetMapTemp
+		})
+		this.etl();
+  }
+  
+  @action
+	fixFillMethod() {
+		this.updateProject({
+			outlierDict: toJS(this.outlierDict),
+			nullFillMethod: toJS(this.nullFillMethod),
+			mismatchFillMethod: toJS(this.mismatchFillMethod),
+			outlierFillMethod: toJS(this.outlierFillMethod)
+		})
+		this.etl();
+	}
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
