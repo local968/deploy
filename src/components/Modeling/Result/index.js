@@ -17,9 +17,9 @@ export default class ModelResult extends Component {
   @observable show = false
   @observable view = "simple"
 
-  // componentWillMount() {
-  //   this.props.project.chartData();
-  // }
+  componentWillMount() {
+    this.props.project.chartData();
+  }
 
   deploy = () => {
     const { project } = this.props;

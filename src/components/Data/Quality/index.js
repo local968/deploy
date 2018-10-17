@@ -101,7 +101,7 @@ export default class DataQuality extends Component {
 
     return <div className={styles.quality}>
       <div className={styles.issue}>
-        {(issues.targetIssue || issues.rowIssue) ?
+        {(issues.targetIssue || issues.rowIssue || issues.dataIssue) ?
           <div className={styles.issueTitle}><span>Issue Found!</span></div> :
           <div className={styles.cleanTitle}><span>No data issues were detected in your target variable!</span></div>}
         <div className={styles.issueBox}>
