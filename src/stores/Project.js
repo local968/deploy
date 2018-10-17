@@ -715,7 +715,7 @@ export default class Project {
         console.log(returnValue, "preTrainImportance result")
         const { status, result } = returnValue
         if (status < 0) return alert("preTrainImportance error")
-        this.project.setProperty({
+        this.setProperty({
           preImportance: result.data
         })
       })
