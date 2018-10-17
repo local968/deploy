@@ -24,12 +24,12 @@ import givemecreditSmall from 'sample/givemecredit_dirty.csv';
 import { observable, action } from 'mobx';
 
 const fileMap = {
-  '2': titanic,
-  '1': bankSmall,
-  '5': houseSmall,
-  '6': gameSmall,
-  '3': dma1cSmall,
-  '4': givemecreditSmall
+  'titanic.train.csv': titanic,
+  'bank.train.csv': bankSmall,
+  'regression.house.csv': houseSmall,
+  'game.csv': gameSmall,
+  'dma1c_dirty.csv': dma1cSmall,
+  'givemecredit_dirty.csv': givemecreditSmall
 };
 
 const files = {
@@ -40,7 +40,6 @@ const files = {
       desc: 'house features and price',
       target: 'price',
       usecase: 'house features and price',
-      id: '5'
     },
     {
       filename: 'game.csv',
@@ -48,7 +47,6 @@ const files = {
       desc: 'game sales prediction',
       target: 'NA_Sales',
       usecase: 'video game sales',
-      id: '6'
     }
   ],
   ClassificationSample: [
@@ -59,7 +57,6 @@ const files = {
         'Predict target customers for telemarketing of long term deposits product.',
       target: 'y',
       usecase: 'Retail bank telemarketing campaign data',
-      id: '1'
     },
     {
       filename: 'titanic.train.csv',
@@ -67,7 +64,6 @@ const files = {
       desc: 'Predict if a passenger on the Titanic boat would survive or not.',
       target: 'survived',
       usecase: 'Titanic survival data',
-      id: '2'
     },
     {
       filename: 'dma1c_dirty.csv',
@@ -75,7 +71,6 @@ const files = {
       desc: 'Predict diabetic patients blood suger cross control level',
       target: 'target8',
       usecase: 'Predict diabetic',
-      id: '3'
     },
     {
       filename: 'givemecredit_dirty.csv',
@@ -83,7 +78,6 @@ const files = {
       desc: 'Predict whether or not a loan should be granted',
       target: 'target',
       usecase: 'Give me credit',
-      id: '4'
     }
   ]
 };
@@ -151,18 +145,18 @@ export default class DataConnect extends Component {
     this.sample = false
   })
 
-  selectSample = id => {
+  selectSample = filename => {
     if (!!this.process) return false;
 
     this.uploading = true
 
-    axios.post('/upload/sample', { id }).then(
+    axios.post('/upload/sample', { filename }).then(
       action(data => {
         const { fileId } = data.data
         this.process = 90
         this.props.project.fastTrackInit(fileId);
 
-        Papa.parse(fileMap[id], {
+        Papa.parse(fileMap[filename], {
           download: true,
           preview: 100,
           complete: result => {
@@ -351,7 +345,7 @@ class DataSample extends Component {
     const sample = files[project.problemType + 'Sample'];
     const file = sample[this.select];
     if (!file) return;
-    selectSample(file.id);
+    selectSample(file.filename);
   };
 
   render() {

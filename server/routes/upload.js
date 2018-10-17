@@ -56,14 +56,14 @@ router.post('/', (req, res) => {
 })
 
 router.post('/sample', (req, res) => {
-  const id = req.body.id
+  const filename = req.body.filename
   const userId = req.session.userId
-  if (!id || !userId) return res.json({
+  if (!filename || !userId) return res.json({
     status: 404,
     message: 'missing params',
     error: 'missing params'
   })
-  redis.get('file:sample:' + id, (err, data) => {
+  redis.get('file:sample:' + filename, (err, data) => {
     if (err) return res.json({ status: 201, message: 'file error' })
     if (!data) return res.json({ status: 202, message: 'file not exist' })
     res.json({ status: 200, message: 'ok', fileId: data })
@@ -74,32 +74,32 @@ function saveSample() {
   const array = [
     {
       name: 'bank.train.csv',
-      path: '/r2/sample/1',
+      path: '/r2/sample/bank.train.csv',
       createdTime: 1539757558
     },
     {
-      name: 'titanic.train.csvv',
-      path: '/r2/sample/2',
+      name: 'titanic.train.csv',
+      path: '/r2/sample/titanic.train.csv',
       createdTime: 1539757558
     },
     {
       name: 'dma1c_dirty.csv',
-      path: '/r2/sample/3',
+      path: '/r2/sample/dma1c_dirty.csv',
       createdTime: 1539757558
     },
     {
       name: 'givemecredit_dirty.csv',
-      path: '/r2/sample/4',
+      path: '/r2/sample/givemecredit_dirty.csv',
       createdTime: 1539757558
     },
     {
       name: 'regression.house.csv',
-      path: '/r2/sample/5',
+      path: '/r2/sample/regression.house.csv',
       createdTime: 1539757558
     },
     {
       name: 'game.csv',
-      path: '/r2/sample/6',
+      path: '/r2/sample/game.csv',
       createdTime: 1539757558
     }
   ]
@@ -108,8 +108,7 @@ function saveSample() {
 
   const pipeline = redis.pipeline();
   array.forEach((v, k) => {
-    const fileId = 
-    pipeline.set('file:sample:' + (k + 1), ids[k])
+    pipeline.set('file:sample:' + v.name, ids[k])
     pipeline.set('file:' + ids[k], JSON.stringify(v))
   })
   pipeline.exec().then(console.log)
