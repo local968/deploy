@@ -31,7 +31,7 @@ export default class OneTime extends Component {
         <div className={styles.title}>One Time Settings</div>
         <div className={styles.line}>
           <span className={styles.label}>Starts</span>
-          <div
+          <div
             className={styles.options}
             onClick={() => {
               if (this.time === 'completed')

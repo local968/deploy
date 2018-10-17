@@ -216,3 +216,45 @@
   font-size: 1rem;
   margin-right: 1rem;
 }
+.uploading {
+  display: flex;
+  margin-top: 2rem;
+}
+.speed {
+  font-size: 1rem;
+  min-width: 10rem;
+  line-height: 2rem;
+  text-align: center;
+}
+.pause {
+  min-width: 8rem;
+  text-align: center;
+  line-height: 2;
+  margin-right: 0.3em;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, white, #f1f3f5);
+  -webkit-box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  cursor: pointer;
+  height: 2rem;
+  font-size: 1rem;
+  color: #1d2b3c;
+}
+
+.pause :global(.anticon) {
+  color: black;
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.pause:active {
+  background: linear-gradient(to top, white, #f1f3f5);
+}
+
+.uploadError {
+  font-size: 1rem;
+  color: #ff3151;
+}

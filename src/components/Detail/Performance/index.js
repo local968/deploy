@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Checkbox } from 'antd';
 import { observer, inject } from 'mobx-react';
 import { observable, action, runInAction } from 'mobx';
-import { Select, InputNumber, Icon } from 'antd';
+import { Select, InputNumber, Icon, Progress } from 'antd';
 import moment from 'moment';
 import styles from './styles.module.css';
 import downloadIcon from './icon-download.svg';
@@ -39,10 +39,14 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-@inject('deploymentStore', 'routing')
+@inject('deploymentStore', 'userStore', 'routing')
 @observer
 export default class Performance extends Component {
   @observable dialog = null;
+  @observable errorTimes = 0;
+  @observable uploadStatus = false;
+  @observable uploadPercentage = 0;
+  @observable uploadSpeed = '0 Kb/s';
 
   @action
   selectionOption = (key, value) => () => {
@@ -52,10 +56,43 @@ export default class Performance extends Component {
   show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
   render() {
-    const { deploymentStore, routing, match } = this.props;
+    const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
     const cdpo = cd.performanceOptions;
-
+    const uploader = {
+      onError: action((error, times) => {
+        console.error(error)
+        this.errorTimes = times
+        this.uploadStatus = 'error'
+        this.uploadError = error
+      }),
+      onFinished: action((response, file) => {
+        if (response.status === 200) {
+          cdpo.file = file.name
+          cdpo.fileId = response.fileId
+          cdpo.source = 'file'
+          cd.save()
+          this.uploadPercentage = 100
+          this.uploadStatus = false
+        } else {
+          this.uploadError = response.message
+          console.error(response)
+        }
+      }),
+      onProgress: action((progress, speed) => {
+        const done = progress.split('/')[0]
+        const total = progress.split('/')[1]
+        this.uploadSpeed = speed
+        this.uploadPercentage = parseFloat(((done / total) * 100).toFixed(2))
+      }),
+      onStart: action(() => {
+        this.uploadStatus = 'uploading'
+      }),
+      operator: (opeartor) => {
+        this.uploadOperator = opeartor
+      },
+      params: { projectId: cd.projectId, userId: userStore.info.id }
+    }
     return (
       <div className={styles.performance}>
         {/* {cdpo.enable && (
@@ -93,7 +130,16 @@ export default class Performance extends Component {
           cdpo={cdpo}
           selectionOption={this.selectionOption}
           show={this.show}
+          uploader={uploader}
         />
+        {this.uploadStatus && <div className={styles.uploading}>
+          <Progress percent={this.uploadPercentage} />
+          <span className={styles.speed}>{this.uploadSpeed}</span>
+          <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
+            ? <span><Icon type="pause" theme="outlined" />Pause</span>
+            : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+        </div>}
+        {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
         {cdpo.source && (
           <MeasurementMetric
             cdpo={cdpo}
@@ -183,7 +229,7 @@ export default class Performance extends Component {
   }
 }
 
-const DataSource = observer(({ cd, cdpo, selectionOption, show }) => (
+const DataSource = observer(({ cd, cdpo, show, uploader }) => (
   <div className={styles.block}>
     <span className={styles.label}>
       <span className={styles.text}>Data Source:</span>
@@ -212,8 +258,7 @@ const DataSource = observer(({ cd, cdpo, selectionOption, show }) => (
         <div className={styles.selected}>
           <Uploader
             className={styles.resultText}
-            onComplete={file => selectionOption('file', file.name)()}
-            params={{ projectId: cd.projectId, userId: cd.userId }}
+            {...uploader}
           >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File
@@ -242,14 +287,7 @@ const DataSource = observer(({ cd, cdpo, selectionOption, show }) => (
         <div className={styles.selectionWithoutHover}>
           <Uploader
             className={styles.text}
-            onComplete={file => {
-              runInAction(() => {
-                cd.performanceOptions['source'] = 'file';
-                cd.performanceOptions['file'] = file.name;
-                cd.save();
-              });
-            }}
-            params={{ projectId: cd.projectId, userId: cd.userId }}
+            {...uploader}
           >
             <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
             File

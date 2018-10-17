@@ -169,7 +169,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label}>Hostname:</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
@@ -183,7 +183,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label}>Port:</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
@@ -198,7 +198,7 @@ export default class DatabaseConfig extends Component {
         <div className={styles.separate} />
         <div className={styles.line}>
           <div className={styles.label}>Database Type:</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <Select
               value={state.databaseType}
               onChange={this.changeState.bind(this, 'databaseType')}
@@ -210,7 +210,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label}>Database Name:</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
@@ -224,7 +224,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label}>Table Name:</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
@@ -238,7 +238,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label}>SQL(optional):</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
@@ -254,7 +254,7 @@ export default class DatabaseConfig extends Component {
           <div className={styles.label}>
             Database Encoding:<br />(optional)
           </div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <Select
               value={state.sqlEncoding}
               onChange={this.changeState.bind(this, 'sqlEncoding')}
@@ -267,7 +267,7 @@ export default class DatabaseConfig extends Component {
         <div className={styles.separate} />
         <div className={styles.line}>
           <div className={styles.label}>Username:</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
@@ -281,7 +281,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label}>Password:</div>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <input
               type="password"
               className={classnames(styles.input, {
@@ -295,7 +295,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label} />
-          <div className={classnames(styles.options, styles.checkbox)}>
+          <div className={classnames(styles.options, styles.checkbox)}>
             <Checkbox
               checked={state.rememberMyPassword}
               onChange={this.checkboxChange('rememberMyPassword')}
@@ -308,7 +308,7 @@ export default class DatabaseConfig extends Component {
         <div className={styles.separate} />
         <div className={styles.line}>
           <div className={styles.label} />
-          <div className={classnames(styles.options, styles.checkbox)}>
+          <div className={classnames(styles.options, styles.checkbox)}>
             <Checkbox
               checked={state.rememberMyConnectionProfile}
               onChange={this.checkboxChange('rememberMyConnectionProfile')}

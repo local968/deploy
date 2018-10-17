@@ -67,7 +67,7 @@ const api = {
   getScheduleCount: (deploymentId, type) => redis.scard(`deployment:${deploymentId}:schedules:type:${type}`),
   getLastWaitingSchedule: (deploymentId, type) =>
     redis.zrevrangebyscore(`deployment:${deploymentId}:scheduleTimeline:type:${type}`, '+inf', '-inf', 'LIMIT', 0, 1)
-      .then(result => result[0] && api.getDeployment(result[0])),
+      .then(result => result[0] && redis.get(`schedule:${result[0]}`).then(JSON.parse)),
   getAllSchedule: (userId) => redis.smembers(`user:${userId}:schedules`).then(list => {
     const pipeline = redis.pipeline()
     list.map(id => pipeline.get(`schedule:${id}`))

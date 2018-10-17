@@ -80,7 +80,7 @@ export default class AutoRepeat extends Component {
         <div className={styles.title}>Auto Repeat Settings</div>
         <div className={styles.line}>
           <span className={styles.label}>Repeat every</span>
-          <div className={styles.options}>
+          <div className={styles.options}>
             <InputNumber
               min={1}
               max={max}
@@ -102,7 +102,7 @@ export default class AutoRepeat extends Component {
         {state.repeatPeriod === 'week' && (
           <div className={styles.line}>
             <span className={styles.label}>Repeat On</span>
-            <div className={styles.options}>
+            <div className={styles.options}>
               <div
                 className={classnames(styles.day, {
                   [styles.active]: state.repeatOn === 1
@@ -166,7 +166,7 @@ export default class AutoRepeat extends Component {
         {state.repeatPeriod === 'month' && (
           <div className={styles.line}>
             <span className={styles.label}>Repeat On</span>
-            <div className={styles.options}>
+            <div className={styles.options}>
               <InputNumber
                 min={1}
                 max={28}
@@ -183,7 +183,7 @@ export default class AutoRepeat extends Component {
 
         <div className={styles.line}>
           <span className={styles.label}>Starts</span>
-          <div className={styles.options}>
+          <div className={styles.options}>
             {/* <i
               className={classnames(styles.pot, {
                 [styles.active]: state.starts !== 'completed'
@@ -215,7 +215,7 @@ export default class AutoRepeat extends Component {
         </div> */}
         <div className={styles.line}>
           <span className={styles.label}>Ends</span>
-          <div className={styles.options} onClick={this.c('ends', 'never')}>
+          <div className={styles.options} onClick={this.c('ends', 'never')}>
             <i
               className={classnames([styles.pot], {
                 [styles.active]: state.ends === 'never'
