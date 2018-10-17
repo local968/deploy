@@ -3,6 +3,24 @@ import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
 
+function indexOfMax(arr) {
+  if (arr.length === 0) {
+      return -1;
+  }
+
+  let max = arr.Youden[0];
+  let maxIndex = 0;
+
+  for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
+      if (arr.Youden[i] > max) {
+      maxIndex = i;
+      max = arr.Youden[i];
+      }
+  }
+
+  return maxIndex;
+}
+
 export default class Project {
   @observable models = []
 
@@ -349,6 +367,43 @@ export default class Project {
 
     return data
   }
+
+  parseChartData(result) {
+    if (!result) return { chart: null, fitIndex: null };
+    let fitIndex;
+    const charts = ['density', 'lift', 'roc'];
+    charts.forEach(chart => {
+        result[chart] = this.parseJson(result[chart])
+    });
+    if (result.roc) {
+        fitIndex = indexOfMax(result.roc);
+        this.roundN(result.roc);
+      }
+    return { chart: result, fitIndex };
+  }
+
+  roundN(data, n = 2) {
+      if (!data) return;
+      const pow = Math.pow(10, n);
+      if (typeof data === 'number') {
+        return Math.floor(data * pow) / pow;
+      }
+      Object.keys(data).forEach(key => {
+        const num = data[key];
+        if (typeof num === 'number') {
+          data[key] = Math.floor(num * pow) / pow;
+        } else if (typeof num === 'object') {
+          return this.roundN(num, n);
+        } else {
+          data[key] = num;
+        }
+      });
+    }
+
+  parseJson(json_string) {
+      if (!json_string) return null;
+      return JSON.parse(json_string);
+    }
 
   @computed
   get issueRows() {
@@ -738,13 +793,26 @@ export default class Project {
 
   chartData = () => {
     socketStore.ready().then(api => {
-      const {uploadFileName} = this;
       const request = {
         action: 'all',
-        version: 'r2-solution-a1'
+        version: this.models.map(m => m.name).toString(),
+        command: 'chartData',
+        csvLocation: [...this.uploadFileName],
+        projectId: this.id
       };
-      api.chartData(request, result => {
-        console.log(result);
+      api.chartData(request, chartResult => {
+        const {result} = chartResult;
+        if (result.progress === 'start') return;
+        const model = this.models.find(m => {
+          return result.model === m.name;
+        })
+        if (model) {
+          const {fitIndex, chart} = this.parseChartData(result.data);
+          model.updateModel({
+            fitIndex,
+            chartData: chart
+          })
+        }
       })
     })
   }

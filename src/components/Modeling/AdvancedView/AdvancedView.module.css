@@ -1,0 +1,81 @@
+.advancedModelResult {
+  font-size: 1rem;
+  padding: 0 10%;
+}
+.advancedModelResult .modelResult {
+  display: inline-block;
+}
+.advancedModelResult .modelResult .status {
+  color: #f5a623;
+  display: inline-block;
+}
+.advancedModelResult .modelComp {
+  margin-left: 10em;
+  cursor: pointer;
+  display: inline-block;
+}
+.advancedModelTable {
+  font-size: 0.875rem;
+  border: 0.5px solid #d8d8d8;
+}
+.advancedModelTable .modelName {
+  display: inline-block;
+  width: 100px;
+  text-align: center;
+}
+.advancedModelTable .adrow {
+  display: flex;
+  cursor: pointer;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+}
+.advancedModelTable .adrow .adcell {
+  padding: 0.2em;
+  border: 0.5px solid #d8d8d8;
+  height: 3em;
+  flex: 1;
+  padding: 0 0.5em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  line-height: 3em;
+}
+.detailCurves {
+  display: flex;
+}
+.detailCurves .leftPanel {
+  min-width: 300px;
+  padding: 0.5em 3em;
+  background-color: #f0f0f0;
+  min-height: 200px;
+}
+.detailCurves .leftPanel .thumbnails {
+  display: flex;
+}
+.detailCurves .leftPanel .thumbnails .thumbnail {
+  flex-basis: 200px;
+  text-align: center;
+}
+.detailCurves .leftPanel button {
+  margin-right: 0.2em;
+}
+.detailCurves .leftPanel .predictTable {
+  background-color: white;
+  margin: 1em 0;
+}
+.detailCurves .leftPanel .predictTable th,
+.detailCurves .leftPanel .predictTable td {
+  padding: 0 8px !important;
+}
+.detailCurves .leftPanel .predictTable :global(.ant-table-tbody) :global(.ant-table-row):first-child td:nth-of-type(1),
+.detailCurves .leftPanel .predictTable :global(.ant-table-tbody) :global(.ant-table-row):nth-of-type(2) td:nth-of-type(1) {
+  background-color: #eaeff5;
+}
+.detailCurves .leftPanel .predictTable :global(.ant-table-thead) th {
+  background-color: white;
+}
+.detailCurves .leftPanel .predictTable :global(.ant-table-thead) th:nth-of-type(2),
+.detailCurves .leftPanel .predictTable :global(.ant-table-thead) th:nth-of-type(3) {
+  background-color: #edfddb;
+}

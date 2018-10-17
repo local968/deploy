@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import { Table, Tabs, Modal } from 'antd';
 import { observer } from 'mobx-react';
-import styles from './AdvancedView.module.less';
+// import styles from './AdvancedView.module.less';
+import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
@@ -84,7 +85,8 @@ class ModelRow extends Component {
   }
   render() {
     const { model, texts, checked } = this.props;
-    const { id, fitIndex, chartData: { roc } } = model;
+    if (!model.chartData) return null;
+    const { name, fitIndex, chartData: { roc } } = model;
     const { detail } = this.state;
     return (
       <div onClick={this.handleResult} >
@@ -97,7 +99,7 @@ class ModelRow extends Component {
                     {/* <span onClick={this.handleClick} >
                       <Radio checked={checked} onClick={this.props.onClickCheckbox} />
                     </span> */}
-                    <span className={styles.modelName} >{id}</span>
+                    <span className={styles.modelName} >{name}</span>
                   </div>}
                   />
                 )

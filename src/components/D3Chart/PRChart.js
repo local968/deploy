@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 
-import styles from './D3Chart.module.less';
+import styles from './D3Chart.module.css';
 
 function parseData(chartData) {
   const Recall = chartData.Recall;

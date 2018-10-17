@@ -9,6 +9,7 @@ export default class Model {
   @observable predicted = [];
   @observable modelInsightsData = null;
   @observable fitIndex = 0;
+  @observable chartData;
 
   constructor(projectId, model, name) {
     this.projectId = projectId;
