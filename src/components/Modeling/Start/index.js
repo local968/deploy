@@ -253,7 +253,7 @@ class SimplifiedView extends Component {
           })}
         </div>
       </div>
-      {(!dataViews || !preImportance) && <div className={styles.simplifiedLoad}>
+      {<div className={styles.simplifiedLoad}>
         <Spin size="large" />
       </div>}
     </div>
