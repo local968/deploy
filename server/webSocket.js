@@ -85,7 +85,7 @@ const init = (server, sessionParser) => {
       if (socket && socket.readyState === WebSocket.OPEN) {
         const result = await listener(message)
         result.type = result.type || channel
-        result.trigger = message
+        result.trigger = { ...message }
         return socket.send(JSON.stringify(result))
       }
       wss.removeListener('channel:' + channel, callback)

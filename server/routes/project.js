@@ -70,8 +70,8 @@ function createModel(id, params) {
 function deleteModels(id) {
   return redis.smembers("project:" + id + ":models").then(ids => {
     const pipeline = redis.pipeline();
-    ids.forEach(id => {
-      pipeline.del("model:" + id)
+    ids.forEach(modelId => {
+      pipeline.del("model:" + modelId)
     })
     pipeline.del("project:" + id + ":models")
     return pipeline.exec().then(list => {
@@ -82,14 +82,40 @@ function deleteModels(id) {
         message: 'ok'
       }
     })
+  })
+}
 
+function deleteProject(userId, id) {
+  return checkProject(userId, id).then(err => {
+    if (err) return err
+    const pipeline = redis.pipeline();
+    pipeline.del("project:" + id)
+    pipeline.zrem(`user:${userId}:projects:updateTime`, id)
+    pipeline.zrem(`user:${userId}:projects:createTime`, id)
+    return pipeline.exec().then(list => {
+      const error = list.find(i => !!i[0])
+      if (error) return { status: 415, message: "delete project error", error }
+      return deleteModels(id)
+    })
+  })
+}
+
+function checkProject(userId, id) {
+  return redis.hgetall("project:" + id).then(result => {
+    for (let key in result) {
+      try {
+        result[key] = JSON.parse(result[key])
+      } catch (e) { }
+    }
+    if (result.userId !== userId) return { status: 421, message: "project error" }
+    return null
   })
 }
 
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
-  return redis.incr("node:user:" + userId).then(id => {
+  return redis.incr("node:project:count").then(id => {
     return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
       console.log(result)
       const params = mapObjectToArray({ id, userId });
@@ -108,7 +134,27 @@ wss.register("updateProject", (message, socket) => {
   data.userId = userId
 
   const params = mapObjectToArray(data)
-  return createOrUpdate(id, userId, params)
+  return checkProject(userId, id).then(err => {
+    if (err) return err
+    return createOrUpdate(id, userId, params)
+  })
+})
+
+wss.register("deleteProjects", (message, socket) => {
+  const userId = socket.session.userId;
+  const ids = message.ids;
+  const array = []
+  ids.map(id => {
+    array.push(deleteProject(userId, id))
+  })
+  return Promise.all(array).then(list => {
+    const error = list.find(i => !!i.status !== 200)
+    if (error) return error
+    return {
+      status: 200,
+      message: 'ok'
+    }
+  })
 })
 
 wss.register("queryProjectList", (message, socket) => {
@@ -130,7 +176,8 @@ wss.register("queryProjectList", (message, socket) => {
   })
 })
 
-wss.register("queryProject", message => {
+wss.register("queryProject", (message, socket) => {
+  const userId = socket.session.userId;
   const id = message.id;
   const key = `project:${id}`;
 
@@ -140,6 +187,7 @@ wss.register("queryProject", message => {
         result[key] = JSON.parse(result[key])
       } catch (e) { }
     }
+    if (result.userId !== userId) return { status: 420, message: 'error' }
     return {
       status: 200,
       message: 'ok',
@@ -154,8 +202,8 @@ wss.register("queryModelList", message => {
 
   return redis.smembers(key).then(ids => {
     const pipeline = redis.pipeline();
-    ids.forEach(id => {
-      pipeline.hgetall("model:" + id)
+    ids.forEach(modelId => {
+      pipeline.hgetall("model:" + modelId)
     })
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
@@ -175,7 +223,6 @@ wss.register("queryModelList", message => {
         list: result
       }
     })
-
   })
 })
 
@@ -188,18 +235,54 @@ wss.register('etl', (message, socket, progress) => {
   return pipeline.exec().then(list => {
     const error = list.find(i => !!i[0])
     if (error) return error
-    const csvLocation = list.map(item => {
-      let file = item[1]
-      if (!file) return ""
+    const csvLocation = []
+    const ext = []
+    for (let n = 0; n < list.length; n++) {
+      let file = list[n][1]
+      if (!file) continue;
       try {
         file = JSON.parse(file)
       } catch (e) { }
-      return file.path || ""
-    }).filter(v => !!v)
-    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation: csvLocation }
+      if (!file.path || !file.name) continue
+      csvLocation.push(file.path)
+      const fileext = file.name.split(".").pop()
+      ext.push("." + fileext)
+    }
+    if (!csvLocation.length) return { status: 416, message: "file not exist" }
+    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation, ext }
     return command(data, (result) => {
       return (result.status < 0 || result.status === 100) ? result : progress(result)
     })
+  })
+})
+
+wss.register('dataView', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('correlationMatrix', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('preTrainImportance', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('histgramPlot', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
+wss.register('univariatePlot', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
   })
 })
 
@@ -266,4 +349,3 @@ function mapObjectToArray(obj) {
   })
   return arr
 }
-

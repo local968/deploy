@@ -3,7 +3,7 @@ import config from '../config'
 import EventEmitter from 'events'
 import uuid from 'uuid'
 
-const debug = false
+const debug = true
 
 class Socket extends EventEmitter {
   url = "ws://" + window.location.hostname + ":" + config.port

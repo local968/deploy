@@ -3,6 +3,8 @@ import styles from './styles.module.css';
 import axios from 'axios';
 import NginxUploader from '../NginxUploader';
 
+const AllowExt = ["csv", "zip", "rar"]
+
 export default class Uploader extends Component {
   componentDidUpdate() {
     const { file } = this.props;
@@ -18,11 +20,11 @@ export default class Uploader extends Component {
   }
 
   check = file => {
-    if (file.name.split('.').slice(-1)[0] !== 'csv') {
-      console.error('extension is not csv');
+    const ext = file.name.split('.').pop()
+    if (!ext || !AllowExt.includes(ext)) {
       return {
         err: true,
-        msg: 'extension is not csv'
+        msg: 'extension is not allowed'
       };
     }
     return {
@@ -60,7 +62,10 @@ export default class Uploader extends Component {
       if (checkd.err) {
         return onError(new Error(checkd.msg), 1)
       }
-      if (onStart && typeof onStart === 'function') onStart()
+      if (onStart && typeof onStart === 'function') onStart({
+        pause: this.pause,
+        resume: this.resume
+      })
       this.upload(file)
     }
   };
