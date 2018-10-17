@@ -210,7 +210,7 @@ class SimplifiedView extends Component {
             <option value='all'>All Variables ({rawHeader.length - 1})</option>
           </select>
         </div>
-        <div className={styles.toolButton}><span>Create a New Variable</span></div>
+        {/* <div className={styles.toolButton}><span>Create a New Variable</span></div> */}
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
             visible={this.showCorrelation}
