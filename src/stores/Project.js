@@ -530,23 +530,23 @@ export default class Project {
   }
 
   @action
-	fixTarget() {
-		this.updateProject({
-			targetMap: this.targetMapTemp
-		})
-		this.etl();
+  fixTarget() {
+    this.updateProject({
+      targetMap: this.targetMapTemp
+    })
+    this.etl();
   }
-  
+
   @action
-	fixFillMethod() {
-		this.updateProject({
-			outlierDict: toJS(this.outlierDict),
-			nullFillMethod: toJS(this.nullFillMethod),
-			mismatchFillMethod: toJS(this.mismatchFillMethod),
-			outlierFillMethod: toJS(this.outlierFillMethod)
-		})
-		this.etl();
-	}
+  fixFillMethod() {
+    this.updateProject({
+      outlierDict: toJS(this.outlierDict),
+      nullFillMethod: toJS(this.nullFillMethod),
+      mismatchFillMethod: toJS(this.mismatchFillMethod),
+      outlierFillMethod: toJS(this.outlierFillMethod)
+    })
+    this.etl();
+  }
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
@@ -715,7 +715,7 @@ export default class Project {
         console.log(returnValue, "preTrainImportance result")
         const { status, result } = returnValue
         if (status < 0) return alert("preTrainImportance error")
-        this.project.setProperty({
+        this.setProperty({
           preImportance: result.data
         })
       })
@@ -734,8 +734,8 @@ export default class Project {
         console.log(progressResult, "correlationMatrix progress")
       }).then(returnValue => {
         console.log(returnValue, "correlationMatrix result")
-        const {status, result} = returnValue
-        if(status < 0) return alert("correlationMatrix error")
+        const { status, result } = returnValue
+        if (status < 0) return alert("correlationMatrix error")
         this.correlationMatrixImg = result.imageSavePath
       })
     })
@@ -752,7 +752,7 @@ export default class Project {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
         if (progress && progress === "start") return
-        const { univariatePlots } = this;
+        const univariatePlots = Object.assign({}, this.univariatePlots);
         univariatePlots[plotKey] = imageSavePath
         this.setProperty("univariatePlots", univariatePlots)
       }).then(returnValue => {
@@ -772,7 +772,7 @@ export default class Project {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
         if (progress && progress === "start") return
-        const { histgramPlots } = this;
+        const histgramPlots = Object.assign({}, this.histgramPlots);
         histgramPlots[plotKey] = imageSavePath
         this.setProperty("histgramPlots", histgramPlots)
       }).then(returnValue => {
