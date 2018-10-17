@@ -29,7 +29,7 @@ const imgs = {
 
 const step = ['project', 'problem', 'data', 'modeling'];
 
-@inject('deploymentStore', 'scheduleStore')
+@inject('deploymentStore', 'scheduleStore', 'routing')
 @observer
 class NormalHeader extends Component {
   @computed
@@ -47,9 +47,9 @@ class NormalHeader extends Component {
   }
 
   render() {
-    const { deploymentStore } = this.props;
+    const { deploymentStore, routing } = this.props;
     return (
-      <div className={styles.header}>
+      <div className={styles.header} onClick={() => routing.push('/deploy')}>
         <div className={classnames(styles.block, styles.total)}>
           <span className={styles.number}>
             {deploymentStore.deployments.length}
@@ -102,7 +102,7 @@ class ProjectHeader extends Component {
     const { projectStore } = this.props;
     let maxStep = projectStore.project.mainStep;
     if (index > maxStep) return;
-    const {nextMainStep, updateProject} = projectStore.project
+    const { nextMainStep, updateProject } = projectStore.project
     updateProject(nextMainStep(index));
   };
 

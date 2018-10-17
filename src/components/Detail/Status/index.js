@@ -89,10 +89,10 @@ export default class List extends Component {
                       {isNaN(s.schedule.actualTime || s.schedule.estimatedTime)
                         ? s.schedule.actualTime || s.schedule.estimatedTime
                         : moment
-                            .unix(
-                              s.schedule.actualTime || s.schedule.estimatedTime
-                            )
-                            .format('DD/MM/YYYY-hh:mma')}
+                          .unix(
+                            s.schedule.actualTime || s.schedule.estimatedTime
+                          )
+                          .format('DD/MM/YYYY-hh:mma')}
                     </span>
                     <span
                       className={classnames(styles.performance, {
@@ -103,18 +103,18 @@ export default class List extends Component {
                         s.schedule.status === 'finished' &&
                         (s.schedule.result.problemType === 'Classification'
                           ? `Accuracy:${s.schedule.result.score &&
-                              s.schedule.result.score.acc.toFixed(2)} AUC:${s
-                              .schedule.result.score &&
-                              s.schedule.result.score.auc.toFixed(2)}`
+                          s.schedule.result.score.acc.toFixed(2)} AUC:${s
+                            .schedule.result.score &&
+                          s.schedule.result.score.auc.toFixed(2)}`
                           : `RMSE:${s.schedule.result.score &&
-                              s.schedule.result.score.nrmse.toFixed(2)} R2:${s
-                              .schedule.result.score &&
-                              s.schedule.result.score.r2.toFixed(2)}`)}
+                          s.schedule.result.score.nrmse.toFixed(2)} R2:${s
+                            .schedule.result.score &&
+                          s.schedule.result.score.r2.toFixed(2)}`)}
                     </span>
                     <span className={styles.threshold}>
                       {s.schedule.threshold &&
                         `${s.schedule.threshold.type} ${
-                          s.schedule.threshold.value
+                        s.schedule.threshold.value
                         }`}
                     </span>
                     {s.schedule.status !== 'issue' && (
@@ -129,11 +129,8 @@ export default class List extends Component {
                         overlayClassName={styles.popover}
                         content={
                           <Alert text={s.schedule.result['process error']} />
-                        }
-                      >
-                        <span
-                          className={classnames(styles.status, styles.issue)}
-                        >
+                        } >
+                        <span className={classnames(styles.status, styles.issue)} >
                           Issue
                         </span>
                       </Popover>
@@ -144,13 +141,13 @@ export default class List extends Component {
                         target="_blank"
                         href={`/api/download?userId=${cd.userId}&projectId=${
                           cd.projectId
-                        }&csvLocation=${s.schedule.result.resultPath}`}
+                          }&csvLocation=${s.schedule.result.resultPath}`}
                       >
                         Download
                       </a>
                     ) : (
-                      <span className={styles.results}> - </span>
-                    )}
+                        <span className={styles.results}> - </span>
+                      )}
                   </div>
                 ))}
               </div>

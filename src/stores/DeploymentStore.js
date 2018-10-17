@@ -144,7 +144,7 @@ class DeploymentStore {
   @action
   create(project) {
     return new Promise((resolve, reject) => {
-      socketStore.ready().then(api => api.addDeployment({ tuple: project }));
+      socketStore.ready().then(api => api.addDeployment({ project }));
     });
   }
 

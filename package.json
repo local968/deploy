@@ -60,6 +60,7 @@
     "wss": "server/webSocket",
     "logger": "server/logger",
     "redis": "server/redis",
-    "config": "config"
+    "config": "config",
+    "command": "command"
   }
 }
