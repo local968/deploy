@@ -428,7 +428,6 @@ export default class Project {
       data.noCompute = true;
     }
     this.etling = true;
-    console.log(data)
     // id: request ID
     // userId: user ID
     // projectId: project ID
@@ -439,7 +438,6 @@ export default class Project {
     // kwargs:
     socketStore.ready()
       .then(api => api.etl(data, progressResult => {
-        console.log(progressResult, "progressResult")
         // let { result } = progressResult;
         // if (!this.etling) return;
         // Object.keys(result).forEach(k => {
@@ -457,7 +455,6 @@ export default class Project {
         // this.updateProject(result)
       }))
       .then(returnValue => {
-        console.log(returnValue, "etl result")
         this.etling = false;
         let { result } = returnValue;
         Object.keys(result).forEach(k => {
@@ -500,26 +497,8 @@ export default class Project {
         projectId: this.id,
         command: 'dataView'
       };
-      console.log(command)
       api.dataView(command, progressResult => {
-        console.log(progressResult, "dataview progress")
-        // let { result } = progressResult;
-        // if (!this.etling) return;
-        // Object.keys(result).forEach(k => {
-        //   if (k === "name") {
-        //     delete result[k];
-        //   }
-        //   if (k.includes("FillMethod")) {
-        //     Object.keys(result[k]).forEach(key => {
-        //       if (result[k][key] === "ignore") delete result[k][key]
-        //     })
-        //   }
-        // })
-        // console.log(result, "etl progress")
-        // // this.project.setProperty(result)
-        // this.updateProject(result))
       }).then(returnValue => {
-        console.log(returnValue, "dataview result")
         const { status, result } = returnValue
         if (status < 0) return alert("dataview error")
         this.setProperty({
@@ -693,26 +672,8 @@ export default class Project {
         projectId: this.id,
         command: 'preTrainImportance'
       };
-      console.log(command)
       api.preTrainImportance(command, progressResult => {
-        console.log(progressResult, "preTrainImportance progress")
-        // let { result } = progressResult;
-        // if (!this.etling) return;
-        // Object.keys(result).forEach(k => {
-        //   if (k === "name") {
-        //     delete result[k];
-        //   }
-        //   if (k.includes("FillMethod")) {
-        //     Object.keys(result[k]).forEach(key => {
-        //       if (result[k][key] === "ignore") delete result[k][key]
-        //     })
-        //   }
-        // })
-        // console.log(result, "etl progress")
-        // // this.project.setProperty(result)
-        // this.updateProject(result))
       }).then(returnValue => {
-        console.log(returnValue, "preTrainImportance result")
         const { status, result } = returnValue
         if (status < 0) return alert("preTrainImportance error")
         this.setProperty({
@@ -731,9 +692,7 @@ export default class Project {
         featureLabel: toJS(this.dataHeader)
       };
       api.correlationMatrix(command, progressResult => {
-        console.log(progressResult, "correlationMatrix progress")
       }).then(returnValue => {
-        console.log(returnValue, "correlationMatrix result")
         const { status, result } = returnValue
         if (status < 0) return alert("correlationMatrix error")
         this.correlationMatrixImg = result.imageSavePath
@@ -748,7 +707,6 @@ export default class Project {
         command: 'univariatePlot',
       };
       api.univariatePlot(command, progressResult => {
-        console.log(progressResult, "univariatePlot progress")
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
         if (progress && progress === "start") return
@@ -756,7 +714,6 @@ export default class Project {
         univariatePlots[plotKey] = imageSavePath
         this.setProperty("univariatePlots", univariatePlots)
       }).then(returnValue => {
-        console.log(returnValue, "univariatePlot result")
       })
     })
   }
@@ -768,7 +725,6 @@ export default class Project {
         command: 'histgramPlot',
       };
       api.histgramPlot(command, progressResult => {
-        console.log(progressResult, "histgramPlot progress")
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
         if (progress && progress === "start") return
@@ -776,7 +732,6 @@ export default class Project {
         histgramPlots[plotKey] = imageSavePath
         this.setProperty("histgramPlots", histgramPlots)
       }).then(returnValue => {
-        console.log(returnValue, "histgramPlot result")
       })
     })
   }
