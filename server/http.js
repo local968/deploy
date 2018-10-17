@@ -138,6 +138,15 @@ app.use(routes)
 // Serve static files from the 'static' folder.
 app.use(express.static('static'));
 
+// CRA routing
+app.get('/*', function(req, res) {
+  const index = path.join(process.cwd(), 'static', 'index.html');
+  if(fs.existsSync(index)) {
+    res.sendFile(index);
+  }
+});
+
+
 // Create HTTP server by ourselves.
 const server = http.createServer(app);
 
