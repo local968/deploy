@@ -780,4 +780,17 @@ export default class Project {
       })
     })
   }
+
+  chartData = () => {
+    socketStore.ready().then(api => {
+      const {uploadFileName} = this;
+      const request = {
+        action: 'all',
+        version: 'r2-solution-a1'
+      };
+      api.chartData(request, result => {
+        console.log(result);
+      })
+    })
+  }
 }
