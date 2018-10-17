@@ -13,7 +13,7 @@ import { withRouter } from 'react-router';
 export default class Sider extends Component {
   render() {
     const { userStore, routing } = this.props;
-    const { userId } = userStore;
+    const isLogin = userStore.status === 'login';
     const isDeploy = routing.location.pathname.includes('deploy');
     return (
       <aside className={styles.sider}>
@@ -25,7 +25,7 @@ export default class Sider extends Component {
           <a
             className={styles.home}
             onClick={() =>
-              isDeploy && userId ? routing.push('/deploy') : routing.push('/')
+              isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')
             }
           >
             <img alt="home" src={home} />
@@ -38,7 +38,7 @@ export default class Sider extends Component {
         </div>
         <a className={styles.bottom} onClick={this.switchClick}>
           <img alt="switch" src={switchIcon} />
-          {isDeploy || !userId ? (
+          {isDeploy || !isLogin ? (
             <h4 className={styles.nav}>
               Model<br />Training
             </h4>

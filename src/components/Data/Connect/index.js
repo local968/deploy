@@ -15,21 +15,21 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 
 // sample data
-import bankSmall from 'sample/classification/bank.train.csv';
-import titanic from 'sample/classification/titanic.train.csv';
-import houseSmall from 'sample/regression/regression.house.csv';
-import gameSmall from 'sample/regression/game.csv';
-import dma1cSmall from 'sample/classification/dma1c_dirty.csv';
-import givemecreditSmall from 'sample/classification/givemecredit_dirty.csv';
+import bankSmall from 'sample/bank.train.csv';
+import titanic from 'sample/titanic.train.csv';
+import houseSmall from 'sample/regression.house.csv';
+import gameSmall from 'sample/game.csv';
+import dma1cSmall from 'sample/dma1c_dirty.csv';
+import givemecreditSmall from 'sample/givemecredit_dirty.csv';
 import { observable, action } from 'mobx';
 
 const fileMap = {
-  'titanic.train.csv': titanic,
-  'bank.train.csv': bankSmall,
-  'regression.house.csv': houseSmall,
-  'game.csv': gameSmall,
-  'dma1c_dirty.csv': dma1cSmall,
-  'givemecredit_dirty.csv': givemecreditSmall
+  '2': titanic,
+  '1': bankSmall,
+  '5': houseSmall,
+  '6': gameSmall,
+  '3': dma1cSmall,
+  '4': givemecreditSmall
 };
 
 const files = {
@@ -39,14 +39,16 @@ const files = {
       size: '2.4M',
       desc: 'house features and price',
       target: 'price',
-      usecase: 'house features and price'
+      usecase: 'house features and price',
+      id: '5'
     },
     {
       filename: 'game.csv',
       size: '1.6M',
       desc: 'game sales prediction',
       target: 'NA_Sales',
-      usecase: 'video game sales'
+      usecase: 'video game sales',
+      id: '6'
     }
   ],
   ClassificationSample: [
@@ -56,28 +58,32 @@ const files = {
       desc:
         'Predict target customers for telemarketing of long term deposits product.',
       target: 'y',
-      usecase: 'Retail bank telemarketing campaign data'
+      usecase: 'Retail bank telemarketing campaign data',
+      id: '1'
     },
     {
       filename: 'titanic.train.csv',
       size: '59K',
       desc: 'Predict if a passenger on the Titanic boat would survive or not.',
       target: 'survived',
-      usecase: 'Titanic survival data'
+      usecase: 'Titanic survival data',
+      id: '2'
     },
     {
       filename: 'dma1c_dirty.csv',
       size: '24M',
       desc: 'Predict diabetic patients blood suger cross control level',
       target: 'target8',
-      usecase: 'Predict diabetic'
+      usecase: 'Predict diabetic',
+      id: '3'
     },
     {
       filename: 'givemecredit_dirty.csv',
       size: '5.5MB',
       desc: 'Predict whether or not a loan should be granted',
       target: 'target',
-      usecase: 'Give me credit'
+      usecase: 'Give me credit',
+      id: '4'
     }
   ]
 };
@@ -94,7 +100,6 @@ export default class DataConnect extends Component {
 
   onUpload = ({ pause, resume }) => {
     this.uploading = true
-    console.log(pause, resume)
     this.pause = pause
     this.resume = resume
   }
@@ -146,26 +151,18 @@ export default class DataConnect extends Component {
     this.sample = false
   })
 
-  selectSample = filename => {
+  selectSample = id => {
     if (!!this.process) return false;
-    const { userStore, project } = this.props;
 
     this.uploading = true
 
-    axios('/api/sample', {
-      method: 'post',
-      params: {
-        userId: userStore.info.id,
-        projectId: project.id,
-        type: project.problemType.toLowerCase(),
-        filename: filename
-      }
-    }).then(
-      action(() => {
+    axios.post('/upload/sample', { id }).then(
+      action(data => {
+        const { fileId } = data.data
         this.process = 90
-        this.props.project.fastTrackInit(filename);
+        this.props.project.fastTrackInit(fileId);
 
-        Papa.parse(fileMap[filename], {
+        Papa.parse(fileMap[id], {
           download: true,
           preview: 100,
           complete: result => {
@@ -354,7 +351,7 @@ class DataSample extends Component {
     const sample = files[project.problemType + 'Sample'];
     const file = sample[this.select];
     if (!file) return;
-    selectSample(file.filename);
+    selectSample(file.id);
   };
 
   render() {
