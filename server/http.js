@@ -135,8 +135,8 @@ const createFilePath = (filePath) => {
 
 app.use(routes)
 
-// Serve static files from the 'public' folder.
-app.use(express.static('public'));
+// Serve static files from the 'static' folder.
+app.use(express.static('static'));
 
 // Create HTTP server by ourselves.
 const server = http.createServer(app);
