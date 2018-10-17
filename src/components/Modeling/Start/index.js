@@ -161,7 +161,7 @@ class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance } = project;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues } = project;
     const targetUnique = Object.values(Object.assign({}, colMap[target], targetMap)).length;
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     return <div className={styles.simplified}>
@@ -249,7 +249,7 @@ class SimplifiedView extends Component {
             const data = colType[h] !== 'Categorical' && dataViews ? dataViews[h] : {}
             const map = targetMap || {};
             const importance = preImportance ? preImportance[h] : 0.01;
-            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} />
+            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} />
           })}
         </div>
       </div>
@@ -292,7 +292,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, map, importance, colType, value, project } = this.props;
+    const { data, map, importance, colType, value, project, uniqueValues } = this.props;
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' defaultChecked={true} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
@@ -329,7 +329,9 @@ class SimplifiedViewRow extends Component {
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] === 'Categorical'
       })} title={data.mean || 'N/A'}><span>{data.mean || 'N/A'}</span></div>
-      <div className={styles.tableTd} title={Object.values(map).length}><span>{Object.values(map).length}</span></div>
+      <div className={classnames(styles.tableTd, {
+        [styles.none]: colType[value] !== 'Categorical'
+      })} title={uniqueValues || 'N/A'}><span>{uniqueValues || 'N/A'}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] === 'Categorical'
       })} title={data.std || 'N/A'}><span>{data.std || 'N/A'}</span></div>
