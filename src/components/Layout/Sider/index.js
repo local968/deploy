@@ -43,10 +43,10 @@ export default class Sider extends Component {
               Model<br />Training
             </h4>
           ) : (
-            <h4 className={styles.nav}>
-              Deployment<br />Console
+              <h4 className={styles.nav}>
+                Deployment<br />Console
             </h4>
-          )}
+            )}
         </a>
       </aside>
     );
@@ -55,12 +55,12 @@ export default class Sider extends Component {
   switchClick = () => {
     const { location, deploymentStore, userStore, routing } = this.props;
     const isDeploy = routing.location.pathname.includes('deploy');
-    const { userId } = userStore;
+    const userId = userStore.info.id;
     if (location.pathname.indexOf('/deploy/project/') !== -1) {
       const deploymentId = location.pathname.split('/')[3];
       const projectId = deploymentStore.deployments.find(d => d.id === parseInt(deploymentId))
         .projectId;
-        routing.push('/project/' + projectId);
+      routing.push('/project/' + projectId);
       return;
     }
 

@@ -168,11 +168,6 @@ class DeploymentStore {
         } else if (_d.enable === true) {
           api.deploySchedule({
             deploymentId: id,
-            type: 'deployment'
-          });
-          api.deploySchedule({
-            deploymentId: id,
-            type: 'performance',
             threshold: {
               type: _d.performanceOptions.measurementMetric,
               value: _d.performanceOptions.metricThreshold
@@ -195,9 +190,7 @@ class DeploymentStore {
     this.sortOptions[key] = value;
   };
 
-  deploySchedule = (deploymentId, threshold) => {
-    socketStore.ready().then(api => api.deploySchedule({ deploymentId, threshold }));
-  }
+  deploySchedule = (deploymentId, threshold) => socketStore.ready().then(api => api.deploySchedule({ deploymentId, threshold }));
 }
 
 export default new DeploymentStore();
