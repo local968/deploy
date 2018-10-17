@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { Popover } from 'antd';
 import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
+import config from 'config'
 
 @inject('deploymentStore', 'scheduleStore')
 @observer
@@ -46,10 +47,10 @@ export default class Operation extends Component {
                     {isNaN(s.schedule.actualTime || s.schedule.estimatedTime)
                       ? s.schedule.actualTime || s.schedule.estimatedTime
                       : moment
-                          .unix(
-                            s.schedule.actualTime || s.schedule.estimatedTime
-                          )
-                          .format('DD/MM/YYYY-hh:mma')}
+                        .unix(
+                          s.schedule.actualTime || s.schedule.estimatedTime
+                        )
+                        .format('DD/MM/YYYY-hh:mma')}
                   </span>
                   <span className={styles.deploymentStyle}>
                     Predict with{' '}
@@ -90,15 +91,8 @@ export default class Operation extends Component {
                     <a
                       className={styles.results}
                       target="_blank"
-                      href={`/api/download?userId=${cd.userId}&projectId=${
-                        cd.projectId
-                      }&csvLocation=${s.schedule.result.resultPath}`}
-                    >
-                      Download
-                    </a>
-                  ) : (
-                    <span className={styles.results}> - </span>
-                  )}
+                      href={`http://${config.uploadServer}/download/${s.schedule.result.resultPath}`}
+                    >Download</a>) : (<span className={styles.results}> - </span>)}
                 </div>
               ))}
 

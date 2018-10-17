@@ -12,7 +12,7 @@
 
 .switch:global(.ant-switch-checked:before),
 .switch:global(.ant-switch-checked:after) {
-  margin-left: -20px;
+  /* margin-left: -20px; */
 }
 
 .switch:global(.ant-switch-checked) {
@@ -22,5 +22,5 @@
 .switch:global(.ant-switch-checked:before),
 .switch:global(.ant-switch-checked:after) {
   left: 100%;
-  margin-left: -20px;
+  /* margin-left: -20px; */
 }
