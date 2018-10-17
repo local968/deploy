@@ -142,7 +142,7 @@ class SimplifiedView extends Component {
     this.showHistograms = false
   }
 
-  sort = () => {
+  sortImportance = () => {
     this.sort = this.sort * -1
   }
 
@@ -230,7 +230,7 @@ class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Histogram</span></div>
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Univariant Plot</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
-            <div className={styles.tableSort} onClick={this.sort}><span>sort</span></div>
+            <div className={styles.tableSort} onClick={this.sortImportance}><span>sort</span></div>
             <span>Importance</span>
           </div>
           <div className={styles.tableTh}><span>Data type</span></div>
