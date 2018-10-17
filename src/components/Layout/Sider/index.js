@@ -58,7 +58,7 @@ export default class Sider extends Component {
     const { userId } = userStore;
     if (location.pathname.indexOf('/deploy/project/') !== -1) {
       const deploymentId = location.pathname.split('/')[3];
-      const projectId = deploymentStore.deployments.find(d => d.id === deploymentId)
+      const projectId = deploymentStore.deployments.find(d => d.id === parseInt(deploymentId))
         .projectId;
         routing.push('/project/' + projectId);
       return;

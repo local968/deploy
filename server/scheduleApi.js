@@ -73,6 +73,7 @@ const api = {
     list.map(id => pipeline.get(`schedule:${id}`))
     return pipeline.exec()
   }).then(result => result.map(([error, schedule]) => JSON.parse(schedule))),
+  getFile: (id) => redis.get(`file:${id}`).then(JSON.parse)
   // removeScheduleFromWaiting: (schedule) => {
   //   const pipeline = redis.pipeline()
   //   pipeline.zrem(`deployment:${schedule.deploymentId}:scheduleTimeline:type:${schedule.type}`, schedule.id)

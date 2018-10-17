@@ -85,4 +85,8 @@ router.get('/deployment', (req, res) => {
 router.get('/delete', (req, res) => {
   api.deleteDeploymentSchedules(req.query.id).then(res.json.bind(res))
 })
+
+router.get('/file', (req, res) => {
+  api.getFile(req.query.id).then(res.json.bind(res))
+})
 module.exports = router

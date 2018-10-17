@@ -1,6 +1,7 @@
 const moment = require('moment');
 const config = require('../config');
 const api = require('./scheduleApi');
+const command = require('./command')
 
 // schedule handle
 const scheduleInterval = setInterval(
@@ -14,7 +15,6 @@ const scheduleInterval = setInterval(
 async function scheduleHandler() {
   const now = moment().unix();
   const schedules = await api.getTimeUpSchedules(now);
-  console.log(schedules.length)
   schedules.map(async schedule => {
     schedule.updatedDate = now;
     schedule.status = 'progressing';
@@ -22,6 +22,33 @@ async function scheduleHandler() {
 
     const deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return
+
+    // send command to python
+    const fileId = deployment[`${schedule.type}Options`].fileId
+    const fileName = deployment[`${schedule.type}Options`].file
+    const ext = fileName.split('.')[fileName.split('.').length - 1]
+    api.getFile(fileId).then(file => {
+      const request = {
+        requestId: `schedule-${schedule.id}`,
+        projectId: deployment.projectId,
+        userId: deployment.userId,
+        csvLocation: [file.path],
+        ext: [ext],
+        command: "deploy2",
+        solution: deployment.modelName
+      }
+      let result = {}
+      command(request, data => {
+        result = { ...result, ...data.result }
+        return data.status === 100 || data.status < 0
+      }).then(() => {
+        schedule.result = result
+        schedule.status = 'finished'
+        schedule.updatedDate = moment().unix()
+        return api.upsertSchedule(schedule)
+      })
+    })
+
     const cdo = deployment[`${schedule.type}Options`];
     const nextTime = generateNextScheduleTime(
       cdo.frequency,
@@ -98,7 +125,6 @@ const deploy = (deployment, threshold = null) => {
   cddo && api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
     const nextScheduleTime = generateNextScheduleTime(cddo.frequency, cddo.frequencyOptions);
     if (!schedule && !nextScheduleTime) return;
-    console.log(schedule)
     if (schedule) {
       // update estimated time
       schedule.estimatedTime = nextScheduleTime;

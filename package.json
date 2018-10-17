@@ -37,7 +37,7 @@
   },
   "proxy": "http://localhost:8080",
   "scripts": {
-    "start": "react-app-rewired build && mv build public && node ./server/index.js",
+    "start": "react-app-rewired build && rm -rf static && mv build static && node ./server/index.js",
     "dev": "react-app-rewired start & pm2 start deploy2-dev.json",
     "fdev": "react-app-rewired start & node ./server/index.js",
     "frontend": "react-app-rewired start",
@@ -60,6 +60,7 @@
     "wss": "server/webSocket",
     "logger": "server/logger",
     "redis": "server/redis",
-    "config": "config"
+    "config": "config",
+    "command": "command"
   }
 }
