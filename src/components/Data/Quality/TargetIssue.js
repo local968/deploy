@@ -461,7 +461,6 @@ export class FixIssue extends Component {
         </div>
       </div>}
       <div className={styles.fixesBottom}>
-      {console.log(this.canSave)}
         <button className={classnames(styles.save, {
           [styles.disabled]: !this.canSave
         })} onClick={saveDataFixes} disabled={!this.canSave} ><span>save</span></button>
