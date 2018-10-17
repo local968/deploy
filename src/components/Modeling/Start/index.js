@@ -8,6 +8,7 @@ import { when, observable } from 'mobx';
 import { Spin, Popover } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
+import config from 'config';
 
 @observer
 export default class StartTrain extends Component {
@@ -96,10 +97,10 @@ class AdvancedModel extends Component {
         <div className={styles.tabBox}>
           <div className={classnames(styles.tab, {
             [styles.active]: this.tab === 1
-          })} onClick={this.switchTab.bind(null, 1)}><span>Simplified View</span></div>
+          })} onClick={this.switchTab.bind(null, 1)}><span>Advanced Variable Setting</span></div>
           <div className={classnames(styles.tab, {
             [styles.active]: this.tab === 2
-          })} onClick={this.switchTab.bind(null, 2)}><span>Advanced View</span></div>
+          })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
         </div>
         {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
         <div className={styles.bottom}>
@@ -141,7 +142,7 @@ class SimplifiedView extends Component {
     this.showHistograms = false
   }
 
-  sort = () => {
+  sortImportance = () => {
     this.sort = this.sort * -1
   }
 
@@ -185,8 +186,7 @@ class SimplifiedView extends Component {
               content={<SimplifiedViewPlot onClose={this.hide}
                 type='histogram'
                 path={project.histgramPlots ? project.histgramPlots.target : ''}
-                userId={project.userId}
-                projectId={project.projectId} />} />}
+                 />} />}
             <span>Compute</span>
           </div>
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
@@ -219,8 +219,7 @@ class SimplifiedView extends Component {
             content={<SimplifiedViewPlot onClose={this.hideCorrelationMatrix}
               type='correlationMatrix'
               path={project.correlationMatrixImg}
-              userId={project.userId}
-              projectId={project.projectId} />} />}
+               />} />}
           <span>Check Correlation Matric</span>
         </div>
       </div>
@@ -231,7 +230,7 @@ class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Histogram</span></div>
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Univariant Plot</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
-            <div className={styles.tableSort} onClick={this.sort}><span>sort</span></div>
+            <div className={styles.tableSort} onClick={this.sortImportance}><span>sort</span></div>
             <span>Importance</span>
           </div>
           <div className={styles.tableTh}><span>Data type</span></div>
@@ -306,8 +305,7 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type='histgram'
             path={project.histgramPlots ? project.histgramPlots[value] : ''}
-            userId={project.userId}
-            projectId={project.projectId} />} />}
+             />} />}
         <span>Compute</span>
       </div>
       <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showUnivariant}>
@@ -319,8 +317,7 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideUnivariant}
             type='univariate'
             path={project.univariatePlots ? project.univariatePlots[value] : ''}
-            userId={project.userId}
-            projectId={project.projectId} />} />}
+             />} />}
         <span>Compute</span>
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
@@ -352,8 +349,8 @@ class SimplifiedViewRow extends Component {
 @observer
 class SimplifiedViewPlot extends Component {
   render() {
-    const { onClose, path, type, userId, projectId } = this.props;
-    const imgPath = path ? `/api/read?userId=${userId}&projectId=${projectId}&csvLocation=${path}` : ''
+    const { onClose, path, type } = this.props;
+    const imgPath = path ? `http://${config.uploadServer}/download/${path}` : ''
     return <div className={styles.plot}>
       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}

@@ -24,6 +24,7 @@ export default class Home extends Component {
   @observable deleteNames = []
   @observable deleteIds = []
   @observable visible = false
+  @observable loading = false
 
   constructor(props) {
     super(props);
@@ -91,7 +92,10 @@ export default class Home extends Component {
   }
 
   handleAdd = () => {
+    if(this.loading) return
+    this.loading = true
     this.props.projectStore.addProject().then(data => {
+      this.loading = false
       if (data.error) return alert(data.error)
       this.props.routing.push(`/project/${data.id}`);
     });

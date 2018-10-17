@@ -7,6 +7,7 @@ import styles from './list.module.css';
 import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 import { Popover } from 'antd';
+import config from 'config';
 
 @inject('scheduleStore', 'deploymentStore', 'routing')
 @observer
@@ -139,9 +140,7 @@ export default class List extends Component {
                       <a
                         className={styles.results}
                         target="_blank"
-                        href={`/api/download?userId=${cd.userId}&projectId=${
-                          cd.projectId
-                          }&csvLocation=${s.schedule.result.resultPath}`}
+                        href={`http://${config.uploadServer}/download/${s.schedule.result.resultPath}`}
                       >
                         Download
                       </a>
