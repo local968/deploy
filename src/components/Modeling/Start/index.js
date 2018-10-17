@@ -97,10 +97,10 @@ class AdvancedModel extends Component {
         <div className={styles.tabBox}>
           <div className={classnames(styles.tab, {
             [styles.active]: this.tab === 1
-          })} onClick={this.switchTab.bind(null, 1)}><span>Simplified View</span></div>
+          })} onClick={this.switchTab.bind(null, 1)}><span>Advanced Variable Setting</span></div>
           <div className={classnames(styles.tab, {
             [styles.active]: this.tab === 2
-          })} onClick={this.switchTab.bind(null, 2)}><span>Advanced View</span></div>
+          })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
         </div>
         {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
         <div className={styles.bottom}>
