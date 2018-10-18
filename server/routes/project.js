@@ -116,8 +116,8 @@ wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
   return redis.incr("node:project:count").then(id => {
+    console.log('new project id:', id)
     return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
-      console.log(result)
       const params = mapObjectToArray({ id, userId });
       return createOrUpdate(id, userId, params, true)
     })

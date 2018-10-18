@@ -7,7 +7,11 @@ const command = (command, callback) => {
   const returnPromise = new Promise((resolve, reject) => {
     const requestId = command.requestId
     if (!requestId) return reject(new Error('no request id'))
-    pubsub.lpush(config.requestQueue, JSON.stringify(command))
+    if (command.command === 'create') {
+      pubsub.lpush(config.requestQueue, JSON.stringify(command)).then(console.log.bind(console, 'create:'))
+    } else {
+      pubsub.lpush(config.requestQueue, JSON.stringify(command))
+    }
     if (!callback) return pubsub.once(requestId, resolve)
 
     const _callback = async (result) => {

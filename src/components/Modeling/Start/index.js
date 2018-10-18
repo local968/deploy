@@ -186,7 +186,7 @@ class SimplifiedView extends Component {
               content={<SimplifiedViewPlot onClose={this.hide}
                 type='histogram'
                 path={project.histgramPlots ? project.histgramPlots.target : ''}
-                 />} />}
+              />} />}
             <span>Compute</span>
           </div>
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
@@ -219,7 +219,7 @@ class SimplifiedView extends Component {
             content={<SimplifiedViewPlot onClose={this.hideCorrelationMatrix}
               type='correlationMatrix'
               path={project.correlationMatrixImg}
-               />} />}
+            />} />}
           <span>Check Correlation Matric</span>
         </div>
       </div>
@@ -253,7 +253,7 @@ class SimplifiedView extends Component {
           })}
         </div>
       </div>
-      {<div className={styles.simplifiedLoad}>
+      {(!dataViews || !preImportance) && <div className={styles.simplifiedLoad}>
         <Spin size="large" />
       </div>}
     </div>
@@ -305,7 +305,7 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type='histgram'
             path={project.histgramPlots ? project.histgramPlots[value] : ''}
-             />} />}
+          />} />}
         <span>Compute</span>
       </div>
       <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showUnivariant}>
@@ -317,7 +317,7 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideUnivariant}
             type='univariate'
             path={project.univariatePlots ? project.univariatePlots[value] : ''}
-             />} />}
+          />} />}
         <span>Compute</span>
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
