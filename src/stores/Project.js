@@ -2,20 +2,22 @@ import { observable, action, computed, toJS, when } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
+import config from 'config';
+import Papa from 'papaparse';
 
 function indexOfMax(arr) {
   if (arr.length === 0) {
-      return -1;
+    return -1;
   }
 
   let max = arr.Youden[0];
   let maxIndex = 0;
 
   for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
-      if (arr.Youden[i] > max) {
+    if (arr.Youden[i] > max) {
       maxIndex = i;
       max = arr.Youden[i];
-      }
+    }
   }
 
   return maxIndex;
@@ -373,37 +375,37 @@ export default class Project {
     let fitIndex;
     const charts = ['density', 'lift', 'roc'];
     charts.forEach(chart => {
-        result[chart] = this.parseJson(result[chart])
+      result[chart] = this.parseJson(result[chart])
     });
     if (result.roc) {
-        fitIndex = indexOfMax(result.roc);
-        this.roundN(result.roc);
-      }
+      fitIndex = indexOfMax(result.roc);
+      this.roundN(result.roc);
+    }
     return { chart: result, fitIndex };
   }
 
   roundN(data, n = 2) {
-      if (!data) return;
-      const pow = Math.pow(10, n);
-      if (typeof data === 'number') {
-        return Math.floor(data * pow) / pow;
-      }
-      Object.keys(data).forEach(key => {
-        const num = data[key];
-        if (typeof num === 'number') {
-          data[key] = Math.floor(num * pow) / pow;
-        } else if (typeof num === 'object') {
-          return this.roundN(num, n);
-        } else {
-          data[key] = num;
-        }
-      });
+    if (!data) return;
+    const pow = Math.pow(10, n);
+    if (typeof data === 'number') {
+      return Math.floor(data * pow) / pow;
     }
+    Object.keys(data).forEach(key => {
+      const num = data[key];
+      if (typeof num === 'number') {
+        data[key] = Math.floor(num * pow) / pow;
+      } else if (typeof num === 'object') {
+        return this.roundN(num, n);
+      } else {
+        data[key] = num;
+      }
+    });
+  }
 
   parseJson(json_string) {
-      if (!json_string) return null;
-      return JSON.parse(json_string);
-    }
+    if (!json_string) return null;
+    return JSON.parse(json_string);
+  }
 
   @computed
   get issueRows() {
@@ -493,20 +495,25 @@ export default class Project {
     // kwargs:
     socketStore.ready()
       .then(api => api.etl(data, progressResult => {
-        // let { result } = progressResult;
-        // if (!this.etling) return;
-        // Object.keys(result).forEach(k => {
-        //   if (k === "name") {
-        //     delete result[k];
-        //   }
-        //   if (k.includes("FillMethod")) {
-        //     Object.keys(result[k]).forEach(key => {
-        //       if (result[k][key] === "ignore") delete result[k][key]
-        //     })
-        //   }
-        // })
-        // console.log(result, "etl progress")
-        // // this.project.setProperty(result)
+        let { result } = progressResult;
+        if (!this.etling) return;
+        const { progress, name, path } = result
+        if (progress === "start") return
+        if (name === "csvHeader") {
+          const url = `http://${config.uploadServer}/download/${path}`
+          Papa.parse(url, {
+            download: true,
+            preview: 100,
+            complete: result => {
+              if (result.errors.length !== 0) {
+                console.error('parse error: ', result.errors[0].message);
+                return;
+              }
+              this.newFileInit(result.data);
+            }
+          });
+        }
+        // this.project.setProperty(result)
         // this.updateProject(result)
       }))
       .then(returnValue => {
@@ -767,7 +774,7 @@ export default class Project {
         if (progress && progress === "start") return
         const univariatePlots = Object.assign({}, this.univariatePlots);
         univariatePlots[plotKey] = imageSavePath
-        this.setProperty({univariatePlots})
+        this.setProperty({ univariatePlots })
       }).then(returnValue => {
       })
     })
@@ -785,7 +792,7 @@ export default class Project {
         if (progress && progress === "start") return
         const histgramPlots = Object.assign({}, this.histgramPlots);
         histgramPlots[plotKey] = imageSavePath
-        this.setProperty({histgramPlots})
+        this.setProperty({ histgramPlots })
       }).then(returnValue => {
       })
     })
@@ -801,13 +808,13 @@ export default class Project {
         projectId: this.id
       };
       api.chartData(request, chartResult => {
-        const {result} = chartResult;
+        const { result } = chartResult;
         if (result.progress === 'start') return;
         const model = this.models.find(m => {
           return result.model === m.name;
         })
         if (model) {
-          const {fitIndex, chart} = this.parseChartData(result.data);
+          const { fitIndex, chart } = this.parseChartData(result.data);
           model.updateModel({
             fitIndex,
             chartData: chart
