@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Progress } from 'antd';
-import config from '../../../config.js';
+import config from 'config';
 
 @observer
 export default class Loading extends Component {

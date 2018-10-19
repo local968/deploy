@@ -39,7 +39,7 @@ export default class Uploader extends Component {
       const token = response.data.token
       this.uploader = NginxUploader(file, {
         onProgress: onProgress,
-        onFinished: onComplete.bind(null, file),
+        onFinished: onComplete,
         onError: this.retry,
         params: {
           ...params,

@@ -2,35 +2,17 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
-import Papa from 'papaparse';
 import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
-import sqlIcon from './sql.svg';
+// import sqlIcon from './sql.svg';
 import defileIcon from './define.svg';
 import axios from 'axios';
 import { message, Progress } from 'antd';
 import { Uploader } from 'components/Common';
-import DatabaseConfig from 'components/Common/DatabaseConfig';
-
+// import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 
-// sample data
-import bankSmall from 'sample/bank.train.csv';
-import titanic from 'sample/titanic.train.csv';
-import houseSmall from 'sample/regression.house.csv';
-import gameSmall from 'sample/game.csv';
-import dma1cSmall from 'sample/dma1c_dirty.csv';
-import givemecreditSmall from 'sample/givemecredit_dirty.csv';
 import { observable, action } from 'mobx';
-
-const fileMap = {
-  'titanic.train.csv': titanic,
-  'bank.train.csv': bankSmall,
-  'regression.house.csv': houseSmall,
-  'game.csv': gameSmall,
-  'dma1c_dirty.csv': dma1cSmall,
-  'givemecredit_dirty.csv': givemecreditSmall
-};
 
 const files = {
   RegressionSample: [
@@ -86,7 +68,7 @@ const files = {
 @observer
 export default class DataConnect extends Component {
   @observable sample = false
-  @observable sql = false
+  // @observable sql = false
   @observable file = null
   @observable uploading = false
   @observable process = 0
@@ -98,26 +80,26 @@ export default class DataConnect extends Component {
     this.resume = resume
   }
 
-  upload = action((file, data) => {
+  upload = action(data => {
     this.process = 90
     this.file = null
 
     this.props.project.fastTrackInit(data.fileId);
 
-    const reader = new FileReader();
-    reader.onload = e => {
-      const result = Papa.parse(e.target.result, {
-        header: false,
-        preview: 100
-      });
-      if (result.errors.length !== 0) {
-        console.error('parse error: ', result.errors[0].message);
-        return;
-      }
-      this.props.project.newFileInit(result.data);
-    };
-    const blob = file.slice(0, 5000000);
-    reader.readAsText(blob);
+    // const reader = new FileReader();
+    // reader.onload = e => {
+    //   const result = Papa.parse(e.target.result, {
+    //     header: false,
+    //     preview: 100
+    //   });
+    //   if (result.errors.length !== 0) {
+    //     console.error('parse error: ', result.errors[0].message);
+    //     return;
+    //   }
+    //   this.props.project.newFileInit(result.data);
+    // };
+    // const blob = file.slice(0, 5000000);
+    // reader.readAsText(blob);
   })
 
   onError = action((error, times) => {
@@ -156,17 +138,17 @@ export default class DataConnect extends Component {
         this.process = 90
         this.props.project.fastTrackInit(fileId);
 
-        Papa.parse(fileMap[filename], {
-          download: true,
-          preview: 100,
-          complete: result => {
-            if (result.errors.length !== 0) {
-              console.error('parse error: ', result.errors[0].message);
-              return;
-            }
-            this.props.project.newFileInit(result.data);
-          }
-        });
+        // Papa.parse(fileMap[filename], {
+        //   download: true,
+        //   preview: 100,
+        //   complete: result => {
+        //     if (result.errors.length !== 0) {
+        //       console.error('parse error: ', result.errors[0].message);
+        //       return;
+        //     }
+        //     this.props.project.newFileInit(result.data);
+        //   }
+        // });
       }),
       () => {
         message.error('sample file error, please choose again');
@@ -175,13 +157,13 @@ export default class DataConnect extends Component {
     this.hideSample();
   };
 
-  showSql = action(() => {
-    this.sql = true;
-  })
+  // showSql = action(() => {
+  //   this.sql = true;
+  // })
 
-  hideSql = (() => {
-    this.sql = false;
-  })
+  // hideSql = (() => {
+  //   this.sql = false;
+  // })
 
   block = (label, img, onClick) => {
     return (
@@ -248,7 +230,7 @@ export default class DataConnect extends Component {
                 file={this.file}
               />
             )}
-          {this.block('From SQL', sqlIcon, this.showSql)}
+          {/* {this.block('From SQL', sqlIcon, this.showSql)} */}
         </div>
         <div className={styles.cutoff}>
           <div className={styles.line} />
@@ -300,7 +282,7 @@ export default class DataConnect extends Component {
             </div>
           </div>
         )}
-        <DatabaseConfig
+        {/* <DatabaseConfig
           options={{}}
           visible={this.sql}
           onClose={this.hideSql}
@@ -326,7 +308,7 @@ export default class DataConnect extends Component {
 
             this.hideSql();
           })}
-        />
+        /> */}
       </div>
     );
   }
