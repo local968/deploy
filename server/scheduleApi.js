@@ -1,5 +1,6 @@
 const { redis, pubsub } = require('redis')
 const wss = require('./webSocket')
+const userConcurrentRestrict = [0, 1, 1, 5, 999999]
 
 const setSchedule = (schedule) => {
   const pipeline = redis.pipeline()
@@ -73,14 +74,26 @@ const api = {
     list.map(id => pipeline.get(`schedule:${id}`))
     return pipeline.exec()
   }).then(result => result.map(([error, schedule]) => JSON.parse(schedule))),
-  getFile: (id) => redis.get(`file:${id}`).then(JSON.parse)
-  // removeScheduleFromWaiting: (schedule) => {
-  //   const pipeline = redis.pipeline()
-  //   pipeline.zrem(`deployment:${schedule.deploymentId}:scheduleTimeline:type:${schedule.type}`, schedule.id)
-  //   pipeline.zrem(`scheduleTimeline`, schedule.id)
-  //   pipeline.zcard('scheduleTimeline')
-  //   return pipeline.exec()
-  // }
+  getFile: (id) => redis.get(`file:${id}`).then(JSON.parse),
+  isExceedConcurrent: (deploymentId) => new Promise((resolve, reject) => api.getDeployment(deploymentId).then(deployment => {
+    const pipeline = redis.pipeline()
+    pipeline.get(`user:${deployment.userId}:concurrent`)
+    pipeline.hmget(`user:${id}`, 'level')
+    return pipeline.exec()
+  }).then(result => {
+    if (result[0][0] || result[1][0]) resolve(true)
+    const concurrent = result[0][1]
+    const level = result[1][1][0]
+    concurrent >= userConcurrentRestrict[level] ? resolve(true) : resolve(false)
+  })),
+  startDeploy: (deploymentId) =>
+    new Promise((resolve, reject) =>
+      api.getDeployment(deploymentId).then(deployment =>
+        redis.incr(`user:${deployment.userId}:concurrent`).then(resolve))),
+  finishDeploy: (deploymentId) => new Promise((resolve, reject) =>
+    new Promise((resolve, reject) =>
+      api.getDeployment(deploymentId).then(deployment =>
+        redis.incrby(`user:${deployment.userId}:concurrent`, -1).then(resolve))))
 }
 
 module.exports = api

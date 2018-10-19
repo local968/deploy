@@ -16,6 +16,9 @@ async function scheduleHandler() {
   const now = moment().unix();
   const schedules = await api.getTimeUpSchedules(now);
   schedules.map(async schedule => {
+    const exccedConcurrent = await api.isExceedConcurrent(schedule.deploymentId)
+    if (exccedConcurrent) return
+    api.startDeploy(schedule.deploymentId)
     schedule.updatedDate = now;
     schedule.status = 'progressing';
     await api.upsertSchedule(schedule);
@@ -45,6 +48,7 @@ async function scheduleHandler() {
         schedule.result = result
         schedule.status = 'finished'
         schedule.updatedDate = moment().unix()
+        api.finishDeploy(schedule.deploymentId)
         return api.upsertSchedule(schedule)
       })
     })
