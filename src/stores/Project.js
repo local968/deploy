@@ -4,6 +4,7 @@ import Model from "./Model";
 import moment from 'moment';
 import config from 'config';
 import Papa from 'papaparse';
+import { message as antdMessage } from 'antd';
 
 function indexOfMax(arr) {
   if (arr.length === 0) {
@@ -723,12 +724,42 @@ export default class Project {
       } else {
         this.models[index] = new Model(this.id, result)
       }
-    })).then(() => {
+    })).then(returnValue => {
+      const { status, message } = returnValue
+      if (status === -1 && this.models.length === 0) {
+        return this.modelingError()
+      }
+      if (status < -1) {
+        return this.concurrentError(message)
+      }
       this.updateProject({
         train2Finished: true,
         train2ing: false
       });
     })
+  }
+
+  modelingError = () => {
+    this.updateProject({
+      train2Finished: true,
+      train2ing: false,
+      train2Error: true,
+      selectId: '',
+    });
+  }
+
+  concurrentError = message => {
+    antdMessage.error(message)
+    this.updateProject({
+      train2Finished: false,
+      train2ing: false,
+      train2Error: false,
+      selectId: '',
+      mainStep: 3,
+      curStep: 3,
+      lastSubStep: 1,
+      subStepActive: 1
+    });
   }
 
   calcPredicted = model => {
