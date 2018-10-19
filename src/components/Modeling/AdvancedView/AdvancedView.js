@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal } from 'antd';
+import { Table, Tabs, Modal, Select } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './AdvancedView.module.less';
 import RocChart from 'components/D3Chart/RocChart';
@@ -21,6 +21,11 @@ import liftchartSelected from './icon-lift-chart-selected.svg';
 import rocSelected from './icon-roc-curve-selected.svg';
 import precisionRecallSelected from './icon-precision-recall-tradeoff-selected.svg';
 import predictionDistributionSelected from './icon-prediction-distribution-selected.svg';
+import varImpactHover from './icon-variable-impact-linear-hover.svg';
+import varImpactSelected from './icon-variable-impact-selected.svg';
+import varImpactNormal from './icon-variable-impact-linear-normal.svg';
+
+import {VariableImpact} from '../Result';
 
 const TabPane = Tabs.TabPane;
 
@@ -34,9 +39,9 @@ export default class AdvancedView extends Component {
             Modeling Results :{' '}
             <div className={styles.status}>&nbsp;&nbsp;OK</div>
           </div>
-          <div className={styles.modelComp} >
+          { project.problemType === 'Classification' && <div className={styles.modelComp} >
             <ModelComp models={models} />
-          </div>
+          </div>}
         </div>
         <AdvancedModelTable models={models} project={project} />
       </div>
@@ -45,9 +50,40 @@ export default class AdvancedView extends Component {
 }
 
 class AdvancedModelTable extends Component {
+  constructor(props) {
+    super(props);
+    const {project: {problemType}} = props;
+    const metricOptions = problemType === 'Classification' ? [{
+      display: 'acc',
+      key: 'acc'
+    }, {
+      display: 'auc',
+      key: 'auc'
+    }] : [{
+      display: 'MAE',
+      key: 'mae'
+    }, {
+      display: 'RMSE',
+      key: 'rmse'
+    }, {
+      display: <div>R<sup>2</sup></div>,
+      key: 'r2'
+    }]
+    this.state = {
+      metric: metricOptions[0],
+      metricOptions
+    }
+  }
+  handleChange = value => {
+    const metric = this.state.metricOptions.find(m => m.key === value);
+    this.setState({ metric: metric })
+  }
   render() {
-    const { models, project } = this.props;
-    const texts = ['Model Name', 'F1-Score', 'Precision', 'Recall', 'Cutoff Threshold'];
+    const { models, project: { problemType } } = this.props;
+    const { metric, metricOptions } = this.state;
+    const texts = problemType === 'Classification' ?
+      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'Cutoff Threshold', 'Validation', 'Holdout'] :
+      ['Model Name', 'RMSE', 'MSE', 'MAE', 'R2', 'Validation', 'Holdout']
     const header = (
       <Row>
         {texts.map(t => {
@@ -58,12 +94,23 @@ class AdvancedModelTable extends Component {
       </Row>
     )
     const dataSource = models.map(m => {
-      return (
-        <ModelRow key={m.id} texts={texts} model={m} />
-      )
+      if (problemType === 'Classification') {
+        return (
+          <ClassificationModelRow key={m.id} texts={texts} model={m} metric={metric.key} />
+        )
+      } else {
+        return <RegressionModleRow key={m.id} texts={texts} model={m} metric={metric.key} />
+      }
     })
+    const Option = Select.Option;
     return (
       <div className={styles.advancedModelTable} >
+        <div className={styles.metricSelection} >
+          <span className={styles.text} >Measurement Metric</span>
+          <Select size="large" value={metric.display} onChange={this.handleChange} >
+            {metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
+          </Select>
+        </div>
         {header}
         {dataSource}
       </div>
@@ -71,8 +118,90 @@ class AdvancedModelTable extends Component {
   }
 }
 
+@observer class RegressionModleRow extends Component {
+  state = {
+    detail: false
+  }
+  handleResult = e => {
+    this.setState({ detail: !this.state.detail });
+  }
+  render() {
+    const { model, texts, checked, metric } = this.props;
+    const { score, name } = model;
+    const {detail} = this.state;
+    return (
+      <div >
+        <Row onClick={this.handleResult} >
+          {texts.map(t => {
+            switch (t) {
+              case 'Model Name':
+                return (
+                  <RowCell key={1} data={<div key={1} >
+                      <span className={styles.modelName} >{name}</span>
+                    </div>}
+                  />
+                )
+              case 'RMSE':
+                return <RowCell key={2} data={score.validateScore.rmse} />;
+              case 'MSE':
+                return <RowCell key={2} data={score.validateScore.mse} />;
+              case 'MAE':
+                return <RowCell key={2} data={score.validateScore.mae} />;
+              case 'R2':
+                return <RowCell key={2} data={score.validateScore.r2} />;
+              case 'Validation':
+                return <RowCell key={2} data={score.validateScore[metric]} />;
+              case 'Holdout':
+                return <RowCell key={3} data={score.holdoutScore[metric]} />;
+            }
+          })}
+        </Row>
+        {detail && <RegressionDetailCurves model={model} />}
+      </div>
+    )
+  }
+}
+
 @observer
-class ModelRow extends Component {
+class RegressionDetailCurves extends Component {
+  state = {
+    curve: "impact"
+  }
+
+  handleClick = val => {
+    this.setState({ curve: val });
+  }
+
+  render() {
+    const { model, model: { id } } = this.props;
+    const { curve } = this.state;
+    let curComponent;
+    switch (curve) {
+      case 'impact':
+        curComponent = <div style={{fontSize: 100}} ><VariableImpact model={model} /></div>
+        break;
+    }
+    const thumbnails = [{
+      normalIcon: varImpactNormal,
+      hoverIcon: varImpactHover,
+      selectedIcon: varImpactSelected,
+      text: 'Variable Impact'
+    }]
+    return (
+      <div className={styles.detailCurves} >
+        <div className={styles.leftPanel} >
+          <Thumbnail curSelected={curve} thumbnail={thumbnails[0]} onClick={this.handleClick} value="impact" />
+        </div>
+        <div className={styles.rightPanel} >
+          {curComponent}
+        </div>
+      </div>
+    )
+  }
+}
+
+@observer
+class ClassificationModelRow extends Component {
   state = {
     detail: false
   }
@@ -83,13 +212,13 @@ class ModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, checked } = this.props;
+    const { model, texts, checked, metric } = this.props;
     if (!model.chartData) return null;
-    const { name, fitIndex, chartData: { roc } } = model;
+    const { name, fitIndex, chartData: { roc }, score } = model;
     const { detail } = this.state;
     return (
-      <div onClick={this.handleResult} >
-        <Row >
+      <div >
+        <Row onClick={this.handleResult} >
           {texts.map(t => {
             switch (t) {
               case 'Model Name':
@@ -110,6 +239,10 @@ class ModelRow extends Component {
                 return <RowCell key={4} data={roc.Recall[fitIndex]} />;
               case 'Cutoff Threshold':
                 return <RowCell key={5} data={roc.Threshold[fitIndex]} />;
+              case 'Validation':
+                return <RowCell key={6} data={score.validateScore[metric]} />;
+              case 'Holdout':
+                return <RowCell key={7} data={score.holdoutScore[metric]} />;
             }
 
           })}
@@ -314,13 +447,13 @@ class ModelComp extends Component {
     modelCompVisible: false
   }
   handleClick = () => {
-    this.setState({modelCompVisible: true});
+    this.setState({ modelCompVisible: true });
   }
   handleCancel = () => {
-    this.setState({modelCompVisible: false});
+    this.setState({ modelCompVisible: false });
   }
   render() {
-    const {models} = this.props;
+    const { models } = this.props;
     return (
       <div className={styles.modelComp}>
         <img

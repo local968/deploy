@@ -816,4 +816,18 @@ export default class Project {
       })
     })
   }
+
+  fitPlotAndResidualPlot = () => {
+    socketStore.ready().then(api => {
+      const request = {
+        projectId: this.id,
+        command: 'fitPlotAndResidualPlot',
+        csvLocation: [...this.uploadFileName],
+        featureLabel: toJS(this.dataHeader)
+      }
+      api.fitPlotAndResidualPlot(request, chartResult => {
+        console.log(chartResult);
+      })
+    })
+  }
 }

@@ -18,7 +18,11 @@ export default class ModelResult extends Component {
   @observable view = "simple"
 
   componentWillMount() {
-    this.props.project.chartData();
+    if (this.props.project.problemType === 'Classification') {
+      this.props.project.chartData();
+    } else {
+      this.props.project.fitPlotAndResidualPlot();
+    }
   }
 
   deploy = () => {
@@ -359,16 +363,8 @@ class ModelTable extends Component {
 }
 
 @observer
-class ModelDetail extends Component {
-  @observable type = ''
-  @observable visible = false
-
-  toggleImpact = () => {
-    this.type = 'impact'
-    this.visible = !this.visible
-  };
-
-  detail = () => {
+export class VariableImpact extends Component {
+  render() {
     const { model } = this.props;
     const { featureImportanceDetail } = model;
     const arr = Object.entries(featureImportanceDetail).sort(
@@ -394,6 +390,17 @@ class ModelDetail extends Component {
         })}
       </div>
     );
+  }
+}
+
+@observer
+class ModelDetail extends Component {
+  @observable type = ''
+  @observable visible = false
+
+  toggleImpact = () => {
+    this.type = 'impact'
+    this.visible = !this.visible
   };
 
   render() {
@@ -451,7 +458,7 @@ class ModelDetail extends Component {
           </div>
         </div>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-        {this.visible && this.detail()}
+        {this.visible && <VariableImpact model={model} />}
       </div>
     );
   }
