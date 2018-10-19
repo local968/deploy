@@ -112,6 +112,21 @@ function checkProject(userId, id) {
   })
 }
 
+function checkModeling(userId, level) {
+  return new Promise((resolve, reject) => {
+    try {
+      level = parseInt(level, 10)
+    } catch (e) {
+      return reject({ message: "modeling error", status: -2 })
+    }
+    const max = (level === 0 && 0) || (level<3 && 1) || (level === 3 && 5) || Infinity
+    return redis.get(`user:${userId}:concurrent`).then(num => {
+      if (num >= max) return reject({ message: "Number of your concurrent projects has reached the max restricted by your current lisense.", status: -3 })
+      return resolve()
+    })
+  })
+}
+
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
@@ -301,17 +316,22 @@ wss.register('fitPlotAndResidualPlot', (message, socket, progress) => {
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
 
-  return deleteModels(message.projectId)
-    .then(() => {
-      return command(data, queueValue => {
-        const isFinish = queueValue.status < 0 || queueValue.status === 100
-        if (isFinish) return queueValue
-        const { result, projectId, userId } = queueValue
-        if (userId !== socket.session.userId) return null
-        if (result.progress === "start") return progress(result)
-        return createModel(projectId, result).then(progress)
-      })
+  return checkModeling(socket.session.userId, socket.session.user.level)
+    .then(() => deleteModels(message.projectId))
+    .then(() => redis.incr(`user:${userId}:concurrent`))
+    .then(() => command(data, queueValue => {
+      const isFinish = queueValue.status < 0 || queueValue.status === 100
+      if (isFinish) return queueValue
+      const { result, projectId, userId } = queueValue
+      if (userId !== socket.session.userId) return null
+      if (result.progress === "start") return progress(result)
+      return createModel(projectId, result).then(progress)
+    }))
+    .then(result => {
+      redis.incrby(`user:${userId}:concurrent`, -1)
+      return result
     })
+    .catch(err => err)
 })
 
 wss.register("watchProject", (message, socket) => {
@@ -346,9 +366,7 @@ wss.register("watchProjectList", (message, socket) => {
 })
 
 wss.register("testPub", (message, socket) => {
-  const userId = socket.session.userId;
-  wss.publish("user:" + userId + "projects", { a: 1 })
-  return { status: 200, message: "ok" }
+  return Promise.reject({ status: 1, test: "aaa" }).catch(err => err)
 })
 
 function mapObjectToArray(obj) {

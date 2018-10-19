@@ -29,7 +29,7 @@ router.post('/check', (req, res) => {
     message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
     error: 'modeling file too large'
   })
-  redis.get(`user:${params.userId}:upload`).then(size => {
+  redis.get(`user:${userId}:upload`).then(size => {
     if (size + fileSize > userStorageRestrict[level]) return res.json({
       status: 417,
       message: 'Your usage of storage space has reached the max restricted by your current lisense.',
@@ -132,6 +132,6 @@ function saveSample() {
   pipeline.exec().then(console.log)
 }
 
-// saveSample()
+saveSample()
 
 module.exports = router
