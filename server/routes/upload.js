@@ -114,6 +114,6 @@ function saveSample() {
   pipeline.exec().then(console.log)
 }
 
-// saveSample()
+saveSample()
 
 module.exports = router

@@ -112,6 +112,10 @@ function checkProject(userId, id) {
   })
 }
 
+function checkModeling(level) {
+  return Promise.resolve()
+}
+
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
 
@@ -295,7 +299,8 @@ wss.register('chartData', (message, socket, progress) => {
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
 
-  return deleteModels(message.projectId)
+  return checkModeling(socket.session.user.level)
+    .then(() => deleteModels(message.projectId))
     .then(() => {
       return command(data, queueValue => {
         const isFinish = queueValue.status < 0 || queueValue.status === 100

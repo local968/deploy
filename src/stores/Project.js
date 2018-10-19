@@ -59,8 +59,8 @@ export default class Project {
   @observable firstEtl = true;
   @observable target = '';
   @observable noCompute = false;
-  @observable validationRate = 0.1;
-  @observable holdoutRate = 0.1;
+  @observable validationRate = 15;
+  @observable holdoutRate = 5;
   @observable uploadFileName = [];
 
   //data quality
@@ -88,10 +88,10 @@ export default class Project {
   @observable overfit = 5;
   @observable speed = 5;
   @observable advancedSize = 0;
-  @observable maxTime = 0;
+  @observable maxTime = 10;
   @observable randSeed = 0;
   @observable measurement = '';
-  @observable resampling = "no";
+  @observable resampling = "auto";
   @observable runWith = 'holdout';
   @observable crossCount = 5;
 
@@ -117,8 +117,8 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      validationRate: 0.1,
-      holdoutRate: 0.1
+      validationRate: 10,
+      holdoutRate: 10
     }
   }
 
@@ -254,6 +254,7 @@ export default class Project {
       business: this.business,
       problemType: this.changeProjectType
     };
+    updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
     if (this.problemType && this.changeProjectType !== this.problemType) {
       this.models = []
       //全部恢复到problem步骤
@@ -444,8 +445,8 @@ export default class Project {
       projectId: id,
       time: moment().valueOf(),
       command,
-      validationRate: this.validationRate,
-      holdoutRate: this.holdoutRate
+      validationRate: this.validationRate / 100,
+      holdoutRate: this.holdoutRate / 100
     }
 
     if (this.colType.length) {
@@ -486,7 +487,6 @@ export default class Project {
     }
     this.etling = true;
     // id: request ID
-    // userId: user ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
     // problem_type: 预测类型 Classification , Regression
@@ -618,7 +618,6 @@ export default class Project {
   @action
   fastTrain = () => {
     const {
-      userId,
       id,
       problemType,
       target,
@@ -641,7 +640,6 @@ export default class Project {
     const featureLabel = dataHeader.filter(d => d !== target);
 
     // id: request ID
-    // userId: user ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
     // problem_type: 预测类型 Classification , Regression
@@ -653,17 +651,65 @@ export default class Project {
     // model_option: model的额外参数，不同model参数不同
     // kwargs:
     const trainData = {
-      csvLocation: uploadFileName,
       problemType,
       featureLabel,
       targetLabel: target,
       projectId: id,
-      userId,
       speed,
       overfit,
       command
     };
 
+    this.modeling(trainData)
+  }
+
+  advancedModeling = () => {
+    const {
+      id,
+      problemType,
+      target,
+      dataHeader,
+      speed,
+      overfit
+    } = this;
+    const command = 'train';
+
+    this.updateProject(Object.assign({
+      train2Finished: false,
+      train2ing: true,
+      train2Error: false,
+      selectId: '',
+      validationRate: this.validationRate,
+      holdoutRate: this.holdoutRate,
+      resampling: this.resampling,
+      maxTime: this.maxTime,
+      measurement: this.measurement,
+      randSeed: this.randSeed
+    }, this.nextSubStep(2, 3)));
+
+    this.models = []
+
+    const featureLabel = dataHeader.filter(d => d !== target);
+
+    const trainData = {
+      problemType,
+      featureLabel,
+      targetLabel: target,
+      projectId: id,
+      speed,
+      overfit,
+      command,
+      validationRate: this.validationRate / 100,
+      holdoutRate: this.holdoutRate / 100,
+      sampling: this.resampling,
+      maxTime: this.maxTime,
+      randSeed: this.randSeed
+    };
+
+    this.modeling(trainData)
+  }
+
+  modeling = trainData => {
     socketStore.ready().then(api => api.train(trainData, progressResult => {
       if (progressResult.progress === "start") return;
       if (progressResult.status !== 200) return
