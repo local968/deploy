@@ -9,16 +9,34 @@ const path = require('path')
 const fs = require('fs')
 
 const router = new Router()
+const MB = 1024 * 1024
+const GB = MB * 1024
+
+const userModelingRestrict = [0, 50 * MB, 50 * MB, 200 * MB, 999999 * MB]
+const userStorageRestrict = [0, 10 * GB, 10 * GB, 100 * GB, 999999 * GB]
 
 router.post('/check', (req, res) => {
   const fileSize = req.body.fileSize
   const userId = req.session.userId
-  if (!fileSize || !userId) return res.json({
+  const type = req.body.type
+  if (!fileSize || !userId || !type) return res.json({
     status: 404,
     message: 'missing params',
     error: 'missing params'
   })
-  const token = crypto.createHash('md5').update(userId + fileSize + config.secret).digest('hex')
+  if (type === 'modeling' && fileSize > userModelingRestrict[req.session.user.level]) return res.json({
+    status: 416,
+    message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
+    error: 'modeling file too large'
+  })
+  redis.get(`user:${params.userId}:upload`).then(size => {
+    if (size + fileSize > userStorageRestrict[level]) return res.json({
+      status: 417,
+      message: 'Your usage of storage space has reached the max restricted by your current lisense.',
+      error: 'storage space full'
+    })
+  })
+  const token = crypto.createHash('md5').update(userId + type + fileSize + config.secret).digest('hex')
   res.json({
     status: 200,
     message: 'ok',
@@ -30,12 +48,12 @@ router.post('/', (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, function (error, fields, files) {
     const params = req.query
-    if (!params || !params.token || !params.userId) return res.json({
+    if (!params || !params.token || !params.userId || !params.type) return res.json({
       status: 404,
       message: 'missing params',
       error: 'missing params'
     })
-    const validationToken = crypto.createHash('md5').update(params.userId + params.fileSize + config.secret).digest('hex')
+    const validationToken = crypto.createHash('md5').update(params.userId + params.type + params.fileSize + config.secret).digest('hex')
     if (validationToken !== params.token) return res.json({
       status: 401,
       message: 'token error',
@@ -49,8 +67,8 @@ router.post('/', (req, res) => {
     const fileId = uuid.v4()
     fields.createdTime = moment().unix()
     fields.params = params
-    console.log(fields)
     redis.set('file:' + fileId, JSON.stringify(fields))
+    redis.incrby(`user:${params.userId}:upload`, parseInt(params.fileSize))
     res.json({ fileId, status: 200, message: 'ok' })
   });
 })

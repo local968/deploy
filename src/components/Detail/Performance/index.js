@@ -91,7 +91,7 @@ export default class Performance extends Component {
       operator: (opeartor) => {
         this.uploadOperator = opeartor
       },
-      params: { projectId: cd.projectId, userId: userStore.info.id }
+      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' }
     }
     return (
       <div className={styles.performance}>

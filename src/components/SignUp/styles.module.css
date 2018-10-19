@@ -31,7 +31,8 @@
     flex-direction: column;
 }
 
-.row input {
+.row input,
+.row select {
     color: #4a4a4a;;
     font-size: 1.25rem;
     outline: none;
@@ -126,7 +127,7 @@
     position: relative;
     overflow: hidden;
 }
-  
+
 .licenseTitle {
     display: flex;
     justify-content: center;

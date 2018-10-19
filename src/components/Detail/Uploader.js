@@ -6,7 +6,7 @@ export default class Uploader extends React.Component {
   onChange = (event) => {
     typeof this.props.onStart === 'function' && this.props.onStart()
     const file = event.target.files[0]
-    axios.post('/upload/check', { fileSize: file.size }).then(response => {
+    axios.post('/upload/check', { fileSize: file.size, type: 'deploy' }).then(response => {
       this.props.params.token = response.data.token
       this.props.params.fileSize = file.size
       const nu = new NginxUploader(file, this.props)

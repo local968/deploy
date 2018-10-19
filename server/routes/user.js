@@ -19,11 +19,14 @@ router.post('/login', (req, res) => {
   redis
     .get(`userEmail:${email}`)
     .then(id => id
-      ? redis.hmget(`user:${id}`, 'id', 'email', 'password')
+      ? redis.hmget(`user:${id}`, 'id', 'email', 'password', 'level')
       : Promise.reject({ status: 404, message: 'user not exists.' }))
     .then(info => {
+      console.log(info)
       if (sha256(password) === info[2]) {
+        if (info[3] === 0 || !info[3]) return Promise.reject({ status: 302, message: 'Your account is not available' })
         req.session.userId = info[0]
+        req.session.user = { id: info[0], email: info[1], level: info[3] }
         res.send({ status: 200, message: 'ok', info: { id: info[0], email: info[1] } })
       } else {
         Promise.reject({ status: 400, message: 'incorrect password.' })
@@ -56,16 +59,18 @@ register('status', (data) => {
 router.post('/register', (req, res) => {
   const email = req.body.email
   const password = sha256(req.body.password)
+  const level = req.body.level
   const id = uuid.v4()
   // todo verify user info
 
   redis
     .setnx(`userEmail:${email}`, id)
     .then(success => success
-      ? redis.hmset(`user:${id}`, 'id', id, 'email', email, 'password', password, 'createdTime', moment().unix())
+      ? redis.hmset(`user:${id}`, 'id', id, 'email', email, 'password', password, 'level', level || 1, 'createdTime', moment().unix())
       : Promise.reject({ status: 400, message: 'email exists.' })
     ).then(ok => {
       req.session.userId = id
+      req.session.user = { id, email, level }
       if (ok) res.send({
         status: 200,
         message: 'ok',
@@ -88,5 +93,9 @@ router.get('/delete', (req, res) => {
 
 router.get('/file', (req, res) => {
   api.getFile(req.query.id).then(res.json.bind(res))
+})
+
+router.get('/session', (req, res) => {
+  res.json(req.session)
 })
 module.exports = router
