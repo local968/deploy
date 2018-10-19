@@ -11,10 +11,12 @@ export default class SignUp extends Component {
   @observable email = ''
   @observable password = ''
   @observable confirmPassword = ''
+  @observable level = 1
   @observable warning = {
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    level: ''
   }
   @observable showLicense = false
 
@@ -30,8 +32,12 @@ export default class SignUp extends Component {
     this.confirmPassword = e.target.value
   })
 
+  onChangeLevel = action(e => {
+    this.level = e.target.value
+  })
+
   register = () => {
-    const { email, password, confirmPassword, warning } = this;
+    const { email, password, confirmPassword, warning, level } = this;
     if (!email) {
       warning.email = "Enter your email";
     } else if (!new RegExp(/^[a-zA-Z0-9_-]+(\.([a-zA-Z0-9_-])+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/).test(email)) {
@@ -57,7 +63,7 @@ export default class SignUp extends Component {
       return
     }
 
-    this.props.userStore.register({ email, password })
+    this.props.userStore.register({ email, password, level })
   }
 
   login = () => {
@@ -83,6 +89,16 @@ export default class SignUp extends Component {
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.confirmPassword && <span><img src={warnIcon} alt='warning' />{this.warning.confirmPassword}</span>}</div>
           <input type="password" placeholder="Confirm Password" value={this.confirmPassword} onChange={this.onChangeConfirmPassword} />
+        </div>
+        <div className={styles.row}>
+          <div className={styles.warning}>{this.warning.level && <span><img src={warnIcon} alt='warning' />{this.warning.level}</span>}</div>
+          <select value={this.level} onChange={this.onChangeLevel}>
+            <option value='0'>Unavailable</option>
+            <option value='1'>Free Trail</option>
+            <option value='2'>Basic</option>
+            <option value='3'>Essential</option>
+            <option value='4'>Enterprise</option>
+          </select>
         </div>
         <div className={styles.text}><span>By clicking Sign Up,you agree to our&nbsp;<span className={styles.bold} onClick={this.show}>End User License Agreement</span></span></div>
         <div className={styles.buttonRow}>

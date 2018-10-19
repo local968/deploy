@@ -82,7 +82,6 @@ export default class Deployment extends Component {
   pause = action(() => {
     if (!this.uploadOperator) return
     if (this.uploadStatus === 'uploading') {
-      console.log('pause')
       this.uploadOperator.pause()
       this.uploadStatus = 'paused'
       return
@@ -127,7 +126,7 @@ export default class Deployment extends Component {
       operator: (opeartor) => {
         this.uploadOperator = opeartor
       },
-      params: { projectId: cd.projectId, userId: userStore.info.id }
+      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' }
     }
     return (
       <div className={styles.deployment}>

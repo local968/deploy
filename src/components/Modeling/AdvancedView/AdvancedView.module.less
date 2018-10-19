@@ -18,6 +18,22 @@
 .advancedModelTable {
     font-size: 0.875rem;
     border: 0.5px solid #d8d8d8;
+    position: relative;
+    .metricSelection {
+        position: absolute;
+        right: 6%;
+        top: -50px;
+        display: flex;
+        .text {
+            line-height: 38px;
+            margin-right: 0.3em;
+        }
+        // :global {
+        //     .ant-select {
+        //         display: inline-block;
+        //     }
+        // }
+    }
     .modelName {
         display: inline-block;
         width: 100px;
@@ -45,6 +61,9 @@
 
 .detailCurves {
     display: flex;
+    .rightPanel {
+        flex: 1;
+    }
     .leftPanel {
         min-width: 300px;
         padding: 0.5em 3em;

@@ -296,6 +296,12 @@ wss.register('chartData', (message, socket, progress) => {
   })
 })
 
+wss.register('fitPlotAndResidualPlot', (message, socket, progress) => {
+  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+})
+
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
 

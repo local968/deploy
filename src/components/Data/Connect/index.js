@@ -105,6 +105,8 @@ export default class DataConnect extends Component {
   onError = action((error, times) => {
     this.file = null
     this.process = 0
+    this.uploading = false
+    message.error(error)
     console.log(error, times)
   })
 
@@ -225,6 +227,7 @@ export default class DataConnect extends Component {
                 children={this.block('From Computer', localFileIcon)}
                 onStart={this.onUpload}
                 onComplete={this.upload}
+                onError={this.onError}
                 params={{ userId: userStore.info.id, projectId: project.id }}
                 onProgress={this.onProgress}
                 file={this.file}
