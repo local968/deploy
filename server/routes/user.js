@@ -19,14 +19,14 @@ router.post('/login', (req, res) => {
   redis
     .get(`userEmail:${email}`)
     .then(id => id
-      ? redis.hmget(`user:${id}`, 'id', 'email', 'password', 'level')
+      ? redis.hmget(`user:${id}`, 'id', 'email', 'password', 'level', 'createdTime')
       : Promise.reject({ status: 404, message: 'user not exists.' }))
     .then(info => {
       console.log(info)
       if (sha256(password) === info[2]) {
         if (info[3] === 0 || !info[3]) return Promise.reject({ status: 302, message: 'Your account is not available' })
         req.session.userId = info[0]
-        req.session.user = { id: info[0], email: info[1], level: info[3] }
+        req.session.user = { id: info[0], email: info[1], level: info[3], createdTime: info[4] }
         res.send({ status: 200, message: 'ok', info: { id: info[0], email: info[1] } })
       } else {
         Promise.reject({ status: 400, message: 'incorrect password.' })
@@ -43,11 +43,11 @@ router.delete('/logout', (req, res) => {
 
 router.get('/status', (req, res) => {
   if (!req.session || !req.session.userId) return res.send({ status: 401, message: 'not login' })
-  redis.hmget('user:' + req.session.userId, 'id', 'email').then(info =>
+  redis.hmget('user:' + req.session.userId, 'id', 'email', 'createdTime').then(info =>
     res.send({
       status: 200,
       message: 'ok',
-      info: { id: info[0], email: info[1] }
+      info: { id: info[0], email: info[1], createdTime: info[2] }
     })
   ).catch(error => res.send({ status: 500, message: 'get status failed', error }))
 })
@@ -61,16 +61,17 @@ router.post('/register', (req, res) => {
   const password = sha256(req.body.password)
   const level = req.body.level
   const id = uuid.v4()
+  const createdTime = moment().unix()
   // todo verify user info
 
   redis
     .setnx(`userEmail:${email}`, id)
     .then(success => success
-      ? redis.hmset(`user:${id}`, 'id', id, 'email', email, 'password', password, 'level', level || 1, 'createdTime', moment().unix())
+      ? redis.hmset(`user:${id}`, 'id', id, 'email', email, 'password', password, 'level', level || 1, 'createdTime', createdTime)
       : Promise.reject({ status: 400, message: 'email exists.' })
     ).then(ok => {
       req.session.userId = id
-      req.session.user = { id, email, level }
+      req.session.user = { id, email, level, createdTime }
       if (ok) res.send({
         status: 200,
         message: 'ok',

@@ -5,6 +5,8 @@ const uuid = require('uuid')
 const moment = require('moment')
 const command = require('../command')
 
+const userProjectRestrict = [0, 15, 15, 150, 999999]
+
 function query(key, params) {
   const Field = ["id", "name", "createTime", "curStep"]
   const pipeline = redis.pipeline();
@@ -119,7 +121,7 @@ function checkModeling(userId, level) {
     } catch (e) {
       return reject({ message: "modeling error", status: -2 })
     }
-    const max = (level === 0 && 0) || (level<3 && 1) || (level === 3 && 5) || Infinity
+    const max = (level === 0 && 0) || (level < 3 && 1) || (level === 3 && 5) || Infinity
     return redis.get(`user:${userId}:concurrent`).then(num => {
       if (num >= max) return reject({ message: "Number of your concurrent projects has reached the max restricted by your current lisense.", status: -3 })
       return resolve()
@@ -129,12 +131,21 @@ function checkModeling(userId, level) {
 
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
-
-  return redis.incr("node:project:count").then(id => {
-    console.log('new project id:', id)
-    return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
-      const params = mapObjectToArray({ id, userId });
-      return createOrUpdate(id, userId, params, true)
+  const duration = moment.duration(moment().unix() - socket.session.user.createdTime)
+  const restrictQuery = `user:${socket.session.userId}:duration:${duration.years()}-${duration.months()}:projects`
+  redis.get(restrictQuery).then(count => {
+    if (count > userProjectRestrict[socket.session.user.level]) return {
+      status: 416,
+      message: 'Your usage of number of project has reached the max restricted by your current lisense.',
+      error: 'project number exceed'
+    }
+    redis.incr(restrictQuery)
+    return redis.incr("node:project:count").then(id => {
+      console.log('new project id:', id)
+      return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
+        const params = mapObjectToArray({ id, userId });
+        return createOrUpdate(id, userId, params, true)
+      })
     })
   })
 })
