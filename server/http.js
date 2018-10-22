@@ -46,6 +46,21 @@ app.post('/api/sample', (req, res) => {
   })
 });
 
+app.get('/api/fetchImg', (req, res) => {
+  const { imgPath } = req.query;
+  const fullImgPath = path.resolve(config.backendFS || '/r2/fs', imgPath)
+  fs.exists(fullImgPath, exists => {
+    if (!exists) {
+      res.json({message: 'image not found!'})
+      return;
+    }
+    fs.readFile(fullImgPath, (err, data) => {
+      res.writeHead(200, { 'Content-Type': 'image/png' });
+      res.end(data);
+    });
+  });
+});
+
 app.post('/api/upload', (req, res) => {
   // locate file path
   const {userId, projectId, start, filename, size, isFirst} = req.query;

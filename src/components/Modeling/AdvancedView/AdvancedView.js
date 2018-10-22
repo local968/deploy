@@ -186,6 +186,12 @@ class RegressionDetailCurves extends Component {
       case 'Variable Impact':
         curComponent = <div style={{fontSize: 60}} ><VariableImpact model={model} /></div>
         break;
+      case 'Fit Plot':
+        curComponent = <img src={model.fitPlot} />;
+        break;
+      case 'Residual Plot':
+        curComponent = <img src={model.residualPlot} />;
+        break;
     }
     const thumbnails = [{
       text: 'Fit Plot',
