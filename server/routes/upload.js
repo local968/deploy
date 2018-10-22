@@ -30,17 +30,17 @@ router.post('/check', (req, res) => {
     error: 'modeling file too large'
   })
   redis.get(`user:${userId}:upload`).then(size => {
-    if (size + fileSize > userStorageRestrict[level]) return res.json({
+    if (size + fileSize > userStorageRestrict[req.session.user.level]) return res.json({
       status: 417,
       message: 'Your usage of storage space has reached the max restricted by your current lisense.',
       error: 'storage space full'
     })
-  })
-  const token = crypto.createHash('md5').update(userId + type + fileSize + config.secret).digest('hex')
-  res.json({
-    status: 200,
-    message: 'ok',
-    token
+    const token = crypto.createHash('md5').update(userId + type + fileSize + config.secret).digest('hex')
+    res.json({
+      status: 200,
+      message: 'ok',
+      token
+    })
   })
 })
 
@@ -129,7 +129,7 @@ function saveSample() {
     pipeline.set('file:sample:' + v.name, ids[k])
     pipeline.set('file:' + ids[k], JSON.stringify(v))
   })
-  pipeline.exec().then(console.log)
+  pipeline.exec()
 }
 
 saveSample()

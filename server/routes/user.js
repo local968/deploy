@@ -22,7 +22,6 @@ router.post('/login', (req, res) => {
       ? redis.hmget(`user:${id}`, 'id', 'email', 'password', 'level', 'createdTime')
       : Promise.reject({ status: 404, message: 'user not exists.' }))
     .then(info => {
-      console.log(info)
       if (sha256(password) === info[2]) {
         if (info[3] === 0 || !info[3]) return Promise.reject({ status: 302, message: 'Your account is not available' })
         req.session.userId = info[0]

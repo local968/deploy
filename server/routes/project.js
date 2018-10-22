@@ -129,23 +129,27 @@ function checkModeling(userId, level) {
   })
 }
 
-wss.register("addProject", (message, socket) => {
-  const userId = socket.session.userId;
-  const duration = moment.duration(moment().unix() - socket.session.user.createdTime)
-  const restrictQuery = `user:${socket.session.userId}:duration:${duration.years()}-${duration.months()}:projects`
-  redis.get(restrictQuery).then(count => {
-    if (count > userProjectRestrict[socket.session.user.level]) return {
+const checkTraningRestriction = (user) => {
+  const duration = moment.duration(moment().unix() - user.createdTime)
+  const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
+  return redis.get(restrictQuery).then(count => {
+    if (count > userProjectRestrict[user.level]) return {
       status: 416,
-      message: 'Your usage of number of project has reached the max restricted by your current lisense.',
+      message: 'Your usage of number of training has reached the max restricted by your current lisense.',
       error: 'project number exceed'
     }
     redis.incr(restrictQuery)
-    return redis.incr("node:project:count").then(id => {
-      console.log('new project id:', id)
-      return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
-        const params = mapObjectToArray({ id, userId });
-        return createOrUpdate(id, userId, params, true)
-      })
+    return true
+  })
+}
+
+wss.register("addProject", (message, socket) => {
+  const userId = socket.session.userId;
+  return redis.incr("node:project:count").then(id => {
+    console.log('new project id:', id)
+    return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
+      const params = mapObjectToArray({ id, userId });
+      return createOrUpdate(id, userId, params, true)
     })
   })
 })
@@ -326,8 +330,10 @@ wss.register('fitPlotAndResidualPlot', (message, socket, progress) => {
 
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
-
-  return checkModeling(socket.session.userId, socket.session.user.level)
+  return checkTraningRestriction(socket.session.user).then(result => {
+    if (result !== true) return result
+    return checkModeling(socket.session.userId, socket.session.user.level)
+  })
     .then(() => deleteModels(message.projectId))
     .then(() => redis.incr(`user:${userId}:concurrent`))
     .then(() => command(data, queueValue => {
