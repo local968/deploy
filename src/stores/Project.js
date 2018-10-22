@@ -905,6 +905,7 @@ export default class Project {
     socketStore.ready().then(api => {
       const request = {
         projectId: this.id,
+        version: this.models.map(m => m.name).toString(),
         command: 'fitPlotAndResidualPlot',
         csvLocation: [...this.uploadFileName],
         featureLabel: toJS(this.dataHeader)
