@@ -10,6 +10,8 @@ export default class Model {
   @observable modelInsightsData = null;
   @observable fitIndex = 0;
   @observable chartData;
+  @observable fitPlot;
+  @observable residualPlot;
 
   constructor(projectId, model, name) {
     this.projectId = projectId;

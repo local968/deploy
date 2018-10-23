@@ -203,7 +203,7 @@ export default class PRChart extends Component {
               );
             });
           svg.call(tool_tip);
-          this.drawPoints(modelData, x, y, svg, color[index], tool_tip, m.id);
+          // this.drawPoints(modelData, x, y, svg, color[index], tool_tip, m.id);
         }
       });
     } else {

@@ -4,6 +4,7 @@ import Model from "./Model";
 import moment from 'moment';
 import config from 'config';
 import Papa from 'papaparse';
+import axios from 'axios';
 import { message as antdMessage } from 'antd';
 
 function indexOfMax(arr) {
@@ -920,12 +921,22 @@ export default class Project {
     socketStore.ready().then(api => {
       const request = {
         projectId: this.id,
+        version: this.models.map(m => m.name).toString(),
         command: 'fitPlotAndResidualPlot',
         csvLocation: [...this.uploadFileName],
         featureLabel: toJS(this.dataHeader)
       }
       api.fitPlotAndResidualPlot(request, chartResult => {
-        console.log(chartResult);
+        const { result } = chartResult;
+        if (result.progress === 'start') return;
+        const model = this.models.find(m => {
+          return result.name.split(' ')[0] === m.name;
+        })
+        if (model) {
+          model.updateModel({
+            [result.action]: `/api/fetchImg?imgPath=${result.imageSavePath}`
+          });
+        }
       })
     })
   }
