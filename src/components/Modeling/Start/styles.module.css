@@ -628,6 +628,7 @@ span.advancedDesc {
     margin: 0.15em 0;
     position: relative;
     align-items: center;
+    width: 100%;
 }
 
 .advancedPercent {
@@ -785,4 +786,27 @@ span.advancedDesc {
     width: 2em;
     flex-direction: column;
     flex: none;
+}
+
+.viewBox {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    position: relative;
+}
+
+.advancedPercentValid {
+    height: 0.2em;
+    background-color: #aac0fc;
+}
+
+.advancedPercentInvalid {
+    height: 0.2em;
+    background-color: #e6eaef;
+}
+
+.advancedCustomRange {
+    display: flex;
+    flex: none;
+    flex-direction: column;
 }

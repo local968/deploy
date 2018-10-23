@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "amqplib": "^0.5.2",
     "antd": "^3.3.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
