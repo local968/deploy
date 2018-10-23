@@ -7,12 +7,12 @@
 import * as d3 from 'd3';
 
 function functor(v) {
-  return typeof v === 'function' ? v : function() {
+  return typeof v === 'function' ? v : function () {
     return v;
   };
 };
 
-export default function(location) {
+export default function (location) {
   let direction = d3_tip_direction,
     offset = d3_tip_offset,
     html = d3_tip_html,
@@ -30,7 +30,7 @@ export default function(location) {
   // Public - show the tooltip on the screen
   //
   // Returns a tip
-  tip.show = function() {
+  tip.show = function () {
     let args = Array.prototype.slice.call(arguments);
     if (args[args.length - 1] instanceof SVGElement) target = args.pop();
 
@@ -53,14 +53,14 @@ export default function(location) {
     nodel.classed(dir, true)
       .style('top', (poffset[0]) + scrollTop + 'px')
       .style('left', (poffset[1]) + scrollLeft + 'px');
-
+    window.coords = coords
     return tip;
   };
 
   // Public - hide the tooltip
   //
   // Returns a tip
-  tip.hide = function() {
+  tip.hide = function () {
     let nodel = getNodeEl();
     nodel
       .style('opacity', 0)
@@ -74,7 +74,7 @@ export default function(location) {
   // v - value of the attribute
   //
   // Returns tip or attribute value
-  tip.attr = function(n, v) {
+  tip.attr = function (n, v) {
     if (arguments.length < 2 && typeof n === 'string') {
       return getNodeEl().attr(n);
     } else {
@@ -91,7 +91,7 @@ export default function(location) {
   // v - value of the property
   //
   // Returns tip or style property value
-  tip.style = function(n, v) {
+  tip.style = function (n, v) {
     // debugger;
     if (arguments.length < 2 && typeof n === 'string') {
       return getNodeEl().style(n);
@@ -99,7 +99,7 @@ export default function(location) {
       let args = Array.prototype.slice.call(arguments);
       if (args.length === 1) {
         let styles = args[0];
-        Object.keys(styles).forEach(function(key) {
+        Object.keys(styles).forEach(function (key) {
           return d3.selection.prototype.style.apply(getNodeEl(), [key, styles[key]]);
         });
       }
@@ -114,7 +114,7 @@ export default function(location) {
   //     sw(southwest), ne(northeast) or se(southeast)
   //
   // Returns tip or direction
-  tip.direction = function(v) {
+  tip.direction = function (v) {
     if (!arguments.length) return direction;
     direction = v == null ? v : functor(v);
 
@@ -126,7 +126,7 @@ export default function(location) {
   // v - Array of [x, y] offset
   //
   // Returns offset or
-  tip.offset = function(v) {
+  tip.offset = function (v) {
     if (!arguments.length) return offset;
     offset = v == null ? v : functor(v);
 
@@ -138,7 +138,7 @@ export default function(location) {
   // v - String value of the tip
   //
   // Returns html value or tip
-  tip.html = function(v) {
+  tip.html = function (v) {
     if (!arguments.length) return html;
     html = v == null ? v : functor(v);
 
@@ -148,7 +148,7 @@ export default function(location) {
   // Public: destroys the tooltip and removes it from the DOM
   //
   // Returns a tip
-  tip.destroy = function() {
+  tip.destroy = function () {
     if (node) {
       getNodeEl().remove();
       node = null;
