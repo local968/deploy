@@ -3,7 +3,7 @@
     {
       "name": "deploy2",
       "script": "npm",
-      "args": "start",
+      "args": "run server",
       "watch": false,
       "interpreter": "node",
       "exec_mode": "fork"
