@@ -14,6 +14,8 @@ import config from 'config';
 import Slider from 'rc-slider';
 
 const Range = Slider.Range;
+const ClassificationAlgorithms = ['adaboost', 'bernoulli_nb', 'decision_tree', 'extra_trees', 'gaussian_nb', 'gradient_boosting', 'k_nearest_neighbors', 'lda', 'liblinear_svc', 'libsvm_svc', 'multinomial_nb', 'passive_aggressive', 'qda', 'random_forest', 'sgd', 'xgradient_boosting'];
+const RegressionAlgorithms = ['adaboost', 'ard_regression', 'decision_tree', 'extra_trees', 'gaussian_process', 'gradient_boosting', 'k_nearest_neighbors', 'liblinear_svr', 'libsvm_svr', 'random_forest', 'ridge_regression', 'sgd', 'xgradient_boosting'];
 
 @observer
 export default class StartTrain extends Component {
@@ -146,11 +148,20 @@ class SimplifiedView extends Component {
   @observable showHistograms = false
   @observable showCorrelation = false
 
+  getHistograms = value => {
+    if (!value) {
+      value = []
+    } else {
+      value = [value]
+    }
+    this.props.project.histgramPlot(value)
+  }
+
+  getCorrelationMatrix = () => {
+    this.props.project.correlationMatrix()
+  }
+
   show = () => {
-    when(
-      () => !this.props.project.histograms,
-      () => this.props.project.histgramPlot()
-    )
     this.showHistograms = true
   }
 
@@ -164,10 +175,6 @@ class SimplifiedView extends Component {
   }
 
   showCorrelationMatrix = () => {
-    when(
-      () => !this.props.project.correlationMatrixImg,
-      () => this.props.project.correlationMatrix()
-    )
     this.showCorrelation = true
   }
 
@@ -178,7 +185,7 @@ class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues } = project;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots } = project;
     const targetUnique = Object.values(Object.assign({}, colMap[target], targetMap)).length;
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     return <div className={styles.simplified}>
@@ -202,7 +209,8 @@ class SimplifiedView extends Component {
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
                 type='histogram'
-                path={project.histgramPlots ? project.histgramPlots.target : ''}
+                getPath={this.getHistograms.bind(null, target)}
+                path={histgramPlots[target]}
               />} />}
             <span>Compute</span>
           </div>
@@ -235,6 +243,7 @@ class SimplifiedView extends Component {
             trigger="click"
             content={<SimplifiedViewPlot onClose={this.hideCorrelationMatrix}
               type='correlationMatrix'
+              getPath={this.getCorrelationMatrix}
               path={project.correlationMatrixImg}
             />} />}
           <span>Check Correlation Matric</span>
@@ -280,19 +289,29 @@ class SimplifiedViewRow extends Component {
   @observable histograms = false
   @observable univariant = false
 
+  getHistograms = value => {
+    if (!value) {
+      value = []
+    } else {
+      value = [value]
+    }
+    this.props.project.histgramPlot(value)
+  }
+
+  getUnivariant = value => {
+    if (!value) {
+      value = []
+    } else {
+      value = [value]
+    }
+    this.props.project.univariatePlot(value)
+  }
+
   showHistograms = () => {
-    when(
-      () => !this.props.project.histgramPlots,
-      () => this.props.project.histgramPlot()
-    )
     this.histograms = true
   }
 
   showUnivariant = () => {
-    when(
-      () => !this.props.project.univariatePlots,
-      () => this.props.project.univariatePlot()
-    )
     this.univariant = true
   }
 
@@ -319,7 +338,8 @@ class SimplifiedViewRow extends Component {
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type='histgram'
-            path={project.histgramPlots ? project.histgramPlots[value] : ''}
+            getPath={this.getHistograms.bind(null, value)}
+            path={project.histgramPlots[value]}
           />} />}
         <span>Compute</span>
       </div>
@@ -331,7 +351,8 @@ class SimplifiedViewRow extends Component {
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideUnivariant}
             type='univariate'
-            path={project.univariatePlots ? project.univariatePlots[value] : ''}
+            getPath={this.getUnivariant.bind(null, value)}
+            path={project.univariatePlots[value]}
           />} />}
         <span>Compute</span>
       </div>
@@ -365,6 +386,11 @@ class SimplifiedViewRow extends Component {
 
 @observer
 class SimplifiedViewPlot extends Component {
+  constructor(props) {
+    super(props)
+    if (!props.path) props.getPath()
+  }
+
   render() {
     const { onClose, path, type } = this.props;
     const imgPath = path ? `http://${config.uploadServer}/download/${path}` : ''
@@ -378,8 +404,6 @@ class SimplifiedViewPlot extends Component {
 @observer
 class AdvancedView extends Component {
   // @observable type = ''
-
-  algorithmList = []
 
   handleName = (e) => {
     this.props.project.advancedName = e.target.value;
@@ -492,7 +516,29 @@ class AdvancedView extends Component {
   }
 
   handleSelectAll = value => {
-    this.props.project.algorithms = value ? this.algorithmList : []
+    const { problemType } = this.props.project
+    if (!value) {
+      this.props.project.algorithms = []
+      return
+    }
+    if (problemType === "Classification") {
+      this.props.project.algorithms = ClassificationAlgorithms
+      return 
+    }
+    this.props.project.algorithms = RegressionAlgorithms
+  }
+
+  handleCheck = (key, e) => {
+    const isCheck = e.target.checked
+    const { algorithms } = this.props.project
+    console.log(key, isCheck)
+    if (isCheck) {
+      if(algorithms.includes(key)) return
+      this.props.project.algorithms = [...algorithms, key]
+    } else {
+      if(!algorithms.includes(key)) return
+      this.props.project.algorithms = algorithms.filter(v => v !== key)
+    }
   }
 
   render() {
@@ -501,6 +547,7 @@ class AdvancedView extends Component {
       [{ value: "accuracy", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: 'R²' }, { value: "mse", label: 'MSE' }]
     const customFieldList = rawHeader.filter(v => colType[v] === "Numerical")
+    const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
 
     return <div className={styles.advanced}>
       <div className={styles.advancedRow}>
@@ -530,22 +577,31 @@ class AdvancedView extends Component {
       <div className={styles.advancedRow}>
         <div className={styles.advancedLeft}>
           <div className={styles.advancedBlock}>
-            <div className={styles.advancedTitle}>
+            <div className={classnames(styles.advancedTitle, styles.limit)}>
               <span>Select Algorithm:</span>
             </div>
             <div className={styles.advancedOption}>
               <div className={styles.advancedOptionBox}>
-                <input id="algorithm1" type='radio' name="algorithm" defaultChecked={algorithms.length} onChange={this.handleSelectAll.bind(null, true)} />
-                <label htmlFor="algorithm1">Select All</label>
+                <input id="algorithmSelect1" type='radio' name="algorithmSelect" defaultChecked={algorithms.length} onClick={this.handleSelectAll.bind(null, true)} />
+                <label htmlFor="algorithmSelect1">Select All</label>
               </div>
               <div className={styles.advancedOptionBox}>
-                <input id="algorithm2" type='radio' name="algorithm" defaultChecked={!algorithms.length} onChange={this.handleSelectAll.bind(null, false)} />
-                <label htmlFor="algorithm2">Deselect all</label>
+                <input id="algorithmSelect2" type='radio' name="algorithmSelect" defaultChecked={!algorithms.length} onClick={this.handleSelectAll.bind(null, false)} />
+                <label htmlFor="algorithmSelect2">Deselect all</label>
               </div>
             </div>
-            <div className={styles.advancedOption}>
-              <div className={styles.advancedOptionBox}><input id="solutiona" type='checkbox' name="algorithm" defaultChecked={true} /><label htmlFor="solutiona">solution-a</label></div>
-              <div className={styles.advancedOptionBox}><input id="solutionb" type='checkbox' name="algorithm" defaultChecked={true} /><label htmlFor="solutionb">solution-b</label></div>
+          </div>
+          <div className={styles.advancedBlock}>
+            <div className={styles.advancedAlgorithmList}>
+              {algorithmList.map((v, k) => {
+                return <div className={styles.advancedAlgorithm} key={k}>
+                  <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v)} onChange={this.handleCheck.bind(null, v)} />
+                  <label htmlFor={"algorithm" + k}>{v.split("_").map(i => {
+                    const arr = i.split("")
+                    return arr.shift().toUpperCase() + arr.join("")
+                  }).join(" ")}</label>
+                </div>
+              })}
             </div>
           </div>
           <div className={styles.advancedBlock}>

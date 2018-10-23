@@ -11,7 +11,7 @@ function parseData(chartData) {
   const tpr = chartData.TPR;
 
   return Object.values(fpr).reduce((result, value, index) => {
-    result.push({FPR: value, TPR: tpr[index]});
+    result.push({ FPR: value, TPR: tpr[index] });
     return result;
   }, [])
 }
@@ -26,21 +26,21 @@ export default class RocChart extends Component {
     compareChart: false
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.renderD3();
   }
-  componentDidUpdate () {
+  componentDidUpdate() {
     d3.select(`.${this.props.className} svg`).remove();
     this.renderD3();
   }
-  handleCheck = (val, {target: {checked}}) => {
+  handleCheck = (val, { target: { checked } }) => {
     const op = new Set(this.state.options);
     if (checked)
       op.add(val);
     else
       op.delete(val);
 
-    this.setState({options: [...op]});
+    this.setState({ options: [...op] });
   }
 
   drawChart = (data, x, y, svg, height, line, index, color, lineEnable = true, width) => {
@@ -94,9 +94,9 @@ export default class RocChart extends Component {
   }
 
   drawFocus = (self, x, y, data, focus) => {
-    const {model} = this.props;
+    const { model } = this.props;
     const x0 = x.invert(d3.mouse(self)[0]);
-    
+
     const index = this.getNearestPoint(x0, data, 'FPR');
     const d = data[index];
 
@@ -107,7 +107,7 @@ export default class RocChart extends Component {
     model.setFitIndex(index);
   }
 
-  getNearestPoint (val, data, key) {
+  getNearestPoint(val, data, key) {
     let index;
     let minOffset = 1;
     data.forEach((d, i) => {
@@ -120,29 +120,29 @@ export default class RocChart extends Component {
     return index;
   }
 
-  render () {
-    const {compareChart} = this.props;
+  render() {
+    const { compareChart } = this.props;
     const names = compareChart && this.props.models.map(m => m.id);
     // observe for fitIndex
-    const {fitIndex, isChangable} = this.props.model;
+    // const {fitIndex, isChangable} = this.props.model;
 
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
         {compareChart && <div className={styles.checkbox} >
-          {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{color: d3ColorsCategory20[i]}} key={o} >{o}</Checkbox>)}
+          {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{ color: d3ColorsCategory20[i] }} key={o} >{o}</Checkbox>)}
         </div>}
       </div>
     );
   }
 
   renderD3 = () => {
-    let {height, width} = this.props;
-    const {model, isFocus, compareChart} = this.props;
-    const {chartData} = model;
+    let { height, width } = this.props;
+    const { model, isFocus, compareChart } = this.props;
+    const { chartData } = model;
     if (!chartData) return null;
     let data = parseData(chartData.roc);
 
-    const margin = {top: 20, right: 20, bottom: 20, left: 50};
+    const margin = { top: 20, right: 20, bottom: 20, left: 50 };
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
 
@@ -164,11 +164,11 @@ export default class RocChart extends Component {
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    x.domain([d3.min(data, d => d.FPR), d3.max(data, function (d) {return d.FPR;})]);
-    y.domain([d3.min(data, d => d.TPR), d3.max(data, function (d) {return d.TPR;})]);
-    
+    x.domain([d3.min(data, d => d.FPR), d3.max(data, function (d) { return d.FPR; })]);
+    y.domain([d3.min(data, d => d.TPR), d3.max(data, function (d) { return d.TPR; })]);
+
     if (compareChart) {
-      const {models} = this.props;
+      const { models } = this.props;
       models.forEach((m, index) => {
         const lineEnable = this.state.options.indexOf(m.id) >= 0;
         this.drawChart(parseData(m.chartData.roc), x, y, svg, height, line, index, color, lineEnable, width);
@@ -178,7 +178,7 @@ export default class RocChart extends Component {
     }
 
     if (isFocus) {
-      const {fitIndex, isChangable} = model;
+      const { fitIndex } = model;
       const initalData = data[fitIndex];
       const focus = svg.append('g')
         .attr('class', styles.focus)
@@ -193,14 +193,14 @@ export default class RocChart extends Component {
         .attr('width', width)
         .attr('height', height)
         .on('mousedown', function () {
-          _this.setState({movable: true});
+          _this.setState({ movable: true });
         })
         .on('mousemove', function () {
           if (!_this.state.movable) return;
           _this.drawFocus(this, x, y, data, focus);
         })
-        .on('mouseup', function() {
-          _this.setState({movable: false});
+        .on('mouseup', function () {
+          _this.setState({ movable: false });
         });
     }
   }

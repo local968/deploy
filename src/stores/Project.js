@@ -75,8 +75,8 @@ export default class Project {
   @observable targetMap = {};
   @observable dataViews = null;
   @observable preImportance = null;
-  @observable histgramPlots = null;
-  @observable univariatePlots = null;
+  @observable histgramPlots = {};
+  @observable univariatePlots = {};
   @observable correlationMatrixImg = '';
   //not save
   @observable targetMapTemp = {};
@@ -699,7 +699,8 @@ export default class Project {
       randSeed: this.randSeed,
       dataRange: this.dataRange,
       customField: this.customField,
-      customRange: this.customRange
+      customRange: [...this.customRange],
+      algorithms: [...this.algorithms]
     }, this.nextSubStep(2, 3)));
 
     this.models = []
@@ -718,7 +719,8 @@ export default class Project {
       holdoutRate: this.holdoutRate / 100,
       sampling: this.resampling,
       maxTime: this.maxTime,
-      randSeed: this.randSeed
+      randSeed: this.randSeed,
+      algorithms: [...this.algorithms]
     };
 
     this.modeling(trainData)
@@ -819,7 +821,7 @@ export default class Project {
     })
   }
 
-  preTrainImportance() {
+  preTrainImportance = () => {
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -837,7 +839,7 @@ export default class Project {
   }
 
   /**------------------------------------------------chart---------------------------------------------------------*/
-  correlationMatrix() {
+  correlationMatrix = () => {
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -853,12 +855,13 @@ export default class Project {
     })
   }
 
-  univariatePlot() {
+  univariatePlot = (fields) => {
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'univariatePlot',
       };
+      if (fields) command.feature_label = fields
       api.univariatePlot(command, progressResult => {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
@@ -871,12 +874,13 @@ export default class Project {
     })
   }
 
-  histgramPlot() {
+  histgramPlot = (fields) => {
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'histgramPlot',
       };
+      if (fields) command.feature_label = fields
       api.histgramPlot(command, progressResult => {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
