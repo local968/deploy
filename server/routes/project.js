@@ -133,7 +133,7 @@ const checkTraningRestriction = (user) => {
       })
 
       return redis.get(`user:${user.id}:concurrent`).then(num => {
-        if (num >= max) return reject({ message: "Number of your concurrent projects has reached the max restricted by your current lisense.", status: -3 })
+        if (num >= max) return reject({ error: 'project concurrent exceed', message: "Number of your concurrent projects has reached the max restricted by your current lisense.", status: -3 })
         redis.incr(restrictQuery)
         redis.incr(`user:${user.id}:concurrent`)
         return resolve()

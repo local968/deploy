@@ -124,13 +124,14 @@ class DeploymentStore {
     );
   }
 
-  async addDeployment(projectId, projectName, modelName, modelType) {
+  async addDeployment(projectId, projectName, modelName, modelType, modelList) {
     const data = {
       deploymentOptions: {},
       modelName,
       modelType,
       projectId,
       projectName,
+      modelList,
       performanceOptions: {}
     };
     const api = await socketStore.ready();
