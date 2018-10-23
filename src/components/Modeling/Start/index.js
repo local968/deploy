@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import 'rc-slider/assets/index.css';
 import styles from './styles.module.css';
 import classnames from 'classnames';
+import Hint from 'components/Common/Hint';
 import { observer } from 'mobx-react';
 import autoIcon from './mr-one-logo-blue.svg';
 import { Modal } from 'components/Common';
@@ -249,6 +250,7 @@ class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
             <div className={styles.tableSort} onClick={this.sortImportance}><span>sort</span></div>
             <span>Importance</span>
+            <Hint themeStyle={{ fontSize: '1rem' }} content='It reflect the importance of the predictor to the target variable.' />
           </div>
           <div className={styles.tableTh}><span>Data type</span></div>
           <div className={styles.tableTh}><span>Mean</span></div>

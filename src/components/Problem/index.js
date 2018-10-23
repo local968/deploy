@@ -11,7 +11,7 @@ const { TextArea } = Input;
 
 const RadioGroup = Radio.Group;
 const selectable = [
-  { value: 'Classification', type: 'True or False (Binary Classification)', detail: (<p>To predict if an event is likely to happen or not (e.g. if a customer will purchase or not; if someone will become diabetic or not).</p>) },
+  { value: 'Classification', type: 'True or False (Binary Classification)', detail: (<p>To predict if an event is likely to happen or not (e.g. if a customer will purchase or not).</p>) },
   { value: 'Regression', type: 'Continuous Values (Regression)', detail: (<p>To predict a continuous/numeric value (e.g. cost of a purchase)</p>) },
 ];
 

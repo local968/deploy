@@ -7,7 +7,7 @@ import localFileIcon from './local-file.svg';
 // import sqlIcon from './sql.svg';
 import defileIcon from './define.svg';
 import axios from 'axios';
-import { message, Progress } from 'antd';
+import { message, Progress, Popover } from 'antd';
 import { Uploader } from 'components/Common';
 // import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
@@ -212,9 +212,11 @@ export default class DataConnect extends Component {
         </div>
         <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
-          <div className={styles.mark}>
-            <span>?</span>
-          </div>
+          <Popover content="By default, we will load maximum X,000,000 rows of data. You can modify the data size as needed.">
+            <div className={styles.mark}>
+              <span>?</span>
+            </div>
+          </Popover>
           <span> : 50000 (rows) </span>
           <a>Edit</a>
         </div>

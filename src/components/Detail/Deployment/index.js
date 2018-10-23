@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Checkbox, Progress } from 'antd';
+import { Icon, Checkbox, Progress, Popover } from 'antd';
 import { action, observable, runInAction } from 'mobx';
 import moment from 'moment';
 import styles from './styles.module.css';
@@ -18,6 +18,7 @@ import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
+import Hint from 'components/Common/Hint';
 
 const ordinalNumberPostFix = number => {
   if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
@@ -132,8 +133,10 @@ export default class Deployment extends Component {
       <div className={styles.deployment}>
         <div className={styles.info}>
           <span className={styles.model}>Model:{cd.modelName}</span>
+          {/* <Hint themeStyle={{ fontSize: '1rem' }} content='Current model' /> */}
           <a className={styles.change}>Change</a>
           <span className={styles.data}>Deployment Data Definition</span>
+          <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
           <a className={styles.download} href={deploymentStore.dataDefinition}>
             Download
           </a>

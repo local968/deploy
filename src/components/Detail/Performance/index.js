@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Checkbox } from 'antd';
 import { observer, inject } from 'mobx-react';
-import { observable, action, runInAction } from 'mobx';
-import { Select, InputNumber, Icon, Progress } from 'antd';
+import { observable, action } from 'mobx';
+import { Select, InputNumber, Icon, Progress, Checkbox } from 'antd';
 import moment from 'moment';
 import styles from './styles.module.css';
 import downloadIcon from './icon-download.svg';
@@ -15,6 +14,7 @@ import AutoRepeat from 'components/Common/AutoRepeat';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
+import Hint from 'components/Common/Hint';
 
 const Option = Select.Option;
 
@@ -112,7 +112,7 @@ export default class Performance extends Component {
         <div className={styles.block}>
           <span className={styles.label}>
             <span className={styles.text}>Validation Data Definition</span>
-            {/* <img src={helpIcon} alt="help" className={styles.helpIcon} /> */}
+            <Hint themeStyle={{fontSize:'1rem'}} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
           </span>
           <div className={styles.selections}>
             <img
