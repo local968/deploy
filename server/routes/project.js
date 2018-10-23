@@ -114,32 +114,31 @@ function checkProject(userId, id) {
   })
 }
 
-function checkModeling(userId, level) {
+const checkTraningRestriction = (user) => {
   return new Promise((resolve, reject) => {
+    let level
     try {
-      level = parseInt(level, 10)
+      level = parseInt(user.level, 10)
     } catch (e) {
       return reject({ message: "modeling error", status: -2 })
     }
     const max = (level === 0 && 0) || (level < 3 && 1) || (level === 3 && 5) || Infinity
-    return redis.get(`user:${userId}:concurrent`).then(num => {
-      if (num >= max) return reject({ message: "Number of your concurrent projects has reached the max restricted by your current lisense.", status: -3 })
-      return resolve()
-    })
-  })
-}
+    const duration = moment.duration(moment().unix() - user.createdTime)
+    const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
+    return redis.get(restrictQuery).then(count => {
+      if (count > userProjectRestrict[user.level]) return reject({
+        status: -4,
+        message: 'Your usage of number of training has reached the max restricted by your current lisense.',
+        error: 'project number exceed'
+      })
 
-const checkTraningRestriction = (user) => {
-  const duration = moment.duration(moment().unix() - user.createdTime)
-  const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
-  return redis.get(restrictQuery).then(count => {
-    if (count > userProjectRestrict[user.level]) return {
-      status: 416,
-      message: 'Your usage of number of training has reached the max restricted by your current lisense.',
-      error: 'project number exceed'
-    }
-    redis.incr(restrictQuery)
-    return true
+      return redis.get(`user:${user.id}:concurrent`).then(num => {
+        if (num >= max) return reject({ message: "Number of your concurrent projects has reached the max restricted by your current lisense.", status: -3 })
+        redis.incr(restrictQuery)
+        redis.incr(`user:${user.id}:concurrent`)
+        return resolve()
+      })
+    })
   })
 }
 
@@ -330,17 +329,12 @@ wss.register('fitPlotAndResidualPlot', (message, socket, progress) => {
 
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
-  return checkTraningRestriction(socket.session.user).then(result => {
-    if (result !== true) return result
-    return checkModeling(socket.session.userId, socket.session.user.level)
-  })
+  return checkTraningRestriction(socket.session.user)
     .then(() => deleteModels(message.projectId))
-    .then(() => redis.incr(`user:${userId}:concurrent`))
     .then(() => command(data, queueValue => {
       const isFinish = queueValue.status < 0 || queueValue.status === 100
       if (isFinish) return queueValue
-      const { result, projectId, userId } = queueValue
-      if (userId !== socket.session.userId) return null
+      const { result, projectId } = queueValue
       if (result.progress === "start") return progress(result)
       return createModel(projectId, result).then(progress)
     }))

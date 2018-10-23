@@ -4,6 +4,7 @@ import Model from "./Model";
 import moment from 'moment';
 import config from 'config';
 import Papa from 'papaparse';
+import axios from 'axios';
 import { message as antdMessage } from 'antd';
 
 function indexOfMax(arr) {
@@ -82,12 +83,20 @@ export default class Project {
   @observable targetMapTemp = {};
 
   // train
+  // 训练状态
   @observable train2Finished = false;
   @observable train2ing = false;
   @observable train2Error = false;
+
+  // 暂时移除
   @observable criteria = 'defualt';
+
+  // 训练速度和过拟合
   @observable overfit = 5;
   @observable speed = 5;
+
+  @observable speedVSaccuracy = 5;
+
   @observable advancedSize = 0;
   @observable maxTime = 10;
   @observable randSeed = 0;
@@ -95,6 +104,10 @@ export default class Project {
   @observable resampling = "auto";
   @observable runWith = 'holdout';
   @observable crossCount = 5;
+  @observable dataRange = 'all';
+  @observable customField = '';
+  @observable customRange = [];
+  @observable algorithms = [];
 
   @observable selectId = '';
 
@@ -685,7 +698,10 @@ export default class Project {
       resampling: this.resampling,
       maxTime: this.maxTime,
       measurement: this.measurement,
-      randSeed: this.randSeed
+      randSeed: this.randSeed,
+      dataRange: this.dataRange,
+      customField: this.customField,
+      customRange: this.customRange
     }, this.nextSubStep(2, 3)));
 
     this.models = []
@@ -876,6 +892,9 @@ export default class Project {
   }
 
   chartData = () => {
+    if (this.models.length === 0) {
+      return;
+    }
     socketStore.ready().then(api => {
       const request = {
         action: 'all',
@@ -902,15 +921,28 @@ export default class Project {
   }
 
   fitPlotAndResidualPlot = () => {
+    if (this.models.length === 0) {
+      return;
+    }
     socketStore.ready().then(api => {
       const request = {
         projectId: this.id,
+        version: this.models.map(m => m.name).toString(),
         command: 'fitPlotAndResidualPlot',
         csvLocation: [...this.uploadFileName],
         featureLabel: toJS(this.dataHeader)
       }
       api.fitPlotAndResidualPlot(request, chartResult => {
-        console.log(chartResult);
+        const { result } = chartResult;
+        if (result.progress === 'start') return;
+        const model = this.models.find(m => {
+          return result.name.split(' ')[0] === m.name;
+        })
+        if (model) {
+          model.updateModel({
+            [result.action]: `/api/fetchImg?imgPath=${result.imageSavePath}`
+          });
+        }
       })
     })
   }

@@ -17,14 +17,6 @@ export default class ModelResult extends Component {
   @observable show = false
   @observable view = "simple"
 
-  componentWillMount() {
-    if (this.props.project.problemType === 'Classification') {
-      this.props.project.chartData();
-    } else {
-      this.props.project.fitPlotAndResidualPlot();
-    }
-  }
-
   deploy = () => {
     const { project } = this.props;
     const current = project.selectModel;

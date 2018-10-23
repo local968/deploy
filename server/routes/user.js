@@ -28,7 +28,7 @@ router.post('/login', (req, res) => {
         req.session.user = { id: info[0], email: info[1], level: info[3], createdTime: info[4] }
         res.send({ status: 200, message: 'ok', info: { id: info[0], email: info[1] } })
       } else {
-        Promise.reject({ status: 400, message: 'incorrect password.' })
+        return Promise.reject({ status: 400, message: 'incorrect password.' })
       }
     })
     .catch(error => res.send(error))

@@ -11,6 +11,7 @@ import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import config from 'config';
 import Slider from 'rc-slider';
+import { throws } from 'assert';
 
 const Range = Slider.Range;
 
@@ -87,6 +88,17 @@ export default class StartTrain extends Component {
 
 @observer
 class AdvancedModel extends Component {
+  componentDidMount() {
+    when(
+      () => !this.props.project.dataViews,
+      () => this.props.project.dataView()
+    )
+    when(
+      () => !this.props.project.preImportance,
+      () => this.props.project.preTrainImportance()
+    )
+  }
+
   @observable tab = 1
 
   switchTab = (num) => {
@@ -112,11 +124,17 @@ class AdvancedModel extends Component {
             [styles.active]: this.tab === 2
           })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
         </div>
-        {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
+        <div className={styles.viewBox}>
+          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
+          {(!project.dataViews || !project.preImportance) && <div className={styles.simplifiedLoad}>
+            <Spin size="large" />
+          </div>}
+        </div>
         <div className={styles.bottom}>
           <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
           <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
         </div>
+
       </div>
     </div>
   }
@@ -127,17 +145,6 @@ class SimplifiedView extends Component {
   @observable sort = -1
   @observable showHistograms = false
   @observable showCorrelation = false
-
-  componentDidMount() {
-    when(
-      () => !this.props.project.dataViews,
-      () => this.props.project.dataView()
-    )
-    when(
-      () => !this.props.project.preImportance,
-      () => this.props.project.preTrainImportance()
-    )
-  }
 
   show = () => {
     when(
@@ -263,9 +270,6 @@ class SimplifiedView extends Component {
           })}
         </div>
       </div>
-      {(!dataViews || !preImportance) && <div className={styles.simplifiedLoad}>
-        <Spin size="large" />
-      </div>}
     </div>
   }
 }
@@ -374,6 +378,8 @@ class SimplifiedViewPlot extends Component {
 class AdvancedView extends Component {
   // @observable type = ''
 
+  algorithmList = []
+
   handleName = (e) => {
     this.props.project.advancedName = e.target.value;
   }
@@ -480,11 +486,20 @@ class AdvancedView extends Component {
     return arr
   }
 
+  handleDataRange = v => {
+    this.props.project.dataRange = v;
+  }
+
+  handleSelectAll = value => {
+    this.props.project.algorithms = value ? this.algorithmList : []
+  }
+
   render() {
-    const { advancedName, advancedSize, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType } = this.props.project;
+    const { advancedName, advancedSize, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "accuracy", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: 'R²' }, { value: "mse", label: 'MSE' }]
+    const customFieldList = rawHeader.filter(v => colType[v] === "Numerical")
 
     return <div className={styles.advanced}>
       <div className={styles.advancedRow}>
@@ -513,15 +528,25 @@ class AdvancedView extends Component {
       </div>
       <div className={styles.advancedRow}>
         <div className={styles.advancedLeft}>
-          {/* <div className={styles.advancedBlock}>
+          <div className={styles.advancedBlock}>
             <div className={styles.advancedTitle}>
               <span>Select Algorithm:</span>
+            </div>
+            <div className={styles.advancedOption}>
+              <div className={styles.advancedOptionBox}>
+                <input id="algorithm1" type='radio' name="algorithm" defaultChecked={algorithms.length} onChange={this.handleSelectAll.bind(null, true)} />
+                <label htmlFor="algorithm1">Select All</label>
+              </div>
+              <div className={styles.advancedOptionBox}>
+                <input id="algorithm2" type='radio' name="algorithm" defaultChecked={!algorithms.length} onChange={this.handleSelectAll.bind(null, false)} />
+                <label htmlFor="algorithm2">Deselect all</label>
+              </div>
             </div>
             <div className={styles.advancedOption}>
               <div className={styles.advancedOptionBox}><input id="solutiona" type='checkbox' name="algorithm" defaultChecked={true} /><label htmlFor="solutiona">solution-a</label></div>
               <div className={styles.advancedOptionBox}><input id="solutionb" type='checkbox' name="algorithm" defaultChecked={true} /><label htmlFor="solutionb">solution-b</label></div>
             </div>
-          </div> */}
+          </div>
           <div className={styles.advancedBlock}>
             <div className={styles.advancedResampling}>
               <div className={styles.advancedTitle}>
@@ -580,7 +605,7 @@ class AdvancedView extends Component {
           </div>
         </div>
         <div className={styles.advancedRight}>
-          <div className={styles.advancedBlock}>
+          {/* <div className={styles.advancedBlock}>
             <div className={classnames(styles.advancedTitle, styles.limit)}>
               <span>Set Model Ensemble Size:</span>
               <span className={styles.advancedDesc}>Actual number of ensemble models may be less than this number.</span>
@@ -589,8 +614,24 @@ class AdvancedView extends Component {
               <input className={styles.advancedSize} value={advancedSize} onChange={this.handleSize} />
               <span>(1~30)</span>
             </div>
-          </div>
+          </div> */}
           <div className={styles.advancedBlock}>
+            <div className={classnames(styles.advancedTitle, styles.limit)}>
+              <span>Set Data Range:</span>
+            </div>
+            <div className={styles.advancedOption}>
+              <div className={styles.advancedOptionBox}>
+                <input id="datarange1" type='radio' name="datarange" checked={dataRange === "all"} onChange={this.handleDataRange.bind(null, 'all')} />
+                <label htmlFor="datarange1">All Data</label>
+              </div>
+              <div className={styles.advancedOptionBox}>
+                <input id="datarange2" type='radio' name="datarange" checked={dataRange === "custom"} onChange={this.handleDataRange.bind(null, 'custom')} />
+                <label htmlFor="datarange2">Custom Selected Rows</label>
+              </div>
+            </div>
+          </div>
+          {dataRange === "custom" && <CustomRange customRange={customRange} customFieldList={customFieldList} dataViews={dataViews} customField={customField} project={this.props.project} />}
+          {dataRange === "all" && <div className={styles.advancedBlock}>
             <div className={styles.advancedTitle}>
               <span>Run models with:</span>
             </div>
@@ -604,8 +645,8 @@ class AdvancedView extends Component {
                 <label htmlFor="runwith2">Train / Validation / Holdout</label>
               </div>
             </div>
-          </div>
-          <div className={styles.advancedBlock}>
+          </div>}
+          {dataRange === "all" && <div className={styles.advancedBlock}>
             <div className={styles.advancedBox}>
               <div className={styles.advancedTitle}>
                 <span>Set Percentage of Each Part:</span>
@@ -730,8 +771,95 @@ class AdvancedView extends Component {
                   </div>
                 </div>}
             </div>
-          </div>
+          </div>}
         </div>
+      </div>
+    </div>
+  }
+}
+
+@observer
+class CustomRange extends Component {
+  handleCustomField = e => {
+    this.props.project.customField = e.target.value
+    this.props.project.customRange = []
+  }
+
+  handleSlider = value => {
+    this.props.project.customRange = value
+  }
+
+  render() {
+    const { dataViews, customRange, customFieldList, customField } = this.props
+    const data = customField ? dataViews[customField] : {}
+    const min = data.min || 0
+    const max = data.max || 0
+    const total = max - min || 1
+    const rangeMin = customRange[0] || min
+    const rangeMax = customRange[1] || max
+    const marks = {}
+    marks[rangeMin] = rangeMin
+    marks[rangeMax] = rangeMax
+    return <div className={styles.advancedCustomRange}>
+      <div className={styles.advancedBlock}>
+        <div className={classnames(styles.advancedTitle, styles.limit)}>
+          <span>Select a variable as reference:</span>
+        </div>
+        <div className={styles.advancedOption}>
+          <select className={classnames(styles.advancedSize, styles.inputLarge)} value={customField} onChange={this.handleCustomField} >
+            {customFieldList.map((i, k) => {
+              return <option value={i} key={k}>{i}</option>
+            })}
+          </select>
+        </div>
+      </div>
+      <div className={styles.advancedBlock}>
+        {!!customField && <div className={styles.advancedPercentBlock}>
+          <div className={styles.advancedPercent}>
+            <div className={styles.advancedPercentInvalid} style={{ width: (rangeMin - min) / total * 100 + '%' }}></div>
+            <div className={styles.advancedPercentValid} style={{ width: (rangeMax - rangeMin) / total * 100 + '%' }}></div>
+            <div className={styles.advancedPercentInvalid} style={{ width: (max - rangeMax) / total * 100 + '%' }}></div>
+          </div>
+          <Range
+            className={styles.range}
+            railStyle={{ backgroundColor: 'transparent' }}
+            trackStyle={[{ backgroundColor: 'transparent' }, { backgroundColor: 'transparent' }]}
+            handleStyle={[{
+              backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
+              border: '0.07em solid #e8e8e8',
+              width: '0.3em',
+              height: '0.3em',
+              marginLeft: '-0.15em',
+              marginTop: '-0.13em',
+              borderRadius: '50%',
+              display: 'flex',
+              flex: 'none',
+              alignitems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }, {
+              backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
+              border: '0.07em solid #e8e8e8',
+              width: '0.3em',
+              height: '0.3em',
+              marginLeft: '-0.15em',
+              marginTop: '-0.13em',
+              borderRadius: '50%',
+              display: 'flex',
+              flex: 'none',
+              alignitems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }]}
+            value={[rangeMin, rangeMax]}
+            onChange={this.handleSlider}
+            min={min}
+            max={max}
+            allowCross={false}
+            pushable={1}
+            marks={marks}
+          />
+        </div>}
       </div>
     </div>
   }

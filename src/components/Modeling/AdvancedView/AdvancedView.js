@@ -18,6 +18,12 @@ import rocHover from './icon-roc-curve-hover.svg';
 import precisionRecallHover from './icon-precision-recall-tradeoff-hover.svg';
 import predictionDistribution from './icon-prediction-distribution-hover.svg';
 import liftchartSelected from './icon-lift-chart-selected.svg';
+import FitPlotHover from './iconMR-FitPlot-Hover.svg';
+import FitPlotNormal from './iconMR-FitPlot-Normal.svg';
+import FitPlotSelected from './iconMR-FitPlot-Selected.svg';
+import ResidualHover from './iconMR-Residual-Hover.svg';
+import ResidualNormal from './iconMR-Residual-Normal.svg';
+import ResidualSelected from './iconMR-ResidualPlot-Selected.svg';
 import rocSelected from './icon-roc-curve-selected.svg';
 import precisionRecallSelected from './icon-precision-recall-tradeoff-selected.svg';
 import predictionDistributionSelected from './icon-prediction-distribution-selected.svg';
@@ -30,6 +36,14 @@ import {VariableImpact} from '../Result';
 const TabPane = Tabs.TabPane;
 
 export default class AdvancedView extends Component {
+  componentWillMount() {
+    if (this.props.project.problemType === 'Classification') {
+      this.props.project.chartData();
+    } else {
+      this.props.project.fitPlotAndResidualPlot();
+    }
+  }
+
   render() {
     const { models, project } = this.props;
     return (
@@ -144,15 +158,15 @@ class AdvancedModelTable extends Component {
               case 'RMSE':
                 return <RowCell key={2} data={score.validateScore.rmse} />;
               case 'MSE':
-                return <RowCell key={2} data={score.validateScore.mse} />;
+                return <RowCell key={3} data={score.validateScore.mse} />;
               case 'MAE':
-                return <RowCell key={2} data={score.validateScore.mae} />;
+                return <RowCell key={4} data={score.validateScore.mae} />;
               case 'R2':
-                return <RowCell key={2} data={score.validateScore.r2} />;
+                return <RowCell key={5} data={score.validateScore.r2} />;
               case 'Validation':
-                return <RowCell key={2} data={score.validateScore[metric]} />;
+                return <RowCell key={6} data={score.validateScore[metric]} />;
               case 'Holdout':
-                return <RowCell key={3} data={score.holdoutScore[metric]} />;
+                return <RowCell key={7} data={score.holdoutScore[metric]} />;
             }
           })}
         </Row>
@@ -165,7 +179,7 @@ class AdvancedModelTable extends Component {
 @observer
 class RegressionDetailCurves extends Component {
   state = {
-    curve: "impact"
+    curve: "Variable Impact"
   }
 
   handleClick = val => {
@@ -177,11 +191,37 @@ class RegressionDetailCurves extends Component {
     const { curve } = this.state;
     let curComponent;
     switch (curve) {
-      case 'impact':
-        curComponent = <div style={{fontSize: 100}} ><VariableImpact model={model} /></div>
+      case 'Variable Impact':
+        curComponent = <div style={{fontSize: 60}} ><VariableImpact model={model} /></div>
+        break;
+      case 'Fit Plot':
+        curComponent = (
+          <div className={styles.plot} >
+            <img className={styles.img} src={model.fitPlot} />
+          </div>
+        )
+        break;
+      case 'Residual Plot':
+        curComponent = (
+          <div className={styles.plot} >
+            <img className={styles.img} src={model.residualPlot} />
+          </div>
+        )
         break;
     }
     const thumbnails = [{
+      text: 'Fit Plot',
+      hoverIcon: FitPlotHover,
+      normalIcon: FitPlotNormal,
+      selectedIcon: FitPlotSelected,
+      type: 'fitplot'
+    }, {
+      text: 'Residual Plot',
+      hoverIcon: ResidualHover,
+      normalIcon: ResidualNormal,
+      selectedIcon: ResidualSelected,
+      type: 'residualplot'
+    }, {
       normalIcon: varImpactNormal,
       hoverIcon: varImpactHover,
       selectedIcon: varImpactSelected,
@@ -189,8 +229,8 @@ class RegressionDetailCurves extends Component {
     }]
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} >
-          <Thumbnail curSelected={curve} thumbnail={thumbnails[0]} onClick={this.handleClick} value="impact" />
+        <div className={styles.leftPanel} style={{minWidth: 0}} >
+          {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
         </div>
         <div className={styles.rightPanel} >
           {curComponent}
@@ -255,7 +295,7 @@ class ClassificationModelRow extends Component {
 
 class DetailCurves extends Component {
   state = {
-    curve: "roc"
+    curve: "ROC Curve"
   }
   handleClick = val => {
     this.setState({ curve: val });
@@ -265,17 +305,20 @@ class DetailCurves extends Component {
     const { curve } = this.state;
     let curComponent;
     switch (this.state.curve) {
-      case 'roc':
+      case 'ROC Curve':
         curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
         break;
-      case 'pd':
+      case 'Prediction Distribution':
         curComponent = <PredictionDistribution height={190} width={500} className={`roc${id}`} model={model} />
         break;
-      case 'prt':
+      case 'Precision Recall Tradeoff':
         curComponent = <PRChart height={190} width={500} className={`precisionrecall${id}`} model={model} />
         break;
-      case 'lift':
+      case 'Lift Chart':
         curComponent = <LiftChart height={190} width={500} className={`lift${id}`} model={model} />;
+        break;
+      case 'Variable Impact':
+        curComponent = <div style={{fontSize: 50}} ><VariableImpact model={model} /></div>
         break;
     }
     const thumbnails = [{
@@ -298,15 +341,17 @@ class DetailCurves extends Component {
       hoverIcon: liftchartHover,
       selectedIcon: liftchartSelected,
       text: 'Lift Chart'
+    }, {
+      normalIcon: varImpactNormal,
+      hoverIcon: varImpactHover,
+      selectedIcon: varImpactSelected,
+      text: 'Variable Impact'
     }];
     return (
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} >
           <div className={styles.thumbnails} >
-            <Thumbnail curSelected={curve} thumbnail={thumbnails[0]} onClick={this.handleClick} value="roc" />
-            <Thumbnail curSelected={curve} thumbnail={thumbnails[1]} onClick={this.handleClick} value="pd" />
-            <Thumbnail curSelected={curve} thumbnail={thumbnails[2]} onClick={this.handleClick} value="prt" />
-            <Thumbnail curSelected={curve} thumbnail={thumbnails[3]} onClick={this.handleClick} value="lift" />
+            {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} />
         </div>
