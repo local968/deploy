@@ -83,12 +83,20 @@ export default class Project {
   @observable targetMapTemp = {};
 
   // train
+  // 训练状态
   @observable train2Finished = false;
   @observable train2ing = false;
   @observable train2Error = false;
+
+  // 暂时移除
   @observable criteria = 'defualt';
+
+  // 训练速度和过拟合
   @observable overfit = 5;
   @observable speed = 5;
+
+  @observable speedVSaccuracy = 5;
+
   @observable advancedSize = 0;
   @observable maxTime = 10;
   @observable randSeed = 0;
@@ -96,6 +104,10 @@ export default class Project {
   @observable resampling = "auto";
   @observable runWith = 'holdout';
   @observable crossCount = 5;
+  @observable dataRange = 'all';
+  @observable customField = '';
+  @observable customRange = [];
+  @observable algorithms = [];
 
   @observable selectId = '';
 
@@ -686,7 +698,10 @@ export default class Project {
       resampling: this.resampling,
       maxTime: this.maxTime,
       measurement: this.measurement,
-      randSeed: this.randSeed
+      randSeed: this.randSeed,
+      dataRange: this.dataRange,
+      customField: this.customField,
+      customRange: this.customRange
     }, this.nextSubStep(2, 3)));
 
     this.models = []
