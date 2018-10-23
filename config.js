@@ -11,6 +11,7 @@ const RESULT_QUEUE = 'resultDataQueue' || process.env.RESULT_QUEUE
 const QUEUE_PERIOD = 60 || process.env.QUEUE_PERIOD
 const SCHEDULE_PERIOD = 60 || process.env.SCHEDULE_PERIOD
 const MAX_CONCURRENCY_SCHEDULE = 2 || process.env.MAX_CONCURRENCY_SCHEDULE
+const SECRET = 'FNcidLwifNC902LCC9f2C' || process.env.SECRET
 
 const defaultConfig = {
   port: BACKEND_PORT,
@@ -28,6 +29,7 @@ const defaultConfig = {
   queuePeriod: QUEUE_PERIOD,
   schedulePeriod: SCHEDULE_PERIOD,
   maxConcurrencySchedule: MAX_CONCURRENCY_SCHEDULE,
+  secret: SECRET
 }
 
 let localConfig = {};
