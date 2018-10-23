@@ -810,3 +810,24 @@ span.advancedDesc {
     flex: none;
     flex-direction: column;
 }
+
+.advancedAlgorithmList {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.advancedAlgorithm {
+    display: flex;
+    flex: none;
+    margin: 0.1em;
+}
+
+.advancedAlgorithm label{
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    color: #000000;
+    line-height: 1.2;
+    cursor: pointer;
+}
