@@ -11,7 +11,6 @@ import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import config from 'config';
 import Slider from 'rc-slider';
-import { throws } from 'assert';
 
 const Range = Slider.Range;
 
@@ -306,7 +305,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, map, importance, colType, value, project, uniqueValues } = this.props;
+    const { data, importance, colType, value, project, uniqueValues } = this.props;
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' defaultChecked={true} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
@@ -495,7 +494,7 @@ class AdvancedView extends Component {
   }
 
   render() {
-    const { advancedName, advancedSize, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms } = this.props.project;
+    const { advancedName, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "accuracy", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: 'R²' }, { value: "mse", label: 'MSE' }]

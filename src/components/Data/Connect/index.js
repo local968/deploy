@@ -210,14 +210,14 @@ export default class DataConnect extends Component {
         <div className={styles.title}>
           <span>If your data is ready, choose a data source to connect.</span>
         </div>
-        <div className={styles.maxRow}>
+        {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
           <div className={styles.mark}>
             <span>?</span>
           </div>
           <span> : 50000 (rows) </span>
           <a>Edit</a>
-        </div>
+        </div> */}
         <div className={styles.uploadRow}>
           {this.block('From Mr.One', sampleIcon, this.showSample)}
           {!!this.process ? (

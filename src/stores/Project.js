@@ -4,7 +4,6 @@ import Model from "./Model";
 import moment from 'moment';
 import config from 'config';
 import Papa from 'papaparse';
-import axios from 'axios';
 import { message as antdMessage } from 'antd';
 
 function indexOfMax(arr) {
@@ -617,11 +616,11 @@ export default class Project {
         continue;
       }
       if (problemType === "Classification") {
-        if (model.score.holdoutScore.auc < m.score.holdoutScore.auc) {
+        if (model.score.validateScore.auc + model.score.validateScore.acc > m.score.validateScore.auc + m.score.validateScore.acc) {
           model = m;
         }
       } else {
-        if (1 - model.score.holdoutScore.rmse + model.score.holdoutScore.r2 < 1 - m.score.holdoutScore.rmse + m.score.holdoutScore.r2) {
+        if (1 - model.score.validateScore.rmse + model.score.validateScore.r2 < 1 - m.score.validateScore.rmse + m.score.validateScore.r2) {
           model = m;
         }
       }
@@ -636,7 +635,6 @@ export default class Project {
       problemType,
       target,
       dataHeader,
-      uploadFileName,
       speed,
       overfit
     } = this;
