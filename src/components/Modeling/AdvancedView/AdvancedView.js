@@ -187,10 +187,18 @@ class RegressionDetailCurves extends Component {
         curComponent = <div style={{fontSize: 60}} ><VariableImpact model={model} /></div>
         break;
       case 'Fit Plot':
-        curComponent = <img src={model.fitPlot} />;
+        curComponent = (
+          <div className={styles.plot} >
+            <img className={styles.img} src={model.fitPlot} />
+          </div>
+        )
         break;
       case 'Residual Plot':
-        curComponent = <img src={model.residualPlot} />;
+        curComponent = (
+          <div className={styles.plot} >
+            <img className={styles.img} src={model.residualPlot} />
+          </div>
+        )
         break;
     }
     const thumbnails = [{
@@ -301,6 +309,9 @@ class DetailCurves extends Component {
       case 'Lift Chart':
         curComponent = <LiftChart height={190} width={500} className={`lift${id}`} model={model} />;
         break;
+      case 'Variable Impact':
+        curComponent = <div style={{fontSize: 50}} ><VariableImpact model={model} /></div>
+        break;
     }
     const thumbnails = [{
       normalIcon: ROCCurve,
@@ -322,6 +333,11 @@ class DetailCurves extends Component {
       hoverIcon: liftchartHover,
       selectedIcon: liftchartSelected,
       text: 'Lift Chart'
+    }, {
+      normalIcon: varImpactNormal,
+      hoverIcon: varImpactHover,
+      selectedIcon: varImpactSelected,
+      text: 'Variable Impact'
     }];
     return (
       <div className={styles.detailCurves} >
