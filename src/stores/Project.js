@@ -892,6 +892,9 @@ export default class Project {
   }
 
   chartData = () => {
+    if (this.models.length === 0) {
+      return;
+    }
     socketStore.ready().then(api => {
       const request = {
         action: 'all',
@@ -918,6 +921,9 @@ export default class Project {
   }
 
   fitPlotAndResidualPlot = () => {
+    if (this.models.length === 0) {
+      return;
+    }
     socketStore.ready().then(api => {
       const request = {
         projectId: this.id,
