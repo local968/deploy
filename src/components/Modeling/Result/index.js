@@ -8,8 +8,10 @@ import { Modal } from 'components/Common';
 import { when, observable } from 'mobx';
 import * as d3 from 'd3';
 import AdvancedView from '../AdvancedView/AdvancedView';
+import Hint from 'components/Common/Hint';
 
 const Classification = 'Classification';
+const AccuracyHint = "Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%."
 
 @inject('deploymentStore', 'routing')
 @observer
@@ -17,19 +19,23 @@ export default class ModelResult extends Component {
   @observable show = false
   @observable view = "simple"
 
-  componentWillMount() {
-    if (this.props.project.problemType === 'Classification') {
-      this.props.project.chartData();
-    } else {
-      this.props.project.fitPlotAndResidualPlot();
-    }
-  }
-
   deploy = () => {
-    const { project } = this.props;
+    const { project, models } = this.props;
     const current = project.selectModel;
+    const modelList = models.map(m => {
+      try {
+        const score = m.score.validateScore
+        const performance = Object.entries(score).map(([k, v]) => `${k}:${v}`).join(" ")
+        return {
+          name: m.name,
+          performance
+        }
+      } catch (e) {
+        return
+      }
+    }).filter(v => !!v)
     this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.name, current.problemType)
+      .addDeployment(project.id, project.name, current.name, current.problemType, modelList)
       .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 
@@ -317,18 +323,20 @@ class ModelTable extends Component {
               />
             )}
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>
-                {problemType === Classification ? 'Performance(AUC)' : 'RMSE'}
-              </span>
+              {problemType === Classification ? <span>
+                Accuracy
+                <Hint content={AccuracyHint} placement="right" />
+              </span> : <span>
+                  RMSE
+              </span>}
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              {problemType === Classification ? (
-                <span>Holdout</span>
-              ) : (
-                  <span>
-                    R<sup>2</sup>
-                  </span>
-                )}
+              {problemType === Classification ?
+                <span>
+                  Performance(AUC)
+                </span> : <span>
+                  R<sup>2</sup>
+                </span>}
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Execution Speed</span>
@@ -439,15 +447,15 @@ class ModelDetail extends Component {
           <div className={styles.cell}>
             <span>
               {problemType === Classification
-                ? model.score.validateScore.auc.toFixed(2)
-                : model.score.holdoutScore.nrmse.toFixed(4)}
+                ? model.score.validateScore.acc.toFixed(2)
+                : model.score.validateScore.nrmse.toFixed(4)}
             </span>
           </div>
           <div className={styles.cell}>
             <span>
               {problemType === Classification
-                ? model.score.holdoutScore.auc.toFixed(2)
-                : model.score.holdoutScore.r2.toFixed(4)}
+                ? model.score.validateScore.auc.toFixed(2)
+                : model.score.validateScore.r2.toFixed(4)}
             </span>
           </div>
           <div className={styles.cell}>

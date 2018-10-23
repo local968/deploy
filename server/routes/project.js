@@ -334,8 +334,7 @@ wss.register('train', (message, socket, progress) => {
     .then(() => command(data, queueValue => {
       const isFinish = queueValue.status < 0 || queueValue.status === 100
       if (isFinish) return queueValue
-      const { result, projectId, userId } = queueValue
-      if (userId !== socket.session.userId) return null
+      const { result, projectId } = queueValue
       if (result.progress === "start") return progress(result)
       return createModel(projectId, result).then(progress)
     }))

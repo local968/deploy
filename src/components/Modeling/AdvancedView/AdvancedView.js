@@ -36,6 +36,14 @@ import {VariableImpact} from '../Result';
 const TabPane = Tabs.TabPane;
 
 export default class AdvancedView extends Component {
+  componentWillMount() {
+    if (this.props.project.problemType === 'Classification') {
+      this.props.project.chartData();
+    } else {
+      this.props.project.fitPlotAndResidualPlot();
+    }
+  }
+
   render() {
     const { models, project } = this.props;
     return (
