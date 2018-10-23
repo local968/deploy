@@ -1,0 +1,55 @@
+.content {
+  padding-top: 48px;
+  padding-left: 8%;
+  font-size: 20px;
+}
+
+.header {
+  font-size: 36px;
+  font-family: HelveticaNeue-Bold;
+  font-weight: bold;
+  color: rgba(74, 74, 74, 1);
+}
+
+.label {
+  font-size: 20px;
+  padding: 28px 0 20px 0;
+}
+
+.funcs {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.funcs div {
+  padding: 10px 0;
+}
+
+.endLabel {
+  padding: 28px 0;
+}
+
+.imgs {
+  width: 100%;
+  padding: 26%;
+}
+
+.selectContent {
+  display: flex;
+  width: 12%;
+  min-width: 184px;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(241, 243, 245, 1) 100%);
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  border: 1px solid rgba(196, 203, 215, 1);
+}
+
+.selectText {
+  text-align: center;
+  padding: 4% 0;
+  background-color: #2C3B4F;
+  color: white;
+  font-size: 14px;
+}
+
