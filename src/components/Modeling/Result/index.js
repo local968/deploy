@@ -31,7 +31,7 @@ export default class ModelResult extends Component {
           performance
         }
       } catch (e) {
-        return
+        return true
       }
     }).filter(v => !!v)
     this.props.deploymentStore

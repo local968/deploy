@@ -7,7 +7,7 @@ import localFileIcon from './local-file.svg';
 // import sqlIcon from './sql.svg';
 import defileIcon from './define.svg';
 import axios from 'axios';
-import { message, Progress, Popover } from 'antd';
+import { message, Progress } from 'antd';
 import { Uploader } from 'components/Common';
 // import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Checkbox, Progress, Popover } from 'antd';
-import { action, observable, runInAction } from 'mobx';
+import { Icon, Checkbox, Progress, Select } from 'antd';
+import { action, observable } from 'mobx';
 import moment from 'moment';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
@@ -19,6 +19,8 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
+
+const Option = Select.Option;
 
 const ordinalNumberPostFix = number => {
   if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
@@ -51,6 +53,8 @@ export default class Deployment extends Component {
   @observable uploadStatus = false;
   @observable uploadPercentage = 0;
   @observable uploadSpeed = '0 Kb/s';
+  @observable modelEditing = false;
+  @observable tempModelName = false;
 
   @action
   selectionOption = (key, value) => () => {
@@ -79,6 +83,19 @@ export default class Deployment extends Component {
   show = key => action(() => (this.dialog = key));
 
   closeDialog = action(() => (this.dialog = null));
+
+  modelChange = action(value => {
+    this.tempModelName = value
+  })
+
+  onSaveModel = action(() => {
+    if (this.modelEditing && this.tempModelName) {
+      this.props.deploymentStore.currentDeployment.modelName = this.tempModelName;
+      this.props.deploymentStore.currentDeployment.save();
+      this.tempModelName = false;
+    }
+    this.modelEditing = !this.modelEditing
+  })
 
   pause = action(() => {
     if (!this.uploadOperator) return
@@ -132,9 +149,9 @@ export default class Deployment extends Component {
     return (
       <div className={styles.deployment}>
         <div className={styles.info}>
-          <span className={styles.model}>Model:{cd.modelName}</span>
-          {/* <Hint themeStyle={{ fontSize: '1rem' }} content='Current model' /> */}
-          <a className={styles.change}>Change</a>
+          <span className={styles.model}>Model:{this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>{cd.modelList.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}</Select> : cd.modelName}</span>
+          <Hint themeStyle={{ fontSize: '1rem' }} content={cd.modelList && cd.modelList.find(model => model.name === cd.modelName).performance} />
+          <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? 'Save' : 'Change'}</a>
           <span className={styles.data}>Deployment Data Definition</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
           <a className={styles.download} href={deploymentStore.dataDefinition}>

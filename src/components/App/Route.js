@@ -10,6 +10,7 @@ import Home from 'components/Home';
 import SignIn from 'components/SignIn';
 import SignUp from 'components/SignUp';
 import SignActive from 'components/SignActive';
+import Community from 'components/Community';
 
 @inject('socketStore')
 class defaultRouter extends Component {
@@ -22,7 +23,8 @@ class defaultRouter extends Component {
         <Route exact path="/test" component={() => 'test/test'} />
         <Route path="/project/:pid" component={Main} />
         <Route path="/deploy/project/:id" component={Detail} />
-        {/*<Route path="" render={() => <Redirect to="/" />} />*/}
+        <Route exact path="/community" component={Community} />
+        <Route path="" render={() => <Redirect to="/" />} />
       </Switch>
     )
   }
@@ -34,12 +36,13 @@ export class LoginRouter extends Component {
   render() {
     return (
       <div className={styles.warp}>
+        <Route exact path="/community" component={Community} />
         <Background />
         <Switch>
           <Route exact path="/" component={SignIn} />
           <Route exact path="/signup" component={SignUp} />
           <Route exact path="/active" component={SignActive} />
-          {/*<Route path="" render={() => <Redirect to="/" />} />*/}
+          <Route path="" render={() => <Redirect to="/" />} />
         </Switch>
       </div>
     );

@@ -45,12 +45,11 @@ export default class AreaChart extends Component {
     const margin = {top: 15, right: 20, bottom: 20, left: 50};
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
-    const _this = this;
     const {chartData} = model;
     if (!chartData) return null;
 
     let data = parseData(chartData.density);
-    
+
     const x = d3.scaleLinear()
       .range([0, width]);
 
@@ -195,5 +194,5 @@ export default class AreaChart extends Component {
     return index;
   }
 
-  
+
 }

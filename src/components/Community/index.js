@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import styles from './styles.module.css';
-import {inject, observer} from 'mobx-react';
-import moment from 'moment';
-import {Bread, Select, Pagination, Switch, Search} from 'components/Common';
+// import {inject, observer} from 'mobx-react';
+// import moment from 'moment';
+// import {Bread, Select, Pagination, Switch, Search} from 'components/Common';
 import {Menu, Dropdown, Icon} from 'antd';
 import communityLanguage from './communityLanguage.png'
 
@@ -41,7 +41,7 @@ export default class Community extends Component {
         <div className={styles.selectContent}>
           <img className={styles.imgs} src={communityLanguage} alt="communityImage"/>
           <Dropdown overlay={menu} placement="bottomCenter">
-            <a className="ant-dropdown-link" href="#" className={styles.selectText}>
+            <a className={`ant-dropdown-link ${styles.selectText}`}>
               Enter the community <Icon type="down"/>
             </a>
           </Dropdown>

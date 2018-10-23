@@ -98,7 +98,7 @@ class DeploymentStore {
 
   @computed
   get currentDeployment() {
-    const _deployment = this.deployments.find(({ id }) => id === parseInt(this.currentId));
+    const _deployment = this.deployments.find(({ id }) => id === parseInt(this.currentId, 10));
     return new Deployment(_deployment || {});
   }
 
@@ -125,6 +125,7 @@ class DeploymentStore {
   }
 
   async addDeployment(projectId, projectName, modelName, modelType, modelList) {
+    console.log(modelList)
     const data = {
       deploymentOptions: {},
       modelName,

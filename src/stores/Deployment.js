@@ -33,6 +33,7 @@ export default class Deploy {
   @observable projectName;
   @observable modelId;
   @observable modelName;
+  @observable modelList;
   @observable modelType;
   @observable createdDate;
   @observable enable;
@@ -48,6 +49,7 @@ export default class Deploy {
     this.projectName = deploy.projectName;
     this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
+    this.modelList = deploy.modelList;
     this.modelType = deploy.modelType;
     this.enable = deploy.enable;
     this.createdDate = deploy.createdDate;
@@ -73,6 +75,7 @@ export default class Deploy {
             projectId: this.projectId,
             projectName: this.projectName,
             modelName: this.modelName,
+            modelList: this.modelList,
             modelType: this.modelType,
             createdDate: this.createdDate,
             email: this.email,
@@ -92,6 +95,7 @@ export default class Deploy {
       projectId: this.projectId,
       projectName: this.projectName,
       modelName: this.modelName,
+      modelList: this.modelList,
       modelType: this.modelType,
       createdDate: this.createdDate,
       email: this.email,

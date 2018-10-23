@@ -99,7 +99,7 @@ class ScheduleStore {
   sortSchedules = (type, schedules, deployments) => {
     if (deployments.length === 0) return []
     const _schedules = schedules.filter(
-      s => s && s.type === type && parseInt(s.deploymentId) === parseInt(deploymentStore.currentId)
+      s => s && s.type === type && parseInt(s.deploymentId, 10) === parseInt(deploymentStore.currentId, 10)
     );
 
     let result = [];
