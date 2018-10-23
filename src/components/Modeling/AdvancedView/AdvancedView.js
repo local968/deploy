@@ -31,7 +31,7 @@ import varImpactHover from './icon-variable-impact-linear-hover.svg';
 import varImpactSelected from './icon-variable-impact-selected.svg';
 import varImpactNormal from './icon-variable-impact-linear-normal.svg';
 
-import {VariableImpact} from '../Result';
+import { VariableImpact } from '../Result';
 
 const TabPane = Tabs.TabPane;
 
@@ -53,7 +53,7 @@ export default class AdvancedView extends Component {
             Modeling Results :{' '}
             <div className={styles.status}>&nbsp;&nbsp;OK</div>
           </div>
-          { project.problemType === 'Classification' && <div className={styles.modelComp} >
+          {project.problemType === 'Classification' && <div className={styles.modelComp} >
             <ModelComp models={models} />
           </div>}
         </div>
@@ -66,7 +66,7 @@ export default class AdvancedView extends Component {
 class AdvancedModelTable extends Component {
   constructor(props) {
     super(props);
-    const {project: {problemType}} = props;
+    const { project: { problemType } } = props;
     const metricOptions = problemType === 'Classification' ? [{
       display: 'acc',
       key: 'acc'
@@ -140,9 +140,9 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, checked, metric } = this.props;
+    const { model, texts, metric } = this.props;
     const { score, name } = model;
-    const {detail} = this.state;
+    const { detail } = this.state;
     return (
       <div >
         <Row onClick={this.handleResult} >
@@ -151,8 +151,8 @@ class AdvancedModelTable extends Component {
               case 'Model Name':
                 return (
                   <RowCell key={1} data={<div key={1} >
-                      <span className={styles.modelName} >{name}</span>
-                    </div>}
+                    <span className={styles.modelName} >{name}</span>
+                  </div>}
                   />
                 )
               case 'RMSE':
@@ -167,6 +167,8 @@ class AdvancedModelTable extends Component {
                 return <RowCell key={6} data={score.validateScore[metric]} />;
               case 'Holdout':
                 return <RowCell key={7} data={score.holdoutScore[metric]} />;
+              default:
+                return null
             }
           })}
         </Row>
@@ -187,27 +189,29 @@ class RegressionDetailCurves extends Component {
   }
 
   render() {
-    const { model, model: { id } } = this.props;
+    const { model } = this.props;
     const { curve } = this.state;
     let curComponent;
     switch (curve) {
       case 'Variable Impact':
-        curComponent = <div style={{fontSize: 60}} ><VariableImpact model={model} /></div>
+        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
         break;
       case 'Fit Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.fitPlot} />
+            <img className={styles.img} src={model.fitPlot} alt="fit plot" />
           </div>
         )
         break;
       case 'Residual Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.residualPlot} />
+            <img className={styles.img} src={model.residualPlot} alt="residual plot" />
           </div>
         )
         break;
+      default:
+        break
     }
     const thumbnails = [{
       text: 'Fit Plot',
@@ -229,7 +233,7 @@ class RegressionDetailCurves extends Component {
     }]
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{minWidth: 0}} >
+        <div className={styles.leftPanel} style={{ minWidth: 0 }} >
           {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
         </div>
         <div className={styles.rightPanel} >
@@ -252,7 +256,7 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, checked, metric } = this.props;
+    const { model, texts, metric } = this.props;
     if (!model.chartData) return null;
     const { name, fitIndex, chartData: { roc }, score } = model;
     const { detail } = this.state;
@@ -283,8 +287,9 @@ class ClassificationModelRow extends Component {
                 return <RowCell key={6} data={score.validateScore[metric]} />;
               case 'Holdout':
                 return <RowCell key={7} data={score.holdoutScore[metric]} />;
+              default:
+                return null
             }
-
           })}
         </Row>
         {detail && <DetailCurves model={model} />}
@@ -318,7 +323,9 @@ class DetailCurves extends Component {
         curComponent = <LiftChart height={190} width={500} className={`lift${id}`} model={model} />;
         break;
       case 'Variable Impact':
-        curComponent = <div style={{fontSize: 50}} ><VariableImpact model={model} /></div>
+        curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
+        break;
+      default:
         break;
     }
     const thumbnails = [{
@@ -394,7 +401,7 @@ class Thumbnail extends Component {
         onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
-        <img src={icon} />
+        <img src={icon} alt="icon"/>
         <div>{text}</div>
       </div>
     )
@@ -503,7 +510,8 @@ class ModelComp extends Component {
       <div className={styles.modelComp}>
         <img
           onClick={this.handleClick}
-          src={modelComp} />
+          src={modelComp} 
+          alt="comp" />
         <Modal
           width={1000}
           visible={this.state.modelCompVisible}
