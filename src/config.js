@@ -1,7 +1,9 @@
-const PORT = 8080 || process.env.PORT
-const FRONTEND_PORT = PORT || process.env.FRONTEND_PORT
-const NGINX_HOST = '192.168.0.3:8088' || process.env.NGINX_HOST
-const NGINX_BACKEND = 1 || process.env.NGINX_BACKEND
+
+
+const PORT = process.env.PORT || 8080 
+const FRONTEND_PORT = process.env.FRONTEND_PORT || PORT
+const NGINX_HOST = process.env.NGINX_HOST || '192.168.0.3:8088' 
+const NGINX_BACKEND = process.env.NGINX_BACKEND || 1 
 
 const defaultConfig = {
   uploadServer: NGINX_HOST,
