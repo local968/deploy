@@ -223,8 +223,8 @@ class PredictedProgress extends Component {
             <span>{label}</span>
           </div>
         );
-    const predictedPercent = parseInt(predicted * 100, 10);
-    const failedPercent = parseInt((1 - predicted) * 100, 10);
+    const predictedPercent = Math.round(predicted * 100);
+    const failedPercent = 100 - predictedPercent
     return (
       <div className={styles.progressLine}>
         {title}
