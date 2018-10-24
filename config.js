@@ -34,7 +34,7 @@ const defaultConfig = {
 
 let localConfig = {};
 try {
-  localConfig = require('./local_config.js').server;
+  localConfig = require('./local_config.js');
 } catch (e) { }
 
 module.exports = { ...defaultConfig, ...localConfig };

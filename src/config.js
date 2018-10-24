@@ -11,9 +11,9 @@ const defaultConfig = {
   port: FRONTEND_PORT
 }
 
-let localConfig = {};
-// try {
-//   localConfig = require('../local_config.js').client;
-// } catch (e) { }
+let localConfig = {}
+try {
+  localConfig = require('./local_config.js');
+} catch (e) { }
 
 export default { ...defaultConfig, ...localConfig }

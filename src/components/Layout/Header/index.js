@@ -109,7 +109,7 @@ class ProjectHeader extends Component {
   render() {
     const { userStore, projectStore } = this.props;
 
-    const { curStep } = projectStore.project || {};
+    const { curStep, mainStep } = projectStore.project || {};
     return (
       <div className={styles.header}>
         <div className={styles.menu}>
@@ -130,12 +130,12 @@ class ProjectHeader extends Component {
                 onClick={this.enter.bind(this, k)}
                 className={classnames(styles.item, {
                   [styles.current]: curStep === k,
-                  [styles.active]: curStep >= k
+                  [styles.active]: mainStep >= k
                 })}
               >
                 <div className={styles.iconBlock}>
                   <div className={styles.icon}>
-                    {imgs[v + (curStep >= k ? 'Active' : '')]}
+                    {imgs[v + (mainStep >= k ? 'Active' : '')]}
                   </div>
                   {line}
                   <div className={styles.iconText}>

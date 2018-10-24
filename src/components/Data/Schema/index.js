@@ -89,7 +89,7 @@ export default class DataSchema extends Component {
               <span>Select Undesirable Variables</span>
             </div>
           }
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem' }} content="Unselect predictors that lead to less wanted modeling results, they could be: 1.Variable IDs 2.Variables that are derived from the target 3.Any other variables you don't need" />
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="Unselect predictors that lead to less wanted modeling results, they could be: 1.Variable IDs 2.Variables that are derived from the target 3.Any other variables you don't need" />
           {isMissed && <div className={styles.schemaMissed} >
             <div className={styles.errorBlock}></div>
             <span>Missing</span>

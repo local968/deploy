@@ -64,9 +64,11 @@ export default class Data extends Component {
 
   render() {
     const { project } = this.props;
+    const { mainStep, lastSubStep, noCompute } = project;
+    let maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
     return <div className={styles.data}>
       {project && this.getChild()}
-      {project && <ProjectSide enter={this.enter} list={this.step} step={project.subStepActive} imgs={imgs} />}
+      {project && <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} />}
     </div>
   }
 }

@@ -142,6 +142,12 @@ const checkTraningRestriction = (user) => {
   })
 }
 
+function sendToCommand(data, progress) {
+  return command(data, (result) => {
+    return (result.status < 0 || result.status === 100) ? result : progress(result)
+  })
+}
+
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
   return redis.incr("node:project:count").then(id => {
@@ -279,53 +285,23 @@ wss.register('etl', (message, socket, progress) => {
     }
     if (!csvLocation.length) return { status: 416, message: "file not exist" }
     const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation, ext }
-    return command(data, (result) => {
-      return (result.status < 0 || result.status === 100) ? result : progress(result)
-    })
+    return sendToCommand(data, progress)
   })
 })
 
-wss.register('dataView', (message, socket, progress) => {
-  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
-})
+wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
-wss.register('correlationMatrix', (message, socket, progress) => {
-  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
-})
+wss.register('correlationMatrix', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
-wss.register('preTrainImportance', (message, socket, progress) => {
-  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
-})
+wss.register('preTrainImportance', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
-wss.register('histgramPlot', (message, socket, progress) => {
-  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
-})
+wss.register('histgramPlot', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
-wss.register('univariatePlot', (message, socket, progress) => {
-  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
-})
+wss.register('univariatePlot', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
-wss.register('chartData', (message, socket, progress) => {
-  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
-})
+wss.register('chartData', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
-wss.register('fitPlotAndResidualPlot', (message, socket, progress) => {
-  return command({ ...message, userId: socket.session.userId, requestId: message._id }, (result) => {
-    return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
-})
+wss.register('fitPlotAndResidualPlot', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
