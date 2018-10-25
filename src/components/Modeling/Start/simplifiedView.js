@@ -8,6 +8,7 @@ import { Spin, Popover } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import config from 'config';
+import FUNCTIONS from './functions';
 
 @observer
 export default class SimplifiedView extends Component {
@@ -122,12 +123,12 @@ export default class SimplifiedView extends Component {
             <option value='all'>All Variables ({rawHeader.length - 1})</option>
           </select>
         </div>
-        {/* <div className={styles.newVariable}>
+        <div className={styles.newVariable}>
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>Create a New Variable</span>
           </div>
-          {this.visible && <CreateNewVariable />}
-        </div> */}
+          {this.visible && <CreateNewVariable rawHeader={rawHeader} />}
+        </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
             visible={this.showCorrelation}
@@ -296,13 +297,102 @@ class SimplifiedViewPlot extends Component {
 @observer
 class CreateNewVariable extends Component {
   @observable hintStatus = false
+  @observable hints = []
+  @observable exp = ''
+  @observable showFunction = ""
+  @observable active = 0
+  //光标结束位置
+  @observable inputPosition = 0
 
   showHint = () => {
-
+    this.hintStatus = true
   }
 
   hideHint = () => {
+    this.hintStatus = false
+  }
 
+  handleChange = e => {
+    this.exp = e.target.value
+  }
+
+  changeHints = () => {
+    const startIndex = this.getStartIndex()
+    const functionStr = this.exp.slice(0, startIndex)
+    const hasFunction = FUNCTIONS.find(v => functionStr.toLowerCase().includes(v.value) || functionStr.toLowerCase().includes(v.value.slice(0, -1)))
+    if (hasFunction) this.showFunction = hasFunction.value
+    let exp = this.exp.slice(startIndex, this.inputPosition).trim()
+    const { rawHeader } = this.props
+    if (exp.startsWith("@")) {
+      exp = exp.slice(1).trim()
+      if (!exp) return this.hints = rawHeader.map(v => {
+        return {
+          label: v,
+          value: "@" + v
+        }
+      })
+    }
+    const isFunction = FUNCTIONS.find(v => v.value === exp.toLowerCase() || v.value === exp.toLowerCase() + ")")
+    if (isFunction) {
+      this.hints = []
+      this.showFunction = isFunction.value
+      return
+    }
+    let filterFunctions = []
+    if (!hasFunction) {
+      filterFunctions = FUNCTIONS.filter(v => v.value.includes(exp.toLowerCase()))
+    }
+    const filterHeaders = rawHeader.filter(_v => _v.includes(exp.toLowerCase())).map(item => {
+      return {
+        label: item,
+        value: "@" + item
+      }
+    })
+    this.hints = [...filterFunctions, ...filterHeaders]
+    return
+  }
+
+  getStartIndex = () => {
+    const exp = this.exp.slice(0, this.inputPosition)
+    let start = exp.length
+    const endStr = ["+", "-", "*", "/", "(", ")", ","]
+    for (; start > 0; start--) {
+      if (endStr.includes(exp[start])) {
+        start++ 
+        break
+      }
+    }
+    return start
+  }
+
+  handleSelect = value => {
+    // this.exp = value
+    const startIndex = this.getStartIndex()
+    this.exp = this.exp.slice(0, startIndex) + value + this.exp.slice(this.inputPosition)
+  }
+
+  showTips = fn => {
+    console.log(fn)
+  }
+
+  onKeyDown = e => {
+    // up
+    if (e.keyCode === 38) {
+      e.preventDefault()
+      if (this.active === 0) return
+      return this.active--
+    }
+    // down
+    if (e.keyCode === 40) {
+      e.preventDefault()
+      if (this.active === this.hints.length - 1) return
+      return this.active++
+    }
+  }
+
+  onSelect = e => {
+    this.inputPosition = e.target.selectionEnd
+    this.changeHints()
   }
 
   render() {
@@ -311,7 +401,14 @@ class CreateNewVariable extends Component {
         <div className={styles.newVariableName}><input className={styles.newVariableInput} placeholder="Name" /></div>
         <span>=</span>
         <div className={styles.newVariableFx}>
-          <input className={styles.newVariableInput} placeholder="fx" onFocus={this.showHint} onBlur={this.hideHint} />
+          <input className={styles.newVariableInput} placeholder="fx" value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onFocus={this.showHint} onBlur={this.hideHint} onSelect={this.onSelect} />
+          {this.hintStatus && <div className={styles.newVariableHintList}>
+            {this.hints.map((v, k) => {
+              return <div key={k} className={classnames(styles.newVariableHint, {
+                [styles.activeHint]: this.active === k
+              })} onMouseDown={this.handleSelect.bind(null, v.value)}><span>{v.label}</span></div>
+            })}
+          </div>}
         </div>
       </div>
       <div className={styles.newVariableRow}>

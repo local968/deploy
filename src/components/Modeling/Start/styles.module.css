@@ -915,8 +915,30 @@ span.advancedDesc {
 
 .newVariableAdd span {
   color: #fff;
-} 
+}
 
 .newVariableCancel span {
   color: #1d2b3c;
+}
+
+.newVariableHintList {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #fff;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.newVariableHint {
+  display: flex;
+  flex: none;
+  padding: 0.1em 12px;
+  cursor: pointer;
+}
+
+.activeHint {
+  background: #ededed;
 }
