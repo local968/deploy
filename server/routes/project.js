@@ -148,6 +148,43 @@ function sendToCommand(data, progress) {
   })
 }
 
+function getFileInfo(files) {
+  if (!files) return Promise.resolve({
+    status: 200,
+    message: "ok",
+    csvLocation: null,
+    ext: null
+  })
+  const pipeline = redis.pipeline();
+  files.forEach(f => {
+    pipeline.get("file:" + f)
+  })
+  return pipeline.exec().then(list => {
+    const error = list.find(i => !!i[0])
+    if (error) return error
+    const csvLocation = []
+    const ext = []
+    for (let n = 0; n < list.length; n++) {
+      let file = list[n][1]
+      if (!file) continue;
+      try {
+        file = JSON.parse(file)
+      } catch (e) { }
+      if (!file.path || !file.name) continue
+      csvLocation.push(file.path)
+      const fileext = file.name.split(".").pop()
+      ext.push("." + fileext)
+    }
+    if (!csvLocation.length) return { status: 416, message: "file not exist" }
+    return {
+      status: 200,
+      message: "ok",
+      csvLocation,
+      ext
+    }
+  })
+}
+
 wss.register("addProject", (message, socket) => {
   const userId = socket.session.userId;
   return redis.incr("node:project:count").then(id => {
@@ -262,30 +299,41 @@ wss.register("queryModelList", message => {
 })
 
 wss.register('etl', (message, socket, progress) => {
-  const pipeline = redis.pipeline();
-  const files = message.csvLocation || []
-  files.forEach(f => {
-    pipeline.get("file:" + f)
-  })
-  return pipeline.exec().then(list => {
-    const error = list.find(i => !!i[0])
-    if (error) return error
-    const csvLocation = []
-    const ext = []
-    for (let n = 0; n < list.length; n++) {
-      let file = list[n][1]
-      if (!file) continue;
-      try {
-        file = JSON.parse(file)
-      } catch (e) { }
-      if (!file.path || !file.name) continue
-      csvLocation.push(file.path)
-      const fileext = file.name.split(".").pop()
-      ext.push("." + fileext)
-    }
-    if (!csvLocation.length) return { status: 416, message: "file not exist" }
-    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation, ext }
-    return sendToCommand(data, progress)
+  const files = message.csvLocation
+  const id = message.projectId
+
+  return getFileInfo(files).then(fileInfo => {
+    if (fileInfo.status !== 200) return fileInfo
+    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation: fileInfo.csvLocation, ext: fileInfo.ext }
+    return sendToCommand(data, progress).then(returnValue => {
+      let { result, status } = returnValue;
+      if(status < 0) return {
+        status: 418,
+        message: result['process error']
+      }
+      Object.keys(result).forEach(k => {
+        if (k === "name") {
+          delete result[k];
+        }
+        if (k.includes("FillMethod")) {
+          Object.keys(result[k]).forEach(key => {
+            if (result[k][key] === "ignore") delete result[k][key]
+          })
+        }
+      })
+      result.dataViews = null;
+      result.firstEtl = false;
+      if (!files) delete result.totalRawLines
+
+      return createOrUpdate(id, socket.session.userId, mapObjectToArray(result)).then(updateResult => {
+        if (updateResult.status !== 200) return updateResult
+        return {
+          status: 200,
+          message: 'ok',
+          result: result
+        }
+      })
+    })
   })
 })
 

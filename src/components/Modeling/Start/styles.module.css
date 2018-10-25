@@ -867,17 +867,9 @@ span.advancedDesc {
   color: #4a4a4a;
 }
 
-.newVariableName {
-  display: flex;
-  flex: none;
-  width: 1.2em;
-  margin-right: 0.05em;
-}
-
 .newVariableFx {
   display: flex;
-  flex: none;
-  width: 2.2em;
+  width: 4em;
   margin-left: 0.05em;
   position: relative;
 }
@@ -900,6 +892,7 @@ span.advancedDesc {
   border: none;
   padding: 0.1em 0.25em;
   margin-right: 0.1em;
+  margin-top: 0.6em;
   cursor: pointer;
 }
 
@@ -915,8 +908,47 @@ span.advancedDesc {
 
 .newVariableAdd span {
   color: #fff;
-} 
+}
 
 .newVariableCancel span {
   color: #1d2b3c;
+}
+
+.newVariableHintList {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #fff;
+  margin-top: 0.05em;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.newVariableHint {
+  display: flex;
+  flex: none;
+  padding: 0.1em 12px;
+  cursor: pointer;
+}
+
+.activeHint {
+  background: #ededed;
+}
+
+.newVariableSyntax {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #f0f4f9;
+  padding: 0.1em 12px;
+  margin-top: 0.05em;
+}
+
+.hasList {
+  left: 100%;
 }
