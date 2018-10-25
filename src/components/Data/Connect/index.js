@@ -106,7 +106,7 @@ export default class DataConnect extends Component {
     this.file = null
     this.process = 0
     this.uploading = false
-    message.error(error)
+    message.error(error.toString())
     console.log(error, times)
   })
 

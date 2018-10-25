@@ -14,7 +14,7 @@ export default class Operation extends Component {
   render() {
     const { deploymentStore, scheduleStore } = this.props;
     const cd = deploymentStore.currentDeployment || {};
-
+    console.log(scheduleStore.sortedDeploymentSchedules)
     return (
       <div className={styles.operation}>
         <div className={styles.info}>

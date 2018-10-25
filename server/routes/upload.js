@@ -5,8 +5,7 @@ const config = require('config')
 const uuid = require('uuid')
 const crypto = require('crypto');
 const moment = require('moment')
-const path = require('path')
-const fs = require('fs')
+const command = require('../command')
 
 const router = new Router()
 const MB = 1024 * 1024
@@ -64,12 +63,29 @@ router.post('/', (req, res) => {
       message: 'upload error',
       error
     })
+
+    const _filename = fields.name.split('.')
     const fileId = uuid.v4()
-    fields.createdTime = moment().unix()
-    fields.params = params
-    redis.set('file:' + fileId, JSON.stringify(fields))
-    redis.incrby(`user:${params.userId}:upload`, parseInt(params.fileSize))
-    res.json({ fileId, status: 200, message: 'ok' })
+    const csvLocation = [fields.path]
+    const ext = ['.' + _filename[_filename.length - 1]]
+    command({
+      command: 'csvMeta',
+      requestId: fileId,
+      userId: params.userId,
+      projectId: params.projectId,
+      csvLocation,
+      computeLines: true,
+      ext
+    }, (result) => (result.status < 0 || result.status === 100) && result)
+      .then(result => {
+        const lineCount = result.result.lines || 0
+        fields.createdTime = moment().unix()
+        fields.lineCount = lineCount
+        fields.params = params
+        redis.set('file:' + fileId, JSON.stringify(fields))
+        redis.incrby(`user:${params.userId}:upload`, parseInt(params.fileSize))
+        res.json({ fileId, status: 200, message: 'ok' })
+      })
   });
 })
 

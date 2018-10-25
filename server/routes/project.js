@@ -122,7 +122,7 @@ const checkTraningRestriction = (user) => {
     } catch (e) {
       return reject({ message: "modeling error", status: -2 })
     }
-    const max = (level === 0 && 0) || (level < 3 && 1) || (level === 3 && 5) || Infinity
+    const max = (level === 0 && 0) || (level < 3 && 99) || (level === 3 && 9999) || Infinity
     const duration = moment.duration(moment().unix() - user.createdTime)
     const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
     return redis.get(restrictQuery).then(count => {

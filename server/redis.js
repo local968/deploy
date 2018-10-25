@@ -9,6 +9,6 @@ redis.on('connect', () => {
 pubsub.on('connect', () => {
   console.log('pubsub redis connected')
 })
-redis.on('error', console.log)
+redis.on('error', console.log.bind(console,'redis error:'))
 
 module.exports = { redis, pubsub }

@@ -1,6 +1,8 @@
 const { redis, pubsub } = require('redis')
 const wss = require('./webSocket')
-const userConcurrentRestrict = [0, 1, 1, 5, 999999]
+const moment = require('moment')
+const userConcurrentRestrict = [0, 99, 99, 999, 999999]
+const userDeployRestrict = [0, 20000, 20000, 200000, 999999999]
 
 const setSchedule = (schedule) => {
   const pipeline = redis.pipeline()
@@ -75,25 +77,42 @@ const api = {
     return pipeline.exec()
   }).then(result => result.map(([error, schedule]) => JSON.parse(schedule))),
   getFile: (id) => redis.get(`file:${id}`).then(JSON.parse),
-  isExceedConcurrent: (deploymentId) => new Promise((resolve, reject) => api.getDeployment(deploymentId).then(deployment => {
+  isExceedConcurrent: async (deploymentId) => {
+    const deployment = await api.getDeployment(deploymentId)
     const pipeline = redis.pipeline()
     pipeline.get(`user:${deployment.userId}:concurrent`)
-    pipeline.hmget(`user:${id}`, 'level')
-    return pipeline.exec()
-  }).then(result => {
-    if (result[0][0] || result[1][0]) resolve(true)
+    pipeline.hmget(`user:${deployment.userId}`, 'level')
+    const result = await pipeline.exec()
+    if (result[0][0] || result[1][0]) return true
     const concurrent = result[0][1]
     const level = result[1][1][0]
-    concurrent >= userConcurrentRestrict[level] ? resolve(true) : resolve(false)
-  })),
-  startDeploy: (deploymentId) =>
-    new Promise((resolve, reject) =>
-      api.getDeployment(deploymentId).then(deployment =>
-        redis.incr(`user:${deployment.userId}:concurrent`).then(resolve))),
-  finishDeploy: (deploymentId) => new Promise((resolve, reject) =>
-    new Promise((resolve, reject) =>
-      api.getDeployment(deploymentId).then(deployment =>
-        redis.incrby(`user:${deployment.userId}:concurrent`, -1).then(resolve))))
+    return concurrent >= userConcurrentRestrict[level] ? true : false
+  },
+  startDeploy: async (deploymentId) => {
+    const deployment = await api.getDeployment(deploymentId)
+    await redis.incr(`user:${deployment.userId}:concurrent`)
+  },
+  finishDeploy: async (deploymentId) => {
+    const deployment = await api.getDeployment(deploymentId)
+    await redis.incrby(`user:${deployment.userId}:concurrent`, -1)
+  },
+  checkUserFileRestriction: async (deploymentId, type) => {
+    const deployment = await api.getDeployment(deploymentId)
+    const userId = deployment.userId
+    const [level, createdTime] = await redis.hmget(`user:${userId}`, 'level', 'createdTime')
+    const duration = moment.duration(moment().unix() - createdTime)
+    const restrictQuery = `user:${userId}:duration:${duration.years()}-${duration.months()}:deploy`
+    const fileId = deployment[`${type}Options`].fileId
+    if (!fileId) return restrictQuery
+    const count = await redis.get(restrictQuery)
+    const file = await api.getFile(fileId)
+    if (parseInt(count) + parseInt(file.lineCount) > userDeployRestrict[level]) return false
+    await redis.incrby(restrictQuery, file.lineCount)
+    return restrictQuery
+  },
+  decreaseLines: async (restrictQuery, lineCount) => {
+    await redis.incrby(restrictQuery, -lineCount)
+  }
 }
 
 module.exports = api

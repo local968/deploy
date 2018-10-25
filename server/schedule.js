@@ -2,13 +2,12 @@ const moment = require('moment');
 const config = require('../config');
 const api = require('./scheduleApi');
 const command = require('./command')
-
 // schedule handle
 const scheduleInterval = setInterval(
   scheduleHandler,
-  config.schedulePeriod * 1000
+  config.schedulePeriod * 100
 );
-
+scheduleHandler()
 // queue handle
 // const queueInterval = setInterval(scheduleQueue, config.queuePeriod * 1000);
 
@@ -26,11 +25,19 @@ async function scheduleHandler() {
     const deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return
 
-    // send command to python
-    const fileId = deployment[`${schedule.type}Options`].fileId
-    const fileName = deployment[`${schedule.type}Options`].file
-    const ext = fileName.split('.')[fileName.split('.').length - 1]
-    api.getFile(fileId).then(file => {
+    const restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+    if (restrictQuery === false) {
+      schedule.result = result
+      schedule.status = 'finished'
+      schedule.updatedDate = moment().unix()
+      schedule.result = { ['process error']: 'Your usage of number of deploy lines has reached the max restricted by your current lisense.' }
+      api.finishDeploy(schedule.deploymentId)
+    } else {
+      // send command to python
+      const fileId = deployment[`${schedule.type}Options`].fileId
+      const fileName = deployment[`${schedule.type}Options`].file
+      const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
+      const file = await api.getFile(fileId)
       const request = {
         requestId: `schedule-${schedule.id}`,
         projectId: deployment.projectId,
@@ -41,17 +48,19 @@ async function scheduleHandler() {
         solution: deployment.modelName
       }
       let result = {}
-      command(request, data => {
+      await command(request, data => {
         result = { ...result, ...data.result }
         return data.status === 100 || data.status < 0
-      }).then(() => {
-        schedule.result = result
-        schedule.status = 'finished'
-        schedule.updatedDate = moment().unix()
-        api.finishDeploy(schedule.deploymentId)
-        return api.upsertSchedule(schedule)
       })
-    })
+      console.log(result)
+      if (result['process error']) api.decreaseLines(restrictQuery, file.lineCount)
+      schedule.result = result
+      schedule.status = result['process error'] ? 'issue' : 'finished'
+      schedule.updatedDate = moment().unix()
+      api.finishDeploy(schedule.deploymentId)
+      return api.upsertSchedule(schedule)
+    }
+
 
     const cdo = deployment[`${schedule.type}Options`];
     const nextTime = generateNextScheduleTime(
