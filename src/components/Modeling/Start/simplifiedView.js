@@ -319,7 +319,7 @@ class CreateNewVariable extends Component {
   changeHints = () => {
     const startIndex = this.getStartIndex()
     const functionStr = this.exp.slice(0, startIndex)
-    const hasFunction = functionStr ? FUNCTIONS.find(v => functionStr.toLowerCase().includes(v.value.toLowerCase()) || functionStr.toLowerCase().includes(v.value.toLowerCase().slice(0, -1))) : null
+    const hasFunction = FUNCTIONS.find(v => functionStr.toLowerCase().includes(v.value.toLowerCase()) || functionStr.toLowerCase().includes(v.value.toLowerCase().slice(0, -1)))
     this.myFunction = hasFunction || {}
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
     const { rawHeader, colType } = this.props

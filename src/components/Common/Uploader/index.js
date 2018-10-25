@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import axios from 'axios';
 import NginxUploader from '../NginxUploader';
 
-const AllowExt = ["csv", "zip", "rar"]
+const AllowExt = ["csv", "zip", "rar", "tar", "tgz"]
 
 export default class Uploader extends Component {
   componentDidUpdate() {

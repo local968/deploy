@@ -454,12 +454,9 @@ export default class Project {
     const command = 'etl';
 
     const data = {
-      csvLocation: [...uploadFileName],
       projectId: id,
       time: moment().valueOf(),
-      command,
-      validationRate: this.validationRate / 100,
-      holdoutRate: this.holdoutRate / 100
+      command
     }
 
     if (this.colType.length) {
@@ -498,6 +495,10 @@ export default class Project {
     if (this.noCompute || this.firstEtl) {
       data.noCompute = true;
     }
+
+    if(this.firstEtl) {
+      data.csvLocation = [...uploadFileName]
+    }
     this.etling = true;
     // id: request ID
     // projectId: project ID
@@ -531,23 +532,14 @@ export default class Project {
       }))
       .then(returnValue => {
         this.etling = false;
-        let { result } = returnValue;
-        Object.keys(result).forEach(k => {
-          if (k === "name") {
-            delete result[k];
-          }
-          if (k.includes("FillMethod")) {
-            Object.keys(result[k]).forEach(key => {
-              if (result[k][key] === "ignore") delete result[k][key]
-            })
-          }
-        })
-        result.dataViews = null;
-        result.firstEtl = false;
+        let { result, status, message } = returnValue;
+
+        if(status !== 200) return antdMessage.error(message)
+        this.setProperty(result)
 
         when(
           () => !!this.uploadData.length,
-          () => this.updateProject(Object.assign(result, this.next()))
+          () => this.updateProject(this.next())
         )
       })
   }
