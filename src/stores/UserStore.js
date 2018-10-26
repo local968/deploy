@@ -48,6 +48,7 @@ class UserStore {
     axios.delete('/user/logout').then(action(res => {
       if (res.data.status === 200) {
         this.status = 'unlogin'
+        window.location.reload()
       } else {
         alert(res.data.message)
       }
