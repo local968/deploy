@@ -5,7 +5,8 @@ const uuid = require('uuid')
 const moment = require('moment')
 const command = require('../command')
 
-const userProjectRestrict = [0, 15, 15, 150, 999999]
+const userProjectRestrict = [0, 15, 15, 150, Infinity]
+const userConcurrentRestrict = [0, 1, 1, 5, Infinity]
 
 function query(key, params) {
   const Field = ["id", "name", "createTime", "curStep"]
@@ -179,15 +180,22 @@ function getFileInfo(files) {
   })
 }
 
-wss.register("addProject", (message, socket) => {
+wss.register("addProject", async (message, socket) => {
   const userId = socket.session.userId;
-  return redis.incr("node:project:count").then(id => {
-    console.log('new project id:', id)
-    return command({ command: "create", projectId: id.toString(), userId, requestId: message._id }).then(result => {
-      const params = mapObjectToArray({ id, userId });
-      return createOrUpdate(id, userId, params, true)
-    })
-  })
+  const createdTime = socket.session.user.createdTime
+  const duration = moment.duration(moment().unix() - createdTime)
+  const startTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() })
+  const endTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() + 1 })
+  const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
+  if (projects.length >= userConcurrentRestrict[socket.session.user.level]) throw {
+    status: 408,
+    message: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
+    error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
+  }
+  const id = await redis.incr("node:project:count")
+  await command({ command: "create", projectId: id.toString(), userId, requestId: message._id })
+  const params = mapObjectToArray({ id, userId });
+  return createOrUpdate(id, userId, params, true)
 })
 
 wss.register("updateProject", (message, socket) => {
