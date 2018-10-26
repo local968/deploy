@@ -122,22 +122,16 @@ const checkTraningRestriction = (user) => {
     } catch (e) {
       return reject({ message: "modeling error", status: -2 })
     }
-    const max = (level === 0 && 0) || (level < 3 && 99) || (level === 3 && 9999) || Infinity
     const duration = moment.duration(moment().unix() - user.createdTime)
     const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
     return redis.get(restrictQuery).then(count => {
-      if (count > userProjectRestrict[user.level]) return reject({
+      if (count > userProjectRestrict[level]) return reject({
         status: -4,
         message: 'Your usage of number of training has reached the max restricted by your current lisense.',
         error: 'project number exceed'
       })
-
-      return redis.get(`user:${user.id}:concurrent`).then(num => {
-        if (num >= max) return reject({ error: 'project concurrent exceed', message: "Number of your concurrent projects has reached the max restricted by your current lisense.", status: -3 })
-        redis.incr(restrictQuery)
-        redis.incr(`user:${user.id}:concurrent`)
-        return resolve()
-      })
+      redis.incr(restrictQuery)
+      resolve()
     })
   })
 }
@@ -304,13 +298,13 @@ wss.register('etl', (message, socket, progress) => {
 
   return getFileInfo(files).then((fileInfo) => {
     if (fileInfo.status !== 200) return fileInfo
-    const {csvLocation, ext} = fileInfo
+    const { csvLocation, ext } = fileInfo
     const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation, ext }
-    if(!csvLocation) delete data.csvLocation
-    if(!ext) delete data.ext
+    if (!csvLocation) delete data.csvLocation
+    if (!ext) delete data.ext
     return sendToCommand(data, progress).then(returnValue => {
       let { result, status } = returnValue;
-      if(status < 0) return {
+      if (status < 0) return {
         status: 418,
         message: result['process error']
       }
@@ -365,10 +359,6 @@ wss.register('train', (message, socket, progress) => {
       if (result.progress === "start") return progress(result)
       return createModel(projectId, result).then(progress)
     }))
-    .then(result => {
-      redis.incrby(`user:${userId}:concurrent`, -1)
-      return result
-    })
     .catch(err => err)
 })
 
