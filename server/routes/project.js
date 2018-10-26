@@ -302,9 +302,12 @@ wss.register('etl', (message, socket, progress) => {
   const files = message.csvLocation
   const id = message.projectId
 
-  return getFileInfo(files).then(fileInfo => {
+  return getFileInfo(files).then((fileInfo) => {
     if (fileInfo.status !== 200) return fileInfo
-    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation: fileInfo.csvLocation, ext: fileInfo.ext }
+    const {csvLocation, ext} = fileInfo
+    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation, ext }
+    if(!csvLocation) delete data.csvLocation
+    if(!ext) delete data.ext
     return sendToCommand(data, progress).then(returnValue => {
       let { result, status } = returnValue;
       if(status < 0) return {
