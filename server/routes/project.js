@@ -5,8 +5,7 @@ const uuid = require('uuid')
 const moment = require('moment')
 const command = require('../command')
 
-const userProjectRestrict = [0, 15, 15, 150, Infinity]
-const userConcurrentRestrict = [0, 1, 1, 5, Infinity]
+const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
 
 function query(key, params) {
   const Field = ["id", "name", "createTime", "curStep"]
@@ -126,7 +125,7 @@ const checkTraningRestriction = (user) => {
     const duration = moment.duration(moment().unix() - user.createdTime)
     const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
     return redis.get(restrictQuery).then(count => {
-      if (count > userProjectRestrict[level]) return reject({
+      if (count > userProjectRestriction[level]) return reject({
         status: -4,
         message: 'Your usage of number of training has reached the max restricted by your current lisense.',
         error: 'project number exceed'
@@ -187,7 +186,7 @@ wss.register("addProject", async (message, socket) => {
   const startTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() })
   const endTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() + 1 })
   const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
-  if (projects.length >= userConcurrentRestrict[socket.session.user.level]) throw {
+  if (projects.length >= userConcurrentRestriction[socket.session.user.level]) throw {
     status: 408,
     message: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
     error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',

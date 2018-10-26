@@ -6,13 +6,9 @@ const uuid = require('uuid')
 const crypto = require('crypto');
 const moment = require('moment')
 const command = require('../command')
+const { userModelingRestriction, userStorageRestriction } = require('restriction')
 
 const router = new Router()
-const MB = 1024 * 1024
-const GB = MB * 1024
-
-const userModelingRestrict = [0, 50 * MB, 50 * MB, 200 * MB, 999999 * MB]
-const userStorageRestrict = [0, 10 * GB, 10 * GB, 100 * GB, 999999 * GB]
 
 router.post('/check', (req, res) => {
   const fileSize = req.body.fileSize
@@ -23,13 +19,13 @@ router.post('/check', (req, res) => {
     message: 'missing params',
     error: 'missing params'
   })
-  if (type === 'modeling' && parseInt(fileSize) > userModelingRestrict[req.session.user.level]) return res.json({
+  if (type === 'modeling' && parseInt(fileSize) > userModelingRestriction[req.session.user.level]) return res.json({
     status: 416,
     message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
     error: 'modeling file too large'
   })
   redis.get(`user:${userId}:upload`).then(size => {
-    if (parseInt(size) + parseInt(fileSize) > userStorageRestrict[req.session.user.level]) return res.json({
+    if (parseInt(size) + parseInt(fileSize) > userStorageRestriction[req.session.user.level]) return res.json({
       status: 417,
       message: 'Your usage of storage space has reached the max restricted by your current lisense.',
       error: 'storage space full'

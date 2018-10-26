@@ -1,7 +1,7 @@
 const { redis, pubsub } = require('redis')
 const wss = require('./webSocket')
 const moment = require('moment')
-const userDeployRestrict = [0, 20000, 20000, 200000, 999999999]
+const { userDeployRestriction } = require('restriction')
 
 const setSchedule = (schedule) => {
   const pipeline = redis.pipeline()
@@ -86,7 +86,7 @@ const api = {
     if (!fileId) return restrictQuery
     const count = await redis.get(restrictQuery)
     const file = await api.getFile(fileId)
-    if (parseInt(count) + parseInt(file.lineCount) > userDeployRestrict[level]) return false
+    if (parseInt(count) + parseInt(file.lineCount) > userDeployRestriction[level]) return false
     await redis.incrby(restrictQuery, file.lineCount)
     return restrictQuery
   },

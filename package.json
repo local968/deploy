@@ -62,6 +62,7 @@
     "logger": "server/logger",
     "redis": "server/redis",
     "config": "config",
+    "restriction": "server/restriction",
     "command": "command"
   }
 }
