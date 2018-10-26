@@ -73,8 +73,8 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader } = project;
-    const targetUnique = Object.values(Object.assign({}, colMap[target], targetMap)).length;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, problemType } = project;
+    const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     return <div className={styles.simplified}>
       <div className={styles.targetTable}>
@@ -106,7 +106,9 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
           })} title={targetData.mean || 'N/A'}><span>{targetData.mean || 'N/A'}</span></div>
-          <div className={styles.targetCell}><span>{targetUnique}</span></div>
+          <div className={classnames(styles.targetCell, {
+            [styles.none]: colType[target] !== 'Categorical'
+          })}><span>{targetUnique || 'N/A'}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
           })} title={targetData.min || 'N/A'}><span>{targetData.min || 'N/A'}</span></div>
