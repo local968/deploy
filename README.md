@@ -17,13 +17,8 @@ nginx backend
 SECRET = 'FNcidLwifNC902LCC9f2C' || process.env.SECRET   
 session 密码验证 上传验证 都用到了改secret   
 
-REDIS_HOST = '192.168.0.3' || process.env.REDIS_HOST      
-redis port   
-
-REDIS_PORT_1 = 16390 || process.env.REDIS_PORT_1   
-REDIS_PORT_2 = 16391 || process.env.REDIS_PORT_2   
-REDIS_PORT_3 = 16392 || process.env.REDIS_PORT_3   
-redis 哨兵模式的三个接口   
+REDIS_SENTINEL_HOSTS = process.env.REDIS_SENTINEL_HOSTS || '192.168.0.3:16390,192.168.0.3:16391,192.168.0.3:16392'
+redis 哨兵模式的N个地址，以逗号分隔   
 
 REDIS_USERNAME = 'redismaster' || process.env.REDIS_USERNAME   
 redis 用户名   
