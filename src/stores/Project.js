@@ -894,7 +894,7 @@ export default class Project {
         action: 'all',
         version: this.models.map(m => m.name).toString(),
         command: 'chartData',
-        csvLocation: [...this.uploadFileName],
+        // csvLocation: [...this.uploadFileName],
         projectId: this.id
       };
       api.chartData(request, chartResult => {

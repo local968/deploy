@@ -15,9 +15,6 @@ async function scheduleHandler() {
   const now = moment().unix();
   const schedules = await api.getTimeUpSchedules(now);
   schedules.map(async schedule => {
-    const exccedConcurrent = await api.isExceedConcurrent(schedule.deploymentId)
-    if (exccedConcurrent) return
-    api.startDeploy(schedule.deploymentId)
     schedule.updatedDate = now;
     schedule.status = 'progressing';
     await api.upsertSchedule(schedule);
@@ -27,11 +24,10 @@ async function scheduleHandler() {
 
     const restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
     if (restrictQuery === false) {
-      schedule.result = result
-      schedule.status = 'finished'
+      schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
       schedule.result = { ['process error']: 'Your usage of number of deploy lines has reached the max restricted by your current lisense.' }
-      api.finishDeploy(schedule.deploymentId)
+      await api.upsertSchedule(schedule);
     } else {
       // send command to python
       const fileId = deployment[`${schedule.type}Options`].fileId
@@ -52,12 +48,10 @@ async function scheduleHandler() {
         result = { ...result, ...data.result }
         return data.status === 100 || data.status < 0
       })
-      console.log(result)
       if (result['process error']) api.decreaseLines(restrictQuery, file.lineCount)
       schedule.result = result
       schedule.status = result['process error'] ? 'issue' : 'finished'
       schedule.updatedDate = moment().unix()
-      api.finishDeploy(schedule.deploymentId)
       return api.upsertSchedule(schedule)
     }
 

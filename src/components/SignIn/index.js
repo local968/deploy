@@ -47,6 +47,10 @@ export default class SignIn extends Component {
     this.props.userStore.login({ email, password })
   }
 
+  onKeyUp = (event) => {
+    if (event.keyCode === 13) this.login()
+  }
+
   register = () => {
     this.props.history.push("/signup")
   }
@@ -60,7 +64,7 @@ export default class SignIn extends Component {
       </div>
       <div className={styles.row}>
         <div className={styles.warning}>{this.warning.password && <span><img src={warnIcon} alt='warning' />{this.warning.password}</span>}</div>
-        <input type="password" placeholder="Set a Password" value={this.password} onChange={this.onChangePassword} />
+        <input type="password" placeholder="Set a Password" value={this.password} onChange={this.onChangePassword} onKeyUp={this.onKeyUp} />
       </div>
       <div className={styles.buttonRow}>
         <button className={styles.button} onClick={this.login}>
