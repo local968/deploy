@@ -27,10 +27,10 @@ async function scheduleHandler() {
 
     const restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
     if (restrictQuery === false) {
-      schedule.result = result
-      schedule.status = 'finished'
+      schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
       schedule.result = { ['process error']: 'Your usage of number of deploy lines has reached the max restricted by your current lisense.' }
+      await api.upsertSchedule(schedule);
       api.finishDeploy(schedule.deploymentId)
     } else {
       // send command to python
