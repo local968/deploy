@@ -365,7 +365,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
       <span className={styles.text}>Data Source:</span>
     </span>
     <div className={styles.selections}>
-      {cddo.source === 'database' && (
+      {/* {cddo.source === 'database' && (
         <div className={styles.selected} onClick={show('databasesource')}>
           <span className={styles.result}>
             <img
@@ -382,7 +382,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
             <span className={styles.orText}>or</span>
           </span>
         </div>
-      )}
+      )} */}
 
       {cddo.source === 'file' && (
         <div className={styles.selected}>
@@ -396,9 +396,9 @@ const DataSource = observer(({ cddo, show, uploader }) => (
               {cddo.file}
             </span>
           </Uploader>
-          <span className={styles.or}>
+          {/* <span className={styles.or}>
             <span className={styles.orText}>or</span>
-          </span>
+          </span> */}
         </div>
       )}
 
@@ -417,7 +417,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
         </div>
       )} */}
 
-      {cddo.source !== 'database' && (
+      {/* {cddo.source !== 'database' && (
         <div className={styles.selection} onClick={show('databasesource')}>
           <span className={styles.text}>
             <img
@@ -427,7 +427,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
             />Database
           </span>
         </div>
-      )}
+      )} */}
       {cddo.source !== 'file' && (
         <div
           className={styles.selectionWithoutHover}
