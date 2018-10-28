@@ -576,7 +576,7 @@ export default class Project {
   }
 
   @action
-  fixTarget() {
+  fixTarget = () => {
     this.updateProject({
       targetMap: this.targetMapTemp
     })
@@ -584,7 +584,7 @@ export default class Project {
   }
 
   @action
-  fixFillMethod() {
+  fixFillMethod = () => {
     this.updateProject({
       outlierDict: toJS(this.outlierDict),
       nullFillMethod: toJS(this.nullFillMethod),
@@ -592,6 +592,28 @@ export default class Project {
       outlierFillMethod: toJS(this.outlierFillMethod)
     })
     this.etl();
+  }
+
+  @action 
+  addNewVariable = exp => {
+    console.log(exp)
+    socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'createNewVariable',
+        csvScript: exp
+      };
+      api.createNewVariable(command, progressResult => {
+          console.log(progressResult)
+      }).then(returnValue => {
+        console.log(returnValue)
+        // const { status, result } = returnValue
+        // if (status < 0) return alert("dataview error")
+        // this.setProperty({
+        //   dataViews: result.data
+        // })
+      })
+    })
   }
   /**---------------------------------------------train------------------------------------------------*/
   @computed
@@ -608,7 +630,7 @@ export default class Project {
         continue;
       }
       if (problemType === "Classification") {
-        if (model.score.validateScore.auc + model.score.validateScore.acc > m.score.validateScore.auc + m.score.validateScore.acc) {
+        if (model.score.validateScore.auc + model.score.validateScore.acc < m.score.validateScore.auc + m.score.validateScore.acc) {
           model = m;
         }
       } else {

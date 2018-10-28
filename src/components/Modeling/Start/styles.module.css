@@ -638,6 +638,7 @@ span.advancedDesc {
   height: 0.2em;
   border-radius: 0.2em;
   overflow: hidden;
+  position: absolute;
 }
 
 .advancedPercentTrain {
@@ -664,7 +665,6 @@ span.advancedDesc {
 }
 
 .range {
-  position: absolute;
   display: flex;
   flex: none;
 }

@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import Hint from 'components/Common/Hint';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
-import { Spin, Popover } from 'antd';
+import { Spin, Popover, message as antdMessage } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import config from 'config';
@@ -73,7 +73,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, problemType } = project;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     return <div className={styles.simplified}>
@@ -129,7 +129,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>Create a New Variable</span>
           </div>
-          <CreateNewVariable rawHeader={rawHeader} colType={colType} onClose={this.hideNewVariable} visible={this.visible}/>
+          <CreateNewVariable rawHeader={rawHeader} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
@@ -321,12 +321,14 @@ class CreateNewVariable extends Component {
   changeHints = () => {
     const startIndex = this.getStartIndex()
     const functionStr = this.exp.slice(0, startIndex)
-    const hasFunction = FUNCTIONS.find(v => functionStr.toLowerCase().includes(v.value.toLowerCase()) || functionStr.toLowerCase().includes(v.value.toLowerCase().slice(0, -1)))
-    this.myFunction = hasFunction || {}
+    const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
+    const inFunction = functionList.find(v => functionStr.toLowerCase().includes(v.value.toLowerCase().slice(0, -1)))
+    const isOutOfFuntion = functionStr.toLowerCase().includes(")")
+    this.myFunction = isOutOfFuntion ? {} : (inFunction || {})
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
     const { rawHeader, colType } = this.props
     let valueList = [...rawHeader]
-    if (hasFunction && hasFunction.value !== "combine()") valueList = valueList.filter(v => colType[v] === "Numerical")
+    if (isOutOfFuntion || !inFunction || inFunction.value !== "Concat()") valueList = valueList.filter(v => colType[v] === "Numerical")
     if (exp.startsWith("@")) {
       exp = exp.slice(1).trim()
       if (!exp) return this.hints = valueList.map(v => {
@@ -336,17 +338,8 @@ class CreateNewVariable extends Component {
         }
       })
     }
-    const isFunction = FUNCTIONS.find(v => v.value.toLowerCase() === exp.toLowerCase() || v.value === exp.toLowerCase() + ")")
-    if (isFunction) {
-      this.hints = []
-      this.myFunction = isFunction
-      this.showFunction = {}
-      return
-    }
-    let filterFunctions = []
-    if (!hasFunction) {
-      filterFunctions = FUNCTIONS.filter(v => v.value.toLowerCase().includes(exp.toLowerCase()))
-    }
+    let filterFunctions = [...FUNCTIONS.base]
+    if (!inFunction) filterFunctions = FUNCTIONS.senior.filter(v => v.value.toLowerCase().includes(exp.toLowerCase())).concat(filterFunctions)
     const filterValues = valueList.filter(_v => _v.includes(exp.toLowerCase())).map(item => {
       return {
         label: item,
@@ -364,7 +357,7 @@ class CreateNewVariable extends Component {
     const endStr = ["+", "-", "*", "/", "(", ","]
     for (; start > 0; start--) {
       if (endStr.includes(exp[start])) {
-        start++ 
+        start++
         break
       }
     }
@@ -380,9 +373,9 @@ class CreateNewVariable extends Component {
   onKeyDown = e => {
     // enter
     if (e.keyCode === 13) {
-      if(!this.hints.length) return
+      if (!this.hints.length) return
       const selectValue = this.hints[this.active]
-      if(!selectValue) return
+      if (!selectValue) return
       this.handleSelect(selectValue.value)
       return
     }
@@ -413,9 +406,238 @@ class CreateNewVariable extends Component {
     this.showFunction = this.hints[this.active]
   }
 
+  handleAdd = () => {
+    const checked = this.checkExp(this.exp)
+    if (!checked.isPass) return antdMessage.error(checked.message)
+    const num = checked.num
+    console.log(this.exp, num)
+    this.props.addNewVariable(this.exp)
+  }
+
+  checkExp = _expression => {
+    let expression = _expression
+    if (!expression) return { isPass: true, message: "ok", num: 0 }
+    const baseOptReg = new RegExp(/[\+\-\*\/]/)
+    const exps = []
+    let num = 1
+    let start = 0
+    let end = 0
+    let functions = 0
+    let seniorFunctions = 0
+    while (true) {
+      start = expression.indexOf("(", start) + 1
+      end = expression.indexOf(")", start) + 1
+      if (start === 0 || end === 0 || start > end) {
+        exps.push(expression)
+        break
+      }
+      while (true) {
+        let center = start
+        let centerNum = 0
+        while (true) {
+          center = expression.indexOf("(", center) + 1
+          if (center === 0 || center > end) break;
+          start = center
+          centerNum++
+        }
+        if (!centerNum) break;
+        while (centerNum) {
+          end = expression.indexOf(")", end) + 1
+          if (end === 0) break
+          centerNum--
+        }
+        if (centerNum) return { isPass: false, message: "error expression" }
+      }
+      const str = expression.slice(0, end)
+      exps.push(str)
+      expression = expression.slice(end)
+      if (!expression.trim()) break
+      const optIndex = expression.search(baseOptReg)
+      if (optIndex === -1) return { isPass: false, message: `Unexpected identifier: ${expression}` }
+      expression = expression.slice(optIndex + 1)
+    }
+    for (let exp of exps) {
+      const start = exp.indexOf("(")
+      const end = exp.lastIndexOf(")")
+      const hasFunction = start > -1 && end > -1 && end > start
+      if (!hasFunction) {
+        const array = exp.split(baseOptReg)
+        const isPass = this.checkParams(array)
+        if (!isPass) return { isPass: false, message: "error expression" }
+      } else {
+        const prev = exp.slice(0, start)
+        const prevArray = prev.split(baseOptReg)
+        const functionName = prevArray.pop().trim()
+        if (functionName) {
+          const isBase = FUNCTIONS.base.find(f => f.value.slice(0, -2) === functionName)
+          const isSenior = FUNCTIONS.senior.find(f => f.value.slice(0, -2) === functionName)
+          const isFunction = (isBase || isSenior)
+          functions += isFunction ? 1 : 0
+          seniorFunctions += isSenior ? 1 : 0
+          if (!isFunction) return { isPass: false, message: `error function:"${functionName}"` }
+          const functionExp = exp.slice(start + 1, end)
+          if (!functionExp.trim()) return { isPass: false, message: `function: "${functionName}" must have param` }
+          const params = functionExp.split(",")
+          if (isFunction.params && params.length !== isFunction.params) return { isPass: false, message: `function: "${functionName}" must have ${isFunction.params} param` }
+          if (isSenior) {
+            const seniorChecked = this.checkSeniorParams(isSenior, params)
+            if (!seniorChecked.isPass) return seniorChecked
+            num += seniorChecked.num - 1
+            const next = exp.slice(end + 1)
+            const nextArray = next.split(baseOptReg)
+            nextArray.shift()
+            const checkArray = [...prevArray, ...nextArray]
+            for (let checkStr of checkArray) {
+              const checked = this.checkExp(checkStr)
+              if (!checked.isPass) return checked
+              num += checked.num - 1
+              functions += checked.functions
+              seniorFunctions += checked.seniorFunctions
+            }
+          }else{
+            const next = exp.slice(end + 1)
+            const nextArray = next.split(baseOptReg)
+            nextArray.shift()
+            const checkArray = [...prevArray, ...params, ...nextArray]
+            for (let checkStr of checkArray) {
+              const checked = this.checkExp(checkStr)
+              if (!checked.isPass) return checked
+              num += checked.num - 1
+              functions += checked.functions
+              seniorFunctions += checked.seniorFunctions
+            }
+          }
+        } else {
+          const isPrevPass = this.checkParams(prevArray)
+          if (!isPrevPass) return { isPass: false, message: "error expression" }
+          const functionExp = exp.slice(start + 1, end)
+          if (!functionExp.trim()) return { isPass: false, message: `Unexpected token )` }
+          const fnArray = functionExp.split(baseOptReg)
+          for (let checkStr of fnArray) {
+            const checked = this.checkExp(checkStr)
+            if (!checked.isPass) return checked
+            num += checked.num - 1
+            functions += checked.functions
+            seniorFunctions += checked.seniorFunctions
+          }
+          const next = exp.slice(end + 1)
+          const nextArray = next.split(baseOptReg)
+          nextArray.shift()
+          const isNextPass = this.checkParams(nextArray)
+          if (!isNextPass) return { isPass: false, message: "error expression" }
+        }
+      }
+    }
+    if (seniorFunctions > 1) return { isPass: false, message: "error expression" }
+    return { isPass: true, message: "ok", num: num, functions, seniorFunctions }
+  }
+
+  checkParams = array => {
+    const { rawHeader } = this.props
+    for (let item of array) {
+      let value = item.trim()
+      if (value.startsWith("@")) value = value.slice(1)
+      if (!value || (!rawHeader.includes(value) && isNaN(value))) return false
+    }
+    return true
+  }
+
+  checkSeniorParams = (senior, params) => {
+    let num = 0
+    const length = params.length
+    if (length < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} must have param` }
+    let numOfParam = 0
+    for (let value of params) {
+      if (!value) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} param error` }
+      if (value.includes("@")) numOfParam++
+      if (!value.includes("@")) break;
+    }
+    const numList = params.slice(numOfParam)
+    switch (senior.value) {
+      case "Concat()":
+        if (numOfParam < 2) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} has At least 3 parameters` }
+        const concatResults = numList.map(n => {
+          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
+          try {
+            n = parseInt(n, 10)
+          } catch (e) {
+            return { isPass: false, message: `${n} must be integer` }
+          }
+          if (n < 2) return { isPass: false, message: `${n} must greater than 1` }
+          if (n > numOfParam) return { isPass: false, message: `${n} must less than ${numOfParam + 1}` }
+          return { isPass: true, message: "ok", num: this.factorial(numOfParam) / this.factorial(n) / this.factorial(numOfParam - n) }
+        })
+        for (let numResult of concatResults) {
+          if (!numResult.isPass) return numResult
+          num += numResult.num
+        }
+        break;
+      case "Diff()":
+        const diffResults = numList.map(n => {
+          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
+          try {
+            n = parseInt(n, 10)
+          } catch (e) {
+            return { isPass: false, message: `${n} must be integer` }
+          }
+          return { isPass: true, message: "ok", num: numOfParam }
+        })
+        for (let numResult of diffResults) {
+          if (!numResult.isPass) return numResult
+          num += numResult.num
+        }
+        break;
+      case "Accumulate()":
+        num = numOfParam
+        break;
+      case "Combine()":
+        const combineArray = ["min", "max", "mean", "sum"]
+        for (let row of numList) {
+          if (!combineArray.includes(row.trim())) return { isPass: false, message: `${row} is not supported` }
+        }
+        num = length - numOfParam
+        break;
+      case "Quantile_bin()":
+        const quantileBinArray = ["value", "frequency"]
+        const [b, type1, type2] = numList
+        if (isNaN(b) || b.includes(".")) return { isPass: false, message: `${b} must be integer` }
+        if (!quantileBinArray.includes(type1.trim())) return { isPass: false, message: `${type1} is not supported` }
+        if (type2 && !quantileBinArray.includes(type2.trim())) return { isPass: false, message: `${type2} is not supported` }
+        num = numOfParam * (type2 ? 2 : 1)
+        break;
+      case "Custom_Quantile_bin()":
+        const numResults = numList.map(n => {
+          const str = n.trim()
+          const first = str.slice(0, 1)
+          const last = str.slice(-1)
+          if (first !== "[" || last !== "]") return { isPass: false, message: `Unexpected identifier: ${n}` }
+          const array = str.slice(1,-1).split("|")
+          for (let item of array) {
+            if (!item || isNaN(item.trim())) return { isPass: false, message: `${item} must be number` }
+          }
+          return { isPass: true, message: "ok", num: 1 }
+        })
+        for (let numResult of numResults) {
+          if (!numResult.isPass) return numResult
+          num += numResult.num
+        }
+        break;
+      default:
+        break;
+    }
+    if (num < 1) return { isPass: false, message: "error expression" }
+    return { isPass: true, message: "ok", num: num }
+  }
+
+  factorial(n) {
+    if (n < 2) return 1
+    return n * this.factorial(n - 1)
+  }
+
   render() {
-    const {visible, onClose} = this.props
-    const functionSyntax = FUNCTIONS.find(v => v.syntax === this.myFunction.syntax) || FUNCTIONS.find(v => v.syntax === this.showFunction.syntax)
+    const { visible, onClose } = this.props
+    const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
+    const functionSyntax = functionList.find(v => v.syntax === this.myFunction.syntax) || functionList.find(v => v.syntax === this.showFunction.syntax)
 
     return visible && <div className={styles.newVariableBlock}>
       <div className={styles.newVariableRow}>
@@ -435,7 +657,7 @@ class CreateNewVariable extends Component {
         </div>
       </div>
       <div className={styles.newVariableRow}>
-        <button className={classnames(styles.newVariableButton, styles.newVariableAdd)}>
+        <button className={classnames(styles.newVariableButton, styles.newVariableAdd)} onClick={this.handleAdd}>
           <span>Add</span>
         </button>
         <button className={classnames(styles.newVariableButton, styles.newVariableCancel)} onClick={onClose}>

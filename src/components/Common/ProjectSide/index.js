@@ -10,13 +10,14 @@ export default class ProjectSide extends Component {
     }
 
     render() {
-        const { list, step, imgs } = this.props;
+        const { list, step, imgs, current } = this.props;
         return <div className={styles.projectSide}>
             <div className={styles.sideBox}>
                 {list.map((v, k) => {
                     return <div className={classnames(styles.sideBlock, {
                         [styles.sideBlockLarge]: list.length < 3,
-                        [styles.active]: step > k
+                        [styles.active]: step > k,
+                        [styles.current]: current === k + 1
                     })} key={k}>
                         {k !== 0 && <div className={classnames(styles.sideLine, {
                             [styles.sideLineLarge]: list.length < 3
