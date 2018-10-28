@@ -19,7 +19,8 @@
 .sideBlock {
     display: flex;
     flex: none;
-    margin: 0.8em 0;
+    margin: 0.4em 0;
+    padding: 0.4em 0;
     justify-content: center;
     position: relative;
     cursor: pointer;
@@ -28,10 +29,11 @@
 }
 
 .sideBlockLarge {
-    margin: 1.3em 0;
+    margin: 0.6em 0;
+    padding: 0.7em 0;
 }
 
-.sideBlock span{
+.sideBlock span {
     font-size: 0.875rem;
     color: #9b9b9b;
     text-align: center;
@@ -43,14 +45,14 @@
 
 .sideLine {
     position: absolute;
-    top: -1.4em;
+    top: -1em;
     max-height: 1.2em;
     overflow: hidden;
     display: flex;
 }
 
 .sideLineLarge {
-    top: -2.5em;
+    top: -1.8em;
     max-height: 2.4em;
 }
 
@@ -59,7 +61,11 @@
     white-space: nowrap;
 }
 
-.sideBlock.active span{
+.sideBlock.current {
+    border-right: 0.03em solid #1d2b3c;
+}
+
+.sideBlock.active span {
     color: #1d2b3c;
 }
 

@@ -69,6 +69,7 @@ export default class Modeling extends Component {
             enter={this.enter}
             list={this.step}
             step={project.lastSubStep}
+            current={project.subStepActive}
             imgs={imgs}
           />
         )}
