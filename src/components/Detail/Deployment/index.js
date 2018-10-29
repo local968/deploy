@@ -6,7 +6,7 @@ import moment from 'moment';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
 import sourceIcon from './icon-data-source.svg';
-import databaseIcon from './icon-database.svg';
+// import databaseIcon from './icon-database.svg';
 import fileIcon from './icon-file-local.svg';
 // import serverIcon from './icon-server.svg';
 import upDatabaseIcon from './icon-upload-to-server.svg';

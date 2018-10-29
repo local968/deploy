@@ -496,7 +496,7 @@ export default class Project {
       data.noCompute = true;
     }
 
-    if(this.firstEtl) {
+    if (this.firstEtl) {
       data.csvLocation = [...uploadFileName]
     }
     this.etling = true;
@@ -514,7 +514,7 @@ export default class Project {
         const { progress, name, path } = result
         if (progress === "start") return
         if (name === "csvHeader") {
-          const url = `http://${config.uploadServer}/download/${path}`
+          const url = `http://${this.host}:8088/download/${path}`
           Papa.parse(url, {
             download: true,
             preview: 100,
@@ -534,7 +534,7 @@ export default class Project {
         this.etling = false;
         let { result, status, message } = returnValue;
 
-        if(status !== 200) return antdMessage.error(message)
+        if (status !== 200) return antdMessage.error(message)
         this.setProperty(result)
 
         when(

@@ -73,7 +73,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, problemType } = project;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader/*, problemType*/ } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     return <div className={styles.simplified}>
@@ -364,7 +364,7 @@ class CreateNewVariable extends Component {
     const endStr = ["+", "-", "*", "/", "(", ","]
     for (; start > 0; start--) {
       if (endStr.includes(exp[start])) {
-        start++ 
+        start++
         break
       }
     }

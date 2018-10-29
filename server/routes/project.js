@@ -192,8 +192,9 @@ wss.register("addProject", async (message, socket) => {
     error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
   }
   const id = await redis.incr("node:project:count")
-  await command({ command: "create", projectId: id.toString(), userId, requestId: message._id })
-  const params = mapObjectToArray({ id, userId });
+  const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id })
+  const params = mapObjectToArray({ id, userId, host: result.host });
+  console.log(params)
   return createOrUpdate(id, userId, params, true)
 })
 

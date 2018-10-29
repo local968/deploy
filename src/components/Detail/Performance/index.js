@@ -5,7 +5,7 @@ import { Select, InputNumber, Icon, Progress, Checkbox } from 'antd';
 import moment from 'moment';
 import styles from './styles.module.css';
 import downloadIcon from './icon-download.svg';
-import databaseIcon from './icon-database.svg';
+// import databaseIcon from './icon-database.svg';
 import fileIcon from './icon-file-local.svg';
 import onceIcon from './icon-once.svg';
 import OneTime from 'components/Common/OneTime';
