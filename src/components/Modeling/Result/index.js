@@ -34,8 +34,9 @@ export default class ModelResult extends Component {
         return true
       }
     }).filter(v => !!v)
+    const exps = project.csvScript.join(";").replace(/\|/g, ",")
     this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.name, current.problemType, modelList)
+      .addDeployment(project.id, project.name, current.name, current.problemType, modelList, exps)
       .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 
@@ -261,7 +262,7 @@ class Performance extends Component {
           <Progress
             width={84}
             type="circle"
-            percent={current.score.holdoutScore.auc * 100}
+            percent={current.score.validateScore.auc * 100}
             format={percent => (percent / 100).toFixed(2)}
           />
           <div className={styles.performanceText}>
@@ -274,7 +275,7 @@ class Performance extends Component {
         <div className={styles.performanceBox}>
           <div className={styles.performance}>
             <div className={styles.rmsePerformance}>
-              <span>{current.score.holdoutScore.nrmse.toFixed(4)}</span>
+              <span>{current.score.validateScore.nrmse.toFixed(4)}</span>
             </div>
             <div className={styles.performanceText}>
               <span>Normalized RMSE</span>
@@ -283,7 +284,7 @@ class Performance extends Component {
           <div className={styles.space} />
           <div className={styles.performance}>
             <div className={styles.r2Performance}>
-              <span>{current.score.holdoutScore.r2.toFixed(4)}</span>
+              <span>{current.score.validateScore.r2.toFixed(4)}</span>
             </div>
             <div className={styles.performanceText}>
               <span>

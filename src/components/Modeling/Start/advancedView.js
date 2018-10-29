@@ -472,6 +472,7 @@ class CustomRange extends Component {
         </div>
         <div className={styles.advancedOption}>
           <select className={classnames(styles.advancedSize, styles.inputLarge)} value={customField} onChange={this.handleCustomField} >
+            <option value={""} key="option"></option>
             {customFieldList.map((i, k) => {
               return <option value={i} key={k}>{i}</option>
             })}

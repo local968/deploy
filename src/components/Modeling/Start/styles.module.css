@@ -329,7 +329,7 @@
   font-family: SanFranciscoText;
   color: #4a4a4a;
   font-size: 0.875rem;
-  line-height: 1.2;
+  line-height: 1.5;
 }
 
 .tableHeader {
@@ -419,6 +419,13 @@
 .tableSort {
   display: flex;
   margin-right: 0.1em;
+  flex: none;
+  cursor: pointer;
+}
+
+.tableReload {
+  display: flex;
+  margin: 0 0.1em;
   flex: none;
   cursor: pointer;
 }
@@ -638,6 +645,7 @@ span.advancedDesc {
   height: 0.2em;
   border-radius: 0.2em;
   overflow: hidden;
+  position: absolute;
 }
 
 .advancedPercentTrain {
@@ -664,7 +672,6 @@ span.advancedDesc {
 }
 
 .range {
-  position: absolute;
   display: flex;
   flex: none;
 }
@@ -867,9 +874,16 @@ span.advancedDesc {
   color: #4a4a4a;
 }
 
+.newVariableName {
+  display: flex;
+  width: 1em;
+  margin-right: 0.05em;
+  position: relative;
+}
+
 .newVariableFx {
   display: flex;
-  width: 4em;
+  width: 3em;
   margin-left: 0.05em;
   position: relative;
 }
@@ -951,4 +965,11 @@ span.advancedDesc {
 
 .hasList {
   left: 100%;
+}
+
+.disable {
+  cursor: not-allowed;
+  background-color: #d3d3d3;
+  color: #aaaaaa;
+  background-image: none;
 }

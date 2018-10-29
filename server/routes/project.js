@@ -355,6 +355,8 @@ wss.register('chartData', (message, socket, progress) => sendToCommand({ ...mess
 
 wss.register('fitPlotAndResidualPlot', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
+wss.register('createNewVariable', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
+
 wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId: socket.session.userId, requestId: message._id }
   return checkTraningRestriction(socket.session.user)
