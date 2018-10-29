@@ -157,12 +157,12 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.tableBody}>
           {allVariables.sort((a, b) => {
-            return preImportance ? this.sort * (preImportance[a] - preImportance[b]) : 0
+            return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
           }).map((h, i) => {
             if (h === target) return null;
-            const data = colType[h] !== 'Categorical' && dataViews ? dataViews[h] : {}
+            const data = colType[h] !== 'Categorical' && dataViews ? (dataViews[h] || {}) : {}
             const map = targetMap || {};
-            const importance = preImportance ? preImportance[h] : 0.01;
+            const importance = preImportance ? (preImportance[h] || 0) : 0.01;
             return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={dataHeader.includes(h)} handleCheck={this.handleCheck.bind(null, h)} />
           })}
         </div>
