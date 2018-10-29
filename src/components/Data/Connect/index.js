@@ -237,14 +237,14 @@ export default class DataConnect extends Component {
             )}
           {/* {this.block('From SQL', sqlIcon, this.showSql)} */}
         </div>
-        <div className={styles.cutoff}>
+        {/* <div className={styles.cutoff}>
           <div className={styles.line} />
           <div className={styles.or}>
             <span>or</span>
           </div>
           <div className={styles.line} />
-        </div>
-        <div className={styles.title}>
+        </div> */}
+        {/* <div className={styles.title}>
           <span>
             If you need to define what training data to collect, please proceed
 						here.
@@ -252,7 +252,7 @@ export default class DataConnect extends Component {
         </div>
         <div className={styles.uploadRow}>
           {this.block('From Mr.One', defileIcon)}
-        </div>
+        </div> */}
         {this.sample && (
           <DataSample
             project={project}

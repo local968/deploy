@@ -173,7 +173,7 @@ export default class SimplifiedView extends Component {
             const data = colType[h] !== 'Categorical' && dataViews ? (dataViews[h] || {}) : {}
             const map = targetMap || {};
             const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={dataHeader.includes(h)} handleCheck={this.handleCheck.bind(null, h)} />
+            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={dataHeader.includes(h)} handleCheck={this.handleCheck.bind(null, h)} host={host} />
           })}
         </div>
       </div>
