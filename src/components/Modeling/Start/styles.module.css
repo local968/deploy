@@ -329,7 +329,7 @@
   font-family: SanFranciscoText;
   color: #4a4a4a;
   font-size: 0.875rem;
-  line-height: 1.2;
+  line-height: 1.5;
 }
 
 .tableHeader {
@@ -419,6 +419,13 @@
 .tableSort {
   display: flex;
   margin-right: 0.1em;
+  flex: none;
+  cursor: pointer;
+}
+
+.tableReload {
+  display: flex;
+  margin: 0 0.1em;
   flex: none;
   cursor: pointer;
 }

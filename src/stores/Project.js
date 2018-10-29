@@ -499,9 +499,9 @@ export default class Project {
       data.noCompute = true;
     }
 
-    if (this.firstEtl) {
+    // if (this.firstEtl) {
       data.csvLocation = [...uploadFileName]
-    }
+    // }
     this.etling = true;
     // id: request ID
     // projectId: project ID

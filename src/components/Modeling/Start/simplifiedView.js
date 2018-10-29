@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import Hint from 'components/Common/Hint';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
-import { Spin, Popover, message as antdMessage } from 'antd';
+import { Spin, Popover, message as antdMessage, Icon } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import config from 'config';
@@ -60,6 +60,13 @@ export default class SimplifiedView extends Component {
 
   hideNewVariable = () => {
     this.visible = false
+  }
+
+  reloadTable = () => {
+    this.props.project.dataViews = null
+    this.props.project.preImportance = null
+    this.props.project.dataView()
+    this.props.project.preTrainImportance()
   }
 
   render() {
@@ -143,8 +150,9 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Histogram</span></div>
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Univariant Plot</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
-            <div className={styles.tableSort} onClick={this.sortImportance}><span>sort</span></div>
+            <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort===1?'up':'down'}`} theme="outlined" /></span></div>
             <span>Importance</span>
+            <div className={styles.tableReload} onClick={this.reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
             <Hint themeStyle={{ fontSize: '1rem' }} content='It reflect the importance of the predictor to the target variable.' />
           </div>
           <div className={styles.tableTh}><span>Data type</span></div>
