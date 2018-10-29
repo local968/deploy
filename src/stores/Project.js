@@ -603,13 +603,13 @@ export default class Project {
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     const exps = [...this.csvScript, fullExp]
 
-    socketStore.ready().then(api => {
+    return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'createNewVariable',
         csvScript: exps.join(";").replace(/\|/g, ",")
       };
-      api.createNewVariable(command, progressResult => {
+      return api.createNewVariable(command, progressResult => {
         // console.log(progressResult)
       }).then(returnValue => {
         const { status, result } = returnValue

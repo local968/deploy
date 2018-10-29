@@ -667,7 +667,7 @@ class CreateNewVariable extends Component {
       <div className={styles.newVariableRow}>
         <button className={classnames(styles.newVariableButton, styles.newVariableAdd, {
           [styles.disable]: this.loading
-        })} onClick={this.loading ? () => { } : this.handleAdd}>
+        })} onClick={this.loading ? null : this.handleAdd}>
           <span>{this.loading ? <Icon type="loading" theme="outlined" /> : 'Add'}</span>
         </button>
         <button className={classnames(styles.newVariableButton, styles.newVariableCancel)} onClick={onClose}>
