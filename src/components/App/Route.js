@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { Route, Redirect, Switch } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Route, Redirect, Switch} from 'react-router-dom';
 import styles from './styles.module.css';
-import { inject } from "mobx-react";
-import { Background } from 'components/Common';
+import {inject} from "mobx-react";
+import {Background} from 'components/Common';
 import Detail from 'components/Detail';
 import Deploy from 'components/Deploy';
 import Main from 'components/Main';
@@ -18,13 +18,12 @@ class defaultRouter extends Component {
   render() {
     return (
       <Switch>
-        <Route exact path="/" component={Home} />
-        <Route exact path="/deploy" component={Deploy} />
-        <Route exact path="/test" component={() => 'test/test'} />
-        <Route path="/project/:pid" component={Main} />
-        <Route path="/deploy/project/:id" component={Detail} />
-        <Route exact path="/community" component={Community} />
-        <Route path="" render={() => <Redirect to="/" />} />
+        <Route exact path="/" component={Home}/>
+        <Route exact path="/deploy" component={Deploy}/>
+        <Route exact path="/test" component={() => 'test/test'}/>
+        <Route path="/project/:pid" component={Main}/>
+        <Route path="/deploy/project/:id" component={Detail}/>
+        <Redirect to="/"/>
       </Switch>
     )
   }
@@ -36,13 +35,12 @@ export class LoginRouter extends Component {
   render() {
     return (
       <div className={styles.warp}>
-        <Route exact path="/community" component={Community} />
-        <Background />
+        <Background/>
         <Switch>
-          <Route exact path="/" component={SignIn} />
-          <Route exact path="/signup" component={SignUp} />
-          <Route exact path="/active" component={SignActive} />
-          <Route path="" render={() => <Redirect to="/" />} />
+          <Route exact path="/" component={SignIn}/>
+          <Route exact path="/signup" component={SignUp}/>
+          <Route exact path="/active" component={SignActive}/>
+          <Redirect to="/"/>
         </Switch>
       </div>
     );
