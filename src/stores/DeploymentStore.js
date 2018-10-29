@@ -124,8 +124,7 @@ class DeploymentStore {
     );
   }
 
-  async addDeployment(projectId, projectName, modelName, modelType, modelList) {
-    console.log(modelList)
+  async addDeployment(projectId, projectName, modelName, modelType, modelList, csvScript) {
     const data = {
       deploymentOptions: {},
       modelName,
@@ -133,6 +132,7 @@ class DeploymentStore {
       projectId,
       projectName,
       modelList,
+      csvScript,
       performanceOptions: {}
     };
     const api = await socketStore.ready();

@@ -10,10 +10,12 @@ const { userModelingRestriction, userStorageRestriction } = require('restriction
 
 const router = new Router()
 
-router.post('/check', (req, res) => {
+router.post('/check', async (req, res) => {
   const fileSize = req.body.fileSize
   const userId = req.session.userId
   const type = req.body.type
+  const projectId = req.body.projectId
+  const host = JSON.parse(await redis.hget(`project:${projectId}`, 'host'))
   if (!fileSize || !userId || !type) return res.json({
     status: 404,
     message: 'missing params',
@@ -24,18 +26,18 @@ router.post('/check', (req, res) => {
     message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
     error: 'modeling file too large'
   })
-  redis.get(`user:${userId}:upload`).then(size => {
-    if (parseInt(size) + parseInt(fileSize) > userStorageRestriction[req.session.user.level]) return res.json({
-      status: 417,
-      message: 'Your usage of storage space has reached the max restricted by your current lisense.',
-      error: 'storage space full'
-    })
-    const token = crypto.createHash('md5').update(userId + type + fileSize + config.secret).digest('hex')
-    res.json({
-      status: 200,
-      message: 'ok',
-      token
-    })
+  const size = redis.get(`user:${userId}:upload`)
+  if (parseInt(size) + parseInt(fileSize) > userStorageRestriction[req.session.user.level]) return res.json({
+    status: 417,
+    message: 'Your usage of storage space has reached the max restricted by your current lisense.',
+    error: 'storage space full'
+  })
+  const token = crypto.createHash('md5').update(userId + type + fileSize + config.secret).digest('hex')
+  res.json({
+    status: 200,
+    message: 'ok',
+    token,
+    host
   })
 })
 
@@ -98,6 +100,12 @@ router.post('/sample', (req, res) => {
     if (!data) return res.json({ status: 202, message: 'file not exist' })
     res.json({ status: 200, message: 'ok', fileId: data })
   })
+})
+
+router.get('/test', async (req, res) => {
+  const projectId = req.query.id
+  const host = await redis.hget(`project:${projectId}`, 'host')
+  res.json(JSON.parse(host))
 })
 
 function saveSample() {

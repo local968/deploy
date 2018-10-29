@@ -517,7 +517,7 @@ export default class Project {
         const { progress, name, path } = result
         if (progress === "start") return
         if (name === "csvHeader") {
-          const url = `http://${config.uploadServer}/download/${path}`
+          const url = `http://${this.host}:8088/download/${path}`
           Papa.parse(url, {
             download: true,
             preview: 100,
