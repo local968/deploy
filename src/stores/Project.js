@@ -78,6 +78,9 @@ export default class Project {
   @observable histgramPlots = {};
   @observable univariatePlots = {};
   @observable correlationMatrixImg = '';
+  @observable csvScript = [];
+  @observable newVariable = [];
+
   //not save
   @observable targetMapTemp = {};
 
@@ -496,7 +499,7 @@ export default class Project {
       data.noCompute = true;
     }
 
-    if(this.firstEtl) {
+    if (this.firstEtl) {
       data.csvLocation = [...uploadFileName]
     }
     this.etling = true;
@@ -534,9 +537,8 @@ export default class Project {
         this.etling = false;
         let { result, status, message } = returnValue;
 
-        if(status !== 200) return antdMessage.error(message)
+        if (status !== 200) return antdMessage.error(message)
         this.setProperty(result)
-
         when(
           () => !!this.uploadData.length,
           () => this.updateProject(this.next())
@@ -553,17 +555,19 @@ export default class Project {
       const nextStep = subStepActive + 1;
       return this.nextSubStep(nextStep, curStep)
     } else {
-      return false
+      return {}
     }
   }
 
   @action
   dataView = () => {
+    const exp = this.csvScript.join(";")
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'dataView'
       };
+      if(exp) command.csvScript = exp.replace(/\|/g, ",")
       api.dataView(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
@@ -594,24 +598,27 @@ export default class Project {
     this.etl();
   }
 
-  @action 
-  addNewVariable = exp => {
-    console.log(exp)
+  @action
+  addNewVariable = (variables, exp) => {
+    const fullExp = `${variables.join(",")}=${exp}`
+    const exps = [...this.csvScript, fullExp]
+    
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'createNewVariable',
-        csvScript: exp
+        csvScript: exps.join(";").replace(/\|/g, ",")
       };
       api.createNewVariable(command, progressResult => {
-          console.log(progressResult)
+        // console.log(progressResult)
       }).then(returnValue => {
-        console.log(returnValue)
-        // const { status, result } = returnValue
-        // if (status < 0) return alert("dataview error")
-        // this.setProperty({
-        //   dataViews: result.data
-        // })
+        const { status, result } = returnValue
+        if (status < 0) return antdMessage.error(result.msg)
+        const newVariable = [...this.newVariable, ...variables]
+        this.updateProject({
+          csvScript: exps,
+          newVariable 
+        })
       })
     })
   }
@@ -650,7 +657,8 @@ export default class Project {
       target,
       dataHeader,
       speed,
-      overfit
+      overfit,
+      csvScript
     } = this;
     const command = 'train';
 
@@ -665,6 +673,7 @@ export default class Project {
 
     const featureLabel = dataHeader.filter(d => d !== target);
 
+    const exps = csvScript.join(";")
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -686,6 +695,8 @@ export default class Project {
       command
     };
 
+    if(exps) trainData.csvScript = exps.replace(/\|/g, ",")
+
     this.modeling(trainData)
   }
 
@@ -696,7 +707,8 @@ export default class Project {
       target,
       dataHeader,
       speed,
-      overfit
+      overfit,
+      csvScript
     } = this;
     const command = 'train';
 
@@ -720,6 +732,7 @@ export default class Project {
     this.models = []
 
     const featureLabel = dataHeader.filter(d => d !== target);
+    const exps = csvScript.join(";")
 
     const trainData = {
       problemType,
@@ -736,6 +749,8 @@ export default class Project {
       randSeed: this.randSeed,
       algorithms: [...this.algorithms]
     };
+
+    if(exps) trainData.csvScript = exps.replace(/\|/g, ",")
 
     this.modeling(trainData)
   }
@@ -836,11 +851,13 @@ export default class Project {
   }
 
   preTrainImportance = () => {
+    const exp = this.csvScript.join(";")
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'preTrainImportance'
       };
+      if(exp) command.csvScript = exp.replace(/\|/g, ",")
       api.preTrainImportance(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
@@ -869,13 +886,19 @@ export default class Project {
     })
   }
 
-  univariatePlot = (fields) => {
+  univariatePlot = field => {
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'univariatePlot',
       };
-      if (fields) command.feature_label = fields
+      if (field) {
+        if(this.newVariable.includes(field)) {
+          command.feature_label = [...this.newVariable]
+        }else{
+          command.feature_label = [field]
+        }
+      }
       api.univariatePlot(command, progressResult => {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
@@ -888,13 +911,19 @@ export default class Project {
     })
   }
 
-  histgramPlot = (fields) => {
+  histgramPlot = field => {
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'histgramPlot',
       };
-      if (fields) command.feature_label = fields
+      if (field) {
+        if(this.newVariable.includes(field)) {
+          command.feature_label = [...this.newVariable]
+        }else{
+          command.feature_label = [field]
+        }
+      }
       api.histgramPlot(command, progressResult => {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;

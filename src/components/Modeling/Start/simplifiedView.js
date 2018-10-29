@@ -17,15 +17,6 @@ export default class SimplifiedView extends Component {
   @observable showCorrelation = false
   @observable visible = false
 
-  getHistograms = value => {
-    if (!value) {
-      value = []
-    } else {
-      value = [value]
-    }
-    this.props.project.histgramPlot(value)
-  }
-
   getCorrelationMatrix = () => {
     this.props.project.correlationMatrix()
   }
@@ -73,9 +64,10 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable } = project;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
+    const allVariables = [...rawHeader, ...newVariable]
     return <div className={styles.simplified}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -97,7 +89,7 @@ export default class SimplifiedView extends Component {
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
                 type='histogram'
-                getPath={this.getHistograms.bind(null, target)}
+                getPath={project.histgramPlot.bind(null, target)}
                 path={histgramPlots[target]}
               />} />}
             <span>Compute</span>
@@ -164,7 +156,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.tableTh}><span>Max</span></div>
         </div>
         <div className={styles.tableBody}>
-          {rawHeader.sort((a, b) => {
+          {allVariables.sort((a, b) => {
             return preImportance ? this.sort * (preImportance[a] - preImportance[b]) : 0
           }).map((h, i) => {
             if (h === target) return null;
@@ -183,24 +175,6 @@ export default class SimplifiedView extends Component {
 class SimplifiedViewRow extends Component {
   @observable histograms = false
   @observable univariant = false
-
-  getHistograms = value => {
-    if (!value) {
-      value = []
-    } else {
-      value = [value]
-    }
-    this.props.project.histgramPlot(value)
-  }
-
-  getUnivariant = value => {
-    if (!value) {
-      value = []
-    } else {
-      value = [value]
-    }
-    this.props.project.univariatePlot(value)
-  }
 
   showHistograms = () => {
     this.histograms = true
@@ -233,7 +207,7 @@ class SimplifiedViewRow extends Component {
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type='histgram'
-            getPath={this.getHistograms.bind(null, value)}
+            getPath={project.histgramPlot.bind(null, value)}
             path={project.histgramPlots[value]}
           />} />}
         <span>Compute</span>
@@ -246,7 +220,7 @@ class SimplifiedViewRow extends Component {
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideUnivariant}
             type='univariate'
-            getPath={this.getUnivariant.bind(null, value)}
+            getPath={project.univariatePlot.bind(null, value)}
             path={project.univariatePlots[value]}
           />} />}
         <span>Compute</span>
@@ -301,6 +275,7 @@ class CreateNewVariable extends Component {
   @observable hintStatus = false
   @observable hints = []
   @observable exp = ''
+  @observable name = ''
   @observable showFunction = {}
   @observable active = 0
   //光标结束位置
@@ -407,11 +382,23 @@ class CreateNewVariable extends Component {
   }
 
   handleAdd = () => {
-    const checked = this.checkExp(this.exp)
+    const { name, exp } = this
+    if (!name) {
+      antdMessage.error("name is empty")
+      return
+    }
+    const checked = this.checkExp(exp)
     if (!checked.isPass) return antdMessage.error(checked.message)
     const num = checked.num
-    console.log(this.exp, num)
-    this.props.addNewVariable(this.exp)
+    const nameArray = []
+    if (num === 1) {
+      nameArray.push("@r2_" + name)
+    } else {
+      for (let n = 0; n < num; n++) {
+        nameArray.push(`@r2_${name}_${n + 1}`)
+      }
+    }
+    this.props.addNewVariable(nameArray, exp)
   }
 
   checkExp = _expression => {
@@ -494,7 +481,7 @@ class CreateNewVariable extends Component {
               functions += checked.functions
               seniorFunctions += checked.seniorFunctions
             }
-          }else{
+          } else {
             const next = exp.slice(end + 1)
             const nextArray = next.split(baseOptReg)
             nextArray.shift()
@@ -611,7 +598,7 @@ class CreateNewVariable extends Component {
           const first = str.slice(0, 1)
           const last = str.slice(-1)
           if (first !== "[" || last !== "]") return { isPass: false, message: `Unexpected identifier: ${n}` }
-          const array = str.slice(1,-1).split("|")
+          const array = str.slice(1, -1).split("|")
           for (let item of array) {
             if (!item || isNaN(item.trim())) return { isPass: false, message: `${item} must be number` }
           }
@@ -629,9 +616,14 @@ class CreateNewVariable extends Component {
     return { isPass: true, message: "ok", num: num }
   }
 
-  factorial(n) {
+  factorial = (n) => {
     if (n < 2) return 1
     return n * this.factorial(n - 1)
+  }
+
+  handleNameChange = e => {
+    const value = e.target.value.trim()
+    this.name = value
   }
 
   render() {
@@ -641,7 +633,10 @@ class CreateNewVariable extends Component {
 
     return visible && <div className={styles.newVariableBlock}>
       <div className={styles.newVariableRow}>
-        <span>Fx =</span>
+        <div className={styles.newVariableName}>
+          <input className={styles.newVariableInput} placeholder="name" value={this.name} onChange={this.handleNameChange} />
+        </div>
+        <span>=</span>
         <div className={styles.newVariableFx}>
           <input className={styles.newVariableInput} placeholder="fx" value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onBlur={this.hideHint} onSelect={this.onSelect} />
           {this.hintStatus && <div className={styles.newVariableHintList}>

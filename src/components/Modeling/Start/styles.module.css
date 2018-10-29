@@ -867,9 +867,16 @@ span.advancedDesc {
   color: #4a4a4a;
 }
 
+.newVariableName {
+  display: flex;
+  width: 1em;
+  margin-right: 0.05em;
+  position: relative;
+}
+
 .newVariableFx {
   display: flex;
-  width: 4em;
+  width: 3em;
   margin-left: 0.05em;
   position: relative;
 }

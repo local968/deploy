@@ -34,8 +34,9 @@ export default class ModelResult extends Component {
         return true
       }
     }).filter(v => !!v)
+    const exps = project.csvScript.join(";").replace(/\|/g, ",")
     this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.name, current.problemType, modelList)
+      .addDeployment(project.id, project.name, current.name, current.problemType, modelList, exps)
       .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 
