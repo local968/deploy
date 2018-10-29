@@ -43,6 +43,7 @@ async function scheduleHandler() {
         command: "deploy2",
         solution: deployment.modelName
       }
+      if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
       await command(request, data => {
         result = { ...result, ...data.result }

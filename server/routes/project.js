@@ -194,7 +194,6 @@ wss.register("addProject", async (message, socket) => {
   const id = await redis.incr("node:project:count")
   const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id })
   const params = mapObjectToArray({ id, userId, host: result.host });
-  console.log(params)
   return createOrUpdate(id, userId, params, true)
 })
 
