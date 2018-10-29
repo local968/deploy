@@ -8,7 +8,7 @@ const command = require('../command')
 const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
 
 function query(key, params) {
-  const Field = ["id", "name", "createTime", "curStep"]
+  const Field = ["id", "name", "createTime", "curStep", "host"]
   const pipeline = redis.pipeline();
   pipeline.zcard(key)
   pipeline.zrevrangebyscore(key, params)

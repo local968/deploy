@@ -205,7 +205,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, importance, colType, value, project, uniqueValues, isChecked, handleCheck } = this.props;
+    const { data, importance, colType, value, project, uniqueValues, isChecked, handleCheck, host } = this.props;
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
@@ -274,7 +274,7 @@ class SimplifiedViewPlot extends Component {
 
   render() {
     const { onClose, path, type, host } = this.props;
-    const imgPath = path ? `http://${host}/download/${path}` : ''
+    const imgPath = path ? `http://${host}:8088/download/${path}` : ''
     return <div className={styles.plot}>
       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}

@@ -30,6 +30,7 @@ export default class Project {
   @observable id = "";
   @observable exist = true;
   @observable loading = false;
+  @observable host = '';
 
   //step
   @observable mainStep = 0;
