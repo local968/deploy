@@ -71,7 +71,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable } = project;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, host } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     const allVariables = [...rawHeader, ...newVariable]
@@ -98,6 +98,7 @@ export default class SimplifiedView extends Component {
                 type='histogram'
                 getPath={project.histgramPlot.bind(null, target)}
                 path={histgramPlots[target]}
+                host={host}
               />} />}
             <span>Compute</span>
           </div>
@@ -139,6 +140,7 @@ export default class SimplifiedView extends Component {
               type='correlationMatrix'
               getPath={this.getCorrelationMatrix}
               path={project.correlationMatrixImg}
+              host={host}
             />} />}
           <span>Check Correlation Matric</span>
         </div>
@@ -217,6 +219,7 @@ class SimplifiedViewRow extends Component {
             type='histgram'
             getPath={project.histgramPlot.bind(null, value)}
             path={project.histgramPlots[value]}
+            host={host}
           />} />}
         <span>Compute</span>
       </div>
@@ -230,6 +233,7 @@ class SimplifiedViewRow extends Component {
             type='univariate'
             getPath={project.univariatePlot.bind(null, value)}
             path={project.univariatePlots[value]}
+            host={host}
           />} />}
         <span>Compute</span>
       </div>
@@ -269,8 +273,8 @@ class SimplifiedViewPlot extends Component {
   }
 
   render() {
-    const { onClose, path, type } = this.props;
-    const imgPath = path ? `http://${config.uploadServer}/download/${path}` : ''
+    const { onClose, path, type, host } = this.props;
+    const imgPath = path ? `http://${host}/download/${path}` : ''
     return <div className={styles.plot}>
       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
