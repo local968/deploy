@@ -567,7 +567,7 @@ export default class Project {
         projectId: this.id,
         command: 'dataView'
       };
-      if(exp) command.csvScript = exp.replace(/\|/g, ",")
+      if (exp) command.csvScript = exp.replace(/\|/g, ",")
       api.dataView(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
@@ -600,9 +600,9 @@ export default class Project {
 
   @action
   addNewVariable = (variables, exp) => {
-    const fullExp = `${variables.join(",")}=${exp}`
+    const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     const exps = [...this.csvScript, fullExp]
-    
+
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -613,12 +613,16 @@ export default class Project {
         // console.log(progressResult)
       }).then(returnValue => {
         const { status, result } = returnValue
-        if (status < 0) return antdMessage.error(result.msg)
+        if (status < 0) {
+          antdMessage.error(result.msg)
+          return false
+        }
         const newVariable = [...this.newVariable, ...variables]
         this.updateProject({
           csvScript: exps,
-          newVariable 
+          newVariable
         })
+        return true
       })
     })
   }
@@ -695,7 +699,7 @@ export default class Project {
       command
     };
 
-    if(exps) trainData.csvScript = exps.replace(/\|/g, ",")
+    if (exps) trainData.csvScript = exps.replace(/\|/g, ",")
 
     this.modeling(trainData)
   }
@@ -750,7 +754,7 @@ export default class Project {
       algorithms: [...this.algorithms]
     };
 
-    if(exps) trainData.csvScript = exps.replace(/\|/g, ",")
+    if (exps) trainData.csvScript = exps.replace(/\|/g, ",")
 
     this.modeling(trainData)
   }
@@ -857,7 +861,7 @@ export default class Project {
         projectId: this.id,
         command: 'preTrainImportance'
       };
-      if(exp) command.csvScript = exp.replace(/\|/g, ",")
+      if (exp) command.csvScript = exp.replace(/\|/g, ",")
       api.preTrainImportance(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
@@ -893,9 +897,9 @@ export default class Project {
         command: 'univariatePlot',
       };
       if (field) {
-        if(this.newVariable.includes(field)) {
+        if (this.newVariable.includes(field)) {
           command.feature_label = [...this.newVariable]
-        }else{
+        } else {
           command.feature_label = [field]
         }
       }
@@ -918,9 +922,9 @@ export default class Project {
         command: 'histgramPlot',
       };
       if (field) {
-        if(this.newVariable.includes(field)) {
+        if (this.newVariable.includes(field)) {
           command.feature_label = [...this.newVariable]
-        }else{
+        } else {
           command.feature_label = [field]
         }
       }

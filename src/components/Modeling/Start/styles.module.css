@@ -966,3 +966,10 @@ span.advancedDesc {
 .hasList {
   left: 100%;
 }
+
+.disable {
+  cursor: not-allowed;
+  background-color: #d3d3d3;
+  color: #aaaaaa;
+  background-image: none;
+}

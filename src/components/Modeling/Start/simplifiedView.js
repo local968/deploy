@@ -150,7 +150,7 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Histogram</span></div>
           <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Univariant Plot</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
-            <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort===1?'up':'down'}`} theme="outlined" /></span></div>
+            <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>Importance</span>
             <div className={styles.tableReload} onClick={this.reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
             <Hint themeStyle={{ fontSize: '1rem' }} content='It reflect the importance of the predictor to the target variable.' />
@@ -289,6 +289,7 @@ class CreateNewVariable extends Component {
   //光标结束位置
   @observable inputPosition = 0
   @observable myFunction = {}
+  @observable loading = false
 
   hideHint = () => {
     this.hintStatus = false
@@ -400,13 +401,17 @@ class CreateNewVariable extends Component {
     const num = checked.num
     const nameArray = []
     if (num === 1) {
-      nameArray.push("@r2_" + name)
+      nameArray.push("r2_" + name)
     } else {
       for (let n = 0; n < num; n++) {
-        nameArray.push(`@r2_${name}_${n + 1}`)
+        nameArray.push(`r2_${name}_${n + 1}`)
       }
     }
-    this.props.addNewVariable(nameArray, exp)
+    this.loading = true
+    this.props.addNewVariable(nameArray, exp).then(result => {
+      this.loading = false
+      if (result) this.props.onClose()
+    })
   }
 
   checkExp = _expression => {
@@ -660,8 +665,10 @@ class CreateNewVariable extends Component {
         </div>
       </div>
       <div className={styles.newVariableRow}>
-        <button className={classnames(styles.newVariableButton, styles.newVariableAdd)} onClick={this.handleAdd}>
-          <span>Add</span>
+        <button className={classnames(styles.newVariableButton, styles.newVariableAdd, {
+          [styles.disable]: this.loading
+        })} onClick={this.loading ? () => { } : this.handleAdd}>
+          <span>{this.loading ? <Icon type="loading" theme="outlined" /> : 'Add'}</span>
         </button>
         <button className={classnames(styles.newVariableButton, styles.newVariableCancel)} onClick={onClose}>
           <span>Cancel</span>
