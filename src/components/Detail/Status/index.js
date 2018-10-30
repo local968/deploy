@@ -141,7 +141,7 @@ export default class List extends Component {
                       <a
                         className={styles.results}
                         target="_blank"
-                        href={`http://${(project ? project.host : "")}:8080/download/${s.schedule.result.resultPath}`}
+                        href={`http://${(project ? project.host : "")}/download/${s.schedule.result.resultPath}`}
                       >
                         Download
                       </a>
