@@ -10,6 +10,7 @@ class ProjectStore {
 
   @observable list = [];
   @observable total = 0;
+  @observable keywords = '';
   @observable toolsOption = {
     current: 1,
     limit: 10,
