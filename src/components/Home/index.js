@@ -101,17 +101,21 @@ export default class Home extends Component {
     });
   }
 
+  changeWords = v => {
+    this.props.projectStore.keywords = v;
+  }
+
   render() {
     const { projectStore } = this.props;
-    const { toolsOption, total, list: sortProjects, changeOption, changePage } = projectStore;
+    const { toolsOption, total, list: sortProjects, changeOption, changePage, keywords } = projectStore;
     return <div className={classnames(styles.home)} >
-      <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} />
+      <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} keywords={keywords} changeWords={this.changeWords} />
       <div className={classnames(styles.projects)}>
         <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
           <img src={addProjectIcon} alt="New Project" />
           <span>Create New Project</span>
         </div>
-        {sortProjects.map((project) => {
+        {sortProjects.filter(p => p.id.includes(keywords) || (p.name || "").includes(keywords)).map((project) => {
           return <Project project={project} selectId={this.selectId} actions={this.actions} key={"project-" + project.id} selected={this.ids.includes(project.id)} />
         })}
       </div>
@@ -194,11 +198,11 @@ class Project extends Component {
 @observer
 class Tools extends Component {
   render() {
-    const { toolsOption, total, changeOption, changePage } = this.props;
+    const { toolsOption, total, changeOption, changePage, keywords, changeWords } = this.props;
     return <div className={styles.tools}>
       <Search
-        value={toolsOption.keywords}
-        onChange={changeOption.bind(null, "keywords")}
+        value={keywords}
+        onChange={changeWords}
       />
       <Select
         title="Sort by"
