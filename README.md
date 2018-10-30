@@ -8,8 +8,8 @@ FRONTEND_PORT = PORT || process.env.FRONTEND_PORT
 BACKEND_PORT = PORT || process.env.BACKEND_PORT   
 后端端口单独设置   
 
-NGINX_HOST = '192.168.0.3:8088' || process.env.NGINX_HOST   
-nginx 上传服务器地址和端口   
+NGINX_PORT
+Nginx 上传服务器端口
 
 NGINX_BACKEND = 1 || process.env.NGINX_BACKEND   
 nginx backend   

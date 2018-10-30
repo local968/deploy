@@ -5,7 +5,7 @@ window.axios = axios
 export default (file, config = {}) => {
   config = {
     headers: { backend: _config.uploadBackend },
-    path: 'http://' + (config.host || _config.uploadServer) + ':8088/upload',
+    path: `http://${(config.host || _config.uploadServer)}:${_config.nginxPort}/upload`,
     ...config
   }
   const uploader = new Uploader(file, config)
