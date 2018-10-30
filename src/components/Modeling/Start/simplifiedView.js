@@ -274,7 +274,7 @@ class SimplifiedViewPlot extends Component {
 
   render() {
     const { onClose, path, type, host } = this.props;
-    const imgPath = path ? `http://${host}:${config.nginxPort}/download/${path}` : ''
+    const imgPath = path ? `http://${host}/download/${path}` : ''
     return <div className={styles.plot}>
       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
