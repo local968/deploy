@@ -102,10 +102,22 @@ router.post('/sample', (req, res) => {
   })
 })
 
-router.get('/test', async (req, res) => {
+router.get('/dataDefinition', async (req, res) => {
+  const userId = req.session.userId
+  if (!userId) return res.json({ status: 401, message: 'need login', error: 'need login' })
+  const rank = await redis.zrank(`user:${userId}:projects:createTime`, projectId)
+  if (rank === null) return redis.json({ status: 404, message: 'project not found.', error: 'project not found.' })
   const projectId = req.query.id
-  const host = await redis.hget(`project:${projectId}`, 'host')
-  res.json(JSON.parse(host))
+  const data = JSON.parse(await redis.hget(`project:${projectId}`, 'dataHeader'))
+  res.attachment('definition.csv');
+  res.type('csv')
+  res.send(data.join(','))
+})
+
+router.get('/test', async (req, res) => {
+  const userId = req.session.userId
+  const projectId = req.query.id
+  res.json(req.session)
 })
 
 function saveSample() {
