@@ -117,7 +117,8 @@ router.get('/dataDefinition', async (req, res) => {
 router.get('/test', async (req, res) => {
   const userId = req.session.userId
   const projectId = req.query.id
-  res.json(req.session)
+  const host = await redis.hget(`project:${projectId}`, 'host')
+  res.json(host)
 })
 
 function saveSample() {

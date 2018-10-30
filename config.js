@@ -8,9 +8,9 @@ const QUEUE_PERIOD = process.env.QUEUE_PERIOD || 60
 const SCHEDULE_PERIOD = process.env.SCHEDULE_PERIOD || 60
 const MAX_CONCURRENCY_SCHEDULE = process.env.MAX_CONCURRENCY_SCHEDULE || 2
 const SECRET = process.env.SECRET || 'FNcidLwifNC902LCC9f2C'
-const REDIS_SENTINEL_HOSTS = process.env.REDIS_SENTINEL_HOSTS || '192.168.0.3:16390,192.168.0.3:16391,192.168.0.3:16392'
+const REDIS_SENTINEL_HOSTS = process.env.REDIS_SENTINEL_HOSTS || '192.168.0.23:16390,192.168.0.23:16391,192.168.0.23:16392'
 
-const defaultConfig = {
+const config = {
   port: BACKEND_PORT,
   redis: {
     sentinels: REDIS_SENTINEL_HOSTS.split(',').map(host => ({
@@ -28,9 +28,4 @@ const defaultConfig = {
   secret: SECRET
 }
 
-let localConfig = {};
-try {
-  localConfig = require('./local_config.js');
-} catch (e) { }
-
-module.exports = { ...defaultConfig, ...localConfig };
+module.exports = config
