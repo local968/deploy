@@ -131,7 +131,7 @@ export class DataIssue extends Component {
           {num === 0 && <div className={styles.reasonTitle}><span>Possible Reasons</span></div>}
           <div className={styles.methodBox}>
             <div className={styles.method}>
-              <div className={styles.reason}><span>Mr.One will fix these issues automaticly</span></div>
+              <div className={styles.reason}><span>R2 Learn will fix these issues automaticly</span></div>
               <div className={styles.button} onClick={editFixes}>
                 <button><span>Edit the Fixes</span></button>
               </div>

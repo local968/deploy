@@ -222,7 +222,7 @@ export default class DataConnect extends Component {
           <a>Edit</a>
         </div> */}
         <div className={styles.uploadRow}>
-          {this.block('From Mr.One', sampleIcon, this.showSample)}
+          {this.block('From R2 Learn', sampleIcon, this.showSample)}
           {!!this.process ? (
             this.block('From Computer', localFileIcon)
           ) : (
@@ -252,7 +252,7 @@ export default class DataConnect extends Component {
           </span>
         </div>
         <div className={styles.uploadRow}>
-          {this.block('From Mr.One', defileIcon)}
+          {this.block('From R2 Learn', defileIcon)}
         </div> */}
         {this.sample && (
           <DataSample
