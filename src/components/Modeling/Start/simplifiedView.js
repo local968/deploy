@@ -97,7 +97,8 @@ export default class SimplifiedView extends Component {
               content={<SimplifiedViewPlot onClose={this.hide}
                 type='histogram'
                 getPath={project.histgramPlot.bind(null, target)}
-                path={`${histgramPlots[target]}?projectId=${id}`}
+                path={histgramPlots[target]}
+                id={id}
               />} />}
             <span>Compute</span>
           </div>
@@ -138,7 +139,8 @@ export default class SimplifiedView extends Component {
             content={<SimplifiedViewPlot onClose={this.hideCorrelationMatrix}
               type='correlationMatrix'
               getPath={this.getCorrelationMatrix}
-              path={`${project.correlationMatrixImg}?projectId=${id}`}
+              path={project.correlationMatrixImg}
+              id={id}
             />} />}
           <span>Check Correlation Matric</span>
         </div>
@@ -216,7 +218,8 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type='histgram'
             getPath={project.histgramPlot.bind(null, value)}
-            path={`${project.histgramPlots[value]}?projectId=${id}`}
+            path={project.histgramPlots[value]}
+            id={id}
           />} />}
         <span>Compute</span>
       </div>
@@ -229,7 +232,8 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideUnivariant}
             type='univariate'
             getPath={project.univariatePlot.bind(null, value)}
-            path={`${project.univariatePlots[value]}?projectId=${id}`}
+            path={project.univariatePlots[value]}
+            id={id}
           />} />}
         <span>Compute</span>
       </div>
@@ -269,8 +273,8 @@ class SimplifiedViewPlot extends Component {
   }
 
   render() {
-    const { onClose, path, type } = this.props;
-    const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}` : ''
+    const { onClose, path, type, id } = this.props;
+    const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
     return <div className={styles.plot}>
       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
