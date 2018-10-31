@@ -29,7 +29,14 @@ const hpm = proxy({
   },
   router: req => {
     return "http://" + req.proxyHost
-  }
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    const header = {...proxyRes.headers}
+    delete header.connection
+    res.headers = header
+    // proxyRes.headers[""] = res.headers;     // add new header to response
+    // delete proxyRes.headers['x-removed'];       // remove header from response
+}
 })
 
 router.use("/*", getHost, hpm)
