@@ -1,5 +1,4 @@
-const PORT = process.env.PORT || 8080
-const BACKEND_PORT = process.env.BACKEND_PORT || PORT
+const BACKEND_PORT = process.env.BACKEND_PORT || '8080'
 const REDIS_USERNAME = process.env.REDIS_USERNAME || 'redismaster'
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis123321eq'
 const REQUEST_QUEUE = process.env.REQUEST_QUEUE || 'taskQueue'
@@ -37,7 +36,5 @@ const config = {
   maxConcurrencySchedule: MAX_CONCURRENCY_SCHEDULE,
   secret: SECRET
 }
-
-console.log(config)
 
 module.exports = config

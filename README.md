@@ -1,42 +1,33 @@
-## System Environment
-PORT = 8080 || process.env.PORT
-Webserver port   
+## 前端部分
+```
+process.env.REACT_APP_FRONTEND_HOST || window.location.hostname
+// 前端使用该地址连接到后端服务器
 
-FRONTEND_PORT = PORT || process.env.FRONTEND_PORT   
-如果后端对外接口并非第一项中的PORT(如nginx转发) 则需要使用该参数调整前端连接到后端的接口   
+process.env.REACT_APP_FRONTEND_PORT || '8080'
+// 前端页面使用该接口连接到后端服务器
 
-BACKEND_PORT = PORT || process.env.BACKEND_PORT   
-后端端口单独设置   
+process.env.REACT_APP_NGINX_BACKEND || 1
+// 无需修改 但在nginx配置内需要主要 有 backend1 的对应配置
 
-NGINX_PORT
-Nginx 上传服务器端口
+```
 
-NGINX_BACKEND = 1 || process.env.NGINX_BACKEND   
-nginx backend   
+## 后端部分
+```
+process.env.BACKEND_PORT || '8080'
+// 后端服务启动端口
 
-SECRET = 'FNcidLwifNC902LCC9f2C' || process.env.SECRET   
-session 密码验证 上传验证 都用到了改secret   
+process.env.REDIS_USERNAME || 'redismaster'
+process.env.REDIS_PASSWORD || 'redis123321eq'
+// redis 账户名密码
 
-REDIS_SENTINEL_HOSTS = process.env.REDIS_SENTINEL_HOSTS || '192.168.0.3:16390,192.168.0.3:16391,192.168.0.3:16392'
-redis 哨兵模式的N个地址，以逗号分隔   
+process.env.REDIS_TYPE || 1 // 1 standalone 2 sentinel
+// redis 连接模式 1->单机模式 2->哨兵模式 
 
-REDIS_USERNAME = 'redismaster' || process.env.REDIS_USERNAME   
-redis 用户名   
+process.env.REDIS_SENTINEL_HOSTS || '192.168.0.23:16390,192.168.0.23:16391,192.168.0.23:16392'
+// redis 哨兵模式下连接信息 
+const REDIS_HOST = process.env.REDIS_HOST || '192.168.0.23:6376'
+// redis 单机模式下连接信息
 
-REDIS_PASSWORD = 'redis123321eq' || process.env.REDIS_PASSWORD   
-redis密码   
-
-REQUEST_QUEUE = 'taskQueue' || process.env.REQUEST_QUEUE   
-redis 任务请求队列名称   
-
-RESULT_QUEUE = 'resultDataQueue' || process.env.RESULT_QUEUE   
-redis 任务结果队列名称   
-
-QUEUE_PERIOD = 60 || process.env.QUEUE_PERIOD   
-队列循环周期(秒)   
-
-SCHEDULE_PERIOD = 60 || process.env.SCHEDULE_PERIOD   
-计划任务循环周期(秒)   
-
-MAX_CONCURRENCY_SCHEDULE = 2 || process.env.MAX_CONCURRENCY_SCHEDULE   
-最大并发计划任务
+process.env.SECRET || 'FNcidLwifNC902LCC9f2C'
+// Secret
+```

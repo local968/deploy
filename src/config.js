@@ -1,15 +1,11 @@
-const PORT = process.env.PORT || 8080
-const FRONTEND_PORT = process.env.FRONTEND_PORT || PORT
-const NGINX_BACKEND = process.env.NGINX_BACKEND || 1
+const FRONTEND_HOST = process.env.REACT_APP_FRONTEND_HOST || window.location.hostname
+const FRONTEND_PORT = process.env.REACT_APP_FRONTEND_PORT || '8080'
+const NGINX_BACKEND = process.env.REACT_APP_NGINX_BACKEND || 1
 
-const defaultConfig = {
+const config = {
   uploadBackend: NGINX_BACKEND,
   port: FRONTEND_PORT,
+  host: FRONTEND_HOST
 }
 
-let localConfig = {}
-try {
-  localConfig = require('./local_config.js');
-} catch (e) { }
-
-export default { ...defaultConfig, ...localConfig }
+export default config
