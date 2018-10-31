@@ -7,17 +7,9 @@ const _publishes = []
 
 const init = (server, sessionParser) => {
   const wss = new WebSocket.Server({
-
-    verifyClient: (info, done) => {
-      // console.log('Parsing session from request...');
-      sessionParser(info.req, {}, () => {
-        // console.log('Session is parsed!');
-        // We can reject the connection by returning false to done(). For example,
-        // reject here if user is unknown.
-        done(info.req.session.userId);
-      });
-    },
-    server
+    verifyClient: (info, done) => sessionParser(info.req, {}, () => done(info.req.session.userId)),
+    server,
+    path: '/ws'
   });
 
   wss.api = []

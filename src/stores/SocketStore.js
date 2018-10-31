@@ -6,7 +6,7 @@ import uuid from 'uuid'
 const debug = false
 
 class Socket extends EventEmitter {
-  url = "ws://" + config.host + ":" + config.port
+  url = "ws://" + config.host + ":" + config.port + '/ws'
   reconnectLock = false
   connectionError = false
   errorTimes = 0
