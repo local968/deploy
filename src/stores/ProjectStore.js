@@ -136,7 +136,6 @@ class ProjectStore {
       when(
         () => !this.loading,
         () => {
-          console.log([...this.list])
           if (!this.list.length) return resolve(false)
           this.currentId = id
           const project = this.list.find(row => {
