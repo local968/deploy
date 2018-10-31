@@ -3,7 +3,7 @@ import socketStore from "./SocketStore";
 import Project from "./Project";
 
 class ProjectStore {
-  @observable loading = false;
+  @observable loading = true;
   @observable watchList = false;
   @observable watch = [];
   @observable currentId = "";
@@ -130,19 +130,25 @@ class ProjectStore {
 
   @action
   initProject = id => {
-    when(
-      () => this.list.length,
-      () => {
-        this.currentId = id
-        const project = this.list.find(row => {
-          return row.id === id
+    return new Promise(resolve => {
+      when(
+        () => !this.loading,
+        () => {
+          if (!this.list.length) return resolve(false)
+          this.currentId = id
+          const project = this.list.find(row => {
+            return row.id === id
+          })
+          if (project) {
+            !this.watch.includes(id) && this.watch.push(id)
+            project.queryProject()
+            project.initModels()
+            return resolve(true)
+          } else {
+            return resolve(false)
+          }
         })
-        if (project) {
-          !this.watch.includes(id) && this.watch.push(id)
-          project.queryProject()
-          project.initModels()
-        }
-      }
+    }
     )
   }
 }

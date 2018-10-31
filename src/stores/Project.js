@@ -518,7 +518,7 @@ export default class Project {
         const { progress, name, path } = result
         if (progress === "start") return
         if (name === "csvHeader") {
-          const url = `http://${this.host}:${config.nginxPort}/download/${path}`
+          const url = `/redirect/download/${path}?projectId=${this.id}`
           Papa.parse(url, {
             download: true,
             preview: 100,
@@ -747,13 +747,18 @@ export default class Project {
       speed,
       overfit,
       command,
-      validationRate: this.validationRate / 100,
-      holdoutRate: this.holdoutRate / 100,
       sampling: this.resampling,
       maxTime: this.maxTime,
       randSeed: this.randSeed,
       algorithms: [...this.algorithms]
     };
+
+    if (this.dataRange === "all") {
+      trainData.validationRate = this.validationRate / 100
+      trainData.holdoutRate = this.holdoutRate / 100
+    } else {
+      trainData.splitBy = [this.customField, ...this.customRange]
+    }
 
     if (exps) trainData.csvScript = exps.replace(/\|/g, ",")
 

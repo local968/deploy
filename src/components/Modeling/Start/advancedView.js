@@ -93,7 +93,7 @@ export default class AdvancedView extends Component {
   }
 
   handleMeasurement = e => {
-
+    this.props.project.measurement = e.target.value
   }
 
   handleRunWith = v => {
@@ -451,7 +451,13 @@ class CustomRange extends Component {
   }
 
   handleSlider = value => {
-    this.props.project.customRange = value
+    const [minValue, maxValue] = value
+    const { dataViews, customField } = this.props
+    const data = customField ? dataViews[customField] : {}
+    const min = data.min || 0
+    const max = data.max || 0
+    const total = max - min || 1
+    this.props.project.customRange = [minValue * total / 100, maxValue * total / 100]
   }
 
   render() {
@@ -460,11 +466,13 @@ class CustomRange extends Component {
     const min = data.min || 0
     const max = data.max || 0
     const total = max - min || 1
-    const rangeMin = customRange[0] || min
-    const rangeMax = customRange[1] || max
+    const rangeMin = customRange[0] || (min + total * 0.8)
+    const rangeMax = customRange[1] || min + total * 0.95
+    const minPercent = Math.round(rangeMin / total * 100)
+    const maxPercent = Math.round(rangeMax / total * 100)
     const marks = {}
-    marks[rangeMin] = rangeMin
-    marks[rangeMax] = rangeMax
+    marks[minPercent] = rangeMin
+    marks[maxPercent] = rangeMax
     return <div className={styles.advancedCustomRange}>
       <div className={styles.advancedBlock}>
         <div className={classnames(styles.advancedTitle, styles.limit)}>
@@ -482,9 +490,9 @@ class CustomRange extends Component {
       <div className={styles.advancedBlock}>
         {!!customField && <div className={styles.advancedPercentBlock}>
           <div className={styles.advancedPercent}>
-            <div className={styles.advancedPercentInvalid} style={{ width: (rangeMin - min) / total * 100 + '%' }}></div>
-            <div className={styles.advancedPercentValid} style={{ width: (rangeMax - rangeMin) / total * 100 + '%' }}></div>
-            <div className={styles.advancedPercentInvalid} style={{ width: (max - rangeMax) / total * 100 + '%' }}></div>
+            <div className={styles.advancedPercentTrain} style={{ width: minPercent + '%' }}></div>
+            <div className={styles.advancedPercentValidation} style={{ width: (maxPercent - minPercent) + '%' }}></div>
+            <div className={styles.advancedPercentHoldout} style={{ width: (100 - maxPercent) + '%' }}></div>
           </div>
           <Range
             className={styles.range}
@@ -517,10 +525,10 @@ class CustomRange extends Component {
               justifyContent: 'center',
               cursor: 'pointer'
             }]}
-            value={[rangeMin, rangeMax]}
+            value={[minPercent, maxPercent]}
             onChange={this.handleSlider}
-            min={min}
-            max={max}
+            min={1}
+            max={99}
             allowCross={false}
             pushable={1}
             marks={marks}
