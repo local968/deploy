@@ -81,12 +81,13 @@ class ProjectStore {
     socketStore.ready().then(api => {
       api.queryProjectList(this.toolsOption).then(result => {
         const { status, message, list, count } = result
-        this.loading = false;
         if (status !== 200) {
+          this.loading = false;
           return alert(message)
         }
         this.list = list.map(row => new Project(row.id + "", row))
         this.total = count
+        this.loading = false;
       })
     })
   }
@@ -98,11 +99,12 @@ class ProjectStore {
     return socketStore.ready().then(api => {
       return api.addProject().then(result => {
         const { status, message, id } = result
-        this.loading = false;
         if (status !== 200) {
+          this.loading = false;
           return { error: message }
         }
         this.list.push(new Project(id + ""))
+        this.loading = false;
         return { id }
       })
     })
@@ -134,6 +136,7 @@ class ProjectStore {
       when(
         () => !this.loading,
         () => {
+          console.log([...this.list])
           if (!this.list.length) return resolve(false)
           this.currentId = id
           const project = this.list.find(row => {
