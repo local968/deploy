@@ -19,7 +19,7 @@ export default class Main extends Component {
       () => props.userStore.status === "login",
       () => props.projectStore.initProject(this.pid).then(init => {
         if(init) return
-        this.routing.push("/")
+        this.props.routing.push("/")
         message.error("project is not exist")
       })
     )

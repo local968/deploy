@@ -7,6 +7,7 @@ import styles from './list.module.css';
 import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 import { Popover } from 'antd';
+import config from 'config'
 // import config from 'config';
 
 @inject('scheduleStore', 'deploymentStore', 'routing')

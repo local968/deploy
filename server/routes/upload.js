@@ -42,6 +42,7 @@ router.post('/check', async (req, res) => {
 })
 
 router.post('/', (req, res) => {
+  console.log('upload nginx callback')
   const form = new formidable.IncomingForm();
   form.parse(req, function (error, fields, files) {
     const params = req.query
@@ -80,6 +81,7 @@ router.post('/', (req, res) => {
         fields.createdTime = moment().unix()
         fields.lineCount = lineCount
         fields.params = params
+        console.log('fields:', fields)
         redis.set('file:' + fileId, JSON.stringify(fields))
         redis.incrby(`user:${params.userId}:upload`, parseInt(params.fileSize))
         res.json({ fileId, status: 200, message: 'ok' })

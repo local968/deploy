@@ -38,6 +38,15 @@
     "uuid": "^3.3.2",
     "ws": "^6.0.0"
   },
+  "proxy": {
+    "/ws": {
+      "target": "ws://localhost:8080",
+      "ws": true
+    },
+    "/": {
+      "target": "http://localhost:8080"
+    }
+  },
   "scripts": {
     "start": "react-app-rewired build && rm -rf static && mv build static && node ./server/index.js",
     "dev": "react-app-rewired start & pm2 start deploy2-dev.json",

@@ -9,6 +9,7 @@ import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 // import config from 'config';
 import FUNCTIONS from './functions';
+import config from 'config'
 
 @observer
 export default class SimplifiedView extends Component {
