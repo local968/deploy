@@ -20,7 +20,7 @@ export default class Sider extends Component {
       <aside className={styles.sider}>
         <div className={styles.logo}>
           <img className={styles.logoImg} src={logo} alt="logo"/>
-          {/* <h2 className={styles.mrone}>Mr.one</h2> */}
+          {/* <h2 className={styles.mrone}>R2 Learn</h2> */}
         </div>
         <div className={styles.menus}>
           <a

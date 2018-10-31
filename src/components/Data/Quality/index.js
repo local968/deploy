@@ -115,7 +115,7 @@ export default class DataQuality extends Component {
           </div>}
           {issues.dataIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span>Some data issues are found. Mr.One will fix them automatically, you can also fix them by clicking the colored cell.</span>
+            <span>Some data issues are found. R2 Learn will fix them automatically, you can also fix them by clicking the colored cell.</span>
           </div>}
         </div>
       </div>
@@ -165,13 +165,13 @@ export default class DataQuality extends Component {
       <Modal content={<FixIssue project={project} closeFixes={this.closeFixes} saveDataFixes={this.saveDataFixes} />}
         visible={this.visible}
         width='12em'
-        title='How Mr.One Will Fix the Issues'
+        title='How R2 Learn Will Fix the Issues'
         onClose={this.closeFixes}
       />
       <Modal content={<SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes} />}
         visible={this.edit}
         width='12em'
-        title='How Mr.One Will Fix the Issues'
+        title='How R2 Learn Will Fix the Issues'
         onClose={this.closeTarget}
       />
     </div>

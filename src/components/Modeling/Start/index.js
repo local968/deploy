@@ -45,7 +45,7 @@ export default class StartTrain extends Component {
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want Mr.One to build the model automatically, choose
+                  If you want R2 Learn to build the model automatically, choose
                   automatic modeling.
                 </span>
               </div>
