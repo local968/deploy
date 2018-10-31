@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import { Popover } from 'antd';
 import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
-import config from 'config'
+// import config from 'config'
 
 @inject('deploymentStore', 'scheduleStore', 'projectStore')
 @observer

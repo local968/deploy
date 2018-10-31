@@ -9,7 +9,7 @@ import sourceIcon from './icon-data-source.svg';
 // import databaseIcon from './icon-database.svg';
 import fileIcon from './icon-file-local.svg';
 // import serverIcon from './icon-server.svg';
-import upDatabaseIcon from './icon-upload-to-server.svg';
+// import upDatabaseIcon from './icon-upload-to-server.svg';
 import appIcon from './icon-inapp.svg';
 import onceIcon from './icon-once.svg';
 import ApiInstruction from './apiInstruction';

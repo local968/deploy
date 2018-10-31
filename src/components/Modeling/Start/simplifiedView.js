@@ -7,7 +7,7 @@ import { observable } from 'mobx';
 import { Spin, Popover, message as antdMessage, Icon } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
-import config from 'config';
+// import config from 'config';
 import FUNCTIONS from './functions';
 
 @observer

@@ -31,3 +31,5 @@ local_config.js
 uploads
 config.lua
 /data
+
+start_dev.sh

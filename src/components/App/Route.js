@@ -10,7 +10,6 @@ import Home from 'components/Home';
 import SignIn from 'components/SignIn';
 import SignUp from 'components/SignUp';
 import SignActive from 'components/SignActive';
-import Community from 'components/Community';
 
 @inject('socketStore')
 class defaultRouter extends Component {

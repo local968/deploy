@@ -2,7 +2,7 @@ import { observable, action, computed, toJS, when } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
-import config from 'config';
+// import config from 'config';
 import Papa from 'papaparse';
 import { message as antdMessage } from 'antd';
 

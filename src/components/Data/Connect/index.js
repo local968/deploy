@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react';
 import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
 // import sqlIcon from './sql.svg';
-import defileIcon from './define.svg';
+// import defileIcon from './define.svg';
 import axios from 'axios';
 import { message, Progress } from 'antd';
 import { Uploader } from 'components/Common';

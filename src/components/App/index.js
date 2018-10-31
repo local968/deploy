@@ -9,7 +9,7 @@ import Header from 'components/Layout/Header';
 import Community from 'components/Community';
 import Stores from 'stores';
 import styles from './styles.module.css';
-import {Route, Redirect, Switch} from 'react-router-dom';
+import {Route, Switch} from 'react-router-dom';
 
 const browserHistory = createBrowserHistory();
 const routingStore = new RouterStore();
