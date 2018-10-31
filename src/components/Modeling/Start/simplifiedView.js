@@ -71,7 +71,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, host } = project;
+    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     const allVariables = [...rawHeader, ...newVariable]
@@ -97,8 +97,7 @@ export default class SimplifiedView extends Component {
               content={<SimplifiedViewPlot onClose={this.hide}
                 type='histogram'
                 getPath={project.histgramPlot.bind(null, target)}
-                path={histgramPlots[target]}
-                host={host}
+                path={`${histgramPlots[target]}?projectId=${id}`}
               />} />}
             <span>Compute</span>
           </div>
@@ -139,8 +138,7 @@ export default class SimplifiedView extends Component {
             content={<SimplifiedViewPlot onClose={this.hideCorrelationMatrix}
               type='correlationMatrix'
               getPath={this.getCorrelationMatrix}
-              path={project.correlationMatrixImg}
-              host={host}
+              path={`${project.correlationMatrixImg}?projectId=${id}`}
             />} />}
           <span>Check Correlation Matric</span>
         </div>
@@ -173,7 +171,7 @@ export default class SimplifiedView extends Component {
             const data = colType[h] !== 'Categorical' && dataViews ? (dataViews[h] || {}) : {}
             const map = targetMap || {};
             const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={dataHeader.includes(h)} handleCheck={this.handleCheck.bind(null, h)} host={host} />
+            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={dataHeader.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
           })}
         </div>
       </div>
@@ -205,7 +203,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, importance, colType, value, project, uniqueValues, isChecked, handleCheck, host } = this.props;
+    const { data, importance, colType, value, project, uniqueValues, isChecked, handleCheck, id } = this.props;
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
@@ -218,8 +216,7 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type='histgram'
             getPath={project.histgramPlot.bind(null, value)}
-            path={project.histgramPlots[value]}
-            host={host}
+            path={`${project.histgramPlots[value]}?projectId=${id}`}
           />} />}
         <span>Compute</span>
       </div>
@@ -232,8 +229,7 @@ class SimplifiedViewRow extends Component {
           content={<SimplifiedViewPlot onClose={this.hideUnivariant}
             type='univariate'
             getPath={project.univariatePlot.bind(null, value)}
-            path={project.univariatePlots[value]}
-            host={host}
+            path={`${project.univariatePlots[value]}?projectId=${id}`}
           />} />}
         <span>Compute</span>
       </div>
@@ -273,8 +269,8 @@ class SimplifiedViewPlot extends Component {
   }
 
   render() {
-    const { onClose, path, type, host } = this.props;
-    const imgPath = path ? `http://${host}/download/${path}` : ''
+    const { onClose, path, type } = this.props;
+    const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}` : ''
     return <div className={styles.plot}>
       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
