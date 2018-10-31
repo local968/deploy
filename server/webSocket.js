@@ -1,5 +1,6 @@
 const WebSocket = require('ws')
 const { redis, pubsub } = require('redis')
+const uuid = require('uuid')
 
 const _apis = []
 const _subscribes = []
@@ -32,6 +33,7 @@ const init = (server, sessionParser) => {
       console.error('socket error:' + error)
     })
     socket.session = req.session
+    socket.id = uuid.v4()
   });
 
   wss.on('message', (socket, message) => {

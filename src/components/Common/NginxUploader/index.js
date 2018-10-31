@@ -5,7 +5,8 @@ window.axios = axios
 export default (file, config = {}) => {
   config = {
     headers: { backend: _config.uploadBackend },
-    path: `http://${(config.host || _config.uploadServer)}/upload`,
+    // path: `http://${(config.host || _config.uploadServer)}:${_config.nginxPort}/upload`,
+    path: `/redirect/upload`,
     ...config
   }
   const uploader = new Uploader(file, config)
@@ -21,7 +22,7 @@ class Uploader {
   chunkCount = 0;
   errorTimes = 0;
   latestResponse = '';
-  totalLoaded = 0;
+  totalLoaded = 0; 
   isPause = false;
   sessionId = moment().valueOf();
   speeds = [];
