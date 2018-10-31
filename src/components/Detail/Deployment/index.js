@@ -154,7 +154,7 @@ export default class Deployment extends Component {
           <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? 'Save' : 'Change'}</a>
           <span className={styles.data}>Deployment Data Definition</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
-          <a className={styles.download} href={deploymentStore.dataDefinition}>
+          <a className={styles.download} target="_blank" href={`/upload/dataDefinition?id=${cd.projectId}`}>
             Download
           </a>
           <span className={styles.email}>
@@ -473,11 +473,11 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
             App
           </span>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            {/* <span className={styles.orText}>or</span> */}
           </span>
         </div>
       )}
-      {cddo.location === 'database' && (
+      {/* {cddo.location === 'database' && (
         <div className={styles.selected} onClick={show('databaselocation')}>
           <span className={styles.result}>
             <img
@@ -495,8 +495,8 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
             <span className={styles.orText}>or</span>
           </span>
         </div>
-      )}
-      {cddo.location !== 'database' && (
+      )} */}
+      {/* {cddo.location !== 'database' && (
         <div className={styles.selection} onClick={show('databaselocation')}>
           <span className={styles.text}>
             <img
@@ -506,7 +506,7 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
             />Upload to Database
           </span>
         </div>
-      )}
+      )} */}
       {cddo.location !== 'app' && (
         <div
           className={styles.selection}

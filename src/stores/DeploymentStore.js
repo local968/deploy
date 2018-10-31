@@ -102,14 +102,6 @@ class DeploymentStore {
     return new Deployment(_deployment || {});
   }
 
-  @computed
-  get dataDefinition() {
-    if (!this.currentModel) return '';
-    let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += this.currentModel.variableList.join(',');
-    return encodeURI(csvContent);
-  }
-
   constructor() {
     when(
       () => userStore.status === 'login',
