@@ -107,7 +107,7 @@ router.get('/dataDefinition', async (req, res) => {
   if (!userId) return res.json({ status: 401, message: 'need login', error: 'need login' })
   const rank = await redis.zrank(`user:${userId}:projects:createTime`, projectId)
   if (rank === null) return redis.json({ status: 404, message: 'project not found.', error: 'project not found.' })
-  const projectId = req.query.id
+  const projectId = req.query.projectId
   const data = JSON.parse(await redis.hget(`project:${projectId}`, 'dataHeader'))
   res.attachment('definition.csv');
   res.type('csv')

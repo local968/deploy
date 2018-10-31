@@ -9,7 +9,7 @@ import alertIcon from './fail.svg';
 import { Popover } from 'antd';
 // import config from 'config';
 
-@inject('scheduleStore', 'deploymentStore', 'routing', 'projectStore')
+@inject('scheduleStore', 'deploymentStore', 'routing')
 @observer
 export default class List extends Component {
   @action
@@ -18,11 +18,10 @@ export default class List extends Component {
     this.props.deploymentStore.currentDeployment.save();
   };
   render() {
-    const { deploymentStore, scheduleStore, routing, match, projectStore } = this.props;
+    const { deploymentStore, scheduleStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
     const cdpo = cd.performanceOptions;
     const selectionOption = this.selectionOption;
-    const project = projectStore.list.find(v => v.id === cd.projectId)
     return (
       <div className={styles.status}>
         <div className={styles.list}>
@@ -141,7 +140,7 @@ export default class List extends Component {
                       <a
                         className={styles.results}
                         target="_blank"
-                        href={`http://${(project ? project.host : "")}/download/${s.schedule.result.resultPath}`}
+                        href={`http://${config.host}:${config.port}/redirect/download/${s.schedule.result.resultPath}?projectId=${cd.projectId}`}
                       >
                         Download
                       </a>

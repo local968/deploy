@@ -2,7 +2,7 @@ import { observable, action, computed, toJS, when } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
-// import config from 'config';
+import config from 'config';
 import Papa from 'papaparse';
 import { message as antdMessage } from 'antd';
 
@@ -518,7 +518,7 @@ export default class Project {
         const { progress, name, path } = result
         if (progress === "start") return
         if (name === "csvHeader") {
-          const url = `/redirect/download/${path}?projectId=${this.id}`
+          const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
           Papa.parse(url, {
             download: true,
             preview: 100,

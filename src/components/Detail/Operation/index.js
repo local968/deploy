@@ -8,13 +8,12 @@ import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 // import config from 'config'
 
-@inject('deploymentStore', 'scheduleStore', 'projectStore')
+@inject('deploymentStore', 'scheduleStore')
 @observer
 export default class Operation extends Component {
   render() {
-    const { deploymentStore, scheduleStore, projectStore } = this.props;
+    const { deploymentStore, scheduleStore } = this.props;
     const cd = deploymentStore.currentDeployment || {};
-    const project = projectStore.list.find(v => v.id === cd.projectId)
     return (
       <div className={styles.operation}>
         <div className={styles.info}>
@@ -91,7 +90,7 @@ export default class Operation extends Component {
                     <a
                       className={styles.results}
                       target="_blank"
-                      href={`http://${(project?project.host:"")}/download/${s.schedule.result.resultPath}`}
+                      href={`http://${config.host}:${config.port}/redirect/download/${s.schedule.result.resultPath}?projectId=${cd.projectId}`}
                     >Download</a>) : (<span className={styles.results}> - </span>)}
                 </div>
               ))}

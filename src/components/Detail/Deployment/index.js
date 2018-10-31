@@ -3,6 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox, Progress, Select } from 'antd';
 import { action, observable } from 'mobx';
 import moment from 'moment';
+import config from 'config';
 import styles from './styles.module.css';
 import apiIcon from './icon-data-api.svg';
 import sourceIcon from './icon-data-source.svg';
@@ -154,7 +155,7 @@ export default class Deployment extends Component {
           <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? 'Save' : 'Change'}</a>
           <span className={styles.data}>Deployment Data Definition</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
-          <a className={styles.download} target="_blank" href={`/upload/dataDefinition?id=${cd.projectId}`}>
+          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>
             Download
           </a>
           <span className={styles.email}>
