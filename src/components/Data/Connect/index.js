@@ -9,6 +9,7 @@ import localFileIcon from './local-file.svg';
 import axios from 'axios';
 import { message, Progress } from 'antd';
 import { Uploader } from 'components/Common';
+import config from 'config';
 // import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 
@@ -134,7 +135,7 @@ export default class DataConnect extends Component {
 
     this.uploading = true
 
-    axios.post('/upload/sample', { filename }).then(
+    axios.post(`http://${config.host}:${config.port}/upload/sample`, { filename }).then(
       action(data => {
         const { fileId } = data.data
         this.process = 90

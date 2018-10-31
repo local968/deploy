@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import axios from 'axios';
+import config from 'config'
 import NginxUploader from '../NginxUploader';
 
 const AllowExt = ["csv", "zip", "rar", "tar", "tgz"]
@@ -35,7 +36,7 @@ export default class Uploader extends Component {
 
   upload = file => {
     const { params, onProgress, onError, onComplete } = this.props;
-    axios.post('/upload/check', { fileSize: file.size, type: 'modeling', projectId: params.projectId }).then(response => {
+    axios.post(`http://${config.host}:${config.port}/upload/check`, { fileSize: file.size, type: 'modeling', projectId: params.projectId }).then(response => {
       if (response.data.status !== 200) return onError(response.data.message)
       const token = response.data.token
       const host = response.data.host

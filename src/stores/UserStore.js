@@ -1,5 +1,6 @@
 import { observable, action, when } from 'mobx';
 import axios from 'axios';
+import config from 'config';
 import socketStore from './SocketStore';
 
 class UserStore {
@@ -11,7 +12,7 @@ class UserStore {
   }
 
   constructor() {
-    axios.get('/user/status').then(action(res => {
+    axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
@@ -23,7 +24,7 @@ class UserStore {
   }
 
   login(params) {
-    axios.post('/user/login', params).then(action(res => {
+    axios.post(`http://${config.host}:${config.port}/user/login`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
@@ -34,7 +35,7 @@ class UserStore {
   }
 
   register(params) {
-    axios.post('/user/register', params).then(action(res => {
+    axios.post(`http://${config.host}:${config.port}/user/register`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
@@ -45,7 +46,7 @@ class UserStore {
   }
 
   logout() {
-    axios.delete('/user/logout').then(action(res => {
+    axios.delete(`http://${config.host}:${config.port}/user/logout`).then(action(res => {
       if (res.data.status === 200) {
         this.status = 'unlogin'
         window.location.reload()
