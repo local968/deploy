@@ -3,15 +3,15 @@ const REDIS_USERNAME = process.env.REDIS_USERNAME || 'redismaster'
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis123321eq'
 const REQUEST_QUEUE = process.env.REQUEST_QUEUE || 'taskQueue'
 const RESULT_QUEUE = process.env.RESULT_QUEUE || 'resultDataQueue'
-const QUEUE_PERIOD = process.env.QUEUE_PERIOD || 60
-const SCHEDULE_PERIOD = process.env.SCHEDULE_PERIOD || 60
-const MAX_CONCURRENCY_SCHEDULE = process.env.MAX_CONCURRENCY_SCHEDULE || 2
+const QUEUE_PERIOD = process.env.QUEUE_PERIOD || '60'
+const SCHEDULE_PERIOD = process.env.SCHEDULE_PERIOD || '60'
+const MAX_CONCURRENCY_SCHEDULE = process.env.MAX_CONCURRENCY_SCHEDULE || '2'
 const SECRET = process.env.SECRET || 'FNcidLwifNC902LCC9f2C'
 const REDIS_SENTINEL_HOSTS = process.env.REDIS_SENTINEL_HOSTS || '192.168.0.23:16390,192.168.0.23:16391,192.168.0.23:16392'
 const REDIS_HOST = process.env.REDIS_HOST || '192.168.0.23:6376'
-const REDIS_TYPE = process.env.REDIS_TYPE || 2 // 1 standalone 2 sentinel
+const REDIS_TYPE = process.env.REDIS_TYPE || '2' // 1 standalone 2 sentinel
 
-const redis = REDIS_TYPE === 2 ?
+const redis = REDIS_TYPE === '2' ?
   {
     sentinels: REDIS_SENTINEL_HOSTS.split(',').map(host => ({
       host: host.split(':')[0],
