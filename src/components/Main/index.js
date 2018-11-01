@@ -5,15 +5,12 @@ import Project from 'components/Project';
 import Problem from 'components/Problem';
 import Data from 'components/Data';
 import Modeling from 'components/Modeling';
-import {ProjectLoading} from 'components/Common';
+import { ProjectLoading } from 'components/Common';
 import { message } from 'antd';
-import {observable} from 'mobx'
 
 @inject('userStore', 'projectStore', 'routing')
 @observer
 export default class Main extends Component {
-  @observable loading = true
-
   constructor(props) {
     super(props);
     const { pid } = props.match.params || {};
@@ -21,12 +18,21 @@ export default class Main extends Component {
 
     when(
       () => props.userStore.status === "login",
-      () => props.projectStore.initProject(this.pid).then(init => {
-        if(init) return this.loading = false
-        this.props.routing.push("/")
-        message.error("project is not exist")
-      })
+      () => props.projectStore.initProject(this.pid)
     )
+  }
+
+  componentWillMount(){
+    when(
+      () => this.props.projectStore.project,
+      () => {
+        this.props.projectStore.inProject(this.pid)
+      }
+    )
+  }
+
+  componentWillUnmount(){
+    this.props.projectStore.outProject()
   }
 
   getChild = () => {
@@ -56,7 +62,7 @@ export default class Main extends Component {
 
   render() {
     return <React.Fragment>
-      {this.loading ? <ProjectLoading /> : this.getChild()}
+      {!this.props.projectStore.project ? <ProjectLoading /> : this.getChild()}
     </React.Fragment>
   }
 }

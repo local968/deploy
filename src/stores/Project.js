@@ -769,16 +769,8 @@ export default class Project {
     socketStore.ready().then(api => api.train(trainData, progressResult => {
       if (progressResult.progress === "start") return;
       if (progressResult.status !== 200) return
-      let result = progressResult.result
-      let index = this.models.findIndex(m => {
-        return result.id === m.id
-      })
-      if (this.problemType === "Classification") result.predicted = this.calcPredicted(result)
-      if (index === -1) {
-        this.models.push(new Model(this.id, result))
-      } else {
-        this.models[index] = new Model(this.id, result)
-      }
+      let result = progressResult.model
+      this.setModel(result)
     })).then(returnValue => {
       const { status, message } = returnValue
       if (status === -1 && this.models.length === 0) {
@@ -792,6 +784,18 @@ export default class Project {
         train2ing: false
       });
     })
+  }
+
+  setModel = data => {
+    if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
+    const index = this.models.findIndex(m => {
+      return data.id === m.id
+    })
+    if (index === -1) {
+      this.models.push(new Model(this.id, data))
+    } else {
+      this.models[index] = new Model(this.id, data)
+    }
   }
 
   modelingError = () => {
@@ -854,8 +858,7 @@ export default class Project {
       if (status !== 200) return alert(message)
       this.models = []
       list.forEach(m => {
-        if (this.problemType === "Classification") m.predicted = this.calcPredicted(m)
-        this.models.push(new Model(this.id, m))
+        this.setModel(m)
       });
     })
   }

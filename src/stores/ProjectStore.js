@@ -5,7 +5,6 @@ import Project from "./Project";
 class ProjectStore {
   @observable loading = true;
   @observable watchList = false;
-  @observable watch = [];
   @observable currentId = "";
 
   @observable list = [];
@@ -24,18 +23,6 @@ class ProjectStore {
       () => this.watchList,
       () => this.queryProjectList()
     )
-    autorun(() => this.watch.forEach(pid => {
-      socketStore.ready().then(api => {
-        api.watchProject({ id: pid }).then(watch => {
-          if (watch.status !== 200) {
-            return alert(watch.message)
-          }
-          api.on(watch.id, data => {
-            console.log(data, "watch")
-          })
-        })
-      })
-    }))
   }
 
   @computed
@@ -68,7 +55,13 @@ class ProjectStore {
         if (watch.status === 200) {
           this.watchList = true
           api.on(watch.id, data => {
-            console.log(data, "watchlist")
+            const {status, id, result, model} = data
+            if(status === 200) {
+              const project = this.list.find(p => p.id === id)
+              if(!project) return
+              if(result) project.setProperty(result)
+              if(model) project.setModel(model)
+            }
           })
         }
       })
@@ -134,17 +127,16 @@ class ProjectStore {
   initProject = id => {
     return new Promise(resolve => {
       when(
-        () => !this.loading,
+        () => !this.loading && !this.isInit,
         () => {
           if (!this.list.length) return resolve(false)
-          this.currentId = id
           const project = this.list.find(row => {
             return row.id === id
           })
           if (project) {
-            !this.watch.includes(id) && this.watch.push(id)
             project.queryProject()
             project.initModels()
+            this.currentId = id
             return resolve(true)
           } else {
             return resolve(false)
@@ -152,6 +144,21 @@ class ProjectStore {
         })
     }
     )
+  }
+
+  @action
+  inProject = id => {
+    // return socketStore.ready().then(api => {
+    //   return api.inProject({ id, status: true })
+    // })
+  }
+
+  @action
+  outProject = () => {
+    // if(!this.currentId) return
+    // socketStore.ready().then(api => {
+    //   return api.inProject({ id, status: false })
+    // })
   }
 }
 

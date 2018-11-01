@@ -40,7 +40,8 @@ function query(key, params) {
     })
 }
 
-function createOrUpdate(id, userId, params, isCreate = false) {
+function createOrUpdate(id, userId, data, isCreate = false) {
+  const params = mapObjectToArray(data)
   const time = moment().unix();
   params.push("updateTime", time)
   if (isCreate) params.push("createTime", time)
@@ -51,9 +52,9 @@ function createOrUpdate(id, userId, params, isCreate = false) {
   return pipeline.exec()
     .then(result => {
       const err = result.find(([error]) => !!error);
-      const data = err ? { status: 411, message: (isCreate ? "create" : "update") + " project error" } : { status: 200, message: "ok", id: id }
-      wss.publish("user:" + userId + ":projects", data)
-      return data
+      const returnValue = err ? { status: 411, message: (isCreate ? "create" : "update") + " project error" } : { status: 200, message: "ok", result: data, id }
+      wss.publish("user:" + userId + ":projects", returnValue)
+      return returnValue
     })
 }
 
@@ -65,7 +66,7 @@ function createModel(id, params) {
   return pipeline.exec().then(result => {
     const err = result.find(([error]) => !!error);
     const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
-    return { ...data, result: { ...params, id: modelId } }
+    return { ...data, model: { ...params, id: modelId } }
   })
 }
 
@@ -193,8 +194,7 @@ wss.register("addProject", async (message, socket) => {
   }
   const id = await redis.incr("node:project:count")
   const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id })
-  const params = mapObjectToArray({ id, userId, host: result.host });
-  return createOrUpdate(id, userId, params, true)
+  return createOrUpdate(id, userId, { id, userId, host: result.host }, true)
 })
 
 wss.register("updateProject", (message, socket) => {
@@ -206,10 +206,9 @@ wss.register("updateProject", (message, socket) => {
   delete data.type
   data.userId = userId
 
-  const params = mapObjectToArray(data)
   return checkProject(userId, id).then(err => {
     if (err) return err
-    return createOrUpdate(id, userId, params)
+    return createOrUpdate(id, userId, data)
   })
 })
 
@@ -329,7 +328,7 @@ wss.register('etl', (message, socket, progress) => {
       result.firstEtl = false;
       if (!files) delete result.totalRawLines
 
-      return createOrUpdate(id, socket.session.userId, mapObjectToArray(result)).then(updateResult => {
+      return createOrUpdate(id, socket.session.userId, result).then(updateResult => {
         if (updateResult.status !== 200) return updateResult
         return {
           status: 200,
@@ -366,23 +365,12 @@ wss.register('train', (message, socket, progress) => {
       if (isFinish) return queueValue
       const { result, projectId } = queueValue
       if (result.progress === "start") return progress(result)
-      return createModel(projectId, result).then(progress)
+      return createModel(projectId, result).then(model => {
+        wss.publish("user:" + userId + ":projects", model)
+        return progress(model)
+      })
     }))
     .catch(err => err)
-})
-
-wss.register("watchProject", (message, socket) => {
-  const userId = socket.session.userId;
-  const id = message.id;
-  if (!id) return { status: 500, message: "empty id" }
-  const key = "user:" + userId + ":project:" + id
-  wss.subscribe(key, (data) => {
-    try {
-      data = JSON.parse(data)
-    } catch (e) { }
-    return data
-  }, socket)
-  return { status: 200, message: "ok", id: key }
 })
 
 wss.register("watchProjectList", (message, socket) => {
@@ -403,7 +391,7 @@ wss.register("watchProjectList", (message, socket) => {
 })
 
 wss.register("testPub", (message, socket) => {
-  return Promise.reject({ status: 1, test: "aaa" }).catch(err => err)
+  return Promise.reject({ status: 1, test: "aaa" }).catch(err => err) 
 })
 
 function mapObjectToArray(obj) {

@@ -938,6 +938,8 @@ span.advancedDesc {
   background: #fff;
   margin-top: 0.05em;
   box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+  max-height: 5em;
+  overflow-y: auto;
 }
 
 .newVariableHint {
