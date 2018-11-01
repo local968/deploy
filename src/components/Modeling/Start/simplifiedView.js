@@ -318,6 +318,7 @@ class CreateNewVariable extends Component {
     const { rawHeader, colType } = this.props
     let valueList = [...rawHeader]
     if (isOutOfFuntion || !inFunction || inFunction.value !== "Concat()") valueList = valueList.filter(v => colType[v] === "Numerical")
+    let filterFunctions = []
     if (exp.startsWith("@")) {
       exp = exp.slice(1).trim()
       if (!exp) return this.hints = valueList.map(v => {
@@ -326,9 +327,10 @@ class CreateNewVariable extends Component {
           value: "@" + v
         }
       })
+    } else {
+      filterFunctions = [...FUNCTIONS.base]
+      if (!inFunction) filterFunctions = FUNCTIONS.senior.filter(v => v.value.toLowerCase().includes(exp.toLowerCase())).concat(filterFunctions)
     }
-    let filterFunctions = [...FUNCTIONS.base]
-    if (!inFunction) filterFunctions = FUNCTIONS.senior.filter(v => v.value.toLowerCase().includes(exp.toLowerCase())).concat(filterFunctions)
     const filterValues = valueList.filter(_v => _v.includes(exp.toLowerCase())).map(item => {
       return {
         label: item,
