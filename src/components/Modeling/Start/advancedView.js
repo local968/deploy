@@ -149,8 +149,24 @@ export default class AdvancedView extends Component {
     }
   }
 
+  handleSpeed = value => {
+    this.props.project.speedVSaccuracy = value[0]
+  }
+
+  changeSpeed = (isSpeed, e) => {
+    let value = e.target.value
+    if (!value || isNaN(value)) return
+    if (value.toString().includes(".")) return
+    try {
+      value = parseInt(value, 10)
+    } catch (e) { }
+    if (!isSpeed) value = 10 - value
+    if (value < 1 || value > 9) return
+    this.props.project.speedVSaccuracy = value
+  }
+
   render() {
-    const { advancedName, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms } = this.props.project;
+    const { advancedName, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "accuracy", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: 'R²' }, { value: "mse", label: 'MSE' }]
@@ -437,6 +453,60 @@ export default class AdvancedView extends Component {
                 </div>}
             </div>
           </div>}
+          <div className={styles.advancedBlock}>
+            <div className={styles.advancedBox}>
+              <div className={styles.advancedTitle}>
+                <span>Speed VS Accuracy:</span>
+              </div>
+              <div className={styles.advancedPercentBlock}>
+                <div className={styles.advancedPercent}>
+                  <div className={styles.advancedPercentCross} style={{ width: ((speedVSaccuracy - 1) / 8 * 100) + '%' }}></div>
+                  <div className={styles.advancedPercentHoldout} style={{ width: ((9 - speedVSaccuracy) / 8 * 100) + '%' }}></div>
+                </div>
+                <Range
+                  className={styles.range}
+                  railStyle={{ backgroundColor: 'transparent' }}
+                  trackStyle={[{ backgroundColor: 'transparent' }]}
+                  handleStyle={[{
+                    backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
+                    border: '0.07em solid #e8e8e8',
+                    width: '0.3em',
+                    height: '0.3em',
+                    marginLeft: '-0.15em',
+                    marginTop: '-0.13em',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    flex: 'none',
+                    alignitems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }]}
+                  value={[speedVSaccuracy]}
+                  onChange={this.handleSpeed}
+                  min={1}
+                  max={9}
+                  allowCross={false}
+                  pushable={1}
+                />
+              </div>
+              <div className={styles.advancedPercentBox}>
+                <div className={styles.advancedPercentInput}>
+                  <div className={styles.advancedPercentText}>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
+                    <span>Speed</span>
+                  </div>
+                  <input value={speedVSaccuracy} onChange={this.changeSpeed.bind(null, true)} />
+                </div>
+                <div className={styles.advancedPercentInput}>
+                  <div className={styles.advancedPercentText}>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
+                    <span>Accuracy</span>
+                  </div>
+                  <input value={10 - speedVSaccuracy} onChange={this.changeSpeed.bind(null, false)} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

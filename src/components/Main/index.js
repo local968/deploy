@@ -5,7 +5,7 @@ import Project from 'components/Project';
 import Problem from 'components/Problem';
 import Data from 'components/Data';
 import Modeling from 'components/Modeling';
-import { ProjectLoading } from 'components/Common';
+import { ProjectLoading, Conflict } from 'components/Common';
 import { message } from 'antd';
 
 @inject('userStore', 'projectStore', 'routing')
@@ -25,14 +25,8 @@ export default class Main extends Component {
   componentWillMount(){
     when(
       () => this.props.projectStore.project,
-      () => {
-        this.props.projectStore.inProject(this.pid)
-      }
+      () => this.props.projectStore.inProject(this.pid)
     )
-  }
-
-  componentWillUnmount(){
-    this.props.projectStore.outProject()
   }
 
   getChild = () => {
@@ -60,9 +54,16 @@ export default class Main extends Component {
     }
   }
 
+  exit = () => {
+    this.props.routing.push("/")
+    this.props.projectStore.outProject()
+  }
+
   render() {
+    const {project, conflict, notExit} = this.props.projectStore
     return <React.Fragment>
-      {!this.props.projectStore.project ? <ProjectLoading /> : this.getChild()}
+      {!project ? <ProjectLoading /> : this.getChild()}
+      {conflict && <Conflict onConfirm={notExit} onClose={this.exit}/>}
     </React.Fragment>
   }
 }

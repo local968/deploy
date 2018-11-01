@@ -11,6 +11,7 @@ import ProjectSide from './ProjectSide';
 import ProjectLoading from './ProjectLoading';
 import Table from './Table';
 import Modal from './Modal';
+import Conflict from './Conflict';
 
 export {
   BlackButton,
@@ -25,5 +26,6 @@ export {
   ProjectLoading,
   Background,
   Table,
-  Modal
+  Modal,
+  Conflict
 };
