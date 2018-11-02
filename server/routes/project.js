@@ -357,7 +357,8 @@ wss.register('fitPlotAndResidualPlot', (message, socket, progress) => sendToComm
 wss.register('createNewVariable', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
 wss.register('train', (message, socket, progress) => {
-  const data = { ...message, userId: socket.session.userId, requestId: message._id }
+  const userId = socket.session.userId
+  const data = { ...message, userId, requestId: message._id }
   return checkTraningRestriction(socket.session.user)
     .then(() => deleteModels(message.projectId))
     .then(() => command(data, queueValue => {
