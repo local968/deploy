@@ -40,7 +40,7 @@ export default class Project {
 
   //project
   @observable name;
-  @observable description;
+  // @observable description;
 
   //problem
   @observable problemType = '';

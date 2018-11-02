@@ -143,7 +143,8 @@
 
 .action {
     display: flex;
-    flex: auto;
+    flex: none;
+    justify-content: flex-end;
 }
 
 .openBox {

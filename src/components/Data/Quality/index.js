@@ -138,7 +138,7 @@ export default class DataQuality extends Component {
           <div className={styles.table}>
             <div className={classnames(styles.cell, styles.target)}><span>Target Variable</span></div>
             <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
-            <div className={classnames(styles.cell, styles.select)}><select value={colType[target]} readOnly={true}>
+            <div className={classnames(styles.cell, styles.select)}><select value={colType[target]} readOnly={true} disabled={true}>
               <option value="Categorical">Categorical</option>
               <option value="Numerical">Numerical</option>
             </select></div>

@@ -3,13 +3,13 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import addProjectIcon from './combined-shape-copy.svg';
 import deleteIcon from './delete.svg';
-import duplicateIcon from './duplicate.svg';
-import shareIcon from './share.svg';
+// import duplicateIcon from './duplicate.svg';
+// import shareIcon from './share.svg';
 import deleteDarkIcon from './delete-dark.svg';
-import duplicateDarkIcon from './duplicate-dark.svg';
-import shareDarkIcon from './share-dark.svg';
+// import duplicateDarkIcon from './duplicate-dark.svg';
+// import shareDarkIcon from './share-dark.svg';
 import checkedIcon from './checked.svg';
-import { Search, Select, Pagination } from 'components/Common';
+import { Search, Select, Pagination, ProjectLoading } from 'components/Common';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import { Modal, Button } from 'antd';
@@ -40,7 +40,7 @@ export default class Home extends Component {
       delete: (ids) => {
         const deleteNames = this.props.projectStore.list.filter(project => {
           return ids.includes(project.id);
-        }).map(project => project.name || "project-"+project.id);
+        }).map(project => project.name || "project-" + project.id);
         this.deleteNames = deleteNames
         this.deleteIds = ids
         this.visible = true
@@ -70,7 +70,7 @@ export default class Home extends Component {
 
   actions = (act, ids) => {
     ids = toJS(ids)
-    if(!Array.isArray(ids)) ids = [ids]
+    if (!Array.isArray(ids)) ids = [ids]
     console.log(act, ids);
     this.acts[act](ids);
   }
@@ -92,7 +92,7 @@ export default class Home extends Component {
   }
 
   handleAdd = () => {
-    if(this.loading) return
+    if (this.loading) return
     this.loading = true
     this.props.projectStore.addProject().then(data => {
       this.loading = false
@@ -107,8 +107,9 @@ export default class Home extends Component {
 
   render() {
     const { projectStore } = this.props;
-    const { toolsOption, total, list: sortProjects, changeOption, changePage, keywords } = projectStore;
+    const { toolsOption, total, sortList: sortProjects, changeOption, changePage, keywords } = projectStore;
     return <div className={classnames(styles.home)} >
+      {this.loading && <ProjectLoading />}
       <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} keywords={keywords} changeWords={this.changeWords} />
       <div className={classnames(styles.projects)}>
         <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
@@ -180,8 +181,8 @@ class Project extends Component {
             }
           </div>
           <div className={styles.action}>
-            <img onClick={actions.bind(null, "share", project.id)} src={shareIcon} alt="share" />
-            <img onClick={actions.bind(null, "duplicate", project.id)} src={duplicateIcon} alt="duplicate" />
+            {/* <img onClick={actions.bind(null, "share", project.id)} src={shareIcon} alt="share" />
+            <img onClick={actions.bind(null, "duplicate", project.id)} src={duplicateIcon} alt="duplicate" /> */}
             <img onClick={actions.bind(null, "delete", project.id)} src={deleteIcon} alt="delete" />
           </div>
         </div>
@@ -249,8 +250,8 @@ class Bar extends Component {
         <span><span className={styles.count}>{ids.length}</span> Screen Selected</span>
       </div>
       <div className={styles.action}>
-        <img onClick={actions.bind(null, "share", ids)} src={shareDarkIcon} alt="share" />
-        <img onClick={actions.bind(null, "duplicate", ids)} src={duplicateDarkIcon} alt="duplicate" />
+        {/* <img onClick={actions.bind(null, "share", ids)} src={shareDarkIcon} alt="share" />
+        <img onClick={actions.bind(null, "duplicate", ids)} src={duplicateDarkIcon} alt="duplicate" /> */}
         <img onClick={actions.bind(null, "delete", ids)} src={deleteDarkIcon} alt="delete" />
       </div>
     </div>

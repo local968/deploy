@@ -29,6 +29,14 @@ class ProjectStore {
   }
 
   @computed
+  get sortList() {
+    const sort = this.toolsOption.sort
+    return this.list.sort((a, b) => {
+      return b[sort] - a[sort]
+    })
+  }
+
+  @computed
   get project() {
     return this.currentId ? this.list.find(row => row.id === this.currentId) : null
   }
