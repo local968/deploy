@@ -308,7 +308,7 @@ export class FixIssue extends Component {
     this.canSave = true
   }
 
-  render = () => {
+  render() {
     const { closeFixes, project, saveDataFixes } = this.props;
     const { issueRows, colType, mismatchIndex, nullIndexes, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict } = project
     return <div className={styles.fixesContent}>
