@@ -532,7 +532,9 @@ export default class Project {
           Papa.parse(url, {
             download: true,
             preview: 100,
+            delimiter: ',',
             complete: result => {
+              console.log(result)
               if (result.errors.length !== 0) {
                 console.error('parse error: ', result.errors[0].message);
                 return;
