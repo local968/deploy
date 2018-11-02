@@ -4,6 +4,7 @@ const upload = require('./upload')
 const redirect = require('./redirect')
 require('./project')
 require('./deployment')
+require('./database')
 
 const router = new Router()
 

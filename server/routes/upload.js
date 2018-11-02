@@ -26,7 +26,7 @@ router.post('/check', async (req, res) => {
     message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
     error: 'modeling file too large'
   })
-  const size = redis.get(`user:${userId}:upload`)
+  const size = await redis.get(`user:${userId}:upload`)
   if (parseInt(size) + parseInt(fileSize) > userStorageRestriction[req.session.user.level]) return res.json({
     status: 417,
     message: 'Your usage of storage space has reached the max restricted by your current lisense.',
@@ -80,8 +80,10 @@ router.post('/', (req, res) => {
         const lineCount = result.result.lines || 0
         fields.createdTime = moment().unix()
         fields.lineCount = lineCount
+        fields.from = 'upload'
+        fields.type = params.type
         fields.params = params
-        console.log('fields:', fields)
+        fields.userId = params.userId
         redis.set('file:' + fileId, JSON.stringify(fields))
         redis.incrby(`user:${params.userId}:upload`, parseInt(params.fileSize))
         res.json({ fileId, status: 200, message: 'ok' })

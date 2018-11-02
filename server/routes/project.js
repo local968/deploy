@@ -391,7 +391,7 @@ wss.register("watchProjectList", (message, socket) => {
 })
 
 wss.register("testPub", (message, socket) => {
-  return Promise.reject({ status: 1, test: "aaa" }).catch(err => err) 
+  return Promise.reject({ status: 1, test: "aaa" }).catch(err => err)
 })
 
 function mapObjectToArray(obj) {

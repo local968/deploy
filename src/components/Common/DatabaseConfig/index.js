@@ -117,7 +117,7 @@ export default class DatabaseConfig extends Component {
       this.localState = {
         ...defaultState,
         ...filter(storedProfile),
-        sqlPassword: storedPassword,
+        sqlPassword: storedPassword || '',
         ...filter(props.options)
       };
     });
@@ -125,7 +125,7 @@ export default class DatabaseConfig extends Component {
 
   render() {
     const { visible, onClose, onSubmit: submit, title, projectId } = this.props;
-    const state = this.localState;
+    const state = { ...this.localState };
     const onSubmit = () => {
       if (this.checkForm()) return;
       this.loading = true;
@@ -134,8 +134,9 @@ export default class DatabaseConfig extends Component {
           ...state,
           projectId
         }).then(resp => {
-          if (resp.result.status === -1) {
-            Message.error(resp.result.result['process error']);
+          this.loading = false;
+          if (resp.result.connectionOK === false) {
+            Message.error(resp.result.result);
           } else {
             if (state.rememberMyPassword) {
               storage.setItem('DatabaseConnectionPassword', state.sqlPassword);
@@ -145,9 +146,8 @@ export default class DatabaseConfig extends Component {
               delete profile.sqlPassword;
               storage.setItem('DatabaseConnectionProfile', JSON.stringify(state));
             }
-            submit(resp);
+            submit(state);
           }
-          this.loading = false;
         });
       })
     };

@@ -59,7 +59,10 @@ const init = (server, sessionParser) => {
         // returnValue.progress = (result) => socket.send(JSON.stringify({ ...result, request: { ...message, progress: true } }))
         returnValue.then(
           result => socket.send(JSON.stringify({ ...result, request: message })),
-          error => socket.send(JSON.stringify({ status: 500, error: 'server error', message: 'server error', ...error, request: message })))
+          error => {
+            console.error(error)
+            return socket.send(JSON.stringify({ status: 500, error: 'server error', message: 'server error', ...error, request: message }))
+          })
       } else {
         return socket.send(JSON.stringify({ ...returnValue, request: message }))
       }
