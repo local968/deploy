@@ -1,22 +1,26 @@
 .select {
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
 }
+
 .selector {
   flex: 1 1 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .selectTitle {
   font-size: 1.125rem;
   display: block;
 }
+
 .selectSelect {
   display: block;
   margin-left: 0.625em;
   height: 100%;
   composes: select;
 }
+
 .selectWrapper {
   width: 1.88em;
   height: 100%;
@@ -34,15 +38,19 @@
   justify-content: start;
   align-items: center;
 }
+
 .select :global(.ant-select-arrow) {
   color: rgba(255, 255, 255, 0.8);
 }
+
 .select :global(.ant-select-selection__rendered) {
   margin-left: 20px;
 }
-.notAuto{
-  flex:none 
+
+.notAuto {
+  flex: none
 }
+
 .targetSelect {
   border-radius: 5px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
@@ -50,7 +58,9 @@
   border: solid 1px #c4cbd7;
 }
 
-.selectSelect div{
+.selectSelect div {
   display: flex;
   flex: auto;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

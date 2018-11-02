@@ -35,6 +35,7 @@ import { VariableImpact } from '../Result';
 
 const TabPane = Tabs.TabPane;
 
+@observer
 export default class AdvancedView extends Component {
   componentWillMount() {
     if (this.props.project.problemType === 'Classification') {
@@ -63,10 +64,11 @@ export default class AdvancedView extends Component {
   }
 }
 
+@observer
 class AdvancedModelTable extends Component {
   constructor(props) {
     super(props);
-    const { project: { problemType } } = props;
+    const { project: { problemType, measurement } } = props;
     const metricOptions = problemType === 'Classification' ? [{
       display: 'acc',
       key: 'acc'
@@ -84,7 +86,7 @@ class AdvancedModelTable extends Component {
       key: 'r2'
     }]
     this.state = {
-      metric: metricOptions[0],
+      metric: metricOptions.find(metric => metric.key === measurement) || metricOptions[0],
       metricOptions
     }
   }
@@ -401,7 +403,7 @@ class Thumbnail extends Component {
         onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
-        <img src={icon} alt="icon"/>
+        <img src={icon} alt="icon" />
         <div>{text}</div>
       </div>
     )
@@ -510,7 +512,7 @@ class ModelComp extends Component {
       <div className={styles.modelComp}>
         <img
           onClick={this.handleClick}
-          src={modelComp} 
+          src={modelComp}
           alt="comp" />
         <Modal
           width={1000}

@@ -13,7 +13,7 @@ export default class Project extends Component {
     const { project } = this.props;
     project.updateProject(Object.assign({
       name: project.name || "project " + new Date().toLocaleString(),
-      description: project.description,
+      // description: project.description,
       business: project.business,
       statement: project.statement
     }, project.nextMainStep(1)))
@@ -30,10 +30,10 @@ export default class Project extends Component {
         <label>Project Name</label>
         <Input placeholder={"project name"} defaultValue={project ? project.name : ""} onChange={this.onChange.bind(this, "name")} />
       </div>
-      <div className={styles.row}>
+      {/* <div className={styles.row}>
         <label >Project Description</label>
         <TextArea rows={4} placeholder="project description" defaultValue={project ? project.description : ""} onChange={this.onChange.bind(this, "description")} className={styles.textarea}/>
-      </div>
+      </div> */}
       <div className={styles.sep}> </div>
       <div className={styles.textBox}>
         <label>Problem Statement</label>

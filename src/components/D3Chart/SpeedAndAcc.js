@@ -8,7 +8,7 @@ const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57
 
 export default class SpeedAndAcc extends Component {
   state = {
-    options: this.props.models.map(m => m.id),
+    options: this.props.models.map(m => m.name),
   }
   componentDidMount () {
     this.renderD3();
@@ -32,8 +32,8 @@ export default class SpeedAndAcc extends Component {
   resolveData(models) {
     return models.filter(function ({executeSpeed}) {
       return executeSpeed !== undefined;
-    }).map(({executeSpeed, score, id}) => {
-      return {speed: executeSpeed, acc: score.validateScore.auc, name: id };
+    }).map(({executeSpeed, score, name}) => {
+      return {speed: executeSpeed, acc: score.validateScore.auc, name };
     });
   }
 
@@ -157,7 +157,7 @@ export default class SpeedAndAcc extends Component {
   }
 
   render() {
-    const names = this.props.models.map(m => m.id);
+    const names = this.props.models.map(m => m.name);
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
         <div className={styles.hoverPanel}></div>

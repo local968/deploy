@@ -142,8 +142,9 @@ export default class SimplifiedView extends Component {
               getPath={this.getCorrelationMatrix}
               path={project.correlationMatrixImg}
               id={id}
+              style={{ width: "640px", height: "480px" }}
             />} />}
-          <span>Check Correlation Matric</span>
+          <span>Check Correlation Matrix</span>
         </div>
       </div>
       <div className={styles.table}>
@@ -274,9 +275,9 @@ class SimplifiedViewPlot extends Component {
   }
 
   render() {
-    const { onClose, path, type, id } = this.props;
+    const { onClose, path, type, id, style } = this.props;
     const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
-    return <div className={styles.plot}>
+    return <div className={styles.plot} style={style}>
       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
     </div>
@@ -424,7 +425,7 @@ class CreateNewVariable extends Component {
   checkExp = _expression => {
     let expression = _expression
     if (!expression) return { isPass: true, message: "ok", num: 0 }
-    const baseOptReg = new RegExp(/[\+\-\*\/]/)
+    const baseOptReg = new RegExp(/[+\-*/]/)
     const exps = []
     let num = 1
     let start = 0

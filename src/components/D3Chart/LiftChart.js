@@ -23,7 +23,7 @@ export default class PRChart extends Component {
   }
 
   state = {
-    options: this.props.compareChart && this.props.models.map(m => m.id),
+    options: this.props.compareChart && this.props.models.map(m => m.name),
     movable: true
   }
 
@@ -135,7 +135,7 @@ export default class PRChart extends Component {
 
   render () {
     const {compareChart} = this.props;
-    const names = compareChart && this.props.models.map(m => m.id);
+    const names = compareChart && this.props.models.map(m => m.name);
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
         {compareChart && <div className={styles.liftHoverPanel} ></div>}
@@ -188,7 +188,7 @@ export default class PRChart extends Component {
     if (compareChart) {
       models.forEach((m, index) => {
         const modelData = parseData(m.chartData.lift);
-        const lineEnable = this.state.options.indexOf(m.id) >= 0;
+        const lineEnable = this.state.options.indexOf(m.name) >= 0;
         this.drawChart(modelData, x, y, svg, height, line, index, color, lineEnable, width);
         if (lineEnable) {
           const tool_tip = d3tips(`.${styles.liftHoverPanel}`)
@@ -196,7 +196,7 @@ export default class PRChart extends Component {
             .html(function(d) {
               return (
                 `
-                  <h4 >${m.id}</h4>
+                  <h4 >${m.name}</h4>
                   <div>percentage: ${d.PERCENTAGE}</div>
                   <div>lift: ${d.LIFT}</div>
                 `

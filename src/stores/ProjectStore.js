@@ -1,6 +1,7 @@
-import { observable, action, when, autorun, computed } from "mobx";
+import { observable, action, when, computed } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
+import uuid from "uuid";
 
 class ProjectStore {
   @observable loading = true;
@@ -16,6 +17,8 @@ class ProjectStore {
     offset: 0,
     sort: 'createTime',
   }
+  @observable broadcastId = "";
+  @observable conflict = false
 
   constructor() {
     this.watchProjectList();
@@ -23,6 +26,14 @@ class ProjectStore {
       () => this.watchList,
       () => this.queryProjectList()
     )
+  }
+
+  @computed
+  get sortList() {
+    const sort = this.toolsOption.sort
+    return this.list.sort((a, b) => {
+      return b[sort] - a[sort]
+    })
   }
 
   @computed
@@ -55,13 +66,19 @@ class ProjectStore {
         if (watch.status === 200) {
           this.watchList = true
           api.on(watch.id, data => {
-            const {status, id, result, model} = data
-            if(status === 200) {
+            const { status, id, result, model } = data
+            if (status === 200) {
               const project = this.list.find(p => p.id === id)
-              if(!project) return
-              if(result) project.setProperty(result)
-              if(model) project.setModel(model)
+              if (!project) return
+              if (result) project.setProperty(result)
+              if (model) project.setModel(model)
             }
+          })
+          api.on("inProject", data => {
+            const { id, broadcastId } = data
+            if(broadcastId === this.broadcastId) return
+            if(id !== this.currentId) return 
+            this.showConflict()
           })
         }
       })
@@ -148,17 +165,27 @@ class ProjectStore {
 
   @action
   inProject = id => {
-    // return socketStore.ready().then(api => {
-    //   return api.inProject({ id, status: true })
-    // })
+    return socketStore.ready().then(api => {
+      this.broadcastId = uuid.v4()
+      return api.inProject({ id, broadcastId: this.broadcastId })
+    })
   }
 
   @action
   outProject = () => {
-    // if(!this.currentId) return
-    // socketStore.ready().then(api => {
-    //   return api.inProject({ id, status: false })
-    // })
+    this.currentId = ""
+    this.conflict = false
+  }
+
+  @action
+  showConflict = () => {
+    this.conflict = true
+  }
+
+  @action
+  notExit = () => {
+    this.conflict = false
+    this.inProject(this.currentId)
   }
 }
 

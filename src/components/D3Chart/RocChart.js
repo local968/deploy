@@ -19,7 +19,7 @@ function parseData(chartData) {
 export default class RocChart extends Component {
   state = {
     movable: false,
-    options: this.props.compareChart && this.props.models.map(m => m.id),
+    options: this.props.compareChart && this.props.models.map(m => m.name),
   }
   static defaultProps = {
     isFocus: true,
@@ -122,7 +122,7 @@ export default class RocChart extends Component {
 
   render() {
     const { compareChart } = this.props;
-    const names = compareChart && this.props.models.map(m => m.id);
+    const names = compareChart && this.props.models.map(m => m.name);
     // observe for fitIndex
     // const {fitIndex, isChangable} = this.props.model;
 
@@ -170,7 +170,7 @@ export default class RocChart extends Component {
     if (compareChart) {
       const { models } = this.props;
       models.forEach((m, index) => {
-        const lineEnable = this.state.options.indexOf(m.id) >= 0;
+        const lineEnable = this.state.options.indexOf(m.name) >= 0;
         this.drawChart(parseData(m.chartData.roc), x, y, svg, height, line, index, color, lineEnable, width);
       });
     } else {

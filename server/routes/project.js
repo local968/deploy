@@ -395,6 +395,16 @@ wss.register("testPub", (message, socket) => {
   return Promise.reject({ status: 1, test: "aaa" }).catch(err => err)
 })
 
+wss.register("inProject", (message, socket) => {
+  const userId = socket.session.userId
+  const id = message.id
+  const broadcastId = message.broadcastId
+  wss.clients.forEach(client => {
+    if (client === socket) return
+    if (client.session && client.session.userId === userId) client.send(JSON.stringify({ id, broadcastId, type: "inProject" }))
+  })
+})
+
 function mapObjectToArray(obj) {
   const arr = [];
   Object.entries(obj).forEach(([k, v]) => {

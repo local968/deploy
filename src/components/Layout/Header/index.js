@@ -100,6 +100,7 @@ class ProjectHeader extends Component {
 
   enter = index => {
     const { projectStore } = this.props;
+    if (projectStore.conflict) return
     let maxStep = projectStore.project.mainStep;
     if (index > maxStep) return;
     const { nextMainStep, updateProject } = projectStore.project

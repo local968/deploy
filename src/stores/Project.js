@@ -40,7 +40,7 @@ export default class Project {
 
   //project
   @observable name;
-  @observable description;
+  // @observable description;
 
   //problem
   @observable problemType = '';
@@ -95,9 +95,6 @@ export default class Project {
   @observable criteria = 'defualt';
 
   // 训练速度和过拟合
-  @observable overfit = 5;
-  @observable speed = 5;
-
   @observable speedVSaccuracy = 5;
 
   @observable advancedSize = 0;
@@ -158,13 +155,26 @@ export default class Project {
 
   @computed
   get defaultTarin() {
+    const measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
+
     return {
       train2Finished: false,
       train2ing: false,
       train2Error: false,
       criteria: 'defualt',
-      overfit: 5,
-      speed: 5
+      speedVSaccuracy: 5,
+      advancedSize: 0,
+      maxTime: 10,
+      randSeed: 0,
+      resampling: 'auto',
+      runWith: 'holdout',
+      crossCount: 5,
+      dataRange: 'all',
+      customField: '',
+      customRange: [],
+      algorithms: [],
+      measurement,
+      selectId: ''
     }
   }
 
@@ -572,19 +582,18 @@ export default class Project {
       api.dataView(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
-        if (status < 0) return alert("dataview error")
-        this.setProperty({
-          dataViews: result.data
-        })
+        if (status < 0) {
+          this.setProperty({ dataViews: {} })
+          return antdMessage.error("dataview error")
+        }
+        this.setProperty({ dataViews: result.data })
       })
     })
   }
 
   @action
   fixTarget = () => {
-    this.updateProject({
-      targetMap: this.targetMapTemp
-    })
+    this.updateProject({ targetMap: this.targetMapTemp })
     this.etl();
   }
 
@@ -661,8 +670,6 @@ export default class Project {
       problemType,
       target,
       dataHeader,
-      speed,
-      overfit,
       csvScript
     } = this;
     const command = 'train';
@@ -686,8 +693,6 @@ export default class Project {
     // feature_label: 特征列名
     // target_label:  目标列
     // fill_method:  无效值
-    // speed:  1-10  默认5
-    // overfit:   1-10 默认5
     // model_option: model的额外参数，不同model参数不同
     // kwargs:
     const trainData = {
@@ -695,8 +700,6 @@ export default class Project {
       featureLabel,
       targetLabel: target,
       projectId: id,
-      speed,
-      overfit,
       command
     };
 
@@ -711,8 +714,6 @@ export default class Project {
       problemType,
       target,
       dataHeader,
-      speed,
-      overfit,
       csvScript
     } = this;
     const command = 'train';
@@ -731,7 +732,8 @@ export default class Project {
       dataRange: this.dataRange,
       customField: this.customField,
       customRange: [...this.customRange],
-      algorithms: [...this.algorithms]
+      algorithms: [...this.algorithms],
+      speedVSaccuracy: this.speedVSaccuracy
     }, this.nextSubStep(2, 3)));
 
     this.models = []
@@ -744,13 +746,11 @@ export default class Project {
       featureLabel,
       targetLabel: target,
       projectId: id,
-      speed,
-      overfit,
       command,
       sampling: this.resampling,
       maxTime: this.maxTime,
       randSeed: this.randSeed,
-      algorithms: [...this.algorithms]
+      speedVSaccuracy: this.speedVSaccuracy
     };
 
     if (this.dataRange === "all") {
@@ -759,7 +759,7 @@ export default class Project {
     } else {
       trainData.splitBy = [this.customField, ...this.customRange]
     }
-
+    if (this.algorithms.length) trainData.algorithms = [...this.algorithms]
     if (exps) trainData.csvScript = exps.replace(/\|/g, ",")
 
     this.modeling(trainData)
@@ -874,10 +874,11 @@ export default class Project {
       api.preTrainImportance(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
-        if (status < 0) return alert("preTrainImportance error")
-        this.setProperty({
-          preImportance: result.data
-        })
+        if (status < 0) {
+          this.setProperty({ preImportance: {} })
+          return antdMessage.error("preTrainImportance error")
+        }
+        this.setProperty({ preImportance: result.data })
       })
     })
   }
