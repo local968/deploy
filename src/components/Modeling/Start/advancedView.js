@@ -168,8 +168,8 @@ export default class AdvancedView extends Component {
   render() {
     const { advancedName, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
     const measurementList = problemType === "Classification" ?
-      [{ value: "accuracy", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
-      [{ value: "r2", label: 'R²' }, { value: "mse", label: 'MSE' }]
+      [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
+      [{ value: "r2", label: 'R²' }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
     const customFieldList = rawHeader.filter(v => colType[v] === "Numerical")
     const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
 

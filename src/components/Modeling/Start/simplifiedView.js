@@ -425,7 +425,7 @@ class CreateNewVariable extends Component {
   checkExp = _expression => {
     let expression = _expression
     if (!expression) return { isPass: true, message: "ok", num: 0 }
-    const baseOptReg = new RegExp(/[\+\-\*\/]/)
+    const baseOptReg = new RegExp(/[+\-*/]/)
     const exps = []
     let num = 1
     let start = 0

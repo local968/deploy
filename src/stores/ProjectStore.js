@@ -1,4 +1,4 @@
-import { observable, action, when, autorun, computed } from "mobx";
+import { observable, action, when, computed } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
 import uuid from "uuid";

@@ -476,7 +476,7 @@ export class FixIssue extends Component {
         visible={this.visible}
         width='12em'
         title='Outlier'
-        onClose={this.closeTarget}
+        onClose={this.closeEdit}
       />}
     </div>
   }
@@ -485,7 +485,7 @@ export class FixIssue extends Component {
 @observer
 class EditOutLier extends Component {
   @observable min = this.props.outlierDict && this.props.outlierDict.length === 2 ? this.props.outlierDict[0] : this.props.outlierRange[0]
-  @observable  max = this.props.outlierDict && this.props.outlierDict.length === 2 ? this.props.outlierDict[1] : this.props.outlierRange[1]
+  @observable max = this.props.outlierDict && this.props.outlierDict.length === 2 ? this.props.outlierDict[1] : this.props.outlierRange[1]
   @observable temp = ''
   @observable focus = ''
 
@@ -511,7 +511,7 @@ class EditOutLier extends Component {
   d3Chart = () => {
     d3.select(`.${styles.d3Chart} svg`).remove();
     const { width, height, x, y } = this.props;
-    let { min, max } = this;
+    let { min, max, minX, maxX } = this;
     const padding = { left: 50, bottom: 30, right: 5, top: 100 };
 
     const realHeight = height - padding.bottom - padding.top;
@@ -524,19 +524,19 @@ class EditOutLier extends Component {
       .append("g")
       .attr('transform', `translate(${padding.left}, 0)`);
 
-    const maxH = d3.max(y);
+    const maxH = d3.max(y) || 1;
     const dataset = [];
 
     //x轴的比例尺
     const xScale = d3.scaleLinear()
+      .domain([minX, maxX])
       .range([0, realWidth])
-      .domain([this.minX, this.maxX])
       .clamp(true);
 
     //y轴的比例尺
     const yScale = d3.scaleLinear()
-      .range([realHeight, 0])
       .domain([0, maxH])
+      .range([realHeight, 0])
       .clamp(true);
 
     //定义x轴
@@ -562,7 +562,7 @@ class EditOutLier extends Component {
         .on('drag', () => {
           let minTemp = xScale.invert(d3.event.x)
           if (minTemp > max) minTemp = max;
-          if (minTemp < this.minX) minTemp = this.minX;
+          if (minTemp < minX) minTemp = minX;
           if (minTemp === min) return;
           min = minTemp;
           minRect.attr('width', xScale(min))
@@ -588,16 +588,16 @@ class EditOutLier extends Component {
       let minDragBlock = svg.append('g');
       let minRect = minDragBlock.append('rect')
         .attr('class', `${styles.dragRect}`)
-        .attr('x', xScale(this.minX))
+        .attr('x', xScale(minX))
         .attr('y', yScale(maxH) + padding.top)
-        .attr('width', xScale(min) - xScale(this.minX))
+        .attr('width', xScale(min) - xScale(minX))
         .attr('height', realHeight)
 
       let minLine = minDragBlock.append('line')
         .attr('class', `${styles.dragLine}`)
-        .attr('x1', xScale(min) - xScale(this.minX))
+        .attr('x1', xScale(min) - xScale(minX))
         .attr('y1', yScale(maxH) + padding.top)
-        .attr('x2', xScale(min) - xScale(this.minX))
+        .attr('x2', xScale(min) - xScale(minX))
         .attr('y2', realHeight + padding.top)
 
       let minCircle = minDragBlock.append('circle')
@@ -619,11 +619,11 @@ class EditOutLier extends Component {
         .on('drag', () => {
           let maxTemp = xScale.invert(d3.event.x)
           if (maxTemp < min) maxTemp = min;
-          if (maxTemp > this.maxX) maxTemp = this.maxX;
+          if (maxTemp > maxX) maxTemp = maxX;
           if (maxTemp === max) return;
           max = maxTemp;
           maxRect.attr('x', xScale(max))
-            .attr('width', xScale(this.maxX) - xScale(max))
+            .attr('width', xScale(maxX) - xScale(max))
           maxLine.attr('x1', xScale(max))
             .attr('x2', xScale(max))
           maxCircle.attr('cx', xScale(max))
@@ -647,7 +647,7 @@ class EditOutLier extends Component {
         .attr('class', `${styles.dragRect}`)
         .attr('x', xScale(max))
         .attr('y', yScale(maxH) + padding.top)
-        .attr('width', xScale(this.maxX) - xScale(max))
+        .attr('width', xScale(maxX) - xScale(max))
         .attr('height', realHeight)
 
       let maxLine = maxDragBlock.append('line')
@@ -691,79 +691,81 @@ class EditOutLier extends Component {
     const drawRect = () => {
       // 处理dataset数据
       for (let i = 1; i < x.length; i++) {
+        let data
         if (x[i] <= min || x[i - 1] >= max) {
-          dataset.push({
+          data = {
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
-            width: xScale(Math.abs(x[i] - x[i - 1])) - xScale(0),
+            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
             class: styles.outer
-          })
+          }
         } else if (x[i] <= max && x[i - 1] >= min) {
-          dataset.push({
+          data = {
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
-            width: xScale(Math.abs(x[i] - x[i - 1])) - xScale(0),
+            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
             class: styles.rect
-          })
+          }
         } else if (x[i] > max && x[i - 1] < max && x[i - 1] > min) {
-          const left = xScale(Math.abs(x[i - 1] - max)) - xScale(0)
-          dataset.push({
+          const left = Math.abs(xScale(x[i - 1]) - xScale(max))
+          data = {
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
             width: left,
             class: styles.rect
-          })
-          dataset.push({
+          }
+          data = {
             x: xScale(x[i - 1]) + left,
             y: yScale(y[i - 1]) + padding.top,
-            width: xScale(Math.abs(x[i] - x[i - 1])) - xScale(0) - left,
+            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
             class: styles.outer
-          })
+          }
         } else if (x[i] > min && x[i - 1] < min && x[i] < max) {
-          const left = xScale(Math.abs(x[i - 1] - min)) - xScale(0)
-          dataset.push({
+          const left = Math.abs(xScale(x[i - 1]) - xScale(min))
+          data = {
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
             width: left,
             class: styles.outer
-          })
-          dataset.push({
+          }
+          data = {
             x: xScale(x[i - 1]) + left,
             y: yScale(y[i - 1]) + padding.top,
-            width: xScale(Math.abs(x[i] - x[i - 1])) - xScale(0) - left,
+            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
             class: styles.rect
-          })
+          }
         } else {
           if (min > max) {
-            dataset.push({
+            data = {
               x: xScale(x[i - 1]),
               y: yScale(y[i - 1]) + padding.top,
-              width: xScale(Math.abs(x[i] - x[i - 1])) - xScale(0),
+              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
               class: styles.outer
-            })
+            }
           } else {
-            const left = xScale(Math.abs(x[i - 1] - min)) - xScale(0);
-            const middle = xScale(Math.abs(max - min)) - xScale(0);
-            dataset.push({
+            const left = Math.abs(xScale(x[i - 1]) - xScale(min))
+            const middle = Math.abs(xScale(max) - xScale(min))
+            data = {
               x: xScale(x[i - 1]),
               y: yScale(y[i - 1]) + padding.top,
               width: left,
               class: styles.outer
-            })
-            dataset.push({
+            }
+            data = {
               x: xScale(x[i - 1]) + left,
               y: yScale(y[i - 1]) + padding.top,
               width: middle,
               class: styles.rect
-            })
-            dataset.push({
+            }
+            data = {
               x: xScale(x[i - 1]) + left + middle,
               y: yScale(y[i - 1]) + padding.top,
-              width: xScale(Math.abs(x[i] - x[i - 1])) - xScale(0) - left - middle,
+              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
               class: styles.outer
-            })
+            }
           }
         }
+        dataset.push(data)
       }
 
       const rects = svg.selectAll(`.${styles.rect}`);
@@ -776,7 +778,7 @@ class EditOutLier extends Component {
         .attr("x", (d) => d.x)
         .attr("y", (d) => d.y)
         .attr("width", (d) => d.width)
-        .attr("height", (d) => realHeight - d.y + padding.top);
+        .attr("height", (d) => {console.log(realHeight , d.y , padding.top);return realHeight - d.y + padding.top});
     }
 
     //添加矩形元素
@@ -787,7 +789,7 @@ class EditOutLier extends Component {
     this.temp = e.target.value
   }
 
-  focus = type => {
+  focusInput = type => {
     if (!type) return;
     this.focus = type
     this.temp = this.renderNum(this[type])
@@ -838,11 +840,11 @@ class EditOutLier extends Component {
       <div className={styles.outlierBox}>
         <div className={styles.outlierBlock}>
           <div className={styles.outliertext}><span>min</span></div>
-          <div className={styles.input}><input value={focus === 'min' ? temp : this.renderNum(min)} onChange={this.change} onFocus={this.focus.bind(null, 'min')} onBlur={this.blur} /></div>
+          <div className={styles.input}><input value={focus === 'min' ? temp : this.renderNum(min)} onChange={this.change} onFocus={this.focusInput.bind(null, 'min')} onBlur={this.blur} /></div>
         </div>
         <div className={styles.outlierBlock}>
           <div className={styles.outliertext}><span>max</span></div>
-          <div className={styles.input}><input value={focus === 'max' ? temp : this.renderNum(max)} onChange={this.change} onFocus={this.focus.bind(null, 'max')} onBlur={this.blur} /></div>
+          <div className={styles.input}><input value={focus === 'max' ? temp : this.renderNum(max)} onChange={this.change} onFocus={this.focusInput.bind(null, 'max')} onBlur={this.blur} /></div>
         </div>
         <div className={styles.outlierBlock}><button onClick={this.reset}><span>Reset to default</span></button></div>
       </div>
