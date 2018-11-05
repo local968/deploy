@@ -453,7 +453,7 @@ class ModelDetail extends Component {
             <span>
               {problemType === Classification
                 ? model.score.validateScore.acc.toFixed(2)
-                : model.score.validateScore.nrmse.toFixed(4)}
+                : model.score.validateScore.rmse.toFixed(4)}
             </span>
           </div>
           <div className={styles.cell}>

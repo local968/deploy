@@ -5,7 +5,9 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import Slider from 'rc-slider';
 import { NumberInput } from 'components/Common';
+import { Select } from 'antd';
 
+const Option = Select.Option;
 const Range = Slider.Range;
 const ClassificationAlgorithms = ['adaboost', 'bernoulli_nb', 'decision_tree', 'extra_trees', 'gaussian_nb', 'gradient_boosting', 'k_nearest_neighbors', 'lda', 'liblinear_svc', 'libsvm_svc', 'multinomial_nb', 'passive_aggressive', 'qda', 'random_forest', 'sgd', 'xgradient_boosting'];
 const RegressionAlgorithms = ['adaboost', 'ard_regression', 'decision_tree', 'extra_trees', 'gaussian_process', 'gradient_boosting', 'k_nearest_neighbors', 'liblinear_svr', 'libsvm_svr', 'random_forest', 'ridge_regression', 'sgd', 'xgradient_boosting'];
@@ -69,7 +71,7 @@ export default class AdvancedView extends Component {
   }
 
   changeCrossCount = value => {
-      this.props.project.crossCount = value;
+    this.props.project.crossCount = value;
   }
 
   handleMaxTime = value => {
@@ -80,8 +82,8 @@ export default class AdvancedView extends Component {
     this.props.project.randSeed = value;
   }
 
-  handleMeasurement = e => {
-    this.props.project.measurement = e.target.value
+  handleMeasurement = value => {
+    this.props.project.measurement = value
   }
 
   handleRunWith = v => {
@@ -151,7 +153,7 @@ export default class AdvancedView extends Component {
     const { advancedName, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
-      [{ value: "r2", label: 'R²' }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
+      [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
     const customFieldList = rawHeader.filter(v => colType[v] === "Numerical")
     const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
 
@@ -238,11 +240,14 @@ export default class AdvancedView extends Component {
                   <span>Set Measurement:</span>
                 </div>
                 <div className={styles.advancedOption}>
-                  <select className={classnames(styles.advancedSize, styles.inputLarge)} value={measurement} onChange={this.handleMeasurement} >
+                  <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} >
+                    {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
+                  </Select>
+                  {/* <select className={classnames(styles.advancedSize, styles.inputLarge)} value={measurement} onChange={this.handleMeasurement} >
                     {measurementList.map((i, k) => {
                       return <option value={i.value} key={k}>{i.label}</option>
                     })}
-                  </select>
+                  </select> */}
                 </div>
               </div>
               <div className={styles.advancedBlock}>

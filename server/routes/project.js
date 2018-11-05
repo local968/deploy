@@ -399,23 +399,6 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
 wss.register('histgramPlot', (message, socket, progress) => {
   const id = message.projectId
   const userId = socket.session.userId
-  const univariatePlots = {}
-  command({ ...message, userId, requestId: message._id }, progressResult => {
-    if (progressResult.status < 0 || progressResult.status === 100) {
-      createOrUpdate(id, userId, { univariatePlots })
-      return progressResult
-    }
-    const { result } = progressResult
-    const { field, imageSavePath, progress: status } = result;
-    if (status && status === "start") return
-    univariatePlots[field] = imageSavePath
-    return progress(result)
-  })
-})
-
-wss.register('univariatePlot', (message, socket, progress) => {
-  const id = message.projectId
-  const userId = socket.session.userId
   const histgramPlots = {}
   command({ ...message, userId, requestId: message._id }, progressResult => {
     if (progressResult.status < 0 || progressResult.status === 100) {
@@ -426,7 +409,24 @@ wss.register('univariatePlot', (message, socket, progress) => {
     const { field, imageSavePath, progress: status } = result;
     if (status && status === "start") return
     histgramPlots[field] = imageSavePath
-    return progress(result)
+    return progress(progressResult)
+  })
+})
+
+wss.register('univariatePlot', (message, socket, progress) => {
+  const id = message.projectId
+  const userId = socket.session.userId
+  const univariatePlots = {}
+  command({ ...message, userId, requestId: message._id }, progressResult => {
+    if (progressResult.status < 0 || progressResult.status === 100) {
+      createOrUpdate(id, userId, { univariatePlots })
+      return progressResult
+    }
+    const { result } = progressResult
+    const { field, imageSavePath, progress: status } = result;
+    if (status && status === "start") return
+    univariatePlots[field] = imageSavePath
+    return progress(progressResult)
   })
 })
 
