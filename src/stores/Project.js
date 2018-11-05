@@ -506,8 +506,12 @@ export default class Project {
       data.outlierDict = toJS(this.outlierDict);
     }
 
-    if (this.noCompute || this.firstEtl) {
+    if (this.noCompute) {
       data.noCompute = true;
+    }
+
+    if (this.firstEtl) {
+      data.firstEtl = true;
     }
 
     if (this.firstEtl) {
@@ -541,6 +545,7 @@ export default class Project {
             }
           });
         }
+        console.log(progressResult)
         // this.project.setProperty(result)
         // this.updateProject(result)
       }))
@@ -550,10 +555,10 @@ export default class Project {
 
         if (status !== 200) return antdMessage.error(message)
         this.setProperty(result)
-        when(
-          () => !!this.uploadData.length,
-          () => this.updateProject(this.next())
-        )
+        // when(
+        //   () => !!this.uploadData.length,
+        //   () => this.updateProject(this.next())
+        // )
       })
   }
 
@@ -773,16 +778,17 @@ export default class Project {
       this.setModel(result)
     })).then(returnValue => {
       const { status, message } = returnValue
-      if (status === -1 && this.models.length === 0) {
-        return this.modelingError()
-      }
+      // if (status === -1 && this.models.length === 0) {
+      //   return this.modelingError()
+      // }
       if (status < -1) {
-        return this.concurrentError(message)
+        antdMessage.error(message)
+        // return this.concurrentError(message)
       }
-      this.updateProject({
-        train2Finished: true,
-        train2ing: false
-      });
+      // this.updateProject({
+      //   train2Finished: true,
+      //   train2ing: false
+      // });
     })
   }
 
@@ -798,28 +804,28 @@ export default class Project {
     }
   }
 
-  modelingError = () => {
-    this.updateProject({
-      train2Finished: true,
-      train2ing: false,
-      train2Error: true,
-      selectId: '',
-    });
-  }
+  // modelingError = () => {
+  //   this.updateProject({
+  //     train2Finished: true,
+  //     train2ing: false,
+  //     train2Error: true,
+  //     selectId: '',
+  //   });
+  // }
 
-  concurrentError = message => {
-    antdMessage.error(message)
-    this.updateProject({
-      train2Finished: false,
-      train2ing: false,
-      train2Error: false,
-      selectId: '',
-      mainStep: 3,
-      curStep: 3,
-      lastSubStep: 1,
-      subStepActive: 1
-    });
-  }
+  // concurrentError = message => {
+  //   antdMessage.error(message)
+  //   this.updateProject({
+  //     train2Finished: false,
+  //     train2ing: false,
+  //     train2Error: false,
+  //     selectId: '',
+  //     mainStep: 3,
+  //     curStep: 3,
+  //     lastSubStep: 1,
+  //     subStepActive: 1
+  //   });
+  // }
 
   calcPredicted = model => {
     const { targetMap, colMap, target } = this;
@@ -889,10 +895,9 @@ export default class Project {
       const command = {
         projectId: this.id,
         command: 'correlationMatrix',
-        featureLabel: toJS(this.dataHeader)
+        featureLabel: this.dataHeader.filter(n => n !== this.target)
       };
-      api.correlationMatrix(command, progressResult => {
-      }).then(returnValue => {
+      api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) return alert("correlationMatrix error")
         this.correlationMatrixImg = result.imageSavePath
@@ -920,7 +925,6 @@ export default class Project {
         const univariatePlots = Object.assign({}, this.univariatePlots);
         univariatePlots[plotKey] = imageSavePath
         this.setProperty({ univariatePlots })
-      }).then(returnValue => {
       })
     })
   }
@@ -945,7 +949,6 @@ export default class Project {
         const histgramPlots = Object.assign({}, this.histgramPlots);
         histgramPlots[plotKey] = imageSavePath
         this.setProperty({ histgramPlots })
-      }).then(returnValue => {
       })
     })
   }
@@ -988,8 +991,7 @@ export default class Project {
         projectId: this.id,
         version: this.models.map(m => m.name).toString(),
         command: 'fitPlotAndResidualPlot',
-        csvLocation: [...this.uploadFileName],
-        featureLabel: toJS(this.dataHeader)
+        featureLabel: this.dataHeader.filter(n => n !== this.target)
       }
       api.fitPlotAndResidualPlot(request, chartResult => {
         const { result } = chartResult;
@@ -999,7 +1001,7 @@ export default class Project {
         })
         if (model) {
           model.updateModel({
-            [result.action]: `/api/fetchImg?imgPath=${result.imageSavePath}`
+            [result.action]: `http://${config.host}:${config.port}/redirect/download/${result.imageSavePath}?projectId=${this.id}`
           });
         }
       })

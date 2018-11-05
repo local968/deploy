@@ -185,6 +185,10 @@
     line-height: 1.2;
 }
 
+.progressLarge {
+    max-width: 100%;
+}
+
 .success {
     background-color: #9be44b;
 }
