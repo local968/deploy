@@ -103,7 +103,7 @@ export default class Project {
   @observable measurement = '';
   @observable resampling = "auto";
   @observable runWith = 'holdout';
-  @observable crossCount = 5;
+  @observable crossCount = 3;
   @observable dataRange = 'all';
   @observable customField = '';
   @observable customRange = [];
@@ -131,8 +131,8 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      validationRate: 10,
-      holdoutRate: 10
+      validationRate: 15,
+      holdoutRate: 5
     }
   }
 
@@ -168,7 +168,7 @@ export default class Project {
       randSeed: 0,
       resampling: 'auto',
       runWith: 'holdout',
-      crossCount: 5,
+      crossCount: 3,
       dataRange: 'all',
       customField: '',
       customRange: [],
@@ -705,6 +705,7 @@ export default class Project {
       featureLabel,
       targetLabel: target,
       projectId: id,
+      version: "1,2",
       command
     };
 
@@ -738,7 +739,9 @@ export default class Project {
       customField: this.customField,
       customRange: [...this.customRange],
       algorithms: [...this.algorithms],
-      speedVSaccuracy: this.speedVSaccuracy
+      speedVSaccuracy: this.speedVSaccuracy,
+      runWith: this.runWith,
+      crossCount: this.crossCount
     }, this.nextSubStep(2, 3)));
 
     this.models = []
@@ -755,16 +758,21 @@ export default class Project {
       sampling: this.resampling,
       maxTime: this.maxTime,
       randSeed: this.randSeed,
-      speedVSaccuracy: this.speedVSaccuracy
+      speedVSaccuracy: this.speedVSaccuracy,
+      version: "1,2,3",
+      algorithms = [...this.algorithms]
     };
-
+    
     if (this.dataRange === "all") {
-      trainData.validationRate = this.validationRate / 100
       trainData.holdoutRate = this.holdoutRate / 100
+      if(this.runWith === "holdout") {
+        trainData.validationRate = this.validationRate / 100
+      }else{
+        trainData.nfold = this.crossCount
+      }
     } else {
       trainData.splitBy = [this.customField, ...this.customRange]
     }
-    if (this.algorithms.length) trainData.algorithms = [...this.algorithms]
     if (exps) trainData.csvScript = exps.replace(/\|/g, ",")
 
     this.modeling(trainData)
