@@ -230,16 +230,20 @@ class PredictedProgress extends Component {
       <div className={styles.progressLine}>
         {title}
         {!!predictedPercent && <div
-          className={classnames(styles.progress, styles[type])}
+          className={classnames(styles.progress, styles[type], {
+            [styles.progressLarge]: !failedPercent
+          })}
           style={{
             width: width * predicted + 'em',
-            height: (height || 0.27) + 'em'
+            height: (height || 0.27) + 'em',
           }}
         >
           <span>{predictedPercent + '%'}</span>
         </div>}
         {!!failedPercent && <div
-          className={classnames(styles.progress, styles.different)}
+          className={classnames(styles.progress, styles.different, {
+            [styles.progressLarge]: !predictedPercent
+          })}
           style={{
             width: width * (1 - predicted) + 'em',
             height: (height || 0.27) + 'em'

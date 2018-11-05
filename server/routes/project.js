@@ -7,6 +7,17 @@ const command = require('../command')
 
 const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
 
+function setDefaultData(id, userId) {
+  const data = {
+    correlationMatrixImg: '',
+    univariatePlots: {},
+    histgramPlots: {},
+    preImportance: null,
+    dataViews: null
+  }
+  return createOrUpdate(id, userId, data)
+}
+
 function query(key, params) {
   const Field = ["id", "name", "createTime", "curStep", "host"]
   const pipeline = redis.pipeline();
@@ -300,55 +311,124 @@ wss.register("queryModelList", message => {
 
 wss.register('etl', (message, socket, progress) => {
   const files = message.csvLocation
-  const id = message.projectId
+  const userId = socket.session.userId
+  const { firstEtl, noCompute, projectId: id } = message
 
-  return getFileInfo(files).then((fileInfo) => {
-    if (fileInfo.status !== 200) return fileInfo
-    const { csvLocation, ext } = fileInfo
-    const data = { ...message, userId: socket.session.userId, requestId: message._id, csvLocation, ext }
-    if (!csvLocation) delete data.csvLocation
-    if (!ext) delete data.ext
-    return sendToCommand(data, progress).then(returnValue => {
-      let { result, status } = returnValue;
-      if (status < 0) return {
-        status: 418,
-        message: result['process error']
-      }
-      Object.keys(result).forEach(k => {
-        if (k === "name") {
-          delete result[k];
+  return setDefaultData(id, userId).then(setResult => {
+    if (setResult.status !== 200) return setResult
+    return getFileInfo(files).then((fileInfo) => {
+      if (fileInfo.status !== 200) return fileInfo
+      const { csvLocation, ext } = fileInfo
+      const data = { ...message, userId: userId, requestId: message._id, csvLocation, ext, noCompute: firstEtl || noCompute }
+      delete data.firstEtl
+      if (!csvLocation) delete data.csvLocation
+      if (!ext) delete data.ext
+      return sendToCommand(data, progress).then(returnValue => {
+        let { result, status } = returnValue;
+        if (status < 0) return {
+          status: 418,
+          message: result['process error']
         }
-        if (k.includes("FillMethod")) {
-          Object.keys(result[k]).forEach(key => {
-            if (result[k][key] === "ignore") delete result[k][key]
-          })
-        }
-      })
-      result.dataViews = null;
-      result.firstEtl = false;
-      if (!files) delete result.totalRawLines
+        Object.keys(result).forEach(k => {
+          if (k === "name") {
+            delete result[k];
+          }
+          if (k.includes("FillMethod")) {
+            Object.keys(result[k]).forEach(key => {
+              if (result[k][key] === "ignore") delete result[k][key]
+            })
+          }
+        })
+        result.dataViews = null;
+        result.firstEtl = false;
+        if (!files) delete result.totalRawLines
 
-      return createOrUpdate(id, socket.session.userId, result).then(updateResult => {
-        if (updateResult.status !== 200) return updateResult
-        return {
-          status: 200,
-          message: 'ok',
-          result: result
+        const steps = {}
+        if (firstEtl) {
+          steps.subStepActive = 2
+          steps.lastSubStep = 2
+        } else {
+          if (noCompute) {
+            steps.curStep = 3
+            steps.mainStep = 3
+            steps.subStepActive = 1
+            steps.lastSubStep = 1
+          } else {
+            steps.subStepActive = 3
+            steps.lastSubStep = 3
+          }
         }
+
+        return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
+          if (updateResult.status !== 200) return updateResult
+          return {
+            status: 200,
+            message: 'ok',
+            result: result
+          }
+        })
       })
     })
   })
 })
 
-wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
+wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
+  const { status, result } = returnValue
+  if (status === 100) {
+    createOrUpdate(message.projectId, socket.session.userId, { dataViews: result.data })
+  }
+  return returnValue
+}))
 
-wss.register('correlationMatrix', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
+wss.register('correlationMatrix', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
+  const { status, result } = returnValue
+  if (status === 100) {
+    createOrUpdate(message.projectId, socket.session.userId, { correlationMatrixImg: result.imageSavePath })
+  }
+  return returnValue
+}))
 
-wss.register('preTrainImportance', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
+wss.register('preTrainImportance', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
+  const { status, result } = returnValue
+  if (status === 100) {
+    createOrUpdate(message.projectId, socket.session.userId, { preImportance: result.data })
+  }
+  return returnValue
+}))
 
-wss.register('histgramPlot', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
+wss.register('histgramPlot', (message, socket, progress) => {
+  const id = message.projectId
+  const userId = socket.session.userId
+  const univariatePlots = {}
+  command({ ...message, userId, requestId: message._id }, progressResult => {
+    if (progressResult.status < 0 || progressResult.status === 100) {
+      createOrUpdate(id, userId, { univariatePlots })
+      return progressResult
+    }
+    const { result } = progressResult
+    const { field, imageSavePath, progress: status } = result;
+    if (status && status === "start") return
+    univariatePlots[field] = imageSavePath
+    return progress(result)
+  })
+})
 
-wss.register('univariatePlot', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
+wss.register('univariatePlot', (message, socket, progress) => {
+  const id = message.projectId
+  const userId = socket.session.userId
+  const histgramPlots = {}
+  command({ ...message, userId, requestId: message._id }, progressResult => {
+    if (progressResult.status < 0 || progressResult.status === 100) {
+      createOrUpdate(id, userId, { histgramPlots })
+      return progressResult
+    }
+    const { result } = progressResult
+    const { field, imageSavePath, progress: status } = result;
+    if (status && status === "start") return
+    histgramPlots[field] = imageSavePath
+    return progress(result)
+  })
+})
 
 wss.register('chartData', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
@@ -358,19 +438,43 @@ wss.register('createNewVariable', (message, socket, progress) => sendToCommand({
 
 wss.register('train', (message, socket, progress) => {
   const userId = socket.session.userId
+  const projectId = message.projectId
   const data = { ...message, userId, requestId: message._id }
+  let num = 0
   return checkTraningRestriction(socket.session.user)
     .then(() => deleteModels(message.projectId))
     .then(() => command(data, queueValue => {
       const isFinish = queueValue.status < 0 || queueValue.status === 100
       if (isFinish) return queueValue
-      const { result, projectId } = queueValue
+      const { result } = queueValue
       if (result.progress === "start") return progress(result)
       return createModel(projectId, result).then(model => {
+        num++
         wss.publish("user:" + userId + ":projects", model)
         return progress(model)
       })
-    }))
+    })
+      .then(returnValue => {
+        const { status } = returnValue
+        const statusData = {
+          train2Finished: true,
+          train2ing: false,
+          train2Error: false,
+          selectId: ''
+        }
+        if (status === -1 && num === 0) {
+          statusData.train2Error = true
+        }
+        if (status < -1) {
+          statusData.train2Finished = false
+          statusData.mainStep = 3
+          statusData.curStep = 3
+          statusData.lastSubStep = 1
+          statusData.subStepActive = 1
+        }
+        createOrUpdate(projectId, userId, statusData)
+        return returnValue
+      }))
     .catch(err => err)
 })
 

@@ -308,7 +308,7 @@ export class FixIssue extends Component {
     this.canSave = true
   }
 
-  render = () => {
+  render() {
     const { closeFixes, project, saveDataFixes } = this.props;
     const { issueRows, colType, mismatchIndex, nullIndexes, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict } = project
     return <div className={styles.fixesContent}>
@@ -778,7 +778,7 @@ class EditOutLier extends Component {
         .attr("x", (d) => d.x)
         .attr("y", (d) => d.y)
         .attr("width", (d) => d.width)
-        .attr("height", (d) => {console.log(realHeight , d.y , padding.top);return realHeight - d.y + padding.top});
+        .attr("height", (d) => realHeight - d.y + padding.top);
     }
 
     //添加矩形元素

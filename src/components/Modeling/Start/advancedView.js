@@ -4,11 +4,25 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import Slider from 'rc-slider';
+import { NumberInput } from 'components/Common';
 
 const Range = Slider.Range;
 const ClassificationAlgorithms = ['adaboost', 'bernoulli_nb', 'decision_tree', 'extra_trees', 'gaussian_nb', 'gradient_boosting', 'k_nearest_neighbors', 'lda', 'liblinear_svc', 'libsvm_svc', 'multinomial_nb', 'passive_aggressive', 'qda', 'random_forest', 'sgd', 'xgradient_boosting'];
 const RegressionAlgorithms = ['adaboost', 'ard_regression', 'decision_tree', 'extra_trees', 'gaussian_process', 'gradient_boosting', 'k_nearest_neighbors', 'liblinear_svr', 'libsvm_svr', 'random_forest', 'ridge_regression', 'sgd', 'xgradient_boosting'];
-
+const HandleStyle = {
+  backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
+  border: '0.07em solid #e8e8e8',
+  width: '0.3em',
+  height: '0.3em',
+  marginLeft: '-0.15em',
+  marginTop: '-0.13em',
+  borderRadius: '50%',
+  display: 'flex',
+  flex: 'none',
+  alignitems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer'
+}
 
 @observer
 export default class AdvancedView extends Component {
@@ -30,66 +44,40 @@ export default class AdvancedView extends Component {
   handleSlider = value => {
     const { runWith } = this.props.project;
     if (runWith === 'holdout') {
-      this.props.project.holdoutRate = (100 - value[1]);
-      this.props.project.validationRate = (value[1] - value[0]);
+      this.props.project.holdoutRate = 100 - value[1];
+      this.props.project.validationRate = value[1] - value[0];
     } else {
-      this.props.project.holdoutRate = (100 - value[0]);
+      this.props.project.holdoutRate = 100 - value[0];
     }
   }
 
-  changeValidationRate = e => {
-    let value = e.target.value;
-    if (value && !isNaN(value)) {
-      const { validationRate, holdoutRate } = this.props.project;
-      value = parseInt(value, 10)
-      if (value < 1) value = 1;
-      if (value + holdoutRate > 99) value = 99 - holdoutRate;
-      if (validationRate === value) return;
-      this.props.project.validationRate = value;
-    }
+  changeValidationRate = value => {
+    const { validationRate, holdoutRate } = this.props.project;
+    if (value < 1) value = 1;
+    if (value + holdoutRate > 99) value = 99 - holdoutRate;
+    if (validationRate === value) return;
+    this.props.project.validationRate = value;
   }
 
-  changeHoldoutRate = e => {
-    let value = e.target.value;
-    if (value && !isNaN(value)) {
-      const { holdoutRate, validationRate, runWith } = this.props.project;
-      const num = runWith === 'holdout' ? validationRate : 0;
-      value = parseInt(value, 10);
-      if (value < 1) value = 1;
-      if (value + num > 99) value = 99 - num;
-      if (holdoutRate === value) return;
-      this.props.project.holdoutRate = value;
-    }
+  changeHoldoutRate = value => {
+    const { holdoutRate, validationRate, runWith } = this.props.project;
+    const num = runWith === 'holdout' ? validationRate : 0;
+    if (value < 1) value = 1;
+    if (value + num > 99) value = 99 - num;
+    if (holdoutRate === value) return;
+    this.props.project.holdoutRate = value;
   }
 
-  changeCrossCount = e => {
-    let value = e.target.value;
-    if (value && !isNaN(value)) {
-      const { crossCount } = this.props.project;
-      value = parseInt(value, 10);
-      if (value > 15) value = 15;
-      if (value < 2) value = 2;
-      if (value === crossCount) return;
+  changeCrossCount = value => {
       this.props.project.crossCount = value;
-    }
   }
 
-  handleMaxTime = e => {
-    let value = e.target.value;
-    if (value && !isNaN(value)) {
-      value = parseFloat(value)
-      if (value < 3) return;
-      this.props.project.maxTime = value;
-    }
+  handleMaxTime = value => {
+    this.props.project.maxTime = value;
   }
 
-  handleRandSeed = e => {
-    let value = e.target.value;
-    if (value && !isNaN(value)) {
-      value = parseInt(value, 10)
-      if (value < 0 || value > 99999999) return;
-      this.props.project.randSeed = value;
-    }
+  handleRandSeed = value => {
+    this.props.project.randSeed = value;
   }
 
   handleMeasurement = e => {
@@ -153,13 +141,7 @@ export default class AdvancedView extends Component {
     this.props.project.speedVSaccuracy = value[0]
   }
 
-  changeSpeed = (isSpeed, e) => {
-    let value = e.target.value
-    if (!value || isNaN(value)) return
-    if (value.toString().includes(".")) return
-    try {
-      value = parseInt(value, 10)
-    } catch (e) { }
+  changeSpeed = (isSpeed, value) => {
     if (!isSpeed) value = 10 - value
     if (value < 1 || value > 9) return
     this.props.project.speedVSaccuracy = value
@@ -269,7 +251,7 @@ export default class AdvancedView extends Component {
                   <span className={styles.advancedDesc}>Max amount of time to evaluate different modules.</span>
                 </div>
                 <div className={styles.advancedOption}>
-                  <input className={styles.advancedSize} value={maxTime} onChange={this.handleMaxTime} />
+                  <NumberInput className={styles.advancedSize} value={maxTime} onBlur={this.handleMaxTime} min={3} isInt={true} />
                   <span>Minutes<br />(3 minutes or longer)</span>
                 </div>
               </div>
@@ -279,7 +261,7 @@ export default class AdvancedView extends Component {
                   <span className={styles.advancedDesc}>Value between 0 - 99999999</span>
                 </div>
                 <div className={styles.advancedOption}>
-                  <input className={classnames(styles.advancedSize, styles.inputLarge)} value={randSeed} onChange={this.handleRandSeed} />
+                  <NumberInput className={classnames(styles.advancedSize, styles.inputLarge)} value={randSeed} onBlur={this.handleRandSeed} min={0} max={99999999} isInt={true} />
                 </div>
               </div>
             </div>
@@ -342,33 +324,7 @@ export default class AdvancedView extends Component {
                   className={styles.range}
                   railStyle={{ backgroundColor: 'transparent' }}
                   trackStyle={[{ backgroundColor: 'transparent' }, { backgroundColor: 'transparent' }]}
-                  handleStyle={[{
-                    backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
-                    border: '0.07em solid #e8e8e8',
-                    width: '0.3em',
-                    height: '0.3em',
-                    marginLeft: '-0.15em',
-                    marginTop: '-0.13em',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    flex: 'none',
-                    alignitems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer'
-                  }, {
-                    backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
-                    border: '0.07em solid #e8e8e8',
-                    width: '0.3em',
-                    height: '0.3em',
-                    marginLeft: '-0.15em',
-                    marginTop: '-0.13em',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    flex: 'none',
-                    alignitems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer'
-                  }]}
+                  handleStyle={[HandleStyle, HandleStyle]}
                   value={[100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10), 100 - parseInt(holdoutRate, 10)]}
                   onChange={this.handleSlider}
                   allowCross={false}
@@ -386,20 +342,7 @@ export default class AdvancedView extends Component {
                     className={styles.range}
                     railStyle={{ backgroundColor: 'transparent' }}
                     trackStyle={[{ backgroundColor: 'transparent' }]}
-                    handleStyle={[{
-                      backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
-                      border: '0.07em solid #e8e8e8',
-                      width: '0.3em',
-                      height: '0.3em',
-                      marginLeft: '-0.15em',
-                      marginTop: '-0.13em',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      flex: 'none',
-                      alignitems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer'
-                    }]}
+                    handleStyle={[HandleStyle]}
                     value={[100 - parseInt(holdoutRate, 10)]}
                     onChange={this.handleSlider}
                     allowCross={false}
@@ -423,7 +366,7 @@ export default class AdvancedView extends Component {
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)}></div>
                     <span>Validation</span>
                   </div>
-                  <input value={parseInt(validationRate, 10)} onChange={this.changeValidationRate} />
+                  <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} />
                   <span>%</span>
                 </div>
                 <div className={styles.advancedPercentInput}>
@@ -431,7 +374,7 @@ export default class AdvancedView extends Component {
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
                     <span>Holdout</span>
                   </div>
-                  <input value={parseInt(holdoutRate, 10)} onChange={this.changeHoldoutRate} />
+                  <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} />
                   <span>%</span>
                 </div>
               </div> : <div className={styles.advancedPercentBox}>
@@ -440,14 +383,14 @@ export default class AdvancedView extends Component {
                       <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
                       <span>Select Number of CV folds</span>
                     </div>
-                    <input value={crossCount} onChange={this.changeCrossCount} />
+                    <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={5} isInt={true} />
                   </div>
                   <div className={styles.advancedPercentInput}>
                     <div className={styles.advancedPercentText}>
                       <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
                       <span>Holdout</span>
                     </div>
-                    <input value={parseInt(holdoutRate, 10)} onChange={this.changeHoldoutRate} />
+                    <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} />
                     <span>%</span>
                   </div>
                 </div>}
@@ -467,20 +410,7 @@ export default class AdvancedView extends Component {
                   className={styles.range}
                   railStyle={{ backgroundColor: 'transparent' }}
                   trackStyle={[{ backgroundColor: 'transparent' }]}
-                  handleStyle={[{
-                    backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
-                    border: '0.07em solid #e8e8e8',
-                    width: '0.3em',
-                    height: '0.3em',
-                    marginLeft: '-0.15em',
-                    marginTop: '-0.13em',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    flex: 'none',
-                    alignitems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer'
-                  }]}
+                  handleStyle={[HandleStyle]}
                   value={[speedVSaccuracy]}
                   onChange={this.handleSpeed}
                   min={1}
@@ -495,14 +425,14 @@ export default class AdvancedView extends Component {
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
                     <span>Speed</span>
                   </div>
-                  <input value={speedVSaccuracy} onChange={this.changeSpeed.bind(null, true)} />
+                  <NumberInput value={speedVSaccuracy} onBlur={this.changeSpeed.bind(null, true)} min={1} max={9} isInt={true} />
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
                     <span>Accuracy</span>
                   </div>
-                  <input value={10 - speedVSaccuracy} onChange={this.changeSpeed.bind(null, false)} />
+                  <NumberInput value={10 - speedVSaccuracy} onBlur={this.changeSpeed.bind(null, false)} min={1} max={9} isInt={true} />
                 </div>
               </div>
             </div>
@@ -568,33 +498,7 @@ class CustomRange extends Component {
             className={styles.range}
             railStyle={{ backgroundColor: 'transparent' }}
             trackStyle={[{ backgroundColor: 'transparent' }, { backgroundColor: 'transparent' }]}
-            handleStyle={[{
-              backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
-              border: '0.07em solid #e8e8e8',
-              width: '0.3em',
-              height: '0.3em',
-              marginLeft: '-0.15em',
-              marginTop: '-0.13em',
-              borderRadius: '50%',
-              display: 'flex',
-              flex: 'none',
-              alignitems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }, {
-              backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
-              border: '0.07em solid #e8e8e8',
-              width: '0.3em',
-              height: '0.3em',
-              marginLeft: '-0.15em',
-              marginTop: '-0.13em',
-              borderRadius: '50%',
-              display: 'flex',
-              flex: 'none',
-              alignitems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }]}
+            handleStyle={[HandleStyle, HandleStyle]}
             value={[minPercent, maxPercent]}
             onChange={this.handleSlider}
             min={1}
