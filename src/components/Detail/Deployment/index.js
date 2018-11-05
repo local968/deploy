@@ -252,14 +252,14 @@ export default class Deployment extends Component {
           title="Data Source - Database"
           projectId={cd.projectId}
           onSubmit={action(options => {
-            options.csvLocation = options.result.result.csvLocation;
+            // options.csvLocation = options.result.result.csvLocation;
             cddo['source'] = 'database';
             cddo['sourceOptions'] = options;
             cd.save();
             this.closeDialog();
           })}
         />
-        <DatabaseConfig
+        {/* <DatabaseConfig
           options={cddo.locationOptions}
           visible={this.dialog === 'databaselocation'}
           onClose={this.closeDialog}
@@ -272,7 +272,7 @@ export default class Deployment extends Component {
             cd.save();
             this.closeDialog();
           })}
-        />
+        /> */}
         <OneTime
           options={cddo.frequencyOptions}
           visible={this.dialog === 'onetime'}

@@ -1,7 +1,9 @@
 const { redis, pubsub } = require('redis')
 const wss = require('./webSocket')
+const uuid = require('uuid')
+const command = require('./command')
 const moment = require('moment')
-const { userDeployRestriction } = require('restriction')
+const { userDeployRestriction, userStorageRestriction } = require('restriction')
 
 const setSchedule = (schedule) => {
   const pipeline = redis.pipeline()
@@ -76,13 +78,61 @@ const api = {
     return pipeline.exec()
   }).then(result => result.map(([error, schedule]) => JSON.parse(schedule))),
   getFile: (id) => redis.get(`file:${id}`).then(JSON.parse),
+  getDatabaseFile: async (options, userId, projectId, level) => {
+    const resp = await command({
+      ...options,
+      projectId,
+      requestId: uuid.v4(),
+      command: 'sqlData',
+      userId
+    }, (result) => (result.status < 0 || result.status === 100) ? result : false)
+    if (resp.result['process error']) throw {
+      status: 420,
+      message: resp.result.msg,
+      error: resp.result['process error']
+    }
+    const path = resp.result.csvLocation
+    const name = resp.result.filename
+    const size = resp.result.size.toString()
+    const lineCount = resp.result.totalLines
+    if (!path) throw new Error('no path')
+    const previewSize = await redis.get(`user:${userId}:upload`)
+    if (parseInt(previewSize) + parseInt(size) > userStorageRestriction[level]) throw {
+      status: 417,
+      message: 'Your usage of storage space has reached the max restricted by your current lisense.',
+      error: 'storage space full'
+    }
+    const fileId = uuid.v4()
+    await redis.set('file:' + fileId, JSON.stringify({
+      name,
+      content_type: "application/octet-stream",
+      path,
+      md5: '',
+      size,
+      from: 'sql',
+      type: 'deploy',
+      createdTime: moment().unix(),
+      lineCount,
+      userId,
+      options
+    }))
+    await redis.incrby(`user:${userId}:upload`, parseInt(size))
+    return fileId
+  },
   checkUserFileRestriction: async (deploymentId, type) => {
     const deployment = await api.getDeployment(deploymentId)
     const userId = deployment.userId
     const [level, createdTime] = await redis.hmget(`user:${userId}`, 'level', 'createdTime')
     const duration = moment.duration(moment().unix() - createdTime)
     const restrictQuery = `user:${userId}:duration:${duration.years()}-${duration.months()}:deploy`
-    const fileId = deployment[`${type}Options`].fileId
+    const options = deployment[`${type}Options`].sourceOptions
+    const source = deployment[`${type}Options`].source
+    const fileId = source === 'database' ? await api.getDatabaseFile(options, userId, deployment.projectId, level) : deployment[`${type}Options`].fileId
+    if (source === 'database') {
+      deployment[`${type}Options`].fileId = fileId
+      deployment[`${type}Options`].file = `${options.databaseType}-${moment().unix()}`
+      await redis.set(`deployment:${deploymentId}`, JSON.stringify(deployment))
+    }
     if (!fileId) return restrictQuery
     const count = await redis.get(restrictQuery)
     const file = await api.getFile(fileId)

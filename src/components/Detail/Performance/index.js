@@ -5,7 +5,7 @@ import { Select, InputNumber, Icon, Progress, Checkbox } from 'antd';
 import moment from 'moment';
 import styles from './styles.module.css';
 import downloadIcon from './icon-download.svg';
-// import databaseIcon from './icon-database.svg';
+import databaseIcon from './icon-database.svg';
 import fileIcon from './icon-file-local.svg';
 import onceIcon from './icon-once.svg';
 import OneTime from 'components/Common/OneTime';
@@ -193,7 +193,7 @@ export default class Performance extends Component {
           onClose={this.closeDialog}
           title="Validation Data Source - Database"
           onSubmit={action(options => {
-            options.csvLocation = options.result.result.csvLocation;
+            // options.csvLocation = options.result.result.csvLocation;
             cdpo['source'] = 'database';
             cdpo['sourceOptions'] = options;
             cd.save();
@@ -235,7 +235,7 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
       <span className={styles.text}>Data Source:</span>
     </span>
     <div className={styles.selections}>
-      {/* {cdpo.source === 'database' && (
+      {cdpo.source === 'database' && (
         <div className={styles.selected} onClick={show('databasesource')}>
           <span className={styles.result}>
             <img
@@ -252,7 +252,7 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
             <span className={styles.orText}>or</span>
           </span>
         </div>
-      )} */}
+      )}
 
       {cdpo.source === 'file' && (
         <div className={styles.selected}>
@@ -266,13 +266,13 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
               {cdpo.file}
             </span>
           </Uploader>
-          {/* <span className={styles.or}>
+          <span className={styles.or}>
             <span className={styles.orText}>or</span>
-          </span> */}
+          </span>
         </div>
       )}
 
-      {/* {cdpo.source !== 'database' && (
+      {cdpo.source !== 'database' && (
         <div className={styles.selection} onClick={show('databasesource')}>
           <span className={styles.text}>
             <img
@@ -282,7 +282,7 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
             />Database
           </span>
         </div>
-      )} */}
+      )}
       {cdpo.source !== 'file' && (
         <div className={styles.selectionWithoutHover}>
           <Uploader

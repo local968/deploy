@@ -19,10 +19,11 @@ async function scheduleHandler() {
     schedule.status = 'progressing';
     await api.upsertSchedule(schedule);
 
-    const deployment = await api.getDeployment(schedule.deploymentId);
+    let deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return
 
     const restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+    deployment = await api.getDeployment(schedule.deploymentId);
     if (restrictQuery === false) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()

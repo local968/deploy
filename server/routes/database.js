@@ -23,6 +23,11 @@ wss.register('downloadFromDatabase', (message, socket, progress) => {
     userId
   }, (result) => (result.status < 0 || result.status === 100) ? result : progress(result))
     .then(async resp => {
+      if(resp.result['process error']) return {
+        status: 420,
+        message: resp.result.msg,
+        error: resp.result['process error']
+      }
       const path = resp.result.csvLocation
       const name = resp.result.filename
       const size = resp.result.size.toString()

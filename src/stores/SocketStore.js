@@ -52,7 +52,7 @@ class Socket extends EventEmitter {
     this.heartbeatTimeout = setTimeout(() => {
       // send a  ping, any message from server will reset this timeout.
       this.ws && this.ws.readyState === 1 && this.ws.send("ping");
-      this.serverTimeout = setTimeout(() => this.ws && this.ws.readyState === 1 && this.close(), this.timeout)
+      this.serverTimeout = setTimeout(() => this.ws && this.ws.readyState === 1 && this.terminate(), this.timeout)
     }, this.timeout)
   }
 
@@ -102,7 +102,7 @@ class Socket extends EventEmitter {
   }
 
   terminate() {
-    this.ws && this.ws.terminate()
+    // this.ws && this.ws.terminate()
     clearTimeout(this.heartbeatTimeout);
     clearTimeout(this.serverTimeout);
   }

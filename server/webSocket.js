@@ -25,7 +25,8 @@ const init = (server, sessionParser) => {
     socket.on('message', wss.emit.bind(wss, 'message', socket));
     socket.on('close', (socket, code, reason) => {
       socket.isAlive = false;
-      console.warn('socket closed, reason:' + reason + ' code:' + code)
+      // client closed
+      // console.warn('socket closed, reason:' + reason + ' code:' + code)
     })
 
     socket.on('error', (socket, error) => {
@@ -53,7 +54,14 @@ const init = (server, sessionParser) => {
       if (args.length < 2 || !args[0].type) return listener(...args)
       const message = args[0]
       const socket = args[1]
-      const progress = (result) => socket.send(JSON.stringify({ ...result, request: { ...message, progress: true } }))
+      const progress = (result) => {
+        try {
+          socket.send(JSON.stringify({ ...result, request: { ...message, progress: true } }))
+        } catch (e) {
+          // socket closed
+        }
+        return false
+      }
       const returnValue = listener(message, socket, progress) || {}
       if (returnValue.then && typeof returnValue.then === 'function') {
         // returnValue.progress = (result) => socket.send(JSON.stringify({ ...result, request: { ...message, progress: true } }))
