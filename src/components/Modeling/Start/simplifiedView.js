@@ -130,7 +130,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>Create a New Variable</span>
           </div>
-          <CreateNewVariable rawHeader={rawHeader.filter(h => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} />
+          <CreateNewVariable rawHeader={rawHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'

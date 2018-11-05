@@ -1,4 +1,4 @@
-import { observable, action, computed, toJS, when } from "mobx";
+import { observable, action, computed, toJS } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
@@ -762,9 +762,9 @@ export default class Project {
       randSeed: this.randSeed,
       speedVSaccuracy: this.speedVSaccuracy,
       version: "1,2,3",
-      algorithms = [...this.algorithms]
+      algorithms: [...this.algorithms]
     };
-    
+
     if (this.dataRange === "all") {
       trainData.holdoutRate = this.holdoutRate / 100
       if(this.runWith === "holdout") {
