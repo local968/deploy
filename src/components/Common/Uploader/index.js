@@ -108,6 +108,7 @@ export default class Uploader extends Component {
           className={styles.input}
           type="file"
           onChange={this._onChange}
+          accept={AllowExt.map(n => "." + n).join(",")}
         />
       </React.Fragment>
     );

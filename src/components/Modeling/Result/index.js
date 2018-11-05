@@ -430,7 +430,7 @@ class ModelDetail extends Component {
             />
           </div>
           <div className={classnames(styles.cell, styles.name)}>
-            <span>{model.name}</span>
+            <span title={model.name}>{model.name}</span>
           </div>
           {problemType === Classification && (
             <div className={classnames(styles.cell, styles.predict)}>

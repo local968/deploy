@@ -97,6 +97,7 @@ export default class DataConnect extends Component {
   })
 
   onProgress = action((progress, speed) => {
+    if(!this.uploading) return
     const [loaded, size] = progress.split("/")
     try {
       this.process = (parseFloat(loaded) / parseFloat(size)) * 90
@@ -177,6 +178,13 @@ export default class DataConnect extends Component {
     this.isPause = false
   }
 
+  closeUpload = () => {
+    this.pause && this.pause()
+    this.uploading = false
+    this.process = 0
+    this.file = null
+  }
+
   render() {
     const { project, userStore, socketStore } = this.props;
     return (
@@ -240,6 +248,7 @@ export default class DataConnect extends Component {
             <div className={styles.progressBlock}>
               <div className={styles.progressTitle}>
                 <span>Connect Data File</span>
+                {this.process < 90 && <div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
               </div>
               <div className={styles.progressContent}>
                 <div className={styles.progressLoad}>

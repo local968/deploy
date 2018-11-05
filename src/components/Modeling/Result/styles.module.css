@@ -298,6 +298,14 @@
     width: 1.5em;
 }
 
+.name span{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: block;
+}
+
 .predict {
     width: 3.1em;
     border: none;
