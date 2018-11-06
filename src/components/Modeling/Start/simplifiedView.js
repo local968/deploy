@@ -598,13 +598,13 @@ class CreateNewVariable extends Component {
       case "Accumulate()":
         num = numOfParam
         break;
-      case "Combine()":
-        const combineArray = ["min", "max", "mean", "sum"]
-        for (let row of numList) {
-          if (!combineArray.includes(row.trim())) return { isPass: false, message: `${row} is not supported` }
-        }
-        num = length - numOfParam
-        break;
+      // case "Combine()":
+      //   const combineArray = ["min", "max", "mean", "sum"]
+      //   for (let row of numList) {
+      //     if (!combineArray.includes(row.trim())) return { isPass: false, message: `${row} is not supported` }
+      //   }
+      //   num = length - numOfParam
+      //   break;
       case "Quantile_bin()":
         const quantileBinArray = ["value", "frequency"]
         const [b, type1, type2] = numList

@@ -531,14 +531,13 @@ export default class Project {
         if (!this.etling) return;
         const { progress, name, path } = result
         if (progress === "start") return
-        if (name === "csvHeader") {
+        if (name === "csvHeader" || name === 'cleanCsvHeader') {
           const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
           Papa.parse(url, {
             download: true,
             preview: 100,
             delimiter: ',',
             complete: result => {
-              console.log(result)
               if (result.errors.length !== 0) {
                 console.error('parse error: ', result.errors[0].message);
                 return;
@@ -547,7 +546,6 @@ export default class Project {
             }
           });
         }
-        console.log(progressResult)
         // this.project.setProperty(result)
         // this.updateProject(result)
       }))
@@ -767,9 +765,9 @@ export default class Project {
 
     if (this.dataRange === "all") {
       trainData.holdoutRate = this.holdoutRate / 100
-      if(this.runWith === "holdout") {
+      if (this.runWith === "holdout") {
         trainData.validationRate = this.validationRate / 100
-      }else{
+      } else {
         trainData.nfold = this.crossCount
       }
     } else {

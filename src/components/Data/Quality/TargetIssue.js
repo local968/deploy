@@ -331,27 +331,32 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(mismatchIndex).map((k, i) => {
-              if (!mismatchIndex[k].length) {
+              const num = mismatchIndex[k].length
+              if (!num) {
                 return null;
               }
+              const rowText = `${num} ${mismatchFillMethod.hasOwnProperty(k) ? ' row'+(num===1?'':"s")+' will be ' + (mismatchFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
-                <div className={styles.fixesCell}><select value={colType[k]} readOnly={true}>
-                  <option value="Categorical">Categorical</option>
-                  <option value="Numerical">Numerical</option>
-                </select></div>
-                <div className={styles.fixesCell}><span>{mismatchIndex[k].length} ({(mismatchIndex[k].length / (totalRawLines || 1)).toFixed(4)}%)</span></div>
+                <div className={styles.fixesCell}><span>{colType[k]}</span></div>
+                <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.mismatchSelect.bind(null, k)}>
-                  {colType[k] === 'Categorical' ? <option value="mode">Replace with most frequent value</option> : <option value="mean">Replace with mean value</option>}
-                  <option value="drop">Delete the row</option>
-                  <option value="min">Replace with min value</option>
-                  <option value="max">Replace with max value</option>
-                  <option value="max+1">Replace with max+1 value</option>
-                  {colType[k] === 'Categorical' ? <option value="mean">Replace with mean value</option> : <option value="mode">Replace with most frequent value</option>}
-                  <option value="median">Replace with median value</option>
+                  {colType[k] === 'Categorical' ? [
+                    <option value={dataViews[k].mode} key="mode">Replace with most frequent value</option>,
+                    <option value="drop" key="drop">Delete the row</option>,
+                    <option value={0} key={0}>Replace with 0</option>
+                  ] : [
+                      <option value={dataViews[k].mean} key='mean'>Replace with mean value</option>,
+                      <option value="drop" key='drop'>Delete the row</option>,
+                      <option value={dataViews[k].min} key='min'>Replace with min value</option>,
+                      <option value={dataViews[k].max} key='max'>Replace with max value</option>,
+                      <option value={dataViews[k].mode} key='mode'>Replace with most frequent value</option>,
+                      <option value={dataViews[k].median} key='median'>Replace with median value</option>,
+                      <option value={0} key={0}>Replace with 0</option>
+                    ]}
                 </select></div>
               </div>
             })}
@@ -378,29 +383,33 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(nullIndexes).map((k, i) => {
-              if (!nullIndexes[k].length) {
+              const num = nullIndexes[k].length
+              if (!num) {
                 return null;
               }
+              const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row'+(num===1?'':"s")+' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>I don`t know</span></div>
-                <div className={styles.fixesCell}><select value={colType[k]} readOnly={true}>
-                  <option value="Categorical">Categorical</option>
-                  <option value="Numerical">Numerical</option>
-                </select></div>
-                <div className={styles.fixesCell}><span>{nullIndexes[k].length} ({(nullIndexes[k].length / (totalRawLines || 1)).toFixed(4)}%)</span></div>
+                <div className={styles.fixesCell}><span>{colType[k]}</span></div>
+                <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.nullSelect.bind(null, k)}>
-                  {colType[k] === 'Categorical' ? <option value="mode">Replace with most frequent value</option> : <option value="mean">Replace with mean value</option>}
-                  <option value="drop">Delete the row</option>
-                  <option value="ignore">Do Nothing</option>
-                  <option value="min">Replace with min value</option>
-                  <option value="max">Replace with max value</option>
-                  <option value="max+1">Replace with max+1 value</option>
-                  {colType[k] === 'Categorical' ? <option value="mean">Replace with mean value</option> : <option value="mode">Replace with most frequent value</option>}
-                  <option value="median">Replace with median value</option>
+                  {colType[k] === 'Categorical' ? [
+                    <option value={dataViews[k].mode} key="mode">Replace with most frequent value</option>,
+                    <option value="drop" key="drop">Delete the row</option>,
+                    <option value={0} key={0}>Replace with 0</option>
+                  ] : [
+                      <option value={dataViews[k].mean} key='mean'>Replace with mean value</option>,
+                      <option value="drop" key='drop'>Delete the row</option>,
+                      <option value={dataViews[k].min} key='min'>Replace with min value</option>,
+                      <option value={dataViews[k].max} key='max'>Replace with max value</option>,
+                      <option value={dataViews[k].mode} key='mode'>Replace with most frequent value</option>,
+                      <option value={dataViews[k].median} key='median'>Replace with median value</option>,
+                      <option value={0} key={0}>Replace with 0</option>
+                    ]}
                 </select></div>
               </div>
             })}
@@ -426,11 +435,13 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(outlierIndex).map((k, i) => {
-              if (!outlierIndex[k].length) {
+              const num = outlierIndex[k].length
+              if (!num) {
                 return null;
               }
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const isShow = colType[k] === 'Numerical';
+              const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row'+(num===1?'':"s")+' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return isShow && <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
@@ -438,22 +449,18 @@ export class FixIssue extends Component {
                     {outlier[0].toFixed(2) + "-" + outlier[1].toFixed(2)}
                   </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>edit</span>
                 </div>
-                <div className={styles.fixesCell}><select value={colType[k]} readOnly={true}>
-                  <option value="Categorical">Categorical</option>
-                  <option value="Numerical">Numerical</option>
-                </select></div>
-                <div className={styles.fixesCell}><span>{outlierIndex[k].length} ({(outlierIndex[k].length / (totalRawLines || 1)).toFixed(4)}%)</span></div>
+                <div className={styles.fixesCell}><span>{colType[k]}</span></div>
+                <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mean} >{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={outlierFillMethod[k]} onChange={this.outlierSelect.bind(null, k)}>
-                  <option value="ignore">Do Nothing</option>
-                  <option value="drop">Delete the row</option>
-                  <option value="min">Replace with min value</option>
-                  <option value="max">Replace with max value</option>
-                  <option value="max+1">Replace with max+1 value</option>
-                  <option value="mean">Replace with mean value</option>
-                  <option value="median">Replace with median value</option>
-                  <option value="mode">Replace with most frequent value</option>
+                  <option value="ignore" key='ignore'>Do Nothing</option>
+                  <option value="drop" key='drop'>Delete the row</option>
+                  <option value={dataViews[k].min} key='min'>Replace with min value</option>
+                  <option value={dataViews[k].max} key='max'>Replace with max value</option>
+                  <option value={dataViews[k].mean} key='mean'>Replace with mean value</option>
+                  <option value={dataViews[k].median} key='median'>Replace with median value</option>
+                  <option value={dataViews[k].mode} key='mode'>Replace with most frequent value</option>
                 </select></div>
               </div>
             })}
