@@ -76,6 +76,7 @@ async function scheduleHandler() {
     if (has) {
       const nextSchedule = generateSchedule(
         schedule.deploymentId,
+        schedule.modelName || deployment.modelName,
         schedule.type,
         cdo ? nextTime : null,
         schedule.ends,
@@ -146,6 +147,7 @@ const deploy = (deployment, threshold = null) => {
       api.upsertSchedule(
         generateSchedule(
           deployment.id,
+          deployment.modelName,
           'deployment',
           nextScheduleTime,
           cddo.frequency === 'once'
@@ -170,6 +172,7 @@ const deploy = (deployment, threshold = null) => {
       api.upsertSchedule(
         generateSchedule(
           deployment.id,
+          deployment.modelName,
           'performance',
           nextScheduleTime,
           cdpo.frequency === 'once'
@@ -183,6 +186,7 @@ const deploy = (deployment, threshold = null) => {
 
 const generateSchedule = (
   deploymentId,
+  modelName,
   type,
   estimatedTime,
   ends,
@@ -194,6 +198,7 @@ const generateSchedule = (
   createdDate = moment().unix()
 ) => ({
   deploymentId,
+  modelName,
   type,
   estimatedTime,
   ends,
