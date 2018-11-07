@@ -77,7 +77,7 @@ function createModel(id, params) {
   return pipeline.exec().then(result => {
     const err = result.find(([error]) => !!error);
     const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
-    return { ...data, model: { ...params, id: modelId } }
+    return { ...data, model: { ...params, id: modelId }, id }
   })
 }
 
