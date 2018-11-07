@@ -250,6 +250,7 @@
     padding: 0 0.2em;
     position: relative;
     align-items: center;
+    flex: none;
 }
 
 .rowBox {
@@ -631,6 +632,7 @@
     border: solid 1px #1d2b3c;
     background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
     padding: 0.1em 0.3em;
+    cursor: pointer;
 }
 
 .abortButton span {

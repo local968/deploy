@@ -380,11 +380,11 @@ class ModelTable extends Component {
               <div className={styles.trainingText}>{`${trainModel.value}%`}</div>
             </div>
           </div>}
-          {/* {!train2Finished && <div className={styles.trainingAbort}>
+          {!train2Finished && <div className={styles.trainingAbort}>
             <div className={styles.abortButton} onClick={abortTrain}>
               <span>Abort Training</span>
             </div>
-          </div>} */}
+          </div>}
         </div>
       </div>
     );

@@ -74,9 +74,9 @@ export default class AdvancedView extends Component {
     this.props.project.crossCount = value;
   }
 
-  handleMaxTime = value => {
-    this.props.project.maxTime = value;
-  }
+  // handleMaxTime = value => {
+  //   this.props.project.maxTime = value;
+  // }
 
   handleRandSeed = value => {
     this.props.project.randSeed = value;
@@ -150,7 +150,7 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { advancedName, validationRate, holdoutRate, maxTime, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
+    const { advancedName, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
@@ -229,10 +229,6 @@ export default class AdvancedView extends Component {
                 <input id="resampling3" type='radio' name="resampling" checked={resampling === "no"} onChange={this.handleResampling.bind(null, 'no')} />
                 <label htmlFor="resampling3">No resampling</label>
               </div>
-              <div className={styles.advancedOptionBox}>
-                <input id="resampling4" type='radio' name="resampling" checked={resampling === "auto"} onChange={this.handleResampling.bind(null, 'auto')} />
-                <label htmlFor="resampling4">Auto resampling</label>
-              </div>
             </div>
             <div className={styles.advancedOther}>
               <div className={styles.advancedBlock}>
@@ -250,7 +246,7 @@ export default class AdvancedView extends Component {
                   </select> */}
                 </div>
               </div>
-              <div className={styles.advancedBlock}>
+              {/* <div className={styles.advancedBlock}>
                 <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
                   <span>Set Max Training Time:</span>
                   <span className={styles.advancedDesc}>Max amount of time to evaluate different modules.</span>
@@ -259,7 +255,7 @@ export default class AdvancedView extends Component {
                   <NumberInput className={styles.advancedSize} value={maxTime} onBlur={this.handleMaxTime} min={3} isInt={true} />
                   <span>Minutes<br />(3 minutes or longer)</span>
                 </div>
-              </div>
+              </div> */}
               <div className={styles.advancedBlock}>
                 <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
                   <span>Random Seed:</span>

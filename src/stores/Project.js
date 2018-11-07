@@ -1,4 +1,4 @@
-import { observable, action, computed, toJS } from "mobx";
+import { observable, action, computed, toJS, when } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
@@ -62,8 +62,8 @@ export default class Project {
   @observable firstEtl = true;
   @observable target = '';
   @observable noCompute = false;
-  @observable validationRate = 15;
-  @observable holdoutRate = 5;
+  @observable validationRate = 20;
+  @observable holdoutRate = 20;
   @observable uploadFileName = [];
 
   @observable noComputeTemp = false;
@@ -101,18 +101,19 @@ export default class Project {
   @observable speedVSaccuracy = 5;
 
   @observable advancedSize = 0;
-  @observable maxTime = 10;
+  // @observable maxTime = 10;
   @observable randSeed = 0;
   @observable measurement = '';
-  @observable resampling = "auto";
+  @observable resampling = "no";
   @observable runWith = 'holdout';
   @observable crossCount = 3;
   @observable dataRange = 'all';
   @observable customField = '';
   @observable customRange = [];
   @observable algorithms = [];
-
   @observable selectId = '';
+
+  @observable stopModel = false
 
   constructor(id, args) {
     this.id = id
@@ -135,8 +136,8 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      validationRate: 15,
-      holdoutRate: 5
+      validationRate: 20,
+      holdoutRate: 20
     }
   }
 
@@ -168,9 +169,9 @@ export default class Project {
       criteria: 'defualt',
       speedVSaccuracy: 5,
       advancedSize: 0,
-      maxTime: 10,
+      // maxTime: 10,
       randSeed: 0,
-      resampling: 'auto',
+      resampling: 'no',
       runWith: 'holdout',
       crossCount: 3,
       dataRange: 'all',
@@ -559,10 +560,10 @@ export default class Project {
 
         if (status !== 200) return antdMessage.error(message)
         this.setProperty(result)
-        // when(
-        //   () => !!this.uploadData.length,
-        //   () => this.updateProject(this.next())
-        // )
+        when(
+          () => !!this.uploadData.length,
+          () => this.updateProject(this.next())
+        )
       })
   }
 
@@ -736,7 +737,7 @@ export default class Project {
       validationRate: this.validationRate,
       holdoutRate: this.holdoutRate,
       resampling: this.resampling,
-      maxTime: this.maxTime,
+      // maxTime: this.maxTime,
       measurement: this.measurement,
       randSeed: this.randSeed,
       dataRange: this.dataRange,
@@ -760,7 +761,7 @@ export default class Project {
       projectId: id,
       command,
       sampling: this.resampling,
-      maxTime: this.maxTime,
+      // maxTime: this.maxTime,
       randSeed: this.randSeed,
       speedVSaccuracy: this.speedVSaccuracy,
       version: "1,2,3",
@@ -783,6 +784,7 @@ export default class Project {
   }
 
   modeling = trainData => {
+    if(this.train2ing) return false
     socketStore.ready().then(api => api.train(trainData, progressResult => {
       if (progressResult.name === "progress") {
         if(!progressResult.model) return
@@ -809,19 +811,24 @@ export default class Project {
   }
 
   abortTrain = () => {
+    if(this.stopModel) return
+    this.stopModel = true
     const command = {
       command: 'stop',
       action: 'train',
       projectId: this.id
     }
     socketStore.ready().then(api => api.abortTrain(command, process => {
-      console.log(process)
     }).then(returnValue => {
-      console.log(returnValue)
+      const {status, message, result, id} = returnValue
+      if(id !== this.id) return 
+      if(status !== 200) return antdMessage.error(message)
+      this.setProperty({...result, stopModel: false}) 
     }))
   }
 
   setModel = data => {
+    if(this.trainModel && data.name === this.trainModel.name) this.trainModel = null
     if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
     const index = this.models.findIndex(m => {
       return data.id === m.id
@@ -831,7 +838,6 @@ export default class Project {
     } else {
       this.models[index] = new Model(this.id, data)
     }
-    if(this.trainModel && data.name === this.trainModel.name) this.trainModel = null
   }
 
   // modelingError = () => {
