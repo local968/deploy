@@ -8,17 +8,18 @@ const uuid = require('uuid');
 const { redis } = require('./redis')
 const routes = require('./routes')
 const path = require('path')
+const axios = require('axios')
 const fs = require('fs')
 
 const app = express();
 
-app.all('*', function(req, res, next) {
+app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
-  res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-  res.header("X-Powered-By",' 3.2.1')
-  if(req.method=="OPTIONS") res.send(200);/*让options请求快速返回*/
-  else  next();
+  res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+  res.header("X-Powered-By", ' 3.2.1')
+  if (req.method == "OPTIONS") res.send(200);/*让options请求快速返回*/
+  else next();
 });
 
 // We need the same instance of the session parser in express and
@@ -42,11 +43,10 @@ app.use(routes)
 app.use(express.static('static'));
 
 // CRA routing
-app.get('/*', function(req, res) {
+app.get('*', function (req, res) {
   const index = path.join(process.cwd(), 'static', 'index.html');
-  if(fs.existsSync(index)) {
-    res.sendFile(index);
-  }
+  if (fs.existsSync(index)) return res.sendFile(index)
+  axios.get('http://localhost:3000').then(resp => res.send(resp.data))
 });
 
 
