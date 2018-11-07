@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal, Select } from 'antd';
+import { Table, Tabs, Modal, Select, Radio } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './AdvancedView.module.less';
 import RocChart from 'components/D3Chart/RocChart';
@@ -90,12 +90,16 @@ class AdvancedModelTable extends Component {
       metricOptions
     }
   }
+  onClickCheckbox = (modelId) => (e) => {
+    this.props.project.setSelectModel(modelId)
+    e.stopPropagation()
+  }
   handleChange = value => {
     const metric = this.state.metricOptions.find(m => m.key === value);
     this.setState({ metric: metric })
   }
   render() {
-    const { models, project: { problemType } } = this.props;
+    const { models, project: { problemType, selectModel } } = this.props;
     const { metric, metricOptions } = this.state;
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'Cutoff Threshold', 'Validation', 'Holdout'] :
@@ -112,10 +116,10 @@ class AdvancedModelTable extends Component {
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
         return (
-          <ClassificationModelRow key={m.id} texts={texts} model={m} metric={metric.key} />
+          <ClassificationModelRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
         )
       } else {
-        return <RegressionModleRow key={m.id} texts={texts} model={m} metric={metric.key} />
+        return <RegressionModleRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       }
     })
     const Option = Select.Option;
@@ -142,7 +146,7 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric } = this.props;
+    const { model, texts, metric, checked } = this.props;
     const { score, name } = model;
     const { detail } = this.state;
     return (
@@ -153,6 +157,7 @@ class AdvancedModelTable extends Component {
               case 'Model Name':
                 return (
                   <RowCell key={1} data={<div key={1} >
+                    <Radio checked={checked} onClick={this.props.onClickCheckbox} />
                     <span className={styles.modelName} >{name}</span>
                   </div>}
                   />
@@ -258,7 +263,7 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric } = this.props;
+    const { model, texts, metric, checked } = this.props;
     if (!model.chartData) return null;
     const { name, fitIndex, chartData: { roc }, score } = model;
     const { detail } = this.state;
@@ -270,9 +275,9 @@ class ClassificationModelRow extends Component {
               case 'Model Name':
                 return (
                   <RowCell key={1} data={<div key={1} >
-                    {/* <span onClick={this.handleClick} >
-                      <Radio checked={checked} onClick={this.props.onClickCheckbox} />
-                    </span> */}
+                    {/* <span onClick={this.handleClick} > */}
+                    <Radio checked={checked} onClick={this.props.onClickCheckbox} />
+                    {/* </span> */}
                     <span className={styles.modelName} >{name}</span>
                   </div>}
                   />
