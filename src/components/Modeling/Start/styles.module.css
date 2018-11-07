@@ -837,6 +837,7 @@ span.advancedDesc {
   display: flex;
   flex: none;
   margin: 0.1em;
+  align-items: center;
 }
 
 .advancedAlgorithm label {

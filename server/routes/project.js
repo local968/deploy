@@ -344,20 +344,20 @@ wss.register('etl', (message, socket, progress) => {
         if (!files) delete result.totalRawLines
 
         const steps = {}
-        if (firstEtl) {
-          steps.subStepActive = 2
-          steps.lastSubStep = 2
-        } else {
-          if (noCompute) {
-            steps.curStep = 3
-            steps.mainStep = 3
-            steps.subStepActive = 1
-            steps.lastSubStep = 1
-          } else {
-            steps.subStepActive = 3
-            steps.lastSubStep = 3
-          }
-        }
+        // if (firstEtl) {
+        //   steps.subStepActive = 2
+        //   steps.lastSubStep = 2
+        // } else {
+        //   if (noCompute) {
+        //     steps.curStep = 3
+        //     steps.mainStep = 3
+        //     steps.subStepActive = 1
+        //     steps.lastSubStep = 1
+        //   } else {
+        //     steps.subStepActive = 3
+        //     steps.lastSubStep = 3
+        //   }
+        // }
 
         return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
           if (updateResult.status !== 200) return updateResult
@@ -436,6 +436,20 @@ wss.register('fitPlotAndResidualPlot', (message, socket, progress) => sendToComm
 
 wss.register('createNewVariable', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
+wss.register('abortTrain', (message, socket, progress) => {
+  const projectId = message.projectId
+  const userId = socket.session.userId
+  return command({ ...message, userId, requestId: message._id }).then(result => {
+    const statusData = {
+      train2Finished: true,
+      train2ing: false,
+      train2Error: false,
+      trainModel: null
+    }
+    return createOrUpdate(projectId, userId, statusData)
+  })
+})
+
 wss.register('train', (message, socket, progress) => {
   const userId = socket.session.userId
   const projectId = message.projectId
@@ -447,12 +461,15 @@ wss.register('train', (message, socket, progress) => {
       const isFinish = queueValue.status < 0 || queueValue.status === 100
       if (isFinish) return queueValue
       const { result } = queueValue
-      if (result.progress === "start") return progress(result)
-      return createModel(projectId, result).then(model => {
-        num++
-        wss.publish("user:" + userId + ":projects", model)
-        return progress(model)
-      })
+      if (result.name === "progress") {
+        return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress(result))
+      }
+      return createOrUpdate(projectId, userId, { trainModel: null })
+        .then(() => createModel(projectId, result).then(model => {
+          num++
+          wss.publish("user:" + userId + ":projects", model)
+          return progress(model)
+        }))
     })
       .then(returnValue => {
         const { status } = returnValue

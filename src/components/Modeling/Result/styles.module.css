@@ -178,6 +178,11 @@
     min-width: 20%;
 }
 
+.progressSmall {
+    max-width: 87%;
+    min-width: 13%;
+}
+
 .progress span {
     font-size: 1.125rem;
     font-weight: bold;
@@ -205,7 +210,7 @@
     margin-right: 0.1em;
 }
 
-.progressTitle span{
+.progressTitle span {
     font-size: 1.25rem;
     font-family: SanFranciscoText;
     color: #000;
@@ -245,6 +250,7 @@
     padding: 0 0.2em;
     position: relative;
     align-items: center;
+    flex: none;
 }
 
 .rowBox {
@@ -298,7 +304,7 @@
     width: 1.5em;
 }
 
-.name span{
+.name span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -333,8 +339,7 @@
     left: 0.05em;
 }
 
-.rmsePerformance,
-.r2Performance {
+.rmsePerformance, .r2Performance {
     display: flex
 }
 
@@ -397,6 +402,7 @@
 }
 
 /**modelInsights*/
+
 .modelInsights {
     display: flex;
     flex: none;
@@ -494,7 +500,8 @@
 
 .modelInsightsProgress {
     display: flex;
-    flex: none;;
+    flex: none;
+    ;
     background-color: #13ce66;
 }
 
@@ -550,4 +557,87 @@
     flex: auto;
     justify-content: center;
     align-items: center;
+}
+
+.trainingProcessBg {
+    display: flex;
+    flex: auto;
+    height: .2em;
+    background: #ccc;
+    border-radius: .1em;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4% 0 2%;
+}
+
+.trainingText {
+    color: #fff;
+    font-size: 1rem;
+    font-family: SanFranciscoText;
+    position: absolute;
+}
+
+.trainingProcessBlock {
+    display: flex;
+    flex: none;
+    height: .2em;
+    background: transparent;
+    width: 100%;
+    position: relative;
+}
+
+.trainingProcess {
+    display: flex;
+    flex: none;
+    height: .2em;
+    background: #448eed;
+    align-items: center;
+    overflow: hidden;
+}
+
+.trainingModel {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    align-items: center;
+    padding: 0.08em 0;
+    border-bottom: 1px solid #979797;
+    width: 15%;
+    margin: 0 0.05em;
+    position: relative;
+}
+
+.trainingModel span {
+    font-size: 0.875rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: block;
+}
+
+.trainingAbort {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-top: 0.1em;
+}
+
+.abortButton {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: solid 1px #1d2b3c;
+    background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+    padding: 0.1em 0.3em;
+    cursor: pointer;
+}
+
+.abortButton span {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #1d2b3c;
+    font-family: SanFranciscoText;
 }

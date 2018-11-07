@@ -13,12 +13,12 @@ export default class DataSchema extends Component {
   @observable showSelect = false
 
   doEtl = () => {
-    const { colType, rawHeader, noCompute } = this.props.project;
+    const { colType, rawHeader, noComputeTemp } = this.props.project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
     this.props.project.updateProject({
       dataHeader: newDataHeader,
       colType: colType,
-      noCompute: noCompute
+      noCompute: noComputeTemp
     });
     this.props.project.etl();
   }
@@ -47,12 +47,12 @@ export default class DataSchema extends Component {
   }
 
   checkNoCompute = (e) => {
-    this.props.project.noCompute = e.target.checked;
+    this.props.project.noComputeTemp = e.target.checked;
   }
 
   render() {
     const { project } = this.props;
-    const { etling, uploadData, rawHeader, noCompute, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
+    const { etling, uploadData, rawHeader, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
     const targetOption = {};
 
     //target选择列表
@@ -119,7 +119,7 @@ export default class DataSchema extends Component {
       </div>
       <div className={styles.bottom}>
         <ContinueButton onClick={this.doEtl} disabled={etling || !target} text="Continue" />
-        <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noCompute} /><span>Skip Etl</span></div>
+        <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noComputeTemp} /><span>Skip Etl</span></div>
       </div>
       {etling && <ProjectLoading />}
     </div>

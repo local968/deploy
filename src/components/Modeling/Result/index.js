@@ -97,7 +97,7 @@ class SimpleView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { problemType, train2Finished } = project;
+    const { problemType, train2Finished, trainModel, abortTrain } = project;
     const current = project.selectModel
     return (
       <div>
@@ -147,6 +147,8 @@ class SimpleView extends Component {
           onSelect={this.onSelect}
           problemType={problemType}
           train2Finished={train2Finished}
+          trainModel={trainModel}
+          abortTrain={abortTrain}
         />
       </div>
     )
@@ -226,12 +228,14 @@ class PredictedProgress extends Component {
         );
     const predictedPercent = Math.round(predicted * 100);
     const failedPercent = 100 - predictedPercent
+    const isSmaller = (!!predictedPercent && predictedPercent < 10) || (!!failedPercent && failedPercent < 10)
     return (
       <div className={styles.progressLine}>
         {title}
         {!!predictedPercent && <div
           className={classnames(styles.progress, styles[type], {
-            [styles.progressLarge]: !failedPercent
+            [styles.progressLarge]: !failedPercent,
+            [styles.progressSmall]: isSmaller
           })}
           style={{
             width: width * predicted + 'em',
@@ -242,7 +246,8 @@ class PredictedProgress extends Component {
         </div>}
         {!!failedPercent && <div
           className={classnames(styles.progress, styles.different, {
-            [styles.progressLarge]: !predictedPercent
+            [styles.progressLarge]: !predictedPercent,
+            [styles.progressSmall]: isSmaller
           })}
           style={{
             width: width * (1 - predicted) + 'em',
@@ -304,7 +309,7 @@ class Performance extends Component {
 @observer
 class ModelTable extends Component {
   render() {
-    const { models, onSelect, problemType, train2Finished, current } = this.props;
+    const { models, onSelect, problemType, train2Finished, current, trainModel, abortTrain } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -364,11 +369,22 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && (
-            <div className={styles.center}>
-              <Spin size="large" />
+          {(!train2Finished && trainModel) && <div className={styles.rowData}>
+            <div className={styles.trainingModel}>
+              <span>{trainModel.model}</span>
             </div>
-          )}
+            <div className={styles.trainingProcessBg}>
+              <div className={styles.trainingProcessBlock}>
+                <div className={styles.trainingProcess} style={{ width: `${trainModel.value}%` }}></div>
+              </div>
+              <div className={styles.trainingText}>{`${trainModel.value}%`}</div>
+            </div>
+          </div>}
+          {!train2Finished && <div className={styles.trainingAbort}>
+            <div className={styles.abortButton} onClick={abortTrain}>
+              <span>Abort Training</span>
+            </div>
+          </div>}
         </div>
       </div>
     );
