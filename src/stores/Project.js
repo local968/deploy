@@ -26,6 +26,7 @@ function indexOfMax(arr) {
 
 export default class Project {
   @observable models = []
+  @observable trainModel = null
 
   @observable id = "";
   @observable exist = true;
@@ -64,6 +65,8 @@ export default class Project {
   @observable validationRate = 15;
   @observable holdoutRate = 5;
   @observable uploadFileName = [];
+
+  @observable noComputeTemp = false;
 
   //data quality
   @observable mismatchFillMethod = {}
@@ -119,6 +122,7 @@ export default class Project {
   @computed
   get defaultUploadFile() {
     this.etling = false;
+    this.noComputeTemp = false
 
     return {
       uploadFileName: [],
@@ -780,7 +784,11 @@ export default class Project {
 
   modeling = trainData => {
     socketStore.ready().then(api => api.train(trainData, progressResult => {
-      if (progressResult.progress === "start") return;
+      if (progressResult.name === "progress") {
+        if(!progressResult.model) return
+        this.trainModel = progressResult
+        return
+      }
       if (progressResult.status !== 200) return
       let result = progressResult.model
       this.setModel(result)
@@ -800,6 +808,19 @@ export default class Project {
     })
   }
 
+  abortTrain = () => {
+    const command = {
+      command: 'stop',
+      action: 'train',
+      projectId: this.id
+    }
+    socketStore.ready().then(api => api.abortTrain(command, process => {
+      console.log(process)
+    }).then(returnValue => {
+      console.log(returnValue)
+    }))
+  }
+
   setModel = data => {
     if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
     const index = this.models.findIndex(m => {
@@ -810,6 +831,7 @@ export default class Project {
     } else {
       this.models[index] = new Model(this.id, data)
     }
+    if(this.trainModel && data.name === this.trainModel.name) this.trainModel = null
   }
 
   // modelingError = () => {

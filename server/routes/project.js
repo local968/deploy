@@ -436,6 +436,8 @@ wss.register('fitPlotAndResidualPlot', (message, socket, progress) => sendToComm
 
 wss.register('createNewVariable', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
+wss.register('abortTrain', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
+
 wss.register('train', (message, socket, progress) => {
   const userId = socket.session.userId
   const projectId = message.projectId
@@ -447,7 +449,7 @@ wss.register('train', (message, socket, progress) => {
       const isFinish = queueValue.status < 0 || queueValue.status === 100
       if (isFinish) return queueValue
       const { result } = queueValue
-      if (result.progress === "start") return progress(result)
+      if (result.name === "progress") return progress(result)
       return createModel(projectId, result).then(model => {
         num++
         wss.publish("user:" + userId + ":projects", model)
