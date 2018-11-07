@@ -127,7 +127,7 @@ class AdvancedModelTable extends Component {
       <div className={styles.advancedModelTable} >
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={metric.display} onChange={this.handleChange} >
+          <Select size="large" value={metric.key} onChange={this.handleChange} >
             {metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
