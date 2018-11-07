@@ -22,20 +22,18 @@ const command = (command, callback) => {
   return returnPromise
 }
 
-const watchQueue = () => {
-  pubsub.rpop(config.resultQueue).then(result => {
+const watchQueue = async () => {
+  let result = null
+  while (1) {
+    result = await pubsub.rpop(config.resultQueue)
     if (result === null) return
     result = JSON.parse(result)
     const requestId = result.requestId
-    // const interval = setInterval(() => {
-    //   pubsub.emit(requestId, result)
-    // }, 500)
-    // setTimeout(clearInterval.bind(null, interval), 10000)
     pubsub.emit(requestId, result)
-  })
+  }
 }
 
-setInterval(watchQueue, 1000)
+setInterval(watchQueue, 100)
 
 command.FINISH = FINISH
 command.SEND = SEND
