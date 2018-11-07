@@ -179,7 +179,6 @@ const isExcessThreshold = schedule => {
   if (!schedule.result || !schedule.result.score) return false;
   if (!schedule.threshold || !schedule.threshold.type || !schedule.threshold.value) return false
   const nameMap = { R2: 'r2', RMSE: 'nrmse', AUC: 'auc', Accurancy: 'acc' };
-  console.log(schedule);
   return {
     R2: (threshold, real) => threshold > real,
     RMSE: (threshold, real) => threshold < real,

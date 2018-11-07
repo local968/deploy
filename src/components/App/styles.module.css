@@ -4,6 +4,10 @@
   display: flex;
 }
 
+.app :global(.ant-progress-bg) {
+  background-color: #455267;
+}
+
 @media only screen and (max-width: 1440px) {
   .app {
     font-size: 80px;
