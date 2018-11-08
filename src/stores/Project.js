@@ -112,6 +112,7 @@ export default class Project {
   @observable customRange = [];
   @observable algorithms = [];
   @observable selectId = '';
+  @observable version = [1, 2]
 
   @observable stopModel = false
 
@@ -179,7 +180,8 @@ export default class Project {
       customRange: [],
       algorithms: [],
       measurement,
-      selectId: ''
+      selectId: '',
+      version: [1, 2]
     }
   }
 
@@ -710,7 +712,6 @@ export default class Project {
       featureLabel,
       targetLabel: target,
       projectId: id,
-      version: "1,2",
       command
     };
 
@@ -746,7 +747,8 @@ export default class Project {
       algorithms: [...this.algorithms],
       speedVSaccuracy: this.speedVSaccuracy,
       runWith: this.runWith,
-      crossCount: this.crossCount
+      crossCount: this.crossCount,
+      version: this.version
     }, this.nextSubStep(2, 3)));
 
     this.models = []
@@ -764,8 +766,8 @@ export default class Project {
       // maxTime: this.maxTime,
       randSeed: this.randSeed,
       speedVSaccuracy: this.speedVSaccuracy,
-      version: "1,2,3",
-      algorithms: [...this.algorithms]
+      version: this.version.join(","),
+      algorithms: [...this.algorithms],
     };
 
     if (this.dataRange === "all") {

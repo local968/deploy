@@ -80,7 +80,7 @@ export default class SimplifiedView extends Component {
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
           <div className={classnames(styles.targetCell, styles.targetName)}><span>Target Variable</span></div>
-          <div className={classnames(styles.targetCell, styles.large)}><span>Histogram</span></div>
+          <div className={styles.targetCell}><span>Histogram</span></div>
           <div className={styles.targetCell}><span>Data Type</span></div>
           <div className={styles.targetCell}><span>Mean</span></div>
           <div className={styles.targetCell}><span>Unique Value</span></div>
@@ -89,8 +89,8 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.targetRow}>
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
-          <div className={classnames(styles.targetCell, styles.targetHistogram)} onClick={this.show}>
-            <img src={histogramIcon} alt='histogram' />
+          <div className={styles.targetCell} onClick={this.show}>
+            <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
             {<Popover placement='bottomLeft'
               visible={this.showHistograms}
               onVisibleChange={this.hide}
@@ -101,7 +101,6 @@ export default class SimplifiedView extends Component {
                 path={histgramPlots[target]}
                 id={id}
               />} />}
-            <span>Compute</span>
           </div>
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
           <div className={classnames(styles.targetCell, {
@@ -151,8 +150,8 @@ export default class SimplifiedView extends Component {
         <div className={styles.tableHeader}>
           <div className={classnames(styles.tableTh, styles.tableCheck)}></div>
           <div className={styles.tableTh}><span>Name</span></div>
-          <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Histogram</span></div>
-          <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Univariant Plot</span></div>
+          <div className={styles.tableTh}><span>Histogram</span></div>
+          <div className={styles.tableTh}><span>Univariant Plot</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>Importance</span>
@@ -211,8 +210,8 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showHistograms}>
-        <img src={histogramIcon} alt='histogram' />
+      <div className={styles.tableTd} onClick={this.showHistograms}>
+        <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}
           onVisibleChange={this.hideHistograms}
@@ -223,10 +222,9 @@ class SimplifiedViewRow extends Component {
             path={project.histgramPlots[value]}
             id={id}
           />} />}
-        <span>Compute</span>
       </div>
-      <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showUnivariant}>
-        <img src={univariantIcon} alt='univariant' />
+      <div className={styles.tableTd} onClick={this.showUnivariant}>
+        <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
         {this.univariant && <Popover placement='topLeft'
           visible={this.univariant}
           onVisibleChange={this.hideUnivariant}
@@ -237,7 +235,6 @@ class SimplifiedViewRow extends Component {
             path={project.univariatePlots[value]}
             id={id}
           />} />}
-        <span>Compute</span>
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
         <div className={styles.preImpotance}>

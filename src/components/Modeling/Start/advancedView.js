@@ -149,8 +149,20 @@ export default class AdvancedView extends Component {
     this.props.project.speedVSaccuracy = value
   }
 
+  handleSolution = (num, e) => {
+    const isCheck = e.target.checked
+    const { version } = this.props.project
+    if (isCheck) {
+      if (version.includes(num)) return
+      this.props.project.version = [...version, num]
+    } else {
+      if (!version.includes(num)) return
+      this.props.project.version = version.filter(n => n !== num)
+    }
+  }
+
   render() {
-    const { advancedName, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
+    const { advancedName, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy, version } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
@@ -201,6 +213,14 @@ export default class AdvancedView extends Component {
           </div>
           <div className={styles.advancedBlock}>
             <div className={styles.advancedAlgorithmList}>
+              <div className={styles.advancedAlgorithm} key={'solution-a'}>
+                <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
+                <label htmlFor={'R2-solution-a'}>R2-solution-a</label>
+              </div>
+              <div className={styles.advancedAlgorithm} key={'solution-b'}>
+                <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
+                <label htmlFor={'R2-solution-b'}>R2-solution-b</label>
+              </div>
               {algorithmList.map((v, k) => {
                 return <div className={styles.advancedAlgorithm} key={k}>
                   <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v)} onChange={this.handleCheck.bind(null, v)} />

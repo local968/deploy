@@ -9,10 +9,9 @@ import deleteDarkIcon from './delete-dark.svg';
 // import duplicateDarkIcon from './duplicate-dark.svg';
 // import shareDarkIcon from './share-dark.svg';
 import checkedIcon from './checked.svg';
-import { Search, Select, Pagination, ProjectLoading } from 'components/Common';
+import { Search, Select, Pagination, ProjectLoading, Confirm } from 'components/Common';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
-import { Modal, Button } from 'antd';
 import { observable, toJS } from 'mobx';
 
 @inject('routing', 'projectStore')
@@ -121,17 +120,15 @@ export default class Home extends Component {
         })}
       </div>
       {this.isShow && <Bar toggleSelect={this.removeSelected} ids={this.ids} actions={this.actions} selected={this.selected} />}
-      <Modal
-        title={`Delete Project${this.deleteIds.length > 1 ? "s" : ""}: ${this.deleteNames.join(" , ")}`}
+      {<Confirm
+        width="7em"
+        title={`Delete project confirmation`}
         visible={this.visible && !!this.deleteIds.length}
-        onOk={this.handleOk}
-        onCancel={this.handleCancel}
-        footer={<div style={{ textAlign: "center" }}>
-          <Button onClick={this.handleCancel}>No, thanks</Button>,
-          <Button type="primary" onClick={this.handleOk}>Yes, delete</Button>,
-        </div>}>
-        <h4 style={{ padding: '3em' }} >Are you sure to delete project{this.deleteIds.length > 1 ? "s" : ""} : {this.deleteNames.join(" , ")} ?</h4>
-      </Modal>
+        onClose={this.handleCancel}
+        onConfirm={this.handleOk}
+        confirmText="Yes"
+        closeText="No"
+        content={this.deleteNames.map(n => `Are you sure to delete project: ${n}?`).join(" ")} />}
     </div>
   }
 }
@@ -159,7 +156,7 @@ class Project extends Component {
   }
 
   render() {
-    const { project, actions } = this.props;
+    const { project, actions, selected } = this.props;
     return <div className={styles.project} onMouseEnter={this.showCover} onMouseLeave={this.hideCover}>
       <div className={styles.info}>
         <div className={styles.name}>{project.name}</div>
@@ -170,7 +167,7 @@ class Project extends Component {
         <div className={styles.time}>Create Date: {moment.unix(project.createTime).fromNow()}</div>
       </div>
       <div className={classnames(styles.cover, {
-        [styles.active]: this.cover
+        [styles.active]: this.cover || selected
       })}>
         <div className={styles.actionBox}>
           <div className={styles.select}>
