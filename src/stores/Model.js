@@ -45,6 +45,10 @@ export default class Model {
   setFitIndex(index) {
     this.fitIndex = index;
   }
+  @action
+  resetFitIndex() {
+    this.fitIndex = this.initialFitIndex;
+  }
   updateModel(data) {
     Object.assign(this, data);
   }

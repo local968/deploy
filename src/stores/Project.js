@@ -1013,6 +1013,7 @@ export default class Project {
           const { fitIndex, chart } = this.parseChartData(result.data);
           model.updateModel({
             fitIndex,
+            initialFitIndex: fitIndex,
             chartData: chart
           })
         }
