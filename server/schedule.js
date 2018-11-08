@@ -132,7 +132,7 @@ const deploy = (deployment, threshold = null) => {
   if (!deployment) throw new Error('no deployment')
   const cddo = deployment.deploymentOptions;
   const cdpo = deployment.performanceOptions;
-  cddo && api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
+  threshold === null && cddo && api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
     const nextScheduleTime = generateNextScheduleTime(cddo.frequency, cddo.frequencyOptions);
     if (!schedule && !nextScheduleTime) return;
     if (schedule) {
@@ -158,7 +158,7 @@ const deploy = (deployment, threshold = null) => {
     }
   })
 
-  cdpo && api.getLastWaitingSchedule(deployment.id, 'proformance').then(schedule => {
+  threshold && cdpo && api.getLastWaitingSchedule(deployment.id, 'proformance').then(schedule => {
     const nextScheduleTime = generateNextScheduleTime(cdpo.frequency, cdpo.frequencyOptions);
     if (!schedule && !nextScheduleTime) return;
     if (schedule) {
@@ -167,6 +167,7 @@ const deploy = (deployment, threshold = null) => {
       schedule.updatedDate = moment().unix();
       schedule.ends =
         cdpo.frequency === 'once' ? 1 : cdpo.frequencyOptions.ends;
+      if (threshold) schedule.threshold = threshold
       api.upsertSchedule(schedule).catch(catchError);
     } else {
       api.upsertSchedule(
