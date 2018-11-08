@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { withRouter } from 'react-router';
-import { Menu, Dropdown, Icon } from 'antd';
+import { Menu, Dropdown } from 'antd';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';

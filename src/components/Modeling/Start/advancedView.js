@@ -359,24 +359,24 @@ export default class AdvancedView extends Component {
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)}></div>
                     <span>Training</span>
                   </div>
-                  <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} />
-                  <span>%</span>
+                  {/* <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} /> */}
+                  <span>{100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)}%</span>
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)}></div>
                     <span>Validation</span>
                   </div>
-                  <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} />
-                  <span>%</span>
+                  {/* <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} /> */}
+                  <span>{parseInt(validationRate, 10)}%</span>
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
                     <span>Holdout</span>
                   </div>
-                  <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} />
-                  <span>%</span>
+                  {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
+                  <span>{parseInt(holdoutRate, 10)}%</span>
                 </div>
               </div> : <div className={styles.advancedPercentBox}>
                   <div className={styles.advancedPercentInput}>
@@ -384,15 +384,16 @@ export default class AdvancedView extends Component {
                       <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
                       <span>Select Number of CV folds</span>
                     </div>
-                    <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={5} isInt={true} />
+                    {/* <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={5} isInt={true} /> */}
+                    <span>{crossCount}</span>
                   </div>
                   <div className={styles.advancedPercentInput}>
                     <div className={styles.advancedPercentText}>
                       <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
                       <span>Holdout</span>
                     </div>
-                    <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} />
-                    <span>%</span>
+                    {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
+                    <span>{parseInt(holdoutRate, 10)}%</span>
                   </div>
                 </div>}
             </div>
