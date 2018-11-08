@@ -6,7 +6,6 @@
   z-index: 1;
   overflow-x: auto;
   position: relative;
-  cursor: pointer;
 }
 
 .block {
