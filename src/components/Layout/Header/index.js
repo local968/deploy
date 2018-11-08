@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { withRouter } from 'react-router';
+import { Menu, Dropdown, Icon } from 'antd';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
@@ -179,6 +180,13 @@ class WelcomeHeader extends Component {
   };
 
   render() {
+    const menu = (
+      <Menu>
+        <Menu.Item key="0">
+          <a onClick={this.logout}>Log out</a>
+        </Menu.Item>
+      </Menu>
+    );
     return (
       <div className={styles.header}>
         <div className={styles.wheader}>
@@ -186,9 +194,11 @@ class WelcomeHeader extends Component {
           <span className={styles.welcome}>
             Welcome , {this.props.userStore.info.email}
           </span>
-          <div className={styles.down} onClick={this.logout}>
-            <img src={down} alt="down" />
-          </div>
+          <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+            <div className={styles.down}>
+              <img src={down} alt="down" />
+            </div>
+          </Dropdown>
         </div>
         <div className={styles.notification}>
           <img src={notificationIcon} alt="notification" />
