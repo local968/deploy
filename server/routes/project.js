@@ -458,9 +458,9 @@ wss.register('train', (message, socket, progress) => {
   return checkTraningRestriction(socket.session.user)
     .then(() => deleteModels(message.projectId))
     .then(() => command(data, queueValue => {
-      const isFinish = queueValue.status < 0 || queueValue.status === 100
-      if (isFinish) return queueValue
-      const { result } = queueValue
+      const { status, result } = queueValue
+      if (status === 100) return queueValue
+      if (status < 0) return null
       if (result.name === "progress") {
         return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress(result))
       }
@@ -472,27 +472,31 @@ wss.register('train', (message, socket, progress) => {
         }))
     })
       .then(returnValue => {
-        const { status } = returnValue
         const statusData = {
           train2Finished: true,
           train2ing: false,
           train2Error: false,
           selectId: ''
         }
-        if (status === -1 && num === 0) {
-          statusData.train2Error = true
-        }
-        if (status < -1) {
-          statusData.train2Finished = false
-          statusData.mainStep = 3
-          statusData.curStep = 3
-          statusData.lastSubStep = 1
-          statusData.subStepActive = 1
-        }
+        if(num === 0) statusData.train2Error = true
         createOrUpdate(projectId, userId, statusData)
         return returnValue
       }))
-    .catch(err => err)
+    .catch(err => {
+      const statusData = {
+        train2Finished: true,
+        train2ing: false,
+        train2Error: false,
+        selectId: '',
+        train2Finished: false,
+        mainStep: 3,
+        curStep: 3,
+        lastSubStep: 1,
+        subStepActive: 1
+      }
+      createOrUpdate(projectId, userId, statusData)
+      return err
+    })
 })
 
 wss.register("watchProjectList", (message, socket) => {
