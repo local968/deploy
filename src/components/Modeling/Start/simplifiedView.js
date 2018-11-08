@@ -283,6 +283,11 @@ class SimplifiedViewPlot extends Component {
 
 @observer
 class CreateNewVariable extends Component {
+  constructor(props) {
+    super(props)
+    this.fxRef = React.createRef();
+  }
+
   @observable hintStatus = false
   @observable hints = []
   @observable exp = ''
@@ -293,12 +298,14 @@ class CreateNewVariable extends Component {
   @observable inputPosition = 0
   @observable myFunction = {}
   @observable loading = false
+  @observable isIn=false
 
   hideHint = () => {
     this.hintStatus = false
     this.showFunction = {}
     this.active = 0
     this.hints = []
+    document.onmousedown = () => {}
   }
 
   handleChange = e => {
@@ -353,10 +360,17 @@ class CreateNewVariable extends Component {
     return start
   }
 
-  handleSelect = value => {
+  handleSelect = (value, isFunciton) => {
     // this.exp = value
     const startIndex = this.getStartIndex()
     this.exp = this.exp.slice(0, startIndex) + value + this.exp.slice(this.inputPosition)
+    this.fxRef.current.focus()
+    setTimeout(() => {
+      this.inputPosition = (this.exp.slice(0, startIndex) + value).length + (isFunciton ? -1 : 0)
+      this.fxRef.current.setSelectionRange(this.inputPosition, this.inputPosition)
+    }, 0);
+    
+    window.ref= this.fxRef.current
   }
 
   onKeyDown = e => {
@@ -365,7 +379,7 @@ class CreateNewVariable extends Component {
       if (!this.hints.length) return
       const selectValue = this.hints[this.active]
       if (!selectValue) return
-      this.handleSelect(selectValue.value)
+      this.handleSelect(selectValue.value, !!selectValue.syntax)
       return
     }
     // up
@@ -384,10 +398,20 @@ class CreateNewVariable extends Component {
     }
   }
 
-  onSelect = e => {
-    this.inputPosition = e.target.selectionEnd
+  onSelect = () => {
+    this.inputPosition = this.fxRef.current.selectionEnd
     this.changeHints()
     this.hintStatus = true
+    this.isIn = true
+    document.onmousedown = e => {
+      let dom = e.target; let isIn = false
+      while (dom) {
+        if (dom.className === styles.newVariableFx) { isIn = true; break }
+        dom = dom.parentNode
+      }
+      if(!isIn) this.hideHint()
+      this.isIn = isIn
+    }
   }
 
   showSyntax = n => {
@@ -644,6 +668,11 @@ class CreateNewVariable extends Component {
     this.name = value
   }
 
+  deleteFx = () => {
+    this.exp = ''
+    this.fxRef.current.focus()
+  }
+
   render() {
     const { visible, onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
@@ -656,12 +685,13 @@ class CreateNewVariable extends Component {
         </div>
         <span>=</span>
         <div className={styles.newVariableFx}>
-          <input className={styles.newVariableInput} placeholder="fx" value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onBlur={this.hideHint} onSelect={this.onSelect} />
+          <input className={styles.newVariableInput} placeholder="fx" ref={this.fxRef} value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onSelect={this.onSelect} />
+          {this.isIn && <div className={styles.newVariableEmpty} onClick={this.deleteFx}><span>X</span></div>}
           {this.hintStatus && <div className={styles.newVariableHintList}>
             {this.hints.map((v, k) => {
               return <div key={k} className={classnames(styles.newVariableHint, {
                 [styles.activeHint]: this.active === k
-              })} onMouseDown={this.handleSelect.bind(null, v.value)} onMouseOver={this.showSyntax.bind(null, k)}><span>{v.label}</span></div>
+              })} onClick={this.handleSelect.bind(null, v.value, !!v.syntax)} onMouseOver={this.showSyntax.bind(null, k)}><span>{v.label}</span></div>
             })}
           </div>}
           {!!functionSyntax && <div className={classnames(styles.newVariableSyntax, {
