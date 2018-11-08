@@ -206,7 +206,7 @@ class Tools extends Component {
         onChange={changeWords}
       />
       <Select
-        title="Sort by"
+        title="Sorted by"
         autoWidth={null}
         options={{
           createTime: 'Last Created',

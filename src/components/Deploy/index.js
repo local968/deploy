@@ -54,7 +54,7 @@ export default class Home extends Component {
           />
           <Select
             className={styles.selector}
-            title="Sort by"
+            title="Sorted by"
             autoWidth
             options={deploymentStore.sortByOptions}
             value={deploymentStore.sortOptions.sortBy}
@@ -62,7 +62,7 @@ export default class Home extends Component {
           />
           <Select
             className={styles.selector}
-            title="per page"
+            title="Projects per Page"
             autoWidth
             options={deploymentStore.perPageOptions}
             value={parseInt(deploymentStore.sortOptions.perPage, 10)}
