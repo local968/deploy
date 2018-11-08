@@ -698,81 +698,79 @@ class EditOutLier extends Component {
     const drawRect = () => {
       // 处理dataset数据
       for (let i = 1; i < x.length; i++) {
-        let data
         if (x[i] <= min || x[i - 1] >= max) {
-          data = {
+          dataset.push({
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
             width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
             class: styles.outer
-          }
+          })
         } else if (x[i] <= max && x[i - 1] >= min) {
-          data = {
+          dataset.push({
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
             width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
             class: styles.rect
-          }
+          })
         } else if (x[i] > max && x[i - 1] < max && x[i - 1] > min) {
           const left = Math.abs(xScale(x[i - 1]) - xScale(max))
-          data = {
+          dataset.push({
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
             width: left,
             class: styles.rect
-          }
-          data = {
+          })
+          dataset.push({
             x: xScale(x[i - 1]) + left,
             y: yScale(y[i - 1]) + padding.top,
             width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
             class: styles.outer
-          }
+          })
         } else if (x[i] > min && x[i - 1] < min && x[i] < max) {
           const left = Math.abs(xScale(x[i - 1]) - xScale(min))
-          data = {
+          dataset.push({
             x: xScale(x[i - 1]),
             y: yScale(y[i - 1]) + padding.top,
             width: left,
             class: styles.outer
-          }
-          data = {
+          })
+          dataset.push({
             x: xScale(x[i - 1]) + left,
             y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
             class: styles.rect
-          }
+          })
         } else {
           if (min > max) {
-            data = {
+            dataset.push({
               x: xScale(x[i - 1]),
               y: yScale(y[i - 1]) + padding.top,
               width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
               class: styles.outer
-            }
+            })
           } else {
             const left = Math.abs(xScale(x[i - 1]) - xScale(min))
             const middle = Math.abs(xScale(max) - xScale(min))
-            data = {
+            dataset.push({
               x: xScale(x[i - 1]),
               y: yScale(y[i - 1]) + padding.top,
               width: left,
               class: styles.outer
-            }
-            data = {
+            })
+            dataset.push({
               x: xScale(x[i - 1]) + left,
               y: yScale(y[i - 1]) + padding.top,
               width: middle,
               class: styles.rect
-            }
-            data = {
+            })
+            dataset.push({
               x: xScale(x[i - 1]) + left + middle,
               y: yScale(y[i - 1]) + padding.top,
-              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left - middle,
               class: styles.outer
-            }
+            })
           }
         }
-        dataset.push(data)
       }
 
       const rects = svg.selectAll(`.${styles.rect}`);
