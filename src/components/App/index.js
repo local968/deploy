@@ -7,6 +7,8 @@ import Layout from 'components/App/Layout';
 import Sider from 'components/Layout/Sider';
 import Header from 'components/Layout/Header';
 import Community from 'components/Community';
+import OrderManage from 'components/OrderManage';
+import Upgrade from 'components/Upgrade/index';
 import Stores from 'stores';
 import styles from './styles.module.css';
 import {Route, Switch} from 'react-router-dom';
@@ -33,6 +35,8 @@ class App extends Component {
             <Sider/>
             <Switch>
               <Route exact path="/community" component={Community}/>
+              <Route exact path="/ordersManage" component={OrderManage}/>
+              <Route exact path="/upgrade" component={Upgrade}/>
               <Route component={() => <Product/>}/>
             </Switch>
           </div>

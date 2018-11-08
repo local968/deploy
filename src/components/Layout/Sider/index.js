@@ -3,7 +3,9 @@ import styles from './styles.module.css';
 import logo from './rsquared_logo_color.svg';
 import home from './icon-home.svg';
 import help from './icon-help.svg';
-import community from './community.png'
+import community from './community.svg'
+import order from './order.svg'
+import upgrade from './upgrade.svg'
 import switchIcon from './switch.svg';
 import {inject, observer} from 'mobx-react';
 import {withRouter} from 'react-router';
@@ -15,6 +17,7 @@ export default class Sider extends Component {
   render() {
     const {userStore, routing} = this.props;
     const isLogin = userStore.status === 'login';
+    const isMaster = userStore.role === 'master';
     const isDeploy = routing.location.pathname.includes('deploy');
     return (
       <aside className={styles.sider}>
@@ -37,9 +40,20 @@ export default class Sider extends Component {
             <h4 className={styles.nav}>Support</h4>
           </a>
           <a className={styles.support} onClick={() => routing.push('/community')}>
-            <img alt="support" src={community} className={styles.community}/>
+            <img alt="support" src={community}/>
             <h4 className={styles.nav}>Community</h4>
           </a>
+          <a className={styles.support} onClick={() => routing.push('/upgrade')}>
+            <img alt="support" src={upgrade}/>
+            <h4 className={styles.nav}>Upgrade</h4>
+          </a>
+          {
+            isMaster && <a className={styles.support} onClick={() => routing.push('/ordersManage')}>
+              <img alt="support" src={order} className={styles.community}/>
+              <h4 className={styles.nav}>订单管理</h4>
+            </a>
+
+          }
         </div>
         <a className={styles.bottom} onClick={this.switchClick}>
           <img alt="switch" src={switchIcon}/>

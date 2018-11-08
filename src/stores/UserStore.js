@@ -6,15 +6,17 @@ import socketStore from './SocketStore';
 class UserStore {
 
   @observable status = 'init' // unlogin login
+  @observable role = ''
   @observable info = {
     id: '',
     email: ''
   }
 
   constructor() {
-    axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
+    axios.get(`http://${config.host}:${8080||config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
+        this.role = res.data.info.role
         this.status = 'login'
       } else {
         this.status = 'unlogin'

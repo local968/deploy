@@ -33,3 +33,9 @@ config.lua
 /data
 
 start_dev.sh
+
+# IDEA
+.idea
+
+#YARN
+yarn.lock

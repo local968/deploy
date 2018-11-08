@@ -10,11 +10,11 @@ const menu = (
   <Menu>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer"
-         href="http://localhost:3000?language=zh-CN">中文社区</a>
+         href="http://app14.newa-tech.com:54000?language=zh-CN">中文社区</a>
     </Menu.Item>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer"
-         href="http://localhost:3000?language=en-US">community for english</a>
+         href="http://app14.newa-tech.com:54000?language=en-US">community for english</a>
     </Menu.Item>
   </Menu>
 );
