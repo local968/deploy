@@ -3,6 +3,7 @@ import 'rc-slider/assets/index.css';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
+import { action } from 'mobx';
 import Slider from 'rc-slider';
 import { NumberInput } from 'components/Common';
 import { Select } from 'antd';
@@ -148,6 +149,12 @@ export default class AdvancedView extends Component {
     if (value < 1 || value > 9) return
     this.props.project.speedVSaccuracy = value
   }
+
+  reset = action(() => {
+    this.props.project.holdoutRate = 20
+    this.props.project.validationRate = 20
+    this.props.project.crossCount = 3
+  })
 
   render() {
     const { advancedName, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
@@ -313,7 +320,7 @@ export default class AdvancedView extends Component {
           {dataRange === "all" && <div className={styles.advancedBlock}>
             <div className={styles.advancedBox}>
               <div className={styles.advancedTitle}>
-                <span>Set Percentage of Each Part:</span>
+                <span>Set Percentage of Each Part:<a className={styles.reset} onClick={this.reset}>Reset</a></span>
               </div>
               {runWith === "holdout" ? <div className={styles.advancedPercentBlock}>
                 <div className={styles.advancedPercent}>
@@ -384,8 +391,8 @@ export default class AdvancedView extends Component {
                       <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
                       <span>Select Number of CV folds</span>
                     </div>
-                    {/* <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={5} isInt={true} /> */}
-                    <span>{crossCount}</span>
+                    <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={5} isInt={true} />
+                    {/* <span>{crossCount}</span> */}
                   </div>
                   <div className={styles.advancedPercentInput}>
                     <div className={styles.advancedPercentText}>

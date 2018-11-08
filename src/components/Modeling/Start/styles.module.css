@@ -985,3 +985,11 @@ span.advancedDesc {
   color: #aaaaaa;
   background-image: none;
 }
+
+.reset {
+  font-size: 1rem;
+  float: right;
+  border-radius: 5px;
+  color: #445167;
+  text-decoration: underline;
+}
