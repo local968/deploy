@@ -21,13 +21,13 @@ router.post('/check', async (req, res) => {
     message: 'missing params',
     error: 'missing params'
   })
-  if (type === 'modeling' && parseInt(fileSize) > userModelingRestriction[req.session.user.level]) return res.json({
+  if (type === 'modeling' && parseInt(fileSize) >= userModelingRestriction[req.session.user.level]) return res.json({
     status: 416,
     message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
     error: 'modeling file too large'
   })
   const size = await redis.get(`user:${userId}:upload`)
-  if (parseInt(size) + parseInt(fileSize) > userStorageRestriction[req.session.user.level]) return res.json({
+  if (parseInt(size) + parseInt(fileSize) >= userStorageRestriction[req.session.user.level]) return res.json({
     status: 417,
     message: 'Your usage of storage space has reached the max restricted by your current lisense.',
     error: 'storage space full'

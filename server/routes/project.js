@@ -137,7 +137,7 @@ const checkTraningRestriction = (user) => {
     const duration = moment.duration(moment().unix() - user.createdTime)
     const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
     return redis.get(restrictQuery).then(count => {
-      if (count > userProjectRestriction[level]) return reject({
+      if (count >= userProjectRestriction[level]) return reject({
         status: -4,
         message: 'Your usage of number of training has reached the max restricted by your current lisense.',
         error: 'project number exceed'
