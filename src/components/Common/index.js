@@ -11,7 +11,6 @@ import ProjectSide from './ProjectSide';
 import ProjectLoading from './ProjectLoading';
 import Table from './Table';
 import Modal from './Modal';
-import Conflict from './Conflict';
 import NumberInput from './NumberInput';
 import Confirm from './Confirm';
 
@@ -29,7 +28,6 @@ export {
   Background,
   Table,
   Modal,
-  Conflict,
   NumberInput,
   Confirm
 };
