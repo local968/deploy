@@ -34,7 +34,7 @@ export default class AreaChart extends Component {
   render () {
     const {className} = this.props;
     return (
-      <div className={`${styles.chart} ${className}`}>
+      <div className={`${styles.areaChart} ${className}`}>
 
       </div>
     );

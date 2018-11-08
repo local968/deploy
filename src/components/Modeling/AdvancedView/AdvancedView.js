@@ -312,6 +312,9 @@ class DetailCurves extends Component {
   handleClick = val => {
     this.setState({ curve: val });
   }
+  reset = () => {
+    this.props.model.resetFitIndex();
+  }
   render() {
     const { model, model: { id } } = this.props;
     const { curve } = this.state;
@@ -370,6 +373,7 @@ class DetailCurves extends Component {
           <PredictTable model={model} />
         </div>
         <div className={styles.rightPanel} >
+          <button onClick={this.reset} className={styles.button} >Reset</button>
           {curComponent}
         </div>
       </div>

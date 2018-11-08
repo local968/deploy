@@ -784,10 +784,10 @@ export default class Project {
   }
 
   modeling = trainData => {
-    if(this.train2ing) return false
+    if (this.train2ing) return false
     socketStore.ready().then(api => api.train(trainData, progressResult => {
       if (progressResult.name === "progress") {
-        if(!progressResult.model) return
+        if (!progressResult.model) return
         this.trainModel = progressResult
         return
       }
@@ -811,7 +811,7 @@ export default class Project {
   }
 
   abortTrain = () => {
-    if(this.stopModel) return
+    if (this.stopModel) return
     this.stopModel = true
     const command = {
       command: 'stop',
@@ -820,24 +820,24 @@ export default class Project {
     }
     socketStore.ready().then(api => api.abortTrain(command, process => {
     }).then(returnValue => {
-      const {status, message, result, id} = returnValue
-      if(id !== this.id) return 
-      if(status !== 200) return antdMessage.error(message)
-      this.setProperty({...result, stopModel: false}) 
+      const { status, message, result, id } = returnValue
+      if (id !== this.id) return
+      if (status !== 200) return antdMessage.error(message)
+      this.setProperty({ ...result, stopModel: false })
     }))
   }
 
   setModel = data => {
-    if(this.trainModel && data.name === this.trainModel.name) this.trainModel = null
+    if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
     if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
-    const index = this.models.findIndex(m => {
-      return data.id === m.id
-    })
-    if (index === -1) {
-      this.models.push(new Model(this.id, data))
-    } else {
-      this.models[index] = new Model(this.id, data)
-    }
+    this.models = [...this.models.filter(m => {
+      return data.id !== m.id
+    }), new Model(this.id, data)]
+    // if (index === -1) {
+    //   this.models.push(new Model(this.id, data))
+    // } else {
+    //   this.models[index] = new Model(this.id, data)
+    // }
   }
 
   // modelingError = () => {
@@ -1011,6 +1011,7 @@ export default class Project {
           const { fitIndex, chart } = this.parseChartData(result.data);
           model.updateModel({
             fitIndex,
+            initialFitIndex: fitIndex,
             chartData: chart
           })
         }
