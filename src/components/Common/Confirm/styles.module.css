@@ -1,0 +1,56 @@
+.deleteModal {
+  display: flex;
+  flex: none;
+  flex-direction: column
+}
+
+.modalText {
+  display: flex;
+  flex: none;
+  margin-bottom: 0.2em;
+}
+
+.modalText span {
+  font-size: 1rem;
+  font-family: HelveticaNeue;
+  color: #4a4a4a;
+  line-height: 1.4
+}
+
+.modalBox {
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  margin-top: 0.2em;
+}
+
+.modalButton {
+  display: flex;
+  flex: none;
+  padding: 0.1em 0.3em;
+  margin-left: 0.1em;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  outline: none;
+  border: 1px solid #4a4a4a;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modalButton span {
+  font-size: 0.875rem;
+  font-family: HelveticaNeue;
+  color: #4a4a4a;
+}
+
+.modalConfirm {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  border-color: transparent;
+}
+
+.modalConfirm span {
+  color: #fff;
+}
+
+.modalCancel {
+  background: #fff;
+}

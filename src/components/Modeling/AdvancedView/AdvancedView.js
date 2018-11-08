@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal, Select, Radio } from 'antd';
+import { Table, Tabs, Modal, Select, Radio, Button } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './AdvancedView.module.less';
 import RocChart from 'components/D3Chart/RocChart';
@@ -526,7 +526,12 @@ class ModelComp extends Component {
         <Modal
           width={1000}
           visible={this.state.modelCompVisible}
-          onCancel={this.handleCancel}>
+          onCancel={this.handleCancel}
+          closable={false}
+          footer={
+            <Button key="cancel" type="primary" onClick={this.handleCancel}>Close</Button>
+          }
+          >
           <div>
             <h4>Model Comparison Charts</h4>
             <Tabs defaultActiveKey="1">

@@ -5,7 +5,7 @@ import Project from 'components/Project';
 import Problem from 'components/Problem';
 import Data from 'components/Data';
 import Modeling from 'components/Modeling';
-import { ProjectLoading, Conflict } from 'components/Common';
+import { ProjectLoading, Confirm } from 'components/Common';
 import { message } from 'antd';
 
 @inject('userStore', 'projectStore', 'routing')
@@ -22,7 +22,7 @@ export default class Main extends Component {
     )
   }
 
-  componentWillMount(){
+  componentWillMount() {
     when(
       () => this.props.projectStore.project,
       () => this.props.projectStore.inProject(this.pid)
@@ -60,10 +60,20 @@ export default class Main extends Component {
   }
 
   render() {
-    const {project, conflict, notExit} = this.props.projectStore
+    const { project, conflict, notExit } = this.props.projectStore
     return <React.Fragment>
       {!project ? <ProjectLoading /> : this.getChild()}
-      {conflict && <Conflict onConfirm={notExit} onClose={this.exit}/>}
+      {<Confirm
+        width="6em"
+        title={`You have been kicked out`}
+        visible={conflict}
+        onClose={this.exit}
+        onConfirm={notExit}
+        closeByMask={false}
+        showClose={false}
+        confirmText="Go Back to the Project"
+        closeText="Go to Home Page"
+        content={"You have been kicked out of the project by another user."} />}
     </React.Fragment>
   }
 }

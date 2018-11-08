@@ -17,7 +17,7 @@ export default class Operation extends Component {
     return (
       <div className={styles.operation}>
         <div className={styles.info}>
-          <span className={styles.model}>Model:{cd.modelName}</span>
+          <span className={styles.model}>Model: {cd.modelName}</span>
         </div>
         {scheduleStore.sortedDeploymentSchedules.length === 0 && <Empty />}
         {scheduleStore.sortedDeploymentSchedules.length > 0 && (
