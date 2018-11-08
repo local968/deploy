@@ -10,6 +10,8 @@ import { Popover } from 'antd';
 import config from 'config'
 // import config from 'config';
 
+const transferR2 = (str) => str === 'R2' && 'R^2'
+
 @inject('scheduleStore', 'deploymentStore', 'routing')
 @observer
 export default class List extends Component {
@@ -45,7 +47,7 @@ export default class List extends Component {
               <div className={styles.item}>
                 <span className={styles.label}>Threshold</span>
                 <span className={styles.text}>
-                  {cdpo.measurementMetric} {cdpo.metricThreshold}
+                  {transferR2(cdpo.measurementMetric)}:{cdpo.metricThreshold}
                 </span>
               </div>
               <div className={styles.item}>
@@ -104,13 +106,13 @@ export default class List extends Component {
                             .schedule.result.score &&
                           s.schedule.result.score.auc.toFixed(2)}`
                           : `RMSE:${s.schedule.result.score &&
-                          s.schedule.result.score.nrmse.toFixed(2)} R2:${s
+                          s.schedule.result.score.nrmse.toFixed(2)} R^2:${s
                             .schedule.result.score &&
                           s.schedule.result.score.r2.toFixed(2)}`)}
                     </span>
                     <span className={styles.threshold}>
                       {s.schedule.threshold &&
-                        `${s.schedule.threshold.type} ${
+                        `${transferR2(s.schedule.threshold.type)}:${
                         s.schedule.threshold.value
                         }`}
                     </span>
