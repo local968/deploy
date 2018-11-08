@@ -150,7 +150,7 @@ export default class DataQuality extends Component {
                 [styles.mismatch]: mismatchIndex[target] && mismatchIndex[target].includes(k),
                 [styles.missing]: nullIndexes[target] && nullIndexes[target].includes(k),
                 [styles.outlier]: colType[target] !== 'Categorical' && outlierIndex[target] && outlierIndex[target].includes(k)
-              })}><span>{console.log(colMap[target], v[targetIndex], 'hasCleanData')}{hasCleanData ? (Object.entries({...colMap[target], ...targetMap}).find(arr => arr[1] == v[targetIndex]) || [])[0] : v[targetIndex]}</span></div>)}
+              })}><span>{hasCleanData ? (Object.entries({...colMap[target], ...targetMap}).find(arr => arr[1] == v[targetIndex]) || [])[0] : v[targetIndex]}</span></div>)}
             </div>
           </div>
           <ContinueButton onClick={this.startTrain} text='continue' width="100%" />
