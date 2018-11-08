@@ -150,7 +150,7 @@ export default class Deployment extends Component {
     return (
       <div className={styles.deployment}>
         <div className={styles.info}>
-          <span className={styles.model}>Model:{this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>{cd.modelList.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}</Select> : cd.modelName}</span>
+          <span className={styles.model}>Model: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>{cd.modelList.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}</Select> : cd.modelName}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={cd.modelList && cd.modelList.find(model => model.name === cd.modelName).performance} />
           <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? 'Save' : 'Change'}</a>
           <span className={styles.data}>Deployment Data Definition</span>
@@ -159,7 +159,7 @@ export default class Deployment extends Component {
             Download
           </a>
           <span className={styles.email}>
-            Email to Receive Alert:{!this.emailEditing && (cd.email || 'empty')}
+            Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (
               <input
                 type="text"
