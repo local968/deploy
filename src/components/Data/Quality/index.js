@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { ContinueButton, ProjectLoading, Modal } from 'components/Common';
+import { ContinueButton, ProjectLoading, Modal, EtlLoading } from 'components/Common';
 import { when, observable } from 'mobx';
 import { TargetIssue, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 
@@ -70,7 +70,7 @@ export default class DataQuality extends Component {
 
   render() {
     const { project } = this.props;
-    const { issues, uploadData, cleanData, target, targetMap, colType, colMap, rawHeader, mismatchIndex, nullIndexes, outlierIndex, problemType, totalLines, issueRows, totalRawLines, etling } = project;
+    const { issues, uploadData, cleanData, target, targetMap, colType, colMap, rawHeader, mismatchIndex, nullIndexes, outlierIndex, problemType, totalLines, issueRows, totalRawLines, etling, etlProgress } = project;
     const targetIndex = rawHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? '2' : '10+';
     const percent = {
@@ -159,7 +159,8 @@ export default class DataQuality extends Component {
           {arr}
         </div>
       </div>
-      {(this.isLoad || etling) && <ProjectLoading />}
+      {this.isLoad && <ProjectLoading />}
+      {etling && <EtlLoading progress={etlProgress} />}
       <Modal content={<FixIssue project={project} closeFixes={this.closeFixes} saveDataFixes={this.saveDataFixes} />}
         visible={this.visible}
         width='12em'

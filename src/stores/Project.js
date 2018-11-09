@@ -51,6 +51,7 @@ export default class Project {
 
   //etl
   @observable etling = false;
+  @observable etlProgress = 0
 
   // upload data
   @observable dataHeader = [];
@@ -128,7 +129,6 @@ export default class Project {
 
   @computed
   get defaultUploadFile() {
-    this.etling = false;
     this.noComputeTemp = false
 
     return {
@@ -304,6 +304,9 @@ export default class Project {
         lastSubStep: 1,
         subStepActive: 1
       })
+      this.etling = false;
+      this.etlProgress = 0
+
       this.updateProject(backData);
     } else {
       this.updateProject(Object.assign({}, updObj, this.nextMainStep(2)));
@@ -320,6 +323,8 @@ export default class Project {
       lastSubStep: 1,
       subStepActive: 1
     })
+    this.etling = false;
+    this.etlProgress = 0
     this.updateProject(backData).then(() => this.etl())
   }
 
@@ -542,8 +547,10 @@ export default class Project {
       .then(api => api.etl(data, progressResult => {
         let { result } = progressResult;
         if (!this.etling) return;
-        const { progress, name, path } = result
-        if (progress === "start") return
+        const { name, path, value, key } = result
+        if (name === "progress" && key === 'etl') {
+          this.etlProgress = value
+        }
         if (name === "csvHeader") {
           const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
           Papa.parse(url, {
@@ -579,6 +586,7 @@ export default class Project {
       }))
       .then(returnValue => {
         this.etling = false;
+        this.etlProgress = 0
         let { result, status, message } = returnValue;
 
         if (status !== 200) return antdMessage.error(message)

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { observable } from 'mobx'
 import Hint from 'components/Common/Hint';
 
-import { Select, ContinueButton, ProjectLoading, Table } from 'components/Common';
+import { Select, ContinueButton, EtlLoading, Table } from 'components/Common';
 
 @observer
 export default class DataSchema extends Component {
@@ -58,7 +58,7 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props;
-    const { etling, uploadData, rawHeader, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, uploadData, rawHeader, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
     const targetOption = {};
 
     //target选择列表
@@ -130,7 +130,7 @@ export default class DataSchema extends Component {
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you do not want R2-Learn to make any change to your dataset, you can skip data quality check." />
         </div>
       </div>
-      {etling && <ProjectLoading />}
+      {etling && <EtlLoading progress={etlProgress}/>}
     </div>
   }
 }

@@ -97,7 +97,7 @@ export default class DataConnect extends Component {
   })
 
   onProgress = action((progress, speed) => {
-    if(!this.uploading) return
+    if (!this.uploading) return
     const [loaded, size] = progress.split("/")
     try {
       this.process = (parseFloat(loaded) / parseFloat(size)) * 90
@@ -187,6 +187,7 @@ export default class DataConnect extends Component {
 
   render() {
     const { project, userStore, socketStore } = this.props;
+    const { etling, etlProgress } = project
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
@@ -256,7 +257,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressing}>
                   <Progress
-                    percent={this.process}
+                    percent={this.process + (etling ? etlProgress : 0) / 10}
                     status="active"
                     strokeWidth={12}
                     showInfo={false}

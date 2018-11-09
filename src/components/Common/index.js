@@ -13,6 +13,7 @@ import Table from './Table';
 import Modal from './Modal';
 import NumberInput from './NumberInput';
 import Confirm from './Confirm';
+import EtlLoading from './EtlLoading';
 
 export {
   BlackButton,
@@ -29,5 +30,6 @@ export {
   Table,
   Modal,
   NumberInput,
-  Confirm
+  Confirm,
+  EtlLoading
 };
