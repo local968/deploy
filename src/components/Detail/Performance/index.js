@@ -320,7 +320,7 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           value={cdpo.measurementMetric}
           onChange={value => selectionOption('measurementMetric', value)()}
         >
-          <Option value="R2">R2</Option>
+          <Option value="R2">R^2</Option>
           <Option value="RMSE">RMSE</Option>
         </Select>
       )}

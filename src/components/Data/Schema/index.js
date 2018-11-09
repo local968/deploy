@@ -18,7 +18,13 @@ export default class DataSchema extends Component {
     this.props.project.updateProject({
       dataHeader: newDataHeader,
       colType: colType,
-      noCompute: noComputeTemp
+      noCompute: noComputeTemp,
+      cleanData: [],
+      targetMap: {},
+      outlierDict: {},
+      nullFillMethod: {},
+      mismatchFillMethod: {},
+      outlierFillMethod: {}
     });
     this.props.project.etl();
   }
@@ -119,7 +125,10 @@ export default class DataSchema extends Component {
       </div>
       <div className={styles.bottom}>
         <ContinueButton onClick={this.doEtl} disabled={etling || !target} text="Continue" />
-        <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noComputeTemp} /><span>Skip Etl</span></div>
+        <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noComputeTemp} />
+          <span>Skip Data Quality Check</span>
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you do not want R2-Learn to make any change to your dataset, you can skip data quality check." />
+        </div>
       </div>
       {etling && <ProjectLoading />}
     </div>

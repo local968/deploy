@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import autoIcon from './mr-one-logo-blue.svg';
 import { Modal } from 'components/Common';
 import { when, observable } from 'mobx';
-import { Spin } from 'antd';
+import { Spin, message } from 'antd';
 import AdvancedView from './advancedView';
 import SimplifiedView from './simplifiedView';
 
@@ -102,8 +102,12 @@ class AdvancedModel extends Component {
 
   modeling = () => {
     const { project, closeAdvanced } = this.props
+    const { advancedModeling, version, algorithms } = project
+    const sortFn = (a, b) => a - b
+    if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
+    if (!version.length) return message.error("You need to select at least one algorithm!")
     closeAdvanced()
-    project.advancedModeling()
+    advancedModeling()
   }
 
   render() {

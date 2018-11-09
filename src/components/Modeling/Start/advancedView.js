@@ -3,6 +3,7 @@ import 'rc-slider/assets/index.css';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
+import { action } from 'mobx';
 import Slider from 'rc-slider';
 import { NumberInput } from 'components/Common';
 import { Select } from 'antd';
@@ -149,8 +150,26 @@ export default class AdvancedView extends Component {
     this.props.project.speedVSaccuracy = value
   }
 
+  handleSolution = (num, e) => {
+    const isCheck = e.target.checked
+    const { version } = this.props.project
+    if (isCheck) {
+      if (version.includes(num)) return
+      this.props.project.version = [...version, num]
+    } else {
+      if (!version.includes(num)) return
+      this.props.project.version = version.filter(n => n !== num)
+    }
+  }
+
+  reset = action(() => {
+    this.props.project.holdoutRate = 20
+    this.props.project.validationRate = 20
+    this.props.project.crossCount = 3
+  })
+
   render() {
-    const { advancedName, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
+    const { advancedName, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
@@ -201,6 +220,14 @@ export default class AdvancedView extends Component {
           </div>
           <div className={styles.advancedBlock}>
             <div className={styles.advancedAlgorithmList}>
+              <div className={styles.advancedAlgorithm} key={'solution-a'}>
+                <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
+                <label htmlFor={'R2-solution-a'}>R2-solution-a</label>
+              </div>
+              <div className={styles.advancedAlgorithm} key={'solution-b'}>
+                <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
+                <label htmlFor={'R2-solution-b'}>R2-solution-b</label>
+              </div>
               {algorithmList.map((v, k) => {
                 return <div className={styles.advancedAlgorithm} key={k}>
                   <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v)} onChange={this.handleCheck.bind(null, v)} />
@@ -313,7 +340,7 @@ export default class AdvancedView extends Component {
           {dataRange === "all" && <div className={styles.advancedBlock}>
             <div className={styles.advancedBox}>
               <div className={styles.advancedTitle}>
-                <span>Set Percentage of Each Part:</span>
+                <span>Set Percentage of Each Part:<a className={styles.reset} onClick={this.reset}>Reset</a></span>
               </div>
               {runWith === "holdout" ? <div className={styles.advancedPercentBlock}>
                 <div className={styles.advancedPercent}>
@@ -359,24 +386,24 @@ export default class AdvancedView extends Component {
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)}></div>
                     <span>Training</span>
                   </div>
-                  <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} />
-                  <span>%</span>
+                  {/* <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} /> */}
+                  <span>{100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)}%</span>
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)}></div>
                     <span>Validation</span>
                   </div>
-                  <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} />
-                  <span>%</span>
+                  {/* <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} /> */}
+                  <span>{parseInt(validationRate, 10)}%</span>
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
                     <span>Holdout</span>
                   </div>
-                  <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} />
-                  <span>%</span>
+                  {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
+                  <span>{parseInt(holdoutRate, 10)}%</span>
                 </div>
               </div> : <div className={styles.advancedPercentBox}>
                   <div className={styles.advancedPercentInput}>
@@ -385,14 +412,15 @@ export default class AdvancedView extends Component {
                       <span>Select Number of CV folds</span>
                     </div>
                     <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={5} isInt={true} />
+                    {/* <span>{crossCount}</span> */}
                   </div>
                   <div className={styles.advancedPercentInput}>
                     <div className={styles.advancedPercentText}>
                       <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
                       <span>Holdout</span>
                     </div>
-                    <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} />
-                    <span>%</span>
+                    {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
+                    <span>{parseInt(holdoutRate, 10)}%</span>
                   </div>
                 </div>}
             </div>

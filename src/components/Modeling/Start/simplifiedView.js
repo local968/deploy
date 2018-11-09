@@ -80,7 +80,7 @@ export default class SimplifiedView extends Component {
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
           <div className={classnames(styles.targetCell, styles.targetName)}><span>Target Variable</span></div>
-          <div className={classnames(styles.targetCell, styles.large)}><span>Histogram</span></div>
+          <div className={styles.targetCell}><span>Histogram</span></div>
           <div className={styles.targetCell}><span>Data Type</span></div>
           <div className={styles.targetCell}><span>Mean</span></div>
           <div className={styles.targetCell}><span>Unique Value</span></div>
@@ -89,8 +89,8 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.targetRow}>
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
-          <div className={classnames(styles.targetCell, styles.targetHistogram)} onClick={this.show}>
-            <img src={histogramIcon} alt='histogram' />
+          <div className={styles.targetCell} onClick={this.show}>
+            <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
             {<Popover placement='bottomLeft'
               visible={this.showHistograms}
               onVisibleChange={this.hide}
@@ -101,7 +101,6 @@ export default class SimplifiedView extends Component {
                 path={histgramPlots[target]}
                 id={id}
               />} />}
-            <span>Compute</span>
           </div>
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
           <div className={classnames(styles.targetCell, {
@@ -151,8 +150,8 @@ export default class SimplifiedView extends Component {
         <div className={styles.tableHeader}>
           <div className={classnames(styles.tableTh, styles.tableCheck)}></div>
           <div className={styles.tableTh}><span>Name</span></div>
-          <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Histogram</span></div>
-          <div className={classnames(styles.tableTh, styles.tableLarge)}><span>Univariant Plot</span></div>
+          <div className={styles.tableTh}><span>Histogram</span></div>
+          <div className={styles.tableTh}><span>Univariant Plot</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>Importance</span>
@@ -211,8 +210,8 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showHistograms}>
-        <img src={histogramIcon} alt='histogram' />
+      <div className={styles.tableTd} onClick={this.showHistograms}>
+        <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}
           onVisibleChange={this.hideHistograms}
@@ -223,10 +222,9 @@ class SimplifiedViewRow extends Component {
             path={project.histgramPlots[value]}
             id={id}
           />} />}
-        <span>Compute</span>
       </div>
-      <div className={classnames(styles.tableTd, styles.tableChart)} onClick={this.showUnivariant}>
-        <img src={univariantIcon} alt='univariant' />
+      <div className={styles.tableTd} onClick={this.showUnivariant}>
+        <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
         {this.univariant && <Popover placement='topLeft'
           visible={this.univariant}
           onVisibleChange={this.hideUnivariant}
@@ -237,7 +235,6 @@ class SimplifiedViewRow extends Component {
             path={project.univariatePlots[value]}
             id={id}
           />} />}
-        <span>Compute</span>
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
         <div className={styles.preImpotance}>
@@ -286,6 +283,11 @@ class SimplifiedViewPlot extends Component {
 
 @observer
 class CreateNewVariable extends Component {
+  constructor(props) {
+    super(props)
+    this.fxRef = React.createRef();
+  }
+
   @observable hintStatus = false
   @observable hints = []
   @observable exp = ''
@@ -296,12 +298,14 @@ class CreateNewVariable extends Component {
   @observable inputPosition = 0
   @observable myFunction = {}
   @observable loading = false
+  @observable isIn=false
 
   hideHint = () => {
     this.hintStatus = false
     this.showFunction = {}
     this.active = 0
     this.hints = []
+    document.onmousedown = () => {}
   }
 
   handleChange = e => {
@@ -356,10 +360,17 @@ class CreateNewVariable extends Component {
     return start
   }
 
-  handleSelect = value => {
+  handleSelect = (value, isFunciton) => {
     // this.exp = value
     const startIndex = this.getStartIndex()
     this.exp = this.exp.slice(0, startIndex) + value + this.exp.slice(this.inputPosition)
+    this.fxRef.current.focus()
+    setTimeout(() => {
+      this.inputPosition = (this.exp.slice(0, startIndex) + value).length + (isFunciton ? -1 : 0)
+      this.fxRef.current.setSelectionRange(this.inputPosition, this.inputPosition)
+    }, 0);
+    
+    window.ref= this.fxRef.current
   }
 
   onKeyDown = e => {
@@ -368,7 +379,7 @@ class CreateNewVariable extends Component {
       if (!this.hints.length) return
       const selectValue = this.hints[this.active]
       if (!selectValue) return
-      this.handleSelect(selectValue.value)
+      this.handleSelect(selectValue.value, !!selectValue.syntax)
       return
     }
     // up
@@ -387,10 +398,20 @@ class CreateNewVariable extends Component {
     }
   }
 
-  onSelect = e => {
-    this.inputPosition = e.target.selectionEnd
+  onSelect = () => {
+    this.inputPosition = this.fxRef.current.selectionEnd
     this.changeHints()
     this.hintStatus = true
+    this.isIn = true
+    document.onmousedown = e => {
+      let dom = e.target; let isIn = false
+      while (dom) {
+        if (dom.className === styles.newVariableFx) { isIn = true; break }
+        dom = dom.parentNode
+      }
+      if(!isIn) this.hideHint()
+      this.isIn = isIn
+    }
   }
 
   showSyntax = n => {
@@ -647,6 +668,11 @@ class CreateNewVariable extends Component {
     this.name = value
   }
 
+  deleteFx = () => {
+    this.exp = ''
+    this.fxRef.current.focus()
+  }
+
   render() {
     const { visible, onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
@@ -659,12 +685,13 @@ class CreateNewVariable extends Component {
         </div>
         <span>=</span>
         <div className={styles.newVariableFx}>
-          <input className={styles.newVariableInput} placeholder="fx" value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onBlur={this.hideHint} onSelect={this.onSelect} />
+          <input className={styles.newVariableInput} placeholder="fx" ref={this.fxRef} value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onSelect={this.onSelect} />
+          {this.isIn && <div className={styles.newVariableEmpty} onClick={this.deleteFx}><span>X</span></div>}
           {this.hintStatus && <div className={styles.newVariableHintList}>
             {this.hints.map((v, k) => {
               return <div key={k} className={classnames(styles.newVariableHint, {
                 [styles.activeHint]: this.active === k
-              })} onMouseDown={this.handleSelect.bind(null, v.value)} onMouseOver={this.showSyntax.bind(null, k)}><span>{v.label}</span></div>
+              })} onClick={this.handleSelect.bind(null, v.value, !!v.syntax)} onMouseOver={this.showSyntax.bind(null, k)}><span>{v.label}</span></div>
             })}
           </div>}
           {!!functionSyntax && <div className={classnames(styles.newVariableSyntax, {

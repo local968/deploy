@@ -594,6 +594,7 @@
     background: #448eed;
     align-items: center;
     overflow: hidden;
+    transition: width 1s ease-in-out;
 }
 
 .trainingModel {

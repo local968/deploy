@@ -97,7 +97,7 @@ const api = {
     const lineCount = resp.result.totalLines
     if (!path) throw new Error('no path')
     const previewSize = await redis.get(`user:${userId}:upload`)
-    if (parseInt(previewSize) + parseInt(size) > userStorageRestriction[level]) throw {
+    if (parseInt(previewSize) + parseInt(size) >= userStorageRestriction[level]) throw {
       status: 417,
       message: 'Your usage of storage space has reached the max restricted by your current lisense.',
       error: 'storage space full'
@@ -136,7 +136,7 @@ const api = {
     if (!fileId) return restrictQuery
     const count = await redis.get(restrictQuery)
     const file = await api.getFile(fileId)
-    if (parseInt(count) + parseInt(file.lineCount) > userDeployRestriction[level]) return false
+    if (parseInt(count) + parseInt(file.lineCount) >= userDeployRestriction[level]) return false
     await redis.incrby(restrictQuery, file.lineCount)
     return restrictQuery
   },

@@ -17,7 +17,7 @@ export default class Operation extends Component {
     return (
       <div className={styles.operation}>
         <div className={styles.info}>
-          <span className={styles.model}>Model:{cd.modelName}</span>
+          <span className={styles.model}>Model: {cd.modelName}</span>
         </div>
         {scheduleStore.sortedDeploymentSchedules.length === 0 && <Empty />}
         {scheduleStore.sortedDeploymentSchedules.length > 0 && (
@@ -29,7 +29,7 @@ export default class Operation extends Component {
               <span className={styles.exeuctionSpeed}>
                 Exeuction Speed<small>(row/ms)</small>
               </span>
-              <span className={styles.dataSize}>Data Size</span>
+              <span className={styles.dataSize}>Total lines</span>
               <span className={styles.status}>Status</span>
               <span className={styles.results}>Results</span>
             </div>

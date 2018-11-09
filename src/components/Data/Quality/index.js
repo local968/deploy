@@ -70,7 +70,7 @@ export default class DataQuality extends Component {
 
   render() {
     const { project } = this.props;
-    const { issues, uploadData, target, colType, colMap, rawHeader, mismatchIndex, nullIndexes, outlierIndex, problemType, totalLines, issueRows, totalRawLines, etling } = project;
+    const { issues, uploadData, cleanData, target, targetMap, colType, colMap, rawHeader, mismatchIndex, nullIndexes, outlierIndex, problemType, totalLines, issueRows, totalRawLines, etling } = project;
     const targetIndex = rawHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? '2' : '10+';
     const percent = {
@@ -83,6 +83,7 @@ export default class DataQuality extends Component {
       mismatch: (mismatchIndex[target] ? mismatchIndex[target].length : 0) * 100 / (totalRawLines || 1),
       outlier: colType[target] === 'Numerical' ? outlierIndex[target].length * 100 / (totalRawLines || 1) : 0,
     }
+    const hasCleanData = !!cleanData.length
     let num = 0;
     let arr = [];
     if (issues.targetIssue) {
@@ -145,11 +146,11 @@ export default class DataQuality extends Component {
               {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier.toFixed(2)}%</span></div>}
             </div>
             <div className={styles.tableBody}>
-              {uploadData.map((v, k) => <div key={k} className={classnames(styles.cell, {
+              {(hasCleanData ? cleanData : uploadData).map((v, k) => <div key={k} className={classnames(styles.cell, {
                 [styles.mismatch]: mismatchIndex[target] && mismatchIndex[target].includes(k),
                 [styles.missing]: nullIndexes[target] && nullIndexes[target].includes(k),
                 [styles.outlier]: colType[target] !== 'Categorical' && outlierIndex[target] && outlierIndex[target].includes(k)
-              })}><span>{v[targetIndex]}</span></div>)}
+              })}><span>{hasCleanData ? (Object.entries({...colMap[target], ...targetMap}).find(arr => arr[1] == v[targetIndex]) || [])[0] : v[targetIndex]}</span></div>)}
             </div>
           </div>
           <ContinueButton onClick={this.startTrain} text='continue' width="100%" />
