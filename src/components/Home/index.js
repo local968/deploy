@@ -128,7 +128,7 @@ export default class Home extends Component {
         onConfirm={this.handleOk}
         confirmText="Yes"
         closeText="No"
-        content={this.deleteNames.map(n => `Are you sure to delete project: ${n}?`).join(" ")} />}
+        content={this.deleteNames.map(n => `Are you sure to delete project "${n}"?`).join(" ")} />}
     </div>
   }
 }

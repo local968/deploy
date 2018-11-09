@@ -391,7 +391,7 @@ wss.register('correlationMatrix', (message, socket, progress) => sendToCommand({
 wss.register('preTrainImportance', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
   const { status, result } = returnValue
   if (status === 100) {
-    createOrUpdate(message.projectId, socket.session.userId, { preImportance: result.data })
+    createOrUpdate(message.projectId, socket.session.userId, { preImportance: result.data, informativesLabel: result.informativesLabel })
   }
   return returnValue
 }))
@@ -439,7 +439,7 @@ wss.register('createNewVariable', (message, socket, progress) => sendToCommand({
 wss.register('abortTrain', (message, socket, progress) => {
   const projectId = message.projectId
   const userId = socket.session.userId
-  return command({ ...message, userId, requestId: message._id }).then(result => {
+  return command({ ...message, userId, requestId: message._id }).then(() => {
     const statusData = {
       train2Finished: true,
       train2ing: false,
@@ -462,7 +462,9 @@ wss.register('train', (message, socket, progress) => {
       if (status === 100) return queueValue
       if (status < 0) return null
       if (result.name === "progress") {
-        return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress(result))
+        const trainId = result.requestId
+        delete result.requestId
+        return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
       }
       return createOrUpdate(projectId, userId, { trainModel: null })
         .then(() => createModel(projectId, result).then(model => {
@@ -478,7 +480,7 @@ wss.register('train', (message, socket, progress) => {
           train2Error: false,
           selectId: ''
         }
-        if(num === 0) statusData.train2Error = true
+        if (num === 0) statusData.train2Error = true
         createOrUpdate(projectId, userId, statusData)
         return returnValue
       }))

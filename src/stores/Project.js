@@ -85,6 +85,7 @@ export default class Project {
   @observable correlationMatrixImg = '';
   @observable csvScript = [];
   @observable newVariable = [];
+  @observable informativesLabel = []
 
   //not save
   @observable targetMapTemp = {};
@@ -95,6 +96,9 @@ export default class Project {
   @observable train2ing = false;
   @observable train2Error = false;
 
+  @observable trainingId = ''
+  // 不需要参加训练的label
+  @observable trainHeader = []
   // 暂时移除
   @observable criteria = 'defualt';
 
@@ -182,7 +186,8 @@ export default class Project {
       algorithms: [],
       measurement,
       selectId: '',
-      version: [1, 2]
+      version: [1, 2],
+      trainHeader: []
     }
   }
 
@@ -693,6 +698,7 @@ export default class Project {
 
   @action
   fastTrain = () => {
+    if (this.train2ing) return false
     const {
       id,
       problemType,
@@ -737,10 +743,12 @@ export default class Project {
   }
 
   advancedModeling = () => {
+    if (this.train2ing) return false
     const {
       id,
       problemType,
       target,
+      trainHeader,
       dataHeader,
       csvScript
     } = this;
@@ -769,7 +777,7 @@ export default class Project {
 
     this.models = []
 
-    const featureLabel = dataHeader.filter(d => d !== target);
+    const featureLabel = dataHeader.filter(v => !trainHeader.includes(v) && v !== target)
     const exps = csvScript.join(";")
 
     const trainData = {
@@ -805,6 +813,7 @@ export default class Project {
     if (this.train2ing) return false
     socketStore.ready().then(api => api.train(trainData, progressResult => {
       if (progressResult.name === "progress") {
+        if (progressResult.trainId) this.trainingId = progressResult.trainId
         if (!progressResult.model) return
         this.trainModel = progressResult
         return
@@ -813,6 +822,7 @@ export default class Project {
       let result = progressResult.model
       this.setModel(result)
     })).then(returnValue => {
+      this.trainingId = ''
       const { status, message } = returnValue
       // if (status === -1 && this.models.length === 0) {
       //   return this.modelingError()
@@ -938,7 +948,7 @@ export default class Project {
           this.setProperty({ preImportance: {} })
           return antdMessage.error("preTrainImportance error")
         }
-        this.setProperty({ preImportance: result.data })
+        this.setProperty({ preImportance: result.data, informativesLabel: result.informativesLabel })
       })
     })
   }

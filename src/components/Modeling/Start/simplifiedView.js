@@ -45,13 +45,13 @@ export default class SimplifiedView extends Component {
   }
 
   handleCheck = (key, e) => {
-    const { dataHeader } = this.props.project
+    const { trainHeader } = this.props.project
     const isChecked = e.target.checked
     if (isChecked) {
-      if (dataHeader.includes(key)) return
-      this.props.project.dataHeader = [...dataHeader, key]
+      this.props.project.trainHeader = trainHeader.filter(v => v !== key)
     } else {
-      this.props.project.dataHeader = dataHeader.filter(v => v !== key)
+      if (trainHeader.includes(key)) return
+      this.props.project.trainHeader = [...trainHeader, key]
     }
   }
 
@@ -70,12 +70,24 @@ export default class SimplifiedView extends Component {
     this.props.project.preTrainImportance()
   }
 
+  handleChange = e => {
+    const value = e.target.value
+    const { project } = this.props
+    const { informativesLabel, dataHeader } = project
+    if (value === 'all') {
+      project.trainHeader = []
+    } else {
+      project.trainHeader = dataHeader.filter(v => !informativesLabel.includes(v))
+    }
+  }
+
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, rawHeader, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id } = project;
+    const { target, colType, colMap, targetMap, dataViews, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
-    const allVariables = [...rawHeader, ...newVariable]
+    const allVariables = [...dataHeader, ...newVariable]
+    const checkedVariables = dataHeader.filter(v => !trainHeader.includes(v))
     return <div className={styles.simplified}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -121,15 +133,16 @@ export default class SimplifiedView extends Component {
       <div className={styles.tool}>
         <div className={styles.toolSelect}>
           <div className={styles.toolLabel}><span>Current Variable List</span></div>
-          <select defaultValue="all">
-            <option value='all'>All Variables ({rawHeader.length - 1})</option>
+          <select defaultValue="all" onChange={this.handleChange}>
+            <option value='all'>All Variables ({dataHeader.length - 1})</option>
+            <option value='informatives'>informatives Variables ({informativesLabel.length})</option>
           </select>
         </div>
         <div className={styles.newVariable}>
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>Create a New Variable</span>
           </div>
-          <CreateNewVariable rawHeader={rawHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} />
+          <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
@@ -174,7 +187,7 @@ export default class SimplifiedView extends Component {
             const data = colType[h] !== 'Categorical' && dataViews ? (dataViews[h] || {}) : {}
             const map = targetMap || {};
             const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={dataHeader.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
+            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
           })}
         </div>
       </div>
@@ -298,14 +311,14 @@ class CreateNewVariable extends Component {
   @observable inputPosition = 0
   @observable myFunction = {}
   @observable loading = false
-  @observable isIn=false
+  @observable isIn = false
 
   hideHint = () => {
     this.hintStatus = false
     this.showFunction = {}
     this.active = 0
     this.hints = []
-    document.onmousedown = () => {}
+    document.onmousedown = () => { }
   }
 
   handleChange = e => {
@@ -320,8 +333,8 @@ class CreateNewVariable extends Component {
     const isOutOfFuntion = functionStr.toLowerCase().includes(")")
     this.myFunction = isOutOfFuntion ? {} : (inFunction || {})
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
-    const { rawHeader, colType } = this.props
-    let valueList = [...rawHeader]
+    const { dataHeader, colType } = this.props
+    let valueList = [...dataHeader]
     if (isOutOfFuntion || !inFunction || inFunction.value !== "Concat()") valueList = valueList.filter(v => colType[v] === "Numerical")
     let filterFunctions = []
     if (exp.startsWith("@")) {
@@ -369,8 +382,8 @@ class CreateNewVariable extends Component {
       this.inputPosition = (this.exp.slice(0, startIndex) + value).length + (isFunciton ? -1 : 0)
       this.fxRef.current.setSelectionRange(this.inputPosition, this.inputPosition)
     }, 0);
-    
-    window.ref= this.fxRef.current
+
+    window.ref = this.fxRef.current
   }
 
   onKeyDown = e => {
@@ -409,7 +422,7 @@ class CreateNewVariable extends Component {
         if (dom.className === styles.newVariableFx) { isIn = true; break }
         dom = dom.parentNode
       }
-      if(!isIn) this.hideHint()
+      if (!isIn) this.hideHint()
       this.isIn = isIn
     }
   }
@@ -562,11 +575,11 @@ class CreateNewVariable extends Component {
   }
 
   checkParams = array => {
-    const { rawHeader } = this.props
+    const { dataHeader } = this.props
     for (let item of array) {
       let value = item.trim()
       if (value.startsWith("@")) value = value.slice(1)
-      if (!value || (!rawHeader.includes(value) && isNaN(value))) return false
+      if (!value || (!dataHeader.includes(value) && isNaN(value))) return false
     }
     return true
   }
