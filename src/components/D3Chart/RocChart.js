@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Checkbox } from 'antd';
+import { observer } from 'mobx-react';
 import styles from './D3Chart.module.less';
 // import d3tips from './d3-tip';
 
@@ -16,6 +17,7 @@ function parseData(chartData) {
   }, [])
 }
 
+@observer
 export default class RocChart extends Component {
   state = {
     movable: false,
