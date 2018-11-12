@@ -257,7 +257,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressing}>
                   <Progress
-                    percent={this.process + (etling ? etlProgress : 0) / 10}
+                    percent={this.process + (etlProgress || 0) / 10}
                     status="active"
                     strokeWidth={12}
                     showInfo={false}
