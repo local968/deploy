@@ -31,7 +31,7 @@ import varImpactHover from './icon-variable-impact-linear-hover.svg';
 import varImpactSelected from './icon-variable-impact-selected.svg';
 import varImpactNormal from './icon-variable-impact-linear-normal.svg';
 
-import { VariableImpact } from '../Result';
+import VariableImpact from '../Result/VariableImpact';
 
 const TabPane = Tabs.TabPane;
 
