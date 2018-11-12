@@ -90,10 +90,6 @@ export default class ModelResult extends Component {
 @withRouter
 @observer
 class SimpleView extends Component {
-  onSelect = model => {
-    this.props.project.setSelectModel(model.id)
-  };
-
   render() {
     const { models, project } = this.props;
     const { problemType } = project;

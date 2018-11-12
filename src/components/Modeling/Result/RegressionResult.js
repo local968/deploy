@@ -7,6 +7,10 @@ import VariableImpact from "./VariableImpact"
 
 @observer
 export default class RegressionView extends Component {
+  onSelect = model => {
+    this.props.project.setSelectModel(model.id)
+  };
+
   render() {
     const { models, project } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current } = project;

@@ -11,9 +11,18 @@ const AccuracyHint = "Given a particular population, the accuracy measures the p
 
 @observer
 export default class ClassificationView extends Component {
+  onChange = e => {
+    const criteria = e.target.value
+    this.props.project.updateProject({ criteria })
+  }
+
+  onSelect = model => {
+    this.props.project.setSelectModel(model.id)
+  };
+
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria } = project;
 
     return <div>
       <div className={styles.result}>
@@ -37,15 +46,21 @@ export default class ClassificationView extends Component {
         <Performance current={current} />
       </div>
       <div className={styles.line} />
-      {/* <div className={styles.selectBlock}>
-            <div className={styles.selectText}>
-                <span> Select your model based on your own criteria:</span>
-            </div>
-            <div className={styles.radioGroup}>
-                <div className={styles.radio}><input type="radio" name="criteria" value={Criteria.defualt} id={Criteria.defualt} onChange={this.onChange} defaultChecked={criteria === Criteria.defualt} /><label htmlFor={Criteria.defualt}>Mr. One's Defult Selection</label></div>
-                <div className={styles.radio}><input type="radio" name="criteria" value={Criteria.costBased} id={Criteria.costBased} onChange={this.onChange} defaultChecked={criteria === Criteria.costBased} /><label htmlFor={Criteria.costBased}>Cost Based</label></div>
-            </div>
-        </div> */}
+      <div className={styles.selectBlock}>
+        <div className={styles.selectText}>
+          <span> Select your model based on your own criteria:</span>
+        </div>
+        <div className={styles.radioGroup}>
+          <div className={styles.radio}>
+            <input type="radio" name="criteria" value='default' id='criteria_default' onChange={this.onChange} checked={criteria === 'default'} />
+            <label htmlFor='criteria_default'>Mr. One's Defult Selection</label>
+          </div>
+          <div className={styles.radio}>
+            <input type="radio" name="criteria" value='cost' id='criteria_cost' onChange={this.onChange} checked={criteria === 'cost'} />
+            <label htmlFor='criteria_cost'>Cost Based</label>
+          </div>
+        </div>
+      </div>
       <ModelTable
         models={models}
         current={current}
