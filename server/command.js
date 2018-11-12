@@ -39,7 +39,7 @@ const watchQueue = async () => {
   }
 }
 
-setInterval(watchQueue, 100)
+setInterval(watchQueue, 500)
 
 command.FINISH = FINISH
 command.SEND = SEND
