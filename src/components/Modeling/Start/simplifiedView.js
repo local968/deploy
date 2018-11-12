@@ -329,8 +329,9 @@ class CreateNewVariable extends Component {
     const startIndex = this.getStartIndex()
     const functionStr = this.exp.slice(0, startIndex)
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
+    const hasFunction = functionList.find(v => functionStr.includes(v.value.slice(0, -1)))
     const inFunction = functionList.find(v => functionStr.endsWith(v.value.slice(0, -1)))
-    this.myFunction = inFunction || {}
+    this.myFunction = FUNCTIONS.senior.find(v => functionStr.endsWith(v.value.slice(0, -1))) || {}
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
     const { dataHeader, colType } = this.props
     let valueList = [...dataHeader]
@@ -346,7 +347,7 @@ class CreateNewVariable extends Component {
       })
     } else {
       filterFunctions = [...FUNCTIONS.base]
-      if (!inFunction) filterFunctions = FUNCTIONS.senior.filter(v => v.value.toLowerCase().includes(exp.toLowerCase())).concat(filterFunctions)
+      if (!hasFunction) filterFunctions = FUNCTIONS.senior.filter(v => v.value.toLowerCase().includes(exp.toLowerCase())).concat(filterFunctions)
     }
     const filterValues = valueList.filter(_v => _v.includes(exp.toLowerCase())).map(item => {
       return {

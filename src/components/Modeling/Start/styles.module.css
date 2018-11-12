@@ -1017,7 +1017,7 @@ span.advancedDesc {
   display: flex;
   flex: none;
   flex-direction: column;
-  background: #f0f4f9;
+  background: #fff;
   padding: 0.1em 12px;
   margin-top: 0.05em;
 }
