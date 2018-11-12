@@ -187,7 +187,7 @@ export default class DataConnect extends Component {
 
   render() {
     const { project, userStore, socketStore } = this.props;
-    const { etling, etlProgress } = project
+    const { etlProgress } = project
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
