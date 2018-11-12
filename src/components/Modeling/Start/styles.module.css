@@ -950,6 +950,7 @@ span.advancedDesc {
   box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
   max-height: 5em;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .newVariableHint {
@@ -957,6 +958,7 @@ span.advancedDesc {
   flex: none;
   padding: 0.1em 12px;
   cursor: pointer;
+  position: relative;
 }
 
 .activeHint {
@@ -965,14 +967,14 @@ span.advancedDesc {
 
 .newVariableSyntax {
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   width: 100%;
   display: flex;
   flex: none;
   flex-direction: column;
   background: #f0f4f9;
   padding: 0.1em 12px;
-  margin-top: 0.05em;
+  margin-bottom: 0.05em;
 }
 
 .newVariableEmpty {
@@ -992,10 +994,6 @@ span.advancedDesc {
   font-size: 0.75rem
 }
 
-.hasList {
-  left: 100%;
-}
-
 .disable {
   cursor: not-allowed;
   background-color: #d3d3d3;
@@ -1009,4 +1007,17 @@ span.advancedDesc {
   border-radius: 5px;
   color: #445167;
   text-decoration: underline;
+}
+
+.newVariableHintSyntax {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  width: 100%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #f0f4f9;
+  padding: 0.1em 12px;
+  margin-top: 0.05em;
 }

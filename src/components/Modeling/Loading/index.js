@@ -40,6 +40,7 @@ export default class Loading extends Component {
     };
 
     render() {
+        const { abortTrain } = this.props.project
         return (
             <div className={styles.loading}>
                 <div className={styles.training}>
@@ -51,6 +52,11 @@ export default class Loading extends Component {
                 </div>
                 <div className={styles.trainingText}>
                     <span>Training</span>
+                </div>
+                <div className={styles.trainingAbort}>
+                    <div className={styles.abortButton} onClick={abortTrain.bind(null, true)}>
+                        <span>Abort Training</span>
+                    </div>
                 </div>
             </div>
         );

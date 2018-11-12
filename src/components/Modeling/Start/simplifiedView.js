@@ -83,11 +83,11 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, colMap, targetMap, dataViews, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader } = project;
+    const { target, colType, colMap, targetMap, dataViews, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader, expression } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, colMap[target], targetMap)).length : 'N/A';
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
     const allVariables = [...dataHeader, ...newVariable]
-    const checkedVariables = dataHeader.filter(v => !trainHeader.includes(v))
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     return <div className={styles.simplified}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -142,7 +142,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>Create a New Variable</span>
           </div>
-          <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} />
+          <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} expression={expression} />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
@@ -329,13 +329,12 @@ class CreateNewVariable extends Component {
     const startIndex = this.getStartIndex()
     const functionStr = this.exp.slice(0, startIndex)
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
-    const inFunction = functionList.find(v => functionStr.toLowerCase().includes(v.value.toLowerCase().slice(0, -1)))
-    const isOutOfFuntion = functionStr.toLowerCase().includes(")")
-    this.myFunction = isOutOfFuntion ? {} : (inFunction || {})
+    const inFunction = functionList.find(v => functionStr.endsWith(v.value.slice(0, -1)))
+    this.myFunction = inFunction || {}
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
     const { dataHeader, colType } = this.props
     let valueList = [...dataHeader]
-    if (isOutOfFuntion || !inFunction || inFunction.value !== "Concat()") valueList = valueList.filter(v => colType[v] === "Numerical")
+    if (!inFunction || inFunction.value !== "Concat()") valueList = valueList.filter(v => colType[v] === "Numerical")
     let filterFunctions = []
     if (exp.startsWith("@")) {
       exp = exp.slice(1).trim()
@@ -433,13 +432,14 @@ class CreateNewVariable extends Component {
   }
 
   handleAdd = () => {
-    const { name, exp } = this
-    if (!name) {
-      antdMessage.error("name is empty")
-      return
-    }
+    let { name, exp, props: { expression } } = this
+    name = name.trim()
+    if (!name) return antdMessage.error("name is empty")
+    if (expression.map(v => v.name).includes(name)) return antdMessage.error(`new variable ${name} is exist`)
+    if (name.includes("_")) return antdMessage.error(`name cannot contain _`)
     const checked = this.checkExp(exp)
     if (!checked.isPass) return antdMessage.error(checked.message)
+    if (!checked.num) return antdMessage.error("expression is empty")
     const num = checked.num
     const nameArray = []
     if (num === 1) {
@@ -450,155 +450,124 @@ class CreateNewVariable extends Component {
       }
     }
     this.loading = true
-    this.props.addNewVariable(nameArray, exp).then(result => {
+    this.props.addNewVariable(name, nameArray, exp).then(result => {
       this.loading = false
-      if (result) this.props.onClose()
+      if (!result) return
+      this.props.onClose()
+      this.name = ''
+      this.exp = ''
     })
   }
 
-  checkExp = _expression => {
+  formatBracket = _expression => {
     let expression = _expression
-    if (!expression) return { isPass: true, message: "ok", num: 0 }
-    const baseOptReg = new RegExp(/[+\-*/]/)
-    const exps = []
-    let num = 1
-    let start = 0
-    let end = 0
-    let functions = 0
-    let seniorFunctions = 0
-    while (true) {
-      start = expression.indexOf("(", start) + 1
-      end = expression.indexOf(")", start) + 1
-      if (start === 0 || end === 0 || start > end) {
-        exps.push(expression)
-        break
-      }
-      while (true) {
-        let center = start
-        let centerNum = 0
-        while (true) {
-          center = expression.indexOf("(", center) + 1
-          if (center === 0 || center > end) break;
-          start = center
-          centerNum++
-        }
-        if (!centerNum) break;
-        while (centerNum) {
-          end = expression.indexOf(")", end) + 1
-          if (end === 0) break
-          centerNum--
-        }
-        if (centerNum) return { isPass: false, message: "error expression" }
-      }
-      const str = expression.slice(0, end)
-      exps.push(str)
-      expression = expression.slice(end)
-      if (!expression.trim()) break
-      const optIndex = expression.search(baseOptReg)
-      if (optIndex === -1) return { isPass: false, message: `Unexpected identifier: ${expression}` }
-      expression = expression.slice(optIndex + 1)
-    }
-    for (let exp of exps) {
-      const start = exp.indexOf("(")
-      const end = exp.lastIndexOf(")")
-      const hasFunction = start > -1 && end > -1 && end > start
-      if (!hasFunction) {
-        const array = exp.split(baseOptReg)
-        const isPass = this.checkParams(array)
-        if (!isPass) return { isPass: false, message: "error expression" }
-      } else {
-        const prev = exp.slice(0, start)
-        const prevArray = prev.split(baseOptReg)
-        const functionName = prevArray.pop().trim()
-        if (functionName) {
-          const isBase = FUNCTIONS.base.find(f => f.value.slice(0, -2) === functionName)
-          const isSenior = FUNCTIONS.senior.find(f => f.value.slice(0, -2) === functionName)
-          const isFunction = (isBase || isSenior)
-          functions += isFunction ? 1 : 0
-          seniorFunctions += isSenior ? 1 : 0
-          if (!isFunction) return { isPass: false, message: `error function:"${functionName}"` }
-          const functionExp = exp.slice(start + 1, end)
-          if (!functionExp.trim()) return { isPass: false, message: `function: "${functionName}" must have param` }
-          const params = functionExp.split(",")
-          if (isFunction.params && params.length !== isFunction.params) return { isPass: false, message: `function: "${functionName}" must have ${isFunction.params} param` }
-          if (isSenior) {
-            const seniorChecked = this.checkSeniorParams(isSenior, params)
-            if (!seniorChecked.isPass) return seniorChecked
-            num += seniorChecked.num - 1
-            const next = exp.slice(end + 1)
-            const nextArray = next.split(baseOptReg)
-            nextArray.shift()
-            const checkArray = [...prevArray, ...nextArray]
-            for (let checkStr of checkArray) {
-              const checked = this.checkExp(checkStr)
-              if (!checked.isPass) return checked
-              num += checked.num - 1
-              functions += checked.functions
-              seniorFunctions += checked.seniorFunctions
-            }
-          } else {
-            const next = exp.slice(end + 1)
-            const nextArray = next.split(baseOptReg)
-            nextArray.shift()
-            const checkArray = [...prevArray, ...params, ...nextArray]
-            for (let checkStr of checkArray) {
-              const checked = this.checkExp(checkStr)
-              if (!checked.isPass) return checked
-              num += checked.num - 1
-              functions += checked.functions
-              seniorFunctions += checked.seniorFunctions
-            }
-          }
-        } else {
-          const isPrevPass = this.checkParams(prevArray)
-          if (!isPrevPass) return { isPass: false, message: "error expression" }
-          const functionExp = exp.slice(start + 1, end)
-          if (!functionExp.trim()) return { isPass: false, message: `Unexpected token )` }
-          const fnArray = functionExp.split(baseOptReg)
-          for (let checkStr of fnArray) {
-            const checked = this.checkExp(checkStr)
-            if (!checked.isPass) return checked
-            num += checked.num - 1
-            functions += checked.functions
-            seniorFunctions += checked.seniorFunctions
-          }
-          const next = exp.slice(end + 1)
-          const nextArray = next.split(baseOptReg)
-          nextArray.shift()
-          const isNextPass = this.checkParams(nextArray)
-          if (!isNextPass) return { isPass: false, message: "error expression" }
-        }
-      }
-    }
-    if (seniorFunctions > 1) return { isPass: false, message: "error expression" }
-    return { isPass: true, message: "ok", num: num, functions, seniorFunctions }
-  }
-
-  checkParams = array => {
-    const { dataHeader } = this.props
-    for (let item of array) {
-      let value = item.trim()
-      if (value.startsWith("@")) value = value.slice(1)
-      if (!value || (!dataHeader.includes(value) && isNaN(value))) return false
-    }
-    return true
-  }
-
-  checkSeniorParams = (senior, params) => {
+    const bracketExps = []
     let num = 0
-    const length = params.length
-    if (length < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} must have param` }
-    let numOfParam = 0
-    for (let value of params) {
-      if (!value) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} param error` }
-      if (value.includes("@")) numOfParam++
-      if (!value.includes("@")) break;
+
+    while (true) {
+      const end = expression.indexOf(")") + 1
+      if (end === 0) break;
+      if (num > 9) return { isPass: false, message: "too many functions" }
+      const start = expression.lastIndexOf("(", end)
+      if (start === -1) return { isPass: false, message: "Unexpected token )" }
+      const exp = expression.slice(start + 1, end - 1)
+      bracketExps.push(exp)
+      expression = expression.slice(0, start) + "$" + num + expression.slice(end)
+      num++
     }
+
+    return {
+      expression,
+      bracketExps
+    }
+  }
+
+  checkSimpleExp = (expression, bracketExps) => {
+    if (!expression) return { isPass: false, message: "empty expression" }
+    const baseOptReg = new RegExp(/[+\-*/]/)
+    const array = expression.split(baseOptReg)
+    let num = 1
+    let isVariable = false
+    for (let item of array) {
+      item = item.trim()
+      if (!item) return { isPass: false, message: "error expression" }
+      if (isNaN(item)) {
+        if (item.includes("$")) {
+          const index = item.indexOf("$")
+          const functionName = item.slice(0, index).trim()
+          let bracketNum = item.slice(index + 1, index + 2).trim()
+          if (!bracketNum || isNaN(bracketNum)) return { isPass: false, message: `error expression` }
+          try {
+            bracketNum = parseInt(bracketNum, 10)
+          } catch (e) {
+            return { isPass: false, message: `error expression` }
+          }
+          const other = item.slice(index + 2).trim()
+          if (other) return { isPass: false, message: `Unexpected identifier: ${other}` }
+          const numResult = this.checkParams(functionName, bracketExps, bracketNum)
+          if (!numResult.isPass) return numResult
+          num += numResult.num - 1
+          isVariable = numResult.isVariable
+        }
+        if (item.startsWith("@")) {
+          item = item.slice(1)
+          const { dataHeader } = this.props
+          if (!item || !dataHeader.includes(item)) return { isPass: false, message: `unknown variable: ${item}` }
+          isVariable = true
+        }
+      }
+    }
+    return { isPass: true, message: `ok`, num, isVariable }
+  }
+
+  checkParams = (functionName, bracketExps, bracketNum) => {
+    const exps = bracketExps[bracketNum]
+    if (!exps) return { isPass: false, message: `params error` }
+    const expArray = exps.split(",")
+    if (!functionName && expArray.length > 1) return { isPass: false, message: `Unexpected identifier: ${exps}` }
+    const isBaseFn = FUNCTIONS.base.find(fn => fn.value === functionName + "()")
+    const isSeniorFn = FUNCTIONS.senior.find(fn => fn.value === functionName + "()")
+    const currentFn = isBaseFn || isSeniorFn
+    if (currentFn.params && currentFn.params < expArray.length) return { isPass: false, message: `function ${functionName} must have ${currentFn.params} params` }
+    let numOfParam = 0
+    let isVariable = false
+    let num = 1
+    const params = []
+
+    for (const exp of expArray) {
+      const expChecked = this.checkSimpleExp(exp.trim(), bracketExps)
+      if (!expChecked.isPass) return expChecked
+      const { isVariable, num } = expChecked
+      if (isVariable) numOfParam++
+      params.push({
+        isVariable,
+        num,
+        exp
+      })
+    }
+
+    if (isSeniorFn) {
+      const seniorResult = this.checkSeniorParams(currentFn, params, numOfParam)
+      if (!seniorResult.isPass) return seniorResult
+      isVariable = true
+      num += seniorResult.num - 1
+    }
+    if (isBaseFn) isVariable = true
+    for (let param of params) {
+      num += param.num - 1
+    }
+    return { isPass: true, message: `ok`, num, isVariable }
+  }
+
+  checkSeniorParams = (senior, params, numOfParam) => {
+    let num = 0
+
     const numList = params.slice(numOfParam)
     switch (senior.value) {
       case "Concat()":
-        if (numOfParam < 2) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} has At least 3 parameters` }
-        const concatResults = numList.map(n => {
+        if (numOfParam < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} has At least 2 parameters` }
+        const concatResults = numList.map(num => {
+          let n = num.exp
           if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
           try {
             n = parseInt(n, 10)
@@ -615,7 +584,8 @@ class CreateNewVariable extends Component {
         }
         break;
       case "Diff()":
-        const diffResults = numList.map(n => {
+        const diffResults = numList.map(num => {
+          let n = num.exp
           if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
           try {
             n = parseInt(n, 10)
@@ -632,13 +602,6 @@ class CreateNewVariable extends Component {
       case "Accumulate()":
         num = numOfParam
         break;
-      // case "Combine()":
-      //   const combineArray = ["min", "max", "mean", "sum"]
-      //   for (let row of numList) {
-      //     if (!combineArray.includes(row.trim())) return { isPass: false, message: `${row} is not supported` }
-      //   }
-      //   num = length - numOfParam
-      //   break;
       case "Quantile_bin()":
         const quantileBinArray = ["value", "frequency"]
         const [b, type1, type2] = numList
@@ -648,7 +611,8 @@ class CreateNewVariable extends Component {
         num = numOfParam * (type2 ? 2 : 1)
         break;
       case "Custom_Quantile_bin()":
-        const numResults = numList.map(n => {
+        const numResults = numList.map(num => {
+          let n = num.exp
           const str = n.trim()
           const first = str.slice(0, 1)
           const last = str.slice(-1)
@@ -671,6 +635,17 @@ class CreateNewVariable extends Component {
     return { isPass: true, message: "ok", num: num }
   }
 
+
+  checkExp = _expression => {
+    if (!_expression) return { isPass: true, message: "ok", num: 0 }
+    if (_expression.includes("$")) return { isPass: false, message: "Unexpected token $" }
+
+    const { bracketExps, expression } = this.formatBracket(_expression)
+    const { isPass, message, num } = this.checkSimpleExp(expression, bracketExps)
+
+    return { isPass, message, num }
+  }
+
   factorial = (n) => {
     if (n < 2) return 1
     return n * this.factorial(n - 1)
@@ -689,7 +664,8 @@ class CreateNewVariable extends Component {
   render() {
     const { visible, onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
-    const functionSyntax = functionList.find(v => v.syntax === this.myFunction.syntax) || functionList.find(v => v.syntax === this.showFunction.syntax)
+    const functionSyntax = functionList.find(v => v.syntax === this.myFunction.syntax)
+    const hintFunctionSyntax = functionList.find(v => v.syntax === this.showFunction.syntax)
 
     return visible && <div className={styles.newVariableBlock}>
       <div className={styles.newVariableRow}>
@@ -704,12 +680,13 @@ class CreateNewVariable extends Component {
             {this.hints.map((v, k) => {
               return <div key={k} className={classnames(styles.newVariableHint, {
                 [styles.activeHint]: this.active === k
-              })} onClick={this.handleSelect.bind(null, v.value, !!v.syntax)} onMouseOver={this.showSyntax.bind(null, k)}><span>{v.label}</span></div>
+              })} onClick={this.handleSelect.bind(null, v.value, !!v.syntax)} onMouseOver={this.showSyntax.bind(null, k)}>
+                <span>{v.label}</span>
+              </div>
             })}
           </div>}
-          {!!functionSyntax && <div className={classnames(styles.newVariableSyntax, {
-            [styles.hasList]: this.hintStatus && !!this.hints.length
-          })}><span>{functionSyntax.syntax}</span></div>}
+          {!!hintFunctionSyntax && <div className={styles.newVariableHintSyntax}><span>{hintFunctionSyntax.syntax}</span></div>}
+          {!!functionSyntax && <div className={styles.newVariableSyntax}><span>{functionSyntax.syntax}</span></div>}
         </div>
       </div>
       <div className={styles.newVariableRow}>

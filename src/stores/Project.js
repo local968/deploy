@@ -84,8 +84,8 @@ export default class Project {
   @observable histgramPlots = {};
   @observable univariatePlots = {};
   @observable correlationMatrixImg = '';
-  @observable csvScript = [];
   @observable newVariable = [];
+  @observable expression = {}
   @observable informativesLabel = []
 
   //not save
@@ -107,7 +107,6 @@ export default class Project {
   @observable speedVSaccuracy = 5;
 
   @observable advancedSize = 0;
-  // @observable maxTime = 10;
   @observable randSeed = 0;
   @observable measurement = '';
   @observable resampling = "no";
@@ -187,7 +186,9 @@ export default class Project {
       measurement,
       selectId: '',
       version: [1, 2],
-      trainHeader: []
+      trainHeader: [],
+      newVariable: [],
+      expression: {}
     }
   }
 
@@ -613,7 +614,7 @@ export default class Project {
 
   @action
   dataView = () => {
-    const exp = this.csvScript.join(";")
+    const exp = Object.values(this.expression).join(";")
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -650,15 +651,14 @@ export default class Project {
   }
 
   @action
-  addNewVariable = (variables, exp) => {
+  addNewVariable = (variableName, variables, exp) => {
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
-    const exps = [...this.csvScript, fullExp]
 
     return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'createNewVariable',
-        csvScript: exps.join(";").replace(/\|/g, ",")
+        csvScript: fullExp.replace(/\|/g, ",")
       };
       return api.createNewVariable(command, progressResult => {
         // console.log(progressResult)
@@ -669,9 +669,12 @@ export default class Project {
           return false
         }
         const newVariable = [...this.newVariable, ...variables]
+        const trainHeader = [...this.trainHeader, ...variables]
+        const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
         this.updateProject({
-          csvScript: exps,
-          newVariable
+          newVariable,
+          trainHeader,
+          expression
         })
         return true
       })
@@ -711,23 +714,14 @@ export default class Project {
       id,
       problemType,
       target,
-      dataHeader,
-      csvScript
+      dataHeader
     } = this;
     const command = 'train';
-
-    this.updateProject(Object.assign({
-      train2Finished: false,
-      train2ing: true,
-      train2Error: false,
-      selectId: ''
-    }, this.nextSubStep(2, 3)));
 
     this.models = []
 
     const featureLabel = dataHeader.filter(d => d !== target);
 
-    const exps = csvScript.join(";")
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -745,9 +739,12 @@ export default class Project {
       command
     };
 
-    if (exps) trainData.csvScript = exps.replace(/\|/g, ",")
-
-    this.modeling(trainData)
+    this.modeling(trainData, Object.assign({
+      train2Finished: false,
+      train2ing: true,
+      train2Error: false,
+      selectId: ''
+    }, this.nextSubStep(2, 3)))
   }
 
   advancedModeling = () => {
@@ -758,39 +755,19 @@ export default class Project {
       target,
       trainHeader,
       dataHeader,
-      csvScript
+      expression,
+      newVariable
     } = this;
     const command = 'train';
-
-    this.updateProject(Object.assign({
-      train2Finished: false,
-      train2ing: true,
-      train2Error: false,
-      selectId: '',
-      validationRate: this.validationRate,
-      holdoutRate: this.holdoutRate,
-      resampling: this.resampling,
-      // maxTime: this.maxTime,
-      measurement: this.measurement,
-      randSeed: this.randSeed,
-      dataRange: this.dataRange,
-      customField: this.customField,
-      customRange: [...this.customRange],
-      algorithms: [...this.algorithms],
-      speedVSaccuracy: this.speedVSaccuracy,
-      runWith: this.runWith,
-      crossCount: this.crossCount,
-      version: this.version
-    }, this.nextSubStep(2, 3)));
 
     this.models = []
 
     const featureLabel = dataHeader.filter(v => !trainHeader.includes(v) && v !== target)
-    const exps = csvScript.join(";")
+    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
 
     const trainData = {
       problemType,
-      featureLabel,
+      featureLabel: [...featureLabel, ...newVariableLabel],
       targetLabel: target,
       projectId: id,
       command,
@@ -812,14 +789,36 @@ export default class Project {
     } else {
       trainData.splitBy = [this.customField, ...this.customRange]
     }
-    if (exps) trainData.csvScript = exps.replace(/\|/g, ",")
+    if (newVariableLabel.length) {
+      const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+      trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+    }
 
-    this.modeling(trainData)
+    this.modeling(trainData, Object.assign({
+      train2Finished: false,
+      train2ing: true,
+      train2Error: false,
+      selectId: '',
+      validationRate: this.validationRate,
+      holdoutRate: this.holdoutRate,
+      resampling: this.resampling,
+      // maxTime: this.maxTime,
+      measurement: this.measurement,
+      randSeed: this.randSeed,
+      dataRange: this.dataRange,
+      customField: this.customField,
+      customRange: [...this.customRange],
+      algorithms: [...this.algorithms],
+      speedVSaccuracy: this.speedVSaccuracy,
+      runWith: this.runWith,
+      crossCount: this.crossCount,
+      version: this.version,
+      trainHeader: this.trainHeader
+    }, this.nextSubStep(2, 3)))
   }
 
-  modeling = trainData => {
-    if (this.train2ing) return false
-    socketStore.ready().then(api => api.train(trainData, progressResult => {
+  modeling = (trainData, updateData) => {
+    socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
       if (progressResult.name === "progress") {
         if (progressResult.trainId) this.trainingId = progressResult.trainId
         if (!progressResult.model) return
@@ -846,13 +845,14 @@ export default class Project {
     })
   }
 
-  abortTrain = () => {
+  abortTrain = (isLoading = false) => {
     if (this.stopModel) return
     this.stopModel = true
     const command = {
       command: 'stop',
       action: 'train',
-      projectId: this.id
+      projectId: this.id,
+      isLoading
     }
     socketStore.ready().then(api => api.abortTrain(command, process => {
     }).then(returnValue => {
@@ -942,7 +942,7 @@ export default class Project {
   }
 
   preTrainImportance = () => {
-    const exp = this.csvScript.join(";")
+    const exp = Object.values(this.expression).map(v => v.exp).join(";")
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,

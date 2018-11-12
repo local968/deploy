@@ -439,12 +439,19 @@ wss.register('createNewVariable', (message, socket, progress) => sendToCommand({
 wss.register('abortTrain', (message, socket, progress) => {
   const projectId = message.projectId
   const userId = socket.session.userId
+  const isLoading = message.isLoading
   return command({ ...message, userId, requestId: message._id }).then(() => {
     const statusData = {
       train2Finished: true,
       train2ing: false,
       train2Error: false,
       trainModel: null
+    }
+    if(isLoading) {
+      statusData.mainStep = 3,
+      statusData.curStep = 3,
+      statusData.lastSubStep = 1,
+      statusData.subStepActive = 1
     }
     return createOrUpdate(projectId, userId, statusData)
   })
@@ -453,10 +460,13 @@ wss.register('abortTrain', (message, socket, progress) => {
 wss.register('train', (message, socket, progress) => {
   const userId = socket.session.userId
   const projectId = message.projectId
+  const updateData = message.data
+  delete message.data
   const data = { ...message, userId, requestId: message._id }
   let num = 0
   return checkTraningRestriction(socket.session.user)
     .then(() => deleteModels(message.projectId))
+    .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
       const { status, result } = queueValue
       if (status === 100) return queueValue
@@ -486,7 +496,7 @@ wss.register('train', (message, socket, progress) => {
       }))
     .catch(err => {
       const statusData = {
-        train2Finished: true,
+        train2Finished: false,
         train2ing: false,
         train2Error: false,
         selectId: '',
