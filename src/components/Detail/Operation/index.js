@@ -29,7 +29,7 @@ export default class Operation extends Component {
               <span className={styles.exeuctionSpeed}>
                 Exeuction Speed<small>(row/ms)</small>
               </span>
-              <span className={styles.dataSize}>Total lines</span>
+              <span className={styles.dataSize}>Total Lines</span>
               <span className={styles.status}>Status</span>
               <span className={styles.results}>Results</span>
             </div>
