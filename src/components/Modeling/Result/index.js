@@ -34,7 +34,11 @@ export default class ModelResult extends Component {
         return true
       }
     }).filter(v => !!v)
-    const exps = project.csvScript.join(";").replace(/\|/g, ",")
+    const {newVariable, trainHeader, expression} = project
+    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
+    const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+    const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+
     this.props.deploymentStore
       .addDeployment(project.id, project.name, current.name, current.problemType, modelList, exps)
       .then(id => this.props.routing.push('/deploy/project/' + id));
