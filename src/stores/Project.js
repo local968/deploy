@@ -101,7 +101,7 @@ export default class Project {
   // 不需要参加训练的label
   @observable trainHeader = []
   // 暂时移除
-  @observable criteria = 'defualt';
+  @observable criteria = 'default';
 
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
@@ -625,7 +625,7 @@ export default class Project {
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          this.setProperty({ dataViews: {} })
+          this.setProperty({ dataViews: null })
           return antdMessage.error("dataview error")
         }
         this.setProperty({ dataViews: result.data })
@@ -736,6 +736,7 @@ export default class Project {
       featureLabel,
       targetLabel: target,
       projectId: id,
+      version: '1,2',
       command
     };
 
@@ -953,7 +954,7 @@ export default class Project {
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          this.setProperty({ preImportance: {} })
+          this.setProperty({ preImportance: null })
           return antdMessage.error("preTrainImportance error")
         }
         this.setProperty({ preImportance: result.data, informativesLabel: result.informativesLabel })

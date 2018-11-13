@@ -436,7 +436,7 @@ class CreateNewVariable extends Component {
     let { name, exp, props: { expression } } = this
     name = name.trim()
     if (!name) return antdMessage.error("name is empty")
-    if (expression.map(v => v.name).includes(name)) return antdMessage.error(`new variable ${name} is exist`)
+    if (expression.hasOwnProperty(name)) return antdMessage.error(`new variable ${name} is exist`)
     if (name.includes("_")) return antdMessage.error(`name cannot contain _`)
     const checked = this.checkExp(exp)
     if (!checked.isPass) return antdMessage.error(checked.message)

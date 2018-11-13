@@ -391,6 +391,7 @@ wss.register('correlationMatrix', (message, socket, progress) => sendToCommand({
 wss.register('preTrainImportance', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
   const { status, result } = returnValue
   if (status === 100) {
+    result.informativesLabel = result.informativesLabel || []
     createOrUpdate(message.projectId, socket.session.userId, { preImportance: result.data, informativesLabel: result.informativesLabel || [] })
   }
   return returnValue
