@@ -3,7 +3,7 @@ import {message as antdMessage} from 'antd';
 import axios from 'axios';
 import {runInAction} from 'mobx';
 
-const host = process.env.NODE_ENV === 'development' ? 'http://loaclhost:54000' : 'http://community.r2.ai';
+const host = process.env.NODE_ENV === 'development' ? 'http://app14.newa-tech.com:54000' : 'http://community.r2.ai';
 
 class OrderStore {
 
