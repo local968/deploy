@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="30px" viewBox="0 0 24 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>shengji</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0.00223463687 0.0193263158 19.99054 0.0193263158 19.99054 16.9705453 0.00223463687 16.9705453"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Upgrade-" transform="translate(-49.000000, -520.000000)">
+            <g id="shengji" transform="translate(49.000000, 520.000000)">
+                <polygon id="Fill-1" fill="#31C4E9" points="15.2052837 21.0267364 8.79471632 21.0267364 8.79471632 9.70867553 3 9.70867553 12.000058 0.0267364017 21 9.70867553 15.2052837 9.70867553"></polygon>
+                <polygon id="Fill-2" fill="#31C4E9" points="9 26.0267364 15 26.0267364 15 22.0267364 9 22.0267364"></polygon>
+                <polygon id="Fill-3" fill="#31C4E9" points="2 29.0267364 3 29.0267364 3 22.0267364 2 22.0267364"></polygon>
+                <polygon id="Fill-4" fill="#31C4E9" points="23 17.0267364 24 17.0267364 24 10.0267364 23 10.0267364"></polygon>
+                <g id="分组" transform="translate(0.000000, 6.026736)">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="Clip-6"></g>
+                    <polygon id="Fill-5" fill="#31C4E9" mask="url(#mask-2)" points="18.8138547 16.9705453 19.99054 16.9705453 19.99054 13.5808884 18.8138547 13.5808884"></polygon>
+                    <polygon id="Fill-7" fill="#31C4E9" mask="url(#mask-2)" points="0.00223463687 9.06035579 1.17683426 9.06035579 1.17683426 0.0193263158 0.00223463687 0.0193263158"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

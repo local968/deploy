@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="46px" viewBox="0 0 48 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>btn_search</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#5B657B" offset="0%"></stop>
+            <stop stop-color="#243448" offset="100%"></stop>
+        </linearGradient>
+        <path d="M4,0 L35.5111111,0 L35.5111111,34 L4,34 C1.790861,34 2.705415e-16,32.209139 0,30 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 Z" id="path-2"></path>
+        <filter x="-29.6%" y="-22.1%" width="159.1%" height="161.8%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="3" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="3" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.2 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Order-management" transform="translate(-678.000000, -207.000000)">
+            <g id="Content" transform="translate(215.000000, 210.000000)">
+                <g id="SearchBar">
+                    <g id="btn_search" transform="translate(469.000000, 0.000000)">
+                        <g id="Rectangle-21" transform="translate(17.755556, 17.000000) scale(-1, 1) translate(-17.755556, -17.000000) ">
+                            <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                            <use fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
+                        </g>
+                        <g id="search_icon" transform="translate(18.996280, 18.240725) scale(-1, 1) rotate(-315.000000) translate(-18.996280, -18.240725) translate(12.574058, 9.551836)">
+                            <circle id="Oval-13" stroke="#FFFFFF" stroke-width="2" transform="translate(6.120382, 6.151836) scale(-1, 1) translate(-6.120382, -6.151836) " cx="6.1203816" cy="6.1518358" r="6.04444444"></circle>
+                            <rect id="Rectangle-2" fill="#FFFFFF" x="5.6166779" y="11.6925765" width="2.26666667" height="5.03703704" rx="1.13333333"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
