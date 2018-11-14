@@ -101,7 +101,8 @@ export default class Project {
   // 不需要参加训练的label
   @observable trainHeader = []
   // 暂时移除
-  @observable criteria = 'default';
+  @observable criteria = 'defualt';
+  @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
 
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
@@ -164,14 +165,15 @@ export default class Project {
   }
 
   @computed
-  get defaultTarin() {
+  get defaultTrain() {
     const measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
 
     return {
       train2Finished: false,
       train2ing: false,
       train2Error: false,
-      criteria: 'defualt',
+      criteria: 'default',
+      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
       speedVSaccuracy: 5,
       advancedSize: 0,
       // maxTime: 10,
@@ -250,12 +252,29 @@ export default class Project {
   }
 
   @action
-  queryProject = () => {
+  queryProject = (isInit = false) => {
     this.loading = true;
     return socketStore.ready().then(api => {
       return api.queryProject({ id: this.id }).then(result => {
         this.loading = false;
-        if (result.status === 200) return this.setProperty(result.data)
+        if (result.status === 200) {
+          this.setProperty(result.data)
+          if (isInit) {
+            if (this.train2ing) {
+              when(
+                () => this.train2Finished,
+                () => {
+                  if (this.problemType === 'Classification') {
+                    this.chartData();
+                  } else {
+                    this.fitPlotAndResidualPlot();
+                  }
+                }
+              )
+            }
+          }
+          return
+        }
         alert(result.message)
       })
     })
@@ -299,7 +318,7 @@ export default class Project {
     if (this.problemType && this.changeProjectType !== this.problemType) {
       this.models = []
       //全部恢复到problem步骤
-      const backData = Object.assign({}, updObj, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, {
+      const backData = Object.assign({}, updObj, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
         mainStep: 2,
         curStep: 2,
         lastSubStep: 1,
@@ -318,7 +337,7 @@ export default class Project {
   //修改上传文件
   @action
   fastTrackInit = (name) => {
-    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTarin, { uploadFileName: [name] }, {
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, { uploadFileName: [name] }, {
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
@@ -683,22 +702,37 @@ export default class Project {
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
-    const { problemType, selectId } = this
+    const { problemType, selectId, criteria, costOption } = this
     if (selectId) {
       const model = this.models.find(m => m.id === selectId)
       if (model) return model
     }
     let model;
-    for (let m of this.models) {
-      if (!model) {
-        model = m;
-        continue;
-      }
-      if (problemType === "Classification") {
-        if (model.score.validateScore.auc + model.score.validateScore.acc < m.score.validateScore.auc + m.score.validateScore.acc) {
+
+    if (problemType === "Classification") {
+      const { TP, FN, FP, TN } = costOption
+      let recommendByDefault = criteria === "default" || (!TN && !FN && !TP && !FP)
+      for (let m of this.models) {
+        if (!model) {
           model = m;
+          continue;
         }
-      } else {
+        if (recommendByDefault) {
+          if (model.score.validateScore.auc + model.score.validateScore.acc < m.score.validateScore.auc + m.score.validateScore.acc) {
+            model = m;
+          }
+        } else {
+          if (model.getBenifit(TP, FN, FP, TN) < m.getBenifit(TP, FN, FP, TN)) {
+            model = m;
+          }
+        }
+      }
+    } else {
+      for (let m of this.models) {
+        if (!model) {
+          model = m;
+          continue;
+        }
         if (1 - model.score.validateScore.rmse + model.score.validateScore.r2 < 1 - m.score.validateScore.rmse + m.score.validateScore.r2) {
           model = m;
         }
@@ -744,7 +778,9 @@ export default class Project {
       train2Finished: false,
       train2ing: true,
       train2Error: false,
-      selectId: ''
+      selectId: '',
+      criteria: 'default',
+      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 }
     }, this.nextSubStep(2, 3)))
   }
 
@@ -800,6 +836,8 @@ export default class Project {
       train2ing: true,
       train2Error: false,
       selectId: '',
+      criteria: 'default',
+      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
       validationRate: this.validationRate,
       holdoutRate: this.holdoutRate,
       resampling: this.resampling,
@@ -819,6 +857,7 @@ export default class Project {
   }
 
   modeling = (trainData, updateData) => {
+    this.train2ing = true
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
       if (progressResult.name === "progress") {
         if (progressResult.trainId) this.trainingId = progressResult.trainId
@@ -835,9 +874,14 @@ export default class Project {
       // if (status === -1 && this.models.length === 0) {
       //   return this.modelingError()
       // }
-      if (status < -1) {
+      if (status !== 200) {
         antdMessage.error(message)
         // return this.concurrentError(message)
+      }
+      if (this.problemType === 'Classification') {
+        this.chartData();
+      } else {
+        this.fitPlotAndResidualPlot();
       }
       // this.updateProject({
       //   train2Finished: true,

@@ -151,7 +151,7 @@ class ProjectStore {
             return row.id === id
           })
           if (project) {
-            project.queryProject()
+            project.queryProject(true)
             project.initModels()
             this.currentId = id
             return resolve(true)

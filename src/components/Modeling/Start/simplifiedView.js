@@ -135,7 +135,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolLabel}><span>Current Variable List</span></div>
           <select defaultValue="all" onChange={this.handleChange}>
             <option value='all'>All Variables ({dataHeader.length - 1})</option>
-            <option value='informatives'>informatives Variables ({informativesLabel.length})</option>
+            <option value='informatives'>informatives ({informativesLabel.length})</option>
           </select>
         </div>
         <div className={styles.newVariable}>

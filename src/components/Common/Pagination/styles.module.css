@@ -57,6 +57,14 @@
 }
 .pagination:global(.ant-pagination.mini
     .ant-pagination-prev
+    .ant-pagination-item-link),
+.pagination:global(.ant-pagination.mini
+    .ant-pagination-next
+    .ant-pagination-item-link) {
+  color: rgba(255, 255, 255, 0.8);
+}
+.pagination:global(.ant-pagination.mini
+    .ant-pagination-prev
     .ant-pagination-item-link:after),
 .pagination:global(.ant-pagination.mini
     .ant-pagination-next

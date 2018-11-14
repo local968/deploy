@@ -14,6 +14,7 @@ import Modal from './Modal';
 import NumberInput from './NumberInput';
 import Confirm from './Confirm';
 import EtlLoading from './EtlLoading';
+import Hint from './Hint';
 
 export {
   BlackButton,
@@ -31,5 +32,6 @@ export {
   Modal,
   NumberInput,
   Confirm,
-  EtlLoading
+  EtlLoading,
+  Hint
 };
