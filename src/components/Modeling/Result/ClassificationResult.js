@@ -280,7 +280,7 @@ class ModelTable extends Component {
               <ModelDetail
                 key={key}
                 model={model}
-                current={current}
+                isSelect={model.id === current.id}
                 onSelect={onSelect}
               />
             );
@@ -318,7 +318,7 @@ class ModelDetail extends Component {
   };
 
   render() {
-    const { model, onSelect, current } = this.props;
+    const { model, onSelect, isSelect } = this.props;
     return (
       <div className={styles.rowBox}>
         <div className={styles.rowData}>
@@ -326,7 +326,7 @@ class ModelDetail extends Component {
             <input
               type="radio"
               name="modelSelect"
-              defaultChecked={model.id === current.id}
+              checked={isSelect}
               onChange={onSelect.bind(null, model)}
             />
           </div>
