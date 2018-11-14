@@ -33,3 +33,4 @@ config.lua
 /data
 
 start_dev.sh
+static
