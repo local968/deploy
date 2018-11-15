@@ -297,7 +297,7 @@ class ModelTable extends Component {
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>
-            <div className={styles.abortButton} onClick={abortTrain}>
+            <div className={styles.abortButton} onClick={abortTrain.bind(null, false)}>
               <span>Abort Training</span>
             </div>
           </div>}
