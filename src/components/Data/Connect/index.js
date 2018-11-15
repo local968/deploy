@@ -13,7 +13,7 @@ import config from 'config';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 
 const files = {
   RegressionSample: [
@@ -74,6 +74,18 @@ export default class DataConnect extends Component {
   @observable uploading = false
   @observable process = 0
   @observable isPause = false
+  @observable isSql = false
+  @observable sqlProgress = 0
+
+  @computed
+  get message() {
+    if (this.isPause) return 'Paused'
+    if (!this.isSql && this.process === 0) return 'Perparing for upload...'
+    if (!this.isSql && this.process > 0 && this.process < 90) return 'Uploading data...'
+    if (this.process >= 90) return 'Extract-Transform-Load in progress...'
+    if (this.isSql && this.process === 0) return 'Perparing for database connection...'
+    if (this.isSql && this.process >= 20 && this.process < 90) return `Downloaded Data: ${this.sqlProgress} rows`
+  }
 
   onUpload = ({ pause, resume }) => {
     this.uploading = true
@@ -188,6 +200,7 @@ export default class DataConnect extends Component {
   render() {
     const { project, userStore, socketStore } = this.props;
     const { etlProgress } = project
+    window.cn = this
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
@@ -264,8 +277,8 @@ export default class DataConnect extends Component {
                   />
                 </div>
                 <div className={styles.progressText}>
-                  <span>Load modeling data and detect data type…</span>
-                  {(this.process < 90 && this.process > 0) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
+                  <span>{this.message}</span>
+                  {(this.process < 90 && this.process > 0 && this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
                 </div>
               </div>
             </div>
@@ -280,8 +293,20 @@ export default class DataConnect extends Component {
           onSubmit={action(async options => {
             this.hideSql();
             this.uploading = true
+            this.process = 0
+            let processInterval;
             const api = await socketStore.ready()
-            const resp = await api.downloadFromDatabase({ ...options, type: 'modeling', projectId: project.id })
+            const resp = await api.downloadFromDatabase({ ...options, type: 'modeling', projectId: project.id }, action(res => {
+              const result = res.result
+              if (result.value === 0) {
+                this.process = 20
+                processInterval = setInterval(() => {
+                  if (this.process && this.process < 90) this.process++
+                }, 1000)
+              }
+              if (result.value) this.sqlProgress = result.value
+            }))
+            clearInterval(processInterval)
             if (resp.status !== 200) return message.error(resp.message)
             const fileId = resp.fileId
             project.fastTrackInit(fileId);
