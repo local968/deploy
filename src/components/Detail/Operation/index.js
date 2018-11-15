@@ -85,7 +85,11 @@ export default class Operation extends Component {
                     <a
                       className={styles.results}
                       target="_blank"
-                      href={`http://${config.host}:${config.port}/redirect/download/${s.schedule.result.resultPath}?projectId=${cd.projectId}`}
+                      href={`http://${config.host}:${config.port}/redirect/download/${s.schedule.result.resultPath}?projectId=${cd.projectId}&filename=${cd.deploymentOptions.file}-${moment
+                        .unix(
+                          s.schedule.actualTime || s.schedule.estimatedTime
+                        )
+                        .format('DD-MM-YYYY_hh-mm')}-predict.csv`}
                     >Download</a>) : (<span className={styles.results}> - </span>)}
                 </div>
               ))}

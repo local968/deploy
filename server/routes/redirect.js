@@ -15,9 +15,10 @@ const getHost = (req, res, next) => {
       error: "projectId empty"
     })
     return
-  } 
+  }
   redis.hget("project:" + projectId, "host").then(url => {
     req.proxyHost = JSON.parse(url)
+    req.filename = query.filename
     next()
   })
 }
@@ -34,12 +35,13 @@ const hpm = proxy({
     // const header = { ...proxyRes.headers }
     // delete header.connection
     // res.headers = header
-    
-    if(req.baseUrl.includes(".")){
+
+    if (req.baseUrl.includes(".")) {
       const arr = req.path.split("/")
-      const file = arr[arr.length-1]
+      const file = arr[arr.length - 1]
       const type = file.split(".")[1]
-      if(type) proxyRes.headers["content-disposition"] = `attachment; filename="${file}"`
+      if (type) proxyRes.headers["content-disposition"] = `attachment; filename="${file}"`
+      if (req.filename) proxyRes.headers["content-disposition"] = `attachment; filename="${req.filename}"`
     }
     // proxyRes.headers["content-disposition"] = 'attachment; filename="definition.csv"'
     // proxyRes.type("csv")

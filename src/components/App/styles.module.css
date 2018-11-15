@@ -26,7 +26,7 @@
 .route {
   position: relative;
   flex: 1 1 0;
-  overflow: auto;
+  /* overflow: auto; */
   display: flex;
   flex-direction: column;
   font-family: HelveticaNeue;
@@ -34,6 +34,7 @@
 
 .warp {
   display: flex;
+  overflow: auto;
 }
 
 .load {
