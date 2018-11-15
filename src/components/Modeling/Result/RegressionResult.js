@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import VariableImpact from "./VariableImpact"
+import { Tooltip } from 'antd';
 
 @observer
 export default class RegressionView extends Component {
@@ -132,9 +133,7 @@ class ModelTable extends Component {
             );
           })}
           {(!train2Finished && trainModel) && <div className={styles.rowData}>
-            <div className={styles.trainingModel}>
-              <span>{trainModel.model}</span>
-            </div>
+            <div className={styles.trainingModel}><Tooltip title={trainModel.model}>{trainModel.model}</Tooltip></div>
             <div className={styles.trainingProcessBg}>
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${trainModel.value}%` }}></div>
@@ -143,7 +142,7 @@ class ModelTable extends Component {
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>
-            <div className={styles.abortButton} onClick={abortTrain}>
+            <div className={styles.abortButton} onClick={abortTrain.bind(null, false)}>
               <span>Abort Training</span>
             </div>
           </div>}
@@ -177,7 +176,7 @@ class ModelDetail extends Component {
             />
           </div>
           <div className={classnames(styles.cell, styles.name)}>
-            <span title={model.name}>{model.name}</span>
+            <Tooltip title={model.name}>{model.name}</Tooltip>
           </div>
           <div className={styles.cell}>
             <span>

@@ -858,7 +858,9 @@ export default class Project {
 
   modeling = (trainData, updateData) => {
     this.train2ing = true
+    this.isAbort = false
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
+      if(this.isAbort) return
       if (progressResult.name === "progress") {
         if (progressResult.trainId) this.trainingId = progressResult.trainId
         if (!progressResult.model) return
@@ -899,11 +901,12 @@ export default class Project {
       projectId: this.id,
       isLoading
     }
-    socketStore.ready().then(api => api.abortTrain(command, process => {
-    }).then(returnValue => {
+    socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
       const { status, message, result, id } = returnValue
+      this.isAbort = true
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
+
       this.setProperty({ ...result, stopModel: false })
     }))
   }

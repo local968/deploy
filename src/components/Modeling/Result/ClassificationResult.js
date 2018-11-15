@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Progress } from 'antd';
+import { Progress, Tooltip } from 'antd';
 import { observable } from 'mobx';
 // import Hint from 'components/Common/Hint';
 import { Hint, NumberInput } from 'components/Common';
@@ -34,7 +34,7 @@ export default class ClassificationView extends Component {
     return <div className={styles.costTd}>
       <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
       <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benifit:'}</span></div>
-      <div className={styles.costInput}><NumberInput value={this.props.project.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true}  /></div>
+      <div className={styles.costInput}><NumberInput value={this.props.project.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
       <div className={styles.costUnits}><span>units</span></div>
     </div>
   }
@@ -286,9 +286,7 @@ class ModelTable extends Component {
             );
           })}
           {(!train2Finished && trainModel) && <div className={styles.rowData}>
-            <div className={styles.trainingModel}>
-              <span>{trainModel.model}</span>
-            </div>
+            <div className={styles.trainingModel}><Tooltip title={trainModel.model}>{trainModel.model}</Tooltip></div>
             <div className={styles.trainingProcessBg}>
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${trainModel.value}%` }}></div>
@@ -331,7 +329,7 @@ class ModelDetail extends Component {
             />
           </div>
           <div className={classnames(styles.cell, styles.name)}>
-            <span title={model.name}>{model.name}</span>
+            <Tooltip title={model.name}>{model.name}</Tooltip>
           </div>
           <div className={classnames(styles.cell, styles.predict)}>
             <PredictedProgress
