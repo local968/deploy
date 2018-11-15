@@ -10,7 +10,7 @@ import { Popover } from 'antd';
 import config from 'config'
 // import config from 'config';
 
-const transferR2 = (str) => str === 'R2' && 'R^2'
+const transferR2 = (str) => str === 'R2' && 'R²'
 
 @inject('scheduleStore', 'deploymentStore', 'routing')
 @observer
@@ -106,7 +106,7 @@ export default class List extends Component {
                             .schedule.result.score &&
                           s.schedule.result.score.auc.toFixed(2)}`
                           : `RMSE:${s.schedule.result.score &&
-                          s.schedule.result.score.nrmse.toFixed(2)} R^2:${s
+                          s.schedule.result.score.nrmse.toFixed(2)} R²:${s
                             .schedule.result.score &&
                           s.schedule.result.score.r2.toFixed(2)}`)}
                     </span>
