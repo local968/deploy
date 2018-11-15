@@ -97,7 +97,7 @@
 span.modelName,
 span.deploymentTime,
 span.deploymentStyle {
-  flex: 2 1 0;
+  flex: 1.5 1 0;
 }
 .project .results {
   text-decoration: underline;

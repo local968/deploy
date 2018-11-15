@@ -359,7 +359,7 @@ class ModelDetail extends Component {
             </span>
           </div>
           <div className={styles.cell}>
-            <span>{model.executeSpeed + 'ms/1000rows'}</span>
+            <span>{model.executeSpeed + ' rows/s'}</span>
           </div>
           <div className={classnames(styles.cell, styles.compute)}>
             <span onClick={this.toggleImpact}>Compute</span>
