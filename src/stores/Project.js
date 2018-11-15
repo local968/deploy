@@ -521,7 +521,7 @@ export default class Project {
     }
 
     if (dataHeader.length !== rawHeader.length) {
-      data.featureLabel = toJS(...dataHeader)
+      data.featureLabel = toJS(dataHeader)
     }
 
     if (this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {

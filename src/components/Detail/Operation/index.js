@@ -27,7 +27,7 @@ export default class Operation extends Component {
               <span className={styles.deploymentTime}>Deployment Time</span>
               <span className={styles.deploymentStyle}>Deployment Style</span>
               <span className={styles.exeuctionSpeed}>
-                Exeuction Speed<small>(row/ms)</small>
+                Execution speed<small>(row/ms)</small>
               </span>
               <span className={styles.dataSize}>Total Lines</span>
               <span className={styles.status}>Status</span>
