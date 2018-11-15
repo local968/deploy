@@ -29,7 +29,7 @@ class UserStore {
         this.info = res.data.info
         this.status = 'login'
       } else {
-        alert(res.data.message||'登陆失败')
+        alert(res.data.message||'Login failure')
       }
     }))
   }

@@ -32,7 +32,10 @@ export default class Sider extends Component {
             <img alt="home" src={home}/>
             <h4 className={styles.nav}>Home</h4>
           </a>
-          <a className={styles.support}>
+          <a className={styles.support}
+            onClick={() => {
+              routing.push('/support')
+            }}>
             <img alt="support" src={help}/>
             <h4 className={styles.nav}>Support</h4>
           </a>
