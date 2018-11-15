@@ -37,13 +37,13 @@ const TabPane = Tabs.TabPane;
 
 @observer
 export default class AdvancedView extends Component {
-  componentWillMount() {
-    if (this.props.project.problemType === 'Classification') {
-      this.props.project.chartData();
-    } else {
-      this.props.project.fitPlotAndResidualPlot();
-    }
-  }
+  // componentWillMount() {
+  //   if (this.props.project.problemType === 'Classification') {
+  //     this.props.project.chartData();
+  //   } else {
+  //     this.props.project.fitPlotAndResidualPlot();
+  //   }
+  // }
 
   render() {
     const { models, project } = this.props;

@@ -1,5 +1,4 @@
-const { redis, pubsub } = require('redis')
-const config = require("../../config")
+const { redis } = require('redis')
 const wss = require('../webSocket')
 const uuid = require('uuid')
 const moment = require('moment')
@@ -72,7 +71,7 @@ function createOrUpdate(id, userId, data, isCreate = false) {
 function createModel(id, params) {
   const modelId = uuid.v4()
   const pipeline = redis.pipeline();
-  pipeline.hmset("model:" + modelId, mapObjectToArray({ ...params, id: modelId }))
+  pipeline.hmset("project:" + id + ":model:" + modelId, mapObjectToArray({ ...params, id: modelId }))
   pipeline.sadd("project:" + id + ":models", modelId)
   return pipeline.exec().then(result => {
     const err = result.find(([error]) => !!error);
@@ -81,13 +80,43 @@ function createModel(id, params) {
   })
 }
 
-function deleteModels(id) {
+function updateModel(id, mid, params) {
+  return redis.hmset("project:" + id + ":model:" + mid, mapObjectToArray(params)).then(() => {
+    return { status: 200, message: "ok", model: { ...params, id: mid }, id }
+  })
+}
+
+function moveModels(id) {
   return redis.smembers("project:" + id + ":models").then(ids => {
     const pipeline = redis.pipeline();
-    ids.forEach(modelId => {
-      pipeline.del("model:" + modelId)
+    ids.forEach(mid => {
+      pipeline.sadd("project:" + id + ":models:previous", mid)
     })
     pipeline.del("project:" + id + ":models")
+    return pipeline.exec().then(list => {
+      const error = list.find(i => !!i[0])
+      if (error) return { status: 414, message: "delete models error", error }
+      return {
+        status: 200,
+        message: 'ok'
+      }
+    })
+  })
+}
+
+function deleteModels(id) {
+  const selPipeline = redis.pipeline();
+  selPipeline.smembers("project:" + id + ":models")
+  selPipeline.smembers("project:" + id + ":models:previous")
+
+  return selPipeline.exec().then(([[nowError, nowIds], [oldError, oldIds]]) => {
+    if (nowError || oldError) return { status: 414, message: "delete models error", error: nowError || oldError }
+    const pipeline = redis.pipeline();
+    [...nowIds, ...oldIds].forEach(mid => {
+      pipeline.del("project:" + id + ":model:" + mid)
+    })
+    pipeline.del("project:" + id + ":models")
+    pipeline.del("project:" + id + ":models:previous")
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
       if (error) return { status: 414, message: "delete models error", error }
@@ -286,7 +315,7 @@ wss.register("queryModelList", message => {
   return redis.smembers(key).then(ids => {
     const pipeline = redis.pipeline();
     ids.forEach(modelId => {
-      pipeline.hgetall("model:" + modelId)
+      pipeline.hgetall("project:" + id + ":model:" + modelId)
     })
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
@@ -437,7 +466,7 @@ wss.register('fitPlotAndResidualPlot', (message, socket, progress) => sendToComm
 
 wss.register('createNewVariable', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress))
 
-wss.register('abortTrain', (message, socket, progress) => {
+wss.register('abortTrain', (message, socket) => {
   const projectId = message.projectId
   const userId = socket.session.userId
   const isLoading = message.isLoading
@@ -448,11 +477,11 @@ wss.register('abortTrain', (message, socket, progress) => {
       train2Error: false,
       trainModel: null
     }
-    if(isLoading) {
+    if (isLoading) {
       statusData.mainStep = 3,
-      statusData.curStep = 3,
-      statusData.lastSubStep = 1,
-      statusData.subStepActive = 1
+        statusData.curStep = 3,
+        statusData.lastSubStep = 1,
+        statusData.subStepActive = 1
     }
     return createOrUpdate(projectId, userId, statusData)
   })
@@ -466,7 +495,7 @@ wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId, requestId: message._id }
   let num = 0
   return checkTraningRestriction(socket.session.user)
-    .then(() => deleteModels(message.projectId))
+    .then(() => moveModels(message.projectId))
     .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
       const { status, result } = queueValue
@@ -484,7 +513,7 @@ wss.register('train', (message, socket, progress) => {
           return progress(model)
         }))
     })
-      .then(returnValue => {
+      .then(() => {
         const statusData = {
           train2Finished: true,
           train2ing: false,
@@ -492,8 +521,7 @@ wss.register('train', (message, socket, progress) => {
           selectId: ''
         }
         if (num === 0) statusData.train2Error = true
-        createOrUpdate(projectId, userId, statusData)
-        return returnValue
+        return createOrUpdate(projectId, userId, statusData)
       }))
     .catch(err => {
       const statusData = {
@@ -501,7 +529,6 @@ wss.register('train', (message, socket, progress) => {
         train2ing: false,
         train2Error: false,
         selectId: '',
-        train2Finished: false,
         mainStep: 3,
         curStep: 3,
         lastSubStep: 1,
@@ -541,6 +568,14 @@ wss.register("inProject", (message, socket) => {
     if (client === socket) return
     if (client.session && client.session.userId === userId) client.send(JSON.stringify({ id, broadcastId, type: "inProject" }))
   })
+})
+
+
+wss.register("updateModel", (message, socket) => {
+  const projectId = message.projectId
+  const mid = message.id
+  const data = message.data
+  return updateModel(projectId, mid, data)
 })
 
 function mapObjectToArray(obj) {

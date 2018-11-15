@@ -4,15 +4,19 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress } from 'antd';
 import { observable } from 'mobx';
-import Hint from 'components/Common/Hint';
+// import Hint from 'components/Common/Hint';
+import { Hint, NumberInput } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 
 const AccuracyHint = "Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%."
 
 @observer
 export default class ClassificationView extends Component {
+  @observable showCost = false
+
   onChange = e => {
     const criteria = e.target.value
+    this.showCost = criteria === 'cost'
     this.props.project.updateProject({ criteria })
   }
 
@@ -20,10 +24,29 @@ export default class ClassificationView extends Component {
     this.props.project.setSelectModel(model.id)
   };
 
+  onHide = () => {
+    this.showCost = false
+  }
+
+  costInput = (row, col) => {
+    const isCost = row !== col
+    const field = (row === col ? "T" : "F") + (col === 0 ? "P" : "N")
+    return <div className={styles.costTd}>
+      <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
+      <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benifit:'}</span></div>
+      <div className={styles.costInput}><NumberInput value={this.props.project.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true}  /></div>
+      <div className={styles.costUnits}><span>units</span></div>
+    </div>
+  }
+
+  handleChange = (field, value) => {
+    this.props.project.costOption[field] = value
+  }
+
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria } = project;
-
+    const { train2Finished, train2ing, trainModel, abortTrain, selectModel: current, criteria } = project;
+    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.7 && "OK") || "NotSatisfied" : ''
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -34,7 +57,7 @@ export default class ClassificationView extends Component {
             <span>You can also tell us your business needs to get a more precise recommendation.</span>
           </div>
           <div className={styles.row}>
-            <span>Modeling Results :{' '}<div className={styles.status}>&nbsp;&nbsp;OK</div></span>
+            <span>Modeling Results :{' '}<div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div></span>
           </div>
           <div className={styles.row}>
             <span>Selected Model :<a>&nbsp;{current.name}</a></span>
@@ -52,13 +75,41 @@ export default class ClassificationView extends Component {
         </div>
         <div className={styles.radioGroup}>
           <div className={styles.radio}>
-            <input type="radio" name="criteria" value='default' id='criteria_default' onChange={this.onChange} checked={criteria === 'default'} />
+            <input type="radio" name="criteria" value='default' id='criteria_default' readOnly onClick={train2ing ? null : this.onChange} checked={criteria === 'default'} disabled={train2ing} />
             <label htmlFor='criteria_default'>Mr. One's Defult Selection</label>
           </div>
           <div className={styles.radio}>
-            <input type="radio" name="criteria" value='cost' id='criteria_cost' onChange={this.onChange} checked={criteria === 'cost'} />
+            <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={train2ing ? null : this.onChange} checked={criteria === 'cost'} disabled={train2ing} />
             <label htmlFor='criteria_cost'>Cost Based</label>
           </div>
+          {this.showCost && <div className={styles.costBlock}>
+            <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
+            <div className={styles.costTitle}>
+              <span>Input your cost or benifit of every prediction result: (0 ~ 100)</span>
+            </div>
+            <div className={styles.costContent}>
+              <span>Note: If a prediction result will let you loose your resource or money. It should be a cost; If a prediction result will bring you revenue or income, it should be a benifit. All input should be measured at the same unit.</span>
+            </div>
+            <div className={styles.costBox}>
+              <div className={styles.costTable}>
+                <div className={styles.costRow}>
+                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span>Actual / Predicted</span></div>
+                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span>YES</span></div>
+                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span>NO</span></div>
+                </div>
+                <div className={styles.costRow}>
+                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span>YES</span></div>
+                  <div className={styles.costCell}>{this.costInput(1, 1)}</div>
+                  <div className={styles.costCell}>{this.costInput(1, 0)}</div>
+                </div>
+                <div className={styles.costRow}>
+                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span>NO</span></div>
+                  <div className={styles.costCell}>{this.costInput(0, 1)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 0)}</div>
+                </div>
+              </div>
+            </div>
+          </div>}
         </div>
       </div>
       <ModelTable
@@ -229,7 +280,7 @@ class ModelTable extends Component {
               <ModelDetail
                 key={key}
                 model={model}
-                current={current}
+                isSelect={model.id === current.id}
                 onSelect={onSelect}
               />
             );
@@ -267,7 +318,7 @@ class ModelDetail extends Component {
   };
 
   render() {
-    const { model, onSelect, current } = this.props;
+    const { model, onSelect, isSelect } = this.props;
     return (
       <div className={styles.rowBox}>
         <div className={styles.rowData}>
@@ -275,7 +326,7 @@ class ModelDetail extends Component {
             <input
               type="radio"
               name="modelSelect"
-              defaultChecked={model.id === current.id}
+              checked={isSelect}
               onChange={onSelect.bind(null, model)}
             />
           </div>

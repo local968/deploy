@@ -1,4 +1,5 @@
 import { observable, action } from 'mobx';
+import socketStore from "./SocketStore";
 
 export default class Model {
   @observable score;
@@ -31,7 +32,8 @@ export default class Model {
     if (Array.isArray(data)) {
       return false;
     }
-    delete data.userId;
+    delete data.id;
+    delete data.name;
     delete data.projectId;
     for (let key in data) {
       if (typeof data[key] === 'function') {
@@ -49,7 +51,19 @@ export default class Model {
   resetFitIndex() {
     this.fitIndex = this.initialFitIndex;
   }
+  getBenifit(ITP, IFN, IFP, ITN) {
+    const data = this.chartData || {}
+    const roc = data.roc || {}
+    const { TP, FN, FP, TN } = roc
+    const ctp = ITP ? (TP || [])[ITP - 1] : 0
+    const cfn = IFN ? (FN || [])[IFN - 1] : 0
+    const cfp = IFP ? (FP || [])[IFP - 1] : 0
+    const ctn = ITN ? (TN || [])[ITN - 1] : 0
+    console.log(this.name, ctp, cfn, cfp, ctn, ctp - cfn - cfp + ctn)
+    return ctp - cfn - cfp + ctn
+  }
   updateModel(data) {
+    socketStore.ready().then(api => api.updateModel({ data, id: this.id, projectId: this.projectId }))
     Object.assign(this, data);
   }
 }
