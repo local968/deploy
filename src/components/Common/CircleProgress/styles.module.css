@@ -1,0 +1,116 @@
+.circle {
+  width:200px;
+  height: 200px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.topRight,
+.bottomRight,
+.topLeft,
+.bottomLeft {
+  overflow: hidden;
+  width: 50%;
+  height: 50%;
+  position: relative;
+}
+
+.topRight .cover,
+.topRight .circumference {
+  top: 0;
+  left: -100%;
+}
+
+
+.bottomRight .cover,
+.bottomRight .circumference {
+  top: -100%;
+  left: -100%;
+}
+
+.topLeft .cover,
+.topLeft .circumference {
+  top: 0;
+  left: 0;
+}
+
+.bottomLeft .cover,
+.bottomLeft .circumference {
+  top: -100%;
+  left: 0;
+}
+
+.tl,.bl,.tr,.br {
+  width: 100%;
+  height: 100%;
+  background: #f0f2f5;
+  position: absolute;
+  transition: transform .3s;
+}
+
+.tl {
+  top: 0;
+  left: -100%;
+  transform-origin: bottom right;
+}
+
+.bl {
+  top: 100%;
+  left: 0;
+  transform-origin: top right;
+}
+
+.tr {
+  top: -100%;
+  left: 0;
+  transform-origin: bottom left;
+}
+
+.br {
+  top: 0;
+  left: 100%;
+  transform-origin: top left;
+}
+
+.topRight {
+  z-index: 4;
+}
+
+.bottomRight {
+  z-index: 3;
+}
+
+.topLeft {
+  z-index: 1;
+}
+
+.bottomLeft {
+  z-index: 2;
+}
+
+
+.circumference {
+  width: 200%;
+  height: 200%;
+  border: 6px solid #c4cbd7;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  opacity: .5;
+}
+
+.cover {
+  width: 200%;
+  height: 200%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 6px solid #c4cbd7;
+  border-radius: 50%;
+  z-index: 0;
+}
