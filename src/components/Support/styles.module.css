@@ -1,0 +1,22 @@
+.content {
+  padding-top: 48px;
+  padding-left: 8%;
+  font-size: 20px;
+}
+
+.header {
+  font-size: 36px;
+  font-family: HelveticaNeue-Bold;
+  font-weight: bold;
+  color: rgba(74, 74, 74, 1);
+  margin-bottom: 50px;
+}
+.item{
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.tag{
+  margin:0 0 0 20px;
+}
