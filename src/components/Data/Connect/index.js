@@ -261,7 +261,7 @@ export default class DataConnect extends Component {
             <div className={styles.cover} />
             <div className={styles.progressBlock}>
               <div className={styles.progressTitle}>
-                <span>Connect Data File</span>
+                <span>Data Import</span>
                 {this.process < 90 && <div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
               </div>
               <div className={styles.progressContent}>

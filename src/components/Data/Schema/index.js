@@ -127,7 +127,7 @@ export default class DataSchema extends Component {
         <ContinueButton onClick={this.doEtl} disabled={etling || !target} text="Continue" />
         <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <span>Skip Data Quality Check</span>
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you do not want R2-Learn to make any change to your dataset, you can skip data quality check." />
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
         </div>
       </div>
       {etling && <EtlLoading progress={etlProgress}/>}
