@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal, Select, Radio, Button } from 'antd';
+import { Table, Tabs, Modal, Select, Radio, Button, Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './AdvancedView.module.less';
 import RocChart from 'components/D3Chart/RocChart';
@@ -158,7 +158,9 @@ class AdvancedModelTable extends Component {
                 return (
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
-                    <span className={styles.modelName} >{name}</span>
+                    <Tooltip title={name}>
+                      <span className={styles.modelName} alt={name}>{name}</span>
+                    </Tooltip>
                   </div>}
                   />
                 )
@@ -275,10 +277,10 @@ class ClassificationModelRow extends Component {
               case 'Model Name':
                 return (
                   <RowCell key={1} data={<div key={1} >
-                    {/* <span onClick={this.handleClick} > */}
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
-                    {/* </span> */}
-                    <span className={styles.modelName} >{name}</span>
+                    <Tooltip title={name}>
+                      <span className={styles.modelName} alt={name} >{name}</span>
+                    </Tooltip>
                   </div>}
                   />
                 )
@@ -433,15 +435,15 @@ class Row extends Component {
 class RowCell extends Component {
   render() {
     const { data, cellStyle, other, cellClassName, ...rest } = this.props;
-
+    const fixed3 = (data) => typeof data === 'number' ? data.toFixed(3) : data
     return (
       <div
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={(typeof data === 'string' || typeof data === 'number') ? data : null}
+        title={(typeof data === 'string' || typeof data === 'number') ? fixed3(data) : null}
       >
-        {other ? <span className={styles.hasotherCell} >{data}</span> : data}
+        {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
         {other}
       </div>
     );
@@ -531,7 +533,7 @@ class ModelComp extends Component {
           footer={
             <Button key="cancel" type="primary" onClick={this.handleCancel}>Close</Button>
           }
-          >
+        >
           <div>
             <h4>Model Comparison Charts</h4>
             <Tabs defaultActiveKey="1">

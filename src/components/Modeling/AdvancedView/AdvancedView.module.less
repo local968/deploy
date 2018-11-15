@@ -1,8 +1,9 @@
 .advancedModelResult {
     font-size: 1rem;
-    padding: 0 2%;
+    // padding: 0 2%;
     .modelResult {
         display: inline-block;
+        padding-bottom: 1.2em;
         .status {
             color: #f5a623;
             display: inline-block;
@@ -21,8 +22,8 @@
     position: relative;
     .metricSelection {
         position: absolute;
-        right: 6%;
-        top: -50px;
+        right: 0;
+        top: -25%;
         display: flex;
         .text {
             line-height: 38px;
@@ -34,17 +35,23 @@
         //     }
         // }
     }
+    :global(.ant-radio-wrapper) {
+      vertical-align: middle;
+    }
     .modelName {
         display: inline-block;
-        width: 100px;
-        text-align: center;
+        width: 10em;
+        font-size: 1em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
     }
     .adrow {
         display: flex;
         cursor: pointer;
         justify-content: space-around;
         align-items: center;
-        text-align: center; 
+        text-align: center;
         .adcell {
             padding: 0.2em;
             border: 0.5px solid #d8d8d8;
@@ -123,6 +130,6 @@
                 background-color: rgb(237, 253, 219);
               }
             }
-        } 
+        }
     }
 }
