@@ -79,6 +79,7 @@ export default class Project {
   @observable outlierIndex = {}
   @observable outlierDict = {}
   @observable targetMap = {};
+  @observable targetArray = []
   @observable dataViews = null;
   @observable preImportance = null;
   @observable histgramPlots = {};
@@ -87,9 +88,11 @@ export default class Project {
   @observable newVariable = [];
   @observable expression = {}
   @observable informativesLabel = []
+  @observable colValueCounts = {}
 
   //not save
   @observable targetMapTemp = {};
+  @observable targetArrayTemp = [];
 
   // train
   // 训练状态
@@ -150,6 +153,7 @@ export default class Project {
   @computed
   get defaultDataQuality() {
     this.targetMapTemp = {};
+    this.targetArrayTemp = []
 
     return {
       mismatchFillMethod: {},
@@ -160,7 +164,8 @@ export default class Project {
       outlierIndex: {},
       dataViews: null,
       outlierDict: {},
-      targetMap: {}
+      targetMap: {},
+      targetArray: []
     }
   }
 
@@ -260,18 +265,16 @@ export default class Project {
         if (result.status === 200) {
           this.setProperty(result.data)
           if (isInit) {
-            if (this.train2ing) {
-              when(
-                () => this.train2Finished,
-                () => {
-                  if (this.problemType === 'Classification') {
-                    this.chartData();
-                  } else {
-                    this.fitPlotAndResidualPlot();
-                  }
+            when(
+              () => this.train2Finished,
+              () => {
+                if (this.problemType === 'Classification') {
+                  this.chartData();
+                } else {
+                  this.fitPlotAndResidualPlot();
                 }
-              )
-            }
+              }
+            )
           }
           return
         }
@@ -301,6 +304,10 @@ export default class Project {
 
       if (key === 'targetMap') {
         data.targetMapTemp = data[key];
+      }
+
+      if (key === 'targetArray') {
+        data.targetArrayTemp = data[key];
       }
     }
     Object.assign(this, data)
@@ -411,11 +418,11 @@ export default class Project {
       dataIssue: false,
       targetIssue: false
     }
-    const { problemType, totalRawLines, target, colMap, issueRows, colType } = this;
+    const { problemType, totalRawLines, target, colMap, targetIssues, colType } = this;
 
     if (problemType === "Classification") {
       if (colType[target] === 'Categorical') {
-        data.targetIssue = Object.keys(this.targetMap).length < 2 && Object.keys(colMap[target]).length > 2;
+        data.targetIssue = this.targetArray.length < 2 && Object.keys(colMap[target]).length > 2;
       } else {
         data.targetIssue = true
       }
@@ -429,7 +436,7 @@ export default class Project {
       data.rowIssue = true;
     }
 
-    if (issueRows.errorRow.length) {
+    if (targetIssues.errorRow.length) {
       data.dataIssue = true
     }
 
@@ -471,6 +478,19 @@ export default class Project {
   parseJson(json_string) {
     if (!json_string) return null;
     return JSON.parse(json_string);
+  }
+
+  @computed
+  get targetIssues() {
+    const { target, mismatchIndex, nullIndexes, outlierIndex, colType } = this;
+    const arr = {
+      mismatchRow: mismatchIndex[target] || [],
+      nullRow: nullIndexes[target] || [],
+      outlierRow: colType[target] !== "Categorical" ? (outlierIndex[target] || []) : [],
+    }
+
+    arr.errorRow = Array.from(new Set([...arr.mismatchRow, ...arr.nullRow, ...arr.outlierRow]))
+    return arr
   }
 
   @computed
@@ -536,7 +556,7 @@ export default class Project {
       data.outlierFillMethod = toJS(this.outlierFillMethod);
     }
 
-    if (this.targetMap && Object.keys(this.targetMap).length) {
+    if (this.targetArray && this.targetArray.length) {
       data.targetMap = toJS(this.targetMap);
     }
 
@@ -654,7 +674,7 @@ export default class Project {
 
   @action
   fixTarget = () => {
-    this.updateProject({ targetMap: this.targetMapTemp })
+    this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp })
     this.etl();
   }
 
@@ -878,11 +898,17 @@ export default class Project {
         antdMessage.error(message)
         // return this.concurrentError(message)
       }
-      if (this.problemType === 'Classification') {
-        this.chartData();
-      } else {
-        this.fitPlotAndResidualPlot();
-      }
+      when(
+        () => this.train2Finished,
+        () => {
+          if (this.problemType === 'Classification') {
+            this.chartData();
+          } else {
+            this.fitPlotAndResidualPlot();
+          }
+        }
+      )
+
       // this.updateProject({
       //   train2Finished: true,
       //   train2ing: false

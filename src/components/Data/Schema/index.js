@@ -21,6 +21,7 @@ export default class DataSchema extends Component {
       noCompute: noComputeTemp,
       cleanData: [],
       targetMap: {},
+      targetArray: [],
       outlierDict: {},
       nullFillMethod: {},
       mismatchFillMethod: {},

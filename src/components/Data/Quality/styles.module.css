@@ -41,6 +41,7 @@
 }
 
 .cleanTitle span {
+    color: #00b570;
     font-size: 1.125rem;
     line-height: 1.2;
     font-weight: bold;
@@ -57,6 +58,7 @@
     align-items: center;
     margin: 0.01em 0;
 }
+
 .issueText span {
     font-weight: bold;
 }
@@ -169,22 +171,25 @@
     flex: 1 0;
     margin-left: 0.5em;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .block {
     display: flex;
     flex: none;
-    margin-top: 0.25em;
-    border-bottom: dashed 1px #979797;
+    padding-top: 0.25em;
+    border-top: dashed 1px #979797;
     flex-direction: column;
+    margin-top: -1px;
 }
 
 .name {
     display: flex;
     flex: none;
+    align-items: center;
 }
 
-.name span{
+.name span {
     font-size: 1.5rem;
 }
 
@@ -358,7 +363,6 @@
 
 .fixesBottom {
     display: flex;
-    justify-content: center;
     margin-top: 0.2em;
     flex: none;
 }
@@ -369,11 +373,11 @@
     width: 1.1em;
     outline: none;
     border: none;
-    margin: 0 0.1em;
     justify-content: center;
     cursor: pointer;
     border: 1px solid #4a4a4a;
     border-radius: 5px;
+    margin-right: .55em;
 }
 
 .fixesBottom .disabled {
@@ -402,6 +406,7 @@
     display: flex;
     flex: none;
     flex-direction: column;
+    margin-top: .1em;
 }
 
 .fixesBox {
@@ -410,13 +415,13 @@
     flex-direction: column;
 }
 
-.fixesCheckBox{
+.fixesCheckBox {
     display: flex;
     flex: none;
     flex-wrap: wrap;
 }
 
-.fixesCheck{
+.fixesCheck {
     display: flex;
     flex: none;
     margin: 0.1em 0.5em 0.1em 0;
@@ -459,6 +464,14 @@
 .fixesText {
     display: flex;
     flex: none;
+}
+
+.fixesText span {
+    font-family: HelveticaNeue;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #1d2b3c;
+    line-height: 1.3;
 }
 
 .fixesArea {
@@ -571,7 +584,7 @@ span.fixesEdit {
 
 .outlierBlock {
     display: flex;
-    flex:none;
+    flex: none;
     align-items: center;
     border: solid 1px #c4cbd7;
     line-height: 1.5;
@@ -619,11 +632,11 @@ span.fixesEdit {
     margin-bottom: 0.2em;
 }
 
-.d3Chart svg{
+.d3Chart svg {
     overflow: visible;
 }
 
-.d3Chart g{
+.d3Chart g {
     position: relative;
 }
 
@@ -635,8 +648,7 @@ span.fixesEdit {
     fill: #bdbdbd;
 }
 
-.axis path,
-.axis line{
+.axis path, .axis line {
     fill: none;
     stroke: black;
     shape-rendering: crispEdges;
@@ -653,7 +665,7 @@ span.fixesEdit {
 
 .dragLine {
     stroke: #124d8e;
-    stroke-width:2;
+    stroke-width: 2;
 }
 
 .dragText {
@@ -666,4 +678,230 @@ span.fixesEdit {
 
 .Circle {
     cursor: pointer;
+}
+
+.cleanHeaderIcon {
+    display: flex;
+    flex: none;
+    height: .4em;
+    width: .4em;
+    align-items: center;
+    justify-content: center;
+    background-color: #00c855;
+    border-radius: 50%;
+    margin-right: .1em;
+}
+
+.targetPercentBox {
+    display: flex;
+    flex: none;
+    margin: .2em 0;
+    flex-direction: column;
+    max-height: 3em;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.targetPercentRow {
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin: .1em 0;
+}
+
+.targetPercentLabel {
+    display: flex;
+    flex: none;
+    width: .8em;
+}
+
+.targetPercentLabel span {
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #4a4a4a;
+    line-height: 1.2;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.targetPercentValue {
+    display: flex;
+    flex: auto;
+    height: .2em;
+    margin-left: .1em;
+}
+
+.targetPercent {
+    display: flex;
+    flex: none;
+    height: 100%;
+}
+
+.cleanTargetBlock {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.cleanTargetRename {
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: .2em 0;
+}
+
+.cleanTargetRename span {
+    font-family: HelveticaNeue;
+    font-size: 0.875;
+    color: #9b9b9b;
+    line-height: 1.2;
+}
+
+.cleanTargetButton {
+    display: flex;
+    flex: none;
+    margin-right: 0.2em;
+}
+
+.cleanTargetButton button {
+    display: flex;
+    flex: none;
+    padding: .1em .2em;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.cleanTargetButton span {
+    color: #1d2b3c;
+}
+
+.cleanTargetRow {
+    display: flex;
+    flex: none;
+}
+
+.cleanTargetText {
+    display: flex;
+    flex: none;
+    padding-top: .2em;
+    border-top: 1px #ccc dashed;
+}
+
+.cleanTargetText span {
+    font-family: Arial;
+    font-size: 1.125rem;
+    color: #4a4a4a;
+    line-height: 1.4;
+}
+
+.cleanTargetBox {
+    display: flex;
+    flex: none;
+    margin-top: .1em;
+    margin-bottom: .2em;
+}
+
+.cleanTargetCheck {
+    display: flex;
+    flex: none;
+    margin-left: 0.2em;
+    margin-right: 0.5em;
+    align-items: center;
+}
+
+.cleanTargetCheck input {
+    width: 0.16em;
+    height: 0.16em;
+    cursor: pointer;
+}
+
+.cleanTargetCheck label {
+    font-family: Arial;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #4a4a4a;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.targetPercentCheckBox {
+    display: flex;
+    flex: none;
+    margin-right: .1em;
+}
+
+.fixesCheckBoxLabel {
+    font-family: PingFangSC;
+    font-size: 0.875rem;
+    color: #4a4a4a;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.disabledText {
+    color: #312323;
+    cursor: not-allowed;
+}
+
+.fixesTips {
+    display: flex;
+    flex: none;
+    height: 1em;
+}
+
+.fixesTips span {
+    font-family: HelveticaNeue;
+    font-size: 0.875rem;
+    color: #4a4a4a;
+    line-height: 1.3;
+}
+
+.fixesTextBottom {
+    margin: .2em 0;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: 100%;
+}
+
+.fixesIconBox {
+    display: flex;
+    flex: none;
+    margin-bottom: .2em;
+}
+
+.largeIcon {
+    width: .6em;
+    height: .6em;
+}
+
+.center {
+    justify-content: center;
+    align-items: center;
+}
+
+.fixesComplete {
+    display: flex;
+    flex: none;
+    width: 100%;
+    flex-wrap: wrap;
+    margin: .2em 0
+}
+
+.fixesComplete span {
+    font-family: HelveticaNeue;
+    font-size: 0.875rem;
+    color: #4a4a4a;
+    line-height: 1.8;
+}
+
+.goodInfo {
+    width: 100%;
 }
