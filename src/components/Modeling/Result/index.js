@@ -22,7 +22,7 @@ export default class ModelResult extends Component {
     const modelList = models.map(m => {
       try {
         const score = m.score.validateScore
-        const performance = Object.entries(score).map(([k, v]) => `${k}:${v}`).join(" ")
+        const performance = Object.entries(score).map(([k, v]) => `${k}:${v.toFix(3)}`).join(" ")
         return {
           name: m.name,
           performance
