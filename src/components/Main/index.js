@@ -18,7 +18,12 @@ export default class Main extends Component {
 
     when(
       () => props.userStore.status === "login",
-      () => props.projectStore.initProject(this.pid)
+      () => props.projectStore.initProject(this.pid).then(init => {
+        if (!init) {
+          message.error("Sorry but you don't have the authority for entering this project.")
+          this.props.routing.push("/")
+        }
+      })
     )
   }
 
