@@ -298,6 +298,7 @@ export class SelectTarget extends Component {
 
     const { colMap, target, colValueCounts } = project
     const { checked, belongTo0, belongTo1 } = this
+    const [v0, v1] = checked
 
     return <div className={styles.fixesContent}>
       {this.step === 1 && <div className={styles.fixesBox}>
@@ -305,7 +306,7 @@ export class SelectTarget extends Component {
         <div className={styles.fixesCheckBox}>
           <div className={styles.targetPercentBox}>
             {Object.keys(colMap[target]).map((v, k) => {
-              const backgroundColor = (checked[0] === v && '#9be44b') || (checked[1] === v && '#adaafc') || '#c4cbd7'
+              const backgroundColor = (v0 === v && '#9be44b') || (v1 === v && '#adaafc') || '#c4cbd7'
               return <div className={styles.targetPercentRow} key={k}>
                 <div className={styles.targetPercentCheckBox}>
                   <input type='checkbox' onChange={this.check} value={v} checked={checked.includes(v)} />
