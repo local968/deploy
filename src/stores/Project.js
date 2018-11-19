@@ -1099,6 +1099,31 @@ export default class Project {
     })
   }
 
+  pointToShow = () => {
+    if (this.models.length === 0) {
+      return;
+    }
+    socketStore.ready().then(api => {
+      const request = {
+        version: this.models.map(m => m.name).toString(),
+        projectId: this.id,
+        command: 'pointToShow'
+      }
+      api.pointToShow(request, points => {
+        const name = points.result.name;
+        if (name === "progress") return;
+        const model = this.models.find(m => {
+          return name.split('.')[0] === m.name.split('.')[0]
+        })
+        if (model) {
+          model.updateModel({
+            qcut: points.result.data
+          });
+        }
+      })
+    })
+  }
+
   chartData = () => {
     if (this.models.length === 0) {
       return;

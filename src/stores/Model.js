@@ -13,6 +13,7 @@ export default class Model {
   @observable chartData;
   @observable fitPlot;
   @observable residualPlot;
+  @observable qcut;
 
   constructor(projectId, model, name) {
     this.projectId = projectId;

@@ -147,7 +147,7 @@
 .performanceBox {
     display: flex;
     flex: 1 0;
-    justify-content: center;
+    /* justify-content: center; */
 }
 
 .performance {
@@ -828,4 +828,8 @@
     background-color: #d3d3d3;
     color: #aaaaaa;
     background-image: none;
+}
+
+.predictActual {
+    
 }
