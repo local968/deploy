@@ -266,11 +266,6 @@ export default class AdvancedView extends Component {
                   <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} >
                     {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
                   </Select>
-                  {/* <select className={classnames(styles.advancedSize, styles.inputLarge)} value={measurement} onChange={this.handleMeasurement} >
-                    {measurementList.map((i, k) => {
-                      return <option value={i.value} key={k}>{i.label}</option>
-                    })}
-                  </select> */}
                 </div>
               </div>
               {/* <div className={styles.advancedBlock}>

@@ -105,7 +105,7 @@ class AdvancedModel extends Component {
     const { advancedModeling, version, algorithms } = project
     const sortFn = (a, b) => a - b
     if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
-    if (!version.length) return message.error("You need to select at least one algorithm!")
+    if (!project.version.length) return message.error("You need to select at least one algorithm!")
     closeAdvanced()
     advancedModeling()
   }
