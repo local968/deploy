@@ -356,6 +356,7 @@ wss.register('etl', (message, socket, progress) => {
         let { result, status } = returnValue;
         if (status < 0) return {
           status: 418,
+          result,
           message: result['process error']
         }
         Object.keys(result).forEach(k => {
