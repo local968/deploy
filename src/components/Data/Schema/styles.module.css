@@ -121,9 +121,14 @@
     margin: 0.3em 0 0.6em 0.3em;
 }
 
-.checkBox span {
+.checkBox label {
     font-size: 0.875rem;
     line-height: 1.1;
     font-family: SanFranciscoText;
     color: #1d2b3c;
+    cursor: pointer;
+}
+
+.checkBox input {
+    cursor: pointer;
 }

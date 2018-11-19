@@ -419,8 +419,6 @@
     display: flex;
     flex: none;
     flex-wrap: wrap;
-    overflow-y: scroll;
-    max-height: 70vh;
     margin-top: 0.5rem;
 }
 
@@ -735,12 +733,14 @@ span.fixesEdit {
     flex: auto;
     height: .2em;
     margin-left: .1em;
+    align-items: flex-end;
 }
 
 .targetPercent {
     display: flex;
     flex: none;
     height: 100%;
+    margin-right: .1em;
 }
 
 .cleanTargetBlock {
@@ -895,7 +895,7 @@ span.fixesEdit {
     flex: none;
     width: 100%;
     flex-wrap: wrap;
-    margin: .2em 0
+    margin: .2em 0 1.4em
 }
 
 .fixesComplete span {
@@ -903,8 +903,53 @@ span.fixesEdit {
     font-size: 0.875rem;
     color: #4a4a4a;
     line-height: 1.8;
+    font-weight: bold;
 }
 
 .goodInfo {
     width: 100%;
+}
+
+
+.variableIssue {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+}
+
+.variableBottom {
+    display: flex;
+    flex: none;
+}
+
+.checkBox {
+    display: flex;
+    flex: none;
+    line-height: 0.4em;
+    align-items: center;
+    margin: 0.3em 0 0.6em 0.3em;
+}
+
+.checkBox label {
+    font-size: 0.875rem;
+    line-height: 1.1;
+    font-family: SanFranciscoText;
+    color: #1d2b3c;
+    cursor: pointer;
+}
+
+
+.checkBox span {
+    font-size: 0.875rem;
+    line-height: 1.1;
+    font-family: SanFranciscoText;
+    color: #9b9b9b;
+}
+
+.checkBox input {
+    cursor: pointer;
+}
+
+.limitText {
+    width: 75%;
 }
