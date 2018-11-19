@@ -541,7 +541,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                     ? ' After completed'
                     : moment
                       .unix(cddo.frequencyOptions.time)
-                      .format('DD/MM/YYYY h:mma')}
+                      .format('MM/DD/YYYY h:mma')}
                 </span>
               </span>
             </span>
@@ -568,7 +568,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                   <span className={styles.bold}>Starts:</span>
                   {moment
                     .unix(cddo.frequencyOptions.starts)
-                    .format('DD/MM/YYYY h:mma')}
+                    .format('MM/DD/YYYY h:mma')}
                   <br />
                   <span className={styles.bold}>Ends:</span>
                   {cddo.frequencyOptions.ends === 'never'
@@ -576,7 +576,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                     : cddo.frequencyOptions.ends > 10000
                       ? moment
                         .unix(cddo.frequencyOptions.ends)
-                        .format('DD/MM/YYYY h:mma')
+                        .format('MM/DD/YYYY h:mma')
                       : `after ${cddo.frequencyOptions.ends} occurrences`}
                 </small>
               </span>

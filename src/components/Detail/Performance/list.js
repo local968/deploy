@@ -77,7 +77,7 @@ export default class List extends Component {
                   <span className={styles.modelInvokeTime}>
                     {moment
                       .unix(s.schedule.actualTime || s.schedule.estimatedTime)
-                      .format('DD/MM/YYYY-hh:mma')}
+                      .format('MM/DD/YYYY-hh:mma')}
                   </span>
                   {/* <Popover
                   placement="left"

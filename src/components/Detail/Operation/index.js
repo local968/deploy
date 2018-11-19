@@ -42,7 +42,7 @@ export default class Operation extends Component {
                         .unix(
                           s.schedule.actualTime || s.schedule.estimatedTime
                         )
-                        .format('DD/MM/YYYY-hh:mma')}
+                        .format('MM/DD/YYYY-hh:mma')}
                   </span>
                   <span className={styles.deploymentStyle}>
                     Predict with{' '}
