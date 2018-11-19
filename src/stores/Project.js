@@ -3,6 +3,7 @@ import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
 import config from 'config';
+import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage } from 'antd';
 
@@ -107,6 +108,10 @@ export default class Project {
   @observable criteria = 'defualt';
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
 
+  // Advanced Modeling Setting
+  @observable settingId = '';
+  @observable settings = []
+
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
 
@@ -197,6 +202,16 @@ export default class Project {
       newVariable: [],
       expression: {}
     }
+  }
+
+  @computed
+  get settingName() {
+    return this.settings.find(s => s.id === this.settingId).name
+  }
+
+  @computed
+  get currentSetting() {
+    return this.settings.find(s => s.id === this.settingId)
   }
 
   @action
@@ -800,7 +815,9 @@ export default class Project {
       train2Error: false,
       selectId: '',
       criteria: 'default',
-      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 }
+      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
+      settings: this.settings,
+      settingId: this.settingId
     }, this.nextSubStep(2, 3)))
   }
 
@@ -851,6 +868,10 @@ export default class Project {
       trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
     }
 
+    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy } = this;
+    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy }
+    this.settings.find(s => s.id === this.settingId).setting = setting
+
     this.modeling(trainData, Object.assign({
       train2Finished: false,
       train2ing: true,
@@ -872,15 +893,31 @@ export default class Project {
       runWith: this.runWith,
       crossCount: this.crossCount,
       version: this.version,
-      trainHeader: this.trainHeader
+      trainHeader: this.trainHeader,
+      settings: this.settings,
+      settingId: this.settingId
     }, this.nextSubStep(2, 3)))
+  }
+
+  newSetting = (type = 'auto') => {
+    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy } = this;
+    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy }
+    const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
+    const id = uuid.v4()
+    this.settingId = id
+    this.settings.push({
+      id,
+      name: name,
+      setting,
+      models: []
+    })
   }
 
   modeling = (trainData, updateData) => {
     this.train2ing = true
     this.isAbort = false
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
-      if(this.isAbort) return
+      if (this.isAbort) return
       if (progressResult.name === "progress") {
         if (progressResult.trainId) this.trainingId = progressResult.trainId
         if (!progressResult.model) return

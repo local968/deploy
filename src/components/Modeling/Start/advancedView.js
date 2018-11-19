@@ -31,9 +31,10 @@ const HandleStyle = {
 export default class AdvancedView extends Component {
   // @observable type = ''
 
-  handleName = (e) => {
-    this.props.project.advancedName = e.target.value;
-  }
+  handleName = action((e) => {
+    const { project } = this.props
+    project.settings.find(s => s.id === project.settingId).name = e.target.value
+  })
 
   handleSize = (e) => {
     let value = e.target.value;
@@ -168,8 +169,21 @@ export default class AdvancedView extends Component {
     this.props.project.crossCount = 3
   })
 
+  changeSetting = action((e) => {
+    const { project } = this.props
+    const selectedSetting = project.settings.find(s => s.id === e.target.value)
+    if (selectedSetting) {
+      project.settingId = e.target.value
+      Object.entries(selectedSetting.setting).map(([key, value]) => {
+        project[key] = value
+      })
+    } else {
+      project.settingId = 'default'
+    }
+  })
+
   render() {
-    const { advancedName, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
+    const { settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
@@ -184,8 +198,8 @@ export default class AdvancedView extends Component {
               <span>Select From Previous Settings:</span>
             </div>
             <div className={styles.advancedOption}>
-              <select>
-                <option value={advancedName || 1}>{advancedName || 'custom.03.07.2018_23:14:40'}</option>
+              <select value={settingId} onChange={this.changeSetting}>
+                {settings && settings.map(setting => <option key={setting.id} value={setting.id}>{setting.name}</option>)}
               </select>
             </div>
           </div>
@@ -196,7 +210,7 @@ export default class AdvancedView extends Component {
               <span>Name Your Model Settings:</span>
             </div>
             <div className={styles.advancedOption}>
-              <input type="text" value={advancedName} onChange={this.handleName} />
+              <input type="text" value={settingName} onChange={this.handleName} />
             </div>
           </div>
         </div>

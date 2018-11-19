@@ -68,6 +68,19 @@ function createOrUpdate(id, userId, data, isCreate = false) {
     })
 }
 
+function addSettingModel(userId, projectId) {
+  return function (result) {
+    const modelName = result.model.name
+    redis.hmget(`project:${projectId}`, 'settingId', 'settings').then(([settingId, settings]) => {
+      settingId = JSON.parse(settingId)
+      settings = JSON.parse(settings)
+      settings.find(s => s.id === settingId).models.push(modelName)
+      createOrUpdate(projectId, userId, { settings })
+    }, console.error)
+    return result
+  }
+}
+
 function createModel(id, params) {
   const modelId = uuid.v4()
   const pipeline = redis.pipeline();
@@ -510,7 +523,7 @@ wss.register('train', (message, socket, progress) => {
         return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
       }
       return createOrUpdate(projectId, userId, { trainModel: null })
-        .then(() => createModel(projectId, result).then(model => {
+        .then(() => createModel(projectId, result).then(addSettingModel(userId, projectId)).then(model => {
           num++
           wss.publish("user:" + userId + ":projects", model)
           return progress(model)

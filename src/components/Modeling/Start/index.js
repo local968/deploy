@@ -14,10 +14,12 @@ export default class StartTrain extends Component {
   @observable visible = false
 
   fastTrain = () => {
+    this.props.project.newSetting('auto')
     this.props.project.fastTrain();
   };
 
   advanced = () => {
+    this.props.project.newSetting('custom')
     this.visible = true
   }
 
