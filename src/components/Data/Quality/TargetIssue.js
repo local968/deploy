@@ -5,28 +5,70 @@ import { observer } from 'mobx-react';
 import { Modal } from 'components/Common';
 import { observable } from 'mobx'
 import * as d3 from 'd3';
+import { Icon } from 'antd'
 
 @observer
-export class TargetIssue extends Component {
+export class ClassificationTarget extends Component {
   render() {
-    const { num, backToConnect, backToSchema, editTarget, unique, recomm } = this.props;
+    const { backToConnect, backToSchema, editTarget, project } = this.props
+    const { issues, colMap, target, targetMap, targetArray, colValueCounts } = project
+    const map = !targetArray.length ? colMap[target] : targetArray.map((v, k) => {
+      let n = 0
+      Object.entries(targetMap).forEach(([key, value]) => {
+        if (value === k) n += colValueCounts[target] ? (colValueCounts[target][key] || 0) : 0
+      })
+      return { [v]: n }
+    }).reduce((start, item) => {
+      return Object.assign(start, item)
+    }, {})
+    const isGood = Object.keys(map).length === 2
+    if (isGood && (issues.rowIssue || issues.dataIssue)) return null
+    const text = (isGood && 'Target variable quality is good!') || 'Your target variable has more than two unique values'
     return <div className={styles.block}>
-      <div className={styles.name}><span>Target Variable Unique Value</span></div>
+      <div className={styles.name}>
+        {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
+        <span>{text}</span>
+      </div>
       <div className={styles.desc}>
-        <div className={styles.info}>
-          <div className={styles.infoBox}>
-            <div className={styles.infoBlock}>
-              <div className={styles.num}><span>{unique}</span></div>
-              <div className={styles.text}><span>Your Unique Value</span></div>
-            </div>
-            <div className={styles.infoBlock}>
-              <div className={styles.num}><span>{recomm}</span></div>
-              <div className={styles.text}><span>Recommended</span></div>
-            </div>
+        <div className={classnames(styles.info, {
+          [styles.goodInfo]: isGood
+        })}>
+          <div className={styles.targetPercentBox}>
+            {Object.keys(map).map((v, k) => {
+              const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
+              return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
+                <div className={styles.targetPercentLabel}>
+                  <span>{v}</span>
+                </div>
+                <div className={styles.targetPercentValue}>
+                  <div className={styles.targetPercent} style={{ width: '70%', backgroundColor }}></div>
+                </div>
+              </div>
+            })}
           </div>
+          {isGood && <div className={styles.cleanTargetBlock}>
+            <div className={styles.cleanTargetRename}>
+              <div className={styles.cleanTargetButton}>
+                <button><span>Rename target varibles</span></button>
+              </div>
+              <span>(opthional)</span>
+            </div>
+            <div className={styles.cleanTargetText}>
+              <span style={{ color: "#d0021b", marginRight: '10px' }}>*</span>
+              <span>Which target value’s results is more important to you?</span>
+            </div>
+            <div className={styles.cleanTargetBox}>
+              {Object.keys(map).map((v, k) => {
+                return <div className={styles.cleanTargetCheck} key={"targetCheck" + k}>
+                  <input type='checkbox' id={`cleanTargetCheck${k}`} />
+                  <label htmlFor={`cleanTargetCheck${k}`}>{v}</label>
+                </div>
+              })}
+            </div>
+          </div>}
         </div>
-        <div className={styles.methods}>
-          {num === 0 && <div className={styles.reasonTitle}><span>Possible Reasons</span></div>}
+        {!isGood && <div className={styles.methods}>
+          <div className={styles.reasonTitle}><span>Possible Reasons</span></div>
           <div className={styles.methodBox}>
             <div className={styles.method}>
               <div className={styles.reason}><span>It’s the wrong target variable</span></div>
@@ -47,6 +89,47 @@ export class TargetIssue extends Component {
               </div>
             </div>
           </div>
+        </div>}
+      </div>
+    </div>
+  }
+}
+
+@observer
+export class RegressionTarget extends Component {
+  render() {
+    const { backToConnect, backToSchema, hasIssue, unique, recomm } = this.props;
+    return !hasIssue ? null : <div className={styles.block}>
+      <div className={styles.name}><span>Target Variable Unique Value</span></div>
+      <div className={styles.desc}>
+        <div className={styles.info}>
+          <div className={styles.infoBox}>
+            <div className={styles.infoBlock}>
+              <div className={styles.num}><span>{unique}</span></div>
+              <div className={styles.text}><span>Your Unique Value</span></div>
+            </div>
+            <div className={styles.infoBlock}>
+              <div className={styles.num}><span>{recomm}</span></div>
+              <div className={styles.text}><span>Recommended</span></div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.methods}>
+          <div className={styles.reasonTitle}><span>Possible Reasons</span></div>
+          <div className={styles.methodBox}>
+            <div className={styles.method}>
+              <div className={styles.reason}><span>It’s the wrong target variable</span></div>
+              <div className={styles.button} onClick={backToSchema}>
+                <button><span>Reselect target variable</span></button>
+              </div>
+            </div>
+            <div className={styles.method}>
+              <div className={styles.reason}><span>It’s general data quality issue</span></div>
+              <div className={styles.button} onClick={backToConnect}>
+                <button><span>Load a New Dataset</span></button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -56,7 +139,7 @@ export class TargetIssue extends Component {
 @observer
 export class RowIssue extends Component {
   render() {
-    const { num, backToConnect, totalRawLines } = this.props;
+    const { backToConnect, totalRawLines } = this.props;
     return <div className={styles.block}>
       <div className={styles.name}><span>Data Size is too small</span></div>
       <div className={styles.desc}>
@@ -67,7 +150,6 @@ export class RowIssue extends Component {
           </div>
         </div>
         <div className={styles.methods}>
-          {num === 0 && <div className={styles.reasonTitle}><span>Possible Reasons</span></div>}
           <div className={styles.methodBox}>
             <div className={styles.method}>
               <div className={styles.reason}><span>Data size >1000 rows is recommended</span></div>
@@ -85,35 +167,34 @@ export class RowIssue extends Component {
 @observer
 export class DataIssue extends Component {
   render() {
-    const { num, backToConnect, editFixes, issueRows, totalLines, percent } = this.props;
-    // const cleanRows = totalLines - issueRows.errorRow.length;
+    const { backToConnect, editFixes, targetIssues, totalLines, percent } = this.props;
 
     return <div className={styles.block}>
       <div className={styles.name}><span>Data issues are found</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
-            {!!issueRows.nullRow.length && <div className={styles.issueBlock}>
+            {!!targetIssues.nullRow.length && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Missing Value ({issueRows.nullRow.length} rows) {percent.missing.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow.length} rows) {percent.missing.toFixed(4)}%</span></div>
                 <div className={classnames(styles.progress, styles.missing)} style={{ width: percent.missing < 1 ? 1 : percent.missing + "%" }}></div>
               </div>
               <div className={styles.right}>
                 <span>Will be fixed</span>
               </div>
             </div>}
-            {!!issueRows.mismatchRow.length && <div className={styles.issueBlock}>
+            {!!targetIssues.mismatchRow.length && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Data Type Mismatch ({issueRows.mismatchRow.length} rows) {percent.mismatch.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow.length} rows) {percent.mismatch.toFixed(4)}%</span></div>
                 <div className={classnames(styles.progress, styles.mismatch)} style={{ width: percent.mismatch < 1 ? 1 : percent.mismatch + "%" }}></div>
               </div>
               <div className={styles.right}>
                 <span>Will be fixed</span>
               </div>
             </div>}
-            {!!issueRows.outlierRow.length && <div className={styles.issueBlock}>
+            {!!targetIssues.outlierRow.length && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Outlier ({issueRows.outlierRow.length} rows) {percent.outlier.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow.length} rows) {percent.outlier.toFixed(4)}%</span></div>
                 <div className={classnames(styles.progress, styles.outlier)} style={{ width: percent.outlier < 1 ? 1 : percent.outlier + "%" }}></div>
               </div>
               <div className={styles.right}>
@@ -128,7 +209,6 @@ export class DataIssue extends Component {
         </div>
 
         <div className={styles.methods}>
-          {num === 0 && <div className={styles.reasonTitle}><span>Possible Reasons</span></div>}
           <div className={styles.methodBox}>
             <div className={styles.method}>
               <div className={styles.reason}><span>R2 Learn will fix these issues automatically</span></div>
@@ -152,10 +232,12 @@ export class DataIssue extends Component {
 @observer
 export class SelectTarget extends Component {
   @observable checked = []
+  @observable belongTo0 = []
+  @observable belongTo1 = []
+  @observable step = 1
   @observable canSave = false
-  @observable map = {}
 
-  check = (e) => {
+  check = e => {
     let arr, canSave = false;
     if (e.target.checked && this.checked.length < 2) {
       arr = [...this.checked, e.target.value];
@@ -172,45 +254,19 @@ export class SelectTarget extends Component {
   }
 
   save = () => {
-    const { checked, map } = this;
-    const { target, colMap } = this.props.project;
-    let min, max;
-    for (let key in colMap[target]) {
-      if (checked.includes(key)) {
-        if (!max) {
-          max = {
-            k: key,
-            v: colMap[target][key]
-          }
-        } else {
-          if (max.v > colMap[target][key]) {
-            min = {
-              k: key,
-              v: colMap[target][key]
-            }
-          } else {
-            min = max;
-            max = {
-              k: key,
-              v: colMap[target][key]
-            }
-          }
-        }
-      }
+    const { checked, belongTo0, belongTo1 } = this;
+    const { colValueCounts, target } = this.props.project;
+    const [v0, v1] = checked
+    const totalOf0 = [v0, ...belongTo0].reduce((start, v) => start += ((colValueCounts[target] || {})[v]) || 0, 0)
+    const totalOf1 = [v1, ...belongTo1].reduce((start, v) => start += ((colValueCounts[target] || {})[v]) || 0, 0)
+    const maxKey = totalOf0 >= totalOf1 ? 0 : 1
+    let targetMap = {
+      [checked[maxKey]]: 0,
+      [checked[1 - maxKey]]: 1
     }
-    if (!max || !min) {
-      return false;
-    }
-    let targetMap = this.props.project.targetMap || {}
-    targetMap[min.k] = 0;
-    targetMap[max.k] = 1;
-    for (let key in map) {
-      if (map[key] === max.k) {
-        targetMap[key] = 1
-      } else if (map[key] === min.k) {
-        targetMap[key] = 0
-      }
-    }
+    this[`belongTo${maxKey}`].forEach(v0 => targetMap[v0] = 0)
+    this[`belongTo${1 - maxKey}`].forEach(v1 => targetMap[v1] = 1)
+    this.props.project.targetArrayTemp = [checked[maxKey], checked[1 - maxKey]];
     this.props.project.targetMapTemp = targetMap;
     this.props.saveTargetFixes()
   }
@@ -221,43 +277,176 @@ export class SelectTarget extends Component {
     this.map = map
   }
 
+  handleCheck = (key, e) => {
+    const value = e.target.value
+    const checked = e.target.checked
+    const field = `belongTo${key}`
+    if (checked && !this[field].includes(value)) this[field] = [...this[field], value]
+    if (!checked && this[field].includes(value)) this[field] = this[field].filter(v => v !== value)
+  }
+
+  nextStep = () => {
+    this.step++
+  }
+
+  backStep = () => {
+    this.step--
+  }
+
   render() {
-    const { closeTarget } = this.props;
-    const { target, colMap } = this.props.project;
+    const { closeTarget, project } = this.props;
+
+    const { colMap, target, colValueCounts } = project
+    const { checked, belongTo0, belongTo1 } = this
+    const [v0, v1] = checked
 
     return <div className={styles.fixesContent}>
-      <div className={styles.fixesBox}>
+      {this.step === 1 && <div className={styles.fixesBox}>
         <div className={styles.fixesText}><span>Please select two valid values from all unique values in your target variable</span></div>
         <div className={styles.fixesCheckBox}>
-          {Object.keys(colMap[target]).map((t, i) => {
-            return <div className={styles.fixesCheck} key={i}>
-              <input type='checkbox' value={t} checked={this.checked.includes(t)} onChange={this.check} />
-              <span>{t}</span>
-            </div>
-          })}
+          <div className={styles.targetPercentBox}>
+            {Object.keys(colMap[target]).map((v, k) => {
+              const backgroundColor = (v0 === v && '#9be44b') || (v1 === v && '#adaafc') || '#c4cbd7'
+              return <div className={styles.targetPercentRow} key={k}>
+                <div className={styles.targetPercentCheckBox}>
+                  <input type='checkbox' onChange={this.check} value={v} checked={checked.includes(v)} />
+                </div>
+                <div className={styles.targetPercentLabel}>
+                  <span>{v}</span>
+                </div>
+                <div className={styles.targetPercentValue}>
+                  <div className={styles.targetPercent} style={{ width: '70%', backgroundColor }}></div>
+                </div>
+              </div>
+            })}
+          </div>
         </div>
-      </div>
-      {this.canSave && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>Please map the other values to valid ones if they are equivalent. The rest will be deleted</span></div>
-        <div className={styles.fixesSelectBox}>
-          {Object.keys(colMap[target]).map((t, i) => {
-            if (this.checked.includes(t)) return null;
-            return <div className={styles.fixesSelect} key={i}>
-              <span title={t}>{t}: </span>
-              <select value={this.map[t]} onChange={this.changeBind.bind(null, t)}>
-                <option value="drop">Drop</option>
-                <option value={this.checked[0]}>{this.checked[0]}</option>
-                <option value={this.checked[1]}>{this.checked[1]}</option>
-              </select>
+      </div>}
+      {this.step === 2 && <div className={styles.fixesBox}>
+        <div className={styles.fixesText}><span>Select all values that belong to value1 </span></div>
+        <div className={styles.targetPercentBox}>
+          <div className={styles.targetPercentRow}>
+            <div className={styles.targetPercentLabel}>
+              <span>{checked[0]}</span>
             </div>
-          })}
+            <div className={styles.targetPercentValue}>
+              <div className={styles.targetPercent} style={{ width: '70%', backgroundColor: '#9be44b' }}></div>
+            </div>
+          </div>
+          <div className={styles.fixesCheckBox}>
+            {Object.keys(colMap[target]).filter(v => !checked.includes(v)).map((t, i) => {
+              const disabled = belongTo1.includes(t)
+              return <div className={styles.fixesCheck} key={i}>
+                <input type='checkbox' value={t} id={`belongTo0${t}`} checked={belongTo0.includes(t)} disabled={disabled} onChange={this.handleCheck.bind(null, 0)} />
+                <label className={classnames(styles.fixesCheckBoxLabel, {
+                  [styles.disabledText]: disabled
+                })} htmlFor={`belongTo0${t}`}>{t}</label>
+              </div>
+            })}
+          </div>
+          <div className={styles.fixesTips}></div>
+        </div>
+      </div>}
+      {this.step === 3 && <div className={styles.fixesBox}>
+        <div className={styles.fixesText}><span>Select all values that belong to value2 </span></div>
+        <div className={styles.targetPercentBox}>
+          <div className={styles.targetPercentRow}>
+            <div className={styles.targetPercentLabel}>
+              <span>{this.checked[1]}</span>
+            </div>
+            <div className={styles.targetPercentValue}>
+              <div className={styles.targetPercent} style={{ width: '70%', backgroundColor: '#adaafc' }}></div>
+            </div>
+          </div>
+          <div className={styles.fixesCheckBox}>
+            {Object.keys(colMap[target]).filter(v => !checked.includes(v)).map((t, i) => {
+              const disabled = belongTo0.includes(t)
+              return <div className={styles.fixesCheck} key={i}>
+                <input type='checkbox' value={t} id={`belongTo1${t}`} checked={belongTo1.includes(t)} disabled={disabled} onChange={this.handleCheck.bind(null, 1)} />
+                <label className={classnames(styles.fixesCheckBoxLabel, {
+                  [styles.disabledText]: disabled
+                })} htmlFor={`belongTo1${t}`}>{t}</label>
+              </div>
+            })}
+          </div>
+        </div>
+        <div className={styles.fixesTips}><span>The rest values will be deleted by default</span></div>
+      </div>}
+      {this.step === 4 && <div className={styles.fixesBox}>
+        <div className={classnames(styles.fixesIconBox, styles.center)}>
+          <div className={classnames(styles.cleanHeaderIcon, styles.largeIcon)}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '2.4rem' }} /></div>
+        </div>
+        <div className={classnames(styles.fixesText, styles.center)}><span>Your target variable value is clean now! </span></div>
+        <div className={styles.fixesCheckBox}>
+          <div className={styles.targetPercentBox}>
+            {this.checked.map((v, k) => {
+              const backgroundColor = (checked[0] === v && '#9be44b') || (checked[1] === v && '#adaafc') || '#c4cbd7'
+              return <div className={styles.targetPercentRow} key={k}>
+                <div className={styles.targetPercentCheckBox}>
+                  <input type='checkbox' onChange={this.check} value={v} checked={checked.includes(v)} />
+                </div>
+                <div className={styles.targetPercentLabel}>
+                  <span>{v}</span>
+                </div>
+                <div className={styles.targetPercentValue}>
+                  <div className={styles.targetPercent} style={{ width: '70%', backgroundColor }}></div>
+                </div>
+              </div>
+            })}
+          </div>
+          <div className={styles.fixesTextBottom}>
+            <div className={styles.cleanTargetText}>
+              <span style={{ color: "#d0021b", marginRight: '10px' }}>*</span>
+              <span>Which target value’s results is more important to you?</span>
+            </div>
+            <div className={styles.cleanTargetBox}>
+              {this.checked.map((v, k) => {
+                return <div className={styles.cleanTargetCheck} key={"targetCheck" + k}>
+                  <input type='checkbox' id={`cleanTargetCheck${k}`} />
+                  <label htmlFor={`cleanTargetCheck${k}`}>{v}</label>
+                </div>
+              })}
+            </div>
+          </div>
+        </div>
+      </div>}
+      {this.step === 5 && <div className={styles.fixesBox}>
+        <div className={classnames(styles.fixesIconBox, styles.center)}>
+          <div className={classnames(styles.cleanHeaderIcon, styles.largeIcon)}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '2.4rem' }} /></div>
+        </div>
+        <div className={classnames(styles.fixesText, styles.center)}><span>Your target variable value is clean now! </span></div>
+        <div className={styles.fixesCheckBox}>
+          <div className={styles.targetPercentBox}>
+            {this.checked.map((v, k) => {
+              const backgroundColor = (checked[0] === v && '#9be44b') || (checked[1] === v && '#adaafc') || '#c4cbd7'
+              return <div className={styles.targetPercentRow} key={k}>
+                <div className={styles.targetPercentCheckBox}>
+                  <input type='checkbox' onChange={this.check} value={v} checked={checked.includes(v)} />
+                </div>
+                <div className={styles.targetPercentLabel}>
+                  <span>{v}</span>
+                </div>
+                <div className={styles.targetPercentValue}>
+                  <div className={styles.targetPercent} style={{ width: '70%', backgroundColor }}></div>
+                </div>
+              </div>
+            })}
+          </div>
+          <div className={styles.fixesTextBottom}>
+            <div className={styles.fixesComplete}>
+              <span>Your</span>
+              <span style={{ fontWeight: 'bold' }}>&nbsp;data size meets the standards&nbsp;</span>
+              <span>after fixing data issue.</span>
+              <span>You don't need to upload a new dataset.</span>
+            </div>
+          </div>
         </div>
       </div>}
       <div className={styles.fixesBottom}>
+        <button className={styles.cancel} onClick={this.step > 1 ? this.backStep : closeTarget}><span>{this.step > 1 ? 'Back' : 'Cancel'}</span></button>
         <button className={classnames(styles.save, {
           [styles.disabled]: !this.canSave
-        })} onClick={this.save} disabled={!this.canSave} ><span>save</span></button>
-        <button className={styles.cancel} onClick={closeTarget}><span>cancel</span></button>
+        })} onClick={this.step < 5 ? this.nextStep : this.save} disabled={!this.canSave} ><span>{this.step < 5 ? 'Next' : "Done"}</span></button>
       </div>
     </div>
   }
@@ -310,9 +499,9 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, saveDataFixes } = this.props;
-    const { issueRows, colType, mismatchIndex, nullIndexes, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict } = project
+    const { targetIssues, colType, mismatchIndex, nullIndexes, outlierIndex, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target } = project
     return <div className={styles.fixesContent}>
-      {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
+      {!!targetIssues.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
           <div className={styles.type}>
             <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
@@ -331,11 +520,14 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(mismatchIndex).map((k, i) => {
+              if (k !== target) {
+                return null;
+              }
               const num = mismatchIndex[k].length
               if (!num) {
                 return null;
               }
-              const rowText = `${num} ${mismatchFillMethod.hasOwnProperty(k) ? ' row'+(num===1?'':"s")+' will be ' + (mismatchFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
+              const rowText = `${num} ${mismatchFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (mismatchFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>{colType[k]}</span></div>
@@ -363,7 +555,7 @@ export class FixIssue extends Component {
           </div>
         </div>
       </div>}
-      {!!issueRows.nullRow.length && <div className={styles.fixesArea}>
+      {!!targetIssues.nullRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
           <div className={styles.type}>
             <div className={classnames(styles.typeBlock, styles.missing)}></div>
@@ -383,11 +575,14 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(nullIndexes).map((k, i) => {
+              if (k !== target) {
+                return null;
+              }
               const num = nullIndexes[k].length
               if (!num) {
                 return null;
               }
-              const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row'+(num===1?'':"s")+' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
+              const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>I don`t know</span></div>
@@ -416,7 +611,7 @@ export class FixIssue extends Component {
           </div>
         </div>
       </div>}
-      {!!issueRows.outlierRow.length && <div className={styles.fixesArea}>
+      {!!targetIssues.outlierRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
           <div className={styles.type}>
             <div className={classnames(styles.typeBlock, styles.outlier)}></div>
@@ -435,13 +630,16 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(outlierIndex).map((k, i) => {
+              if (k !== target) {
+                return null;
+              }
               const num = outlierIndex[k].length
               if (!num) {
                 return null;
               }
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const isShow = colType[k] === 'Numerical';
-              const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row'+(num===1?'':"s")+' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
+              const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return isShow && <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>

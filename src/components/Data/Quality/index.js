@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { ContinueButton, ProjectLoading, Modal, EtlLoading } from 'components/Common';
 import { when, observable } from 'mobx';
-import { TargetIssue, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
+import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 
 @observer
 export default class DataQuality extends Component {
@@ -70,13 +70,13 @@ export default class DataQuality extends Component {
 
   render() {
     const { project } = this.props;
-    const { issues, uploadData, cleanData, target, targetMap, colType, colMap, rawHeader, mismatchIndex, nullIndexes, outlierIndex, problemType, totalLines, issueRows, totalRawLines, etling, etlProgress } = project;
+    const { issues, uploadData, cleanData, target, targetMap, colType, colMap, rawHeader, mismatchIndex, nullIndexes, outlierIndex, problemType, totalLines, targetIssues, totalRawLines, etling, etlProgress } = project;
     const targetIndex = rawHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? '2' : '10+';
     const percent = {
-      missing: issueRows.nullRow.length * 100 / (totalRawLines || 1),
-      mismatch: issueRows.mismatchRow.length * 100 / (totalRawLines || 1),
-      outlier: issueRows.outlierRow.length * 100 / (totalRawLines || 1),
+      missing: targetIssues.nullRow.length * 100 / (totalRawLines || 1),
+      mismatch: targetIssues.mismatchRow.length * 100 / (totalRawLines || 1),
+      outlier: targetIssues.outlierRow.length * 100 / (totalRawLines || 1),
     }
     const targetPercent = {
       missing: (nullIndexes[target] ? nullIndexes[target].length : 0) * 100 / (totalRawLines || 1),
@@ -84,27 +84,12 @@ export default class DataQuality extends Component {
       outlier: colType[target] === 'Numerical' ? outlierIndex[target].length * 100 / (totalRawLines || 1) : 0,
     }
     const hasCleanData = !!cleanData.length
-    let num = 0;
-    let arr = [];
-    if (issues.targetIssue) {
-      const unique = colType[target] === 'Categorical' ? Object.keys(colMap[target]).length : 10;
-      arr.push(<TargetIssue num={num} backToConnect={this.backToConnect} backToSchema={this.backToSchema} editTarget={this.editTarget} unique={unique} recomm={recomm} key={num} />);
-      num++;
-    }
-    if (issues.rowIssue) {
-      arr.push(<RowIssue num={num} backToConnect={this.backToConnect} totalRawLines={totalRawLines} key={num} />);
-      num++;
-    }
-    if (issues.dataIssue) {
-      arr.push(<DataIssue num={num} backToConnect={this.backToConnect} editFixes={this.editFixes} issueRows={issueRows} totalLines={totalLines} percent={percent} key={num} />);
-      num++;
-    }
 
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.targetIssue || issues.rowIssue || issues.dataIssue) ?
           <div className={styles.issueTitle}><span>Issue Found!</span></div> :
-          <div className={styles.cleanTitle}><span>No data issues were detected in your target variable!</span></div>}
+          <div className={styles.cleanTitle}><span>Target variable quality looks good!</span></div>}
         <div className={styles.issueBox}>
           {issues.targetIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
@@ -118,21 +103,25 @@ export default class DataQuality extends Component {
             <div className={styles.point}></div>
             <span>Some data issues are found. R2 Learn will fix them automatically, you can also fix them by clicking the colored cell.</span>
           </div>}
+          {(!issues.targetIssue && !issues.rowIssue && !issues.dataIssue) && <div className={styles.issueText}>
+            <div className={styles.point}></div>
+            <span>Please choose set the major variable and minor variable.</span>
+          </div>}
         </div>
       </div>
       <div className={styles.typeBox}>
-        <div className={styles.type}>
+        {!!targetIssues.mismatchRow.length && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
           <span>Data Type Mismatch</span>
-        </div>
-        <div className={styles.type}>
+        </div>}
+        {!!targetIssues.nullRow.length && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
           <span>Missing Value</span>
-        </div>
-        <div className={styles.type}>
+        </div>}
+        {!!targetIssues.outlierRow.length && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
           <span>Outlier</span>
-        </div>
+        </div>}
       </div>
       <div className={styles.contentBox}>
         <div className={styles.list}>
@@ -157,10 +146,14 @@ export default class DataQuality extends Component {
               )}
             </div>
           </div>
-          <ContinueButton onClick={this.startTrain} text='continue' width="100%" />
+          <ContinueButton onClick={this.startTrain} disabled={issues.targetIssue} text='continue' width="100%" />
         </div>
         <div className={styles.content}>
-          {arr}
+          {problemType === 'Classification' ?
+            <ClassificationTarget project={project} backToConnect={this.backToConnect} backToSchema={this.backToSchema} editTarget={this.editTarget} /> :
+            <RegressionTarget backToConnect={this.backToConnect} backToSchema={this.backToSchema} hasIssue={issues.targetIssue} unique={10} recomm={recomm} />}
+          {issues.rowIssue && <RowIssue backToConnect={this.backToConnect} totalRawLines={totalRawLines} />}
+          {issues.dataIssue && <DataIssue backToConnect={this.backToConnect} editFixes={this.editFixes} targetIssues={targetIssues} totalLines={totalLines} percent={percent} />}
         </div>
       </div>
       {this.isLoad && <ProjectLoading />}
@@ -173,11 +166,10 @@ export default class DataQuality extends Component {
       />
       <Modal content={<SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes} />}
         visible={this.edit}
-        width='12em'
+        width='5.5em'
         title='How R2 Learn Will Fix the Issues'
         onClose={this.closeTarget}
       />
     </div>
   }
 }
-
