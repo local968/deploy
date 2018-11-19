@@ -74,7 +74,7 @@ export default class Project {
   @observable mismatchFillMethod = {}
   @observable mismatchIndex = {}
   @observable nullFillMethod = {}
-  @observable nullIndexes = {}
+  @observable nullIndex = {}
   @observable outlierFillMethod = {}
   @observable outlierIndex = {}
   @observable outlierDict = {}
@@ -159,7 +159,7 @@ export default class Project {
       mismatchFillMethod: {},
       mismatchIndex: {},
       nullFillMethod: {},
-      nullIndexes: {},
+      nullIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
       dataViews: null,
@@ -416,20 +416,15 @@ export default class Project {
     const data = {
       rowIssue: false,
       dataIssue: false,
-      targetIssue: false
+      targetIssue: false,
+      targetRowIssue: false
     }
-    const { problemType, totalRawLines, target, colMap, targetIssues, colType } = this;
+    const { problemType, totalRawLines, targetColMap, issueRows, targetIssues } = this;
 
     if (problemType === "Classification") {
-      if (colType[target] === 'Categorical') {
-        data.targetIssue = this.targetArray.length < 2 && Object.keys(colMap[target]).length > 2;
-      } else {
-        data.targetIssue = true
-      }
+      data.targetIssue = this.targetArray.length < 2 && Object.keys(targetColMap).length > 2;
     } else {
-      if (colType[target] === 'Categorical') {
-        data.targetIssue = Object.keys(colMap[target]).length < 10;
-      }
+      data.targetIssue = Object.keys(targetColMap).length < 10;
     }
 
     if (totalRawLines < 1000) {
@@ -437,10 +432,48 @@ export default class Project {
     }
 
     if (targetIssues.errorRow.length) {
+      data.targetRowIssue = true
+    }
+
+    if (issueRows.errorRow.length) {
       data.dataIssue = true
     }
 
     return data
+  }
+
+  @computed
+  get variableIssues() {
+    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType, totalRawLines } = this;
+    const obj = {
+      mismatchRow: {},
+      nullRow: {},
+      outlierRow: {}
+    }
+
+    dataHeader.forEach(h => {
+      if (colType[h] !== "Categorical" && mismatchIndex[h] && !!mismatchIndex[h].length) {
+        obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchIndex[h].length || 0) / (totalRawLines || 1) * 100 })
+      }
+      if (nullIndex[h] && !!nullIndex[h].length) {
+        obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullIndex[h].length || 0) / (totalRawLines || 1) * 100 })
+      }
+      if (colType[h] !== "Categorical" && outlierIndex[h] && !!outlierIndex[h].length) {
+        obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierIndex[h].length || 0) / (totalRawLines || 1) * 100 })
+      }
+    })
+    return obj
+  }
+
+  @computed
+  get targetColMap() {
+    const { colValueCounts, target } = this
+    let n = 0
+    const array = Object.entries(colValueCounts[target] || {}).sort((a, b) => b[1] - a[1]) || []
+    const map = array.reduce((start, [k]) => {
+      return Object.assign(start, { [k]: n++ })
+    }, {})
+    return map
   }
 
   parseChartData(result) {
@@ -482,10 +515,10 @@ export default class Project {
 
   @computed
   get targetIssues() {
-    const { target, mismatchIndex, nullIndexes, outlierIndex, colType } = this;
+    const { target, mismatchIndex, nullIndex, outlierIndex, colType } = this;
     const arr = {
-      mismatchRow: mismatchIndex[target] || [],
-      nullRow: nullIndexes[target] || [],
+      mismatchRow: colType[target] !== "Categorical" ? mismatchIndex[target] : [],
+      nullRow: nullIndex[target] || [],
       outlierRow: colType[target] !== "Categorical" ? (outlierIndex[target] || []) : [],
     }
 
@@ -495,7 +528,7 @@ export default class Project {
 
   @computed
   get issueRows() {
-    const { dataHeader, mismatchIndex, nullIndexes, outlierIndex, colType } = this;
+    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType } = this;
     const arr = {
       mismatchRow: [],
       nullRow: [],
@@ -504,13 +537,13 @@ export default class Project {
     }
 
     dataHeader.forEach(h => {
-      if (mismatchIndex[h] && !!mismatchIndex[h].length) {
+      if (colType[h] !== "Categorical" && mismatchIndex[h] && !!mismatchIndex[h].length) {
         arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
         arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));
       }
-      if (nullIndexes[h] && !!nullIndexes[h].length) {
-        arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndexes[h]])));
-        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndexes[h]])));
+      if (nullIndex[h] && !!nullIndex[h].length) {
+        arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndex[h]])));
+        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndex[h]])));
       }
       if (colType[h] !== "Categorical" && outlierIndex[h] && !!outlierIndex[h].length) {
         arr.outlierRow = Array.from(new Set(arr.outlierRow.concat([...outlierIndex[h]])));
@@ -675,7 +708,7 @@ export default class Project {
   @action
   fixTarget = () => {
     this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp })
-    this.etl();
+    // this.etl();
   }
 
   @action
@@ -686,7 +719,7 @@ export default class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethod),
       outlierFillMethod: toJS(this.outlierFillMethod)
     })
-    this.etl();
+    // this.etl();
   }
 
   @action
@@ -880,7 +913,7 @@ export default class Project {
     this.train2ing = true
     this.isAbort = false
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
-      if(this.isAbort) return
+      if (this.isAbort) return
       if (progressResult.name === "progress") {
         if (progressResult.trainId) this.trainingId = progressResult.trainId
         if (!progressResult.model) return
@@ -974,8 +1007,8 @@ export default class Project {
   // }
 
   calcPredicted = model => {
-    const { targetMap, colMap, target } = this;
-    const targetCol = colMap ? colMap[target] : {}
+    const { targetMap, targetColMap } = this;
+    const targetCol = targetColMap
     const map = Object.assign({}, targetCol, targetMap);
     let actual = [[0, 0], [0, 0]]
     Object.keys(model.targetMap).forEach(k => {

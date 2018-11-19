@@ -113,21 +113,26 @@ export default class DataSchema extends Component {
             target={target}
             colType={colType}
             rawHeader={rawHeader}
+            dataHeader={rawHeader}
             temp={temp}
             checkList={this.checkList}
             showSelect={this.showSelect}
             columnWidth={110}
             rowHeight={34}
+            columnCount={rawHeader.length + 1}
+            rowCount={uploadData.length + (this.showSelect ? 3 : 2)}
             fixedColumnCount={1}
             fixedRowCount={this.showSelect ? 3 : 2}
             checked={this.checked}
-            select={this.select} />
+            select={this.select}
+            indexPosition='left'
+            showTarget={true} />
         </div>
       </div>
       <div className={styles.bottom}>
         <ContinueButton onClick={this.doEtl} disabled={etling || !target} text="Continue" />
-        <div className={styles.checkBox}><input type='checkbox' onChange={this.checkNoCompute} checked={noComputeTemp} />
-          <span>Skip Data Quality Check</span>
+        <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
+          <label htmlFor='noCompute'>Skip Data Quality Check</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
         </div>
       </div>
