@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import VariableImpact from "./VariableImpact"
+import PredictVActual from './PredictVActual';
 import { Tooltip } from 'antd';
 
 @observer
@@ -34,8 +35,9 @@ export default class RegressionView extends Component {
           <div className={styles.row}>
             <span>Target :<a>&nbsp;{project.target}</a></span>
           </div>
+          <Performance current={current} />
         </div>
-        <Performance current={current} />
+        <PredictVActual model={current} project={project} />
       </div>
       <div className={styles.line} />
       {/* <div className={styles.selectBlock}>
