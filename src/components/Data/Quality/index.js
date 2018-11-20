@@ -387,9 +387,9 @@ class Summary extends Component {
     const arc = d3.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-    const { totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts } = this.props.project
+    const { totalRawLines, totalLines, totalMismatchLines, totalNullLines, totalOutlierLines } = this.props.project
     const deleteRows = totalRawLines - totalLines
-    const fixedRows = nullLineCounts + mismatchLineCounts + outlierLineCounts
+    const fixedRows = totalMismatchLines + totalNullLines + totalOutlierLines
     const cleanRows = totalLines - fixedRows
     const data = [deleteRows, fixedRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
@@ -414,10 +414,10 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalMismatchLines, totalNullLines, totalOutlierLines } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
-    const fixedPercent = (nullLineCounts + mismatchLineCounts + outlierLineCounts) / totalRawLines * 100
-    const cleanPercent = (totalLines - (nullLineCounts + mismatchLineCounts + outlierLineCounts)) / totalRawLines * 100
+    const fixedPercent = (totalMismatchLines + totalNullLines + totalOutlierLines) / totalRawLines * 100
+    const cleanPercent = (totalLines - (totalMismatchLines + totalNullLines + totalOutlierLines)) / totalRawLines * 100
     const variableList = sortHeader.slice(1)
     const percentList = sortHeader.map(v => {
       const percent = {

@@ -413,7 +413,7 @@ wss.register('etl', (message, socket, progress) => {
         result.firstEtl = false;
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
-        if (result.totalLines < 10000) result.runWith = 'cross'
+        if (result.totalLines && result.totalLines < 10000) result.runWith = 'cross'
 
         const steps = {}
         // if (firstEtl) {
@@ -469,9 +469,7 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
     promise.push(updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel))
   }
   return Promise.all(promise).then(([result1, result2]) => {
-    const aaa = Object.assign({}, returnValue, result1.result, result2.result )
-    console.log(aaa)
-    return aaa
+    return Object.assign({}, returnValue, result1.result, result2.result)
   })
 }))
 
@@ -529,10 +527,10 @@ wss.register('abortTrain', (message, socket) => {
       trainModel: null
     }
     if (isLoading) {
-      statusData.mainStep = 3,
-        statusData.curStep = 3,
-        statusData.lastSubStep = 1,
-        statusData.subStepActive = 1
+      statusData.mainStep = 3
+      statusData.curStep = 3
+      statusData.lastSubStep = 1
+      statusData.subStepActive = 1
     }
     return createOrUpdate(projectId, userId, statusData)
   })
