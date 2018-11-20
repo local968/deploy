@@ -32,7 +32,8 @@ export default class DataSchema extends Component {
 
   targetSelect = (value) => {
     this.props.project.updateProject({
-      target: value
+      target: value,
+      colType: this.props.project.colType
     }).then(() => this.refs.table.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
   }
