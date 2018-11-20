@@ -173,12 +173,9 @@ class TargetIssue extends Component {
             totalRawLines={totalRawLines} />}
           {issues.targetRowIssue && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
-            issues={targetIssues}
+            targetIssues={targetIssues}
             totalLines={totalLines}
-            percent={percent}
-            mismatchIndex={{ [target]: mismatchIndex[target] }}
-            nullIndex={{ [target]: mismatchIndex[target] }}
-            outlierIndex={{ [target]: mismatchIndex[target] }} />}
+            percent={percent} />}
         </div>
         {this.isLoad && <ProjectLoading />}
         <Modal content={<FixIssue project={project}
