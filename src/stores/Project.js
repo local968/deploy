@@ -91,6 +91,12 @@ export default class Project {
   @observable expression = {}
   @observable informativesLabel = []
   @observable colValueCounts = {}
+  @observable totalNullLines = 0
+  @observable totalMismatchLines = 0
+  @observable totalOutlierLines = 0
+  @observable nullLineCounts = {}
+  @observable mismatchLineCounts = {}
+  @observable outlierLineCounts = {}
 
   //not save
   @observable targetMapTemp = {};
@@ -179,7 +185,13 @@ export default class Project {
       dataViews: null,
       outlierDict: {},
       targetMap: {},
-      targetArray: []
+      targetArray: [],
+      totalNullLines: 0,
+      totalMismatchLines: 0,
+      totalOutlierLines: 0,
+      nullLineCounts: {},
+      mismatchLineCounts: {},
+      outlierLineCounts: {}
     }
   }
 
