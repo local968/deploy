@@ -7,6 +7,7 @@ import Data from 'components/Data';
 import Modeling from 'components/Modeling';
 import { ProjectLoading, Confirm } from 'components/Common';
 import { message } from 'antd';
+import styles from './styles.module.css';
 
 @inject('userStore', 'projectStore', 'routing')
 @observer
@@ -67,6 +68,16 @@ export default class Main extends Component {
   render() {
     const { project, conflict, notExit } = this.props.projectStore
     return <React.Fragment>
+      <div className={styles.header}>
+        {project && project.name && <div className={styles.projectName}>
+          <span className={styles.label}>Project: </span>
+          <span className={styles.value}> {project.name}</span>
+        </div>}
+        {project && project.fileName && <div className={styles.dataset}>
+          <span className={styles.label}>Dataset: </span>
+          <span className={styles.value}> {project.fileName}</span>
+        </div>}
+      </div>
       {!project ? <ProjectLoading /> : this.getChild()}
       {<Confirm
         width="6em"

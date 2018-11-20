@@ -106,7 +106,7 @@ export default class List extends Component {
                             .schedule.result.score &&
                           s.schedule.result.score.auc.toFixed(2)}`
                           : `RMSE:${s.schedule.result.score &&
-                          s.schedule.result.score.nrmse.toFixed(2)} R²:${s
+                          s.schedule.result.score.rmse.toFixed(2)} R²:${s
                             .schedule.result.score &&
                           s.schedule.result.score.r2.toFixed(2)}`)}
                     </span>

@@ -1,0 +1,18 @@
+.header {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.projectName,
+.dataset {
+  margin: 0 2rem;
+  font-size: 1rem;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.value {
+}

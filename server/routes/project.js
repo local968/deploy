@@ -212,6 +212,7 @@ function getFileInfo(files) {
     if (error) return error
     const csvLocation = []
     const ext = []
+    const fileNames = []
     for (let n = 0; n < list.length; n++) {
       let file = list[n][1]
       if (!file) continue;
@@ -219,6 +220,7 @@ function getFileInfo(files) {
         file = JSON.parse(file)
       } catch (e) { }
       if (!file.path || !file.name) continue
+      fileNames.push(file.name)
       csvLocation.push(file.path)
       const fileext = file.name.split(".").pop()
       ext.push("." + fileext)
@@ -228,7 +230,8 @@ function getFileInfo(files) {
       status: 200,
       message: "ok",
       csvLocation,
-      ext
+      ext,
+      fileNames
     }
   })
 }
@@ -606,3 +609,7 @@ function mapObjectToArray(obj) {
   })
   return arr
 }
+
+wss.register('getFiles', (message, socket) => {
+  return getFileInfo(message.files)
+})

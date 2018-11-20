@@ -1,4 +1,4 @@
-import { observable, action, computed, toJS, when } from "mobx";
+import { observable, action, computed, toJS, when, autorun } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
@@ -67,6 +67,7 @@ export default class Project {
   @observable validationRate = 20;
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
+  @observable fileName = '';
   @observable cleanData = []
 
   @observable noComputeTemp = false;
@@ -133,6 +134,14 @@ export default class Project {
   constructor(id, args) {
     this.id = id
     this.setProperty(args)
+
+    autorun(async () => {
+      if (this.uploadFileName.length === 0) return
+      const api = await socketStore.ready()
+      const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
+      this.fileName = fileNames[0]
+      return
+    })
   }
 
   @computed
