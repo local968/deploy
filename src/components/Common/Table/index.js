@@ -12,12 +12,12 @@ export default class Table extends Component {
   }
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-    const { checkList, showSelect, target, colType, temp, uploadData, rawHeader, dataHeader, select, indexPosition, showTarget, showIssue, issues, issueIndex } = this.props;
-    // const { uploadData, target, colType, rawHeader, headerTemp: {temp} } = this.props.project;
+    const { checkList, showSelect, target, colType, temp, sortData, sortHeader, dataHeader, select, indexPosition, showIssue, issues, issueIndex, targetStyle } = this.props;
+    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     const headerList = [...dataHeader]
-    const notShowIndex = rawHeader.filter(v => !dataHeader.includes(v)).map(v => rawHeader.indexOf(v))
-    const data = uploadData.map(row => {
+    const notShowIndex = sortHeader.filter(v => !dataHeader.includes(v)).map(v => sortHeader.indexOf(v))
+    const data = sortData.map(row => {
       notShowIndex.forEach(i => row.splice(i, 1))
       return row
     })
@@ -56,8 +56,8 @@ export default class Table extends Component {
         content = <span>{realColumn + 1}</span>;
         title = realColumn + 1;
       }
-      if (showTarget && target && target === header) {
-        cn = classnames(cn, styles.target);
+      if (target && target === header) {
+        cn = classnames(cn, targetStyle);
       }
       //勾选框行
     } else if (rowIndex === index.checkRow) {
@@ -68,7 +68,7 @@ export default class Table extends Component {
       } else {
         content = <Checkbox onChange={this.checked.bind(null, header)} checked={true}></Checkbox>
         if (target && target === header) {
-          cn = classnames(styles.check, styles.target);
+          cn = classnames(styles.check, targetStyle);
           content = "";
         }
         if (checkList.includes(header)) {
@@ -85,8 +85,8 @@ export default class Table extends Component {
       } else {
         content = <span>{header}</span>;
         title = header;
-        if (showTarget && target && target === header) {
-          cn = classnames(cn, styles.target);
+        if (target && target === header) {
+          cn = classnames(cn, targetStyle);
         }
         if (checkList.includes(header)) {
           cn = classnames(cn, styles.checked);
@@ -114,13 +114,14 @@ export default class Table extends Component {
           const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
           key = header + suffix
         }
-        if (showTarget && target && target === header) {
-          cn = classnames(cn, styles.target);
+        if (target && target === header) {
+          cn = classnames(cn, targetStyle);
         }
         content = select ? <select value={colType[key]} onChange={this.select.bind(null, key)}>
           <option value="Categorical">Categorical</option>
           <option value="Numerical">Numerical</option>
         </select> : <span>{colType[key]}</span>
+        title = colType[key]
       }
       //issue 行
     } else if (rowIndex === index.issueRow) {
@@ -139,8 +140,8 @@ export default class Table extends Component {
           const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
           key = header + suffix
         }
-        if (showTarget && target && target === header) {
-          cn = classnames(cn, styles.target);
+        if (target && target === header) {
+          cn = classnames(cn, targetStyle);
         }
         if (issues.mismatchRow[key]) {
           content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + key}><span>{issues.mismatchRow[key].toFixed(2)}%</span></div>)
@@ -163,8 +164,8 @@ export default class Table extends Component {
       } else {
         content = <span>{data[realRow][realColumn]}</span>;
         title = data[realRow][realColumn];
-        if (showTarget && target && target === header) {
-          cn = classnames(cn, styles.target);
+        if (target && target === header) {
+          cn = classnames(cn, targetStyle);
         }
         if (checkList.includes(header)) {
           cn = classnames(cn, styles.checked);

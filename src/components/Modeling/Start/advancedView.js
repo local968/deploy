@@ -169,11 +169,11 @@ export default class AdvancedView extends Component {
   })
 
   render() {
-    const { advancedName, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, rawHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
+    const { advancedName, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
-    const customFieldList = rawHeader.filter(v => colType[v] === "Numerical")
+    const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
     const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
 
     return <div className={styles.advanced}>
@@ -477,7 +477,7 @@ class CustomRange extends Component {
   handleSlider = value => {
     const [minValue, maxValue] = value
     const { dataViews, customField } = this.props
-    const data = customField ? dataViews[customField] : {}
+    const data = customField ? (dataViews[customField] || {}) : {}
     const min = data.min || 0
     const max = data.max || 0
     const total = max - min || 1
@@ -486,7 +486,7 @@ class CustomRange extends Component {
 
   render() {
     const { dataViews, customRange, customFieldList, customField } = this.props
-    const data = customField ? dataViews[customField] : {}
+    const data = customField ? (dataViews[customField] || {}) : {}
     const min = data.min || 0
     const max = data.max || 0
     const total = max - min || 1

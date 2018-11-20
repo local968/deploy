@@ -21,6 +21,15 @@
     padding-top: 3px;
 }
 
+.titleCell span{
+    font-size: 0.875rem;
+    overflow: hidden;
+    padding: 0.5em 0;
+    white-space: nowrap;
+    text-decoration: none;
+    text-overflow: ellipsis;
+}
+
 .cell span{
     font-size: 0.875rem;
     overflow: hidden;
@@ -40,10 +49,6 @@
     white-space: nowrap;
     text-decoration: none;
     text-overflow: ellipsis;
-}
-
-.target {
-    background-color: #daefe4;
 }
 
 .check {

@@ -9,32 +9,36 @@ import { Select, ContinueButton, EtlLoading, Table } from 'components/Common';
 
 @observer
 export default class DataSchema extends Component {
-  @observable checkList = this.props.project.rawHeader.filter(r => !this.props.project.dataHeader.includes(r))
+  @observable checkList = this.props.project.sortHeader.filter(r => !this.props.project.dataHeader.includes(r))
   @observable showSelect = false
 
   doEtl = () => {
-    const { colType, rawHeader, noComputeTemp } = this.props.project;
-    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
+    const { sortHeader, noComputeTemp } = this.props.project;
+    const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
     this.props.project.updateProject({
       dataHeader: newDataHeader,
-      colType: colType,
       noCompute: noComputeTemp,
       cleanData: [],
       targetMap: {},
       targetArray: [],
       outlierDict: {},
       nullFillMethod: {},
-      mismatchFillMethod: {},
-      outlierFillMethod: {}
-    });
-    this.props.project.etl();
+      mismatchFillMethod: {}
+    }).then(() => this.props.project.etl())
   }
 
   targetSelect = (value) => {
-    this.props.project.updateProject({
+    const { colType } = this.props.project
+    const data = {
       target: value,
-      colType: this.props.project.colType
-    }).then(() => this.refs.table.updateGrids())
+      colType,
+      outlierFillMethod: {}
+    }
+    // 回归默认设置为drop
+    if (value && colType[value] === 'Numerical') {
+      data.outlierFillMethod = { [value]: 'drop' }
+    }
+    this.props.project.updateProject(data).then(() => this.refs.table.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
   }
 
@@ -60,11 +64,11 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props;
-    const { etling, etlProgress, uploadData, rawHeader, problemType, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, sortData, sortHeader, problemType, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
     const targetOption = {};
 
     //target选择列表
-    rawHeader.forEach(h => {
+    sortHeader.forEach(h => {
       h = h.trim()
       if (problemType === "Classification" && colType[h] === "Categorical") targetOption[h] = h
       if (problemType === "Regression" && colType[h] === "Numerical") targetOption[h] = h
@@ -111,24 +115,24 @@ export default class DataSchema extends Component {
         <div className={styles.content}>
           <Table
             ref="table"
-            uploadData={uploadData}
+            sortData={sortData}
             target={target}
             colType={colType}
-            rawHeader={rawHeader}
-            dataHeader={rawHeader}
+            sortHeader={sortHeader}
+            dataHeader={sortHeader}
             temp={temp}
             checkList={this.checkList}
             showSelect={this.showSelect}
             columnWidth={110}
             rowHeight={34}
-            columnCount={rawHeader.length + 1}
-            rowCount={uploadData.length + (this.showSelect ? 3 : 2)}
+            columnCount={sortHeader.length + 1}
+            rowCount={sortData.length + (this.showSelect ? 3 : 2)}
             fixedColumnCount={1}
             fixedRowCount={this.showSelect ? 3 : 2}
             checked={this.checked}
             select={this.select}
-            indexPosition='left'
-            showTarget={true} />
+            indexPosition='left' 
+            targetStyle={styles.target}/>
         </div>
       </div>
       <div className={styles.bottom}>

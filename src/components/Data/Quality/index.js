@@ -6,6 +6,7 @@ import { ContinueButton, ProjectLoading, Modal, EtlLoading, Table } from 'compon
 import { when, observable } from 'mobx';
 import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
+import * as d3 from 'd3';
 
 @observer
 export default class DataQuality extends Component {
@@ -82,8 +83,8 @@ class TargetIssue extends Component {
 
   render() {
     const { project, next } = this.props;
-    const { issues, uploadData, target, colType, rawHeader, mismatchIndex, nullIndex, outlierIndex, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress } = project;
-    const targetIndex = rawHeader.findIndex(h => h === target);
+    const { issues, sortData, target, colType, sortHeader, mismatchIndex, nullIndex, outlierIndex, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress } = project;
+    const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? '2' : '10+';
     const percent = {
       missing: targetIssues.nullRow.length * 100 / (totalRawLines || 1),
@@ -146,7 +147,7 @@ class TargetIssue extends Component {
               {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier.toFixed(2)}%</span></div>}
             </div>
             <div className={styles.tableBody}>
-              {uploadData.map((v, k) => <div key={k} className={classnames(styles.cell, {
+              {sortData.map((v, k) => <div key={k} className={classnames(styles.cell, {
                 [styles.mismatch]: targetIssues.mismatchRow.includes(k),
                 [styles.missing]: targetIssues.nullRow.includes(k),
                 [styles.outlier]: targetIssues.outlierRow.includes(k)
@@ -188,12 +189,16 @@ class TargetIssue extends Component {
           width='12em'
           title='How R2 Learn Will Fix the Issues'
           onClose={this.closeFixes}
+          closeByMask={true}
+          showClose={true}
         />
         <Modal content={<SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes} />}
           visible={this.edit}
           width='5.5em'
           title='How R2 Learn Will Fix the Issues'
           onClose={this.closeTarget}
+          closeByMask={true}
+          showClose={true}
         />
       </div>
       {etling && <EtlLoading progress={etlProgress} />}
@@ -204,11 +209,7 @@ class TargetIssue extends Component {
 @observer
 class VariableIssue extends Component {
   @observable visible = false
-
-  startTrain = () => {
-    const { project } = this.props;
-    project.updateProject(project.nextMainStep(3))
-  }
+  @observable summary = false
 
   handleCheck = e => {
     const checked = e.target.checked
@@ -220,6 +221,7 @@ class VariableIssue extends Component {
   }
 
   editFixes = () => {
+    this.closeSummary()
     if (this.props.project.dataViews) {
       this.visible = true
     } else {
@@ -242,6 +244,14 @@ class VariableIssue extends Component {
     this.visible = false
   }
 
+  showSummary = () => {
+    this.summary = true
+  }
+
+  closeSummary = () => {
+    this.summary = false
+  }
+
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
     message.info('Thank you for fixing the issues below. The changes will be applied at training section')
@@ -250,7 +260,7 @@ class VariableIssue extends Component {
 
   render() {
     const { project } = this.props;
-    const { issues, issueRows, uploadData, target, colType, rawHeader, dataHeader, headerTemp: { temp, isMissed, isDuplicated }, variableIssues, nullIndex, mismatchIndex, outlierIndex, etling, etlProgress } = project;
+    const { issues, issueRows, sortData, target, colType, sortHeader, dataHeader, headerTemp: { temp, isMissed, isDuplicated }, variableIssues, nullIndex, mismatchIndex, outlierIndex, etling, etlProgress } = project;
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
@@ -268,7 +278,7 @@ class VariableIssue extends Component {
             <div className={styles.point}></div>
             <span className={styles.limitText}>Some data issues are found. You can fix them by cleck the coloured cell, or we will fix them and generate a new dataset automatically.</span>
             <div className={styles.button} onClick={this.editFixes}>
-              <button><span>How R2.Learn Will Fix The Issues</span></button>
+              <button><span>Edit The Fixes</span></button>
             </div>
           </div>}
           {(!issues.rowIssue && !issues.dataIssue) && <div className={styles.issueText}>
@@ -294,10 +304,10 @@ class VariableIssue extends Component {
       <div className={styles.variableIssue}>
         <div className={styles.contentBox}>
           <Table
-            uploadData={uploadData}
+            sortData={sortData}
             target={target}
             colType={colType}
-            rawHeader={rawHeader}
+            sortHeader={sortHeader}
             dataHeader={dataHeader}
             temp={temp}
             checkList={[]}
@@ -305,19 +315,20 @@ class VariableIssue extends Component {
             columnWidth={110}
             rowHeight={34}
             columnCount={dataHeader.length}
-            rowCount={uploadData.length + 4}
+            rowCount={sortData.length + 4}
             fixedColumnCount={0}
-            fixedRowCount={3}
+            fixedRowCount={4}
             checked={null}
             select={null}
             indexPosition='top'
             showIssue={true}
             issues={variableIssues}
             issueIndex={{ nullIndex: { ...nullIndex }, mismatchIndex: { ...mismatchIndex }, outlierIndex: { ...outlierIndex } }}
+            targetStyle={styles.targetCell}
           />
         </div>
         <div className={styles.variableBottom}>
-          <ContinueButton onClick={this.startTrain} text='continue' width="15%" />
+          <ContinueButton onClick={this.showSummary} text='continue' width="15%" />
           <div className={styles.checkBox}>
             <input type='checkbox' onChange={this.handleCheck} defaultChecked={false} id="ignoreIssue" />
             <label htmlFor='ignoreIssue'>Ignore these issues<span>(R2.Learn will not fix the issues automatically)</span></label>
@@ -335,7 +346,196 @@ class VariableIssue extends Component {
         width='12em'
         title='How R2 Learn Will Fix the Issues'
         onClose={this.closeFixes}
+        closeByMask={true}
+        showClose={true}
       />
+      <Modal content={<Summary project={project}
+        editFixes={this.editFixes}/>}
+        visible={this.summary}
+        width='12em'
+        title='How R2 Learn Will Fix the Issues'
+        onClose={this.closeSummary}
+        closeByMask={true}
+        showClose={true}
+      />
+    </div>
+  }
+}
+
+@observer
+class Summary extends Component {
+  componentDidMount() {
+    this.renderD3()
+  }
+
+  backToConnect = () => {
+    const { updateProject, nextSubStep } = this.props.project
+    updateProject(nextSubStep(1, 2))
+  }
+
+  startTrain = () => {
+    const { project } = this.props;
+    project.updateProject(project.nextMainStep(3))
+  }
+
+  renderD3 = () => {
+    d3.select(`.${styles.summaryChart} svg`).remove();
+
+    const outerRadius = 60;           // 外半径
+    const innerRadius = 0;             // 内半径
+
+    //弧生成器
+    const arc = d3.arc()
+      .innerRadius(innerRadius)
+      .outerRadius(outerRadius)
+
+    const data = [30, 30, 40]
+    const color = ['#9cebff', '#c4cbd7', '#00c855'];
+    const dataset = d3.pie()(data);
+
+    const svg = d3.select(`.${styles.summaryChart}`)
+      .append("svg")
+      .attr("width", 120)
+      .attr("height", 120)
+
+    svg.selectAll(`g`)
+      .data(dataset)
+      .enter()
+      .append("g")
+      .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")")
+      .append("path")
+      .attr("fill", (d, i) => color[i])
+      .attr("d", (d) => {
+        return arc(d);   //调用弧生成器，得到路径值
+      });
+  }
+
+  render() {
+    const { project, editFixes } = this.props;
+    const { target, sortHeader } = project
+    return <div className={styles.summary}>
+      <div className={styles.summaryLeft}>
+        <div className={styles.summaryTitle}><span>Your data summary</span></div>
+        <div className={styles.summaryTypeBox}>
+          <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
+            <span>Clean Data</span>
+          </div>
+          <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }}></div>
+            <span>Data Type Mismatch</span>
+          </div>
+          <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }}></div>
+            <span>Missing Value</span>
+          </div>
+          <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }}></div>
+            <span>Outlier</span>
+          </div>
+        </div>
+        <div className={styles.summaryTable}>
+          <div className={styles.summaryTableLeft}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>% Clean Data</span></div>
+            </div>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span>{target}</span></div>
+              <div className={styles.summaryCell}><span>70%</span></div>
+            </div>
+          </div>
+          <div className={styles.summaryTableRight}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+              <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div>
+            </div>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryProgressBlock}>
+                <div className={styles.summaryProgress} style={{ width: '70%', backgroundColor: '#00c855' }}></div>
+                <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#819ffc' }}></div>
+                <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#ff97a7' }}></div>
+                <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#f9cf37' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.summaryTable}>
+          <div className={styles.summaryTableLeft}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>% Clean Data</span></div>
+            </div>
+            {sortHeader.map((v, k) => {
+              return <div className={styles.summaryTableRow} key={k}>
+                <div className={styles.summaryCell}><span>{v}</span></div>
+                <div className={styles.summaryCell}><span>50%</span></div>
+              </div>
+            })}
+          </div>
+          <div className={styles.summaryTableRight}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+              <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div>
+            </div>
+            {sortHeader.map((v, k) => {
+              return <div className={styles.summaryTableRow} key={k}>
+                <div className={styles.summaryProgressBlock}>
+                  <div className={styles.summaryProgress} style={{ width: '50%', backgroundColor: '#00c855' }}></div>
+                  <div className={styles.summaryProgress} style={{ width: '20%', backgroundColor: '#819ffc' }}></div>
+                  <div className={styles.summaryProgress} style={{ width: '20%', backgroundColor: '#ff97a7' }}></div>
+                  <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#f9cf37' }}></div>
+                </div>
+              </div>
+            })}
+          </div>
+        </div>
+      </div>
+      <div className={styles.summaryRight}>
+        <div className={styles.summaryTitle}><span>R2.Learn will fix the issues</span></div>
+        <div className={styles.summaryText}><span>The mush data issues will be deleted by default</span></div>
+        <div className={styles.summaryPie}>
+          <div className={styles.summaryChart}>
+          </div>
+          <div className={styles.summaryParts}>
+            <div className={styles.summaryPart}>
+              <div className={styles.summaryPartText}>
+                <div className={styles.summaryCube} style={{ backgroundColor: '#9cebff' }}></div>
+                <span style={{ fontWeight: 'bold' }}>Rows Will Be Fixed</span>
+              </div>
+              <div className={styles.summaryPartText}>
+                <div className={styles.summaryCube}></div>
+                <span>30.00%</span>
+              </div>
+            </div>
+            <div className={styles.summaryPart}>
+              <div className={styles.summaryPartText}>
+                <div className={styles.summaryCube} style={{ backgroundColor: '#c4cbd7' }}></div>
+                <span style={{ fontWeight: 'bold' }}>Rows Will Be Deleted</span>
+              </div>
+              <div className={styles.summaryPartText}>
+                <div className={styles.summaryCube}></div>
+                <span>30.00%</span>
+              </div>
+            </div>
+            <div className={styles.summaryPart}>
+              <div className={styles.summaryPartText}>
+                <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
+                <span style={{ fontWeight: 'bold' }}>Clean Data</span>
+              </div>
+              <div className={styles.summaryPartText}>
+                <div className={styles.summaryCube}></div>
+                <span>40.00%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.summaryBottom}>
+          <div className={classnames(styles.summaryButton, styles.summaryConfirm)} onClick={this.startTrain}><span>Continue</span></div>
+          <div className={styles.summaryButton} onClick={editFixes}><span>Edit the Fixes</span></div>
+          <div className={styles.summaryButton} onClick={this.backToConnect}><span>Load a Better Dataset</span></div>
+        </div>
+      </div>
     </div>
   }
 }

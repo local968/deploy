@@ -220,6 +220,30 @@ function getFileInfo(files) {
   })
 }
 
+function updateProjectField(id, userId, field, data) {
+  const key = "project:" + id
+  return redis.hget(key, field).then(result => {
+    try {
+      result = JSON.parse(result)
+    } catch (e) { }
+    if (Array.isArray(result)) {
+      data = [...result, ...data]
+    } else if (typeof result === 'object') {
+      data = Object.assign({}, result, data)
+    }
+    return redis.hset(key, field, JSON.stringify(data)).then(() => {
+      const returnValue = {
+        status: 200,
+        message: "ok",
+        id,
+        result: { [field]: data }
+      }
+      wss.publish("user:" + userId + ":projects", returnValue)
+      return returnValue
+    })
+  })
+}
+
 wss.register("addProject", async (message, socket) => {
   const userId = socket.session.userId;
   const createdTime = socket.session.user.createdTime
@@ -357,7 +381,7 @@ wss.register('etl', (message, socket, progress) => {
         if (status < 0) return {
           status: 418,
           result,
-          message: result['process error']
+          message: returnValue.message
         }
         Object.keys(result).forEach(k => {
           if (k === "name") {
@@ -422,11 +446,17 @@ wss.register('correlationMatrix', (message, socket, progress) => sendToCommand({
 
 wss.register('preTrainImportance', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
   const { status, result } = returnValue
+  const promise = []
   if (status === 100) {
     result.informativesLabel = result.informativesLabel || []
-    createOrUpdate(message.projectId, socket.session.userId, { preImportance: result.data, informativesLabel: result.informativesLabel || [] })
+    promise.push(updateProjectField(message.projectId, socket.session.userId, 'preImportance', result.data))
+    promise.push(updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel))
   }
-  return returnValue
+  return Promise.all(promise).then(([result1, result2]) => {
+    const aaa = Object.assign({}, returnValue, result1.result, result2.result )
+    console.log(aaa)
+    return aaa
+  })
 }))
 
 wss.register('histgramPlot', (message, socket, progress) => {
@@ -435,7 +465,7 @@ wss.register('histgramPlot', (message, socket, progress) => {
   const histgramPlots = {}
   command({ ...message, userId, requestId: message._id }, progressResult => {
     if (progressResult.status < 0 || progressResult.status === 100) {
-      createOrUpdate(id, userId, { histgramPlots })
+      updateProjectField(id, userId, "histgramPlots", histgramPlots)
       return progressResult
     }
     const { result } = progressResult
@@ -452,7 +482,7 @@ wss.register('univariatePlot', (message, socket, progress) => {
   const univariatePlots = {}
   command({ ...message, userId, requestId: message._id }, progressResult => {
     if (progressResult.status < 0 || progressResult.status === 100) {
-      createOrUpdate(id, userId, { univariatePlots })
+      updateProjectField(id, userId, "univariatePlots", univariatePlots)
       return progressResult
     }
     const { result } = progressResult
@@ -562,7 +592,7 @@ wss.register("watchProjectList", (message, socket) => {
 })
 
 wss.register("testPub", (message, socket) => {
-  return Promise.reject({ status: 1, test: "aaa" }).catch(err => err)
+  return updateProjectField("1", socket.session.userId, "colType", {})
 })
 
 wss.register("inProject", (message, socket) => {

@@ -199,6 +199,26 @@ export default class Project {
     }
   }
 
+  @computed
+  get sortHeader() {
+    const { target, rawHeader } = this
+    if (!target) return rawHeader
+    return [target, ...rawHeader.filter(v => target !== v)]
+  }
+
+  @computed
+  get sortData() {
+    const { target, rawHeader, uploadData } = this
+    if (!target) return uploadData
+    const index = rawHeader.indexOf(target)
+    return uploadData.map(row => {
+      const value = row[index]
+      row.splice(index, 1)
+      row.unshift(value)
+      return row
+    })
+  }
+
   @action
   nextMainStep = (routeIndex) => {
     let obj;
@@ -361,28 +381,37 @@ export default class Project {
     const rawHeader = uploadData[0].map((h) => h.trim());
     const data = uploadData.slice(1);
 
-    const temp = {};
-    const header = rawHeader.map((h, i) => {
-      h = h.trim();
-      if (/^$/.test(h)) {
-        h = `Unnamed: ${i}`;
-      }
-      if (!temp[h]) {
-        temp[h] = 1;
-      } else {
-        h = h + '.' + temp[h];
-        temp[h]++;
-      }
-      return h;
-    });
-
-    // 上传文件，target为空
+    // 上传文件，不需要修改header
     this.updateProject({
       uploadData: data,
-      dataHeader: header,
-      rawHeader: header,
+      dataHeader: rawHeader,
+      rawHeader: rawHeader
     });
-    // this.nextSubStep(2, 2);
+
+    /**
+     * 自动修改header
+     */
+    // const temp = {};
+    // const header = rawHeader.map((h, i) => {
+    //   h = h.trim();
+    //   if (/^$/.test(h)) {
+    //     h = `Unnamed: ${i}`;
+    //   }
+    //   if (!temp[h]) {
+    //     temp[h] = 1;
+    //   } else {
+    //     h = h + '.' + temp[h];
+    //     temp[h]++;
+    //   }
+    //   return h;
+    // });
+
+    // // 上传文件，target为空
+    // this.updateProject({
+    //   uploadData: data,
+    //   dataHeader: header,
+    //   rawHeader: header,
+    // });
   }
 
   @computed
@@ -685,13 +714,13 @@ export default class Project {
   @action
   dataView = () => {
     const exp = Object.values(this.expression).join(";")
-    socketStore.ready().then(api => {
+    return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'dataView'
       };
       if (exp) command.csvScript = exp.replace(/\|/g, ",")
-      api.dataView(command, progressResult => {
+      return api.dataView(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
@@ -1048,20 +1077,23 @@ export default class Project {
 
   preTrainImportance = () => {
     const exp = Object.values(this.expression).map(v => v.exp).join(";")
-    socketStore.ready().then(api => {
+    return socketStore.ready().then(api => {
+      const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
+      const feature_label = [...this.dataHeader, ...this.newVariable].filter(v => !readyLabels.includes(v))
+      if (!feature_label.length) return
       const command = {
         projectId: this.id,
-        command: 'preTrainImportance'
+        command: 'preTrainImportance',
+        feature_label
       };
       if (exp) command.csvScript = exp.replace(/\|/g, ",")
-      api.preTrainImportance(command, progressResult => {
+      return api.preTrainImportance(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          this.setProperty({ preImportance: null })
           return antdMessage.error("preTrainImportance error")
         }
-        this.setProperty({ preImportance: result.data, informativesLabel: result.informativesLabel })
+        this.setProperty({ preImportance: result.preImportance, informativesLabel: result.informativesLabel })
       })
     })
   }

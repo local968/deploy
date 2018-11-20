@@ -12,10 +12,10 @@ export default class Loading extends Component {
 
     componentDidMount() {
         const { project } = this.props;
-        const { totalLines, rawHeader } = project || {};
+        const { totalLines, sortHeader } = project || {};
         //暂定
         const rowRatio = (Math.max(totalLines / 50000, 1) - 1) * 0.1 + 1;
-        const colRatio = Math.max(rawHeader.length / 20, 1) * 1;
+        const colRatio = Math.max(sortHeader.length / 20, 1) * 1;
         const time = rowRatio * colRatio * config.trainTimeDefault * 1000;
         const perTime = (time / 90) * 5;
         this.clearTimer();

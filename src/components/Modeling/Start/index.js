@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import autoIcon from './mr-one-logo-blue.svg';
 import { Modal } from 'components/Common';
-import { when, observable } from 'mobx';
+import { observable } from 'mobx';
 import { Spin, message } from 'antd';
 import AdvancedView from './advancedView';
 import SimplifiedView from './simplifiedView';
@@ -74,7 +74,15 @@ export default class StartTrain extends Component {
             </button>
           </div>
         </div>
-        <Modal width='13em' content={<AdvancedModel project={this.props.project} closeAdvanced={this.closeAdvanced} />} title='Advanced Modeling' onClose={this.closeAdvanced} visible={this.visible} />
+        <Modal width='13em'
+          content={<AdvancedModel
+            project={this.props.project}
+            closeAdvanced={this.closeAdvanced} />}
+          title='Advanced Modeling'
+          onClose={this.closeAdvanced}
+          visible={this.visible}
+          closeByMask={true}
+          showClose={true} />
       </div>
     );
   }
@@ -82,18 +90,14 @@ export default class StartTrain extends Component {
 
 @observer
 class AdvancedModel extends Component {
-  componentDidMount() {
-    when(
-      () => !this.props.project.dataViews,
-      () => this.props.project.dataView()
-    )
-    when(
-      () => !this.props.project.preImportance,
-      () => this.props.project.preTrainImportance()
-    )
-  }
-
   @observable tab = 1
+  @observable dataViewLoading = true
+  @observable preImportanceLoading = true
+
+  componentDidMount() {
+    this.props.project.dataView().then(() => this.dataViewLoading = false)
+    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+  }
 
   switchTab = (num) => {
     if (num !== 1 && num !== 2) return false;
@@ -110,6 +114,13 @@ class AdvancedModel extends Component {
     advancedModeling()
   }
 
+  reloadTable = () => {
+    this.dataViewLoading = true
+    this.preImportanceLoading = true
+    this.props.project.dataView().then(() => this.dataViewLoading = false)
+    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+  }
+
   render() {
     const { project, closeAdvanced } = this.props
     return <div className={styles.advancedModel}>
@@ -123,8 +134,8 @@ class AdvancedModel extends Component {
           })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
         </div>
         <div className={styles.viewBox}>
-          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
-          {(!project.dataViews || !project.preImportance) && <div className={styles.simplifiedLoad}>
+          {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable}/> : <AdvancedView project={project} />}
+          {(this.dataViewLoading || this.preImportanceLoading) && <div className={styles.simplifiedLoad}>
             <Spin size="large" />
           </div>}
         </div>

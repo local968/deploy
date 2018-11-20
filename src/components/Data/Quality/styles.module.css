@@ -1,955 +1,1169 @@
 .quality {
-    display: flex;
-    margin-top: 0.25em;
-    flex-direction: column;
-    flex: auto;
-    padding: 0 10%;
+	display: flex;
+	margin-top: 0.25em;
+	flex-direction: column;
+	flex: auto;
+	padding: 0 10%;
 }
 
 .quality span {
-    font-family: Arial;
-    font-size: 0.875rem;
-    color: #4a4a4a;
-    line-height: 1.1;
+	font-family: Arial;
+	font-size: 0.875rem;
+	color: #4a4a4a;
+	line-height: 1.1;
 }
 
 .issue {
-    background-color: #f1f4f6;
-    border: solid 1px #c4cbd7;
-    display: flex;
-    flex-direction: column;
-    padding: 0.15em;
-    flex: none;
+	background-color: #f1f4f6;
+	border: solid 1px #c4cbd7;
+	display: flex;
+	flex-direction: column;
+	padding: 0.15em;
+	flex: none;
 }
 
 .issueTitle {
-    display: flex;
-    margin-bottom: 0.06em;
+	display: flex;
+	margin-bottom: 0.06em;
 }
 
 .issueTitle span {
-    color: #ff3151;
-    font-size: 1.125rem;
-    line-height: 1.2;
-    font-weight: bold;
-    font-family: HelveticaNeue;
+	color: #ff3151;
+	font-size: 1.125rem;
+	line-height: 1.2;
+	font-weight: bold;
+	font-family: HelveticaNeue;
 }
 
 .cleanTitle {
-    display: flex;
-    margin-bottom: 0.06em;
+	display: flex;
+	margin-bottom: 0.06em;
 }
 
 .cleanTitle span {
-    color: #00b570;
-    font-size: 1.125rem;
-    line-height: 1.2;
-    font-weight: bold;
-    font-family: HelveticaNeue;
+	color: #00b570;
+	font-size: 1.125rem;
+	line-height: 1.2;
+	font-weight: bold;
+	font-family: HelveticaNeue;
 }
 
 .issueBox {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .issueText {
-    display: flex;
-    align-items: center;
-    margin: 0.01em 0;
+	display: flex;
+	align-items: center;
+	margin: 0.01em 0;
 }
 
 .issueText span {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 .point {
-    width: 0.05em;
-    height: 0.05em;
-    background: #4a4a4a;
-    border-radius: 50%;
-    margin-left: 0.1em;
-    margin-right: 0.25em;
+	width: 0.05em;
+	height: 0.05em;
+	background: #4a4a4a;
+	border-radius: 50%;
+	margin-left: 0.1em;
+	margin-right: 0.25em;
 }
 
 .typeBox {
-    display: flex;
-    margin: 0.1em 0;
-    flex: none;
+	display: flex;
+	margin: 0.1em 0;
+	flex: none;
 }
 
 .type {
-    display: flex;
-    margin-right: 0.3em;
+	display: flex;
+	margin-right: 0.3em;
 }
 
 .typeBlock {
-    width: 10px;
-    height: 10px;
-    display: flex;
-    margin-right: 0.1em;
+	width: 10px;
+	height: 10px;
+	display: flex;
+	margin-right: 0.1em;
 }
 
 .contentBox {
-    display: flex;
-    margin-top: 0.05em;
-    flex: auto;
+	display: flex;
+	margin-top: 0.05em;
+	flex: auto;
 }
 
 .list {
-    display: flex;
-    flex: 0 0 15%;
-    flex-direction: column;
-    align-items: center;
+	display: flex;
+	flex: 0 0 15%;
+	flex-direction: column;
+	align-items: center;
 }
 
 .table {
-    display: flex;
-    border: solid 1px #00b570;
-    flex-direction: column;
-    width: 100%;
-    flex: auto;
+	display: flex;
+	border: solid 1px #00b570;
+	flex-direction: column;
+	width: 100%;
+	flex: auto;
 }
 
 .cell {
-    display: flex;
-    padding: 0.1em;
-    border-bottom: solid 1px #c4cbd7;
-    flex: 0 0 0.4em;
-    align-items: center;
+	display: flex;
+	padding: 0.1em;
+	border-bottom: solid 1px #c4cbd7;
+	flex: 0 0 0.4em;
+	align-items: center;
 }
 
 .target {
-    display: flex;
-    background-color: #daefe4;
+	display: flex;
+	background-color: #daefe4;
 }
 
 .label {
-    display: flex;
-    border-bottom: 2px solid #4a4a4a;
+	display: flex;
+	border-bottom: 2px solid #4a4a4a;
 }
 
 .label span {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 .select {
-    display: flex;
+	display: flex;
 }
 
 .select select {
-    display: flex;
-    flex: auto;
-    border: none;
-    outline: none;
-    font-size: 0.875rem;
-    font-weight: bold;
-    font-family: Arial;
-    color: #4a4a4a;
+	display: flex;
+	flex: auto;
+	border: none;
+	outline: none;
+	font-size: 0.875rem;
+	font-weight: bold;
+	font-family: Arial;
+	color: #4a4a4a;
 }
 
 .error {
-    display: flex;
-    justify-content: center;
+	display: flex;
+	justify-content: center;
 }
 
 .errorBlock {
-    display: flex;
-    flex: none;
-    padding: 0 0.1em;
-    border-radius: 0.15em;
+	display: flex;
+	flex: none;
+	padding: 0 0.1em;
+	border-radius: 0.15em;
 }
 
 .tableBody {
-    display: flex;
-    overflow: auto;
-    flex-direction: column;
+	display: flex;
+	overflow: auto;
+	flex-direction: column;
 }
 
 .content {
-    display: flex;
-    flex: 1 0;
-    margin-left: 0.5em;
-    flex-direction: column;
-    overflow: hidden;
+	display: flex;
+	flex: 1 0;
+	margin-left: 0.5em;
+	flex-direction: column;
+	overflow: hidden;
 }
 
 .block {
-    display: flex;
-    flex: none;
-    padding-top: 0.25em;
-    border-top: dashed 1px #979797;
-    flex-direction: column;
-    margin-top: -1px;
+	display: flex;
+	flex: none;
+	padding-top: 0.25em;
+	border-top: dashed 1px #979797;
+	flex-direction: column;
+	margin-top: -1px;
 }
 
 .name {
-    display: flex;
-    flex: none;
-    align-items: center;
+	display: flex;
+	flex: none;
+	align-items: center;
 }
 
 .name span {
-    font-size: 1.5rem;
+	font-size: 1.5rem;
 }
 
 .desc {
-    display: flex;
-    flex: auto;
+	display: flex;
+	flex: auto;
 }
 
 .methods {
-    display: flex;
-    flex-direction: column;
-    margin-left: 0.35em;
-    flex: 1 1;
+	display: flex;
+	flex-direction: column;
+	margin-left: 0.35em;
+	flex: 1 1;
 }
 
 .reasonTitle {
-    display: flex;
-    margin-top: 0.25em;
+	display: flex;
+	margin-top: 0.25em;
 }
 
 .reasonTitle span {
-    font-size: 1.125rem;
-    color: #9b9b9b;
+	font-size: 1.125rem;
+	color: #9b9b9b;
 }
 
 .methodBox {
-    display: flex;
-    flex-direction: column;
-    flex: auto;
+	display: flex;
+	flex-direction: column;
+	flex: auto;
 }
 
 .method {
-    display: flex;
-    margin: 0.2em 0;
-    align-items: center;
-    flex: auto;
+	display: flex;
+	margin: 0.2em 0;
+	align-items: center;
+	flex: auto;
 }
 
 .reason {
-    display: flex;
-    width: 0;
-    flex: 1 1;
+	display: flex;
+	width: 0;
+	flex: 1 1;
 }
 
 .button {
-    display: flex;
-    width: 0;
-    flex: 1 1;
+	display: flex;
+	width: 0;
+	flex: 1 1;
 }
 
 .button button {
-    display: flex;
-    border-radius: 5px;
-    background-image: linear-gradient(to bottom, #5b657b, #243448);
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-    outline: none;
-    border: none;
-    padding: 0.1em 0;
-    cursor: pointer;
-    flex: auto;
-    justify-content: center;
+	display: flex;
+	border-radius: 5px;
+	background-image: linear-gradient(to bottom, #5b657b, #243448);
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	outline: none;
+	border: none;
+	padding: 0.1em 0;
+	cursor: pointer;
+	flex: auto;
+	justify-content: center;
 }
 
 .button span {
-    color: #ffffff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	color: #ffffff;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .info {
-    display: flex;
-    width: 40%;
-    flex: none;
-    overflow: hidden;
-    flex-direction: column;
+	display: flex;
+	width: 40%;
+	flex: none;
+	overflow: hidden;
+	flex-direction: column;
 }
 
 .infoBox {
-    display: flex;
-    flex: auto;
+	display: flex;
+	flex: auto;
 }
 
 .infoBlock {
-    display: flex;
-    margin: 0.35em 0;
-    flex-direction: column;
-    margin-right: 0.4em;
-    align-items: center;
-    justify-content: center;
+	display: flex;
+	margin: 0.35em 0;
+	flex-direction: column;
+	margin-right: 0.4em;
+	align-items: center;
+	justify-content: center;
 }
 
 .num {
-    display: flex;
-    margin-bottom: 0.35em;
+	display: flex;
+	margin-bottom: 0.35em;
 }
 
 .num span {
-    font-size: 3rem;
+	font-size: 3rem;
 }
 
 .text {
-    display: flex;
+	display: flex;
 }
 
 .text span {
-    color: #636166;
+	color: #636166;
 }
 
 .progressBox {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex: auto;
-    margin: 0.2em 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	flex: auto;
+	margin: 0.2em 0;
 }
 
 .progressText {
-    display: flex;
-    padding: 0.05em 0;
-    justify-content: space-between;
-    width: 100%;
-    border-bottom: 2px solid #00c855;
+	display: flex;
+	padding: 0.05em 0;
+	justify-content: space-between;
+	width: 100%;
+	border-bottom: 2px solid #00c855;
 }
 
 .progress {
-    display: flex;
-    background-color: #00c855;
-    height: 0.1em;
+	display: flex;
+	background-color: #00c855;
+	height: 0.1em;
 }
 
 .issueRow {
-    display: flex;
-    padding: 0.05em 0;
+	display: flex;
+	padding: 0.05em 0;
 }
 
 .issueBlock {
-    display: flex;
-    flex: auto;
-    margin-top: 0.1em;
+	display: flex;
+	flex: auto;
+	margin-top: 0.1em;
 }
 
 .left {
-    display: flex;
-    flex: auto;
-    flex-direction: column;
-    justify-content: center;
+	display: flex;
+	flex: auto;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .right {
-    display: flex;
-    flex: none;
-    align-items: center
+	display: flex;
+	flex: none;
+	align-items: center
 }
 
 .right span {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 .mismatch {
-    background-color: #93b0f5;
+	background-color: #93b0f5;
 }
 
 .missing {
-    background-color: #ff97a7;
+	background-color: #ff97a7;
 }
 
 .outlier {
-    background-color: #fed900;
+	background-color: #fed900;
 }
 
 .fixesBottom {
-    display: flex;
-    margin-top: 0.2em;
-    flex: none;
+	display: flex;
+	margin-top: 0.2em;
+	flex: none;
 }
 
 .fixesBottom button {
-    display: flex;
-    padding: 0.1em 0;
-    width: 1.1em;
-    outline: none;
-    border: none;
-    justify-content: center;
-    cursor: pointer;
-    border: 1px solid #4a4a4a;
-    border-radius: 5px;
-    margin-right: .55em;
+	display: flex;
+	padding: 0.1em 0;
+	width: 1.1em;
+	outline: none;
+	border: none;
+	justify-content: center;
+	cursor: pointer;
+	border: 1px solid #4a4a4a;
+	border-radius: 5px;
+	margin-right: .55em;
 }
 
 .fixesBottom .disabled {
-    cursor: not-allowed;
-    background-color: #d3d3d3;
-    color: #aaaaaa;
-    background-image: none;
-    border: transparent;
-    cursor: not-allowed;
+	cursor: not-allowed;
+	background-color: #d3d3d3;
+	color: #aaaaaa;
+	background-image: none;
+	border: transparent;
+	cursor: not-allowed;
 }
 
 .save {
-    background-image: linear-gradient(to bottom, #5b657b, #243448);
+	background-image: linear-gradient(to bottom, #5b657b, #243448);
 }
 
 .save span {
-    color: #fff;
+	color: #fff;
 }
 
 .cancel {
-    background: #fff;
-    color: #4a4a4a;
+	background: #fff;
+	color: #4a4a4a;
 }
 
 .fixesContent {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    margin-top: .1em;
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	margin-top: .1em;
 }
 
 .fixesBox {
-    display: flex;
-    flex: none;
-    flex-direction: column;
+	display: flex;
+	flex: none;
+	flex-direction: column;
 }
 
 .fixesCheckBox {
-    display: flex;
-    flex: none;
-    flex-wrap: wrap;
-    margin-top: 0.5rem;
+	display: flex;
+	flex: none;
+	flex-wrap: wrap;
+	margin-top: 0.5rem;
 }
 
 .fixesCheck {
-    display: flex;
-    flex: none;
-    margin: 0.1em 0.5em 0.1em 0;
+	display: flex;
+	flex: none;
+	margin: 0.1em 0.5em 0.1em 0;
 }
 
 .fixesSelectBox {
-    display: flex;
-    flex: none;
-    flex-wrap: wrap;
+	display: flex;
+	flex: none;
+	flex-wrap: wrap;
 }
 
 .fixesSelect {
-    display: flex;
-    flex: none;
-    align-items: center;
-    width: 50%;
-    padding: 0.05em 0;
+	display: flex;
+	flex: none;
+	align-items: center;
+	width: 50%;
+	padding: 0.05em 0;
 }
 
 .fixesSelect select {
-    display: flex;
-    flex: auto;
-    outline: none;
-    font-size: 0.875rem;
-    font-family: Arial;
-    color: #4a4a4a;
-    width: 0;
+	display: flex;
+	flex: auto;
+	outline: none;
+	font-size: 0.875rem;
+	font-family: Arial;
+	color: #4a4a4a;
+	width: 0;
 }
 
 .fixesSelect span {
-    display: block;
-    flex: auto;
-    text-align: center;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    width: 0;
+	display: block;
+	flex: auto;
+	text-align: center;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	width: 0;
 }
 
 .fixesText {
-    display: flex;
-    flex: none;
+	display: flex;
+	flex: none;
 }
 
 .fixesText span {
-    font-family: HelveticaNeue;
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: #1d2b3c;
-    line-height: 1.3;
+	font-family: HelveticaNeue;
+	font-size: 0.875rem;
+	font-weight: bold;
+	color: #1d2b3c;
+	line-height: 1.3;
 }
 
 .fixesArea {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    margin-bottom: 0.3em;
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	margin-bottom: 0.3em;
 }
 
 .fixesTable {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    border: solid 1px #c4cbd7;
-    overflow: auto;
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	border: solid 1px #c4cbd7;
+	overflow: auto;
 }
 
 .fixesRow {
-    display: flex;
-    flex: none;
-    padding: 0 0.1em;
+	display: flex;
+	flex: none;
+	padding: 0 0.1em;
 }
 
 .fixesHeader {
-    border-bottom: solid 1px #c4cbd7;
-    margin-right: 0.15em;
+	border-bottom: solid 1px #c4cbd7;
+	margin-right: 0.15em;
 }
 
 .fixesCell {
-    display: flex;
-    flex: 1 1;
-    width: 0;
-    padding: 0.15em 0;
-    margin: 0 0.05em;
-    margin-bottom: -1px;
-    border-bottom: solid 1px #c4cbd7;
-    align-items: center;
+	display: flex;
+	flex: 1 1;
+	width: 0;
+	padding: 0.15em 0;
+	margin: 0 0.05em;
+	margin-bottom: -1px;
+	border-bottom: solid 1px #c4cbd7;
+	align-items: center;
 }
 
 .fixesTd {
-    display: flex;
-    flex: 1 1;
-    width: 0;
-    padding: 0.15em 0;
-    margin: 0 0.05em;
-    margin-bottom: -1px;
+	display: flex;
+	flex: 1 1;
+	width: 0;
+	padding: 0.15em 0;
+	margin: 0 0.05em;
+	margin-bottom: -1px;
 }
 
 .fixesTd span {
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: #4a4a4a;
+	font-size: 0.875rem;
+	font-weight: bold;
+	color: #4a4a4a;
 }
 
 .fixesCell span {
-    font-size: 0.75rem;
-    color: #636166;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    max-width: 75%;
-    white-space: nowrap;
+	font-size: 0.75rem;
+	color: #636166;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: 75%;
+	white-space: nowrap;
 }
 
 .fixesLarge {
-    flex: 2 1;
+	flex: 2 1;
 }
 
 .fixesBwtween {
-    justify-content: space-between;
+	justify-content: space-between;
 }
 
 .fixesCell select {
-    display: flex;
-    flex: auto;
-    border: none;
-    outline: none;
-    font-size: 0.875rem;
-    font-family: Arial;
-    color: #4a4a4a;
-    width: 100%;
+	display: flex;
+	flex: auto;
+	border: none;
+	outline: none;
+	font-size: 0.875rem;
+	font-family: Arial;
+	color: #4a4a4a;
+	width: 100%;
 }
 
 span.fixesEdit {
-    color: #448eed;
-    text-decoration: underline;
-    cursor: pointer;
+	color: #448eed;
+	text-decoration: underline;
+	cursor: pointer;
 }
 
 .fixesBody {
-    display: flex;
-    flex: 0 0 1.6em;
-    overflow-y: scroll;
-    flex-direction: column;
-    overflow-x: hidden;
+	display: flex;
+	flex: 0 0 1.6em;
+	overflow-y: scroll;
+	flex-direction: column;
+	overflow-x: hidden;
 }
 
 .close {
-    display: flex;
-    position: absolute;
-    right: 0;
-    margin-right: 0.1em;
-    cursor: pointer;
+	display: flex;
+	position: absolute;
+	right: 0;
+	margin-right: 0.1em;
+	cursor: pointer;
 }
 
 .outlierBox {
-    display: flex;
-    flex: none;
-    justify-content: space-evenly;
+	display: flex;
+	flex: none;
+	justify-content: space-evenly;
 }
 
 .outlierBlock {
-    display: flex;
-    flex: none;
-    align-items: center;
-    border: solid 1px #c4cbd7;
-    line-height: 1.5;
-    border-radius: 4px;
+	display: flex;
+	flex: none;
+	align-items: center;
+	border: solid 1px #c4cbd7;
+	line-height: 1.5;
+	border-radius: 4px;
 }
 
 .input {
-    display: flex;
-    flex: none;
-    background-color: #f0f0f0;
-    width: 1.5em;
-    padding: 0.05em 0.1em;
+	display: flex;
+	flex: none;
+	background-color: #f0f0f0;
+	width: 1.5em;
+	padding: 0.05em 0.1em;
 }
 
 .input input {
-    outline: none;
-    border: none;
-    font-size: 0.875rem;
-    width: 100%;
-    background-color: #f0f0f0;
+	outline: none;
+	border: none;
+	font-size: 0.875rem;
+	width: 100%;
+	background-color: #f0f0f0;
 }
 
 .outliertext {
-    display: flex;
-    flex: none;
-    padding: 0.05em 0.1em;
+	display: flex;
+	flex: none;
+	padding: 0.05em 0.1em;
 }
 
 .outlierBlock button {
-    display: flex;
-    flex: none;
-    outline: none;
-    background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
-    border: none;
-    height: 100%;
-    border-radius: 4px;
-    cursor: pointer;
+	display: flex;
+	flex: none;
+	outline: none;
+	background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+	border: none;
+	height: 100%;
+	border-radius: 4px;
+	cursor: pointer;
 }
 
 .d3Chart {
-    position: relative;
-    display: flex;
-    flex: none;
-    justify-content: center;
-    margin-bottom: 0.2em;
+	position: relative;
+	display: flex;
+	flex: none;
+	justify-content: center;
+	margin-bottom: 0.2em;
 }
 
 .d3Chart svg {
-    overflow: visible;
+	overflow: visible;
 }
 
 .d3Chart g {
-    position: relative;
+	position: relative;
 }
 
 .rect {
-    fill: #a4cbed;
+	fill: #a4cbed;
 }
 
 .outer {
-    fill: #bdbdbd;
+	fill: #bdbdbd;
 }
 
 .axis path, .axis line {
-    fill: none;
-    stroke: black;
-    shape-rendering: crispEdges;
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
 }
 
 .axis text {
-    font-family: sans-serif;
-    font-size: 11px;
+	font-family: sans-serif;
+	font-size: 11px;
 }
 
 .dragRect {
-    fill: #f5f5f5
+	fill: #f5f5f5
 }
 
 .dragLine {
-    stroke: #124d8e;
-    stroke-width: 2;
+	stroke: #124d8e;
+	stroke-width: 2;
 }
 
 .dragText {
-    font-size: 0.875rem;
-    color: #4a4a4a;
-    font-weight: bold;
-    text-anchor: middle;
-    cursor: pointer;
+	font-size: 0.875rem;
+	color: #4a4a4a;
+	font-weight: bold;
+	text-anchor: middle;
+	cursor: pointer;
 }
 
 .Circle {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .cleanHeaderIcon {
-    display: flex;
-    flex: none;
-    height: .4em;
-    width: .4em;
-    align-items: center;
-    justify-content: center;
-    background-color: #00c855;
-    border-radius: 50%;
-    margin-right: .1em;
+	display: flex;
+	flex: none;
+	height: .4em;
+	width: .4em;
+	align-items: center;
+	justify-content: center;
+	background-color: #00c855;
+	border-radius: 50%;
+	margin-right: .1em;
 }
 
 .targetPercentBox {
-    display: flex;
-    flex: none;
-    margin: .2em 0;
-    flex-direction: column;
-    max-height: 3em;
-    overflow-x: hidden;
-    overflow-y: auto;
-    width: 100%;
+	display: flex;
+	flex: none;
+	margin: .2em 0;
+	flex-direction: column;
+	max-height: 3em;
+	overflow-x: hidden;
+	overflow-y: auto;
+	width: 100%;
 }
 
 .targetPercentRow {
-    display: flex;
-    flex: none;
-    align-items: center;
-    margin: .1em 0;
+	display: flex;
+	flex: none;
+	align-items: center;
+	margin: .1em 0;
 }
 
 .targetPercentLabel {
-    display: flex;
-    flex: none;
-    width: .8em;
+	display: flex;
+	flex: none;
+	width: .8em;
 }
 
 .targetPercentLabel span {
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: #4a4a4a;
-    line-height: 1.2;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+	font-size: 0.875rem;
+	font-weight: bold;
+	color: #4a4a4a;
+	line-height: 1.2;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .targetPercentValue {
-    display: flex;
-    flex: auto;
-    height: .2em;
-    margin-left: .1em;
-    align-items: flex-end;
+	display: flex;
+	flex: auto;
+	height: .2em;
+	margin-left: .1em;
+	align-items: flex-end;
 }
 
 .targetPercent {
-    display: flex;
-    flex: none;
-    height: 100%;
-    margin-right: .1em;
+	display: flex;
+	flex: none;
+	height: 100%;
+	margin-right: .1em;
 }
 
 .cleanTargetBlock {
-    display: flex;
-    flex: none;
-    flex-direction: column;
+	display: flex;
+	flex: none;
+	flex-direction: column;
 }
 
 .cleanTargetRename {
-    display: flex;
-    flex: none;
-    align-items: center;
-    padding: .2em 0;
+	display: flex;
+	flex: none;
+	align-items: center;
+	padding: .2em 0;
 }
 
 .cleanTargetRename span {
-    font-family: HelveticaNeue;
-    font-size: 0.875;
-    color: #9b9b9b;
-    line-height: 1.2;
+	font-family: HelveticaNeue;
+	font-size: 0.875;
+	color: #9b9b9b;
+	line-height: 1.2;
 }
 
 .cleanTargetButton {
-    display: flex;
-    flex: none;
-    margin-right: 0.2em;
+	display: flex;
+	flex: none;
+	margin-right: 0.2em;
 }
 
 .cleanTargetButton button {
-    display: flex;
-    flex: none;
-    padding: .1em .2em;
-    border-radius: 5px;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-    background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
-    border: none;
-    outline: none;
-    cursor: pointer;
+	display: flex;
+	flex: none;
+	padding: .1em .2em;
+	border-radius: 5px;
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+	border: none;
+	outline: none;
+	cursor: pointer;
 }
 
 .cleanTargetButton span {
-    color: #1d2b3c;
+	color: #1d2b3c;
 }
 
 .cleanTargetRow {
-    display: flex;
-    flex: none;
+	display: flex;
+	flex: none;
 }
 
 .cleanTargetText {
-    display: flex;
-    flex: none;
-    padding-top: .2em;
-    border-top: 1px #ccc dashed;
+	display: flex;
+	flex: none;
+	padding-top: .2em;
+	border-top: 1px #ccc dashed;
 }
 
 .cleanTargetText span {
-    font-family: Arial;
-    font-size: 1.125rem;
-    color: #4a4a4a;
-    line-height: 1.4;
+	font-family: Arial;
+	font-size: 1.125rem;
+	color: #4a4a4a;
+	line-height: 1.4;
 }
 
 .cleanTargetBox {
-    display: flex;
-    flex: none;
-    margin-top: .1em;
-    margin-bottom: .2em;
+	display: flex;
+	flex: none;
+	margin-top: .1em;
+	margin-bottom: .2em;
 }
 
 .cleanTargetCheck {
-    display: flex;
-    flex: none;
-    margin-left: 0.2em;
-    margin-right: 0.5em;
-    align-items: center;
+	display: flex;
+	flex: none;
+	margin-left: 0.2em;
+	margin-right: 0.5em;
+	align-items: center;
 }
 
 .cleanTargetCheck input {
-    width: 0.16em;
-    height: 0.16em;
-    cursor: pointer;
+	width: 0.16em;
+	height: 0.16em;
+	cursor: pointer;
 }
 
 .cleanTargetCheck label {
-    font-family: Arial;
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: #4a4a4a;
-    line-height: 1.2;
-    cursor: pointer;
+	font-family: Arial;
+	font-size: 0.875rem;
+	font-weight: bold;
+	color: #4a4a4a;
+	line-height: 1.2;
+	cursor: pointer;
 }
 
 .targetPercentCheckBox {
-    display: flex;
-    flex: none;
-    margin-right: .1em;
+	display: flex;
+	flex: none;
+	margin-right: .1em;
 }
 
 .fixesCheckBoxLabel {
-    font-family: PingFangSC;
-    font-size: 0.875rem;
-    color: #4a4a4a;
-    line-height: 1.2;
-    cursor: pointer;
+	font-family: PingFangSC;
+	font-size: 0.875rem;
+	color: #4a4a4a;
+	line-height: 1.2;
+	cursor: pointer;
 }
 
 .disabledText {
-    color: #312323;
-    cursor: not-allowed;
+	color: #312323;
+	cursor: not-allowed;
 }
 
 .fixesTips {
-    display: flex;
-    flex: none;
-    height: 1em;
+	display: flex;
+	flex: none;
+	height: 1em;
 }
 
 .fixesTips span {
-    font-family: HelveticaNeue;
-    font-size: 0.875rem;
-    color: #4a4a4a;
-    line-height: 1.3;
+	font-family: HelveticaNeue;
+	font-size: 0.875rem;
+	color: #4a4a4a;
+	line-height: 1.3;
 }
 
 .fixesTextBottom {
-    margin: .2em 0;
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    width: 100%;
+	margin: .2em 0;
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	width: 100%;
 }
 
 .fixesIconBox {
-    display: flex;
-    flex: none;
-    margin-bottom: .2em;
+	display: flex;
+	flex: none;
+	margin-bottom: .2em;
 }
 
 .largeIcon {
-    width: .6em;
-    height: .6em;
+	width: .6em;
+	height: .6em;
 }
 
 .center {
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 }
 
 .fixesComplete {
-    display: flex;
-    flex: none;
-    width: 100%;
-    flex-wrap: wrap;
-    margin: .2em 0 1.4em
+	display: flex;
+	flex: none;
+	width: 100%;
+	flex-wrap: wrap;
+	margin: .2em 0 1.4em
 }
 
 .fixesComplete span {
-    font-family: HelveticaNeue;
-    font-size: 0.875rem;
-    color: #4a4a4a;
-    line-height: 1.8;
-    font-weight: bold;
+	font-family: HelveticaNeue;
+	font-size: 0.875rem;
+	color: #4a4a4a;
+	line-height: 1.8;
+	font-weight: bold;
 }
 
 .goodInfo {
-    width: 100%;
+	width: 100%;
 }
 
-
 .variableIssue {
-    display: flex;
-    flex: auto;
-    flex-direction: column;
+	display: flex;
+	flex: auto;
+	flex-direction: column;
 }
 
 .variableBottom {
-    display: flex;
-    flex: none;
+	display: flex;
+	flex: none;
 }
 
 .checkBox {
-    display: flex;
-    flex: none;
-    line-height: 0.4em;
-    align-items: center;
-    margin: 0.3em 0 0.6em 0.3em;
+	display: flex;
+	flex: none;
+	line-height: 0.4em;
+	align-items: center;
+	margin: 0.3em 0 0.6em 0.3em;
 }
 
 .checkBox label {
-    font-size: 0.875rem;
-    line-height: 1.1;
-    font-family: SanFranciscoText;
-    color: #1d2b3c;
-    cursor: pointer;
+	font-size: 0.875rem;
+	line-height: 1.1;
+	font-family: SanFranciscoText;
+	color: #1d2b3c;
+	cursor: pointer;
 }
 
-
 .checkBox span {
-    font-size: 0.875rem;
-    line-height: 1.1;
-    font-family: SanFranciscoText;
-    color: #9b9b9b;
+	font-size: 0.875rem;
+	line-height: 1.1;
+	font-family: SanFranciscoText;
+	color: #9b9b9b;
 }
 
 .checkBox input {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .limitText {
-    width: 75%;
+	width: 75%;
+}
+
+.targetCell {
+	background-color: #daefe4;
+}
+
+.summary {
+	display: flex;
+	flex: none;
+	padding: 0.2em 0;
+}
+
+.summaryLeft {
+	display: flex;
+	flex: 7 7;
+	width: 0;
+	flex-direction: column;
+	border: 1px solid rgba(0, 0, 0, 0.6);
+	padding: .2em;
+}
+
+.summaryRight {
+	display: flex;
+	flex: 3 3;
+	width: 0;
+	flex-direction: column;
+	margin: 0 0.3em;
+	border: 1px solid rgba(0, 0, 0, 0.6);
+	padding: .2em .4em;
+}
+
+.summaryTitle {
+	display: flex;
+	flex: none;
+}
+
+.summaryTitle span {
+	font-family: HelveticaNeue;
+	font-size: 1.125rem;
+	color: #4a4a4a;
+	line-height: 1.2;
+}
+
+.summaryTypeBox {
+	display: flex;
+	flex: none;
+	justify-content: space-around;
+	margin-left: 35%;
+	margin-top: 0.3em;
+}
+
+.summaryType {
+	display: flex;
+	flex: none;
+}
+
+.summaryCube {
+	display: flex;
+	flex: none;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+}
+
+.summaryType span {
+	font-family: Arial;
+	font-size: 0.75rem;
+	color: #4a4a4a;
+	line-height: 1.2
+}
+
+.summaryTable {
+	display: flex;
+	flex: none;
+	max-height: 3em;
+	overflow-y: auto;
+}
+
+.summaryTableLeft {
+	display: flex;
+	flex: none;
+	width: 35%;
+	padding-right: 0.2em;
+	flex-direction: column;
+}
+
+.summaryTableRight {
+	display: flex;
+	flex: none;
+	width: 65%;
+	flex-direction: column;
+}
+
+.summaryTableRow {
+	display: flex;
+	flex: none;
+	justify-content: space-between;
+	align-items: center;
+	margin: 0.08em 0;
+	height: 0.15em;
+}
+
+.summaryCell {
+	display: flex;
+	flex: none;
+	max-width: 70%;
+}
+
+.summaryCell span {
+	font-family: Arial;
+	font-size: 0.875rem;
+	color: #595959;
+	line-height: 1.2;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.summaryProgressBlock {
+	display: flex;
+	flex: none;
+	overflow: hidden;
+	border-radius: 5px;
+	height: 10px;
+	width: 100%;
+}
+
+.summaryText {
+	display: flex;
+	flex: none;
+	margin-top: .3em;
+}
+
+.summaryText span {
+	font-family: HelveticaNeue;
+	font-size: 0.875rem;
+	color: #4a4a4a;
+	line-height: 1.2;
+}
+
+.summaryBottom {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+}
+
+.summaryButton {
+	display: flex;
+	flex: none;
+	padding: .1em 0;
+	margin: .1em 0;
+	width: 85%;
+	border-radius: 5px;
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.summaryButton span {
+	font-family: HelveticaNeue;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: left;
+	color: #1d2b3c;
+	line-height: 1.3;
+}
+
+.summaryConfirm {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+}
+
+.summaryConfirm span {
+  color: #fff;
+}
+
+.summaryPie {
+	display: flex;
+	flex: none;
+	margin: .1em 0;
+}
+
+.summaryChart {
+	display: flex;
+	flex: none;
+	width: 120px;
+	height: 120px;
+}
+
+.summaryParts {
+	display: flex;
+	flex: auto;
+	flex-direction: column;
+	justify-content: space-between;
+	margin-left: .1em;
+}
+
+.summaryPart {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	margin: .1em 0;
+}
+
+.summaryPartText {
+	display: flex;
+	flex: none;
+	align-items: center;
+}
+
+.summaryPartText span {
+	font-family: Arial;
+	font-size: 0.875rem;
+	color: #595959;
+	line-height: 1.2;
 }
