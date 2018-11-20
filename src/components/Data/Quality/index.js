@@ -414,7 +414,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
     const fixedPercent = (nullLineCounts + mismatchLineCounts + outlierLineCounts) / totalRawLines * 100
     const cleanPercent = (totalLines - (nullLineCounts + mismatchLineCounts + outlierLineCounts)) / totalRawLines * 100
