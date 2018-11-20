@@ -26,7 +26,7 @@ export default class Operation extends Component {
               <span className={styles.modelName}>Model Name</span>
               <span className={styles.deploymentTime}>Deployment Time</span>
               <span className={styles.deploymentStyle}>Deployment Style</span>
-              <span className={styles.exeuctionSpeed}>Exeuction Speed <small>(rows/s)</small></span>
+              <span className={styles.executionSpeed}>Execution Speed <small>(rows/s)</small></span>
               <span className={styles.dataSize}>Total Lines</span>
               <span className={styles.status}>Status</span>
               <span className={styles.results}>Results</span>
@@ -50,7 +50,7 @@ export default class Operation extends Component {
                       ? 'DataSource'
                       : 'API Source'}
                   </span>
-                  <span className={styles.exeuctionSpeed}>
+                  <span className={styles.executionSpeed}>
                     {s.schedule.status === 'finished'
                       ? s.schedule.result && s.schedule.result.executeSpeed
                       : ' - '}
@@ -98,7 +98,7 @@ export default class Operation extends Component {
               <span className={styles.deploymentStyle}>
                 Predict with DataSource
               </span>
-              <span className={styles.exeuctionSpeed}>10,000</span>
+              <span className={styles.executionSpeed}>10,000</span>
               <span className={styles.dataSize}>100,000</span>
               <span className={styles.status}>Success</span>
               <span className={styles.results}>Download</span>
@@ -109,7 +109,7 @@ export default class Operation extends Component {
               <span className={styles.deploymentStyle}>
                 Predict with DataSource
               </span>
-              <span className={styles.exeuctionSpeed}>10,000</span>
+              <span className={styles.executionSpeed}>10,000</span>
               <span className={styles.dataSize}>100,000</span>
               <Popover
                 placement="left"
