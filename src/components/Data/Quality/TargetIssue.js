@@ -388,7 +388,6 @@ export class SelectTarget extends Component {
 @observer
 export class FixIssue extends Component {
   @observable editKey = ''
-  @observable canSave = false
   @observable visible = false
 
   editRange = (key) => {
@@ -406,28 +405,24 @@ export class FixIssue extends Component {
     this.props.project.outlierDict[editKey] = data;
     this.visible = false
     this.editKey = ''
-    this.canSave = true
   }
 
   nullSelect = (key, e) => {
     let value = e.target.value
     if (value === "ignore") value = null
     this.props.project.nullFillMethod[key] = value;
-    this.canSave = true
   }
 
   mismatchSelect = (key, e) => {
     let value = e.target.value
     if (value === "ignore") value = null
     this.props.project.mismatchFillMethod[key] = value;
-    this.canSave = true
   }
 
   outlierSelect = (key, e) => {
     let value = e.target.value
     if (value === "ignore") value = null
     this.props.project.outlierFillMethod[key] = value;
-    this.canSave = true
   }
 
   render() {
@@ -576,13 +571,12 @@ export class FixIssue extends Component {
                 <div className={styles.fixesCell}><span title={dataViews[k].mean} >{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={outlierFillMethod[k]} onChange={this.outlierSelect.bind(null, k)}>
-                  <option value="ignore" key='ignore'>Do Nothing</option>
                   <option value="drop" key='drop'>Delete the row</option>
-                  <option value={dataViews[k].min} key='min'>Replace with min value</option>
-                  <option value={dataViews[k].max} key='max'>Replace with max value</option>
+                  <option value="ignore" key='ignore'>Do Nothing</option>
                   <option value={dataViews[k].mean} key='mean'>Replace with mean value</option>
                   <option value={dataViews[k].median} key='median'>Replace with median value</option>
                   <option value={dataViews[k].mode} key='mode'>Replace with most frequent value</option>
+                  <option value={0} key='0'>Replace with 0</option>
                 </select></div>
               </div>
             })}
@@ -590,9 +584,7 @@ export class FixIssue extends Component {
         </div>
       </div>}
       <div className={styles.fixesBottom}>
-        <button className={classnames(styles.save, {
-          [styles.disabled]: !this.canSave
-        })} onClick={saveDataFixes} disabled={!this.canSave} ><span>save</span></button>
+        <button className={styles.save} onClick={saveDataFixes} ><span>save</span></button>
         <button className={styles.cancel} onClick={closeFixes}><span>cancel</span></button>
       </div>
       {this.editKey && <Modal content={<EditOutLier width={800}
@@ -606,6 +598,8 @@ export class FixIssue extends Component {
         width='12em'
         title='Outlier'
         onClose={this.closeEdit}
+        closeByMask={true}
+        showClose={true}
       />}
     </div>
   }

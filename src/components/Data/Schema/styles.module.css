@@ -132,3 +132,7 @@
 .checkBox input {
     cursor: pointer;
 }
+
+.target {
+    background-color: #daefe4;
+}

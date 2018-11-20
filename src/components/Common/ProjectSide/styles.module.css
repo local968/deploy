@@ -62,7 +62,7 @@
 }
 
 .sideBlock.current {
-    border-right: 0.03em solid #1d2b3c;
+    border-left: 0.03em solid #1d2b3c;
 }
 
 .sideBlock.active span {

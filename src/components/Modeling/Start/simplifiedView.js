@@ -63,12 +63,12 @@ export default class SimplifiedView extends Component {
     this.visible = false
   }
 
-  reloadTable = () => {
-    this.props.project.dataViews = null
-    this.props.project.preImportance = null
-    this.props.project.dataView()
-    this.props.project.preTrainImportance()
-  }
+  // reloadTable = () => {
+  //   this.props.project.dataViews = null
+  //   this.props.project.preImportance = null
+  //   this.props.project.dataView()
+  //   this.props.project.preTrainImportance()
+  // }
 
   handleChange = e => {
     const value = e.target.value
@@ -82,10 +82,10 @@ export default class SimplifiedView extends Component {
   }
 
   render() {
-    const { project } = this.props;
+    const { project, reloadTable } = this.props;
     const { target, colType, targetColMap, targetMap, dataViews, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader, expression } = project;
     const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, targetColMap, targetMap)).length : 'N/A';
-    const targetData = (colType[target] !== 'Categorical' && dataViews) ? dataViews[target] : {}
+    const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     return <div className={styles.simplified}>
@@ -168,7 +168,7 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>Importance</span>
-            <div className={styles.tableReload} onClick={this.reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
+            <div className={styles.tableReload} onClick={reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
             <Hint themeStyle={{ fontSize: '1rem' }} content='It reflect the importance of the predictor to the target variable.' />
           </div>
           <div className={styles.tableTh}><span>Data type</span></div>
