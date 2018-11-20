@@ -23,7 +23,13 @@ export default class DataSchema extends Component {
       targetArray: [],
       outlierDict: {},
       nullFillMethod: {},
-      mismatchFillMethod: {}
+      mismatchFillMethod: {},
+      totalNullLines: 0,
+      totalMismatchLines: 0,
+      totalOutlierLines: 0,
+      nullLineCounts: {},
+      mismatchLineCounts: {},
+      outlierLineCounts: {}
     }).then(() => this.props.project.etl())
   }
 

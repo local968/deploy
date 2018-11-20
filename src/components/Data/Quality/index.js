@@ -350,7 +350,7 @@ class VariableIssue extends Component {
         showClose={true}
       />
       <Modal content={<Summary project={project}
-        editFixes={this.editFixes}/>}
+        editFixes={this.editFixes} />}
         visible={this.summary}
         width='12em'
         title='How R2 Learn Will Fix the Issues'
@@ -383,13 +383,15 @@ class Summary extends Component {
 
     const outerRadius = 60;           // 外半径
     const innerRadius = 0;             // 内半径
-
     //弧生成器
     const arc = d3.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-
-    const data = [30, 30, 40]
+    const { totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts } = this.props.project
+    const deleteRows = totalRawLines - totalLines
+    const fixedRows = nullLineCounts + mismatchLineCounts + outlierLineCounts
+    const cleanRows = totalLines - fixedRows
+    const data = [deleteRows, fixedRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
 
@@ -412,7 +414,20 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader } = project
+    const { target, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
+    const fixedPercent = (nullLineCounts + mismatchLineCounts + outlierLineCounts) / totalRawLines * 100
+    const cleanPercent = (totalLines - (nullLineCounts + mismatchLineCounts + outlierLineCounts)) / totalRawLines * 100
+    const variableList = sortHeader.slice(1)
+    const percentList = sortHeader.map(v => {
+      const percent = {
+        missing: (nullLineCounts[v] || 0) / (totalRawLines || 1) * 100,
+        mismatch: (mismatchLineCounts[v] || 0) / (totalRawLines || 1) * 100,
+        outlier: (outlierLineCounts[v] || 0) / (totalRawLines || 1) * 100
+      }
+      percent.clean = 100 - percent.missing + percent.mismatch + percent.outlier
+      return percent
+    })
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
         <div className={styles.summaryTitle}><span>Your data summary</span></div>
@@ -442,7 +457,7 @@ class Summary extends Component {
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span>{target}</span></div>
-              <div className={styles.summaryCell}><span>70%</span></div>
+              <div className={styles.summaryCell}><span>{percentList[0].clean.toFixed(2)}%</span></div>
             </div>
           </div>
           <div className={styles.summaryTableRight}>
@@ -452,10 +467,10 @@ class Summary extends Component {
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock}>
-                <div className={styles.summaryProgress} style={{ width: '70%', backgroundColor: '#00c855' }}></div>
-                <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#819ffc' }}></div>
-                <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#ff97a7' }}></div>
-                <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#f9cf37' }}></div>
+                <div className={styles.summaryProgress} style={{ width: percentList[0].clean + '%', backgroundColor: '#00c855' }}></div>
+                <div className={styles.summaryProgress} style={{ width: percentList[0].mismatch + '%', backgroundColor: '#819ffc' }}></div>
+                <div className={styles.summaryProgress} style={{ width: percentList[0].missing + '%', backgroundColor: '#ff97a7' }}></div>
+                <div className={styles.summaryProgress} style={{ width: percentList[0].outlier + '%', backgroundColor: '#f9cf37' }}></div>
               </div>
             </div>
           </div>
@@ -466,10 +481,11 @@ class Summary extends Component {
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>% Clean Data</span></div>
             </div>
-            {sortHeader.map((v, k) => {
+            {variableList.map((v, k) => {
+              const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
                 <div className={styles.summaryCell}><span>{v}</span></div>
-                <div className={styles.summaryCell}><span>50%</span></div>
+                <div className={styles.summaryCell}><span>{percent.clean.toFixed(2)}%</span></div>
               </div>
             })}
           </div>
@@ -478,13 +494,14 @@ class Summary extends Component {
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
               <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div>
             </div>
-            {sortHeader.map((v, k) => {
+            {variableList.map((v, k) => {
+              const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
                 <div className={styles.summaryProgressBlock}>
-                  <div className={styles.summaryProgress} style={{ width: '50%', backgroundColor: '#00c855' }}></div>
-                  <div className={styles.summaryProgress} style={{ width: '20%', backgroundColor: '#819ffc' }}></div>
-                  <div className={styles.summaryProgress} style={{ width: '20%', backgroundColor: '#ff97a7' }}></div>
-                  <div className={styles.summaryProgress} style={{ width: '10%', backgroundColor: '#f9cf37' }}></div>
+                  <div className={styles.summaryProgress} style={{ width: percent.clean + '%', backgroundColor: '#00c855' }}></div>
+                  <div className={styles.summaryProgress} style={{ width: percent.mismatch + '%', backgroundColor: '#819ffc' }}></div>
+                  <div className={styles.summaryProgress} style={{ width: percent.missing + '%', backgroundColor: '#ff97a7' }}></div>
+                  <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }}></div>
                 </div>
               </div>
             })}
@@ -505,7 +522,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>30.00%</span>
+                <span>{fixedPercent.toFixed(2)}</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -515,7 +532,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>30.00%</span>
+                <span>{deletePercent.toFixed(2)}</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -525,7 +542,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>40.00%</span>
+                <span>{cleanPercent.toFixed(2)}</span>
               </div>
             </div>
           </div>
