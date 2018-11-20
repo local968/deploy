@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { action } from 'mobx';
 import Slider from 'rc-slider';
 import { NumberInput } from 'components/Common';
-import { Select } from 'antd';
+import { Select, message } from 'antd';
 
 const Option = Select.Option;
 const Range = Slider.Range;
@@ -171,6 +171,7 @@ export default class AdvancedView extends Component {
 
   changeSetting = action((e) => {
     const { project } = this.props
+    if (e.target.value === 'default') return this.resetSetting(project)
     const selectedSetting = project.settings.find(s => s.id === e.target.value)
     if (selectedSetting) {
       project.settingId = e.target.value
@@ -180,6 +181,28 @@ export default class AdvancedView extends Component {
     } else {
       project.settingId = 'default'
     }
+  })
+
+  resetSetting = action((project) => {
+    const defaultSetting = {
+      version: [1, 2],
+      validationRate: 20,
+      holdoutRate: 20,
+      randSeed: 0,
+      measurement: project.changeProjectType === "Classification" ? "auc" : "r2",
+      runWith: project.totalRawLines > 10000 ? 'holdout' : 'cross',
+      resampling: 'no',
+      crossCount: 3,
+      dataRange: 'all',
+      customField: '',
+      customRange: [],
+      algorithms: [],
+      speedVSaccuracy: 5
+    }
+    Object.entries(defaultSetting).map(([key, value]) => {
+      project[key] = value
+    })
+    message.info('Your Advanced Modeling Setting is reset.')
   })
 
   render() {
@@ -199,6 +222,7 @@ export default class AdvancedView extends Component {
             </div>
             <div className={styles.advancedOption}>
               <select value={settingId} onChange={this.changeSetting}>
+                <option value={'default'}>default</option>
                 {settings && settings.map(setting => <option key={setting.id} value={setting.id}>{setting.name}</option>)}
               </select>
             </div>
