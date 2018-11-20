@@ -59,13 +59,14 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props;
-    const { etling, etlProgress, uploadData, rawHeader, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, uploadData, rawHeader, problemType, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
     const targetOption = {};
 
     //target选择列表
-    rawHeader.forEach((h, i) => {
+    rawHeader.forEach(h => {
       h = h.trim()
-      targetOption[h] = h
+      if (problemType === "Classification" && colType[h] === "Categorical") targetOption[h] = h
+      if (problemType === "Regression" && colType[h] === "Numerical") targetOption[h] = h
     });
 
     return project && <div className={styles.schema}>
@@ -136,7 +137,7 @@ export default class DataSchema extends Component {
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
         </div>
       </div>
-      {etling && <EtlLoading progress={etlProgress}/>}
+      {etling && <EtlLoading progress={etlProgress} />}
     </div>
   }
 }
