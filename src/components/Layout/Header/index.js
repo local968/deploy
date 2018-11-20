@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { withRouter } from 'react-router';
-import { Menu, Dropdown } from 'antd';
+import { Menu, Dropdown, Icon } from 'antd';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import mockAvatar from 'components/Layout/Sider/mr-one-copy.svg';
@@ -181,9 +181,9 @@ class WelcomeHeader extends Component {
 
   render() {
     const menu = (
-      <Menu>
+      <Menu className={styles.logout}>
         <Menu.Item key="0">
-          <a onClick={this.logout}>Log out</a>
+          <a onClick={this.logout}><Icon type='logout' />Log out</a>
         </Menu.Item>
       </Menu>
     );
