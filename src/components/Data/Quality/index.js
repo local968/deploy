@@ -425,7 +425,7 @@ class Summary extends Component {
         mismatch: (mismatchLineCounts[v] || 0) / (totalRawLines || 1) * 100,
         outlier: (outlierLineCounts[v] || 0) / (totalRawLines || 1) * 100
       }
-      percent.clean = 100 - percent.missing + percent.mismatch + percent.outlier
+      percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
     return <div className={styles.summary}>
@@ -522,7 +522,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{fixedPercent.toFixed(2)}</span>
+                <span>{fixedPercent.toFixed(2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -532,7 +532,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{deletePercent.toFixed(2)}</span>
+                <span>{deletePercent.toFixed(2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -542,7 +542,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{cleanPercent.toFixed(2)}</span>
+                <span>{cleanPercent.toFixed(2)}%</span>
               </div>
             </div>
           </div>
