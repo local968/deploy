@@ -423,8 +423,6 @@ export default class Project {
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArray.length < 2 && Object.keys(targetColMap).length > 2;
-    } else {
-      data.targetIssue = Object.keys(targetColMap).length < 10;
     }
 
     if (totalRawLines < 1000) {
