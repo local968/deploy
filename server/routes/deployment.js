@@ -83,3 +83,35 @@ wss.register('updateDeployment', (message, socket) => {
       return { status: 500, message: 'update deployment error', error }
     }))
 })
+
+wss.register('getAllModels', async (message, socket) => {
+  const projectId = message.projectId
+  const currModelIds = await redis.smembers(`project:${projectId}:models`)
+  const prevModelIds = await redis.smembers(`project:${projectId}:models:previous`)
+  const modelIds = [...currModelIds, ...prevModelIds]
+  const pipeline = redis.pipeline()
+  modelIds.map(modelId => {
+    pipeline.hmget(`project:${projectId}:model:${modelId}`, 'name', 'score')
+  })
+  const modelsResult = await pipeline.exec()
+  const models = modelsResult.reduce((prev, curr, index) => {
+    const _result = [...prev]
+    if (curr[0]) throw { status: 500, message: 'model query failed', error: curr[0] }
+    if (!curr[1] || curr[1].length < 2) return
+    const score = JSON.parse(curr[1][1])
+    _result.push({
+      name: JSON.parse(curr[1][0]),
+      score,
+      modelId: modelIds[index],
+      performance: Object.entries(score.validateScore).map(([k, v]) => `${k}:${v.toFixed(3)}`).join("\r\n")
+    })
+    return _result
+  }, [])
+  const settings = JSON.parse(await redis.hget(`project:${projectId}`, 'settings'))
+  const result = settings && settings.reduce((prev, curr) => {
+    const _result = { ...prev }
+    _result[curr.name] = curr.models.map(name => models.find(model => model.name === name))
+    return _result
+  }, {})
+  return { modelList: result || {} }
+})

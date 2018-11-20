@@ -116,14 +116,13 @@ class DeploymentStore {
     );
   }
 
-  async addDeployment(projectId, projectName, modelName, modelType, modelList, csvScript) {
+  async addDeployment(projectId, projectName, modelName, modelType, csvScript) {
     const data = {
       deploymentOptions: {},
       modelName,
       modelType,
       projectId,
       projectName,
-      modelList,
       csvScript,
       performanceOptions: {}
     };

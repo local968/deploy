@@ -21,7 +21,7 @@ import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
 
-const Option = Select.Option;
+const { Option, OptGroup } = Select;
 
 const ordinalNumberPostFix = number => {
   if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
@@ -90,9 +90,10 @@ export default class Deployment extends Component {
   })
 
   onSaveModel = action(() => {
+    const cd = this.props.deploymentStore.currentDeployment
     if (this.modelEditing && this.tempModelName) {
-      this.props.deploymentStore.currentDeployment.modelName = this.tempModelName;
-      this.props.deploymentStore.currentDeployment.save();
+      cd.modelName = this.tempModelName;
+      cd.save();
       this.tempModelName = false;
     }
     this.modelEditing = !this.modelEditing
@@ -150,14 +151,17 @@ export default class Deployment extends Component {
     return (
       <div className={styles.deployment}>
         <div className={styles.info}>
-          <span className={styles.model}>Model: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>{cd.modelList.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}</Select> : cd.modelName}</span>
-          <Hint themeStyle={{ fontSize: '1rem' }} content={cd.modelList && cd.modelList.find(model => model.name === cd.modelName).performance} />
+          <span className={styles.model}>Model: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+            {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
+              <OptGroup key={settingName} label={settingName}>
+                {models.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}
+              </OptGroup>)}
+          </Select> : cd.modelName}</span>
+          <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
           <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? 'Save' : 'Change'}</a>
           <span className={styles.data}>Deployment Data Definition</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
-          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>
-            Download
-          </a>
+          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>Download</a>
           <span className={styles.email}>
             Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (

@@ -1,5 +1,6 @@
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import moment from 'moment';
+import { action } from 'mobx';
 import socketStore from 'stores/SocketStore';
 
 const defaultDeploymentOptions = {
@@ -33,11 +34,11 @@ export default class Deploy {
   @observable projectName;
   @observable modelId;
   @observable modelName;
-  @observable modelList;
   @observable modelType;
   @observable createdDate;
   @observable enable;
   @observable email;
+  @observable modelList;
 
   @observable deploymentOptions = { ...defaultDeploymentOptions };
   @observable performanceOptions = { ...defaultPerformanceOptions };
@@ -49,7 +50,6 @@ export default class Deploy {
     this.projectName = deploy.projectName;
     this.modelId = deploy.modelId;
     this.modelName = deploy.modelName;
-    this.modelList = deploy.modelList;
     this.modelType = deploy.modelType;
     this.enable = deploy.enable;
     this.createdDate = deploy.createdDate;
@@ -64,6 +64,7 @@ export default class Deploy {
       measurementMetric: deploy.modelType === 'Classification' ? 'AUC' : 'R2',
       ...deploy.performanceOptions
     };
+    this.getModelInfo()
   }
 
   save = () => {
@@ -75,7 +76,6 @@ export default class Deploy {
             projectId: this.projectId,
             projectName: this.projectName,
             modelName: this.modelName,
-            modelList: this.modelList,
             modelType: this.modelType,
             createdDate: this.createdDate,
             email: this.email,
@@ -95,7 +95,6 @@ export default class Deploy {
       projectId: this.projectId,
       projectName: this.projectName,
       modelName: this.modelName,
-      modelList: this.modelList,
       modelType: this.modelType,
       createdDate: this.createdDate,
       email: this.email,
@@ -104,4 +103,28 @@ export default class Deploy {
       performanceOptions: this.performanceOptions,
       updatedDate: moment().unix()
     });
+
+  getModelInfo = action(async () => {
+    const api = await socketStore.ready()
+    const { modelList } = await api.getAllModels({ projectId: this.projectId })
+    this.modelList = modelList
+  })
+
+  findModel = (modelName) => {
+    let result
+    this.modelList && Object.entries(this.modelList).map(([settingName, models]) => {
+      if (result) return
+      models.map(model => {
+        if (result) return
+        if (model.name === modelName) result = model
+      })
+    })
+    return result
+  }
+
+  @computed
+  get currentModel() {
+    if (!this.modelList) return
+    return this.findModel(this.modelName)
+  }
 }
