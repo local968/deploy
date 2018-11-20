@@ -51,21 +51,9 @@ export class ClassificationTarget extends Component {
           {isGood && <div className={styles.cleanTargetBlock}>
             <div className={styles.cleanTargetRename}>
               <div className={styles.cleanTargetButton}>
-                <button><span>Rename target varibles</span></button>
+                <button><span>Rename target variables</span></button>
               </div>
-              <span>(opthional)</span>
-            </div>
-            <div className={styles.cleanTargetText}>
-              <span style={{ color: "#d0021b", marginRight: '10px' }}>*</span>
-              <span>Which target value’s results is more important to you?</span>
-            </div>
-            <div className={styles.cleanTargetBox}>
-              {Object.keys(map).map((v, k) => {
-                return <div className={styles.cleanTargetCheck} key={"targetCheck" + k}>
-                  <input type='checkbox' id={`cleanTargetCheck${k}`} />
-                  <label htmlFor={`cleanTargetCheck${k}`}>{v}</label>
-                </div>
-              })}
+              <span>(optional)</span>
             </div>
           </div>}
         </div>
@@ -271,12 +259,6 @@ export class SelectTarget extends Component {
     this.props.project.targetArrayTemp = [checked[maxKey], checked[1 - maxKey]];
     this.props.project.targetMapTemp = targetMap;
     this.props.saveTargetFixes()
-  }
-
-  changeBind = (key, e) => {
-    let map = this.map;
-    map[key] = e.target.value;
-    this.map = map
   }
 
   handleCheck = (key, e) => {
