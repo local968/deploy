@@ -19,25 +19,25 @@ export default class ModelResult extends Component {
   deploy = () => {
     const { project, models } = this.props;
     const current = project.selectModel;
-    const modelList = models.map(m => {
-      try {
-        const score = m.score.validateScore
-        const performance = Object.entries(score).map(([k, v]) => `${k}:${v.toFixed(3)}`).join(" ")
-        return {
-          name: m.name,
-          performance
-        }
-      } catch (e) {
-        return true
-      }
-    }).filter(v => !!v)
+    // const modelList = models.map(m => {
+    //   try {
+    //     const score = m.score.validateScore
+    //     const performance = Object.entries(score).map(([k, v]) => `${k}:${v.toFixed(3)}`).join(" ")
+    //     return {
+    //       name: m.name,
+    //       performance
+    //     }
+    //   } catch (e) {
+    //     return true
+    //   }
+    // }).filter(v => !!v)
     const { newVariable, trainHeader, expression } = project
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
     const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
     const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
 
     this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.name, current.problemType, modelList, exps)
+      .addDeployment(project.id, project.name, current.name, current.problemType, exps)
       .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 
