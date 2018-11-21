@@ -102,8 +102,8 @@ class AdvancedModelTable extends Component {
     const { models, project: { problemType, selectModel } } = this.props;
     const { metric, metricOptions } = this.state;
     const texts = problemType === 'Classification' ?
-      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'Cutoff Threshold', 'Validation', 'Holdout'] :
-      ['Model Name', 'RMSE', 'MSE', 'MAE', 'R2', 'Validation', 'Holdout']
+      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
+      ['Model Name', 'NRMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout', ]
     const header = (
       <Row>
         {texts.map(t => {
@@ -164,14 +164,22 @@ class AdvancedModelTable extends Component {
                   </div>}
                   />
                 )
+              case 'NRMSE':
+                return <RowCell key={10} data={score.validateScore.nrmse} />;
               case 'RMSE':
                 return <RowCell key={2} data={score.validateScore.rmse} />;
+              case 'MSLE':
+                return <RowCell key={11} data={score.validateScore.msle} />;
+              case 'RMSLE':
+                return <RowCell key={9} data={score.validateScore.rmsle} />;
               case 'MSE':
                 return <RowCell key={3} data={score.validateScore.mse} />;
               case 'MAE':
                 return <RowCell key={4} data={score.validateScore.mae} />;
               case 'R2':
                 return <RowCell key={5} data={score.validateScore.r2} />;
+              case 'adjustR2':
+                return <RowCell key={8} data={score.validateScore.adjustR2} />;
               case 'Validation':
                 return <RowCell key={6} data={score.validateScore[metric]} />;
               case 'Holdout':
@@ -290,6 +298,8 @@ class ClassificationModelRow extends Component {
                 return <RowCell key={3} data={roc.Precision[fitIndex]} />;
               case 'Recall':
                 return <RowCell key={4} data={roc.Recall[fitIndex]} />;
+              case 'LogLoss':
+                return <RowCell key={8} data={roc.LOGLOSS[fitIndex]} />;
               case 'Cutoff Threshold':
                 return <RowCell key={5} data={roc.Threshold[fitIndex]} />;
               case 'Validation':
