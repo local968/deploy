@@ -324,7 +324,6 @@ class VariableIssue extends Component {
             showIssue={true}
             issues={variableIssues}
             issueIndex={{ nullIndex: { ...nullIndex }, mismatchIndex: { ...mismatchIndex }, outlierIndex: { ...outlierIndex } }}
-            targetStyle={styles.targetCell}
           />
         </div>
         <div className={styles.variableBottom}>
