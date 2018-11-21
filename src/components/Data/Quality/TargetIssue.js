@@ -475,7 +475,6 @@ export class FixIssue extends Component {
   render() {
     const { closeFixes, project, saveDataFixes, isTarget, issueRows } = this.props;
     const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
-    console.log({...nullLineCounts}, {...mismatchLineCounts}, {...outlierLineCounts})
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -605,11 +604,9 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(outlierLineCounts).map((k, i) => {
-              console.log(isTarget && k !== target ,!isTarget && k === target)
               if (isTarget && k !== target) return null
               if (!isTarget && k === target) return null
               const num = outlierLineCounts[k]
-              console.log(num)
               if (!num) {
                 return null;
               }
