@@ -127,6 +127,8 @@ class DeploymentStore {
       performanceOptions: {}
     };
     const api = await socketStore.ready();
+    const checkResponse = await api.getProjectDeployment({ projectId })
+    if (checkResponse.deploymentId) return checkResponse.deploymentId
     const response = await api.addDeployment({ data });
     if (response.status !== 200) {
       throw new Error(response.message);

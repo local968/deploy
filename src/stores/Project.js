@@ -120,6 +120,10 @@ export default class Project {
   @observable settingId = '';
   @observable settings = []
 
+  // correlation
+  @observable correlationMatrixHeader;
+  @observable correlationMatrixData;
+    
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
 
@@ -1162,7 +1166,8 @@ export default class Project {
       api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) return alert("correlationMatrix error")
-        this.correlationMatrixImg = result.imageSavePath
+        this.correlationMatrixHeader = result.header;
+        this.correlationMatrixData = result.data;
       })
     })
   }

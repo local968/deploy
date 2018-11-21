@@ -5,6 +5,18 @@ const moment = require('moment')
 const scheduleApi = require('../scheduleApi')
 const deploy = require('../schedule')
 
+const fetchDeployments = (userId) => () => redis.zrange(`user:${userId}:deployments:createdDate`, 0, -1).then(deploymentIds => {
+  const pipeline = redis.pipeline()
+  deploymentIds.map(deploymentId => pipeline.get(`deployment:${deploymentId}`))
+  return pipeline.exec()
+}).then(results => {
+  const list = results.map(result => JSON.parse(result[1]))
+  return { list, status: 200, message: 'ok', type: 'watchDeployments' }
+}, error => {
+  console.error(error)
+  return { status: 500, message: 'search deployments error', error, type: 'watchDeployments' }
+})
+
 wss.register('watchSchedule', (message, socket) => {
   const userId = socket.session.userId
   const callback = list => ({ status: 200, message: 'ok', list, type: 'watchSchedule' })
@@ -14,20 +26,8 @@ wss.register('watchSchedule', (message, socket) => {
 
 wss.register('watchDeployments', (message, socket) => {
   const userId = socket.session.userId
-  const fetchDeployments = () => redis.zrange(`user:${userId}:deployments:createdDate`, 0, -1).then(deploymentIds => {
-    const pipeline = redis.pipeline()
-    deploymentIds.map(deploymentId => pipeline.get(`deployment:${deploymentId}`))
-    return pipeline.exec()
-  }).then(results => {
-    const list = results.map(result => JSON.parse(result[1]))
-    return { list, status: 200, message: 'ok', type: 'watchDeployments' }
-  }, error => {
-    console.error(error)
-    return { status: 500, message: 'search deployments error', error, type: 'watchDeployments' }
-  })
-
-  wss.subscribe(`user:${userId}:deployments`, fetchDeployments, socket)
-  return fetchDeployments()
+  wss.subscribe(`user:${userId}:deployments`, fetchDeployments(userId), socket)
+  return fetchDeployments(userId)()
 })
 
 wss.register('addDeployment', (message, socket) => {
@@ -114,4 +114,14 @@ wss.register('getAllModels', async (message, socket) => {
     return _result
   }, {})
   return { modelList: result || {} }
+})
+
+wss.register('getProjectDeployment', async (message, socket) => {
+  const projectId = message.projectId
+  return fetchDeployments(socket.session.userId)().then(response => {
+    if (response.status !== 200) return response
+    const deployment = response.list.find(d => d.projectId === projectId)
+    if (deployment) return { ...response, deploymentId: deployment.id }
+    return response
+  })
 })
