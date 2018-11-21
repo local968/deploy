@@ -952,10 +952,6 @@ span.fixesEdit {
 	width: 75%;
 }
 
-.targetCell {
-	background-color: #daefe4;
-}
-
 .summary {
 	display: flex;
 	flex: none;
