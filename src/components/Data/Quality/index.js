@@ -89,7 +89,7 @@ class TargetIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, target, colType, sortHeader, mismatchIndex, nullIndex, outlierIndex, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable } = project;
+    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? '2' : '10+';
     const percent = {
@@ -98,9 +98,9 @@ class TargetIssue extends Component {
       outlier: targetIssues.outlierRow.length * 100 / (totalRawLines || 1),
     }
     const targetPercent = {
-      missing: (nullIndex[target] ? nullIndex[target].length : 0) * 100 / (totalRawLines || 1),
-      mismatch: (colType[target] === 'Numerical' ? mismatchIndex[target].length : 0) * 100 / (totalRawLines || 1),
-      outlier: colType[target] === 'Numerical' ? outlierIndex[target].length * 100 / (totalRawLines || 1) : 0,
+      missing: (nullLineCounts[target] ? nullLineCounts[target] : 0) * 100 / (totalRawLines || 1),
+      mismatch: (colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0) * 100 / (totalRawLines || 1),
+      outlier: colType[target] === 'Numerical' ? outlierLineCounts[target] * 100 / (totalRawLines || 1) : 0,
     }
 
     return <div className={styles.quality}>
