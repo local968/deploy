@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
 
 export default class Model {
@@ -7,13 +7,14 @@ export default class Model {
   @observable featureImportance;
   @observable executeSpeed = 0;
   @observable name = "";
-  @observable predicted = [];
   @observable modelInsightsData = null;
   @observable fitIndex = 0;
   @observable chartData;
   @observable fitPlot;
   @observable residualPlot;
   @observable qcut;
+  @observable confusionMatrix
+  @observable problemType
 
   constructor(projectId, model, name) {
     this.projectId = projectId;
@@ -62,6 +63,16 @@ export default class Model {
     const ctn = ITN ? (TN || [])[ITN - 1] : 0
     console.log(this.name, ctp, cfn, cfp, ctn, ctp - cfn - cfp + ctn)
     return ctp - cfn - cfp + ctn
+  }
+  @computed
+  get predicted() {
+    const { chartData, confusionMatrix, fitIndex, problemType } = this
+    if (problemType !== 'Classification') return [1, 1]
+    if (chartData) {
+      const { TP, FN, FP, TN } = chartData.roc
+      return [TP[fitIndex] / TP[fitIndex] + FN[fitIndex], TN[fitIndex] / TN[fitIndex] + FP[fitIndex]]
+    }
+    return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
   updateModel(data) {
     socketStore.ready().then(api => api.updateModel({ data, id: this.id, projectId: this.projectId }))

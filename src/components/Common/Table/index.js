@@ -12,7 +12,7 @@ export default class Table extends Component {
   }
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-    const { checkList, showSelect, target, colType, temp, sortData, sortHeader, dataHeader, select, indexPosition, showIssue, issues, issueIndex, targetStyle } = this.props;
+    const { checkList, showSelect, target, colType, temp, sortData, sortHeader, dataHeader, select, indexPosition, showIssue, issues, issueIndex, targetStyle, renameVariable } = this.props;
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     const headerList = [...dataHeader]
@@ -162,10 +162,13 @@ export default class Table extends Component {
         content = <span>{realRow + 1}</span>;
         title = realRow + 1;
       } else {
-        content = <span>{data[realRow][realColumn]}</span>;
-        title = data[realRow][realColumn];
+        const cellValue = data[realRow][realColumn]
+        content = <span>{cellValue}</span>;
+        title = cellValue;
         if (target && target === header) {
           cn = classnames(cn, targetStyle);
+          content = <span>{renameVariable[cellValue] || cellValue}</span>;
+          title = renameVariable[cellValue] || cellValue;
         }
         if (checkList.includes(header)) {
           cn = classnames(cn, styles.checked);

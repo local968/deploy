@@ -67,7 +67,7 @@ export default class Project {
   @observable validationRate = 20;
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
-  @observable fileName = '';
+  @observable fileNames = [];
   @observable cleanData = []
 
   @observable noComputeTemp = false;
@@ -97,6 +97,7 @@ export default class Project {
   @observable nullLineCounts = {}
   @observable mismatchLineCounts = {}
   @observable outlierLineCounts = {}
+  @observable renameVariable = {}
 
   //not save
   @observable targetMapTemp = {};
@@ -136,6 +137,7 @@ export default class Project {
   @observable version = [1, 2]
 
   @observable stopModel = false
+  @observable completeModels = []
 
   constructor(id, args) {
     this.id = id
@@ -145,7 +147,7 @@ export default class Project {
       if (this.uploadFileName.length === 0) return
       const api = await socketStore.ready()
       const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-      this.fileName = fileNames[0]
+      this.fileNames = fileNames
       return
     })
   }
@@ -191,7 +193,8 @@ export default class Project {
       totalOutlierLines: 0,
       nullLineCounts: {},
       mismatchLineCounts: {},
-      outlierLineCounts: {}
+      outlierLineCounts: {},
+      renameVariable: {}
     }
   }
 
@@ -768,7 +771,7 @@ export default class Project {
 
   @action
   fixTarget = () => {
-    this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp })
+    this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp, renameVariable: this.renameVariable })
     // this.etl();
   }
 
@@ -857,7 +860,7 @@ export default class Project {
 
   @action
   fastTrain = () => {
-    if (this.train2ing) return false
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
     const {
       id,
       problemType,
@@ -901,7 +904,7 @@ export default class Project {
   }
 
   advancedModeling = () => {
-    if (this.train2ing) return false
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
     const {
       id,
       problemType,
@@ -1016,17 +1019,6 @@ export default class Project {
         antdMessage.error(message)
         // return this.concurrentError(message)
       }
-      when(
-        () => this.train2Finished,
-        () => {
-          if (this.problemType === 'Classification') {
-            this.chartData();
-          } else {
-            this.fitPlotAndResidualPlot();
-          }
-        }
-      )
-
       // this.updateProject({
       //   train2Finished: true,
       //   train2ing: false
@@ -1055,7 +1047,12 @@ export default class Project {
 
   setModel = data => {
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
-    if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
+    // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
+    if (this.problemType === 'Classification') {
+      this.chartData(data.name);
+    } else {
+      this.fitPlotAndResidualPlot(data.name);
+    }
     this.models = [...this.models.filter(m => {
       return data.id !== m.id
     }), new Model(this.id, data)]
@@ -1089,32 +1086,32 @@ export default class Project {
   //   });
   // }
 
-  calcPredicted = model => {
-    const { targetMap, targetColMap } = this;
-    const targetCol = targetColMap
-    const map = Object.assign({}, targetCol, targetMap);
-    let actual = [[0, 0], [0, 0]]
-    Object.keys(model.targetMap).forEach(k => {
-      //映射的index
-      const actualIndex = map[k];
-      if (actualIndex !== 0 && actualIndex !== 1) {
-        return;
-      }
-      //返回数组的index
-      const confusionMatrixIndex = model.targetMap[k];
-      //遍历当前那一列数组
-      model.confusionMatrix[confusionMatrixIndex] && model.confusionMatrix[confusionMatrixIndex].forEach((item, i) => {
-        const key = Object.keys(model.targetMap).find(t => model.targetMap[t] === i);
-        const pridict = map[key];
-        if (pridict !== 0 && pridict !== 1) {
-          return;
-        }
-        actual[actualIndex][pridict] += item;
-      })
-    })
-    const predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
-    return predicted
-  }
+  // calcPredicted = model => {
+  //   const { targetMap, targetColMap } = this;
+  //   const targetCol = targetColMap
+  //   const map = Object.assign({}, targetCol, targetMap);
+  //   let actual = [[0, 0], [0, 0]]
+  //   Object.keys(model.targetMap).forEach(k => {
+  //     //映射的index
+  //     const actualIndex = map[k];
+  //     if (actualIndex !== 0 && actualIndex !== 1) {
+  //       return;
+  //     }
+  //     //返回数组的index
+  //     const confusionMatrixIndex = model.targetMap[k];
+  //     //遍历当前那一列数组
+  //     model.confusionMatrix[confusionMatrixIndex] && model.confusionMatrix[confusionMatrixIndex].forEach((item, i) => {
+  //       const key = Object.keys(model.targetMap).find(t => model.targetMap[t] === i);
+  //       const pridict = map[key];
+  //       if (pridict !== 0 && pridict !== 1) {
+  //         return;
+  //       }
+  //       actual[actualIndex][pridict] += item;
+  //     })
+  //   })
+  //   const predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
+  //   return predicted
+  // }
 
   setSelectModel = id => {
     this.updateProject({ selectId: id })
@@ -1243,14 +1240,14 @@ export default class Project {
     })
   }
 
-  chartData = () => {
+  chartData = name => {
     if (this.models.length === 0) {
       return;
     }
     socketStore.ready().then(api => {
       const request = {
         action: 'all',
-        version: this.models.map(m => m.name).toString(),
+        version: name || this.models.map(m => m.name).toString(),
         command: 'chartData',
         // csvLocation: [...this.uploadFileName],
         projectId: this.id
@@ -1273,14 +1270,14 @@ export default class Project {
     })
   }
 
-  fitPlotAndResidualPlot = () => {
+  fitPlotAndResidualPlot = name => {
     if (this.models.length === 0) {
       return;
     }
     socketStore.ready().then(api => {
       const request = {
         projectId: this.id,
-        version: this.models.map(m => m.name).toString(),
+        version: name || this.models.map(m => m.name).toString(),
         command: 'fitPlotAndResidualPlot',
         featureLabel: this.dataHeader.filter(n => n !== this.target)
       }
