@@ -397,7 +397,7 @@ wss.register('etl', (message, socket, progress) => {
         if (status < 0) return {
           status: 418,
           result,
-          message: returnValue.message
+          message: returnValue['process error']
         }
         Object.keys(result).forEach(k => {
           if (k === "name") {
@@ -469,7 +469,8 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
     promise.push(updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel))
   }
   return Promise.all(promise).then(([result1, result2]) => {
-    return Object.assign({}, returnValue, result1.result, result2.result)
+    const returnResult = Object.assign({}, result, result1.result, result2.result)
+    return Object.assign({}, returnValue, { result: returnResult })
   })
 }))
 
