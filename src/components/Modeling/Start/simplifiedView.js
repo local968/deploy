@@ -218,6 +218,11 @@ class SimplifiedViewRow extends Component {
     this.univariant = false
   }
 
+  formatNumber = num => {
+    if(typeof num === "number") return num
+    return "N/A"
+  }
+
   render() {
     const { data, importance, colType, value, project, uniqueValues, isChecked, handleCheck, id } = this.props;
     return <div className={styles.tableRow}>
@@ -257,22 +262,22 @@ class SimplifiedViewRow extends Component {
       <div className={styles.tableTd} title={colType[value]}><span>{colType[value]}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] === 'Categorical'
-      })} title={data.mean || 'N/A'}><span>{data.mean || 'N/A'}</span></div>
+      })} title={this.formatNumber(data.mean)}><span>{this.formatNumber(data.mean)}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] !== 'Categorical'
-      })} title={uniqueValues || 'N/A'}><span>{uniqueValues || 'N/A'}</span></div>
+      })} title={this.formatNumber(uniqueValues)}><span>{this.formatNumber(uniqueValues)}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] === 'Categorical'
-      })} title={data.std || 'N/A'}><span>{data.std || 'N/A'}</span></div>
+      })} title={this.formatNumber(data.std)}><span>{this.formatNumber(data.std)}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] === 'Categorical'
-      })} title={data.median || 'N/A'}><span>{data.median || 'N/A'}</span></div>
+      })} title={this.formatNumber(data.median)}><span>{this.formatNumber(data.median)}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] === 'Categorical'
-      })} title={data.min || 'N/A'}><span>{data.min || 'N/A'}</span></div>
+      })} title={this.formatNumber(data.min)}><span>{this.formatNumber(data.min)}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: colType[value] === 'Categorical'
-      })} title={data.max || 'N/A'}><span>{data.max || 'N/A'}</span></div>
+      })} title={this.formatNumber(data.max)}><span>{this.formatNumber(data.max)}</span></div>
     </div>
   }
 }

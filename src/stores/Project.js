@@ -249,9 +249,7 @@ export default class Project {
     const index = rawHeader.indexOf(target)
     return uploadData.map(row => {
       const value = row[index]
-      row.splice(index, 1)
-      row.unshift(value)
-      return row
+      return [value, ...row.slice(0, index), ...row.slice(index + 1)]
     })
   }
 
