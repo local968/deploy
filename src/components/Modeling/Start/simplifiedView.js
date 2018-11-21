@@ -3,6 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import Hint from 'components/Common/Hint';
 import { observer } from 'mobx-react';
+import CorrelationMatrix from './CorrelationMatrix';
 import { observable } from 'mobx';
 import { Spin, Popover, message as antdMessage, Icon } from 'antd';
 import histogramIcon from './histogramIcon.svg';
@@ -149,12 +150,12 @@ export default class SimplifiedView extends Component {
             visible={this.showCorrelation}
             onVisibleChange={this.hideCorrelationMatrix}
             trigger="click"
-            content={<SimplifiedViewPlot onClose={this.hideCorrelationMatrix}
+            content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
               type='correlationMatrix'
               getPath={this.getCorrelationMatrix}
-              path={project.correlationMatrixImg}
+              data={project.correlationMatrixData}
+              header={project.correlationMatrixHeader}
               id={id}
-              style={{ width: "640px", height: "480px" }}
             />} />}
           <span>Check Correlation Matrix</span>
         </div>
@@ -279,6 +280,23 @@ class SimplifiedViewRow extends Component {
         [styles.none]: colType[value] === 'Categorical'
       })} title={this.formatNumber(data.max)}><span>{this.formatNumber(data.max)}</span></div>
     </div>
+  }
+}
+
+@observer
+class CorrelationPlot extends Component {
+  constructor(props) {
+    super(props)
+    if(!props.data) props.getPath()
+  }
+  render() {
+    const { onClose, data, header, type, id, style } = this.props;
+    return (
+      <div className={styles.correlationPlot} >
+        {/* <div onClick={onClose} className={styles.close}>X</div> */}
+        {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
+      </div>
+    )
   }
 }
 

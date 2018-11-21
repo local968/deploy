@@ -16,9 +16,9 @@
     flex: none;
     align-items: center;
     padding: 0 0.1em;
-    border-bottom: 1px solid #ccc;
     border-right: 1px solid #ccc;
     padding-top: 3px;
+    border-bottom: 3px solid;
 }
 
 .titleCell span{
