@@ -1123,8 +1123,8 @@ export default class Project {
     const exp = Object.values(this.expression).map(v => v.exp).join(";")
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
-      const feature_label = [...this.dataHeader, ...this.newVariable].filter(v => !readyLabels.includes(v))
-      if (!feature_label.length) return
+      const feature_label = [...this.dataHeader, ...this.newVariable].filter(v => !readyLabels.includes(v) && v !== this.target)
+      if (!feature_label.length || feature_label.length === 0) return
       const command = {
         projectId: this.id,
         command: 'preTrainImportance',

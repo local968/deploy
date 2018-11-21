@@ -34,7 +34,7 @@
 5. **前后端基础架构(技术选型,数据库结构设计)**
 6. **产品开发(前后端编码,单元测试)**
 
-![总览](https://vcing.net/static/%E6%80%BB%E8%A7%88.jpg)
+![总览](http://ty.dnnmind.com/static/%E6%80%BB%E8%A7%88.jpg)
 
 ## 2 前端
 
@@ -69,7 +69,7 @@ DBStore的另外一个功能就是讲将所有后端API接口promise化，使全
    
 对于其他的数据模型存储，只依赖于DBStore所提供的API获取数据，并且将所有获取到的数据转化成可观察(Observable)数据，在数据发生变化时，组件和页面会自动重新渲染该数据。   
    
-![Frontend data flow](https://vcing.net/static/Frontend-data-flow.jpg)
+![Frontend data flow](http://ty.dnnmind.com/static/Frontend-data-flow.jpg)
    
 在此架构下，真正做到了业务逻辑和后端接口的分离。在测试阶段可以单独生成一个 mock-DBStore 作为纯前端的测试数据源，单独测试前端逻辑。也可在后端做大幅度修改的时候通过只修改DBStore来兼容另外一套后端架构。   
    
@@ -147,7 +147,7 @@ onlineUsers
    
 ### 3.5 架构图
    
-![Backend Architecture](https://vcing.net/static/Backend-Architecture.jpg)
+![Backend Architecture](http://ty.dnnmind.com/static/Backend-Architecture.jpg)
 
 ## 4 上传服务
 ### 4.1 总体流程
