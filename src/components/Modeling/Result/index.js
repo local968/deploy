@@ -17,7 +17,7 @@ export default class ModelResult extends Component {
   @observable view = "simple"
 
   deploy = () => {
-    const { project, models } = this.props;
+    const { project } = this.props;
     const current = project.selectModel;
     // const modelList = models.map(m => {
     //   try {

@@ -123,7 +123,7 @@ export default class Project {
   // correlation
   @observable correlationMatrixHeader;
   @observable correlationMatrixData;
-    
+
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
 
@@ -1053,9 +1053,9 @@ export default class Project {
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
     // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
     if (this.problemType === 'Classification') {
-      this.chartData(data.name);
+      if (!data.chartData) this.chartData(data.name);
     } else {
-      this.fitPlotAndResidualPlot(data.name);
+      if (!data.residualPlot || !data.fitPlot) this.fitPlotAndResidualPlot(data.name);
     }
     this.models = [...this.models.filter(m => {
       return data.id !== m.id
@@ -1249,10 +1249,23 @@ export default class Project {
     if (this.models.length === 0) {
       return;
     }
+    let version
+    if (name) {
+      const model = this.models.find(m => m.name === name)
+      if (model && model.chartData) return
+      version = name
+    } else {
+      const all = name || this.models.map(m => {
+        if (m.chartData) return ''
+        return m.name
+      }).filter(n => !!n).toString()
+      if (!all) return
+      version = all
+    }
     socketStore.ready().then(api => {
       const request = {
         action: 'all',
-        version: name || this.models.map(m => m.name).toString(),
+        version: version,
         command: 'chartData',
         // csvLocation: [...this.uploadFileName],
         projectId: this.id
@@ -1279,10 +1292,23 @@ export default class Project {
     if (this.models.length === 0) {
       return;
     }
+    let version
+    if (name) {
+      const model = this.models.find(m => m.name === name)
+      if (model && model.residualPlot && model.fitPlot) return
+      version = name
+    } else {
+      const all = name || this.models.map(m => {
+        if (m.residualPlot && m.fitPlot) return ''
+        return m.name
+      }).filter(n => !!n).toString()
+      if (!all) return
+      version = all
+    }
     socketStore.ready().then(api => {
       const request = {
         projectId: this.id,
-        version: name || this.models.map(m => m.name).toString(),
+        version: version,
         command: 'fitPlotAndResidualPlot',
         featureLabel: this.dataHeader.filter(n => n !== this.target)
       }

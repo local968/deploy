@@ -13,7 +13,6 @@ export default class DataQuality extends Component {
   @observable step = 1
 
   changeTab = value => {
-    console.log(value)
     this.step = value
   }
 
@@ -193,10 +192,7 @@ class TargetIssue extends Component {
         {this.isLoad && <ProjectLoading />}
         <Modal content={<FixIssue project={project}
           closeFixes={this.closeFixes}
-          saveDataFixes={this.saveDataFixes}
-          mismatchIndex={{ [target]: mismatchIndex[target] }}
-          nullIndex={{ [target]: nullIndex[target] }}
-          outlierIndex={{ [target]: outlierIndex[target] }} />}
+          saveDataFixes={this.saveDataFixes} />}
           visible={this.visible}
           width='12em'
           title='How R2 Learn Will Fix the Issues'
@@ -224,9 +220,9 @@ class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
 
-  handleCheck = e => {
-    const checked = e.target.checked
-  }
+  // handleCheck = e => {
+  //   const checked = e.target.checked
+  // }
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -355,10 +351,7 @@ class VariableIssue extends Component {
       {etling && <EtlLoading progress={etlProgress} />}
       <Modal content={<FixIssue project={project}
         closeFixes={this.closeFixes}
-        saveDataFixes={this.saveDataFixes}
-        mismatchIndex={{ ...mismatchIndex }}
-        nullIndex={{ ...nullIndex }}
-        outlierIndex={{ ...outlierIndex }} />}
+        saveDataFixes={this.saveDataFixes} />}
         visible={this.visible}
         width='12em'
         title='How R2 Learn Will Fix the Issues'

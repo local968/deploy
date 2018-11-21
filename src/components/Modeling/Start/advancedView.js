@@ -175,7 +175,7 @@ export default class AdvancedView extends Component {
     const selectedSetting = project.settings.find(s => s.id === e.target.value)
     if (selectedSetting) {
       project.settingId = e.target.value
-      Object.entries(selectedSetting.setting).map(([key, value]) => {
+      Object.entries(selectedSetting.setting).forEach(([key, value]) => {
         project[key] = value
       })
     } else {
@@ -199,7 +199,7 @@ export default class AdvancedView extends Component {
       algorithms: [],
       speedVSaccuracy: 5
     }
-    Object.entries(defaultSetting).map(([key, value]) => {
+    Object.entries(defaultSetting).forEach(([key, value]) => {
       project[key] = value
     })
     message.info('Your Advanced Modeling Setting is reset.')

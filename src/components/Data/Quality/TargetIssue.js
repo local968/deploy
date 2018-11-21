@@ -50,8 +50,8 @@ export class ClassificationTarget extends Component {
 
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
-    const { issues, targetColMap, target, targetMap, targetArray, colValueCounts, totalRawLines, renameVariable } = project
-    const map = !targetArray.length ? targetColMap : targetArray.map((v, k) => {
+    const { issues, target, targetMap, targetArray, colValueCounts, totalRawLines, renameVariable } = project
+    const map = !targetArray.length ? colValueCounts[target] : targetArray.map((v, k) => {
       let n = 0
       Object.entries(targetMap).forEach(([key, value]) => {
         if (value === k) n += colValueCounts[target] ? (colValueCounts[target][key] || 0) : 0
@@ -473,8 +473,8 @@ export class FixIssue extends Component {
   }
 
   render() {
-    const { closeFixes, project, saveDataFixes, nullLineCounts, mismatchLineCounts, outlierLineCounts, isTarget } = this.props;
-    const { issueRows, colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target } = project
+    const { closeFixes, project, saveDataFixes, isTarget } = this.props;
+    const { issueRows, colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -497,7 +497,7 @@ export class FixIssue extends Component {
             {Object.keys(mismatchLineCounts).map((k, i) => {
               if (isTarget && k !== target) return null
               if (!isTarget && k === target) return null
-              const num = mismatchLineCounts[k].length
+              const num = mismatchLineCounts[k]
               if (!num) {
                 return null;
               }
@@ -551,7 +551,7 @@ export class FixIssue extends Component {
             {Object.keys(nullLineCounts).map((k, i) => {
               if (isTarget && k !== target) return null
               if (!isTarget && k === target) return null
-              const num = nullLineCounts[k].length
+              const num = nullLineCounts[k]
               if (!num) {
                 return null;
               }
@@ -606,7 +606,7 @@ export class FixIssue extends Component {
             {Object.keys(outlierLineCounts).map((k, i) => {
               if (isTarget && k !== target) return null
               if (!isTarget && k === target) return null
-              const num = outlierLineCounts[k].length
+              const num = outlierLineCounts[k]
               if (!num) {
                 return null;
               }

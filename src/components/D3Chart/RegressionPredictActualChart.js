@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import * as d3 from 'd3';
-import _ from 'lodash';
 import d3tips from './d3-tip';
 
 import styles from './D3Chart.module.less';

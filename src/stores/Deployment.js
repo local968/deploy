@@ -112,9 +112,9 @@ export default class Deploy {
 
   findModel = (modelName) => {
     let result
-    this.modelList && Object.entries(this.modelList).map(([settingName, models]) => {
+    this.modelList && Object.entries(this.modelList).forEach(([settingName, models]) => {
       if (result) return
-      models.map(model => {
+      models.forEach(model => {
         if (result) return
         if (model.name === modelName) result = model
       })
