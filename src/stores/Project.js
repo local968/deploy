@@ -596,7 +596,7 @@ export default class Project {
 
   @computed
   get issueRows() {
-    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType } = this;
+    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType, target } = this;
     const arr = {
       mismatchRow: [],
       nullRow: [],
@@ -605,6 +605,7 @@ export default class Project {
     }
 
     dataHeader.forEach(h => {
+      if(h === target) return;
       if (colType[h] !== "Categorical" && mismatchIndex[h] && !!mismatchIndex[h].length) {
         arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
         arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));

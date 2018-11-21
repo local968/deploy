@@ -473,8 +473,9 @@ export class FixIssue extends Component {
   }
 
   render() {
-    const { closeFixes, project, saveDataFixes, isTarget } = this.props;
-    const { issueRows, colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    const { closeFixes, project, saveDataFixes, isTarget, issueRows } = this.props;
+    const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    console.log({...nullLineCounts}, {...mismatchLineCounts}, {...outlierLineCounts})
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -604,12 +605,15 @@ export class FixIssue extends Component {
           </div>
           <div className={styles.fixesBody}>
             {Object.keys(outlierLineCounts).map((k, i) => {
+              console.log(isTarget && k !== target ,!isTarget && k === target)
               if (isTarget && k !== target) return null
               if (!isTarget && k === target) return null
               const num = outlierLineCounts[k]
+              console.log(num)
               if (!num) {
                 return null;
               }
+              
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const isShow = colType[k] === 'Numerical';
               const rowText = num + ' (' + (num / (totalRawLines || 1)).toFixed(4) + '%)'

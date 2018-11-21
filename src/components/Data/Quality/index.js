@@ -191,15 +191,16 @@ class TargetIssue extends Component {
         </div>
         {this.isLoad && <ProjectLoading />}
         <Modal content={<FixIssue project={project}
+          issueRows={targetIssues}
           closeFixes={this.closeFixes}
-          saveDataFixes={this.saveDataFixes} />}
+          saveDataFixes={this.saveDataFixes}
+          isTarget={true} />}
           visible={this.visible}
           width='12em'
           title='How R2 Learn Will Fix the Issues'
           onClose={this.closeFixes}
           closeByMask={true}
           showClose={true}
-          isTarget={true}
         />
         <Modal content={<SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes} />}
           visible={this.edit}
@@ -350,15 +351,16 @@ class VariableIssue extends Component {
       </div>
       {etling && <EtlLoading progress={etlProgress} />}
       <Modal content={<FixIssue project={project}
+        issueRows={issueRows}
         closeFixes={this.closeFixes}
-        saveDataFixes={this.saveDataFixes} />}
+        saveDataFixes={this.saveDataFixes}
+        isTarget={false} />}
         visible={this.visible}
         width='12em'
         title='How R2 Learn Will Fix the Issues'
         onClose={this.closeFixes}
         closeByMask={true}
         showClose={true}
-        isTarget={false}
       />
       <Modal content={<Summary project={project}
         editFixes={this.editFixes} />}
