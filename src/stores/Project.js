@@ -67,7 +67,7 @@ export default class Project {
   @observable validationRate = 20;
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
-  @observable fileName = '';
+  @observable fileNames = [];
   @observable cleanData = []
 
   @observable noComputeTemp = false;
@@ -97,6 +97,7 @@ export default class Project {
   @observable nullLineCounts = {}
   @observable mismatchLineCounts = {}
   @observable outlierLineCounts = {}
+  @observable renameVariable = {}
 
   //not save
   @observable targetMapTemp = {};
@@ -149,7 +150,7 @@ export default class Project {
       if (this.uploadFileName.length === 0) return
       const api = await socketStore.ready()
       const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-      this.fileName = fileNames[0]
+      this.fileNames = fileNames
       return
     })
   }
@@ -195,7 +196,8 @@ export default class Project {
       totalOutlierLines: 0,
       nullLineCounts: {},
       mismatchLineCounts: {},
-      outlierLineCounts: {}
+      outlierLineCounts: {},
+      renameVariable: {}
     }
   }
 
@@ -322,18 +324,6 @@ export default class Project {
         this.loading = false;
         if (result.status === 200) {
           this.setProperty(result.data)
-          if (isInit) {
-            when(
-              () => this.train2Finished,
-              () => {
-                if (this.problemType === 'Classification') {
-                  this.chartData();
-                } else {
-                  this.fitPlotAndResidualPlot();
-                }
-              }
-            )
-          }
           return
         }
         alert(result.message)
@@ -593,7 +583,7 @@ export default class Project {
 
   @computed
   get issueRows() {
-    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType } = this;
+    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType, target } = this;
     const arr = {
       mismatchRow: [],
       nullRow: [],
@@ -602,6 +592,7 @@ export default class Project {
     }
 
     dataHeader.forEach(h => {
+      if (h === target) return;
       if (colType[h] !== "Categorical" && mismatchIndex[h] && !!mismatchIndex[h].length) {
         arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
         arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));
@@ -772,7 +763,7 @@ export default class Project {
 
   @action
   fixTarget = () => {
-    this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp })
+    this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp, renameVariable: this.renameVariable })
     // this.etl();
   }
 
@@ -798,7 +789,6 @@ export default class Project {
         csvScript: fullExp.replace(/\|/g, ",")
       };
       return api.createNewVariable(command, progressResult => {
-        // console.log(progressResult)
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
@@ -861,7 +851,7 @@ export default class Project {
 
   @action
   fastTrain = () => {
-    if (this.train2ing) return false
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
     const {
       id,
       problemType,
@@ -905,7 +895,7 @@ export default class Project {
   }
 
   advancedModeling = () => {
-    if (this.train2ing) return false
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
     const {
       id,
       problemType,
@@ -1008,8 +998,9 @@ export default class Project {
         return
       }
       if (progressResult.status !== 200) return
-      let result = progressResult.model
-      this.setModel(result)
+      //暂时移除  保证命令只发一次
+      // let result = progressResult.model
+      // this.setModel(result)
     })).then(returnValue => {
       this.trainingId = ''
       const { status, message } = returnValue
@@ -1020,17 +1011,6 @@ export default class Project {
         antdMessage.error(message)
         // return this.concurrentError(message)
       }
-      when(
-        () => this.train2Finished,
-        () => {
-          if (this.problemType === 'Classification') {
-            this.chartData();
-          } else {
-            this.fitPlotAndResidualPlot();
-          }
-        }
-      )
-
       // this.updateProject({
       //   train2Finished: true,
       //   train2ing: false
@@ -1059,10 +1039,14 @@ export default class Project {
 
   setModel = data => {
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
-    if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
-    this.models = [...this.models.filter(m => {
-      return data.id !== m.id
-    }), new Model(this.id, data)]
+    // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
+    this.models = [...this.models.filter(m => data.id !== m.id), new Model(this.id, data)]
+    if (this.problemType === 'Classification') {
+      if (!data.chartData) this.chartData(data.name);
+    } else {
+      if (!data.residualPlot || !data.fitPlot) this.fitPlotAndResidualPlot(data.name)
+      if (!data.qcut) this.pointToShow(data.name)
+    }
     // if (index === -1) {
     //   this.models.push(new Model(this.id, data))
     // } else {
@@ -1093,32 +1077,32 @@ export default class Project {
   //   });
   // }
 
-  calcPredicted = model => {
-    const { targetMap, targetColMap } = this;
-    const targetCol = targetColMap
-    const map = Object.assign({}, targetCol, targetMap);
-    let actual = [[0, 0], [0, 0]]
-    Object.keys(model.targetMap).forEach(k => {
-      //映射的index
-      const actualIndex = map[k];
-      if (actualIndex !== 0 && actualIndex !== 1) {
-        return;
-      }
-      //返回数组的index
-      const confusionMatrixIndex = model.targetMap[k];
-      //遍历当前那一列数组
-      model.confusionMatrix[confusionMatrixIndex] && model.confusionMatrix[confusionMatrixIndex].forEach((item, i) => {
-        const key = Object.keys(model.targetMap).find(t => model.targetMap[t] === i);
-        const pridict = map[key];
-        if (pridict !== 0 && pridict !== 1) {
-          return;
-        }
-        actual[actualIndex][pridict] += item;
-      })
-    })
-    const predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
-    return predicted
-  }
+  // calcPredicted = model => {
+  //   const { targetMap, targetColMap } = this;
+  //   const targetCol = targetColMap
+  //   const map = Object.assign({}, targetCol, targetMap);
+  //   let actual = [[0, 0], [0, 0]]
+  //   Object.keys(model.targetMap).forEach(k => {
+  //     //映射的index
+  //     const actualIndex = map[k];
+  //     if (actualIndex !== 0 && actualIndex !== 1) {
+  //       return;
+  //     }
+  //     //返回数组的index
+  //     const confusionMatrixIndex = model.targetMap[k];
+  //     //遍历当前那一列数组
+  //     model.confusionMatrix[confusionMatrixIndex] && model.confusionMatrix[confusionMatrixIndex].forEach((item, i) => {
+  //       const key = Object.keys(model.targetMap).find(t => model.targetMap[t] === i);
+  //       const pridict = map[key];
+  //       if (pridict !== 0 && pridict !== 1) {
+  //         return;
+  //       }
+  //       actual[actualIndex][pridict] += item;
+  //     })
+  //   })
+  //   const predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
+  //   return predicted
+  // }
 
   setSelectModel = id => {
     this.updateProject({ selectId: id })
@@ -1223,13 +1207,26 @@ export default class Project {
     })
   }
 
-  pointToShow = () => {
+  pointToShow = name => {
     if (this.models.length === 0) {
       return;
     }
+    let version
+    if (name) {
+      const model = this.models.find(m => m.name === name)
+      if (model && model.qcut) return
+      version = name
+    } else {
+      const all = name || this.models.map(m => {
+        if (m.qcut) return ''
+        return m.name
+      }).filter(n => !!n).toString()
+      if (!all) return
+      version = all
+    }
     socketStore.ready().then(api => {
       const request = {
-        version: this.models.map(m => m.name).toString(),
+        version: version,
         projectId: this.id,
         command: 'pointToShow'
       }
@@ -1248,14 +1245,27 @@ export default class Project {
     })
   }
 
-  chartData = () => {
+  chartData = name => {
     if (this.models.length === 0) {
       return;
+    }
+    let version
+    if (name) {
+      const model = this.models.find(m => m.name === name)
+      if (model && model.chartData) return
+      version = name
+    } else {
+      const all = name || this.models.map(m => {
+        if (m.chartData) return ''
+        return m.name
+      }).filter(n => !!n).toString()
+      if (!all) return
+      version = all
     }
     socketStore.ready().then(api => {
       const request = {
         action: 'all',
-        version: this.models.map(m => m.name).toString(),
+        version: version,
         command: 'chartData',
         // csvLocation: [...this.uploadFileName],
         projectId: this.id
@@ -1278,14 +1288,27 @@ export default class Project {
     })
   }
 
-  fitPlotAndResidualPlot = () => {
+  fitPlotAndResidualPlot = name => {
     if (this.models.length === 0) {
       return;
+    }
+    let version
+    if (name) {
+      const model = this.models.find(m => m.name === name)
+      if (model && model.residualPlot && model.fitPlot) return
+      version = name
+    } else {
+      const all = name || this.models.map(m => {
+        if (m.residualPlot && m.fitPlot) return ''
+        return m.name
+      }).filter(n => !!n).toString()
+      if (!all) return
+      version = all
     }
     socketStore.ready().then(api => {
       const request = {
         projectId: this.id,
-        version: this.models.map(m => m.name).toString(),
+        version: version,
         command: 'fitPlotAndResidualPlot',
         featureLabel: this.dataHeader.filter(n => n !== this.target)
       }

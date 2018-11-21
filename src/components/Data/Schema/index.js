@@ -29,7 +29,8 @@ export default class DataSchema extends Component {
       totalOutlierLines: 0,
       nullLineCounts: {},
       mismatchLineCounts: {},
-      outlierLineCounts: {}
+      outlierLineCounts: {},
+      renameVariable: {}
     }).then(() => this.props.project.etl())
   }
 
@@ -126,6 +127,7 @@ export default class DataSchema extends Component {
             colType={colType}
             sortHeader={sortHeader}
             dataHeader={sortHeader}
+            renameVariable={{}}
             temp={temp}
             checkList={this.checkList}
             showSelect={this.showSelect}

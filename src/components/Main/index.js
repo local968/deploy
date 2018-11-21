@@ -73,9 +73,9 @@ export default class Main extends Component {
           <span className={styles.label}>Project: </span>
           <span className={styles.value}> {project.name}</span>
         </div>}
-        {project && project.fileName && <div className={styles.dataset}>
+        {project && project.fileNames && <div className={styles.dataset}>
           <span className={styles.label}>Dataset: </span>
-          <span className={styles.value}> {project.fileName}</span>
+          <span className={styles.value}> {project.fileNames.toString()}</span>
         </div>}
       </div>
       {!project ? <ProjectLoading /> : this.getChild()}

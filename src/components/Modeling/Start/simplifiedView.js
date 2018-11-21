@@ -290,10 +290,9 @@ class CorrelationPlot extends Component {
     if(!props.data) props.getPath()
   }
   render() {
-    const { onClose, data, header, type, id, style } = this.props;
+    const { data, header } = this.props;
     return (
       <div className={styles.correlationPlot} >
-        {/* <div onClick={onClose} className={styles.close}>X</div> */}
         {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
       </div>
     )

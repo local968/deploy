@@ -18,7 +18,7 @@ function setDefaultData(id, userId) {
 }
 
 function query(key, params) {
-  const Field = ["id", "name", "createTime", "curStep", "host"]
+  const Field = ["id", "name", "createTime", "curStep", "host", "uploadFileName"]
   const pipeline = redis.pipeline();
   pipeline.zcard(key)
   pipeline.zrevrangebyscore(key, params)
@@ -35,7 +35,7 @@ function query(key, params) {
         return redis.hmget("project:" + r, Field)
       })
       return Promise.all(promiseArray).then(array => {
-        result.list = array.map(item => {
+        return Promise.all(array.map(item => {
           const obj = {}
           item.forEach((v, k) => {
             try {
@@ -43,9 +43,17 @@ function query(key, params) {
             } catch (e) { }
             obj[Field[k]] = v
           })
-          return obj
+          if(obj.uploadFileName) {
+            return getFileInfo(obj.uploadFileName).then(files => {
+              obj.fileNames = files.fileNames
+              return obj
+            })
+          }
+          return Promise.resolve(obj)
+        })).then(list => {
+          result.list = list
+          return result
         })
-        return result
       })
     })
 }
@@ -397,7 +405,7 @@ wss.register('etl', (message, socket, progress) => {
         if (status < 0) return {
           status: 418,
           result,
-          message: returnValue['process error']
+          message: returnValue.message
         }
         Object.keys(result).forEach(k => {
           if (k === "name") {
@@ -413,7 +421,7 @@ wss.register('etl', (message, socket, progress) => {
         result.firstEtl = false;
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
-        if (result.totalLines && result.totalLines < 10000) result.runWith = 'cross'
+        if (result.totalLines < 10000) result.runWith = 'cross'
 
         const steps = {}
         // if (firstEtl) {
@@ -469,8 +477,9 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
     promise.push(updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel))
   }
   return Promise.all(promise).then(([result1, result2]) => {
-    const returnResult = Object.assign({}, result, result1.result, result2.result)
-    return Object.assign({}, returnValue, { result: returnResult })
+    const aaa = Object.assign({}, returnValue, result1.result, result2.result )
+    console.log(aaa)
+    return aaa
   })
 }))
 
@@ -528,10 +537,10 @@ wss.register('abortTrain', (message, socket) => {
       trainModel: null
     }
     if (isLoading) {
-      statusData.mainStep = 3
-      statusData.curStep = 3
-      statusData.lastSubStep = 1
-      statusData.subStepActive = 1
+      statusData.mainStep = 3,
+        statusData.curStep = 3,
+        statusData.lastSubStep = 1,
+        statusData.subStepActive = 1
     }
     return createOrUpdate(projectId, userId, statusData)
   })

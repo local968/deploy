@@ -10,15 +10,15 @@ import * as d3 from 'd3';
 
 @observer
 export default class DataQuality extends Component {
-  @observable allData = false
+  @observable step = 1
 
-  next = () => {
-    this.allData = true
+  changeTab = value => {
+    this.step = value
   }
 
   render() {
     const { project } = this.props;
-    return this.allData ? <VariableIssue project={project} /> : <TargetIssue project={project} next={this.next} />
+    return this.step !== 1 ? <VariableIssue project={project} changeTab={this.changeTab.bind(null, 1)} /> : <TargetIssue project={project} changeTab={this.changeTab.bind(null, 2)} />
   }
 }
 
@@ -81,9 +81,15 @@ class TargetIssue extends Component {
     this.closeFixes();
   }
 
+  renameTarget = v => {
+    const { renameVariable, updateProject } = this.props.project
+    const data = Object.assign({}, renameVariable, v)
+    updateProject({ renameVariable: data })
+  }
+
   render() {
-    const { project, next } = this.props;
-    const { issues, sortData, target, colType, sortHeader, mismatchIndex, nullIndex, outlierIndex, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress } = project;
+    const { project, changeTab } = this.props;
+    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? '2' : '10+';
     const percent = {
@@ -92,9 +98,9 @@ class TargetIssue extends Component {
       outlier: targetIssues.outlierRow.length * 100 / (totalRawLines || 1),
     }
     const targetPercent = {
-      missing: (nullIndex[target] ? nullIndex[target].length : 0) * 100 / (totalRawLines || 1),
-      mismatch: (colType[target] === 'Numerical' ? mismatchIndex[target].length : 0) * 100 / (totalRawLines || 1),
-      outlier: colType[target] === 'Numerical' ? outlierIndex[target].length * 100 / (totalRawLines || 1) : 0,
+      missing: (nullLineCounts[target] ? nullLineCounts[target] : 0) * 100 / (totalRawLines || 1),
+      mismatch: (colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0) * 100 / (totalRawLines || 1),
+      outlier: colType[target] === 'Numerical' ? outlierLineCounts[target] * 100 / (totalRawLines || 1) : 0,
     }
 
     return <div className={styles.quality}>
@@ -134,6 +140,10 @@ class TargetIssue extends Component {
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
           <span>Outlier</span>
         </div>}
+        <div className={styles.issueTabs}>
+          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
+          <div className={styles.issueTab} onClick={changeTab}><span>All Data</span></div>
+        </div>
       </div>
       <div className={styles.contentBox}>
         <div className={styles.list}>
@@ -152,19 +162,20 @@ class TargetIssue extends Component {
                 [styles.missing]: targetIssues.nullRow.includes(k),
                 [styles.outlier]: targetIssues.outlierRow.includes(k)
               })}>
-                <span>{v[targetIndex]}</span>
+                <span title={renameVariable[v[targetIndex]] || v[targetIndex]}>{renameVariable[v[targetIndex]] || v[targetIndex]}</span>
               </div>
               )}
             </div>
           </div>
-          <ContinueButton onClick={next} text='continue' width="100%" />
+          <ContinueButton onClick={changeTab} text='continue' width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
             <ClassificationTarget project={project}
               backToConnect={this.backToConnect}
               backToSchema={this.backToSchema}
-              editTarget={this.editTarget} /> :
+              editTarget={this.editTarget}
+              renameTarget={this.renameTarget} /> :
             <RegressionTarget backToConnect={this.backToConnect}
               backToSchema={this.backToSchema}
               hasIssue={issues.targetIssue}
@@ -180,11 +191,10 @@ class TargetIssue extends Component {
         </div>
         {this.isLoad && <ProjectLoading />}
         <Modal content={<FixIssue project={project}
+          issueRows={targetIssues}
           closeFixes={this.closeFixes}
           saveDataFixes={this.saveDataFixes}
-          mismatchIndex={{ [target]: mismatchIndex[target] }}
-          nullIndex={{ [target]: nullIndex[target] }}
-          outlierIndex={{ [target]: outlierIndex[target] }} />}
+          isTarget={true} />}
           visible={this.visible}
           width='12em'
           title='How R2 Learn Will Fix the Issues'
@@ -211,9 +221,9 @@ class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
 
-  handleCheck = e => {
-    const checked = e.target.checked
-  }
+  // handleCheck = e => {
+  //   const checked = e.target.checked
+  // }
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -259,8 +269,8 @@ class VariableIssue extends Component {
   }
 
   render() {
-    const { project } = this.props;
-    const { issues, issueRows, sortData, target, colType, sortHeader, dataHeader, headerTemp: { temp, isMissed, isDuplicated }, variableIssues, nullIndex, mismatchIndex, outlierIndex, etling, etlProgress } = project;
+    const { project, changeTab } = this.props;
+    const { issues, issueRows, sortData, target, colType, sortHeader, dataHeader, headerTemp: { temp }, variableIssues, nullIndex, mismatchIndex, outlierIndex, etling, etlProgress, renameVariable } = project;
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
@@ -300,6 +310,10 @@ class VariableIssue extends Component {
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
           <span>Outlier</span>
         </div>}
+        <div className={styles.issueTabs}>
+          <div className={styles.issueTab} onClick={changeTab}><span>Target Variable</span></div>
+          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>All Data</span></div>
+        </div>
       </div>
       <div className={styles.variableIssue}>
         <div className={styles.contentBox}>
@@ -323,6 +337,7 @@ class VariableIssue extends Component {
             indexPosition='top'
             showIssue={true}
             issues={variableIssues}
+            renameVariable={renameVariable}
             issueIndex={{ nullIndex: { ...nullIndex }, mismatchIndex: { ...mismatchIndex }, outlierIndex: { ...outlierIndex } }}
           />
         </div>
@@ -336,11 +351,10 @@ class VariableIssue extends Component {
       </div>
       {etling && <EtlLoading progress={etlProgress} />}
       <Modal content={<FixIssue project={project}
+        issueRows={issueRows}
         closeFixes={this.closeFixes}
         saveDataFixes={this.saveDataFixes}
-        mismatchIndex={{ ...mismatchIndex }}
-        nullIndex={{ ...nullIndex }}
-        outlierIndex={{ ...outlierIndex }} />}
+        isTarget={false} />}
         visible={this.visible}
         width='12em'
         title='How R2 Learn Will Fix the Issues'
@@ -413,16 +427,16 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalMismatchLines, totalNullLines, totalOutlierLines } = project
+    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalMismatchLines, totalNullLines, totalOutlierLines, problemType } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
-    const fixedPercent = (totalMismatchLines + totalNullLines + totalOutlierLines) / totalRawLines * 100
-    const cleanPercent = (totalLines - (totalMismatchLines + totalNullLines + totalOutlierLines)) / totalRawLines * 100
+    const fixedPercent = (totalMismatchLines + totalNullLines + (problemType !== 'Classification' ? totalOutlierLines : 0)) / totalRawLines * 100
+    const cleanPercent = (totalLines - (totalMismatchLines + totalNullLines + (problemType !== 'Classification' ? totalOutlierLines : 0))) / totalRawLines * 100
     const variableList = sortHeader.slice(1)
     const percentList = sortHeader.map(v => {
       const percent = {
         missing: (nullLineCounts[v] || 0) / (totalRawLines || 1) * 100,
         mismatch: (mismatchLineCounts[v] || 0) / (totalRawLines || 1) * 100,
-        outlier: (outlierLineCounts[v] || 0) / (totalRawLines || 1) * 100
+        outlier: (problemType !== 'Classification' ? (outlierLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100
       }
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
@@ -443,10 +457,10 @@ class Summary extends Component {
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }}></div>
             <span>Missing Value</span>
           </div>
-          <div className={styles.summaryType}>
+          {problemType !== 'Classification' && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }}></div>
             <span>Outlier</span>
-          </div>
+          </div>}
         </div>
         <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
@@ -469,7 +483,7 @@ class Summary extends Component {
                 <div className={styles.summaryProgress} style={{ width: percentList[0].clean + '%', backgroundColor: '#00c855' }}></div>
                 <div className={styles.summaryProgress} style={{ width: percentList[0].mismatch + '%', backgroundColor: '#819ffc' }}></div>
                 <div className={styles.summaryProgress} style={{ width: percentList[0].missing + '%', backgroundColor: '#ff97a7' }}></div>
-                <div className={styles.summaryProgress} style={{ width: percentList[0].outlier + '%', backgroundColor: '#f9cf37' }}></div>
+                {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percentList[0].outlier + '%', backgroundColor: '#f9cf37' }}></div>}
               </div>
             </div>
           </div>
@@ -500,7 +514,7 @@ class Summary extends Component {
                   <div className={styles.summaryProgress} style={{ width: percent.clean + '%', backgroundColor: '#00c855' }}></div>
                   <div className={styles.summaryProgress} style={{ width: percent.mismatch + '%', backgroundColor: '#819ffc' }}></div>
                   <div className={styles.summaryProgress} style={{ width: percent.missing + '%', backgroundColor: '#ff97a7' }}></div>
-                  <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }}></div>
+                  {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }}></div>}
                 </div>
               </div>
             })}

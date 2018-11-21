@@ -9,10 +9,49 @@ import { Icon } from 'antd'
 
 @observer
 export class ClassificationTarget extends Component {
+  @observable rename = false
+  @observable temp = {}
+
+  showRename = () => {
+    this.rename = true
+  }
+
+  hideRename = () => {
+    this.rename = false
+    this.temp = {}
+  }
+
+  handleRename = (key, e) => {
+    const value = e.target.value
+    const { temp } = this
+
+    this.temp = Object.assign({}, temp, { [key]: value })
+  }
+
+  handleSave = () => {
+    const { temp } = this
+    const { targetArray, targetMap } = this.props.project
+    Object.keys(temp).forEach(k => {
+      if (!temp[k]) delete temp[k]
+    })
+    if (!!targetArray.length) {
+      targetArray.forEach((v, k) => {
+        if (temp.hasOwnProperty(v)) {
+          Object.keys(targetMap).forEach(key => {
+            if (targetMap[key] === k) temp[key] = temp[v]
+          })
+        }
+      })
+    }
+    this.props.renameTarget(temp)
+    this.rename = false;
+    this.temp = {}
+  }
+
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
-    const { issues, targetColMap, target, targetMap, targetArray, colValueCounts, totalRawLines } = project
-    const map = !targetArray.length ? targetColMap : targetArray.map((v, k) => {
+    const { issues, target, targetMap, targetArray, colValueCounts, totalRawLines, renameVariable } = project
+    const map = !targetArray.length ? colValueCounts[target] : targetArray.map((v, k) => {
       let n = 0
       Object.entries(targetMap).forEach(([key, value]) => {
         if (value === k) n += colValueCounts[target] ? (colValueCounts[target][key] || 0) : 0
@@ -39,22 +78,27 @@ export class ClassificationTarget extends Component {
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
                 <div className={styles.targetPercentLabel}>
-                  <span>{v}</span>
+                  {!this.rename ? <span title={renameVariable[v] || v}>{renameVariable[v] || v}</span> : <input value={this.temp[v] || renameVariable[v] || v} onChange={this.handleRename.bind(null, v)} />}
                 </div>
                 <div className={styles.targetPercentValue}>
                   <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                  <span>{colValueCounts[target][v] || 0}</span>
+                  <span>{map[v]}</span>
                 </div>
               </div>
             })}
           </div>
           {isGood && <div className={styles.cleanTargetBlock}>
-            <div className={styles.cleanTargetRename}>
+            {!this.rename ? <div className={styles.cleanTargetRename}>
               <div className={styles.cleanTargetButton}>
-                <button><span>Rename target variables</span></button>
+                <button onClick={this.showRename}><span>Rename target variables</span></button>
               </div>
               <span>(optional)</span>
-            </div>
+            </div> : <div className={styles.cleanTargetRename}>
+                <div className={styles.cleanTargetButton}>
+                  <button onClick={this.handleSave} className={styles.save}><span>Save</span></button>
+                  <button onClick={this.hideRename}><span>Cancel</span></button>
+                </div>
+              </div>}
           </div>}
         </div>
         {!isGood && <div className={styles.methods}>
@@ -254,8 +298,14 @@ export class SelectTarget extends Component {
       [checked[maxKey]]: 0,
       [checked[1 - maxKey]]: 1
     }
-    this[`belongTo${maxKey}`].forEach(v0 => targetMap[v0] = 0)
-    this[`belongTo${1 - maxKey}`].forEach(v1 => targetMap[v1] = 1)
+    this[`belongTo${maxKey}`].forEach(v0 => {
+      targetMap[v0] = 0
+      this.props.project.renameVariable[v0] = checked[maxKey]
+    })
+    this[`belongTo${1 - maxKey}`].forEach(v1 => {
+      targetMap[v1] = 1
+      this.props.project.renameVariable[v1] = checked[1 - maxKey]
+    })
     this.props.project.targetArrayTemp = [checked[maxKey], checked[1 - maxKey]];
     this.props.project.targetMapTemp = targetMap;
     this.props.saveTargetFixes()
@@ -423,8 +473,8 @@ export class FixIssue extends Component {
   }
 
   render() {
-    const { closeFixes, project, saveDataFixes, mismatchIndex, nullIndex, outlierIndex } = this.props;
-    const { issueRows, colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict } = project
+    const { closeFixes, project, saveDataFixes, isTarget, issueRows } = this.props;
+    const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -444,8 +494,10 @@ export class FixIssue extends Component {
             <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
           </div>
           <div className={styles.fixesBody}>
-            {Object.keys(mismatchIndex).map((k, i) => {
-              const num = mismatchIndex[k].length
+            {Object.keys(mismatchLineCounts).map((k, i) => {
+              if (isTarget && k !== target) return null
+              if (!isTarget && k === target) return null
+              const num = mismatchLineCounts[k]
               if (!num) {
                 return null;
               }
@@ -496,8 +548,10 @@ export class FixIssue extends Component {
             <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
           </div>
           <div className={styles.fixesBody}>
-            {Object.keys(nullIndex).map((k, i) => {
-              const num = nullIndex[k].length
+            {Object.keys(nullLineCounts).map((k, i) => {
+              if (isTarget && k !== target) return null
+              if (!isTarget && k === target) return null
+              const num = nullLineCounts[k]
               if (!num) {
                 return null;
               }
@@ -549,11 +603,14 @@ export class FixIssue extends Component {
             <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
           </div>
           <div className={styles.fixesBody}>
-            {Object.keys(outlierIndex).map((k, i) => {
-              const num = outlierIndex[k].length
+            {Object.keys(outlierLineCounts).map((k, i) => {
+              if (isTarget && k !== target) return null
+              if (!isTarget && k === target) return null
+              const num = outlierLineCounts[k]
               if (!num) {
                 return null;
               }
+              
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const isShow = colType[k] === 'Numerical';
               const rowText = num + ' (' + (num / (totalRawLines || 1)).toFixed(4) + '%)'
