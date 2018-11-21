@@ -5,9 +5,6 @@ import RegressionPredictActualChart from 'components/D3Chart/RegressionPredictAc
 
 @observer
 export default class PredictVActual extends Component {
-  componentWillMount() {
-    this.props.project.pointToShow();
-  }
   render() {
     const {model, project} = this.props;
     // const { selectedModel, qcutSize, chartLoading } = this.props.approach;

@@ -141,7 +141,6 @@ export default class Project {
   @observable version = [1, 2]
 
   @observable stopModel = false
-  @observable completeModels = []
 
   constructor(id, args) {
     this.id = id
@@ -325,18 +324,6 @@ export default class Project {
         this.loading = false;
         if (result.status === 200) {
           this.setProperty(result.data)
-          if (isInit) {
-            when(
-              () => this.train2Finished,
-              () => {
-                if (this.problemType === 'Classification') {
-                  this.chartData();
-                } else {
-                  this.fitPlotAndResidualPlot();
-                }
-              }
-            )
-          }
           return
         }
         alert(result.message)
@@ -605,7 +592,7 @@ export default class Project {
     }
 
     dataHeader.forEach(h => {
-      if(h === target) return;
+      if (h === target) return;
       if (colType[h] !== "Categorical" && mismatchIndex[h] && !!mismatchIndex[h].length) {
         arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
         arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));
@@ -802,7 +789,6 @@ export default class Project {
         csvScript: fullExp.replace(/\|/g, ",")
       };
       return api.createNewVariable(command, progressResult => {
-        // console.log(progressResult)
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
@@ -1012,8 +998,9 @@ export default class Project {
         return
       }
       if (progressResult.status !== 200) return
-      let result = progressResult.model
-      this.setModel(result)
+      //暂时移除  保证命令只发一次
+      // let result = progressResult.model
+      // this.setModel(result)
     })).then(returnValue => {
       this.trainingId = ''
       const { status, message } = returnValue
@@ -1053,14 +1040,13 @@ export default class Project {
   setModel = data => {
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
     // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
+    this.models = [...this.models.filter(m => data.id !== m.id), new Model(this.id, data)]
     if (this.problemType === 'Classification') {
       if (!data.chartData) this.chartData(data.name);
     } else {
-      if (!data.residualPlot || !data.fitPlot) this.fitPlotAndResidualPlot(data.name);
+      if (!data.residualPlot || !data.fitPlot) this.fitPlotAndResidualPlot(data.name)
+      if (!data.qcut) this.pointToShow(data.name)
     }
-    this.models = [...this.models.filter(m => {
-      return data.id !== m.id
-    }), new Model(this.id, data)]
     // if (index === -1) {
     //   this.models.push(new Model(this.id, data))
     // } else {
@@ -1221,13 +1207,26 @@ export default class Project {
     })
   }
 
-  pointToShow = () => {
+  pointToShow = name => {
     if (this.models.length === 0) {
       return;
     }
+    let version
+    if (name) {
+      const model = this.models.find(m => m.name === name)
+      if (model && model.qcut) return
+      version = name
+    } else {
+      const all = name || this.models.map(m => {
+        if (m.qcut) return ''
+        return m.name
+      }).filter(n => !!n).toString()
+      if (!all) return
+      version = all
+    }
     socketStore.ready().then(api => {
       const request = {
-        version: this.models.map(m => m.name).toString(),
+        version: version,
         projectId: this.id,
         command: 'pointToShow'
       }
