@@ -117,11 +117,12 @@ export default class Table extends Component {
         if (target && target === header) {
           cn = classnames(cn, targetStyle);
         }
-        content = select ? <select value={colType[key]} onChange={this.select.bind(null, key)}>
+        const colValue = colType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
+        content = select ? <select value={colValue} onChange={this.select.bind(null, key)}>
           <option value="Categorical">Categorical</option>
           <option value="Numerical">Numerical</option>
-        </select> : <span>{colType[key]}</span>
-        title = colType[key]
+        </select> : <span>{colValue}</span>
+        title = colValue
       }
       //issue 行
     } else if (rowIndex === index.issueRow) {
