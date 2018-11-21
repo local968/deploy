@@ -754,6 +754,14 @@ span.advancedDesc {
   margin-top: 0.2em;
 }
 
+.correlationPlot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  /* margin-top: 20px; */
+}
+
 .plot {
   width: 400px;
   height: 300px;
@@ -763,6 +771,7 @@ span.advancedDesc {
   position: relative;
 }
 
+.correlationPlot img,
 .plot img {
   max-height: 100%;
   max-width: 100%;
