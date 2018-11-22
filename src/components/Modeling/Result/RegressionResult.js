@@ -68,7 +68,7 @@ class Performance extends Component {
     return <div className={styles.performanceBox}>
       <div className={styles.performance}>
         <div className={styles.rmsePerformance}>
-          <span>{current.score.validateScore.rmse.toFixed(4)}</span>
+          <span>{current.score.validateScore.nrmse.toFixed(4)}</span>
         </div>
         <div className={styles.performanceText}>
           <span>Normalized RMSE</span>
