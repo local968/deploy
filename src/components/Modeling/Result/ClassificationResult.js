@@ -13,11 +13,17 @@ const AccuracyHint = "Given a particular population, the accuracy measures the p
 @observer
 export default class ClassificationView extends Component {
   @observable showCost = false
+  @observable costOption = this.props.project.costOption
 
   onChange = e => {
     const criteria = e.target.value
     this.showCost = criteria === 'cost'
-    this.props.project.updateProject({ criteria })
+    const data = { criteria }
+    if (!this.showCost) {
+      this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+      data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+    }
+    this.props.project.updateProject(data)
   }
 
   onSelect = model => {
@@ -34,18 +40,23 @@ export default class ClassificationView extends Component {
     return <div className={styles.costTd}>
       <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
       <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benifit:'}</span></div>
-      <div className={styles.costInput}><NumberInput value={this.props.project.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
+      <div className={styles.costInput}><NumberInput value={this.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
       <div className={styles.costUnits}><span>units</span></div>
     </div>
   }
 
   handleChange = (field, value) => {
-    this.props.project.costOption[field] = value
+    this.costOption[field] = value
+  }
+
+  handleSubmit = () => {
+    this.props.project.updateProject({ costOption: this.costOption })
+    // this.props.project.costOption = this.costOption
   }
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, train2ing, trainModel, abortTrain, selectModel: current, criteria } = project;
+    const { train2Finished, train2ing, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN } } = project;
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.7 && "OK") || "NotSatisfied" : ''
     return <div>
       <div className={styles.result}>
@@ -108,6 +119,12 @@ export default class ClassificationView extends Component {
                   <div className={styles.costCell}>{this.costInput(0, 0)}</div>
                 </div>
               </div>
+            </div>
+            {!!(TP || FN || FP || TN) && <div className={styles.costContent}>
+              <span>{current.getBenifit(TP, FN, FP, TN).text}</span>
+            </div>}
+            <div className={styles.costButton}>
+              <button onClick={this.handleSubmit}><span>Submit</span></button>
             </div>
           </div>}
         </div>

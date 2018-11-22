@@ -806,40 +806,20 @@ export default class Project {
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
-    const { problemType, selectId, criteria, costOption } = this
+    const { selectId, costOption, criteria } = this
     if (selectId) {
       const model = this.models.find(m => m.id === selectId)
       if (model) return model
     }
     let model;
-
-    if (problemType === "Classification") {
-      const { TP, FN, FP, TN } = costOption
-      let recommendByDefault = criteria === "default" || (!TN && !FN && !TP && !FP)
-      for (let m of this.models) {
-        if (!model) {
-          model = m;
-          continue;
-        }
-        if (recommendByDefault) {
-          if (model.score.validateScore.auc + model.score.validateScore.acc < m.score.validateScore.auc + m.score.validateScore.acc) {
-            model = m;
-          }
-        } else {
-          if (model.getBenifit(TP, FN, FP, TN) < m.getBenifit(TP, FN, FP, TN)) {
-            model = m;
-          }
-        }
+    const { TP, FN, FP, TN } = criteria === 'cost' ? costOption : { TP: 0, FN: 0, FP: 0, TN: 0 }
+    for (let m of this.models) {
+      if (!model) {
+        model = m;
+        continue;
       }
-    } else {
-      for (let m of this.models) {
-        if (!model) {
-          model = m;
-          continue;
-        }
-        if (1 - model.score.validateScore.rmse + model.score.validateScore.r2 < 1 - m.score.validateScore.rmse + m.score.validateScore.r2) {
-          model = m;
-        }
+      if (model.getScore(TP, FN, FP, TN) < m.getScore(TP, FN, FP, TN)) {
+        model = m;
       }
     }
     return model
@@ -1023,17 +1003,17 @@ export default class Project {
       projectId: this.id,
       isLoading
     }
+    this.isAbort = true
     socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
       const { status, message, result, id } = returnValue
-      this.isAbort = true
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
-
       this.setProperty({ ...result, stopModel: false })
     }))
   }
 
   setModel = data => {
+    if(this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
     // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
     this.models = [...this.models.filter(m => data.id !== m.id), new Model(this.id, data)]
@@ -1127,7 +1107,7 @@ export default class Project {
         command: 'preTrainImportance',
         feature_label
       };
-      if(new_label.length) {
+      if (new_label.length) {
         const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
         command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       }

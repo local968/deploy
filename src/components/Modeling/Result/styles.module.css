@@ -666,7 +666,7 @@
     top: 0;
     left: 100%;
     width: 5.5em;
-    height: 3em;
+    height: 4em;
     background: #fff;
     z-index: 2;
     border-radius: 5px;
@@ -691,7 +691,6 @@
 .costContent {
     display: flex;
     flex: none;
-    margin-bottom: 0.2em;
 }
 
 .costContent span {
@@ -832,4 +831,28 @@
 
 .predictActual {
     
+}
+
+.costButton {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-top: .1em;
+}
+
+.costButton button {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    flex: none;
+    padding: .1em .2em;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.costButton span {
+    font-size: 1rem;
+    color: #fff;
 }

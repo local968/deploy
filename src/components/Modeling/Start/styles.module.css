@@ -74,6 +74,11 @@
   flex: none;
 }
 
+.trainImg img{
+  width: 130px;
+  height: 120px;
+}
+
 .trainName {
   display: flex;
   justify-content: center;

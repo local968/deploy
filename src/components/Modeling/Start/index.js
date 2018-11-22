@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import autoIcon from './mr-one-logo-blue.svg';
+// import autoIcon from './mr-one-logo-blue.svg';
 import { Modal } from 'components/Common';
 import { observable } from 'mobx';
-import { Spin, message } from 'antd';
+import { Spin, message, Icon } from 'antd';
 import AdvancedView from './advancedView';
 import SimplifiedView from './simplifiedView';
+import autoIcon from './icon_automatic_modeling.svg';
+import advancedIcon from './icon_advanced_modeling.svg';
 
 @observer
 export default class StartTrain extends Component {
@@ -37,7 +39,7 @@ export default class StartTrain extends Component {
           <div className={styles.trainBox}>
             <div className={styles.trainBlock}>
               <div className={styles.trainRecommend}>
-                <span>Recommended</span>
+                <span><Icon type="star" style={{ color: "#50647a" }} theme='filled' />Recommended</span>
               </div>
               <div className={styles.trainImg}>
                 <img src={autoIcon} alt="auto" />
@@ -60,7 +62,7 @@ export default class StartTrain extends Component {
           <div className={styles.trainBox}>
             <div className={styles.trainBlock}>
               <div className={styles.trainImg}>
-                <img src={autoIcon} alt="auto" />
+                <img src={advancedIcon} alt="advanced" />
               </div>
               <div className={styles.trainName}>
                 <span>Detailed and advanced</span>
@@ -136,7 +138,7 @@ class AdvancedModel extends Component {
           })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
         </div>
         <div className={styles.viewBox}>
-          {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable}/> : <AdvancedView project={project} />}
+          {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable} /> : <AdvancedView project={project} />}
           {(this.dataViewLoading || this.preImportanceLoading) && <div className={styles.simplifiedLoad}>
             <Spin size="large" />
           </div>}
