@@ -501,7 +501,7 @@ export class FixIssue extends Component {
               if (!num) {
                 return null;
               }
-              const rowText = num + ' (' + (num / (totalRawLines || 1)).toFixed(4) + '%)'
+              const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>{colType[k]}</span></div>
@@ -555,7 +555,7 @@ export class FixIssue extends Component {
               if (!num) {
                 return null;
               }
-              const rowText = num + ' (' + (num / (totalRawLines || 1)).toFixed(4) + '%)'
+              const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
               // const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
@@ -613,7 +613,7 @@ export class FixIssue extends Component {
               
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const isShow = colType[k] === 'Numerical';
-              const rowText = num + ' (' + (num / (totalRawLines || 1)).toFixed(4) + '%)'
+              const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
               // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return isShow && <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>

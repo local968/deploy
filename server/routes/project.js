@@ -43,7 +43,7 @@ function query(key, params) {
             } catch (e) { }
             obj[Field[k]] = v
           })
-          if(obj.uploadFileName) {
+          if (obj.uploadFileName) {
             return getFileInfo(obj.uploadFileName).then(files => {
               obj.fileNames = files.fileNames
               return obj
@@ -473,13 +473,12 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
   const promise = []
   if (status === 100) {
     result.informativesLabel = result.informativesLabel || []
+    result.preImportance = result.data
     promise.push(updateProjectField(message.projectId, socket.session.userId, 'preImportance', result.data))
     promise.push(updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel))
   }
   return Promise.all(promise).then(([result1, result2]) => {
-    const aaa = Object.assign({}, returnValue, result1.result, result2.result )
-    console.log(aaa)
-    return aaa
+    return Object.assign({}, returnValue, { result }, (result1 || {}).result, (result2 || {}).result)
   })
 }))
 

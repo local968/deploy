@@ -91,9 +91,7 @@ export default class Project {
   @observable expression = {}
   @observable informativesLabel = []
   @observable colValueCounts = {}
-  @observable totalNullLines = 0
-  @observable totalMismatchLines = 0
-  @observable totalOutlierLines = 0
+  @observable totalFixedLines = 0
   @observable nullLineCounts = {}
   @observable mismatchLineCounts = {}
   @observable outlierLineCounts = {}
@@ -191,9 +189,7 @@ export default class Project {
       outlierDict: {},
       targetMap: {},
       targetArray: [],
-      totalNullLines: 0,
-      totalMismatchLines: 0,
-      totalOutlierLines: 0,
+      totalFixedLines: 0,
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
@@ -499,7 +495,7 @@ export default class Project {
 
   @computed
   get variableIssues() {
-    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType, totalRawLines } = this;
+    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines } = this;
     const obj = {
       mismatchRow: {},
       nullRow: {},
@@ -507,14 +503,14 @@ export default class Project {
     }
 
     dataHeader.forEach(h => {
-      if (colType[h] !== "Categorical" && mismatchIndex[h] && !!mismatchIndex[h].length) {
-        obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchIndex[h].length || 0) / (totalRawLines || 1) * 100 })
+      if (colType[h] !== "Categorical" && mismatchLineCounts[h]) {
+        obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
-      if (nullIndex[h] && !!nullIndex[h].length) {
-        obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullIndex[h].length || 0) / (totalRawLines || 1) * 100 })
+      if (nullLineCounts[h]) {
+        obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
-      if (colType[h] !== "Categorical" && outlierIndex[h] && !!outlierIndex[h].length) {
-        obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierIndex[h].length || 0) / (totalRawLines || 1) * 100 })
+      if (colType[h] !== "Categorical" && outlierLineCounts[h]) {
+        obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
     })
     return obj
@@ -1120,17 +1116,21 @@ export default class Project {
   }
 
   preTrainImportance = () => {
-    const exp = Object.values(this.expression).map(v => v.exp).join(";")
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
-      const feature_label = [...this.dataHeader, ...this.newVariable].filter(v => !readyLabels.includes(v) && v !== this.target)
+      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return
       const command = {
         projectId: this.id,
         command: 'preTrainImportance',
         feature_label
       };
-      if (exp) command.csvScript = exp.replace(/\|/g, ",")
+      if(new_label.length) {
+        const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+        command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      }
       return api.preTrainImportance(command, progressResult => {
       }).then(returnValue => {
         const { status, result } = returnValue
