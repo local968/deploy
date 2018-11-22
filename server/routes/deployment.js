@@ -125,3 +125,13 @@ wss.register('getProjectDeployment', async (message, socket) => {
     return response
   })
 })
+
+wss.register('updateDeploymentModel', async (message, socket) => {
+  const userId = socket.session.userId
+  const deploymentId = message.deploymentId
+  const modelName = message.modelName
+  const deployment = JSON.parse(await redis.get(`deployment:${deploymentId}`))
+  deployment.modelName = modelName
+  await redis.set(`deployment:${deploymentId}`, JSON.stringify(deployment))
+  wss.publish(`user:${userId}:deployments`, { type: 'update model name' })
+})

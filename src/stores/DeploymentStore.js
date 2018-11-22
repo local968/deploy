@@ -128,7 +128,10 @@ class DeploymentStore {
     };
     const api = await socketStore.ready();
     const checkResponse = await api.getProjectDeployment({ projectId })
-    if (checkResponse.deploymentId) return checkResponse.deploymentId
+    if (checkResponse.deploymentId) {
+      api.updateDeploymentModel({ deploymentId: checkResponse.deploymentId, modelName })
+      return checkResponse.deploymentId
+    }
     const response = await api.addDeployment({ data });
     if (response.status !== 200) {
       throw new Error(response.message);
