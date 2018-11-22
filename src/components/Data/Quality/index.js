@@ -427,7 +427,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType } = project
+    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
     const fixedPercent = totalFixedLines / totalRawLines * 100
     const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100
@@ -562,7 +562,9 @@ class Summary extends Component {
         </div>
         <div className={styles.summaryBottom}>
           <div className={classnames(styles.summaryButton, styles.summaryConfirm)} onClick={this.startTrain}><span>Continue</span></div>
-          <div className={styles.summaryButton} onClick={editFixes}><span>Edit the Fixes</span></div>
+          <div className={classnames(styles.summaryButton, {
+            [styles.disabled]: !issues.dataIssue
+          })} onClick={issues.dataIssue?editFixes:null}><span>Edit the Fixes</span></div>
           <div className={styles.summaryButton} onClick={this.backToConnect}><span>Load a Better Dataset</span></div>
         </div>
       </div>

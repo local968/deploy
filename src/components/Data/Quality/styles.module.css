@@ -1107,6 +1107,15 @@ span.fixesEdit {
 	cursor: pointer;
 }
 
+.disabled {
+	cursor: not-allowed;
+	background-color: #d3d3d3;
+	color: #aaaaaa;
+	background-image: none;
+	border: transparent;
+	cursor: not-allowed;
+}
+
 .summaryButton span {
 	font-family: HelveticaNeue;
 	font-size: 1rem;

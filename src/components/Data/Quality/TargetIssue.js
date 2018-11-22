@@ -501,16 +501,17 @@ export class FixIssue extends Component {
               if (!num) {
                 return null;
               }
+              const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
-                <div className={styles.fixesCell}><span>{colType[k]}</span></div>
+                <div className={styles.fixesCell}><span>{showType}</span></div>
                 <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.mismatchSelect.bind(null, k)}>
-                  {colType[k] === 'Categorical' ? [
+                  {showType === 'Categorical' ? [
                     <option value={dataViews[k].mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,
                     <option value={0} key={0}>Replace with 0</option>
@@ -555,18 +556,19 @@ export class FixIssue extends Component {
               if (!num) {
                 return null;
               }
+              const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
               // const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>I don`t know</span></div>
-                <div className={styles.fixesCell}><span>{colType[k]}</span></div>
+                <div className={styles.fixesCell}><span>{showType}</span></div>
                 <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mode}>{dataViews[k].mode}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.nullSelect.bind(null, k)}>
-                  {colType[k] === 'Categorical' ? [
+                  {showType === 'Categorical' ? [
                     <option value={dataViews[k].mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,
                     <option value={0} key={0}>Replace with 0</option>
@@ -610,19 +612,20 @@ export class FixIssue extends Component {
               if (!num) {
                 return null;
               }
-              
+              const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+              const isShow = showType === 'Numerical';
+              if(!isShow) return null
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
-              const isShow = colType[k] === 'Numerical';
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
               // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
-              return isShow && <div className={styles.fixesRow} key={i}>
+              return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                   <span title={outlier[0].toFixed(2) + "-" + outlier[1].toFixed(2)}>
                     {outlier[0].toFixed(2) + "-" + outlier[1].toFixed(2)}
                   </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>edit</span>
                 </div>
-                <div className={styles.fixesCell}><span>{colType[k]}</span></div>
+                <div className={styles.fixesCell}><span>{showType}</span></div>
                 <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].mean} >{dataViews[k].mean}</span></div>
                 <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
