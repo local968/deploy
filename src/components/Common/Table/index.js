@@ -17,10 +17,7 @@ export default class Table extends Component {
     // const { checkList, showSelect } = this.state;
     const headerList = [...dataHeader]
     const notShowIndex = sortHeader.filter(v => !dataHeader.includes(v)).map(v => sortHeader.indexOf(v))
-    const data = sortData.map(row => {
-      notShowIndex.forEach(i => row.splice(i, 1))
-      return row
-    })
+    const data = sortData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
