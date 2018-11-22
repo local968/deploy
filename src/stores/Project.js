@@ -130,7 +130,7 @@ export default class Project {
   @observable measurement = '';
   @observable resampling = "no";
   @observable runWith = 'holdout';
-  @observable crossCount = 3;
+  @observable crossCount = 5;
   @observable dataRange = 'all';
   @observable customField = '';
   @observable customRange = [];
@@ -213,7 +213,7 @@ export default class Project {
       randSeed: 0,
       resampling: 'no',
       runWith: 'holdout',
-      crossCount: 3,
+      crossCount: 5,
       dataRange: 'all',
       customField: '',
       customRange: [],

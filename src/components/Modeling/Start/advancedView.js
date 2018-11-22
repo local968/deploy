@@ -166,7 +166,7 @@ export default class AdvancedView extends Component {
   reset = action(() => {
     this.props.project.holdoutRate = 20
     this.props.project.validationRate = 20
-    this.props.project.crossCount = 3
+    this.props.project.crossCount = 5
   })
 
   changeSetting = action((e) => {
@@ -192,7 +192,7 @@ export default class AdvancedView extends Component {
       measurement: project.changeProjectType === "Classification" ? "auc" : "r2",
       runWith: project.totalRawLines > 10000 ? 'holdout' : 'cross',
       resampling: 'no',
-      crossCount: 3,
+      crossCount: 5,
       dataRange: 'all',
       customField: '',
       customRange: [],
@@ -444,7 +444,7 @@ export default class AdvancedView extends Component {
                       <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
                       <span>Select Number of CV folds</span>
                     </div>
-                    <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={5} isInt={true} />
+                    <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={10} isInt={true} />
                     {/* <span>{crossCount}</span> */}
                   </div>
                   <div className={styles.advancedPercentInput}>
