@@ -402,8 +402,8 @@ class Summary extends Component {
       .outerRadius(outerRadius)
     const { totalRawLines, totalLines, totalFixedLines } = this.props.project
     const deleteRows = totalRawLines - totalLines
-    const fixedRows = totalFixedLines
-    const cleanRows = totalLines - totalFixedLines
+    const fixedRows = totalFixedLines + totalLines - totalRawLines
+    const cleanRows = totalRawLines - totalFixedLines
     const data = [deleteRows, fixedRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
@@ -429,8 +429,8 @@ class Summary extends Component {
     const { project, editFixes } = this.props;
     const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
-    const fixedPercent = totalFixedLines / totalRawLines * 100
-    const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100
+    const fixedPercent = (totalFixedLines + totalLines - totalRawLines) / totalRawLines * 100
+    const cleanPercent = (totalRawLines - totalFixedLines) / totalRawLines * 100
     const variableList = sortHeader.slice(1)
     const percentList = sortHeader.map(v => {
       const percent = {
