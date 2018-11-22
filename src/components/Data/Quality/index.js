@@ -404,7 +404,7 @@ class Summary extends Component {
     const deleteRows = totalRawLines - totalLines
     const fixedRows = totalFixedLines + totalLines - totalRawLines
     const cleanRows = totalRawLines - totalFixedLines
-    const data = [deleteRows, fixedRows, cleanRows]
+    const data = [fixedRows, deleteRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
 
