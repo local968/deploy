@@ -71,13 +71,13 @@ class TargetIssue extends Component {
 
   saveTargetFixes = () => {
     this.props.project.fixTarget()
-    message.info('Thank you for fixing the issues below. The changes will be applied at training section')
+    message.info('Thank you for fixing the issues. The changes will be applied at training section')
     this.closeTarget();
   }
 
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
-    message.info('Thank you for fixing the issues below. The changes will be applied at training section')
+    message.info('Thank you for fixing the issues. The changes will be applied at training section')
     this.closeFixes();
   }
 
@@ -264,7 +264,7 @@ class VariableIssue extends Component {
 
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
-    message.info('Thank you for fixing the issues below. The changes will be applied at training section')
+    message.info('Thank you for fixing the issues. The changes will be applied at training section')
     this.closeFixes();
   }
 
@@ -400,10 +400,10 @@ class Summary extends Component {
     const arc = d3.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-    const { totalRawLines, totalLines, totalMismatchLines, totalNullLines, totalOutlierLines } = this.props.project
+    const { totalRawLines, totalLines, totalFixedLines } = this.props.project
     const deleteRows = totalRawLines - totalLines
-    const fixedRows = totalMismatchLines + totalNullLines + totalOutlierLines
-    const cleanRows = totalLines - fixedRows
+    const fixedRows = totalFixedLines
+    const cleanRows = totalLines - totalFixedLines
     const data = [deleteRows, fixedRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
@@ -427,10 +427,10 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalMismatchLines, totalNullLines, totalOutlierLines, problemType } = project
+    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
-    const fixedPercent = (totalMismatchLines + totalNullLines + (problemType !== 'Classification' ? totalOutlierLines : 0)) / totalRawLines * 100
-    const cleanPercent = (totalLines - (totalMismatchLines + totalNullLines + (problemType !== 'Classification' ? totalOutlierLines : 0))) / totalRawLines * 100
+    const fixedPercent = totalFixedLines / totalRawLines * 100
+    const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100
     const variableList = sortHeader.slice(1)
     const percentList = sortHeader.map(v => {
       const percent = {
@@ -562,7 +562,9 @@ class Summary extends Component {
         </div>
         <div className={styles.summaryBottom}>
           <div className={classnames(styles.summaryButton, styles.summaryConfirm)} onClick={this.startTrain}><span>Continue</span></div>
-          <div className={styles.summaryButton} onClick={editFixes}><span>Edit the Fixes</span></div>
+          <div className={classnames(styles.summaryButton, {
+            [styles.disabled]: !issues.dataIssue
+          })} onClick={issues.dataIssue?editFixes:null}><span>Edit the Fixes</span></div>
           <div className={styles.summaryButton} onClick={this.backToConnect}><span>Load a Better Dataset</span></div>
         </div>
       </div>
