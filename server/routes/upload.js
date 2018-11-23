@@ -86,7 +86,7 @@ router.post('/', (req, res) => {
         fields.userId = params.userId
         redis.set('file:' + fileId, JSON.stringify(fields))
         redis.incrby(`user:${params.userId}:upload`, parseInt(params.fileSize))
-        res.json({ fileId, status: 200, message: 'ok' })
+        // res.json({ fileId, status: 200, message: 'ok' })
       })
   });
 })

@@ -13,7 +13,7 @@ const AccuracyHint = "Given a particular population, the accuracy measures the p
 @observer
 export default class ClassificationView extends Component {
   @observable showCost = false
-  @observable costOption = this.props.project.costOption
+  @observable costOption = { ...this.props.project.costOption }
 
   onChange = e => {
     const criteria = e.target.value
@@ -50,7 +50,7 @@ export default class ClassificationView extends Component {
   }
 
   handleSubmit = () => {
-    this.props.project.updateProject({ costOption: this.costOption })
+    this.props.project.updateProject({ costOption: { ...this.costOption } })
     // this.props.project.costOption = this.costOption
   }
 

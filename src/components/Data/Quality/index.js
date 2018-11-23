@@ -363,7 +363,8 @@ class VariableIssue extends Component {
         showClose={true}
       />
       <Modal content={<Summary project={project}
-        editFixes={this.editFixes} />}
+        editFixes={this.editFixes} 
+        closeSummary={this.closeSummary} />}
         visible={this.summary}
         width='12em'
         title='How R2 Learn Will Fix the Issues'
@@ -387,8 +388,9 @@ class Summary extends Component {
   }
 
   startTrain = () => {
-    const { project } = this.props;
-    project.updateProject(project.nextMainStep(3))
+    const { project, closeSummary } = this.props;
+    closeSummary()
+    project.etl().then(() => project.updateProject(project.nextMainStep(3)))
   }
 
   renderD3 = () => {
@@ -564,7 +566,7 @@ class Summary extends Component {
           <div className={classnames(styles.summaryButton, styles.summaryConfirm)} onClick={this.startTrain}><span>Continue</span></div>
           <div className={classnames(styles.summaryButton, {
             [styles.disabled]: !issues.dataIssue
-          })} onClick={issues.dataIssue?editFixes:null}><span>Edit the Fixes</span></div>
+          })} onClick={issues.dataIssue ? editFixes : null}><span>Edit the Fixes</span></div>
           <div className={styles.summaryButton} onClick={this.backToConnect}><span>Load a Better Dataset</span></div>
         </div>
       </div>

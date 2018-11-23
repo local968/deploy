@@ -145,7 +145,7 @@ export default class Project {
     this.setProperty(args)
 
     autorun(async () => {
-      if (this.uploadFileName.length === 0) return
+      if (!this.uploadFileName || this.uploadFileName.length === 0) return
       const api = await socketStore.ready()
       const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
       this.fileNames = fileNames
@@ -668,7 +668,7 @@ export default class Project {
     // feature_label: 特征列名
     // fill_method:  无效值
     // kwargs:
-    socketStore.ready()
+    return socketStore.ready()
       .then(api => api.etl(data, progressResult => {
         let { result } = progressResult;
         if (!this.etling) return;
