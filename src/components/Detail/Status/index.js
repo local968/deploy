@@ -20,6 +20,12 @@ export default class List extends Component {
     this.props.deploymentStore.currentDeployment.performanceOptions[key] = value;
     this.props.deploymentStore.currentDeployment.save();
   };
+
+  showScore = (score, type) => {
+    if (!score || !score[type] || !score[type].toFixed || typeof score[type].toFixed !== 'function') return ''
+    return score[type].toFixed(2)
+  }
+
   render() {
     const { deploymentStore, scheduleStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
@@ -101,14 +107,8 @@ export default class List extends Component {
                       {s.schedule.result &&
                         s.schedule.status === 'finished' &&
                         (s.schedule.result.problemType === 'Classification'
-                          ? `Accuracy:${s.schedule.result.score &&
-                          s.schedule.result.score.acc.toFixed(2)} AUC:${s
-                            .schedule.result.score &&
-                          s.schedule.result.score.auc.toFixed(2)}`
-                          : `RMSE:${s.schedule.result.score &&
-                          s.schedule.result.score.rmse.toFixed(2)} R²:${s
-                            .schedule.result.score &&
-                          s.schedule.result.score.r2.toFixed(2)}`)}
+                          ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')} AUC:${this.showScore(s.schedule.result.score, 'auc')}`
+                          : `RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`)}
                     </span>
                     <span className={styles.threshold}>
                       {s.schedule.threshold &&
