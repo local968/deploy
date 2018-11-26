@@ -680,7 +680,6 @@ export default class Project {
           const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
           Papa.parse(url, {
             download: true,
-            preview: 100,
             delimiter: ',',
             complete: result => {
               if (result.errors.length !== 0) {
@@ -695,7 +694,6 @@ export default class Project {
           const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
           Papa.parse(url, {
             download: true,
-            preview: 100,
             delimiter: ',',
             complete: result => {
               if (result.errors.length !== 0) {

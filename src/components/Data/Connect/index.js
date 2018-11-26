@@ -278,7 +278,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressText}>
                   <span>{this.message}</span>
-                  {(this.process < 90 && this.process > 0 && this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
+                  {(this.process < 90 && this.process > 0 && !this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
                 </div>
               </div>
             </div>
