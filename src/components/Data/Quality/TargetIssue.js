@@ -270,6 +270,7 @@ export class SelectTarget extends Component {
   @observable belongTo1 = []
   @observable step = 1
   @observable canSave = false
+  @observable belong = ""
 
   check = e => {
     let arr, canSave = false;
@@ -311,10 +312,15 @@ export class SelectTarget extends Component {
     this.props.saveTargetFixes()
   }
 
-  handleCheck = (key, e) => {
+  handleBelong = key => {
+    this.belong = key === this.belong ? -1 : key
+  }
+
+  handleCheck = e => {
+    const field = 'belongTo' + this.belong
     const value = e.target.value
     const checked = e.target.checked
-    const field = `belongTo${key}`
+    // const field = `belongTo${key}`
     if (checked && !this[field].includes(value)) this[field] = [...this[field], value]
     if (!checked && this[field].includes(value)) this[field] = this[field].filter(v => v !== value)
   }
@@ -331,62 +337,73 @@ export class SelectTarget extends Component {
     const { closeTarget, project } = this.props;
 
     const { targetColMap, target, colValueCounts, totalRawLines } = project
-    const { checked, belongTo0, belongTo1 } = this
+    const { checked } = this
     const [v0, v1] = checked
-    const percent0 = (v0 ? colValueCounts[target][v0] || 0 : 0) / (totalRawLines || 1) * 85
-    const percent1 = (v1 ? colValueCounts[target][v1] || 0 : 0) / (totalRawLines || 1) * 85
-
+    const currentBelong = [...this.belongTo0, ...this.belongTo1]
+    const disabledArray = Object.keys(targetColMap).filter(h => {
+      if (this.belong !== 0 && this.belong !== 1) return true
+      const arr = this['belongTo' + (1 - this.belong)]
+      return arr.includes(h)
+    })
     return <div className={styles.fixesContent}>
       {this.step === 1 && <div className={styles.fixesBox}>
         <div className={styles.fixesText}><span>Please select two valid values from all unique values in your target variable</span></div>
-        <div className={styles.fixesCheckBox}>
-          <div className={styles.targetPercentBox}>
-            {Object.keys(targetColMap).map((v, k) => {
-              const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
-              const backgroundColor = (v0 === v && '#9be44b') || (v1 === v && '#adaafc') || '#c4cbd7'
-              return <div className={styles.targetPercentRow} key={k}>
-                <div className={styles.targetPercentCheckBox}>
-                  <input type='checkbox' onChange={this.check} value={v} checked={checked.includes(v)} />
-                </div>
-                <div className={styles.targetPercentLabel}>
-                  <span>{v}</span>
-                </div>
-                <div className={styles.targetPercentValue}>
-                  <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                  <span>{colValueCounts[target][v] || 0}</span>
-                </div>
+        <div className={styles.targetPercentBox}>
+          {Object.keys(targetColMap).map((v, k) => {
+            const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
+            const backgroundColor = (v0 === v && '#9be44b') || (v1 === v && '#adaafc') || '#c4cbd7'
+            return <div className={styles.targetPercentRow} key={k}>
+              <div className={styles.targetPercentCheckBox}>
+                <input type='checkbox' onChange={this.check} value={v} checked={checked.includes(v)} />
               </div>
-            })}
-          </div>
+              <div className={styles.targetPercentLabel}>
+                <span>{v}</span>
+              </div>
+              <div className={styles.targetPercentValue}>
+                <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
+                <span>{colValueCounts[target][v] || 0}</span>
+              </div>
+            </div>
+          })}
         </div>
+        <div className={styles.fixesTips}><span>You can rename the selected values by double click the value’s name.</span></div>
       </div>}
       {this.step === 2 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>Select all values that belong to value1 </span></div>
+        <div className={styles.fixesText}><span>Select all values that match as {v0} or {v1} </span></div>
         <div className={styles.targetPercentBox}>
-          <div className={styles.targetPercentRow}>
-            <div className={styles.targetPercentLabel}>
-              <span>{checked[0]}</span>
+          {this.checked.map((t, i) => {
+            const percent = (colValueCounts[target][t] || 0) / (totalRawLines || 1) * 85
+            const backgroundColor = (v0 === t && '#9be44b') || (v1 === t && '#adaafc') || '#c4cbd7'
+            return <div className={styles.targetPercentRow} key={i}>
+              <div className={styles.targetPercentLabel}>
+                <span>{t}</span>
+              </div>
+              <div className={styles.targetPercentValue}>
+                <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
+                <span>{colValueCounts[target][t] || 0}</span>
+              </div>
             </div>
-            <div className={styles.targetPercentValue}>
-              <div className={styles.targetPercent} style={{ width: percent0 + '%', backgroundColor: '#9be44b' }}></div>
-              <span>{colValueCounts[target][v0] || 0}</span>
-            </div>
-          </div>
+          })}
           <div className={styles.fixesCheckBox}>
             {Object.keys(targetColMap).filter(v => !checked.includes(v)).map((t, i) => {
-              const disabled = belongTo1.includes(t)
+              const disabled = disabledArray.includes(t)
               return <div className={styles.fixesCheck} key={i}>
-                <input type='checkbox' value={t} id={`belongTo0${t}`} checked={belongTo0.includes(t)} disabled={disabled} onChange={this.handleCheck.bind(null, 0)} />
+                <input type='checkbox' value={t} id={`belong${t}`} checked={currentBelong.includes(t)} disabled={disabled} onChange={disabled ? null : this.handleCheck} />
                 <label className={classnames(styles.fixesCheckBoxLabel, {
                   [styles.disabledText]: disabled
-                })} htmlFor={`belongTo0${t}`}>{t}</label>
+                })} htmlFor={`belong${t}`}>{t}</label>
               </div>
             })}
           </div>
-          <div className={styles.fixesTips}></div>
+          <div className={styles.cleanTargetButton} style={{ margin: '.1em 0' }}>
+            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>Match as {v0}</span></button>
+            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>Match as {v1}</span></button>
+          </div>
         </div>
+
+        <div className={styles.fixesTips}><span>The rest values will be deleted by default</span></div>
       </div>}
-      {this.step === 3 && <div className={styles.fixesBox}>
+      {/* {this.step === 3 && <div className={styles.fixesBox}>
         <div className={styles.fixesText}><span>Select all values that belong to value2 </span></div>
         <div className={styles.targetPercentBox}>
           <div className={styles.targetPercentRow}>
@@ -411,8 +428,8 @@ export class SelectTarget extends Component {
           </div>
         </div>
         <div className={styles.fixesTips}><span>The rest values will be deleted by default</span></div>
-      </div>}
-      {this.step === 4 && <div className={styles.fixesBox}>
+      </div>} */}
+      {this.step === 3 && <div className={styles.fixesBox}>
         <div className={classnames(styles.fixesIconBox, styles.center)}>
           <div className={classnames(styles.cleanHeaderIcon, styles.largeIcon)}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '2.4rem' }} /></div>
         </div>
@@ -429,7 +446,7 @@ export class SelectTarget extends Component {
         <button className={styles.cancel} onClick={this.step > 1 ? this.backStep : closeTarget}><span>{this.step > 1 ? 'Back' : 'Cancel'}</span></button>
         <button className={classnames(styles.save, {
           [styles.disabled]: !this.canSave
-        })} onClick={this.step < 4 ? this.nextStep : this.save} disabled={!this.canSave} ><span>{this.step < 4 ? 'Next' : "Done"}</span></button>
+        })} onClick={this.step < 3 ? this.nextStep : this.save} disabled={!this.canSave} ><span>{this.step < 3 ? 'Next' : "Done"}</span></button>
       </div>
     </div>
   }
@@ -614,7 +631,7 @@ export class FixIssue extends Component {
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const isShow = showType === 'Numerical';
-              if(!isShow) return null
+              if (!isShow) return null
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
               // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`

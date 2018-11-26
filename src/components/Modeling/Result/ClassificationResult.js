@@ -39,7 +39,7 @@ export default class ClassificationView extends Component {
     const field = (row === col ? "T" : "F") + (col === 0 ? "P" : "N")
     return <div className={styles.costTd}>
       <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
-      <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benifit:'}</span></div>
+      <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benefit:'}</span></div>
       <div className={styles.costInput}><NumberInput value={this.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
       <div className={styles.costUnits}><span>units</span></div>
     </div>
@@ -87,7 +87,7 @@ export default class ClassificationView extends Component {
         <div className={styles.radioGroup}>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='default' id='criteria_default' readOnly onClick={train2ing ? null : this.onChange} checked={criteria === 'default'} disabled={train2ing} />
-            <label htmlFor='criteria_default'>Mr. One's Defult Selection</label>
+            <label htmlFor='criteria_default'>Mr. One's Default Selection</label>
           </div>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={train2ing ? null : this.onChange} checked={criteria === 'cost'} disabled={train2ing} />
@@ -96,10 +96,10 @@ export default class ClassificationView extends Component {
           {this.showCost && <div className={styles.costBlock}>
             <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
             <div className={styles.costTitle}>
-              <span>Input your cost or benifit of every prediction result: (0 ~ 100)</span>
+              <span>Input your cost or benefit of every prediction result: (0 ~ 100)</span>
             </div>
             <div className={styles.costContent}>
-              <span>Note: If a prediction result will let you loose your resource or money. It should be a cost; If a prediction result will bring you revenue or income, it should be a benifit. All input should be measured at the same unit.</span>
+              <span>Note: If a prediction brings you loss, it is a cost; If a prediction result brings you profit, it is a benefit. All inputs should be measured at the same unit.</span>
             </div>
             <div className={styles.costBox}>
               <div className={styles.costTable}>
@@ -120,8 +120,9 @@ export default class ClassificationView extends Component {
                 </div>
               </div>
             </div>
-            {!!(TP || FN || FP || TN) && <div className={styles.costContent}>
-              <span>{current.getBenifit(TP, FN, FP, TN).text}</span>
+            {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
+              {/* <div className={styles.costText}><span>The best benefit score based on 3616 row samples size:</span></div> */}
+              <div className={styles.costText}><span>{current.getBenefit(TP, FN, FP, TN).text}</span></div>
             </div>}
             <div className={styles.costButton}>
               <button onClick={this.handleSubmit}><span>Submit</span></button>

@@ -695,7 +695,7 @@
 
 .costContent span {
     font-family: SanFranciscoText;
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.33;
     color: #000000;
 }
@@ -829,10 +829,6 @@
     background-image: none;
 }
 
-.predictActual {
-    
-}
-
 .costButton {
     display: flex;
     flex: none;
@@ -855,4 +851,23 @@
 .costButton span {
     font-size: 1rem;
     color: #fff;
+}
+
+.costTextBox {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.costText {
+    display: flex;
+    flex: none;
+}
+
+.costText span {
+    font-family: SanFranciscoText;
+    font-size: 0.75rem;
+    line-height: 1.33;
+    color: #000000;
+    font-weight: bold;
 }

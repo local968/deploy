@@ -54,34 +54,34 @@ export default class Model {
     this.fitIndex = this.initialFitIndex;
   }
   getScore(ITP, IFN, IFP, ITN) {
-    const { problemType, score: {validateScore} } = this
+    const { problemType, score: { validateScore } } = this
     if (problemType === 'Classification') {
       if (!ITP || !IFN || !IFP || !ITN) return validateScore.auc + validateScore.acc
-      return this.getBenifit(ITP, IFN, IFP, ITN).benifit
+      return this.getBenefit(ITP, IFN, IFP, ITN).benefit
     }
     return 1 - validateScore.rmse + validateScore.r2
   }
-  getBenifit(ITP, IFN, IFP, ITN) {
+  getBenefit(ITP, IFN, IFP, ITN) {
     const data = this.chartData || {}
     const roc = data.roc || {}
     const { TP, FN, FP, TN } = roc
     if (!TP || !FN || !FP || !TN) return {
-      benifit: 0,
+      benefit: 0,
       index: this.fitIndex,
-      text: `${ITP}*${0}{TP}-${IFN}*${0}{FN}-${IFP}*${0}{FP}+${ITN}*${0}{TN}=${0}`
+      text: `${ITP} * ${0}(TP) - ${IFN} * ${0}(FN) - ${IFP} * ${0}(FP) + ${ITN} * ${0}(TN) = ${0}`
     }
     let maxIndex = 0
     for (let i = 1; i < 100; i++) {
-      const benifit = TP[i] * ITP - FN[i] * IFN - FP[i] * IFP + TN[i] * ITN
-      const maxBenifit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
-      if (benifit > maxBenifit) maxIndex = i
+      const benefit = TP[i] * ITP - FN[i] * IFN - FP[i] * IFP + TN[i] * ITN
+      const maxBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
+      if (benefit > maxBenefit) maxIndex = i
     }
-    const realBenifit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
+    const realBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
     // this.fitIndex = maxIndex
     return {
-      benifit: realBenifit,
+      benefit: realBenefit,
       index: maxIndex,
-      text: `${ITP}*${TP[maxIndex]}{TP}-${IFN}*${FN[maxIndex]}(FN)-${IFP}*${FP[maxIndex]}(FP)+${ITN}*${TN[maxIndex]}(TN)=${realBenifit}`
+      text: `${ITP} * ${TP[maxIndex]}(TP) - ${IFN} * ${FN[maxIndex]}(FN) - ${IFP} * ${FP[maxIndex]}(FP) + ${ITN} * ${TN[maxIndex]}(TN) = ${realBenefit}`
     }
   }
   @computed
