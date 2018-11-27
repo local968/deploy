@@ -73,6 +73,7 @@ export default class DataSchema extends Component {
   formatTable = () => {
     const { target, colType, headerTemp: { temp }, sortData, sortHeader, renameVariable } = this.props.project;
     const { showSelect, checkList } = this
+    if (!sortData.length) return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     const headerList = [...sortHeader]
@@ -124,63 +125,63 @@ export default class DataSchema extends Component {
         }
         checkArr.push(checkData)
       }
-      if (index.headerRow > -1) {
-        const headerData = {
-          content: '',
-          title: '',
-          cn: styles.titleCell
-        }
-        if (i === index.columnHeader - 1) {
-          headerData.content = <span>row/header</span>;
-          headerData.title = '';
-        } else {
-          headerData.content = <span>{header}</span>;
-          headerData.title = header;
-          if (target && target === header) {
-            headerData.cn = classnames(headerData.cn, styles.target);
-          }
-          if (checkList.includes(header)) {
-            headerData.cn = classnames(headerData.cn, styles.checked);
-          }
-          if (!header) {
-            headerData.cn = classnames(headerData.cn, styles.missed);
-          }
-          if (header && temp[header].length > 1) {
-            headerData.cn = classnames(headerData.cn, styles.duplicated);
-          }
-        }
-        headerArr.push(headerData)
+
+      const headerData = {
+        content: '',
+        title: '',
+        cn: styles.titleCell
       }
-      if (index.selectRow > -1) {
-        const selectData = {
-          content: '',
-          title: '',
-          cn: styles.check
+      if (i === index.columnHeader - 1) {
+        headerData.content = <span>row/header</span>;
+        headerData.title = '';
+      } else {
+        headerData.content = <span>{header}</span>;
+        headerData.title = header;
+        if (target && target === header) {
+          headerData.cn = classnames(headerData.cn, styles.target);
         }
-        if (i === index.columnHeader - 1) {
-          selectData.content = "";
-        } else {
-          let key = header;
-          if (!header) {
-            key = `Unnamed: ${realColumn}`
-          }
-          if (header && temp[header].length > 1) {
-            const tempIndex = temp[header].findIndex(c => c === realColumn);
-            const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
-            key = header + suffix
-          }
-          if (target && target === header) {
-            selectData.cn = classnames(selectData.cn, styles.target);
-          }
-          const colValue = colType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
-          selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
-            <option value="Categorical">Categorical</option>
-            <option value="Numerical">Numerical</option>
-          </select>
-          selectData.title = colValue
+        if (checkList.includes(header)) {
+          headerData.cn = classnames(headerData.cn, styles.checked);
         }
-        selectArr.push(selectData)
+        if (!header) {
+          headerData.cn = classnames(headerData.cn, styles.missed);
+        }
+        if (header && temp[header].length > 1) {
+          headerData.cn = classnames(headerData.cn, styles.duplicated);
+        }
       }
+      headerArr.push(headerData)
+
+      const selectData = {
+        content: '',
+        title: '',
+        cn: styles.check
+      }
+      if (i === index.columnHeader - 1) {
+        selectData.content = "";
+      } else {
+        let key = header;
+        if (!header) {
+          key = `Unnamed: ${realColumn}`
+        }
+        if (header && temp[header].length > 1) {
+          const tempIndex = temp[header].findIndex(c => c === realColumn);
+          const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
+          key = header + suffix
+        }
+        const colValue = colType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
+        selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
+          <option value="Categorical">Categorical</option>
+          <option value="Numerical">Numerical</option>
+        </select>
+        selectData.title = colValue
+        if (target && target === key) {
+          selectData.cn = classnames(styles.cell, styles.target);
+          selectData.content = <span>{colValue}</span>
+        }
+
+      }
+      selectArr.push(selectData)
     }
 
     const tableData = data.map((row, rowIndex) => {

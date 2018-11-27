@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { AutoSizer, MultiGrid } from 'react-virtualized';
+import { Spin } from 'antd'
 
 @observer
 export default class Table extends Component {
@@ -29,8 +30,8 @@ export default class Table extends Component {
   }
 
   render() {
-    const { columnCount, columnWidth, rowHeight, fixedColumnCount, fixedRowCount, rowCount } = this.props;
-    return <AutoSizer>
+    const { columnCount, columnWidth, rowHeight, fixedColumnCount, fixedRowCount, rowCount, data } = this.props;
+    return !!data.length ? <AutoSizer>
       {({ height, width }) => {
         return <MultiGrid
           columnCount={columnCount}
@@ -46,6 +47,6 @@ export default class Table extends Component {
           ref={this.MultiGridCb}
         />
       }}
-    </AutoSizer>
+    </AutoSizer> : <div style={{ display: 'flex', flex: 'auto', justifyContent: 'center', alignItems: 'center', border: '1px solid #ccc' }}><Spin size='large' /></div>
   }
 }

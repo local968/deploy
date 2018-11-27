@@ -182,7 +182,7 @@ export default class Project {
           // this.newFileInit(result.data);
         }
       });
-      return 
+      return
     })
   }
 
@@ -711,44 +711,43 @@ export default class Project {
         }
         // if (name === "csvHeader") {
         //   this.setProperty({ originPath: path })
-          // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
-          // Papa.parse(url, {
-          //   download: true,
-          //   delimiter: ',',
-          //   complete: result => {
-          //     if (result.errors.length !== 0) {
-          //       console.error('parse error: ', result.errors[0].message);
-          //       return;
-          //     }
-          //     // this.newFileInit(result.data);
-          //   }
-          // });
+        // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
+        // Papa.parse(url, {
+        //   download: true,
+        //   delimiter: ',',
+        //   complete: result => {
+        //     if (result.errors.length !== 0) {
+        //       console.error('parse error: ', result.errors[0].message);
+        //       return;
+        //     }
+        //     // this.newFileInit(result.data);
+        //   }
+        // });
         // }
         // if (name === "cleanCsvHeader") {
         //   this.updateProject({ cleanPath: path })
-          // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
-          // Papa.parse(url, {
-          //   download: true,
-          //   delimiter: ',',
-          //   complete: result => {
-          //     if (result.errors.length !== 0) {
-          //       console.error('parse error: ', result.errors[0].message);
-          //       return;
-          //     }
-          //     this.updateProject({ cleanData: result.data.slice(1) })
-          //   }
-          // });
+        // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
+        // Papa.parse(url, {
+        //   download: true,
+        //   delimiter: ',',
+        //   complete: result => {
+        //     if (result.errors.length !== 0) {
+        //       console.error('parse error: ', result.errors[0].message);
+        //       return;
+        //     }
+        //     this.updateProject({ cleanData: result.data.slice(1) })
+        //   }
+        // });
         // }
         // this.project.setProperty(result)
         // this.updateProject(result)
       }))
       .then(returnValue => {
+        const { result, status } = returnValue;
+        if (status !== 200) return antdMessage.error(result['process error'])
+        this.setProperty(result)
         this.etling = false;
         this.etlProgress = 0
-        let { result, status, message } = returnValue;
-
-        if (status !== 200) return antdMessage.error(message)
-        this.setProperty(result)
         // this.updateProject(this.next())
         // when(
         //   () => !!this.uploadData.length,

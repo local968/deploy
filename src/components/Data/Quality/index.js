@@ -270,11 +270,12 @@ class VariableIssue extends Component {
   }
 
   formatTable = () => {
-    const { target, colType, sortData, sortHeader, dataHeader, renameVariable, nullIndex, mismatchIndex, outlierIndex, variableIssues } = this.props.project;
+    const { target, colType, sortData, sortHeader, dataHeader, nullIndex, mismatchIndex, outlierIndex, variableIssues } = this.props.project;
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
-    const headerList = [...dataHeader]
-    const notShowIndex = sortHeader.filter(v => !dataHeader.includes(v)).map(v => sortHeader.indexOf(v))
+    if (!sortData.length) return []
+    const headerList = [...dataHeader.filter(v => v !== target)]
+    const notShowIndex = sortHeader.filter(v => !headerList.includes(v)).map(v => sortHeader.indexOf(v))
     const data = sortData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
     /**
      * 根据showSelect, indexPosition变化
@@ -285,14 +286,6 @@ class VariableIssue extends Component {
      * columnHeader: 表头的列数
      * rowHeader: 表头的行数
      */
-    const index = {
-      indexRow: 0,
-      headerRow: 1,
-      selectRow: 2,
-      issueRow: 3,
-      rowHeader: 4
-    }
-
     const realColumn = headerList.length
 
     const indexArr = []
@@ -301,62 +294,41 @@ class VariableIssue extends Component {
     const issueArr = []
     for (let i = 0; i < realColumn; i++) {
       const header = headerList[i] ? headerList[i].trim() : '';
-      if (index.indexRow > -1) {
-        const indexData = {
-          content: <span>{i + 1}</span>,
-          title: i + 1,
-          cn: styles.cell
-        }
-        if (target && target === header) {
-          indexData.cn = classnames(indexData.cn, styles.target);
-        }
-        indexArr.push(indexData)
+
+      indexArr.push({
+        content: <span>{i + 1}</span>,
+        title: i + 1,
+        cn: styles.cell
+      })
+
+      headerArr.push({
+        content: <span>{header}</span>,
+        title: header,
+        cn: styles.titleCell
+      })
+
+      const colValue = colType[header] === 'Numerical' ? 'Numerical' : 'Categorical'
+      selectArr.push({
+        content: <span>{colValue}</span>,
+        title: colValue,
+        cn: styles.cell
+      })
+
+      const issueData = {
+        content: [],
+        title: '',
+        cn: styles.cell
       }
-      if (index.headerRow > -1) {
-        const headerData = {
-          content: <span>{header}</span>,
-          title: header,
-          cn: styles.titleCell
-        }
-        if (target && target === header) {
-          headerData.cn = classnames(headerData.cn, styles.target);
-        }
-        headerArr.push(headerData)
+      if (variableIssues.mismatchRow[header]) {
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
       }
-      if (index.selectRow > -1) {
-        const selectData = {
-          content: '',
-          title: '',
-          cn: styles.cell
-        }
-        if (target && target === header) {
-          selectData.cn = classnames(selectData.cn, styles.target);
-        }
-        const colValue = colType[header] === 'Numerical' ? 'Numerical' : 'Categorical'
-        selectData.content = <span>{colValue}</span>
-        selectData.title = colValue
-        selectArr.push(selectData)
+      if (variableIssues.nullRow[header]) {
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header].toFixed(2)}%</span></div>)
       }
-      if (index.issueRow > -1) {
-        const issueData = {
-          content: [],
-          title: '',
-          cn: styles.cell
-        }
-        if (target && target === header) {
-          issueData.cn = classnames(issueData.cn, styles.target);
-        }
-        if (variableIssues.mismatchRow[header]) {
-          issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
-        }
-        if (variableIssues.nullRow[header]) {
-          issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header].toFixed(2)}%</span></div>)
-        }
-        if (variableIssues.outlierRow[header]) {
-          issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
-        }
-        issueArr.push(issueData)
+      if (variableIssues.outlierRow[header]) {
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
       }
+      issueArr.push(issueData)
     }
 
     const tableData = data.map((row, rowIndex) => row.map((v, k) => {
@@ -365,12 +337,6 @@ class VariableIssue extends Component {
         content: <span>{v}</span>,
         title: v,
         cn: styles.cell
-      }
-      // const cellValue = data[rowIndex][realColumn]
-      if (target && target === header) {
-        itemData.cn = classnames(itemData.cn, styles.target);
-        itemData.content = <span>{renameVariable[v] || v}</span>;
-        itemData.title = renameVariable[v] || v;
       }
       if (nullIndex[header] && nullIndex[header].includes(rowIndex)) {
         itemData.cn = classnames(itemData.cn, styles.missing);
@@ -440,7 +406,7 @@ class VariableIssue extends Component {
           <Table
             columnWidth={110}
             rowHeight={34}
-            columnCount={dataHeader.length}
+            columnCount={dataHeader.length - 1}
             rowCount={tableData.length}
             fixedColumnCount={0}
             fixedRowCount={4}

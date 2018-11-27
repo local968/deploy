@@ -561,22 +561,21 @@ wss.register('train', (message, socket, progress) => {
   const updateData = message.data
   delete message.data
   const data = { ...message, userId, requestId: message._id }
-  let num = 0
+  let hasModel = false
   return checkTraningRestriction(socket.session.user)
     .then(() => moveModels(message.projectId))
     .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
       const { status, result } = queueValue
-      if (status === 100) return queueValue
-      if (status < 0) return null
+      if (status < 0 || status === 100) return queueValue
       if (result.name === "progress") {
         const trainId = result.requestId
         delete result.requestId
         return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
       }
+      hasModel = true
       return createOrUpdate(projectId, userId, { trainModel: null })
         .then(() => createModel(projectId, result).then(addSettingModel(userId, projectId)).then(model => {
-          num++
           wss.publish("user:" + userId + ":projects", model)
           return progress(model)
         }))
@@ -588,7 +587,7 @@ wss.register('train', (message, socket, progress) => {
           train2Error: false,
           selectId: ''
         }
-        if (num === 0) statusData.train2Error = true
+        if (!hasModel) statusData.train2Error = true
         return createOrUpdate(projectId, userId, statusData)
       }))
     .catch(err => {
