@@ -400,7 +400,17 @@ wss.register('etl', (message, socket, progress) => {
       delete data.firstEtl
       if (!csvLocation) delete data.csvLocation
       if (!ext) delete data.ext
-      return sendToCommand(data, progress).then(returnValue => {
+      return command(data, processData => {
+        let { result, status } = processData;
+        if (status < 0 || status === 100) return processData
+        const { name, path, key, origin_header } = result
+        if (name === "progress" && key === 'etl') {
+          return progress(processData)
+        }
+        if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: origin_header, dataHeader: origin_header })
+        if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
+        return null
+      }).then(returnValue => {
         let { result, status } = returnValue;
         if (status < 0) return {
           status: 418,
@@ -424,20 +434,20 @@ wss.register('etl', (message, socket, progress) => {
         if (result.totalLines < 10000) result.runWith = 'cross'
 
         const steps = {}
-        // if (firstEtl) {
-        //   steps.subStepActive = 2
-        //   steps.lastSubStep = 2
-        // } else {
-        //   if (noCompute) {
-        //     steps.curStep = 3
-        //     steps.mainStep = 3
-        //     steps.subStepActive = 1
-        //     steps.lastSubStep = 1
-        //   } else {
-        //     steps.subStepActive = 3
-        //     steps.lastSubStep = 3
-        //   }
-        // }
+        if (firstEtl) {
+          steps.subStepActive = 2
+          steps.lastSubStep = 2
+        } else {
+          if (noCompute) {
+            steps.curStep = 3
+            steps.mainStep = 3
+            steps.subStepActive = 1
+            steps.lastSubStep = 1
+          } else {
+            steps.subStepActive = 3
+            steps.lastSubStep = 3
+          }
+        }
 
         return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
           if (updateResult.status !== 200) return updateResult

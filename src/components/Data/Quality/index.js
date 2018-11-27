@@ -142,7 +142,7 @@ class TargetIssue extends Component {
         </div>}
         <div className={styles.issueTabs}>
           <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
-          <div className={styles.issueTab} onClick={changeTab}><span>All Data</span></div>
+          <div className={styles.issueTab} onClick={changeTab}><span>Predictor Variables</span></div>
         </div>
       </div>
       <div className={styles.contentBox}>
@@ -255,7 +255,8 @@ class VariableIssue extends Component {
   }
 
   showSummary = () => {
-    this.summary = true
+    const { project } = this.props
+    project.etl().then(() => this.summary = true)
   }
 
   closeSummary = () => {
@@ -268,9 +269,128 @@ class VariableIssue extends Component {
     this.closeFixes();
   }
 
+  formatTable = () => {
+    const { target, colType, sortData, sortHeader, dataHeader, renameVariable, nullIndex, mismatchIndex, outlierIndex, variableIssues } = this.props.project;
+    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
+    // const { checkList, showSelect } = this.state;
+    const headerList = [...dataHeader]
+    const notShowIndex = sortHeader.filter(v => !dataHeader.includes(v)).map(v => sortHeader.indexOf(v))
+    const data = sortData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
+    /**
+     * 根据showSelect, indexPosition变化
+     * showSelect: true  显示勾选框
+     * checkRow: 勾选框的行数
+     * headerRow: 标题的行数
+     * selectRow: 类型选择的行数
+     * columnHeader: 表头的列数
+     * rowHeader: 表头的行数
+     */
+    const index = {
+      indexRow: 0,
+      headerRow: 1,
+      selectRow: 2,
+      issueRow: 3,
+      rowHeader: 4
+    }
+
+    const realColumn = headerList.length
+
+    const indexArr = []
+    const headerArr = []
+    const selectArr = []
+    const issueArr = []
+    for (let i = 0; i < realColumn; i++) {
+      const header = headerList[i] ? headerList[i].trim() : '';
+      if (index.indexRow > -1) {
+        const indexData = {
+          content: <span>{i + 1}</span>,
+          title: i + 1,
+          cn: styles.cell
+        }
+        if (target && target === header) {
+          indexData.cn = classnames(indexData.cn, styles.target);
+        }
+        indexArr.push(indexData)
+      }
+      if (index.headerRow > -1) {
+        const headerData = {
+          content: <span>{header}</span>,
+          title: header,
+          cn: styles.titleCell
+        }
+        if (target && target === header) {
+          headerData.cn = classnames(headerData.cn, styles.target);
+        }
+        headerArr.push(headerData)
+      }
+      if (index.selectRow > -1) {
+        const selectData = {
+          content: '',
+          title: '',
+          cn: styles.cell
+        }
+        if (target && target === header) {
+          selectData.cn = classnames(selectData.cn, styles.target);
+        }
+        const colValue = colType[header] === 'Numerical' ? 'Numerical' : 'Categorical'
+        selectData.content = <span>{colValue}</span>
+        selectData.title = colValue
+        selectArr.push(selectData)
+      }
+      if (index.issueRow > -1) {
+        const issueData = {
+          content: [],
+          title: '',
+          cn: styles.cell
+        }
+        if (target && target === header) {
+          issueData.cn = classnames(issueData.cn, styles.target);
+        }
+        if (variableIssues.mismatchRow[header]) {
+          issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
+        }
+        if (variableIssues.nullRow[header]) {
+          issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header].toFixed(2)}%</span></div>)
+        }
+        if (variableIssues.outlierRow[header]) {
+          issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
+        }
+        issueArr.push(issueData)
+      }
+    }
+
+    const tableData = data.map((row, rowIndex) => row.map((v, k) => {
+      const header = headerList[k] && headerList[k].trim();
+      const itemData = {
+        content: <span>{v}</span>,
+        title: v,
+        cn: styles.cell
+      }
+      // const cellValue = data[rowIndex][realColumn]
+      if (target && target === header) {
+        itemData.cn = classnames(itemData.cn, styles.target);
+        itemData.content = <span>{renameVariable[v] || v}</span>;
+        itemData.title = renameVariable[v] || v;
+      }
+      if (nullIndex[header] && nullIndex[header].includes(rowIndex)) {
+        itemData.cn = classnames(itemData.cn, styles.missing);
+      }
+      if (colType[header] === 'Numerical' && mismatchIndex[header] && mismatchIndex[header].includes(rowIndex)) {
+        itemData.cn = classnames(itemData.cn, styles.mismatch);
+      }
+      if (colType[header] === 'Numerical' && outlierIndex[header] && outlierIndex[header].includes(rowIndex)) {
+        itemData.cn = classnames(itemData.cn, styles.outlier);
+      }
+      return itemData
+    }))
+
+    return [indexArr, headerArr, selectArr, issueArr, ...tableData].filter(row => row.length === realColumn)
+  }
+
   render() {
     const { project, changeTab } = this.props;
-    const { issues, issueRows, sortData, target, colType, sortHeader, dataHeader, headerTemp: { temp }, variableIssues, nullIndex, mismatchIndex, outlierIndex, etling, etlProgress, renameVariable } = project;
+    const { issues, issueRows, dataHeader, etling, etlProgress } = project;
+    const tableData = this.formatTable()
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
@@ -312,33 +432,21 @@ class VariableIssue extends Component {
         </div>}
         <div className={styles.issueTabs}>
           <div className={styles.issueTab} onClick={changeTab}><span>Target Variable</span></div>
-          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>All Data</span></div>
+          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>Predictor Variables</span></div>
         </div>
       </div>
       <div className={styles.variableIssue}>
         <div className={styles.contentBox}>
           <Table
-            sortData={sortData}
-            target={target}
-            colType={colType}
-            sortHeader={sortHeader}
-            dataHeader={dataHeader}
-            temp={temp}
-            checkList={[]}
-            showSelect={false}
             columnWidth={110}
             rowHeight={34}
             columnCount={dataHeader.length}
-            rowCount={sortData.length + 4}
+            rowCount={tableData.length}
             fixedColumnCount={0}
             fixedRowCount={4}
             checked={null}
             select={null}
-            indexPosition='top'
-            showIssue={true}
-            issues={variableIssues}
-            renameVariable={renameVariable}
-            issueIndex={{ nullIndex: { ...nullIndex }, mismatchIndex: { ...mismatchIndex }, outlierIndex: { ...outlierIndex } }}
+            data={tableData}
           />
         </div>
         <div className={styles.variableBottom}>
@@ -363,7 +471,7 @@ class VariableIssue extends Component {
         showClose={true}
       />
       <Modal content={<Summary project={project}
-        editFixes={this.editFixes} 
+        editFixes={this.editFixes}
         closeSummary={this.closeSummary} />}
         visible={this.summary}
         width='12em'
@@ -388,9 +496,8 @@ class Summary extends Component {
   }
 
   startTrain = () => {
-    const { project, closeSummary } = this.props;
-    closeSummary()
-    project.etl().then(() => project.updateProject(project.nextMainStep(3)))
+    const { project } = this.props
+    project.updateProject(project.nextMainStep(3))
   }
 
   renderD3 = () => {

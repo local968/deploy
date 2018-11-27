@@ -3,9 +3,8 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx'
-import Hint from 'components/Common/Hint';
-
-import { Select, ContinueButton, EtlLoading, Table } from 'components/Common';
+import { Checkbox } from 'antd'
+import { Select, ContinueButton, EtlLoading, Table, Hint } from 'components/Common';
 
 @observer
 export default class DataSchema extends Component {
@@ -47,16 +46,20 @@ export default class DataSchema extends Component {
     this.checkList = [...this.checkList.filter(v => v !== value)]
   }
 
-  checked = (key, checked) => {
+  checked = (key, e) => {
+    const checked = e.target.checked
     if (!checked) {
       this.checkList = [...this.checkList, key]
     } else {
       this.checkList = [...this.checkList.filter(v => v !== key)]
     }
+    this.refs.table.updateGrids()
   }
 
-  select = (key, v) => {
+  select = (key, e) => {
+    const v = e.target.value
     this.props.project.colType[key] = v
+    this.refs.table.updateGrids()
   }
 
   toggleSelect = () => {
@@ -67,11 +70,156 @@ export default class DataSchema extends Component {
     this.props.project.noComputeTemp = e.target.checked;
   }
 
+  formatTable = () => {
+    const { target, colType, headerTemp: { temp }, sortData, sortHeader, renameVariable } = this.props.project;
+    const { showSelect, checkList } = this
+    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
+    // const { checkList, showSelect } = this.state;
+    const headerList = [...sortHeader]
+    // const notShowIndex = sortHeader.filter(v => !sortHeader.includes(v)).map(v => sortHeader.indexOf(v))
+    const data = [...sortData]
+    // if(!sortData.length) return []
+    /**
+     * 根据showSelect, indexPosition变化
+     * showSelect: true  显示勾选框
+     * checkRow: 勾选框的行数
+     * headerRow: 标题的行数
+     * selectRow: 类型选择的行数
+     * columnHeader: 表头的列数
+     * rowHeader: 表头的行数
+     */
+    const index = {
+      checkRow: -1 + (showSelect ? 1 : 0),
+      headerRow: 0 + (showSelect ? 1 : 0),
+      selectRow: 1 + (showSelect ? 1 : 0),
+      columnHeader: 1,
+      rowHeader: 2 + (showSelect ? 1 : 0)
+    }
+
+    const realColumn = headerList.length + index.columnHeader
+
+    const checkArr = []
+    const headerArr = []
+    const selectArr = []
+    for (let i = 0; i < realColumn; i++) {
+      const header = headerList[i - index.columnHeader] ? headerList[i - index.columnHeader].trim() : '';
+      if (index.checkRow > -1) {
+        const checkData = {
+          content: '',
+          title: '',
+          cn: styles.check
+        }
+        if (i === index.columnHeader - 1) {
+          checkData.content = "";
+        } else {
+          checkData.content = <Checkbox onChange={this.checked.bind(null, header)} checked={true}></Checkbox>
+          if (target && target === header) {
+            checkData.cn = classnames(styles.check, styles.target);
+            checkData.content = "";
+          }
+          if (checkList.includes(header)) {
+            checkData.cn = classnames(styles.check, styles.checked);
+            checkData.content = <Checkbox onChange={this.checked.bind(null, header)} checked={false}></Checkbox>
+          }
+        }
+        checkArr.push(checkData)
+      }
+      if (index.headerRow > -1) {
+        const headerData = {
+          content: '',
+          title: '',
+          cn: styles.titleCell
+        }
+        if (i === index.columnHeader - 1) {
+          headerData.content = <span>row/header</span>;
+          headerData.title = '';
+        } else {
+          headerData.content = <span>{header}</span>;
+          headerData.title = header;
+          if (target && target === header) {
+            headerData.cn = classnames(headerData.cn, styles.target);
+          }
+          if (checkList.includes(header)) {
+            headerData.cn = classnames(headerData.cn, styles.checked);
+          }
+          if (!header) {
+            headerData.cn = classnames(headerData.cn, styles.missed);
+          }
+          if (header && temp[header].length > 1) {
+            headerData.cn = classnames(headerData.cn, styles.duplicated);
+          }
+        }
+        headerArr.push(headerData)
+      }
+      if (index.selectRow > -1) {
+        const selectData = {
+          content: '',
+          title: '',
+          cn: styles.check
+        }
+        if (i === index.columnHeader - 1) {
+          selectData.content = "";
+        } else {
+          let key = header;
+          if (!header) {
+            key = `Unnamed: ${realColumn}`
+          }
+          if (header && temp[header].length > 1) {
+            const tempIndex = temp[header].findIndex(c => c === realColumn);
+            const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
+            key = header + suffix
+          }
+          if (target && target === header) {
+            selectData.cn = classnames(selectData.cn, styles.target);
+          }
+          const colValue = colType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
+          selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
+            <option value="Categorical">Categorical</option>
+            <option value="Numerical">Numerical</option>
+          </select>
+          selectData.title = colValue
+        }
+        selectArr.push(selectData)
+      }
+    }
+
+    const tableData = data.map((row, rowIndex) => {
+      const arr = []
+      if (index.columnHeader > 0) {
+        arr.push({
+          content: <span>{rowIndex + 1}</span>,
+          title: rowIndex + 1,
+          cn: styles.cell
+        })
+      }
+      const dataArr = row.map((v, k) => {
+        const header = headerList[k] && headerList[k].trim();
+        const itemData = {
+          content: <span>{v}</span>,
+          title: v,
+          cn: styles.cell
+        }
+        // const cellValue = data[rowIndex][realColumn]
+        if (target && target === header) {
+          itemData.cn = classnames(itemData.cn, styles.target);
+          itemData.content = <span>{renameVariable[v] || v}</span>;
+          itemData.title = renameVariable[v] || v;
+        }
+        if (checkList.includes(header)) {
+          itemData.cn = classnames(itemData.cn, styles.checked);
+        }
+        return itemData
+      })
+      return arr.concat(dataArr)
+    })
+    return [checkArr, headerArr, selectArr, ...tableData].filter(row => row.length === realColumn)
+  }
+
   render() {
     const { project } = this.props;
-    const { etling, etlProgress, sortData, sortHeader, problemType, noComputeTemp, target, colType, headerTemp: { temp, isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, sortHeader, problemType, noComputeTemp, target, colType, headerTemp: { isMissed, isDuplicated } } = project;
     const targetOption = {};
-
+    const tableData = this.formatTable()
     //target选择列表
     sortHeader.forEach(h => {
       h = h.trim()
@@ -120,25 +268,15 @@ export default class DataSchema extends Component {
         <div className={styles.content}>
           <Table
             ref="table"
-            sortData={sortData}
-            target={target}
-            colType={colType}
-            sortHeader={sortHeader}
-            dataHeader={sortHeader}
-            renameVariable={{}}
-            temp={temp}
-            checkList={this.checkList}
-            showSelect={this.showSelect}
             columnWidth={110}
             rowHeight={34}
             columnCount={sortHeader.length + 1}
-            rowCount={sortData.length + (this.showSelect ? 3 : 2)}
+            rowCount={tableData.length}
             fixedColumnCount={1}
             fixedRowCount={this.showSelect ? 3 : 2}
             checked={this.checked}
             select={this.select}
-            indexPosition='left' 
-            targetStyle={styles.target}/>
+            data={tableData} />
         </div>
       </div>
       <div className={styles.bottom}>

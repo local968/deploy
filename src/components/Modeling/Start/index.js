@@ -139,7 +139,7 @@ class AdvancedModel extends Component {
         </div>
         <div className={styles.viewBox}>
           {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable} /> : <AdvancedView project={project} />}
-          {(this.dataViewLoading || this.preImportanceLoading) && <div className={styles.simplifiedLoad}>
+          {((this.tab === 1 && this.preImportanceLoading) || this.dataViewLoading) && <div className={styles.simplifiedLoad}>
             <Spin size="large" />
           </div>}
         </div>

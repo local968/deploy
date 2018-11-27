@@ -69,6 +69,8 @@ export default class Project {
   @observable uploadFileName = [];
   @observable fileNames = [];
   @observable cleanData = []
+  @observable originPath = '';
+  @observable cleanPath = ''
 
   @observable noComputeTemp = false;
 
@@ -151,16 +153,47 @@ export default class Project {
       this.fileNames = fileNames
       return
     })
+    autorun(() => {
+      if (!this.originPath) return this.uploadData = []
+      this.readData(this.originPath).then(data => {
+        this.uploadData = data.filter(r => r.length === this.rawHeader.length)
+      })
+    })
+    // autorun(() => {
+    //   if (!this.cleanPath) return this.cleanData = []
+    //   this.readData(this.cleanPath).then(data => {
+    //     this.cleanData = data
+    //   })
+    // })
+  }
+
+  readData = path => {
+    const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
+    return new Promise((resolve, reject) => {
+      Papa.parse(url, {
+        download: true,
+        delimiter: ',',
+        complete: result => {
+          if (result.errors.length !== 0) {
+            console.error('parse error: ', result.errors[0].message);
+            return;
+          }
+          return resolve(result.data.slice(1))
+          // this.newFileInit(result.data);
+        }
+      });
+      return 
+    })
   }
 
   @computed
   get defaultUploadFile() {
     this.noComputeTemp = false
+    this.uploadData = []
 
     return {
       uploadFileName: [],
       dataHeader: [],
-      uploadData: [],
       rawHeader: [],
       colType: [],
       totalLines: 0,
@@ -313,7 +346,7 @@ export default class Project {
   }
 
   @action
-  queryProject = (isInit = false) => {
+  queryProject = () => {
     this.loading = true;
     return socketStore.ready().then(api => {
       return api.queryProject({ id: this.id }).then(result => {
@@ -400,43 +433,43 @@ export default class Project {
   }
 
   //读取预览文件
-  @action
-  newFileInit = (uploadData) => {
-    const rawHeader = uploadData[0].map((h) => h.trim());
-    const data = uploadData.slice(1);
+  // @action
+  // newFileInit = (uploadData) => {
+  //   const rawHeader = uploadData[0].map((h) => h.trim());
+  //   const data = uploadData.slice(1);
 
-    // 上传文件，不需要修改header
-    this.updateProject({
-      uploadData: data,
-      dataHeader: rawHeader,
-      rawHeader: rawHeader
-    });
+  //   // 上传文件，不需要修改header
+  //   this.updateProject({
+  //     uploadData: data,
+  //     dataHeader: rawHeader,
+  //     rawHeader: rawHeader
+  //   });
 
-    /**
-     * 自动修改header
-     */
-    // const temp = {};
-    // const header = rawHeader.map((h, i) => {
-    //   h = h.trim();
-    //   if (/^$/.test(h)) {
-    //     h = `Unnamed: ${i}`;
-    //   }
-    //   if (!temp[h]) {
-    //     temp[h] = 1;
-    //   } else {
-    //     h = h + '.' + temp[h];
-    //     temp[h]++;
-    //   }
-    //   return h;
-    // });
+  /**
+   * 自动修改header
+   */
+  // const temp = {};
+  // const header = rawHeader.map((h, i) => {
+  //   h = h.trim();
+  //   if (/^$/.test(h)) {
+  //     h = `Unnamed: ${i}`;
+  //   }
+  //   if (!temp[h]) {
+  //     temp[h] = 1;
+  //   } else {
+  //     h = h + '.' + temp[h];
+  //     temp[h]++;
+  //   }
+  //   return h;
+  // });
 
-    // // 上传文件，target为空
-    // this.updateProject({
-    //   uploadData: data,
-    //   dataHeader: header,
-    //   rawHeader: header,
-    // });
-  }
+  // // 上传文件，target为空
+  // this.updateProject({
+  //   uploadData: data,
+  //   dataHeader: header,
+  //   rawHeader: header,
+  // });
+  // }
 
   @computed
   get headerTemp() {
@@ -672,38 +705,40 @@ export default class Project {
       .then(api => api.etl(data, progressResult => {
         let { result } = progressResult;
         if (!this.etling) return;
-        const { name, path, value, key } = result
+        const { name, value, key } = result
         if (name === "progress" && key === 'etl') {
           this.etlProgress = value
         }
-        if (name === "csvHeader") {
-          const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
-          Papa.parse(url, {
-            download: true,
-            delimiter: ',',
-            complete: result => {
-              if (result.errors.length !== 0) {
-                console.error('parse error: ', result.errors[0].message);
-                return;
-              }
-              this.newFileInit(result.data);
-            }
-          });
-        }
-        if (name === "cleanCsvHeader") {
-          const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
-          Papa.parse(url, {
-            download: true,
-            delimiter: ',',
-            complete: result => {
-              if (result.errors.length !== 0) {
-                console.error('parse error: ', result.errors[0].message);
-                return;
-              }
-              this.updateProject({ cleanData: result.data.slice(1) })
-            }
-          });
-        }
+        // if (name === "csvHeader") {
+        //   this.setProperty({ originPath: path })
+          // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
+          // Papa.parse(url, {
+          //   download: true,
+          //   delimiter: ',',
+          //   complete: result => {
+          //     if (result.errors.length !== 0) {
+          //       console.error('parse error: ', result.errors[0].message);
+          //       return;
+          //     }
+          //     // this.newFileInit(result.data);
+          //   }
+          // });
+        // }
+        // if (name === "cleanCsvHeader") {
+        //   this.updateProject({ cleanPath: path })
+          // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
+          // Papa.parse(url, {
+          //   download: true,
+          //   delimiter: ',',
+          //   complete: result => {
+          //     if (result.errors.length !== 0) {
+          //       console.error('parse error: ', result.errors[0].message);
+          //       return;
+          //     }
+          //     this.updateProject({ cleanData: result.data.slice(1) })
+          //   }
+          // });
+        // }
         // this.project.setProperty(result)
         // this.updateProject(result)
       }))
@@ -714,10 +749,11 @@ export default class Project {
 
         if (status !== 200) return antdMessage.error(message)
         this.setProperty(result)
-        when(
-          () => !!this.uploadData.length,
-          () => this.updateProject(this.next())
-        )
+        // this.updateProject(this.next())
+        // when(
+        //   () => !!this.uploadData.length,
+        //   () => this.updateProject(this.next())
+        // )
       })
   }
 
@@ -1011,7 +1047,7 @@ export default class Project {
   }
 
   setModel = data => {
-    if(this.isAbort) return
+    if (this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
     // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
     this.models = [...this.models.filter(m => data.id !== m.id), new Model(this.id, data)]

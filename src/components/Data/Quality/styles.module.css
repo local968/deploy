@@ -116,8 +116,10 @@
 	display: flex;
 	padding: 0.1em;
 	border-bottom: solid 1px #c4cbd7;
+	border-right: 1px solid #c4cbd7;
 	flex: 0 0 0.4em;
 	align-items: center;
+	height: 30px;
 }
 
 .target {
@@ -1213,10 +1215,62 @@ button.save {
 }
 
 button.activeButton {
-	background-image: #ccc;
+	background-color: #ccc;
 	cursor: pointer;
+	background-image: none;
 }
 
 button.activeButton span {
 	color: #1d2b3c;
+}
+
+.titleCell {
+	display: flex;
+	flex: none;
+	align-items: center;
+	padding: 0 0.1em;
+	border-right: 1px solid #ccc;
+	padding-top: 3px;
+	border-bottom: 3px solid;
+}
+
+.titleCell span {
+	font-size: 0.875rem;
+	overflow: hidden;
+	padding: 0.5em 0;
+	white-space: nowrap;
+	text-decoration: none;
+	text-overflow: ellipsis;
+}
+
+.cell span {
+	font-size: 0.875rem;
+	overflow: hidden;
+	padding: 0.5em 0;
+	white-space: nowrap;
+	text-decoration: none;
+	text-overflow: ellipsis;
+}
+
+.check select {
+	display: flex;
+	flex: auto;
+	border: none;
+	outline: none;
+	font-size: 0.875rem;
+	overflow: hidden;
+	white-space: nowrap;
+	text-decoration: none;
+	text-overflow: ellipsis;
+}
+
+.check {
+	display: flex;
+	justify-content: center;
+	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+}
+
+.checked {
+	color: #9b9b9b;
 }
