@@ -488,7 +488,8 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
     promise.push(updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel))
   }
   return Promise.all(promise).then(([result1, result2]) => {
-    return Object.assign({}, returnValue, { result }, (result1 || {}).result, (result2 || {}).result)
+    const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
+    return Object.assign({}, returnValue, {result: realResult})
   })
 }))
 
