@@ -73,7 +73,7 @@ router.post('/', (req, res) => {
       userId: params.userId,
       projectId: params.projectId,
       csvLocation,
-      computeLines: true,
+      computeLines: params.type === 'deploy',
       ext
     }, (result) => (result.status < 0 || result.status === 100) && result)
       .then(result => {

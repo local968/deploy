@@ -86,11 +86,11 @@ export default class ClassificationView extends Component {
         </div>
         <div className={styles.radioGroup}>
           <div className={styles.radio}>
-            <input type="radio" name="criteria" value='default' id='criteria_default' readOnly onClick={train2ing ? null : this.onChange} checked={criteria === 'default'} disabled={train2ing} />
+            <input type="radio" name="criteria" value='default' id='criteria_default' readOnly onClick={this.onChange} checked={criteria === 'default'} />
             <label htmlFor='criteria_default'>Mr. One's Default Selection</label>
           </div>
           <div className={styles.radio}>
-            <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={train2ing ? null : this.onChange} checked={criteria === 'cost'} disabled={train2ing} />
+            <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={this.onChange} checked={criteria === 'cost'} />
             <label htmlFor='criteria_cost'>Cost Based</label>
           </div>
           {this.showCost && <div className={styles.costBlock}>
