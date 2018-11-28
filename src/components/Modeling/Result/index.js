@@ -50,8 +50,8 @@ export default class ModelResult extends Component {
   // }
 
   changeView = view => {
-    const { train2ing } = this.props.project
-    if(train2ing && view !== 'simple') return false
+    // const { train2ing } = this.props.project
+    // if(train2ing && view !== 'simple') return false
     this.view = view
   }
 
@@ -65,9 +65,7 @@ export default class ModelResult extends Component {
           <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
             <span>Simple View</span>
           </button>
-          <button className={classnames(styles.button, {
-            [styles.disabled]: project.train2ing
-          })} onClick={this.changeView.bind(this, 'advanced')}>
+          <button className={styles.button} onClick={this.changeView.bind(this, 'advanced')}>
             <span>Advanced View</span>
           </button>
         </div>

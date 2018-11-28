@@ -709,38 +709,6 @@ export default class Project {
         if (name === "progress" && key === 'etl') {
           this.etlProgress = value
         }
-        // if (name === "csvHeader") {
-        //   this.setProperty({ originPath: path })
-        // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
-        // Papa.parse(url, {
-        //   download: true,
-        //   delimiter: ',',
-        //   complete: result => {
-        //     if (result.errors.length !== 0) {
-        //       console.error('parse error: ', result.errors[0].message);
-        //       return;
-        //     }
-        //     // this.newFileInit(result.data);
-        //   }
-        // });
-        // }
-        // if (name === "cleanCsvHeader") {
-        //   this.updateProject({ cleanPath: path })
-        // const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
-        // Papa.parse(url, {
-        //   download: true,
-        //   delimiter: ',',
-        //   complete: result => {
-        //     if (result.errors.length !== 0) {
-        //       console.error('parse error: ', result.errors[0].message);
-        //       return;
-        //     }
-        //     this.updateProject({ cleanData: result.data.slice(1) })
-        //   }
-        // });
-        // }
-        // this.project.setProperty(result)
-        // this.updateProject(result)
       }))
       .then(returnValue => {
         const { result, status } = returnValue;
@@ -748,11 +716,6 @@ export default class Project {
         this.setProperty(result)
         this.etling = false;
         this.etlProgress = 0
-        // this.updateProject(this.next())
-        // when(
-        //   () => !!this.uploadData.length,
-        //   () => this.updateProject(this.next())
-        // )
       })
   }
 
@@ -793,7 +756,6 @@ export default class Project {
   @action
   fixTarget = () => {
     this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp, renameVariable: this.renameVariable })
-    // this.etl();
   }
 
   @action
@@ -804,7 +766,6 @@ export default class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethod),
       outlierFillMethod: toJS(this.outlierFillMethod)
     })
-    // this.etl();
   }
 
   @action
