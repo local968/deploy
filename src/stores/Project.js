@@ -1153,7 +1153,7 @@ export default class Project {
         const univariatePlots = Object.assign({}, this.univariatePlots);
         univariatePlots[plotKey] = imageSavePath
         this.setProperty({ univariatePlots })
-      })
+      }).then(this.handleError)
     })
   }
 
@@ -1177,7 +1177,7 @@ export default class Project {
         const histgramPlots = Object.assign({}, this.histgramPlots);
         histgramPlots[plotKey] = imageSavePath
         this.setProperty({ histgramPlots })
-      })
+      }).then(this.handleError)
     })
   }
 
@@ -1215,7 +1215,7 @@ export default class Project {
             qcut: points.result.data
           });
         }
-      })
+      }).then(this.handleError)
     })
   }
 
@@ -1258,7 +1258,7 @@ export default class Project {
             chartData: chart
           })
         }
-      })
+      }).then(this.handleError)
     })
   }
 
@@ -1297,7 +1297,12 @@ export default class Project {
             [result.action]: `http://${config.host}:${config.port}/redirect/download/${result.imageSavePath}?projectId=${this.id}`
           });
         }
-      })
+      }).then(this.handleError)
     })
+  }
+
+  handleError = returnValue => {
+    const { result, status, command } = returnValue
+    if (status < 0) antdMessage.error(`command:${command}, error:${result['process error']}`)
   }
 }
