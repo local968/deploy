@@ -115,8 +115,8 @@
 .cell {
 	display: flex;
 	padding: 0.1em;
-	border-bottom: solid 1px #c4cbd7;
-	border-right: 1px solid #c4cbd7;
+	border-bottom: solid 1px #d8d8d8;
+	border-right: 1px solid #d8d8d8;
 	flex: 0 0 0.4em;
 	align-items: center;
 	height: 30px;
@@ -1229,7 +1229,7 @@ button.activeButton span {
 	flex: none;
 	align-items: center;
 	padding: 0 0.1em;
-	border-right: 1px solid #ccc;
+	border-right: 1px solid #d8d8d8;
 	padding-top: 3px;
 	border-bottom: 3px solid;
 }
@@ -1241,6 +1241,7 @@ button.activeButton span {
 	white-space: nowrap;
 	text-decoration: none;
 	text-overflow: ellipsis;
+	width: 100%;
 }
 
 .cell span {
@@ -1250,6 +1251,7 @@ button.activeButton span {
 	white-space: nowrap;
 	text-decoration: none;
 	text-overflow: ellipsis;
+	width: 100%;
 }
 
 .check select {
@@ -1262,15 +1264,4 @@ button.activeButton span {
 	white-space: nowrap;
 	text-decoration: none;
 	text-overflow: ellipsis;
-}
-
-.check {
-	display: flex;
-	justify-content: center;
-	border-bottom: 1px solid #ccc;
-	border-right: 1px solid #ccc;
-}
-
-.checked {
-	color: #9b9b9b;
 }

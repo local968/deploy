@@ -98,6 +98,7 @@ export default class Project {
   @observable mismatchLineCounts = {}
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
+  @observable modeNotNull = {}
 
   //not save
   @observable targetMapTemp = {};
@@ -226,7 +227,8 @@ export default class Project {
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
-      renameVariable: {}
+      renameVariable: {},
+      modeNotNull: {}
     }
   }
 
@@ -748,7 +750,7 @@ export default class Project {
           this.setProperty({ dataViews: null })
           return antdMessage.error("dataview error")
         }
-        this.setProperty({ dataViews: result.data })
+        this.setProperty({ dataViews: result.data, modeNotNull: result.modeNotNull })
       })
     })
   }
@@ -1007,6 +1009,7 @@ export default class Project {
   }
 
   setModel = data => {
+    if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
     // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)

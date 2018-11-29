@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx'
-import { Checkbox } from 'antd'
+import { Checkbox, Popover } from 'antd'
 import { Select, ContinueButton, EtlLoading, Table, Hint } from 'components/Common';
 
 @observer
@@ -27,7 +27,8 @@ export default class DataSchema extends Component {
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
-      renameVariable: {}
+      renameVariable: {},
+      modeNotNull: {}
     }).then(() => this.props.project.etl())
   }
 
@@ -290,4 +291,8 @@ export default class DataSchema extends Component {
       {etling && <EtlLoading progress={etlProgress} />}
     </div>
   }
+}
+
+class EditHeader extends Component {
+
 }
