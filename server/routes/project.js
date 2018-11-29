@@ -431,7 +431,7 @@ wss.register('etl', (message, socket, progress) => {
         result.firstEtl = false;
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
-        if (result.totalLines < 10000) result.runWith = 'cross'
+        if (result.totalLines > 0 && result.totalLines < 10000) result.runWith = 'cross'
 
         const steps = {}
         if (firstEtl) {
