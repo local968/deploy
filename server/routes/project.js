@@ -465,7 +465,7 @@ wss.register('etl', (message, socket, progress) => {
 wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
   const { status, result } = returnValue
   if (status === 100) {
-    createOrUpdate(message.projectId, socket.session.userId, { dataViews: result.data, modeNotNull: result.modeNotNull })
+    createOrUpdate(message.projectId, socket.session.userId, { dataViews: result.data })
   }
   return returnValue
 }))

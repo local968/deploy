@@ -490,7 +490,7 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, saveDataFixes, isTarget, issueRows } = this.props;
-    const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target, modeNotNull, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, dataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -519,7 +519,7 @@ export class FixIssue extends Component {
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const [v1, v2] = modeNotNull[k] || []
+              const [v1, v2] = dataViews[k].modeNotNull || []
               const mode = v1 === 'nan' ? v2 : v1
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
@@ -576,7 +576,7 @@ export class FixIssue extends Component {
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const [v1, v2] = modeNotNull[k] || []
+              const [v1, v2] = dataViews[k].modeNotNull || []
               const mode = v1 === 'nan' ? v2 : v1
               // const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
@@ -637,7 +637,7 @@ export class FixIssue extends Component {
               if (!isShow) return null
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const [v1, v2] = modeNotNull[k] || []
+              const [v1, v2] = dataViews[k].modeNotNull || []
               const mode = v1 === 'nan' ? v2 : v1
               // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>

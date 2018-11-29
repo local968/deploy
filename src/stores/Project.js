@@ -98,7 +98,6 @@ export default class Project {
   @observable mismatchLineCounts = {}
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
-  @observable modeNotNull = {}
 
   //not save
   @observable targetMapTemp = {};
@@ -227,8 +226,7 @@ export default class Project {
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
-      renameVariable: {},
-      modeNotNull: {}
+      renameVariable: {}
     }
   }
 
@@ -750,7 +748,7 @@ export default class Project {
           this.setProperty({ dataViews: null })
           return antdMessage.error("dataview error")
         }
-        this.setProperty({ dataViews: result.data, modeNotNull: result.modeNotNull })
+        this.setProperty({ dataViews: result.data })
       })
     })
   }

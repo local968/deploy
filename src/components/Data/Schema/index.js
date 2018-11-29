@@ -27,8 +27,7 @@ export default class DataSchema extends Component {
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
-      renameVariable: {},
-      modeNotNull: {}
+      renameVariable: {}
     }).then(() => this.props.project.etl())
   }
 
