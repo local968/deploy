@@ -292,7 +292,3 @@ export default class DataSchema extends Component {
     </div>
   }
 }
-
-class EditHeader extends Component {
-
-}
