@@ -207,32 +207,32 @@ export class DataIssue extends Component {
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
-            {!!targetIssues.nullRow.length && <div className={styles.issueBlock}>
+            {!!targetIssues.nullRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow.length} rows) {percent.missing.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {percent.missing.toFixed(4)}%</span></div>
                 <div className={classnames(styles.progress, styles.missing)} style={{ width: percent.missing < 1 ? 1 : percent.missing + "%" }}></div>
               </div>
-              <div className={styles.right}>
+              {/* <div className={styles.right}>
                 <span>Will be fixed</span>
-              </div>
+              </div> */}
             </div>}
-            {!!targetIssues.mismatchRow.length && <div className={styles.issueBlock}>
+            {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow.length} rows) {percent.mismatch.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {percent.mismatch.toFixed(4)}%</span></div>
                 <div className={classnames(styles.progress, styles.mismatch)} style={{ width: percent.mismatch < 1 ? 1 : percent.mismatch + "%" }}></div>
               </div>
-              <div className={styles.right}>
+              {/* <div className={styles.right}>
                 <span>Will be fixed</span>
-              </div>
+              </div> */}
             </div>}
-            {!!targetIssues.outlierRow.length && <div className={styles.issueBlock}>
+            {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow.length} rows) {percent.outlier.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {percent.outlier.toFixed(4)}%</span></div>
                 <div className={classnames(styles.progress, styles.outlier)} style={{ width: percent.outlier < 1 ? 1 : percent.outlier + "%" }}></div>
               </div>
-              <div className={styles.right}>
+              {/* <div className={styles.right}>
                 <span>Will be ignore</span>
-              </div>
+              </div> */}
             </div>}
           </div>
           {totalLines < 1000 && <div className={styles.progressBox}>
@@ -519,13 +519,15 @@ export class FixIssue extends Component {
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
+              const mode = showType === 'Numerical' ? 'N/A' : (dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode)
+              const mean = showType === 'Numerical' ? dataViews[k].mean : 'N/A'
+              const median = showType === 'Numerical' ? dataViews[k].median : 'N/A'
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>{showType}</span></div>
                 <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
-                <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
-                <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
+                <div className={styles.fixesCell}><span title={mean}>{mean}</span></div>
+                <div className={styles.fixesCell}><span title={median}>{median}</span></div>
                 <div className={styles.fixesCell}><span title={mode}>{mode}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.mismatchSelect.bind(null, k)}>
                   {showType === 'Categorical' ? [
@@ -533,12 +535,12 @@ export class FixIssue extends Component {
                     <option value="drop" key="drop">Delete the row</option>,
                     <option value={0} key={0}>Replace with 0</option>
                   ] : [
-                      <option value={dataViews[k].mean} key='mean'>Replace with mean value</option>,
+                      <option value={mean} key='mean'>Replace with mean value</option>,
                       <option value="drop" key='drop'>Delete the row</option>,
                       <option value={dataViews[k].min} key='min'>Replace with min value</option>,
                       <option value={dataViews[k].max} key='max'>Replace with max value</option>,
-                      <option value={mode} key='mode'>Replace with most frequent value</option>,
-                      <option value={dataViews[k].median} key='median'>Replace with median value</option>,
+                      // <option value={mode} key='mode'>Replace with most frequent value</option>,
+                      <option value={median} key='median'>Replace with median value</option>,
                       <option value={0} key={0}>Replace with 0</option>
                     ]}
                 </select></div>
@@ -575,15 +577,17 @@ export class FixIssue extends Component {
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
+              const mode = showType === 'Numerical' ? 'N/A' : (dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode)
+              const mean = showType === 'Numerical' ? dataViews[k].mean : 'N/A'
+              const median = showType === 'Numerical' ? dataViews[k].median : 'N/A'
               // const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>I don`t know</span></div>
                 <div className={styles.fixesCell}><span>{showType}</span></div>
                 <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
-                <div className={styles.fixesCell}><span title={dataViews[k].mean}>{dataViews[k].mean}</span></div>
-                <div className={styles.fixesCell}><span title={dataViews[k].median}>{dataViews[k].median}</span></div>
+                <div className={styles.fixesCell}><span title={mean}>{mean}</span></div>
+                <div className={styles.fixesCell}><span title={median}>{median}</span></div>
                 <div className={styles.fixesCell}><span title={mode}>{mode}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.nullSelect.bind(null, k)}>
                   {showType === 'Categorical' ? [
@@ -591,12 +595,12 @@ export class FixIssue extends Component {
                     <option value="drop" key="drop">Delete the row</option>,
                     <option value={0} key={0}>Replace with 0</option>
                   ] : [
-                      <option value={dataViews[k].mean} key='mean'>Replace with mean value</option>,
+                      <option value={mean} key='mean'>Replace with mean value</option>,
                       <option value="drop" key='drop'>Delete the row</option>,
                       <option value={dataViews[k].min} key='min'>Replace with min value</option>,
                       <option value={dataViews[k].max} key='max'>Replace with max value</option>,
-                      <option value={mode} key='mode'>Replace with most frequent value</option>,
-                      <option value={dataViews[k].median} key='median'>Replace with median value</option>,
+                      // <option value={mode} key='mode'>Replace with most frequent value</option>,
+                      <option value={median} key='median'>Replace with median value</option>,
                       <option value={0} key={0}>Replace with 0</option>
                     ]}
                 </select></div>
@@ -635,7 +639,7 @@ export class FixIssue extends Component {
               if (!isShow) return null
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
+              // const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
               // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
@@ -653,7 +657,7 @@ export class FixIssue extends Component {
                   <option value="ignore" key='ignore'>Do Nothing</option>
                   <option value={dataViews[k].mean} key='mean'>Replace with mean value</option>
                   <option value={dataViews[k].median} key='median'>Replace with median value</option>
-                  <option value={mode} key='mode'>Replace with most frequent value</option>
+                  {/* <option value={mode} key='mode'>Replace with most frequent value</option> */}
                   <option value={0} key='0'>Replace with 0</option>
                 </select></div>
               </div>
