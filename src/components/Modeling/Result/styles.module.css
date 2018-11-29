@@ -45,6 +45,9 @@
 
 .row span {
     color: #000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .status {

@@ -85,7 +85,8 @@ export default class SimplifiedView extends Component {
   render() {
     const { project, reloadTable } = this.props;
     const { target, colType, targetColMap, targetMap, dataViews, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader, expression } = project;
-    const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, targetColMap, targetMap)).length : 'N/A';
+    // const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, targetColMap, targetMap)).length : 'N/A';
+    const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
@@ -220,8 +221,8 @@ class SimplifiedViewRow extends Component {
   }
 
   formatNumber = (num, isNA) => {
-    if(isNA) return "N/A"
-    if(typeof num === "number") return num
+    if (isNA) return "N/A"
+    if (typeof num === "number") return num
     return "N/A"
   }
 
@@ -290,7 +291,7 @@ class SimplifiedViewRow extends Component {
 class CorrelationPlot extends Component {
   constructor(props) {
     super(props)
-    if(!props.data) props.getPath()
+    if (!props.data) props.getPath()
   }
   render() {
     const { data, header } = this.props;
