@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx'
-import { Checkbox } from 'antd'
+import { Checkbox, Popover } from 'antd'
 import { Select, ContinueButton, EtlLoading, Table, Hint } from 'components/Common';
 
 @observer

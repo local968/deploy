@@ -497,7 +497,7 @@ wss.register('histgramPlot', (message, socket, progress) => {
   const id = message.projectId
   const userId = socket.session.userId
   const histgramPlots = {}
-  command({ ...message, userId, requestId: message._id }, progressResult => {
+  return command({ ...message, userId, requestId: message._id }, progressResult => {
     if (progressResult.status < 0 || progressResult.status === 100) {
       updateProjectField(id, userId, "histgramPlots", histgramPlots)
       return progressResult
@@ -514,7 +514,7 @@ wss.register('univariatePlot', (message, socket, progress) => {
   const id = message.projectId
   const userId = socket.session.userId
   const univariatePlots = {}
-  command({ ...message, userId, requestId: message._id }, progressResult => {
+  return command({ ...message, userId, requestId: message._id }, progressResult => {
     if (progressResult.status < 0 || progressResult.status === 100) {
       updateProjectField(id, userId, "univariatePlots", univariatePlots)
       return progressResult

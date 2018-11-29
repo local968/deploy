@@ -154,7 +154,8 @@ export default class AreaChart extends Component {
   }
 
   drawLegend = (svg, color) => {
-    // const {targetValue} = this.props.model.approachStore;
+    const {targetMap} = this.props.model;
+    const targets = Object.keys(targetMap);
     const legend = svg.append('g').attr('transform', 'translate(' + 0 + ',' + 0 + ')');
     legend.append('circle')
       .attr('r', 5)
@@ -162,11 +163,11 @@ export default class AreaChart extends Component {
       .attr('cx', 40)
       .attr('fill', color['NEGATIVE']);
 
-    // legend.append('text')
-    //   .attr('x', '50px')
-    //   .attr('y', '3px')
-    //   .attr('fill', '#000')
-    //   .text(targetValue[0]);
+    legend.append('text')
+      .attr('x', '50px')
+      .attr('y', '3px')
+      .attr('fill', '#000')
+      .text(targets[0]);
 
     legend.append('circle')
       .attr('r', 5)
@@ -174,11 +175,11 @@ export default class AreaChart extends Component {
       .attr('cx', 180)
       .attr('fill', color['POSITIVE']);
 
-    // legend.append('text')
-    //   .attr('x', '190px')
-    //   .attr('y', '3px')
-    //   .attr('fill', '#000')
-    //   .text(targetValue[1]);
+    legend.append('text')
+      .attr('x', '190px')
+      .attr('y', '3px')
+      .attr('fill', '#000')
+      .text(targets[1]);
   }
 
   getNearestPoint (val, data, key) {

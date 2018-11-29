@@ -227,7 +227,13 @@ class RegressionDetailCurves extends Component {
         curComponent = (
           <div className={styles.plot} >
             <img className={styles.img} src={model.fitPlot} alt="fit plot" />
-            
+          </div>
+        )
+        break;
+      case 'Residual Plot':
+        curComponent = (
+          <div className={styles.plot} >
+            <img className={styles.img} src={model.residualPlot} alt="residual plot" />
             <Modal
               visible={this.state.visible}
               title='Residual Plot Diagnose'
@@ -238,13 +244,6 @@ class RegressionDetailCurves extends Component {
               <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.fitPlot} />
             </Modal>
             <DiagnoseResult handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
-          </div>
-        )
-        break;
-      case 'Residual Plot':
-        curComponent = (
-          <div className={styles.plot} >
-            <img className={styles.img} src={model.residualPlot} alt="residual plot" />
           </div>
         )
         break;
@@ -621,7 +620,7 @@ class ResidualDiagnose extends Component {
     }];
     const {diagnoseType, residualplot} = this.props;
     const RadioGroup = Radio.Group;
-    const disabled = diagnoseType === '';
+    // const disabled = diagnoseType === '';
     // const disabled = false;
     return (
       <div className={styles.residualDiagnose} >
@@ -635,7 +634,7 @@ class ResidualDiagnose extends Component {
               <div className={styles.radioWrapper} key={i}>
                 <Radio value={p.type} >{p.text}</Radio>
                 <div>
-                  <img width={200} src={p.plot} />
+                  <img width={200} src={p.plot} alt='plot'/>
                 </div>
               </div>
             ))}
@@ -660,7 +659,7 @@ class DiagnoseResult extends Component {
   render() {
     const {diagnoseType} = this.props;
     let result;
-    const type = 'large';
+    // const type = 'large';
     switch (diagnoseType) {
       case 'random':
         result = <div className={styles.content} >Perfect, your residual plot is randomly distributed. No need to further improve your models. </div>;
