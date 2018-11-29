@@ -9,7 +9,7 @@ export default ({ progress }) => {
                 percent={progress}
                 // status="active"
                 strokeWidth={12}
-                format={percent => <div className={styles.text}>{percent}%</div>}
+                format={percent => <div className={styles.text}>{percent.toFixed(2)}%</div>}
                 type="circle"
             />
         </div>
