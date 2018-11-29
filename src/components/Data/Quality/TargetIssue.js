@@ -519,8 +519,7 @@ export class FixIssue extends Component {
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const [v1, v2] = dataViews[k].modeNotNull || []
-              const mode = v1 === 'nan' ? v2 : v1
+              const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>{showType}</span></div>
@@ -576,8 +575,7 @@ export class FixIssue extends Component {
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const [v1, v2] = dataViews[k].modeNotNull || []
-              const mode = v1 === 'nan' ? v2 : v1
+              const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
               // const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
@@ -637,8 +635,7 @@ export class FixIssue extends Component {
               if (!isShow) return null
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
               const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
-              const [v1, v2] = dataViews[k].modeNotNull || []
-              const mode = v1 === 'nan' ? v2 : v1
+              const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
               // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
