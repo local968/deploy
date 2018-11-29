@@ -31,20 +31,20 @@ import varImpactHover from './icon-variable-impact-linear-hover.svg';
 import varImpactSelected from './icon-variable-impact-selected.svg';
 import varImpactNormal from './icon-variable-impact-linear-normal.svg';
 
+import nonlinearImg from './img-residual-plot-nonlinear.svg';
+import heteroscedasticityImg from './img-residual-plot-heteroscedasticity.svg';
+import largeImg from './img-residual-plot-large-y.svg';
+import yAxisUnbalancedImg from './img-residual-plot-y-axis-unbalanced.svg';
+import outliersImg from './img-residual-plot-outliers.svg';
+import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
+import randomlyImg from './img-residual-plot-randomly.svg';
+
 import VariableImpact from '../Result/VariableImpact';
 
 const TabPane = Tabs.TabPane;
 
 @observer
 export default class AdvancedView extends Component {
-  // componentWillMount() {
-  //   if (this.props.project.problemType === 'Classification') {
-  //     this.props.project.chartData();
-  //   } else {
-  //     this.props.project.fitPlotAndResidualPlot();
-  //   }
-  // }
-
   render() {
     const { models, project } = this.props;
     return (
@@ -198,16 +198,26 @@ class AdvancedModelTable extends Component {
 @observer
 class RegressionDetailCurves extends Component {
   state = {
-    curve: "Variable Impact"
+    curve: "Variable Impact",
+    visible: false,
+    diagnoseType: null
   }
 
   handleClick = val => {
     this.setState({ curve: val });
   }
 
-  render() {
+  handleDiagnose = () => {
+    this.setState({visible: true});
+  }
+
+  handleDiagnoseType = e => {
+    this.setState({diagnoseType: e.target.value});
+  }
+
+  render() {``
     const { model } = this.props;
-    const { curve } = this.state;
+    const { curve, diagnoseType } = this.state;
     let curComponent;
     switch (curve) {
       case 'Variable Impact':
@@ -224,6 +234,16 @@ class RegressionDetailCurves extends Component {
         curComponent = (
           <div className={styles.plot} >
             <img className={styles.img} src={model.residualPlot} alt="residual plot" />
+            <Modal
+              visible={this.state.visible}
+              title='Residual Plot Diagnose'
+              width={1200}
+              onOk={() => this.setState({visible: false})}
+              onCancel={() => this.setState({visible: false})}
+            >
+              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.fitPlot} />
+            </Modal>
+            <DiagnoseResult handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
         )
         break;
@@ -562,6 +582,213 @@ class ModelComp extends Component {
             </Tabs>
           </div>
         </Modal>
+      </div>
+    );
+  }
+}
+
+class ResidualDiagnose extends Component {
+  render() {
+    const plots = [{
+      plot: randomlyImg,
+      type: 'random',
+      text: 'Randomly Distributed'
+    }, {
+      plot: yAxisUnbalancedImg,
+      type: 'yUnbalanced',
+      text: 'Y-axis Unbalanced'
+    }, {
+      plot: xAxisUnbalancedImg,
+      type: 'xUnbalanced',
+      text: 'X-axis Unbalanced'
+    }, {
+      plot: outliersImg,
+      type: 'outliers',
+      text: 'Outliers'
+    }, {
+      plot: nonlinearImg,
+      type: 'nonlinear',
+      text: 'Nonlinear'
+    }, {
+      plot: heteroscedasticityImg,
+      type: 'heteroscedasticity',
+      text: 'Heteroscedasticity'
+    }, {
+      plot: largeImg,
+      type: 'largey',
+      text: 'Large Y-axis Data Points'
+    }];
+    const {diagnoseType, residualplot} = this.props;
+    const RadioGroup = Radio.Group;
+    const disabled = diagnoseType === '';
+    // const disabled = false;
+    return (
+      <div className={styles.residualDiagnose} >
+        <div className={styles.plot} >
+          <img width={300} src={residualplot} alt="" />
+        </div>
+        <div className={styles.choosePlot} >
+          <div>Which plot does your residual plot look most similar to?</div>
+          <RadioGroup value={diagnoseType} onChange={this.props.handleDiagnoseType} >
+            {plots.map((p, i) => (
+              <div className={styles.radioWrapper} key={i}>
+                <Radio value={p.type} >{p.text}</Radio>
+                <div>
+                  <img width={200} src={p.plot} />
+                </div>
+              </div>
+            ))}
+          </RadioGroup >
+        </div>
+        
+      </div>
+    );
+  }
+}
+
+class DiagnoseResult extends Component {
+  handleNewData = () => {
+    // history.push(`/data/${this.props.projectId}/1`);
+  }
+  handleSetting = () => {
+    // history.push(`/modeling/${this.props.projectId}/1`);
+  }
+  handleOutlierFix = () => {
+    // history.push(`/data/${this.props.projectId}/5`);
+  }
+  render() {
+    const {diagnoseType} = this.props;
+    let result;
+    const type = 'large';
+    switch (diagnoseType) {
+      case 'random':
+        result = <div className={styles.content} >Perfect, your residual plot is randomly distributed. No need to further improve your models. </div>;
+        break;
+      case 'yUnbalanced':
+        result = (
+          <div className={styles.content}>
+            <div>Your plot is unbalanced on y-axis. You might be able to improve your model via:</div>
+            <ul className={styles.items} >
+              <li>Looking for an opportunity to usefully transform your variables, typically your target variable</li>
+              <li>Checking if your model lacks informative variables</li>
+            </ul>
+            <div className={styles.action} >
+              <span>You can transform or select variables in our application</span>
+              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+            </div>
+            <div className={styles.action} >
+              <span>Alternatively, you can modify your data offline and reload it.</span>
+              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+            </div>
+          </div>
+        );
+        break;
+      case 'xUnbalanced':
+        result = (
+          <div className={styles.content}>
+            <div>Your plot is unbalanced on x-axis. You might be able to improve your model via:</div>
+            <ul className={styles.items} >
+              <li>Looking for an opportunity to usefully transform your variables, typically your predictors</li>
+              <li>Checking if your model lacks informative variables</li>
+            </ul>
+            <div className={styles.action} >
+              <span>You can transform or select variables in our application</span>
+              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+            </div>
+            <div className={styles.action} >
+              <span>Alternatively, you can modify your data offline and reload it.</span>
+              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+            </div>
+          </div>
+        );
+        break;
+      case 'outliers':
+        result = (
+          <div className={styles.content}>
+            <div>Your plot is has some outliers. You might be able to improve your model via:</div>
+            <ul className={styles.items} >
+              <li>Deleting the outliers if you decide that they are useless</li>
+              <li>Checking if your model lacks informative variables</li>
+            </ul>
+            <div className={styles.action} >
+              <span>You can delete the outliers in our application</span>
+              {/* <button onClick={this.handleOutlierFix} className="navButton smallButton" >Go to Edit the Fixes for Outliers</button> */}
+            </div>
+            <div className={styles.action} >
+              <span>You can transform or select variables in our application</span>
+              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+            </div>
+            <div className={styles.action} >
+              <span>Alternatively, you can modify your data offline and reload it.</span>
+              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+            </div>
+          </div>
+        );
+        break;
+      case 'nonlinear':
+        result = (
+          <div className={styles.content}>
+            <div>Your plot is nonlinear. You might be able to improve your model via:</div>
+            <ul className={styles.items} >
+              <li>Looking for an opportunity to usefully transform a variable.</li>
+              <li>Checking if your need to add new a variable</li>
+            </ul>
+            <div className={styles.action} >
+              <span>You can transform or select variables in our application</span>
+              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+            </div>
+            <div className={styles.action} >
+              <span>Alternatively, you can modify your data offline and reload it.</span>
+              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+            </div>
+          </div>
+        );
+        break;
+      case 'heteroscedasticity':
+        result = (
+          <div className={styles.content}>
+            <div>Your plot is heteroscedasticity. You might be able to improve your model via:</div>
+            <ul className={styles.items} >
+              <li>Looking for an opportunity to usefully transform a variable.</li>
+              <li>Checking if your need to add new a variable</li>
+            </ul>
+            <div className={styles.action} >
+              <span>You can transform or select variables in our application</span>
+              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+            </div>
+            <div className={styles.action} >
+              <span>Alternatively, you can modify your data offline and reload it.</span>
+              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+            </div>
+          </div>
+        );
+        break;
+      case 'largey':
+        result = (
+          <div className={styles.content}>
+            <div>Your plot has large y-axis datapoints. You might be able to improve your model via:</div>
+            <ul className={styles.items} >
+              <li>Looking for an opportunity to usefully transform a variable.</li>
+              <li>Checking if your need to add new a variable</li>
+            </ul>
+            <div className={styles.action} >
+              <span>You can transform or select variables in our application</span>
+              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+            </div>
+            <div className={styles.action} >
+              <span>Alternatively, you can modify your data offline and reload it.</span>
+              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+            </div>
+          </div>
+        );
+        break;
+      default: break;
+    }
+    return (
+      <div className={styles.diagnoseResult} >
+        <button onClick={this.props.handleDiagnose} className={styles.button} >Diagnose</button>
+        <div className={styles.header} >Diagnose Results:</div>
+        {result}
       </div>
     );
   }
