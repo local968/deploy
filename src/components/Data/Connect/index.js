@@ -80,11 +80,12 @@ export default class DataConnect extends Component {
   @computed
   get message() {
     if (this.isPause) return 'Paused'
-    if (!this.isSql && this.process === 0) return 'Perparing for upload...'
-    if (!this.isSql && this.process > 0 && this.process < 90) return 'Uploading data...'
-    if (this.process >= 90) return 'Extract-Transform-Load in progress...'
-    if (this.isSql && this.process === 0) return 'Perparing for database connection...'
-    if (this.isSql && this.process >= 20 && this.process < 90) return `Downloaded Data: ${this.sqlProgress} rows`
+    const process = this.props.project.etling ? 90 : this.process
+    if (!this.isSql && process === 0) return 'Perparing for upload...'
+    if (!this.isSql && process > 0 && process < 90) return 'Uploading data...'
+    if (process >= 90) return 'Extract-Transform-Load in progress...'
+    if (this.isSql && process === 0) return 'Perparing for database connection...'
+    if (this.isSql && process >= 20 && process < 90) return `Downloaded Data: ${this.sqlProgress} rows`
   }
 
   onUpload = ({ pause, resume }) => {
@@ -129,7 +130,8 @@ export default class DataConnect extends Component {
   })
 
   selectSample = filename => {
-    if (!!this.process) return false;
+    const process = this.props.project.etling ? 90 : this.process
+    if (!!process) return false;
 
     this.uploading = true
 
@@ -169,7 +171,8 @@ export default class DataConnect extends Component {
 
   handleDrop = action((e) => {
     e.preventDefault();
-    if (this.process) return false;
+    const process = this.props.project.etling ? 90 : this.process
+    if (process) return false;
     let file = e.dataTransfer.files[0];
     this.file = file
   })
@@ -199,7 +202,8 @@ export default class DataConnect extends Component {
 
   render() {
     const { project, userStore, socketStore } = this.props;
-    const { etlProgress } = project
+    const { etlProgress, etling } = project
+    const process = etling ? 90 : this.process
     window.cn = this
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
@@ -218,7 +222,7 @@ export default class DataConnect extends Component {
         </div> */}
         <div className={styles.uploadRow}>
           {this.block('From R2 Learn', sampleIcon, this.showSample)}
-          {!!this.process ? (
+          {!!(this.uploading || etling) ? (
             this.block('From Computer', localFileIcon)
           ) : (
               <Uploader
@@ -256,13 +260,13 @@ export default class DataConnect extends Component {
             selectSample={this.selectSample}
           />
         )}
-        {!!this.uploading && (
+        {!!(this.uploading || etling) && (
           <div className={styles.sample}>
             <div className={styles.cover} />
             <div className={styles.progressBlock}>
               <div className={styles.progressTitle}>
                 <span>Data Import</span>
-                {this.process < 90 && <div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
+                {process < 90 && <div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
               </div>
               <div className={styles.progressContent}>
                 <div className={styles.progressLoad}>
@@ -270,7 +274,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressing}>
                   <Progress
-                    percent={this.process + (etlProgress || 0) / 10}
+                    percent={process + (etlProgress || 0) / 10}
                     status="active"
                     strokeWidth={12}
                     showInfo={false}
@@ -278,7 +282,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressText}>
                   <span>{this.message}</span>
-                  {(this.process < 90 && this.process > 0 && !this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
+                  {(process < 90 && process > 0 && !this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
                 </div>
               </div>
             </div>

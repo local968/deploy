@@ -400,65 +400,78 @@ wss.register('etl', (message, socket, progress) => {
       delete data.firstEtl
       if (!csvLocation) delete data.csvLocation
       if (!ext) delete data.ext
-      return command(data, processData => {
-        let { result, status } = processData;
-        if (status < 0 || status === 100) return processData
-        const { name, path, key, origin_header } = result
-        if (name === "progress" && key === 'etl') {
-          return progress(processData)
-        }
-        if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: origin_header, dataHeader: origin_header })
-        if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
-        return null
-      }).then(returnValue => {
-        let { result, status } = returnValue;
-        if (status < 0) return {
-          status: 418,
-          result,
-          message: returnValue.message
-        }
-        Object.keys(result).forEach(k => {
-          if (k === "name") {
-            delete result[k];
+      return createOrUpdate(id, userId, { etling: true })
+        .then(() => command(data, processData => {
+          let { result, status } = processData;
+          if (status < 0 || status === 100) return processData
+          const { name, path, key, origin_header, value } = result
+          if (name === "progress" && key === 'etl') createOrUpdate(id, userId, { etlProgress: value })
+          if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: origin_header, dataHeader: origin_header })
+          if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
+          return null
+        }).then(returnValue => {
+          let { result, status } = returnValue;
+          if (status < 0) return {
+            status: 418,
+            result,
+            message: returnValue.message
           }
-          if (k.includes("FillMethod")) {
-            Object.keys(result[k]).forEach(key => {
-              if (result[k][key] === "ignore") delete result[k][key]
-            })
-          }
-        })
-        result.dataViews = null;
-        result.firstEtl = false;
-        if (!files) delete result.totalRawLines
-        // 最终ETL 小于1W行  使用cross
-        if (result.totalLines < 10000) result.runWith = 'cross'
+          Object.keys(result).forEach(k => {
+            if (k === "name") {
+              delete result[k];
+            }
+            if (k.includes("FillMethod")) {
+              Object.keys(result[k]).forEach(key => {
+                if (result[k][key] === "ignore") delete result[k][key]
+              })
+            }
+          })
+          result.dataViews = null;
+          result.firstEtl = false;
+          result.etling = false;
+          result.etlProgress = 0;
+          if (!files) delete result.totalRawLines
+          // 最终ETL 小于1W行  使用cross
+          if (result.totalLines < 10000) result.runWith = 'cross'
 
-        const steps = {}
-        if (firstEtl) {
-          steps.subStepActive = 2
-          steps.lastSubStep = 2
-        } else {
-          if (noCompute) {
-            steps.curStep = 3
-            steps.mainStep = 3
-            steps.subStepActive = 1
-            steps.lastSubStep = 1
+          const steps = {}
+          if (firstEtl) {
+            steps.subStepActive = 2
+            steps.lastSubStep = 2
           } else {
-            steps.subStepActive = 3
-            steps.lastSubStep = 3
+            if (noCompute) {
+              steps.curStep = 3
+              steps.mainStep = 3
+              steps.subStepActive = 1
+              steps.lastSubStep = 1
+            } else {
+              steps.subStepActive = 3
+              steps.lastSubStep = 3
+            }
           }
-        }
 
-        return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
-          if (updateResult.status !== 200) return updateResult
-          return {
-            status: 200,
-            message: 'ok',
-            result: result
-          }
-        })
-      })
+          return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
+            if (updateResult.status !== 200) return updateResult
+            return {
+              status: 200,
+              message: 'ok',
+              result: result
+            }
+          })
+        }))
     })
+  })
+})
+
+wss.register('abortEtl', (message, socket) => {
+  const projectId = message.projectId
+  const userId = socket.session.userId
+  return command({ ...message, userId, requestId: message._id }).then(() => {
+    const statusData = {
+      etling: false,
+      etlProgress: 0
+    }
+    return createOrUpdate(projectId, userId, statusData)
   })
 })
 
@@ -489,7 +502,7 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
   }
   return Promise.all(promise).then(([result1, result2]) => {
     const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
-    return Object.assign({}, returnValue, {result: realResult})
+    return Object.assign({}, returnValue, { result: realResult })
   })
 }))
 

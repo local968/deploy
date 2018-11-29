@@ -141,6 +141,7 @@ export default class Project {
   @observable version = [1, 2]
 
   @observable stopModel = false
+  @observable stopEtl = false
 
   constructor(id, args) {
     this.id = id
@@ -406,10 +407,8 @@ export default class Project {
         mainStep: 2,
         curStep: 2,
         lastSubStep: 1,
-        subStepActive: 1
+        subStepActive: 1,
       })
-      this.etling = false;
-      this.etlProgress = 0
 
       this.updateProject(backData);
     } else {
@@ -427,8 +426,6 @@ export default class Project {
       lastSubStep: 1,
       subStepActive: 1
     })
-    this.etling = false;
-    this.etlProgress = 0
     this.updateProject(backData).then(() => this.etl())
   }
 
@@ -702,21 +699,29 @@ export default class Project {
     // fill_method:  无效值
     // kwargs:
     return socketStore.ready()
-      .then(api => api.etl(data, progressResult => {
-        let { result } = progressResult;
-        if (!this.etling) return;
-        const { name, value, key } = result
-        if (name === "progress" && key === 'etl') {
-          this.etlProgress = value
-        }
-      }))
+      .then(api => api.etl(data))
       .then(returnValue => {
         const { result, status } = returnValue;
         if (status !== 200) return antdMessage.error(result['process error'])
         this.setProperty(result)
-        this.etling = false;
-        this.etlProgress = 0
       })
+  }
+
+  abortEtl = () => {
+    if (this.stopEtl) return
+    this.stopEtl = true
+    const command = {
+      command: 'stop',
+      action: 'etl',
+      projectId: this.id
+    }
+    this.isAbort = true
+    socketStore.ready().then(api => api.abortEtl(command).then(returnValue => {
+      const { status, message, result, id } = returnValue
+      if (id !== this.id) return
+      if (status !== 200) return antdMessage.error(message)
+      this.setProperty({ ...result, stopEtl: false })
+    }))
   }
 
   next = () => {
