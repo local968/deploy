@@ -215,7 +215,7 @@ class RegressionDetailCurves extends Component {
     this.setState({diagnoseType: e.target.value});
   }
 
-  render() {``
+  render() {
     const { model } = this.props;
     const { curve, diagnoseType } = this.state;
     let curComponent;
@@ -620,7 +620,7 @@ class ResidualDiagnose extends Component {
     }];
     const {diagnoseType, residualplot} = this.props;
     const RadioGroup = Radio.Group;
-    const disabled = diagnoseType === '';
+    // const disabled = diagnoseType === '';
     // const disabled = false;
     return (
       <div className={styles.residualDiagnose} >
@@ -634,7 +634,7 @@ class ResidualDiagnose extends Component {
               <div className={styles.radioWrapper} key={i}>
                 <Radio value={p.type} >{p.text}</Radio>
                 <div>
-                  <img width={200} src={p.plot} />
+                  <img width={200} src={p.plot} alt='plot'/>
                 </div>
               </div>
             ))}
@@ -659,7 +659,7 @@ class DiagnoseResult extends Component {
   render() {
     const {diagnoseType} = this.props;
     let result;
-    const type = 'large';
+    // const type = 'large';
     switch (diagnoseType) {
       case 'random':
         result = <div className={styles.content} >Perfect, your residual plot is randomly distributed. No need to further improve your models. </div>;

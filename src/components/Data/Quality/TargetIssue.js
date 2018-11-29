@@ -50,7 +50,7 @@ export class ClassificationTarget extends Component {
 
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
-    const { issues, target, targetMap, targetArray, colValueCounts, totalRawLines, renameVariable } = project
+    const { target, targetMap, targetArray, colValueCounts, totalRawLines, renameVariable } = project
     const map = !targetArray.length ? colValueCounts[target] : targetArray.map((v, k) => {
       let n = 0
       Object.entries(targetMap).forEach(([key, value]) => {
