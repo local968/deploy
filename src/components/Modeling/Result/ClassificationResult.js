@@ -36,7 +36,7 @@ export default class ClassificationView extends Component {
 
   costInput = (row, col) => {
     const isCost = row !== col
-    const field = (row === col ? "T" : "F") + (col === 0 ? "P" : "N")
+    const field = (row === col ? "T" : "F") + (col === 1 ? "P" : "N")
     return <div className={styles.costTd}>
       <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
       <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benefit:'}</span></div>
@@ -56,7 +56,7 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, train2ing, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN } } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN } } = project;
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.7 && "OK") || "NotSatisfied" : ''
     return <div>
       <div className={styles.result}>
@@ -309,7 +309,7 @@ class ModelTable extends Component {
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${trainModel.value}%` }}></div>
               </div>
-              <div className={styles.trainingText}>{`${trainModel.value}%`}</div>
+              <div className={styles.trainingText}>{`${(trainModel.value || 0).toFixed(2)}%`}</div>
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>

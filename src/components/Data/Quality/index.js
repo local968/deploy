@@ -92,11 +92,6 @@ class TargetIssue extends Component {
     const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? '2' : '10+';
-    const percent = {
-      missing: targetIssues.nullRow.length * 100 / (totalRawLines || 1),
-      mismatch: targetIssues.mismatchRow.length * 100 / (totalRawLines || 1),
-      outlier: targetIssues.outlierRow.length * 100 / (totalRawLines || 1),
-    }
     const targetPercent = {
       missing: (nullLineCounts[target] ? nullLineCounts[target] : 0) * 100 / (totalRawLines || 1),
       mismatch: (colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0) * 100 / (totalRawLines || 1),
@@ -185,9 +180,13 @@ class TargetIssue extends Component {
             totalRawLines={totalRawLines} />}
           {issues.targetRowIssue && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
-            targetIssues={targetIssues}
+            targetIssues={{
+              nullRow: nullLineCounts[target] ? nullLineCounts[target] : 0,
+              mismatchRow: colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0,
+              outlierRow: colType[target] === 'Numerical' ? outlierLineCounts[target] : 0,
+            }}
             totalLines={totalLines}
-            percent={percent} />}
+            percent={targetPercent} />}
         </div>
         {this.isLoad && <ProjectLoading />}
         <Modal content={<FixIssue project={project}

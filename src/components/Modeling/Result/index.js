@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import classnames from  'classnames'
+// import classnames from  'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
 import { observable } from 'mobx';
@@ -19,18 +19,6 @@ export default class ModelResult extends Component {
   deploy = () => {
     const { project } = this.props;
     const current = project.selectModel;
-    // const modelList = models.map(m => {
-    //   try {
-    //     const score = m.score.validateScore
-    //     const performance = Object.entries(score).map(([k, v]) => `${k}:${v.toFixed(3)}`).join(" ")
-    //     return {
-    //       name: m.name,
-    //       performance
-    //     }
-    //   } catch (e) {
-    //     return true
-    //   }
-    // }).filter(v => !!v)
     const { newVariable, trainHeader, expression } = project
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
     const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
@@ -50,8 +38,6 @@ export default class ModelResult extends Component {
   // }
 
   changeView = view => {
-    // const { train2ing } = this.props.project
-    // if(train2ing && view !== 'simple') return false
     this.view = view
   }
 
