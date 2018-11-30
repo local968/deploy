@@ -262,7 +262,8 @@ export default class Project {
 
   @computed
   get settingName() {
-    return this.settings.find(s => s.id === this.settingId).name
+    if(this.currentSetting) return this.currentSetting.name
+    return ''
   }
 
   @computed
