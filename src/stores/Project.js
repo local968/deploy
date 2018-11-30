@@ -233,6 +233,7 @@ export default class Project {
   @computed
   get defaultTrain() {
     const measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
+    this.models = []
 
     return {
       train2Finished: false,
@@ -333,6 +334,9 @@ export default class Project {
     this.loading = true;
     data.id = this.id
 
+    const {curStep} = this
+    curStep !== 3 
+
     return socketStore.ready().then(api => {
       return api.updateProject(data).then(result => {
         const { status, message } = result
@@ -400,7 +404,6 @@ export default class Project {
     };
     updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
     if (this.problemType && this.changeProjectType !== this.problemType) {
-      this.models = []
       //全部恢复到problem步骤
       const backData = Object.assign({}, updObj, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
         mainStep: 2,
@@ -830,8 +833,6 @@ export default class Project {
     } = this;
     const command = 'train';
 
-    this.models = []
-
     const featureLabel = dataHeader.filter(d => d !== target);
 
     // id: request ID
@@ -876,8 +877,6 @@ export default class Project {
       newVariable
     } = this;
     const command = 'train';
-
-    this.models = []
 
     const featureLabel = dataHeader.filter(v => !trainHeader.includes(v) && v !== target)
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))

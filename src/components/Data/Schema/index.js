@@ -232,8 +232,8 @@ export default class DataSchema extends Component {
       <div className={styles.schemaInfo}>
         <div className={styles.schemaI}><span>i</span></div>
         <div className={styles.schemaText}>
-          <span>Please edit the default header row if necessary.</span>
-          <span>If your data doesn't have a header, please prepare a dataset that has one.</span>
+          <span>If your data is not with a header, please reload one WITH a header.</span>
+          <span>Please select a variable as the target variable , and select undesirable variables if necessary.</span>
         </div>
       </div>
       <div className={styles.schemaContent}>

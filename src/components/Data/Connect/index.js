@@ -80,7 +80,7 @@ export default class DataConnect extends Component {
   @computed
   get message() {
     if (this.isPause) return 'Paused'
-    if (!this.isSql && this.process === 0) return 'Perparing for upload...'
+    if (!this.isSql && this.process === 0) return 'Preparing for upload...'
     if (!this.isSql && this.process > 0 && this.process < 90) return 'Uploading data...'
     if (this.process >= 90) return 'Extract-Transform-Load in progress...'
     if (this.isSql && this.process === 0) return 'Perparing for database connection...'
@@ -204,7 +204,7 @@ export default class DataConnect extends Component {
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
-          <span>If your data is ready, choose a data source to connect.</span>
+          <span>choose a data source to connect.</span>
         </div>
         {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
@@ -356,7 +356,7 @@ class DataSample extends Component {
           <div className={styles.sampleTable}>
             <div className={styles.sampleHeader}>
               <div className={styles.sampleCell}>
-                <span>Use Case Name</span>
+                <span>Name</span>
               </div>
               <div className={classnames(styles.sampleCell, styles.sampleDesc)}>
                 <span>Description</span>

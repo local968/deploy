@@ -113,7 +113,7 @@ export default class Home extends Component {
       <div className={classnames(styles.projects)}>
         <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
           <img src={addProjectIcon} alt="New Project" />
-          <span>Create New Project</span>
+          <span>Create a New Project</span>
         </div>
         {sortProjects.filter(p => p.id.includes(keywords) || (p.name || "").includes(keywords)).map((project) => {
           return <Project project={project} selectId={this.selectId} actions={this.actions} key={"project-" + project.id} selected={this.ids.includes(project.id)} />

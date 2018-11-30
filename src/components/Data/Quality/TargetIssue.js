@@ -178,14 +178,14 @@ export class RowIssue extends Component {
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
-            <div className={styles.progressText}><span>All Data ({totalRawLines} rows)</span><span>1000 rows(minimum)</span></div>
+            <div className={styles.progressText}><span>All Data ({totalRawLines} rows)</span><span>1000 rows (minimum)</span></div>
             <div className={styles.progress} style={{ width: totalRawLines / 10 + "%" }}></div>
           </div>
         </div>
         <div className={styles.methods}>
           <div className={styles.methodBox}>
             <div className={styles.method}>
-              <div className={styles.reason}><span>Data size >1000 rows is recommended</span></div>
+              <div className={styles.reason}><span>Data size > 1000 rows is recommended</span></div>
               <div className={styles.button} onClick={backToConnect}>
                 <button><span>Load a New Dataset</span></button>
               </div>
@@ -236,7 +236,7 @@ export class DataIssue extends Component {
             </div>}
           </div>
           {totalLines < 1000 && <div className={styles.progressBox}>
-            <div className={styles.progressText}><span>Clean Data ({totalLines} rows)</span><span>1000 rows(minimum)</span></div>
+            <div className={styles.progressText}><span>Clean Data ({totalLines} rows)</span><span>1000 rows (minimum)</span></div>
             <div className={styles.progress} style={{ width: totalLines / 10 + "%" }}></div>
           </div>}
         </div>
@@ -436,7 +436,7 @@ export class SelectTarget extends Component {
         <div className={styles.fixesCheckBox}>
           <div className={styles.fixesTextBottom}>
             <div className={styles.fixesComplete}>
-              <span>The changes will not show up until they are applied an training section.</span>
+              <span>The changes will not show up until they are applied in training section.</span>
             </div>
           </div>
         </div>

@@ -33,7 +33,7 @@ export default class StartTrain extends Component {
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
-          <span>Data looks good now, It's time to train your model!</span>
+          <span>Data looks good now. It's time to train your model!</span>
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
@@ -49,8 +49,7 @@ export default class StartTrain extends Component {
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want R2 Learn to build the model automatically, choose
-                  automatic modeling.
+                  If you want R2 Learn to build the model automatically.
                 </span>
               </div>
             </div>
@@ -69,7 +68,7 @@ export default class StartTrain extends Component {
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want to have more control over the modeling process, choose advanced modeling.
+                  If you want to have more control over the modeling process.
                 </span>
               </div>
             </div>
