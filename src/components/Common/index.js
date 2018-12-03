@@ -8,12 +8,11 @@ import Search from './Search';
 import Background from './Background';
 import ContinueButton from './ContinueButton';
 import ProjectSide from './ProjectSide';
-import ProjectLoading from './ProjectLoading';
 import Table from './Table';
 import Modal from './Modal';
 import NumberInput from './NumberInput';
 import Confirm from './Confirm';
-import EtlLoading from './EtlLoading';
+import ProcessLoading from './ProcessLoading';
 import Hint from './Hint';
 
 export {
@@ -26,12 +25,11 @@ export {
   Search,
   ContinueButton,
   ProjectSide,
-  ProjectLoading,
   Background,
   Table,
   Modal,
   NumberInput,
   Confirm,
-  EtlLoading,
+  ProcessLoading,
   Hint
 };

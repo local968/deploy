@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx'
 import { Checkbox, Popover } from 'antd'
-import { Select, ContinueButton, EtlLoading, Table, Hint } from 'components/Common';
+import { Select, ContinueButton, ProcessLoading, Table, Hint } from 'components/Common';
 
 @observer
 export default class DataSchema extends Component {
@@ -287,7 +287,7 @@ export default class DataSchema extends Component {
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
         </div>
       </div>
-      {etling && <EtlLoading progress={etlProgress} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
     </div>
   }
 }

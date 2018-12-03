@@ -12,7 +12,8 @@ export default class Loading extends Component {
         <div className={styles.training}>
           <Progress
             className={styles.trainingProgress}
-            percent={trainModel ? (trainModel.value || 0).toFixed(2) : 0}
+            percent={trainModel ? (trainModel.value || 0) : 0}
+            format={percent => percent.toFixed(2) + "%"}
             status="active"
           />
         </div>
