@@ -142,6 +142,26 @@ const api = {
   },
   decreaseLines: async (restrictQuery, lineCount) => {
     await redis.incrby(restrictQuery, -lineCount)
+  },
+  getCutOff: async (projectId, modelName) => {
+    redis.smembers(`project:${projectId}:models`).then(ids => {
+      const pipeline = redis.pipeline();
+      ids.forEach(mid => {
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex')
+      })
+      pipeline.exec().then(list => {
+        const models = list.map(row => {
+          let [name, fitIndex] = row[1] || []
+          try {
+            name = JSON.parse(name)
+            fitIndex = JSON.parse(fitIndex)
+          } catch (e) { }
+          return { name, fitIndex }
+        })
+        const model = models.find(m => m.name === modelName) || {}
+        return (model.fitIndex || 0) / 100
+      })
+    })
   }
 }
 
