@@ -1015,6 +1015,7 @@ span.fixesEdit {
 	width: 12px;
 	height: 12px;
 	border-radius: 50%;
+	margin-right: .05em;
 }
 
 .summaryType span {
@@ -1078,6 +1079,12 @@ span.fixesEdit {
 	border-radius: 5px;
 	height: 10px;
 	width: 100%;
+}
+
+.summaryProgress {
+	display: flex;
+	flex: none;
+	height: 10px;
 }
 
 .summaryText {

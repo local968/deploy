@@ -84,7 +84,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project, reloadTable } = this.props;
-    const { target, colType, targetColMap, targetMap, dataViews, preImportance, uniqueValues, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader, expression } = project;
+    const { target, colType, targetColMap, targetMap, dataViews, preImportance, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader, expression } = project;
     // const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, targetColMap, targetMap)).length : 'N/A';
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
@@ -171,11 +171,11 @@ export default class SimplifiedView extends Component {
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>Importance</span>
             <div className={styles.tableReload} onClick={reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
-            <Hint themeStyle={{ fontSize: '1rem' }} content='It reflect the importance of the predictor to the target variable.' />
+            <Hint themeStyle={{ fontSize: '1rem' }} content='The following column reflects the importance of the predictor to the target variable.' />
           </div>
-          <div className={styles.tableTh}><span>Data type</span></div>
-          <div className={styles.tableTh}><span>Mean</span></div>
+          <div className={styles.tableTh}><span>Data Type</span></div>
           <div className={styles.tableTh}><span>Unique Value</span></div>
+          <div className={styles.tableTh}><span>Mean</span></div>
           <div className={styles.tableTh}><span>STD</span></div>
           <div className={styles.tableTh}><span>Median</span></div>
           <div className={styles.tableTh}><span>Min</span></div>
@@ -189,7 +189,7 @@ export default class SimplifiedView extends Component {
             const data = colType[h] !== 'Categorical' && dataViews ? (dataViews[h] || {}) : {}
             const map = targetMap || {};
             const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} uniqueValues={uniqueValues[h]} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
+            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
           })}
         </div>
       </div>
@@ -222,12 +222,12 @@ class SimplifiedViewRow extends Component {
 
   formatNumber = (num, isNA) => {
     if (isNA) return "N/A"
-    if (typeof num === "number") return num
+    if (typeof num === "number") return num.toFixed(2)
     return "N/A"
   }
 
   render() {
-    const { data, importance, colType, value, project, uniqueValues, isChecked, handleCheck, id } = this.props;
+    const { data, importance, colType, value, project, isChecked, handleCheck, id } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     return <div className={styles.tableRow}>
@@ -266,11 +266,11 @@ class SimplifiedViewRow extends Component {
       </div>
       <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
       <div className={classnames(styles.tableTd, {
+        [styles.none]: valueType !== 'Categorical' || isRaw
+      })} title={this.formatNumber(data.uniqueValues, valueType !== 'Categorical' || isRaw)}><span>{this.formatNumber(data.uniqueValues, valueType !== 'Categorical' || isRaw)}</span></div>
+      <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
       })} title={this.formatNumber(data.mean, valueType === 'Categorical')}><span>{this.formatNumber(data.mean, valueType === 'Categorical')}</span></div>
-      <div className={classnames(styles.tableTd, {
-        [styles.none]: valueType !== 'Categorical' || isRaw
-      })} title={this.formatNumber(uniqueValues, valueType !== 'Categorical' || isRaw)}><span>{this.formatNumber(uniqueValues, valueType !== 'Categorical' || isRaw)}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
       })} title={this.formatNumber(data.std, valueType === 'Categorical')}><span>{this.formatNumber(data.std, valueType === 'Categorical')}</span></div>
