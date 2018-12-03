@@ -84,7 +84,7 @@ export default class Project {
   @observable outlierDict = {}
   @observable targetMap = {};
   @observable targetArray = []
-  @observable dataViews = null;
+  @observable rawDataViews = null;
   @observable preImportance = null;
   @observable histgramPlots = {};
   @observable univariatePlots = {};
@@ -139,6 +139,7 @@ export default class Project {
   @observable algorithms = [];
   @observable selectId = '';
   @observable version = [1, 2]
+  @observable dataViews = null;
 
   @observable stopModel = false
 
@@ -218,6 +219,7 @@ export default class Project {
       nullIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
+      rawDataViews: null,
       dataViews: null,
       outlierDict: {},
       targetMap: {},
@@ -334,9 +336,6 @@ export default class Project {
   updateProject = data => {
     this.loading = true;
     data.id = this.id
-
-    const {curStep} = this
-    curStep !== 3 
 
     return socketStore.ready().then(api => {
       return api.updateProject(data).then(result => {
@@ -737,22 +736,24 @@ export default class Project {
   }
 
   @action
-  dataView = () => {
+  dataView = (isClean = true) => {
     const exp = Object.values(this.expression).join(";")
     return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'dataView'
+        command: 'dataView',
+        actionType: isClean ? 'clean' : 'raw'
       };
       if (exp) command.csvScript = exp.replace(/\|/g, ",")
       return api.dataView(command, progressResult => {
       }).then(returnValue => {
+        const key = isClean ? 'dataViews' : 'rawDataViews'
         const { status, result } = returnValue
         if (status < 0) {
-          this.setProperty({ dataViews: null })
+          this.setProperty({ [key]: null })
           return antdMessage.error("dataview error")
         }
-        this.setProperty({ dataViews: result.data })
+        this.setProperty({ [key]: result.data })
       })
     })
   }

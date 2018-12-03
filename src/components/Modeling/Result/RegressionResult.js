@@ -140,7 +140,7 @@ class ModelTable extends Component {
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${trainModel.value}%` }}></div>
               </div>
-              <div className={styles.trainingText}>{`${trainModel.value}%`}</div>
+              <div className={styles.trainingText}>{`${(trainModel.value || 0).toFixed(2)}%`}</div>
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>

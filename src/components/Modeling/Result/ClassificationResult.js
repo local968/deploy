@@ -112,7 +112,11 @@ export default class ClassificationView extends Component {
             <div className={styles.costBox}>
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
-                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span>Actual / Predicted</span></div>
+                  <div className={styles.sepCell}>
+                    <div className={styles.sepText} style={{marginLeft: 'auto'}}><span title='Predicted'>Predicted</span></div>
+                    <div className={styles.sep}><span></span></div>
+                    <div className={styles.sepText} style={{marginRight: 'auto'}}><span title='Actual'>Actual</span></div>
+                  </div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span>YES</span></div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span>NO</span></div>
                 </div>

@@ -12,7 +12,8 @@ function setDefaultData(id, userId) {
     univariatePlots: {},
     histgramPlots: {},
     preImportance: null,
-    dataViews: null
+    dataViews: null,
+    rawDataViews: null
   }
   return createOrUpdate(id, userId, data)
 }
@@ -429,7 +430,6 @@ wss.register('etl', (message, socket, progress) => {
             })
           }
         })
-        result.dataViews = null;
         result.firstEtl = false;
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
@@ -465,9 +465,10 @@ wss.register('etl', (message, socket, progress) => {
 })
 
 wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
+  const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
   const { status, result } = returnValue
   if (status === 100) {
-    createOrUpdate(message.projectId, socket.session.userId, { dataViews: result.data })
+    createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
   }
   return returnValue
 }))

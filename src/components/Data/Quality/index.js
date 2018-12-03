@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { ContinueButton, ProjectLoading, Modal, EtlLoading, Table } from 'components/Common';
+import { ContinueButton, Modal, ProcessLoading, Table } from 'components/Common';
 import { when, observable } from 'mobx';
 import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
@@ -39,16 +39,16 @@ class TargetIssue extends Component {
   }
 
   editFixes = () => {
-    if (this.props.project.dataViews) {
+    if (this.props.project.rawDataViews) {
       this.visible = true
     } else {
       if (this.isLoad) return false;
 
       this.isLoad = true
 
-      this.props.project.dataView()
+      this.props.project.dataView(false)
       when(
-        () => this.props.project.dataViews,
+        () => this.props.project.rawDataViews,
         () => {
           this.visible = true
           this.isLoad = false
@@ -183,7 +183,7 @@ class TargetIssue extends Component {
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
-        {this.isLoad && <ProjectLoading />}
+        {this.isLoad && <ProcessLoading />}
         <Modal content={<FixIssue project={project}
           issueRows={targetIssues}
           closeFixes={this.closeFixes}
@@ -205,7 +205,7 @@ class TargetIssue extends Component {
           showClose={true}
         />
       </div>
-      {etling && <EtlLoading progress={etlProgress} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
     </div>
   }
 }
@@ -226,16 +226,16 @@ class VariableIssue extends Component {
 
   editFixes = () => {
     this.closeSummary()
-    if (this.props.project.dataViews) {
+    if (this.props.project.rawDataViews) {
       this.visible = true
     } else {
       if (this.isLoad) return false;
 
       this.isLoad = true
 
-      this.props.project.dataView()
+      this.props.project.dataView(false)
       when(
-        () => this.props.project.dataViews,
+        () => this.props.project.rawDataViews,
         () => {
           this.visible = true
           this.isLoad = false
@@ -413,7 +413,7 @@ class VariableIssue extends Component {
           </div>
         </div>
       </div>
-      {etling && <EtlLoading progress={etlProgress} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
       <Modal content={<FixIssue project={project}
         issueRows={issueRows}
         closeFixes={this.closeFixes}
