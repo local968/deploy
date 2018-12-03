@@ -892,6 +892,7 @@
     height: 100%;
     align-items: center;
     display: flex;
+    z-index: -1;
 }
 
 .sep span {
