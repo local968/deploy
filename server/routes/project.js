@@ -418,16 +418,6 @@ wss.register('etl', (message, socket, progress) => {
           result,
           message: returnValue.message
         }
-        Object.keys(result).forEach(k => {
-          if (k === "name") {
-            delete result[k];
-          }
-          if (k.includes("FillMethod")) {
-            Object.keys(result[k]).forEach(key => {
-              if (result[k][key] === "ignore") delete result[k][key]
-            })
-          }
-        })
         result.firstEtl = false;
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
