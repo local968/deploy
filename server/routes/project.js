@@ -253,10 +253,10 @@ function updateProjectField(id, userId, field, data) {
     try {
       result = JSON.parse(result)
     } catch (e) { }
-    if (Array.isArray(result)) {
-      data = [...result, ...data]
-    } else if (typeof result === 'object') {
-      data = Object.assign({}, result, data)
+    if (Array.isArray(data) || Array.isArray(result)) {
+      data = [...(result || []), ...(data || [])]
+    } else if (typeof data === 'object' || typeof result === 'object') {
+      data = Object.assign({}, (result || {}), (data || {}))
     }
     return redis.hset(key, field, JSON.stringify(data)).then(() => {
       const returnValue = {
@@ -421,6 +421,9 @@ wss.register('etl', (message, socket, progress) => {
           message: returnValue.message
         }
         result.firstEtl = false;
+        delete result.name
+        delete result.id
+        delete result.userId
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
         if (result.totalLines > 0 && result.totalLines < 10000) result.runWith = 'cross'
