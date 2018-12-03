@@ -80,10 +80,12 @@ function addSettingModel(userId, projectId) {
   return function (result) {
     const modelName = result.model.name
     redis.hmget(`project:${projectId}`, 'settingId', 'settings').then(([settingId, settings]) => {
-      settingId = JSON.parse(settingId)
-      settings = JSON.parse(settings)
-      settings.find(s => s.id === settingId).models.push(modelName)
-      createOrUpdate(projectId, userId, { settings })
+      if (settingId && settings) {
+        settingId = JSON.parse(settingId)
+        settings = JSON.parse(settings)
+        settings.find(s => s.id === settingId).models.push(modelName)
+        createOrUpdate(projectId, userId, { settings })
+      }
     }, console.error)
     return result
   }
@@ -489,7 +491,7 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
   }
   return Promise.all(promise).then(([result1, result2]) => {
     const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
-    return Object.assign({}, returnValue, {result: realResult})
+    return Object.assign({}, returnValue, { result: realResult })
   })
 }))
 
@@ -564,7 +566,7 @@ wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId, requestId: message._id }
   let hasModel = false
   return checkTraningRestriction(socket.session.user)
-    .then(() => moveModels(message.projectId))
+    // .then(() => moveModels(message.projectId))
     .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
       const { status, result } = queueValue
