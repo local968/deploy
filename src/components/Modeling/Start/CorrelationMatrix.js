@@ -64,7 +64,7 @@ class CorrelationRow extends Component {
     const colorStep1 = gradientColors('#ffffff', '#688bfa', 50);
     const colorStep2 = gradientColors('#ff0000', '#ffffff', 50);
     return (
-      <div>
+      <div className={styles.correlationRow} >
         <span className={styles.horizonText} title={header[index]} >{header[index]}</span>
         {header.map((key, i) => {
           return (
