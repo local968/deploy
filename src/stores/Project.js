@@ -127,7 +127,7 @@ export default class Project {
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
 
-  @observable advancedSize = 0;
+  @observable ensembleSize = 20;
   @observable randSeed = 0;
   @observable measurement = '';
   @observable resampling = "no";
@@ -244,7 +244,7 @@ export default class Project {
       criteria: 'default',
       costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
       speedVSaccuracy: 5,
-      advancedSize: 0,
+      ensembleSize: 20,
       // maxTime: 10,
       randSeed: 0,
       resampling: 'no',
@@ -914,6 +914,7 @@ export default class Project {
       speedVSaccuracy: this.speedVSaccuracy,
       version: this.version.join(","),
       algorithms: [...this.algorithms],
+      ensembleSize: this.ensembleSize
     };
 
     if (this.dataRange === "all") {
@@ -953,6 +954,7 @@ export default class Project {
       customRange: [...this.customRange],
       algorithms: [...this.algorithms],
       speedVSaccuracy: this.speedVSaccuracy,
+      ensembleSize: this.ensembleSize,
       runWith: this.runWith,
       crossCount: this.crossCount,
       version: this.version,
@@ -963,8 +965,8 @@ export default class Project {
   }
 
   newSetting = (type = 'auto') => {
-    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy } = this;
-    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy }
+    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize }
     const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
     const id = uuid.v4()
     this.settingId = id

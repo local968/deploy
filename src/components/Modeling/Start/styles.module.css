@@ -1047,6 +1047,7 @@ span.advancedDesc {
   margin-left: auto;
   margin-right: .2em;
   margin-top: .1em;
+  cursor: pointer;
 }
 
 .newVariableHintTips {

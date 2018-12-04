@@ -727,7 +727,7 @@ class CreateNewVariable extends Component {
           </div>}
           {!!hintFunctionSyntax && (this.showTips ?
             <div className={styles.newVariableHintTips}>
-              <span>{hintFunctionSyntax.syntax}</span>
+              <span>{hintFunctionSyntax.tips}</span>
             </div> :
             <div className={styles.newVariableHintSyntax}>
               <span>{hintFunctionSyntax.syntax}</span>

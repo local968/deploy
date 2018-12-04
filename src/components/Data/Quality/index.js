@@ -493,12 +493,13 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
+    const { target, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
     const fixedPercent = (totalFixedLines + totalLines - totalRawLines) / totalRawLines * 100
     const cleanPercent = (totalRawLines - totalFixedLines) / totalRawLines * 100
-    const variableList = sortHeader.slice(1)
-    const percentList = sortHeader.map(v => {
+    const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
+    const variableList = currentHeader.slice(1)
+    const percentList = currentHeader.map(v => {
       const percent = {
         missing: (nullLineCounts[v] || 0) / (totalRawLines || 1) * 100,
         mismatch: (mismatchLineCounts[v] || 0) / (totalRawLines || 1) * 100,
