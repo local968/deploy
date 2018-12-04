@@ -649,14 +649,16 @@ class ResidualDiagnose extends Component {
 class DiagnoseResult extends Component {
   handleNewData = () => {
     const { updateProject, nextSubStep } = this.props.project
-    // updateProject(nextSubStep(1, 1))
+    updateProject(nextSubStep(1, 2))
   }
   handleSetting = () => {
     const { updateProject, nextSubStep } = this.props.project
+    updateProject(nextSubStep(1, 3))
     // history.push(`/modeling/${this.props.projectId}/1`);
   }
   handleOutlierFix = () => {
     const { updateProject, nextSubStep } = this.props.project
+    updateProject(nextSubStep(3, 2))
     // history.push(`/data/${this.props.projectId}/5`);
   }
   render() {
