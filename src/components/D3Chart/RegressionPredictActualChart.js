@@ -59,7 +59,7 @@ export default class RegressionPredictActualChart extends Component {
       .x((d, i) => x(i + 1))
       .y(d => y(d[field]));
     const tool_tip = d3tips(`.${styles.hoverPanel}`)
-      .offset((d, i) => ([y(d[field]), x(i) + 400]))
+      .offset((d, i) => ([y(d[field]), x(i)]))
       .html(function(d, i) {
         return (
           `

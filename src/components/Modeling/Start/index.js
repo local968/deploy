@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 // import autoIcon from './mr-one-logo-blue.svg';
 import { Modal, ProcessLoading } from 'components/Common';
 import { observable } from 'mobx';
@@ -11,17 +11,18 @@ import SimplifiedView from './simplifiedView';
 import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
 
+@inject('projectStore')
 @observer
 export default class StartTrain extends Component {
   @observable visible = false
 
   fastTrain = () => {
-    this.props.project.newSetting('auto')
-    this.props.project.fastTrain();
+    this.props.projectStore.project.newSetting('auto')
+    this.props.projectStore.project.fastTrain();
   };
 
   advanced = () => {
-    this.props.project.newSetting('custom')
+    this.props.projectStore.project.newSetting('custom')
     this.visible = true
   }
 
@@ -79,7 +80,7 @@ export default class StartTrain extends Component {
         </div>
         <Modal width='13em'
           content={<AdvancedModel
-            project={this.props.project}
+            project={this.props.projectStore.project}
             closeAdvanced={this.closeAdvanced} />}
           title='Advanced Modeling'
           onClose={this.closeAdvanced}

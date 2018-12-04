@@ -143,6 +143,7 @@ class ProjectStore {
   @action
   initProject = id => {
     return new Promise(resolve => {
+      if(this.currentId === id) return resolve(true)
       when(
         () => !this.loading && !this.isInit,
         () => {
@@ -186,6 +187,11 @@ class ProjectStore {
   notExit = () => {
     this.conflict = false
     this.inProject(this.currentId)
+  }
+
+  @action
+  clean = () => {
+    this.currentId = ''
   }
 }
 

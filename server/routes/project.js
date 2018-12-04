@@ -33,24 +33,48 @@ function query(key, params) {
       if (data.length === 0) return result
 
       const promiseArray = data.map(r => {
-        return redis.hmget("project:" + r, Field)
+        return redis.hgetall("project:" + r)
+        // return redis.hmget("project:" + r, Field)
       })
       return Promise.all(promiseArray).then(array => {
         return Promise.all(array.map(item => {
-          const obj = {}
-          item.forEach((v, k) => {
+          Object.keys(item).forEach(key => {
             try {
-              v = JSON.parse(v)
+              item[key] = JSON.parse(item[key])
             } catch (e) { }
-            obj[Field[k]] = v
           })
-          if (obj.uploadFileName) {
-            return getFileInfo(obj.uploadFileName).then(files => {
-              obj.fileNames = files.fileNames
-              return obj
+          if (item.uploadFileName) {
+            return getFileInfo(item.uploadFileName).then(files => {
+              item.fileNames = files.fileNames
+              return item
             })
           }
-          return Promise.resolve(obj)
+          return Promise.resolve(item)
+          // for (let key in item) {
+          //   try {
+          //     result[key] = JSON.parse(result[key])
+          //   } catch (e) { }
+          //   if (result.uploadFileName) {
+          //     return getFileInfo(obj.uploadFileName).then(files => {
+          //       obj.fileNames = files.fileNames
+          //       return obj
+          //     })
+          //   }
+          // }
+          // const obj = {}
+          // item.forEach((v, k) => {
+          //   try {
+          //     v = JSON.parse(v)
+          //   } catch (e) { }
+          //   obj[Field[k]] = v
+          // })
+          // if (obj.uploadFileName) {
+          //   return getFileInfo(obj.uploadFileName).then(files => {
+          //     obj.fileNames = files.fileNames
+          //     return obj
+          //   })
+          // }
+          // return Promise.resolve(obj)
         })).then(list => {
           result.list = list
           return result

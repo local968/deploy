@@ -10,14 +10,14 @@ import RegressionResult from './RegressionResult';
 
 const Classification = 'Classification';
 
-@inject('deploymentStore', 'routing')
+@inject('deploymentStore', 'routing', 'projectStore')
 @observer
 export default class ModelResult extends Component {
   @observable show = false
   @observable view = "simple"
 
   deploy = () => {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     const current = project.selectModel;
     const { newVariable, trainHeader, expression } = project
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
@@ -42,7 +42,8 @@ export default class ModelResult extends Component {
   }
 
   render() {
-    const { models, project } = this.props;
+    const { project } = this.props.projectStore;
+    const { models } = project
     if (!models.length) return null;
     const { view } = this;
     return (

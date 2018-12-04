@@ -36,13 +36,8 @@ export default class AdvancedView extends Component {
     project.settings.find(s => s.id === project.settingId).name = e.target.value
   })
 
-  handleSize = (e) => {
-    let value = e.target.value;
-    if (value && !isNaN(value)) {
-      value = parseInt(value, 10)
-      if (value < 1 || value > 30) return;
-      this.props.project.advancedSize = value;
-    }
+  handleSize = value => {
+    this.props.project.ensembleSize = value;
   }
 
   handleSlider = value => {
@@ -206,7 +201,7 @@ export default class AdvancedView extends Component {
   })
 
   render() {
-    const { settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy } = this.props.project;
+    const { settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy, ensembleSize } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
@@ -329,16 +324,16 @@ export default class AdvancedView extends Component {
           </div>
         </div>
         <div className={styles.advancedRight}>
-          {/* <div className={styles.advancedBlock}>
+          <div className={styles.advancedBlock}>
             <div className={classnames(styles.advancedTitle, styles.limit)}>
               <span>Set Model Ensemble Size:</span>
               <span className={styles.advancedDesc}>Actual number of ensemble models may be less than this number.</span>
             </div>
             <div className={styles.advancedOption}>
-              <input className={styles.advancedSize} value={advancedSize} onChange={this.handleSize} />
+              <NumberInput className={styles.advancedSize} value={ensembleSize} onBlur={this.handleSize} min={1} max={30} isInt={true} />
               <span>(1~30)</span>
             </div>
-          </div> */}
+          </div>
           {/* <div className={styles.advancedBlock}>
             <div className={classnames(styles.advancedTitle, styles.limit)}>
               <span>Set Data Range:</span>

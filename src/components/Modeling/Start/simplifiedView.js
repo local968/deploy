@@ -345,6 +345,7 @@ class CreateNewVariable extends Component {
   @observable myFunction = {}
   @observable loading = false
   @observable isIn = false
+  @observable showTips = false
 
   hideHint = () => {
     this.hintStatus = false
@@ -463,6 +464,7 @@ class CreateNewVariable extends Component {
   showSyntax = n => {
     this.active = n
     this.showFunction = this.hints[this.active]
+    this.showTips = false
   }
 
   handleAdd = () => {
@@ -695,6 +697,10 @@ class CreateNewVariable extends Component {
     this.fxRef.current.focus()
   }
 
+  showAll = () => {
+    this.showTips = true
+  }
+
   render() {
     const { visible, onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
@@ -719,7 +725,14 @@ class CreateNewVariable extends Component {
               </div>
             })}
           </div>}
-          {!!hintFunctionSyntax && <div className={styles.newVariableHintSyntax}><span>{hintFunctionSyntax.syntax}</span></div>}
+          {!!hintFunctionSyntax && (this.showTips ?
+            <div className={styles.newVariableHintTips}>
+              <span>{hintFunctionSyntax.tips}</span>
+            </div> :
+            <div className={styles.newVariableHintSyntax}>
+              <span>{hintFunctionSyntax.syntax}</span>
+              <button onClick={this.showAll}><span>Tips</span></button>
+            </div>)}
           {!!functionSyntax && <div className={styles.newVariableSyntax}><span>{functionSyntax.syntax}</span></div>}
         </div>
       </div>
