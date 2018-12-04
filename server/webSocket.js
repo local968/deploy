@@ -72,7 +72,12 @@ const init = (server, sessionParser) => {
             return socket.send(JSON.stringify({ status: 500, error: 'server error', message: 'server error', ...error, request: message }))
           })
       } else {
-        return socket.send(JSON.stringify({ ...returnValue, request: message }))
+        try {
+          socket.send(JSON.stringify({ ...returnValue, request: message }))
+        }catch(e) {
+          // socket closed
+        }
+        return
       }
     }
     wss.addListener(eventName, callback)
