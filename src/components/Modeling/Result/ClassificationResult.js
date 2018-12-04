@@ -50,25 +50,34 @@ export default class ClassificationView extends Component {
   }
 
   handleSubmit = () => {
-    this.props.project.updateProject({ costOption: { ...this.costOption } })
+    const { models, project } = this.props
+    const { TP, FN, FP, TN } = this.costOption
+    if (!!TP || !!FN || !!FP || !!TN) {
+      models.forEach(m => {
+        const benefit = m.getBenefit(TP, FN, FP, TN)
+        if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
+      })
+    }
+    project.updateProject({ costOption: { ...this.costOption } })
     // this.props.project.costOption = this.costOption
   }
 
   render() {
     const { models, project } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN } } = project;
-    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.7 && "OK") || "NotSatisfied" : ''
+    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
           <div className={styles.title}>
             <span>We have recommended a model by default.</span>
           </div>
-          <div className={styles.text}>
+          {/* <div className={styles.text}>
             <span>You can also tell us your business needs to get a more precise recommendation.</span>
-          </div>
+          </div> */}
           <div className={styles.row}>
-            <span>Modeling Results :{' '}<div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div></span>
+            <span>Modeling Results :{' '}</span>
+            <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
             <span>Selected Model :<a>&nbsp;{current.name}</a></span>
@@ -104,7 +113,11 @@ export default class ClassificationView extends Component {
             <div className={styles.costBox}>
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
-                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span>Actual / Predicted</span></div>
+                  <div className={styles.sepCell}>
+                    <div className={styles.sepText} style={{marginLeft: 'auto'}}><span title='Predicted'>Predicted</span></div>
+                    <div className={styles.sep}><span></span></div>
+                    <div className={styles.sepText} style={{marginRight: 'auto'}}><span title='Actual'>Actual</span></div>
+                  </div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span>YES</span></div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span>NO</span></div>
                 </div>

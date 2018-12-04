@@ -5,13 +5,16 @@ import Project from 'components/Project';
 import Problem from 'components/Problem';
 import Data from 'components/Data';
 import Modeling from 'components/Modeling';
-import { ProjectLoading, Confirm } from 'components/Common';
+import { ProcessLoading, Confirm } from 'components/Common';
 import { message } from 'antd';
 import styles from './styles.module.css';
+import { observable } from 'mobx'
 
 @inject('userStore', 'projectStore', 'routing')
 @observer
 export default class Main extends Component {
+  @observable hasError = false
+
   constructor(props) {
     super(props);
     const { pid } = props.match.params || {};
@@ -26,6 +29,11 @@ export default class Main extends Component {
         }
       })
     )
+  }
+
+  componentDidCatch(error, info) {
+    this.hasError = true
+    console.log(error, info)
   }
 
   componentWillMount() {
@@ -67,7 +75,7 @@ export default class Main extends Component {
 
   render() {
     const { project, conflict, notExit } = this.props.projectStore
-    return <React.Fragment>
+    return this.hasError ? <div>error</div> : <React.Fragment>
       <div className={styles.header}>
         {project && project.name && <div className={styles.projectName}>
           <span className={styles.label}>Project: </span>
@@ -78,7 +86,7 @@ export default class Main extends Component {
           <span className={styles.value}> {project.fileNames.toString()}</span>
         </div>}
       </div>
-      {!project ? <ProjectLoading /> : this.getChild()}
+      {!project ? <ProcessLoading /> : this.getChild()}
       {<Confirm
         width="6em"
         title={`You have been kicked out`}

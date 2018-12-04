@@ -9,7 +9,7 @@ import deleteDarkIcon from './delete-dark.svg';
 // import duplicateDarkIcon from './duplicate-dark.svg';
 // import shareDarkIcon from './share-dark.svg';
 import checkedIcon from './checked.svg';
-import { Search, Select, Pagination, ProjectLoading, Confirm } from 'components/Common';
+import { Search, Select, Pagination, ProcessLoading, Confirm } from 'components/Common';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import { observable, toJS } from 'mobx';
@@ -108,12 +108,12 @@ export default class Home extends Component {
     const { projectStore } = this.props;
     const { toolsOption, total, sortList: sortProjects, changeOption, changePage, keywords } = projectStore;
     return <div className={classnames(styles.home)} >
-      {this.loading && <ProjectLoading />}
+      {this.loading && <ProcessLoading />}
       <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} keywords={keywords} changeWords={this.changeWords} />
       <div className={classnames(styles.projects)}>
         <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
           <img src={addProjectIcon} alt="New Project" />
-          <span>Create New Project</span>
+          <span>Create a New Project</span>
         </div>
         {sortProjects.filter(p => p.id.includes(keywords) || (p.name || "").includes(keywords)).map((project) => {
           return <Project project={project} selectId={this.selectId} actions={this.actions} key={"project-" + project.id} selected={this.ids.includes(project.id)} />

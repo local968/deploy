@@ -27,7 +27,8 @@ export default class RegressionView extends Component {
             <span>You can also tell us your business needs to get a more precise recommendation.</span>
           </div>
           <div className={styles.row}>
-            <span>Modeling Results :{' '}<div className={styles.status}>&nbsp;&nbsp;OK</div></span>
+            <span>Modeling Results :{' '}</span>
+            <div className={styles.status}>&nbsp;&nbsp;OK</div>
           </div>
           <div className={styles.row}>
             <span>Selected Model :<a>&nbsp;{current.name}</a></span>
@@ -140,7 +141,7 @@ class ModelTable extends Component {
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${trainModel.value}%` }}></div>
               </div>
-              <div className={styles.trainingText}>{`${trainModel.value}%`}</div>
+              <div className={styles.trainingText}>{`${(trainModel.value || 0).toFixed(2)}%`}</div>
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>

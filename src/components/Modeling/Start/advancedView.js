@@ -339,7 +339,7 @@ export default class AdvancedView extends Component {
               <span>(1~30)</span>
             </div>
           </div> */}
-          <div className={styles.advancedBlock}>
+          {/* <div className={styles.advancedBlock}>
             <div className={classnames(styles.advancedTitle, styles.limit)}>
               <span>Set Data Range:</span>
             </div>
@@ -353,7 +353,7 @@ export default class AdvancedView extends Component {
                 <label htmlFor="datarange2">Custom Selected Rows</label>
               </div>
             </div>
-          </div>
+          </div> */}
           {dataRange === "custom" && <CustomRange customRange={customRange} customFieldList={customFieldList} dataViews={dataViews} customField={customField} project={this.props.project} />}
           {dataRange === "all" && <div className={styles.advancedBlock}>
             <div className={styles.advancedTitle}>

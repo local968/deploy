@@ -103,7 +103,6 @@ export default class RegressionPredictActualChart extends Component {
   renderD3 = () => {
     let {height, width, data} = this.props;
     if (!data) return null;
-    console.log(data);
     data = data.map(d => ({target: d[0], pred: d[1]}));
     const margin = {top: 15, right: 40, bottom: 30, left: 80};
     width = width - margin.left - margin.right;

@@ -12,7 +12,8 @@ function setDefaultData(id, userId) {
     univariatePlots: {},
     histgramPlots: {},
     preImportance: null,
-    dataViews: null
+    dataViews: null,
+    rawDataViews: null
   }
   return createOrUpdate(id, userId, data)
 }
@@ -80,10 +81,12 @@ function addSettingModel(userId, projectId) {
   return function (result) {
     const modelName = result.model.name
     redis.hmget(`project:${projectId}`, 'settingId', 'settings').then(([settingId, settings]) => {
-      settingId = JSON.parse(settingId)
-      settings = JSON.parse(settings)
-      settings.find(s => s.id === settingId).models.push(modelName)
-      createOrUpdate(projectId, userId, { settings })
+      if (settingId && settings) {
+        settingId = JSON.parse(settingId)
+        settings = JSON.parse(settings)
+        settings.find(s => s.id === settingId).models.push(modelName)
+        createOrUpdate(projectId, userId, { settings })
+      }
     }, console.error)
     return result
   }
@@ -250,10 +253,10 @@ function updateProjectField(id, userId, field, data) {
     try {
       result = JSON.parse(result)
     } catch (e) { }
-    if (Array.isArray(result)) {
-      data = [...result, ...data]
-    } else if (typeof result === 'object') {
-      data = Object.assign({}, result, data)
+    if (Array.isArray(data) || Array.isArray(result)) {
+      data = [...(result || []), ...(data || [])]
+    } else if (typeof data === 'object' || typeof result === 'object') {
+      data = Object.assign({}, (result || {}), (data || {}))
     }
     return redis.hset(key, field, JSON.stringify(data)).then(() => {
       const returnValue = {
@@ -417,18 +420,10 @@ wss.register('etl', (message, socket, progress) => {
           result,
           message: returnValue.message
         }
-        Object.keys(result).forEach(k => {
-          if (k === "name") {
-            delete result[k];
-          }
-          if (k.includes("FillMethod")) {
-            Object.keys(result[k]).forEach(key => {
-              if (result[k][key] === "ignore") delete result[k][key]
-            })
-          }
-        })
-        result.dataViews = null;
         result.firstEtl = false;
+        delete result.name
+        delete result.id
+        delete result.userId
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
         if (result.totalLines > 0 && result.totalLines < 10000) result.runWith = 'cross'
@@ -463,9 +458,10 @@ wss.register('etl', (message, socket, progress) => {
 })
 
 wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
+  const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
   const { status, result } = returnValue
   if (status === 100) {
-    createOrUpdate(message.projectId, socket.session.userId, { dataViews: result.data })
+    createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
   }
   return returnValue
 }))
@@ -489,7 +485,7 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
   }
   return Promise.all(promise).then(([result1, result2]) => {
     const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
-    return Object.assign({}, returnValue, {result: realResult})
+    return Object.assign({}, returnValue, { result: realResult })
   })
 }))
 
@@ -564,7 +560,7 @@ wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId, requestId: message._id }
   let hasModel = false
   return checkTraningRestriction(socket.session.user)
-    .then(() => moveModels(message.projectId))
+    // .then(() => moveModels(message.projectId))
     .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
       const { status, result } = queueValue

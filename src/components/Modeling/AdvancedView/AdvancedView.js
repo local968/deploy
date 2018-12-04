@@ -103,7 +103,7 @@ class AdvancedModelTable extends Component {
     const { metric, metricOptions } = this.state;
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
-      ['Model Name', 'NRMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout', ]
+      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout', ]
     const header = (
       <Row>
         {texts.map(t => {
@@ -164,7 +164,7 @@ class AdvancedModelTable extends Component {
                   </div>}
                   />
                 )
-              case 'NRMSE':
+              case 'Normalized RMSE':
                 return <RowCell key={10} data={score.validateScore.nrmse} />;
               case 'RMSE':
                 return <RowCell key={2} data={score.validateScore.rmse} />;

@@ -84,7 +84,7 @@ export default class Project {
   @observable outlierDict = {}
   @observable targetMap = {};
   @observable targetArray = []
-  @observable dataViews = null;
+  @observable rawDataViews = null;
   @observable preImportance = null;
   @observable histgramPlots = {};
   @observable univariatePlots = {};
@@ -139,6 +139,7 @@ export default class Project {
   @observable algorithms = [];
   @observable selectId = '';
   @observable version = [1, 2]
+  @observable dataViews = null;
 
   @observable stopModel = false
 
@@ -218,6 +219,7 @@ export default class Project {
       nullIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
+      rawDataViews: null,
       dataViews: null,
       outlierDict: {},
       targetMap: {},
@@ -233,6 +235,7 @@ export default class Project {
   @computed
   get defaultTrain() {
     const measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
+    this.models = []
 
     return {
       train2Finished: false,
@@ -262,7 +265,8 @@ export default class Project {
 
   @computed
   get settingName() {
-    return this.settings.find(s => s.id === this.settingId).name
+    if(this.currentSetting) return this.currentSetting.name
+    return ''
   }
 
   @computed
@@ -400,7 +404,6 @@ export default class Project {
     };
     updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
     if (this.problemType && this.changeProjectType !== this.problemType) {
-      this.models = []
       //全部恢复到problem步骤
       const backData = Object.assign({}, updObj, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
         mainStep: 2,
@@ -733,22 +736,24 @@ export default class Project {
   }
 
   @action
-  dataView = () => {
+  dataView = (isClean = true) => {
     const exp = Object.values(this.expression).join(";")
     return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'dataView'
+        command: 'dataView',
+        actionType: isClean ? 'clean' : 'raw'
       };
       if (exp) command.csvScript = exp.replace(/\|/g, ",")
       return api.dataView(command, progressResult => {
       }).then(returnValue => {
+        const key = isClean ? 'dataViews' : 'rawDataViews'
         const { status, result } = returnValue
         if (status < 0) {
-          this.setProperty({ dataViews: null })
+          this.setProperty({ [key]: null })
           return antdMessage.error("dataview error")
         }
-        this.setProperty({ dataViews: result.data })
+        this.setProperty({ [key]: result.data })
       })
     })
   }
@@ -830,8 +835,6 @@ export default class Project {
     } = this;
     const command = 'train';
 
-    this.models = []
-
     const featureLabel = dataHeader.filter(d => d !== target);
 
     // id: request ID
@@ -876,8 +879,6 @@ export default class Project {
       newVariable
     } = this;
     const command = 'train';
-
-    this.models = []
 
     const featureLabel = dataHeader.filter(v => !trainHeader.includes(v) && v !== target)
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
