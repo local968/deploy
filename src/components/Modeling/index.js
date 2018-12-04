@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
 import { Route, Switch } from 'react-router-dom';
-import { autorun } from 'mobx'
+import { autorun, observable } from 'mobx'
 import StartTrain from './Start';
 import Loading from './Loading';
 import ModelError from './Error';
@@ -28,6 +28,8 @@ const imgs = {
 @inject('projectStore', 'routing')
 @observer
 export default class Modeling extends Component {
+  @observable subStep = 0
+
   constructor(props) {
     super(props);
     this.step = [
@@ -42,6 +44,8 @@ export default class Modeling extends Component {
       if (!project) return
       const { curStep, subStepActive, id } = project;
       if (curStep !== 3) return
+      if(this.subStep === subStepActive) return 
+      this.subStep = subStepActive
       let url = ''
       if (subStepActive === 1) url = `/project/${id}/modeling/start`
       if (subStepActive === 2) url = `/project/${id}/modeling/result`
@@ -57,11 +61,8 @@ export default class Modeling extends Component {
 
   enter = step => {
     const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
-
     if (step === subStepActive) return false;
-
     if (step > lastSubStep) return false;
-
     updateProject(nextSubStep(step, 3))
   };
 

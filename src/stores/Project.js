@@ -1229,7 +1229,7 @@ export default class Project {
         const name = points.result.name;
         if (name === "progress") return;
         const model = this.models.find(m => {
-          return name.split('.')[0] === m.name.split('.')[0]
+          return name.model === m.name
         })
         if (model) {
           model.updateModel({
@@ -1311,7 +1311,7 @@ export default class Project {
         const { result } = chartResult;
         if (result.progress === 'start') return;
         const model = this.models.find(m => {
-          return result.name.split(' ')[0] === m.name;
+          return result.model === m.name;
         })
         if (model) {
           model.updateModel({
