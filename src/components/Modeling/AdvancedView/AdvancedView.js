@@ -40,25 +40,61 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
+import { observable, computed, action } from 'mobx';
 
 const TabPane = Tabs.TabPane;
+const Option = Select.Option;
 
 @observer
 export default class AdvancedView extends Component {
+
+  @observable currentSettingId = 'all'
+
+  @computed
+  get filtedModels() {
+    const { models, project } = this.props
+    if (this.currentSettingId === 'all') return models
+    const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
+    if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
+      return currentSetting.models.map(id => models.find(model => model.name === id))
+    return models
+  }
+
+  @computed
+  get performance() {
+    try {
+      const { project } = this.props;
+      const { selectModel: current } = project;
+      const index = project.problemType === 'Classification' ? 'auc' : 'r2'
+      return current ? (current.score.validateScore[index] > 0.8 && "GOOD") || (current.score.validateScore[index] > 0.6 && "OK") || "NotSatisfied" : ''
+    } catch (e) {
+      return 'ok'
+    }
+  }
+
+  changeSetting = action((settingId) => {
+    this.currentSettingId = settingId
+  })
+
   render() {
-    const { models, project } = this.props;
+    const { project } = this.props;
     return (
       <div className={styles.advancedModelResult}>
-        <div className={styles.row}>
-          <div className={styles.modelResult} >
-            Modeling Results :{' '}
-            <div className={styles.status}>&nbsp;&nbsp;OK</div>
-          </div>
-          {project.problemType === 'Classification' && <div className={styles.modelComp} >
-            <ModelComp models={models} />
-          </div>}
+        <div className={styles.modelResult} >
+          Modeling Results :{' '}
+          <div className={styles.status}>&nbsp;&nbsp;{this.performance}</div>
         </div>
-        <AdvancedModelTable models={models} project={project} />
+        <div className={styles.middle}>
+          <div className={styles.settings}>
+            <span className={styles.label}>Model Name Contains:</span>
+            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} >
+              <Option value={'all'}>All</Option>
+              {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
+            </Select>
+          </div>
+          {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
+        </div>
+        <AdvancedModelTable models={this.filtedModels} project={project} />
       </div>
     )
   }
@@ -103,7 +139,7 @@ class AdvancedModelTable extends Component {
     const { metric, metricOptions } = this.state;
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
-      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout', ]
+      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',]
     const header = (
       <Row>
         {texts.map(t => {
@@ -122,7 +158,6 @@ class AdvancedModelTable extends Component {
         return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       }
     })
-    const Option = Select.Option;
     return (
       <div className={styles.advancedModelTable} >
         <div className={styles.metricSelection} >
@@ -208,11 +243,11 @@ class RegressionDetailCurves extends Component {
   }
 
   handleDiagnose = () => {
-    this.setState({visible: true});
+    this.setState({ visible: true });
   }
 
   handleDiagnoseType = e => {
-    this.setState({diagnoseType: e.target.value});
+    this.setState({ diagnoseType: e.target.value });
   }
 
   render() {
@@ -238,8 +273,8 @@ class RegressionDetailCurves extends Component {
               visible={this.state.visible}
               title='Residual Plot Diagnose'
               width={1200}
-              onOk={() => this.setState({visible: false})}
-              onCancel={() => this.setState({visible: false})}
+              onOk={() => this.setState({ visible: false })}
+              onCancel={() => this.setState({ visible: false })}
             >
               <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.fitPlot} />
             </Modal>
@@ -551,10 +586,7 @@ class ModelComp extends Component {
     const { models } = this.props;
     return (
       <div className={styles.modelComp}>
-        <img
-          onClick={this.handleClick}
-          src={modelComp}
-          alt="comp" />
+        <a className={styles.comparison}>Models comparison charts</a>
         <Modal
           width={1000}
           visible={this.state.modelCompVisible}
@@ -618,7 +650,7 @@ class ResidualDiagnose extends Component {
       type: 'largey',
       text: 'Large Y-axis Data Points'
     }];
-    const {diagnoseType, residualplot} = this.props;
+    const { diagnoseType, residualplot } = this.props;
     const RadioGroup = Radio.Group;
     // const disabled = diagnoseType === '';
     // const disabled = false;
@@ -634,13 +666,13 @@ class ResidualDiagnose extends Component {
               <div className={styles.radioWrapper} key={i}>
                 <Radio value={p.type} >{p.text}</Radio>
                 <div>
-                  <img width={200} src={p.plot} alt='plot'/>
+                  <img width={200} src={p.plot} alt='plot' />
                 </div>
               </div>
             ))}
           </RadioGroup >
         </div>
-        
+
       </div>
     );
   }
@@ -660,7 +692,7 @@ class DiagnoseResult extends Component {
     // history.push(`/data/${this.props.projectId}/5`);
   }
   render() {
-    const {diagnoseType} = this.props;
+    const { diagnoseType } = this.props;
     let result;
     // const type = 'large';
     switch (diagnoseType) {

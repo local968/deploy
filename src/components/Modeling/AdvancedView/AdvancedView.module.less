@@ -10,9 +10,9 @@
         }
     }
     .modelComp {
-        margin-left: 10%;
         cursor: pointer;
         display: inline-block;
+        margin-left: auto;
     }
 }
 
@@ -40,7 +40,7 @@
     }
     .modelName {
         display: inline-block;
-        width: 10em;
+        width: 80%;
         font-size: 1em;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -147,7 +147,7 @@ padding-bottom: 0.5em;
     vertical-align: top;
     .radioWrapper {
     display: inline-block;
-    margin: 0.1em; 
+    margin: 0.1em;
     }
 }
 }
@@ -180,4 +180,43 @@ padding-bottom: 0.5em;
     font-weight: bold;
 }
 }
-  
+
+.settings {
+  display: flex;
+  align-items: center;
+}
+
+.settings .label{
+  font-size: 1rem;
+  margin-right: 1rem;
+}
+
+.middle :global(.ant-select-arrow) {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.comparison {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  padding: .8rem 2rem;
+}
+
+.comparison:hover {
+  color: white;
+}
+
+.middle {
+  display: flex;
+  margin-bottom: 4rem;
+}
+
+.settingsSelect {
+  min-width: 14rem;
+}
