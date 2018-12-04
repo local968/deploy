@@ -119,7 +119,7 @@ class AdvancedModelTable extends Component {
           <ClassificationModelRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
         )
       } else {
-        return <RegressionModleRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       }
     })
     const Option = Select.Option;
@@ -189,7 +189,7 @@ class AdvancedModelTable extends Component {
             }
           })}
         </Row>
-        {detail && <RegressionDetailCurves model={model} />}
+        {detail && <RegressionDetailCurves project={this.props.project} model={model} />}
       </div>
     )
   }
@@ -200,7 +200,7 @@ class RegressionDetailCurves extends Component {
   state = {
     curve: "Variable Impact",
     visible: false,
-    diagnoseType: null
+    diagnoseType: 'yUnbalanced'
   }
 
   handleClick = val => {
@@ -243,7 +243,7 @@ class RegressionDetailCurves extends Component {
             >
               <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.fitPlot} />
             </Modal>
-            <DiagnoseResult handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
+            <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
         )
         break;
@@ -648,12 +648,15 @@ class ResidualDiagnose extends Component {
 
 class DiagnoseResult extends Component {
   handleNewData = () => {
-    // history.push(`/data/${this.props.projectId}/1`);
+    const { updateProject, nextSubStep } = this.props.project
+    // updateProject(nextSubStep(1, 1))
   }
   handleSetting = () => {
+    const { updateProject, nextSubStep } = this.props.project
     // history.push(`/modeling/${this.props.projectId}/1`);
   }
   handleOutlierFix = () => {
+    const { updateProject, nextSubStep } = this.props.project
     // history.push(`/data/${this.props.projectId}/5`);
   }
   render() {
@@ -674,11 +677,11 @@ class DiagnoseResult extends Component {
             </ul>
             <div className={styles.action} >
               <span>You can transform or select variables in our application</span>
-              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
             </div>
             <div className={styles.action} >
               <span>Alternatively, you can modify your data offline and reload it.</span>
-              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
             </div>
           </div>
         );
@@ -686,6 +689,7 @@ class DiagnoseResult extends Component {
       case 'xUnbalanced':
         result = (
           <div className={styles.content}>
+            <div className={styles.header} >Diagnose Results:</div>
             <div>Your plot is unbalanced on x-axis. You might be able to improve your model via:</div>
             <ul className={styles.items} >
               <li>Looking for an opportunity to usefully transform your variables, typically your predictors</li>
@@ -693,11 +697,11 @@ class DiagnoseResult extends Component {
             </ul>
             <div className={styles.action} >
               <span>You can transform or select variables in our application</span>
-              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
             </div>
             <div className={styles.action} >
               <span>Alternatively, you can modify your data offline and reload it.</span>
-              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
             </div>
           </div>
         );
@@ -705,6 +709,7 @@ class DiagnoseResult extends Component {
       case 'outliers':
         result = (
           <div className={styles.content}>
+            <div className={styles.header} >Diagnose Results:</div>
             <div>Your plot is has some outliers. You might be able to improve your model via:</div>
             <ul className={styles.items} >
               <li>Deleting the outliers if you decide that they are useless</li>
@@ -712,15 +717,15 @@ class DiagnoseResult extends Component {
             </ul>
             <div className={styles.action} >
               <span>You can delete the outliers in our application</span>
-              {/* <button onClick={this.handleOutlierFix} className="navButton smallButton" >Go to Edit the Fixes for Outliers</button> */}
+              <button onClick={this.handleOutlierFix} className={styles.button} >Go to Edit the Fixes for Outliers</button>
             </div>
             <div className={styles.action} >
               <span>You can transform or select variables in our application</span>
-              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
             </div>
             <div className={styles.action} >
               <span>Alternatively, you can modify your data offline and reload it.</span>
-              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
             </div>
           </div>
         );
@@ -728,6 +733,7 @@ class DiagnoseResult extends Component {
       case 'nonlinear':
         result = (
           <div className={styles.content}>
+            <div className={styles.header} >Diagnose Results:</div>
             <div>Your plot is nonlinear. You might be able to improve your model via:</div>
             <ul className={styles.items} >
               <li>Looking for an opportunity to usefully transform a variable.</li>
@@ -735,11 +741,11 @@ class DiagnoseResult extends Component {
             </ul>
             <div className={styles.action} >
               <span>You can transform or select variables in our application</span>
-              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
             </div>
             <div className={styles.action} >
               <span>Alternatively, you can modify your data offline and reload it.</span>
-              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
             </div>
           </div>
         );
@@ -747,6 +753,7 @@ class DiagnoseResult extends Component {
       case 'heteroscedasticity':
         result = (
           <div className={styles.content}>
+            <div className={styles.header} >Diagnose Results:</div>
             <div>Your plot is heteroscedasticity. You might be able to improve your model via:</div>
             <ul className={styles.items} >
               <li>Looking for an opportunity to usefully transform a variable.</li>
@@ -754,11 +761,11 @@ class DiagnoseResult extends Component {
             </ul>
             <div className={styles.action} >
               <span>You can transform or select variables in our application</span>
-              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
             </div>
             <div className={styles.action} >
               <span>Alternatively, you can modify your data offline and reload it.</span>
-              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
             </div>
           </div>
         );
@@ -766,6 +773,7 @@ class DiagnoseResult extends Component {
       case 'largey':
         result = (
           <div className={styles.content}>
+            <div className={styles.header} >Diagnose Results:</div>
             <div>Your plot has large y-axis datapoints. You might be able to improve your model via:</div>
             <ul className={styles.items} >
               <li>Looking for an opportunity to usefully transform a variable.</li>
@@ -773,11 +781,11 @@ class DiagnoseResult extends Component {
             </ul>
             <div className={styles.action} >
               <span>You can transform or select variables in our application</span>
-              {/* <button onClick={this.handleSetting} className="navButton smallButton" >Go to Advanced Variable Setting</button> */}
+              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
             </div>
             <div className={styles.action} >
               <span>Alternatively, you can modify your data offline and reload it.</span>
-              {/* <button onClick={this.handleNewData} className="navButton smallButton" >Load My New Data</button> */}
+              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
             </div>
           </div>
         );
@@ -787,7 +795,6 @@ class DiagnoseResult extends Component {
     return (
       <div className={styles.diagnoseResult} >
         <button onClick={this.props.handleDiagnose} className={styles.button} >Diagnose</button>
-        <div className={styles.header} >Diagnose Results:</div>
         {result}
       </div>
     );
