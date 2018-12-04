@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal, Select, Radio, Button, Tooltip } from 'antd';
+import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './AdvancedView.module.less';
 import RocChart from 'components/D3Chart/RocChart';
@@ -41,6 +41,7 @@ import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
 import { observable, computed, action } from 'mobx';
+import moment from 'moment';
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -49,15 +50,30 @@ const Option = Select.Option;
 export default class AdvancedView extends Component {
 
   @observable currentSettingId = 'all'
+  @observable sortState = { 'Model Name': 1, 'F1-Score': false, 'Precision': false, 'Recall': false, 'LogLoss': false, 'Cutoff Threshold': false, 'Validation': false, 'Holdout': false, 'Normalized RMSE': false, 'RMSE': false, 'MSLE': false, 'RMSLE': false, 'MSE': false, 'MAE': false, 'R2': false, 'adjustR2': false, 'Validation': false, 'Holdout': false }
 
   @computed
   get filtedModels() {
     const { models, project } = this.props
-    if (this.currentSettingId === 'all') return models
+    let _filtedModels = [...models]
+    const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
+    const sortMethods = (a, b) => {
+      switch (currentSort) {
+        case 'Model Name':
+        default:
+          const aTime = a.name.split('.').splice(1, Infinity).join('.')
+          const aUnix = moment(aTime, 'MM.DD.YYYY_HH:mm:ss').unix()
+          const bTime = b.name.split('.').splice(1, Infinity).join('.')
+          const bUnix = moment(bTime, 'MM.DD.YYYY_HH:mm:ss').unix()
+          return this.sortState[currentSort] === 1 ? aUnix - bUnix : bUnix - aUnix
+      }
+    }
+    _filtedModels = _filtedModels.sort(sortMethods)
+    if (this.currentSettingId === 'all') return _filtedModels
     const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
     if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
-      return currentSetting.models.map(id => models.find(model => model.name === id))
-    return models
+      return currentSetting.models.map(id => _filtedModels.find(model => model.name === id))
+    return _filtedModels
   }
 
   @computed
@@ -71,6 +87,13 @@ export default class AdvancedView extends Component {
       return 'ok'
     }
   }
+
+  changeSort = (type) => action(() => {
+    const currentActive = Object.keys(this.sortState).find(key => this.sortState[key])
+    if (type === currentActive) return this.sortState[type] = this.sortState[type] === 1 ? 2 : 1
+    this.sortState[currentActive] = false
+    this.sortState[type] = 1
+  })
 
   changeSetting = action((settingId) => {
     this.currentSettingId = settingId
@@ -94,7 +117,7 @@ export default class AdvancedView extends Component {
           </div>
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
-        <AdvancedModelTable models={this.filtedModels} project={project} />
+        <AdvancedModelTable models={this.filtedModels} project={project} sortState={this.sortState} changeSort={this.changeSort} />
       </div>
     )
   }
@@ -135,20 +158,19 @@ class AdvancedModelTable extends Component {
     this.setState({ metric: metric })
   }
   render() {
-    const { models, project: { problemType, selectModel } } = this.props;
+    const { models, project: { problemType, selectModel }, sortState, changeSort } = this.props;
     const { metric, metricOptions } = this.state;
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',]
-    const header = (
-      <Row>
-        {texts.map(t => {
-          return (
-            <RowCell data={t} key={t} />
-          )
-        })}
-      </Row>
-    )
+    const headerData = texts.reduce((prev, curr) => {
+      if (sortState[curr] === undefined) return { ...prev, [curr]: curr }
+      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{curr}<Icon type='minus' /></div> }
+      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{curr}<Icon type='up' /></div> }
+      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{curr}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+      return prev
+    }, {})
+    const header = <Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
         return (
@@ -506,7 +528,7 @@ class RowCell extends Component {
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={(typeof data === 'string' || typeof data === 'number') ? fixed3(data) : null}
+        title={data}
       >
         {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
         {other}
