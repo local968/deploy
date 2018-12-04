@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { Radio } from 'antd';
 import Hint from 'components/Common/Hint';
 import ContinueButton from 'components/Common/ContinueButton';
@@ -12,20 +12,21 @@ const selectable = [
   { value: 'Regression', type: 'Continuous Values (Regression)', detail: (<p>To predict a continuous/numeric value (e.g. cost of a purchase)</p>) },
 ];
 
+@inject('projectStore')
 @observer
 class Problem extends Component {
 
   nextStep = () => {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     project.saveProblem()
   }
 
   onChange = action((type, e) => {
-    this.props.project[type] = e.target.value;
+    this.props.projectStore.project[type] = e.target.value;
   })
 
   render() {
-    const { changeProjectType } = this.props.project || {}
+    const { changeProjectType } = this.props.projectStore.project || {}
     return <div className={styles.problem}>
       <div className={styles.title}><span>Choose Problem Type</span></div>
       <div className={styles.radioBox}>

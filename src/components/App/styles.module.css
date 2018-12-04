@@ -49,3 +49,10 @@
   justify-content: center;
   align-items: center;
 }
+
+.error {
+  display: flex;
+  flex: auto;
+  justify-content: center;
+  align-items: center;
+}

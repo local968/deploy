@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { ContinueButton, Modal, ProcessLoading, Table } from 'components/Common';
 import { when, observable } from 'mobx';
 import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
 import * as d3 from 'd3';
 
+@inject('projectStore')
 @observer
 export default class DataQuality extends Component {
   @observable step = 1
@@ -17,7 +18,7 @@ export default class DataQuality extends Component {
   }
 
   render() {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     return this.step !== 1 ? <VariableIssue project={project} changeTab={this.changeTab.bind(null, 1)} /> : <TargetIssue project={project} changeTab={this.changeTab.bind(null, 2)} />
   }
 }

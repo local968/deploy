@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
 import { Checkbox } from 'antd'
 import { Select, ContinueButton, ProcessLoading, Table, Hint } from 'components/Common';
 
+@inject('projectStore')
 @observer
 export default class DataSchema extends Component {
-  @observable checkList = this.props.project.sortHeader.filter(r => !this.props.project.dataHeader.includes(r))
+  @observable checkList = this.props.projectStore.project.sortHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
   @observable showSelect = false
 
   doEtl = () => {
-    const { sortHeader, noComputeTemp } = this.props.project;
+    const { sortHeader, noComputeTemp } = this.props.projectStore.project;
     const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
-    this.props.project.updateProject({
+    this.props.projectStore.project.updateProject({
       dataHeader: newDataHeader,
       noCompute: noComputeTemp,
       cleanData: [],
@@ -28,11 +29,11 @@ export default class DataSchema extends Component {
       mismatchLineCounts: {},
       outlierLineCounts: {},
       renameVariable: {}
-    }).then(() => this.props.project.etl())
+    }).then(() => this.props.projectStore.project.etl())
   }
 
   targetSelect = (value) => {
-    const { colType } = this.props.project
+    const { colType } = this.props.projectStore.project
     const data = {
       target: value,
       colType,
@@ -42,7 +43,7 @@ export default class DataSchema extends Component {
     if (value && colType[value] === 'Numerical') {
       data.outlierFillMethod = { [value]: 'drop' }
     }
-    this.props.project.updateProject(data).then(() => this.refs.table.updateGrids())
+    this.props.projectStore.project.updateProject(data).then(() => this.refs.table.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
   }
 
@@ -58,7 +59,7 @@ export default class DataSchema extends Component {
 
   select = (key, e) => {
     const v = e.target.value
-    this.props.project.colType[key] = v
+    this.props.projectStore.project.colType[key] = v
     this.refs.table.updateGrids()
   }
 
@@ -67,11 +68,11 @@ export default class DataSchema extends Component {
   }
 
   checkNoCompute = (e) => {
-    this.props.project.noComputeTemp = e.target.checked;
+    this.props.projectStore.project.noComputeTemp = e.target.checked;
   }
 
   formatTable = () => {
-    const { target, colType, headerTemp: { temp }, sortData, sortHeader, renameVariable } = this.props.project;
+    const { target, colType, headerTemp: { temp }, sortData, sortHeader, renameVariable } = this.props.projectStore.project;
     const { showSelect, checkList } = this
     if (!sortData.length) return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
@@ -217,7 +218,7 @@ export default class DataSchema extends Component {
   }
 
   render() {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     const { etling, etlProgress, sortHeader, problemType, noComputeTemp, target, colType, headerTemp: { isMissed, isDuplicated } } = project;
     const targetOption = {};
     const tableData = this.formatTable()

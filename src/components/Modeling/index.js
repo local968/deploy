@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
+import { Route, Switch } from 'react-router-dom';
+import { autorun } from 'mobx'
 import StartTrain from './Start';
 import Loading from './Loading';
 import ModelError from './Error';
@@ -23,6 +25,7 @@ const imgs = {
   modelSelectionActive: <img src={modelSelectionActiveIcon} alt="selection" />
 };
 
+@inject('projectStore', 'routing')
 @observer
 export default class Modeling extends Component {
   constructor(props) {
@@ -33,24 +36,27 @@ export default class Modeling extends Component {
     ];
   }
 
-  getChild = () => {
-    const { project } = this.props;
-    const { models } = project;
-    const { train2Error, train2ing, subStepActive } = project;
-    if (subStepActive === 1) return <StartTrain project={project} />;
-
-    if (train2Error) return <ModelError />;
-    if (!models.length && train2ing) return <Loading project={project} />;
-    return (
-      <ModelResult
-        models={models}
-        project={project}
-      />
-    );
+  componentDidMount() {
+    this.autorun = autorun(() => {
+      const { projectStore: { project }, routing } = this.props;
+      if (!project) return
+      const { curStep, subStepActive, id } = project;
+      if (curStep !== 3) return
+      let url = ''
+      if (subStepActive === 1) url = `/project/${id}/modeling/start`
+      if (subStepActive === 2) url = `/project/${id}/modeling/result`
+      if (!url) return routing.push("/")
+      if (routing.location.pathname.includes(url)) return
+      return routing.push(url)
+    })
   };
 
+  componentWillUnmount() {
+    this.autorun && this.autorun()
+  }
+
   enter = step => {
-    const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.project;
+    const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
 
     if (step === subStepActive) return false;
 
@@ -60,10 +66,13 @@ export default class Modeling extends Component {
   };
 
   render() {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     return (
       <div className={styles.modeling}>
-        {project && this.getChild()}
+        {project && <Switch>
+          <Route exact path="/project/:id/modeling/start" component={StartTrain} />
+          <Route exact path="/project/:id/modeling/result" component={trainResult} />
+        </Switch>}
         {project && (
           <ProjectSide
             enter={this.enter}
@@ -74,6 +83,24 @@ export default class Modeling extends Component {
           />
         )}
       </div>
+    );
+  }
+}
+
+@inject('projectStore')
+@observer
+class trainResult extends Component {
+  render() {
+    const { project } = this.props.projectStore;
+    const { models } = project;
+    const { train2Error, train2ing } = project;
+    if (train2Error) return <ModelError />;
+    if (!models.length && train2ing) return <Loading project={project} />;
+    return (
+      <ModelResult
+        models={models}
+        project={project}
+      />
     );
   }
 }

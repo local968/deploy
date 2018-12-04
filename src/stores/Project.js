@@ -265,7 +265,7 @@ export default class Project {
 
   @computed
   get settingName() {
-    if(this.currentSetting) return this.currentSetting.name
+    if (this.currentSetting) return this.currentSetting.name
     return ''
   }
 
@@ -289,6 +289,25 @@ export default class Project {
     return uploadData.map(row => {
       const value = row[index]
       return [value, ...row.slice(0, index), ...row.slice(index + 1)]
+    })
+  }
+
+  @action
+  goback = () => {
+    const { mainStep, lastSubStep } = this
+    let backStep = mainStep
+    let backSubStep = lastSubStep
+    if (lastSubStep === 1) {
+      backStep--;
+      backSubStep = backStep === 2 ? 3 : 1
+    } else {
+      backSubStep--
+    }
+    this.updateProject({
+      curStep: backStep,
+      mainStep: backStep,
+      lastSubStep: backSubStep,
+      subStepActive: backSubStep
     })
   }
 
