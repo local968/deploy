@@ -1226,10 +1226,10 @@ export default class Project {
         command: 'pointToShow'
       }
       api.pointToShow(request, points => {
-        const name = points.result.name;
+        const name = points.result.model;
         if (name === "progress") return;
         const model = this.models.find(m => {
-          return name.model === m.name
+          return name === m.name
         })
         if (model) {
           model.updateModel({
