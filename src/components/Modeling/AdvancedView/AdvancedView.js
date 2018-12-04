@@ -241,7 +241,7 @@ class RegressionDetailCurves extends Component {
               onOk={() => this.setState({visible: false})}
               onCancel={() => this.setState({visible: false})}
             >
-              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.fitPlot} />
+              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlot} />
             </Modal>
             <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
