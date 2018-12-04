@@ -53,6 +53,7 @@
     "fdev": "react-app-rewired start & node ./server/index.js",
     "frontend": "react-app-rewired start",
     "server": "node server",
+    "nodemon": "nodemon server",
     "build": "react-app-rewired build && rm -rf static && mv build static",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject"

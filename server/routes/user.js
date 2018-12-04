@@ -14,8 +14,7 @@ const sha256 = password => crypto.createHmac('sha256', config.secret)
 const router = new Router()
 
 router.post('/login', (req, res) => {
-  const email = req.body.email
-  const password = req.body.password
+  const {email,password} = req.body
   redis
     .get(`userEmail:${email}`)
     .then(id => id
@@ -56,9 +55,8 @@ register('status', (data) => {
 })
 
 router.post('/register', (req, res) => {
-  const email = req.body.email
+  const {email,level} = req.body
   const password = sha256(req.body.password)
-  const level = req.body.level
   const id = uuid.v4()
   const createdTime = moment().unix()
   // todo verify user info

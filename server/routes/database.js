@@ -14,8 +14,8 @@ wss.register('checkDatabase', (message, socket, progress) => command({
 }, (result) => (result.status < 0 || result.status === 100) ? result : progress(result)))
 
 wss.register('downloadFromDatabase', (message, socket, progress) => {
-  const type = message.type
-  const userId = socket.session.userId
+  const {type} = message
+  const {userId} = socket.session
   return command({
     ...message,
     requestId: message._id,
@@ -62,4 +62,3 @@ wss.register('downloadFromDatabase', (message, socket, progress) => {
       return { fileId, status: 200, message: 'ok' }
     })
 })
-
