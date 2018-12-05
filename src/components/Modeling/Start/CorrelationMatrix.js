@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import styles from './CorrelationMatrix.module.less';
-import { CellMeasurer, CellMeasurerCache, MultiGrid } from 'react-virtualized';
+import { MultiGrid } from 'react-virtualized';
 
 @observer
 export default class CorrelationMatrix extends Component {

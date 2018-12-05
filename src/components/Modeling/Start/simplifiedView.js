@@ -365,12 +365,12 @@ class CreateNewVariable extends Component {
     const functionStr = this.exp.slice(0, startIndex)
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
     const hasFunction = functionList.find(v => functionStr.includes(v.value.slice(0, -1)))
-    const inFunction = functionList.find(v => functionStr.endsWith(v.value.slice(0, -1)))
-    this.myFunction = FUNCTIONS.senior.find(v => functionStr.endsWith(v.value.slice(0, -1))) || {}
+    const hasConcat = functionList.filter(v => functionStr.includes(v.value.slice(0, -1))).find(v => v.value === "Concat()")
+    this.myFunction = FUNCTIONS.senior.find(v => functionStr.includes(v.value.slice(0, -1))) || {}
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
     const { dataHeader, colType } = this.props
     let valueList = [...dataHeader]
-    if (!inFunction || inFunction.value !== "Concat()") valueList = valueList.filter(v => colType[v] === "Numerical")
+    if (!hasConcat) valueList = valueList.filter(v => colType[v] === "Numerical")
     let filterFunctions = []
     if (exp.startsWith("@")) {
       exp = exp.slice(1).trim()
@@ -602,7 +602,7 @@ class CreateNewVariable extends Component {
     const numList = params.slice(numOfParam)
     switch (senior.value) {
       case "Concat()":
-        if (numOfParam < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} has At least 2 parameters` }
+        if (numOfParam < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters error` }
         const concatResults = numList.map(num => {
           let n = num.exp
           if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
