@@ -65,7 +65,7 @@ const files = {
   ]
 };
 
-@inject('userStore', 'socketStore')
+@inject('userStore', 'socketStore', 'projectStore')
 @observer
 export default class DataConnect extends Component {
   @observable sample = false
@@ -97,7 +97,7 @@ export default class DataConnect extends Component {
     this.process = 90
     this.file = null
 
-    this.props.project.fastTrackInit(data.fileId);
+    this.props.projectStore.project.fastTrackInit(data.fileId);
   })
 
   onError = action((error, times) => {
@@ -117,7 +117,7 @@ export default class DataConnect extends Component {
   })
 
   doEtl = () => {
-    this.props.project.etl();
+    this.props.projectStore.project.etl();
   };
 
   showSample = action(() => {
@@ -137,7 +137,7 @@ export default class DataConnect extends Component {
       action(data => {
         const { fileId } = data.data
         this.process = 90
-        this.props.project.fastTrackInit(fileId);
+        this.props.projectStore.project.fastTrackInit(fileId);
       }),
       () => {
         message.error('sample file error, please choose again');
@@ -198,7 +198,7 @@ export default class DataConnect extends Component {
   }
 
   render() {
-    const { project, userStore, socketStore } = this.props;
+    const { projectStore: { project }, userStore, socketStore } = this.props;
     const { etlProgress } = project
     window.cn = this
     return (

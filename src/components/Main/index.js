@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { when } from 'mobx';
+import { Route, Switch } from 'react-router-dom';
+import { when, autorun } from 'mobx';
 import Project from 'components/Project';
 import Problem from 'components/Problem';
 import Data from 'components/Data';
@@ -8,32 +9,59 @@ import Modeling from 'components/Modeling';
 import { ProcessLoading, Confirm } from 'components/Common';
 import { message } from 'antd';
 import styles from './styles.module.css';
-import { observable } from 'mobx'
 
 @inject('userStore', 'projectStore', 'routing')
 @observer
 export default class Main extends Component {
-  @observable hasError = false
-
   constructor(props) {
     super(props);
     const { pid } = props.match.params || {};
     this.pid = pid
+    this.step = -1
+  }
 
+  componentDidMount() {
     when(
-      () => props.userStore.status === "login",
-      () => props.projectStore.initProject(this.pid).then(init => {
+      () => this.props.userStore.status === "login",
+      () => this.props.projectStore.initProject(this.pid).then(init => {
         if (!init) {
           message.error("Sorry but you don't have the authority for entering this project.")
           this.props.routing.push("/")
         }
+        autorun(() => {
+          const { projectStore: { project }, routing } = this.props;
+          const { curStep } = project || {};
+          if (curStep === this.step) return
+          this.step = curStep
+          let url = ''
+          switch (curStep) {
+            case 1:
+              url = `/project/${project.id}/problem`
+              break
+            case 2:
+              url = `/project/${project.id}/data`
+              break
+            case 3:
+              url = `/project/${project.id}/modeling`
+              break
+            case 0:
+              url = `/project/${project.id}/project`
+              break
+            default:
+          }
+          if (!url) routing.push('/')
+          if (routing.location.pathname.includes(url)) return
+          return routing.push(url)
+        })
+        when(
+          () => this.props.projectStore.project && !this.props.projectStore.project.exist,
+          () => {
+            message.warn("project not exist")
+            this.props.routing.push("/")
+          }
+        )
       })
     )
-  }
-
-  componentDidCatch(error, info) {
-    this.hasError = true
-    console.log(error, info)
   }
 
   componentWillMount() {
@@ -43,31 +71,6 @@ export default class Main extends Component {
     )
   }
 
-  getChild = () => {
-    const { project } = this.props.projectStore;
-    const { curStep } = project || {};
-
-    when(
-      () => project && !project.exist,
-      () => {
-        message.warn("project not exist")
-        this.props.routing.push("/")
-      }
-    )
-
-    switch (curStep) {
-      case 1:
-        return <Problem project={project} />
-      case 2:
-        return <Data project={project} />
-      case 3:
-        return <Modeling project={project} />
-      case 0:
-      default:
-        return <Project project={project} />
-    }
-  }
-
   exit = () => {
     this.props.routing.push("/")
     this.props.projectStore.outProject()
@@ -75,7 +78,7 @@ export default class Main extends Component {
 
   render() {
     const { project, conflict, notExit } = this.props.projectStore
-    return this.hasError ? <div>error</div> : <React.Fragment>
+    return <React.Fragment>
       <div className={styles.header}>
         {project && project.name && <div className={styles.projectName}>
           <span className={styles.label}>Project: </span>
@@ -86,7 +89,12 @@ export default class Main extends Component {
           <span className={styles.value}> {project.fileNames.toString()}</span>
         </div>}
       </div>
-      {!project ? <ProcessLoading /> : this.getChild()}
+      {!project ? <ProcessLoading /> : <Switch>
+        <Route path="/project/:id/problem" component={Problem} />
+        <Route path="/project/:id/data" component={Data} />
+        <Route path="/project/:id/modeling" component={Modeling} />
+        <Route path="/project/:id/project" component={Project} />
+      </Switch>}
       {<Confirm
         width="6em"
         title={`You have been kicked out`}

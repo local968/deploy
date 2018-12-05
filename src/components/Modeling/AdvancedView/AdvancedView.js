@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal, Select, Radio, Button, Tooltip } from 'antd';
+import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
 import { observer } from 'mobx-react';
 import styles from './AdvancedView.module.less';
 import RocChart from 'components/D3Chart/RocChart';
@@ -8,7 +8,7 @@ import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
-import modelComp from './Btn-ModelComparison-normal.svg';
+// import modelComp from './Btn-ModelComparison-normal.svg';
 import ROCCurve from './icon-roc-curve-normal.svg';
 import liftChart from './icon-lift-chart-normal.svg';
 import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
@@ -40,25 +40,242 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
+import { observable, computed, action, autorun } from 'mobx';
+import moment from 'moment';
 
 const TabPane = Tabs.TabPane;
+const Option = Select.Option;
 
 @observer
 export default class AdvancedView extends Component {
+
+  @observable currentSettingId = 'all'
+  // undefined = can not sort, false = no sort ,1 = asc, 2 = desc
+  @observable sortState = { 'Model Name': 1, 'F1-Score': false, 'Precision': false, 'Recall': false, 'LogLoss': false, 'Cutoff Threshold': false, 'Validation': false, 'Holdout': false, 'Normalized RMSE': false, 'RMSE': false, 'MSLE': false, 'RMSLE': false, 'MSE': false, 'MAE': false, 'R2': false, 'adjustR2': false }
+  @observable metric = {
+    key: '',
+    display: ''
+  }
+
+  @computed
+  get filtedModels() {
+    const { models, project } = this.props
+    let _filtedModels = [...models]
+    const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
+    const formatNumber = number => {
+      try {
+        number = parseFloat(number)
+        return parseInt(number * 1000, 10)
+      } catch (e) {
+        console.log('compare error:', e)
+        return 0
+      }
+    }
+    const sortMethods = (aModel, bModel) => {
+      switch (currentSort) {
+        case 'F1-Score':
+          {
+            const aFitIndex = aModel.fitIndex
+            const bFitIndex = bModel.fitIndex
+            const aModelData = formatNumber(aModel.chartData.roc.F1[aFitIndex])
+            const bModelData = formatNumber(bModel.chartData.roc.F1[bFitIndex])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'Precesion':
+          {
+            const aFitIndex = aModel.fitIndex
+            const bFitIndex = bModel.fitIndex
+            const aModelData = formatNumber(aModel.chartData.roc.Precision[aFitIndex])
+            const bModelData = formatNumber(bModel.chartData.roc.Precision[bFitIndex])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'Recall':
+          {
+            const aFitIndex = aModel.fitIndex
+            const bFitIndex = bModel.fitIndex
+            const aModelData = formatNumber(aModel.chartData.roc.Recall[aFitIndex])
+            const bModelData = formatNumber(bModel.chartData.roc.Recall[bFitIndex])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'LogLoss':
+          {
+            const aFitIndex = aModel.fitIndex
+            const bFitIndex = bModel.fitIndex
+            const aModelData = formatNumber(aModel.chartData.roc.LOGLOSS[aFitIndex])
+            const bModelData = formatNumber(bModel.chartData.roc.LOGLOSS[bFitIndex])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'Cutoff Threshold':
+          {
+            const aFitIndex = aModel.fitIndex
+            const bFitIndex = bModel.fitIndex
+            const aModelData = formatNumber(aModel.chartData.roc.Threshold[aFitIndex])
+            const bModelData = formatNumber(bModel.chartData.roc.Threshold[bFitIndex])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'Normalized RMSE':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.nrmse)
+            const bModelData = formatNumber(bModel.score.validateScore.nrmse)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'RMSE':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.rmse)
+            const bModelData = formatNumber(bModel.score.validateScore.rmse)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'MSLE':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.msle)
+            const bModelData = formatNumber(bModel.score.validateScore.msle)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'RMSLE':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.rmsle)
+            const bModelData = formatNumber(bModel.score.validateScore.rmsle)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'MSE':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.mse)
+            const bModelData = formatNumber(bModel.score.validateScore.mse)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'MAE':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.mae)
+            const bModelData = formatNumber(bModel.score.validateScore.mae)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'R2':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.r2)
+            const bModelData = formatNumber(bModel.score.validateScore.r2)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'adjustR2':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore.adjustR2)
+            const bModelData = formatNumber(bModel.score.validateScore.adjustR2)
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'Validation':
+          {
+            const aModelData = formatNumber(aModel.score.validateScore[this.metric.key])
+            const bModelData = formatNumber(bModel.score.validateScore[this.metric.key])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'Holdout':
+          {
+            const aModelData = formatNumber(aModel.score.holdoutScore[this.metric.key])
+            const bModelData = formatNumber(bModel.score.holdoutScore[this.metric.key])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
+        case 'Model Name':
+        default:
+          const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.')
+          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix()
+          const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.')
+          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix()
+          return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
+      }
+    }
+    _filtedModels = _filtedModels.sort(sortMethods)
+    if (this.currentSettingId === 'all') return _filtedModels
+    const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
+    if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
+      return currentSetting.models.map(id => _filtedModels.find(model => model.name === id))
+    return _filtedModels
+  }
+
+  @computed
+  get performance() {
+    try {
+      const { project } = this.props;
+      const { selectModel: current } = project;
+      const index = project.problemType === 'Classification' ? 'auc' : 'r2'
+      return current ? (current.score.validateScore[index] > 0.8 && "GOOD") || (current.score.validateScore[index] > 0.6 && "OK") || "NotSatisfied" : ''
+    } catch (e) {
+      return 'ok'
+    }
+  }
+
+  @computed
+  get metricOptions() {
+    const { project } = this.props
+    if (project && project.problemType) {
+      return project.problemType === 'Classification' ? [{
+        display: 'acc',
+        key: 'acc'
+      }, {
+        display: 'auc',
+        key: 'auc'
+      }] : [{
+        display: 'MAE',
+        key: 'mae'
+      }, {
+        display: 'RMSE',
+        key: 'rmse'
+      }, {
+        display: <div>R<sup>2</sup></div>,
+        key: 'r2'
+      }]
+    }
+    return []
+  }
+
+  changeSort = (type) => action(() => {
+    const currentActive = Object.keys(this.sortState).find(key => this.sortState[key])
+    if (type === currentActive) return this.sortState[type] = this.sortState[type] === 1 ? 2 : 1
+    this.sortState[currentActive] = false
+    this.sortState[type] = 1
+  })
+
+  changeSetting = action((settingId) => {
+    this.currentSettingId = settingId
+  })
+
+  handleChange = value => {
+    this.metric = this.metricOptions.find(m => m.key === value);
+  }
+
+  constructor(props) {
+    super(props)
+    autorun(() => {
+      const { project } = props
+      if (project && project.measurement)
+        this.metric = this.metricOptions.find(metric => metric.key === project.measurement) || this.metricOptions[0]
+    })
+  }
+
   render() {
-    const { models, project } = this.props;
+    const { project } = this.props;
+
     return (
       <div className={styles.advancedModelResult}>
-        <div className={styles.row}>
-          <div className={styles.modelResult} >
-            Modeling Results :{' '}
-            <div className={styles.status}>&nbsp;&nbsp;OK</div>
-          </div>
-          {project.problemType === 'Classification' && <div className={styles.modelComp} >
-            <ModelComp models={models} />
-          </div>}
+        <div className={styles.modelResult} >
+          Modeling Results :{' '}
+          <div className={styles.status}>&nbsp;&nbsp;{this.performance}</div>
         </div>
-        <AdvancedModelTable models={models} project={project} />
+        <div className={styles.middle}>
+          <div className={styles.settings}>
+            <span className={styles.label}>Model Name Contains:</span>
+            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} >
+              <Option value={'all'}>All</Option>
+              {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
+            </Select>
+          </div>
+          {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
+        </div>
+        <div className={styles.metricSelection} >
+          <span className={styles.text} >Measurement Metric</span>
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} >
+            {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
+          </Select>
+        </div>
+        <AdvancedModelTable models={this.filtedModels} project={project} sortState={this.sortState} changeSort={this.changeSort} metric={this.metric} />
       </div>
     )
   }
@@ -66,53 +283,27 @@ export default class AdvancedView extends Component {
 
 @observer
 class AdvancedModelTable extends Component {
-  constructor(props) {
-    super(props);
-    const { project: { problemType, measurement } } = props;
-    const metricOptions = problemType === 'Classification' ? [{
-      display: 'acc',
-      key: 'acc'
-    }, {
-      display: 'auc',
-      key: 'auc'
-    }] : [{
-      display: 'MAE',
-      key: 'mae'
-    }, {
-      display: 'RMSE',
-      key: 'rmse'
-    }, {
-      display: <div>R<sup>2</sup></div>,
-      key: 'r2'
-    }]
-    this.state = {
-      metric: metricOptions.find(metric => metric.key === measurement) || metricOptions[0],
-      metricOptions
-    }
-  }
+
   onClickCheckbox = (modelId) => (e) => {
     this.props.project.setSelectModel(modelId)
     e.stopPropagation()
   }
-  handleChange = value => {
-    const metric = this.state.metricOptions.find(m => m.key === value);
-    this.setState({ metric: metric })
-  }
+
   render() {
-    const { models, project: { problemType, selectModel } } = this.props;
-    const { metric, metricOptions } = this.state;
+    const { models, project: { problemType, selectModel }, sortState, changeSort, metric } = this.props;
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
-      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout', ]
-    const header = (
-      <Row>
-        {texts.map(t => {
-          return (
-            <RowCell data={t} key={t} />
-          )
-        })}
-      </Row>
-    )
+      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',]
+    const replaceR2 = str => str.replace(/R2/g, 'R²')
+    const headerData = texts.reduce((prev, curr) => {
+      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>
+      if (sortState[curr] === undefined) return { ...prev, [curr]: curr }
+      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='minus' /></div> }
+      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' /></div> }
+      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+      return prev
+    }, {})
+    const header = <Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
         return (
@@ -122,15 +313,8 @@ class AdvancedModelTable extends Component {
         return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       }
     })
-    const Option = Select.Option;
     return (
       <div className={styles.advancedModelTable} >
-        <div className={styles.metricSelection} >
-          <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={metric.key} onChange={this.handleChange} >
-            {metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
-          </Select>
-        </div>
         {header}
         {dataSource}
       </div>
@@ -208,11 +392,11 @@ class RegressionDetailCurves extends Component {
   }
 
   handleDiagnose = () => {
-    this.setState({visible: true});
+    this.setState({ visible: true });
   }
 
   handleDiagnoseType = e => {
-    this.setState({diagnoseType: e.target.value});
+    this.setState({ diagnoseType: e.target.value });
   }
 
   render() {
@@ -238,10 +422,10 @@ class RegressionDetailCurves extends Component {
               visible={this.state.visible}
               title='Residual Plot Diagnose'
               width={1200}
-              onOk={() => this.setState({visible: false})}
-              onCancel={() => this.setState({visible: false})}
+              onOk={() => this.setState({ visible: false })}
+              onCancel={() => this.setState({ visible: false })}
             >
-              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.fitPlot} />
+              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlot} />
             </Modal>
             <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
@@ -471,7 +655,7 @@ class RowCell extends Component {
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={(typeof data === 'string' || typeof data === 'number') ? fixed3(data) : null}
+        title={data}
       >
         {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
         {other}
@@ -551,10 +735,7 @@ class ModelComp extends Component {
     const { models } = this.props;
     return (
       <div className={styles.modelComp}>
-        <img
-          onClick={this.handleClick}
-          src={modelComp}
-          alt="comp" />
+        <a onClick={this.handleClick} className={styles.comparison}>Models comparison charts</a>
         <Modal
           width={1000}
           visible={this.state.modelCompVisible}
@@ -618,7 +799,7 @@ class ResidualDiagnose extends Component {
       type: 'largey',
       text: 'Large Y-axis Data Points'
     }];
-    const {diagnoseType, residualplot} = this.props;
+    const { diagnoseType, residualplot } = this.props;
     const RadioGroup = Radio.Group;
     // const disabled = diagnoseType === '';
     // const disabled = false;
@@ -634,13 +815,13 @@ class ResidualDiagnose extends Component {
               <div className={styles.radioWrapper} key={i}>
                 <Radio value={p.type} >{p.text}</Radio>
                 <div>
-                  <img width={200} src={p.plot} alt='plot'/>
+                  <img width={200} src={p.plot} alt='plot' />
                 </div>
               </div>
             ))}
           </RadioGroup >
         </div>
-        
+
       </div>
     );
   }
@@ -649,18 +830,20 @@ class ResidualDiagnose extends Component {
 class DiagnoseResult extends Component {
   handleNewData = () => {
     const { updateProject, nextSubStep } = this.props.project
-    // updateProject(nextSubStep(1, 1))
+    updateProject(nextSubStep(1, 2))
   }
   handleSetting = () => {
     const { updateProject, nextSubStep } = this.props.project
+    updateProject(nextSubStep(1, 3))
     // history.push(`/modeling/${this.props.projectId}/1`);
   }
   handleOutlierFix = () => {
     const { updateProject, nextSubStep } = this.props.project
+    updateProject(nextSubStep(3, 2))
     // history.push(`/data/${this.props.projectId}/5`);
   }
   render() {
-    const {diagnoseType} = this.props;
+    const { diagnoseType } = this.props;
     let result;
     // const type = 'large';
     switch (diagnoseType) {

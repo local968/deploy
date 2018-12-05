@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import ContinueButton from 'components/Common/ContinueButton';
 import { Input } from 'antd';
 import { action } from 'mobx';
 const { TextArea } = Input;
 
-
+@inject('projectStore')
 @observer
 export default class Project extends Component {
   nextStep = () => {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     project.updateProject(Object.assign({
       name: project.name || "project " + new Date().toLocaleString(),
       // description: project.description,
@@ -20,11 +20,11 @@ export default class Project extends Component {
   }
 
   onChange = action((type, e) => {
-    this.props.project[type] = e.target.value;
+    this.props.projectStore.project[type] = e.target.value;
   })
 
   render() {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     return <div className={styles.project}>
       <div className={styles.row}>
         <label>Project Name</label>

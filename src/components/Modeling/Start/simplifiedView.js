@@ -5,7 +5,7 @@ import Hint from 'components/Common/Hint';
 import { observer } from 'mobx-react';
 import CorrelationMatrix from './CorrelationMatrix';
 import { observable } from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon } from 'antd';
+import { Spin, Popover, message as antdMessage, Icon, Table } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 // import config from 'config';
@@ -345,9 +345,11 @@ class CreateNewVariable extends Component {
   @observable myFunction = {}
   @observable loading = false
   @observable isIn = false
+  @observable showTips = false
 
   hideHint = () => {
     this.hintStatus = false
+    this.showTips = false
     this.showFunction = {}
     this.active = 0
     this.hints = []
@@ -463,6 +465,7 @@ class CreateNewVariable extends Component {
   showSyntax = n => {
     this.active = n
     this.showFunction = this.hints[this.active]
+    this.showTips = false
   }
 
   handleAdd = () => {
@@ -695,11 +698,17 @@ class CreateNewVariable extends Component {
     this.fxRef.current.focus()
   }
 
+  showAll = () => {
+    const isSenior = FUNCTIONS.senior.map(v => v.syntax).includes(this.showFunction.syntax)
+    if (isSenior) this.showTips = true
+  }
+
   render() {
     const { visible, onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
     const functionSyntax = functionList.find(v => v.syntax === this.myFunction.syntax)
     const hintFunctionSyntax = functionList.find(v => v.syntax === this.showFunction.syntax)
+    const hintIsSenior = FUNCTIONS.senior.includes(hintFunctionSyntax)
 
     return visible && <div className={styles.newVariableBlock}>
       <div className={styles.newVariableRow}>
@@ -719,8 +728,13 @@ class CreateNewVariable extends Component {
               </div>
             })}
           </div>}
-          {!!hintFunctionSyntax && <div className={styles.newVariableHintSyntax}><span>{hintFunctionSyntax.syntax}</span></div>}
-          {!!functionSyntax && <div className={styles.newVariableSyntax}><span>{functionSyntax.syntax}</span></div>}
+          {!!hintFunctionSyntax && (this.showTips ?
+            <FunctionTips value={hintFunctionSyntax.value} /> :
+            <div className={styles.newVariableHintSyntax}>
+              <span>{hintFunctionSyntax.syntax}</span>
+              {hintIsSenior && <button onClick={this.showAll}><span>Tips</span></button>}
+            </div>)}
+          {!!functionSyntax && <div className={styles.newVariableSyntax} style={this.hintStatus ? { right: '100%' } : null}><span>{functionSyntax.syntax}</span></div>}
         </div>
       </div>
       <div className={styles.newVariableRow}>
@@ -734,5 +748,341 @@ class CreateNewVariable extends Component {
         </button>
       </div>
     </div>
+  }
+}
+
+class FunctionTips extends Component {
+  Concat() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsName}><span>Concat()</span></div>
+      <div className={styles.funcTipsContent}><span>Combine function allows you to easily construct new variables by combine certaininterdependent variables (e.g. variables that describe the same object)</span></div>
+      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
+      <div className={styles.funcTipsContent}><span>Combine(@var1, @var2, @var3,...p1, p2...)</span></div>
+      <div className={styles.funcTipsTitle}><span>Input:</span></div>
+      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 2 or more numerical or categorical variables to be combined; the combination order are decided by the input order. All variables need to start with@.<br />
+        p1, p2... - Number of variables in each combination; its number must be largerthan 1 but cannot be larger than the number of specified variables; combinations of p1 variables are created, then combinations of p2 variables are created, and so on.</span></div>
+      <div className={styles.funcTipsTitle}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
+      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
+      <div className={styles.funcTipsContent}><span>Combine(@color, @theme, @size, 2)</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: 'red_nature', 2: 'red_small', 3: 'nature_small' },
+            { key: '2', 1: 'blue_sports', 2: 'blue_medium', 3: 'sports_medium' }
+          ]}
+          columns={[{
+            title: 'color_theme',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'color_size',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'theme_size',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsContent}><span>Combine(@color, @theme, @size, 3)</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: 'red_nature_small' },
+            { key: '2', 1: 'blue_sports_medium' }
+          ]}
+          columns={[{
+            title: 'color_theme_size',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsContent}><span>Combine(@color, @theme, @size, 2, 3)</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: 'red_nature', 2: 'red_small', 3: 'nature_small', 4: 'red_nature_small' },
+            { key: '2', 1: 'blue_sports', 2: 'blue_medium', 3: 'sports_medium', 4: 'blue_sports_medium' }
+          ]}
+          columns={[{
+            title: 'color_theme',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'color_size',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'theme_size',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          },
+          {
+            title: 'color_theme_size',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
+      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+    </div>
+  }
+
+  Diff() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsName}><span>Diff()</span></div>
+      <div className={styles.funcTipsContent}><span>Diff function allows you to easily construct new variables by calculating the difference between two rows of selected variables.</span></div>
+      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
+      <div className={styles.funcTipsContent}><span>DIff(@var1, @var2, @var3,...row1,row2,...)</span></div>
+      <div className={styles.funcTipsTitle}><span>Input:</span></div>
+      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be calculated the difference; All variables need to start with@.<br />
+        row1,row2,... – distance to be calculated; its number must be equal to or largerthan 1 but cannot be larger than the length of the variable(suggestion: larger the row, more missing values).</span></div>
+      <div className={styles.funcTipsTitle}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>1 or more numerical variables</span></div>
+      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
+      <div className={styles.funcTipsContent}><span>Diff (@tax, 1,2)</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: '200', 2: 'nan', 3: 'nan' },
+            { key: '2', 1: '230', 2: '30', 3: 'nan' },
+            { key: '3', 1: '280', 2: '50', 3: '80' },
+            { key: '4', 1: '250', 2: '-30', 3: '20' }
+          ]}
+          columns={[{
+            title: 'tax',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'tax_diff_r1',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'tax_diff_r2',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
+      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+    </div>
+  }
+
+  Accumulate() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsName}><span>Accumulate()</span></div>
+      <div className={styles.funcTipsContent}><span>Accumulate function allows you to easily construct new variables by accumulating values from all previous rows.</span></div>
+      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
+      <div className={styles.funcTipsContent}><span>Accumulate(@var1, @var2, @var3,...)</span></div>
+      <div className={styles.funcTipsTitle}><span>Input:</span></div>
+      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be accumulated; All variables need to start with@.</span></div>
+      <div className={styles.funcTipsTitle}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>1 or more numerical variables</span></div>
+      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
+      <div className={styles.funcTipsContent}><span>Accumulate (@daily_sales, @daily_cost)</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: '1000', 2: '1000', 3: '200', 4: '200' },
+            { key: '2', 1: '1500', 2: '2500', 3: '300', 4: '500' },
+            { key: '3', 1: '1800', 2: '4300', 3: '350', 4: '850' }
+          ]}
+          columns={[{
+            title: 'daily_sales',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'daily_sales_accum',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'daily_cost',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          },
+          {
+            title: 'daily_cost_accum',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
+      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory.Thetotal number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+    </div>
+  }
+
+  Quantile_bin() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsName}><span>Quantile_bin()</span></div>
+      <div className={styles.funcTipsContent}><span>Quantile_bin function allows you to easily construct new variables by dividing selected variables into certain groups depending on its frequency or value.</span></div>
+      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
+      <div className={styles.funcTipsContent}><span>Quantile_bin(@var1, @var2, @var3,b, type1, type2)</span></div>
+      <div className={styles.funcTipsTitle}><span>Input:</span></div>
+      <div className={styles.funcTipsContent}><span>Quantile_bin()Quantile_bin function allows you to easily construct new variables by dividing selected variables into certain groups depending on its frequency or value.Syntax:Quantile_bin(@var1, @var2, @var3,b, type1, type2)Input:var1, var2, var3... – 1 or more numerical variables to be divided; All variables need to start with@.<br />
+        b – number of groups to be divided; its number must be greater than 1 but cannotbe larger than the length of the variable(suggestion: many groups are meaningless)<br />
+        type1,type2 – ways to dividing the variables; [frequency] and [value] are supported.<br />
+        [frequency]: variable is divided by its percentile, each group is thesame size;<br />
+        [value]: variable is divided by its value, each group is with the same value range.</span></div>
+      <div className={styles.funcTipsTitle}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
+      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
+      <div className={styles.funcTipsContent}><span>Quantile_bin(@age, 3, value)</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: '19', 2: '0-25' },
+            { key: '2', 1: '45', 2: '25-50' },
+            { key: '3', 1: '60', 2: '50-75' }
+          ]}
+          columns={[{
+            title: 'age',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'age_val_b3',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsContent}><span>Quantile_bin(@age1, @age2, 4, value,frequency))</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: '0-24', 2: '0-25', 3: '0-3', 4: '0-5' },
+            { key: '2', 1: '24-50', 2: '25-40', 3: '3-9', 4: '5-8' },
+            { key: '3', 1: '50-75', 2: '40-60', 3: '9-15', 4: '8-15' }
+          ]}
+          columns={[{
+            title: 'age1_val_b4',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'age1_fre_b4',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'age2_val_b4',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          },
+          {
+            title: 'age2_fre_b4',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
+      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+    </div>
+  }
+
+  Custom_Quantile_bin() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsName}><span>Custom_Quantile_bin()</span></div>
+      <div className={styles.funcTipsContent}><span>Custom_Quantile_bin function allows you to easily construct new variables by dividing selected variables into certain groups depending on customized range.</span></div>
+      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
+      <div className={styles.funcTipsContent}><span>Custom_Quantile_bin(@var, [range_list1], [range_list2]...)</span></div>
+      <div className={styles.funcTipsTitle}><span>Input:</span></div>
+      <div className={styles.funcTipsContent}><span>var - 1 numerical variable to be divided; Variable needs to start with@. [range_list1], [range_list2]... - customized range to dividing the variable; its firstnumber should be larger than the minimum value of the variable and the last number should be smaller than the maximum value of the variable; the length of the range_list decides the number of groups.</span></div>
+      <div className={styles.funcTipsTitle}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
+      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
+      <div className={styles.funcTipsContent}><span>Custom_Quantile_bin(@age,[25|50],[20|40|60])</span></div>
+      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            { key: '1', 1: '15', 2: '(<=25)', 3: '(<=20)' },
+            { key: '2', 1: '40', 2: '(25-50)', 3: '(20-40)' },
+            { key: '3', 1: '55', 2: '(>=50)', 3: '(40-60)' }
+          ]}
+          columns={[{
+            title: 'age',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'age_cus_b3',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'age_cus_b4',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }]} />
+      </div>
+      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
+      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+    </div>
+  }
+
+  render() {
+    const { value } = this.props
+    const key = value.slice(0, -2)
+    if (!key || !this[key] || typeof this[key] !== 'function') return null
+    return this[key]()
   }
 }
