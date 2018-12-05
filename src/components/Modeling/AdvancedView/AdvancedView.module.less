@@ -20,21 +20,6 @@
     font-size: 0.875rem;
     border: 0.5px solid #d8d8d8;
     position: relative;
-    .metricSelection {
-        position: absolute;
-        right: 0;
-        top: -4em;
-        display: flex;
-        .text {
-            line-height: 38px;
-            margin-right: 0.3em;
-        }
-        // :global {
-        //     .ant-select {
-        //         display: inline-block;
-        //     }
-        // }
-    }
     :global(.ant-radio-wrapper) {
       vertical-align: middle;
     }
@@ -214,7 +199,7 @@ padding-bottom: 0.5em;
 
 .middle {
   display: flex;
-  margin-bottom: 4rem;
+  margin-bottom: 1rem;
 }
 
 .settingsSelect {
@@ -224,4 +209,20 @@ padding-bottom: 0.5em;
 .adrow :global(.anticon-up) {
   transition: transform .3s ease;
   margin-left: .2rem;
+}
+
+.metricSelection {
+  display: flex;
+  text-align: right;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+  .text {
+      line-height: 38px;
+      margin-right: 1rem;
+  }
+  // :global {
+  //     .ant-select {
+  //         display: inline-block;
+  //     }
+  // }
 }
