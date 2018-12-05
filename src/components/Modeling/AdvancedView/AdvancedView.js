@@ -294,11 +294,13 @@ class AdvancedModelTable extends Component {
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',]
+    const replaceR2 = str => str.replace(/R2/g, 'R²')
     const headerData = texts.reduce((prev, curr) => {
+      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>
       if (sortState[curr] === undefined) return { ...prev, [curr]: curr }
-      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{curr}<Icon type='minus' /></div> }
-      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{curr}<Icon type='up' /></div> }
-      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{curr}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='minus' /></div> }
+      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' /></div> }
+      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
       return prev
     }, {})
     const header = <Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row>
