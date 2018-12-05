@@ -383,6 +383,8 @@
     flex-direction: column;
     padding: 0.1em 0;
     max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .detailRow {
