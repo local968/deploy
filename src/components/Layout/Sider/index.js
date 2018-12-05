@@ -25,9 +25,8 @@ export default class Sider extends Component {
         <div className={styles.menus}>
           <a
             className={styles.home}
-            onClick={() =>{
-              console.log(isDeploy && isLogin)
-              isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')}
+            onClick={() =>
+              isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')
             }
           >
             <img alt="home" src={home} />
