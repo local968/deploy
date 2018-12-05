@@ -73,7 +73,7 @@ function createOrUpdate(id, userId, data, isCreate = false) {
     .then(result => {
       const err = result.find(([error]) => !!error);
       const returnValue = err ? { status: 411, message: (isCreate ? "create" : "update") + " project error" } : { status: 200, message: "ok", result: data, id }
-      wss.publish("user:" + userId + ":projects", returnValue)
+      wss.publish(`user:${userId}:projects`, returnValue)
       return returnValue
     })
 }
@@ -97,8 +97,8 @@ function addSettingModel(userId, projectId) {
 function createModel(id, params) {
   const modelId = uuid.v4()
   const pipeline = redis.pipeline();
-  pipeline.hmset("project:" + id + ":model:" + modelId, mapObjectToArray({ ...params, id: modelId }))
-  pipeline.sadd("project:" + id + ":models", modelId)
+  pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray({ ...params, id: modelId }))
+  pipeline.sadd(`project:${id}:models`, modelId)
   return pipeline.exec().then(result => {
     const err = result.find(([error]) => !!error);
     const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
@@ -139,10 +139,10 @@ function deleteModels(id) {
     if (nowError || oldError) return { status: 414, message: "delete models error", error: nowError || oldError }
     const pipeline = redis.pipeline();
     [...nowIds, ...oldIds].forEach(mid => {
-      pipeline.del("project:" + id + ":model:" + mid)
+      pipeline.del(`project:${id}:model:${mid}`)
     })
-    pipeline.del("project:" + id + ":models")
-    pipeline.del("project:" + id + ":models:previous")
+    pipeline.del(`project:${id}:models`)
+    pipeline.del(`project:${id}:models:previous`)
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
       if (error) return { status: 414, message: "delete models error", error }
@@ -158,7 +158,7 @@ function deleteProject(userId, id) {
   return checkProject(userId, id).then(err => {
     if (err) return err
     const pipeline = redis.pipeline();
-    pipeline.del("project:" + id)
+    pipeline.del(`project:${id}`)
     pipeline.zrem(`user:${userId}:projects:updateTime`, id)
     pipeline.zrem(`user:${userId}:projects:createTime`, id)
     return pipeline.exec().then(list => {
@@ -217,9 +217,7 @@ function getFileInfo(files) {
     ext: null
   })
   const pipeline = redis.pipeline();
-  files.forEach(f => {
-    pipeline.get("file:" + f)
-  })
+  files.forEach(f => pipeline.get(`file:${f}`))
   return pipeline.exec().then(list => {
     const error = list.find(i => !!i[0])
     if (error) return error
@@ -267,7 +265,7 @@ function updateProjectField(id, userId, field, data) {
         id,
         result: { [field]: data }
       }
-      wss.publish("user:" + userId + ":projects", returnValue)
+      wss.publish(`user:${userId}:projects`, returnValue)
       return returnValue
     })
   })
@@ -373,7 +371,7 @@ wss.register("queryModelList", message => {
   return redis.smembers(key).then(ids => {
     const pipeline = redis.pipeline();
     ids.forEach(modelId => {
-      pipeline.hgetall("project:" + id + ":model:" + modelId)
+      pipeline.hgetall(`project:${id}:model:${modelId}`)
     })
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
@@ -428,10 +426,13 @@ wss.register('etl', (message, socket, progress) => {
           message,
         }
         result.firstEtl = false;
-        delete result.name
-        delete result.id
-        delete result.userId
-        if (!files) delete result.totalRawLines
+        // delete result.name
+        Reflect.deleteProperty(result,'name')
+        // delete result.id
+        Reflect.deleteProperty(result,'id')
+        // delete result.userId
+        Reflect.deleteProperty(result,'userId')
+        if (!files) Reflect.deleteProperty(result,'totalRawLines')
         // 最终ETL 小于1W行  使用cross
         if (result.totalLines > 0 && result.totalLines < 10000) result.runWith = 'cross'
 
@@ -526,8 +527,8 @@ wss.register('univariatePlot', (message, socket, progress) => {
       return progressResult
     }
     const { result } = progressResult
-    const { field, imageSavePath, progress: status } = result;
-    if (status && status === "start") return
+    const { field, imageSavePath, progress: status='' } = result;
+    if (status === "start") return
     univariatePlots[field] = imageSavePath
     return progress(progressResult)
   })
