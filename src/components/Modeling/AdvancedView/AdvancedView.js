@@ -8,7 +8,7 @@ import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
-import modelComp from './Btn-ModelComparison-normal.svg';
+// import modelComp from './Btn-ModelComparison-normal.svg';
 import ROCCurve from './icon-roc-curve-normal.svg';
 import liftChart from './icon-lift-chart-normal.svg';
 import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
@@ -51,7 +51,7 @@ export default class AdvancedView extends Component {
 
   @observable currentSettingId = 'all'
   // undefined = can not sort, false = no sort ,1 = asc, 2 = desc
-  @observable sortState = { 'Model Name': 1, 'F1-Score': false, 'Precision': false, 'Recall': false, 'LogLoss': false, 'Cutoff Threshold': false, 'Validation': false, 'Holdout': false, 'Normalized RMSE': false, 'RMSE': false, 'MSLE': false, 'RMSLE': false, 'MSE': false, 'MAE': false, 'R2': false, 'adjustR2': false, 'Validation': false, 'Holdout': false }
+  @observable sortState = { 'Model Name': 1, 'F1-Score': false, 'Precision': false, 'Recall': false, 'LogLoss': false, 'Cutoff Threshold': false, 'Validation': false, 'Holdout': false, 'Normalized RMSE': false, 'RMSE': false, 'MSLE': false, 'RMSLE': false, 'MSE': false, 'MAE': false, 'R2': false, 'adjustR2': false }
   @observable metric = {
     key: '',
     display: ''
@@ -65,7 +65,7 @@ export default class AdvancedView extends Component {
     const formatNumber = number => {
       try {
         number = parseFloat(number)
-        return parseInt(number * 1000)
+        return parseInt(number * 1000, 10)
       } catch (e) {
         console.log('compare error:', e)
         return 0
