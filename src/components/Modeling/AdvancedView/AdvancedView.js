@@ -8,7 +8,11 @@ import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
+import ModelProcess from './ModelProcess';
 import modelComp from './Btn-ModelComparison-normal.svg';
+import modelProcess from './icon-model-process-flow-normal.svg';
+import processHover from './icon-model-process-flow-hover.svg';
+import processSelectd from './icon-model-process-flow-selected.svg';
 import ROCCurve from './icon-roc-curve-normal.svg';
 import liftChart from './icon-lift-chart-normal.svg';
 import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
@@ -424,6 +428,9 @@ class DetailCurves extends Component {
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
         break;
+      case 'Model Process Flow':
+        curComponent = <ModelProcess model={model} className={`modelprocess${id}`} />
+
       default:
         break;
     }
@@ -452,14 +459,22 @@ class DetailCurves extends Component {
       hoverIcon: varImpactHover,
       selectedIcon: varImpactSelected,
       text: 'Variable Impact'
+    }, {
+      normalIcon: modelProcess,
+      hoverIcon: processHover,
+      selectedIcon: processSelectd,
+      text: 'Model Process Flow'
     }];
     return (
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} >
           <div className={styles.thumbnails} >
-            {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+            {thumbnails.slice(0, 4).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} />
+          <div className={styles.thumbnails}>
+            {thumbnails.slice(4).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+          </div>
         </div>
         <div className={styles.rightPanel} >
           <button onClick={this.reset} className={styles.button} >Reset</button>
