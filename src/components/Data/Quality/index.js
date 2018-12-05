@@ -403,6 +403,7 @@ class VariableIssue extends Component {
             fixedRowCount={4}
             checked={null}
             select={null}
+            style={{ border: "1px solid #ccc" }}
             data={tableData}
           />
         </div>

@@ -756,17 +756,34 @@ export default class Project {
 
   @action
   dataView = (isClean = true) => {
-    const exp = Object.values(this.expression).join(";")
+    const key = isClean ? 'dataViews' : 'rawDataViews'
+    // const featureLabel = [...this.dataHeader, ...this.newVariable].filter(v => !Object.keys(this[key]).includes(v))
+    // if(!featureLabel.length) return Promise.resolve()
     return socketStore.ready().then(api => {
+      // const command = {
+      //   projectId: this.id,
+      //   command: 'dataView',
+      //   actionType: isClean ? 'clean' : 'raw',
+      //   feature_label
+      // };
+
+      const readyLabels = this[key] ? Object.keys(this[key]) : []
+      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = [...data_label, ...new_label]
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
       const command = {
         projectId: this.id,
         command: 'dataView',
-        actionType: isClean ? 'clean' : 'raw'
+        actionType: isClean ? 'clean' : 'raw',
+        feature_label
       };
-      if (exp) command.csvScript = exp.replace(/\|/g, ",")
+      if (new_label.length) {
+        const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+        command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      }
       return api.dataView(command, progressResult => {
       }).then(returnValue => {
-        const key = isClean ? 'dataViews' : 'rawDataViews'
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ [key]: null })
@@ -1118,7 +1135,7 @@ export default class Project {
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
       const feature_label = [...data_label, ...new_label]
-      if (!feature_label.length || feature_label.length === 0) return
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
       const command = {
         projectId: this.id,
         command: 'preTrainImportance',

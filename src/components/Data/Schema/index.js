@@ -278,6 +278,7 @@ export default class DataSchema extends Component {
             fixedRowCount={this.showSelect ? 3 : 2}
             checked={this.checked}
             select={this.select}
+            style={{ border: "1px solid #ccc" }}
             data={tableData} />
         </div>
       </div>
