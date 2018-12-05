@@ -6,7 +6,8 @@ import { observer } from 'mobx-react';
 @observer
 export default class ModelProcess extends Component {
   render() {
-    const { name } = this.props.model;
+    const { name, modelProcessFlow: {flow, flowPara} } = this.props.model;
+    if (!flow) return null;
     const { report } = this.props;
     const processes = ['Raw Data', 'Data Preprocessing', 'Feature Processing', 'Model Training', 'Prediction'];
     const legends = {
@@ -38,7 +39,7 @@ export default class ModelProcess extends Component {
     }
     return (
       <div className={`${styles.modelProcess} ${this.props.className}`}>
-        {processes.map(p => <SubStep key={p} hasArrow={p !== 'Prediction'} model={this.props.model} process={p} color={colors[p]} legend={legends[p]} />)}
+        {processes.map(p => <SubStep flowPara={flowPara} flow={flow} key={p} hasArrow={p !== 'Prediction'} model={this.props.model} process={p} color={colors[p]} legend={legends[p]} />)}
       </div>
     );
   }
@@ -78,45 +79,43 @@ class SubStep extends Component {
     this.setState({ visible: true });
   }
   render() {
-    const { hasArrow, process, color, legend, model: { modelProcessFlow, name } } = this.props;
-    console.log(modelProcessFlow);
-    return;
-    // const nonDisplay = new Set(['select_percentile_classification', 'none', 'no_preprocessing', 'select_rates']);
-    // const popoverContent = legend && (
-    //   <div>
-    //     {flow[process].map(f => {
-    //       if (!flowPara[f]) return null;
-    //       return (
-    //         <div className={styles.processPopoverWrapper} key={f}>
-    //           <h4 className={styles.item}>{f}</h4>
-    //           {Object.entries(flowPara[f]).map(item => {
-    //             if (nonDisplay.has(item[1])) return null;
-    //             return <div key={item[1]} className={styles.param}>{item[0]}: {item[1]}</div>;
-    //           })}
-    //         </div>
-    //       );
-    //     })}
-    //   </div>
-    // );
-    // return (
-    //   <div className={styles.subStep} >
-    //     <span
-    //       style={{ backgroundColor: color, color: process === 'Prediction' && 'white' }}
-    //       className={legend ? styles.textWrapperLegend : styles.textWrapper}>{process === 'Model Training' ? name : process}
-    //     </span>
-    //     {legend &&
-    //       <Popover
-    //         content={popoverContent}
-    //         trigger="click"
-    //       >
-    //         <span onClick={this.handleClick} className={styles.popoverLegend}>
-    //           <i className="fa fa-caret-right fa-2x" aria-hidden="true" style={{ verticalAlign: 'middle' }}></i>
-    //         </span>
-    //       </Popover>
-    //     }
-    //     {hasArrow && <Arrow />}
-    //   </div>
-    // );
+    const { hasArrow, process, color, legend, model: { name }, flow, flowPara } = this.props;
+    const nonDisplay = new Set(['select_percentile_classification', 'none', 'no_preprocessing', 'select_rates']);
+    const popoverContent = legend && (
+      <div>
+        {flow[process].map(f => {
+          if (!flowPara[f]) return null;
+          return (
+            <div className={styles.processPopoverWrapper} key={f}>
+              <h4 className={styles.item}>{f}</h4>
+              {Object.entries(flowPara[f]).map(item => {
+                if (nonDisplay.has(item[1])) return null;
+                return <div key={item[1]} className={styles.param}>{item[0]}: {item[1]}</div>;
+              })}
+            </div>
+          );
+        })}
+      </div>
+    );
+    return (
+      <div className={styles.subStep} >
+        <span
+          style={{ backgroundColor: color, color: process === 'Prediction' && 'white' }}
+          className={legend ? styles.textWrapperLegend : styles.textWrapper}>{process === 'Model Training' ? name : process}
+        </span>
+        {legend &&
+          <Popover
+            content={popoverContent}
+            trigger="click"
+          >
+            <span onClick={this.handleClick} className={styles.popoverLegend}>
+              <i className="fa fa-caret-right fa-2x" aria-hidden="true" style={{ verticalAlign: 'middle' }}></i>
+            </span>
+          </Popover>
+        }
+        {hasArrow && <Arrow />}
+      </div>
+    );
   }
 }
 

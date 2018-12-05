@@ -99,7 +99,7 @@ export default class Model {
     const rawPara = this.dataFlow;
     const para = {};
     const preprocessor = rawPara['preprocessor:__choice__'];
-    if (!preprocessor) return;
+    if (!preprocessor) return {flow: null, flowPara: null};
 
     let algorithm;
     const classifier = rawPara['classifier:__choice__'];
@@ -110,7 +110,7 @@ export default class Model {
     // this.extractParameters(rawPara, para, 'classifier:' + classifier, classifier + modelId);
     this.extractParameters(rawPara, para, 'rescaling:__choice__', 'rescaling');
 
-    if (this.approach.isClassification) {
+    if (this.problemType === 'Classification') {
       algorithm = rawPara['classifier:__choice__'];
       this.extractParameters(rawPara, para, 'classifier:' + algorithm, algorithm);
     } else {

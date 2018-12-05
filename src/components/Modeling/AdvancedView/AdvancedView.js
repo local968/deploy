@@ -412,7 +412,8 @@ class DetailCurves extends Component {
     const { model, model: { id } } = this.props;
     const { curve } = this.state;
     let curComponent;
-    switch (this.state.curve) {
+    let hasReset = true;
+    switch (curve) {
       case 'ROC Curve':
         curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
         break;
@@ -427,10 +428,12 @@ class DetailCurves extends Component {
         break;
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
+        hasReset = false;
         break;
       case 'Model Process Flow':
         curComponent = <ModelProcess model={model} className={`modelprocess${id}`} />
-
+        hasReset = false;
+        break;
       default:
         break;
     }
@@ -477,7 +480,7 @@ class DetailCurves extends Component {
           </div>
         </div>
         <div className={styles.rightPanel} >
-          <button onClick={this.reset} className={styles.button} >Reset</button>
+          {hasReset && <button onClick={this.reset} className={styles.button} >Reset</button>}
           {curComponent}
         </div>
       </div>
