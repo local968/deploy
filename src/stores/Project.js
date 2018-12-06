@@ -202,8 +202,7 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      validationRate: 20,
-      holdoutRate: 20
+      rawDataViews: null,
     }
   }
 
@@ -219,7 +218,6 @@ export default class Project {
       nullIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
-      rawDataViews: null,
       dataViews: null,
       outlierDict: {},
       targetMap: {},
@@ -259,7 +257,9 @@ export default class Project {
       version: [1, 2],
       trainHeader: [],
       newVariable: [],
-      expression: {}
+      expression: {},
+      validationRate: 20,
+      holdoutRate: 20,
     }
   }
 

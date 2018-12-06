@@ -13,7 +13,6 @@ function setDefaultData(id, userId) {
     histgramPlots: {},
     preImportance: null,
     dataViews: null,
-    rawDataViews: null
   }
   return createOrUpdate(id, userId, data)
 }

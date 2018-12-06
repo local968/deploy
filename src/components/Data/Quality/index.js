@@ -226,7 +226,6 @@ class VariableIssue extends Component {
   }
 
   editFixes = () => {
-    this.closeSummary()
     if (this.props.project.rawDataViews) {
       this.visible = true
     } else {
@@ -243,6 +242,7 @@ class VariableIssue extends Component {
         }
       )
     }
+    this.closeSummary()
   }
 
   closeFixes = () => {
