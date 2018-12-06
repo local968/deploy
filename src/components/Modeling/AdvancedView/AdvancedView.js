@@ -431,7 +431,9 @@ class DetailCurves extends Component {
         hasReset = false;
         break;
       case 'Model Process Flow':
-        curComponent = <ModelProcess model={model} className={`modelprocess${id}`} />
+        curComponent = <div style={{maxWidth: document.body.clientWidth / 2}} >
+          <ModelProcess model={model} className={`modelprocess${id}`} />
+        </div>
         hasReset = false;
         break;
       default:

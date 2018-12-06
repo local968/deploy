@@ -58,7 +58,7 @@ class Ensemble extends Component {
               <div key={m.modelName} className={styles.ensembleSubstep}>
                 {processes.map(p => <SubStep hasArrow={p !== 'Model Training'} key={p} model={m} process={p} color={colors[p]} legend={!report && legends[p]} />)}
               </div>
-              <span className={styles.weight} >{m.weight}</span>
+              <div className={styles.weight} >{m.weight}</div>
             </div>
           );
         })}
@@ -99,18 +99,18 @@ class SubStep extends Component {
     );
     return (
       <div className={styles.subStep} >
-        <span
+        <div
           style={{ backgroundColor: color, color: process === 'Prediction' && 'white' }}
           className={legend ? styles.textWrapperLegend : styles.textWrapper}>{process === 'Model Training' ? name : process}
-        </span>
+        </div>
         {legend &&
           <Popover
             content={popoverContent}
             trigger="click"
           >
-            <span onClick={this.handleClick} className={styles.popoverLegend}>
+            <div onClick={this.handleClick} className={styles.popoverLegend}>
               <i className="fa fa-caret-right fa-2x" aria-hidden="true" style={{ verticalAlign: 'middle' }}></i>
-            </span>
+            </div>
           </Popover>
         }
         {hasArrow && <Arrow />}
@@ -123,9 +123,9 @@ class Arrow extends Component {
   render() {
     return (
       <div className={styles.arrow}>
-        <span className={styles.circle}></span>
-        <span className={styles.line}></span>
-        <span className={styles.triangle}></span>
+        <div className={styles.circle}></div>
+        <div className={styles.line}></div>
+        <div className={styles.triangle}></div>
       </div>
     );
   }
