@@ -384,7 +384,7 @@ class RegressionDetailCurves extends Component {
   state = {
     curve: "Variable Impact",
     visible: false,
-    diagnoseType: 'yUnbalanced'
+    diagnoseType: null
   }
 
   handleClick = val => {
