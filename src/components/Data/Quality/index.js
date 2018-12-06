@@ -28,6 +28,7 @@ class TargetIssue extends Component {
   @observable visible = false
   @observable isLoad = false
   @observable edit = false
+  @observable progress = 0
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -46,8 +47,9 @@ class TargetIssue extends Component {
       if (this.isLoad) return false;
 
       this.isLoad = true
+      this.progress = 0
 
-      this.props.project.dataView(false)
+      this.props.project.dataView(false, num => this.progress = num)
       when(
         () => this.props.project.rawDataViews,
         () => {
@@ -184,7 +186,7 @@ class TargetIssue extends Component {
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
-        {this.isLoad && <ProcessLoading />}
+        {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }}/>}
         <Modal content={<FixIssue project={project}
           issueRows={targetIssues}
           closeFixes={this.closeFixes}
@@ -215,6 +217,8 @@ class TargetIssue extends Component {
 class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
+  @observable isLoad = false
+  @observable progress = 0
 
   // handleCheck = e => {
   //   const checked = e.target.checked
@@ -232,8 +236,9 @@ class VariableIssue extends Component {
       if (this.isLoad) return false;
 
       this.isLoad = true
+      this.progress = 0
 
-      this.props.project.dataView(false)
+      this.props.project.dataView(false, num => this.progress = num)
       when(
         () => this.props.project.rawDataViews,
         () => {
@@ -415,6 +420,7 @@ class VariableIssue extends Component {
           </div>
         </div>
       </div>
+      {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }} />}
       {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
       <Modal content={<FixIssue project={project}
         issueRows={issueRows}

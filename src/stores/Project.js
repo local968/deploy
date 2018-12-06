@@ -576,7 +576,7 @@ export default class Project {
       const { TP, FN, FP, TN } = this.costOption
       initialFitIndex = this.indexOfMax(result.roc);
       fitIndex = initialFitIndex
-      if(!!TP || !!FN || !!FP || !!TN) {
+      if (!!TP || !!FN || !!FP || !!TN) {
         const benefit = model.getBenefit(TP, FN, FP, TN, result)
         fitIndex = benefit.index
       }
@@ -762,7 +762,7 @@ export default class Project {
   }
 
   @action
-  dataView = (isClean = true) => {
+  dataView = (isClean = true, progress) => {
     const key = isClean ? 'dataViews' : 'rawDataViews'
     // const featureLabel = [...this.dataHeader, ...this.newVariable].filter(v => !Object.keys(this[key]).includes(v))
     // if(!featureLabel.length) return Promise.resolve()
@@ -790,6 +790,11 @@ export default class Project {
         command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       }
       return api.dataView(command, progressResult => {
+        if (progress && typeof progress === 'function') {
+          const { result } = progressResult
+          const { name, value } = result
+          if (name === "progress") return progress(value)
+        }
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
@@ -1085,7 +1090,7 @@ export default class Project {
     })
   }
 
-  preTrainImportance = () => {
+  preTrainImportance = (progress) => {
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
@@ -1102,6 +1107,11 @@ export default class Project {
         command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       }
       return api.preTrainImportance(command, progressResult => {
+        if (progress && typeof progress === 'function') {
+          const { result } = progressResult
+          const { name, value } = result
+          if (name === "progress") return progress(value)
+        }
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
