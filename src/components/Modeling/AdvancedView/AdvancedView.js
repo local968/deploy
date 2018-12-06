@@ -606,7 +606,7 @@ class DetailCurves extends Component {
           </div>
           <PredictTable model={model} yes={yes} no={no} />
           <div className={styles.thumbnails}>
-            {thumbnails.slice(4).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+            {thumbnails.slice(4, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
         </div>
         <div className={styles.rightPanel} >
