@@ -8,7 +8,10 @@ import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
-// import modelComp from './Btn-ModelComparison-normal.svg';
+import ModelProcess from './ModelProcess';
+import modelProcess from './icon-model-process-flow-normal.svg';
+import processHover from './icon-model-process-flow-hover.svg';
+import processSelectd from './icon-model-process-flow-selected.svg';
 import ROCCurve from './icon-roc-curve-normal.svg';
 import liftChart from './icon-lift-chart-normal.svg';
 import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
@@ -537,7 +540,8 @@ class DetailCurves extends Component {
     const { model, model: { id }, yes, no } = this.props;
     const { curve } = this.state;
     let curComponent;
-    switch (this.state.curve) {
+    let hasReset = true;
+    switch (curve) {
       case 'ROC Curve':
         curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
         break;
@@ -552,6 +556,13 @@ class DetailCurves extends Component {
         break;
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
+        hasReset = false;
+        break;
+      case 'Model Process Flow':
+        curComponent = <div style={{maxWidth: document.body.clientWidth / 2}} >
+          <ModelProcess model={model} className={`modelprocess${id}`} />
+        </div>
+        hasReset = false;
         break;
       default:
         break;
@@ -581,17 +592,25 @@ class DetailCurves extends Component {
       hoverIcon: varImpactHover,
       selectedIcon: varImpactSelected,
       text: 'Variable Impact'
+    }, {
+      normalIcon: modelProcess,
+      hoverIcon: processHover,
+      selectedIcon: processSelectd,
+      text: 'Model Process Flow'
     }];
     return (
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} >
           <div className={styles.thumbnails} >
-            {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+            {thumbnails.slice(0, 4).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} yes={yes} no={no} />
+          <div className={styles.thumbnails}>
+            {thumbnails.slice(4, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+          </div>
         </div>
         <div className={styles.rightPanel} >
-          <button onClick={this.reset} className={styles.button} >Reset</button>
+          {hasReset && <button onClick={this.reset} className={styles.button} >Reset</button>}
           {curComponent}
         </div>
       </div>

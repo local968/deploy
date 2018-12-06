@@ -98,6 +98,59 @@ export default class Model {
     }
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
+
+  modelProcessFlow(dataFlow) {
+    const rawPara = dataFlow || this.dataFlow;
+    const para = {};
+    const preprocessor = rawPara['preprocessor:__choice__'];
+    if (!preprocessor) return {flow: null, flowPara: null};
+
+    let algorithm;
+    // const classifier = rawPara['classifier:__choice__'];
+    // this.paraProcessing(rawPara, result['Raw Data'], para, modelId);
+    this.extractParameters(rawPara, para, 'one_hot_encoding', 'one hot encoding');
+    this.extractParameters(rawPara, para, 'preprocessor:' + preprocessor, preprocessor);
+    this.extractParameters(rawPara, para, 'balancing:', 'balancing');
+    // this.extractParameters(rawPara, para, 'classifier:' + classifier, classifier + modelId);
+    this.extractParameters(rawPara, para, 'rescaling:__choice__', 'rescaling');
+
+    if (this.problemType === 'Classification') {
+      algorithm = rawPara['classifier:__choice__'];
+      this.extractParameters(rawPara, para, 'classifier:' + algorithm, algorithm);
+    } else {
+      algorithm = rawPara['regressor:__choice__'];
+      this.extractParameters(rawPara, para, 'regressor:' + algorithm, algorithm);
+    }
+    const chain = {
+      'Raw Data': ['Raw Data'],
+      'Data Preprocessing': [
+        'one hot encoding',
+        'Imputation',
+        rawPara['balancing:strategy'],
+        rawPara['rescaling:__choice__'] ? 'rescaling' : 'none'
+      ],
+      'Feature Processing': [
+        preprocessor
+      ],
+      'Model Training': [algorithm],
+      Prediction: ['Prediction']
+    };
+    return { flow: chain, flowPara: para };
+  }
+  extractParameters(rawPara, para, str, choice) {
+    const keys = Object.keys(rawPara);
+    para[choice] = {};
+    keys.forEach(key => {
+      if (key.startsWith(str)) {
+        const prop = key.substring(str.length + 1);
+        if (isNaN(Number(rawPara[key]))) {
+          para[choice][prop] = rawPara[key];
+        } else {
+          para[choice][prop] = rawPara[key].toFixed(2);
+        }
+      }
+    });
+  }
   updateModel(data) {
     socketStore.ready().then(api => api.updateModel({ data, id: this.id, projectId: this.projectId }))
     Object.assign(this, data);
