@@ -53,7 +53,7 @@ export default class Model {
   resetFitIndex() {
     this.fitIndex = this.initialFitIndex;
   }
-  getScore(ITP, IFN, IFP, ITN) {
+  getScore = (ITP, IFN, IFP, ITN) => {
     const { problemType, score: { validateScore } } = this
     if (problemType === 'Classification') {
       if (!ITP || !IFN || !IFP || !ITN) return validateScore.auc + validateScore.acc
@@ -61,13 +61,17 @@ export default class Model {
     }
     return 1 - validateScore.rmse + validateScore.r2
   }
-  getBenefit(ITP, IFN, IFP, ITN) {
-    const data = this.chartData || {}
+  getBenefit = (ITP, IFN, IFP, ITN, data = null) => {
+    data = data || this.chartData || {}
     const roc = data.roc || {}
     const { TP, FN, FP, TN } = roc
-    if (!TP || !FN || !FP || !TN) return {
+    if (!ITP && !IFN && !IFP && !ITN) return {
       benefit: 0,
-      index: this.fitIndex,
+      index: this.initialFitIndex
+    }
+    if (!TP && !FN && !FP && !TN) return {
+      benefit: 0,
+      index: this.initialFitIndex,
       text: `${ITP} * ${0}(TP) - ${IFN} * ${0}(FN) - ${IFP} * ${0}(FP) + ${ITN} * ${0}(TN) = ${0}`
     }
     let maxIndex = 0

@@ -7,24 +7,6 @@ import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage } from 'antd';
 
-function indexOfMax(arr) {
-  if (arr.length === 0) {
-    return -1;
-  }
-
-  let max = arr.Youden[0];
-  let maxIndex = 0;
-
-  for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
-    if (arr.Youden[i] > max) {
-      maxIndex = i;
-      max = arr.Youden[i];
-    }
-  }
-
-  return maxIndex;
-}
-
 export default class Project {
   @observable models = []
   @observable trainModel = null
@@ -582,18 +564,43 @@ export default class Project {
     return map
   }
 
-  parseChartData(result) {
+  parseChartData(result, model) {
     if (!result) return { chart: null, fitIndex: null };
     let fitIndex;
+    let initialFitIndex;
     const charts = ['density', 'lift', 'roc'];
     charts.forEach(chart => {
       result[chart] = this.parseJson(result[chart])
     });
     if (result.roc) {
-      fitIndex = indexOfMax(result.roc);
+      const { TP, FN, FP, TN } = this.costOption
+      initialFitIndex = this.indexOfMax(result.roc);
+      fitIndex = initialFitIndex
+      if(!!TP || !!FN || !!FP || !!TN) {
+        const benefit = model.getBenefit(TP, FN, FP, TN, result)
+        fitIndex = benefit.index
+      }
       this.roundN(result.roc);
     }
-    return { chart: result, fitIndex };
+    return { chart: result, fitIndex, initialFitIndex };
+  }
+
+  indexOfMax(arr) {
+    if (arr.length === 0) {
+      return -1;
+    }
+
+    let max = arr.Youden[0];
+    let maxIndex = 0;
+
+    for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
+      if (arr.Youden[i] > max) {
+        maxIndex = i;
+        max = arr.Youden[i];
+      }
+    }
+
+    return maxIndex;
   }
 
   roundN(data, n = 2) {
@@ -909,8 +916,6 @@ export default class Project {
       train2ing: true,
       train2Error: false,
       selectId: '',
-      criteria: 'default',
-      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
       settings: this.settings,
       settingId: this.settingId
     }, this.nextSubStep(2, 3)))
@@ -973,8 +978,6 @@ export default class Project {
       train2ing: true,
       train2Error: false,
       selectId: '',
-      criteria: 'default',
-      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
       validationRate: this.validationRate,
       holdoutRate: this.holdoutRate,
       resampling: this.resampling,
@@ -1014,14 +1017,16 @@ export default class Project {
     this.train2ing = true
     this.isAbort = false
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
-      if (this.isAbort) return
-      if (progressResult.name === "progress") {
-        if (progressResult.trainId) this.trainingId = progressResult.trainId
-        if (!progressResult.model) return
-        this.trainModel = progressResult
-        return
-      }
-      if (progressResult.status !== 200) return
+      // if (this.isAbort) return
+      // if (progressResult.name === "progress") {
+      //   if (progressResult.trainId) this.trainingId = progressResult.trainId
+      //   if (!progressResult.model) return
+      //   if (!progressResult.value) return
+      //   if(this.trainModel && this.trainModel.value && progressResult.value > this.trainModel.value)
+      //   this.trainModel = progressResult
+      //   return
+      // }
+      // if (progressResult.status !== 200) return
       //暂时移除  保证命令只发一次
       // let result = progressResult.model
       // this.setModel(result)
@@ -1242,10 +1247,10 @@ export default class Project {
           return result.model === m.name;
         })
         if (model) {
-          const { fitIndex, chart } = this.parseChartData(result.data);
+          const { fitIndex, chart, initialFitIndex } = this.parseChartData(result.data, model);
           model.updateModel({
             fitIndex,
-            initialFitIndex: fitIndex,
+            initialFitIndex,
             chartData: chart
           })
         }
