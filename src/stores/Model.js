@@ -94,9 +94,9 @@ export default class Model {
     }
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
-  @computed
-  get modelProcessFlow() {
-    const rawPara = this.dataFlow;
+
+  modelProcessFlow(dataFlow) {
+    const rawPara = dataFlow || this.dataFlow;
     const para = {};
     const preprocessor = rawPara['preprocessor:__choice__'];
     if (!preprocessor) return {flow: null, flowPara: null};

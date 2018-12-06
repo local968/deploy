@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 export default class ModelProcess extends Component {
   render() {
     const { name, modelProcessFlow: {flow, flowPara} } = this.props.model;
-    if (!flow) return null;
+    const processFlow = this.props.model.modelProcessFlow();
     const { report } = this.props;
     const processes = ['Raw Data', 'Data Preprocessing', 'Feature Processing', 'Model Training', 'Prediction'];
     const legends = {
@@ -26,20 +26,20 @@ export default class ModelProcess extends Component {
       'Model Training': 'rgb(229, 233, 252)',
       'Prediction': 'rgb(68, 142, 237)'
     };
-    if (name === 'ensemble') {
+    if (name.startsWith('ensemble')) {
       return (
         <div className={`${styles.modelProcess} ${this.props.className}`}>
-          <SubStep model={this.props.model} process="Raw Data" color={colors['Raw Data']} legend={!report && legends['Raw Data']} />
+          <SubStep name={name} process="Raw Data" color={colors['Raw Data']} legend={!report && legends['Raw Data']} />
           <Ensemble colors={colors} model={this.props.model} legends={legends} report={report} />
           <Arrow />
-          <SubStep model={this.props.model} process="Ensembled Model" color={colors['Ensembled Model']} legend={!report && legends['Ensembled Model']} />
-          <SubStep hasArrow={false} model={this.props.model} process="Prediction" color={colors['Prediction']} legend={!report && legends['Prediction']} />
+          <SubStep name={name} process="Ensembled Model" color={colors['Ensembled Model']} legend={!report && legends['Ensembled Model']} />
+          <SubStep name={name} hasArrow={false} process="Prediction" color={colors['Prediction']} legend={!report && legends['Prediction']} />
         </div>
       );
     }
     return (
       <div className={`${styles.modelProcess} ${this.props.className}`}>
-        {processes.map(p => <SubStep flowPara={flowPara} flow={flow} key={p} hasArrow={p !== 'Prediction'} model={this.props.model} process={p} color={colors[p]} legend={legends[p]} />)}
+        {processes.map(p => <SubStep name={name} processFlow={processFlow} flowPara={flowPara} flow={flow} key={p} hasArrow={p !== 'Prediction'} process={p} color={colors[p]} legend={legends[p]} />)}
       </div>
     );
   }
@@ -47,18 +47,19 @@ export default class ModelProcess extends Component {
 
 class Ensemble extends Component {
   render() {
-    const { model: { modelSetting, approachStore: { models } }, colors, legends, report } = this.props;
+    const { model: { dataFlow }, colors, legends, report } = this.props;
     const processes = ['Data Preprocessing', 'Feature Processing', 'Model Training'];
     return (
       <div>
-        {models.map((m, i) => {
-          if (m.name === 'ensemble' || modelSetting !== m.modelSetting) return null;
+        {dataFlow.map((df, i) => {
+          // if (m.name === 'ensemble' || modelSetting !== m.modelSetting) return null;
+          const subModelFlow = this.props.model.modelProcessFlow(df);
           return (
             <div className={styles.ensembleWrapper} key={i}>
-              <div key={m.modelName} className={styles.ensembleSubstep}>
-                {processes.map(p => <SubStep hasArrow={p !== 'Model Training'} key={p} model={m} process={p} color={colors[p]} legend={!report && legends[p]} />)}
+              <div className={styles.ensembleSubstep}>
+                {processes.map(p => <SubStep name={subModelFlow.flow['Model Training'][0]} processFlow={subModelFlow} hasArrow={p !== 'Model Training'} key={p} process={p} color={colors[p]} legend={!report && legends[p]} />)}
               </div>
-              <div className={styles.weight} >{m.weight}</div>
+              {/* <div className={styles.weight} >{m.weight}</div> */}
             </div>
           );
         })}
@@ -79,11 +80,12 @@ class SubStep extends Component {
     this.setState({ visible: true });
   }
   render() {
-    const { hasArrow, process, color, legend, model: { name }, flow, flowPara } = this.props;
+    const { hasArrow, process, color, legend, name, processFlow = {} } = this.props;
+    const {flow = {}, flowPara = {}} = processFlow;
     const nonDisplay = new Set(['select_percentile_classification', 'none', 'no_preprocessing', 'select_rates']);
     const popoverContent = legend && (
       <div>
-        {flow[process].map(f => {
+        {flow && flow[process].map(f => {
           if (!flowPara[f]) return null;
           return (
             <div className={styles.processPopoverWrapper} key={f}>
@@ -101,7 +103,8 @@ class SubStep extends Component {
       <div className={styles.subStep} >
         <div
           style={{ backgroundColor: color, color: process === 'Prediction' && 'white' }}
-          className={legend ? styles.textWrapperLegend : styles.textWrapper}>{process === 'Model Training' ? name : process}
+          className={legend ? styles.textWrapperLegend : styles.textWrapper}>
+            {process === 'Model Training' ? name : process}
         </div>
         {legend &&
           <Popover
