@@ -768,8 +768,8 @@ export default class Project {
       // };
 
       const readyLabels = this[key] ? Object.keys(this[key]) : []
-      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
+      const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
       const command = {
