@@ -226,7 +226,6 @@ class VariableIssue extends Component {
   }
 
   editFixes = () => {
-    this.closeSummary()
     if (this.props.project.rawDataViews) {
       this.visible = true
     } else {
@@ -243,6 +242,7 @@ class VariableIssue extends Component {
         }
       )
     }
+    this.closeSummary()
   }
 
   closeFixes = () => {
@@ -403,6 +403,7 @@ class VariableIssue extends Component {
             fixedRowCount={4}
             checked={null}
             select={null}
+            style={{ border: "1px solid #ccc" }}
             data={tableData}
           />
         </div>

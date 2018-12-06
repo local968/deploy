@@ -99,8 +99,10 @@ class AdvancedModel extends Component {
   @observable preImportanceLoading = true
 
   componentDidMount() {
-    this.props.project.dataView(true).then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    this.props.project.dataView(true).then(() => {
+      this.dataViewLoading = false
+      this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    })
   }
 
   switchTab = (num) => {
@@ -121,8 +123,10 @@ class AdvancedModel extends Component {
   reloadTable = () => {
     this.dataViewLoading = true
     this.preImportanceLoading = true
-    this.props.project.dataView(true).then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    this.props.project.dataView(true).then(() => {
+      this.dataViewLoading = false
+      this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    })
   }
 
   render() {

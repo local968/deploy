@@ -202,8 +202,7 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      validationRate: 20,
-      holdoutRate: 20
+      rawDataViews: null,
     }
   }
 
@@ -219,7 +218,6 @@ export default class Project {
       nullIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
-      rawDataViews: null,
       dataViews: null,
       outlierDict: {},
       targetMap: {},
@@ -234,7 +232,7 @@ export default class Project {
 
   @computed
   get defaultTrain() {
-    const measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
+    const measurement = this.problemType === "Classification" ? "auc" : "r2"
     this.models = []
 
     return {
@@ -259,7 +257,9 @@ export default class Project {
       version: [1, 2],
       trainHeader: [],
       newVariable: [],
-      expression: {}
+      expression: {},
+      validationRate: 20,
+      holdoutRate: 20,
     }
   }
 
@@ -756,17 +756,34 @@ export default class Project {
 
   @action
   dataView = (isClean = true) => {
-    const exp = Object.values(this.expression).join(";")
+    const key = isClean ? 'dataViews' : 'rawDataViews'
+    // const featureLabel = [...this.dataHeader, ...this.newVariable].filter(v => !Object.keys(this[key]).includes(v))
+    // if(!featureLabel.length) return Promise.resolve()
     return socketStore.ready().then(api => {
+      // const command = {
+      //   projectId: this.id,
+      //   command: 'dataView',
+      //   actionType: isClean ? 'clean' : 'raw',
+      //   feature_label
+      // };
+
+      const readyLabels = this[key] ? Object.keys(this[key]) : []
+      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = [...data_label, ...new_label]
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
       const command = {
         projectId: this.id,
         command: 'dataView',
-        actionType: isClean ? 'clean' : 'raw'
+        actionType: isClean ? 'clean' : 'raw',
+        feature_label
       };
-      if (exp) command.csvScript = exp.replace(/\|/g, ",")
+      if (new_label.length) {
+        const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+        command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      }
       return api.dataView(command, progressResult => {
       }).then(returnValue => {
-        const key = isClean ? 'dataViews' : 'rawDataViews'
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ [key]: null })
@@ -871,8 +888,21 @@ export default class Project {
       targetLabel: target,
       projectId: id,
       version: '1,2',
-      command
+      command,
+      sampling: 'no',
+      speedVSaccuracy: 5,
+      ensembleSize: 20,
+      randSeed: 0,
+      measurement: problemType === "Classification" ? "auc" : "r2",
+      settingId: this.settingId,
+      holdoutRate: 0.2
     };
+
+    if (this.totalRawLines > 10000) {
+      trainData.validationRate = 0.2
+    } else {
+      trainData.nfold = 5
+    }
 
     this.modeling(trainData, Object.assign({
       train2Finished: false,
@@ -914,7 +944,9 @@ export default class Project {
       speedVSaccuracy: this.speedVSaccuracy,
       version: this.version.join(","),
       algorithms: [...this.algorithms],
-      ensembleSize: this.ensembleSize
+      ensembleSize: this.ensembleSize,
+      settingId: this.settingId,
+      measurement: this.measurement
     };
 
     if (this.dataRange === "all") {
@@ -996,17 +1028,9 @@ export default class Project {
     })).then(returnValue => {
       this.trainingId = ''
       const { status, message } = returnValue
-      // if (status === -1 && this.models.length === 0) {
-      //   return this.modelingError()
-      // }
       if (status !== 200) {
         antdMessage.error(message)
-        // return this.concurrentError(message)
       }
-      // this.updateProject({
-      //   train2Finished: true,
-      //   train2ing: false
-      // });
     })
   }
 
@@ -1032,7 +1056,6 @@ export default class Project {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
-    // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
     this.models = [...this.models.filter(m => data.id !== m.id), new Model(this.id, data)]
     if (this.problemType === 'Classification') {
       if (!data.chartData) this.chartData(data.name);
@@ -1040,62 +1063,7 @@ export default class Project {
       if (!data.residualPlot || !data.fitPlot) this.fitPlotAndResidualPlot(data.name)
       if (!data.qcut) this.pointToShow(data.name)
     }
-    // if (index === -1) {
-    //   this.models.push(new Model(this.id, data))
-    // } else {
-    //   this.models[index] = new Model(this.id, data)
-    // }
   }
-
-  // modelingError = () => {
-  //   this.updateProject({
-  //     train2Finished: true,
-  //     train2ing: false,
-  //     train2Error: true,
-  //     selectId: '',
-  //   });
-  // }
-
-  // concurrentError = message => {
-  //   antdMessage.error(message)
-  //   this.updateProject({
-  //     train2Finished: false,
-  //     train2ing: false,
-  //     train2Error: false,
-  //     selectId: '',
-  //     mainStep: 3,
-  //     curStep: 3,
-  //     lastSubStep: 1,
-  //     subStepActive: 1
-  //   });
-  // }
-
-  // calcPredicted = model => {
-  //   const { targetMap, targetColMap } = this;
-  //   const targetCol = targetColMap
-  //   const map = Object.assign({}, targetCol, targetMap);
-  //   let actual = [[0, 0], [0, 0]]
-  //   Object.keys(model.targetMap).forEach(k => {
-  //     //映射的index
-  //     const actualIndex = map[k];
-  //     if (actualIndex !== 0 && actualIndex !== 1) {
-  //       return;
-  //     }
-  //     //返回数组的index
-  //     const confusionMatrixIndex = model.targetMap[k];
-  //     //遍历当前那一列数组
-  //     model.confusionMatrix[confusionMatrixIndex] && model.confusionMatrix[confusionMatrixIndex].forEach((item, i) => {
-  //       const key = Object.keys(model.targetMap).find(t => model.targetMap[t] === i);
-  //       const pridict = map[key];
-  //       if (pridict !== 0 && pridict !== 1) {
-  //         return;
-  //       }
-  //       actual[actualIndex][pridict] += item;
-  //     })
-  //   })
-  //   const predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
-  //   return predicted
-  // }
 
   setSelectModel = id => {
     this.updateProject({ selectId: id })
@@ -1118,7 +1086,7 @@ export default class Project {
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
       const feature_label = [...data_label, ...new_label]
-      if (!feature_label.length || feature_label.length === 0) return
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
       const command = {
         projectId: this.id,
         command: 'preTrainImportance',
