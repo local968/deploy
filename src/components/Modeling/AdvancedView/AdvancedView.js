@@ -290,7 +290,9 @@ class AdvancedModelTable extends Component {
   }
 
   render() {
-    const { models, project: { problemType, selectModel }, sortState, changeSort, metric } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sortState, changeSort, metric } = this.props;
+    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray
+    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',]
@@ -307,7 +309,7 @@ class AdvancedModelTable extends Component {
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
         return (
-          <ClassificationModelRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+          <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
         )
       } else {
         return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
@@ -477,7 +479,7 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked } = this.props;
+    const { model, texts, metric, checked, yes, no } = this.props;
     if (!model.chartData) return null;
     const { name, fitIndex, chartData: { roc }, score } = model;
     const { detail } = this.state;
@@ -515,7 +517,7 @@ class ClassificationModelRow extends Component {
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} />}
+        {detail && <DetailCurves model={model} yes={yes} no={no}/>}
       </div>
     )
   }
@@ -532,7 +534,7 @@ class DetailCurves extends Component {
     this.props.model.resetFitIndex();
   }
   render() {
-    const { model, model: { id } } = this.props;
+    const { model, model: { id }, yes, no } = this.props;
     const { curve } = this.state;
     let curComponent;
     switch (this.state.curve) {
@@ -586,7 +588,7 @@ class DetailCurves extends Component {
           <div className={styles.thumbnails} >
             {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
-          <PredictTable model={model} />
+          <PredictTable model={model} yes={yes} no={no} />
         </div>
         <div className={styles.rightPanel} >
           <button onClick={this.reset} className={styles.button} >Reset</button>
@@ -668,7 +670,7 @@ class RowCell extends Component {
 @observer
 class PredictTable extends Component {
   render() {
-    const { model } = this.props;
+    const { model, yes, no } = this.props;
     const { fitIndex, chartData } = model;
     let TN = chartData.roc.TN[fitIndex];
     let FP = chartData.roc.FP[fitIndex];
@@ -679,10 +681,10 @@ class PredictTable extends Component {
       dataIndex: 'rowName',
       className: styles.actual
     }, {
-      title: 'Predict: Yes',
+      title: `Predict: ${yes}`,
       dataIndex: 'col1'
     }, {
-      title: 'Predict: No',
+      title: `Predict: ${no}`,
       dataIndex: 'col2',
     }, {
       title: '',
@@ -692,12 +694,12 @@ class PredictTable extends Component {
     // set default value
 
     const data = [{
-      rowName: 'Actual: Yes',
+      rowName: `Actual: ${yes}`,
       col2: `${Math.round(FN)}(FN)`,
       col1: `${Math.round(TP)}(TP)`,
       sum: Number(FN) + +TP
     }, {
-      rowName: 'Actual: No',
+      rowName: `Actual: ${no}`,
       col2: `${Math.round(TN)}(TN)`,
       col1: `${Math.round(FP)}(FP)`,
       sum: +TN + +FP,

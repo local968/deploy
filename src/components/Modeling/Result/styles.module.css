@@ -226,12 +226,19 @@
 
 .progressTitle {
     margin-right: 0.1em;
+    display: flex;
+    flex: none;
+    width: .5em;
 }
 
 .progressTitle span {
     font-size: 1.25rem;
     font-family: SanFranciscoText;
     color: #000;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
 }
 
 .progressMeans {
@@ -239,10 +246,29 @@
     margin-top: 0.2em;
 }
 
-.progressMeans span {
+.progressMean {
+    display: flex;
+    flex: auto;
+    align-items: center;
+    width: 0;
+    justify-content: flex-start;
+}
+
+.progressMeanText {
+    max-width: 65%;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.progressMeanText span {
     font-size: 0.875rem;
     color: #000;
     white-space: nowrap;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
 }
 
 .progressBlock {
@@ -742,6 +768,10 @@
     font-size: 0.875rem;
     line-height: 1.29;
     color: #000000;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .costCellSmall {
