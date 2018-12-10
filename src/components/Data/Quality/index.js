@@ -145,9 +145,9 @@ class TargetIssue extends Component {
             <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
             <div className={classnames(styles.cell, styles.select)}><span>{colType[target]}</span></div>
             <div className={classnames(styles.cell, styles.error)}>
-              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch.toFixed(2)}%</span></div>}
-              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing.toFixed(2)}%</span></div>}
-              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier.toFixed(2)}%</span></div>}
+              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch<0.01?"<0.01":targetPercent.mismatch.toFixed(2)}%</span></div>}
+              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing<0.01?"<0.01":targetPercent.missing.toFixed(2)}%</span></div>}
+              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier<0.01?"<0.01":targetPercent.outlier.toFixed(2)}%</span></div>}
             </div>
             <div className={styles.tableBody}>
               {sortData.map((v, k) => <div key={k} className={classnames(styles.cell, {
@@ -320,13 +320,13 @@ class VariableIssue extends Component {
         cn: styles.cell
       }
       if (variableIssues.mismatchRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header]?'<0.01%':variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
       }
       if (variableIssues.nullRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header]?'<0.01%':variableIssues.nullRow[header].toFixed(2)}%</span></div>)
       }
       if (variableIssues.outlierRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header]?'<0.01%':variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
       }
       issueArr.push(issueData)
     }

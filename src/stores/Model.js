@@ -104,7 +104,7 @@ export default class Model {
     const roc = data.roc || {}
     const { TP, FN, FP, TN } = roc
     if (!TP || !FN || !FP || !TN) return this.score.validateScore.acc
-    return (TP[this.fitIndex] + TP[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
+    return (TP[this.fitIndex] + TN[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
   }
   @computed
   get holdoutAcc() {
@@ -112,7 +112,7 @@ export default class Model {
     const roc = data.rocHoldout || {}
     const { TP, FN, FP, TN } = roc
     if (!TP || !FN || !FP || !TN) return this.score.holdoutScore.acc
-    return (TP[this.fitIndex] + TP[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
+    return (TP[this.fitIndex] + TN[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
   }
   modelProcessFlow(dataFlow) {
     const rawPara = dataFlow || this.dataFlow;
