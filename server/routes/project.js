@@ -442,7 +442,8 @@ wss.register('etl', (message, socket, progress) => {
           result,
           message: returnValue.message
         }
-        result.rawHeader = Object.keys(result.colType)
+        result.rawHeader = result.fields
+        delete result.fields
         result.firstEtl = false;
         delete result.name
         delete result.id
