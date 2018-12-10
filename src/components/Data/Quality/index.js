@@ -414,10 +414,10 @@ class VariableIssue extends Component {
         </div>
         <div className={styles.variableBottom}>
           <ContinueButton onClick={this.showSummary} text='continue' width="15%" />
-          <div className={styles.checkBox}>
+          {/* <div className={styles.checkBox}>
             <input type='checkbox' onChange={this.handleCheck} defaultChecked={false} id="ignoreIssue" />
             <label htmlFor='ignoreIssue'>Ignore these issues{' '}<span>(R2.Learn will not fix the issues automatically)</span></label>
-          </div>
+          </div> */}
         </div>
       </div>
       {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }} />}
@@ -550,7 +550,7 @@ class Summary extends Component {
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
-              <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div>
+              {/* <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div> */}
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock}>
@@ -579,7 +579,7 @@ class Summary extends Component {
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
-              <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div>
+              {/* <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div> */}
             </div>
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]
