@@ -209,7 +209,7 @@ export class DataIssue extends Component {
           <div className={styles.progressBox}>
             {!!targetIssues.nullRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {percent.missing.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {percent.missing < 0.01 ? '<0.01' : percent.missing.toFixed(2)}%</span></div>
                 <div className={classnames(styles.progress, styles.missing)} style={{ width: percent.missing < 1 ? 1 : percent.missing + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -218,7 +218,7 @@ export class DataIssue extends Component {
             </div>}
             {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {percent.mismatch.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {percent.mismatch < 0.01 ? '<0.01' : percent.mismatch.toFixed(2)}%</span></div>
                 <div className={classnames(styles.progress, styles.mismatch)} style={{ width: percent.mismatch < 1 ? 1 : percent.mismatch + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -227,7 +227,7 @@ export class DataIssue extends Component {
             </div>}
             {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {percent.outlier.toFixed(4)}%</span></div>
+                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {percent.outlier < 0.01 ? '<0.01' : percent.outlier.toFixed(2)}%</span></div>
                 <div className={classnames(styles.progress, styles.outlier)} style={{ width: percent.outlier < 1 ? 1 : percent.outlier + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -525,7 +525,8 @@ export class FixIssue extends Component {
                 return null;
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
-              const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
+              const percnet = num / (totalRawLines || 1) * 100
+              const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(1)) + '%)'
               const mode = showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode)
               const mean = showType === 'Numerical' ? rawDataViews[k].mean : 'N/A'
               const median = showType === 'Numerical' ? rawDataViews[k].median : 'N/A'
@@ -583,7 +584,8 @@ export class FixIssue extends Component {
                 return null;
               }
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
-              const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
+              const percnet = num / (totalRawLines || 1) * 100
+              const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
               const mode = showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode)
               const mean = showType === 'Numerical' ? rawDataViews[k].mean : 'N/A'
               const median = showType === 'Numerical' ? rawDataViews[k].median : 'N/A'
@@ -645,7 +647,8 @@ export class FixIssue extends Component {
               const isShow = showType === 'Numerical';
               if (!isShow) return null
               const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
-              const rowText = num + ' (' + (num / (totalRawLines || 1) * 100).toFixed(4) + '%)'
+              const percnet = num / (totalRawLines || 1) * 100
+              const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
               // const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
               // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
