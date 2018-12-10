@@ -186,7 +186,7 @@ class TargetIssue extends Component {
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
-        {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }}/>}
+        {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }} />}
         <Modal content={<FixIssue project={project}
           issueRows={targetIssues}
           closeFixes={this.closeFixes}
@@ -634,7 +634,9 @@ class Summary extends Component {
           </div>
         </div>
         <div className={styles.summaryBottom}>
-          <div className={classnames(styles.summaryButton, styles.summaryConfirm)} onClick={this.startTrain}><span>Continue</span></div>
+          <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
+            [styles.disabled]: totalLines === 0
+          })} onClick={totalLines === 0 ? null : this.startTrain}><span>Continue</span></div>
           <div className={classnames(styles.summaryButton, {
             [styles.disabled]: !issues.dataIssue
           })} onClick={issues.dataIssue ? editFixes : null}><span>Edit the Fixes</span></div>
