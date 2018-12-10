@@ -98,12 +98,27 @@ export default class Model {
     }
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
-
+  @computed
+  get validationAcc() {
+    const data = this.chartData || {}
+    const roc = data.roc || {}
+    const { TP, FN, FP, TN } = roc
+    if (!TP || !FN || !FP || !TN) return this.score.validateScore.acc
+    return (TP[this.fitIndex] + TP[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
+  }
+  @computed
+  get holdoutAcc() {
+    const data = this.chartData || {}
+    const roc = data.rocHoldout || {}
+    const { TP, FN, FP, TN } = roc
+    if (!TP || !FN || !FP || !TN) return this.score.holdoutScore.acc
+    return (TP[this.fitIndex] + TP[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
+  }
   modelProcessFlow(dataFlow) {
     const rawPara = dataFlow || this.dataFlow;
     const para = {};
     const preprocessor = rawPara['preprocessor:__choice__'];
-    if (!preprocessor) return {flow: null, flowPara: null};
+    if (!preprocessor) return { flow: null, flowPara: null };
 
     let algorithm;
     // const classifier = rawPara['classifier:__choice__'];

@@ -512,15 +512,15 @@ class ClassificationModelRow extends Component {
               case 'Cutoff Threshold':
                 return <RowCell key={5} data={roc.Threshold[fitIndex]} />;
               case 'Validation':
-                return <RowCell key={6} data={score.validateScore[metric]} />;
+                return <RowCell key={6} data={metric === 'acc' ? model.validationAcc : score.validateScore[metric]} />;
               case 'Holdout':
-                return <RowCell key={7} data={score.holdoutScore[metric]} />;
+                return <RowCell key={7} data={metric === 'acc' ? model.holdoutAcc : score.holdoutScore[metric]} />;
               default:
                 return null
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} yes={yes} no={no}/>}
+        {detail && <DetailCurves model={model} yes={yes} no={no} />}
       </div>
     )
   }
@@ -559,7 +559,7 @@ class DetailCurves extends Component {
         hasReset = false;
         break;
       case 'Model Process Flow':
-        curComponent = <div style={{maxWidth: document.body.clientWidth / 2}} >
+        curComponent = <div style={{ maxWidth: document.body.clientWidth / 2 }} >
           <ModelProcess model={model} className={`modelprocess${id}`} />
         </div>
         hasReset = false;
