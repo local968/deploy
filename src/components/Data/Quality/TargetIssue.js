@@ -172,14 +172,14 @@ export class RegressionTarget extends Component {
 @observer
 export class RowIssue extends Component {
   render() {
-    const { backToConnect, totalRawLines } = this.props;
+    const { backToConnect, totalLines } = this.props;
     return <div className={styles.block}>
       <div className={styles.name}><span>Data Size is too small</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
-            <div className={styles.progressText}><span>All Data ({totalRawLines} rows)</span><span>1000 rows (minimum)</span></div>
-            <div className={styles.progress} style={{ width: totalRawLines / 10 + "%" }}></div>
+            <div className={styles.progressText}><span>All Data ({totalLines} rows)</span><span>1000 rows (minimum)</span></div>
+            <div className={styles.progress} style={{ width: totalLines / 10 + "%" }}></div>
           </div>
         </div>
         <div className={styles.methods}>

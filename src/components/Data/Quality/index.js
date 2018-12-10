@@ -175,7 +175,7 @@ class TargetIssue extends Component {
               unique={10}
               recomm={recomm} />}
           {issues.rowIssue && <RowIssue backToConnect={this.backToConnect}
-            totalRawLines={totalRawLines} />}
+            totalLines={totalLines} />}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
             targetIssues={{
