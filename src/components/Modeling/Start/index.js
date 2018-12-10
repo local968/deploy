@@ -95,12 +95,13 @@ export default class StartTrain extends Component {
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
-  @observable dataViewLoading = true
-  @observable preImportanceLoading = true
+  @observable isLoading = true
+  @observable progress = 0
 
   componentDidMount() {
-    this.props.project.dataView(true).then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => this.isLoading = false)
+    })
   }
 
   switchTab = (num) => {
@@ -119,10 +120,11 @@ class AdvancedModel extends Component {
   }
 
   reloadTable = () => {
-    this.dataViewLoading = true
-    this.preImportanceLoading = true
-    this.props.project.dataView(true).then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    this.isLoading = true
+    this.progress = 0
+    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => this.isLoading = false)
+    })
   }
 
   render() {
@@ -139,7 +141,7 @@ class AdvancedModel extends Component {
         </div>
         <div className={styles.viewBox}>
           {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable} /> : <AdvancedView project={project} />}
-          {(this.tab === 1 && (this.dataViewLoading || this.preImportanceLoading)) && <ProcessLoading style={{bottom: '0.25em'}}/>}
+          {(this.tab === 1 && this.isLoading) && <ProcessLoading progress={this.progress} style={{bottom: '0.25em'}}/>}
           {/* {((this.tab === 1 && this.preImportanceLoading) || this.dataViewLoading) && <div className={styles.simplifiedLoad}>
             <Spin size="large" />
           </div>} */}

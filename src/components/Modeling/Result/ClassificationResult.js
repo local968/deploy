@@ -20,8 +20,13 @@ export default class ClassificationView extends Component {
     this.showCost = criteria === 'cost'
     const data = { criteria }
     if (!this.showCost) {
+      const { models } = this.props
       this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
       data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+      models.forEach(m => {
+        if (!m.initialFitIndex) return
+        m.updateModel({ fitIndex: m.initialFitIndex })
+      })
     }
     this.props.project.updateProject(data)
   }
@@ -52,20 +57,19 @@ export default class ClassificationView extends Component {
   handleSubmit = () => {
     const { models, project } = this.props
     const { TP, FN, FP, TN } = this.costOption
-    if (!!TP || !!FN || !!FP || !!TN) {
-      models.forEach(m => {
-        const benefit = m.getBenefit(TP, FN, FP, TN)
-        if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
-      })
-    }
+    models.forEach(m => {
+      const benefit = m.getBenefit(TP, FN, FP, TN)
+      if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
+    })
     project.updateProject({ costOption: { ...this.costOption } })
-    // this.props.project.costOption = this.costOption
   }
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN } } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArray, renameVariable } = project;
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
+    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray
+    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -86,7 +90,7 @@ export default class ClassificationView extends Component {
             <span>Target :<a>&nbsp;{project.target}</a></span>
           </div>
         </div>
-        <Performance current={current} />
+        <Performance current={current} yes={yes} no={no} />
       </div>
       <div className={styles.line} />
       <div className={styles.selectBlock}>
@@ -114,20 +118,20 @@ export default class ClassificationView extends Component {
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
                   <div className={styles.sepCell}>
-                    <div className={styles.sepText} style={{marginLeft: 'auto'}}><span title='Predicted'>Predicted</span></div>
+                    <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title='Predicted'>Predicted</span></div>
                     <div className={styles.sep}><span></span></div>
-                    <div className={styles.sepText} style={{marginRight: 'auto'}}><span title='Actual'>Actual</span></div>
+                    <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title='Actual'>Actual</span></div>
                   </div>
-                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span>YES</span></div>
-                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span>NO</span></div>
+                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
+                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
                 </div>
                 <div className={styles.costRow}>
-                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span>YES</span></div>
+                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span title={yes}>{yes}</span></div>
                   <div className={styles.costCell}>{this.costInput(1, 1)}</div>
                   <div className={styles.costCell}>{this.costInput(1, 0)}</div>
                 </div>
                 <div className={styles.costRow}>
-                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span>NO</span></div>
+                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span title={no}>{no}</span></div>
                   <div className={styles.costCell}>{this.costInput(0, 1)}</div>
                   <div className={styles.costCell}>{this.costInput(0, 0)}</div>
                 </div>
@@ -158,14 +162,14 @@ export default class ClassificationView extends Component {
 @observer
 class Predicted extends Component {
   render() {
-    const { model } = this.props;
+    const { model, yes, no } = this.props;
     return (
       <div className={styles.progressBox}>
         <div className={styles.progressBlock}>
           <PredictedProgress
             predicted={model.predicted[0]}
             width={3.5}
-            label={0}
+            label={no}
             type={'success'}
           />
         </div>
@@ -173,22 +177,22 @@ class Predicted extends Component {
           <PredictedProgress
             predicted={model.predicted[1]}
             width={3.5}
-            label={1}
+            label={yes}
             type={'predicted'}
           />
         </div>
         <div className={styles.progressMeans}>
-          <div className={styles.progressBlock}>
+          <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.success)} />
-            <div><span>Actual: 0<br />Predicted: 0</span></div>
+            <div className={styles.progressMeanText} title={`Actual: ${no} Predicted: ${no}`}><span>Actual: {no}</span><span>Predicted: {no}</span></div>
           </div>
-          <div className={styles.progressBlock}>
+          <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.predicted)} />
-            <div><span>Actual: 1<br />Predicted: 1</span></div>
+            <div className={styles.progressMeanText} title={`Actual: ${yes} Predicted: ${yes}`}><span>Actual: {yes}</span><span>Predicted: {yes}</span></div>
           </div>
-          <div className={styles.progressBlock}>
+          <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.different)} />
-            <div><span>Actual: &<br />Predicted<br />Different</span></div>
+            <div className={styles.progressMeanText} title={`Actual & Predicted Different`}><span>Actual &</span><span>Predicted</span><span>Different</span></div>
           </div>
         </div>
       </div>
@@ -204,7 +208,7 @@ class PredictedProgress extends Component {
       ''
     ) : (
         <div className={styles.progressTitle}>
-          <span>{label}</span>
+          <span title={label}>{label}</span>
         </div>
       );
     const predictedPercent = Math.round(predicted * 100);
@@ -245,7 +249,7 @@ class PredictedProgress extends Component {
 @observer
 class Performance extends Component {
   render() {
-    const { current } = this.props;
+    const { current, yes, no } = this.props;
     return <div className={styles.performanceBox}>
       <div className={styles.performance}>
         <Progress
@@ -258,7 +262,7 @@ class Performance extends Component {
           <span>Performance (AUC)</span>
         </div>
       </div>
-      <Predicted model={current} />
+      <Predicted model={current} yes={yes} no={no} />
     </div>
   }
 }

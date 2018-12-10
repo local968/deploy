@@ -13,7 +13,7 @@ function setDefaultData(id, userId) {
     histgramPlots: {},
     preImportance: null,
     dataViews: null,
-    rawDataViews: null
+    informativesLabel: []
   }
   return createOrUpdate(id, userId, data)
 }
@@ -450,7 +450,7 @@ wss.register('etl', (message, socket, progress) => {
         delete result.userId
         if (!files) delete result.totalRawLines
         // 最终ETL 小于1W行  使用cross
-        if (result.totalLines > 0 && result.totalLines < 10000) result.runWith = 'cross'
+        if (result.totalLines < 10000) result.runWith = 'cross'
 
         const steps = {}
         if (firstEtl) {
@@ -481,11 +481,13 @@ wss.register('etl', (message, socket, progress) => {
   })
 })
 
-wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
+wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
   const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
   const { status, result } = returnValue
   if (status === 100) {
-    createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
+    const {result: updateResult} = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
+    if(updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
+    // createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
   }
   return returnValue
 }))
