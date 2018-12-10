@@ -89,7 +89,7 @@ export class ClassificationTarget extends Component {
           {isGood && <div className={styles.cleanTargetBlock}>
             {!this.rename ? <div className={styles.cleanTargetRename}>
               <div className={styles.cleanTargetButton}>
-                <button onClick={this.showRename}><span>Rename target variables</span></button>
+                <button onClick={this.showRename}><span>Change Target Variable Value</span></button>
               </div>
               <span>(optional)</span>
             </div> : <div className={styles.cleanTargetRename}>
@@ -365,7 +365,8 @@ export class SelectTarget extends Component {
             </div>
           })}
         </div>
-        <div className={styles.fixesTips}><span>You can rename the selected values by double click the value’s name.</span></div>
+        <div className={styles.fixesTips}><span></span></div>
+        {/* <div className={styles.fixesTips}><span>You can rename the selected values by double click the value’s name.</span></div> */}
       </div>}
       {this.step === 2 && <div className={styles.fixesBox}>
         <div className={styles.fixesText}><span>Select all values that match as {v0} or {v1} </span></div>
