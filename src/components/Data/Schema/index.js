@@ -144,7 +144,7 @@ export default class DataSchema extends Component {
         headerData.content = <span>row/header</span>;
         headerData.title = '';
       } else {
-        headerData.content = <Popover trigger='click' content={<span>{header}</span>}><span style={{cursor: 'pointer'}}>{header}</span></Popover>;
+        headerData.content = <span>{header}</span>
         headerData.title = header;
         if (target && target === header) {
           headerData.cn = classnames(headerData.cn, styles.target);
