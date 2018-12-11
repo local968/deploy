@@ -80,7 +80,7 @@ export default class DataConnect extends Component {
   @computed
   get message() {
     if (this.isPause) return 'Paused'
-    const process = this.props.project.etling ? 90 : this.process
+    const process = this.props.projectStore.project.etling ? 90 : this.process
     if (!this.isSql && process === 0) return 'Preparing for upload...'
     if (!this.isSql && process > 0 && process < 90) return 'Uploading data...'
     if (process >= 90) return 'Extract-Transform-Load in progress...'
@@ -130,7 +130,7 @@ export default class DataConnect extends Component {
   })
 
   selectSample = filename => {
-    const process = this.props.project.etling ? 90 : this.process
+    const process = this.props.projectStore.project.etling ? 90 : this.process
     if (!!process) return false;
 
     this.uploading = true
@@ -171,7 +171,7 @@ export default class DataConnect extends Component {
 
   handleDrop = action((e) => {
     e.preventDefault();
-    const process = this.props.project.etling ? 90 : this.process
+    const process = this.props.projectStore.project.etling ? 90 : this.process
     if (process) return false;
     let file = e.dataTransfer.files[0];
     this.file = file
@@ -194,6 +194,8 @@ export default class DataConnect extends Component {
   }
 
   closeUpload = () => {
+    const process = this.props.projectStore.project.etling ? 90 : this.process
+    if (process >= 90) this.props.projectStore.project.abortEtl()
     this.pause && this.pause()
     this.uploading = false
     this.process = 0
@@ -266,7 +268,7 @@ export default class DataConnect extends Component {
             <div className={styles.progressBlock}>
               <div className={styles.progressTitle}>
                 <span>Data Import</span>
-                {process < 90 && <div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
+                {<div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
               </div>
               <div className={styles.progressContent}>
                 <div className={styles.progressLoad}>

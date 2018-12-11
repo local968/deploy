@@ -144,12 +144,12 @@ const api = {
     await redis.incrby(restrictQuery, -lineCount)
   },
   getCutOff: async (projectId, modelName) => {
-    redis.smembers(`project:${projectId}:models`).then(ids => {
+    return redis.smembers(`project:${projectId}:models`).then(ids => {
       const pipeline = redis.pipeline();
       ids.forEach(mid => {
         pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex')
       })
-      pipeline.exec().then(list => {
+      return pipeline.exec().then(list => {
         const models = list.map(row => {
           let [name, fitIndex] = row[1] || []
           try {

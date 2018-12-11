@@ -131,20 +131,6 @@ export default class Project {
   constructor(id, args) {
     this.id = id
     this.setProperty(args)
-
-    autorun(async () => {
-      if (!this.uploadFileName || this.uploadFileName.length === 0) return
-      const api = await socketStore.ready()
-      const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-      this.fileNames = fileNames
-      return
-    })
-    autorun(() => {
-      if (!this.originPath) return this.uploadData = []
-      this.readData(this.originPath).then(data => {
-        this.uploadData = data.filter(r => r.length === this.rawHeader.length)
-      })
-    })
     // autorun(() => {
     //   if (!this.cleanPath) return this.cleanData = []
     //   this.readData(this.cleanPath).then(data => {
@@ -356,18 +342,31 @@ export default class Project {
   }
 
   @action
-  queryProject = () => {
-    this.loading = true;
-    return socketStore.ready().then(api => {
-      return api.queryProject({ id: this.id }).then(result => {
-        this.loading = false;
-        if (result.status === 200) {
-          this.setProperty(result.data)
-          return
-        }
-        alert(result.message)
+  initProject = () => {
+    autorun(async () => {
+      if (!this.uploadFileName || this.uploadFileName.length === 0) return
+      const api = await socketStore.ready()
+      const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
+      this.fileNames = fileNames
+      return
+    })
+    autorun(() => {
+      if (!this.originPath) return this.uploadData = []
+      this.readData(this.originPath).then(data => {
+        this.uploadData = data.filter(r => r.length === this.rawHeader.length)
       })
     })
+    // this.loading = true;
+    // return socketStore.ready().then(api => {
+    //   return api.queryProject({ id: this.id }).then(result => {
+    //     this.loading = false;
+    //     if (result.status === 200) {
+    //       this.setProperty(result.data)
+    //       return
+    //     }
+    //     alert(result.message)
+    //   })
+    // })
   }
 
   @action
@@ -596,7 +595,7 @@ export default class Project {
     if (!result) return { chart: null, fitIndex: null };
     let fitIndex;
     let initialFitIndex;
-    const charts = ['density', 'lift', 'roc'];
+    const charts = ['density', 'lift', 'roc', 'rocHoldout'];
     charts.forEach(chart => {
       result[chart] = this.parseJson(result[chart])
     });
