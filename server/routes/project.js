@@ -12,7 +12,8 @@ function setDefaultData(id, userId) {
     univariatePlots: {},
     histgramPlots: {},
     preImportance: null,
-    dataViews: null
+    dataViews: null,
+    informativesLabel: []
   }
   return createOrUpdate(id, userId, data)
 }
@@ -32,24 +33,48 @@ function query(key, params) {
       if (data.length === 0) return result
 
       const promiseArray = data.map(r => {
-        return redis.hmget("project:" + r, Field)
+        return redis.hgetall("project:" + r)
+        // return redis.hmget("project:" + r, Field)
       })
       return Promise.all(promiseArray).then(array => {
         return Promise.all(array.map(item => {
-          const obj = {}
-          item.forEach((v, k) => {
+          Object.keys(item).forEach(key => {
             try {
-              v = JSON.parse(v)
+              item[key] = JSON.parse(item[key])
             } catch (e) { }
-            obj[Field[k]] = v
           })
-          if (obj.uploadFileName) {
-            return getFileInfo(obj.uploadFileName).then(files => {
-              obj.fileNames = files.fileNames
-              return obj
+          if (item.uploadFileName) {
+            return getFileInfo(item.uploadFileName).then(files => {
+              item.fileNames = files.fileNames
+              return item
             })
           }
-          return Promise.resolve(obj)
+          return Promise.resolve(item)
+          // for (let key in item) {
+          //   try {
+          //     result[key] = JSON.parse(result[key])
+          //   } catch (e) { }
+          //   if (result.uploadFileName) {
+          //     return getFileInfo(obj.uploadFileName).then(files => {
+          //       obj.fileNames = files.fileNames
+          //       return obj
+          //     })
+          //   }
+          // }
+          // const obj = {}
+          // item.forEach((v, k) => {
+          //   try {
+          //     v = JSON.parse(v)
+          //   } catch (e) { }
+          //   obj[Field[k]] = v
+          // })
+          // if (obj.uploadFileName) {
+          //   return getFileInfo(obj.uploadFileName).then(files => {
+          //     obj.fileNames = files.fileNames
+          //     return obj
+          //   })
+          // }
+          // return Promise.resolve(obj)
         })).then(list => {
           result.list = list
           return result
@@ -80,10 +105,12 @@ function addSettingModel(userId, projectId) {
   return function (result) {
     const modelName = result.model.name
     redis.hmget(`project:${projectId}`, 'settingId', 'settings').then(([settingId, settings]) => {
-      settingId = JSON.parse(settingId)
-      settings = JSON.parse(settings)
-      settings.find(s => s.id === settingId).models.push(modelName)
-      createOrUpdate(projectId, userId, { settings })
+      if (settingId && settings) {
+        settingId = JSON.parse(settingId)
+        settings = JSON.parse(settings)
+        settings.find(s => s.id === settingId).models.push(modelName)
+        createOrUpdate(projectId, userId, { settings })
+      }
     }, console.error)
     return result
   }
@@ -250,10 +277,10 @@ function updateProjectField(id, userId, field, data) {
     try {
       result = JSON.parse(result)
     } catch (e) { }
-    if (Array.isArray(result)) {
-      data = [...result, ...data]
-    } else if (typeof result === 'object') {
-      data = Object.assign({}, result, data)
+    if (Array.isArray(data) || Array.isArray(result)) {
+      data = [...(result || []), ...(data || [])]
+    } else if (typeof data === 'object' || typeof result === 'object') {
+      data = Object.assign({}, (result || {}), (data || {}))
     }
     return redis.hset(key, field, JSON.stringify(data)).then(() => {
       const returnValue = {
@@ -416,23 +443,13 @@ wss.register('etl', (message, socket, progress) => {
             result,
             message: returnValue.message
           }
-          Object.keys(result).forEach(k => {
-            if (k === "name") {
-              delete result[k];
-            }
-            if (k.includes("FillMethod")) {
-              Object.keys(result[k]).forEach(key => {
-                if (result[k][key] === "ignore") delete result[k][key]
-              })
-            }
-          })
-          result.dataViews = null;
           result.firstEtl = false;
-          result.etling = false;
-          result.etlProgress = 0;
+          delete result.name
+          delete result.id
+          delete result.userId
           if (!files) delete result.totalRawLines
           // 最终ETL 小于1W行  使用cross
-          if (result.totalLines > 0 && result.totalLines < 10000) result.runWith = 'cross'
+          if (result.totalLines < 10000) result.runWith = 'cross'
 
           const steps = {}
           if (firstEtl) {
@@ -445,8 +462,15 @@ wss.register('etl', (message, socket, progress) => {
               steps.subStepActive = 1
               steps.lastSubStep = 1
             } else {
-              steps.subStepActive = 3
-              steps.lastSubStep = 3
+              if (noCompute) {
+                steps.curStep = 3
+                steps.mainStep = 3
+                steps.subStepActive = 1
+                steps.lastSubStep = 1
+              } else {
+                steps.subStepActive = 3
+                steps.lastSubStep = 3
+              }
             }
           }
 
@@ -475,10 +499,13 @@ wss.register('abortEtl', (message, socket) => {
   })
 })
 
-wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(returnValue => {
+wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
+  const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
   const { status, result } = returnValue
   if (status === 100) {
-    createOrUpdate(message.projectId, socket.session.userId, { dataViews: result.data })
+    const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
+    if (updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
+    // createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
   }
   return returnValue
 }))
@@ -577,7 +604,7 @@ wss.register('train', (message, socket, progress) => {
   const data = { ...message, userId, requestId: message._id }
   let hasModel = false
   return checkTraningRestriction(socket.session.user)
-    .then(() => moveModels(message.projectId))
+    // .then(() => moveModels(message.projectId))
     .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
       const { status, result } = queueValue

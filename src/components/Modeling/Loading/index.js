@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { Progress } from 'antd';
 
+@inject('projectStore')
 @observer
 export default class Loading extends Component {
   render() {
-    const { abortTrain, trainModel } = this.props.project
+    const { abortTrain, trainModel } = this.props.projectStore.project
     return (
       <div className={styles.loading}>
         <div className={styles.training}>
           <Progress
             className={styles.trainingProgress}
-            percent={trainModel ? (trainModel.value || 0).toFixed(2) : 0}
+            percent={trainModel ? (trainModel.value || 0) : 0}
+            format={percent => percent.toFixed(2) + "%"}
             status="active"
           />
         </div>

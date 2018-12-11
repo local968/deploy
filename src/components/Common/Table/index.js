@@ -17,7 +17,7 @@ export default class Table extends Component {
       <div
         className={cell.cn}
         key={key}
-        style={style}
+        style={{ ...style, ...cell.style }}
         title={cell.title}
       >
         {cell.content}
@@ -30,7 +30,7 @@ export default class Table extends Component {
   }
 
   render() {
-    const { columnCount, columnWidth, rowHeight, fixedColumnCount, fixedRowCount, rowCount, data } = this.props;
+    const { columnCount, columnWidth, rowHeight, fixedColumnCount, fixedRowCount, rowCount, data, style } = this.props;
     return !!data.length ? <AutoSizer>
       {({ height, width }) => {
         return <MultiGrid
@@ -43,7 +43,7 @@ export default class Table extends Component {
           cellRenderer={this.cellRenderer}
           fixedRowCount={fixedRowCount}
           fixedColumnCount={fixedColumnCount}
-          style={{ border: "1px solid #ccc" }}
+          style={style}
           ref={this.MultiGridCb}
         />
       }}

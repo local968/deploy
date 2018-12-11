@@ -65,7 +65,7 @@ const files = {
   ]
 };
 
-@inject('userStore', 'socketStore')
+@inject('userStore', 'socketStore', 'projectStore')
 @observer
 export default class DataConnect extends Component {
   @observable sample = false
@@ -81,7 +81,7 @@ export default class DataConnect extends Component {
   get message() {
     if (this.isPause) return 'Paused'
     const process = this.props.project.etling ? 90 : this.process
-    if (!this.isSql && process === 0) return 'Perparing for upload...'
+    if (!this.isSql && process === 0) return 'Preparing for upload...'
     if (!this.isSql && process > 0 && process < 90) return 'Uploading data...'
     if (process >= 90) return 'Extract-Transform-Load in progress...'
     if (this.isSql && process === 0) return 'Perparing for database connection...'
@@ -98,7 +98,7 @@ export default class DataConnect extends Component {
     this.process = 90
     this.file = null
 
-    this.props.project.fastTrackInit(data.fileId);
+    this.props.projectStore.project.fastTrackInit(data.fileId);
   })
 
   onError = action((error, times) => {
@@ -118,7 +118,7 @@ export default class DataConnect extends Component {
   })
 
   doEtl = () => {
-    this.props.project.etl();
+    this.props.projectStore.project.etl();
   };
 
   showSample = action(() => {
@@ -139,7 +139,7 @@ export default class DataConnect extends Component {
       action(data => {
         const { fileId } = data.data
         this.process = 90
-        this.props.project.fastTrackInit(fileId);
+        this.props.projectStore.project.fastTrackInit(fileId);
       }),
       () => {
         message.error('sample file error, please choose again');
@@ -201,14 +201,14 @@ export default class DataConnect extends Component {
   }
 
   render() {
-    const { project, userStore, socketStore } = this.props;
+    const { projectStore: { project }, userStore, socketStore } = this.props;
     const { etlProgress, etling } = project
     const process = etling ? 90 : this.process
     window.cn = this
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
-          <span>If your data is ready, choose a data source to connect.</span>
+          <span>choose a data source to connect.</span>
         </div>
         {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
@@ -360,7 +360,7 @@ class DataSample extends Component {
           <div className={styles.sampleTable}>
             <div className={styles.sampleHeader}>
               <div className={styles.sampleCell}>
-                <span>Use Case Name</span>
+                <span>Name</span>
               </div>
               <div className={classnames(styles.sampleCell, styles.sampleDesc)}>
                 <span>Description</span>

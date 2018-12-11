@@ -126,7 +126,8 @@ export default class RocChart extends Component {
     const { compareChart } = this.props;
     const names = compareChart && this.props.models.map(m => m.name);
     // observe for fitIndex
-    // const {fitIndex, isChangable} = this.props.model;
+    const { fitIndex } = this.props.model;
+    if (fitIndex) { }
 
     return (
       <div className={`${styles.chart} ${this.props.className}`}>

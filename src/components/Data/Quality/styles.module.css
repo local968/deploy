@@ -1015,6 +1015,7 @@ span.fixesEdit {
 	width: 12px;
 	height: 12px;
 	border-radius: 50%;
+	margin-right: .05em;
 }
 
 .summaryType span {
@@ -1080,6 +1081,12 @@ span.fixesEdit {
 	width: 100%;
 }
 
+.summaryProgress {
+	display: flex;
+	flex: none;
+	height: 10px;
+}
+
 .summaryText {
 	display: flex;
 	flex: none;
@@ -1113,14 +1120,6 @@ span.fixesEdit {
 	cursor: pointer;
 }
 
-.disabled {
-	cursor: not-allowed;
-	background-color: #d3d3d3;
-	color: #aaaaaa;
-	background-image: none;
-	border: transparent;
-	cursor: not-allowed;
-}
 
 .summaryButton span {
 	font-family: HelveticaNeue;
@@ -1137,6 +1136,15 @@ span.fixesEdit {
 
 .summaryConfirm span {
 	color: #fff;
+}
+
+.disabled {
+	cursor: not-allowed;
+	background-color: #d3d3d3;
+	color: #aaaaaa;
+	background-image: none;
+	border: transparent;
+	cursor: not-allowed;
 }
 
 .summaryPie {

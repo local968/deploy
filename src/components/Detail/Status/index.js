@@ -101,13 +101,13 @@ export default class List extends Component {
                       {s.schedule.result &&
                         s.schedule.status === 'finished' &&
                         (s.schedule.result.problemType === 'Classification'
-                          ? `Accuracy:${s.schedule.result.score &&
+                          ? `Accuracy:${s.schedule.result.score && s.schedule.result.score.acc &&
                           s.schedule.result.score.acc.toFixed(2)} AUC:${s
-                            .schedule.result.score &&
+                            .schedule.result.score && s.schedule.result.score.auc &&
                           s.schedule.result.score.auc.toFixed(2)}`
-                          : `RMSE:${s.schedule.result.score &&
+                          : `RMSE:${s.schedule.result.score && s.schedule.result.score.rmse &&
                           s.schedule.result.score.rmse.toFixed(2)} R²:${s
-                            .schedule.result.score &&
+                            .schedule.result.score && s.schedule.result.score.r2 &&
                           s.schedule.result.score.r2.toFixed(2)}`)}
                     </span>
                     <span className={styles.threshold}>

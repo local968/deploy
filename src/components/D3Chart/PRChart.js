@@ -28,7 +28,8 @@ export default class PRChart extends Component {
     this.renderD3();
   }
   render () {
-    // const {fitIndex} = this.props.model;
+    const {fitIndex} = this.props.model;
+    if (fitIndex) { }
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
       </div>

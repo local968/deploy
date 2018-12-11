@@ -44,7 +44,11 @@
 }
 
 .row span {
+    display: block;
     color: #000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .status {
@@ -222,12 +226,19 @@
 
 .progressTitle {
     margin-right: 0.1em;
+    display: flex;
+    flex: none;
+    width: .5em;
 }
 
 .progressTitle span {
     font-size: 1.25rem;
     font-family: SanFranciscoText;
     color: #000;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
 }
 
 .progressMeans {
@@ -235,10 +246,29 @@
     margin-top: 0.2em;
 }
 
-.progressMeans span {
+.progressMean {
+    display: flex;
+    flex: auto;
+    align-items: center;
+    width: 0;
+    justify-content: flex-start;
+}
+
+.progressMeanText {
+    max-width: 65%;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.progressMeanText span {
     font-size: 0.875rem;
     color: #000;
     white-space: nowrap;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
 }
 
 .progressBlock {
@@ -378,6 +408,9 @@
     display: flex;
     flex-direction: column;
     padding: 0.1em 0;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .detailRow {
@@ -735,10 +768,15 @@
     font-size: 0.875rem;
     line-height: 1.29;
     color: #000000;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .costCellSmall {
-    flex: 1 1;
+    flex: none;
+    width: 1em;
 }
 
 .costCellCenter {
@@ -870,4 +908,43 @@
     line-height: 1.33;
     color: #000000;
     font-weight: bold;
+}
+
+.sepCell {
+    display: flex;
+    flex: none;
+    width: 1em;
+    height: .4em;
+    position: relative;
+    flex-direction: column;
+}
+
+.sep {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    display: flex;
+    z-index: -1;
+}
+
+.sep span {
+    width: 100%;
+    border-top: 1px solid;
+    transform: rotate(21.8deg);
+}
+
+.sepText {
+    display: flex;
+    width: 50%;
+    height: 50%;
+    align-items: center;
+}
+
+.sepText span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    font-size: .5rem;
 }

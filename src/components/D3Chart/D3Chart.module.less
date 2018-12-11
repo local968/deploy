@@ -3,6 +3,8 @@
   position: absolute;
   overflow: scroll;
   max-height: 400px;
+  max-width: 300px;
+  white-space: nowrap;
 }
 
 .chart,
@@ -220,6 +222,10 @@
 .regressionPredictActualChart {
   height: 100%;
   width: 100%;  
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  position: relative;
 }
 
 .groupSize {

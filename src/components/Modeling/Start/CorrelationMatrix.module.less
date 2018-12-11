@@ -2,37 +2,34 @@
   display: flex;
 
   .matrix {
-    padding-bottom: 5em;
+    overflow: auto;
+    width: 400px;
+    height: 400px;
+    .correlationRow {
+      white-space: nowrap;
+    }
     .horizonText {
-      width: 50px;
       text-overflow: ellipsis;
       overflow: hidden;
       display: inline-block;
       line-height: 30px;
-    }
-    .verticalText {
-      position: absolute;
-      display: inline-block;
-      writing-mode: vertical-lr;
-      overflow: hidden;
-      top: 50px;
-      height: 50px;
-      text-overflow: ellipsis;
+      font-size: 0.75rem;
     }
     .rect {
       position: relative;
       display: inline-block;
-      margin-right: 0.3em;
-      width: 25px;
-      height: 25px;
+    }
+    .correlationTable {
+      display: flex;
+      flex: auto;
     }
   }
   .colorBar {
     width: 60px;
-    height: 230px;
     margin-left: 2em;
     bottom: 0;
     right: -2em;
+    display: flex;
     .bar {
       width: 20px;
       height: 100%;
@@ -41,8 +38,9 @@
       margin-right: 0.3em;
     }
     .text {
-      display: inline-block;
-      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       vertical-align: top;
     }
   }

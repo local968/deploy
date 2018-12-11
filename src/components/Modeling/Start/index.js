@@ -1,27 +1,28 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 // import autoIcon from './mr-one-logo-blue.svg';
-import { Modal } from 'components/Common';
+import { Modal, ProcessLoading } from 'components/Common';
 import { observable } from 'mobx';
-import { Spin, message, Icon } from 'antd';
+import { message, Icon } from 'antd';
 import AdvancedView from './advancedView';
 import SimplifiedView from './simplifiedView';
 import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
 
+@inject('projectStore')
 @observer
 export default class StartTrain extends Component {
   @observable visible = false
 
   fastTrain = () => {
-    this.props.project.newSetting('auto')
-    this.props.project.fastTrain();
+    this.props.projectStore.project.newSetting('auto')
+    this.props.projectStore.project.fastTrain();
   };
 
   advanced = () => {
-    this.props.project.newSetting('custom')
+    this.props.projectStore.project.newSetting('custom')
     this.visible = true
   }
 
@@ -33,7 +34,7 @@ export default class StartTrain extends Component {
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
-          <span>Data looks good now, It's time to train your model!</span>
+          <span>Data looks good now. It's time to train your model!</span>
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
@@ -49,8 +50,7 @@ export default class StartTrain extends Component {
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want R2 Learn to build the model automatically, choose
-                  automatic modeling.
+                  If you want R2 Learn to build the model automatically.
                 </span>
               </div>
             </div>
@@ -69,7 +69,7 @@ export default class StartTrain extends Component {
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want to have more control over the modeling process, choose advanced modeling.
+                  If you want to have more control over the modeling process.
                 </span>
               </div>
             </div>
@@ -80,7 +80,7 @@ export default class StartTrain extends Component {
         </div>
         <Modal width='13em'
           content={<AdvancedModel
-            project={this.props.project}
+            project={this.props.projectStore.project}
             closeAdvanced={this.closeAdvanced} />}
           title='Advanced Modeling'
           onClose={this.closeAdvanced}
@@ -95,12 +95,13 @@ export default class StartTrain extends Component {
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
-  @observable dataViewLoading = true
-  @observable preImportanceLoading = true
+  @observable isLoading = true
+  @observable progress = 0
 
   componentDidMount() {
-    this.props.project.dataView().then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => this.isLoading = false)
+    })
   }
 
   switchTab = (num) => {
@@ -119,10 +120,11 @@ class AdvancedModel extends Component {
   }
 
   reloadTable = () => {
-    this.dataViewLoading = true
-    this.preImportanceLoading = true
-    this.props.project.dataView().then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
+    this.isLoading = true
+    this.progress = 0
+    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => this.isLoading = false)
+    })
   }
 
   render() {
@@ -139,16 +141,18 @@ class AdvancedModel extends Component {
         </div>
         <div className={styles.viewBox}>
           {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable} /> : <AdvancedView project={project} />}
-          {((this.tab === 1 && this.preImportanceLoading) || this.dataViewLoading) && <div className={styles.simplifiedLoad}>
+          {(this.tab === 1 && this.isLoading) && <ProcessLoading progress={this.progress} style={{bottom: '0.25em'}}/>}
+          {/* {((this.tab === 1 && this.preImportanceLoading) || this.dataViewLoading) && <div className={styles.simplifiedLoad}>
             <Spin size="large" />
-          </div>}
+          </div>} */}
         </div>
         <div className={styles.bottom}>
           <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
           <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
         </div>
-
+        
       </div>
+      
     </div>
   }
 }
