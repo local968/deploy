@@ -13,7 +13,7 @@ function setDefaultData(id, userId) {
     histgramPlots: {},
     preImportance: null,
     dataViews: null,
-    rawDataViews: null
+    informativesLabel: []
   }
   return createOrUpdate(id, userId, data)
 }
@@ -435,11 +435,9 @@ wss.register('etl', (message, socket, progress) => {
       return command(data, processData => {
         let { result, status } = processData;
         if (status < 0 || status === 100) return processData
-        const { name, path, key, origin_header } = result
-        if (name === "progress" && key === 'etl') {
-          return progress(processData)
-        }
-        if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: origin_header, dataHeader: origin_header })
+        const { name, path, key, originHeader, fields } = result
+        if (name === "progress" && key === 'etl') return progress(processData)
+        if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, originHeader: originHeader, rawHeader: fields, dataHeader: fields })
         if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
         return null
       }).then(returnValue => {
@@ -458,7 +456,7 @@ wss.register('etl', (message, socket, progress) => {
         Reflect.deleteProperty(result,'userId')
         if (!files) Reflect.deleteProperty(result,'totalRawLines')
         // 最终ETL 小于1W行  使用cross
-        if (result.totalLines > 0 && result.totalLines < 10000) result.runWith = 'cross'
+        if (result.totalLines < 10000) result.runWith = 'cross'
 
         const steps = {}
         if (firstEtl) {
@@ -489,12 +487,13 @@ wss.register('etl', (message, socket, progress) => {
   })
 })
 
-wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
-.then(returnValue => {
+wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
   const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
   const { status, result } = returnValue
   if (status === 100) {
-    createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
+    const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
+    if (updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
+    // createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
   }
   return returnValue
 }))

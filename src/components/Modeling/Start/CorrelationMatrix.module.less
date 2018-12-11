@@ -2,34 +2,26 @@
   display: flex;
 
   .matrix {
-    padding-bottom: 5em;
     overflow: auto;
-    max-width: 400px;
+    width: 400px;
+    height: 400px;
     .correlationRow {
       white-space: nowrap;
     }
     .horizonText {
-      width: 50px;
       text-overflow: ellipsis;
       overflow: hidden;
       display: inline-block;
       line-height: 30px;
-    }
-    .verticalText {
-      position: absolute;
-      display: inline-block;
-      writing-mode: vertical-lr;
-      overflow: hidden;
-      top: 50px;
-      height: 50px;
-      text-overflow: ellipsis;
+      font-size: 0.75rem;
     }
     .rect {
       position: relative;
       display: inline-block;
-      margin-right: 0.3em;
-      width: 25px;
-      height: 25px;
+    }
+    .correlationTable {
+      display: flex;
+      flex: auto;
     }
   }
   .colorBar {

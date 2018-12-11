@@ -28,6 +28,7 @@ class TargetIssue extends Component {
   @observable visible = false
   @observable isLoad = false
   @observable edit = false
+  @observable progress = 0
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -46,8 +47,9 @@ class TargetIssue extends Component {
       if (this.isLoad) return false;
 
       this.isLoad = true
+      this.progress = 0
 
-      this.props.project.dataView(false)
+      this.props.project.dataView(false, num => this.progress = num)
       when(
         () => this.props.project.rawDataViews,
         () => {
@@ -143,9 +145,9 @@ class TargetIssue extends Component {
             <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
             <div className={classnames(styles.cell, styles.select)}><span>{colType[target]}</span></div>
             <div className={classnames(styles.cell, styles.error)}>
-              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch.toFixed(2)}%</span></div>}
-              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing.toFixed(2)}%</span></div>}
-              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier.toFixed(2)}%</span></div>}
+              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch<0.01?"<0.01":targetPercent.mismatch.toFixed(2)}%</span></div>}
+              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing<0.01?"<0.01":targetPercent.missing.toFixed(2)}%</span></div>}
+              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier<0.01?"<0.01":targetPercent.outlier.toFixed(2)}%</span></div>}
             </div>
             <div className={styles.tableBody}>
               {sortData.map((v, k) => <div key={k} className={classnames(styles.cell, {
@@ -173,7 +175,7 @@ class TargetIssue extends Component {
               unique={10}
               recomm={recomm} />}
           {issues.rowIssue && <RowIssue backToConnect={this.backToConnect}
-            totalRawLines={totalRawLines} />}
+            totalLines={totalLines} />}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
             targetIssues={{
@@ -184,7 +186,7 @@ class TargetIssue extends Component {
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
-        {this.isLoad && <ProcessLoading />}
+        {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }} />}
         <Modal content={<FixIssue project={project}
           issueRows={targetIssues}
           closeFixes={this.closeFixes}
@@ -215,6 +217,8 @@ class TargetIssue extends Component {
 class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
+  @observable isLoad = false
+  @observable progress = 0
 
   // handleCheck = e => {
   //   const checked = e.target.checked
@@ -226,15 +230,15 @@ class VariableIssue extends Component {
   }
 
   editFixes = () => {
-    this.closeSummary()
     if (this.props.project.rawDataViews) {
       this.visible = true
     } else {
       if (this.isLoad) return false;
 
       this.isLoad = true
+      this.progress = 0
 
-      this.props.project.dataView(false)
+      this.props.project.dataView(false, num => this.progress = num)
       when(
         () => this.props.project.rawDataViews,
         () => {
@@ -243,6 +247,7 @@ class VariableIssue extends Component {
         }
       )
     }
+    this.closeSummary()
   }
 
   closeFixes = () => {
@@ -315,13 +320,13 @@ class VariableIssue extends Component {
         cn: styles.cell
       }
       if (variableIssues.mismatchRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header]<0.01?'<0.01':variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
       }
       if (variableIssues.nullRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header]<0.01?'<0.01':variableIssues.nullRow[header].toFixed(2)}%</span></div>)
       }
       if (variableIssues.outlierRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header]<0.01?'<0.01':variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
       }
       issueArr.push(issueData)
     }
@@ -403,17 +408,19 @@ class VariableIssue extends Component {
             fixedRowCount={4}
             checked={null}
             select={null}
+            style={{ border: "1px solid #ccc" }}
             data={tableData}
           />
         </div>
         <div className={styles.variableBottom}>
           <ContinueButton onClick={this.showSummary} text='continue' width="15%" />
-          <div className={styles.checkBox}>
+          {/* <div className={styles.checkBox}>
             <input type='checkbox' onChange={this.handleCheck} defaultChecked={false} id="ignoreIssue" />
             <label htmlFor='ignoreIssue'>Ignore these issues{' '}<span>(R2.Learn will not fix the issues automatically)</span></label>
-          </div>
+          </div> */}
         </div>
       </div>
+      {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }} />}
       {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
       <Modal content={<FixIssue project={project}
         issueRows={issueRows}
@@ -543,7 +550,7 @@ class Summary extends Component {
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
-              <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div>
+              {/* <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div> */}
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock}>
@@ -572,7 +579,7 @@ class Summary extends Component {
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
-              <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div>
+              {/* <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div> */}
             </div>
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]
@@ -627,7 +634,9 @@ class Summary extends Component {
           </div>
         </div>
         <div className={styles.summaryBottom}>
-          <div className={classnames(styles.summaryButton, styles.summaryConfirm)} onClick={this.startTrain}><span>Continue</span></div>
+          <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
+            [styles.disabled]: totalLines === 0
+          })} onClick={totalLines === 0 ? null : this.startTrain}><span>Continue</span></div>
           <div className={classnames(styles.summaryButton, {
             [styles.disabled]: !issues.dataIssue
           })} onClick={issues.dataIssue ? editFixes : null}><span>Edit the Fixes</span></div>

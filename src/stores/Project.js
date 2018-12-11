@@ -7,24 +7,6 @@ import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage } from 'antd';
 
-function indexOfMax(arr) {
-  if (arr.length === 0) {
-    return -1;
-  }
-
-  let max = arr.Youden[0];
-  let maxIndex = 0;
-
-  for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
-    if (arr.Youden[i] > max) {
-      maxIndex = i;
-      max = arr.Youden[i];
-    }
-  }
-
-  return maxIndex;
-}
-
 export default class Project {
   @observable models = []
   @observable trainModel = null
@@ -91,6 +73,7 @@ export default class Project {
   @observable correlationMatrixImg = '';
   @observable newVariable = [];
   @observable expression = {}
+  @observable newType = {}
   @observable informativesLabel = []
   @observable colValueCounts = {}
   @observable totalFixedLines = 0
@@ -202,8 +185,7 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      validationRate: 20,
-      holdoutRate: 20
+      rawDataViews: null,
     }
   }
 
@@ -219,7 +201,6 @@ export default class Project {
       nullIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
-      rawDataViews: null,
       dataViews: null,
       outlierDict: {},
       targetMap: {},
@@ -234,7 +215,7 @@ export default class Project {
 
   @computed
   get defaultTrain() {
-    const measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
+    const measurement = this.problemType === "Classification" ? "auc" : "r2"
     this.models = []
 
     return {
@@ -259,7 +240,10 @@ export default class Project {
       version: [1, 2],
       trainHeader: [],
       newVariable: [],
-      expression: {}
+      newType: {},
+      expression: {},
+      validationRate: 20,
+      holdoutRate: 20,
     }
   }
 
@@ -493,6 +477,33 @@ export default class Project {
   // });
   // }
 
+  @action
+  autoFixHeader = () => {
+    /**
+   * 自动修改header
+   */
+    const temp = {};
+    const header = this.rawHeader.map((h, i) => {
+      h = h.trim();
+      if (/^$/.test(h)) {
+        h = `Unnamed: ${i}`;
+      }
+      if (!temp[h]) {
+        temp[h] = 1;
+      } else {
+        h = h + '.' + temp[h];
+        temp[h]++;
+      }
+      return h;
+    });
+
+    // 上传文件，target为空
+    return this.updateProject({
+      dataHeader: header,
+      rawHeader: header,
+    });
+  }
+
   @computed
   get headerTemp() {
     //查看是否存在相同名称的header
@@ -582,18 +593,43 @@ export default class Project {
     return map
   }
 
-  parseChartData(result) {
+  parseChartData(result, model) {
     if (!result) return { chart: null, fitIndex: null };
     let fitIndex;
+    let initialFitIndex;
     const charts = ['density', 'lift', 'roc'];
     charts.forEach(chart => {
       result[chart] = this.parseJson(result[chart])
     });
     if (result.roc) {
-      fitIndex = indexOfMax(result.roc);
+      const { TP, FN, FP, TN } = this.costOption
+      initialFitIndex = this.indexOfMax(result.roc);
+      fitIndex = initialFitIndex
+      if (!!TP || !!FN || !!FP || !!TN) {
+        const benefit = model.getBenefit(TP, FN, FP, TN, result)
+        fitIndex = benefit.index
+      }
       this.roundN(result.roc);
     }
-    return { chart: result, fitIndex };
+    return { chart: result, fitIndex, initialFitIndex };
+  }
+
+  indexOfMax(arr) {
+    if (arr.length === 0) {
+      return -1;
+    }
+
+    let max = arr.Youden[0];
+    let maxIndex = 0;
+
+    for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
+      if (arr.Youden[i] > max) {
+        maxIndex = i;
+        max = arr.Youden[i];
+      }
+    }
+
+    return maxIndex;
   }
 
   roundN(data, n = 2) {
@@ -755,18 +791,40 @@ export default class Project {
   }
 
   @action
-  dataView = (isClean = true) => {
-    const exp = Object.values(this.expression).join(";")
+  dataView = (isClean = true, progress) => {
+    const key = isClean ? 'dataViews' : 'rawDataViews'
+    // const featureLabel = [...this.dataHeader, ...this.newVariable].filter(v => !Object.keys(this[key]).includes(v))
+    // if(!featureLabel.length) return Promise.resolve()
     return socketStore.ready().then(api => {
+      // const command = {
+      //   projectId: this.id,
+      //   command: 'dataView',
+      //   actionType: isClean ? 'clean' : 'raw',
+      //   feature_label
+      // };
+
+      const readyLabels = this[key] ? Object.keys(this[key]) : []
+      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
+      const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
+      const feature_label = [...data_label, ...new_label]
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
       const command = {
         projectId: this.id,
         command: 'dataView',
-        actionType: isClean ? 'clean' : 'raw'
+        actionType: isClean ? 'clean' : 'raw',
+        feature_label
       };
-      if (exp) command.csvScript = exp.replace(/\|/g, ",")
+      if (new_label.length) {
+        const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+        command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      }
       return api.dataView(command, progressResult => {
+        if (progress && typeof progress === 'function') {
+          const { result } = progressResult
+          const { name, value } = result
+          if (name === "progress") return progress(value)
+        }
       }).then(returnValue => {
-        const key = isClean ? 'dataViews' : 'rawDataViews'
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ [key]: null })
@@ -793,7 +851,7 @@ export default class Project {
   }
 
   @action
-  addNewVariable = (variableName, variables, exp) => {
+  addNewVariable = (variableName, variables, exp, type) => {
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
 
     return socketStore.ready().then(api => {
@@ -811,11 +869,16 @@ export default class Project {
         }
         const newVariable = [...this.newVariable, ...variables]
         const trainHeader = [...this.trainHeader, ...variables]
+        const newType = Object.assign({}, this.newType, variables.reduce((start, v) => {
+          start[v] = type
+          return start
+        }, {}))
         const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
         this.updateProject({
           newVariable,
           trainHeader,
-          expression
+          expression,
+          newType
         })
         return true
       })
@@ -871,16 +934,27 @@ export default class Project {
       targetLabel: target,
       projectId: id,
       version: '1,2',
-      command
+      command,
+      sampling: 'no',
+      speedVSaccuracy: 5,
+      ensembleSize: 20,
+      randSeed: 0,
+      measurement: problemType === "Classification" ? "auc" : "r2",
+      settingId: this.settingId,
+      holdoutRate: 0.2
     };
+
+    if (this.totalRawLines > 10000) {
+      trainData.validationRate = 0.2
+    } else {
+      trainData.nfold = 5
+    }
 
     this.modeling(trainData, Object.assign({
       train2Finished: false,
       train2ing: true,
       train2Error: false,
       selectId: '',
-      criteria: 'default',
-      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
       settings: this.settings,
       settingId: this.settingId
     }, this.nextSubStep(2, 3)))
@@ -914,7 +988,9 @@ export default class Project {
       speedVSaccuracy: this.speedVSaccuracy,
       version: this.version.join(","),
       algorithms: [...this.algorithms],
-      ensembleSize: this.ensembleSize
+      ensembleSize: this.ensembleSize,
+      settingId: this.settingId,
+      measurement: this.measurement
     };
 
     if (this.dataRange === "all") {
@@ -941,8 +1017,6 @@ export default class Project {
       train2ing: true,
       train2Error: false,
       selectId: '',
-      criteria: 'default',
-      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
       validationRate: this.validationRate,
       holdoutRate: this.holdoutRate,
       resampling: this.resampling,
@@ -982,31 +1056,25 @@ export default class Project {
     this.train2ing = true
     this.isAbort = false
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
-      if (this.isAbort) return
-      if (progressResult.name === "progress") {
-        if (progressResult.trainId) this.trainingId = progressResult.trainId
-        if (!progressResult.model) return
-        this.trainModel = progressResult
-        return
-      }
-      if (progressResult.status !== 200) return
+      // if (this.isAbort) return
+      // if (progressResult.name === "progress") {
+      //   if (progressResult.trainId) this.trainingId = progressResult.trainId
+      //   if (!progressResult.model) return
+      //   if (!progressResult.value) return
+      //   if(this.trainModel && this.trainModel.value && progressResult.value > this.trainModel.value)
+      //   this.trainModel = progressResult
+      //   return
+      // }
+      // if (progressResult.status !== 200) return
       //暂时移除  保证命令只发一次
       // let result = progressResult.model
       // this.setModel(result)
     })).then(returnValue => {
       this.trainingId = ''
       const { status, message } = returnValue
-      // if (status === -1 && this.models.length === 0) {
-      //   return this.modelingError()
-      // }
       if (status !== 200) {
         antdMessage.error(message)
-        // return this.concurrentError(message)
       }
-      // this.updateProject({
-      //   train2Finished: true,
-      //   train2ing: false
-      // });
     })
   }
 
@@ -1032,7 +1100,6 @@ export default class Project {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
-    // if (this.problemType === "Classification") data.predicted = this.calcPredicted(data)
     this.models = [...this.models.filter(m => data.id !== m.id), new Model(this.id, data)]
     if (this.problemType === 'Classification') {
       if (!data.chartData) this.chartData(data.name);
@@ -1040,62 +1107,7 @@ export default class Project {
       if (!data.residualPlot || !data.fitPlot) this.fitPlotAndResidualPlot(data.name)
       if (!data.qcut) this.pointToShow(data.name)
     }
-    // if (index === -1) {
-    //   this.models.push(new Model(this.id, data))
-    // } else {
-    //   this.models[index] = new Model(this.id, data)
-    // }
   }
-
-  // modelingError = () => {
-  //   this.updateProject({
-  //     train2Finished: true,
-  //     train2ing: false,
-  //     train2Error: true,
-  //     selectId: '',
-  //   });
-  // }
-
-  // concurrentError = message => {
-  //   antdMessage.error(message)
-  //   this.updateProject({
-  //     train2Finished: false,
-  //     train2ing: false,
-  //     train2Error: false,
-  //     selectId: '',
-  //     mainStep: 3,
-  //     curStep: 3,
-  //     lastSubStep: 1,
-  //     subStepActive: 1
-  //   });
-  // }
-
-  // calcPredicted = model => {
-  //   const { targetMap, targetColMap } = this;
-  //   const targetCol = targetColMap
-  //   const map = Object.assign({}, targetCol, targetMap);
-  //   let actual = [[0, 0], [0, 0]]
-  //   Object.keys(model.targetMap).forEach(k => {
-  //     //映射的index
-  //     const actualIndex = map[k];
-  //     if (actualIndex !== 0 && actualIndex !== 1) {
-  //       return;
-  //     }
-  //     //返回数组的index
-  //     const confusionMatrixIndex = model.targetMap[k];
-  //     //遍历当前那一列数组
-  //     model.confusionMatrix[confusionMatrixIndex] && model.confusionMatrix[confusionMatrixIndex].forEach((item, i) => {
-  //       const key = Object.keys(model.targetMap).find(t => model.targetMap[t] === i);
-  //       const pridict = map[key];
-  //       if (pridict !== 0 && pridict !== 1) {
-  //         return;
-  //       }
-  //       actual[actualIndex][pridict] += item;
-  //     })
-  //   })
-  //   const predicted = [actual[0][0] / ((actual[0][0] + actual[0][1]) || 1), actual[1][1] / ((actual[1][0] + actual[1][1]) || 1)];
-  //   return predicted
-  // }
 
   setSelectModel = id => {
     this.updateProject({ selectId: id })
@@ -1112,13 +1124,13 @@ export default class Project {
     })
   }
 
-  preTrainImportance = () => {
+  preTrainImportance = (progress) => {
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
       const feature_label = [...data_label, ...new_label]
-      if (!feature_label.length || feature_label.length === 0) return
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
       const command = {
         projectId: this.id,
         command: 'preTrainImportance',
@@ -1129,6 +1141,11 @@ export default class Project {
         command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       }
       return api.preTrainImportance(command, progressResult => {
+        if (progress && typeof progress === 'function') {
+          const { result } = progressResult
+          const { name, value } = result
+          if (name === "progress") return progress(value)
+        }
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
@@ -1274,10 +1291,10 @@ export default class Project {
           return result.model === m.name;
         })
         if (model) {
-          const { fitIndex, chart } = this.parseChartData(result.data);
+          const { fitIndex, chart, initialFitIndex } = this.parseChartData(result.data, model);
           model.updateModel({
             fitIndex,
-            initialFitIndex: fitIndex,
+            initialFitIndex,
             chartData: chart
           })
         }

@@ -279,11 +279,11 @@ export default class AdvancedView extends Component {
               </div>
               <div className={styles.advancedOptionBox}>
                 <input id="resampling1" type='radio' name="resampling" checked={resampling === "up"} onChange={this.handleResampling.bind(null, 'up')} />
-                <label htmlFor="resampling1">Upsampling</label>
+                <label htmlFor="resampling1">Auto upsampling</label>
               </div>
               <div className={styles.advancedOptionBox}>
                 <input id="resampling2" type='radio' name="resampling" checked={resampling === "down"} onChange={this.handleResampling.bind(null, 'down')} />
-                <label htmlFor="resampling2">Downsampling</label>
+                <label htmlFor="resampling2">Auto downsampling</label>
               </div>
               <div className={styles.advancedOptionBox}>
                 <input id="resampling3" type='radio' name="resampling" checked={resampling === "no"} onChange={this.handleResampling.bind(null, 'no')} />

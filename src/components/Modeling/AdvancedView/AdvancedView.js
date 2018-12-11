@@ -8,7 +8,10 @@ import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
-// import modelComp from './Btn-ModelComparison-normal.svg';
+import ModelProcess from './ModelProcess';
+import modelProcess from './icon-model-process-flow-normal.svg';
+import processHover from './icon-model-process-flow-hover.svg';
+import processSelectd from './icon-model-process-flow-selected.svg';
 import ROCCurve from './icon-roc-curve-normal.svg';
 import liftChart from './icon-lift-chart-normal.svg';
 import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
@@ -290,7 +293,9 @@ class AdvancedModelTable extends Component {
   }
 
   render() {
-    const { models, project: { problemType, selectModel }, sortState, changeSort, metric } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sortState, changeSort, metric } = this.props;
+    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray
+    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',]
@@ -307,7 +312,7 @@ class AdvancedModelTable extends Component {
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
         return (
-          <ClassificationModelRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+          <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
         )
       } else {
         return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
@@ -384,7 +389,7 @@ class RegressionDetailCurves extends Component {
   state = {
     curve: "Variable Impact",
     visible: false,
-    diagnoseType: 'yUnbalanced'
+    diagnoseType: null
   }
 
   handleClick = val => {
@@ -477,7 +482,7 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked } = this.props;
+    const { model, texts, metric, checked, yes, no } = this.props;
     if (!model.chartData) return null;
     const { name, fitIndex, chartData: { roc }, score } = model;
     const { detail } = this.state;
@@ -507,15 +512,15 @@ class ClassificationModelRow extends Component {
               case 'Cutoff Threshold':
                 return <RowCell key={5} data={roc.Threshold[fitIndex]} />;
               case 'Validation':
-                return <RowCell key={6} data={score.validateScore[metric]} />;
+                return <RowCell key={6} data={metric === 'acc' ? model.validationAcc : score.validateScore[metric]} />;
               case 'Holdout':
-                return <RowCell key={7} data={score.holdoutScore[metric]} />;
+                return <RowCell key={7} data={metric === 'acc' ? model.holdoutAcc : score.holdoutScore[metric]} />;
               default:
                 return null
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} />}
+        {detail && <DetailCurves model={model} yes={yes} no={no} />}
       </div>
     )
   }
@@ -532,10 +537,11 @@ class DetailCurves extends Component {
     this.props.model.resetFitIndex();
   }
   render() {
-    const { model, model: { id } } = this.props;
+    const { model, model: { id }, yes, no } = this.props;
     const { curve } = this.state;
     let curComponent;
-    switch (this.state.curve) {
+    let hasReset = true;
+    switch (curve) {
       case 'ROC Curve':
         curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
         break;
@@ -550,6 +556,13 @@ class DetailCurves extends Component {
         break;
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
+        hasReset = false;
+        break;
+      case 'Model Process Flow':
+        curComponent = <div style={{ maxWidth: document.body.clientWidth / 2 }} >
+          <ModelProcess model={model} className={`modelprocess${id}`} />
+        </div>
+        hasReset = false;
         break;
       default:
         break;
@@ -579,17 +592,25 @@ class DetailCurves extends Component {
       hoverIcon: varImpactHover,
       selectedIcon: varImpactSelected,
       text: 'Variable Impact'
+    }, {
+      normalIcon: modelProcess,
+      hoverIcon: processHover,
+      selectedIcon: processSelectd,
+      text: 'Model Process Flow'
     }];
     return (
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} >
           <div className={styles.thumbnails} >
-            {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+            {thumbnails.slice(0, 4).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
-          <PredictTable model={model} />
+          <PredictTable model={model} yes={yes} no={no} />
+          <div className={styles.thumbnails}>
+            {thumbnails.slice(4, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+          </div>
         </div>
         <div className={styles.rightPanel} >
-          <button onClick={this.reset} className={styles.button} >Reset</button>
+          {hasReset && <button onClick={this.reset} className={styles.button} >Reset</button>}
           {curComponent}
         </div>
       </div>
@@ -668,7 +689,7 @@ class RowCell extends Component {
 @observer
 class PredictTable extends Component {
   render() {
-    const { model } = this.props;
+    const { model, yes, no } = this.props;
     const { fitIndex, chartData } = model;
     let TN = chartData.roc.TN[fitIndex];
     let FP = chartData.roc.FP[fitIndex];
@@ -679,10 +700,10 @@ class PredictTable extends Component {
       dataIndex: 'rowName',
       className: styles.actual
     }, {
-      title: 'Predict: Yes',
+      title: `Predict: ${yes}`,
       dataIndex: 'col1'
     }, {
-      title: 'Predict: No',
+      title: `Predict: ${no}`,
       dataIndex: 'col2',
     }, {
       title: '',
@@ -692,12 +713,12 @@ class PredictTable extends Component {
     // set default value
 
     const data = [{
-      rowName: 'Actual: Yes',
+      rowName: `Actual: ${yes}`,
       col2: `${Math.round(FN)}(FN)`,
       col1: `${Math.round(TP)}(TP)`,
       sum: Number(FN) + +TP
     }, {
-      rowName: 'Actual: No',
+      rowName: `Actual: ${no}`,
       col2: `${Math.round(TN)}(TN)`,
       col1: `${Math.round(FP)}(FP)`,
       sum: +TN + +FP,

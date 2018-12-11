@@ -91,11 +91,12 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project, reloadTable } = this.props;
-    const { target, colType, targetMap, dataViews, preImportance, histgramPlots, dataHeader, addNewVariable, newVariable, id, informativesLabel, trainHeader, expression } = project;
+    const { target, colType, targetMap, dataViews, preImportance, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression } = project;
     // const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, targetColMap, targetMap)).length : 'N/A';
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader, ...newVariable]
+    const variableType = {...newType, ...colType}
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     return <div className={styles.simplified}>
       <div className={styles.targetTable}>
@@ -129,7 +130,7 @@ export default class SimplifiedView extends Component {
           })} title={this.formatNumber(targetData.mean, colType[target] === 'Categorical')}><span>{this.formatNumber(targetData.mean, colType[target] === 'Categorical')}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] !== 'Categorical'
-          })}><span>{this.formatNumber(targetUnique, colType[target] !== 'Categorical')}</span></div>
+          })}><span>{targetUnique}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
           })} title={this.formatNumber(targetData.min, colType[target] === 'Categorical')}><span>{this.formatNumber(targetData.min, colType[target] === 'Categorical')}</span></div>
@@ -196,7 +197,7 @@ export default class SimplifiedView extends Component {
             const data = dataViews ? (dataViews[h] || {}) : {}
             const map = targetMap || {};
             const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={colType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
+            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
           })}
         </div>
       </div>
@@ -365,12 +366,12 @@ class CreateNewVariable extends Component {
     const functionStr = this.exp.slice(0, startIndex)
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
     const hasFunction = functionList.find(v => functionStr.includes(v.value.slice(0, -1)))
-    const inFunction = functionList.find(v => functionStr.endsWith(v.value.slice(0, -1)))
-    this.myFunction = FUNCTIONS.senior.find(v => functionStr.endsWith(v.value.slice(0, -1))) || {}
+    const hasConcat = functionList.filter(v => functionStr.includes(v.value.slice(0, -1))).find(v => v.value === "Concat()")
+    this.myFunction = FUNCTIONS.senior.find(v => functionStr.includes(v.value.slice(0, -1))) || {}
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
     const { dataHeader, colType } = this.props
     let valueList = [...dataHeader]
-    if (!inFunction || inFunction.value !== "Concat()") valueList = valueList.filter(v => colType[v] === "Numerical")
+    if (!hasConcat) valueList = valueList.filter(v => colType[v] === "Numerical")
     let filterFunctions = []
     if (exp.startsWith("@")) {
       exp = exp.slice(1).trim()
@@ -477,7 +478,7 @@ class CreateNewVariable extends Component {
     const checked = this.checkExp(exp)
     if (!checked.isPass) return antdMessage.error(checked.message)
     if (!checked.num) return antdMessage.error("expression is empty")
-    const num = checked.num
+    const { num, type } = checked
     const nameArray = []
     if (num === 1) {
       nameArray.push("r2_" + name)
@@ -487,7 +488,7 @@ class CreateNewVariable extends Component {
       }
     }
     this.loading = true
-    this.props.addNewVariable(name, nameArray, exp).then(result => {
+    this.props.addNewVariable(name, nameArray, exp, type).then(result => {
       this.loading = false
       if (!result) return
       this.props.onClose()
@@ -525,7 +526,11 @@ class CreateNewVariable extends Component {
     const array = expression.split(baseOptReg)
     let num = 1
     let isVariable = false
+    let expType = ''
+    const typeArray = []
     for (let item of array) {
+      //Categorical
+      let type = 'Numerical'
       item = item.trim()
       if (!item) return { isPass: false, message: "error expression" }
       if (isNaN(item)) {
@@ -541,20 +546,30 @@ class CreateNewVariable extends Component {
           }
           const other = item.slice(index + 2).trim()
           if (other) return { isPass: false, message: `Unexpected identifier: ${other}` }
-          const numResult = this.checkParams(functionName, bracketExps, bracketNum)
-          if (!numResult.isPass) return numResult
-          num += numResult.num - 1
-          isVariable = numResult.isVariable
+          const fnResult = this.checkParams(functionName, bracketExps, bracketNum)
+          if (!fnResult.isPass) return fnResult
+          num += fnResult.num - 1
+          isVariable = fnResult.isVariable
+          type = fnResult.type
         }
         if (item.startsWith("@")) {
           item = item.slice(1)
-          const { dataHeader } = this.props
+          const { dataHeader, colType } = this.props
           if (!item || !dataHeader.includes(item)) return { isPass: false, message: `unknown variable: ${item}` }
           isVariable = true
+          type = colType[item] === 'Numerical' ? 'Numerical' : 'Categorical'
         }
       }
+      typeArray.push(type)
     }
-    return { isPass: true, message: `ok`, num, isVariable }
+    if (typeArray.length > 1) {
+      const index = typeArray.indexOf('Categorical')
+      if (index !== -1) return { isPass: false, message: `error expression: ${array[index]}` }
+      expType = 'Numerical'
+    } else {
+      expType = typeArray[0]
+    }
+    return { isPass: true, message: `ok`, num, isVariable, type: expType }
   }
 
   checkParams = (functionName, bracketExps, bracketNum) => {
@@ -567,42 +582,58 @@ class CreateNewVariable extends Component {
     const currentFn = isBaseFn || isSeniorFn
     if (currentFn.params && currentFn.params < expArray.length) return { isPass: false, message: `function ${functionName} must have ${currentFn.params} params` }
     let numOfParam = 0
-    let isVariable = false
+    let isVariable1 = false
     let num = 1
+    let fnType = ''
     const params = []
 
     for (const exp of expArray) {
       const expChecked = this.checkSimpleExp(exp.trim(), bracketExps)
       if (!expChecked.isPass) return expChecked
-      const { isVariable, num } = expChecked
+      const { isVariable, num, type } = expChecked
       if (isVariable) numOfParam++
       params.push({
         isVariable,
         num,
-        exp
+        exp,
+        type
       })
     }
 
     if (isSeniorFn) {
       const seniorResult = this.checkSeniorParams(currentFn, params, numOfParam)
       if (!seniorResult.isPass) return seniorResult
-      isVariable = true
+      isVariable1 = true
       num += seniorResult.num - 1
+      fnType = seniorResult.type
+    } else {
+      for (let param of params) {
+        if (param.type !== 'Numerical') return { isPass: false, message: `param must be Numerical` }
+      }
+      fnType = 'Numerical'
     }
-    if (isBaseFn) isVariable = true
     for (let param of params) {
       num += param.num - 1
+      isVariable1 = isVariable1 || param.isVariable
     }
-    return { isPass: true, message: `ok`, num, isVariable }
+    return { isPass: true, message: `ok`, num, isVariable: isVariable1, type: fnType }
   }
 
   checkSeniorParams = (senior, params, numOfParam) => {
     let num = 0
+    let type = ''
 
+    const paramList = params.slice(0, numOfParam)
+    if (senior.value !== 'Concat()') {
+      for (let param of paramList) {
+        if (param.type !== 'Numerical') return { isPass: false, message: `param must be Numerical` }
+      }
+    }
     const numList = params.slice(numOfParam)
     switch (senior.value) {
       case "Concat()":
-        if (numOfParam < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} has At least 2 parameters` }
+        type = 'Categorical'
+        if (numOfParam < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters error` }
         const concatResults = numList.map(num => {
           let n = num.exp
           if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
@@ -621,6 +652,7 @@ class CreateNewVariable extends Component {
         }
         break;
       case "Diff()":
+        type = 'Numerical'
         const diffResults = numList.map(num => {
           let n = num.exp
           if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
@@ -637,9 +669,11 @@ class CreateNewVariable extends Component {
         }
         break;
       case "Accumulate()":
+        type = 'Numerical'
         num = numOfParam
         break;
       case "Quantile_bin()":
+        type = 'Categorical'
         const quantileBinArray = ["value", "frequency"]
         const [b, type1, type2] = numList
         if (isNaN(b) || b.includes(".")) return { isPass: false, message: `${b} must be integer` }
@@ -648,6 +682,7 @@ class CreateNewVariable extends Component {
         num = numOfParam * (type2 ? 2 : 1)
         break;
       case "Custom_Quantile_bin()":
+        type = 'Categorical'
         const numResults = numList.map(num => {
           let n = num.exp
           const str = n.trim()
@@ -669,7 +704,7 @@ class CreateNewVariable extends Component {
         break;
     }
     if (num < 1) return { isPass: false, message: "error expression" }
-    return { isPass: true, message: "ok", num: num }
+    return { isPass: true, message: "ok", num, type }
   }
 
 
@@ -678,9 +713,8 @@ class CreateNewVariable extends Component {
     if (_expression.includes("$")) return { isPass: false, message: "Unexpected token $" }
 
     const { bracketExps, expression } = this.formatBracket(_expression)
-    const { isPass, message, num } = this.checkSimpleExp(expression, bracketExps)
-
-    return { isPass, message, num }
+    const { isPass, message, num, type } = this.checkSimpleExp(expression, bracketExps)
+    return { isPass, message, num, type }
   }
 
   factorial = (n) => {

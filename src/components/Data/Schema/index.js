@@ -11,11 +11,13 @@ import { Select, ContinueButton, ProcessLoading, Table, Hint } from 'components/
 export default class DataSchema extends Component {
   @observable checkList = this.props.projectStore.project.sortHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
   @observable showSelect = false
+  @observable dataType = {...this.props.projectStore.project.colType}
 
   doEtl = () => {
     const { sortHeader, noComputeTemp } = this.props.projectStore.project;
     const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
     this.props.projectStore.project.updateProject({
+      colType: {...this.dataType},
       dataHeader: newDataHeader,
       noCompute: noComputeTemp,
       cleanData: [],
@@ -33,14 +35,14 @@ export default class DataSchema extends Component {
   }
 
   targetSelect = (value) => {
-    const { colType } = this.props.projectStore.project
+    // const { colType } = this.props.projectStore.project
     const data = {
       target: value,
-      colType,
+      colType: {...this.dataType},
       outlierFillMethod: {}
     }
     // 回归默认设置为drop
-    if (value && colType[value] === 'Numerical') {
+    if (value && this.dataType[value] === 'Numerical') {
       data.outlierFillMethod = { [value]: 'drop' }
     }
     this.props.projectStore.project.updateProject(data).then(() => this.refs.table.updateGrids())
@@ -59,7 +61,8 @@ export default class DataSchema extends Component {
 
   select = (key, e) => {
     const v = e.target.value
-    this.props.projectStore.project.colType[key] = v
+    this.dataType[key] = v
+    // this.props.projectStore.project.colType[key] = v
     this.refs.table.updateGrids()
   }
 
@@ -71,8 +74,12 @@ export default class DataSchema extends Component {
     this.props.projectStore.project.noComputeTemp = e.target.checked;
   }
 
+  autoFix = () => {
+    this.props.projectStore.project.autoFixHeader().then(() => this.refs.table.updateGrids())
+  }
+
   formatTable = () => {
-    const { target, colType, headerTemp: { temp }, sortData, sortHeader, renameVariable } = this.props.projectStore.project;
+    const { target, headerTemp: { temp }, sortData, sortHeader, renameVariable } = this.props.projectStore.project;
     const { showSelect, checkList } = this
     if (!sortData.length) return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
@@ -170,7 +177,7 @@ export default class DataSchema extends Component {
           const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
           key = header + suffix
         }
-        const colValue = colType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
+        const colValue = this.dataType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
           <option value="Categorical">Categorical</option>
           <option value="Numerical">Numerical</option>
@@ -219,14 +226,14 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { etling, etlProgress, sortHeader, problemType, noComputeTemp, target, colType, headerTemp: { isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, sortHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated } } = project;
     const targetOption = {};
     const tableData = this.formatTable()
     //target选择列表
     sortHeader.forEach(h => {
       h = h.trim()
-      if (problemType === "Classification" && colType[h] === "Categorical") targetOption[h] = h
-      if (problemType === "Regression" && colType[h] === "Numerical") targetOption[h] = h
+      if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = h
+      if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = h
     });
 
     return project && <div className={styles.schema}>
@@ -266,6 +273,9 @@ export default class DataSchema extends Component {
             <div className={styles.errorBlock}></div>
             <span>Duplicated Header</span>
           </div>}
+          {(isMissed || isDuplicated) && <div className={styles.schemaSelect} onClick={this.autoFix}>
+            <span>Auto Header Repair</span>
+          </div>}
         </div>
         <div className={styles.content}>
           <Table
@@ -278,6 +288,7 @@ export default class DataSchema extends Component {
             fixedRowCount={this.showSelect ? 3 : 2}
             checked={this.checked}
             select={this.select}
+            style={{ border: "1px solid #ccc" }}
             data={tableData} />
         </div>
       </div>

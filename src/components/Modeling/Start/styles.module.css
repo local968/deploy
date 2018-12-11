@@ -354,6 +354,10 @@
   margin: 0 0.05em;
 }
 
+.tableTh span{
+  text-align: center;
+}
+
 .tableBody {
   display: flex;
   flex: none;
