@@ -430,11 +430,9 @@ wss.register('etl', (message, socket, progress) => {
       return command(data, processData => {
         let { result, status } = processData;
         if (status < 0 || status === 100) return processData
-        const { name, path, key, origin_header } = result
-        if (name === "progress" && key === 'etl') {
-          return progress(processData)
-        }
-        if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: origin_header, dataHeader: origin_header })
+        const { name, path, key, originHeader, fields } = result
+        if (name === "progress" && key === 'etl') return progress(processData)
+        if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, originHeader: originHeader, rawHeader: fields, dataHeader: fields })
         if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
         return null
       }).then(returnValue => {
@@ -485,8 +483,8 @@ wss.register('dataView', (message, socket, progress) => sendToCommand({ ...messa
   const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
   const { status, result } = returnValue
   if (status === 100) {
-    const {result: updateResult} = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
-    if(updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
+    const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
+    if (updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
     // createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
   }
   return returnValue

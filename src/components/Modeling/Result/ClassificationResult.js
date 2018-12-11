@@ -383,7 +383,7 @@ class ModelDetail extends Component {
           </div>
           <div className={styles.cell}>
             <span>
-              {model.score.validateScore.acc.toFixed(2)}
+              {model.validationAcc.toFixed(2)}
             </span>
           </div>
           <div className={styles.cell}>

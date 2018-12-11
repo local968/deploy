@@ -3,4 +3,5 @@
     flex: auto;
     background-color: #fff;
     overflow: auto;
+    position: relative;
 }

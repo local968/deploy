@@ -274,7 +274,7 @@ export default class DataSchema extends Component {
             <span>Duplicated Header</span>
           </div>}
           {(isMissed || isDuplicated) && <div className={styles.schemaSelect} onClick={this.autoFix}>
-            <span>Auto Fix Header</span>
+            <span>Auto Header Repair</span>
           </div>}
         </div>
         <div className={styles.content}>

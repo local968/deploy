@@ -73,6 +73,7 @@ export default class Project {
   @observable correlationMatrixImg = '';
   @observable newVariable = [];
   @observable expression = {}
+  @observable newType = {}
   @observable informativesLabel = []
   @observable colValueCounts = {}
   @observable totalFixedLines = 0
@@ -239,6 +240,7 @@ export default class Project {
       version: [1, 2],
       trainHeader: [],
       newVariable: [],
+      newType: {},
       expression: {},
       validationRate: 20,
       holdoutRate: 20,
@@ -849,7 +851,7 @@ export default class Project {
   }
 
   @action
-  addNewVariable = (variableName, variables, exp) => {
+  addNewVariable = (variableName, variables, exp, type) => {
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
 
     return socketStore.ready().then(api => {
@@ -867,11 +869,16 @@ export default class Project {
         }
         const newVariable = [...this.newVariable, ...variables]
         const trainHeader = [...this.trainHeader, ...variables]
+        const newType = Object.assign({}, this.newType, variables.reduce((start, v) => {
+          start[v] = type
+          return start
+        }, {}))
         const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
         this.updateProject({
           newVariable,
           trainHeader,
-          expression
+          expression,
+          newType
         })
         return true
       })
