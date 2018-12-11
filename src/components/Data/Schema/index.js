@@ -11,13 +11,13 @@ import { Select, ContinueButton, ProcessLoading, Table, Hint } from 'components/
 export default class DataSchema extends Component {
   @observable checkList = this.props.projectStore.project.sortHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
   @observable showSelect = false
-  @observable dataType = {...this.props.projectStore.project.colType}
+  @observable dataType = { ...this.props.projectStore.project.colType }
 
   doEtl = () => {
     const { sortHeader, noComputeTemp } = this.props.projectStore.project;
     const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
     this.props.projectStore.project.updateProject({
-      colType: {...this.dataType},
+      colType: { ...this.dataType },
       dataHeader: newDataHeader,
       noCompute: noComputeTemp,
       cleanData: [],
@@ -30,7 +30,8 @@ export default class DataSchema extends Component {
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
-      renameVariable: {}
+      renameVariable: {},
+      missingReason: {}
     }).then(() => this.props.projectStore.project.etl())
   }
 
@@ -38,7 +39,7 @@ export default class DataSchema extends Component {
     // const { colType } = this.props.projectStore.project
     const data = {
       target: value,
-      colType: {...this.dataType},
+      colType: { ...this.dataType },
       outlierFillMethod: {}
     }
     // 回归默认设置为drop

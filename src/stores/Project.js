@@ -81,6 +81,7 @@ export default class Project {
   @observable mismatchLineCounts = {}
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
+  @observable missingReason = {}
 
   //not save
   @observable targetMapTemp = {};
@@ -209,7 +210,8 @@ export default class Project {
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
-      renameVariable: {}
+      renameVariable: {},
+      missingReason: {}
     }
   }
 
@@ -828,7 +830,7 @@ export default class Project {
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ [key]: null })
-          return antdMessage.error("dataview error")
+          return antdMessage.error(result['process error'])
         }
         this.setProperty({ [key]: result.data })
       })
@@ -846,7 +848,8 @@ export default class Project {
       outlierDict: toJS(this.outlierDict),
       nullFillMethod: toJS(this.nullFillMethod),
       mismatchFillMethod: toJS(this.mismatchFillMethod),
-      outlierFillMethod: toJS(this.outlierFillMethod)
+      outlierFillMethod: toJS(this.outlierFillMethod),
+      missingReason: toJS(this.missingReason)
     })
   }
 
@@ -1149,7 +1152,7 @@ export default class Project {
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          return antdMessage.error("preTrainImportance error")
+          return antdMessage.error(result['process error'])
         }
         this.setProperty({ preImportance: result.preImportance, informativesLabel: result.informativesLabel })
       })
@@ -1166,7 +1169,7 @@ export default class Project {
       };
       api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
-        if (status < 0) return alert("correlationMatrix error")
+        if (status < 0) return antdMessage.error(result['process error'])
         this.correlationMatrixHeader = result.header;
         this.correlationMatrixData = result.data;
       })

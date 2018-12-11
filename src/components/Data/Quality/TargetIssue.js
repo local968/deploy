@@ -495,9 +495,27 @@ export class FixIssue extends Component {
     return "N/A"
   }
 
+  reasonSelect = (key, e) => {
+    const value = e.target.value
+    const { missingReason, nullFillMethod, colType } = this.props.project
+    if (value === "none") {
+      delete nullFillMethod[key]
+      delete missingReason[key]
+    } else {
+      missingReason[key] = value
+      if (colType[key] === 'Categorical' && value === 'blank') {
+        nullFillMethod[key] = 'ignore'
+      } else {
+        delete nullFillMethod[key]
+      }
+    }
+    this.props.project.missingReason = { ...missingReason }
+    this.props.project.nullFillMethod = { ...nullFillMethod }
+  }
+
   render() {
     const { closeFixes, project, saveDataFixes, isTarget, issueRows } = this.props;
-    const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, rawDataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, rawDataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReason } = project
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -541,7 +559,7 @@ export class FixIssue extends Component {
                   {showType === 'Categorical' ? [
                     <option value={mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,
-                    <option value={0} key={0}>Replace with 0</option>
+                    <option value="ignore" key="ignore">Replace with a unique value</option>
                   ] : [
                       <option value={mean} key='mean'>Replace with mean value</option>,
                       <option value="drop" key='drop'>Delete the row</option>,
@@ -592,7 +610,11 @@ export class FixIssue extends Component {
               // const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
-                <div className={styles.fixesCell}><span>I don`t know</span></div>
+                <div className={styles.fixesCell}><select value={missingReason[k]} onChange={this.reasonSelect.bind(null, k)}>
+                  <option value='none' key="none">I don`t know</option>
+                  <option value="blank" key="blank">Left blank on purpose</option>
+                  <option value='fail' key='fail'>Failed to Collect or Data Error</option>
+                </select></div>
                 <div className={styles.fixesCell}><span>{showType}</span></div>
                 <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
@@ -602,7 +624,7 @@ export class FixIssue extends Component {
                   {showType === 'Categorical' ? [
                     <option value={mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,
-                    <option value={0} key={0}>Replace with 0</option>
+                    <option value='ignore' key='ignore'>Replace with a unique value</option>
                   ] : [
                       <option value={mean} key='mean'>Replace with mean value</option>,
                       <option value="drop" key='drop'>Delete the row</option>,
