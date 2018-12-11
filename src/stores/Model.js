@@ -15,6 +15,7 @@ export default class Model {
   @observable qcut;
   @observable confusionMatrix
   @observable problemType
+  @observable fitIndexModified;
 
   constructor(projectId, model, name) {
     this.projectId = projectId;
@@ -48,9 +49,11 @@ export default class Model {
   @action
   setFitIndex(index) {
     this.fitIndex = index;
+    this.fitIndexModified = true;
   }
   @action
   resetFitIndex() {
+    this.fitIndexModified = false;
     this.fitIndex = this.initialFitIndex;
   }
   getScore = (ITP, IFN, IFP, ITN) => {
