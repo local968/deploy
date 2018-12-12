@@ -439,6 +439,7 @@ wss.register('etl', (message, socket, progress) => {
         }).then(returnValue => {
           let { result, status } = returnValue;
           result.etling = false
+          result.etlProgress = 0
           if (status < 0) return {
             status: 418,
             result,
