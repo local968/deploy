@@ -431,9 +431,9 @@ wss.register('etl', (message, socket, progress) => {
         .then(() => command(data, processData => {
           let { result, status } = processData;
           if (status < 0 || status === 100) return processData
-          const { name, path, key, origin_header, value } = result
+          const { name, path, key, originHeader, value, fields } = result
           if (name === "progress" && key === 'etl') createOrUpdate(id, userId, { etlProgress: value })
-          if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: origin_header, dataHeader: origin_header })
+          if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, originHeader: originHeader, rawHeader: fields, dataHeader: fields })
           if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
           return null
         }).then(returnValue => {
