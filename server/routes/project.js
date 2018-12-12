@@ -454,6 +454,8 @@ wss.register('etl', (message, socket, progress) => {
 
           const steps = {}
           if (firstEtl) {
+            steps.curStep = 2
+            steps.mainStep = 2
             steps.subStepActive = 2
             steps.lastSubStep = 2
           } else {
@@ -463,18 +465,14 @@ wss.register('etl', (message, socket, progress) => {
               steps.subStepActive = 1
               steps.lastSubStep = 1
             } else {
-              if (noCompute) {
-                steps.curStep = 3
-                steps.mainStep = 3
-                steps.subStepActive = 1
-                steps.lastSubStep = 1
-              } else {
-                steps.subStepActive = 3
-                steps.lastSubStep = 3
-              }
+              steps.curStep = 2
+              steps.mainStep = 2
+              steps.subStepActive = 3
+              steps.lastSubStep = 3
             }
           }
-
+          //重新做ETL后删除所有模型
+          deleteModels(id)
           return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
             if (updateResult.status !== 200) return updateResult
             return {
