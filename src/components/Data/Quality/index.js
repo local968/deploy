@@ -114,7 +114,7 @@ class TargetIssue extends Component {
             <div className={styles.point}></div>
             <span>Data size is too small</span>
           </div>}
-          {issues.targetRowIssue && <div className={styles.issueText}>
+          {(problemType !== 'Classification' && issues.targetRowIssue) && <div className={styles.issueText}>
             <div className={styles.point}></div>
             <span>Some data issues, highlighted incolor, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically</span>
           </div>}
@@ -160,7 +160,7 @@ class TargetIssue extends Component {
               )}
             </div>
           </div>
-          <ContinueButton onClick={changeTab} text='continue' width="100%" />
+          <ContinueButton disabled={issues.targetIssue} onClick={changeTab} text='continue' width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
@@ -256,7 +256,7 @@ class VariableIssue extends Component {
 
   showSummary = () => {
     const { project } = this.props
-    project.etl().then(() => this.summary = true)
+    project.endQuality().then(() => this.summary = true)
   }
 
   closeSummary = () => {

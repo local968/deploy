@@ -14,25 +14,12 @@ export default class DataSchema extends Component {
   @observable dataType = { ...this.props.projectStore.project.colType }
 
   doEtl = () => {
-    const { sortHeader, noComputeTemp } = this.props.projectStore.project;
+    const { project } = this.props.projectStore
+    const { sortHeader } = project;
     const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
-    this.props.projectStore.project.updateProject({
-      colType: { ...this.dataType },
-      dataHeader: newDataHeader,
-      noCompute: noComputeTemp,
-      cleanData: [],
-      targetMap: {},
-      targetArray: [],
-      outlierDict: {},
-      nullFillMethod: {},
-      mismatchFillMethod: {},
-      totalFixedLines: 0,
-      nullLineCounts: {},
-      mismatchLineCounts: {},
-      outlierLineCounts: {},
-      renameVariable: {},
-      missingReason: {}
-    }).then(() => this.props.projectStore.project.etl())
+    project.dataHeader = newDataHeader
+    project.colType = { ...this.dataType }
+    project.endSchema()
   }
 
   targetSelect = (value) => {

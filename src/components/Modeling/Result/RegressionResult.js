@@ -16,7 +16,8 @@ export default class RegressionView extends Component {
   render() {
     const { models, project } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current } = project;
-
+    const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
+    
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -28,7 +29,7 @@ export default class RegressionView extends Component {
           </div>
           <div className={styles.row}>
             <span>Modeling Results :{' '}</span>
-            <div className={styles.status}>&nbsp;&nbsp;OK</div>
+            <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
             <span>Selected Model :<a>&nbsp;{current.name}</a></span>

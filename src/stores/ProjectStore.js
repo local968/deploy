@@ -33,7 +33,7 @@ class ProjectStore {
     const sort = this.toolsOption.sort
     return this.list.sort((a, b) => {
       return b[sort] - a[sort]
-    })
+    }).slice(0, this.toolsOption.limit)
   }
 
   @computed
@@ -76,8 +76,8 @@ class ProjectStore {
           })
           api.on("inProject", data => {
             const { id, broadcastId } = data
-            if(broadcastId === this.broadcastId) return
-            if(id !== this.currentId) return 
+            if (broadcastId === this.broadcastId) return
+            if (id !== this.currentId) return
             this.showConflict()
           })
         }
@@ -113,7 +113,7 @@ class ProjectStore {
           this.loading = false;
           return { error: message }
         }
-        this.list.push(new Project(id + ""))
+        if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: +new Date() }))
         this.loading = false;
         return { id }
       })
@@ -143,7 +143,7 @@ class ProjectStore {
   @action
   initProject = id => {
     return new Promise(resolve => {
-      if(this.currentId === id) return resolve(true)
+      if (this.currentId === id) return resolve(true)
       when(
         () => !this.loading && !this.isInit,
         () => {

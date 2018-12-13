@@ -47,6 +47,10 @@ export default class Home extends Component {
     };
   }
 
+  componentDidMount() {
+    this.props.projectStore.clean()
+  }
+
   selectId = (isSelect, id) => {
     let ids;
     if (isSelect) {

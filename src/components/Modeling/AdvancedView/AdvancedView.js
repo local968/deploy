@@ -198,10 +198,13 @@ export default class AdvancedView extends Component {
     try {
       const { project } = this.props;
       const { selectModel: current } = project;
-      const index = project.problemType === 'Classification' ? 'auc' : 'r2'
-      return current ? (current.score.validateScore[index] > 0.8 && "GOOD") || (current.score.validateScore[index] > 0.6 && "OK") || "NotSatisfied" : ''
+      if (project.problemType === 'Classification') {
+        return current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
+      } else {
+        return current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
+      }
     } catch (e) {
-      return 'ok'
+      return 'OK'
     }
   }
 

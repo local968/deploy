@@ -24,6 +24,8 @@ export default class Project {
 
   //project
   @observable name;
+  @observable createTime
+  @observable updateTime
   // @observable description;
 
   //problem
@@ -37,6 +39,7 @@ export default class Project {
   @observable etlProgress = 0
 
   // upload data
+  @observable cleanHeader = []
   @observable dataHeader = [];
   @observable uploadData = [];
   @observable rawHeader = [];
@@ -164,6 +167,7 @@ export default class Project {
     this.uploadData = []
 
     return {
+      cleanHeader: [],
       uploadFileName: [],
       dataHeader: [],
       rawHeader: [],
@@ -396,6 +400,7 @@ export default class Project {
         data.targetArrayTemp = data[key];
       }
     }
+    data.updateTime = +new Date()
     Object.assign(this, data)
   }
 
@@ -436,69 +441,29 @@ export default class Project {
     this.updateProject(backData).then(() => this.etl())
   }
 
-  //读取预览文件
-  // @action
-  // newFileInit = (uploadData) => {
-  //   const rawHeader = uploadData[0].map((h) => h.trim());
-  //   const data = uploadData.slice(1);
-
-  //   // 上传文件，不需要修改header
-  //   this.updateProject({
-  //     uploadData: data,
-  //     dataHeader: rawHeader,
-  //     rawHeader: rawHeader
-  //   });
-
-  /**
-   * 自动修改header
-   */
-  // const temp = {};
-  // const header = rawHeader.map((h, i) => {
-  //   h = h.trim();
-  //   if (/^$/.test(h)) {
-  //     h = `Unnamed: ${i}`;
-  //   }
-  //   if (!temp[h]) {
-  //     temp[h] = 1;
-  //   } else {
-  //     h = h + '.' + temp[h];
-  //     temp[h]++;
-  //   }
-  //   return h;
-  // });
-
-  // // 上传文件，target为空
-  // this.updateProject({
-  //   uploadData: data,
-  //   dataHeader: header,
-  //   rawHeader: header,
-  // });
-  // }
-
   @action
   autoFixHeader = () => {
-    /**
-   * 自动修改header
-   */
-    const temp = {};
-    const header = this.rawHeader.map((h, i) => {
-      h = h.trim();
-      if (/^$/.test(h)) {
-        h = `Unnamed: ${i}`;
-      }
-      if (!temp[h]) {
-        temp[h] = 1;
-      } else {
-        h = h + '.' + temp[h];
-        temp[h]++;
-      }
-      return h;
-    });
+    //   /**
+    //  * 自动修改header
+    //  */
+    //   const temp = {};
+    //   const header = this.rawHeader.map((h, i) => {
+    //     h = h.trim();
+    //     if (/^$/.test(h)) {
+    //       h = `Unnamed: ${i}`;
+    //     }
+    //     if (!temp[h]) {
+    //       temp[h] = 1;
+    //     } else {
+    //       h = h + '.' + temp[h];
+    //       temp[h]++;
+    //     }
+    //     return h;
+    //   });
 
     // 上传文件，target为空
     return this.updateProject({
-      dataHeader: header,
-      rawHeader: header,
+      rawHeader: this.cleanHeader,
     });
   }
 
@@ -526,6 +491,30 @@ export default class Project {
       isMissed,
       isDuplicated
     };
+  }
+
+  @action
+  endSchema = () => {
+    return this.updateProject(Object.assign({
+      colType: { ...this.colType },
+      dataHeader: [...this.dataHeader],
+      noCompute: this.noComputeTemp
+    }, this.defaultDataQuality, this.defaultTrain))
+      .then(() => this.etl())
+  }
+
+  @action
+  endQuality = () => {
+    return this.updateProject(Object.assign({
+      targetMap: toJS(this.targetMap),
+      targetArray: toJS(this.targetArray),
+      renameVariable: toJS(this.renameVariable),
+      outlierDict: toJS(this.outlierDict),
+      nullFillMethod: toJS(this.nullFillMethodoutlierDict),
+      mismatchFillMethod: toJS(this.mismatchFillMethodoutlierDict),
+      outlierFillMethod: toJS(this.outlierFillMethodoutlierDict),
+      missingReason: toJS(this.missingReasonoutlierDict)
+    }, this.defaultTrain)).then(() => this.etl())
   }
 
   @computed
@@ -781,19 +770,6 @@ export default class Project {
       if (status !== 200) return antdMessage.error(message)
       this.setProperty({ ...result, stopEtl: false })
     }))
-  }
-
-  next = () => {
-    const { curStep, subStepActive, noCompute } = this;
-    if (curStep === 2 && subStepActive < 3) {
-      if (noCompute && subStepActive !== 1) {
-        return this.nextMainStep(3)
-      }
-      const nextStep = subStepActive + 1;
-      return this.nextSubStep(nextStep, curStep)
-    } else {
-      return {}
-    }
   }
 
   @action
