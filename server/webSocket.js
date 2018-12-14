@@ -1,5 +1,6 @@
 const WebSocket = require('ws')
 const { redis, pubsub } = require('redis')
+const { saveMessage, removeMessage } = require('./reboot')
 const uuid = require('uuid')
 
 const _apis = []
@@ -50,7 +51,7 @@ const init = (server, sessionParser) => {
 
   // init custom on function
   wss.register = function (eventName, listener) {
-    const callback = (...args) => {
+    const callback = async (...args) => {
       if (args.length < 2 || !args[0].type) return listener(...args)
       const message = args[0]
       const socket = args[1]
@@ -62,23 +63,15 @@ const init = (server, sessionParser) => {
         }
         return false
       }
-      const returnValue = listener(message, socket, progress) || {}
-      if (returnValue.then && typeof returnValue.then === 'function') {
-        // returnValue.progress = (result) => socket.send(JSON.stringify({ ...result, request: { ...message, progress: true } }))
-        returnValue.then(
-          result => socket.send(JSON.stringify({ ...result, request: message })),
-          error => {
-            console.error(error)
-            return socket.send(JSON.stringify({ status: 500, error: 'server error', message: 'server error', ...error, request: message }))
-          })
-      } else {
-        try {
-          socket.send(JSON.stringify({ ...returnValue, request: message }))
-        }catch(e) {
-          // socket closed
-        }
-        return
+      await saveMessage(message, socket.session.user)
+      try {
+        const returnValue = await listener(message, socket, progress) || {}
+        socket.send(JSON.stringify({ ...returnValue, request: message }))
+        await removeMessage(message, socket.session.user)
+      } catch (e) {
+        // socket closed
       }
+      return
     }
     wss.addListener(eventName, callback)
     wss.api.push(eventName)
