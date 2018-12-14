@@ -35,7 +35,6 @@ class ProjectStore {
   }
 
   initWatch = () => {
-    console.log('initWatch', this.init)
     this.isOnline = true
     if (this.init) return
     this.watchProjectList();
@@ -46,7 +45,6 @@ class ProjectStore {
   }
 
   offline = () => {
-    console.log('offline')
     this.watchList = false;
     this.init = false
     this.isOnline = false
