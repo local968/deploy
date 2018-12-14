@@ -28,8 +28,8 @@ class ProjectStore {
 
   initReload = () => {
     const { projectStore } = this.props
-    socketStore.offline(projectStore.offline)
-    socketStore.online(projectStore.initWatch)
+    socketStore.on('offline', projectStore.offline)
+    socketStore.on('online', projectStore.initWatch)
   }
 
   initWatch = () => {

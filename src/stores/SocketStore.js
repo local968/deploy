@@ -40,6 +40,7 @@ class Socket extends EventEmitter {
   reconnect() {
     if (this.reconnectLock) return;
     this.reconnectLock = true;
+    this.emit('offline')
     setTimeout(() => {     //没连接上会一直重连，设置延迟避免请求过多
       this.createWebSocket();
       this.reconnectLock = false;
@@ -86,6 +87,7 @@ class Socket extends EventEmitter {
   onOpen = (event) => {
     this.errorTimes = 0
     this.start();      //reset client heartbeat check
+    this.emit('offline')
     console.info('websocket connect succesful. ' + new Date().toUTCString())
     for (let i = 0; i < this.messageList.length; i++) {
       const message = this.messageList.shift()
@@ -110,7 +112,7 @@ class Socket extends EventEmitter {
 
 class SocketStore extends EventEmitter {
   status = 'init';
-  api = { on: this.on.bind(this), offline: this.offline.bind(this), online: this.online.bind(this) };
+  api = { on: this.on.bind(this) };
   socket = null;
 
   connect() {
@@ -130,6 +132,12 @@ class SocketStore extends EventEmitter {
       if (data.request && data.request._id && data.request.progress === true) return this.emit('progress' + data.request._id, data);
       if (data.type) return this.emit(data.type, data);
     })
+    this.socket.on('offline', () => {
+      this.emit('offline')
+    })
+    this.socket.on('online', () => {
+      this.emit('online')
+    })
     if (debug) {
       window.ss = this
       window.ws = this.ws
@@ -141,7 +149,7 @@ class SocketStore extends EventEmitter {
   offline(callback) {
     this.ready().then(() => {
       this.socket.addEventListener('close', () => {
-        if(callback && typeof callback === 'function') callback()
+        if (callback && typeof callback === 'function') callback()
         console.log("close 111")
       })
     })
@@ -150,7 +158,7 @@ class SocketStore extends EventEmitter {
   online(callback) {
     this.ready().then(() => {
       this.socket.addEventListener('open', () => {
-        if(callback && typeof callback === 'function') callback()
+        if (callback && typeof callback === 'function') callback()
         console.log("open 1111")
       })
     })
