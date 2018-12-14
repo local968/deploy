@@ -41,11 +41,12 @@ class ProjectStore {
     when(
       () => this.watchList,
       () => {
-        this.queryProjectList()
-        if (this.project) {
-          this.project.initProject()
-          this.project.initModels()
-        }
+        this.queryProjectList().then(() => {
+          if (this.project) {
+            this.project.initProject()
+            this.project.initModels()
+          }
+        })
       }
     )
   }
@@ -117,8 +118,8 @@ class ProjectStore {
   @action
   queryProjectList = () => {
     this.loading = true;
-    socketStore.ready().then(api => {
-      api.queryProjectList(this.toolsOption).then(result => {
+    return socketStore.ready().then(api => {
+      return api.queryProjectList(this.toolsOption).then(result => {
         const { status, message, list, count } = result
         if (status !== 200) {
           this.loading = false;
