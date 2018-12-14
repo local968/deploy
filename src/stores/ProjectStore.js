@@ -42,7 +42,10 @@ class ProjectStore {
       () => this.watchList,
       () => {
         this.queryProjectList()
-        if (this.currentId) this.initProject(this.currentId)
+        if (this.project) {
+          this.project.initProject()
+          this.project.initModels()
+        }
       }
     )
   }
