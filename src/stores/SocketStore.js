@@ -72,10 +72,10 @@ class Socket extends EventEmitter {
 
   onClose = (event) => {
     this.errorTimes++
-    if (this.errorTimes >= 10) {
-      this.connectionError = event
-      console.error('error retry > 10 times')
-    }
+    // if (this.errorTimes >= 10) {
+    //   this.connectionError = event
+    //   console.error('error retry > 10 times')
+    // }
     if (!this.connectionError) this.reconnect();
     console.warn('websocket connection closed!', event)
   }

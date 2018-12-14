@@ -24,6 +24,7 @@ class ProjectStore {
 
   constructor() {
     this.initWatch()
+    this.initReload()
   }
 
   initReload = () => {
