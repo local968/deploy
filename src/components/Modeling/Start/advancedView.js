@@ -10,8 +10,8 @@ import { Select, message } from 'antd';
 
 const Option = Select.Option;
 const Range = Slider.Range;
-const ClassificationAlgorithms = ['adaboost', 'bernoulli_nb', 'decision_tree', 'extra_trees', 'gaussian_nb', 'gradient_boosting', 'k_nearest_neighbors', 'lda', 'liblinear_svc', 'libsvm_svc', 'multinomial_nb', 'passive_aggressive', 'qda', 'random_forest', 'sgd', 'xgradient_boosting'];
-const RegressionAlgorithms = ['adaboost', 'ard_regression', 'decision_tree', 'extra_trees', 'gaussian_process', 'gradient_boosting', 'k_nearest_neighbors', 'liblinear_svr', 'libsvm_svr', 'random_forest', 'ridge_regression', 'sgd', 'xgradient_boosting'];
+const ClassificationAlgorithms = ['AdaBoost', 'NaiveBayes-Bernoulli', 'Decision Tree', 'Extra Trees', 'NaiveBayes-Gaussian', 'GBDT', 'KNN', 'LDA', 'Linear SVM', 'SVM', 'NaiveBayes-Multinomial', 'Online Passive Aggressive', 'QDA', 'Random Forest', 'Linear Incremental Model', 'XGBoost'];
+const RegressionAlgorithms = ['AdaBoost', 'ARD Rregression', 'Decision Tree', 'Extra Trees', 'GP Regression', 'GBDT', 'KNN', 'Linear SVM', 'SVM', 'Random Forest', 'Ridge Regression', 'Linear Incremental Model', 'XGBoost'];
 const HandleStyle = {
   backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
   border: '0.07em solid #e8e8e8',
@@ -264,10 +264,7 @@ export default class AdvancedView extends Component {
               {algorithmList.map((v, k) => {
                 return <div className={styles.advancedAlgorithm} key={k}>
                   <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v)} onChange={this.handleCheck.bind(null, v)} />
-                  <label htmlFor={"algorithm" + k}>{v.split("_").map(i => {
-                    const arr = i.split("")
-                    return arr.shift().toUpperCase() + arr.join("")
-                  }).join(" ")}</label>
+                  <label htmlFor={"algorithm" + k}>{v}</label>
                 </div>
               })}
             </div>

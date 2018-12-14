@@ -141,7 +141,7 @@ class AdvancedModel extends Component {
         </div>
         <div className={styles.viewBox}>
           {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable} /> : <AdvancedView project={project} />}
-          {(this.tab === 1 && this.isLoading) && <ProcessLoading progress={this.progress} style={{bottom: '0.25em'}}/>}
+          {(this.tab === 1 && this.isLoading) && <ProcessLoading progress={this.progress} style={{ bottom: '0.25em' }} />}
           {/* {((this.tab === 1 && this.preImportanceLoading) || this.dataViewLoading) && <div className={styles.simplifiedLoad}>
             <Spin size="large" />
           </div>} */}
@@ -150,9 +150,9 @@ class AdvancedModel extends Component {
           <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
           <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
         </div>
-        
+
       </div>
-      
+
     </div>
   }
 }
