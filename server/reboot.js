@@ -19,6 +19,8 @@ const saveMessage = async (message, user) => {
   message = JSON.stringify(message)
   const id = crypto.createHash('md5').update(message).digest('hex')
   const key = `message:${id}`
+  const exist = await redis.exists(key)
+  if (exist) return
   const pipeline = redis.pipeline()
   pipeline.set(key, message)
   pipeline.sadd(`node:${nodeId}:messages`, key)
@@ -37,22 +39,25 @@ const removeMessage = async (message, user) => {
 }
 
 const init = async (wss) => {
-  // let left = await redis.scard(`node:${nodeId}:messages`)
-  // if (left === 0) return
-  // while (left > 0) {
-  //   try {
-  //     const messageId = await redis.spop(`node:${nodeId}:messages`)
-  //     const message = JSON.parse(await redis.get(messageId))
-  //     console.log(`recovering ${messageId}:`, message)
-  //     const user = message.user
-  //     const socket = { ...fakeSocket, session: { userId: user.id, user } }
-  //     wss.emit('message', socket, JSON.stringify(message))
-  //   } catch (e) {
-  //     console.error('message recover failed', e)
-  //   }
-  //   console.log('left:', left)
-  //   left = await redis.scard(`node:${nodeId}:messages`)
-  // }
+  const emits = []
+  let left = await redis.scard(`node:${nodeId}:messages`)
+  if (left === 0) return
+  while (left > 0) {
+    try {
+      const messageId = await redis.spop(`node:${nodeId}:messages`)
+      const message = JSON.parse(await redis.get(messageId))
+      console.log(`recovering ${messageId}:`, message)
+      const user = message.user
+      const socket = { ...fakeSocket, session: { userId: user.id, user } }
+      await redis.del(messageId)
+      emits.push(['message', socket, JSON.stringify(message)])
+    } catch (e) {
+      console.error('message recover failed', e)
+    }
+    left = await redis.scard(`node:${nodeId}:messages`)
+    console.log('left:', left)
+  }
+  emits.forEach(args => wss.emit(...args))
 }
 
 router.get('/status', async (req, res) => {
@@ -67,6 +72,13 @@ router.get('/clear', async (req, res) => {
   const result = await redis.del(...keys, `node:${nodeId}:messages`)
   const left = await redis.scard(`node:${nodeId}:messages`)
   res.json({ result, left, keys })
+})
+
+router.get('/clearProjectModels', async (req, res) => {
+  if (req.query.password !== config.PASSWORD) return res.status(404).end()
+  const keys = await redis.smembers(`project:${req.query.id}:models`)
+  const result = await redis.del(...keys, `project:${req.query.id}:models`)
+  res.json({ status: 'ok' })
 })
 
 module.exports = { saveMessage, removeMessage, recover: init, messageRouter: router }
