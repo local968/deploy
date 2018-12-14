@@ -427,63 +427,84 @@ wss.register('etl', (message, socket, progress) => {
     return getFileInfo(files).then((fileInfo) => {
       if (fileInfo.status !== 200) return fileInfo
       const { csvLocation, ext } = fileInfo
-      const data = { ...message, userId, requestId: message._id, csvLocation, ext, noCompute: firstEtl || noCompute }
+      const data = { ...message, userId: userId, requestId: message._id, csvLocation, ext, noCompute: firstEtl || noCompute }
       // delete data.firstEtl
       Reflect.deleteProperty(data,'firstEtl')
       if (!csvLocation) Reflect.deleteProperty(data,'csvLocation')
-      if (!ext) Reflect.deleteProperty(data,'ext')
-      return command(data, processData => {
-        let { result, status } = processData;
-        if (status < 0 || status === 100) return processData
-        const { name, path, key, originHeader, fields } = result
-        if (name === "progress" && key === 'etl') return progress(processData)
-        if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, originHeader: originHeader, rawHeader: fields, dataHeader: fields })
-        if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
-        return null
-      }).then(returnValue => {
-        let { result, status,message} = returnValue;
-        if (status < 0) return {
-          status: 418,
-          result,
-          message,
-        }
-        result.firstEtl = false;
-        // delete result.name
-        Reflect.deleteProperty(result,'name')
-        // delete result.id
-        Reflect.deleteProperty(result,'id')
-        // delete result.userId
-        Reflect.deleteProperty(result,'userId')
-        if (!files) Reflect.deleteProperty(result,'totalRawLines')
-        // 最终ETL 小于1W行  使用cross
-        if (result.totalLines < 10000) result.runWith = 'cross'
-
-        const steps = {}
-        if (firstEtl) {
-          steps.subStepActive = 2
-          steps.lastSubStep = 2
-        } else {
-          if (noCompute) {
-            steps.curStep = 3
-            steps.mainStep = 3
-            steps.subStepActive = 1
-            steps.lastSubStep = 1
+      if (!ext) delete Reflect.deleteProperty(data,'ext')
+      return createOrUpdate(id, userId, { etling: true })
+        .then(() => command(data, processData => {
+          let { result, status } = processData;
+          if (status < 0 || status === 100) return processData
+          const { name, path, key, originHeader, value, fields } = result
+          if (name === "progress" && key === 'etl') createOrUpdate(id, userId, { etlProgress: value })
+          if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: originHeader, cleanHeader: fields, dataHeader: fields })
+          if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
+          return null
+        }).then(returnValue => {
+          let { result, status } = returnValue;
+          if (status < 0) {
+            return createOrUpdate(id, userId, { etlProgress: 0, etling: false }).then(() => {
+              return {
+                status: 418,
+                result,
+                message: returnValue.message
+              }
+            })
+          }
+          result.etling = false
+          result.etlProgress = 0
+          result.firstEtl = false;
+          delete result.name
+          delete result.id
+          delete result.userId
+          if (!files) delete result.totalRawLines
+          // 最终ETL 小于1W行  使用cross
+          if (result.totalLines < 10000) result.runWith = 'cross'
+          const steps = {}
+          if (firstEtl) {
+            steps.curStep = 2
+            steps.mainStep = 2
+            steps.subStepActive = 2
+            steps.lastSubStep = 2
           } else {
-            steps.subStepActive = 3
-            steps.lastSubStep = 3
+            if (noCompute) {
+              steps.curStep = 3
+              steps.mainStep = 3
+              steps.subStepActive = 1
+              steps.lastSubStep = 1
+            } else {
+              steps.curStep = 2
+              steps.mainStep = 2
+              steps.subStepActive = 3
+              steps.lastSubStep = 3
+            }
           }
-        }
+          //重新做ETL后删除所有模型
+          deleteModels(id)
 
-        return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
-          if (updateResult.status !== 200) return updateResult
-          return {
-            status: 200,
-            message: 'ok',
-            result: result
-          }
-        })
-      })
+          return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
+            if (updateResult.status !== 200) return updateResult
+            return {
+              status: 200,
+              message: 'ok',
+              result: result
+            }
+          })
+        }))
     })
+  })
+})
+
+wss.register('abortEtl', (message, socket) => {
+  const projectId = message.projectId
+  const userId = socket.session.userId
+  return command({ ...message, userId, requestId: message._id }).then(() => {
+    const statusData = {
+      etling: false,
+      etlProgress: 0
+    }
+    return createOrUpdate(projectId, userId, statusData)
   })
 })
 

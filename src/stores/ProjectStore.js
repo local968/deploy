@@ -5,6 +5,8 @@ import uuid from "uuid";
 
 class ProjectStore {
   @observable loading = true;
+  @observable init = false;
+  @observable isOnline = true
   @observable watchList = false;
   @observable currentId = "";
 
@@ -21,11 +23,38 @@ class ProjectStore {
   @observable conflict = false
 
   constructor() {
+    this.initWatch()
+    this.initReload()
+  }
+
+  initReload = () => {
+    socketStore.ready().then(api => {
+      api.on('offline', this.offline)
+      api.on('online', this.initWatch)
+    })
+  }
+
+  initWatch = () => {
+    this.isOnline = true
+    if (this.init) return
     this.watchProjectList();
     when(
       () => this.watchList,
-      () => this.queryProjectList()
+      () => {
+        this.queryProjectList().then(() => {
+          if (this.project) {
+            this.project.initProject()
+            this.project.initModels()
+          }
+        })
+      }
     )
+  }
+
+  offline = () => {
+    this.watchList = false;
+    this.init = false
+    this.isOnline = false
   }
 
   @computed
@@ -33,7 +62,7 @@ class ProjectStore {
     const sort = this.toolsOption.sort
     return this.list.sort((a, b) => {
       return b[sort] - a[sort]
-    })
+    }).slice(0, this.toolsOption.limit)
   }
 
   @computed
@@ -65,6 +94,7 @@ class ProjectStore {
       api.watchProjectList().then(watch => {
         if (watch.status === 200) {
           this.watchList = true
+          this.init = true
           api.on(watch.id, data => {
             const { status, id, result, model } = data
             if (status === 200) {
@@ -76,8 +106,8 @@ class ProjectStore {
           })
           api.on("inProject", data => {
             const { id, broadcastId } = data
-            if(broadcastId === this.broadcastId) return
-            if(id !== this.currentId) return 
+            if (broadcastId === this.broadcastId) return
+            if (id !== this.currentId) return
             this.showConflict()
           })
         }
@@ -88,8 +118,8 @@ class ProjectStore {
   @action
   queryProjectList = () => {
     this.loading = true;
-    socketStore.ready().then(api => {
-      api.queryProjectList(this.toolsOption).then(result => {
+    return socketStore.ready().then(api => {
+      return api.queryProjectList(this.toolsOption).then(result => {
         const { status, message, list, count } = result
         if (status !== 200) {
           this.loading = false;
@@ -113,7 +143,7 @@ class ProjectStore {
           this.loading = false;
           return { error: message }
         }
-        this.list.push(new Project(id + ""))
+        if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: +new Date() }))
         this.loading = false;
         return { id }
       })
@@ -143,7 +173,7 @@ class ProjectStore {
   @action
   initProject = id => {
     return new Promise(resolve => {
-      if(this.currentId === id) return resolve(true)
+      if (this.currentId === id) return resolve(true)
       when(
         () => !this.loading && !this.isInit,
         () => {
@@ -152,7 +182,7 @@ class ProjectStore {
             return row.id === id
           })
           if (project) {
-            project.queryProject()
+            project.initProject()
             project.initModels()
             this.currentId = id
             return resolve(true)
@@ -191,6 +221,7 @@ class ProjectStore {
 
   @action
   clean = () => {
+    if (this.currentId) this.project.clean()
     this.currentId = ''
   }
 }

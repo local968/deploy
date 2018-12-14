@@ -4,6 +4,8 @@ const { redis } = require('redis')
 const config = require('config')
 const uuid = require('uuid')
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path')
 const moment = require('moment')
 const command = require('../command')
 const { userModelingRestriction, userStorageRestriction } = require('restriction')
@@ -123,46 +125,45 @@ router.get('/test', async (req, res) => {
   res.json(host)
 })
 
+router.get('/reload', (req, res) => {
+  saveSample()
+  res.json({
+    status: 100,
+    msg: 'ok'
+  })
+})
+
 function saveSample() {
-  const array = [
-    {
-      name: 'bank.train.csv',
-      path: '/r2/sample/bank.train.csv',
-      createdTime: 1539757558
-    },
-    {
-      name: 'titanic.train.csv',
-      path: '/r2/sample/titanic.train.csv',
-      createdTime: 1539757558
-    },
-    {
-      name: 'dma1c_dirty.csv',
-      path: '/r2/sample/dma1c_dirty.csv',
-      createdTime: 1539757558
-    },
-    {
-      name: 'givemecredit_dirty.csv',
-      path: '/r2/sample/givemecredit_dirty.csv',
-      createdTime: 1539757558
-    },
-    {
-      name: 'regression.house.csv',
-      path: '/r2/sample/regression.house.csv',
-      createdTime: 1539757558
-    },
-    {
-      name: 'game.csv',
-      path: '/r2/sample/game.csv',
-      createdTime: 1539757558
+  const root = process.cwd()
+  const samplePath = path.join(root, config.samplePath || "sample")
+  const sampleFilePath = config.sampleFilePath || '/r2/sample'
+
+  if (!fs.existsSync(samplePath)) return console.log("sample not exist")
+
+  if (fs.existsSync(sampleFilePath)) {
+    console.log("sample already exist")
+  } else {
+    try {
+      fs.symlinkSync(samplePath, sampleFilePath)
+    } catch (e) { return console.log(e.message) }
+    console.log("symlink create")
+  }
+  const files = fs.readdirSync(samplePath)
+
+  const array = files.map(f => {
+    const id = uuid.v4()
+    const filePath = path.join(sampleFilePath, f)
+    return {
+      id,
+      name: f,
+      path: filePath,
+      createdTime: +new Date()
     }
-  ]
-
-  const ids = ["1539759771", "1539759772", "1539759773", "1539759774", "1539759775", "1539759776"]
-
+  })
   const pipeline = redis.pipeline();
-  array.forEach((v, k) => {
-    pipeline.set(`file:sample:${v.name}`, ids[k])
-    pipeline.set(`file:${ids[k]}`, JSON.stringify(v))
+  array.forEach(v => {
+    pipeline.set(`file:sample:${v.name}`, v.id)
+    pipeline.set(`file:${v.id}`, JSON.stringify(v))
   })
   pipeline.exec()
 }

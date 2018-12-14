@@ -114,7 +114,7 @@ class TargetIssue extends Component {
             <div className={styles.point}></div>
             <span>Data size is too small</span>
           </div>}
-          {issues.targetRowIssue && <div className={styles.issueText}>
+          {(problemType !== 'Classification' && issues.targetRowIssue) && <div className={styles.issueText}>
             <div className={styles.point}></div>
             <span>Some data issues, highlighted incolor, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically</span>
           </div>}
@@ -145,9 +145,9 @@ class TargetIssue extends Component {
             <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
             <div className={classnames(styles.cell, styles.select)}><span>{colType[target]}</span></div>
             <div className={classnames(styles.cell, styles.error)}>
-              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch<0.01?"<0.01":targetPercent.mismatch.toFixed(2)}%</span></div>}
-              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing<0.01?"<0.01":targetPercent.missing.toFixed(2)}%</span></div>}
-              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier<0.01?"<0.01":targetPercent.outlier.toFixed(2)}%</span></div>}
+              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch < 0.01 ? "<0.01" : targetPercent.mismatch.toFixed(2)}%</span></div>}
+              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing < 0.01 ? "<0.01" : targetPercent.missing.toFixed(2)}%</span></div>}
+              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier < 0.01 ? "<0.01" : targetPercent.outlier.toFixed(2)}%</span></div>}
             </div>
             <div className={styles.tableBody}>
               {sortData.map((v, k) => <div key={k} className={classnames(styles.cell, {
@@ -160,7 +160,7 @@ class TargetIssue extends Component {
               )}
             </div>
           </div>
-          <ContinueButton onClick={changeTab} text='continue' width="100%" />
+          <ContinueButton disabled={issues.targetIssue} onClick={changeTab} text='continue' width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
@@ -256,7 +256,7 @@ class VariableIssue extends Component {
 
   showSummary = () => {
     const { project } = this.props
-    project.etl().then(() => this.summary = true)
+    project.endQuality().then(() => this.summary = true)
   }
 
   closeSummary = () => {
@@ -320,13 +320,13 @@ class VariableIssue extends Component {
         cn: styles.cell
       }
       if (variableIssues.mismatchRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header]<0.01?'<0.01':variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header] < 0.01 ? '<0.01' : variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
       }
       if (variableIssues.nullRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header]<0.01?'<0.01':variableIssues.nullRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header] < 0.01 ? '<0.01' : variableIssues.nullRow[header].toFixed(2)}%</span></div>)
       }
       if (variableIssues.outlierRow[header]) {
-        issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header]<0.01?'<0.01':variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
+        issueData.content.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header] < 0.01 ? '<0.01' : variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
       }
       issueArr.push(issueData)
     }
@@ -475,8 +475,8 @@ class Summary extends Component {
       .outerRadius(outerRadius)
     const { totalRawLines, totalLines, totalFixedLines } = this.props.project
     const deleteRows = totalRawLines - totalLines
-    const fixedRows = totalFixedLines + totalLines - totalRawLines
-    const cleanRows = totalRawLines - totalFixedLines
+    const fixedRows = totalFixedLines
+    const cleanRows = totalLines - totalFixedLines
     const data = [fixedRows, deleteRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
@@ -502,8 +502,8 @@ class Summary extends Component {
     const { project, editFixes } = this.props;
     const { target, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
-    const fixedPercent = (totalFixedLines + totalLines - totalRawLines) / totalRawLines * 100
-    const cleanPercent = (totalRawLines - totalFixedLines) / totalRawLines * 100
+    const fixedPercent = totalFixedLines / totalRawLines * 100
+    const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100
     const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
     const variableList = currentHeader.slice(1)
     const percentList = currentHeader.map(v => {

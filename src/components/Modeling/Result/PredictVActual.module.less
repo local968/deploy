@@ -1,15 +1,19 @@
 .predictActual {
-  display: inline-block;
+  display: flex;
   overflow: visible;
   vertical-align: top;
   width: 65%;
   font-size: 1rem;
+  flex: none;
+  flex-direction: column;
   .title {
     font-weight: bold;
     text-align: center;
   }
   .legends {
-    float: right;
+    justify-content: flex-end;
+    display: flex;
+    flex: none;
     .legend {
       display: inline-block;
       margin-right: 3em;
@@ -24,5 +28,11 @@
         display: inline-block;
       }
     }
+  }
+  .loading {
+    display: flex;
+    flex: auto;
+    justify-content: center;
+    align-items: center;
   }
 }

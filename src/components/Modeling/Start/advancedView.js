@@ -107,9 +107,9 @@ export default class AdvancedView extends Component {
     return arr
   }
 
-  handleDataRange = v => {
-    this.props.project.dataRange = v;
-  }
+  // handleDataRange = v => {
+  //   this.props.project.dataRange = v;
+  // }
 
   handleSelectAll = value => {
     const { problemType } = this.props.project
