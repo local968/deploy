@@ -27,10 +27,9 @@ class ProjectStore {
   }
 
   initReload = () => {
-    const { projectStore } = this.props
     socketStore.ready().then(api => {
-      api.on('offline', projectStore.offline)
-      api.on('online', projectStore.initWatch)
+      api.on('offline', this.offline)
+      api.on('online', this.initWatch)
     })
   }
 

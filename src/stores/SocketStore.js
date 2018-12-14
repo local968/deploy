@@ -150,24 +150,6 @@ class SocketStore extends EventEmitter {
     }
   }
 
-  offline(callback) {
-    this.ready().then(() => {
-      this.socket.addEventListener('close', () => {
-        if (callback && typeof callback === 'function') callback()
-        console.log("close 111")
-      })
-    })
-  }
-
-  online(callback) {
-    this.ready().then(() => {
-      this.socket.addEventListener('open', () => {
-        if (callback && typeof callback === 'function') callback()
-        console.log("open 1111")
-      })
-    })
-  }
-
   // reconnect() {
   //   this.socket.terminate()
   //   this.connect()
