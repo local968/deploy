@@ -39,6 +39,7 @@ class Socket extends EventEmitter {
 
   reconnect() {
     if (this.reconnectLock) return;
+    console.log("reconnect")
     this.reconnectLock = true;
     this.emit('offline')
     setTimeout(() => {     //没连接上会一直重连，设置延迟避免请求过多
@@ -87,7 +88,8 @@ class Socket extends EventEmitter {
   onOpen = (event) => {
     this.errorTimes = 0
     this.start();      //reset client heartbeat check
-    this.emit('offline')
+    console.log("reconnect succ")
+    this.emit('online')
     console.info('websocket connect succesful. ' + new Date().toUTCString())
     for (let i = 0; i < this.messageList.length; i++) {
       const message = this.messageList.shift()
@@ -133,9 +135,11 @@ class SocketStore extends EventEmitter {
       if (data.type) return this.emit(data.type, data);
     })
     this.socket.on('offline', () => {
+      console.log("emit offline")
       this.emit('offline')
     })
     this.socket.on('online', () => {
+      console.log("emit online")
       this.emit('online')
     })
     if (debug) {
