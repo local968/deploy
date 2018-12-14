@@ -9,17 +9,6 @@ import { Spin } from 'antd';
 @inject('userStore', 'projectStore')
 @observer
 export default class Layout extends Component {
-  constructor(props) {
-    super(props)
-    this.initReload()
-  }
-
-  initReload = () => {
-    const { projectStore } = this.props
-    window.addEventListener('offline', projectStore.offline)
-    window.addEventListener('online', projectStore.initWatch)
-  }
-
   render() {
     const { userStore, projectStore } = this.props;
     const { status } = userStore;

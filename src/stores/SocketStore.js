@@ -109,9 +109,8 @@ class Socket extends EventEmitter {
 }
 
 class SocketStore extends EventEmitter {
-
   status = 'init';
-  api = { on: this.on.bind(this) };
+  api = { on: this.on.bind(this), offline: this.offline.bind(this), online: this.online.bind(this) };
   socket = null;
 
   connect() {
@@ -137,6 +136,24 @@ class SocketStore extends EventEmitter {
       window.api = this.api
       window.axios = axios;
     }
+  }
+
+  offline(callback) {
+    this.ready().then(() => {
+      this.socket.addEventListener('close', () => {
+        if(callback && typeof callback === 'function') callback()
+        console.log("close 111")
+      })
+    })
+  }
+
+  online(callback) {
+    this.ready().then(() => {
+      this.socket.addEventListener('open', () => {
+        if(callback && typeof callback === 'function') callback()
+        console.log("open 1111")
+      })
+    })
   }
 
   // reconnect() {

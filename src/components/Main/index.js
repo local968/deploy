@@ -77,10 +77,8 @@ export default class Main extends Component {
   }
 
   render() {
-    const { project, conflict, notExit, loading } = this.props.projectStore
-    return !loading ?
-      <ProcessLoading />
-      : <React.Fragment>
+    const { project, conflict, notExit } = this.props.projectStore
+    return <React.Fragment>
         <div className={styles.header}>
           {project && project.name && <div className={styles.projectName}>
             <span className={styles.label}>Project: </span>
