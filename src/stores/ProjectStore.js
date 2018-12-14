@@ -28,12 +28,14 @@ class ProjectStore {
 
   initReload = () => {
     const { projectStore } = this.props
-    socketStore.on('offline', projectStore.offline)
-    socketStore.on('online', projectStore.initWatch)
+    socketStore.ready().then(api => {
+      api.on('offline', projectStore.offline)
+      api.on('online', projectStore.initWatch)
+    })
   }
 
   initWatch = () => {
-    console.log('initWatch')
+    console.log('initWatch', this.init)
     this.isOnline = true
     if (this.init) return
     this.watchProjectList();
