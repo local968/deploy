@@ -10,6 +10,7 @@ import { message as antdMessage } from 'antd';
 export default class Project {
   @observable models = []
   @observable trainModel = null
+  @observable autorun = null
 
   @observable id = "";
   @observable exist = true;
@@ -347,18 +348,19 @@ export default class Project {
 
   @action
   initProject = () => {
-    autorun(async () => {
-      if (!this.uploadFileName || this.uploadFileName.length === 0) return
-      const api = await socketStore.ready()
-      const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-      this.fileNames = fileNames
-      return
-    })
-    autorun(() => {
-      if (!this.originPath) return this.uploadData = []
-      this.readData(this.originPath).then(data => {
-        this.uploadData = data.filter(r => r.length === this.rawHeader.length)
-      })
+    this.autorun = autorun(async () => {
+      if (this.uploadFileName && this.uploadFileName.length > 0) {
+        const api = await socketStore.ready()
+        const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
+        this.fileNames = fileNames
+      }
+      if (!this.originPath) {
+        this.uploadData = []
+      } else {
+        this.readData(this.originPath).then(data => {
+          this.uploadData = data.filter(r => r.length === this.rawHeader.length)
+        })
+      }
     })
     // this.loading = true;
     // return socketStore.ready().then(api => {
@@ -371,6 +373,12 @@ export default class Project {
     //     alert(result.message)
     //   })
     // })
+  }
+
+  @action
+  clean = () => {
+    if(this.autorun) this.autorun()
+    this.uploadData = []
   }
 
   @action
@@ -902,7 +910,7 @@ export default class Project {
 
     const featureLabel = dataHeader.filter(d => d !== target);
     const setting = this.settings.find(s => s.id === this.settingId)
-    if(!setting || !setting.name) return antdMessage.error("setting error")
+    if (!setting || !setting.name) return antdMessage.error("setting error")
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径

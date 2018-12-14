@@ -40,7 +40,10 @@ class ProjectStore {
     this.watchProjectList();
     when(
       () => this.watchList,
-      () => this.queryProjectList()
+      () => {
+        this.queryProjectList()
+        if (this.currentId) this.initProject(this.currentId)
+      }
     )
   }
 
@@ -214,6 +217,7 @@ class ProjectStore {
 
   @action
   clean = () => {
+    if (this.currentId) this.project.clean()
     this.currentId = ''
   }
 }
