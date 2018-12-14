@@ -40,6 +40,7 @@ class Socket extends EventEmitter {
   reconnect() {
     if (this.reconnectLock) return;
     this.reconnectLock = true;
+    this.emit('offline')
     setTimeout(() => {     //没连接上会一直重连，设置延迟避免请求过多
       this.createWebSocket();
       this.reconnectLock = false;
@@ -70,10 +71,10 @@ class Socket extends EventEmitter {
 
   onClose = (event) => {
     this.errorTimes++
-    if (this.errorTimes >= 10) {
-      this.connectionError = event
-      console.error('error retry > 10 times')
-    }
+    // if (this.errorTimes >= 10) {
+    //   this.connectionError = event
+    //   console.error('error retry > 10 times')
+    // }
     if (!this.connectionError) this.reconnect();
     console.warn('websocket connection closed!', event)
   }
@@ -86,6 +87,7 @@ class Socket extends EventEmitter {
   onOpen = (event) => {
     this.errorTimes = 0
     this.start();      //reset client heartbeat check
+    this.emit('online')
     console.info('websocket connect succesful. ' + new Date().toUTCString())
     for (let i = 0; i < this.messageList.length; i++) {
       const message = this.messageList.shift()
@@ -109,7 +111,6 @@ class Socket extends EventEmitter {
 }
 
 class SocketStore extends EventEmitter {
-
   status = 'init';
   api = { on: this.on.bind(this) };
   socket = null;
@@ -131,6 +132,12 @@ class SocketStore extends EventEmitter {
       if (data.request && data.request._id && data.request.progress === true) return this.emit('progress' + data.request._id, data);
       if (data.type) return this.emit(data.type, data);
     })
+    this.socket.on('offline', () => {
+      this.emit('offline')
+    })
+    this.socket.on('online', () => {
+      this.emit('online')
+    })
     if (debug) {
       window.ss = this
       window.ws = this.ws
@@ -139,10 +146,10 @@ class SocketStore extends EventEmitter {
     }
   }
 
-  reconnect() {
-    this.socket.terminate()
-    this.connect()
-  }
+  // reconnect() {
+  //   this.socket.terminate()
+  //   this.connect()
+  // }
 
   ready() {
     if (this.status === 'ready') return Promise.resolve(this.api);

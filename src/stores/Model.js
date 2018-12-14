@@ -97,7 +97,7 @@ export default class Model {
     if (problemType !== 'Classification') return [1, 1]
     if (chartData) {
       const { TP, FN, FP, TN } = chartData.roc
-      return [TP[fitIndex] / (TP[fitIndex] + FN[fitIndex]), TN[fitIndex] / (TN[fitIndex] + FP[fitIndex])]
+      return [TN[fitIndex] / (TN[fitIndex] + FP[fitIndex]), TP[fitIndex] / (TP[fitIndex] + FN[fitIndex])]
     }
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }

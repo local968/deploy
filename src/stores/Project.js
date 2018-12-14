@@ -10,6 +10,7 @@ import { message as antdMessage } from 'antd';
 export default class Project {
   @observable models = []
   @observable trainModel = null
+  @observable autorun = null
 
   @observable id = "";
   @observable exist = true;
@@ -24,6 +25,8 @@ export default class Project {
 
   //project
   @observable name;
+  @observable createTime
+  @observable updateTime
   // @observable description;
 
   //problem
@@ -37,6 +40,7 @@ export default class Project {
   @observable etlProgress = 0
 
   // upload data
+  @observable cleanHeader = []
   @observable dataHeader = [];
   @observable uploadData = [];
   @observable rawHeader = [];
@@ -81,6 +85,7 @@ export default class Project {
   @observable mismatchLineCounts = {}
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
+  @observable missingReason = {}
 
   //not save
   @observable targetMapTemp = {};
@@ -125,24 +130,11 @@ export default class Project {
   @observable dataViews = null;
 
   @observable stopModel = false
+  @observable stopEtl = false
 
   constructor(id, args) {
     this.id = id
     this.setProperty(args)
-
-    autorun(async () => {
-      if (!this.uploadFileName || this.uploadFileName.length === 0) return
-      const api = await socketStore.ready()
-      const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-      this.fileNames = fileNames
-      return
-    })
-    autorun(() => {
-      if (!this.originPath) return this.uploadData = []
-      this.readData(this.originPath).then(data => {
-        this.uploadData = data.filter(r => r.length === this.rawHeader.length)
-      })
-    })
     // autorun(() => {
     //   if (!this.cleanPath) return this.cleanData = []
     //   this.readData(this.cleanPath).then(data => {
@@ -176,6 +168,7 @@ export default class Project {
     this.uploadData = []
 
     return {
+      cleanHeader: [],
       uploadFileName: [],
       dataHeader: [],
       rawHeader: [],
@@ -209,7 +202,8 @@ export default class Project {
       nullLineCounts: {},
       mismatchLineCounts: {},
       outlierLineCounts: {},
-      renameVariable: {}
+      renameVariable: {},
+      missingReason: {}
     }
   }
 
@@ -353,18 +347,38 @@ export default class Project {
   }
 
   @action
-  queryProject = () => {
-    this.loading = true;
-    return socketStore.ready().then(api => {
-      return api.queryProject({ id: this.id }).then(result => {
-        this.loading = false;
-        if (result.status === 200) {
-          this.setProperty(result.data)
-          return
-        }
-        alert(result.message)
-      })
+  initProject = () => {
+    this.autorun = autorun(async () => {
+      if (this.uploadFileName && this.uploadFileName.length > 0) {
+        const api = await socketStore.ready()
+        const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
+        this.fileNames = fileNames
+      }
+      if (!this.originPath) {
+        this.uploadData = []
+      } else {
+        this.readData(this.originPath).then(data => {
+          this.uploadData = data.filter(r => r.length === this.rawHeader.length)
+        })
+      }
     })
+    // this.loading = true;
+    // return socketStore.ready().then(api => {
+    //   return api.queryProject({ id: this.id }).then(result => {
+    //     this.loading = false;
+    //     if (result.status === 200) {
+    //       this.setProperty(result.data)
+    //       return
+    //     }
+    //     alert(result.message)
+    //   })
+    // })
+  }
+
+  @action
+  clean = () => {
+    if(this.autorun) this.autorun()
+    this.uploadData = []
   }
 
   @action
@@ -394,6 +408,7 @@ export default class Project {
         data.targetArrayTemp = data[key];
       }
     }
+    data.updateTime = +new Date()
     Object.assign(this, data)
   }
 
@@ -412,10 +427,8 @@ export default class Project {
         mainStep: 2,
         curStep: 2,
         lastSubStep: 1,
-        subStepActive: 1
+        subStepActive: 1,
       })
-      this.etling = false;
-      this.etlProgress = 0
 
       this.updateProject(backData);
     } else {
@@ -433,74 +446,32 @@ export default class Project {
       lastSubStep: 1,
       subStepActive: 1
     })
-    this.etling = false;
-    this.etlProgress = 0
-    this.updateProject(backData).then(() => this.etl())
+    return this.updateProject(backData).then(() => this.etl())
   }
-
-  //读取预览文件
-  // @action
-  // newFileInit = (uploadData) => {
-  //   const rawHeader = uploadData[0].map((h) => h.trim());
-  //   const data = uploadData.slice(1);
-
-  //   // 上传文件，不需要修改header
-  //   this.updateProject({
-  //     uploadData: data,
-  //     dataHeader: rawHeader,
-  //     rawHeader: rawHeader
-  //   });
-
-  /**
-   * 自动修改header
-   */
-  // const temp = {};
-  // const header = rawHeader.map((h, i) => {
-  //   h = h.trim();
-  //   if (/^$/.test(h)) {
-  //     h = `Unnamed: ${i}`;
-  //   }
-  //   if (!temp[h]) {
-  //     temp[h] = 1;
-  //   } else {
-  //     h = h + '.' + temp[h];
-  //     temp[h]++;
-  //   }
-  //   return h;
-  // });
-
-  // // 上传文件，target为空
-  // this.updateProject({
-  //   uploadData: data,
-  //   dataHeader: header,
-  //   rawHeader: header,
-  // });
-  // }
 
   @action
   autoFixHeader = () => {
-    /**
-   * 自动修改header
-   */
-    const temp = {};
-    const header = this.rawHeader.map((h, i) => {
-      h = h.trim();
-      if (/^$/.test(h)) {
-        h = `Unnamed: ${i}`;
-      }
-      if (!temp[h]) {
-        temp[h] = 1;
-      } else {
-        h = h + '.' + temp[h];
-        temp[h]++;
-      }
-      return h;
-    });
+    //   /**
+    //  * 自动修改header
+    //  */
+    //   const temp = {};
+    //   const header = this.rawHeader.map((h, i) => {
+    //     h = h.trim();
+    //     if (/^$/.test(h)) {
+    //       h = `Unnamed: ${i}`;
+    //     }
+    //     if (!temp[h]) {
+    //       temp[h] = 1;
+    //     } else {
+    //       h = h + '.' + temp[h];
+    //       temp[h]++;
+    //     }
+    //     return h;
+    //   });
 
     // 上传文件，target为空
     return this.updateProject({
-      dataHeader: header,
-      rawHeader: header,
+      rawHeader: this.cleanHeader,
     });
   }
 
@@ -528,6 +499,30 @@ export default class Project {
       isMissed,
       isDuplicated
     };
+  }
+
+  @action
+  endSchema = () => {
+    return this.updateProject(Object.assign({
+      colType: { ...this.colType },
+      dataHeader: [...this.dataHeader],
+      noCompute: this.noComputeTemp
+    }, this.defaultDataQuality, this.defaultTrain))
+      .then(() => this.etl())
+  }
+
+  @action
+  endQuality = () => {
+    return this.updateProject(Object.assign({
+      targetMap: toJS(this.targetMap),
+      targetArray: toJS(this.targetArray),
+      renameVariable: toJS(this.renameVariable),
+      outlierDict: toJS(this.outlierDict),
+      nullFillMethod: toJS(this.nullFillMethodoutlierDict),
+      mismatchFillMethod: toJS(this.mismatchFillMethodoutlierDict),
+      outlierFillMethod: toJS(this.outlierFillMethodoutlierDict),
+      missingReason: toJS(this.missingReasonoutlierDict)
+    }, this.defaultTrain)).then(() => this.etl())
   }
 
   @computed
@@ -597,7 +592,7 @@ export default class Project {
     if (!result) return { chart: null, fitIndex: null };
     let fitIndex;
     let initialFitIndex;
-    const charts = ['density', 'lift', 'roc'];
+    const charts = ['density', 'lift', 'roc', 'rocHoldout'];
     charts.forEach(chart => {
       result[chart] = this.parseJson(result[chart])
     });
@@ -760,34 +755,29 @@ export default class Project {
     // fill_method:  无效值
     // kwargs:
     return socketStore.ready()
-      .then(api => api.etl(data, progressResult => {
-        let { result } = progressResult;
-        if (!this.etling) return;
-        const { name, value, key } = result
-        if (name === "progress" && key === 'etl') {
-          this.etlProgress = value
-        }
-      }))
+      .then(api => api.etl(data))
       .then(returnValue => {
         const { result, status } = returnValue;
         if (status !== 200) return antdMessage.error(result['process error'])
         this.setProperty(result)
-        this.etling = false;
-        this.etlProgress = 0
       })
   }
 
-  next = () => {
-    const { curStep, subStepActive, noCompute } = this;
-    if (curStep === 2 && subStepActive < 3) {
-      if (noCompute && subStepActive !== 1) {
-        return this.nextMainStep(3)
-      }
-      const nextStep = subStepActive + 1;
-      return this.nextSubStep(nextStep, curStep)
-    } else {
-      return {}
+  abortEtl = () => {
+    if (this.stopEtl) return
+    this.stopEtl = true
+    const command = {
+      command: 'stop',
+      action: 'etl',
+      projectId: this.id
     }
+    this.isAbort = true
+    socketStore.ready().then(api => api.abortEtl(command).then(returnValue => {
+      const { status, message, result, id } = returnValue
+      if (id !== this.id) return
+      if (status !== 200) return antdMessage.error(message)
+      this.setProperty({ ...result, stopEtl: false })
+    }))
   }
 
   @action
@@ -828,7 +818,7 @@ export default class Project {
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ [key]: null })
-          return antdMessage.error("dataview error")
+          return antdMessage.error(result['process error'])
         }
         this.setProperty({ [key]: result.data })
       })
@@ -846,7 +836,8 @@ export default class Project {
       outlierDict: toJS(this.outlierDict),
       nullFillMethod: toJS(this.nullFillMethod),
       mismatchFillMethod: toJS(this.mismatchFillMethod),
-      outlierFillMethod: toJS(this.outlierFillMethod)
+      outlierFillMethod: toJS(this.outlierFillMethod),
+      missingReason: toJS(this.missingReason)
     })
   }
 
@@ -918,7 +909,8 @@ export default class Project {
     const command = 'train';
 
     const featureLabel = dataHeader.filter(d => d !== target);
-
+    const setting = this.settings.find(s => s.id === this.settingId)
+    if (!setting || !setting.name) return antdMessage.error("setting error")
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -940,7 +932,7 @@ export default class Project {
       ensembleSize: 20,
       randSeed: 0,
       measurement: problemType === "Classification" ? "auc" : "r2",
-      settingId: this.settingId,
+      settingName: setting.name,
       holdoutRate: 0.2
     };
 
@@ -1149,7 +1141,7 @@ export default class Project {
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          return antdMessage.error("preTrainImportance error")
+          return antdMessage.error(result['process error'])
         }
         this.setProperty({ preImportance: result.preImportance, informativesLabel: result.informativesLabel })
       })
@@ -1166,7 +1158,7 @@ export default class Project {
       };
       api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
-        if (status < 0) return alert("correlationMatrix error")
+        if (status < 0) return antdMessage.error(result['process error'])
         this.correlationMatrixHeader = result.header;
         this.correlationMatrixData = result.data;
       })
