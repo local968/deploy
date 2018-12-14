@@ -6,6 +6,7 @@ const http = require('http');
 const bodyParser = require('body-parser')
 const uuid = require('uuid');
 const { redis } = require('./redis')
+const { messageRouter } = require('./reboot')
 const routes = require('./routes')
 const path = require('path')
 const axios = require('axios')
@@ -38,6 +39,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(sessionParser);
 app.use(routes)
+app.use(messageRouter)
 
 // Serve static files from the 'static' folder.
 app.use(express.static('static'));
