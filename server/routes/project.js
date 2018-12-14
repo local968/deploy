@@ -438,13 +438,17 @@ wss.register('etl', (message, socket, progress) => {
           return null
         }).then(returnValue => {
           let { result, status } = returnValue;
+          if (status < 0) {
+            return createOrUpdate(id, userId, { etlProgress: 0, etling: false }).then(() => {
+              return {
+                status: 418,
+                result,
+                message: returnValue.message
+              }
+            })
+          }
           result.etling = false
           result.etlProgress = 0
-          if (status < 0) return {
-            status: 418,
-            result,
-            message: returnValue.message
-          }
           result.firstEtl = false;
           delete result.name
           delete result.id
@@ -452,7 +456,6 @@ wss.register('etl', (message, socket, progress) => {
           if (!files) delete result.totalRawLines
           // 最终ETL 小于1W行  使用cross
           if (result.totalLines < 10000) result.runWith = 'cross'
-
           const steps = {}
           if (firstEtl) {
             steps.curStep = 2
@@ -474,6 +477,7 @@ wss.register('etl', (message, socket, progress) => {
           }
           //重新做ETL后删除所有模型
           deleteModels(id)
+
           return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
             if (updateResult.status !== 200) return updateResult
             return {

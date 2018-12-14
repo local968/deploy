@@ -77,35 +77,37 @@ export default class Main extends Component {
   }
 
   render() {
-    const { project, conflict, notExit } = this.props.projectStore
-    return <React.Fragment>
-      <div className={styles.header}>
-        {project && project.name && <div className={styles.projectName}>
-          <span className={styles.label}>Project: </span>
-          <span className={styles.value}> {project.name}</span>
-        </div>}
-        {project && project.fileNames && <div className={styles.dataset}>
-          <span className={styles.label}>Dataset: </span>
-          <span className={styles.value}> {project.fileNames.toString()}</span>
-        </div>}
-      </div>
-      {!project ? <ProcessLoading /> : <Switch>
-        <Route path="/project/:id/problem" component={Problem} />
-        <Route path="/project/:id/data" component={Data} />
-        <Route path="/project/:id/modeling" component={Modeling} />
-        <Route path="/project/:id/project" component={Project} />
-      </Switch>}
-      {<Confirm
-        width="6em"
-        title={`You have been kicked out`}
-        visible={conflict}
-        onClose={this.exit}
-        onConfirm={notExit}
-        closeByMask={false}
-        showClose={false}
-        confirmText="Go Back to the Project"
-        closeText="Go to Home Page"
-        content={"You have been kicked out of the project by another user."} />}
-    </React.Fragment>
+    const { project, conflict, notExit, loading } = this.props.projectStore
+    return !loading ?
+      <ProcessLoading />
+      : <React.Fragment>
+        <div className={styles.header}>
+          {project && project.name && <div className={styles.projectName}>
+            <span className={styles.label}>Project: </span>
+            <span className={styles.value}> {project.name}</span>
+          </div>}
+          {project && project.fileNames && <div className={styles.dataset}>
+            <span className={styles.label}>Dataset: </span>
+            <span className={styles.value}> {project.fileNames.toString()}</span>
+          </div>}
+        </div>
+        {!project ? <ProcessLoading /> : <Switch>
+          <Route path="/project/:id/problem" component={Problem} />
+          <Route path="/project/:id/data" component={Data} />
+          <Route path="/project/:id/modeling" component={Modeling} />
+          <Route path="/project/:id/project" component={Project} />
+        </Switch>}
+        {<Confirm
+          width="6em"
+          title={`You have been kicked out`}
+          visible={conflict}
+          onClose={this.exit}
+          onConfirm={notExit}
+          closeByMask={false}
+          showClose={false}
+          confirmText="Go Back to the Project"
+          closeText="Go to Home Page"
+          content={"You have been kicked out of the project by another user."} />}
+      </React.Fragment>
   }
 }

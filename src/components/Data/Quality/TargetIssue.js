@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Modal } from 'components/Common';
 import { observable } from 'mobx'
 import * as d3 from 'd3';
-import { Icon } from 'antd'
+import { Icon, message } from 'antd'
 
 @observer
 export class ClassificationTarget extends Component {
@@ -30,10 +30,12 @@ export class ClassificationTarget extends Component {
 
   handleSave = () => {
     const { temp } = this
-    const { targetArray, targetMap } = this.props.project
     Object.keys(temp).forEach(k => {
       if (!temp[k]) delete temp[k]
     })
+    const values = Object.values(temp)
+    if(values.length !== [...new Set(values)].length) return message.error("Cannot be modified to the same name")
+    const { targetArray, targetMap } = this.props.project
     if (!!targetArray.length) {
       targetArray.forEach((v, k) => {
         if (temp.hasOwnProperty(v)) {

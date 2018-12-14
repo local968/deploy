@@ -703,32 +703,31 @@ class PredictTable extends Component {
       dataIndex: 'rowName',
       className: styles.actual
     }, {
-      title: `Predict: ${yes}`,
-      dataIndex: 'col1'
-    }, {
       title: `Predict: ${no}`,
-      dataIndex: 'col2',
+      dataIndex: 'col1',
+    }, {
+      title: `Predict: ${yes}`,
+      dataIndex: 'col2'
     }, {
       title: '',
       dataIndex: 'sum'
     }];
 
     // set default value
-
     const data = [{
-      rowName: `Actual: ${yes}`,
-      col2: `${Math.round(FN)}(FN)`,
-      col1: `${Math.round(TP)}(TP)`,
-      sum: Number(FN) + +TP
-    }, {
       rowName: `Actual: ${no}`,
-      col2: `${Math.round(TN)}(TN)`,
-      col1: `${Math.round(FP)}(FP)`,
+      col1: `${Math.round(TN)}(TN)`,
+      col2: `${Math.round(FP)}(FP)`,
       sum: +TN + +FP,
     }, {
+      rowName: `Actual: ${yes}`,
+      col1: `${Math.round(FN)}(FN)`,
+      col2: `${Math.round(TP)}(TP)`,
+      sum: Number(FN) + +TP
+    }, {
       rowName: '',
-      col2: +TN + +FN,
-      col1: +FP + +TP,
+      col1: +TN + +FN,
+      col2: +FP + +TP,
       sum: +TN + +FN + +FP + +TP
     }];
     return (
@@ -853,8 +852,8 @@ class ResidualDiagnose extends Component {
 
 class DiagnoseResult extends Component {
   handleNewData = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(1, 2))
+    const { updateProject, nextMainStep } = this.props.project
+    updateProject(nextMainStep(2))
   }
   handleSetting = () => {
     const { updateProject, nextSubStep } = this.props.project

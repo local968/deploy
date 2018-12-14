@@ -98,7 +98,10 @@ export default class DataConnect extends Component {
     this.process = 90
     this.file = null
 
-    this.props.projectStore.project.fastTrackInit(data.fileId);
+    this.props.projectStore.project.fastTrackInit(data.fileId).then(() => {
+      this.process = 0
+      this.uploading = false
+    });
   })
 
   onError = action((error, times) => {
@@ -139,7 +142,10 @@ export default class DataConnect extends Component {
       action(data => {
         const { fileId } = data.data
         this.process = 90
-        this.props.projectStore.project.fastTrackInit(fileId);
+        this.props.projectStore.project.fastTrackInit(fileId).then(() => {
+          this.process = 0
+          this.uploading = false
+        });
       }),
       () => {
         message.error('sample file error, please choose again');
@@ -315,8 +321,11 @@ export default class DataConnect extends Component {
             clearInterval(processInterval)
             if (resp.status !== 200) return message.error(resp.message)
             const fileId = resp.fileId
-            project.fastTrackInit(fileId);
             this.process = 90
+            project.fastTrackInit(fileId).then(() => {
+              this.process = 0
+              this.uploading = false
+            })
           })}
         />
       </div>

@@ -438,7 +438,7 @@ export default class Project {
       lastSubStep: 1,
       subStepActive: 1
     })
-    this.updateProject(backData).then(() => this.etl())
+    return this.updateProject(backData).then(() => this.etl())
   }
 
   @action
@@ -901,7 +901,8 @@ export default class Project {
     const command = 'train';
 
     const featureLabel = dataHeader.filter(d => d !== target);
-
+    const setting = this.settings.find(s => s.id === this.settingId)
+    if(!setting || !setting.name) return antdMessage.error("setting error")
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -923,7 +924,7 @@ export default class Project {
       ensembleSize: 20,
       randSeed: 0,
       measurement: problemType === "Classification" ? "auc" : "r2",
-      settingId: this.settingId,
+      settingName: setting.name,
       holdoutRate: 0.2
     };
 

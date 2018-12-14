@@ -139,10 +139,10 @@ class SocketStore extends EventEmitter {
     }
   }
 
-  reconnect() {
-    this.socket.terminate()
-    this.connect()
-  }
+  // reconnect() {
+  //   this.socket.terminate()
+  //   this.connect()
+  // }
 
   ready() {
     if (this.status === 'ready') return Promise.resolve(this.api);

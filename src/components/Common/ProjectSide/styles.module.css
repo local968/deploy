@@ -4,7 +4,7 @@
     flex: none;
     flex-direction: column;
     margin-top: 0.45em;
-    position: absolute;
+    position: fixed;
     right: 0;
     background-color: #fff;
 }

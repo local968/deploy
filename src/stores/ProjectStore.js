@@ -5,6 +5,8 @@ import uuid from "uuid";
 
 class ProjectStore {
   @observable loading = true;
+  @observable init = false;
+  @observable isOnline = true
   @observable watchList = false;
   @observable currentId = "";
 
@@ -21,11 +23,25 @@ class ProjectStore {
   @observable conflict = false
 
   constructor() {
+    this.initWatch()
+  }
+
+  initWatch = () => {
+    console.log('initWatch')
+    this.isOnline = true
+    if (this.init) return
     this.watchProjectList();
     when(
       () => this.watchList,
       () => this.queryProjectList()
     )
+  }
+
+  offline = () => {
+    console.log('offline')
+    this.watchList = false;
+    this.init = false
+    this.isOnline = false
   }
 
   @computed
@@ -65,6 +81,7 @@ class ProjectStore {
       api.watchProjectList().then(watch => {
         if (watch.status === 200) {
           this.watchList = true
+          this.init = true
           api.on(watch.id, data => {
             const { status, id, result, model } = data
             if (status === 200) {
