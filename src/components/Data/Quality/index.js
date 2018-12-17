@@ -186,7 +186,7 @@ class TargetIssue extends Component {
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
-        {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }} />}
+        {this.isLoad && <ProcessLoading progress={this.progress} style={{ position: 'fixed' }} />}
         <Modal content={<FixIssue project={project}
           issueRows={targetIssues}
           closeFixes={this.closeFixes}
@@ -208,7 +208,7 @@ class TargetIssue extends Component {
           showClose={true}
         />
       </div>
-      {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
     </div>
   }
 }
@@ -420,8 +420,8 @@ class VariableIssue extends Component {
           </div> */}
         </div>
       </div>
-      {this.isLoad && <ProcessLoading progress={this.progress} style={{ top: '-0.25em' }} />}
-      {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
+      {this.isLoad && <ProcessLoading progress={this.progress} style={{ position: 'fixed'  }} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
       <Modal content={<FixIssue project={project}
         issueRows={issueRows}
         closeFixes={this.closeFixes}

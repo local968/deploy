@@ -112,7 +112,7 @@ export default class Home extends Component {
     const { projectStore } = this.props;
     const { toolsOption, total, sortList: sortProjects, changeOption, changePage, keywords } = projectStore;
     return <div className={classnames(styles.home)} >
-      {this.loading && <ProcessLoading />}
+      {this.loading && <ProcessLoading style={{ position: 'fixed' }} />}
       <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} keywords={keywords} changeWords={this.changeWords} />
       <div className={classnames(styles.projects)}>
         <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>

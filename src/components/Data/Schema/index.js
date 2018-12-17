@@ -287,7 +287,7 @@ export default class DataSchema extends Component {
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
         </div>
       </div>
-      {etling && <ProcessLoading progress={etlProgress} style={{ top: '-0.25em' }} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
     </div>
   }
 }

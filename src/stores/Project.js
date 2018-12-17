@@ -10,7 +10,7 @@ import { message as antdMessage } from 'antd';
 export default class Project {
   @observable models = []
   @observable trainModel = null
-  @observable autorun = null
+  @observable autorun = []
 
   @observable id = "";
   @observable exist = true;
@@ -348,12 +348,14 @@ export default class Project {
 
   @action
   initProject = () => {
-    this.autorun = autorun(async () => {
+    this.autorun.push(autorun(async () => {
       if (this.uploadFileName && this.uploadFileName.length > 0) {
         const api = await socketStore.ready()
         const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
         this.fileNames = fileNames
       }
+    }))
+    this.autorun.push(autorun(async () => {
       if (!this.originPath) {
         this.uploadData = []
       } else {
@@ -361,7 +363,7 @@ export default class Project {
           this.uploadData = data.filter(r => r.length === this.rawHeader.length)
         })
       }
-    })
+    }))
     // this.loading = true;
     // return socketStore.ready().then(api => {
     //   return api.queryProject({ id: this.id }).then(result => {
@@ -377,7 +379,7 @@ export default class Project {
 
   @action
   clean = () => {
-    if(this.autorun) this.autorun()
+    this.autorun.forEach(f => f())
     this.uploadData = []
   }
 
@@ -757,8 +759,8 @@ export default class Project {
     return socketStore.ready()
       .then(api => api.etl(data))
       .then(returnValue => {
-        const { result, status } = returnValue;
-        if (status !== 200) return antdMessage.error(result['process error'])
+        const { result, status, message } = returnValue;
+        if (status !== 200) return antdMessage.error(message)
         this.setProperty(result)
       })
   }
