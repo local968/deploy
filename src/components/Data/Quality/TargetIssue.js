@@ -557,7 +557,7 @@ export class FixIssue extends Component {
                 <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
-                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={mismatchFillMethod[k]} onChange={this.mismatchSelect.bind(null, k)}>
+                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={(mismatchFillMethod[k] || (showType === 'Categorical' ? mode : mean))} onChange={this.mismatchSelect.bind(null, k)}>
                   {showType === 'Categorical' ? [
                     <option value={mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,
@@ -622,7 +622,7 @@ export class FixIssue extends Component {
                 <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
-                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={nullFillMethod[k]} onChange={this.nullSelect.bind(null, k)}>
+                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={(nullFillMethod[k] || (showType === 'Categorical' ? mode : mean))} onChange={this.nullSelect.bind(null, k)}>
                   {showType === 'Categorical' ? [
                     <option value={mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,

@@ -2,6 +2,8 @@ import { observable, action, when, computed } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
 import uuid from "uuid";
+import moment from 'moment'
+import { message as antdMessage } from 'antd'
 
 class ProjectStore {
   @observable loading = true;
@@ -99,9 +101,13 @@ class ProjectStore {
             const { status, id, result, model } = data
             if (status === 200) {
               const project = this.list.find(p => p.id === id)
-              if (!project) return
-              if (result) project.setProperty(result)
-              if (model) project.setModel(model)
+              if (!project) {
+                if (!result.host) return
+                if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix() }))
+              } else {
+                if (result) project.setProperty(result)
+                if (model) project.setModel(model)
+              }
             }
           })
           api.on("inProject", data => {
@@ -123,7 +129,7 @@ class ProjectStore {
         const { status, message, list, count } = result
         if (status !== 200) {
           this.loading = false;
-          return alert(message)
+          return antdMessage.error(message)
         }
         this.list = list.map(row => new Project(row.id + "", row))
         this.total = count
@@ -143,7 +149,7 @@ class ProjectStore {
           this.loading = false;
           return { error: message }
         }
-        if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: +new Date() }))
+        if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix() }))
         this.loading = false;
         return { id }
       })
@@ -159,7 +165,7 @@ class ProjectStore {
         const { status, message } = result
         this.loading = false;
         if (status !== 200) {
-          alert(message)
+          return antdMessage.error(message)
           // return { error: message }
         }
         this.list = this.list.filter(i => {

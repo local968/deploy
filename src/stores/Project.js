@@ -100,7 +100,7 @@ export default class Project {
   @observable trainingId = ''
   // 不需要参加训练的label
   @observable trainHeader = []
-  // 暂时移除
+  @observable customHeader = []
   @observable criteria = 'defualt';
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
 
@@ -233,6 +233,7 @@ export default class Project {
       selectId: '',
       version: [1, 2],
       trainHeader: [],
+      customHeader: [],
       newVariable: [],
       newType: {},
       expression: {},
@@ -524,7 +525,8 @@ export default class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodoutlierDict),
       outlierFillMethod: toJS(this.outlierFillMethodoutlierDict),
       missingReason: toJS(this.missingReasonoutlierDict)
-    }, this.defaultTrain)).then(() => this.etl())
+    }, this.defaultTrain))
+    // .then(() => this.etl())
   }
 
   @computed
@@ -1028,7 +1030,8 @@ export default class Project {
       version: this.version,
       trainHeader: this.trainHeader,
       settings: this.settings,
-      settingId: this.settingId
+      settingId: this.settingId,
+      customHeader: this.customHeader
     }, this.nextSubStep(2, 3)))
   }
 
