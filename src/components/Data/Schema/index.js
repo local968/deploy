@@ -27,11 +27,13 @@ export default class DataSchema extends Component {
     const data = {
       target: value,
       colType: { ...this.dataType },
-      outlierFillMethod: {}
+      outlierFillMethod: {},
+      outlierFillMethodTemp: {}
     }
     // 回归默认设置为drop
     if (value && this.dataType[value] === 'Numerical') {
       data.outlierFillMethod = { [value]: 'drop' }
+      data.outlierFillMethodTemp = { [value]: 'drop' }
     }
     this.props.projectStore.project.updateProject(data).then(() => this.refs.table.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
@@ -287,7 +289,7 @@ export default class DataSchema extends Component {
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
         </div>
       </div>
-      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
     </div>
   }
 }

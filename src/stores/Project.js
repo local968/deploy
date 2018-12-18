@@ -87,9 +87,14 @@ export default class Project {
   @observable renameVariable = {}
   @observable missingReason = {}
 
-  //not save
+
   @observable targetMapTemp = {};
   @observable targetArrayTemp = [];
+  @observable missingReasonTemp = {}
+  @observable mismatchFillMethodTemp = {}
+  @observable nullFillMethodTemp = {}
+  @observable outlierFillMethodTemp = {}
+  @observable outlierDictTemp = {}
 
   // train
   // 训练状态
@@ -184,9 +189,6 @@ export default class Project {
 
   @computed
   get defaultDataQuality() {
-    this.targetMapTemp = {};
-    this.targetArrayTemp = []
-
     return {
       mismatchFillMethod: {},
       mismatchIndex: {},
@@ -203,7 +205,13 @@ export default class Project {
       mismatchLineCounts: {},
       outlierLineCounts: {},
       renameVariable: {},
-      missingReason: {}
+      missingReason: {},
+      targetMapTemp: {},
+      targetArrayTemp: [],
+      mismatchFillMethodTemp: {},
+      nullFillMethodTemp: {},
+      outlierFillMethodTemp: {},
+      outlierDictTemp: {}
     }
   }
 
@@ -402,14 +410,6 @@ export default class Project {
       if (key === 'problemType') {
         data.changeProjectType = data[key]
       }
-
-      if (key === 'targetMap') {
-        data.targetMapTemp = data[key];
-      }
-
-      if (key === 'targetArray') {
-        data.targetArrayTemp = data[key];
-      }
     }
     data.updateTime = +new Date()
     Object.assign(this, data)
@@ -516,17 +516,44 @@ export default class Project {
 
   @action
   endQuality = () => {
-    return this.updateProject(Object.assign({
-      targetMap: toJS(this.targetMap),
-      targetArray: toJS(this.targetArray),
-      renameVariable: toJS(this.renameVariable),
-      outlierDict: toJS(this.outlierDict),
-      nullFillMethod: toJS(this.nullFillMethodoutlierDict),
-      mismatchFillMethod: toJS(this.mismatchFillMethodoutlierDict),
-      outlierFillMethod: toJS(this.outlierFillMethodoutlierDict),
-      missingReason: toJS(this.missingReasonoutlierDict)
-    }, this.defaultTrain))
-    // .then(() => this.etl())
+    let hasChange = false
+    const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
+    for (const item of list) {
+      const before = this[item]
+      const after = this[item + "Temp"]
+      hasChange = this.hasChanged(before, after)
+      if (hasChange) break
+    }
+
+    const data = Object.assign({
+      targetMap: toJS(this.targetMapTemp),
+      targetArray: toJS(this.targetArrayTemp),
+      outlierDict: toJS(this.outlierDictTemp),
+      nullFillMethod: toJS(this.nullFillMethodTemp),
+      mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
+      outlierFillMethod: toJS(this.outlierFillMethodTemp),
+      missingReason: toJS(this.missingReasonTemp)
+    }, this.defaultTrain)
+
+    return this.updateProject(data)
+      .then(() => {
+        if (hasChange) return this.etl()
+      })
+  }
+
+  hasChanged = (before, after) => {
+    if (Object.keys(before).length === Object.keys(after).length) {
+      for (const key in before) {
+        if (typeof before[key] === 'object') {
+          const changed = this.hasChanged(before[key], after[key])
+          if (changed) return changed
+        } else {
+          if (before[key] !== after[key]) return true
+        }
+      }
+      return false
+    }
+    return true
   }
 
   @computed
@@ -540,7 +567,7 @@ export default class Project {
     const { problemType, totalRawLines, targetColMap, issueRows, targetIssues } = this;
 
     if (problemType === "Classification") {
-      data.targetIssue = this.targetArray.length < 2 && Object.keys(targetColMap).length > 2;
+      data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
     }
 
     if (totalRawLines < 1000) {
@@ -831,17 +858,17 @@ export default class Project {
 
   @action
   fixTarget = () => {
-    this.updateProject({ targetMap: this.targetMapTemp, targetArray: this.targetArrayTemp, renameVariable: this.renameVariable })
+    this.updateProject({ targetMapTemp: this.targetMapTemp, targetArrayTemp: this.targetArrayTemp })
   }
 
   @action
   fixFillMethod = () => {
     this.updateProject({
-      outlierDict: toJS(this.outlierDict),
-      nullFillMethod: toJS(this.nullFillMethod),
-      mismatchFillMethod: toJS(this.mismatchFillMethod),
-      outlierFillMethod: toJS(this.outlierFillMethod),
-      missingReason: toJS(this.missingReason)
+      outlierDictTemp: toJS(this.outlierDictTemp),
+      nullFillMethodTemp: toJS(this.nullFillMethodTemp),
+      mismatchFillMethodTemp: toJS(this.mismatchFillMethodTemp),
+      outlierFillMethodTemp: toJS(this.outlierFillMethodTemp),
+      missingReasonTemp: toJS(this.missingReasonTemp)
     })
   }
 

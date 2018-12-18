@@ -34,13 +34,13 @@ export class ClassificationTarget extends Component {
       if (!temp[k]) delete temp[k]
     })
     const values = Object.values(temp)
-    if(values.length !== [...new Set(values)].length) return message.error("Cannot be modified to the same name")
-    const { targetArray, targetMap } = this.props.project
-    if (!!targetArray.length) {
-      targetArray.forEach((v, k) => {
+    if (values.length !== [...new Set(values)].length) return message.error("Cannot be modified to the same name")
+    const { targetArrayTemp, targetMapTemp } = this.props.project
+    if (!!targetArrayTemp.length) {
+      targetArrayTemp.forEach((v, k) => {
         if (temp.hasOwnProperty(v)) {
-          Object.keys(targetMap).forEach(key => {
-            if (targetMap[key] === k) temp[key] = temp[v]
+          Object.keys(targetMapTemp).forEach(key => {
+            if (targetMapTemp[key] === k) temp[key] = temp[v]
           })
         }
       })
@@ -52,10 +52,10 @@ export class ClassificationTarget extends Component {
 
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
-    const { target, targetMap, targetArray, colValueCounts, totalRawLines, renameVariable } = project
-    const map = !targetArray.length ? colValueCounts[target] : targetArray.map((v, k) => {
+    const { target, targetMapTemp, targetArrayTemp, colValueCounts, totalRawLines, renameVariable } = project
+    const map = !targetArrayTemp.length ? colValueCounts[target] : targetArrayTemp.map((v, k) => {
       let n = 0
-      Object.entries(targetMap).forEach(([key, value]) => {
+      Object.entries(targetMapTemp).forEach(([key, value]) => {
         if (value === k) n += colValueCounts[target] ? (colValueCounts[target][key] || 0) : 0
       })
       return { [v]: n }
@@ -458,6 +458,7 @@ export class SelectTarget extends Component {
 export class FixIssue extends Component {
   @observable editKey = ''
   @observable visible = false
+  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} }
 
   editRange = (key) => {
     this.visible = true
@@ -471,24 +472,46 @@ export class FixIssue extends Component {
 
   saveEdit = (data) => {
     const { editKey } = this;
-    this.props.project.outlierDict[editKey] = data;
+    this.props.project.outlierDictTemp[editKey] = data;
     this.visible = false
     this.editKey = ''
   }
 
   nullSelect = (key, e) => {
     let value = e.target.value
-    this.props.project.nullFillMethod[key] = value;
+    const { missing } = this.fillMethod
+    missing[key] = value
+    this.fillMethod.missing = { ...missing }
+    // const { nullFillMethodTemp } = this.props.project
+    // nullFillMethodTemp[key] = value
+    // this.props.project.nullFillMethodTemp = { ...nullFillMethodTemp }
   }
 
   mismatchSelect = (key, e) => {
     let value = e.target.value
-    this.props.project.mismatchFillMethod[key] = value;
+    const { mismatch } = this.fillMethod
+    mismatch[key] = value
+    this.fillMethod.mismatch = { ...mismatch }
+    // const { mismatchFillMethodTemp } = this.props.project
+    // mismatchFillMethodTemp[key] = value
+    // this.props.project.mismatchFillMethodTemp = { ...mismatchFillMethodTemp }
   }
 
   outlierSelect = (key, e) => {
     let value = e.target.value
-    this.props.project.outlierFillMethod[key] = value;
+    const { outlier } = this.fillMethod
+    outlier[key] = value
+    this.fillMethod.outlier = { ...outlier }
+    // const { outlierFillMethodTemp } = this.props.project
+    // outlierFillMethodTemp[key] = value
+    // this.props.project.outlierFillMethodTemp = { ...outlierFillMethodTemp }
+  }
+
+  save = () => {
+    this.props.project.nullFillMethodTemp = { ...this.fillMethod.missing }
+    this.props.project.mismatchFillMethodTemp = { ...this.fillMethod.mismatch }
+    this.props.project.outlierFillMethodTemp = { ...this.fillMethod.outlier }
+    this.props.saveDataFixes()
   }
 
   formatCell = num => {
@@ -499,25 +522,25 @@ export class FixIssue extends Component {
 
   reasonSelect = (key, e) => {
     const value = e.target.value
-    const { missingReason, nullFillMethod, colType } = this.props.project
+    const { missingReasonTemp, nullFillMethodTemp, colType } = this.props.project
     if (value === "none") {
-      delete nullFillMethod[key]
-      delete missingReason[key]
+      delete nullFillMethodTemp[key]
+      delete missingReasonTemp[key]
     } else {
-      missingReason[key] = value
+      missingReasonTemp[key] = value
       if (colType[key] === 'Categorical' && value === 'blank') {
-        nullFillMethod[key] = 'ignore'
+        nullFillMethodTemp[key] = 'ignore'
       } else {
-        delete nullFillMethod[key]
+        delete nullFillMethodTemp[key]
       }
     }
-    this.props.project.missingReason = { ...missingReason }
-    this.props.project.nullFillMethod = { ...nullFillMethod }
+    this.props.project.missingReasonTemp = { ...missingReasonTemp }
+    this.props.project.nullFillMethodTemp = { ...nullFillMethodTemp }
   }
 
   render() {
-    const { closeFixes, project, saveDataFixes, isTarget, issueRows } = this.props;
-    const { colType, mismatchFillMethod, nullFillMethod, outlierFillMethod, totalRawLines, rawDataViews, outlierRange, outlierDict, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReason } = project
+    const { closeFixes, project, isTarget, issueRows } = this.props;
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataViews, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
         <div className={styles.typeBox}>
@@ -550,6 +573,7 @@ export class FixIssue extends Component {
               const mode = showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode)
               const mean = showType === 'Numerical' ? rawDataViews[k].mean : 'N/A'
               const median = showType === 'Numerical' ? rawDataViews[k].median : 'N/A'
+              const method = this.fillMethod.mismatch[k] || mismatchFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)
               return <div className={styles.fixesRow} key={i}>
                 <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
                 <div className={styles.fixesCell}><span>{showType}</span></div>
@@ -557,7 +581,7 @@ export class FixIssue extends Component {
                 <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
-                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={(mismatchFillMethod[k] || (showType === 'Categorical' ? mode : mean))} onChange={this.mismatchSelect.bind(null, k)}>
+                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={method} onChange={this.mismatchSelect.bind(null, k)}>
                   {showType === 'Categorical' ? [
                     <option value={mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,
@@ -609,10 +633,10 @@ export class FixIssue extends Component {
               const mode = showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode)
               const mean = showType === 'Numerical' ? rawDataViews[k].mean : 'N/A'
               const median = showType === 'Numerical' ? rawDataViews[k].median : 'N/A'
-              // const rowText = `${num} ${nullFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (nullFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
+              const method = this.fillMethod.missing[k] || nullFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
-                <div className={styles.fixesCell}><select value={missingReason[k]} onChange={this.reasonSelect.bind(null, k)}>
+                <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
                   <option value='none' key="none">I don`t know</option>
                   <option value="blank" key="blank">Left blank on purpose</option>
                   <option value='fail' key='fail'>Failed to Collect or Data Error</option>
@@ -622,7 +646,7 @@ export class FixIssue extends Component {
                 <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
-                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={(nullFillMethod[k] || (showType === 'Categorical' ? mode : mean))} onChange={this.nullSelect.bind(null, k)}>
+                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={method} onChange={this.nullSelect.bind(null, k)}>
                   {showType === 'Categorical' ? [
                     <option value={mode} key="mode">Replace with most frequent value</option>,
                     <option value="drop" key="drop">Delete the row</option>,
@@ -670,11 +694,10 @@ export class FixIssue extends Component {
               const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
               const isShow = showType === 'Numerical';
               if (!isShow) return null
-              const outlier = outlierDict[k] && outlierDict[k].length === 2 ? outlierDict[k] : outlierRange[k];
+              const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : outlierRange[k];
               const percnet = num / (totalRawLines || 1) * 100
               const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
-              // const mode = dataViews[k].mode === 'nan' ? (dataViews[k].modeNotNull || [])[2] : dataViews[k].mode
-              // const rowText = `${num} ${outlierFillMethod.hasOwnProperty(k) ? ' row' + (num === 1 ? '' : "s") + ' will be ' + (outlierFillMethod[k] === "drop" ? "delete" : "fixed") : '(' + (num / (totalRawLines || 1)).toFixed(4) + '%)'}`
+              const method = this.fillMethod.outlier[k] || outlierFillMethodTemp[k] || 'drop'
               return <div className={styles.fixesRow} key={i}>
                 <div className={styles.fixesCell}><span>{k}</span></div>
                 <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
@@ -686,7 +709,7 @@ export class FixIssue extends Component {
                 <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(rawDataViews[k].mean)} >{this.formatCell(rawDataViews[k].mean)}</span></div>
                 <div className={styles.fixesCell}><span title={this.formatCell(rawDataViews[k].median)}>{this.formatCell(rawDataViews[k].median)}</span></div>
-                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={outlierFillMethod[k]} onChange={this.outlierSelect.bind(null, k)}>
+                <div className={classnames(styles.fixesCell, styles.fixesLarge)}><select value={method} onChange={this.outlierSelect.bind(null, k)}>
                   <option value="drop" key='drop'>Delete the row</option>
                   <option value="ignore" key='ignore'>Do Nothing</option>
                   <option value={rawDataViews[k].mean} key='mean'>Replace with mean value</option>
@@ -700,14 +723,14 @@ export class FixIssue extends Component {
         </div>
       </div>}
       <div className={styles.fixesBottom}>
-        <button className={styles.save} onClick={saveDataFixes} ><span>save</span></button>
+        <button className={styles.save} onClick={this.save} ><span>save</span></button>
         <button className={styles.cancel} onClick={closeFixes}><span>cancel</span></button>
       </div>
       {this.editKey && <Modal content={<EditOutLier width={800}
         height={400} saveEdit={this.saveEdit}
         closeEdit={this.closeEdit}
         outlierRange={project.outlierRange[this.editKey]}
-        outlierDict={project.outlierDict[this.editKey]}
+        outlierDict={project.outlierDictTemp[this.editKey]}
         x={project.numberBins[this.editKey][1]}
         y={project.numberBins[this.editKey][0]} />}
         visible={this.visible}

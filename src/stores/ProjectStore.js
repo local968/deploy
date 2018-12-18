@@ -149,7 +149,7 @@ class ProjectStore {
           this.loading = false;
           return { error: message }
         }
-        if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix() }))
+        // if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix() }))
         this.loading = false;
         return { id }
       })
