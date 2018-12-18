@@ -28,7 +28,7 @@ export default class Main extends Component {
           message.error("Sorry but you don't have the authority for entering this project.")
           this.props.routing.push("/")
         }
-        autorun(() => {
+        this.autorun = autorun(() => {
           const { projectStore: { project }, routing } = this.props;
           const { curStep } = project || {};
           if (curStep === this.step) return
@@ -50,6 +50,7 @@ export default class Main extends Component {
             default:
           }
           if (!url) routing.push('/')
+          if (!routing.location.pathname.startsWith(`/project/${project.id}`)) return
           if (routing.location.pathname.includes(url)) return
           return routing.push(url)
         })
@@ -69,6 +70,10 @@ export default class Main extends Component {
       () => this.props.projectStore.project,
       () => this.props.projectStore.inProject(this.pid)
     )
+  }
+
+  componentWillUnmount() {
+    this.autorun && this.autorun()
   }
 
   exit = () => {

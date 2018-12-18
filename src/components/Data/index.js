@@ -54,6 +54,7 @@ export default class Data extends Component {
         default:
       }
       if (!url) return routing.push('/')
+      if (!routing.location.pathname.startsWith(`/project/${project.id}/data`)) return
       if (routing.location.pathname.includes(url)) return
       return routing.push(url)
     })
