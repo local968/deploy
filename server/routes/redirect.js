@@ -17,7 +17,7 @@ const getHost = (req, res, next) => {
     })
     return
   }
-  redis.hget(`project:${projectId}host`).then(url => {
+  redis.hget(`project:${projectId}`,`host`).then(url => {
     req.proxyHost = JSON.parse(url)
     req.filename = query.filename
     next()
