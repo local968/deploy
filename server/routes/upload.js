@@ -13,23 +13,21 @@ const { userModelingRestriction, userStorageRestriction } = require('restriction
 const router = new Router()
 
 router.post('/check', async (req, res) => {
-  const fileSize = req.body.fileSize
-  const userId = req.session.userId
-  const type = req.body.type
-  const projectId = req.body.projectId
+  const {fileSize,type,projectId} = req.body
+  const {userId} = req.session
   const host = JSON.parse(await redis.hget(`project:${projectId}`, 'host'))
   if (!fileSize || !userId || !type) return res.json({
     status: 404,
     message: 'missing params',
     error: 'missing params'
   })
-  if (type === 'modeling' && parseInt(fileSize) >= userModelingRestriction[req.session.user.level]) return res.json({
+  if (type === 'modeling' && +fileSize >= userModelingRestriction[req.session.user.level]) return res.json({
     status: 416,
     message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
     error: 'modeling file too large'
   })
   const size = await redis.get(`user:${userId}:upload`)
-  if (parseInt(size) + parseInt(fileSize) >= userStorageRestriction[req.session.user.level]) return res.json({
+  if (+size + +fileSize >= userStorageRestriction[req.session.user.level]) return res.json({
     status: 417,
     message: 'Your usage of storage space has reached the max restricted by your current lisense.',
     error: 'storage space full'
@@ -79,29 +77,29 @@ router.post('/', (req, res) => {
       ext
     }, (result) => (result.status < 0 || result.status === 100) && result)
       .then(result => {
-        const lineCount = result.result.lines || 0
+        const {lines:lineCount=0} = result.result
         fields.createdTime = moment().unix()
         fields.lineCount = lineCount
         fields.from = 'upload'
         fields.type = params.type
         fields.params = params
         fields.userId = params.userId
-        redis.set('file:' + fileId, JSON.stringify(fields))
-        redis.incrby(`user:${params.userId}:upload`, parseInt(params.fileSize))
+        redis.set(`file:${fileId}`, JSON.stringify(fields))
+        redis.incrby(`user:${params.userId}:upload`, +params.fileSize)
         res.json({ fileId, status: 200, message: 'ok' })
       })
   });
 })
 
 router.post('/sample', (req, res) => {
-  const filename = req.body.filename
-  const userId = req.session.userId
+  const {filename} = req.body
+  const {userId} = req.session
   if (!filename || !userId) return res.json({
     status: 404,
     message: 'missing params',
     error: 'missing params'
   })
-  redis.get('file:sample:' + filename, (err, data) => {
+  redis.get(`file:sample:${filename}` , (err, data) => {
     if (err) return res.json({ status: 201, message: 'file error' })
     if (!data) return res.json({ status: 202, message: 'file not exist' })
     res.json({ status: 200, message: 'ok', fileId: data })
@@ -109,8 +107,8 @@ router.post('/sample', (req, res) => {
 })
 
 router.get('/dataDefinition', async (req, res) => {
-  const userId = req.session.userId
-  const projectId = req.query.projectId
+  const {userId} = req.session
+  const {projectId} = req.query
   if (!userId) return res.json({ status: 401, message: 'need login', error: 'need login' })
   const rank = await redis.zrank(`user:${userId}:projects:createTime`, projectId)
   if (rank === null) return redis.json({ status: 404, message: 'project not found.', error: 'project not found.' })
@@ -121,8 +119,8 @@ router.get('/dataDefinition', async (req, res) => {
 })
 
 router.get('/test', async (req, res) => {
-  const userId = req.session.userId
-  const projectId = req.query.id
+  const {userId} = req.session
+  const {id:projectId} = req.query
   const host = await redis.hget(`project:${projectId}`, 'host')
   res.json(host)
 })
@@ -164,8 +162,8 @@ function saveSample() {
   })
   const pipeline = redis.pipeline();
   array.forEach(v => {
-    pipeline.set('file:sample:' + v.name, v.id)
-    pipeline.set('file:' + v.id, JSON.stringify(v))
+    pipeline.set(`file:sample:${v.name}`, v.id)
+    pipeline.set(`file:${v.id}`, JSON.stringify(v))
   })
   pipeline.exec()
 }
