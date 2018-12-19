@@ -66,9 +66,9 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArray, renameVariable } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable } = project;
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
-    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray
+    const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     return <div>
       <div className={styles.result}>

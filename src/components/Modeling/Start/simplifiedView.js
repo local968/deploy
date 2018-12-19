@@ -91,13 +91,16 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project, reloadTable } = this.props;
-    const { target, colType, targetMap, dataViews, preImportance, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression } = project;
+    const { target, colType, targetMap, dataViews, preImportance, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader } = project;
     // const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, targetColMap, targetMap)).length : 'N/A';
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader, ...newVariable]
-    const variableType = {...newType, ...colType}
+    const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
+    const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
+    const hasNewOne = key === -1
+    const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     return <div className={styles.simplified}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -143,9 +146,11 @@ export default class SimplifiedView extends Component {
       <div className={styles.tool}>
         <div className={styles.toolSelect}>
           <div className={styles.toolLabel}><span>Current Variable List</span></div>
-          <select defaultValue="all" onChange={this.handleChange}>
-            <option value='all'>All Variables ({dataHeader.length - 1})</option>
+          <select value={selectValue} onChange={this.handleChange}>
+            <option value='all'>All Variables ({dataHeader.length})</option>
             <option value='informatives'>informatives ({informativesLabel.length})</option>
+            {customHeader.map((v, k) => <option key={k} value={k}>custom_{k + 1} ({v.length})</option>)}
+            {hasNewOne && <option value={customHeader.length}>custom_{customHeader.length + 1} ({checkedVariables.length})</option>}
           </select>
         </div>
         <div className={styles.newVariable}>

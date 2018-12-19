@@ -100,7 +100,10 @@ class AdvancedModel extends Component {
 
   componentDidMount() {
     this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
-      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => this.isLoading = false)
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
+        this.isLoading = false
+        this.progress = 0
+      })
     })
   }
 
@@ -111,7 +114,12 @@ class AdvancedModel extends Component {
 
   modeling = () => {
     const { project, closeAdvanced } = this.props
-    const { advancedModeling, version, algorithms } = project
+    const { advancedModeling, version, algorithms, dataHeader, newVariable, trainHeader, customHeader, informativesLabel } = project
+    const allVariables = [...dataHeader, ...newVariable]
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
+    const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
+    const hasNewOne = key === -1
+    if(hasNewOne) project.customHeader.push(checkedVariables)
     const sortFn = (a, b) => a - b
     if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
     if (!project.version.length) return message.error("You need to select at least one algorithm!")
@@ -121,9 +129,11 @@ class AdvancedModel extends Component {
 
   reloadTable = () => {
     this.isLoading = true
-    this.progress = 0
     this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
-      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => this.isLoading = false)
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
+        this.isLoading = false
+        this.progress = 0
+      })
     })
   }
 

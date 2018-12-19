@@ -452,6 +452,13 @@ wss.register('etl', (message, socket, progress) => {
               }
             })
           }
+
+          //赋值给temp
+          result.outlierDictTemp = result.outlierDict
+          result.nullFillMethodTemp = result.nullFillMethod
+          result.mismatchFillMethodTemp = result.mismatchFillMethod
+          result.outlierFillMethodTemp = result.outlierFillMethod
+          
           result.etling = false
           result.etlProgress = 0
           result.firstEtl = false;

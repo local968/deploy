@@ -132,9 +132,8 @@ export default class Home extends Component {
         onConfirm={this.handleOk}
         confirmText="Yes"
         closeText="No"
-        content={this.deleteNames.length > 1 ?
-          <div>Are you sure to delete the following projects:<br />{this.deleteNames.map((name, k) => <span key={k}>{name.length > 20 ? name : name.slice(0, 20) + "..."}<br /></span>)} </div> :
-          <div>Are you sure to delete project {this.deleteNames.toString()}?</div>} />}
+        content={this.deleteNames.length > 1 ? `Are you sure to delete the following projects: ${this.deleteNames.map((name, k) => { return name.length > 40 ? name.slice(0, 40) + "..." : name })}?` :
+          `Are you sure to delete project ${this.deleteNames.toString()}?`} />}
     </div>
   }
 }

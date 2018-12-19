@@ -6,7 +6,7 @@ import { Route, Switch } from 'react-router-dom';
 import DataConnect from './Connect';
 import DataSchema from './Schema';
 import DataQuality from './Quality';
-import { autorun, observable } from 'mobx'
+import { autorun } from 'mobx'
 
 import dataConnectActive from './data_prograss_a.svg';
 import dataSchemaActive from './data_schema_a.svg';
@@ -25,8 +25,6 @@ const imgs = {
 @inject('projectStore', 'routing')
 @observer
 export default class Data extends Component {
-  @observable subStep = 0
-
   constructor(props) {
     super(props);
     this.step = [
@@ -42,8 +40,6 @@ export default class Data extends Component {
       if (!project) return
       const { curStep, subStepActive } = project;
       if (curStep !== 2) return
-      if (this.subStep === subStepActive) return
-      this.subStep = subStepActive
       let url = ''
       switch (subStepActive) {
         case 1:
@@ -58,6 +54,7 @@ export default class Data extends Component {
         default:
       }
       if (!url) return routing.push('/')
+      if (!routing.location.pathname.startsWith(`/project/${project.id}/data`)) return
       if (routing.location.pathname.includes(url)) return
       return routing.push(url)
     })

@@ -7,11 +7,10 @@ import { action } from 'mobx';
 import Slider from 'rc-slider';
 import { NumberInput } from 'components/Common';
 import { Select, message } from 'antd';
+import Algorithms from './algorithms';
 
 const Option = Select.Option;
 const Range = Slider.Range;
-const ClassificationAlgorithms = ['AdaBoost', 'NaiveBayes-Bernoulli', 'Decision Tree', 'Extra Trees', 'NaiveBayes-Gaussian', 'GBDT', 'KNN', 'LDA', 'Linear SVM', 'SVM', 'NaiveBayes-Multinomial', 'Online Passive Aggressive', 'QDA', 'Random Forest', 'Linear Incremental Model', 'XGBoost'];
-const RegressionAlgorithms = ['AdaBoost', 'ARD Rregression', 'Decision Tree', 'Extra Trees', 'GP Regression', 'GBDT', 'KNN', 'Linear SVM', 'SVM', 'Random Forest', 'Ridge Regression', 'Linear Incremental Model', 'XGBoost'];
 const HandleStyle = {
   backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
   border: '0.07em solid #e8e8e8',
@@ -117,11 +116,12 @@ export default class AdvancedView extends Component {
       this.props.project.algorithms = []
       return
     }
-    if (problemType === "Classification") {
-      this.props.project.algorithms = ClassificationAlgorithms
-      return
-    }
-    this.props.project.algorithms = RegressionAlgorithms
+    this.props.project.algorithms = Algorithms[problemType].map(v => v.value)
+    // if (problemType === "Classification") {
+    //   this.props.project.algorithms = Classification
+    //   return
+    // }
+    // this.props.project.algorithms = RegressionAlgorithms
   }
 
   handleCheck = (key, e) => {
@@ -206,7 +206,7 @@ export default class AdvancedView extends Component {
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
     const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
-    const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
+    // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
 
     return <div className={styles.advanced}>
       <div className={styles.advancedRow}>
@@ -261,10 +261,10 @@ export default class AdvancedView extends Component {
                 <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
                 <label htmlFor={'R2-solution-b'}>R2-solution-b</label>
               </div>
-              {algorithmList.map((v, k) => {
+              {Algorithms[problemType].map((v, k) => {
                 return <div className={styles.advancedAlgorithm} key={k}>
-                  <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v)} onChange={this.handleCheck.bind(null, v)} />
-                  <label htmlFor={"algorithm" + k}>{v}</label>
+                  <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v.value)} onChange={this.handleCheck.bind(null, v.value)} />
+                  <label htmlFor={"algorithm" + k}>{v.label}</label>
                 </div>
               })}
             </div>
