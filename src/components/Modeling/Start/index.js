@@ -3,11 +3,12 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 // import autoIcon from './mr-one-logo-blue.svg';
-import { Modal, ProcessLoading } from 'components/Common';
+import { Modal } from 'components/Common';
 import { observable } from 'mobx';
 import { message, Icon } from 'antd';
 import AdvancedView from './advancedView';
 import SimplifiedView from './simplifiedView';
+import Preview from './Preview'
 import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
 
@@ -95,17 +96,6 @@ export default class StartTrain extends Component {
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
-  @observable isLoading = true
-  @observable progress = 0
-
-  componentDidMount() {
-    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
-      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
-        this.isLoading = false
-        this.progress = 0
-      })
-    })
-  }
 
   switchTab = (num) => {
     if (num !== 1 && num !== 2) return false;
@@ -119,22 +109,12 @@ class AdvancedModel extends Component {
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
-    if(hasNewOne) project.customHeader.push(checkedVariables)
+    if (hasNewOne) project.customHeader.push(checkedVariables)
     const sortFn = (a, b) => a - b
     if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
     if (!project.version.length) return message.error("You need to select at least one algorithm!")
     closeAdvanced()
     advancedModeling()
-  }
-
-  reloadTable = () => {
-    this.isLoading = true
-    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
-      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
-        this.isLoading = false
-        this.progress = 0
-      })
-    })
   }
 
   render() {
@@ -150,19 +130,15 @@ class AdvancedModel extends Component {
           })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
         </div>
         <div className={styles.viewBox}>
-          {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable} /> : <AdvancedView project={project} />}
-          {(this.tab === 1 && this.isLoading) && <ProcessLoading progress={this.progress} style={{ bottom: '0.25em' }} />}
-          {/* {((this.tab === 1 && this.preImportanceLoading) || this.dataViewLoading) && <div className={styles.simplifiedLoad}>
-            <Spin size="large" />
-          </div>} */}
-        </div>
-        <div className={styles.bottom}>
-          <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
-          <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
+          <Preview project={project} />
+          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
+          <div className={styles.bottom}>
+            <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
+            <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
+          </div>
         </div>
 
       </div>
-
     </div>
   }
 }

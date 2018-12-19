@@ -42,7 +42,7 @@ export default class Project {
   // upload data
   @observable cleanHeader = []
   @observable dataHeader = [];
-  @observable uploadData = [];
+  // @observable uploadData = [];
   @observable rawHeader = [];
   @observable colType = [];
   @observable totalLines = 0;
@@ -54,7 +54,7 @@ export default class Project {
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
   @observable fileNames = [];
-  @observable cleanData = []
+  // @observable cleanData = []
   @observable originPath = '';
   @observable cleanPath = ''
 
@@ -170,7 +170,6 @@ export default class Project {
   @computed
   get defaultUploadFile() {
     this.noComputeTemp = false
-    this.uploadData = []
 
     return {
       cleanHeader: [],
@@ -373,6 +372,15 @@ export default class Project {
         })
       }
     }))
+    this.autorun.push(autorun(async () => {
+      if (!this.cleanPath) {
+        this.cleanData = []
+      } else {
+        this.readData(this.cleanPath).then(data => {
+          this.cleanData = data.filter(r => r.length === this.rawHeader.length)
+        })
+      }
+    }))
     // this.loading = true;
     // return socketStore.ready().then(api => {
     //   return api.queryProject({ id: this.id }).then(result => {
@@ -390,6 +398,7 @@ export default class Project {
   clean = () => {
     this.autorun.forEach(f => f())
     this.uploadData = []
+    this.cleanData = []
   }
 
   @action

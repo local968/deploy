@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import Hint from 'components/Common/Hint';
 import { observer } from 'mobx-react';
 import CorrelationMatrix from './CorrelationMatrix';
+import { Hint, ProcessLoading } from 'components/Common';
 import { observable } from 'mobx';
 import { Spin, Popover, message as antdMessage, Icon, Table } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
-// import config from 'config';
 import FUNCTIONS from './functions';
 import config from 'config'
 
@@ -18,6 +17,17 @@ export default class SimplifiedView extends Component {
   @observable showHistograms = false
   @observable showCorrelation = false
   @observable visible = false
+  @observable isLoading = true
+  @observable progress = 0
+
+  componentDidMount() {
+    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
+        this.isLoading = false
+        this.progress = 0
+      })
+    })
+  }
 
   getCorrelationMatrix = () => {
     this.props.project.correlationMatrix()
@@ -64,22 +74,32 @@ export default class SimplifiedView extends Component {
     this.visible = false
   }
 
-  // reloadTable = () => {
-  //   this.props.project.dataViews = null
-  //   this.props.project.preImportance = null
-  //   this.props.project.dataView()
-  //   this.props.project.preTrainImportance()
-  // }
+  reloadTable = () => {
+    this.isLoading = true
+    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
+        this.isLoading = false
+        this.progress = 0
+      })
+    })
+  }
 
   handleChange = e => {
     const value = e.target.value
     const { project } = this.props
-    const { informativesLabel, dataHeader } = project
+    const { informativesLabel, dataHeader, customHeader } = project
+    let filterList = []
+    if (!value) return
     if (value === 'all') {
-      project.trainHeader = []
-    } else {
-      project.trainHeader = dataHeader.filter(v => !informativesLabel.includes(v))
+      filterList = dataHeader
     }
+    if (value === 'informatives') {
+      filterList = informativesLabel
+    }
+    if (!isNaN(value) && value < customHeader.length) {
+      filterList = customHeader[value]
+    }
+    project.trainHeader = dataHeader.filter(v => !filterList.includes(v))
   }
 
   formatNumber = (num, isNA) => {
@@ -90,9 +110,8 @@ export default class SimplifiedView extends Component {
   }
 
   render() {
-    const { project, reloadTable } = this.props;
+    const { project } = this.props;
     const { target, colType, targetMap, dataViews, preImportance, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader } = project;
-    // const targetUnique = colType[target] === 'Categorical' ? Object.values(Object.assign({}, targetColMap, targetMap)).length : 'N/A';
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader, ...newVariable]
@@ -183,7 +202,7 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>Importance</span>
-            <div className={styles.tableReload} onClick={reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
+            <div className={styles.tableReload} onClick={this.reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
             <Hint themeStyle={{ fontSize: '1rem' }} content='The following column reflects the importance of the predictor to the target variable.' />
           </div>
           <div className={styles.tableTh}><span>Data Type</span></div>
@@ -206,6 +225,7 @@ export default class SimplifiedView extends Component {
           })}
         </div>
       </div>
+      {this.isLoading && <ProcessLoading progress={this.progress} style={{ bottom: '0.25em' }} />}
     </div>
   }
 }

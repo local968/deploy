@@ -74,7 +74,7 @@
   flex: none;
 }
 
-.trainImg img{
+.trainImg img {
   width: 130px;
   height: 120px;
 }
@@ -354,7 +354,7 @@
   margin: 0 0.05em;
 }
 
-.tableTh span{
+.tableTh span {
   text-align: center;
 }
 
@@ -780,8 +780,7 @@ span.advancedDesc {
   position: relative;
 }
 
-.correlationPlot img,
-.plot img {
+.correlationPlot img, .plot img {
   max-height: 100%;
   max-width: 100%;
 }
@@ -1075,7 +1074,7 @@ span.advancedDesc {
   flex: none;
 }
 
-.funcTipsName span{
+.funcTipsName span {
   font-size: 1.125rem;
   font-weight: bold;
   line-height: 1.4;
@@ -1088,7 +1087,7 @@ span.advancedDesc {
   margin-bottom: .15em;
 }
 
-.funcTipsContent span{
+.funcTipsContent span {
   font-size: .875rem;
   line-height: 1.2;
   max-width: 100%;
@@ -1099,7 +1098,7 @@ span.advancedDesc {
   flex: none;
 }
 
-.funcTipsTitle span{
+.funcTipsTitle span {
   font-size: 1rem;
   font-weight: bold;
   line-height: 1.3;
