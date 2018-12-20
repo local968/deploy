@@ -467,7 +467,7 @@ export class FixIssue extends Component {
   @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} }
 
   componentDidMount() {
-    if (this.props.project.rawDataViews) {
+    if (!this.props.project.rawDataViews) {
       this.loading = true
       this.progress = 0
 
