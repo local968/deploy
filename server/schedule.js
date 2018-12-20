@@ -55,9 +55,8 @@ async function scheduleHandler() {
       schedule.result = result
       schedule.status = result['process error'] ? 'issue' : 'finished'
       schedule.updatedDate = moment().unix()
-      return api.upsertSchedule(schedule)
+      api.upsertSchedule(schedule)
     }
-
 
     const cdo = deployment[`${schedule.type}Options`];
     const nextTime = generateNextScheduleTime(
