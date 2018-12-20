@@ -136,6 +136,7 @@ export default class Project {
 
   @observable stopModel = false
   @observable stopEtl = false
+  @observable modelQueue = []
 
   constructor(id, args) {
     this.id = id
@@ -1076,19 +1077,25 @@ export default class Project {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
-    let model = this.models.find(m => data.id !== m.id)
-    if (model) {
-      model.setProperty(data)
-    } else {
-      model = new Model(this.id, data)
-      this.models.push(model)
-    }
+    const model = new Model(this.id, data)
+    this.models = [...this.models.filter(m => data.id !== m.id), model]
     if (data.chartData) {
       const { TP, FP, FN, TN } = this.costOption
       const { index } = model.getBenefit(TP, FP, FN, TN)
       if (index === model.fitIndex) return
       model.updateModel({ fitIndex: index })
     }
+  }
+
+  setModelField = data => {
+    const times = data.times || 0
+    const model = this.models.find(m => data.id === m.id)
+    if (!model) {
+      if (times > 5) return
+      const fn = () => this.setModelField({ data, times: times + 1 })
+      return setTimeout(fn, 500)
+    }
+    model.setProperty(data)
   }
 
   setSelectModel = id => {

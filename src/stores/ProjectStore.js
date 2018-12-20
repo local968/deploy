@@ -98,15 +98,17 @@ class ProjectStore {
           this.watchList = true
           this.init = true
           api.on(watch.id, data => {
-            const { status, id, result, model } = data
+            const { status, id, result, model, modelResult } = data
             if (status === 200) {
               const project = this.list.find(p => p.id === id)
               if (!project) {
+                if (!result) return
                 if (!result.host) return
                 this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix(), visiable: this.toolsOption.current !== 1 }))
               } else {
                 if (result) project.setProperty(result)
                 if (model) project.setModel(model)
+                if (modelResult) project.setModelField(modelResult)
               }
             }
           })

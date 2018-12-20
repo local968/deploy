@@ -217,8 +217,6 @@ class TargetIssue extends Component {
 class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
-  @observable isLoad = false
-  @observable progress = 0
 
   // handleCheck = e => {
   //   const checked = e.target.checked
@@ -230,23 +228,7 @@ class VariableIssue extends Component {
   }
 
   editFixes = () => {
-    if (this.props.project.rawDataViews) {
-      this.visible = true
-    } else {
-      if (this.isLoad) return false;
-
-      this.isLoad = true
-      this.progress = 0
-
-      this.props.project.dataView(false, num => this.progress = num)
-      when(
-        () => this.props.project.rawDataViews,
-        () => {
-          this.visible = true
-          this.isLoad = false
-        }
-      )
-    }
+    this.visible = true
     this.closeSummary()
   }
 
@@ -420,7 +402,6 @@ class VariableIssue extends Component {
           </div> */}
         </div>
       </div>
-      {this.isLoad && <ProcessLoading progress={this.progress} style={{ position: 'fixed'  }} />}
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
       <Modal content={<FixIssue project={project}
         issueRows={issueRows}

@@ -33,7 +33,7 @@ function parseChartData(result) {
     }
     roundN(result.roc);
   }
-  return { chart: result, fitIndex, initialFitIndex };
+  return { chartData: result, fitIndex, initialFitIndex };
 }
 
 function roundN(data, n = 2) {
@@ -166,21 +166,25 @@ function addSettingModel(userId, projectId) {
   }
 }
 
-function createModel(id, modelId, params) {
+function createModel(userId, id, modelId, params) {
   // const modelId = uuid.v4()
   const pipeline = redis.pipeline();
   pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray({ ...params, id: modelId }))
   pipeline.sadd(`project:${id}:models`, modelId)
-  return pipeline.exec().then(result => {
-    const err = result.find(([error]) => !!error);
+  return pipeline.exec().then(list => {
+    const err = list.find(([error]) => !!error);
     const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
-    return { ...data, model: { ...params, id: modelId }, id }
+    const result = { ...data, model: { ...params, id: modelId }, id }
+    wss.publish(`user:${userId}:projects`, result)
+    return result
   })
 }
 
-function updateModel(id, mid, params) {
+function updateModel(userId, id, mid, params) {
   return redis.hmset(`project:${id}:model:${mid}`, mapObjectToArray(params)).then(() => {
-    return { status: 200, message: "ok", model: { ...params, id: mid }, id }
+    const result = { status: 200, message: "ok", modelResult: { ...params, id: mid }, id }
+    wss.publish(`user:${userId}:projects`, result)
+    return result
   })
 }
 
@@ -675,7 +679,6 @@ wss.register('train', (message, socket, progress) => {
     .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
       const { status, result } = queueValue
-      // console.log(result, "adasd")
       if (status < 0 || status === 100) return queueValue
       if (result.name === "progress") {
         const { requestId: trainId } = result
@@ -686,10 +689,7 @@ wss.register('train', (message, socket, progress) => {
       if (result.score) {
         hasModel = true
         return createOrUpdate(projectId, userId, { trainModel: null })
-          .then(() => createModel(projectId, result.name, result).then(addSettingModel(userId, projectId)).then(model => {
-            wss.publish(`user:${userId}:projects`, model)
-            return progress(model)
-          }))
+          .then(() => createModel(userId, projectId, result.name, result).then(addSettingModel(userId, projectId)).then(model => progress(model)))
       }
       if (result.data) {
         const { model: mid, action, data } = result
@@ -700,18 +700,12 @@ wss.register('train', (message, socket, progress) => {
         if (action === "pointToShow") {
           saveData = { qcut: data }
         }
-        return updateModel(projectId, mid, saveData).then(model => {
-          wss.publish(`user:${userId}:projects`, model)
-          return progress(model)
-        })
+        return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
       }
       if (result.imageSavePath) {
         const { model: mid, action, imageSavePath } = result
         const saveData = { [action]: imageSavePath }
-        return updateModel(projectId, mid, saveData).then(model => {
-          wss.publish(`user:${userId}:projects`, model)
-          return progress(model)
-        })
+        return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
       }
     })
       .then(() => {
@@ -772,9 +766,10 @@ wss.register("inProject", (message, socket) => {
 
 
 wss.register("updateModel", (message, socket) => {
+  const { userId } = socket.session
   const { projectId } = message
   const { data, id: mid } = message
-  return updateModel(projectId, mid, data)
+  return updateModel(userId, projectId, mid, data)
 })
 
 function mapObjectToArray(obj) {
