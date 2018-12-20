@@ -418,7 +418,7 @@ class RegressionDetailCurves extends Component {
       case 'Fit Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.Path} alt="fit plot" />
+            <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
           </div>
         )
         break;
