@@ -94,6 +94,9 @@ export class ClassificationTarget extends Component {
                 <button onClick={this.showRename}><span>Change Target Variable Value</span></button>
               </div>
               <span>(optional)</span>
+              {!!targetArrayTemp.length && <div className={styles.remapTargetButton}>
+                <button onClick={editTarget}><span>Remap Target</span></button>
+              </div>}
             </div> : <div className={styles.cleanTargetRename}>
                 <div className={styles.cleanTargetButton}>
                   <button onClick={this.handleSave} className={styles.save}><span>Save</span></button>

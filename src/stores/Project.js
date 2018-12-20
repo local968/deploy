@@ -42,7 +42,7 @@ export default class Project {
   // upload data
   @observable cleanHeader = []
   @observable dataHeader = [];
-  // @observable uploadData = [];
+  @observable uploadData = [];
   @observable rawHeader = [];
   @observable colType = [];
   @observable totalLines = 0;
@@ -54,7 +54,7 @@ export default class Project {
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
   @observable fileNames = [];
-  // @observable cleanData = []
+  @observable cleanData = []
   @observable originPath = '';
   @observable cleanPath = ''
 
@@ -844,10 +844,10 @@ export default class Project {
         actionType: isClean ? 'clean' : 'raw',
         feature_label
       };
-      if (new_label.length) {
-        const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
-        command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
-      }
+      // if (new_label.length) {
+      //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+      //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      // }
       return api.dataView(command, progressResult => {
         if (progress && typeof progress === 'function') {
           const { result } = progressResult
@@ -884,12 +884,14 @@ export default class Project {
   @action
   addNewVariable = (variableName, variables, exp, type) => {
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
+    const oldExp = Object.values(this.expression).join(";")
+    const allExp = `${oldExp};${fullExp}`
 
     return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'createNewVariable',
-        csvScript: fullExp.replace(/\|/g, ",")
+        csvScript: allExp.replace(/\|/g, ",")
       };
       return api.createNewVariable(command, progressResult => {
       }).then(returnValue => {
@@ -1000,7 +1002,7 @@ export default class Project {
       target,
       trainHeader,
       dataHeader,
-      expression,
+      // expression,
       newVariable
     } = this;
     const command = 'train';
@@ -1035,10 +1037,10 @@ export default class Project {
     } else {
       trainData.splitBy = [this.customField, ...this.customRange]
     }
-    if (newVariableLabel.length) {
-      const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
-      trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
-    }
+    // if (newVariableLabel.length) {
+    //   const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+    //   trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+    // }
 
     const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy } = this;
     const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy }
@@ -1169,10 +1171,10 @@ export default class Project {
         command: 'preTrainImportance',
         feature_label
       };
-      if (new_label.length) {
-        const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
-        command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
-      }
+      // if (new_label.length) {
+      //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+      //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      // }
       return api.preTrainImportance(command, progressResult => {
         if (progress && typeof progress === 'function') {
           const { result } = progressResult

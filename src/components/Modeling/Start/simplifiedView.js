@@ -87,7 +87,7 @@ export default class SimplifiedView extends Component {
   handleChange = e => {
     const value = e.target.value
     const { project } = this.props
-    const { informativesLabel, dataHeader, customHeader } = project
+    const { informativesLabel, dataHeader, customHeader, newVariable } = project
     let filterList = []
     if (!value) return
     if (value === 'all') {
@@ -99,7 +99,7 @@ export default class SimplifiedView extends Component {
     if (!isNaN(value) && value < customHeader.length) {
       filterList = customHeader[value]
     }
-    project.trainHeader = dataHeader.filter(v => !filterList.includes(v))
+    project.trainHeader = [...dataHeader, ...newVariable].filter(v => !filterList.includes(v))
   }
 
   formatNumber = (num, isNA) => {
@@ -117,7 +117,7 @@ export default class SimplifiedView extends Component {
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
-    const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
+    const key = [dataHeader, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     return <div className={styles.simplified}>
@@ -599,7 +599,7 @@ class CreateNewVariable extends Component {
 
   checkParams = (functionName, bracketExps, bracketNum) => {
     const exps = bracketExps[bracketNum]
-    if (!exps) return { isPass: false, message: `params error` }
+    if (!exps) return { isPass: false, message: `empty parameters` }
     const expArray = exps.split(",")
     if (!functionName && expArray.length > 1) return { isPass: false, message: `Unexpected identifier: ${exps}` }
     const isBaseFn = FUNCTIONS.base.find(fn => fn.value === functionName + "()")
@@ -633,7 +633,7 @@ class CreateNewVariable extends Component {
       fnType = seniorResult.type
     } else {
       for (let param of params) {
-        if (param.type !== 'Numerical') return { isPass: false, message: `param must be Numerical` }
+        if (param.type !== 'Numerical') return { isPass: false, message: `parameters must be Numerical` }
       }
       fnType = 'Numerical'
     }
@@ -651,7 +651,7 @@ class CreateNewVariable extends Component {
     const paramList = params.slice(0, numOfParam)
     if (senior.value !== 'Concat()') {
       for (let param of paramList) {
-        if (param.type !== 'Numerical') return { isPass: false, message: `param must be Numerical` }
+        if (param.type !== 'Numerical') return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters must be Numerical` }
       }
     }
     const numList = params.slice(numOfParam)
@@ -728,7 +728,7 @@ class CreateNewVariable extends Component {
       default:
         break;
     }
-    if (num < 1) return { isPass: false, message: "error expression" }
+    if (num < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters error` }
     return { isPass: true, message: "ok", num, type }
   }
 
@@ -793,7 +793,7 @@ class CreateNewVariable extends Component {
               <span>{hintFunctionSyntax.syntax}</span>
               {hintIsSenior && <button onClick={this.showAll}><span>Tips</span></button>}
             </div>)}
-          {!!functionSyntax && <div className={styles.newVariableSyntax} style={this.hintStatus ? { right: '100%' } : null}><span>{functionSyntax.syntax}</span></div>}
+          {!!functionSyntax && <div className={styles.newVariableSyntax} style={(this.hintStatus && !!this.hints.length) ? { right: '100%' } : null}><span>{functionSyntax.syntax}</span></div>}
         </div>
       </div>
       <div className={styles.newVariableRow}>

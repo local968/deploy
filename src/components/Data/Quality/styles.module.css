@@ -791,6 +791,28 @@ span.fixesEdit {
 	color: #1d2b3c;
 }
 
+.remapTargetButton {
+	display: flex;
+	flex: none;
+}
+
+.remapTargetButton button {
+	display: flex;
+	flex: none;
+	padding: .1em .2em;
+	border-radius: 5px;
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	background-image: linear-gradient(to bottom, #5b657b, #243448);
+	border: none;
+	outline: none;
+	cursor: pointer;
+	margin-left: .2em;
+}
+
+.remapTargetButton span {
+	color: #fff;
+}
+
 .cleanTargetRow {
 	display: flex;
 	flex: none;
