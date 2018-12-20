@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { ContinueButton, Modal, ProcessLoading, Table } from 'components/Common';
-import { when, observable } from 'mobx';
+import { observable } from 'mobx';
 import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
 import * as d3 from 'd3';

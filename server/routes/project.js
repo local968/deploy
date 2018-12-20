@@ -1,6 +1,6 @@
 const { redis } = require('redis')
 const wss = require('../webSocket')
-// const uuid = require('uuid')
+const uuid = require('uuid')
 const moment = require('moment')
 const command = require('../command')
 
@@ -167,14 +167,14 @@ function addSettingModel(userId, projectId) {
 }
 
 function createModel(userId, id, modelId, params) {
-  // const modelId = uuid.v4()
+  const mid = uuid.v4()
   const pipeline = redis.pipeline();
-  pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray({ ...params, id: modelId }))
+  pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray({ ...params, id: modelId, mid }))
   pipeline.sadd(`project:${id}:models`, modelId)
   return pipeline.exec().then(list => {
     const err = list.find(([error]) => !!error);
     const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
-    const result = { ...data, model: { ...params, id: modelId }, id }
+    const result = { ...data, model: { ...params, id: modelId, mid }, id }
     wss.publish(`user:${userId}:projects`, result)
     return result
   })
