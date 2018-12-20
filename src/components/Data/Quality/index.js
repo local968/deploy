@@ -26,9 +26,9 @@ export default class DataQuality extends Component {
 @observer
 class TargetIssue extends Component {
   @observable visible = false
-  @observable isLoad = false
+  // @observable isLoad = false
   @observable edit = false
-  @observable progress = 0
+  // @observable progress = 0
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -41,23 +41,24 @@ class TargetIssue extends Component {
   }
 
   editFixes = () => {
-    if (this.props.project.rawDataViews) {
-      this.visible = true
-    } else {
-      if (this.isLoad) return false;
+    this.visible = true
+    // if (this.props.project.rawDataViews) {
+    //   this.visible = true
+    // } else {
+    //   if (this.isLoad) return false;
 
-      this.isLoad = true
-      this.progress = 0
+    //   this.isLoad = true
+    //   this.progress = 0
 
-      this.props.project.dataView(false, num => this.progress = num)
-      when(
-        () => this.props.project.rawDataViews,
-        () => {
-          this.visible = true
-          this.isLoad = false
-        }
-      )
-    }
+    //   this.props.project.dataView(false, num => this.progress = num)
+    //   when(
+    //     () => this.props.project.rawDataViews,
+    //     () => {
+    //       this.visible = true
+    //       this.isLoad = false
+    //     }
+    //   )
+    // }
   }
 
   closeFixes = () => {
@@ -186,7 +187,6 @@ class TargetIssue extends Component {
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
-        {this.isLoad && <ProcessLoading progress={this.progress} style={{ position: 'fixed' }} />}
         <Modal content={<FixIssue project={project}
           issueRows={targetIssues}
           closeFixes={this.closeFixes}

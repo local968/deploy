@@ -577,6 +577,9 @@ export default class Project {
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
+    } else {
+      // const uniqueValue = Math.min(1000, this.rawHeader.length * 6)
+      // data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
     }
 
     if (totalRawLines < 1000) {
@@ -626,68 +629,6 @@ export default class Project {
       return Object.assign(start, { [k]: n++ })
     }, {})
     return map
-  }
-
-  parseChartData(result, model) {
-    if (!result) return { chart: null, fitIndex: null };
-    let fitIndex;
-    let initialFitIndex;
-    const charts = ['density', 'lift', 'roc', 'rocHoldout'];
-    charts.forEach(chart => {
-      result[chart] = this.parseJson(result[chart])
-    });
-    if (result.roc) {
-      const { TP, FN, FP, TN } = this.costOption
-      initialFitIndex = this.indexOfMax(result.roc);
-      fitIndex = initialFitIndex
-      if (!!TP || !!FN || !!FP || !!TN) {
-        const benefit = model.getBenefit(TP, FN, FP, TN, result)
-        fitIndex = benefit.index
-      }
-      this.roundN(result.roc);
-    }
-    return { chart: result, fitIndex, initialFitIndex };
-  }
-
-  indexOfMax(arr) {
-    if (arr.length === 0) {
-      return -1;
-    }
-
-    let max = arr.Youden[0];
-    let maxIndex = 0;
-
-    for (let i = 1; i < Object.keys(arr.Youden).length; i++) {
-      if (arr.Youden[i] > max) {
-        maxIndex = i;
-        max = arr.Youden[i];
-      }
-    }
-
-    return maxIndex;
-  }
-
-  roundN(data, n = 2) {
-    if (!data) return;
-    const pow = Math.pow(10, n);
-    if (typeof data === 'number') {
-      return Math.floor(data * pow) / pow;
-    }
-    Object.keys(data).forEach(key => {
-      const num = data[key];
-      if (typeof num === 'number') {
-        data[key] = Math.floor(num * pow) / pow;
-      } else if (typeof num === 'object') {
-        return this.roundN(num, n);
-      } else {
-        data[key] = num;
-      }
-    });
-  }
-
-  parseJson(json_string) {
-    if (!json_string) return null;
-    return JSON.parse(json_string);
   }
 
   @computed
@@ -1135,12 +1076,18 @@ export default class Project {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
-    this.models = [...this.models.filter(m => data.id !== m.id), new Model(this.id, data)]
-    if (this.problemType === 'Classification') {
-      if (!data.chartData) this.chartData(data.name);
+    let model = this.models.find(m => data.id !== m.id)
+    if (model) {
+      model.setProperty(data)
     } else {
-      if (!data.residualPlot || !data.fitPlot) this.fitPlotAndResidualPlot(data.name)
-      if (!data.qcut) this.pointToShow(data.name)
+      model = new Model(this.id, data)
+      this.models.push(model)
+    }
+    if (data.chartData) {
+      const { TP, FP, FN, TN } = this.costOption
+      const { index } = model.getBenefit(TP, FP, FN, TN)
+      if (index === model.fitIndex) return
+      model.updateModel({ fitIndex: index })
     }
   }
 
@@ -1213,14 +1160,15 @@ export default class Project {
       const command = {
         projectId: this.id,
         command: 'univariatePlot',
+        feature_label: [field]
       };
-      if (field) {
-        if (this.newVariable.includes(field)) {
-          command.feature_label = [...this.newVariable]
-        } else {
-          command.feature_label = [field]
-        }
-      }
+      // if (field) {
+      //   if (this.newVariable.includes(field)) {
+      //     command.feature_label = [...this.newVariable]
+      //   } else {
+      //     command.feature_label = [field]
+      //   }
+      // }
       api.univariatePlot(command, progressResult => {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
@@ -1237,14 +1185,15 @@ export default class Project {
       const command = {
         projectId: this.id,
         command: 'histgramPlot',
+        feature_label: [field]
       };
-      if (field) {
-        if (this.newVariable.includes(field)) {
-          command.feature_label = [...this.newVariable]
-        } else {
-          command.feature_label = [field]
-        }
-      }
+      // if (field) {
+      //   if (this.newVariable.includes(field)) {
+      //     command.feature_label = [...this.newVariable]
+      //   } else {
+      //     command.feature_label = [field]
+      //   }
+      // }
       api.histgramPlot(command, progressResult => {
         const { result } = progressResult
         const { field: plotKey, imageSavePath, progress } = result;
@@ -1252,126 +1201,6 @@ export default class Project {
         const histgramPlots = Object.assign({}, this.histgramPlots);
         histgramPlots[plotKey] = imageSavePath
         this.setProperty({ histgramPlots })
-      }).then(this.handleError)
-    })
-  }
-
-  pointToShow = name => {
-    if (this.models.length === 0) {
-      return;
-    }
-    let version
-    if (name) {
-      const model = this.models.find(m => m.name === name)
-      if (model && model.qcut) return
-      version = name
-    } else {
-      const all = name || this.models.map(m => {
-        if (m.qcut) return ''
-        return m.name
-      }).filter(n => !!n).toString()
-      if (!all) return
-      version = all
-    }
-    socketStore.ready().then(api => {
-      const request = {
-        version: version,
-        projectId: this.id,
-        command: 'pointToShow'
-      }
-      api.pointToShow(request, points => {
-        const name = points.result.model;
-        if (name === "progress") return;
-        const model = this.models.find(m => {
-          return name === m.name
-        })
-        if (model) {
-          model.updateModel({
-            qcut: points.result.data
-          });
-        }
-      }).then(this.handleError)
-    })
-  }
-
-  chartData = name => {
-    if (this.models.length === 0) {
-      return;
-    }
-    let version
-    if (name) {
-      const model = this.models.find(m => m.name === name)
-      if (model && model.chartData) return
-      version = name
-    } else {
-      const all = name || this.models.map(m => {
-        if (m.chartData) return ''
-        return m.name
-      }).filter(n => !!n).toString()
-      if (!all) return
-      version = all
-    }
-    socketStore.ready().then(api => {
-      const request = {
-        action: 'all',
-        version: version,
-        command: 'chartData',
-        // csvLocation: [...this.uploadFileName],
-        projectId: this.id
-      };
-      api.chartData(request, chartResult => {
-        const { result } = chartResult;
-        if (result.progress === 'start') return;
-        const model = this.models.find(m => {
-          return result.model === m.name;
-        })
-        if (model) {
-          const { fitIndex, chart, initialFitIndex } = this.parseChartData(result.data, model);
-          model.updateModel({
-            fitIndex,
-            initialFitIndex,
-            chartData: chart
-          })
-        }
-      }).then(this.handleError)
-    })
-  }
-
-  fitPlotAndResidualPlot = name => {
-    if (this.models.length === 0) {
-      return;
-    }
-    let version
-    if (name) {
-      const model = this.models.find(m => m.name === name)
-      if (model && model.residualPlot && model.fitPlot) return
-      version = name
-    } else {
-      const all = name || this.models.map(m => {
-        if (m.residualPlot && m.fitPlot) return ''
-        return m.name
-      }).filter(n => !!n).toString()
-      if (!all) return
-      version = all
-    }
-    socketStore.ready().then(api => {
-      const request = {
-        projectId: this.id,
-        version: version,
-        command: 'fitPlotAndResidualPlot',
-        featureLabel: this.dataHeader.filter(n => n !== this.target)
-      }
-      api.fitPlotAndResidualPlot(request, chartResult => {
-        const { result } = chartResult;
-        if (result.progress === 'start') return;
-        const model = this.models.find(m => {
-          return result.model === m.name;
-        })
-        if (model) {
-          model.updateModel({
-            [result.action]: `http://${config.host}:${config.port}/redirect/download/${result.imageSavePath}?projectId=${this.id}`
-          });
-        }
       }).then(this.handleError)
     })
   }

@@ -367,7 +367,7 @@
 
 .fixesBottom {
 	display: flex;
-	margin-top: 0.2em;
+	margin: 0 0.5em 0.2em;
 	flex: none;
 }
 
@@ -402,7 +402,17 @@
 	display: flex;
 	flex: none;
 	flex-direction: column;
-	margin-top: .1em;
+	/* margin-top: .1em; */
+	margin: -0.2em -0.5em;
+	position: relative;
+}
+
+.fixesBlock {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	padding: 0.2em 0.5em;
+	position: relative;
 }
 
 .fixesBox {

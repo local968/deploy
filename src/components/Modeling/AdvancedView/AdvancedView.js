@@ -418,14 +418,14 @@ class RegressionDetailCurves extends Component {
       case 'Fit Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.fitPlot} alt="fit plot" />
+            <img className={styles.img} src={model.Path} alt="fit plot" />
           </div>
         )
         break;
       case 'Residual Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.residualPlot} alt="residual plot" />
+            <img className={styles.img} src={model.residualPlotPath} alt="residual plot" />
             <Modal
               visible={this.state.visible}
               title='Residual Plot Diagnose'
@@ -433,7 +433,7 @@ class RegressionDetailCurves extends Component {
               onOk={() => this.setState({ visible: false })}
               onCancel={() => this.setState({ visible: false })}
             >
-              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlot} />
+              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlotPath} />
             </Modal>
             <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
