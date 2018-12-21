@@ -62,7 +62,7 @@ class ProjectStore {
   @computed
   get sortList() {
     const sort = this.toolsOption.sort
-    return this.list.sort((a, b) => {
+    return this.list.filter(p => !p.visiable).sort((a, b) => {
       return b[sort] - a[sort]
     }).slice(0, this.toolsOption.limit)
   }
@@ -98,15 +98,17 @@ class ProjectStore {
           this.watchList = true
           this.init = true
           api.on(watch.id, data => {
-            const { status, id, result, model } = data
+            const { status, id, result, model, modelResult } = data
             if (status === 200) {
               const project = this.list.find(p => p.id === id)
               if (!project) {
+                if (!result) return
                 if (!result.host) return
-                if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix() }))
+                this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix(), visiable: this.toolsOption.current !== 1 }))
               } else {
                 if (result) project.setProperty(result)
                 if (model) project.setModel(model)
+                if (modelResult) project.setModelField(modelResult)
               }
             }
           })

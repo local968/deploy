@@ -418,14 +418,14 @@ class RegressionDetailCurves extends Component {
       case 'Fit Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.fitPlot} alt="fit plot" />
+            <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
           </div>
         )
         break;
       case 'Residual Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.residualPlot} alt="residual plot" />
+            <img className={styles.img} src={model.residualPlotPath} alt="residual plot" />
             <Modal
               visible={this.state.visible}
               title='Residual Plot Diagnose'
@@ -433,7 +433,7 @@ class RegressionDetailCurves extends Component {
               onOk={() => this.setState({ visible: false })}
               onCancel={() => this.setState({ visible: false })}
             >
-              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlot} />
+              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlotPath} />
             </Modal>
             <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
@@ -540,22 +540,22 @@ class DetailCurves extends Component {
     this.props.model.resetFitIndex();
   }
   render() {
-    const { model, model: { id }, yes, no } = this.props;
+    const { model, model: { mid }, yes, no } = this.props;
     const { curve } = this.state;
     let curComponent;
     let hasReset = true;
     switch (curve) {
       case 'ROC Curve':
-        curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
+        curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
         break;
       case 'Prediction Distribution':
-        curComponent = <PredictionDistribution height={190} width={500} className={`roc${id}`} model={model} />
+        curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
         break;
       case 'Precision Recall Tradeoff':
-        curComponent = <PRChart height={190} width={500} className={`precisionrecall${id}`} model={model} />
+        curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
         break;
       case 'Lift Chart':
-        curComponent = <LiftChart height={190} width={500} className={`lift${id}`} model={model} />;
+        curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
         break;
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
@@ -563,7 +563,7 @@ class DetailCurves extends Component {
         break;
       case 'Model Process Flow':
         curComponent = <div style={{ maxWidth: document.body.clientWidth / 2 }} >
-          <ModelProcess model={model} className={`modelprocess${id}`} />
+          <ModelProcess model={model} className={`modelprocess${mid}`} />
         </div>
         hasReset = false;
         break;

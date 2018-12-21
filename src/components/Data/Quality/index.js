@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { ContinueButton, Modal, ProcessLoading, Table } from 'components/Common';
-import { when, observable } from 'mobx';
+import { observable } from 'mobx';
 import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
 import * as d3 from 'd3';
@@ -26,9 +26,9 @@ export default class DataQuality extends Component {
 @observer
 class TargetIssue extends Component {
   @observable visible = false
-  @observable isLoad = false
+  // @observable isLoad = false
   @observable edit = false
-  @observable progress = 0
+  // @observable progress = 0
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -41,23 +41,24 @@ class TargetIssue extends Component {
   }
 
   editFixes = () => {
-    if (this.props.project.rawDataViews) {
-      this.visible = true
-    } else {
-      if (this.isLoad) return false;
+    this.visible = true
+    // if (this.props.project.rawDataViews) {
+    //   this.visible = true
+    // } else {
+    //   if (this.isLoad) return false;
 
-      this.isLoad = true
-      this.progress = 0
+    //   this.isLoad = true
+    //   this.progress = 0
 
-      this.props.project.dataView(false, num => this.progress = num)
-      when(
-        () => this.props.project.rawDataViews,
-        () => {
-          this.visible = true
-          this.isLoad = false
-        }
-      )
-    }
+    //   this.props.project.dataView(false, num => this.progress = num)
+    //   when(
+    //     () => this.props.project.rawDataViews,
+    //     () => {
+    //       this.visible = true
+    //       this.isLoad = false
+    //     }
+    //   )
+    // }
   }
 
   closeFixes = () => {
@@ -186,7 +187,6 @@ class TargetIssue extends Component {
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
-        {this.isLoad && <ProcessLoading progress={this.progress} style={{ position: 'fixed' }} />}
         <Modal content={<FixIssue project={project}
           issueRows={targetIssues}
           closeFixes={this.closeFixes}
@@ -217,8 +217,6 @@ class TargetIssue extends Component {
 class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
-  @observable isLoad = false
-  @observable progress = 0
 
   // handleCheck = e => {
   //   const checked = e.target.checked
@@ -230,23 +228,7 @@ class VariableIssue extends Component {
   }
 
   editFixes = () => {
-    if (this.props.project.rawDataViews) {
-      this.visible = true
-    } else {
-      if (this.isLoad) return false;
-
-      this.isLoad = true
-      this.progress = 0
-
-      this.props.project.dataView(false, num => this.progress = num)
-      when(
-        () => this.props.project.rawDataViews,
-        () => {
-          this.visible = true
-          this.isLoad = false
-        }
-      )
-    }
+    this.visible = true
     this.closeSummary()
   }
 
@@ -420,7 +402,6 @@ class VariableIssue extends Component {
           </div> */}
         </div>
       </div>
-      {this.isLoad && <ProcessLoading progress={this.progress} style={{ position: 'fixed'  }} />}
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
       <Modal content={<FixIssue project={project}
         issueRows={issueRows}
