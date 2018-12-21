@@ -33,8 +33,8 @@ export default class AreaChart extends Component {
 
   render () {
     const {className} = this.props;
-    const {fitIndexModified} = this.props.model;
-    if (fitIndexModified) { }
+    // const {fitIndexModified} = this.props.model;
+    // if (fitIndexModified) { }
     return (
       <div className={`${styles.areaChart} ${className}`}>
 
@@ -125,19 +125,13 @@ export default class AreaChart extends Component {
     this.drawThreshold(svg, x, height);
   }
 
-  drawThreshold = (svg, x, height) => {
+  /**
+   * 可移动棒
+   */
+  drawThreshold(svg, x, height){
     const {model: {chartData, fitIndex}} = this.props;
     const thresholdLine = svg.append('g');
-    const threshold = chartData.roc.Threshold[fitIndex];
-    const dragCircle = d3.drag()
-      .on('drag', () => {
-        const p = d3.event.x;
-        const index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
-        line.attr('x1', p)
-          .attr('x2', p);
-        circle.attr('cx', p);
-        this.props.model.setFitIndex(index);
-      });
+    const threshold = chartData.roc.Threshold[fitIndex]
 
     const line = thresholdLine
       .append('line')
@@ -146,6 +140,16 @@ export default class AreaChart extends Component {
       .attr('y1', height)
       .attr('y2', 20)
       .attr('class', styles.thresholdLine);
+    const dragCircle = d3.drag()
+      .on('drag', () => {
+        const p = d3.event.x;
+        const index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
+        line.attr('x1', p)
+          .attr('x2', p);
+        circle.attr('cx', p);
+        this.props.model.setFitIndex(index);//stores/Model.js/setFitIndex
+      });
+
     const circle = thresholdLine
       .append('circle')
       .attr('class', styles.dragCircle)
