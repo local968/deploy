@@ -67,6 +67,7 @@
   display: flex;
   flex: auto;
   margin: .2em;
+  overflow: hidden;
 }
 
 .titleCell {

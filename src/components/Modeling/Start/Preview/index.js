@@ -19,7 +19,7 @@ export default class Preview extends Component {
   }
 
   formatTable = () => {
-    const { colType, cleanData, rawHeader, dataHeader } = this.props.project;
+    const { colType, cleanData, target } = this.props.project;
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     // const index = rawHeader.indexOf(target)
@@ -27,15 +27,17 @@ export default class Preview extends Component {
     //   const value = row[index]
     //   return [value, ...row.slice(0, index), ...row.slice(index + 1)]
     // })
-
-    // if (!cleanData.length) return []
-    // const headerList = [...dataHeader]
-    // const notShowIndex = sortHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
-    // const data = sortData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
     if (!cleanData.length) return []
-    const headerList = [...dataHeader]
-    const notShowIndex = rawHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
-    const data = cleanData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
+    const header = cleanData[0]
+    const index = header.indexOf(target)
+    if (index === -1) return []
+    const headerList = [target, ...header.filter(h => h !== target)]
+    const realColumn = headerList.length
+
+    const realData = cleanData.slice(1).filter(r => r.length === realColumn)
+    const data = index === 0 ? realData : realData.map(row => {
+      return [row[index], ...row.slice(0, index), ...row.slice(index + 1)]
+    })
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -45,8 +47,6 @@ export default class Preview extends Component {
      * columnHeader: 表头的列数
      * rowHeader: 表头的行数
      */
-    const realColumn = headerList.length
-
     const indexArr = []
     const headerArr = []
     const selectArr = []
@@ -81,7 +81,7 @@ export default class Preview extends Component {
       }
     }))
 
-    return [indexArr, headerArr, selectArr, ...tableData].filter(row => row.length === realColumn)
+    return [indexArr, headerArr, selectArr, ...tableData]
   }
 
   render() {

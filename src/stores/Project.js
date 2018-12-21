@@ -159,7 +159,7 @@ export default class Project {
             console.error('parse error: ', result.errors[0].message);
             return;
           }
-          return resolve(result.data.slice(1))
+          return resolve(result.data)
           // this.newFileInit(result.data);
         }
       });
@@ -368,7 +368,7 @@ export default class Project {
         this.uploadData = []
       } else {
         this.readData(this.originPath).then(data => {
-          this.uploadData = data.filter(r => r.length === this.rawHeader.length)
+          this.uploadData = data.slice(1)
         })
       }
     }))
@@ -377,7 +377,7 @@ export default class Project {
         this.cleanData = []
       } else {
         this.readData(this.cleanPath).then(data => {
-          this.cleanData = data.filter(r => r.length === this.rawHeader.length)
+          this.cleanData = data
         })
       }
     }))
