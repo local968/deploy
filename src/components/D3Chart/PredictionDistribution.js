@@ -33,8 +33,8 @@ export default class AreaChart extends Component {
 
   render () {
     const {className} = this.props;
-    // const {fitIndexModified} = this.props.model;
-    // if (fitIndexModified) { }
+    const {fitIndexModified} = this.props.model;
+    if (fitIndexModified) { }
     return (
       <div className={`${styles.areaChart} ${className}`}>
 
