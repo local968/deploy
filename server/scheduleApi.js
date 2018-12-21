@@ -161,7 +161,6 @@ const api = {
         })
         const model = models.find(m => m.name === modelName) || {}
         const cutoff = model.chartData.roc.Threshold[model.fitIndex||0]
-        console.log(cutoff)
         return cutoff
       })
     })
