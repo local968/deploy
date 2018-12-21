@@ -540,22 +540,22 @@ class DetailCurves extends Component {
     this.props.model.resetFitIndex();
   }
   render() {
-    const { model, model: { mid }, yes, no } = this.props;
+    const { model, model: { id }, yes, no } = this.props;
     const { curve } = this.state;
     let curComponent;
     let hasReset = true;
     switch (curve) {
       case 'ROC Curve':
-        curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
+        curComponent = <RocChart height={190} width={500} className={`roc${id}`} model={model} />
         break;
       case 'Prediction Distribution':
-        curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
+        curComponent = <PredictionDistribution height={190} width={500} className={`roc${id}`} model={model} />
         break;
       case 'Precision Recall Tradeoff':
-        curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
+        curComponent = <PRChart height={190} width={500} className={`precisionrecall${id}`} model={model} />
         break;
       case 'Lift Chart':
-        curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
+        curComponent = <LiftChart height={190} width={500} className={`lift${id}`} model={model} />;
         break;
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
@@ -563,7 +563,7 @@ class DetailCurves extends Component {
         break;
       case 'Model Process Flow':
         curComponent = <div style={{ maxWidth: document.body.clientWidth / 2 }} >
-          <ModelProcess model={model} className={`modelprocess${mid}`} />
+          <ModelProcess model={model} className={`modelprocess${id}`} />
         </div>
         hasReset = false;
         break;
