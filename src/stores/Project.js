@@ -270,9 +270,10 @@ export default class Project {
   @computed
   get sortData() {
     const { target, rawHeader, uploadData } = this
+    if (!uploadData.length) return []
     if (!target) return uploadData
     const index = rawHeader.indexOf(target)
-    return uploadData.map(row => {
+    return uploadData.filter(r => r.length === rawHeader.length).map(row => {
       const value = row[index]
       return [value, ...row.slice(0, index), ...row.slice(index + 1)]
     })
