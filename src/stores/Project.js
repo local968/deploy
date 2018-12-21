@@ -136,7 +136,6 @@ export default class Project {
 
   @observable stopModel = false
   @observable stopEtl = false
-  @observable modelQueue = []
 
   constructor(id, args) {
     this.id = id
@@ -710,7 +709,7 @@ export default class Project {
     }
 
     if (this.targetArray && this.targetArray.length) {
-      data.targetMap = toJS(this.targetMap);
+      data.targetMap = { [this.target]: toJS(this.targetMap) };
     }
 
     if (this.outlierDict && Object.keys(this.outlierDict).length) {

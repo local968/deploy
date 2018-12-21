@@ -565,7 +565,7 @@ export class FixIssue extends Component {
     const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataViews, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
-        {!this.loading && <ProcessLoading progress={this.progress} style={{ bottom: '0.1em' }} />}
+        {this.loading && <ProcessLoading progress={this.progress} style={{ bottom: '0.1em' }} />}
         {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
@@ -594,9 +594,9 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(1)) + '%)'
-                const mode = !rawDataViews ? 'N/A' : showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode)
-                const mean = !rawDataViews ? 'N/A' : showType === 'Numerical' ? rawDataViews[k].mean : 'N/A'
-                const median = !rawDataViews ? 'N/A' : showType === 'Numerical' ? rawDataViews[k].median : 'N/A'
+                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode))
+                const mean = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].mean : 'N/A')
+                const median = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].median : 'N/A')
                 const method = this.fillMethod.mismatch[k] || mismatchFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
@@ -654,9 +654,9 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
-                const mode = !rawDataViews ? 'N/A' : showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode)
-                const mean = !rawDataViews ? 'N/A' : showType === 'Numerical' ? rawDataViews[k].mean : 'N/A'
-                const median = !rawDataViews ? 'N/A' : showType === 'Numerical' ? rawDataViews[k].median : 'N/A'
+                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode))
+                const mean = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].mean : 'N/A')
+                const median = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].median : 'N/A')
                 const method = this.fillMethod.missing[k] || nullFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
