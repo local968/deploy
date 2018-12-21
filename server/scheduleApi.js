@@ -147,19 +147,22 @@ const api = {
     return redis.smembers(`project:${projectId}:models`).then(ids => {
       const pipeline = redis.pipeline();
       ids.forEach(mid => {
-        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex')
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex','chartData')
       })
       return pipeline.exec().then(list => {
         const models = list.map(row => {
-          let [name, fitIndex] = row[1] || []
+          let [name, fitIndex,chartData] = row[1] || []
           try {
             name = JSON.parse(name)
             fitIndex = JSON.parse(fitIndex)
+            chartData = JSON.parse(chartData)
           } catch (e) { }
-          return { name, fitIndex }
+          return { name, fitIndex ,chartData}
         })
         const model = models.find(m => m.name === modelName) || {}
-        return (model.fitIndex || 0) / 100
+        const cutoff = model.chartData.roc.Threshold[model.fitIndex||0]
+        console.log(cutoff)
+        return cutoff
       })
     })
   }
