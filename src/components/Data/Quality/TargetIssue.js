@@ -31,22 +31,28 @@ export class ClassificationTarget extends Component {
 
   handleSave = () => {
     const { temp } = this
+    const { colValueCounts, target } = this.props.project
+    let sameNum = 0
     Object.keys(temp).forEach(k => {
       if (!temp[k]) delete temp[k]
+      if (temp[k] === k) sameNum++
     })
-    const values = Object.values(temp)
-    if (values.length !== [...new Set(values)].length) return message.error("Cannot be modified to the same name")
-    const { targetArrayTemp, targetMapTemp } = this.props.project
-    if (!!targetArrayTemp.length) {
-      targetArrayTemp.forEach((v, k) => {
-        if (temp.hasOwnProperty(v)) {
-          Object.keys(targetMapTemp).forEach(key => {
-            if (targetMapTemp[key] === k) temp[key] = temp[v]
-          })
-        }
-      })
+    if (Object.keys(temp).length) {
+      const values = [...Object.keys(colValueCounts[target]), ...Object.values(temp)]
+      console.log(values.length, [...new Set(values)].length, sameNum)
+      if (values.length !== [...new Set(values)].length + sameNum) return message.error("Cannot be modified to the same name")
+      const { targetArrayTemp, targetMapTemp } = this.props.project
+      if (!!targetArrayTemp.length) {
+        targetArrayTemp.forEach((v, k) => {
+          if (temp.hasOwnProperty(v)) {
+            Object.keys(targetMapTemp).forEach(key => {
+              if (targetMapTemp[key] === k) temp[key] = temp[v]
+            })
+          }
+        })
+      }
+      this.props.renameTarget(temp)
     }
-    this.props.renameTarget(temp)
     this.rename = false;
     this.temp = {}
   }
