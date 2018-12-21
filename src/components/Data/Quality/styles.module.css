@@ -935,7 +935,7 @@ span.fixesEdit {
 	flex: none;
 	width: 100%;
 	flex-wrap: wrap;
-	margin: .2em 0 1.4em
+	margin: .2em 0 0;
 }
 
 .fixesComplete span {

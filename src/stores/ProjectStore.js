@@ -104,7 +104,7 @@ class ProjectStore {
               if (!project) {
                 if (!result) return
                 if (!result.host) return
-                this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix(), visiable: this.toolsOption.current !== 1 }))
+                this.queryProjectList()
               } else {
                 if (result) project.setProperty(result)
                 if (model) project.setModel(model)
@@ -151,7 +151,7 @@ class ProjectStore {
           this.loading = false;
           return { error: message }
         }
-        // if (this.toolsOption.current === 1) this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix() }))
+        this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix(), visiable: false }))
         this.loading = false;
         return { id }
       })
