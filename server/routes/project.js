@@ -695,7 +695,7 @@ wss.register('train', (message, socket, progress) => {
         const { model: mid, action, data } = result
         let saveData = {}
         if (action === "chartData") {
-          saveData = parseChartData(data)
+          saveData = parseChartData(data)//原始数据
         }
         if (action === "pointToShow") {
           saveData = { qcut: data }

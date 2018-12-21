@@ -1,6 +1,7 @@
 import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
-import config from 'config';
+import config from 'config'
+import {debounce} from 'lodash'
 
 export default class Model {
   @observable score;
@@ -22,6 +23,13 @@ export default class Model {
     this.projectId = projectId;
     this._id = name;
     Object.assign(this, model);
+
+    this.updateModel = debounce(this.updateModel,1000)
+  }
+
+
+  a(){
+    console.log(78)
   }
 
   @computed
@@ -65,12 +73,20 @@ export default class Model {
   setFitIndex(index) {
     this.fitIndex = index;
     this.fitIndexModified = true;
+    this.updateModel({
+      fitIndex:index
+    })
   }
   @action
   resetFitIndex() {
-    this.fitIndexModified = false;
-    this.fitIndex = this.initialFitIndex;
+    this.fitIndexModified = false
+    const {initialFitIndex:fitIndex} = this
+    this.fitIndex = fitIndex
+    this.updateModel({
+      fitIndex,
+    })
   }
+
   getScore = (ITP, IFN, IFP, ITN) => {
     const { problemType, score: { validateScore } } = this
     if (problemType === 'Classification') {
@@ -185,7 +201,11 @@ export default class Model {
     });
   }
   updateModel(data) {
-    socketStore.ready().then(api => api.updateModel({ data, id: this.id, projectId: this.projectId }))
+    socketStore.ready().then(api => api.updateModel({
+       data,
+       id: this.id,
+       projectId: this.projectId,
+    }))
     Object.assign(this, data);
   }
 }
