@@ -600,7 +600,7 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(1)) + '%)'
-                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode))
+                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[1] : rawDataViews[k].mode))
                 const mean = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].mean : 'N/A')
                 const median = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].median : 'N/A')
                 const method = this.fillMethod.mismatch[k] || mismatchFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)
@@ -660,7 +660,7 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
-                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[2] : rawDataViews[k].mode))
+                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[1] : rawDataViews[k].mode))
                 const mean = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].mean : 'N/A')
                 const median = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].median : 'N/A')
                 const method = this.fillMethod.missing[k] || nullFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)

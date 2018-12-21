@@ -738,8 +738,8 @@ export default class Project {
     return socketStore.ready()
       .then(api => api.etl(data))
       .then(returnValue => {
-        const { result, status, message } = returnValue;
-        if (status !== 200) return antdMessage.error(message)
+        const { result, status } = returnValue;
+        if (status !== 200) return antdMessage.error(result['process error'])
         this.setProperty(result)
       })
   }
