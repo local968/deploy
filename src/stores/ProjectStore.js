@@ -1,4 +1,4 @@
-import { observable, action, when, computed } from "mobx";
+import { observable, action, when, computed, autorun } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
 import uuid from "uuid";
@@ -11,6 +11,7 @@ class ProjectStore {
   @observable isOnline = true
   @observable watchList = false;
   @observable currentId = "";
+  @observable addId = ''
 
   @observable list = [];
   @observable total = 0;
@@ -27,6 +28,12 @@ class ProjectStore {
   constructor() {
     this.initWatch()
     this.initReload()
+    autorun(() => {
+      if(this.project) {
+        this.project.clean()
+        this.project.initProject()
+      }
+    })
   }
 
   initReload = () => {
@@ -104,6 +111,7 @@ class ProjectStore {
               if (!project) {
                 if (!result) return
                 if (!result.host) return
+                if (this.addId === id) return
                 this.queryProjectList()
               } else {
                 if (result) project.setProperty(result)
