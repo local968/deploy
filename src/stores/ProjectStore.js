@@ -11,7 +11,6 @@ class ProjectStore {
   @observable isOnline = true
   @observable watchList = false;
   @observable currentId = "";
-  @observable addId = ''
 
   @observable list = [];
   @observable total = 0;
@@ -111,7 +110,6 @@ class ProjectStore {
               if (!project) {
                 if (!result) return
                 if (!result.host) return
-                if (this.addId === id) return
                 this.queryProjectList()
               } else {
                 if (result) project.setProperty(result)
