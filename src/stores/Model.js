@@ -1,5 +1,6 @@
 import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
+import config from 'config';
 
 export default class Model {
   @observable score;
@@ -21,6 +22,20 @@ export default class Model {
     this.projectId = projectId;
     this._id = name;
     Object.assign(this, model);
+  }
+
+  @computed
+  get fitPlotPath() {
+    return this.fitPlot ? this.urlPath(this.fitPlot) : ''
+  }
+
+  @computed
+  get residualPlotPath() {
+    return this.residualPlot ? this.urlPath(this.residualPlot) : ''
+  }
+
+  urlPath = path => {
+    return `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.projectId}`
   }
 
   @action
@@ -64,8 +79,8 @@ export default class Model {
     }
     return 1 - validateScore.rmse + validateScore.r2
   }
-  getBenefit = (ITP, IFN, IFP, ITN, data = null) => {
-    data = data || this.chartData || {}
+  getBenefit = (ITP, IFN, IFP, ITN) => {
+    const data = this.chartData || {}
     const roc = data.roc || {}
     const { TP, FN, FP, TN } = roc
     if (!ITP && !IFN && !IFP && !ITN) return {
