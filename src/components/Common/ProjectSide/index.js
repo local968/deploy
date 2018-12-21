@@ -13,7 +13,6 @@ export default class ProjectSide extends Component {
 
     render() {
         const { list, step, imgs, current, enter, right } = this.props;
-        console.log(right)
         return <div className={styles.projectSide} style={{ right: right }}>
             <div className={styles.sideBox}>
                 {list.map((v, k) => {
