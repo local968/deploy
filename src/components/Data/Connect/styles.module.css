@@ -16,6 +16,7 @@
 
 .uploadBlock {
     display: flex;
+    flex: none;
     width: 2em;
     height: 2em;
     flex-direction: column;

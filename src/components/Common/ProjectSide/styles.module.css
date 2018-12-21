@@ -4,8 +4,9 @@
     flex: none;
     flex-direction: column;
     margin-top: 0.45em;
-    position: fixed;
+    position: absolute;
     right: 0;
+    overflow: hidden;
     background-color: #fff;
 }
 

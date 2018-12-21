@@ -320,7 +320,7 @@ class ModelTable extends Component {
               />
             );
           })}
-          {(!train2Finished && trainModel) && <div className={styles.rowData}>
+          {(!train2Finished && trainModel && trainModel.model) && <div className={styles.rowData}>
             <div className={styles.trainingModel}><Tooltip title={trainModel.model}>{trainModel.model}</Tooltip></div>
             <div className={styles.trainingProcessBg}>
               <div className={styles.trainingProcessBlock}>
