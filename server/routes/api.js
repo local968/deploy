@@ -8,8 +8,15 @@ const config = require('config')
 const command = require('../command')
 const api = require('../scheduleApi')
 const { userDeployRestriction } = require('restriction')
+const wss = require('../webSocket')
 
 const router = new Router()
+
+wss.register('getDeploymentToken', (message, socket) => {
+  if (!message.projectId || !message.deploymentId) return { status: 404, message: 'missing params', error: 'missing params' }
+  const token = crypto.createHash('md5').update(socket.session.userId + message.projectId + message.deploymentId + config.secret).digest('hex')
+  return { status: 200, token }
+})
 
 router.post('/deploy', async (req, res) => {
   const errorRes = error(res)
@@ -180,3 +187,4 @@ module.exports = router
 
 // back data curl test script
 // curl -X POST --data "data=[{\"age\":\"300\",\"job\":\"unemployed\",\"marital\":\"married\",\"education\":\"primary\",\"default\":\"no\",\"balance\":\"1787\",\"housing\":\"no\",\"loan\":\"no\",\"contact\":\"cellular\",\"day\":\"19\",\"month\":\"oct\",\"duration\":\"79\",\"campaign\":\"1\",\"pdays\":\"100\",\"previous\":\"3\",\"poutcome\":\"unknown\"},{\"job\":\"services\",\"marital\":\"married\",\"education\":\"secondary\",\"default\":\"no\",\"balance\":\"4789\",\"housing\":\"yes\",\"loan\":\"yes\",\"contact\":\"cellular\",\"day\":\"11\",\"month\":\"may\",\"duration\":\"220\",\"campaign\":\"1\",\"pdays\":\"339\",\"previous\":\"4\",\"poutcome\":\"failure\"},{\"age\":\"35\",\"marital\":\"single\",\"education\":\"tertiary\",\"default\":\"no\",\"balance\":\"1476\",\"housing\":\"yes\",\"loan\":\"no\",\"contact\":\"cellular\",\"day\":\"16\",\"month\":\"apr\",\"duration\":\"185\",\"campaign\":\"1\",\"pdays\":\"330\",\"previous\":\"1\",\"poutcome\":\"failure\"},{\"age\":\"30\",\"job\":\"management\",\"marital\":\"married\",\"education\":\"tertiary\",\"default\":\"no\",\"balance\":\"1476\",\"housing\":\"yes\",\"loan\":\"yes\",\"contact\":\"unknown\",\"day\":\"11\",\"month\":\"jun\",\"duration\":\"199\",\"campaign\":\"4\",\"pdays\":\"100\",\"previous\":\"3\",\"poutcome\":\"unknown\"}]&token=43f6fb59585d9b0722c35b4bbcdfae20&deploymentId=3" localhost:8080/api/deploy
+// curl -X POST --data "token=*YOUR DEPLOYMENT TOKEN*&deploymentId=3&data=[{\"age\":\"300\",\"job\":\"unemployed\",\"marital\":\"married\",\"education\":\"primary\",\"default\":\"no\",\"balance\":\"1787\",\"housing\":\"no\",\"loan\":\"no\",\"contact\":\"cellular\",\"day\":\"19\",\"month\":\"oct\",\"duration\":\"79\",\"campaign\":\"1\",\"pdays\":\"100\",\"previous\":\"3\",\"poutcome\":\"unknown\"}]" localhost:8080/api/deploy
