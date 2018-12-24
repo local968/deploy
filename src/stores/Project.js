@@ -517,9 +517,12 @@ export default class Project {
   endSchema = () => {
     this.etling = true
     return this.updateProject(Object.assign({
+      target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
-      noCompute: this.noComputeTemp
+      noCompute: this.noComputeTemp,
+      outlierFillMethod: this.outlierFillMethod,
+      outlierFillMethodTemp: this.outlierFillMethodTemp
     }, this.defaultDataQuality, this.defaultTrain))
       .then(() => this.etl())
   }
@@ -1165,6 +1168,9 @@ export default class Project {
   }
 
   univariatePlot = field => {
+    if (!field) return
+    if (this.univariatePlots.hasOwnProperty(field)) return
+    this.univariatePlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -1190,6 +1196,9 @@ export default class Project {
   }
 
   histgramPlot = field => {
+    if (!field) return
+    if (this.histgramPlots.hasOwnProperty(field)) return
+    this.histgramPlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,

@@ -608,37 +608,45 @@ wss.register('preTrainImportance', (message, socket, progress) => sendToCommand(
   }))
 
 wss.register('histgramPlot', (message, socket, progress) => {
-  const { projectId: id, _id: requestId } = message
+  const { projectId: id, _id: requestId, feature_label } = message
   const { userId } = socket.session
-  const histgramPlots = {}
-  return command({ ...message, userId, requestId }, progressResult => {
-    if (progressResult.status < 0 || progressResult.status === 100) {
-      updateProjectField(id, userId, "histgramPlots", histgramPlots)
-      return progressResult
-    }
-    const { result } = progressResult
-    const { field, imageSavePath, progress: status } = result;
-    if (status && status === "start") return
-    histgramPlots[field] = imageSavePath
-    return progress(progressResult)
-  })
+  const histgramPlots = feature_label.reduce((start, f) => {
+    start[f] = ''
+    return start
+  }, {})
+  return updateProjectField(id, userId, "histgramPlots", histgramPlots)
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
+      if (progressResult.status < 0 || progressResult.status === 100) {
+        updateProjectField(id, userId, "histgramPlots", histgramPlots)
+        return progressResult
+      }
+      const { result } = progressResult
+      const { field, imageSavePath, progress: status } = result;
+      if (status && status === "start") return
+      if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
+      return progress(progressResult)
+    }))
 })
 
 wss.register('univariatePlot', (message, socket, progress) => {
-  const { projectId: id, _id: requestId } = message
+  const { projectId: id, _id: requestId, feature_label } = message
   const { userId } = socket.session
-  const univariatePlots = {}
-  return command({ ...message, userId, requestId }, progressResult => {
-    if (progressResult.status < 0 || progressResult.status === 100) {
-      updateProjectField(id, userId, "univariatePlots", univariatePlots)
-      return progressResult
-    }
-    const { result } = progressResult
-    const { field, imageSavePath, progress: status = '' } = result;
-    if (status === "start") return
-    univariatePlots[field] = imageSavePath
-    return progress(progressResult)
-  })
+  const univariatePlots = feature_label.reduce((start, f) => {
+    start[f] = ''
+    return start
+  }, {})
+  return updateProjectField(id, userId, "univariatePlots", univariatePlots)
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
+      if (progressResult.status < 0 || progressResult.status === 100) {
+        updateProjectField(id, userId, "univariatePlots", univariatePlots)
+        return progressResult
+      }
+      const { result } = progressResult
+      const { field, imageSavePath, progress: status = '' } = result;
+      if (status === "start") return
+      if (univariatePlots.hasOwnProperty(field)) univariatePlots[field] = imageSavePath
+      return progress(progressResult)
+    }))
 })
 
 const _sendToCommand = (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
