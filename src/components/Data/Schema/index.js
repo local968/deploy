@@ -26,7 +26,6 @@ export default class DataSchema extends Component {
     // const { colType } = this.props.projectStore.project
     const data = {
       target: value,
-      colType: { ...this.dataType },
       outlierFillMethod: {},
       outlierFillMethodTemp: {}
     }
@@ -35,7 +34,9 @@ export default class DataSchema extends Component {
       data.outlierFillMethod = { [value]: 'drop' }
       data.outlierFillMethodTemp = { [value]: 'drop' }
     }
-    this.props.projectStore.project.updateProject(data).then(() => this.refs.table.updateGrids())
+    this.props.projectStore.project.setProperty(data)
+    this.refs.table.updateGrids()
+    // this.props.projectStore.project.updateProject(data).then(() => this.refs.table.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
   }
 
