@@ -74,7 +74,8 @@ router.post('/deploy', async (req, res) => {
     csvLocation: [file.path],
     ext: ['.csv'],
     command: "deploy2",
-    solution: deployment.modelName
+    solution: deployment.modelName,
+    actionType: 'deployment'
   }
   if (modelType !== "Regression") request.cutoff = await api.getCutOff(projectId, modelName)
   if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
