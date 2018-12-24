@@ -37,7 +37,6 @@ export default class Data extends Component {
   }
 
   componentDidMount() {
-    this.max = this.data.scrollWidth - this.data.clientWidth
     this.autorun = autorun(() => {
       const { projectStore: { project }, routing } = this.props;
       if (!project) return
@@ -79,25 +78,17 @@ export default class Data extends Component {
     updateProject(nextSubStep(step, 2))
   }
 
-  handleScorll = (e) => {
-    this.right = Math.min(this.max, e.target.scrollLeft) * -1
-  }
-
-  dataCb = (data) => {
-    this.data = data
-  }
-
   render() {
     const { project } = this.props.projectStore;
     const { mainStep, lastSubStep, noCompute, subStepActive } = project;
     const maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
-    return <div className={styles.data} onScroll={this.handleScorll} ref={this.dataCb}>
+    return <div className={styles.data}>
       {!!project && <Switch>
         <Route exact path="/project/:id/data/connect" component={DataConnect} />
         <Route exact path="/project/:id/data/schema" component={DataSchema} />
         <Route exact path="/project/:id/data/quality" component={DataQuality} />
       </Switch>}
-      <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive} right={this.right}/>
+      <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive}/>
     </div>
   }
 }

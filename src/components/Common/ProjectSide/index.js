@@ -7,13 +7,10 @@ import { withRouter } from 'react-router-dom';
 @withRouter
 @observer
 export default class ProjectSide extends Component {
-    // enter = (step) => {
-    //     this.props.enter(step)
-    // }
 
     render() {
-        const { list, step, imgs, current, enter, right } = this.props;
-        return <div className={styles.projectSide} style={{ right: right }}>
+        const { list, step, imgs, current, enter } = this.props;
+        return <div className={styles.projectSide}>
             <div className={styles.sideBox}>
                 {list.map((v, k) => {
                     return <div className={classnames(styles.sideBlock, {

@@ -39,7 +39,6 @@ export default class Modeling extends Component {
   }
 
   componentDidMount() {
-    this.max = this.modeling.scrollWidth - this.modeling.clientWidth
     this.autorun = autorun(() => {
       const { projectStore: { project }, routing } = this.props;
       if (!project) return
@@ -66,18 +65,10 @@ export default class Modeling extends Component {
     updateProject(nextSubStep(step, 3))
   };
 
-  handleScorll = (e) => {
-    this.right = Math.min(this.max, e.target.scrollLeft) * -1
-  }
-
-  modelingCb = (modeling) => {
-    this.modeling = modeling
-  }
-
   render() {
     const { project } = this.props.projectStore;
     return (
-      <div className={styles.modeling} ref={this.modelingCb} onScroll={this.handleScorll}>
+      <div className={styles.modeling}>
         {project && <Switch>
           <Route exact path="/project/:id/modeling/start" component={StartTrain} />
           <Route exact path="/project/:id/modeling/result" component={trainResult} />
@@ -89,7 +80,6 @@ export default class Modeling extends Component {
             step={project.lastSubStep}
             current={project.subStepActive}
             imgs={imgs}
-            right={this.right}
           />
         )}
       </div>
