@@ -1,84 +1,61 @@
-import React from 'react';
-import styles from './styles.module.css';
+import React, { Component } from 'react';
+import styles from './api.module.css';
+import { observer } from 'mobx-react';
+import { observable, action, computed } from 'mobx';
 
-export default ({ cddo }) => (
-  <div className={styles.row}>
-    <span className={styles.holder} />
-    <div className={styles.apiInstruction}>
-      <div className={styles.block}>
-        <div className={styles.line} />
-        <span className={styles.title}>
-          <span className={styles.no}>
-            <span className={styles.noText}>1</span>
-          </span>
-          <span className={styles.titleText}>
-            Send an request with the API key to make predictions on your data.
-          </span>
-          <span className={styles.other}>(We support Python)</span>
-        </span>
-        <div className={styles.codeWrapper}>
-          <div className={styles.content}>
-            <div># API code</div>
-            <div>import requests</div>
-            <div># Make predictions on your data</div>
-            <div>
-              data = &#123;"file": open('/path/to/your/data.csv', 'rb')&#125;
+function csv2array(csv) {
+  const headers = csv.substring(0, csv.indexOf('\n')).split(',')
+  const datas = csv.split('\n').slice(1).map(line => line.split(','))
+  return datas.map(line => line.reduce((prev, curr, index) => {
+    if (curr && curr.length > 0) prev[headers[index]] = curr
+    return prev
+  }, {}))
+}
+
+@observer
+export default class extends Component {
+  @observable token = false
+  @observable csvData = ''
+
+  @computed
+  get jsonData() {
+    let result
+    try {
+      result = JSON.stringify(csv2array(this.csvData))
+    } catch (e) { }
+    return result
+  }
+
+  constructor(props) {
+    super(props)
+  }
+  showToken = action(async () => this.token = await this.props.deployment.getDeploymentToken())
+  onDataChange = action((e) => this.csvData = e.target.value)
+  render() {
+    const { deployment } = this.props
+    return (
+      <div className={styles.row}>
+        {/* <span className={styles.holder} /> */}
+        <div className={styles.apiInstruction}>
+          <div className={styles.block}>
+            <span className={styles.title}>Parameters:</span>
+            <div className={styles.parameter}>
+              <span className={styles.label}>deploymentId:</span>
+              <span className={styles.value}>{deployment.id}</span>
             </div>
-            <div>
-              Response =
-              requests.post('http://service2.newa-tech.com/api/&lt;user_name&gt;/&lt;project_namr&gt;/&lt;model_name&gt;/&lt;api_key&gt;',
-              data)
+            <div className={styles.parameter}>
+              <span className={styles.label}>token:</span>
+              {this.token ? <span className={styles.value}>{this.token}</span> : <a className={styles.showToken} onClick={this.showToken}>show token</a>}
             </div>
+          </div>
+          <div className={styles.block}>
+            <span className={styles.title}>cURL Sample:</span>
+            <textarea className={styles.dataText} cols='60' rows='10' placeholder='Your csv data' value={this.csvData} onChange={this.onDataChange} />
+            <p className={styles.sampleContent}>curl -X POST --data "token={this.token || '*YOUR DEPLOYMENT TOKEN*'}&deploymentId={deployment.id}&data={this.jsonData && this.jsonData.length > 2 ? this.jsonData.replace(/"/g, '\\"') : '*YOUT JSON FORMAT DATA*'}" localhost:8080/api/deploy</p>
           </div>
         </div>
       </div>
-      <div className={styles.block}>
-        <span className={styles.title}>
-          <span className={styles.no}>
-            <span className={styles.noText}>2</span>
-          </span>
-          <span className={styles.titleText}>
-            Get prediction results from the Response object based on the
-            following object definition.
-          </span>
-        </span>
-        <div className={styles.codeWrapper}>
-          <div className={styles.content}>
-            <div style={{ fontWeight: 'bold' }}>
-              <span className={styles.fixWidth}>Attribute</span> Description
-            </div>
-            <div>
-              <span className={styles.fixWidth}>code</span> 200: Successful
-              Others: Failure
-            </div>
-            <div>
-              <span className={styles.fixWidth}>result</span> multiple rows of
-              CSV (comma separated)
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className={styles.block}>
-        <span className={styles.title}>
-          <span className={styles.boldText}>More On How to Use API</span>
-        </span>
-        <div className={styles.codeWrapper}>
-          <div className={styles.content}>
-            <div>
-              Our API supports CSV formatted input data. An API call is sent via
-              POST method.
-            </div>
-            <div>
-              Fill in your user_name, project_name(e.g., {cddo.name}),
-              model_name(e.g., {cddo.modelName}) and api_key to get predictions.
-            </div>
-            <div>
-              The ‘api_key’ in the API call is an unique key we assigned to you
-              for your software integration development.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+    )
+  }
+}
+
