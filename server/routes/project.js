@@ -56,7 +56,8 @@ function roundN(data, n = 2) {
 
 function setDefaultData(id, userId) {
   const data = {
-    correlationMatrixImg: '',
+    correlationMatrixHeader: null,
+    correlationMatrixData: null,
     univariatePlots: {},
     histgramPlots: {},
     preImportance: null,

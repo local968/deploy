@@ -74,7 +74,6 @@ export default class Project {
   @observable preImportance = null;
   @observable histgramPlots = {};
   @observable univariatePlots = {};
-  @observable correlationMatrixImg = '';
   @observable newVariable = [];
   @observable expression = {}
   @observable newType = {}
@@ -516,6 +515,7 @@ export default class Project {
 
   @action
   endSchema = () => {
+    this.etling = true
     return this.updateProject(Object.assign({
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
@@ -544,7 +544,7 @@ export default class Project {
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp)
     }, this.defaultTrain)
-
+    if (hasChange) this.etling = true
     return this.updateProject(data)
       .then(() => {
         if (hasChange) return this.etl()
@@ -853,7 +853,9 @@ export default class Project {
           newVariable,
           trainHeader,
           expression,
-          newType
+          newType,
+          correlationMatrixData: null,
+          correlationMatrixHeader: null
         })
         return true
       })
