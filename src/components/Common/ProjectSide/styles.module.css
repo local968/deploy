@@ -3,20 +3,19 @@
     width: 8%;
     flex: none;
     flex-direction: column;
-    position: fixed;
+    position: absolute;
     right: 0;
     overflow: hidden;
     background-color: #fff;
     overflow-y: auto;
-    top: 2em;
-    max-height: calc(100% - 2.2em);
-    border: solid 1px #c4cbd7;
-    margin-right: -1px;
+    top: .2em;
+    /* max-height: calc(100% - .4em); */
+    /* border: solid 1px #c4cbd7; */
 }
 
 .sideBox {
     display: flex;
-    /* border: solid 1px #c4cbd7; */
+    border: solid 1px #c4cbd7;
     border-right: none;
     flex-direction: column;
     /* justify-content: center; */
