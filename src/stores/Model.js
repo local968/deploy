@@ -27,11 +27,6 @@ export default class Model {
     this.updateModel = debounce(this.updateModel,1000)
   }
 
-
-  a(){
-    console.log(78)
-  }
-
   @computed
   get fitPlotPath() {
     return this.fitPlot ? this.urlPath(this.fitPlot) : ''
@@ -58,9 +53,10 @@ export default class Model {
     if (Array.isArray(data)) {
       return false;
     }
-    delete data.id;
-    delete data.name;
-    delete data.projectId;
+    Reflect.deleteProperty(data,'id')
+    Reflect.deleteProperty(data,'name')
+    Reflect.deleteProperty(data,'projectId')
+
     for (let key in data) {
       if (typeof data[key] === 'function') {
         delete data[key];

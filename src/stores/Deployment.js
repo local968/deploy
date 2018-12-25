@@ -115,7 +115,7 @@ export default class Deploy {
     this.modelList && Object.entries(this.modelList).forEach(([settingName, models]) => {
       if (result) return
       models.forEach(model => {
-        if (result) return
+        if (result||!model) return
         if (model.name === modelName) result = model
       })
     })
