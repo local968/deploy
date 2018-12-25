@@ -6,6 +6,7 @@ import styles from './D3Chart.module.less';
 // import d3tips from './d3-tip';
 
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
+d3ColorsCategory20.push(...d3.schemeCategory20)
 
 function parseData(chartData) {
   const fpr = chartData.FPR;
@@ -173,8 +174,12 @@ export default class RocChart extends Component {
     if (compareChart) {
       const { models } = this.props;
       models.forEach((m, index) => {
+        const {chartData} = m
+        if(!chartData){
+          return
+        }
         const lineEnable = this.state.options.indexOf(m.name) >= 0;
-        this.drawChart(parseData(m.chartData.roc), x, y, svg, height, line, index, color, lineEnable, width);
+        this.drawChart(parseData(chartData.roc), x, y, svg, height, line, index, color, lineEnable, width);
       });
     } else {
       data = this.drawChart(data, x, y, svg, height, line, 0, color, true, width);
