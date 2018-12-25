@@ -144,6 +144,7 @@ export default class SimplifiedView extends Component {
                 getPath={project.histgramPlot.bind(null, target)}
                 path={histgramPlots[target]}
                 id={id}
+                fetch={project.histgramPlot.hasOwnProperty(target)}
               />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
@@ -277,6 +278,7 @@ class SimplifiedViewRow extends Component {
             getPath={project.histgramPlot.bind(null, value)}
             path={project.histgramPlots[value]}
             id={id}
+            fetch={project.histgramPlot.hasOwnProperty(value)}
           />} />}
       </div>
       <div className={styles.tableTd} onClick={this.showUnivariant}>
@@ -290,6 +292,7 @@ class SimplifiedViewRow extends Component {
             getPath={project.univariatePlot.bind(null, value)}
             path={project.univariatePlots[value]}
             id={id}
+            fetch={project.univariatePlots.hasOwnProperty(value)}
           />} />}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
@@ -340,7 +343,7 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
   constructor(props) {
     super(props)
-    if (!props.path) props.getPath()
+    if (!props.fetch) props.getPath()
   }
 
   render() {

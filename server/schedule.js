@@ -42,7 +42,8 @@ async function scheduleHandler() {
         csvLocation: [file.path],
         ext: [ext],
         command: "deploy2",
-        solution: deployment.modelName
+        solution: deployment.modelName,
+        actionType: schedule.type
       }
       if (deployment.modelType !== "Regression") request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript

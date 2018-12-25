@@ -1,7 +1,6 @@
 import moment from 'moment';
 import axios from 'axios';
 import _config from 'config'
-window.axios = axios
 export default (file, config = {}) => {
   config = {
     headers: { backend: _config.uploadBackend },

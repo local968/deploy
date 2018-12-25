@@ -74,7 +74,6 @@ export default class Project {
   @observable preImportance = null;
   @observable histgramPlots = {};
   @observable univariatePlots = {};
-  @observable correlationMatrixImg = '';
   @observable newVariable = [];
   @observable expression = {}
   @observable newType = {}
@@ -516,10 +515,14 @@ export default class Project {
 
   @action
   endSchema = () => {
+    this.etling = true
     return this.updateProject(Object.assign({
+      target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
-      noCompute: this.noComputeTemp
+      noCompute: this.noComputeTemp,
+      outlierFillMethod: this.outlierFillMethod,
+      outlierFillMethodTemp: this.outlierFillMethodTemp
     }, this.defaultDataQuality, this.defaultTrain))
       .then(() => this.etl())
   }
@@ -544,7 +547,7 @@ export default class Project {
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp)
     }, this.defaultTrain)
-
+    if (hasChange) this.etling = true
     return this.updateProject(data)
       .then(() => {
         if (hasChange) return this.etl()
@@ -853,7 +856,9 @@ export default class Project {
           newVariable,
           trainHeader,
           expression,
-          newType
+          newType,
+          correlationMatrixData: null,
+          correlationMatrixHeader: null
         })
         return true
       })
@@ -1163,6 +1168,9 @@ export default class Project {
   }
 
   univariatePlot = field => {
+    if (!field) return
+    if (this.univariatePlots.hasOwnProperty(field)) return
+    this.univariatePlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -1188,6 +1196,9 @@ export default class Project {
   }
 
   histgramPlot = field => {
+    if (!field) return
+    if (this.histgramPlots.hasOwnProperty(field)) return
+    this.histgramPlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,

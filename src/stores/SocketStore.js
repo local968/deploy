@@ -89,10 +89,14 @@ class Socket extends EventEmitter {
     this.start();      //reset client heartbeat check
     this.emit('online')
     console.info('websocket connect succesful. ' + new Date().toUTCString())
-    for (let i = 0; i < this.messageList.length; i++) {
+    while (this.messageList.length) {
       const message = this.messageList.shift()
       this.send(message)
     }
+    // for (let i = 0; i < this.messageList.length; i++) {
+    //   const message = this.messageList.shift()
+    //   this.send(message)
+    // }
   }
 
   send(message) {

@@ -190,7 +190,7 @@ export default class Deployment extends Component {
           )}
         </div>
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
-        {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}
+        {cddo.option === 'api' && <ApiInstruction deployment={cd} />}
         {cddo.option === 'data' && (
           <DataSource
             cddo={cddo}
