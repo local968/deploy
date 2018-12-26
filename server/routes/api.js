@@ -19,6 +19,7 @@ wss.register('getDeploymentToken', (message, socket) => {
 })
 
 router.post('/deploy', async (req, res) => {
+  // x-www-form-urlencode
   const errorRes = error(res)
 
   // deployment
@@ -31,7 +32,8 @@ router.post('/deploy', async (req, res) => {
   let lineCount = 0
 
   // token
-  const token = req.body.token
+  // todo token update( Oauth2?)
+  const token = req.body.token1
   if (!token) return errorRes(10003)
   const validToken = crypto.createHash('md5').update(userId + projectId + deploymentId + config.secret).digest('hex')
   if (token !== validToken) return errorRes(10010)
@@ -47,7 +49,7 @@ router.post('/deploy', async (req, res) => {
   }
   if (!data || !Array.isArray(data) || data.length === 0) return errorRes(10005)
   data = array2csv(data)
-  if (lineCount > 100 || data.length > 1024 * 1024 * 100) return errorRes(10012)
+  if (lineCount > 10000 || data.length > 1024 * 1024 * 100) return errorRes(10012)
 
   const name = `api-deploy-${uuid.v4()}`
 
