@@ -33,7 +33,7 @@ router.post('/deploy', async (req, res) => {
 
   // token
   // todo token update( Oauth2?)
-  const token = req.body.token1
+  const token = req.body.token
   if (!token) return errorRes(10003)
   const validToken = crypto.createHash('md5').update(userId + projectId + deploymentId + config.secret).digest('hex')
   if (token !== validToken) return errorRes(10010)
