@@ -136,7 +136,7 @@ class TargetIssue extends Component {
         </div>}
         <div className={styles.issueTabs}>
           <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
-          <div className={styles.issueTab} onClick={changeTab}><span>Predictor Variables</span></div>
+          <div className={styles.issueTab} onClick={issues.targetIssue ? null : changeTab}><span>Predictor Variables</span></div>
         </div>
       </div>
       <div className={styles.contentBox}>
@@ -208,7 +208,7 @@ class TargetIssue extends Component {
           showClose={true}
         />
       </div>
-      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
     </div>
   }
 }
@@ -402,7 +402,7 @@ class VariableIssue extends Component {
           </div> */}
         </div>
       </div>
-      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed'  }} />}
+      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
       <Modal content={<FixIssue project={project}
         issueRows={issueRows}
         closeFixes={this.closeFixes}

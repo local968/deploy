@@ -468,21 +468,17 @@ export class SelectTarget extends Component {
 export class FixIssue extends Component {
   @observable editKey = ''
   @observable visible = false
-  @observable loading = true
   @observable progress = 0
   @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} }
 
   componentDidMount() {
     if (!this.props.project.rawDataViews) {
-      this.loading = true
       this.progress = 0
-
       this.props.project.dataView(false, num => this.progress = num)
     }
     when(
       () => this.props.project.rawDataViews,
       () => {
-        this.loading = false
         this.progress = 0
       }
     )
@@ -568,10 +564,10 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, issueRows } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataViews, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataViews, rawDataViewsLoading, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
-        {this.loading && <ProcessLoading progress={this.progress} style={{ bottom: '0.1em' }} />}
+        {rawDataViewsLoading && <ProcessLoading progress={this.progress} style={{ bottom: '0.1em' }} />}
         {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>

@@ -17,13 +17,11 @@ export default class SimplifiedView extends Component {
   @observable showHistograms = false
   @observable showCorrelation = false
   @observable visible = false
-  @observable isLoading = true
   @observable progress = 0
 
   componentDidMount() {
     this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
       this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
-        this.isLoading = false
         this.progress = 0
       })
     })
@@ -75,10 +73,8 @@ export default class SimplifiedView extends Component {
   }
 
   reloadTable = () => {
-    this.isLoading = true
     this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
       this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
-        this.isLoading = false
         this.progress = 0
       })
     })
@@ -91,7 +87,7 @@ export default class SimplifiedView extends Component {
     let filterList = []
     if (!value) return
     if (value === 'all') {
-      filterList = dataHeader
+      filterList = [...dataHeader, ...newVariable]
     }
     if (value === 'informatives') {
       filterList = informativesLabel
@@ -111,13 +107,13 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, targetMap, dataViews, preImportance, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader } = project;
+    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader } = project;
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
-    const key = [dataHeader, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
+    const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     return <div className={styles.simplified}>
@@ -167,7 +163,7 @@ export default class SimplifiedView extends Component {
         <div className={styles.toolSelect}>
           <div className={styles.toolLabel}><span>Current Variable List</span></div>
           <select value={selectValue} onChange={this.handleChange}>
-            <option value='all'>All Variables ({dataHeader.length})</option>
+            <option value='all'>All Variables ({allVariables.length})</option>
             <option value='informatives'>informatives ({informativesLabel.length})</option>
             {customHeader.map((v, k) => <option key={k} value={k}>custom_{k + 1} ({v.length})</option>)}
             {hasNewOne && <option value={customHeader.length}>custom_{customHeader.length + 1} ({checkedVariables.length})</option>}
@@ -190,6 +186,7 @@ export default class SimplifiedView extends Component {
               data={project.correlationMatrixData}
               header={project.correlationMatrixHeader}
               id={id}
+              fetch={(!!project.correlationMatrixHeader && !!project.correlationMatrixData) || project.correlationMatrixLoading}
             />} />}
           <span>Check Correlation Matrix</span>
         </div>
@@ -226,7 +223,7 @@ export default class SimplifiedView extends Component {
           })}
         </div>
       </div>
-      {this.isLoading && <ProcessLoading progress={this.progress} style={{ bottom: '0.25em' }} />}
+      {(dataViewsLoading || preImportanceLoading) && <ProcessLoading progress={this.progress} style={{ bottom: '0.25em' }} />}
     </div>
   }
 }
@@ -327,7 +324,7 @@ class SimplifiedViewRow extends Component {
 class CorrelationPlot extends Component {
   constructor(props) {
     super(props)
-    if (!props.data) props.getPath()
+    if (!props.fetch) props.getPath()
   }
   render() {
     const { data, header } = this.props;
