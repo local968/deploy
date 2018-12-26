@@ -64,6 +64,7 @@ router.post('/deploy', async (req, res) => {
     return errorRes(10006)
   }
   const file = await api.getFile(fileId)
+  if(!file) return errorRes(10015)
 
   // check user level usage
   const [level, createdTime] = await redis.hmget(`user:${userId}`, 'level', 'createdTime')
@@ -181,7 +182,8 @@ const errors = {
   10011: 'exceed prediction usage limit',
   10012: 'exceed prediction api limit',
   10013: 'download predict result failed',
-  10014: 'predict result is empty'
+  10014: 'predict result is empty',
+  10015: 'file not exist'
 }
 
 
