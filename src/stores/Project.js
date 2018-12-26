@@ -71,7 +71,9 @@ export default class Project {
   @observable targetMap = {};
   @observable targetArray = []
   @observable rawDataViews = null;
+  @observable rawDataViewsLoading = false
   @observable preImportance = null;
+  @observable preImportanceLoading = false;
   @observable histgramPlots = {};
   @observable univariatePlots = {};
   @observable newVariable = [];
@@ -115,6 +117,7 @@ export default class Project {
   // correlation
   @observable correlationMatrixHeader;
   @observable correlationMatrixData;
+  @observable correlationMatrixLoading = false
 
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
@@ -132,6 +135,7 @@ export default class Project {
   @observable selectId = '';
   @observable version = [1, 2]
   @observable dataViews = null;
+  @observable dataViewsLoading = false
 
   @observable stopModel = false
   @observable stopEtl = false
@@ -182,6 +186,7 @@ export default class Project {
       target: '',
       noCompute: false,
       rawDataViews: null,
+      rawDataViewsLoading: false
     }
   }
 
@@ -195,6 +200,7 @@ export default class Project {
       outlierFillMethod: {},
       outlierIndex: {},
       dataViews: null,
+      dataViewsLoading: false,
       outlierDict: {},
       targetMap: {},
       targetArray: [],
@@ -209,7 +215,8 @@ export default class Project {
       mismatchFillMethodTemp: {},
       nullFillMethodTemp: {},
       outlierFillMethodTemp: {},
-      outlierDictTemp: {}
+      outlierDictTemp: {},
+      preImportanceLoading: false
     }
   }
 
@@ -435,7 +442,7 @@ export default class Project {
     updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
     if (this.problemType && this.changeProjectType !== this.problemType) {
       //全部恢复到problem步骤
-      const backData = Object.assign({}, updObj, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
+      const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, updObj, {
         mainStep: 2,
         curStep: 2,
         lastSubStep: 1,
@@ -516,14 +523,14 @@ export default class Project {
   @action
   endSchema = () => {
     this.etling = true
-    return this.updateProject(Object.assign({
+    return this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp
-    }, this.defaultDataQuality, this.defaultTrain))
+    }))
       .then(() => this.etl())
   }
 
@@ -538,7 +545,7 @@ export default class Project {
       if (hasChange) break
     }
 
-    const data = Object.assign({
+    const data = Object.assign(this.defaultTrain, {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
       outlierDict: toJS(this.outlierDictTemp),
@@ -546,7 +553,7 @@ export default class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp)
-    }, this.defaultTrain)
+    })
     if (hasChange) this.etling = true
     return this.updateProject(data)
       .then(() => {
@@ -677,7 +684,7 @@ export default class Project {
   }
 
   etl = () => {
-    const { id, problemType, dataHeader, uploadFileName, rawHeader } = this;
+    const { id, problemType, dataHeader, uploadFileName } = this;
 
     const command = 'etl';
 
@@ -696,8 +703,8 @@ export default class Project {
       data.problemType = problemType;
     }
 
-    if (dataHeader.length !== rawHeader.length) {
-      data.featureLabel = toJS(dataHeader)
+    if (dataHeader.length) {
+      data.featureLabel = dataHeader.filter(v => v !== this.target)
     }
 
     if (this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
@@ -777,7 +784,6 @@ export default class Project {
       //   actionType: isClean ? 'clean' : 'raw',
       //   feature_label
       // };
-
       const readyLabels = this[key] ? Object.keys(this[key]) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
@@ -793,6 +799,7 @@ export default class Project {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
+      this[`${key}Loading`] = true
       return api.dataView(command, progressResult => {
         if (progress && typeof progress === 'function') {
           const { result } = progressResult
@@ -805,7 +812,7 @@ export default class Project {
           this.setProperty({ [key]: null })
           return antdMessage.error(result['process error'])
         }
-        this.setProperty({ [key]: result.data })
+        this.setProperty({ [key]: result.data, [`${key}Loading`]: false })
       })
     })
   }
@@ -846,7 +853,7 @@ export default class Project {
           return false
         }
         const newVariable = [...this.newVariable, ...variables]
-        const trainHeader = [...this.trainHeader, ...variables]
+        // const trainHeader = [...this.trainHeader, ...variables]
         const newType = Object.assign({}, this.newType, variables.reduce((start, v) => {
           start[v] = type
           return start
@@ -854,7 +861,7 @@ export default class Project {
         const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
         this.updateProject({
           newVariable,
-          trainHeader,
+          // trainHeader,
           expression,
           newType,
           correlationMatrixData: null,
@@ -1134,6 +1141,7 @@ export default class Project {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
+      this.preImportanceLoading = true
       return api.preTrainImportance(command, progressResult => {
         if (progress && typeof progress === 'function') {
           const { result } = progressResult
@@ -1145,13 +1153,15 @@ export default class Project {
         if (status < 0) {
           return antdMessage.error(result['process error'])
         }
-        this.setProperty({ preImportance: result.preImportance, informativesLabel: result.informativesLabel })
+        this.setProperty({ preImportance: result.preImportance, informativesLabel: result.informativesLabel, preImportanceLoading: false })
       })
     })
   }
 
   /**------------------------------------------------chart---------------------------------------------------------*/
   correlationMatrix = () => {
+    if(this.correlationMatrixLoading) return
+    this.correlationMatrixLoading = true
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -1160,6 +1170,7 @@ export default class Project {
       };
       api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
+        this.correlationMatrixLoading = false
         if (status < 0) return antdMessage.error(result['process error'])
         this.correlationMatrixHeader = result.header;
         this.correlationMatrixData = result.data;

@@ -62,7 +62,10 @@ export default class PRChart extends Component {
 
     const _this = this;
     // remove recall = 0 and precision = 0
-    const data = parseData(model.chartData.roc);
+    const data = parseData(model.chartData.roc)||[]
+    if(!data.length){
+      return
+    }
 
     x.domain([d3.min(data, d => d.Recall), d3.max(data, function (d) {return d.Recall;})]);
     y.domain([d3.min(data, d => d.Precision), d3.max(data, function (d) {return d.Precision;})]);
@@ -109,7 +112,7 @@ export default class PRChart extends Component {
       .attr('class', styles.line)
       .attr('d', line)
       .style('stroke', '#7fc8ee');
-    
+
     const {fitIndex} = model;
     const initalData = data[fitIndex];
 
@@ -163,5 +166,5 @@ export default class PRChart extends Component {
     return index;
   }
 
-  
+
 }

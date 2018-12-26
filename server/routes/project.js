@@ -571,41 +571,51 @@ wss.register('abortEtl', (message, socket) => {
   })
 })
 
-wss.register('dataView', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
+wss.register('dataView', (message, socket, progress) => {
   const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
-  const { status, result } = returnValue
-  if (status === 100) {
-    const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
-    if (updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
-    // createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
-  }
-  return returnValue
-}))
+  return createOrUpdate(message.projectId, socket.session.userId, { [`${key}Loading`]: true })
+    .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
+      const { status, result } = returnValue
+      if (status === 100) {
+        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
+        await createOrUpdate(message.projectId, socket.session.userId, { [`${key}Loading`]: false })
+        if (updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
+        // createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
+      }
+      return returnValue
+    }))
+})
 
-wss.register('correlationMatrix', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
-  .then(returnValue => {
-    const { status, result } = returnValue
-    if (status === 100) {
-      createOrUpdate(message.projectId, socket.session.userId, { correlationMatrixImg: result.imageSavePath })
-    }
-    return returnValue
-  }))
 
-wss.register('preTrainImportance', (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
-  .then(returnValue => {
-    const { status, result } = returnValue
-    const promise = []
-    if (status === 100) {
-      result.informativesLabel = result.informativesLabel || []
-      result.preImportance = result.data
-      promise.push(updateProjectField(message.projectId, socket.session.userId, 'preImportance', result.data))
-      promise.push(updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel))
-    }
-    return Promise.all(promise).then(([result1, result2]) => {
-      const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
-      return Object.assign({}, returnValue, { result: realResult })
-    })
-  }))
+
+wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(message.projectId, socket.session.userId, { correlationMatrixLoading: true })
+  .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
+    .then(returnValue => {
+      const { status, result } = returnValue
+      const data = status === 100 ? { correlationMatrixHeader: result.header, correlationMatrixData: result.data, correlationMatrixLoading: false } : { correlationMatrixLoading: false }
+      createOrUpdate(message.projectId, socket.session.userId, data)
+      return returnValue
+    })))
+
+
+wss.register('preTrainImportance', (message, socket, progress) =>
+  createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
+    .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
+      .then(returnValue => {
+        const { status, result } = returnValue
+        const promise = []
+        if (status === 100) {
+          result.informativesLabel = result.informativesLabel || []
+          result.preImportance = result.data
+        }
+        promise.push(status === 100 ? updateProjectField(message.projectId, socket.session.userId, 'preImportance', result.data) : Promise.resolve({}))
+        promise.push(status === 100 ? updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel) : Promise.resolve({}))
+        promise.push(createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: false }))
+        return Promise.all(promise).then(([result1, result2]) => {
+          const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
+          return Object.assign({}, returnValue, { result: realResult })
+        })
+      })))
 
 wss.register('histgramPlot', (message, socket, progress) => {
   const { projectId: id, _id: requestId, feature_label } = message
