@@ -152,7 +152,7 @@ const uploadData = (data, name, userId, projectId, path) => {
       'content-type': 'application/octet-stream',
       'content-range': `bytes 0-${data.length - 1}/${data.length}`,
       'session-id': moment().valueOf(),
-      'backend': 1
+      'backend': config.nginxBackend
     },
     onUploadProgress: console.log
   })
