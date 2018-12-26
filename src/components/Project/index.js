@@ -26,7 +26,6 @@ export default class Project extends Component {
     })
     if (type === 'name') {
       const deployment = deploymentStore.deployments.find(d => project.id === d.projectId)
-      console.log(deployment)
       if (deployment) deploymentStore.change(deployment.id, 'projectName', e.target.value)
     }
   })
