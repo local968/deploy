@@ -6,21 +6,28 @@ import { Input } from 'antd';
 import { action } from 'mobx';
 const { TextArea } = Input;
 
-@inject('projectStore')
+@inject('projectStore', 'deploymentStore')
 @observer
 export default class Project extends Component {
   nextStep = () => {
     const { project } = this.props.projectStore;
-    project.updateProject(Object.assign({
+    project.updateProject(project.nextMainStep(1))
+  }
+
+  onChange = action((type, e) => {
+    const { projectStore, deploymentStore } = this.props
+    const { project } = projectStore;
+    project[type] = e.target.value;
+    project.updateProject({
       name: project.name || "project " + new Date().toLocaleString(),
       // description: project.description,
       business: project.business,
       statement: project.statement
-    }, project.nextMainStep(1)))
-  }
-
-  onChange = action((type, e) => {
-    this.props.projectStore.project[type] = e.target.value;
+    })
+    if (type === 'name') {
+      const deployment = deploymentStore.deployments.find(d => project.id === d.projectId)
+      if (deployment) deploymentStore.change(deployment.id, 'projectName', e.target.value)
+    }
   })
 
   render() {

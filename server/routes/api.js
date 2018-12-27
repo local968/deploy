@@ -19,6 +19,7 @@ wss.register('getDeploymentToken', (message, socket) => {
 })
 
 router.post('/deploy', async (req, res) => {
+  // x-www-form-urlencode
   const errorRes = error(res)
 
   // deployment
@@ -31,6 +32,7 @@ router.post('/deploy', async (req, res) => {
   let lineCount = 0
 
   // token
+  // todo token update( Oauth2?)
   const token = req.body.token
   if (!token) return errorRes(10003)
   const validToken = crypto.createHash('md5').update(userId + projectId + deploymentId + config.secret).digest('hex')
@@ -47,7 +49,7 @@ router.post('/deploy', async (req, res) => {
   }
   if (!data || !Array.isArray(data) || data.length === 0) return errorRes(10005)
   data = array2csv(data)
-  if (lineCount > 100 || data.length > 1024 * 1024 * 100) return errorRes(10012)
+  if (lineCount > 10000 || data.length > 1024 * 1024 * 100) return errorRes(10012)
 
   const name = `api-deploy-${uuid.v4()}`
 
@@ -62,6 +64,7 @@ router.post('/deploy', async (req, res) => {
     return errorRes(10006)
   }
   const file = await api.getFile(fileId)
+  if(!file) return errorRes(10015)
 
   // check user level usage
   const [level, createdTime] = await redis.hmget(`user:${userId}`, 'level', 'createdTime')
@@ -149,7 +152,7 @@ const uploadData = (data, name, userId, projectId, path) => {
       'content-type': 'application/octet-stream',
       'content-range': `bytes 0-${data.length - 1}/${data.length}`,
       'session-id': moment().valueOf(),
-      'backend': 1
+      'backend': config.nginxBackend
     },
     onUploadProgress: console.log
   })
@@ -179,7 +182,8 @@ const errors = {
   10011: 'exceed prediction usage limit',
   10012: 'exceed prediction api limit',
   10013: 'download predict result failed',
-  10014: 'predict result is empty'
+  10014: 'predict result is empty',
+  10015: 'file not exist'
 }
 
 
