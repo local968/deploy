@@ -60,12 +60,12 @@ export default class RegressionPredictActualChart extends Component {
       .y(d => y(d[field]));
     const tool_tip = d3tips(`.${styles.hoverPanel}`)
       .offset((d, i) => ([y(d[field]) - 20, x(i) - 180]))
-      .html(function (d, i) {
+      .html((d, i) => {
         return (
           `
             <div class="${styles.hoverText}">Group Number: ${i + 1}</div>
-            <div class="${styles.hoverText}">Predicted Average: ${d['pred']}</div>
-            <div class="${styles.hoverText}">Actual Average: ${d['target']}</div>
+            <div class="${styles.hoverText}">Predicted Average: ${this.formatNumber(d['pred'])}</div>
+            <div class="${styles.hoverText}">Actual Average: ${this.formatNumber(d['target'])}</div>
           `
         );
       });
@@ -108,7 +108,7 @@ export default class RegressionPredictActualChart extends Component {
   renderD3 = () => {
     let { height, width, data } = this.props;
     if (!data) return null;
-    data = data.map(d => ({ target: this.formatNumber(d[0]), pred: this.formatNumber(d[1]) }));
+    data = data.map(d => ({ target: d[0], pred: d[1] }));
     const margin = { top: 15, right: 40, bottom: 30, left: 80 };
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
