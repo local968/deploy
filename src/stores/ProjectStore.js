@@ -28,7 +28,7 @@ class ProjectStore {
     this.initWatch()
     this.initReload()
     autorun(() => {
-      if(this.project) {
+      if (this.project) {
         this.project.clean()
         this.project.initProject()
       }
@@ -139,7 +139,14 @@ class ProjectStore {
           this.loading = false;
           return antdMessage.error(message)
         }
-        this.list = list.map(row => new Project(row.id + "", row))
+        let newList = list.map(row => new Project(row.id + "", row))
+        if (this.currentId) {
+          const current = this.project
+          newList = newList.filter(p => p.id !== current.id)
+          if (newList.length === list.length) current.visiable = false
+          newList.push(current)
+        }
+        this.list = [...newList]
         this.total = count
         this.loading = false;
       })
