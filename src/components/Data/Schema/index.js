@@ -13,6 +13,11 @@ export default class DataSchema extends Component {
   @observable showSelect = false
   @observable dataType = { ...this.props.projectStore.project.colType }
 
+  constructor(props) {
+    super(props)
+    this.tableRef = React.createRef();
+  }
+
   doEtl = () => {
     const { project } = this.props.projectStore
     const { sortHeader } = project;
@@ -35,8 +40,8 @@ export default class DataSchema extends Component {
       data.outlierFillMethodTemp = { [value]: 'drop' }
     }
     this.props.projectStore.project.setProperty(data)
-    this.refs.table.updateGrids()
-    // this.props.projectStore.project.updateProject(data).then(() => this.refs.table.updateGrids())
+    this.tableRef.current.updateGrids()
+    // this.props.projectStore.project.updateProject(data).then(() => this.tableRef.current.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
   }
 
@@ -47,14 +52,14 @@ export default class DataSchema extends Component {
     } else {
       this.checkList = [...this.checkList.filter(v => v !== key)]
     }
-    this.refs.table.updateGrids()
+    this.tableRef.current.updateGrids()
   }
 
   select = (key, e) => {
     const v = e.target.value
     this.dataType[key] = v
     // this.props.projectStore.project.colType[key] = v
-    this.refs.table.updateGrids()
+    this.tableRef.current.updateGrids()
   }
 
   toggleSelect = () => {
@@ -66,7 +71,7 @@ export default class DataSchema extends Component {
   }
 
   autoFix = () => {
-    this.props.projectStore.project.autoFixHeader().then(() => this.refs.table.updateGrids())
+    this.props.projectStore.project.autoFixHeader().then(() => this.tableRef.current.updateGrids())
   }
 
   formatTable = () => {
@@ -270,7 +275,7 @@ export default class DataSchema extends Component {
         </div>
         <div className={styles.content}>
           <Table
-            ref="table"
+            ref={this.tableRef}
             columnWidth={110}
             rowHeight={34}
             columnCount={sortHeader.length + 1}

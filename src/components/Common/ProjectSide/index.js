@@ -3,11 +3,14 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
-import { withRouter } from 'react-router-dom';
 
-@withRouter
 @observer
 export default class ProjectSide extends Component {
+    constructor(props) {
+        super(props)
+        this.domRef = React.createRef();
+    }
+
     @observable loading = false
     @observable right = 0
 
@@ -22,9 +25,10 @@ export default class ProjectSide extends Component {
 
     reset = () => {
         if (this.loading) return
+        if (!this.domRef.current) return
         this.loading = true
-        const parent = this.dom.parentElement
-        const prev = this.dom.previousSibling
+        const parent = this.domRef.current.parentElement
+        const prev = this.domRef.current.previousSibling
         if (!parent || !prev) {
             this.loading = false
             return setTimeout(this.reset, 100)
@@ -41,13 +45,9 @@ export default class ProjectSide extends Component {
         this.loading = false
     }
 
-    refCb = dom => {
-        this.dom = dom
-    }
-
     render() {
         const { list, step, imgs, current, enter } = this.props;
-        return <div className={styles.projectSide} ref={this.refCb} style={{ right: this.right }}>
+        return <div className={styles.projectSide} ref={this.domRef} style={{ right: this.right }}>
             <div className={styles.sideBox}>
                 {list.map((v, k) => {
                     return <div className={classnames(styles.sideBlock, {
