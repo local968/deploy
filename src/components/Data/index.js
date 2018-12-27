@@ -34,6 +34,7 @@ export default class Data extends Component {
       { label: 'Data Schema', value: "dataSchema" },
       { label: 'Data Quality', value: "dataQuality" }
     ]
+    this.sideRef = React.createRef();
   }
 
   componentDidMount() {
@@ -66,6 +67,10 @@ export default class Data extends Component {
     this.autorun && this.autorun()
   }
 
+  componentDidUpdate() {
+    if (this.sideRef.current) this.sideRef.current.reset()
+  }
+
   enter = (step) => {
     const { mainStep, lastSubStep, subStepActive, noCompute, nextSubStep, updateProject } = this.props.projectStore.project;
 
@@ -88,7 +93,7 @@ export default class Data extends Component {
         <Route exact path="/project/:id/data/schema" component={DataSchema} />
         <Route exact path="/project/:id/data/quality" component={DataQuality} />
       </Switch>}
-      <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive}/>
+      <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive} ref={this.sideRef} />
     </div>
   }
 }

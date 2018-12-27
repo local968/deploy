@@ -117,7 +117,7 @@ class TargetIssue extends Component {
           </div>}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span>Some data issues, highlighted incolor, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically</span>
+            <span>Some data issues, highlighted in color, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically</span>
           </div>}
         </div>
       </div>

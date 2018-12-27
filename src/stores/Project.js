@@ -388,17 +388,6 @@ export default class Project {
         })
       }
     }))
-    // this.loading = true;
-    // return socketStore.ready().then(api => {
-    //   return api.queryProject({ id: this.id }).then(result => {
-    //     this.loading = false;
-    //     if (result.status === 200) {
-    //       this.setProperty(result.data)
-    //       return
-    //     }
-    //     alert(result.message)
-    //   })
-    // })
   }
 
   @action

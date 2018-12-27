@@ -36,6 +36,7 @@ export default class Modeling extends Component {
       { label: 'Start Modeling', value: 'startModeling' },
       { label: 'Model Selection', value: 'modelSelection' }
     ];
+    this.sideRef = React.createRef();
   }
 
   componentDidMount() {
@@ -58,6 +59,10 @@ export default class Modeling extends Component {
     this.autorun && this.autorun()
   }
 
+  componentDidUpdate() {
+    if (this.sideRef.current) this.sideRef.current.reset()
+  }
+
   enter = step => {
     const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
     if (step === subStepActive) return false;
@@ -67,21 +72,25 @@ export default class Modeling extends Component {
 
   render() {
     const { project } = this.props.projectStore;
+    const { models, train2Error, train2ing } = project;
+    //mobx
+    if (models.length) { }
+    if (train2Error) { }
+    if (train2ing) { }
     return (
       <div className={styles.modeling}>
         {project && <Switch>
           <Route exact path="/project/:id/modeling/start" component={StartTrain} />
           <Route exact path="/project/:id/modeling/result" component={trainResult} />
         </Switch>}
-        {project && (
-          <ProjectSide
-            enter={this.enter}
-            list={this.step}
-            step={project.lastSubStep}
-            current={project.subStepActive}
-            imgs={imgs}
-          />
-        )}
+        {project && <ProjectSide
+          enter={this.enter}
+          list={this.step}
+          step={project.lastSubStep}
+          current={project.subStepActive}
+          imgs={imgs}
+          ref={this.sideRef}
+        />}
       </div>
     );
   }
@@ -92,15 +101,12 @@ export default class Modeling extends Component {
 class trainResult extends Component {
   render() {
     const { project } = this.props.projectStore;
-    const { models } = project;
-    const { train2Error, train2ing } = project;
+    const { models, train2Error, train2ing } = project;
     if (train2Error) return <ModelError />;
     if (!models.length && train2ing) return <Loading project={project} />;
-    return (
-      <ModelResult
-        models={models}
-        project={project}
-      />
-    );
+    return <ModelResult
+      models={models}
+      project={project}
+    />
   }
 }

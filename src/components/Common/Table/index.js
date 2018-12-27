@@ -5,8 +5,13 @@ import { Spin } from 'antd'
 
 @observer
 export default class Table extends Component {
+  constructor(props) {
+    super(props)
+    this.gridRef = React.createRef();
+  }
+
   updateGrids = () => {
-    this.grid.forceUpdateGrids()
+    this.gridRef.current.forceUpdateGrids()
   }
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
@@ -24,11 +29,6 @@ export default class Table extends Component {
       </div>
     )
   }
-
-  MultiGridCb = (grid) => {
-    this.grid = grid
-  }
-
   render() {
     const { columnCount, columnWidth, rowHeight, fixedColumnCount, fixedRowCount, rowCount, data, style } = this.props;
     return !!data.length ? <AutoSizer>
@@ -44,7 +44,7 @@ export default class Table extends Component {
           fixedRowCount={fixedRowCount}
           fixedColumnCount={fixedColumnCount}
           style={style}
-          ref={this.MultiGridCb}
+          ref={this.gridRef}
         />
       }}
     </AutoSizer> : <div style={{ display: 'flex', flex: 'auto', justifyContent: 'center', alignItems: 'center', border: '1px solid #ccc' }}><Spin size='large' /></div>
