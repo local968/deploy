@@ -26,9 +26,6 @@ export default class extends Component {
     return result
   }
 
-  constructor(props) {
-    super(props)
-  }
   showToken = action(async () => this.token = await this.props.deployment.getDeploymentToken())
   onDataChange = action((e) => this.csvData = e.target.value)
   render() {

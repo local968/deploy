@@ -100,10 +100,15 @@ export default class RegressionPredictActualChart extends Component {
     );
   }
 
+  formatNumber = (num) => {
+    if (typeof num === "number") return num.toFixed(2)
+    if (typeof num === "string") return num
+  }
+
   renderD3 = () => {
     let { height, width, data } = this.props;
     if (!data) return null;
-    data = data.map(d => ({ target: d[0], pred: d[1] }));
+    data = data.map(d => ({ target: this.formatNumber(d[0]), pred: this.formatNumber(d[1]) }));
     const margin = { top: 15, right: 40, bottom: 30, left: 80 };
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
