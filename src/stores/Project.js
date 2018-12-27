@@ -845,7 +845,7 @@ export default class Project {
           return false
         }
         const newVariable = [...this.newVariable, ...variables]
-        // const trainHeader = [...this.trainHeader, ...variables]
+        const trainHeader = [...this.trainHeader, ...variables]
         const newType = Object.assign({}, this.newType, variables.reduce((start, v) => {
           start[v] = type
           return start
@@ -853,7 +853,7 @@ export default class Project {
         const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
         this.updateProject({
           newVariable,
-          // trainHeader,
+          trainHeader,
           expression,
           newType,
           correlationMatrixData: null,
