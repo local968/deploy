@@ -236,7 +236,7 @@ export default class Project {
       // maxTime: 10,
       randSeed: 0,
       resampling: 'no',
-      runWith: 'holdout',
+      runWith: (this.totalLines > 0 && this.totalLines < 10000) ? 'cross' : 'holdout',
       crossCount: 5,
       dataRange: 'all',
       customField: '',
@@ -673,7 +673,9 @@ export default class Project {
   }
 
   etl = () => {
-    const { id, problemType, dataHeader, uploadFileName } = this;
+    const { id, problemType, dataHeader, uploadFileName, train2ing, models } = this;
+
+    if (train2ing) this.abortTrain(!!models.length)
 
     const command = 'etl';
 
@@ -727,6 +729,7 @@ export default class Project {
     if (this.firstEtl) {
       data.csvLocation = [...uploadFileName]
     }
+
     this.etling = true;
     // id: request ID
     // projectId: project ID
@@ -842,7 +845,7 @@ export default class Project {
           return false
         }
         const newVariable = [...this.newVariable, ...variables]
-        // const trainHeader = [...this.trainHeader, ...variables]
+        const trainHeader = [...this.trainHeader, ...variables]
         const newType = Object.assign({}, this.newType, variables.reduce((start, v) => {
           start[v] = type
           return start
@@ -850,7 +853,7 @@ export default class Project {
         const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
         this.updateProject({
           newVariable,
-          // trainHeader,
+          trainHeader,
           expression,
           newType,
           correlationMatrixData: null,
@@ -1031,6 +1034,7 @@ export default class Project {
   }
 
   modeling = (trainData, updateData) => {
+    if (this.etling) return antdMessage.error('modeling error')
     this.train2ing = true
     this.isAbort = false
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
@@ -1149,7 +1153,7 @@ export default class Project {
 
   /**------------------------------------------------chart---------------------------------------------------------*/
   correlationMatrix = () => {
-    if(this.correlationMatrixLoading) return
+    if (this.correlationMatrixLoading) return
     this.correlationMatrixLoading = true
     socketStore.ready().then(api => {
       const command = {
