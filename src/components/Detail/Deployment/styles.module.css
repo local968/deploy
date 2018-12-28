@@ -9,6 +9,7 @@
   padding: 0.2em;
   border-bottom: 1px dashed #d7d7d7;
   align-items: center;
+  flex: 0 0 .6em;
 }
 .model,
 .data,
@@ -70,6 +71,7 @@
 .deploymentOption {
   margin-top: 0.37em;
   display: flex;
+  flex: 1 0 0.52em;
 }
 .label {
   display: flex;
