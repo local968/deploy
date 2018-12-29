@@ -14,6 +14,26 @@
     color: #1d2b3c;
 }
 
+.process{
+    height: 1em;
+    border:1px solid #C4CBD7;
+    margin: 0.2em;
+    background-color: #FAFBFC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.process img{
+    width: 30px;
+    margin: 0 20px;
+}
+
+.process button span {
+    font-size: 14px;    
+    float: left;
+}
+
 .result {
     display: flex;
     flex: none;
@@ -373,6 +393,10 @@
 .compute span {
     color: #448eed;
     text-decoration: underline;
+}
+
+.compute img{
+  margin-right: 10px;
 }
 
 .modelSelect {
