@@ -280,7 +280,7 @@ export default class Project {
     const index = rawHeader.indexOf(target)
     return uploadData.filter(r => r.length === rawHeader.length).map(row => {
       const value = row[index]
-      return [value, ...row.slice(0, k), ...row.slice(k + 1)]
+      return [value, ...row.slice(0, index), ...row.slice(index + 1)]
     })
   }
 
