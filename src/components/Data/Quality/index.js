@@ -105,7 +105,7 @@ class TargetIssue extends Component {
           </div>)}
         </div>}
         {((problemType === 'Classification' && issues.targetIssue) || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 2 && 's'} Found!</span></div>}
-        {((problemType === 'Classification' && issues.targetIssue) || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
+        {((problemType === 'Classification' && issues.targetIssue) || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
           {(problemType === 'Classification' && issues.targetIssue) && <div className={styles.issueText}>
             <div className={styles.point}></div>
             <span>Your target variable has more than two unique values, which is not suitable for binary classification.</span>
