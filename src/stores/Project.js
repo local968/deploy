@@ -54,7 +54,7 @@ export default class Project {
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
   @observable fileNames = [];
-  @observable cleanData = []
+  // @observable cleanData = []
   @observable originPath = '';
   @observable cleanPath = ''
 
@@ -70,8 +70,7 @@ export default class Project {
   @observable outlierDict = {}
   @observable targetMap = {};
   @observable targetArray = []
-  @observable rawDataViews = null;
-  @observable rawDataViewsLoading = false
+  @observable rawDataView = null;
   @observable preImportance = null;
   @observable preImportanceLoading = false;
   @observable histgramPlots = {};
@@ -142,6 +141,7 @@ export default class Project {
 
   constructor(id, args) {
     this.id = id
+    this.visiable = true
     this.setProperty(args)
     // autorun(() => {
     //   if (!this.cleanPath) return this.cleanData = []
@@ -185,8 +185,7 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      rawDataViews: null,
-      rawDataViewsLoading: false
+      rawDataView: null
     }
   }
 
@@ -281,7 +280,7 @@ export default class Project {
     const index = rawHeader.indexOf(target)
     return uploadData.filter(r => r.length === rawHeader.length).map(row => {
       const value = row[index]
-      return [value, ...row.slice(0, index), ...row.slice(index + 1)]
+      return [value, ...row.filter(v => v !== value)]
     })
   }
 
@@ -363,6 +362,8 @@ export default class Project {
 
   @action
   initProject = () => {
+    if (this.init) return
+    this.init = true
     this.autorun.push(autorun(async () => {
       if (this.uploadFileName && this.uploadFileName.length > 0) {
         const api = await socketStore.ready()
@@ -379,22 +380,23 @@ export default class Project {
         })
       }
     }))
-    this.autorun.push(autorun(async () => {
-      if (!this.cleanPath) {
-        this.cleanData = []
-      } else {
-        this.readData(this.cleanPath).then(data => {
-          this.cleanData = data
-        })
-      }
-    }))
+    // this.autorun.push(autorun(async () => {
+    //   if (!this.cleanPath) {
+    //     this.cleanData = []
+    //   } else {
+    //     this.readData(this.cleanPath).then(data => {
+    //       this.cleanData = data
+    //     })
+    //   }
+    // }))
   }
 
   @action
   clean = () => {
+    this.init = false
     this.autorun.forEach(f => f())
     this.uploadData = []
-    this.cleanData = []
+    // this.cleanData = []
   }
 
   @action
@@ -518,7 +520,11 @@ export default class Project {
       dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
       outlierFillMethod: this.outlierFillMethod,
-      outlierFillMethodTemp: this.outlierFillMethodTemp
+      outlierFillMethodTemp: this.outlierFillMethodTemp,
+      curStep: 2,
+      mainStep: 2,
+      subStepActive: 2,
+      lastSubStep: 2
     }))
       .then(() => this.etl())
   }
@@ -541,8 +547,17 @@ export default class Project {
       nullFillMethod: toJS(this.nullFillMethodTemp),
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
-      missingReason: toJS(this.missingReasonTemp)
+      missingReason: toJS(this.missingReasonTemp),
+      curStep: 2,
+      mainStep: 2,
+      subStepActive: 3,
+      lastSubStep: 3
     })
+
+    const min = Math.min(...Object.values(this.targetCounts))
+    if (min < 3) return antdMessage.error("error!!")
+    if (min < 5) data.crossCount = min - 1
+
     if (hasChange) this.etling = true
     return this.updateProject(data)
       .then(() => {
@@ -566,6 +581,19 @@ export default class Project {
   }
 
   @computed
+  get targetCounts() {
+    return (!this.targetArrayTemp.length ? this.colValueCounts[this.target] : this.targetArrayTemp.map((v, k) => {
+      let n = 0
+      Object.entries(this.targetMapTemp).forEach(([key, value]) => {
+        if (value === k) n += this.colValueCounts[this.target] ? (this.colValueCounts[this.target][key] || 0) : 0
+      })
+      return { [v]: n }
+    }).reduce((start, item) => {
+      return Object.assign(start, item)
+    }, {})) || {}
+  }
+
+  @computed
   get issues() {
     const data = {
       rowIssue: false,
@@ -573,13 +601,13 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, issueRows, targetIssues } = this;
+    const { problemType, totalRawLines, targetColMap, issueRows, targetIssues, rawDataView, rawHeader, target } = this;
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
     } else {
-      // const uniqueValue = Math.min(1000, this.rawHeader.length * 6)
-      // data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
+      const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 1000
+      data.targetIssue = unique < Math.min((rawHeader.length - 1) * 6, 1000)
     }
 
     if (totalRawLines < 1000) {
@@ -712,6 +740,7 @@ export default class Project {
 
     if (this.targetArray && this.targetArray.length) {
       data.targetMap = { [this.target]: toJS(this.targetMap) };
+      data.showTargetMap = this.targetArray.map((v, k) => { return { [v]: k } })
     }
 
     if (this.outlierDict && Object.keys(this.outlierDict).length) {
@@ -765,8 +794,8 @@ export default class Project {
   }
 
   @action
-  dataView = (isClean = true, progress) => {
-    const key = isClean ? 'dataViews' : 'rawDataViews'
+  dataView = progress => {
+    // const key = isClean ? 'dataViews' : 'rawDataView'
     // const featureLabel = [...this.dataHeader, ...this.newVariable].filter(v => !Object.keys(this[key]).includes(v))
     // if(!featureLabel.length) return Promise.resolve()
     return socketStore.ready().then(api => {
@@ -776,7 +805,7 @@ export default class Project {
       //   actionType: isClean ? 'clean' : 'raw',
       //   feature_label
       // };
-      const readyLabels = this[key] ? Object.keys(this[key]) : []
+      const readyLabels = this.dataViews ? Object.keys(this.dataViews) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
       const feature_label = [...data_label, ...new_label]
@@ -784,14 +813,14 @@ export default class Project {
       const command = {
         projectId: this.id,
         command: 'dataView',
-        actionType: isClean ? 'clean' : 'raw',
+        actionType: 'clean',
         feature_label
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
-      this[`${key}Loading`] = true
+      this.dataViewsLoading = true
       return api.dataView(command, progressResult => {
         if (progress && typeof progress === 'function') {
           const { result } = progressResult
@@ -801,10 +830,10 @@ export default class Project {
       }).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          this.setProperty({ [key]: null })
+          this.setProperty({ dataViews: null })
           return antdMessage.error(result['process error'])
         }
-        this.setProperty({ [key]: result.data, [`${key}Loading`]: false })
+        this.setProperty({ dataViews: result.data, dataViewsLoading: false })
       })
     })
   }

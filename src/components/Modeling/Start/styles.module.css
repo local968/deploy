@@ -167,6 +167,7 @@
   padding: 0.35em 0.65em;
   flex-direction: column;
   position: relative;
+  z-index: 1;
 }
 
 .simplifiedLoad {
@@ -358,12 +359,25 @@
   text-align: center;
 }
 
+.tableLoading {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0.1em 0;
+  height: 2.6em;
+  overflow: hidden;
+  position: relative;
+  margin-right: 1px;
+}
+
 .tableBody {
   display: flex;
   flex: none;
   flex-direction: column;
   margin: 0.1em 0;
-  max-height: 2.6em;
+  height: 2.6em;
   overflow-x: hidden;
   overflow-y: scroll;
 }

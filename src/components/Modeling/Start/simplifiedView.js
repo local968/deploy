@@ -20,7 +20,7 @@ export default class SimplifiedView extends Component {
   @observable progress = 0
 
   componentDidMount() {
-    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+    this.props.project.dataView(num => this.progress = num / 2).then(() => {
       this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
         this.progress = 0
       })
@@ -73,7 +73,7 @@ export default class SimplifiedView extends Component {
   }
 
   reloadTable = () => {
-    this.props.project.dataView(true, num => this.progress = num / 2).then(() => {
+    this.props.project.dataView(num => this.progress = num / 2).then(() => {
       this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
         this.progress = 0
       })
@@ -83,7 +83,7 @@ export default class SimplifiedView extends Component {
   handleChange = e => {
     const value = e.target.value
     const { project } = this.props
-    const { informativesLabel, dataHeader, customHeader, newVariable } = project
+    const { informativesLabel, dataHeader, customHeader, newVariable, target } = project
     let filterList = []
     if (!value) return
     if (value === 'all') {
@@ -95,7 +95,7 @@ export default class SimplifiedView extends Component {
     if (!isNaN(value) && value < customHeader.length) {
       filterList = customHeader[value]
     }
-    project.trainHeader = [...dataHeader, ...newVariable].filter(v => !filterList.includes(v))
+    project.trainHeader = [...dataHeader, ...newVariable].filter(v => !filterList.includes(v) && v !== target)
   }
 
   formatNumber = (num, isNA) => {
@@ -110,7 +110,7 @@ export default class SimplifiedView extends Component {
     const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader } = project;
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
-    const allVariables = [...dataHeader, ...newVariable]
+    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
@@ -211,17 +211,21 @@ export default class SimplifiedView extends Component {
           <div className={styles.tableTh}><span>Min</span></div>
           <div className={styles.tableTh}><span>Max</span></div>
         </div>
-        <div className={styles.tableBody}>
-          {allVariables.sort((a, b) => {
-            return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
-          }).map((h, i) => {
-            if (h === target) return null;
-            const data = dataViews ? (dataViews[h] || {}) : {}
-            const map = targetMap || {};
-            const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-            return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
-          })}
-        </div>
+        {(dataViewsLoading || preImportanceLoading) ?
+          <div className={styles.tableLoading}>
+            <Icon type="loading" />
+          </div> :
+          <div className={styles.tableBody}>
+            {allVariables.sort((a, b) => {
+              return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
+            }).map((h, i) => {
+              if (h === target) return null;
+              const data = dataViews ? (dataViews[h] || {}) : {}
+              const map = targetMap || {};
+              const importance = preImportance ? (preImportance[h] || 0) : 0.01;
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
+            })}
+          </div>}
       </div>
       {(dataViewsLoading || preImportanceLoading) && <ProcessLoading progress={this.progress} style={{ bottom: '0.25em' }} />}
     </div>
@@ -701,9 +705,9 @@ class CreateNewVariable extends Component {
         type = 'Categorical'
         const quantileBinArray = ["value", "frequency"]
         const [b, type1, type2] = numList
-        if (isNaN(b) || b.includes(".")) return { isPass: false, message: `${b} must be integer` }
-        if (!quantileBinArray.includes(type1.trim())) return { isPass: false, message: `${type1} is not supported` }
-        if (type2 && !quantileBinArray.includes(type2.trim())) return { isPass: false, message: `${type2} is not supported` }
+        if (isNaN(b.exp) || b.exp.includes(".")) return { isPass: false, message: `${b.exp} must be integer` }
+        if (!quantileBinArray.includes(type1.exp.trim())) return { isPass: false, message: `${type1.exp} is not supported` }
+        if (type2 && !quantileBinArray.includes(type2.exp.trim())) return { isPass: false, message: `${type2.exp} is not supported` }
         num = numOfParam * (type2 ? 2 : 1)
         break;
       case "Custom_Quantile_bin()":

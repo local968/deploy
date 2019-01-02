@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { when } from 'mobx'
-import { Modal, ProcessLoading } from 'components/Common';
+import { Modal } from 'components/Common';
 import { observable } from 'mobx'
 import * as d3 from 'd3';
 import { Icon, message } from 'antd'
@@ -59,19 +58,11 @@ export class ClassificationTarget extends Component {
 
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
-    const { target, targetMapTemp, targetArrayTemp, colValueCounts, totalRawLines, renameVariable } = project
-    const map = !targetArrayTemp.length ? colValueCounts[target] : targetArrayTemp.map((v, k) => {
-      let n = 0
-      Object.entries(targetMapTemp).forEach(([key, value]) => {
-        if (value === k) n += colValueCounts[target] ? (colValueCounts[target][key] || 0) : 0
-      })
-      return { [v]: n }
-    }).reduce((start, item) => {
-      return Object.assign(start, item)
-    }, {})
-    const isGood = Object.keys(map).length === 2
+    const { target, targetArrayTemp, colValueCounts, totalRawLines, renameVariable, targetCounts } = project
+    const error = Object.keys(targetCounts).length < 2
+    const isGood = Object.keys(targetCounts).length === 2
     const text = (isGood && 'Target variable quality is good!') || 'Your target variable has more than two unique values'
-    return <div className={styles.block}>
+    return error ? null : <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
         <span>{text}</span>
@@ -81,7 +72,7 @@ export class ClassificationTarget extends Component {
           [styles.goodInfo]: isGood
         })}>
           <div className={styles.targetPercentBox}>
-            {Object.keys(map).map((v, k) => {
+            {Object.keys(targetCounts).map((v, k) => {
               const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
@@ -90,7 +81,7 @@ export class ClassificationTarget extends Component {
                 </div>
                 <div className={styles.targetPercentValue}>
                   <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                  <span>{map[v]}</span>
+                  <span>{targetCounts[v]}</span>
                 </div>
               </div>
             })}
@@ -154,7 +145,7 @@ export class RegressionTarget extends Component {
               <div className={styles.text}><span>Your Unique Value</span></div>
             </div>
             <div className={styles.infoBlock}>
-              <div className={styles.num}><span>{recomm}</span></div>
+              <div className={styles.num}><span>{recomm}+</span></div>
               <div className={styles.text}><span>Recommended</span></div>
             </div>
           </div>
@@ -471,19 +462,6 @@ export class FixIssue extends Component {
   @observable progress = 0
   @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} }
 
-  componentDidMount() {
-    if (!this.props.project.rawDataViews) {
-      this.progress = 0
-      this.props.project.dataView(false, num => this.progress = num)
-    }
-    when(
-      () => this.props.project.rawDataViews,
-      () => {
-        this.progress = 0
-      }
-    )
-  }
-
   editRange = (key) => {
     this.visible = true
     this.editKey = key
@@ -564,10 +542,9 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, issueRows } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataViews, rawDataViewsLoading, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
-        {rawDataViewsLoading && <ProcessLoading progress={this.progress} style={{ bottom: '0.1em' }} />}
         {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
@@ -596,9 +573,9 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(1)) + '%)'
-                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[1] : rawDataViews[k].mode))
-                const mean = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].mean : 'N/A')
-                const median = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].median : 'N/A')
+                const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
+                const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
+                const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
                 const method = this.fillMethod.mismatch[k] || mismatchFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
@@ -615,8 +592,8 @@ export class FixIssue extends Component {
                     ] : [
                         <option value={mean} key='mean'>Replace with mean value</option>,
                         <option value="drop" key='drop'>Delete the row</option>,
-                        <option value={!rawDataViews ? 'N/A' : rawDataViews[k].min} key='min'>Replace with min value</option>,
-                        <option value={!rawDataViews ? 'N/A' : rawDataViews[k].max} key='max'>Replace with max value</option>,
+                        <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
+                        <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
                         // <option value={mode} key='mode'>Replace with most frequent value</option>,
                         <option value={median} key='median'>Replace with median value</option>,
                         <option value={0} key={0}>Replace with 0</option>
@@ -656,9 +633,9 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
-                const mode = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataViews[k].mode === 'nan' ? (rawDataViews[k].modeNotNull || [])[1] : rawDataViews[k].mode))
-                const mean = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].mean : 'N/A')
-                const median = !rawDataViews ? 'N/A' : (showType === 'Numerical' ? rawDataViews[k].median : 'N/A')
+                const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
+                const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
+                const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
                 const method = this.fillMethod.missing[k] || nullFillMethodTemp[k] || (showType === 'Categorical' ? mode : mean)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
@@ -680,8 +657,8 @@ export class FixIssue extends Component {
                     ] : [
                         <option value={mean} key='mean'>Replace with mean value</option>,
                         <option value="drop" key='drop'>Delete the row</option>,
-                        <option value={!rawDataViews ? 'N/A' : rawDataViews[k].min} key='min'>Replace with min value</option>,
-                        <option value={!rawDataViews ? 'N/A' : rawDataViews[k].max} key='max'>Replace with max value</option>,
+                        <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
+                        <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
                         // <option value={mode} key='mode'>Replace with most frequent value</option>,
                         <option value={median} key='median'>Replace with median value</option>,
                         <option value={0} key={0}>Replace with 0</option>
@@ -724,8 +701,8 @@ export class FixIssue extends Component {
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
                 const method = this.fillMethod.outlier[k] || outlierFillMethodTemp[k] || 'drop'
-                const mean = !rawDataViews ? 'N/A' : rawDataViews[k].mean
-                const median = !rawDataViews ? 'N/A' : rawDataViews[k].median
+                const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
+                const median = !rawDataView ? 'N/A' : rawDataView[k].median
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>

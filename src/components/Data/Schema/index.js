@@ -75,9 +75,11 @@ export default class DataSchema extends Component {
   }
 
   formatTable = () => {
-    const { target, headerTemp: { temp }, sortData, sortHeader, renameVariable } = this.props.projectStore.project;
+    const { target, headerTemp: { temp }, sortData, sortHeader, renameVariable, etling } = this.props.projectStore.project;
+    if (etling) return []
     const { showSelect, checkList } = this
     if (!sortData.length) return []
+    // return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     const headerList = [...sortHeader]

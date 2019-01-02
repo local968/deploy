@@ -11,7 +11,7 @@ const { TextArea } = Input;
 export default class Project extends Component {
   nextStep = () => {
     const { project } = this.props.projectStore;
-    project.updateProject(project.nextMainStep(1))
+    project.updateProject({ ...project.nextMainStep(1), name: project.name || "project " + new Date().toLocaleString() })
   }
 
   onChange = action((type, e) => {

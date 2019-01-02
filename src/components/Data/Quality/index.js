@@ -26,9 +26,7 @@ export default class DataQuality extends Component {
 @observer
 class TargetIssue extends Component {
   @observable visible = false
-  // @observable isLoad = false
   @observable edit = false
-  // @observable progress = 0
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -42,23 +40,6 @@ class TargetIssue extends Component {
 
   editFixes = () => {
     this.visible = true
-    // if (this.props.project.rawDataViews) {
-    //   this.visible = true
-    // } else {
-    //   if (this.isLoad) return false;
-
-    //   this.isLoad = true
-    //   this.progress = 0
-
-    //   this.props.project.dataView(false, num => this.progress = num)
-    //   when(
-    //     () => this.props.project.rawDataViews,
-    //     () => {
-    //       this.visible = true
-    //       this.isLoad = false
-    //     }
-    //   )
-    // }
   }
 
   closeFixes = () => {
@@ -93,21 +74,39 @@ class TargetIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable } = project;
+    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
-    const recomm = problemType === 'Classification' ? '2' : '10+';
+    const recomm = problemType === 'Classification' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
     const targetPercent = {
       missing: (nullLineCounts[target] ? nullLineCounts[target] : 0) * 100 / (totalRawLines || 1),
       mismatch: (colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0) * 100 / (totalRawLines || 1),
       outlier: colType[target] === 'Numerical' ? outlierLineCounts[target] * 100 / (totalRawLines || 1) : 0,
     }
+    const warnings = []
+    const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
+    if (problemType === 'Classification') {
+      if (unique < 2) warnings.push("Your target variable has less than two unique values, It is recommended that you reselect a target variable or upload new data.")
+      if (unique === 2) {
+        const min = Math.min(...Object.values(targetCounts))
+        if (min < 3) warnings.push("It is recommended that you re-select target or upload new data.")
+      }
+    } else {
+      if (unique < recomm) warnings.push(`Your target variable has less than ${recomm} values, which is not suitable for Regression.`)
+    }
+    const cannotContinue = !!warnings.length || issues.targetIssue
+    const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue && !(problemType !== 'Classification' && issues.targetRowIssue)
     return <div className={styles.quality}>
       <div className={styles.issue}>
-        {(issues.targetIssue || issues.rowIssue || issues.targetRowIssue) ?
-          <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 2 && 's'} Found!</span></div> :
-          <div className={styles.cleanTitle}><span>Target variable quality looks good!</span></div>}
-        <div className={styles.issueBox}>
-          {issues.targetIssue && <div className={styles.issueText}>
+        {!!warnings.length && <div className={styles.issueTitle}><span>Warning!</span></div>}
+        {!!warnings.length && <div className={styles.issueBox}>
+          {warnings.map((v, k) => <div className={styles.issueText} key={k}>
+            <div className={styles.point}></div>
+            <span>{v}</span>
+          </div>)}
+        </div>}
+        {((problemType === 'Classification' && issues.targetIssue) || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 2 && 's'} Found!</span></div>}
+        {((problemType === 'Classification' && issues.targetIssue) || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
+          {(problemType === 'Classification' && issues.targetIssue) && <div className={styles.issueText}>
             <div className={styles.point}></div>
             <span>Your target variable has more than two unique values, which is not suitable for binary classification.</span>
           </div>}
@@ -119,7 +118,8 @@ class TargetIssue extends Component {
             <div className={styles.point}></div>
             <span>Some data issues, highlighted in color, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically</span>
           </div>}
-        </div>
+        </div>}
+        {isClean && <div className={styles.cleanTitle}><span>Target variable quality looks good!</span></div>}
       </div>
       <div className={styles.typeBox}>
         {!!targetIssues.mismatchRow.length && <div className={styles.type}>
@@ -136,7 +136,7 @@ class TargetIssue extends Component {
         </div>}
         <div className={styles.issueTabs}>
           <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
-          <div className={styles.issueTab} onClick={issues.targetIssue ? null : changeTab}><span>Predictor Variables</span></div>
+          <div className={styles.issueTab} onClick={cannotContinue ? null : changeTab}><span>Predictor Variables</span></div>
         </div>
       </div>
       <div className={styles.contentBox}>
@@ -161,7 +161,7 @@ class TargetIssue extends Component {
               )}
             </div>
           </div>
-          <ContinueButton disabled={issues.targetIssue} onClick={changeTab} text='continue' width="100%" />
+          <ContinueButton disabled={cannotContinue} onClick={changeTab} text='continue' width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
@@ -173,7 +173,7 @@ class TargetIssue extends Component {
             <RegressionTarget backToConnect={this.backToConnect}
               backToSchema={this.backToSchema}
               hasIssue={issues.targetIssue}
-              unique={10}
+              unique={unique}
               recomm={recomm} />}
           {issues.rowIssue && <RowIssue backToConnect={this.backToConnect}
             totalLines={totalLines} />}
@@ -218,10 +218,6 @@ class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
 
-  // handleCheck = e => {
-  //   const checked = e.target.checked
-  // }
-
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
     updateProject(nextSubStep(1, 2))
@@ -252,9 +248,8 @@ class VariableIssue extends Component {
   }
 
   formatTable = () => {
-    const { target, colType, sortData, sortHeader, dataHeader, nullIndex, mismatchIndex, outlierIndex, variableIssues } = this.props.project;
-    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
-    // const { checkList, showSelect } = this.state;
+    const { target, colType, sortData, sortHeader, dataHeader, nullIndex, mismatchIndex, outlierIndex, variableIssues, etling } = this.props.project;
+    if (etling) return []
     if (!sortData.length) return []
     const headerList = [...dataHeader.filter(v => v !== target)]
     const notShowIndex = sortHeader.filter(v => !headerList.includes(v)).map(v => sortHeader.indexOf(v))
@@ -396,10 +391,6 @@ class VariableIssue extends Component {
         </div>
         <div className={styles.variableBottom}>
           <ContinueButton onClick={this.showSummary} text='continue' width="15%" />
-          {/* <div className={styles.checkBox}>
-            <input type='checkbox' onChange={this.handleCheck} defaultChecked={false} id="ignoreIssue" />
-            <label htmlFor='ignoreIssue'>Ignore these issues{' '}<span>(R2.Learn will not fix the issues automatically)</span></label>
-          </div> */}
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
@@ -531,7 +522,6 @@ class Summary extends Component {
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
-              {/* <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div> */}
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock}>
@@ -543,12 +533,21 @@ class Summary extends Component {
             </div>
           </div>
         </div>
-        <div className={styles.summaryTable}>
+        <div className={styles.summaryTable} style={{ paddingRight: '.2em' }}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Predictor Variables</span></div>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Clean Data</span></div>
             </div>
+          </div>
+          <div className={styles.summaryTableRight}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.summaryTable} style={{ overflow: 'scroll' }}>
+          <div className={styles.summaryTableLeft}>
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
@@ -558,10 +557,6 @@ class Summary extends Component {
             })}
           </div>
           <div className={styles.summaryTableRight}>
-            <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
-              {/* <div className={styles.summaryCell}><span>(Hover/touch on bar chart to see details)</span></div> */}
-            </div>
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>

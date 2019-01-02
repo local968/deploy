@@ -9,6 +9,15 @@ import { Table } from 'components/Common';
 @observer
 export default class Preview extends Component {
   @observable visiable = false
+  @observable cleanData = []
+
+  constructor(props) {
+    super(props)
+    const { cleanPath, readData } = props.project
+    readData(cleanPath).then(data => {
+      this.cleanData = data
+    })
+  }
 
   showTable = () => {
     this.visiable = true
@@ -19,7 +28,8 @@ export default class Preview extends Component {
   }
 
   formatTable = () => {
-    const { colType, cleanData, target } = this.props.project;
+    const { cleanData, visiable } = this
+    const { colType, target } = this.props.project;
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     // const index = rawHeader.indexOf(target)
@@ -27,6 +37,7 @@ export default class Preview extends Component {
     //   const value = row[index]
     //   return [value, ...row.slice(0, index), ...row.slice(index + 1)]
     // })
+    if (!visiable) return []
     if (!cleanData.length) return []
     const header = cleanData[0]
     const index = header.indexOf(target)

@@ -572,15 +572,13 @@ wss.register('abortEtl', (message, socket) => {
 })
 
 wss.register('dataView', (message, socket, progress) => {
-  const key = message.actionType === 'clean' ? 'dataViews' : 'rawDataViews'
-  return createOrUpdate(message.projectId, socket.session.userId, { [`${key}Loading`]: true })
+  return createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: true })
     .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
       const { status, result } = returnValue
       if (status === 100) {
-        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, key, result.data)
-        await createOrUpdate(message.projectId, socket.session.userId, { [`${key}Loading`]: false })
-        if (updateResult && updateResult[key]) returnValue.result.data = updateResult[key]
-        // createOrUpdate(message.projectId, socket.session.userId, { [key]: result.data })
+        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
+        await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false })
+        if (updateResult && updateResult.dataViewsLoading) returnValue.result.data = updateResult.dataViewsLoading
       }
       return returnValue
     }))
@@ -661,9 +659,9 @@ wss.register('univariatePlot', (message, socket, progress) => {
 
 const _sendToCommand = (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
 
-wss.register('chartData', _sendToCommand)
-wss.register('fitPlotAndResidualPlot', _sendToCommand)
-wss.register('pointToShow', _sendToCommand)
+// wss.register('chartData', _sendToCommand)
+// wss.register('fitPlotAndResidualPlot', _sendToCommand)
+// wss.register('pointToShow', _sendToCommand)
 wss.register('createNewVariable', _sendToCommand)
 
 wss.register('abortTrain', (message, socket) => {
