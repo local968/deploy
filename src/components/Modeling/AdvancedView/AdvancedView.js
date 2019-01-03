@@ -84,7 +84,7 @@ export default class AdvancedView extends Component {
             const bModelData = formatNumber(bModel.chartData.roc.F1[bFitIndex])
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'Precesion':
+        case 'Precision':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex

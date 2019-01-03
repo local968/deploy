@@ -540,6 +540,8 @@ export default class Project {
       if (hasChange) break
     }
 
+    if (!hasChange) return Promise.resolve()
+
     const data = Object.assign(this.defaultTrain, {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
@@ -556,11 +558,10 @@ export default class Project {
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
-      if (min < 3) return antdMessage.error("error!!")
+      if (min < 3) return Promise.reject()
       if (min < 5) data.crossCount = min - 1
     }
-
-    if (hasChange) this.etling = true
+    this.etling = true
     return this.updateProject(data)
       .then(() => {
         if (hasChange) return this.etl()

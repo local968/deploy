@@ -90,10 +90,9 @@ class TargetIssue extends Component {
         const min = Math.min(...Object.values(targetCounts))
         if (min < 3) warnings.push("It is recommended that you re-select target or upload new data.")
       }
-    } else {
-      if (unique < recomm) warnings.push(`Your target variable has less than ${recomm} values, which is not suitable for Regression.`)
     }
-    const cannotContinue = !!warnings.length || issues.targetIssue
+    if((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push("Your target variable is empty, It is recommended that you reselect a target variable or upload new data.")
+    const cannotContinue = !!warnings.length || (problemType === 'Classification' && issues.targetIssue)
     const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue && !(problemType !== 'Classification' && issues.targetRowIssue)
     return <div className={styles.quality}>
       <div className={styles.issue}>
@@ -104,11 +103,13 @@ class TargetIssue extends Component {
             <span>{v}</span>
           </div>)}
         </div>}
-        {((problemType === 'Classification' && issues.targetIssue) || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 2 && 's'} Found!</span></div>}
-        {((problemType === 'Classification' && issues.targetIssue) || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
-          {(problemType === 'Classification' && issues.targetIssue) && <div className={styles.issueText}>
+        {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 2 && 's'} Found!</span></div>}
+        {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
+          {issues.targetIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span>Your target variable has more than two unique values, which is not suitable for binary classification.</span>
+            {problemType === 'Classification' ?
+              <span>Your target variable has more than two unique values, which is not suitable for binary classification.</span> :
+              <span>Your target variable has less than {recomm} values, which is not suitable for Regression.</span>}
           </div>}
           {issues.rowIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
@@ -234,7 +235,7 @@ class VariableIssue extends Component {
 
   showSummary = () => {
     const { project } = this.props
-    project.endQuality().then(() => this.summary = true)
+    project.endQuality().then(() => this.summary = true).catch(() => {message.error("error!!")})
   }
 
   closeSummary = () => {

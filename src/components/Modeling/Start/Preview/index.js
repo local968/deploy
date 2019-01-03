@@ -44,7 +44,6 @@ export default class Preview extends Component {
     if (index === -1) return []
     const headerList = [target, ...header.filter(h => h !== target)]
     const realColumn = headerList.length
-
     const realData = cleanData.slice(1).filter(r => r.length === realColumn)
     const data = index === 0 ? realData : realData.map(row => {
       return [row[index], ...row.slice(0, index), ...row.slice(index + 1)]
@@ -111,7 +110,7 @@ export default class Preview extends Component {
         <Table
           columnWidth={110}
           rowHeight={34}
-          columnCount={dataHeader.length - 1}
+          columnCount={dataHeader.length}
           rowCount={tableData.length}
           fixedColumnCount={0}
           fixedRowCount={3}

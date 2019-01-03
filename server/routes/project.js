@@ -62,7 +62,9 @@ function setDefaultData(id, userId) {
     histgramPlots: {},
     preImportance: null,
     dataViews: null,
-    informativesLabel: []
+    informativesLabel: [],
+    settings: [],
+    settingId: ''
   }
   return createOrUpdate(id, userId, data)
 }
@@ -271,7 +273,7 @@ const checkTraningRestriction = (user) => {
     return redis.get(restrictQuery).then(count => {
       if (count >= userProjectRestriction[level]) return reject({
         status: -4,
-        message: 'Your usage of number of training has reached the max restricted by your current lisense.',
+        message: 'Your usage of "Number of Training" has reached the max restricted by your current lisense.',
         error: 'project number exceed'
       })
       redis.incr(restrictQuery)

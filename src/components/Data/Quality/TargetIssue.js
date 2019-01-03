@@ -31,15 +31,12 @@ export class ClassificationTarget extends Component {
   handleSave = () => {
     const { temp } = this
     const { colValueCounts, target } = this.props.project
-    let sameNum = 0
-    Object.keys(temp).forEach(k => {
-      if (!temp[k]) delete temp[k]
-      if (temp[k] === k) sameNum++
-    })
+    for (const v of Object.values(temp)) {
+      if (!v) return message.error("")
+    }
     if (Object.keys(temp).length) {
-      const values = [...Object.keys(colValueCounts[target]), ...Object.values(temp)]
-      console.log(values.length, [...new Set(values)].length, sameNum)
-      if (values.length !== [...new Set(values)].length + sameNum) return message.error("Cannot be modified to the same name")
+      const values = [...Object.keys(colValueCounts[target]).filter(n => !temp.hasOwnProperty(n)), ...Object.values(temp)]
+      if (values.length !== [...new Set(values)].length) return message.error("Cannot be modified to the same name")
       const { targetArrayTemp, targetMapTemp } = this.props.project
       if (!!targetArrayTemp.length) {
         targetArrayTemp.forEach((v, k) => {
@@ -77,7 +74,7 @@ export class ClassificationTarget extends Component {
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
                 <div className={styles.targetPercentLabel}>
-                  {!this.rename ? <span title={renameVariable[v] || v}>{renameVariable[v] || v}</span> : <input value={this.temp[v] || renameVariable[v] || v} onChange={this.handleRename.bind(null, v)} />}
+                  {!this.rename ? <span title={renameVariable[v] || v}>{renameVariable[v] || v}</span> : <input value={this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)} onChange={this.handleRename.bind(null, v)} />}
                 </div>
                 <div className={styles.targetPercentValue}>
                   <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
