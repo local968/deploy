@@ -349,13 +349,15 @@ function updateProjectField(id, userId, field, data) {
 }
 
 wss.register("addProject", async (message, socket) => {
-  const { userId, user } = socket.session
-  const { createdTime } = user
-  const duration = moment.duration(moment().unix() - createdTime)
-  const startTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() })
-  const endTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() + 1 })
-  const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
-  if (projects.length >= userConcurrentRestriction[socket.session.user.level]) throw {
+  // const { userId, user } = socket.session
+  // const { createdTime } = user
+  // const duration = moment.duration(moment().unix() - createdTime)
+  // const startTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() })
+  // const endTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() + 1 })
+  // const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
+  const { userId } = socket.session
+  const counts = await redis.zcard(`user:${userId}:projects:createTime`)
+  if (counts >= userConcurrentRestriction[socket.session.user.level]) return {
     status: 408,
     message: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
     error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',

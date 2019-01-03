@@ -554,9 +554,11 @@ export default class Project {
       lastSubStep: 3
     })
 
-    const min = Math.min(...Object.values(this.targetCounts))
-    if (min < 3) return antdMessage.error("error!!")
-    if (min < 5) data.crossCount = min - 1
+    if (this.problemType === 'Classification') {
+      const min = Math.min(...Object.values(this.targetCounts))
+      if (min < 3) return antdMessage.error("error!!")
+      if (min < 5) data.crossCount = min - 1
+    }
 
     if (hasChange) this.etling = true
     return this.updateProject(data)
