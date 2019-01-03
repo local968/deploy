@@ -63,12 +63,13 @@ class ProjectStore {
     this.watchList = false;
     this.init = false
     this.isOnline = false
+    if (this.project) this.project.clean();
   }
 
   @computed
   get sortList() {
     const sort = this.toolsOption.sort
-    return this.list.filter(p => !p.visiable).sort((a, b) => {
+    return this.list.filter(p => p.visiable).sort((a, b) => {
       return b[sort] - a[sort]
     }).slice(0, this.toolsOption.limit)
   }
@@ -143,7 +144,11 @@ class ProjectStore {
         if (this.currentId) {
           const current = this.project
           newList = newList.filter(p => p.id !== current.id)
-          if (newList.length === list.length) current.visiable = false
+          if (newList.length === list.length) {
+            current.visiable = false
+          }else{
+            current.visiable = true
+          }
           newList.push(current)
         }
         this.list = [...newList]

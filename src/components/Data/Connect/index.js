@@ -216,7 +216,7 @@ export default class DataConnect extends Component {
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
-          <span>choose a data source to connect.</span>
+          <span>Please choose a data source to connect.</span>
         </div>
         {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>

@@ -9,6 +9,15 @@ import { Table } from 'components/Common';
 @observer
 export default class Preview extends Component {
   @observable visiable = false
+  @observable cleanData = []
+
+  constructor(props) {
+    super(props)
+    const { cleanPath, readData } = props.project
+    readData(cleanPath).then(data => {
+      this.cleanData = data
+    })
+  }
 
   showTable = () => {
     this.visiable = true
@@ -19,7 +28,8 @@ export default class Preview extends Component {
   }
 
   formatTable = () => {
-    const { colType, cleanData, target } = this.props.project;
+    const { cleanData, visiable } = this
+    const { colType, target } = this.props.project;
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     // const index = rawHeader.indexOf(target)
@@ -27,13 +37,13 @@ export default class Preview extends Component {
     //   const value = row[index]
     //   return [value, ...row.slice(0, index), ...row.slice(index + 1)]
     // })
+    if (!visiable) return []
     if (!cleanData.length) return []
     const header = cleanData[0]
     const index = header.indexOf(target)
     if (index === -1) return []
     const headerList = [target, ...header.filter(h => h !== target)]
     const realColumn = headerList.length
-
     const realData = cleanData.slice(1).filter(r => r.length === realColumn)
     const data = index === 0 ? realData : realData.map(row => {
       return [row[index], ...row.slice(0, index), ...row.slice(index + 1)]
@@ -100,7 +110,7 @@ export default class Preview extends Component {
         <Table
           columnWidth={110}
           rowHeight={34}
-          columnCount={dataHeader.length - 1}
+          columnCount={dataHeader.length}
           rowCount={tableData.length}
           fixedColumnCount={0}
           fixedRowCount={3}

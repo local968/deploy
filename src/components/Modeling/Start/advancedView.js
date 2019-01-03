@@ -67,6 +67,9 @@ export default class AdvancedView extends Component {
   }
 
   changeCrossCount = value => {
+    const { targetCounts, problemType } = this.props.project
+    const crossCountMax = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
+    if (value >= crossCountMax) return message.error(`One of the classes has number of data points smaller than ${crossCountMax} fold, please select alower fold cv.`)
     this.props.project.crossCount = value;
   }
 
@@ -159,9 +162,11 @@ export default class AdvancedView extends Component {
   }
 
   reset = action(() => {
+    const { targetCounts, problemType } = this.props.project
+    const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
     this.props.project.holdoutRate = 20
     this.props.project.validationRate = 20
-    this.props.project.crossCount = 5
+    this.props.project.crossCount = Math.min((min - 1), 5)
   })
 
   changeSetting = action((e) => {
@@ -179,6 +184,8 @@ export default class AdvancedView extends Component {
   })
 
   resetSetting = action((project) => {
+    const { targetCounts, problemType } = this.props.project
+    const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
     const defaultSetting = {
       version: [1, 2],
       validationRate: 20,
@@ -187,7 +194,7 @@ export default class AdvancedView extends Component {
       measurement: project.changeProjectType === "Classification" ? "auc" : "r2",
       runWith: project.totalRawLines > 10000 ? 'holdout' : 'cross',
       resampling: 'no',
-      crossCount: 5,
+      crossCount: Math.min((min - 1), 5),
       dataRange: 'all',
       customField: '',
       customRange: [],
