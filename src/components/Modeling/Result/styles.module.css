@@ -45,6 +45,7 @@
     flex-direction: column;
     margin-bottom: 0;
 }
+
 .process dd{
     display: flex;
     margin-bottom: 0.1em;
@@ -53,6 +54,10 @@
 
 .process dd div{
     margin-left:15px;
+}
+
+.process dd button{
+    display: flex;
 }
 
 .result {

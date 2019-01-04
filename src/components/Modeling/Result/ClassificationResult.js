@@ -348,8 +348,8 @@ class ModelTable extends Component {
 @observer
 class ModelDetail extends Component {
 
-  @observable type = 'process'
-  @observable visible = true
+  @observable type = '';
+  @observable visible = false;
 
   toggleImpact(type){
     if(!this.visible){//本来是关着的
