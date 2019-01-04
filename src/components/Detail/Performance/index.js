@@ -112,7 +112,7 @@ export default class Performance extends Component {
         <div className={styles.block}>
           <span className={styles.label}>
             <span className={styles.text}>Validation Data Definition</span>
-            <Hint themeStyle={{fontSize:'1rem'}} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
+            <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
           </span>
           <div className={styles.selections}>
             <img
@@ -120,7 +120,7 @@ export default class Performance extends Component {
               src={downloadIcon}
               alt="download"
             />
-            <a className={styles.download} href={deploymentStore.dataDefinition}>
+            <a className={styles.download} href={`/upload/dataDefinition?projectId=${cd.projectId}`} >
               Download
             </a>
           </div>

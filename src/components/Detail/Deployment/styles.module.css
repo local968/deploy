@@ -71,7 +71,7 @@
 .deploymentOption {
   margin-top: 0.37em;
   display: flex;
-  flex: 1 0 0.52em;
+  flex: 0 0 0.52em;
 }
 .label {
   display: flex;

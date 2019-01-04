@@ -10,7 +10,7 @@ import { Popover } from 'antd';
 import config from 'config'
 // import config from 'config';
 
-const transferR2 = (str) => str === 'R2' && 'R²'
+const transferR2 = (str) => str === 'R2' ? 'R²' : str
 
 @inject('scheduleStore', 'deploymentStore', 'routing')
 @observer
@@ -52,9 +52,9 @@ export default class List extends Component {
               </div>
               <div className={styles.item}>
                 <span className={styles.label}>Validation Data Definition</span>
-                <span className={classnames(styles.text, styles.download)}>
+                <a href={`/upload/dataDefinition?projectId=${cd.projectId}`} className={classnames(styles.text, styles.download)}>
                   download
-                </span>
+                </a>
               </div>
             </div>
             <a
@@ -184,11 +184,11 @@ const Alert = ({ text }) => (
 const isExcessThreshold = schedule => {
   if (!schedule.result || !schedule.result.score) return false;
   if (!schedule.threshold || !schedule.threshold.type || !schedule.threshold.value) return false
-  const nameMap = { R2: 'r2', RMSE: 'rmse', AUC: 'auc', Accurancy: 'acc' };
+  const nameMap = { R2: 'r2', RMSE: 'rmse', AUC: 'auc', Accuracy: 'acc' };
   return {
     R2: (threshold, real) => threshold > real,
     RMSE: (threshold, real) => threshold < real,
-    Accurancy: (threshold, real) => threshold > real,
+    Accuracy: (threshold, real) => threshold > real,
     AUC: (threshold, real) => threshold > real
   }[schedule.threshold.type](
     schedule.threshold.value,

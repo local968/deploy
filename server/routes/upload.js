@@ -13,8 +13,8 @@ const { userModelingRestriction, userStorageRestriction } = require('restriction
 const router = new Router()
 
 router.post('/check', async (req, res) => {
-  const {fileSize,type,projectId} = req.body
-  const {userId} = req.session
+  const { fileSize, type, projectId } = req.body
+  const { userId } = req.session
   const host = JSON.parse(await redis.hget(`project:${projectId}`, 'host'))
   if (!fileSize || !userId || !type) return res.json({
     status: 404,
@@ -77,7 +77,7 @@ router.post('/', (req, res) => {
       ext
     }, (result) => (result.status < 0 || result.status === 100) && result)
       .then(result => {
-        const {lines:lineCount=0} = result.result
+        const { lines: lineCount = 0 } = result.result
         fields.createdTime = moment().unix()
         fields.lineCount = lineCount
         fields.from = 'upload'
@@ -92,14 +92,14 @@ router.post('/', (req, res) => {
 })
 
 router.post('/sample', (req, res) => {
-  const {filename} = req.body
-  const {userId} = req.session
+  const { filename } = req.body
+  const { userId } = req.session
   if (!filename || !userId) return res.json({
     status: 404,
     message: 'missing params',
     error: 'missing params'
   })
-  redis.get(`file:sample:${filename}` , (err, data) => {
+  redis.get(`file:sample:${filename}`, (err, data) => {
     if (err) return res.json({ status: 201, message: 'file error' })
     if (!data) return res.json({ status: 202, message: 'file not exist' })
     res.json({ status: 200, message: 'ok', fileId: data })
@@ -107,11 +107,11 @@ router.post('/sample', (req, res) => {
 })
 
 router.get('/dataDefinition', async (req, res) => {
-  const {userId} = req.session
-  const {projectId} = req.query
+  const { userId } = req.session
+  const { projectId } = req.query
   if (!userId) return res.json({ status: 401, message: 'need login', error: 'need login' })
   const rank = await redis.zrank(`user:${userId}:projects:createTime`, projectId)
-  if (rank === null) return redis.json({ status: 404, message: 'project not found.', error: 'project not found.' })
+  if (rank === null) return res.json({ status: 404, message: 'project not found.', error: 'project not found.' })
   const data = JSON.parse(await redis.hget(`project:${projectId}`, 'dataHeader'))
   res.attachment('definition.csv');
   res.type('csv')
@@ -119,8 +119,8 @@ router.get('/dataDefinition', async (req, res) => {
 })
 
 router.get('/test', async (req, res) => {
-  const {userId} = req.session
-  const {id:projectId} = req.query
+  const { userId } = req.session
+  const { id: projectId } = req.query
   const host = await redis.hget(`project:${projectId}`, 'host')
   res.json(host)
 })

@@ -8,7 +8,7 @@
 .modelResult span {
     font-size: 1.125rem;
     display: flex;
-    font-family: SanFranciscoText, serif;
+    font-family: SanFranciscoText;
     line-height: normal;
     align-items: baseline;
     color: #1d2b3c;

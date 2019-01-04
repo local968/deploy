@@ -265,7 +265,7 @@ class SimplifiedViewRow extends Component {
     const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
-    const unique = (isRaw &&  `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
+    const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
@@ -525,6 +525,8 @@ class CreateNewVariable extends Component {
       this.props.onClose()
       this.name = ''
       this.exp = ''
+      this.myFunction = {}
+      this.hideHint()
     })
   }
 
@@ -705,7 +707,7 @@ class CreateNewVariable extends Component {
         break;
       case "Quantile_bin()":
         type = 'Categorical'
-        const quantileBinArray = ["value", "frequency"]
+        const quantileBinArray = ["0", "1"]
         const [b, type1, type2] = numList
         if (isNaN(b.exp) || b.exp.includes(".")) return { isPass: false, message: `${b.exp} must be integer` }
         if (!quantileBinArray.includes(type1.exp.trim())) return { isPass: false, message: `${type1.exp} is not supported` }
@@ -1024,15 +1026,15 @@ class FunctionTips extends Component {
       <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
       <div className={styles.funcTipsContent}><span>Quantile_bin(@var1, @var2, @var3,b, type1, type2)</span></div>
       <div className={styles.funcTipsTitle}><span>Input:</span></div>
-      <div className={styles.funcTipsContent}><span>Quantile_bin()Quantile_bin function allows you to easily construct new variables by dividing selected variables into certain groups depending on its frequency or value.Syntax:Quantile_bin(@var1, @var2, @var3,b, type1, type2)Input:var1, var2, var3... – 1 or more numerical variables to be divided; All variables need to start with@.<br />
+      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be divided; All variables need to start with@.<br />
         b – number of groups to be divided; its number must be greater than 1 but cannotbe larger than the length of the variable(suggestion: many groups are meaningless)<br />
-        type1,type2 – ways to dividing the variables; [frequency] and [value] are supported.<br />
-        [frequency]: variable is divided by its percentile, each group is thesame size;<br />
-        [value]: variable is divided by its value, each group is with the same value range.</span></div>
+        type1,type2 – ways to dividing the variables; 0 and 1 are supported.<br />
+        0: variable is divided by its percentile, each group is thesame size;<br />
+        1: variable is divided by its value, each group is with the same value range.</span></div>
       <div className={styles.funcTipsTitle}><span>Output:</span></div>
       <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
       <div className={styles.funcTipsTitle}><span>Examples:</span></div>
-      <div className={styles.funcTipsContent}><span>Quantile_bin(@age, 3, value)</span></div>
+      <div className={styles.funcTipsContent}><span>Quantile_bin(@age, 3, 1)</span></div>
       <div className={styles.funcTipsContent}><span>Output:</span></div>
       <div className={styles.funcTipsContent}>
         <Table
@@ -1057,7 +1059,7 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsContent}><span>Quantile_bin(@age1, @age2, 4, value,frequency))</span></div>
+      <div className={styles.funcTipsContent}><span>Quantile_bin(@age1, @age2, 4, 1, 0))</span></div>
       <div className={styles.funcTipsContent}><span>Output:</span></div>
       <div className={styles.funcTipsContent}>
         <Table
