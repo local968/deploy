@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
-import { Tooltip } from 'antd';
+import { Tooltip } from 'antd'
 
 @observer
 export default class RegressionView extends Component {
@@ -17,7 +17,7 @@ export default class RegressionView extends Component {
     const { models, project } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current } = project;
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
-    
+
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>

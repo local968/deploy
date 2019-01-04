@@ -21,3 +21,7 @@ body {
   font-family: ShareTech-Regular;
   src: url('./ShareTech-Regular.ttf');
 }
+
+.ant-popover-inner-content dt{
+  text-transform:Capitalize;
+}
