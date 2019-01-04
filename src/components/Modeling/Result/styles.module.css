@@ -8,10 +8,56 @@
 .modelResult span {
     font-size: 1.125rem;
     display: flex;
-    font-family: SanFranciscoText;
+    font-family: SanFranciscoText, serif;
     line-height: normal;
     align-items: baseline;
     color: #1d2b3c;
+}
+
+.process{
+    /*height: 1em;*/
+    padding: 0.2em;
+    border:1px solid #C4CBD7;
+    margin: 0.2em;
+    background-color: #FAFBFC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.process label{
+    font-size: 0.2em;
+}
+
+.process img{
+    width: 30px;
+    margin: 0 20px;
+}
+
+.process button span {
+    font-size: 14px;
+    float: left;
+}
+
+.process dl{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.process dd{
+    display: flex;
+    margin-bottom: 0.1em;
+    align-items: center;
+}
+
+.process dd div{
+    margin-left:15px;
+}
+
+.process dd button{
+    display: flex;
 }
 
 .result {
@@ -373,6 +419,10 @@
 .compute span {
     color: #448eed;
     text-decoration: underline;
+}
+
+.compute img{
+  margin-right: 10px;
 }
 
 .modelSelect {
