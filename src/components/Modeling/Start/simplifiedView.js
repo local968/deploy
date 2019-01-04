@@ -265,7 +265,7 @@ class SimplifiedViewRow extends Component {
     const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
-    const unique = (isRaw &&  `${lines}+`) || (valueType === 'Numerical') && 'N/A' || data.uniqueValues
+    const unique = (isRaw &&  `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>

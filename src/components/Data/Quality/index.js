@@ -339,9 +339,9 @@ class VariableIssue extends Component {
   render() {
     const { project, changeTab } = this.props;
     const { issues, dataHeader, etling, etlProgress, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project;
-    const nullCount = Object.values(nullLineCounts || {}).reduce((sum, v) => sum += Number.isInteger(v) ? v : 0, 0)
-    const mismatchCount = Object.values(mismatchLineCounts || {}).reduce((sum, v) => sum += Number.isInteger(v) ? v : 0, 0)
-    const outlierCount = Object.values(outlierLineCounts || {}).reduce((sum, v) => sum += Number.isInteger(v) ? v : 0, 0)
+    const nullCount = Object.values(nullLineCounts || {}).reduce((sum, v) => sum + Number.isInteger(v) ? v : 0, 0)
+    const mismatchCount = Object.values(mismatchLineCounts || {}).reduce((sum, v) => sum + Number.isInteger(v) ? v : 0, 0)
+    const outlierCount = Object.values(outlierLineCounts || {}).reduce((sum, v) => sum + Number.isInteger(v) ? v : 0, 0)
     const tableData = this.formatTable()
     return <div className={styles.quality}>
       <div className={styles.issue}>

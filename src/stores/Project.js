@@ -621,9 +621,9 @@ export default class Project {
       data.targetRowIssue = true
     }
 
-    const nullCount = Object.values(nullLineCounts || {}).reduce((sum, v) => sum  += Number.isInteger(v) ? v : 0, 0)
-    const mismatchCount = Object.values(mismatchLineCounts || {}).reduce((sum, v) => sum  += Number.isInteger(v) ? v : 0, 0)
-    const outlierCount = Object.values(outlierLineCounts || {}).reduce((sum, v) => sum  += Number.isInteger(v) ? v : 0, 0)
+    const nullCount = Object.values(nullLineCounts || {}).reduce((sum, v) => sum  + Number.isInteger(v) ? v : 0, 0)
+    const mismatchCount = Object.values(mismatchLineCounts || {}).reduce((sum, v) => sum  + Number.isInteger(v) ? v : 0, 0)
+    const outlierCount = Object.values(outlierLineCounts || {}).reduce((sum, v) => sum  + Number.isInteger(v) ? v : 0, 0)
 
     if ((nullCount + mismatchCount + outlierCount) > 0) {
       data.dataIssue = true
