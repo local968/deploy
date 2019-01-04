@@ -83,7 +83,6 @@ export default class List extends Component {
               <div className={styles.list}>
                 {scheduleStore.sortedPerformanceSchedules.map(s => (
                   <div className={styles.project} key={s.schedule.id}>
-                    {console.log(s)}
                     <span className={styles.modelName} title={s.schedule.modelName}>{s.schedule.modelName}</span>
                     <span className={styles.modelInvokeTime}>
                       {isNaN(s.schedule.actualTime || s.schedule.estimatedTime)
