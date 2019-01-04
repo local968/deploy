@@ -538,11 +538,11 @@ export class FixIssue extends Component {
   }
 
   render() {
-    const { closeFixes, project, isTarget, issueRows } = this.props;
+    const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
     const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
-        {!!issueRows.mismatchRow.length && <div className={styles.fixesArea}>
+        {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
@@ -601,7 +601,7 @@ export class FixIssue extends Component {
             </div>
           </div>
         </div>}
-        {!!issueRows.nullRow.length && <div className={styles.fixesArea}>
+        {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.missing)}></div>
@@ -666,7 +666,7 @@ export class FixIssue extends Component {
             </div>
           </div>
         </div>}
-        {!!issueRows.outlierRow.length && <div className={styles.fixesArea}>
+        {!!outlierCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.outlier)}></div>

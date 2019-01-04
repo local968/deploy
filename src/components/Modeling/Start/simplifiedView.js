@@ -107,7 +107,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader } = project;
+    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines } = project;
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
@@ -223,7 +223,7 @@ export default class SimplifiedView extends Component {
               const data = dataViews ? (dataViews[h] || {}) : {}
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} id={id} />
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
             })}
           </div>}
       </div>
@@ -262,9 +262,10 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, importance, colType, value, project, isChecked, handleCheck, id } = this.props;
+    const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
+    const unique = (isRaw &&  `${lines}+`) || (valueType === 'Numerical') && 'N/A' || data.uniqueValues
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
@@ -303,8 +304,8 @@ class SimplifiedViewRow extends Component {
       </div>
       <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
       <div className={classnames(styles.tableTd, {
-        [styles.none]: valueType !== 'Categorical' || isRaw
-      })} title={(valueType !== 'Categorical' || isRaw) ? 'N/A' : data.uniqueValues}><span>{(valueType !== 'Categorical' || isRaw) ? 'N/A' : data.uniqueValues}</span></div>
+        [styles.none]: valueType !== 'Categorical'
+      })} title={unique}><span>{unique}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
       })} title={this.formatNumber(data.mean, valueType === 'Categorical')}><span>{this.formatNumber(data.mean, valueType === 'Categorical')}</span></div>

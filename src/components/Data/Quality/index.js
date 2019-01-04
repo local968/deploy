@@ -82,6 +82,9 @@ class TargetIssue extends Component {
       mismatch: (colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0) * 100 / (totalRawLines || 1),
       outlier: colType[target] === 'Numerical' ? outlierLineCounts[target] * 100 / (totalRawLines || 1) : 0,
     }
+    const nullCount = Number.isInteger(nullLineCounts[target]) ? nullLineCounts[target] : 0
+    const mismatchCount = Number.isInteger(mismatchLineCounts[target]) ? mismatchLineCounts[target] : 0
+    const outlierCount = Number.isInteger(outlierLineCounts[target]) ? outlierLineCounts[target] : 0
     const warnings = []
     const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
     if (problemType === 'Classification') {
@@ -91,7 +94,7 @@ class TargetIssue extends Component {
         if (min < 3) warnings.push("It is recommended that you re-select target or upload new data.")
       }
     }
-    if((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push("Your target variable is empty, It is recommended that you reselect a target variable or upload new data.")
+    if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push("Your target variable is empty, It is recommended that you reselect a target variable or upload new data.")
     const cannotContinue = !!warnings.length || (problemType === 'Classification' && issues.targetIssue)
     const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue && !(problemType !== 'Classification' && issues.targetRowIssue)
     return <div className={styles.quality}>
@@ -123,15 +126,15 @@ class TargetIssue extends Component {
         {isClean && <div className={styles.cleanTitle}><span>Target variable quality looks good!</span></div>}
       </div>
       <div className={styles.typeBox}>
-        {!!targetIssues.mismatchRow.length && <div className={styles.type}>
+        {!!nullCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
           <span>Data Type Mismatch</span>
         </div>}
-        {!!targetIssues.nullRow.length && <div className={styles.type}>
+        {!!mismatchCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
           <span>Missing Value</span>
         </div>}
-        {!!targetIssues.outlierRow.length && <div className={styles.type}>
+        {!!outlierCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
           <span>Outlier</span>
         </div>}
@@ -189,7 +192,9 @@ class TargetIssue extends Component {
             percent={targetPercent} />}
         </div>
         <Modal content={<FixIssue project={project}
-          issueRows={targetIssues}
+          nullCount={nullCount}
+          mismatchCount={mismatchCount}
+          outlierCount={outlierCount}
           closeFixes={this.closeFixes}
           saveDataFixes={this.saveDataFixes}
           isTarget={true} />}
@@ -235,7 +240,7 @@ class VariableIssue extends Component {
 
   showSummary = () => {
     const { project } = this.props
-    project.endQuality().then(() => this.summary = true).catch(() => {message.error("error!!")})
+    project.endQuality().then(() => this.summary = true).catch(() => { message.error("error!!") })
   }
 
   closeSummary = () => {
@@ -333,7 +338,10 @@ class VariableIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, issueRows, dataHeader, etling, etlProgress } = project;
+    const { issues, dataHeader, etling, etlProgress, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project;
+    const nullCount = Object.values(nullLineCounts || {}).reduce((sum, v) => sum += Number.isInteger(v) ? v : 0, 0)
+    const mismatchCount = Object.values(mismatchLineCounts || {}).reduce((sum, v) => sum += Number.isInteger(v) ? v : 0, 0)
+    const outlierCount = Object.values(outlierLineCounts || {}).reduce((sum, v) => sum += Number.isInteger(v) ? v : 0, 0)
     const tableData = this.formatTable()
     return <div className={styles.quality}>
       <div className={styles.issue}>
@@ -358,15 +366,15 @@ class VariableIssue extends Component {
         </div>
       </div>
       <div className={styles.typeBox}>
-        {!!issueRows.mismatchRow.length && <div className={styles.type}>
+        {!!nullCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
           <span>Data Type Mismatch</span>
         </div>}
-        {!!issueRows.nullRow.length && <div className={styles.type}>
+        {!!mismatchCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
           <span>Missing Value</span>
         </div>}
-        {!!issueRows.outlierRow.length && <div className={styles.type}>
+        {!!outlierCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
           <span>Outlier</span>
         </div>}
@@ -396,7 +404,9 @@ class VariableIssue extends Component {
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
       <Modal content={<FixIssue project={project}
-        issueRows={issueRows}
+        nullCount={nullCount}
+        mismatchCount={mismatchCount}
+        outlierCount={outlierCount}
         closeFixes={this.closeFixes}
         saveDataFixes={this.saveDataFixes}
         isTarget={false} />}

@@ -604,7 +604,7 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, issueRows, targetIssues, rawDataView, rawHeader, target } = this;
+    const { problemType, totalRawLines, targetColMap, targetIssues, rawDataView, rawHeader, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = this;
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
@@ -621,7 +621,11 @@ export default class Project {
       data.targetRowIssue = true
     }
 
-    if (issueRows.errorRow.length) {
+    const nullCount = Object.values(nullLineCounts || {}).reduce((sum, v) => sum  += Number.isInteger(v) ? v : 0, 0)
+    const mismatchCount = Object.values(mismatchLineCounts || {}).reduce((sum, v) => sum  += Number.isInteger(v) ? v : 0, 0)
+    const outlierCount = Object.values(outlierLineCounts || {}).reduce((sum, v) => sum  += Number.isInteger(v) ? v : 0, 0)
+
+    if ((nullCount + mismatchCount + outlierCount) > 0) {
       data.dataIssue = true
     }
 
@@ -672,34 +676,6 @@ export default class Project {
     }
 
     arr.errorRow = Array.from(new Set([...arr.mismatchRow, ...arr.nullRow, ...arr.outlierRow]))
-    return arr
-  }
-
-  @computed
-  get issueRows() {
-    const { dataHeader, mismatchIndex, nullIndex, outlierIndex, colType, target } = this;
-    const arr = {
-      mismatchRow: [],
-      nullRow: [],
-      outlierRow: [],
-      errorRow: []
-    }
-
-    dataHeader.forEach(h => {
-      if (h === target) return;
-      if (colType[h] !== "Categorical" && mismatchIndex[h] && !!mismatchIndex[h].length) {
-        arr.mismatchRow = Array.from(new Set(arr.mismatchRow.concat([...mismatchIndex[h]])));
-        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...mismatchIndex[h]])));
-      }
-      if (nullIndex[h] && !!nullIndex[h].length) {
-        arr.nullRow = Array.from(new Set(arr.nullRow.concat([...nullIndex[h]])));
-        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...nullIndex[h]])));
-      }
-      if (colType[h] !== "Categorical" && outlierIndex[h] && !!outlierIndex[h].length) {
-        arr.outlierRow = Array.from(new Set(arr.outlierRow.concat([...outlierIndex[h]])));
-        arr.errorRow = Array.from(new Set(arr.errorRow.concat([...outlierIndex[h]])));
-      }
-    })
     return arr
   }
 
