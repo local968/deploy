@@ -604,7 +604,7 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, targetIssues, rawDataView, rawHeader, target, nullLineCounts, mismatchLineCounts, outlierLineCounts } = this;
+    const { problemType, totalRawLines, targetColMap, targetIssues, rawDataView, rawHeader, target, variableIssueCount } = this;
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
@@ -621,11 +621,7 @@ export default class Project {
       data.targetRowIssue = true
     }
 
-    const nullCount = Object.values(nullLineCounts || {}).reduce((sum, v) => sum  + Number.isInteger(v) ? v : 0, 0)
-    const mismatchCount = Object.values(mismatchLineCounts || {}).reduce((sum, v) => sum  + Number.isInteger(v) ? v : 0, 0)
-    const outlierCount = Object.values(outlierLineCounts || {}).reduce((sum, v) => sum  + Number.isInteger(v) ? v : 0, 0)
-
-    if ((nullCount + mismatchCount + outlierCount) > 0) {
+    if ((variableIssueCount.nullCount + variableIssueCount.mismatchCount + variableIssueCount.outlierCount) > 0) {
       data.dataIssue = true
     }
 
@@ -653,6 +649,15 @@ export default class Project {
       }
     })
     return obj
+  }
+
+  get variableIssueCount() {
+    const {nullLineCounts, mismatchLineCounts, outlierLineCounts, target} = this
+    const nullCount = Object.values(Object.assign({}, nullLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    
+    return {nullCount, mismatchCount, outlierCount}
   }
 
   @computed
