@@ -1,38 +1,62 @@
-import React, {Component} from 'react';
-import styles from './styles.module.css';
-import {Tag} from 'antd';
+import React, { Component } from "react";
+import styles from "./styles.module.css";
+import { Tree,Input } from "antd";
+import {observable, action,toJS} from 'mobx';
+import {observer} from 'mobx-react';
+import Article from './article.js'
+const { TreeNode } = Tree;
+const {Search} = Input;
 
+const _data = observable({
+    selectedKeys:['1.1'],
+});
+
+const _change = action((name,value)=>_data[name] = value)
+
+@observer
 export default class Support extends Component {
 
-  _download(filename,downname){
-    var a  = document.createElement("a")
-    a.href = `/${filename}`
-    a.download = downname
-    a.click();
-  }
+    constructor(props){
+        super(props);
+    }
+
+    onSelect(selectedKeys, info){
+        _change('selectedKeys',selectedKeys)
+    }
 
   render() {
-    return (
-      <div className={styles.content}>
-        <div className={styles.header}>R2.ai Support - Product Manual</div>
-        <div className={styles.item}>
-            R2-Learn User Manual
-            <Tag className={styles.tag} onClick={()=>{
-              this._download('support-eng.docx','R2-Learn User Manual.docx')
-            }}>docs</Tag>
-        </div>
+        const selectedKeys = toJS(_data.selectedKeys);
+    return <section style={{width:'100%'}}>
+        <header className={styles.header}>Welcome to R<span>2</span>.ai support</header>
+        <div className={styles.main}>
+            <div className={styles.menu}>
+                <p>CATALOGUE</p>
+                <Tree
+                    showLine
+                    onSelect={this.onSelect}
+                    selectedKeys={selectedKeys}
+                    // onExpand={this.onExpand}
+                    // expandedKeys={expandedKeys}
+                    // autoExpandParent={autoExpandParent}
+                >
+                    <TreeNode title="1.Overview" key="1">
+                        <TreeNode title="Machine learning" key="1.1"/>
+                        <TreeNode title="Machine learning with R2-Learn" key="1.2"/>
+                    </TreeNode>
 
-        <div className={styles.item}>
-            R2-learn产品操作手册-中文
-            <Tag className={styles.tag} onClick={()=>{
-              this._download('support-chn.docx','R2-learn产品操作手册.docx')
-            }}>docs</Tag>
-            <Tag className={styles.tag} onClick={()=>{
-              this._download('support-chn.pdf','R2-learn产品操作手册.pdf')
-            }}>pdf</Tag>
+                    <TreeNode title="2. Getting started with R2-Learn" key="2">
+                        <TreeNode title="Software requirements" key="2.1"/>
+                        <TreeNode title="Importing data into R2-Learn" key="2.2">
+                            <TreeNode title="Importing data from a database" key="2.2.1"/>
+                            <TreeNode title="Importing a local file" key="2.2.2"/>
+                        </TreeNode>
+                    </TreeNode>
+                </Tree>
+            </div>
+            <div className={styles.content}>
+                <Article/>
+            </div>
         </div>
-
-      </div>
-    )
+    </section>
   }
 }
