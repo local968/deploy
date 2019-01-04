@@ -582,7 +582,7 @@ wss.register('dataView', (message, socket, progress) => {
       if (status === 100) {
         const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
         await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false })
-        if (updateResult && updateResult.dataViewsLoading) returnValue.result.data = updateResult.dataViewsLoading
+        if (updateResult && updateResult.dataViews) returnValue.result.data = updateResult.dataViews
       }
       return returnValue
     }))
@@ -671,7 +671,7 @@ wss.register('createNewVariable', _sendToCommand)
 wss.register('abortTrain', (message, socket) => {
   const { projectId, isLoading, _id: requestId } = message
   const { userId } = socket.session
-  return command({ ...message, userId, requestId }).then(() => {
+  return command({ ...message, userId, requestId }, () => {
     const statusData = {
       train2Finished: true,
       train2ing: false,

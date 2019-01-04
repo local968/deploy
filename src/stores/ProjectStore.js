@@ -146,7 +146,7 @@ class ProjectStore {
           newList = newList.filter(p => p.id !== current.id)
           if (newList.length === list.length) {
             current.visiable = false
-          }else{
+          } else {
             current.visiable = true
           }
           newList.push(current)

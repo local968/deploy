@@ -4,6 +4,7 @@ const { Router } = require('express')
 const config = require('../config');
 const router = new Router()
 const crypto = require('crypto')
+const command = require('./command')
 
 // const nodeId = uuid()
 const nodeId = 1
@@ -39,6 +40,17 @@ const removeMessage = async (message, user) => {
 }
 
 const init = async (wss) => {
+  try {
+    await command({
+      command: 'clearWaitingQueue',
+      projectId: '-1',
+      userId: 'user',
+      requestId: "requestId"
+    })
+  } catch (e) {
+    console.log(e.message)
+  }
+
   const emits = []
   let left = await redis.scard(`node:${nodeId}:messages`)
   if (left === 0) return

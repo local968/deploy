@@ -988,6 +988,16 @@ export default class Project {
     const featureLabel = dataHeader.filter(v => !trainHeader.includes(v) && v !== target)
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
 
+    // if (newVariableLabel.length) {
+    //   const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+    //   trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+    // }
+
+    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy } = this;
+    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy }
+    const curSetting = this.settings.find(s => s.id === this.settingId)
+    curSetting.setting = setting
+
     const trainData = {
       problemType,
       featureLabel: [...featureLabel, ...newVariableLabel],
@@ -1001,7 +1011,7 @@ export default class Project {
       version: this.version.join(","),
       algorithms: [...this.algorithms],
       ensembleSize: this.ensembleSize,
-      settingId: this.settingId,
+      settingName: curSetting.name,
       measurement: this.measurement
     };
 
@@ -1015,14 +1025,6 @@ export default class Project {
     } else {
       trainData.splitBy = [this.customField, ...this.customRange]
     }
-    // if (newVariableLabel.length) {
-    //   const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
-    //   trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
-    // }
-
-    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy } = this;
-    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy }
-    this.settings.find(s => s.id === this.settingId).setting = setting
 
     this.modeling(trainData, Object.assign({
       train2Finished: false,
