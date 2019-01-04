@@ -26,6 +26,7 @@
     white-space: nowrap;
 }
 
+
 .process label{
     font-size: 0.2em;
 }
@@ -33,6 +34,14 @@
 .process img{
     width: 30px;
     margin: 0 20px;
+}
+.many img{
+    width: 15px;
+    margin:0 5px;
+}
+
+.process label{
+    font-size: 0.15em;
 }
 
 .process button span {

@@ -69,7 +69,7 @@ export default class ModelProcessFlow extends Component {
                     <label>Prediction</label>
                 </section>
             }else{
-                return <section className={styles.process}>
+                return <section className={`${styles.process} ${styles.many}`}>
                     <label>Raw Data</label>
                     <img src={Next} alt=''/>
                     <dl>
