@@ -65,6 +65,7 @@ export default class AdvancedView extends Component {
     const { models, project } = this.props
     let _filtedModels = [...models]
     const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
+    const metricKey = this.metric.key
     const formatNumber = number => {
       try {
         number = parseFloat(number)
@@ -166,14 +167,14 @@ export default class AdvancedView extends Component {
           }
         case 'Validation':
           {
-            const aModelData = formatNumber(aModel.score.validateScore[this.metric.key])
-            const bModelData = formatNumber(bModel.score.validateScore[this.metric.key])
+            const aModelData = metricKey === 'acc' ? formatNumber(aModel.validationAcc) : formatNumber(aModel.score.validateScore[metricKey])
+            const bModelData = metricKey === 'acc' ? formatNumber(bModel.validationAcc) : formatNumber(bModel.score.validateScore[metricKey])
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Holdout':
           {
-            const aModelData = formatNumber(aModel.score.holdoutScore[this.metric.key])
-            const bModelData = formatNumber(bModel.score.holdoutScore[this.metric.key])
+            const aModelData = metricKey === 'acc' ? formatNumber(aModel.holdoutAcc) : formatNumber(aModel.score.holdoutScore[metricKey])
+            const bModelData = metricKey === 'acc' ? formatNumber(bModel.holdoutAcc) : formatNumber(bModel.score.holdoutScore[metricKey])
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Model Name':
@@ -243,9 +244,9 @@ export default class AdvancedView extends Component {
     this.currentSettingId = settingId
   })
 
-  handleChange = value => {
+  handleChange = action(value => {
     this.metric = this.metricOptions.find(m => m.key === value);
-  }
+  })
 
   constructor(props) {
     super(props)
