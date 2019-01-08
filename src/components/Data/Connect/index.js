@@ -90,6 +90,7 @@ export default class DataConnect extends Component {
 
   onUpload = ({ pause, resume }) => {
     this.uploading = true
+    this.isPause = false
     this.pause = pause
     this.resume = resume
   }
