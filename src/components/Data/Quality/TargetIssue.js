@@ -542,7 +542,7 @@ export class FixIssue extends Component {
     const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
-        {!!nullCount && <div className={styles.fixesArea}>
+        {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
@@ -601,7 +601,7 @@ export class FixIssue extends Component {
             </div>
           </div>
         </div>}
-        {!!mismatchCount && <div className={styles.fixesArea}>
+        {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.missing)}></div>

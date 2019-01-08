@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Progress, Tooltip } from 'antd';
+import { Progress, Tooltip, Icon } from 'antd';
 import { observable } from 'mobx';
 import { Hint, NumberInput } from 'components/Common';
 import VariableImpact from "./VariableImpact"
@@ -68,7 +68,7 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
@@ -156,6 +156,7 @@ export default class ClassificationView extends Component {
         train2Finished={train2Finished}
         trainModel={trainModel}
         abortTrain={abortTrain}
+        isAbort={isAbort}
       />
     </div>
   }
@@ -272,7 +273,7 @@ class Performance extends Component {
 @observer
 class ModelTable extends Component {
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, abortTrain } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, abortTrain, isAbort } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -335,8 +336,8 @@ class ModelTable extends Component {
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>
-            <div className={styles.abortButton} onClick={abortTrain.bind(null, false)}>
-              <span>Abort Training</span>
+            <div className={styles.abortButton} onClick={!isAbort && abortTrain.bind(null, false)}>
+              {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>
           </div>}
         </div>
@@ -351,15 +352,15 @@ class ModelDetail extends Component {
   @observable type = '';
   @observable visible = false;
 
-  toggleImpact(type){
-    if(!this.visible){//本来是关着的
+  toggleImpact(type) {
+    if (!this.visible) {//本来是关着的
       this.type = type
       this.visible = true
       return
     }
-    if(this.type === type){
-        this.visible = false
-    }else{
+    if (this.type === type) {
+      this.visible = false
+    } else {
       this.type = type
     }
   }
@@ -409,17 +410,17 @@ class ModelDetail extends Component {
             <span>{model.executeSpeed + ' rows/s'}</span>
           </div>
           <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Variable} alt=""/>
-            <span onClick={this.toggleImpact.bind(this,'impact')}>Compute</span>
+            <img src={Variable} alt="" />
+            <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
           </div>
           <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Process} alt=""/>
-            <span onClick={this.toggleImpact.bind(this,'process')}>Compute</span>
+            <img src={Process} alt="" />
+            <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
           </div>
         </div>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-        {this.visible && this.type === 'impact'&&<VariableImpact model={model} />}
-        {this.visible && this.type === 'process'&&<ModelProcessFlow model={model} />}
+        {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
+        {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
       </div>
     );
   }

@@ -80,22 +80,23 @@ export default class DataConnect extends Component {
   @computed
   get message() {
     if (this.isPause) return 'Paused'
-    const process = this.props.projectStore.project.etling ? 90 : this.process
+    const process = this.props.projectStore.project.etling ? 50 : this.process
     if (!this.isSql && process === 0) return 'Preparing for upload...'
-    if (!this.isSql && process > 0 && process < 90) return 'Uploading data...'
-    if (process >= 90) return 'Extract-Transform-Load in progress...'
+    if (!this.isSql && process > 0 && process < 50) return 'Uploading data...'
+    if (process >= 50) return 'Extract-Transform-Load in progress...'
     if (this.isSql && process === 0) return 'Perparing for database connection...'
-    if (this.isSql && process >= 20 && process < 90) return `Downloaded Data: ${this.sqlProgress} rows`
+    if (this.isSql && process >= 20 && process < 50) return `Downloaded Data: ${this.sqlProgress} rows`
   }
 
   onUpload = ({ pause, resume }) => {
     this.uploading = true
+    this.isPause = false
     this.pause = pause
     this.resume = resume
   }
 
   upload = action(data => {
-    this.process = 90
+    this.process = 50
     this.file = null
 
     this.props.projectStore.project.fastTrackInit(data.fileId).then(() => {
@@ -116,7 +117,7 @@ export default class DataConnect extends Component {
     if (!this.uploading) return
     const [loaded, size] = progress.split("/")
     try {
-      this.process = (parseFloat(loaded) / parseFloat(size)) * 90
+      this.process = (parseFloat(loaded) / parseFloat(size)) * 50
     } catch (e) { }
   })
 
@@ -133,7 +134,7 @@ export default class DataConnect extends Component {
   })
 
   selectSample = filename => {
-    const process = this.props.projectStore.project.etling ? 90 : this.process
+    const process = this.props.projectStore.project.etling ? 50 : this.process
     if (!!process) return false;
 
     this.uploading = true
@@ -141,7 +142,7 @@ export default class DataConnect extends Component {
     axios.post(`http://${config.host}:${config.port}/upload/sample`, { filename }).then(
       action(data => {
         const { fileId } = data.data
-        this.process = 90
+        this.process = 50
         this.props.projectStore.project.fastTrackInit(fileId).then(() => {
           this.process = 0
           this.uploading = false
@@ -177,7 +178,7 @@ export default class DataConnect extends Component {
 
   handleDrop = action((e) => {
     e.preventDefault();
-    const process = this.props.projectStore.project.etling ? 90 : this.process
+    const process = this.props.projectStore.project.etling ? 50 : this.process
     if (process) return false;
     let file = e.dataTransfer.files[0];
     this.file = file
@@ -200,8 +201,8 @@ export default class DataConnect extends Component {
   }
 
   closeUpload = () => {
-    const process = this.props.projectStore.project.etling ? 90 : this.process
-    if (process >= 90) this.props.projectStore.project.abortEtl()
+    const process = this.props.projectStore.project.etling ? 50 : this.process
+    if (process >= 50) this.props.projectStore.project.abortEtl()
     this.pause && this.pause()
     this.uploading = false
     this.process = 0
@@ -211,7 +212,7 @@ export default class DataConnect extends Component {
   render() {
     const { projectStore: { project }, userStore, socketStore } = this.props;
     const { etlProgress, etling } = project
-    const process = etling ? 90 : this.process
+    const process = etling ? 50 : this.process
     window.cn = this
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
@@ -282,7 +283,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressing}>
                   <Progress
-                    percent={process + (etlProgress || 0) / 10}
+                    percent={process + (etlProgress || 0) / 2}
                     status="active"
                     strokeWidth={12}
                     showInfo={false}
@@ -290,7 +291,7 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressText}>
                   <span>{this.message}</span>
-                  {(process < 90 && process > 0 && !this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
+                  {(process < 50 && process > 0 && !this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
                 </div>
               </div>
             </div>
@@ -313,7 +314,7 @@ export default class DataConnect extends Component {
               if (result.value === 0) {
                 this.process = 20
                 processInterval = setInterval(() => {
-                  if (this.process && this.process < 90) this.process++
+                  if (this.process && this.process < 50) this.process++
                 }, 1000)
               }
               if (result.value) this.sqlProgress = result.value
@@ -321,7 +322,7 @@ export default class DataConnect extends Component {
             clearInterval(processInterval)
             if (resp.status !== 200) return message.error(resp.message)
             const fileId = resp.fileId
-            this.process = 90
+            this.process = 50
             project.fastTrackInit(fileId).then(() => {
               this.process = 0
               this.uploading = false
