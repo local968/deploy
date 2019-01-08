@@ -6,6 +6,10 @@ import { observable } from 'mobx';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
 import { Tooltip } from 'antd'
+import ModelProcessFlow from "./ModelProcessFlow";
+import Process from "./Process.svg";
+import Variable from "./Variable.svg";
+
 
 @observer
 export default class RegressionView extends Component {
@@ -122,7 +126,9 @@ class ModelTable extends Component {
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Variable Impact</span>
             </div>
-            {/* <div className={classnames(styles.cell, styles.cellHeader)}><span>Process Flow</span></div> */}
+            <div className={classnames(styles.cell, styles.cellHeader)}>
+              <span>Model Process Flow</span>
+            </div>
           </div>
         </div>
         <div className={styles.data}>
@@ -158,13 +164,21 @@ class ModelTable extends Component {
 
 @observer
 class ModelDetail extends Component {
-  @observable type = ''
-  @observable visible = false
+  @observable type = '';
+  @observable visible = false;
 
-  toggleImpact = () => {
-    this.type = 'impact'
-    this.visible = !this.visible
-  };
+  toggleImpact(type){
+    if(!this.visible){//本来是关着的
+      this.type = type
+      this.visible = true
+      return
+    }
+    if(this.type === type){
+      this.visible = false
+    }else{
+      this.type = type
+    }
+  }
 
   render() {
     const { model, onSelect, current } = this.props;
@@ -196,11 +210,18 @@ class ModelDetail extends Component {
             <span>{model.executeSpeed + ' rows/s'}</span>
           </div>
           <div className={classnames(styles.cell, styles.compute)}>
-            <span onClick={this.toggleImpact}>Compute</span>
+            <img src={Variable} alt=""/>
+            <span onClick={this.toggleImpact.bind(this,'impact')}>Compute</span>
+          </div>
+          <div className={classnames(styles.cell, styles.compute)}>
+            <img src={Process} alt=""/>
+            <span onClick={this.toggleImpact.bind(this,'process')}>Compute</span>
           </div>
         </div>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-        {this.visible && <VariableImpact model={model} />}
+        {/*{this.visible && <VariableImpact model={model} />}*/}
+        {this.visible && this.type === 'impact'&&<VariableImpact model={model} />}
+        {this.visible && this.type === 'process'&&<ModelProcessFlow model={model} />}
       </div>
     );
   }

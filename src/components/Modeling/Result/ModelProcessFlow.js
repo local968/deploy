@@ -54,9 +54,15 @@ export default class ModelProcessFlow extends Component {
     }
 
     Third(data){
-        const name = data['classifier:__choice__'];
+        let name = data['classifier:__choice__'];
+        let type = `classifier:${name}:`;
+        if(!name){
+            name = data['regressor:__choice__'];
+            type = `regressor:${name}:`;
+        }
+
         return <dl>
-            {this.list(data,`classifier:${name}:`,'')}
+            {this.list(data,type,'')}
         </dl>;
     }
 
