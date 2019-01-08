@@ -32,8 +32,24 @@ export default class ModelProcessFlow extends Component {
 
     FP(data){
         const name = data['preprocessor:__choice__'];
+       const types =  {
+            'extra_trees_preproc_for_classification':'extreml.rand.trees.prepr.',
+            'extra_trees_preproc_for_regression': 'extreml.rand.trees.prepr.',
+            'fast_ica':'ICA',
+            'feature_agglomeration': 'Feature Agglomeration',
+            'kernel_pca':'kernel PCA',
+            'kitchen_sinks': 'Kitchen Sinks',
+            'linear_svc_preprocessor':'Linear SVM prepr.',
+            'no_preprocessor':'No Preprocessing',
+            'nystroem_sampler': 'Nystroem Sampler',
+            'pca':'PCA',
+            'polynomial':'Polynomial',
+            'random_trees_embedding':'Random Trees embed.',
+            'select_percentile_classification': 'Select Percentile',
+            'select_percentile_regression':'Select Percentile',
+            'select_rates':'Select Rates'};
         return <dl>
-            {this.list(data,`preprocessor:${name}:`,name,true)}
+            {this.list(data,`preprocessor:${name}:`,types[name],true)}
         </dl>
     }
 
