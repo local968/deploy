@@ -138,6 +138,7 @@ export default class Project {
 
   @observable stopModel = false
   @observable stopEtl = false
+  @observable isAbort = false
 
   constructor(id, args) {
     this.id = id
@@ -652,12 +653,12 @@ export default class Project {
   }
 
   get variableIssueCount() {
-    const {nullLineCounts, mismatchLineCounts, outlierLineCounts, target} = this
-    const nullCount = Object.values(Object.assign({}, nullLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    
-    return {nullCount, mismatchCount, outlierCount}
+    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target } = this
+    const nullCount = Object.values(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+
+    return { nullCount, mismatchCount, outlierCount }
   }
 
   @computed

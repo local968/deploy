@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
-import { Progress } from 'antd';
+import { Progress, Icon } from 'antd';
 
 @inject('projectStore')
 @observer
 export default class Loading extends Component {
   render() {
-    const { abortTrain, trainModel } = this.props.projectStore.project
+    const { abortTrain, trainModel, isAbort } = this.props.projectStore.project
     return (
       <div className={styles.loading}>
         <div className={styles.training}>
@@ -23,7 +23,7 @@ export default class Loading extends Component {
         </div>
         <div className={styles.trainingAbort}>
           <div className={styles.abortButton} onClick={abortTrain.bind(null, true)}>
-            <span>Abort Training</span>
+            {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
           </div>
         </div>
       </div>

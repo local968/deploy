@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
-import { Tooltip } from 'antd'
+import { Tooltip, Icon } from 'antd'
 
 @observer
 export default class RegressionView extends Component {
@@ -15,9 +15,8 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort } = project;
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
-
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -58,6 +57,7 @@ export default class RegressionView extends Component {
         train2Finished={train2Finished}
         trainModel={trainModel}
         abortTrain={abortTrain}
+        isAbort={isAbort}
       />
     </div>
   }
@@ -94,7 +94,7 @@ class Performance extends Component {
 @observer
 class ModelTable extends Component {
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, abortTrain } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, abortTrain, isAbort } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -146,8 +146,8 @@ class ModelTable extends Component {
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>
-            <div className={styles.abortButton} onClick={abortTrain.bind(null, false)}>
-              <span>Abort Training</span>
+            <div className={styles.abortButton} onClick={!isAbort && abortTrain.bind(null, false)}>
+              {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>
           </div>}
         </div>

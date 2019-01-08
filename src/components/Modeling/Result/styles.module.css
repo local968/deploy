@@ -754,6 +754,10 @@
     cursor: pointer;
 }
 
+.abortButton :global(.anticon) {
+  font-size: 1rem;
+}
+
 .abortButton span {
     font-size: 1rem;
     font-weight: bold;
