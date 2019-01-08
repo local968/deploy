@@ -7,10 +7,6 @@ import {Popover,Button,Icon,Tag} from 'antd'
 @observer
 export default class ModelProcessFlow extends Component {
 
-    constructor(props){
-        super(props);
-    }
-
     list(data,type,name,show=false){
         const _data = Object.entries(data).filter(itm=>itm[0].startsWith(type));
         if(_data.length||show){
@@ -49,7 +45,7 @@ export default class ModelProcessFlow extends Component {
     }
 
     render() {
-            const {dataFlow} = this.props.model;
+            const {dataFlow,name=''} = this.props.model;
             if(dataFlow.length === 1) {
                 return <section className={styles.process}>
                     <label>Raw Data</label>
@@ -68,7 +64,7 @@ export default class ModelProcessFlow extends Component {
                     <img src={Next} alt=''/>
                     <label>Prediction</label>
                 </section>
-            }else{
+            }else if(dataFlow.length > 1){
                 return <section className={`${styles.process} ${styles.many}`}>
                     <label>Raw Data</label>
                     <img src={Next} alt=''/>
@@ -97,7 +93,16 @@ export default class ModelProcessFlow extends Component {
                     <img src={Next} alt=''/>
                     <label>Prediction</label>
                 </section>
+            }else{
+                let str = name.split('.')[0];
+                str = str.substring(0,str.length-1);
+                return <section className={styles.process}>
+                      <label>Raw Data</label>
+                      <img src={Next} alt=''/>
+                      <label>{str}</label>
+                      <img src={Next} alt=''/>
+                      <label>Prediction</label>
+                </section>
             }
-
         }
 }
