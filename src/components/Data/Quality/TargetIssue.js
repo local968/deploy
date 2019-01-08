@@ -542,7 +542,7 @@ export class FixIssue extends Component {
     const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
-        {!!nullCount && <div className={styles.fixesArea}>
+        {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
@@ -560,10 +560,10 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(nullLineCounts).map((k, i) => {
+              {Object.keys(mismatchLineCounts).map((k, i) => {
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = nullLineCounts[k]
+                const num = mismatchLineCounts[k]
                 if (!num) {
                   return null;
                 }
@@ -601,7 +601,7 @@ export class FixIssue extends Component {
             </div>
           </div>
         </div>}
-        {!!mismatchCount && <div className={styles.fixesArea}>
+        {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.missing)}></div>
@@ -620,10 +620,10 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(mismatchLineCounts).map((k, i) => {
+              {Object.keys(nullLineCounts).map((k, i) => {
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = mismatchLineCounts[k]
+                const num = nullLineCounts[k]
                 if (!num) {
                   return null;
                 }
