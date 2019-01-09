@@ -370,7 +370,9 @@ export default class Project {
         const api = await socketStore.ready()
         const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
         this.fileNames = fileNames
+        return
       }
+      this.fileNames = []
     }))
     this.autorun.push(autorun(async () => {
       if (!this.originPath) {
@@ -457,7 +459,11 @@ export default class Project {
       lastSubStep: 1,
       subStepActive: 1
     })
-    return this.updateProject(backData).then(() => this.etl())
+    return this.updateProject(backData)
+      .then(() => this.etl()
+        .then(pass => {
+          if (!pass) this.updateProject({ uploadFileName: [] })
+        }))
   }
 
   @action
@@ -756,8 +762,12 @@ export default class Project {
       .then(api => api.etl(data))
       .then(returnValue => {
         const { result, status } = returnValue;
-        if (status !== 200) return antdMessage.error(result['process error'])
+        if (status !== 200) {
+          antdMessage.error(result['process error'])
+          return false
+        }
         this.setProperty(result)
+        return true
       })
   }
 

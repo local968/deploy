@@ -126,11 +126,11 @@ class TargetIssue extends Component {
         {isClean && <div className={styles.cleanTitle}><span>Target variable quality looks good!</span></div>}
       </div>
       <div className={styles.typeBox}>
-        {!!nullCount && <div className={styles.type}>
+        {!!mismatchCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
           <span>Data Type Mismatch</span>
         </div>}
-        {!!mismatchCount && <div className={styles.type}>
+        {!!nullCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
           <span>Missing Value</span>
         </div>}
@@ -363,11 +363,11 @@ class VariableIssue extends Component {
         </div>
       </div>
       <div className={styles.typeBox}>
-        {!!nullCount && <div className={styles.type}>
+        {!!mismatchCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
           <span>Data Type Mismatch</span>
         </div>}
-        {!!mismatchCount && <div className={styles.type}>
+        {!!nullCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
           <span>Missing Value</span>
         </div>}

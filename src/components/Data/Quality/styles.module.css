@@ -591,6 +591,7 @@ span.fixesEdit {
 	display: flex;
 	flex: none;
 	justify-content: space-evenly;
+	margin: .2em .5em 0;
 }
 
 .outlierBlock {

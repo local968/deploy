@@ -735,7 +735,9 @@ export class FixIssue extends Component {
         outlierRange={project.outlierRange[this.editKey]}
         outlierDict={project.outlierDictTemp[this.editKey]}
         x={project.numberBins[this.editKey][1]}
-        y={project.numberBins[this.editKey][0]} />}
+        y={project.numberBins[this.editKey][0]}
+        minX={(rawDataView[this.editKey] || {}).min}
+        maxX={(rawDataView[this.editKey] || {}).max} />}
         visible={this.visible}
         width='12em'
         title='Outlier'
@@ -756,12 +758,12 @@ class EditOutLier extends Component {
 
   constructor(props) {
     super(props)
-    const { x } = props
-    const minX = x[0];
-    const maxX = x[x.length - 1];
-    const offset = (maxX - minX) / 4;
-    this.minX = minX - offset;
-    this.maxX = maxX + offset;
+    // const { x } = props
+    // const minX = x[0];
+    // const maxX = x[x.length - 1];
+    // const offset = (maxX - minX) / 4;
+    // this.minX = minX - offset;
+    // this.maxX = maxX + offset;
     this.count = 4;
   }
 
@@ -775,8 +777,8 @@ class EditOutLier extends Component {
 
   d3Chart = () => {
     d3.select(`.${styles.d3Chart} svg`).remove();
-    const { width, height, x, y } = this.props;
-    let { min, max, minX, maxX } = this;
+    const { width, height, x, y, minX, maxX } = this.props;
+    let { min, max } = this;
     const padding = { left: 50, bottom: 30, right: 5, top: 100 };
 
     const realHeight = height - padding.bottom - padding.top;
@@ -1060,16 +1062,17 @@ class EditOutLier extends Component {
 
   blur = () => {
     const { focus, temp, min, max } = this;
+    const { minX, maxX } = this.props
     if (!focus) return;
     if ((temp || temp === '0') && !isNaN(temp)) {
       let num = parseFloat(temp);
       if (focus === 'min') {
         if (num > max) num = max;
-        if (num < this.minX) num = this.minX;
+        if (num < minX) num = minX;
         if (min === num) return;
       } else {
         if (num < min) num = min;
-        if (num > this.maxX) num = this.maxX;
+        if (num > maxX) num = maxX;
         if (max === num) return;
       }
       this.temp = ''
