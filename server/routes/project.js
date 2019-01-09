@@ -578,15 +578,33 @@ wss.register('abortEtl', (message, socket) => {
 
 wss.register('dataView', (message, socket, progress) => {
   return createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: true })
-    .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+      let lock = false
+      const { status, result } = progressResult
+      if (status === 1) {
+        if (!lock) {
+          const { name, value } = result
+          lock = true
+          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, { dataViewProgress: value })
+          setTimeout(() => lock = false, 500)
+        }
+      }
+      if (status < 0 || status === 100) return progressResult
+      return null
+    }).then(async returnValue => {
       const { status, result } = returnValue
       if (status === 100) {
         const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
-        await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false })
+        await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false, dataViewProgress: 0 })
         if (updateResult && updateResult.dataViews) returnValue.result.data = updateResult.dataViews
       }
       return returnValue
     }))
+
+
+
+
+  // sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
 })
 
 
@@ -603,7 +621,21 @@ wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(
 
 wss.register('preTrainImportance', (message, socket, progress) =>
   createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
-    .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+      let lock = false
+      const { status, result } = progressResult
+      if (status === 1) {
+        if (!lock) {
+          const { name, value } = result
+          lock = true
+          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, { importanceProgress: value })
+          setTimeout(() => lock = false, 500)
+        }
+      }
+      if (status < 0 || status === 100) return progressResult
+      return null
+    })
+      // .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
       .then(returnValue => {
         const { status, result } = returnValue
         const promise = []
@@ -613,7 +645,7 @@ wss.register('preTrainImportance', (message, socket, progress) =>
         }
         promise.push(status === 100 ? updateProjectField(message.projectId, socket.session.userId, 'preImportance', result.data) : Promise.resolve({}))
         promise.push(status === 100 ? updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel) : Promise.resolve({}))
-        promise.push(createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: false }))
+        promise.push(createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: false, importanceProgress: 0 }))
         return Promise.all(promise).then(([result1, result2]) => {
           const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
           return Object.assign({}, returnValue, { result: realResult })

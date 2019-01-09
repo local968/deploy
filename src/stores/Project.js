@@ -73,6 +73,7 @@ export default class Project {
   @observable rawDataView = null;
   @observable preImportance = null;
   @observable preImportanceLoading = false;
+  @observable importanceProgress = 0
   @observable histgramPlots = {};
   @observable univariatePlots = {};
   @observable newVariable = [];
@@ -135,6 +136,7 @@ export default class Project {
   @observable version = [1, 2]
   @observable dataViews = null;
   @observable dataViewsLoading = false
+  @observable dataViewProgress = 0
 
   @observable stopModel = false
   @observable stopEtl = false
@@ -789,7 +791,7 @@ export default class Project {
   }
 
   @action
-  dataView = progress => {
+  dataView = () => {
     // const key = isClean ? 'dataViews' : 'rawDataView'
     // const featureLabel = [...this.dataHeader, ...this.newVariable].filter(v => !Object.keys(this[key]).includes(v))
     // if(!featureLabel.length) return Promise.resolve()
@@ -816,13 +818,7 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.dataViewsLoading = true
-      return api.dataView(command, progressResult => {
-        if (progress && typeof progress === 'function') {
-          const { result } = progressResult
-          const { name, value } = result
-          if (name === "progress") return progress(value)
-        }
-      }).then(returnValue => {
+      return api.dataView(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ dataViews: null })
@@ -1144,7 +1140,7 @@ export default class Project {
     })
   }
 
-  preTrainImportance = (progress) => {
+  preTrainImportance = () => {
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
@@ -1161,13 +1157,7 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.preImportanceLoading = true
-      return api.preTrainImportance(command, progressResult => {
-        if (progress && typeof progress === 'function') {
-          const { result } = progressResult
-          const { name, value } = result
-          if (name === "progress") return progress(value)
-        }
-      }).then(returnValue => {
+      return api.preTrainImportance(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
           return antdMessage.error(result['process error'])
