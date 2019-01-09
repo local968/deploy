@@ -684,7 +684,7 @@ export default class Project {
   get targetIssues() {
     const { target, mismatchIndex, nullIndex, outlierIndex, colType } = this;
     const arr = {
-      mismatchRow: colType[target] !== "Categorical" ? mismatchIndex[target] : [],
+      mismatchRow: colType[target] !== "Categorical" ? (mismatchIndex[target] || []) : [],
       nullRow: nullIndex[target] || [],
       outlierRow: colType[target] !== "Categorical" ? (outlierIndex[target] || []) : [],
     }
