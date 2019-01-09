@@ -16,6 +16,10 @@ const selectable = [
 @observer
 class Problem extends Component {
 
+  componentWillUnmount() {
+    this.props.projectStore.project.changeProjectType = this.props.projectStore.project.problemType
+  }
+
   nextStep = () => {
     const { project } = this.props.projectStore;
     project.saveProblem()

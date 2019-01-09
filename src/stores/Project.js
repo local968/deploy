@@ -613,7 +613,7 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, targetIssues, rawDataView, rawHeader, target, variableIssueCount } = this;
+    const { problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCounts, mismatchLineCounts, nullLineCounts } = this;
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
@@ -626,7 +626,7 @@ export default class Project {
       data.rowIssue = true;
     }
 
-    if (targetIssues.errorRow.length) {
+    if (target && (outlierLineCounts[target] + mismatchLineCounts[target] + nullLineCounts[target]) > 0) {
       data.targetRowIssue = true
     }
 
