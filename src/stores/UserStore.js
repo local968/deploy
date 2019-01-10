@@ -29,7 +29,7 @@ class UserStore {
         this.info = res.data.info
         this.status = 'login'
       } else {
-        alert(res.data.message||'Login failure')
+        alert(res.data.message || 'Login failure')
       }
     }))
   }
@@ -54,6 +54,18 @@ class UserStore {
         alert(res.data.message)
       }
     }))
+  }
+
+  setNewPassword(code, password) {
+
+  }
+
+  forgetPassword(email) {
+
+  }
+
+  changePassword(current, newPassword) {
+
   }
 }
 
