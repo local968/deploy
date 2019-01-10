@@ -180,7 +180,7 @@ class TargetIssue extends Component {
               unique={unique}
               recomm={recomm} />}
           {issues.rowIssue && <RowIssue backToConnect={this.backToConnect}
-            totalLines={totalLines} />}
+            totalRawLines={totalRawLines} />}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
             targetIssues={{
@@ -188,6 +188,7 @@ class TargetIssue extends Component {
               mismatchRow: colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0,
               outlierRow: colType[target] === 'Numerical' ? outlierLineCounts[target] : 0,
             }}
+            totalRawLines={totalRawLines}
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>

@@ -3,7 +3,7 @@ import 'rc-slider/assets/index.css';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { action } from 'mobx';
+import { action, observable } from 'mobx';
 import Slider from 'rc-slider';
 import { NumberInput } from 'components/Common';
 import { Select, message } from 'antd';
@@ -28,7 +28,7 @@ const HandleStyle = {
 
 @observer
 export default class AdvancedView extends Component {
-  // @observable type = ''
+  @observable resetStatus = false
 
   handleName = action((e) => {
     const { project } = this.props
@@ -163,10 +163,12 @@ export default class AdvancedView extends Component {
 
   reset = action(() => {
     const { targetCounts, problemType } = this.props.project
+    this.resetStatus = true
     const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
     this.props.project.holdoutRate = 20
     this.props.project.validationRate = 20
     this.props.project.crossCount = Math.min((min - 1), 5)
+    setTimeout(() => this.resetStatus = false, 0)
   })
 
   changeSetting = action((e) => {
@@ -380,7 +382,7 @@ export default class AdvancedView extends Component {
                   <div className={styles.advancedPercentValidation} style={{ width: validationRate + "%" }}></div>
                   <div className={styles.advancedPercentHoldout} style={{ width: holdoutRate + '%' }}></div>
                 </div>
-                <Range
+                {!this.resetStatus && <Range
                   className={styles.range}
                   railStyle={{ backgroundColor: 'transparent' }}
                   trackStyle={[{ backgroundColor: 'transparent' }, { backgroundColor: 'transparent' }]}
@@ -392,7 +394,7 @@ export default class AdvancedView extends Component {
                   count={2}
                   min={1}
                   max={99}
-                />
+                />}
               </div> : <div className={styles.advancedPercentBlock} >
                   <div className={styles.advancedPercent}>
                     {this.crossPercent()}
