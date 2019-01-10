@@ -1,0 +1,62 @@
+.block {
+  width: 5em;
+  height: auto;
+  background: white;
+  box-shadow: 0 0 10px 0px #ccc;
+  margin: .2em auto;
+  border-radius: 4px;
+  padding: .8em .6em;
+}
+
+.title {
+  font-size: 2rem;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+}
+
+.description {
+  font-size: 1rem;
+  margin-bottom: 2em;
+  line-height: 1.5;
+}
+
+.input {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  width: 100%;
+  display: block;
+  margin-bottom: 2em;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.submit {
+  background: linear-gradient(to bottom, #5b657b, #243448);
+  color: white;
+  outline: none;
+  font-size: 1.4rem;
+  line-height: 3rem;
+  border: none;
+  border-radius: 4px;
+  display: block;
+  height: 3rem;
+  width: 100%;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  text-align: center;
+}
+
+.submit:hover {
+  color: white;
+  opacity: .9;
+}
+
+.submit:active {
+  background: linear-gradient(to top, #5b657b, #243448);
+}

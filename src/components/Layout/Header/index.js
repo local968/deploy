@@ -241,7 +241,7 @@ export default class Header extends Component {
     const isHome = this.props.history.location.pathname === '/';
     const isDeploy = this.props.history.location.pathname.startsWith('/deploy');
     const isLogin = this.props.userStore.status === 'login';
-
+    const isProject = this.props.history.location.pathname.startsWith('/project')
     if (!isLogin)
       return (
         <LoginHeader
@@ -251,6 +251,7 @@ export default class Header extends Component {
       );
     if (isHome) return <WelcomeHeader />;
     if (isDeploy) return <NormalHeader />;
-    return <ProjectHeader />;
+    if (isProject) return <ProjectHeader />;
+    return <WelcomeHeader />
   }
 }
