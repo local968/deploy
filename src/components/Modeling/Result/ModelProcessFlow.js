@@ -12,13 +12,6 @@ export default class ModelProcessFlow extends Component {
             .filter(itm=>itm[0].startsWith(type))
             .filter(itm=>!itm[0].endsWith("__choice__"))
             .filter(itm=>itm[1].toString().toUpperCase() !== 'NONE');
-            // .filter(itm=>{
-            //         if(itm[0].startsWith('strategy:')){
-            //             itm[0] = itm[0].substring(9)
-            //         }
-            //         return itm
-            // });
-    console.log(_data)
         if(_data.length||show){
             return <Fragment>
                 <dt>{name}</dt>
