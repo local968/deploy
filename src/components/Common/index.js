@@ -14,6 +14,7 @@ import NumberInput from './NumberInput';
 import Confirm from './Confirm';
 import ProcessLoading from './ProcessLoading';
 import Hint from './Hint';
+import Range from './Range';
 
 export {
   BlackButton,
@@ -31,5 +32,6 @@ export {
   NumberInput,
   Confirm,
   ProcessLoading,
-  Hint
+  Hint,
+  Range
 };

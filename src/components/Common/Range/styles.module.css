@@ -1,0 +1,49 @@
+.range {
+  display: flex;
+  flex: none;
+  width: 100%;
+}
+
+.range :global(.ant-slider) {
+  display: flex;
+  flex: auto;
+  margin: 0;
+  padding: 0;
+  font-size: 7rem;
+  align-items: center;
+}
+
+.range :global(.ant-slider-rail) {
+  background: transparent;
+  position: absolute;
+}
+
+.range :global(.ant-slider:hover .ant-slider-rail) {
+  background: transparent;
+}
+
+.range :global(.ant-slider-track) {
+  background: transparent;
+  position: absolute;
+}
+
+.range :global(.ant-slider:hover .ant-slider-track) {
+  background: transparent;
+}
+
+.range :global(.ant-slider-handle) {
+  background-image: radial-gradient(circle at 50% 0px, rgb(163, 160, 160), rgb(205, 205, 205));
+  border: 0.07em solid rgb(232, 232, 232);
+  width: 0.3em;
+  height: 0.3em;
+  border-radius: 50%;
+  margin-left: calc(7px - 0.3em);
+  display: flex;
+  flex: 0 0 auto;
+  cursor: pointer;
+  position: relative;
+}
+
+.range :global(.ant-slider:hover .ant-slider-handle) {
+  border-color: rgb(232, 232, 232);
+}
