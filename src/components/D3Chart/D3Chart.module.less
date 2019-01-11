@@ -22,6 +22,9 @@
     right: 10px;
     .checkBoxCommon
   }
+  svg{
+    overflow: visible;
+  }
 }
 
 .speedComp {
@@ -110,6 +113,7 @@
   div {
     margin-top: 0.4em;
   }
+
 }
 
 .hoverPanel {
@@ -181,7 +185,7 @@
     }
     path {
       stroke: #b0d9f4
-    } 
+    }
   }
   .axisy2 {
     line {
@@ -204,6 +208,9 @@
 .areaChart {
   height: 100%;
   width: 100%;
+  svg{
+    overflow: visible;
+  }
   .area {
     fill: steelblue;
   }
@@ -219,19 +226,19 @@
     fill: black;
     // stroke: steelblue;
   }
-  
+
   .axis path,
   .axis line {
     fill: none;
     stroke: #000;
     shape-rendering: crispEdges;
   }
-  
+
   .overlay {
     fill: none;
     pointer-events: all;
   }
-  
+
   .focus circle {
     fill: none;
     stroke: steelblue;
@@ -240,7 +247,7 @@
 
 .regressionPredictActualChart {
   height: 100%;
-  width: 100%;  
+  width: 100%;
   display: flex;
   flex: none;
   justify-content: flex-end;
