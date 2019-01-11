@@ -20,6 +20,7 @@
     "mobx-react": "^5.3.6",
     "mobx-react-router": "^4.0.5",
     "module-alias": "^2.1.0",
+    "nodemailer": "^5.1.1",
     "papaparse": "^4.6.1",
     "pm2": "^2.10.4",
     "react": "^16.6.1",
