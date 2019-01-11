@@ -19,7 +19,7 @@ function parseData(chartData) {
 export default class AreaChart extends Component {
   state = {
     movable: true
-  }
+  };
 
   componentDidMount () {
     this.renderD3();
@@ -104,7 +104,7 @@ export default class AreaChart extends Component {
       .call(d3.axisBottom(x))
       .append('text')
       .attr('y', -10)
-      .attr('x', x(1) + 50)
+      .attr('x', x(1) + 55)
       .attr('fill', '#000')
       .text('Probability Threshold');
 
@@ -127,7 +127,7 @@ export default class AreaChart extends Component {
   drawThreshold(svg, x, height){
     const {model: {chartData, fitIndex}} = this.props;
     const thresholdLine = svg.append('g');
-    const threshold = chartData.roc.Threshold[fitIndex]
+    const threshold = chartData.roc.Threshold[fitIndex];
 
     const line = thresholdLine
       .append('line')
@@ -138,8 +138,13 @@ export default class AreaChart extends Component {
       .attr('class', styles.thresholdLine);
     const dragCircle = d3.drag()
       .on('drag', () => {
-        const p = d3.event.x;
+        let p = d3.event.x;
         const index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
+        if(p<0){
+          p=0
+        }else if(p>430){
+            p=430
+        }
         line.attr('x1', p)
           .attr('x2', p);
         circle.attr('cx', p);
@@ -182,7 +187,7 @@ export default class AreaChart extends Component {
       .attr('y', '3px')
       .attr('fill', '#000')
       .text(targets[1]);
-  }
+  };
 
   getNearestPoint (val, data, key) {
     let index;
