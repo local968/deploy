@@ -48,6 +48,7 @@ export default class ModelProcessFlow extends Component {
             'kitchen_sinks': 'Kitchen Sinks',
             'linear_svc_preprocessor':'Linear SVM prepr.',
             'no_preprocessor':'No Preprocessing',
+            'no_preprocessing':'No Preprocessing',
             'nystroem_sampler': 'Nystroem Sampler',
             'pca':'PCA',
             'polynomial':'Polynomial',
@@ -55,6 +56,7 @@ export default class ModelProcessFlow extends Component {
             'select_percentile_classification': 'Select Percentile',
             'select_percentile_regression':'Select Percentile',
             'select_rates':'Select Rates'};
+
         return <dl>
             {this.list(data,`preprocessor:${name}:`,types[name],true)}
         </dl>
