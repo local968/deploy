@@ -14,7 +14,7 @@ const sha256 = password => crypto.createHmac('sha256', config.secret)
 const router = new Router()
 
 router.post('/login', (req, res) => {
-  const {email,password} = req.body
+  const { email, password } = req.body
   redis
     .get(`userEmail:${email}`)
     .then(id => id
@@ -55,7 +55,7 @@ register('status', (data) => {
 })
 
 router.post('/register', (req, res) => {
-  const {email,level} = req.body
+  const { email, level } = req.body
   const password = sha256(req.body.password)
   const id = uuid.v4()
   const createdTime = moment().unix()
@@ -75,6 +75,16 @@ router.post('/register', (req, res) => {
         info: { id, email }
       })
     }, error => res.send(error))
+})
+
+router.put('/changepassword', async (req, res) => {
+  const userId = req.session.userId
+  const { current, newPassword } = req.body
+  const currentPassword = await redis.hget(`user:${userId}`, 'password')
+  if (sha256(current) !== currentPassword) return res.json({ status: 101, message: 'current password incorrect.', error: 'current password incorrect.' })
+  redis.hset(`user:${userId}`, 'password', sha256(newPassword))
+  req.session.destroy();
+  return res.json({ status: 200, message: 'ok' })
 })
 
 router.get('/schedules', (req, res) => {

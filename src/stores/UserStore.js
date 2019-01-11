@@ -65,7 +65,7 @@ class UserStore {
   }
 
   changePassword(current, newPassword) {
-
+    return axios.put(`http://${config.host}:${config.port}/user/changepassword`, { current, newPassword })
   }
 }
 

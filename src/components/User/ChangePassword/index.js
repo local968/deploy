@@ -18,7 +18,15 @@ class ChangePassword extends Component {
 
   submit = () => {
     if (this.newPassword !== this.repeat) return message.error('The two new passwords you entered were inconsistent')
-    this.props.userStore.changePassword(this.current, this.newPassword)
+    this.props.userStore.changePassword(this.current, this.newPassword).then(resp => {
+      if(resp.data.status === 200) {
+        this.props.userStore.status = 'unlogin'
+        message.info('change password successed. please use your new password to log in.')
+      }else {
+        message.error(resp.data.message)
+        console.error(resp.data.error)
+      }
+    },error => message.error('change password failed, please try later.'))
   }
 
   render() {

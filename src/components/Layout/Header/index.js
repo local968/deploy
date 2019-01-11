@@ -99,6 +99,10 @@ class ProjectHeader extends Component {
     this.props.userStore.logout();
   };
 
+  changepassword = () => {
+    this.props.routing.push('/changepassword')
+  }
+
   enter = index => {
     const { projectStore } = this.props;
     if (projectStore.conflict) return
@@ -110,7 +114,16 @@ class ProjectHeader extends Component {
 
   render() {
     const { userStore, projectStore } = this.props;
-
+    const menu = (
+      <Menu className={styles.logout}>
+        <Menu.Item key="0">
+          <a onClick={this.changepassword}><Icon type='unlock' />Change password</a>
+        </Menu.Item>
+        <Menu.Item key="1">
+          <a onClick={this.logout}><Icon type='logout' />Log out</a>
+        </Menu.Item>
+      </Menu>
+    );
     const { curStep, mainStep } = projectStore.project || {};
     return (
       <div className={styles.header}>
@@ -160,9 +173,11 @@ class ProjectHeader extends Component {
             <img src={mockAvatar} alt="avatar" className={styles.avatar} />
             <div className={styles.userBottom}>
               <span className={styles.name}>{userStore.info.email}</span>
-              <div className={styles.down} onClick={this.logout}>
-                <img src={down} alt="down" />
-              </div>
+              <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+                <div className={styles.down}>
+                  <img src={down} alt="down" />
+                </div>
+              </Dropdown>
             </div>
           </div>
         </div>
@@ -179,10 +194,17 @@ class WelcomeHeader extends Component {
     this.props.userStore.logout();
   };
 
+  changepassword = () => {
+    this.props.routing.push('/changepassword')
+  }
+
   render() {
     const menu = (
       <Menu className={styles.logout}>
         <Menu.Item key="0">
+          <a onClick={this.changepassword}><Icon type='unlock' />Change password</a>
+        </Menu.Item>
+        <Menu.Item key="1">
           <a onClick={this.logout}><Icon type='logout' />Log out</a>
         </Menu.Item>
       </Menu>
