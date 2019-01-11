@@ -19,7 +19,7 @@ export default class Layout extends Component {
     const style = isOnline ? null : { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
     // const community = ;
     return <div className={styles.route}>
-      {useLoginRouter ? <LoginRouter /> : <Route />}
+      {status !== 'init' && (useLoginRouter ? <LoginRouter /> : <Route />)}
       {showMask && <Mask text={text} style={style} />}
     </div>
   }

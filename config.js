@@ -12,6 +12,7 @@ const REDIS_HOST = process.env.REDIS_HOST || '192.168.0.23:6375'
 const REDIS_TYPE = process.env.REDIS_TYPE || '1' // 1 standalone 2 sentinel
 const PASSWORD = process.env.PASSWORD || '7788414'
 const BACKEND = process.env.REACT_APP_NGINX_BACKEND || '1'
+const HOST = process.env.R2HOST || 'http://127.0.0.1:3000/'
 
 const redis = REDIS_TYPE === '2' ?
   {
@@ -29,6 +30,7 @@ const redis = REDIS_TYPE === '2' ?
   }
 
 const config = {
+  host: HOST,
   port: BACKEND_PORT,
   redis,
   requestQueue: REQUEST_QUEUE,
@@ -38,7 +40,16 @@ const config = {
   maxConcurrencySchedule: MAX_CONCURRENCY_SCHEDULE,
   secret: SECRET,
   PASSWORD,
-  nginxBackend: BACKEND
+  nginxBackend: BACKEND,
+  mail: {
+    service: "Zoho",
+    port: 465,
+    secureConnection: true,
+    auth: {
+      user: "report@r2.ai",
+      pass: "IfxMzpWxskXq"
+    }
+  }
 }
 
 module.exports = config

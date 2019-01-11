@@ -5,16 +5,33 @@ const { register } = require('../webSocket')
 const moment = require('moment')
 const crypto = require('crypto')
 const config = require('config')
+const nodemailer = require('nodemailer')
 const api = require('../scheduleApi')
 
-const sha256 = password => crypto.createHmac('sha256', config.secret)
-  .update(password)
-  .digest('hex');
+const checkPassword = password => !!/[a-zA-Z0-9]{6,16}$/.test(password)
+const sha256 = password => crypto.createHmac('sha256', config.secret).update(password).digest('hex');
+const passwordError = "The password consists of uppercase letters, lowercase letters, and 6-16 digits!"
+const sendCodeMail = (code, to) => {
+  const transport = nodemailer.createTransport(config.mail)
+  const mailConfig = {
+    from: 'report@r2.ai',
+    to,
+    subject: 'Reset your password for R2.ai',
+    html: '<div style="padding: 0 5%;font-family: Microsoft YaHei;font-size: 12px;color: #151515">' +
+      '  <p style="color: #5B77A9;font-family: Microsoft YaHei;font-size: 24px;text-align:center;font-weight: bold">Reset your password for R2.ai</p >' +
+      '  <p>Dear R2.ai user,</p >' +
+      '  <p>Please set your new password from url below(expire one hour).</p >' +
+      '  <p>Your password reset url: ' + config.host + 'resetpassword?code=' + code + '</p >' +
+      '  <p>Thank you for your interests in our community and products.</p >' +
+      '</div>'
+  }
+  transport.sendMail(mailConfig)
+}
 
 const router = new Router()
 
 router.post('/login', (req, res) => {
-  const {email,password} = req.body
+  const { email, password } = req.body
   redis
     .get(`userEmail:${email}`)
     .then(id => id
@@ -55,7 +72,7 @@ register('status', (data) => {
 })
 
 router.post('/register', (req, res) => {
-  const {email,level} = req.body
+  const { email, level } = req.body
   const password = sha256(req.body.password)
   const id = uuid.v4()
   const createdTime = moment().unix()
@@ -75,6 +92,38 @@ router.post('/register', (req, res) => {
         info: { id, email }
       })
     }, error => res.send(error))
+})
+
+router.put('/changepassword', async (req, res) => {
+  const userId = req.session.userId
+  const { current, newPassword } = req.body
+
+  if (!checkPassword(newPassword)) return res.json({ status: 102, message: passwordError, error: passwordError })
+  const currentPassword = await redis.hget(`user:${userId}`, 'password')
+  if (sha256(current) !== currentPassword) return res.json({ status: 101, message: 'current password incorrect.', error: 'current password incorrect.' })
+  redis.hset(`user:${userId}`, 'password', sha256(newPassword))
+  req.session.destroy();
+  return res.json({ status: 200, message: 'ok' })
+})
+
+router.post('/forgetpassword', async (req, res) => {
+  const { email } = req.body
+  const userId = await redis.get(`userEmail:${email}`)
+  if (!userId) return res.json({ status: 400, message: 'email not exists.', error: 'email not exists.' })
+  const code = new Array(6).fill(0).map(() => Math.floor(Math.random() * 10).toString()).join('')
+  redis.set(`forgetPassword:${code}`, userId, 'EX', 3600)
+  sendCodeMail(code, email)
+  return res.json({ status: 200, message: 'ok' })
+})
+
+router.put('/resetpassword', async (req, res) => {
+  const { code, password } = req.body
+  const userId = await redis.get(`forgetPassword:${code}`)
+  if (!userId) return res.json({ status: 101, message: 'Your reset password request is invalid or expired.' })
+  if (!checkPassword(password)) return res.json({ status: 102, message: passwordError, error: passwordError })
+  redis.hset(`user:${userId}`, 'password', sha256(password))
+  redis.del(`forgetPassword:${code}`)
+  return res.json({ status: 200, message: 'ok' })
 })
 
 router.get('/schedules', (req, res) => {

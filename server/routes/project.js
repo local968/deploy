@@ -722,31 +722,31 @@ wss.register('abortTrain', (message, socket) => {
 })
 
 wss.register('train', (message, socket, progress) => {
-  const { userId, user } = socket.session
-  const { projectId, data: updateData, _id: requestId } = message
+  const { userId, user } = socket.session;
+  const { projectId, data: updateData, _id: requestId } = message;
   // delete message.data
-  Reflect.deleteProperty(message, 'data')
-  const data = { ...message, userId, requestId }
-  let hasModel = false
+  Reflect.deleteProperty(message, 'data');
+  const data = { ...message, userId, requestId };
+  let hasModel = false;
   return checkTraningRestriction(user)
     // .then(() => moveModels(message.projectId))
     .then(() => createOrUpdate(projectId, userId, updateData))
     .then(() => command(data, queueValue => {
-      const { status, result } = queueValue
-      if (status < 0 || status === 100) return queueValue
+      const { status, result } = queueValue;
+      if (status < 0 || status === 100) return queueValue;
       if (result.name === "progress") {
-        const { requestId: trainId } = result
+        const { requestId: trainId } = result;
         // delete result.requestId
         Reflect.deleteProperty(result, 'requestId')
         return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
       }
       if (result.score) {
-        hasModel = true
+        hasModel = true;
         return createOrUpdate(projectId, userId, { trainModel: null })
           .then(() => createModel(userId, projectId, result.name, result).then(addSettingModel(userId, projectId)).then(model => progress(model)))
       }
       if (result.data) {
-        const { model: mid, action, data } = result
+        const { model: mid, action, data } = result;
         let saveData = {}
         if (action === "chartData") {
           saveData = parseChartData(data)//原始数据

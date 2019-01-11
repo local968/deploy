@@ -91,3 +91,10 @@
     display: flex;
     align-items: center;
 }
+
+.forgetPassword {
+  font-size: 1rem;
+  color: #1d2b3c;
+  margin-top: 2em;
+  text-decoration: underline;
+}

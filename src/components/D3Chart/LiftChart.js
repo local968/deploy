@@ -82,7 +82,7 @@ export default class PRChart extends Component {
         .attr('transform', 'translate(0,' + height + ')')
         .call(d3.axisBottom(x).tickFormat(d3.format('.0%')))
         .append('text')
-        .attr('x', x(1) - 30)
+        .attr('x', x(1) + 30)
         .attr('y', -10)
         .attr('fill', '#000')
         .text('percentage');
@@ -106,7 +106,7 @@ export default class PRChart extends Component {
         .style('stroke', color[index]);
     }
     return data;
-  }
+  };
 
   drawFocus = (self, x, y, data, focus) => {
     if (!focus) return null;
@@ -121,7 +121,7 @@ export default class PRChart extends Component {
     focus.attr('transform', 'translate(' + x(d.PERCENTAGE) + ',' + y(d.LIFT) + ')');
     model.setFitIndex(index);
     // this.props.view.panel.models[panelIndex].getMouseOverData(d);
-  }
+  };
 
   getNearestPoint (val, data, key) {
     let index;
@@ -141,7 +141,7 @@ export default class PRChart extends Component {
     const names = compareChart && this.props.models.map(m => m.name);
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
-        {compareChart && <div className={styles.liftHoverPanel} ></div>}
+        {compareChart && <div className={styles.liftHoverPanel} />}
         {compareChart && <div className={styles.checkbox} >
           {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{color: d3ColorsCategory20[i]}} key={o} >{o}</Checkbox>)}
         </div>}

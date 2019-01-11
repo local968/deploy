@@ -75,7 +75,7 @@ export default class PRChart extends Component {
       .attr('transform', 'translate(0,' + height + ')')
       .call(d3.axisBottom(x))
       .append('text')
-      .attr('x', x(1) - 15)
+      .attr('x', x(1) + 18)
       .attr('y', -5)
       .attr('fill', '#000')
       .text('Recall');
