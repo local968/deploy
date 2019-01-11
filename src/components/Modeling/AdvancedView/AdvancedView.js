@@ -342,7 +342,7 @@ class AdvancedModelTable extends Component {
     const { model, texts, metric, checked } = this.props;
     const { score, name } = model;
     const { detail } = this.state;
-    console.log(score.validateScore)
+    // console.log(score.validateScore)
     return (
       <div >
         <Row onClick={this.handleResult} >

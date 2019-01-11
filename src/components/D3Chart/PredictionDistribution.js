@@ -35,11 +35,7 @@ export default class AreaChart extends Component {
     const {className} = this.props;
     const {fitIndexModified} = this.props.model;
     if (fitIndexModified) { }
-    return (
-      <div className={`${styles.areaChart} ${className}`}>
-
-      </div>
-    );
+    return <div className={`${styles.areaChart} ${className}`}/>
   }
 
   renderD3 = () => {
@@ -108,7 +104,7 @@ export default class AreaChart extends Component {
       .call(d3.axisBottom(x))
       .append('text')
       .attr('y', -10)
-      .attr('x', x(1) - 50)
+      .attr('x', x(1) + 50)
       .attr('fill', '#000')
       .text('Probability Threshold');
 
