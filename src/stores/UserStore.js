@@ -56,12 +56,12 @@ class UserStore {
     }))
   }
 
-  setNewPassword(code, password) {
-
+  resetPassword(code, password) {
+    return axios.put(`http://${config.host}:${config.port}/user/resetpassword`, { code, password })
   }
 
   forgetPassword(email) {
-
+    return axios.post(`http://${config.host}:${config.port}/user/forgetpassword`, { email })
   }
 
   changePassword(current, newPassword) {
