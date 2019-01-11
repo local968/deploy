@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
 import { observer } from 'mobx-react';
-import styles from './AdvancedView.module.less';
+import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';

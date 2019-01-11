@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 import d3tips from './d3-tip';
 
-import styles from './D3Chart.module.less';
+import styles from './D3Chart.module.css';
 
 @observer
 export default class RegressionPredictActualChart extends Component {

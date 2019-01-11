@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styles from './PredictVActual.module.less';
+import styles from './PredictVActual.module.css';
 import { observer } from 'mobx-react';
 import RegressionPredictActualChart from 'components/D3Chart/RegressionPredictActualChart';
 import { Spin } from 'antd'

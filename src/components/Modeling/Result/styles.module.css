@@ -233,6 +233,10 @@
     stroke: #ff8000;
 }
 
+.performance span{
+    display: block;
+}
+
 .performanceText {
     color: #000;
     margin-top: 0.15em;

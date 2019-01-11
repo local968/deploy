@@ -1119,8 +1119,8 @@ export default class Project {
     const model = this.models.find(m => data.id === m.id)
     if (!model) {
       if (times > 5) return
-      const fn = () => this.setModelField({ data, times: times + 1 })
-      return setTimeout(fn, 500)
+      setTimeout(() => this.setModelField({ data, times: times + 1 }), 500)
+      return
     }
     model.setProperty(data)
   }

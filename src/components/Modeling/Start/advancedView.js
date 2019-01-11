@@ -244,11 +244,11 @@ export default class AdvancedView extends Component {
           <div className={styles.advancedBlock}>
             <div className={styles.advancedAlgorithmList}>
               <div className={styles.advancedAlgorithm} key={'solution-a'}>
-                <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
+                <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} />
                 <label htmlFor={'R2-solution-a'}>R2-solution-a</label>
               </div>
               <div className={styles.advancedAlgorithm} key={'solution-b'}>
-                <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
+                <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} />
                 <label htmlFor={'R2-solution-b'}>R2-solution-b</label>
               </div>
               {Algorithms[problemType].map((v, k) => {
