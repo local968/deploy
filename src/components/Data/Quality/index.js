@@ -77,14 +77,14 @@ class TargetIssue extends Component {
     const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
-    const targetPercent = {
-      missing: (nullLineCounts[target] ? nullLineCounts[target] : 0) * 100 / (totalRawLines || 1),
-      mismatch: (colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0) * 100 / (totalRawLines || 1),
-      outlier: colType[target] === 'Numerical' ? outlierLineCounts[target] * 100 / (totalRawLines || 1) : 0,
-    }
     const nullCount = Number.isInteger(nullLineCounts[target]) ? nullLineCounts[target] : 0
     const mismatchCount = Number.isInteger(mismatchLineCounts[target]) ? mismatchLineCounts[target] : 0
     const outlierCount = Number.isInteger(outlierLineCounts[target]) ? outlierLineCounts[target] : 0
+    const targetPercent = {
+      missing: nullCount * 100 / (totalRawLines || 1),
+      mismatch: mismatchCount * 100 / (totalRawLines || 1),
+      outlier: outlierCount * 100 / (totalRawLines || 1),
+    }
     const warnings = []
     const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
     if (problemType === 'Classification') {
@@ -180,7 +180,7 @@ class TargetIssue extends Component {
               unique={unique}
               recomm={recomm} />}
           {issues.rowIssue && <RowIssue backToConnect={this.backToConnect}
-            totalLines={totalLines} />}
+            totalRawLines={totalRawLines} />}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
             targetIssues={{
@@ -188,6 +188,7 @@ class TargetIssue extends Component {
               mismatchRow: colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0,
               outlierRow: colType[target] === 'Numerical' ? outlierLineCounts[target] : 0,
             }}
+            totalRawLines={totalRawLines}
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>

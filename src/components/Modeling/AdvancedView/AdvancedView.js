@@ -292,7 +292,7 @@ export default class AdvancedView extends Component {
 class AdvancedModelTable extends Component {
 
   onClickCheckbox = (modelId) => (e) => {
-    this.props.project.setSelectModel(modelId)
+    this.props.project.setSelectModel(modelId);
     e.stopPropagation()
   }
 
@@ -302,8 +302,8 @@ class AdvancedModelTable extends Component {
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'Validation', 'Holdout'] :
-      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',]
-    const replaceR2 = str => str.replace(/R2/g, 'R²')
+      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',];
+    const replaceR2 = str => str.replace(/R2/g, 'R²');
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>
       if (sortState[curr] === undefined) return { ...prev, [curr]: curr }
@@ -311,7 +311,7 @@ class AdvancedModelTable extends Component {
       if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' /></div> }
       if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
       return prev
-    }, {})
+    }, {});
     const header = <Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
@@ -321,7 +321,7 @@ class AdvancedModelTable extends Component {
       } else {
         return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       }
-    })
+    });
     return (
       <div className={styles.advancedModelTable} >
         {header}
@@ -342,6 +342,7 @@ class AdvancedModelTable extends Component {
     const { model, texts, metric, checked } = this.props;
     const { score, name } = model;
     const { detail } = this.state;
+    console.log(score.validateScore)
     return (
       <div >
         <Row onClick={this.handleResult} >

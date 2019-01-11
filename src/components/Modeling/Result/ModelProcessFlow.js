@@ -8,13 +8,20 @@ import {Popover,Button,Icon,Tag} from 'antd'
 export default class ModelProcessFlow extends Component {
 
     list(data,type,name,show=false){
-        const _data = Object.entries(data).filter(itm=>itm[0].startsWith(type));
+        const _data = Object.entries(data)
+            .filter(itm=>itm[0].startsWith(type))
+            .filter(itm=>!itm[0].endsWith("__choice__"))
+            .filter(itm=>itm[1].toString().toUpperCase() !== 'NONE');
         if(_data.length||show){
             return <Fragment>
                 <dt>{name}</dt>
                 {
                     _data.map((itm,index)=>{
-                        return <dd key={index}>{itm[0].substring(type.length)}:{itm[1]}</dd>
+                        const key = itm[0].substring(type.length);
+                        if(key === 'strategy'){
+                            return <dd key={index}>{itm[1]}</dd>
+                        }
+                        return <dd key={index}>{key}:{itm[1]}</dd>
                     })
                 }
             </Fragment>
