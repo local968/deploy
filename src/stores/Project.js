@@ -769,9 +769,11 @@ export default class Project {
     return socketStore.ready()
       .then(api => api.etl(data))
       .then(returnValue => {
-        const { result, status } = returnValue;
+        const { result, status, message } = returnValue;
         if (status !== 200) {
-          antdMessage.error(result['process error'])
+          antdMessage.error(message || result['process error'])
+          this.etling = false
+          this.etlProgress = 0
           return false
         }
         this.setProperty(result)
