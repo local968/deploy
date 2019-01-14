@@ -71,7 +71,7 @@ export default class AdvancedView extends Component {
     'MAE': false,
     'R2': false,
     'adjustR2': false,
-    'KS':false
+    'KS': false
   };
   @observable metric = {
     key: '',
@@ -86,8 +86,8 @@ export default class AdvancedView extends Component {
     const metricKey = this.metric.key;
     const formatNumber = number => {
       try {
-        number = parseFloat(number);
-        return parseInt(number * 1000, 10)
+        return parseFloat(number);
+        // return parseInt(number * 1000, 10)
       } catch (e) {
         console.log('compare error:', e);
         return 0
@@ -193,16 +193,17 @@ export default class AdvancedView extends Component {
           {
             const aModelData = metricKey === 'acc' ? formatNumber(aModel.holdoutAcc) : formatNumber(aModel.score.holdoutScore[metricKey])
             const bModelData = metricKey === 'acc' ? formatNumber(bModel.holdoutAcc) : formatNumber(bModel.score.holdoutScore[metricKey])
+            console.log(aModelData, aModel.score.holdoutScore[metricKey], bModelData, bModel.score.holdoutScore[metricKey])
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'KS':
-        {
-          const aFitIndex = aModel.fitIndex;
-          const bFitIndex = bModel.fitIndex;
-          const aModelData = formatNumber(aModel.chartData.roc.KS[aFitIndex])
-          const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex])
-          return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
-        }
+          {
+            const aFitIndex = aModel.fitIndex;
+            const bFitIndex = bModel.fitIndex;
+            const aModelData = formatNumber(aModel.chartData.roc.KS[aFitIndex])
+            const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex])
+            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+          }
         case 'Model Name':
         default:
           const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.')
@@ -261,7 +262,7 @@ export default class AdvancedView extends Component {
 
   changeSort = (type) => action(() => {
     const currentActive = Object.keys(this.sortState).find(key => this.sortState[key]);
-    if (type === currentActive){
+    if (type === currentActive) {
       return this.sortState[type] = this.sortState[type] === 1 ? 2 : 1;
     }
     this.sortState[currentActive] = false;
@@ -329,7 +330,7 @@ class AdvancedModelTable extends Component {
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     const texts = problemType === 'Classification' ?
-      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold','KS', 'Validation', 'Holdout'] :
+      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const headerData = texts.reduce((prev, curr) => {
