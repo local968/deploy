@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Checkbox, Progress, Select } from 'antd';
+import { Icon, Checkbox, Progress, Select, Modal } from 'antd';
 import { action, observable } from 'mobx';
 import moment from 'moment';
 import config from 'config';
@@ -142,6 +142,8 @@ export default class Deployment extends Component {
       }),
       onStart: action(() => {
         this.uploadStatus = 'uploading'
+        this.uploadSpeed = '0 Kb/s'
+        this.uploadPercentage = 0
       }),
       operator: (opeartor) => {
         this.uploadOperator = opeartor
@@ -198,14 +200,21 @@ export default class Deployment extends Component {
             uploader={uploader}
           />
         )}
-        {this.uploadStatus && <div className={styles.uploading}>
-          <Progress percent={this.uploadPercentage} />
-          <span className={styles.speed}>{this.uploadSpeed}</span>
-          <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
-            ? <span><Icon type="pause" theme="outlined" />Pause</span>
-            : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
-        </div>}
-        {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
+        <Modal
+          visible={!!this.uploadStatus}
+          width={700}
+          maskClosable={false}
+          footer={null}
+          onCancel={action(() => { this.uploadStatus = false; this.uploadOperator.pause() })}>
+          <div className={styles.uploading}>
+            <Progress percent={this.uploadPercentage} />
+            <span className={styles.speed}>{this.uploadSpeed}</span>
+            <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
+              ? <span><Icon type="pause" theme="outlined" />Pause</span>
+              : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+          </div>
+          {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
+        </Modal>
         {cddo.option !== 'api' &&
           cddo.source && (
             <ResultLocation

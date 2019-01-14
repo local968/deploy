@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { observable, action } from 'mobx';
-import { Select, InputNumber, Icon, Progress, Checkbox } from 'antd';
+import { Select, InputNumber, Icon, Progress, Checkbox, Modal } from 'antd';
 import moment from 'moment';
 import styles from './styles.module.css';
 import downloadIcon from './icon-download.svg';
@@ -55,6 +55,17 @@ export default class Performance extends Component {
   };
   show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
+  pause = action(() => {
+    if (!this.uploadOperator) return
+    if (this.uploadStatus === 'uploading') {
+      this.uploadOperator.pause()
+      this.uploadStatus = 'paused'
+      return
+    }
+    this.uploadOperator.resume()
+    this.uploadStatus = 'uploading'
+  })
+
   render() {
     const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
@@ -87,6 +98,8 @@ export default class Performance extends Component {
       }),
       onStart: action(() => {
         this.uploadStatus = 'uploading'
+        this.uploadSpeed = '0 Kb/s'
+        this.uploadPercentage = 0
       }),
       operator: (opeartor) => {
         this.uploadOperator = opeartor
@@ -132,14 +145,21 @@ export default class Performance extends Component {
           show={this.show}
           uploader={uploader}
         />
-        {this.uploadStatus && <div className={styles.uploading}>
-          <Progress percent={this.uploadPercentage} />
-          <span className={styles.speed}>{this.uploadSpeed}</span>
-          <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
-            ? <span><Icon type="pause" theme="outlined" />Pause</span>
-            : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
-        </div>}
-        {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
+        <Modal
+          visible={!!this.uploadStatus}
+          footer={null}
+          width={700}
+          maskClosable={false}
+          onCancel={action(() => { this.uploadStatus = false; this.uploadOperator.pause() })}>
+          <div className={styles.uploading}>
+            <Progress percent={this.uploadPercentage} />
+            <span className={styles.speed}>{this.uploadSpeed}</span>
+            <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
+              ? <span><Icon type="pause" theme="outlined" />Pause</span>
+              : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+          </div>
+          {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
+        </Modal>
         {cdpo.source && (
           <MeasurementMetric
             cdpo={cdpo}
