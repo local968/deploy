@@ -336,7 +336,7 @@ class ModelTable extends Component {
             </div>
           </div>}
           {!train2Finished && <div className={styles.trainingAbort}>
-            <div className={styles.abortButton} onClick={!isAbort && abortTrain.bind(null, false)}>
+            <div className={styles.abortButton} onClick={!isAbort ? abortTrain.bind(null, false) : null}>
               {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>
           </div>}

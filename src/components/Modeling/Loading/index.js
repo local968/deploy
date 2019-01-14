@@ -23,7 +23,7 @@ export default class Loading extends Component {
         </div>
         <div className={styles.trainingAbort}>
           <div className={styles.abortButton} onClick={abortTrain.bind(null, true)}>
-            {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
+            {isAbort ? <span><Icon type='loading' /></span> : <span>Abort Training</span>}
           </div>
         </div>
       </div>

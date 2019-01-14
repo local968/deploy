@@ -9,7 +9,6 @@ import Header from 'components/Layout/Header';
 import ErrorBoundary from 'components/Common/ErrorBoundary';
 import Stores from 'stores';
 import styles from './styles.module.css';
-import { Route, Switch } from 'react-router-dom';
 
 const browserHistory = createBrowserHistory();
 const routingStore = new RouterStore();

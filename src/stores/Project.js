@@ -371,7 +371,7 @@ export default class Project {
       if (this.uploadFileName && this.uploadFileName.length > 0) {
         const api = await socketStore.ready()
         const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-        this.fileNames = fileNames
+        this.fileNames = fileNames || []
         return
       }
       this.fileNames = []
@@ -421,6 +421,12 @@ export default class Project {
       }
       if (key === 'problemType') {
         data.changeProjectType = data[key]
+      }
+      if (key === 'trainModel') {
+        if (data[key]) {
+          const { value } = data[key] || {}
+          data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
+        }
       }
     }
     data.updateTime = +new Date()

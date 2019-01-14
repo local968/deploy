@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styles from '../styles.module.css'
 import { action, observable } from 'mobx';
 import { inject, observer } from 'mobx-react'
-import { message } from 'antd'
 
 @inject('userStore')
 @observer
