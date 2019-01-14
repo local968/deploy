@@ -60,6 +60,7 @@ class DeploymentStore {
   };
 
   @observable deployments = [];
+  @observable watchingList = false
   @observable currentId;
   @observable
   sortOptions = {
@@ -103,18 +104,31 @@ class DeploymentStore {
   }
 
   constructor() {
+    socketStore.ready().then(api => {
+      this.initWatch()
+      api.on('online', this.initWatch)
+      api.on('offline', this.onOffline)
+    })
+  }
+
+  initWatch = () => {
     when(
       () => userStore.status === 'login',
       () =>
         socketStore.ready().then(api => {
-          const callback = response => {
+          const callback = action(response => {
             this.deployments = response.list;
-          }
+            this.watchingList = true;
+          })
           api.watchDeployments().then(callback);
           api.on('watchDeployments', callback)
         })
     );
   }
+
+  onOffline = action(() => {
+    this.watchingList = false;
+  })
 
   async addDeployment(projectId, projectName, modelName, modelType, csvScript) {
     const data = {
