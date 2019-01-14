@@ -1,4 +1,4 @@
-import { observable, computed, when } from 'mobx';
+import { observable, computed, when, action } from 'mobx';
 import socketStore from 'stores/SocketStore';
 import userStore from 'stores/UserStore';
 import deploymentStore from './DeploymentStore.js';
@@ -63,6 +63,7 @@ class ScheduleStore {
   };
 
   @observable schedules = [];
+  @observable watchingList = false
 
   @observable
   sortOptions = {
@@ -73,18 +74,31 @@ class ScheduleStore {
   };
 
   constructor() {
+    socketStore.ready().then(api => {
+      this.initWatch()
+      api.on('online', this.initWatch)
+      api.on('offline', this.onOffline)
+    })
+  }
+
+  initWatch = () => {
     when(
       () => userStore.status === 'login' && userStore.info.id,
       () =>
         socketStore.ready().then(api => {
-          const callback = response => {
+          const callback = action(response => {
             this.schedules = response.list;
-          }
+            this.watchingList = true
+          })
           api.watchSchedule().then(callback);
           api.on('watchSchedule', callback)
         })
     );
   }
+
+  onOffline = action(() => {
+    this.watchingList = false
+  })
 
   @computed
   get sortedDeploymentSchedules() {
