@@ -324,7 +324,11 @@ export default class DataConnect extends Component {
               if (result.value) this.sqlProgress = result.value
             }))
             clearInterval(processInterval)
-            if (resp.status !== 200) return message.error(resp.message)
+            if (resp.status !== 200) {
+              this.process = 0
+              this.uploading = false
+              return message.error(resp.message)
+            }
             const fileId = resp.fileId
             this.process = 50
             project.fastTrackInit(fileId).then(() => {
