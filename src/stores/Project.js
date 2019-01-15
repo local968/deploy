@@ -460,18 +460,17 @@ export default class Project {
   /**---------------------------------------------data-------------------------------------------------*/
   //修改上传文件
   @action
-  fastTrackInit = (name) => {
+  fastTrackInit = async (name) => {
     const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, { uploadFileName: [name] }, {
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
       subStepActive: 1
     })
-    return this.updateProject(backData)
-      .then(() => this.etl()
-        .then(pass => {
-          if (!pass) this.updateProject({ uploadFileName: [] })
-        }))
+    this.etling = true
+    await this.updateProject(backData)
+    const pass = await this.etl()
+    if (!pass) this.updateProject({ uploadFileName: [] })
   }
 
   @action
@@ -527,9 +526,10 @@ export default class Project {
   }
 
   @action
-  endSchema = () => {
+  endSchema = async () => {
     this.etling = true
-    return this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
+    if (this.train2ing) await this.abortTrain(!!this.models.length)
+    await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
@@ -541,11 +541,11 @@ export default class Project {
       subStepActive: 2,
       lastSubStep: 2
     }))
-      .then(() => this.etl())
+    return await this.etl()
   }
 
   @action
-  endQuality = () => {
+  endQuality = async () => {
     let hasChange = false
     const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
     for (const item of list) {
@@ -555,8 +555,9 @@ export default class Project {
       if (hasChange) break
     }
 
-    if (!hasChange) return Promise.resolve()
-
+    if (!hasChange) return await Promise.resolve()
+    this.etling = true
+    if (this.train2ing) await this.abortTrain(!!this.models.length)
     const data = Object.assign(this.defaultTrain, {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
@@ -573,14 +574,12 @@ export default class Project {
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
-      if (min < 3) return Promise.reject()
+      if (min < 3) return await Promise.reject()
       if (min < 5) data.crossCount = min - 1
     }
     this.etling = true
-    return this.updateProject(data)
-      .then(() => {
-        if (hasChange) return this.etl()
-      })
+    await this.updateProject(data)
+    if (hasChange) return await this.etl()
   }
 
   hasChanged = (before, after) => {
@@ -700,10 +699,7 @@ export default class Project {
   }
 
   etl = async () => {
-    const { id, problemType, dataHeader, uploadFileName, train2ing, models } = this;
-
-    this.etling = true;
-    if (train2ing) await this.abortTrain(!!models.length)
+    const { id, problemType, dataHeader, uploadFileName } = this;
 
     const command = 'etl';
 
