@@ -478,19 +478,19 @@ wss.register("queryModelList", message => {
 
 wss.register('etl', (message, socket, progress) => {
   const { userId } = socket.session
-  const { firstEtl, noCompute, projectId: id, csvLocation: files } = message
+  const { firstEtl, noCompute, projectId: id, csvLocation: files, _id: requestId } = message
 
   return setDefaultData(id, userId).then(setResult => {
     if (setResult.status !== 200) return setResult
     return getFileInfo(files).then((fileInfo) => {
       if (fileInfo.status !== 200) return fileInfo
       const { csvLocation, ext } = fileInfo
-      const data = { ...message, userId: userId, requestId: message._id, csvLocation, ext, noCompute: firstEtl || noCompute }
+      const data = { ...message, userId: userId, requestId, csvLocation, ext, noCompute: firstEtl || noCompute, stopId: requestId }
       // delete data.firstEtl
       Reflect.deleteProperty(data, 'firstEtl')
       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation')
       if (!ext) Reflect.deleteProperty(data, 'ext')
-      return createOrUpdate(id, userId, { etling: true })
+      return createOrUpdate(id, userId, { etling: true, stopId: requestId })
         .then(() => command(data, processData => {
           let { result, status } = processData;
           if (status < 0 || status === 100) return processData
@@ -520,6 +520,7 @@ wss.register('etl', (message, socket, progress) => {
           result.etling = false
           result.etlProgress = 0
           result.firstEtl = false;
+          result.stopId = ''
           // delete result.name
           // delete result.id
           // delete result.userId
@@ -567,12 +568,18 @@ wss.register('etl', (message, socket, progress) => {
 wss.register('abortEtl', (message, socket) => {
   const projectId = message.projectId
   const userId = socket.session.userId
-  return command({ ...message, userId, requestId: message._id }).then(() => {
-    const statusData = {
-      etling: false,
-      etlProgress: 0
-    }
-    return createOrUpdate(projectId, userId, statusData)
+  return redis.hget("project:" + id, 'stopId').then(stopId => {
+    try {
+      stopId = JSON.parse(stopId)
+    } catch (e) { }
+    if (!stopId) return { status: 200, message: 'ok' }
+    return command({ ...message, userId, requestId: message._id, stopId }).then(() => {
+      const statusData = {
+        etling: false,
+        etlProgress: 0
+      }
+      return createOrUpdate(projectId, userId, statusData)
+    })
   })
 })
 
@@ -704,20 +711,27 @@ wss.register('createNewVariable', _sendToCommand)
 wss.register('abortTrain', (message, socket) => {
   const { projectId, isLoading, _id: requestId } = message
   const { userId } = socket.session
-  return command({ ...message, userId, requestId }, () => {
-    const statusData = {
-      train2Finished: true,
-      train2ing: false,
-      train2Error: false,
-      trainModel: null
-    }
-    if (isLoading) {
-      statusData.mainStep = 3,
-        statusData.curStep = 3,
-        statusData.lastSubStep = 1,
+  return redis.hget("project:" + id, 'stopId').then(stopId => {
+    try {
+      stopId = JSON.parse(stopId)
+    } catch (e) { }
+    if (!stopId) return { status: 200, message: 'ok' }
+    return command({ ...message, userId, requestId, stopId }, () => {
+      const statusData = {
+        train2Finished: true,
+        train2ing: false,
+        train2Error: false,
+        trainModel: null,
+        stopId: ''
+      }
+      if (isLoading) {
+        statusData.mainStep = 3
+        statusData.curStep = 3
+        statusData.lastSubStep = 1
         statusData.subStepActive = 1
-    }
-    return createOrUpdate(projectId, userId, statusData)
+      }
+      return createOrUpdate(projectId, userId, statusData)
+    })
   })
 })
 
@@ -726,12 +740,13 @@ wss.register('train', (message, socket, progress) => {
   const { projectId, data: updateData, _id: requestId } = message;
   // delete message.data
   Reflect.deleteProperty(message, 'data');
-  const data = { ...message, userId, requestId };
+  // const stopId = uuid.v4()
+  const data = { ...message, userId, requestId, stopId: requestId };
   let hasModel = false;
   return checkTraningRestriction(user)
     // .then(() => moveModels(message.projectId))
-    .then(() => createOrUpdate(projectId, userId, updateData))
-    .then(() => command(data, queueValue => {
+    .then(() => createOrUpdate(projectId, userId, { ...updateData, stopId: requestId }))
+    .then(() => command({ ...data, stopId: requestId }, queueValue => {
       const { status, result } = queueValue;
       if (status < 0 || status === 100) return queueValue;
       if (result.name === "progress") {

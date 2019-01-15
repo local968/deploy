@@ -139,7 +139,7 @@ export default class DataSchema extends Component {
         headerData.content = <span>row/header</span>;
         headerData.title = '';
       } else {
-        headerData.content = <span>{header}</span>
+        headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
         headerData.title = header;
         if (target && target === header) {
           headerData.cn = classnames(headerData.cn, styles.target);
@@ -297,5 +297,13 @@ export default class DataSchema extends Component {
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
     </div>
+  }
+}
+
+//修改表头
+class EditHeader extends Component {
+  render() {
+    const { value } = this.props
+    return <span>{value}</span>
   }
 }
