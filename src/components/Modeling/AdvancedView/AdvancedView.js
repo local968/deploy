@@ -43,7 +43,7 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
-import { observable, computed, action, autorun } from 'mobx';
+import { observable, computed, action, autorun, runInAction } from 'mobx';
 import moment from 'moment';
 
 const TabPane = Tabs.TabPane;
@@ -193,7 +193,6 @@ export default class AdvancedView extends Component {
           {
             const aModelData = metricKey === 'acc' ? formatNumber(aModel.holdoutAcc) : formatNumber(aModel.score.holdoutScore[metricKey])
             const bModelData = metricKey === 'acc' ? formatNumber(bModel.holdoutAcc) : formatNumber(bModel.score.holdoutScore[metricKey])
-            console.log(aModelData, aModel.score.holdoutScore[metricKey], bModelData, bModel.score.holdoutScore[metricKey])
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'KS':
@@ -263,10 +262,14 @@ export default class AdvancedView extends Component {
   changeSort = (type) => action(() => {
     const currentActive = Object.keys(this.sortState).find(key => this.sortState[key]);
     if (type === currentActive) {
-      return this.sortState[type] = this.sortState[type] === 1 ? 2 : 1;
+      this.sortState[type] = this.sortState[type] === 1 ? 2 : 1;
+    } else {
+      this.sortState[currentActive] = false;
+      this.sortState[type] = 1
     }
-    this.sortState[currentActive] = false;
-    this.sortState[type] = 1
+    if (window.localStorage)
+      window.localStorage.setItem(`advancedViewSort:${this.props.project.id}`, JSON.stringify(this.sortState))
+
   });
 
   changeSetting = action((settingId) => {
@@ -275,6 +278,8 @@ export default class AdvancedView extends Component {
 
   handleChange = action(value => {
     this.metric = this.metricOptions.find(m => m.key === value);
+    if (window.localStorage)
+      window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
   });
 
   constructor(props) {
@@ -284,6 +289,17 @@ export default class AdvancedView extends Component {
       if (project && project.measurement)
         this.metric = this.metricOptions.find(metric => metric.key === project.measurement) || this.metricOptions[0]
     })
+
+    if (window.localStorage) {
+      runInAction(() => {
+        try {
+          const storagedSort = JSON.parse(window.localStorage.getItem(`advancedViewSort:${props.project.id}`))
+          const storagedMetric = window.localStorage.getItem(`advancedViewMetric:${props.project.id}`)
+          if (storagedSort) this.sortState = storagedSort
+          if (storagedMetric) this.metric = this.metricOptions.find(m => m.key === storagedMetric);
+        } catch (e) { }
+      })
+    }
   }
 
   render() {
