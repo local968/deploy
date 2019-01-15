@@ -19,14 +19,14 @@ class ChangePassword extends Component {
   submit = () => {
     if (this.newPassword !== this.repeat) return message.error('The two new passwords you entered were inconsistent')
     this.props.userStore.changePassword(this.current, this.newPassword).then(resp => {
-      if(resp.data.status === 200) {
+      if (resp.data.status === 200) {
         this.props.userStore.status = 'unlogin'
-        message.info('change password successed. please use your new password to log in.')
-      }else {
+        message.info('Password change succeeded! Please use your new password to log in.')
+      } else {
         message.error(resp.data.message)
         console.error(resp.data.error)
       }
-    },error => message.error('change password failed, please try later.'))
+    }, error => message.error('Password change failed, please try later.'))
   }
 
   render() {
@@ -35,7 +35,7 @@ class ChangePassword extends Component {
       <p className={styles.description}>Please enter your current password and your new password below.</p>
       <input className={styles.input} value={this.current} onChange={this.onChange('current')} type='password' placeholder='Current Password' />
       <input className={styles.input} value={this.newPassword} onChange={this.onChange('newPassword')} type='password' placeholder='New Password' />
-      <input className={styles.input} value={this.repeat} onChange={this.onChange('repeat')} type='password' placeholder='confirm Your New Password' />
+      <input className={styles.input} value={this.repeat} onChange={this.onChange('repeat')} type='password' placeholder='Confirm Your New Password' />
       <a className={styles.submit} onClick={this.submit}>Submit</a>
     </div>
   }
