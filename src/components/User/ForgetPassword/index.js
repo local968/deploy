@@ -22,7 +22,7 @@ class ForgetPassword extends Component {
   render() {
     const resultTab = <div className={styles.block}>
       <h3 className={styles.title}>Reset Your Password</h3>
-      <p className={styles.description}>We have sent a reset password email to yutong@gmail.com. Please click the resepassword link to set your new password. <br /><br /><br />Didn’t receive the email yet? Please check your spam folder, or <a onClick={this.send}>resend</a> the email.</p>
+      <p className={styles.description}>We have sent a reset password email to {this.email}. Please click the resepassword link to set your new password. <br /><br /><br />Didn’t receive the email yet? Please check your spam folder, or <a onClick={this.send}>resend</a> the email.</p>
     </div>
 
     const inputTab = <div className={styles.block}>
