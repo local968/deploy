@@ -699,10 +699,11 @@ export default class Project {
     return arr
   }
 
-  etl = () => {
+  etl = async () => {
     const { id, problemType, dataHeader, uploadFileName, train2ing, models } = this;
 
-    if (train2ing) this.abortTrain(!!models.length)
+    this.etling = true;
+    if (train2ing) await this.abortTrain(!!models.length)
 
     const command = 'etl';
 
@@ -758,7 +759,6 @@ export default class Project {
       data.csvLocation = [...uploadFileName]
     }
 
-    this.etling = true;
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -766,19 +766,17 @@ export default class Project {
     // feature_label: 特征列名
     // fill_method:  无效值
     // kwargs:
-    return socketStore.ready()
-      .then(api => api.etl(data))
-      .then(returnValue => {
-        const { result, status, message } = returnValue;
-        if (status !== 200) {
-          antdMessage.error(message || result['process error'])
-          this.etling = false
-          this.etlProgress = 0
-          return false
-        }
-        this.setProperty(result)
-        return true
-      })
+    const api = await socketStore.ready()
+    const returnValue = await api.etl(data)
+    const { result, status, message } = returnValue;
+    if (status !== 200) {
+      antdMessage.error(message || result['process error'])
+      this.etling = false
+      this.etlProgress = 0
+      return false
+    }
+    this.setProperty(result)
+    return true
   }
 
   abortEtl = () => {
