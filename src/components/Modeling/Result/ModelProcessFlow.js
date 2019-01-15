@@ -114,7 +114,7 @@ export default class ModelProcessFlow extends Component {
                                     <Popover placement="bottom" content={this.Third(itm)} trigger="click">
                                         <Button>{itm.model_name}<Icon type="down" /></Button>
                                     </Popover>
-                                    <Tag>{itm.weight}</Tag>
+                                    <Tag>{(+itm.weight||0).toFixed(3)}</Tag>
                                 </dd>
                             })
                         }
