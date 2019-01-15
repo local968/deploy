@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { action } from 'mobx';
 import { NumberInput, Range } from 'components/Common';
-import { Select, message } from 'antd';
+import { Select, message, Tooltip } from 'antd';
 import Algorithms from './algorithms';
 
 const Option = Select.Option;
@@ -23,7 +23,7 @@ export default class AdvancedView extends Component {
 
   handleSlider = value => {
     const [min, max] = value
-    if(max === min) return
+    if (max === min) return
     this.props.project.holdoutRate = 100 - max;
     this.props.project.validationRate = max - min;
   }
@@ -191,7 +191,7 @@ export default class AdvancedView extends Component {
   })
 
   render() {
-    const { settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy, ensembleSize } = this.props.project;
+    const { settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy, ensembleSize, totalLines } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
@@ -342,10 +342,18 @@ export default class AdvancedView extends Component {
               <span>Run models with:</span>
             </div>
             <div className={styles.advancedOption}>
-              <div className={styles.advancedOptionBox}>
-                <input id="runwith1" type='radio' name="runWith" checked={runWith === "cross"} onChange={this.handleRunWith.bind(null, 'cross')} />
-                <label htmlFor="runwith1">Cross Validation</label>
-              </div>
+              <Tooltip
+                title={<span className={styles.crossWarning}>
+                  Performing cross validation on large dataset will take significant amount of time. <br />
+                  Hence we recommend choosing “Train Validation Holdout”.`
+                  </span>}
+                visible={runWith === "cross" && totalLines > 200000}
+                overlayStyle={{ maxWidth: '100%' }}>
+                <div className={styles.advancedOptionBox}>
+                  <input id="runwith1" type='radio' name="runWith" checked={runWith === "cross"} onChange={this.handleRunWith.bind(null, 'cross')} />
+                  <label htmlFor="runwith1">Cross Validation</label>
+                </div>
+              </Tooltip>
               <div className={styles.advancedOptionBox}>
                 <input id="runwith2" type='radio' name="runWith" checked={runWith === "holdout"} onChange={this.handleRunWith.bind(null, 'holdout')} />
                 <label htmlFor="runwith2">Train / Validation / Holdout</label>
@@ -443,14 +451,14 @@ export default class AdvancedView extends Component {
                   <div className={styles.advancedPercentHoldout} style={{ width: ((9 - speedVSaccuracy) / 8 * 100) + '%' }}></div>
                 </div>
                 <Range
-                    range={false}
-                    step={1}
-                    min={1}
-                    max={9}
-                    onChange={this.handleSpeed}
-                    value={speedVSaccuracy}
-                    tooltipVisible={false}
-                  />
+                  range={false}
+                  step={1}
+                  min={1}
+                  max={9}
+                  onChange={this.handleSpeed}
+                  value={speedVSaccuracy}
+                  tooltipVisible={false}
+                />
               </div>
               <div className={styles.advancedPercentBox}>
                 <div className={styles.advancedPercentInput}>
@@ -485,7 +493,7 @@ class CustomRange extends Component {
 
   handleSlider = value => {
     const [minValue, maxValue] = value
-    if(minValue === maxValue) return
+    if (minValue === maxValue) return
     const { dataViews, customField } = this.props
     const data = customField ? (dataViews[customField] || {}) : {}
     const min = data.min || 0

@@ -29,7 +29,7 @@ export default class Preview extends Component {
 
   formatTable = () => {
     const { cleanData, visiable } = this
-    const { colType, target } = this.props.project;
+    const { colType, target, will_be_drop_500_lines } = this.props.project;
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
     // const index = rawHeader.indexOf(target)
@@ -83,11 +83,13 @@ export default class Preview extends Component {
       })
     }
 
-    const tableData = data.map(row => row.map(v => {
+    const tableData = data.map((row, index) => row.map(v => {
       return {
         content: <span>{v}</span>,
         title: v,
-        cn: styles.cell
+        cn: classnames(styles.cell, {
+          [styles.drop]: (will_be_drop_500_lines || []).includes(index)
+        })
       }
     }))
 

@@ -109,3 +109,7 @@
   text-overflow: ellipsis;
   width: 100%;
 }
+
+.drop {
+  background: #ff97a7;
+}
