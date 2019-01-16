@@ -25,12 +25,14 @@ class Uploader {
   isPause = false;
   sessionId = moment().valueOf();
   speeds = [];
+  lock = false;
+  temp = []
 
   constructor(file, config = {}) {
     this.path = config.path || '/upload';
     this.headers = config.headers || {};
-    this.CHUNK_SIZE = parseInt(config.chunkSize, 10) || 4194304;
-    this.concurrency = parseInt(config.concurrency, 10) || 4;
+    this.CHUNK_SIZE = parseInt(config.chunkSize, 10) || 1194304;
+    this.concurrency = parseInt(config.concurrency, 10) || 8;
     this.file = file;
     if (config.params) {
       this.path += Object.entries(config.params).reduce(
@@ -83,45 +85,55 @@ class Uploader {
     this.race();
   }
 
-  startSpeedCalculate() {
-    const speedText = speed => {
-      let unit = ' bytes/s';
-      if (speed > 1024 * 1024 * 1024) {
-        unit = ' Gb/s';
-        return (speed / (1024 * 1024 * 1024)).toFixed(2) + unit;
-      }
-      if (speed > 1024 * 1024) {
-        unit = ' Mb/s';
-        return (speed / (1024 * 1024)).toFixed(2) + unit;
-      }
-      if (speed > 1024) {
-        unit = ' kb/s';
-        return (speed / 1024).toFixed(2) + unit;
-      }
+  computeText() {
+    const speed = this.temp.length ? this.temp.reduce((start, s) => start + s, 0) / this.temp.length : 0
+    let unit = ' bytes/s';
+    if (speed > 1024 * 1024 * 1024) {
+      unit = ' Gb/s';
+      return (speed / (1024 * 1024 * 1024)).toFixed(2) + unit;
+    }
+    if (speed > 1024 * 1024) {
+      unit = ' Mb/s';
+      return (speed / (1024 * 1024)).toFixed(2) + unit;
+    }
+    if (speed > 1024) {
+      unit = ' kb/s';
+      return (speed / 1024).toFixed(2) + unit;
+    }
 
-      return speed.toFixed(2) + unit;
-    };
+    return speed.toFixed(2) + unit;
+  };
+
+  startSpeedCalculate() {
     this.startTime = moment().valueOf();
     let latestCalculateTime = this.startTime;
     let latestLoadedSize = this.totalLoaded;
     this.speedInterval = setInterval(() => {
       const currentTime = moment().valueOf();
       const currentLoadedSize = this.totalLoaded;
+      const loadingSize = this.speeds.reduce((start, s) => start + s, 0)
       this.speed =
-        (currentLoadedSize - latestLoadedSize) /
+        (currentLoadedSize - latestLoadedSize + loadingSize) /
         ((currentTime - latestCalculateTime) / 1000);
-      this.speedText = speedText(this.speed);
-      this.progress = this.totalLoaded + '/' + this.file.size;
+      if (this.speed < 0) console.log(currentLoadedSize, latestLoadedSize, loadingSize, this.speed, "err")
+      if (this.temp.length > 4) this.temp.shift()
+      this.temp.push(this.speed)
       latestCalculateTime = currentTime;
-      latestLoadedSize = currentLoadedSize;
+      latestLoadedSize = currentLoadedSize + loadingSize;
+      this.progress = latestLoadedSize + '/' + this.file.size;
       if (this.onProgressCallback && typeof this.onProgressCallback === 'function') {
-        this.onProgressCallback(this.progress, this.speedText, this.speed)
+        this.onProgressCallback(this.progress, this.computeText(), this.speed)
       }
     }, 500);
   }
 
   stopSpeedCalculate() {
     clearInterval(this.speedInterval);
+    this.temp = []
+    this.speed = 0
+    if (this.onProgressCallback && typeof this.onProgressCallback === 'function') {
+      this.onProgressCallback(this.progress, this.computeText(), this.speed)
+    }
   }
 
   pause() {
@@ -233,6 +245,17 @@ class Uploader {
     this.onProgressCallback = fn
   }
 
+  totalAdd(size, loadSize, index) {
+    if (this.lock) {
+      setTimeout(() => this.totalAdd.call(this, size, loadSize, index), 100)
+      return
+    }
+    this.lock = true
+    this.totalLoaded += size
+    this.speeds[index] -= loadSize
+    this.lock = false
+  }
+
   uploadChunk(chunk, index, processingIndex = 0) {
     const rangeEnd =
       (index + 1) * this.CHUNK_SIZE >= this.file.size
@@ -253,13 +276,15 @@ class Uploader {
           ...this.headers
         },
         onUploadProgress: event => {
-          this.totalLoaded += event.loaded - latestLoaded;
-          latestLoaded = event.loaded;
+          this.speeds[processingIndex] = Math.min(event.loaded, rangeEnd - index * this.CHUNK_SIZE)
+          // this.totalLoaded += event.loaded - latestLoaded;
+          // latestLoaded = event.loaded;
         }
       })
       .then(
         res => {
-          this.totalLoaded += rangeEnd - index * this.CHUNK_SIZE - latestLoaded;
+          this.totalAdd(rangeEnd - index * this.CHUNK_SIZE, this.speeds[processingIndex], processingIndex)
+          // this.totalLoaded += rangeEnd - index * this.CHUNK_SIZE;
           return { res, index, processingIndex };
         },
         error => ({ error, index, processingIndex })

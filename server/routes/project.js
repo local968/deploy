@@ -711,7 +711,7 @@ wss.register('createNewVariable', _sendToCommand)
 wss.register('abortTrain', (message, socket) => {
   const { projectId, isLoading, _id: requestId } = message
   const { userId } = socket.session
-  return redis.hget("project:" + id, 'stopId').then(stopId => {
+  return redis.hget("project:" + projectId, 'stopId').then(stopId => {
     try {
       stopId = JSON.parse(stopId)
     } catch (e) { }
