@@ -801,7 +801,7 @@ class ModelComp extends Component {
     const { models } = this.props;
     return (
       <div className={styles.modelComp}>
-        <a onClick={this.handleClick} className={styles.comparison}>Models comparison charts</a>
+        <a onClick={this.handleClick} className={styles.comparison}>Model Comparison Charts</a>
         <Modal
           width={1000}
           visible={this.state.modelCompVisible}
