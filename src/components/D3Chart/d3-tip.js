@@ -1,17 +1,10 @@
-// d3.tip
-// Copyright (c) 2013 Justin Palmer
-// ES6 / D3 v4 Adaption Copyright (c) 2016 Constantin Gavrilete
-// Removal of ES6 for D3 v4 Adaption Copyright (c) 2016 David Gotz
-//
-// Tooltips for d3.js SVG visualizations
 import * as d3 from 'd3';
 
 function functor(v) {
   return typeof v === 'function' ? v : function () {
     return v;
   };
-};
-
+}
 export default function (location) {
   let direction = d3_tip_direction,
     offset = d3_tip_offset,

@@ -24,11 +24,11 @@ export default class PredictVActual extends Component {
         </div>
         <div className={styles.legends} >
           <div className={styles.legend}>
-            <span style={{ backgroundColor: 'lightblue' }} className={styles.circle} ></span>
+            <span style={{backgroundColor: 'lightblue'}} className={styles.circle} />
             <span className={styles.legendText} > Predicted Values </span>
           </div>
           <div className={styles.legend}>
-            <span style={{ backgroundColor: 'black' }} className={styles.circle}></span>
+            <span style={{backgroundColor: 'black'}} className={styles.circle}/>
             <span className={styles.legendText}> Actual Values </span>
           </div>
         </div>
@@ -38,11 +38,7 @@ export default class PredictVActual extends Component {
           className={`PredictVActual-${model.name}`}
           height={200}
           data={model.qcut}
-        /> : <div className={styles.loading}><Spin size='large'></Spin></div>}
-        {/* {chartLoading ?
-          <Loading /> :
-        }
-        <GroupSize approach={this.props.approach} model={selectedModel} /> */}
+        /> : <div className={styles.loading}><Spin size='large'/></div>}
       </div>
     );
   }
