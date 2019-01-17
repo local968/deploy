@@ -20,9 +20,10 @@ export default class ClassificationView extends Component {
   onChange = e => {
     const criteria = e.target.value
     this.showCost = criteria === 'cost'
-    const data = { criteria, selectId: '' }
+    const data = { criteria }
     if (!this.showCost) {
       const { models } = this.props
+      data.selectId = ''
       // this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
       // data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
       models.forEach(m => {
@@ -63,7 +64,7 @@ export default class ClassificationView extends Component {
       const benefit = m.getBenefit(TP, FN, FP, TN)
       if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
     })
-    project.updateProject({ costOption: { ...this.costOption } })
+    project.updateProject({ costOption: { ...this.costOption }, selectId: '' })
   }
 
   render() {
