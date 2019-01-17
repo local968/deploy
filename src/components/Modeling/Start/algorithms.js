@@ -65,7 +65,7 @@ module.exports = {
       label: 'XGBoost'
     },
     {
-      value: 'logistics',
+      value: 'r2-logistics',
       label: 'Logistics'
     }
   ],
