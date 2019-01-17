@@ -237,6 +237,12 @@
     display: block;
 }
 
+span.performanceScore {
+    font-size: 1.3rem;
+    line-height: 1.4;
+    color: #f5a623;
+}
+
 .performanceText {
     color: #000;
     margin-top: 0.15em;
@@ -416,6 +422,7 @@
 
 .name {
     width: 2.3em;
+    flex: none;
 }
 
 .name span {
@@ -701,11 +708,10 @@
     flex: auto;
     height: .2em;
     background: #ccc;
-    border-radius: .1em;
     overflow: hidden;
     align-items: center;
     justify-content: center;
-    margin: 0 4% 0 2%;
+    margin: 0 0.05em;
 }
 
 .trainingText {
@@ -728,7 +734,7 @@
     display: flex;
     flex: none;
     height: .2em;
-    background: #448eed;
+    background: #1d2b3c;
     align-items: center;
     overflow: hidden;
     transition: width 1s ease-in-out;
@@ -768,10 +774,11 @@
     justify-content: center;
     align-items: center;
     border-radius: 5px;
-    border: solid 1px #1d2b3c;
     background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
-    padding: 0.1em 0.3em;
+    padding: 0.05em 0.3em;
+    margin: 0 0.1em;
     cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .abortButton :global(.anticon) {
@@ -779,7 +786,7 @@
 }
 
 .abortButton span {
-    font-size: 1rem;
+    font-size: .875rem;
     font-weight: bold;
     color: #1d2b3c;
     font-family: SanFranciscoText;
