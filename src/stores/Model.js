@@ -104,7 +104,7 @@ export default class Model {
       index: this.initialFitIndex,
       text: `${ITP} * ${0}(TP) - ${IFN} * ${0}(FN) - ${IFP} * ${0}(FP) + ${ITN} * ${0}(TN) = ${0}`
     }
-    let maxIndex = 0
+    let maxIndex = this.fitIndex
     for (let i = 1; i < 100; i++) {
       const benefit = TP[i] * ITP - FN[i] * IFN - FP[i] * IFP + TN[i] * ITN
       const maxBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
