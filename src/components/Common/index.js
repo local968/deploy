@@ -15,6 +15,7 @@ import Confirm from './Confirm';
 import ProcessLoading from './ProcessLoading';
 import Hint from './Hint';
 import Range from './Range';
+import ProgressBar from './ProgressBar';
 
 export {
   BlackButton,
@@ -33,5 +34,6 @@ export {
   Confirm,
   ProcessLoading,
   Hint,
-  Range
+  Range,
+  ProgressBar
 };

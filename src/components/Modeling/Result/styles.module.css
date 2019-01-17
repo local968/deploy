@@ -703,43 +703,6 @@ span.performanceScore {
     align-items: center;
 }
 
-.trainingProcessBg {
-    display: flex;
-    flex: auto;
-    height: .2em;
-    background: #ccc;
-    overflow: hidden;
-    align-items: center;
-    justify-content: center;
-    margin: 0 0.05em;
-}
-
-.trainingText {
-    color: #fff;
-    font-size: 1rem;
-    font-family: SanFranciscoText;
-    position: absolute;
-}
-
-.trainingProcessBlock {
-    display: flex;
-    flex: none;
-    height: .2em;
-    background: transparent;
-    width: 100%;
-    position: relative;
-}
-
-.trainingProcess {
-    display: flex;
-    flex: none;
-    height: .2em;
-    background: #1d2b3c;
-    align-items: center;
-    overflow: hidden;
-    transition: width 1s ease-in-out;
-}
-
 .trainingModel {
     display: flex;
     flex: none;

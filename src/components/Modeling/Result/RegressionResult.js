@@ -9,6 +9,7 @@ import { Tooltip, Icon } from 'antd'
 import ModelProcessFlow from "./ModelProcessFlow";
 import Process from "./Process.svg";
 import Variable from "./Variable.svg";
+import { ProgressBar } from 'components/Common';
 
 
 @observer
@@ -144,12 +145,13 @@ class ModelTable extends Component {
           })}
           {!train2Finished && <div className={styles.rowData}>
             <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div>
-            <div className={styles.trainingProcessBg}>
+            <ProgressBar progress={((trainModel || {}).value || 0)} />
+            {/* <div className={styles.trainingProcessBg}>
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${((trainModel || {}).value || 0)}%` }}></div>
               </div>
               <div className={styles.trainingText}>{`${((trainModel || {}).value || 0).toFixed(2)}%`}</div>
-            </div>
+            </div> */}
             <div className={styles.abortButton} onClick={!isAbort ? abortTrain.bind(null, false) : null}>
               {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>
