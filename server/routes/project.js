@@ -31,27 +31,8 @@ function parseChartData(result) {
       }
       fitIndex = initialFitIndex
     }
-    roundN(result.roc);
   }
   return { chartData: result, fitIndex, initialFitIndex };
-}
-
-function roundN(data, n = 2) {
-  if (!data) return;
-  const pow = Math.pow(10, n);
-  if (typeof data === 'number') {
-    return Math.floor(data * pow) / pow;
-  }
-  Object.keys(data).forEach(key => {
-    const num = data[key];
-    if (typeof num === 'number') {
-      data[key] = Math.floor(num * pow) / pow;
-    } else if (typeof num === 'object') {
-      return roundN(num, n);
-    } else {
-      data[key] = num;
-    }
-  });
 }
 
 function setDefaultData(id, userId) {
@@ -568,7 +549,7 @@ wss.register('etl', (message, socket, progress) => {
 wss.register('abortEtl', (message, socket) => {
   const projectId = message.projectId
   const userId = socket.session.userId
-  return redis.hget("project:" + id, 'stopId').then(stopId => {
+  return redis.hget("project:" + projectId, 'stopId').then(stopId => {
     try {
       stopId = JSON.parse(stopId)
     } catch (e) { }

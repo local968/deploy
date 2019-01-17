@@ -63,6 +63,10 @@ module.exports = {
     {
       value: 'xgradient_boosting',
       label: 'XGBoost'
+    },
+    {
+      value: 'logistics',
+      label: 'Logistics'
     }
   ],
   Regression: [
