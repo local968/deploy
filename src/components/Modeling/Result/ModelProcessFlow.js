@@ -18,10 +18,14 @@ export default class ModelProcessFlow extends Component {
                 {
                     _data.map((itm,index)=>{
                         const key = itm[0].substring(type.length);
-                        if(key === 'strategy'){
-                            return <dd key={index}>{itm[1]}</dd>
+                        let value = itm[1];
+                        if(typeof value === 'number'){
+                            value = value.toFixed(3)
                         }
-                        return <dd key={index}>{key}:{itm[1]}</dd>
+                        if(key === 'strategy'){
+                            return <dd key={index}>{value}</dd>
+                        }
+                        return <dd key={index}>{key}:{value}</dd>
                     })
                 }
             </Fragment>
