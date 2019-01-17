@@ -20,7 +20,7 @@ export default class ClassificationView extends Component {
   onChange = e => {
     const criteria = e.target.value
     this.showCost = criteria === 'cost'
-    const data = { criteria }
+    const data = { criteria, selectId: '' }
     if (!this.showCost) {
       const { models } = this.props
       this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
