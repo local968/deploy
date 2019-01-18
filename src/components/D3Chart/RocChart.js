@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Checkbox } from 'antd';
-import { observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import styles from './D3Chart.module.css';
 // import d3tips from './d3-tip';
 
@@ -18,6 +18,7 @@ function parseData(chartData) {
   }, [])
 }
 
+@inject('projectStore')
 @observer
 export default class RocChart extends Component {
   state = {
@@ -94,10 +95,18 @@ export default class RocChart extends Component {
         .style('stroke', color[index]);
     }
     return data;
+  };
+
+  newSort(index){
+    clearTimeout(window.changeCutoff);
+    window.changeCutoff = setTimeout(()=>{
+      this.props.projectStore.changeStopFilter(false);
+      this.props.model.setFitIndex(index);
+    },800)
   }
 
   drawFocus = (self, x, y, data, focus) => {
-    const { model } = this.props;
+    const { model,projectStore } = this.props;
     const x0 = x.invert(d3.mouse(self)[0]);
 
     const index = this.getNearestPoint(x0, data, 'FPR');
@@ -107,8 +116,10 @@ export default class RocChart extends Component {
       return null;
     }
     focus.attr('transform', 'translate(' + x(d.FPR) + ',' + y(d.TPR) + ')');
+    projectStore.changeStopFilter(true);
     model.setFitIndex(index);
-  }
+    this.newSort(index)
+  };
 
   getNearestPoint(val, data, key) {
     let index;

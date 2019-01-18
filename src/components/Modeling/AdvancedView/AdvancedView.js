@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
-import { observer } from 'mobx-react';
+import { observer,inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
@@ -49,10 +49,12 @@ import moment from 'moment';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
+@inject('projectStore')
 @observer
 export default class AdvancedView extends Component {
 
-  @observable currentSettingId = 'all'
+  @observable currentSettingId = 'all';
+
   // undefined = can not sort, false = no sort ,1 = asc, 2 = desc
   @observable sortState = {
     'Model Name': 1,
@@ -80,7 +82,7 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project } = this.props;
+    const { models, project ,projectStore} = this.props;
     let _filtedModels = [...models];
     const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     const metricKey = this.metric.key;
@@ -93,14 +95,17 @@ export default class AdvancedView extends Component {
         return 0
       }
     };
+
+    let {stopFilter,newfiltedModels,oldfiltedModels} = projectStore;
+
     const sortMethods = (aModel, bModel) => {
       switch (currentSort) {
         case 'F1-Score':
           {
             const aFitIndex = aModel.fitIndex;
-            const bFitIndex = bModel.fitIndex
-            const aModelData = formatNumber(aModel.chartData.roc.F1[aFitIndex])
-            const bModelData = formatNumber(bModel.chartData.roc.F1[bFitIndex])
+            const bFitIndex = bModel.fitIndex;
+            const aModelData = formatNumber(aModel.chartData.roc.F1[aFitIndex]);
+            const bModelData = formatNumber(bModel.chartData.roc.F1[bFitIndex]);
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Precision':
@@ -199,21 +204,34 @@ export default class AdvancedView extends Component {
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
-            const aModelData = formatNumber(aModel.chartData.roc.KS[aFitIndex])
-            const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex])
+            const aModelData = formatNumber(aModel.chartData.roc.KS[aFitIndex]);
+            const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex]);
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Model Name':
         default:
-          const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.')
-          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix()
-          const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.')
-          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix()
+          const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
+          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
+          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
           return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
       }
+    };
+
+    projectStore.changeNewfiltedModels(_filtedModels);
+
+    if(!oldfiltedModels){
+      projectStore.changeOldfiltedModels(_filtedModels);
+      oldfiltedModels = _filtedModels;
     }
-    _filtedModels = _filtedModels.sort(sortMethods)
-    if (this.currentSettingId === 'all') return _filtedModels
+
+    if(stopFilter){
+      _filtedModels = oldfiltedModels.sort(sortMethods);
+    }else{
+      _filtedModels = _filtedModels.sort(sortMethods);
+    }
+
+    if (this.currentSettingId === 'all') return _filtedModels;
     const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
     if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
       return _filtedModels.filter(model => currentSetting.models.find(id => model.name === id))
@@ -288,7 +306,7 @@ export default class AdvancedView extends Component {
       const { project } = props;
       if (project && project.measurement)
         this.metric = this.metricOptions.find(metric => metric.key === project.measurement) || this.metricOptions[0]
-    })
+    });
 
     if (window.localStorage) {
       runInAction(() => {
@@ -327,7 +345,7 @@ export default class AdvancedView extends Component {
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
-        <AdvancedModelTable models={this.filtedModels} project={project} sortState={this.sortState} changeSort={this.changeSort} metric={this.metric} />
+        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sortState={this.sortState} changeSort={this.changeSort} metric={this.metric} />
       </div>
     )
   }
@@ -343,8 +361,8 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sortState, changeSort, metric } = this.props;
-    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray
-    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
+    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
+    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',];

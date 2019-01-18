@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import * as d3 from 'd3';
 
 import styles from './D3Chart.module.css';
@@ -15,11 +15,17 @@ function parseData(chartData) {
   }, [])
 }
 
+@inject('projectStore')
 @observer
 export default class AreaChart extends Component {
   state = {
     movable: true
   };
+
+  constructor(props){
+    super(props);
+    this.newSort = this.newSort.bind(this)
+  }
 
   componentDidMount () {
     this.renderD3();
@@ -119,7 +125,15 @@ export default class AreaChart extends Component {
       .text('Probability Density');
     this.drawLegend(svg, color);
     this.drawThreshold(svg, x, height);
-  }
+  };
+
+    newSort(index){
+      clearTimeout(window.changeCutoff);
+      window.changeCutoff = setTimeout(()=>{
+        this.props.projectStore.changeStopFilter(false);
+        this.props.model.setFitIndex(index);
+      },800)
+    }
 
   /**
    * 可移动棒
@@ -136,6 +150,7 @@ export default class AreaChart extends Component {
       .attr('y1', height)
       .attr('y2', 20)
       .attr('class', styles.thresholdLine);
+
     const dragCircle = d3.drag()
       .on('drag', () => {
         let p = d3.event.x;
@@ -148,7 +163,9 @@ export default class AreaChart extends Component {
         line.attr('x1', p)
           .attr('x2', p);
         circle.attr('cx', p);
+        this.props.projectStore.changeStopFilter(true);
         this.props.model.setFitIndex(index);//stores/Model.js/setFitIndex
+        this.newSort(index)
       });
 
     const circle = thresholdLine
