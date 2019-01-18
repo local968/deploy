@@ -145,7 +145,7 @@ class ModelTable extends Component {
           })}
           {!train2Finished && <div className={styles.rowData}>
             <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div>
-            <ProgressBar progress={((trainModel || {}).value || 0)} />
+            {!!trainModel && <ProgressBar progress={((trainModel || {}).value || 0)} />}
             {/* <div className={styles.trainingProcessBg}>
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${((trainModel || {}).value || 0)}%` }}></div>
