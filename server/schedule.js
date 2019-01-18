@@ -22,7 +22,16 @@ async function scheduleHandler() {
     let deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return
 
-    const restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+    let restrictQuery
+    try {
+      restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+    } catch (e) {
+      schedule.status = 'issue'
+      schedule.updatedDate = moment().unix()
+      schedule.result = { ['process error']: e.message }
+      await api.upsertSchedule(schedule);
+      return
+    }
     deployment = await api.getDeployment(schedule.deploymentId);
     if (restrictQuery === false) {
       schedule.status = 'issue'

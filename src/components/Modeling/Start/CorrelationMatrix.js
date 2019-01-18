@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import styles from './CorrelationMatrix.module.less';
+import styles from './CorrelationMatrix.module.css';
 import { MultiGrid } from 'react-virtualized';
 
 @observer

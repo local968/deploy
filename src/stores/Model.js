@@ -18,6 +18,7 @@ export default class Model {
   @observable confusionMatrix
   @observable problemType
   @observable fitIndexModified;
+  @observable filtedModels;
 
   constructor(projectId, model, name) {
     this.projectId = projectId;
@@ -60,7 +61,6 @@ export default class Model {
     for (let key in data) {
       if (typeof data[key] === 'function') {
         delete data[key];
-        continue;
       }
     }
     Object.assign(this, data)
@@ -70,14 +70,15 @@ export default class Model {
     this.fitIndex = index;
     this.fitIndexModified = true;
     this.updateModel({
-      fitIndex:index
+      fitIndex:index,
     })
   }
+
   @action
   resetFitIndex() {
-    this.fitIndexModified = false
-    const {initialFitIndex:fitIndex} = this
-    this.fitIndex = fitIndex
+    this.fitIndexModified = false;
+    const {initialFitIndex:fitIndex} = this;
+    this.fitIndex = fitIndex;
     this.updateModel({
       fitIndex,
     })
@@ -104,7 +105,7 @@ export default class Model {
       index: this.initialFitIndex,
       text: `${ITP} * ${0}(TP) - ${IFN} * ${0}(FN) - ${IFP} * ${0}(FP) + ${ITN} * ${0}(TN) = ${0}`
     }
-    let maxIndex = 0
+    let maxIndex = this.fitIndex
     for (let i = 1; i < 100; i++) {
       const benefit = TP[i] * ITP - FN[i] * IFN - FP[i] * IFP + TN[i] * ITN
       const maxBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
@@ -201,7 +202,7 @@ export default class Model {
        data,
        id: this.id,
        projectId: this.projectId,
-    }))
+    }));
     Object.assign(this, data);
   }
 }

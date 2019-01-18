@@ -1122,3 +1122,10 @@ span.advancedDesc {
 .funcTipsCol {
   font-size: 0.875rem;
 }
+
+.crossWarning {
+  text-align: center;
+  display: block;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}

@@ -1,34 +1,16 @@
 import React, { Component } from 'react';
-import 'rc-slider/assets/index.css';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { action } from 'mobx';
-import Slider from 'rc-slider';
-import { NumberInput } from 'components/Common';
-import { Select, message } from 'antd';
+import { NumberInput, Range } from 'components/Common';
+import { Select, message, Tooltip } from 'antd';
 import Algorithms from './algorithms';
 
 const Option = Select.Option;
-const Range = Slider.Range;
-const HandleStyle = {
-  backgroundImage: 'radial-gradient(circle at 50% 0, #a3a0a0, #cdcdcd)',
-  border: '0.07em solid #e8e8e8',
-  width: '0.3em',
-  height: '0.3em',
-  marginLeft: '-0.15em',
-  marginTop: '-0.13em',
-  borderRadius: '50%',
-  display: 'flex',
-  flex: 'none',
-  alignitems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer'
-}
 
 @observer
 export default class AdvancedView extends Component {
-  // @observable type = ''
 
   handleName = action((e) => {
     const { project } = this.props
@@ -40,13 +22,14 @@ export default class AdvancedView extends Component {
   }
 
   handleSlider = value => {
-    const { runWith } = this.props.project;
-    if (runWith === 'holdout') {
-      this.props.project.holdoutRate = 100 - value[1];
-      this.props.project.validationRate = value[1] - value[0];
-    } else {
-      this.props.project.holdoutRate = 100 - value[0];
-    }
+    const [min, max] = value
+    if (max === min) return
+    this.props.project.holdoutRate = 100 - max;
+    this.props.project.validationRate = max - min;
+  }
+
+  handleDrag = value => {
+    this.props.project.holdoutRate = 100 - value;
   }
 
   changeValidationRate = value => {
@@ -140,7 +123,7 @@ export default class AdvancedView extends Component {
   }
 
   handleSpeed = value => {
-    this.props.project.speedVSaccuracy = value[0]
+    this.props.project.speedVSaccuracy = value
   }
 
   changeSpeed = (isSpeed, value) => {
@@ -208,7 +191,7 @@ export default class AdvancedView extends Component {
   })
 
   render() {
-    const { settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy, ensembleSize } = this.props.project;
+    const { settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy, ensembleSize, totalLines } = this.props.project;
     const measurementList = problemType === "Classification" ?
       [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }] :
       [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }]
@@ -260,14 +243,28 @@ export default class AdvancedView extends Component {
           </div>
           <div className={styles.advancedBlock}>
             <div className={styles.advancedAlgorithmList}>
-              <div className={styles.advancedAlgorithm} key={'solution-a'}>
-                <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
-                <label htmlFor={'R2-solution-a'}>R2-solution-a</label>
-              </div>
-              <div className={styles.advancedAlgorithm} key={'solution-b'}>
-                <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
-                <label htmlFor={'R2-solution-b'}>R2-solution-b</label>
-              </div>
+              <Tooltip
+                title={<span className={styles.crossWarning}>
+                  R2-solution-a & b are mandatory modelling algorithms for Advanced Modelling.
+                  </span>}
+                mouseLeaveDelay={0}
+                overlayStyle={{ maxWidth: '100%' }}>
+                <div className={styles.advancedAlgorithm} key={'solution-a'}>
+                  <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} />
+                  <label htmlFor={'R2-solution-a'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-a</label>
+                </div>
+              </Tooltip>
+              <Tooltip
+                title={<span className={styles.crossWarning}>
+                  R2-solution-a & b are mandatory modelling algorithms for Advanced Modelling.
+                  </span>}
+                mouseLeaveDelay={0}
+                overlayStyle={{ maxWidth: '100%' }}>
+                <div className={styles.advancedAlgorithm} key={'solution-b'}>
+                  <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} />
+                  <label htmlFor={'R2-solution-b'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-b</label>
+                </div>
+              </Tooltip>
               {Algorithms[problemType].map((v, k) => {
                 return <div className={styles.advancedAlgorithm} key={k}>
                   <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v.value)} onChange={this.handleCheck.bind(null, v.value)} />
@@ -359,10 +356,18 @@ export default class AdvancedView extends Component {
               <span>Run models with:</span>
             </div>
             <div className={styles.advancedOption}>
-              <div className={styles.advancedOptionBox}>
-                <input id="runwith1" type='radio' name="runWith" checked={runWith === "cross"} onChange={this.handleRunWith.bind(null, 'cross')} />
-                <label htmlFor="runwith1">Cross Validation</label>
-              </div>
+              <Tooltip
+                title={<span className={styles.crossWarning}>
+                  Performing cross validation on large dataset will take significant amount of time. <br />
+                  Hence we recommend choosing “Train Validation Holdout”.`
+                  </span>}
+                visible={runWith === "cross" && totalLines > 200000}
+                overlayStyle={{ maxWidth: '100%' }}>
+                <div className={styles.advancedOptionBox}>
+                  <input id="runwith1" type='radio' name="runWith" checked={runWith === "cross"} onChange={this.handleRunWith.bind(null, 'cross')} />
+                  <label htmlFor="runwith1">Cross Validation</label>
+                </div>
+              </Tooltip>
               <div className={styles.advancedOptionBox}>
                 <input id="runwith2" type='radio' name="runWith" checked={runWith === "holdout"} onChange={this.handleRunWith.bind(null, 'holdout')} />
                 <label htmlFor="runwith2">Train / Validation / Holdout</label>
@@ -381,17 +386,13 @@ export default class AdvancedView extends Component {
                   <div className={styles.advancedPercentHoldout} style={{ width: holdoutRate + '%' }}></div>
                 </div>
                 <Range
-                  className={styles.range}
-                  railStyle={{ backgroundColor: 'transparent' }}
-                  trackStyle={[{ backgroundColor: 'transparent' }, { backgroundColor: 'transparent' }]}
-                  handleStyle={[HandleStyle, HandleStyle]}
-                  value={[100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10), 100 - parseInt(holdoutRate, 10)]}
-                  onChange={this.handleSlider}
-                  allowCross={false}
-                  pushable={1}
-                  count={2}
+                  range={true}
+                  step={1}
                   min={1}
                   max={99}
+                  onChange={this.handleSlider}
+                  value={[100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10), 100 - parseInt(holdoutRate, 10)]}
+                  tooltipVisible={false}
                 />
               </div> : <div className={styles.advancedPercentBlock} >
                   <div className={styles.advancedPercent}>
@@ -399,17 +400,13 @@ export default class AdvancedView extends Component {
                     <div className={styles.advancedPercentHoldout} style={{ width: holdoutRate + '%' }}></div>
                   </div>
                   <Range
-                    className={styles.range}
-                    railStyle={{ backgroundColor: 'transparent' }}
-                    trackStyle={[{ backgroundColor: 'transparent' }]}
-                    handleStyle={[HandleStyle]}
-                    value={[100 - parseInt(holdoutRate, 10)]}
-                    onChange={this.handleSlider}
-                    allowCross={false}
-                    pushable={1}
-                    count={1}
+                    range={false}
+                    step={1}
                     min={1}
                     max={99}
+                    onChange={this.handleDrag}
+                    value={100 - parseInt(holdoutRate, 10)}
+                    tooltipVisible={false}
                   />
                 </div>}
               {runWith === "holdout" ? <div className={styles.advancedPercentBox}>
@@ -468,16 +465,13 @@ export default class AdvancedView extends Component {
                   <div className={styles.advancedPercentHoldout} style={{ width: ((9 - speedVSaccuracy) / 8 * 100) + '%' }}></div>
                 </div>
                 <Range
-                  className={styles.range}
-                  railStyle={{ backgroundColor: 'transparent' }}
-                  trackStyle={[{ backgroundColor: 'transparent' }]}
-                  handleStyle={[HandleStyle]}
-                  value={[speedVSaccuracy]}
-                  onChange={this.handleSpeed}
+                  range={false}
+                  step={1}
                   min={1}
                   max={9}
-                  allowCross={false}
-                  pushable={1}
+                  onChange={this.handleSpeed}
+                  value={speedVSaccuracy}
+                  tooltipVisible={false}
                 />
               </div>
               <div className={styles.advancedPercentBox}>
@@ -513,6 +507,7 @@ class CustomRange extends Component {
 
   handleSlider = value => {
     const [minValue, maxValue] = value
+    if (minValue === maxValue) return
     const { dataViews, customField } = this.props
     const data = customField ? (dataViews[customField] || {}) : {}
     const min = data.min || 0
@@ -556,16 +551,12 @@ class CustomRange extends Component {
             <div className={styles.advancedPercentHoldout} style={{ width: (100 - maxPercent) + '%' }}></div>
           </div>
           <Range
-            className={styles.range}
-            railStyle={{ backgroundColor: 'transparent' }}
-            trackStyle={[{ backgroundColor: 'transparent' }, { backgroundColor: 'transparent' }]}
-            handleStyle={[HandleStyle, HandleStyle]}
-            value={[minPercent, maxPercent]}
-            onChange={this.handleSlider}
+            range={true}
             min={1}
             max={99}
-            allowCross={false}
-            pushable={1}
+            onChange={this.handleSlider}
+            value={[minPercent, maxPercent]}
+            tooltipVisible={true}
             marks={marks}
           />
         </div>}

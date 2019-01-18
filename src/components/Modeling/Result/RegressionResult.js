@@ -5,7 +5,12 @@ import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
-import { Tooltip } from 'antd'
+import { Tooltip, Icon } from 'antd'
+import ModelProcessFlow from "./ModelProcessFlow";
+import Process from "./Process.svg";
+import Variable from "./Variable.svg";
+import { ProgressBar } from 'components/Common';
+
 
 @observer
 export default class RegressionView extends Component {
@@ -15,9 +20,8 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort } = project;
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
-
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -58,6 +62,7 @@ export default class RegressionView extends Component {
         train2Finished={train2Finished}
         trainModel={trainModel}
         abortTrain={abortTrain}
+        isAbort={isAbort}
       />
     </div>
   }
@@ -94,7 +99,7 @@ class Performance extends Component {
 @observer
 class ModelTable extends Component {
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, abortTrain } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, abortTrain, isAbort } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -122,7 +127,9 @@ class ModelTable extends Component {
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Variable Impact</span>
             </div>
-            {/* <div className={classnames(styles.cell, styles.cellHeader)}><span>Process Flow</span></div> */}
+            <div className={classnames(styles.cell, styles.cellHeader)}>
+              <span>Model Process Flow</span>
+            </div>
           </div>
         </div>
         <div className={styles.data}>
@@ -136,18 +143,17 @@ class ModelTable extends Component {
               />
             );
           })}
-          {(!train2Finished && trainModel) && <div className={styles.rowData}>
-            <div className={styles.trainingModel}><Tooltip title={trainModel.model}>{trainModel.model}</Tooltip></div>
-            <div className={styles.trainingProcessBg}>
+          {!train2Finished && <div className={styles.rowData}>
+            <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div>
+            <ProgressBar progress={((trainModel || {}).value || 0)} />
+            {/* <div className={styles.trainingProcessBg}>
               <div className={styles.trainingProcessBlock}>
-                <div className={styles.trainingProcess} style={{ width: `${trainModel.value}%` }}></div>
+                <div className={styles.trainingProcess} style={{ width: `${((trainModel || {}).value || 0)}%` }}></div>
               </div>
-              <div className={styles.trainingText}>{`${(trainModel.value || 0).toFixed(2)}%`}</div>
-            </div>
-          </div>}
-          {!train2Finished && <div className={styles.trainingAbort}>
-            <div className={styles.abortButton} onClick={abortTrain.bind(null, false)}>
-              <span>Abort Training</span>
+              <div className={styles.trainingText}>{`${((trainModel || {}).value || 0).toFixed(2)}%`}</div>
+            </div> */}
+            <div className={styles.abortButton} onClick={!isAbort ? abortTrain.bind(null, false) : null}>
+              {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>
           </div>}
         </div>
@@ -158,13 +164,21 @@ class ModelTable extends Component {
 
 @observer
 class ModelDetail extends Component {
-  @observable type = ''
-  @observable visible = false
+  @observable type = '';
+  @observable visible = false;
 
-  toggleImpact = () => {
-    this.type = 'impact'
-    this.visible = !this.visible
-  };
+  toggleImpact(type) {
+    if (!this.visible) {//本来是关着的
+      this.type = type
+      this.visible = true
+      return
+    }
+    if (this.type === type) {
+      this.visible = false
+    } else {
+      this.type = type
+    }
+  }
 
   render() {
     const { model, onSelect, current } = this.props;
@@ -196,11 +210,18 @@ class ModelDetail extends Component {
             <span>{model.executeSpeed + ' rows/s'}</span>
           </div>
           <div className={classnames(styles.cell, styles.compute)}>
-            <span onClick={this.toggleImpact}>Compute</span>
+            <img src={Variable} alt="" />
+            <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
+          </div>
+          <div className={classnames(styles.cell, styles.compute)}>
+            <img src={Process} alt="" />
+            <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
           </div>
         </div>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-        {this.visible && <VariableImpact model={model} />}
+        {/*{this.visible && <VariableImpact model={model} />}*/}
+        {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
+        {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
       </div>
     );
   }

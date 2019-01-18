@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popover } from 'antd';
-import styles from './ModelProcess.module.less';
+import styles from './ModelProcess.module.css';
 import { observer } from 'mobx-react';
 
 @observer

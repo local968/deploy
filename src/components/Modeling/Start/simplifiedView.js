@@ -17,13 +17,10 @@ export default class SimplifiedView extends Component {
   @observable showHistograms = false
   @observable showCorrelation = false
   @observable visible = false
-  @observable progress = 0
 
   componentDidMount() {
-    this.props.project.dataView(num => this.progress = num / 2).then(() => {
-      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
-        this.progress = 0
-      })
+    this.props.project.dataView().then(() => {
+      this.props.project.preTrainImportance()
     })
   }
 
@@ -73,10 +70,8 @@ export default class SimplifiedView extends Component {
   }
 
   reloadTable = () => {
-    this.props.project.dataView(num => this.progress = num / 2).then(() => {
-      this.props.project.preTrainImportance(num => this.progress = 50 + num / 2).then(() => {
-        this.progress = 0
-      })
+    this.props.project.dataView().then(() => {
+      this.props.project.preTrainImportance()
     })
   }
 
@@ -107,7 +102,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines } = project;
+    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
@@ -227,7 +222,7 @@ export default class SimplifiedView extends Component {
             })}
           </div>}
       </div>
-      {(dataViewsLoading || preImportanceLoading) && <ProcessLoading progress={this.progress} style={{ bottom: '0.25em' }} />}
+      {(dataViewsLoading || preImportanceLoading) && <ProcessLoading progress={dataViewsLoading ? (dataViewProgress / 2) : (importanceProgress / 2 + 50)} style={{ bottom: '0.25em' }} />}
     </div>
   }
 }
@@ -613,7 +608,7 @@ class CreateNewVariable extends Component {
     const isBaseFn = FUNCTIONS.base.find(fn => fn.value === functionName + "()")
     const isSeniorFn = FUNCTIONS.senior.find(fn => fn.value === functionName + "()")
     const currentFn = isBaseFn || isSeniorFn
-    if (currentFn.params && currentFn.params < expArray.length) return { isPass: false, message: `function ${functionName} must have ${currentFn.params} params` }
+    if (currentFn.params && currentFn.params !== expArray.length) return { isPass: false, message: `function ${functionName} must have ${currentFn.params} params` }
     let numOfParam = 0
     let isVariable1 = false
     let num = 1

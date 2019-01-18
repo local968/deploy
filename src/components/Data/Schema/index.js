@@ -20,26 +20,24 @@ export default class DataSchema extends Component {
 
   doEtl = () => {
     const { project } = this.props.projectStore
-    const { sortHeader } = project;
+    const { sortHeader, target } = project;
     const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
-    project.dataHeader = newDataHeader
-    project.colType = { ...this.dataType }
+    const data = {
+      dataHeader: newDataHeader,
+      colType: { ...this.dataType }
+    }
+    // 回归默认设置为drop
+    if (target && this.dataType[target] === 'Numerical') {
+      data.outlierFillMethod = { [target]: 'drop' }
+      data.outlierFillMethodTemp = { [target]: 'drop' }
+    }
+    project.setProperty(data)
     project.endSchema()
   }
 
   targetSelect = (value) => {
     // const { colType } = this.props.projectStore.project
-    const data = {
-      target: value,
-      outlierFillMethod: {},
-      outlierFillMethodTemp: {}
-    }
-    // 回归默认设置为drop
-    if (value && this.dataType[value] === 'Numerical') {
-      data.outlierFillMethod = { [value]: 'drop' }
-      data.outlierFillMethodTemp = { [value]: 'drop' }
-    }
-    this.props.projectStore.project.setProperty(data)
+    this.props.projectStore.project.setProperty({ target: value })
     this.tableRef.current.updateGrids()
     // this.props.projectStore.project.updateProject(data).then(() => this.tableRef.current.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
@@ -141,7 +139,7 @@ export default class DataSchema extends Component {
         headerData.content = <span>row/header</span>;
         headerData.title = '';
       } else {
-        headerData.content = <span>{header}</span>
+        headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
         headerData.title = header;
         if (target && target === header) {
           headerData.cn = classnames(headerData.cn, styles.target);
@@ -299,5 +297,13 @@ export default class DataSchema extends Component {
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
     </div>
+  }
+}
+
+//修改表头
+class EditHeader extends Component {
+  render() {
+    const { value } = this.props
+    return <span>{value}</span>
   }
 }

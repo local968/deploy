@@ -7,18 +7,25 @@ import {Popover,Button,Icon,Tag} from 'antd'
 @observer
 export default class ModelProcessFlow extends Component {
 
-    constructor(props){
-        super(props);
-    }
-
     list(data,type,name,show=false){
-        const _data = Object.entries(data).filter(itm=>itm[0].startsWith(type));
+        const _data = Object.entries(data)
+            .filter(itm=>itm[0].startsWith(type))
+            .filter(itm=>!itm[0].endsWith("__choice__"))
+            .filter(itm=>itm[1].toString().toUpperCase() !== 'NONE');
         if(_data.length||show){
             return <Fragment>
                 <dt>{name}</dt>
                 {
                     _data.map((itm,index)=>{
-                        return <dd key={index}>{itm[0].substring(type.length)}:{itm[1]}</dd>
+                        const key = itm[0].substring(type.length);
+                        let value = itm[1];
+                        if(typeof value === 'number'){
+                            value = value.toFixed(3)
+                        }
+                        if(key === 'strategy'){
+                            return <dd key={index}>{value}</dd>
+                        }
+                        return <dd key={index}>{key}:{value}</dd>
                     })
                 }
             </Fragment>
@@ -36,20 +43,44 @@ export default class ModelProcessFlow extends Component {
 
     FP(data){
         const name = data['preprocessor:__choice__'];
+       const types =  {
+            'extra_trees_preproc_for_classification':'extreml.rand.trees.prepr.',
+            'extra_trees_preproc_for_regression': 'extreml.rand.trees.prepr.',
+            'fast_ica':'ICA',
+            'feature_agglomeration': 'Feature Agglomeration',
+            'kernel_pca':'kernel PCA',
+            'kitchen_sinks': 'Kitchen Sinks',
+            'linear_svc_preprocessor':'Linear SVM prepr.',
+            'no_preprocessor':'No Preprocessing',
+            'no_preprocessing':'No Preprocessing',
+            'nystroem_sampler': 'Nystroem Sampler',
+            'pca':'PCA',
+            'polynomial':'Polynomial',
+            'random_trees_embedding':'Random Trees embed.',
+            'select_percentile_classification': 'Select Percentile',
+            'select_percentile_regression':'Select Percentile',
+            'select_rates':'Select Rates'};
+
         return <dl>
-            {this.list(data,`preprocessor:${name}:`,name,true)}
+            {this.list(data,`preprocessor:${name}:`,types[name],true)}
         </dl>
     }
 
     Third(data){
-        const name = data['classifier:__choice__'];
+        let name = data['classifier:__choice__'];
+        let type = `classifier:${name}:`;
+        if(!name){
+            name = data['regressor:__choice__'];
+            type = `regressor:${name}:`;
+        }
+
         return <dl>
-            {this.list(data,`classifier:${name}:`,'')}
+            {this.list(data,type,'')}
         </dl>;
     }
 
     render() {
-            const {dataFlow} = this.props.model;
+            const {dataFlow,name=''} = this.props.model;
             if(dataFlow.length === 1) {
                 return <section className={styles.process}>
                     <label>Raw Data</label>
@@ -68,7 +99,7 @@ export default class ModelProcessFlow extends Component {
                     <img src={Next} alt=''/>
                     <label>Prediction</label>
                 </section>
-            }else{
+            }else if(dataFlow.length > 1){
                 return <section className={`${styles.process} ${styles.many}`}>
                     <label>Raw Data</label>
                     <img src={Next} alt=''/>
@@ -87,7 +118,7 @@ export default class ModelProcessFlow extends Component {
                                     <Popover placement="bottom" content={this.Third(itm)} trigger="click">
                                         <Button>{itm.model_name}<Icon type="down" /></Button>
                                     </Popover>
-                                    <Tag>{itm.weight}</Tag>
+                                    <Tag>{(+itm.weight||0).toFixed(3)}</Tag>
                                 </dd>
                             })
                         }
@@ -97,7 +128,16 @@ export default class ModelProcessFlow extends Component {
                     <img src={Next} alt=''/>
                     <label>Prediction</label>
                 </section>
+            }else{
+                let str = name.split('.')[0];
+                str = str.substring(0,str.length-1);
+                return <section className={styles.process}>
+                      <label>Raw Data</label>
+                      <img src={Next} alt=''/>
+                      <label>{str}</label>
+                      <img src={Next} alt=''/>
+                      <label>Prediction</label>
+                </section>
             }
-
         }
 }

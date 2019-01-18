@@ -31,27 +31,8 @@ function parseChartData(result) {
       }
       fitIndex = initialFitIndex
     }
-    roundN(result.roc);
   }
   return { chartData: result, fitIndex, initialFitIndex };
-}
-
-function roundN(data, n = 2) {
-  if (!data) return;
-  const pow = Math.pow(10, n);
-  if (typeof data === 'number') {
-    return Math.floor(data * pow) / pow;
-  }
-  Object.keys(data).forEach(key => {
-    const num = data[key];
-    if (typeof num === 'number') {
-      data[key] = Math.floor(num * pow) / pow;
-    } else if (typeof num === 'object') {
-      return roundN(num, n);
-    } else {
-      data[key] = num;
-    }
-  });
 }
 
 function setDefaultData(id, userId) {
@@ -478,19 +459,19 @@ wss.register("queryModelList", message => {
 
 wss.register('etl', (message, socket, progress) => {
   const { userId } = socket.session
-  const { firstEtl, noCompute, projectId: id, csvLocation: files } = message
+  const { firstEtl, noCompute, projectId: id, csvLocation: files, _id: requestId } = message
 
   return setDefaultData(id, userId).then(setResult => {
     if (setResult.status !== 200) return setResult
     return getFileInfo(files).then((fileInfo) => {
       if (fileInfo.status !== 200) return fileInfo
       const { csvLocation, ext } = fileInfo
-      const data = { ...message, userId: userId, requestId: message._id, csvLocation, ext, noCompute: firstEtl || noCompute }
+      const data = { ...message, userId: userId, requestId, csvLocation, ext, noCompute: firstEtl || noCompute, stopId: requestId }
       // delete data.firstEtl
       Reflect.deleteProperty(data, 'firstEtl')
       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation')
       if (!ext) Reflect.deleteProperty(data, 'ext')
-      return createOrUpdate(id, userId, { etling: true })
+      return createOrUpdate(id, userId, { etling: true, stopId: requestId })
         .then(() => command(data, processData => {
           let { result, status } = processData;
           if (status < 0 || status === 100) return processData
@@ -520,6 +501,7 @@ wss.register('etl', (message, socket, progress) => {
           result.etling = false
           result.etlProgress = 0
           result.firstEtl = false;
+          result.stopId = ''
           // delete result.name
           // delete result.id
           // delete result.userId
@@ -567,26 +549,50 @@ wss.register('etl', (message, socket, progress) => {
 wss.register('abortEtl', (message, socket) => {
   const projectId = message.projectId
   const userId = socket.session.userId
-  return command({ ...message, userId, requestId: message._id }).then(() => {
-    const statusData = {
-      etling: false,
-      etlProgress: 0
-    }
-    return createOrUpdate(projectId, userId, statusData)
+  return redis.hget("project:" + projectId, 'stopId').then(stopId => {
+    try {
+      stopId = JSON.parse(stopId)
+    } catch (e) { }
+    if (!stopId) return { status: 200, message: 'ok' }
+    return command({ ...message, userId, requestId: message._id, stopId }).then(() => {
+      const statusData = {
+        etling: false,
+        etlProgress: 0
+      }
+      return createOrUpdate(projectId, userId, statusData)
+    })
   })
 })
 
 wss.register('dataView', (message, socket, progress) => {
   return createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: true })
-    .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress).then(async returnValue => {
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+      let lock = false
+      const { status, result } = progressResult
+      if (status === 1) {
+        if (!lock) {
+          const { name, value } = result
+          lock = true
+          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, { dataViewProgress: value })
+          setTimeout(() => lock = false, 500)
+        }
+      }
+      if (status < 0 || status === 100) return progressResult
+      return null
+    }).then(async returnValue => {
       const { status, result } = returnValue
       if (status === 100) {
         const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
-        await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false })
+        await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false, dataViewProgress: 0 })
         if (updateResult && updateResult.dataViews) returnValue.result.data = updateResult.dataViews
       }
       return returnValue
     }))
+
+
+
+
+  // sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
 })
 
 
@@ -603,7 +609,21 @@ wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(
 
 wss.register('preTrainImportance', (message, socket, progress) =>
   createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
-    .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+      let lock = false
+      const { status, result } = progressResult
+      if (status === 1) {
+        if (!lock) {
+          const { name, value } = result
+          lock = true
+          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, { importanceProgress: value })
+          setTimeout(() => lock = false, 500)
+        }
+      }
+      if (status < 0 || status === 100) return progressResult
+      return null
+    })
+      // .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
       .then(returnValue => {
         const { status, result } = returnValue
         const promise = []
@@ -613,7 +633,7 @@ wss.register('preTrainImportance', (message, socket, progress) =>
         }
         promise.push(status === 100 ? updateProjectField(message.projectId, socket.session.userId, 'preImportance', result.data) : Promise.resolve({}))
         promise.push(status === 100 ? updateProjectField(message.projectId, socket.session.userId, 'informativesLabel', result.informativesLabel) : Promise.resolve({}))
-        promise.push(createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: false }))
+        promise.push(createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: false, importanceProgress: 0 }))
         return Promise.all(promise).then(([result1, result2]) => {
           const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
           return Object.assign({}, returnValue, { result: realResult })
@@ -672,49 +692,57 @@ wss.register('createNewVariable', _sendToCommand)
 wss.register('abortTrain', (message, socket) => {
   const { projectId, isLoading, _id: requestId } = message
   const { userId } = socket.session
-  return command({ ...message, userId, requestId }, () => {
-    const statusData = {
-      train2Finished: true,
-      train2ing: false,
-      train2Error: false,
-      trainModel: null
-    }
-    if (isLoading) {
-      statusData.mainStep = 3,
-        statusData.curStep = 3,
-        statusData.lastSubStep = 1,
+  return redis.hget("project:" + projectId, 'stopId').then(stopId => {
+    try {
+      stopId = JSON.parse(stopId)
+    } catch (e) { }
+    if (!stopId) return { status: 200, message: 'ok' }
+    return command({ ...message, userId, requestId, stopId }, () => {
+      const statusData = {
+        train2Finished: true,
+        train2ing: false,
+        train2Error: false,
+        trainModel: null,
+        stopId: ''
+      }
+      if (isLoading) {
+        statusData.mainStep = 3
+        statusData.curStep = 3
+        statusData.lastSubStep = 1
         statusData.subStepActive = 1
-    }
-    return createOrUpdate(projectId, userId, statusData)
+      }
+      return createOrUpdate(projectId, userId, statusData)
+    })
   })
 })
 
 wss.register('train', (message, socket, progress) => {
-  const { userId, user } = socket.session
-  const { projectId, data: updateData, _id: requestId } = message
+  const { userId, user } = socket.session;
+  const { projectId, data: updateData, _id: requestId } = message;
   // delete message.data
-  Reflect.deleteProperty(message, 'data')
-  const data = { ...message, userId, requestId }
-  let hasModel = false
+  Reflect.deleteProperty(message, 'data');
+  // const stopId = uuid.v4()
+  const data = { ...message, userId, requestId, stopId: requestId };
+  let hasModel = false;
   return checkTraningRestriction(user)
     // .then(() => moveModels(message.projectId))
-    .then(() => createOrUpdate(projectId, userId, updateData))
-    .then(() => command(data, queueValue => {
-      const { status, result } = queueValue
-      if (status < 0 || status === 100) return queueValue
+    .then(() => createOrUpdate(projectId, userId, { ...updateData, stopId: requestId }))
+    .then(() => command({ ...data, stopId: requestId }, queueValue => {
+      const { status, result } = queueValue;
+      if (status < 0 || status === 100) return queueValue;
       if (result.name === "progress") {
-        const { requestId: trainId } = result
+        const { requestId: trainId } = result;
         // delete result.requestId
         Reflect.deleteProperty(result, 'requestId')
         return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
       }
       if (result.score) {
-        hasModel = true
+        hasModel = true;
         return createOrUpdate(projectId, userId, { trainModel: null })
           .then(() => createModel(userId, projectId, result.name, result).then(addSettingModel(userId, projectId)).then(model => progress(model)))
       }
       if (result.data) {
-        const { model: mid, action, data } = result
+        const { model: mid, action, data } = result;
         let saveData = {}
         if (action === "chartData") {
           saveData = parseChartData(data)//原始数据

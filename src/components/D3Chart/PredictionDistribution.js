@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import * as d3 from 'd3';
 
-import styles from './D3Chart.module.less';
+import styles from './D3Chart.module.css';
 
 function parseData(chartData) {
   const NEGATIVE = chartData.NEGATIVE;
@@ -15,10 +15,16 @@ function parseData(chartData) {
   }, [])
 }
 
+@inject('projectStore')
 @observer
 export default class AreaChart extends Component {
   state = {
     movable: true
+  };
+
+  constructor(props){
+    super(props);
+    this.newSort = this.newSort.bind(this)
   }
 
   componentDidMount () {
@@ -35,11 +41,7 @@ export default class AreaChart extends Component {
     const {className} = this.props;
     const {fitIndexModified} = this.props.model;
     if (fitIndexModified) { }
-    return (
-      <div className={`${styles.areaChart} ${className}`}>
-
-      </div>
-    );
+    return <div className={`${styles.areaChart} ${className}`}/>
   }
 
   renderD3 = () => {
@@ -108,7 +110,7 @@ export default class AreaChart extends Component {
       .call(d3.axisBottom(x))
       .append('text')
       .attr('y', -10)
-      .attr('x', x(1) - 50)
+      .attr('x', x(1) + 55)
       .attr('fill', '#000')
       .text('Probability Threshold');
 
@@ -123,7 +125,15 @@ export default class AreaChart extends Component {
       .text('Probability Density');
     this.drawLegend(svg, color);
     this.drawThreshold(svg, x, height);
-  }
+  };
+
+    newSort(index){
+      clearTimeout(window.changeCutoff);
+      window.changeCutoff = setTimeout(()=>{
+        this.props.projectStore.changeStopFilter(false);
+        this.props.model.setFitIndex(index);
+      },800)
+    }
 
   /**
    * 可移动棒
@@ -131,7 +141,7 @@ export default class AreaChart extends Component {
   drawThreshold(svg, x, height){
     const {model: {chartData, fitIndex}} = this.props;
     const thresholdLine = svg.append('g');
-    const threshold = chartData.roc.Threshold[fitIndex]
+    const threshold = chartData.roc.Threshold[fitIndex];
 
     const line = thresholdLine
       .append('line')
@@ -140,14 +150,22 @@ export default class AreaChart extends Component {
       .attr('y1', height)
       .attr('y2', 20)
       .attr('class', styles.thresholdLine);
+
     const dragCircle = d3.drag()
       .on('drag', () => {
-        const p = d3.event.x;
+        let p = d3.event.x;
         const index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
+        if(p<0){
+          p=0
+        }else if(p>430){
+            p=430
+        }
         line.attr('x1', p)
           .attr('x2', p);
         circle.attr('cx', p);
+        this.props.projectStore.changeStopFilter(true);
         this.props.model.setFitIndex(index);//stores/Model.js/setFitIndex
+        this.newSort(index)
       });
 
     const circle = thresholdLine
@@ -186,7 +204,7 @@ export default class AreaChart extends Component {
       .attr('y', '3px')
       .attr('fill', '#000')
       .text(targets[1]);
-  }
+  };
 
   getNearestPoint (val, data, key) {
     let index;

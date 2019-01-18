@@ -3,10 +3,16 @@ import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 import d3tips from './d3-tip';
 
-import styles from './D3Chart.module.less';
+import styles from './D3Chart.module.css';
 
 @observer
 export default class RegressionPredictActualChart extends Component {
+
+  constructor(props){
+    super(props);
+    this.regressionPredictActualChart = React.createRef();
+  }
+
   componentDidMount() {
     this.renderD3();
   }
@@ -59,7 +65,15 @@ export default class RegressionPredictActualChart extends Component {
       .x((d, i) => x(i + 1))
       .y(d => y(d[field]));
     const tool_tip = d3tips(`.${styles.hoverPanel}`)
-      .offset((d, i) => ([y(d[field]) - 20, x(i) - 180]))
+      .offset((d, i) => {
+        let width = -150;
+
+        if(this.regressionPredictActualChart.current){
+          width = this.regressionPredictActualChart.current.clientWidth -700 - 100;
+        }
+
+        return [y(d[field]) - 20, x(i) + width]
+      })
       .html((d, i) => {
         return (
           `
@@ -86,15 +100,15 @@ export default class RegressionPredictActualChart extends Component {
       .attr('class', styles.line)
       .attr('d', line)
       .style('stroke', color);
-  }
+  };
 
   render() {
     const { className } = this.props;
 
     return (
       <div>
-        <div className={`${styles.regressionPredictActualChart} ${className}`}>
-          <div className={styles.hoverPanel}></div>
+        <div ref={this.regressionPredictActualChart} className={`${styles.regressionPredictActualChart} ${className}`}>
+          <div className={styles.hoverPanel}/>
         </div>
       </div>
     );
@@ -103,7 +117,7 @@ export default class RegressionPredictActualChart extends Component {
   formatNumber = (num) => {
     if (typeof num === "number") return num.toFixed(2)
     if (typeof num === "string") return num
-  }
+  };
 
   renderD3 = () => {
     let { height, width, data } = this.props;

@@ -18,4 +18,6 @@
   font-weight: bold;
 }
 
-.value {}
+.value {
+  line-height: 1.4;
+}

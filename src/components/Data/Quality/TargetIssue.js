@@ -172,14 +172,14 @@ export class RegressionTarget extends Component {
 @observer
 export class RowIssue extends Component {
   render() {
-    const { backToConnect, totalLines } = this.props;
+    const { backToConnect, totalRawLines } = this.props;
     return <div className={styles.block}>
       <div className={styles.name}><span>Data Size is too small</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
-            <div className={styles.progressText}><span>All Data ({totalLines} rows)</span><span>1000 rows (minimum)</span></div>
-            <div className={styles.progress} style={{ width: totalLines / 10 + "%" }}></div>
+            <div className={styles.progressText}><span>All Data ({totalRawLines} rows)</span><span>1000 rows (minimum)</span></div>
+            <div className={styles.progress} style={{ width: totalRawLines / 10 + "%" }}></div>
           </div>
         </div>
         <div className={styles.methods}>
@@ -200,7 +200,7 @@ export class RowIssue extends Component {
 @observer
 export class DataIssue extends Component {
   render() {
-    const { backToConnect, editFixes, targetIssues, totalLines, percent } = this.props;
+    const { backToConnect, editFixes, targetIssues, totalLines, percent, totalRawLines } = this.props;
 
     return <div className={styles.block}>
       <div className={styles.name}><span>Data issues are found</span></div>
@@ -235,7 +235,7 @@ export class DataIssue extends Component {
               </div> */}
             </div>}
           </div>
-          {totalLines < 1000 && <div className={styles.progressBox}>
+          {(totalRawLines > 1000 && totalLines < 1000) && <div className={styles.progressBox}>
             <div className={styles.progressText}><span>Clean Data ({totalLines} rows)</span><span>1000 rows (minimum)</span></div>
             <div className={styles.progress} style={{ width: totalLines / 10 + "%" }}></div>
           </div>}
@@ -249,7 +249,7 @@ export class DataIssue extends Component {
                 <button><span>Edit the Fixes</span></button>
               </div>
             </div>
-            {totalLines < 1000 && <div className={styles.method}>
+            {(totalRawLines > 1000 && totalLines < 1000) && <div className={styles.method}>
               <div className={styles.reason}><span>Data size will be smaller than the minimum size after delete</span></div>
               <div className={styles.button} onClick={backToConnect}>
                 <button><span>Load a New Dataset</span></button>
@@ -542,7 +542,7 @@ export class FixIssue extends Component {
     const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
-        {!!nullCount && <div className={styles.fixesArea}>
+        {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
@@ -601,7 +601,7 @@ export class FixIssue extends Component {
             </div>
           </div>
         </div>}
-        {!!mismatchCount && <div className={styles.fixesArea}>
+        {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.missing)}></div>
@@ -735,7 +735,9 @@ export class FixIssue extends Component {
         outlierRange={project.outlierRange[this.editKey]}
         outlierDict={project.outlierDictTemp[this.editKey]}
         x={project.numberBins[this.editKey][1]}
-        y={project.numberBins[this.editKey][0]} />}
+        y={project.numberBins[this.editKey][0]}
+        minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}
+        maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}
         visible={this.visible}
         width='12em'
         title='Outlier'
@@ -756,12 +758,12 @@ class EditOutLier extends Component {
 
   constructor(props) {
     super(props)
-    const { x } = props
-    const minX = x[0];
-    const maxX = x[x.length - 1];
-    const offset = (maxX - minX) / 4;
-    this.minX = minX - offset;
-    this.maxX = maxX + offset;
+    // const { x } = props
+    // const minX = x[0];
+    // const maxX = x[x.length - 1];
+    // const offset = (maxX - minX) / 4;
+    // this.minX = minX - offset;
+    // this.maxX = maxX + offset;
     this.count = 4;
   }
 
@@ -775,8 +777,8 @@ class EditOutLier extends Component {
 
   d3Chart = () => {
     d3.select(`.${styles.d3Chart} svg`).remove();
-    const { width, height, x, y } = this.props;
-    let { min, max, minX, maxX } = this;
+    const { width, height, x, y, minX, maxX } = this.props;
+    let { min, max } = this;
     const padding = { left: 50, bottom: 30, right: 5, top: 100 };
 
     const realHeight = height - padding.bottom - padding.top;
@@ -1060,16 +1062,17 @@ class EditOutLier extends Component {
 
   blur = () => {
     const { focus, temp, min, max } = this;
+    const { minX, maxX } = this.props
     if (!focus) return;
     if ((temp || temp === '0') && !isNaN(temp)) {
       let num = parseFloat(temp);
       if (focus === 'min') {
         if (num > max) num = max;
-        if (num < this.minX) num = this.minX;
+        if (num < minX) num = minX;
         if (min === num) return;
       } else {
         if (num < min) num = min;
-        if (num > this.maxX) num = this.maxX;
+        if (num > maxX) num = maxX;
         if (max === num) return;
       }
       this.temp = ''

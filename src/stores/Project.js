@@ -73,6 +73,7 @@ export default class Project {
   @observable rawDataView = null;
   @observable preImportance = null;
   @observable preImportanceLoading = false;
+  @observable importanceProgress = 0
   @observable histgramPlots = {};
   @observable univariatePlots = {};
   @observable newVariable = [];
@@ -111,12 +112,12 @@ export default class Project {
 
   // Advanced Modeling Setting
   @observable settingId = '';
-  @observable settings = []
+  @observable settings = [];
 
   // correlation
   @observable correlationMatrixHeader;
   @observable correlationMatrixData;
-  @observable correlationMatrixLoading = false
+  @observable correlationMatrixLoading = false;
 
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
@@ -132,12 +133,14 @@ export default class Project {
   @observable customRange = [];
   @observable algorithms = [];
   @observable selectId = '';
-  @observable version = [1, 2]
+  @observable version = [1, 2];
   @observable dataViews = null;
-  @observable dataViewsLoading = false
+  @observable dataViewsLoading = false;
+  @observable dataViewProgress = 0;
 
   @observable stopModel = false
   @observable stopEtl = false
+  @observable isAbort = false
 
   constructor(id, args) {
     this.id = id
@@ -368,8 +371,10 @@ export default class Project {
       if (this.uploadFileName && this.uploadFileName.length > 0) {
         const api = await socketStore.ready()
         const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-        this.fileNames = fileNames
+        this.fileNames = fileNames || []
+        return
       }
+      this.fileNames = []
     }))
     this.autorun.push(autorun(async () => {
       if (!this.originPath) {
@@ -417,6 +422,12 @@ export default class Project {
       if (key === 'problemType') {
         data.changeProjectType = data[key]
       }
+      if (key === 'trainModel') {
+        if (data[key]) {
+          const { value } = data[key] || {}
+          data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
+        }
+      }
     }
     data.updateTime = +new Date()
     Object.assign(this, data)
@@ -449,14 +460,17 @@ export default class Project {
   /**---------------------------------------------data-------------------------------------------------*/
   //修改上传文件
   @action
-  fastTrackInit = (name) => {
+  fastTrackInit = async (name) => {
     const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, { uploadFileName: [name] }, {
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
       subStepActive: 1
     })
-    return this.updateProject(backData).then(() => this.etl())
+    this.etling = true
+    await this.updateProject(backData)
+    const pass = await this.etl()
+    if (!pass) this.updateProject({ uploadFileName: [] })
   }
 
   @action
@@ -512,9 +526,10 @@ export default class Project {
   }
 
   @action
-  endSchema = () => {
+  endSchema = async () => {
     this.etling = true
-    return this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
+    if (this.train2ing) await this.abortTrain(!!this.models.length)
+    await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
@@ -526,11 +541,11 @@ export default class Project {
       subStepActive: 2,
       lastSubStep: 2
     }))
-      .then(() => this.etl())
+    return await this.etl()
   }
 
   @action
-  endQuality = () => {
+  endQuality = async () => {
     let hasChange = false
     const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
     for (const item of list) {
@@ -540,8 +555,9 @@ export default class Project {
       if (hasChange) break
     }
 
-    if (!hasChange) return Promise.resolve()
-
+    if (!hasChange) return await Promise.resolve()
+    this.etling = true
+    if (this.train2ing) await this.abortTrain(!!this.models.length)
     const data = Object.assign(this.defaultTrain, {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
@@ -558,14 +574,12 @@ export default class Project {
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
-      if (min < 3) return Promise.reject()
+      if (min < 3) return await Promise.reject()
       if (min < 5) data.crossCount = min - 1
     }
     this.etling = true
-    return this.updateProject(data)
-      .then(() => {
-        if (hasChange) return this.etl()
-      })
+    await this.updateProject(data)
+    if (hasChange) return await this.etl()
   }
 
   hasChanged = (before, after) => {
@@ -604,7 +618,7 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, targetIssues, rawDataView, rawHeader, target, variableIssueCount } = this;
+    const { problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCounts, mismatchLineCounts, nullLineCounts } = this;
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
@@ -617,7 +631,7 @@ export default class Project {
       data.rowIssue = true;
     }
 
-    if (targetIssues.errorRow.length) {
+    if (target && (outlierLineCounts[target] + mismatchLineCounts[target] + nullLineCounts[target]) > 0) {
       data.targetRowIssue = true
     }
 
@@ -652,12 +666,12 @@ export default class Project {
   }
 
   get variableIssueCount() {
-    const {nullLineCounts, mismatchLineCounts, outlierLineCounts, target} = this
-    const nullCount = Object.values(Object.assign({}, nullLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    
-    return {nullCount, mismatchCount, outlierCount}
+    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target } = this
+    const nullCount = Object.values(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+
+    return { nullCount, mismatchCount, outlierCount }
   }
 
   @computed
@@ -675,7 +689,7 @@ export default class Project {
   get targetIssues() {
     const { target, mismatchIndex, nullIndex, outlierIndex, colType } = this;
     const arr = {
-      mismatchRow: colType[target] !== "Categorical" ? mismatchIndex[target] : [],
+      mismatchRow: colType[target] !== "Categorical" ? (mismatchIndex[target] || []) : [],
       nullRow: nullIndex[target] || [],
       outlierRow: colType[target] !== "Categorical" ? (outlierIndex[target] || []) : [],
     }
@@ -684,10 +698,8 @@ export default class Project {
     return arr
   }
 
-  etl = () => {
-    const { id, problemType, dataHeader, uploadFileName, train2ing, models } = this;
-
-    if (train2ing) this.abortTrain(!!models.length)
+  etl = async () => {
+    const { id, problemType, dataHeader, uploadFileName } = this;
 
     const command = 'etl';
 
@@ -743,7 +755,6 @@ export default class Project {
       data.csvLocation = [...uploadFileName]
     }
 
-    this.etling = true;
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -751,13 +762,17 @@ export default class Project {
     // feature_label: 特征列名
     // fill_method:  无效值
     // kwargs:
-    return socketStore.ready()
-      .then(api => api.etl(data))
-      .then(returnValue => {
-        const { result, status } = returnValue;
-        if (status !== 200) return antdMessage.error(result['process error'])
-        this.setProperty(result)
-      })
+    const api = await socketStore.ready()
+    const returnValue = await api.etl(data)
+    const { result, status, message } = returnValue;
+    if (status !== 200) {
+      antdMessage.error(message || result['process error'])
+      this.etling = false
+      this.etlProgress = 0
+      return false
+    }
+    this.setProperty(result)
+    return true
   }
 
   abortEtl = () => {
@@ -778,7 +793,7 @@ export default class Project {
   }
 
   @action
-  dataView = progress => {
+  dataView = () => {
     // const key = isClean ? 'dataViews' : 'rawDataView'
     // const featureLabel = [...this.dataHeader, ...this.newVariable].filter(v => !Object.keys(this[key]).includes(v))
     // if(!featureLabel.length) return Promise.resolve()
@@ -805,13 +820,7 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.dataViewsLoading = true
-      return api.dataView(command, progressResult => {
-        if (progress && typeof progress === 'function') {
-          const { result } = progressResult
-          const { name, value } = result
-          if (name === "progress") return progress(value)
-        }
-      }).then(returnValue => {
+      return api.dataView(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ dataViews: null })
@@ -1111,9 +1120,9 @@ export default class Project {
     const times = data.times || 0
     const model = this.models.find(m => data.id === m.id)
     if (!model) {
-      if (times > 5) return
-      const fn = () => this.setModelField({ data, times: times + 1 })
-      return setTimeout(fn, 500)
+      if (times > 10) return
+      setTimeout(() => this.setModelField({ ...data, times: times + 1 }), 100)
+      return
     }
     model.setProperty(data)
   }
@@ -1133,7 +1142,7 @@ export default class Project {
     })
   }
 
-  preTrainImportance = (progress) => {
+  preTrainImportance = () => {
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
@@ -1150,13 +1159,7 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.preImportanceLoading = true
-      return api.preTrainImportance(command, progressResult => {
-        if (progress && typeof progress === 'function') {
-          const { result } = progressResult
-          const { name, value } = result
-          if (name === "progress") return progress(value)
-        }
-      }).then(returnValue => {
+      return api.preTrainImportance(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
           return antdMessage.error(result['process error'])

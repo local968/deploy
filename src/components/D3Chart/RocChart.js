@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Checkbox } from 'antd';
-import { observer } from 'mobx-react';
-import styles from './D3Chart.module.less';
+import {inject, observer} from 'mobx-react';
+import styles from './D3Chart.module.css';
 // import d3tips from './d3-tip';
 
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
@@ -18,6 +18,7 @@ function parseData(chartData) {
   }, [])
 }
 
+@inject('projectStore')
 @observer
 export default class RocChart extends Component {
   state = {
@@ -70,7 +71,7 @@ export default class RocChart extends Component {
         .attr('transform', 'translate(0,' + height + ')')
         .call(d3.axisBottom(x))
         .append('text')
-        .attr('x', x(lastEl.FPR - 0.1))
+        .attr('x', x(lastEl.FPR + 0.1)+10)
         .attr('y', -10)
         .attr('fill', '#000')
         .text('false positive rate');
@@ -94,10 +95,18 @@ export default class RocChart extends Component {
         .style('stroke', color[index]);
     }
     return data;
+  };
+
+  newSort(index){
+    clearTimeout(window.changeCutoff);
+    window.changeCutoff = setTimeout(()=>{
+      this.props.projectStore.changeStopFilter(false);
+      this.props.model.setFitIndex(index);
+    },800)
   }
 
   drawFocus = (self, x, y, data, focus) => {
-    const { model } = this.props;
+    const { model,projectStore } = this.props;
     const x0 = x.invert(d3.mouse(self)[0]);
 
     const index = this.getNearestPoint(x0, data, 'FPR');
@@ -107,8 +116,10 @@ export default class RocChart extends Component {
       return null;
     }
     focus.attr('transform', 'translate(' + x(d.FPR) + ',' + y(d.TPR) + ')');
+    projectStore.changeStopFilter(true);
     model.setFitIndex(index);
-  }
+    this.newSort(index)
+  };
 
   getNearestPoint(val, data, key) {
     let index;
