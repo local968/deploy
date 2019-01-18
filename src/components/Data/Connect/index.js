@@ -7,8 +7,8 @@ import localFileIcon from './local-file.svg';
 import sqlIcon from './sql.svg';
 // import defileIcon from './define.svg';
 import axios from 'axios';
-import { message, Progress } from 'antd';
-import { Uploader } from 'components/Common';
+import { message } from 'antd';
+import { Uploader, ProgressBar } from 'components/Common';
 import config from 'config';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
@@ -286,11 +286,8 @@ export default class DataConnect extends Component {
                   <img src={r2LoadGif} alt="loading" />
                 </div>
                 <div className={styles.progressing}>
-                  <Progress
-                    percent={process + (etlProgress || 0) / 2}
-                    status="active"
-                    strokeWidth={12}
-                    showInfo={false}
+                  <ProgressBar
+                    progress={process + (etlProgress || 0) / 2}
                   />
                 </div>
                 <div className={styles.progressText}>
