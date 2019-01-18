@@ -1,6 +1,9 @@
 .pagination {
   font-size: 1.25rem;
   white-space: nowrap;
+  align-items: center;
+  display: flex;
+  flex: none;
 }
 .pagination:global(.ant-pagination.mini .ant-pagination-item) {
   height: 2.5rem;
