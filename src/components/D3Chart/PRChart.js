@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import * as d3 from 'd3';
 
 import styles from './D3Chart.module.css';
@@ -14,11 +14,12 @@ function parseData(chartData) {
   }, [])
 }
 
+@inject('projectStore')
 @observer
 export default class PRChart extends Component {
   state = {
     movable: false
-  }
+  };
 
   componentDidMount () {
     this.renderD3();
@@ -136,12 +137,20 @@ export default class PRChart extends Component {
       .on('mouseup', function() {
         _this.setState({movable: false});
       });
+  };
+
+  newSort(index){
+    clearTimeout(window.changeCutoff);
+    window.changeCutoff = setTimeout(()=>{
+      this.props.projectStore.changeStopFilter(false);
+      this.props.model.setFitIndex(index);
+    },800)
   }
 
   drawFocus = (self, x, y, data, focus) => {
     if (!focus) return null;
 
-    const {model} = this.props;
+    const {model,projectStore} = this.props;
     const x0 = x.invert(d3.mouse(self)[0]);
     const index = this.getNearestPoint(x0, data, 'Recall');
     const d = data[index];
@@ -149,9 +158,11 @@ export default class PRChart extends Component {
       return null;
     }
     focus.attr('transform', 'translate(' + x(d.Recall) + ',' + y(d.Precision) + ')');
+    projectStore.changeStopFilter(true);
     model.setFitIndex(index);
+    this.newSort(index)
     // this.props.view.panel.models[panelIndex].getMouseOverData(d);
-  }
+  };
 
   getNearestPoint (val, data, key) {
     let index;
