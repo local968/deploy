@@ -112,12 +112,12 @@ export default class Project {
 
   // Advanced Modeling Setting
   @observable settingId = '';
-  @observable settings = []
+  @observable settings = [];
 
   // correlation
   @observable correlationMatrixHeader;
   @observable correlationMatrixData;
-  @observable correlationMatrixLoading = false
+  @observable correlationMatrixLoading = false;
 
   // 训练速度和过拟合
   @observable speedVSaccuracy = 5;
@@ -133,10 +133,10 @@ export default class Project {
   @observable customRange = [];
   @observable algorithms = [];
   @observable selectId = '';
-  @observable version = [1, 2]
+  @observable version = [1, 2];
   @observable dataViews = null;
-  @observable dataViewsLoading = false
-  @observable dataViewProgress = 0
+  @observable dataViewsLoading = false;
+  @observable dataViewProgress = 0;
 
   @observable stopModel = false
   @observable stopEtl = false

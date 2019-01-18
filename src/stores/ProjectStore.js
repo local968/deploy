@@ -8,7 +8,7 @@ import { message as antdMessage } from 'antd'
 class ProjectStore {
   @observable loading = true;
   @observable init = false;
-  @observable isOnline = true
+  @observable isOnline = true;
   @observable watchList = false;
   @observable currentId = "";
 
@@ -20,9 +20,31 @@ class ProjectStore {
     limit: 10,
     offset: 0,
     sort: 'createTime',
-  }
+  };
   @observable broadcastId = "";
-  @observable conflict = false
+  @observable conflict = false;
+  @observable stopFilter = true;
+  oldfiltedModels = null;
+  newfiltedModels = null;
+
+  @action
+  changeStopFilter = (stopFilter) => {
+    this.stopFilter = stopFilter;
+    if(!stopFilter){
+      this.oldfiltedModels = this.newfiltedModels
+    }
+  };
+
+  @action
+  changeNewfiltedModels = (models) => {
+    this.newfiltedModels = models
+  };
+
+  @action
+  changeOldfiltedModels = (models) => {
+    this.oldfiltedModels = models
+  };
+
 
   constructor() {
     this.initWatch()

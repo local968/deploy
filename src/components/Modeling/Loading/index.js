@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
 import { Progress, Icon } from 'antd';
+import { ProgressBar } from 'components/Common';
 
 @inject('projectStore')
 @observer
@@ -11,11 +12,8 @@ export default class Loading extends Component {
     return (
       <div className={styles.loading}>
         <div className={styles.training}>
-          <Progress
-            className={styles.trainingProgress}
-            percent={trainModel ? (trainModel.value || 0) : 0}
-            format={percent => percent.toFixed(2) + "%"}
-            status="active"
+          <ProgressBar
+            progress={((trainModel || {}).value || 0)}
           />
         </div>
         <div className={styles.trainingText}>
