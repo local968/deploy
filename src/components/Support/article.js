@@ -1,15 +1,28 @@
 import React, { Component ,Fragment} from "react";
 import styles from "./styles.module.css";
+import Waypoint from 'react-waypoint';
 
 export default class Article extends Component {
+    
+    changeHash(hash){
+        this.props.changeSelectedKeys(hash)
+    }
 
     one(){
         return <Fragment>
-            <a className={styles.h1}>1. Overview</a>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'1')}
+            >
+                <a href='javascript:;' name="1" className={styles.h1}>1. Overview</a>
+            </Waypoint>
+            
             R2-Learn helps companies turn data into machine learning models quickly without needing AI (artificial intelligence) expertise. Built with cutting edge technology, R2-Learn uses AI to guide you through the process of creating, deploying, and keeping up-to-date custom machine learning models using data that you already have.
             This section introduces the key concepts of machine learning and how they relate to R2-Learn.
-
-            <a className={styles.h2}>1.1. Machine learning</a>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'1.1')}
+            >
+                <a href='javascript:;' name="1.1" className={styles.h2}>1.1. Machine learning</a>
+            </Waypoint>
             Machine learning is a branch of AI where computers are trained to learn from data using complex learning algorithms. With ever increasing computing power, machine learning is able to discover patterns and relations hidden in massive amounts of data that would be difficult for humans to identify and use. Machine learning models are being developed today to classify objects, detect anomalies, predict outcomes, and augment human capacity in general.
             <p className={styles.p}>
                 Businesses that use machine learning to help them make business decisions with data usually employ a machine learning workflow similar to the following:
@@ -27,7 +40,12 @@ export default class Article extends Component {
             </dl>
             <img src="/support1.png" alt=""/>
             A well-trained data scientist is usually responsible for the workflow illustrated above. It has many steps and decision points. Making the correct decision at each point is critical to the quality of the machine learning model, which in turn determines how accurate predictions made with this model are. Data scientists today largely rely on their experience and intuition to find the best model for the task at hand, which can be very slow, tedious, expensive and flawed process.
-            <a className={styles.h2}>1.2. Machine learning with R2-Learn</a>
+    
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'1.2')}
+            >
+                <a href='javascript:;' name="1.2" className={styles.h2}>1.2. Machine learning with R2-Learn</a>
+            </Waypoint>
             R2-Learn makes it easier for businesses to work with machine learning by using AI to automate large portions of the standard machine learning workflow, reducing the amount of work and human-error that usually comes with the process.
             <p className={styles.p}>
                 The R2-Learn machine learning workflow is as follows:
@@ -58,28 +76,48 @@ export default class Article extends Component {
 
     two(){
          return <Fragment>
-             <a href="javascript:;" className={styles.h1}>2. Getting started with R2-Learn</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'2')}
+             >
+                <a name="2"  href="javascript:;" className={styles.h1}>2. Getting started with R2-Learn</a>
+             </Waypoint>
              This section of the manual helps you get started with your first R2-Learn project.
              To get started with your first project, head on over to Starting a new project.
-             <a href="javascript:;" className={styles.h2}>2.1. Software requirements</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'2.1')}
+             >
+                <a href="javascript:;" name="2.1" className={styles.h2}>2.1. Software requirements</a>
+             </Waypoint>
              R2-Learn is a web application that can be run in your browser.
              We recommend that you use:
              <div>•	Google Chrome version 65 and newer.</div>
-             <a href="javascript:;" className={styles.h2}>2.2. Importing data into R2-Learn</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'2.2')}
+             >
+                <a href="javascript:;" name="2.2" className={styles.h2}>2.2. Importing data into R2-Learn</a>
+             </Waypoint>
              You can import data into R2-Learn for:
              <div>•	Building machine learning models, and</div>
              <div>•	Making predictions on the imported data.</div>
              R2-Learn supports the following methods for importing data:
              <div>•	Importing data from a database</div>
              <div>•	Importing a local file</div>
-
-             <a href="javascript:;" className={styles.h2}>2.2.1. Importing data from a database</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'2.2.1')}
+             >
+                <a href="javascript:;" name="2.2.1" className={styles.h2}>2.2.1. Importing data from a database</a>
+             </Waypoint>
              R2-Learn supports importing data from the following databases:
              <div>•	Oracle Database 11G</div>
              <div>•	MySQL</div>
              Your database must support ODBC 11.2 connections.
              <img src="/support3.png" alt=""/>
-             <a href="javascript:;" className={styles.h2}>2.2.2. Importing a local file</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'2.2.2')}
+             >
+                <a href="javascript:;" name="2.2.2" className={styles.h2}>2.2.2. Importing a local file</a>
+             </Waypoint>
              You can import a UTF-8 encoded CSV file containing your training or input data into R2-Learn.
              Your CSV file must:
              <div>•	Have a header row.</div>
@@ -87,8 +125,13 @@ export default class Article extends Component {
              [Note] If you are importing a CSV file to be used for model deployment or to make predictions on, that CSV file must fulfill the following:
              <div>•	It must contain all the variables required by the deployed model, and</div>
              <div>•	Names of variables contained in the CSV file must be the same as the variable names that are used in the training dataset.</div>
-
-             <a href="javascript:;" className={styles.h2}>2.3. Project home</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'2.3')}
+             >
+                <a href="javascript:;" name="2.3" className={styles.h2}>2.3. Project home</a>
+             </Waypoint>
+             
              When you sign in to R2-Learn, you’ll land on the project home page:
              <img src="/support4.png" alt=""/>
              On the project home page, you can:
@@ -100,7 +143,11 @@ export default class Article extends Component {
                  <dd>5.	<strong>Sort</strong> projects.</dd>
              </dl>
              Click Deploy in the navigation menu at the bottom of the side bar to go to the model deployment home page.
-             <a href="javascript:;" className={styles.h2}>2.4. Model deployment home page</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'2.4')}
+             >
+                 <a href="javascript:;" name="2.4" className={styles.h2}>2.4. Model deployment home page</a>
+             </Waypoint>
              The model deployment home page shows all the projects you’ve created, and the deployment/validation status of these projects:
              <img src="/support5.png" alt=""/>
              <ul>
@@ -118,9 +165,18 @@ export default class Article extends Component {
 
     three(){
          return <Fragment>
-             <a href="javascript:;" className={styles.h1}>3. Starting a new project</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3')}
+             >
+                <a href="javascript:;" name="3" className={styles.h1}>3. Starting a new project</a>
+             </Waypoint>
              This section will walk you through how to start a new machine learning project, using R2-Learn’s automatic modeling features.
-             <a href="javascript:;" className={styles.h2}>3.1. Create a project</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.1')}
+             >
+                <a href="javascript:;" name="3.1" className={styles.h2}>3.1. Create a project</a>
+             </Waypoint>
              When you first sign in on R2-Learn, you’ll be greeted with an empty project home page. Click on <strong>Create New Project</strong> to start a new project.
              <img src="/support7.png" alt=""/>
              <dl>
@@ -129,7 +185,11 @@ export default class Article extends Component {
                  <dd>•	<strong>Describe your project (optional). </strong>Enter a general project description. This helps document the high-level intent and scope of the project for future reference. Low-level specifics of the project should be documented as the Problem Statement in the <strong>Business Problem</strong> section that follows.</dd>
              </dl>
              Once done, click <strong>Continue.</strong>
-             <a href="javascript:;" className={styles.h2}>3.2. Describe your business problem</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.2')}
+             >
+                <a href="javascript:;" name="3.2" className={styles.h2}>3.2. Describe your business problem</a>
+             </Waypoint>
              In the <strong>Problem</strong> section, you’ll be entering your project’s <strong>Problem Description</strong> and <strong>Problem Type.</strong>
              <p>The project’s <strong>Problem Description</strong> (optional) asks you for a <strong>Problem Statement</strong> and a <strong>Business Value </strong>to be documented. Both of these are not used directly to building your machine learning model, but are important for keeping track of projects and making sure that business units that eventually take over the projects are made aware of the kinds of problems that this project’s models are intended to solve.</p>
              <dl>
@@ -138,8 +198,12 @@ export default class Article extends Component {
                  <dd>•	<strong>Continuous Values (Regression):</strong> To predict a continuous/numeric value. For example, how much a product would cost given a set of variables.</dd>
              </dl>
              Once you’ve set your Business Problem and your Problem Type, click Continue to move on to loading your data into R2-Learn.
-
-             <a href="javascript:;" className={styles.h2}>3.3. Working with your data</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.3')}
+             >
+                <a href="javascript:;" name="3.3" className={styles.h2}>3.3. Working with your data</a>
+             </Waypoint>
              Now, we’ll start working with your data. The <strong>Data</strong> section walks you through:
              <dl>
                  <dd>1.	Uploading your data in the <strong>Data Connect</strong> tab.</dd>
@@ -150,8 +214,12 @@ export default class Article extends Component {
             <p>
                 Once the user loads data via R2-Learn’s data connecting interface, R2-Learn detects the data types, checks the data quality and fixes the minor issues automatically or prompts the user to fix them manually.
             </p>
-
-             <a href="javascript:;" className={styles.h2}>3.3.1. Data Connect</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.3.1')}
+             >
+                <a href="javascript:;" name="3.3.1" className={styles.h2}>3.3.1. Data Connect</a>
+             </Waypoint>
              The <strong>Data Connect</strong> tab allows you to select what dataset to use for your machine learning model.
              <img src="/support8.png" alt=""/>
              Here, you’re loading your training dataset into R2-Learn. You can either:
@@ -162,8 +230,12 @@ export default class Article extends Component {
              If you’re just getting to know R2-Learn, you can use one of the sample datasets provided instead.
              <div>After loading your dataset, you can <strong>hange the maximum number of rows</strong>c or records that R2-Learn will use to develop your machine learning model.</div>
              [Important]The dataset that you load into R2-Learn must have a header row.
-
-             <a href="javascript:;" className={styles.h2}>3.3.2. Data Schema</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.3.2')}
+             >
+                <a href="javascript:;" name="3.3.2" className={styles.h2}>3.3.2. Data Schema</a>
+             </Waypoint>
              Once you’ve loaded your training dataset, R2-Learn displays a sample of your data in the <strong>Data Schema </strong>tab for you to inspect. Here, you can:
              <dl>
                  <dd>•	1. <strong>Edit</strong> your header row if necessary.</dd>
@@ -199,9 +271,13 @@ export default class Article extends Component {
              </dl>
              For example, in a dataset for training a model to predict the yearly income of a person, we can safely remove a variable that contains the monthly income of a person. Columns are dimmed in the main display when removed from your model.
              <p>When you’ve selected your target variable and removed any unwanted columns or variables from your dataset, click Continue to move on to Data Quality.</p>
-
-             <a href="javascript:;" className={styles.h2}>3.3.3. Data Quality</a>
-             When you get to the <strong>Data Quality</strong> tab, R2-Learn attempts to detect possible issues that would prevent accurate modeling. It checks for data quality issues at two levels:
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.3.3')}
+             >
+                <a href="javascript:;" name="3.3.3" className={styles.h2}>3.3.3. Data Quality</a>
+             </Waypoint>
+            When you get to the <strong>Data Quality</strong> tab, R2-Learn attempts to detect possible issues that would prevent accurate modeling. It checks for data quality issues at two levels:
              <dl>
                  <dd>•	1. Target Variable Quality: Here, R2-Learn analyzes and flags any issues that it encounters with your target variable.</dd>
                  <dd>•	2. All Data Quality: After R2-Learn has resolved issues with your target variable, it then examines the rest of your dataset for any possible issues.</dd>
@@ -209,6 +285,11 @@ export default class Article extends Component {
              <img src="/support10.png" alt=""/>
              <dl>
                  <dt>Common Issues with Data</dt>
+                 <Waypoint
+                     onEnter={this.changeHash.bind(this,'3.3.3.1')}
+                 >
+                     <a href="javascript:;" name="3.3.3.1" className={styles.h2}/>
+                 </Waypoint>
                  <dd>Two possible issue types that R2-Learn identifies and fixes are:</dd>
                  <dd>
                      •	<strong>Your Target Variable has more than 2 Unique Values:</strong> When working with a True or False (Binary Classification) business problem type, your target variable must have only 2 different unique values (typically, "true" and "false").
@@ -222,6 +303,11 @@ export default class Article extends Component {
              A list of available fixes for these issues can be found in Appendix: Data Quality Fixes.
              <dl>
                  <dt>Target Variable Quality</dt>
+                 <Waypoint
+                     onEnter={this.changeHash.bind(this,'3.3.3.2')}
+                 >
+                     <a href="javascript:;" name="3.3.3.2" className={styles.h2}/>
+                 </Waypoint>
                  <dd>In the <strong>Target Variable Quality</strong> section, R2-Learn identifies and attempts to fix any issues it finds with your target variable.</dd>
              </dl>
              <p>When R2-Learn finds an issue that it can automatically fix, it displays these issues in the <strong>Data Quality</strong> tab:</p>
@@ -234,6 +320,11 @@ export default class Article extends Component {
              </dl>
              <dl>
                  <dt>All Data Quality</dt>
+                 <Waypoint
+                     onEnter={this.changeHash.bind(this,'3.3.3.3')}
+                 >
+                     <a href="javascript:;" name="3.3.3.3" className={styles.h2}/>
+                 </Waypoint>
                  <dd>Once you’ve resolved all issues with your target variable, R2-Learn then examines the quality of all the independent variables in your dataset, and displays a summary of its findings here.</dd>
              </dl>
              <img src="/support13.png" alt=""/>
@@ -246,21 +337,42 @@ export default class Article extends Component {
              See Appendix: Data Quality Fixes for a list of common fixes available.
              <div>[Note]	Saving the changes to your data may take a minute or two. Please be patient.</div>
              Once you’re done with verifying and fixing the quality of your data, click <strong>Continue</strong> to start Modeling your data.
-
-             <a href="javascript:;" className={styles.h2}>3.4. Modeling</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.4')}
+             >
+                <a href="javascript:;" name="3.4" className={styles.h2}>3.4. Modeling</a>
+             </Waypoint>
              You’re ready to start building your machine learning model!
              <div>You can choose to build your machine learning model using:</div>
              <dl>
                  <dd> •	<strong>Automatic Modeling</strong>, or</dd>
                  <dd> •	<strong>Advanced Modeling</strong></dd>
              </dl>
-             <a href="javascript:;" className={styles.h2}>3.4.1. Automatic Modeling</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.4.1')}
+             >
+                <a href="javascript:;" name="3.4.1" className={styles.h2}>3.4.1. Automatic Modeling</a>
+             </Waypoint>
              <strong>Automatic Modeling</strong> automatically builds your machine learning model for you, based on the training dataset that you’ve loaded and cleaned in the steps leading up to this point.
              <div>Click <strong>Automatic Modeling</strong> and R2-Learn will start building your model for you.</div>
-             <a href="javascript:;" className={styles.h2}>3.4.2. Advanced Modeling</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.4.2')}
+             >
+                <a href="javascript:;" name="3.4.2" className={styles.h2}>3.4.2. Advanced Modeling</a>
+             </Waypoint>
              Selecting <strong>Advanced Modeling</strong> gives you more control over the modeling process.
              <div>For information on Advanced modeling, see Appendix: Advanced Modeling.</div>
-             <a href="javascript:;" className={styles.h2}>3.4.3. Building your model</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.4.3')}
+             >
+                <a href="javascript:;" name="3.4.3" className={styles.h2}>3.4.3. Building your model</a>
+             </Waypoint>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'3.4.3.1')}
+             >
+                 <a href="javascript:;" name="3.4.3.1" className={styles.h2}/>
+             </Waypoint>
              <p>Once you’ve selected and finished configuring your modeling mode, R2-Learn will start building your machine learning model.</p>
              There is a possibility that the model training process will fail if R2-Learn is unable to train a sufficiently performant machine learning model from the given training dataset. If model training fails, you have to either reconfigure your project to fix dataset quality issues, or choose a new or larger dataset.
              <dl>
@@ -275,7 +387,11 @@ export default class Article extends Component {
 
     four(){
          return <Fragment>
-             <a href="javascript:;" className={styles.h1}>4. Deploying your models</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4')}
+             >
+                <a href="javascript:;" name="4" className={styles.h1}>4. Deploying your models</a>
+             </Waypoint>
              Deploying your models allow you to make predictions on a new set of input data. This usually involves publishing a REST API endpoint to which you can send data to and receive predictions from.
             <p>R2-Learn handles model deployment for you automatically. Once you’ve successfully created a machine learning model, you can access the deployed model by clicking on its containing project:</p>
              <img src="/support15.png" alt=""/>
@@ -293,35 +409,50 @@ export default class Article extends Component {
                  <dd>•	<strong>Deployment Data Definition:</strong> Click <strong>Download</strong> to download a text file containing a comma-separated list of the variables used by your model.</dd>
                  <dd>•	<strong>Email to Receive Alert:</strong> Click to enter an email address to send deployment-related alerts to.</dd>
              </dl>
-             <a href="javascript:;" className={styles.h2}>4.1. Deployment</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4.1')}
+             >
+                <a href="javascript:;" name="4.1" className={styles.h2}>4.1. Deployment</a>
+             </Waypoint>
              When you open a project in the Model deployment home page, you’ll be brought to the deployment tab. Here, you can select how you want to use your deployed machine learning models:
              <dl>
                  <dd>•	Predict with data source: Predict using data from a local file, or from a database.</dd>
                  <dd>•	Predict with API: Predict by sending data to R2-Learn using R2-Learn’s REST API.</dd>
              </dl>
-             [Important]	Imported data must have the same variables as the machine learning model used. To download a file containing a list of variables required in your imported dataset, click Download next to Deployment Data Definition.
-
-             <a href="javascript:;" className={styles.h2}>4.1.1. Predict with data source</a>
+             [Important]	Imported data must have the same variables as the machine learning model used. To download a file containing a list of variables required in your imported dataset, click <strong>Download</strong> next to <strong>Deployment Data Definition</strong>.
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4.1.1')}
+             >
+                <a href="javascript:;" name="4.1.1" className={styles.h2}>4.1.1. Predict with data source</a>
+             </Waypoint>
              To make a prediction on data imported from a data source:
-             1.	Click on Predict with Data Source.
-
-             <dl>
-                 <dd>2.	Select the data source to import data from:</dd>
-                 <dd> –	Database: Provide connection details to a database that contains data you want to run predictions on. For more information, see Importing data from a database.</dd>
-                 <dd> –	Local File: Uploads a file to R2-Learn that contains data you want to run predictions on. For more information, see Importing a local file.</dd>
-                 <dd>3.	Select Result Location, where the Result Location is where your model’s predictions are saved:</dd>
-                 <dd> –	In App: Saves and displays the results in R2-Learn.</dd>
-                 <dd> –	Upload to Database: Writes the results to a given database.</dd>
-                 <dd>4.	Select Deploy Frequency. This tells R2-Learn how to schedule the deployment:</dd>
-                 <dd >–	One Time: Sets your deployment to run a prediction on the data source once.</dd>
-                 <dd> –	Auto Repeat: Sets your deployment to run predictions on the data source according to a set schedule.</dd>
+             <div>1.	Click on <strong>Predict with Data Source</strong>.</div>
+             <div>2.	Select the data source to import data from:</div>
+             <dl className={styles.pl1}>
+                 <dd>–	<strong>Database</strong>: Provide connection details to a database that contains data you want to run predictions on. For more information, see Importing data from a database.</dd>
+                 <dd>–	<strong>Local File</strong>: Uploads a file to R2-Learn that contains data you want to run predictions on. For more information, see Importing a local file.</dd>
+             </dl>
+             3.	Select <strong>Result Location</strong>, where the <strong>Result Location</strong> is where your model’s predictions are saved:
+             <dl className={styles.pl1}>
+                 <dd> –	<strong>In App</strong>: Saves and displays the results in R2-Learn.</dd>
+                 <dd> –	<strong>Upload to Database</strong>: Writes the results to a given database.</dd>
+             </dl>
+             4.	Select <strong>Deploy Frequency</strong>. This tells R2-Learn how to schedule the deployment:
+             <dl className={styles.pl1}>
+                 <dd >–	<strong>One Time</strong>: Sets your deployment to run a prediction on the data source once.</dd>
+                 <dd> –	<strong>Auto Repeat</strong>: Sets your deployment to run predictions on the data source according to a set schedule.</dd>
              </dl>
              <img src="/support18.png" alt=""/>
              <dl>
                  <dd> –	<strong>Auto disable if any issue occurs:</strong> Select this option to stop the deployment if R2-Learn encounters an issue.</dd>
              </dl>
-
-             <a href="javascript:;" className={styles.h2}>4.1.2. Predict with API</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4.1.2')}
+             >
+                <a href="javascript:;" name="4.1.2" className={styles.h2}>4.1.2. Predict with API</a>
+             </Waypoint>
              When you deploy your machine learning model in R2-Learn, a REST API endpoint is automatically generated for you to make requests to.
              <dl>
                  <dd>To make a prediction with R2-Learn’s REST API, you need:</dd>
@@ -342,20 +473,25 @@ export default class Article extends Component {
                  # Make predictions on your data
                  <div>data = {`"file": open('/path/to/your/data.csv', 'rb')`}</div>
                  {
-
                      `Response = requests.post('http://service2.newa-tech.com/api/<user_name>/<project_namr>/<model_name>/<api_key>', data)`
                  }
              </code>
-
-             <a href="javascript:;" className={styles.h2}>4.2. Monitor your deployed models</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4.2')}
+             >
+                <a href="javascript:;" name="4.2" className={styles.h2}>4.2. Monitor your deployed models</a>
+             </Waypoint>
              <dl>
                  <dd>You can monitor and fine-tune the performance of your deployed models in the following tabs:</dd>
                  <dd>•	Operation Monitor</dd>
                  <dd>•	Performance Monitor</dd>
                  <dd>•	Performance Status</dd>
              </dl>
-
-             <a href="javascript:;" className={styles.h2}>4.2.1. Operation Monitor</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4.2.1')}
+             >
+                <a href="javascript:;" name="4.2.1" className={styles.h2}>4.2.1. Operation Monitor</a>
+             </Waypoint>
              <dl>
                  <dd>This page displays information about any ongoing or completed operations for your models. For each operation, the operation monitor shows:</dd>
                  <dd>•	Model Name: The name of the model being run on the input data.</dd>
@@ -368,8 +504,12 @@ export default class Article extends Component {
                  <dd>•	Download Result: After an operation completes, you can download the result dataset. The results are appended with an extra column named {`"<target_variable_name>_pred"`} that contains the predicted value for each data point.</dd>
                  <dd>•	Cancel Ongoing Deployment: Stops an ongoing operation.</dd>
              </dl>
-
-             <a href="javascript:;" className={styles.h2}>4.2.2. Performance Monitor</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4.2.2')}
+             >
+                <a href="javascript:;" name="4.2.2" className={styles.h2}>4.2.2. Performance Monitor</a>
+             </Waypoint>
              Here, you can upload a validation dataset to run with a model on to validate the performance of that model.
              <dl>
                  <dd>You can connect R2-Learn to a validation dataset to run your model on by:</dd>
@@ -383,8 +523,12 @@ export default class Article extends Component {
                  <dd>•	Deploy Frequency: You can schedule repeating operations here.</dd>
                  <dd>•	Auto Disable if any issue occurs: Enabling this option sets the operation to terminate if it encounters any issues.</dd>
              </dl>
-
-             <a href="javascript:;" className={styles.h2}>4.2.3. Performance Status</a>
+    
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'4.2.3')}
+             >
+                <a href="javascript:;" name="4.2.3" className={styles.h2}>4.2.3. Performance Status</a>
+             </Waypoint>
              <dl>
                  <dd>Here, you can monitor the status of any ongoing or completed operations. Displayed here is the following information:</dd>
                  <dd>•	Model Name: The name of the model being run on the input data.</dd>
@@ -401,7 +545,11 @@ export default class Article extends Component {
 
     five(){
          return <Fragment>
-             <a href="javascript:;" className={styles.h1}>Appendix A: Data Quality Fixes</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'a')}
+             >
+                <a href="javascript:;" name="a" className={styles.h1}>Appendix A: Data Quality Fixes</a>
+             </Waypoint>
              <dl>
                  <dd>Some of the issues with data quality that R2-Learn may flag are:</dd>
                  <dd>•	Data Type Mismatch: When a variable’s data type doesn’t match what R2-Learn expects given what it has inferred from the dataset, it issues a Data Type Mismatch warning. For example, if R2-Learn expects a variable to be categorical, but is labeled as numerical.</dd>
@@ -413,9 +561,11 @@ export default class Article extends Component {
                  <dd>•	Fixing missing values</dd>
                  <dd>•	Fixing data type mismatch</dd>
              </dl>
-
-             <a href="javascript:;" className={styles.h2}>A.1. Fixing outliers</a>
-
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'a.1')}
+             >
+                <a href="javascript:;" name="a.1" className={styles.h2}>A.1. Fixing outliers</a>
+             </Waypoint>
              <dl>
                  <dd>•	Valid Range Editing</dd>
                  <dd>–	With our rule engine, our system automatically extrapolates from your dataset a reasonable range for a variable, and treats values outside the range as outliers. Editing the Valid Range manually expands or contracts the range of values that R2-Learn will accept for that variable.</dd>
@@ -441,8 +591,11 @@ export default class Article extends Component {
                  <dd>–	Replace the outlier value with 0.</dd>
                  <dd>–	Applicable only to numerical variables.</dd>
              </dl>
-
-             <a href="javascript:;" className={styles.h2}>A.2. Fixing missing values</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'a.2')}
+             >
+                <a href="javascript:;" name="a.2" className={styles.h2}>A.2. Fixing missing values</a>
+             </Waypoint>
              <dl>
                  <dd>•	Replace with most frequent value</dd>
                  <dd>–	Replace the missing value with the value that appears the most frequently for that column.</dd>
@@ -470,8 +623,11 @@ export default class Article extends Component {
                  <dd>•	"Left on blank on purpose"</dd>
                  <dd>•	"Failed to collect data"</dd>
              </dl>
-
-             <a href="javascript:;" className={styles.h2}>A.3. Fixing data type mismatch</a>
+             <Waypoint
+                 onEnter={this.changeHash.bind(this,'a.3')}
+             >
+                <a href="javascript:;" name="a.3" className={styles.h2}>A.3. Fixing data type mismatch</a>
+             </Waypoint>
              <dl>
                  <dd>•	Replace with mean value</dd>
                  <dd>–	Replace mismatched data values with the average of the remaining values in the column.</dd>
@@ -505,9 +661,17 @@ export default class Article extends Component {
 
     six(){
         return <Fragment>
-            <a href="javascript:;" className={styles.h1}>Appendix B: Advanced Modeling</a>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b')}
+            >
+              <a href="javascript:;" name="b" className={styles.h1}>Appendix B: Advanced Modeling</a>
+            </Waypoint>
             When you select Advanced Modeling, you can configure the following settings:
-            <a href="javascript:;" className={styles.h2}>B.1. Advanced Variable Settings</a>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.1')}
+            >
+                <a href="javascript:;" name="b.1" className={styles.h2}>B.1. Advanced Variable Settings</a>
+            </Waypoint>
             <dl>
                 <dd>Under this section, you can modify the variables in your data to alter your model. You can change the following in Advanced Variable Settings:</dd>
                 <dd>•	Selecting/Deselecting Variables: You can select additional variables or remove variables from your dataset. After your machine learning model has been built, you can see how the change in your variable selection affects your model in the Model Selection section.</dd>
@@ -530,7 +694,404 @@ export default class Article extends Component {
             </dl>
             <img src="/support20.png" alt=""/>
             •	<strong>Univariant Plot:</strong> Clicking on a variable’s "Univariant Plot" displays a graph that shows a distribution of the values for that variable.
+            <img src="/support21.png" alt=""/>
+            •	<strong>Variable Importance:</strong>  The variable importance section represents the statistical significance of a predictor for the target variable; the higher the "Importance" of a variable, the more a change in this variable would affect the predicted target variable. Variables displayed in Advance Variable Settings are by default sorted from highest to lowest "Importance".
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2')}
+            >
+                <a href="javascript:;" name="b.2" className={styles.h2}>B.2. Advanced Modeling Setting</a>
+            </Waypoint>
+            Here you are able to configure other settings for model building:
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.1')}
+            >
+                <a href="javascript:;" name="b.2.1" className={styles.h2}>B.2.1. Create/Edit Model Setting By default</a>
+            </Waypoint>
+            <dl>
+                <dd>When you click on Advanced Modeling, R2-Learn creates a new "Model Setting". In the Advanced Modeling Settings tab, your new model setting is:</dd>
+                <dd>1.	Given the default name "custom.{"<MM.DD.YYY_HH:MM:SS>"}"</dd>
+                <dd>2.	Sets the {'{select}'} field to this new model setting.</dd>
+            </dl>
+            You can build on a previously defined "Model Setting" by selecting it in the {'{select}'} field. Change the name in the "Name Your Model Settings" field to save your modified model settings as a new model setting.
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.2')}
+            >
+                <a href="javascript:;" name="b.2.2" className={styles.h2}>B.2.2. Select Algorithm</a>
+            </Waypoint>
+            By default, R2-Learn builds models for each project using all available classifier algorithms. You can remove classifiers from this list to reduce the amount of time modeling takes. The following is a table of classifiers and the problem types they are compatible with:
+            <dl className={styles.table}>
+                <dt>
+                    <ul>
+                        <li>Algorithm</li>
+                        <li>Binary Classification</li>
+                        <li>Regression</li>
+                    </ul>
+                </dt>
+                <dd>
+                    <ul>
+                        <li>Adaboost</li>
+                        <li>✓</li>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>ARD (Automatic Relevance Determination) Regression</li>
+                        <li/>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Bernoulli Naive Bayes</li>
+                        <li>✓</li>
+                        <li/>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Decision Tree</li>
+                        <li>✓</li>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+                <dd>
+                   <ul>
+                       <li>Extra Trees</li>
+                       <li>✓</li>
+                       <li>✓</li>
+                   </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Gaussian Naive Bayes</li>
+                        <li>✓</li>
+                        <li/>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Gaussian Process</li>
+                        <li/>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Gradient Boosting</li>
+                        <li>✓</li>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>K Nearest Neighbor</li>
+                        <li>✓</li>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Linear Discriminant Analysis</li>
+                        <li>✓</li>
+                        <li/>
+                    </ul>
+                </dd>
+                <dd>
+                   <ul>
+                       <li>Multinomial Naive Bayes</li>
+                       <li>✓</li>
+                       <li/>
+                   </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Passive Aggressive</li>
+                        <li>✓</li>
+                        <li/>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Quadratic Discriminant Analysis</li>
+                        <li>✓</li>
+                        <li/>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Random Forest</li>
+                        <li>✓</li>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+                <dd>
+                   <ul>
+                       <li>SGD (Stochastic Gradient Descent)</li>
+                       <li>✓</li>
+                       <li>✓</li>
+                   </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Logistic Regression</li>
+                        <li>✓</li>
+                        <li/>
+                    </ul>
+                </dd>
+                <dd>
+                    <ul>
+                        <li>Ridge Regression</li>
+                        <li/>
+                        <li>✓</li>
+                    </ul>
+                </dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.3')}
+            >
+                <a href="javascript:;" name="b.2.3" className={styles.h2}>B.2.3. Set Max Model Ensemble Size</a>
+            </Waypoint>
+            This is the maximum number of sub-models you R2-Learn that can be combined to form one machine learning model, or an ensemble model For example, if the Max Model Ensemble Size is set to 3, then the resulting ensemble can be made up of a maximum number of 3 sub-models.
+            <div>The actual number of sub-models in the resulting ensemble would depend on the allotted training time.</div>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.4')}
+            >
+                <a href="javascript:;" name="b.2.4" className={styles.h2}>B.2.4. Train Validation Holdout and Cross Validation</a>
+            </Waypoint>
+            You can choose to build your machine learning models using:
+            •	Train Validation Holdout: This constructs a machine learning model by partitioning your training dataset into the three subsets:
+            <dl className={styles.pl1}>
+                <dd>–	Training set: This is used to build the machine learning model.</dd>
+                <dd> –	Validation set: This is used to tune the hyper parameters of classifiers for better accuracy.</dd>
+                <dd>–	Holdout set: This set of data helps assess the performance of the final model; it does not play any role in model building, but is used for validating the built model.</dd>
+                <dd>You are able to set the percentage of your dataset to use for each subset by dragging the circle at the intersection of any two sets.</dd>
+            </dl>
+            •	K-fold Cross Validation Holdout: This constructs a machine learning model by:
+            <dl className={styles.pl1}>
+                <dd>a.	Partitioning your training dataset into 'k' number of "folds", or 'k' number of equally sized subsamples.</dd>
+                <dd>b.	Running a modeling process where each of the 'k' subsamples is in turn used as the validation set while the remaining subsamples are used as training set.</dd>
+                <dd>c.	This process is repeated for each of the 'k' subsamples, giving us 'k' number of models.</dd>
+                <dd>d.	We then find the average of the 'k' number of models to attain a single model.</dd>
+                <dd>This method takes much longer than the Train Validation Holdout. You are able to set the number of folds and the holdout percentage.</dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.5')}
+            >
+                <a href="javascript:;" name="b.2.5" className={styles.h2}>B.2.5. Resampling Setting</a>
+            </Waypoint>
+            [Note]	Only available for Binary Classification models.
+            <div>If the target variable shows an uneven distribution of sample sizes for each outcome, then you have an unbalanced dataset.</div>
+            R2-Learn can balance out your dataset by upsampling or downsampling your training dataset. For both upsampling and downsampling, you can adjust the ratio of one category to another.
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.6')}
+            >
+                <a href="javascript:;" name="b.2.6" className={styles.h2}>B.2.6. Set Measurement Metric</a>
+            </Waypoint>
+            You can change the measurement metric used to judge the effectiveness of the machine learning model.
+            <div>For Binary Classification models, you can select:</div>
+            <dl className={styles.pl1}>
+                <dd>•	AUC (area under the curve) (default)</dd>
+                <dd>•	Accuracy</dd>
+                <dd>•	F1</dd>
+            </dl>
+            For Regression models, you can select:
+            <dl>
+                <dd>•	MSE (mean square error) (default)</dd>
+                <dd>•	R²</dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.7')}
+            >
+                <a href="javascript:;" name="b.2.7" className={styles.h2}>B.2.7. Set Max Optimization Time</a>
+            </Waypoint>
+            You can set the maximum optimization time for optimizing the model building parameters. The longer the time allotted for optimization, the better the performance of the resulting machine learning model. For larger training datasets, we recommend you to set a higher maximum optimization time.
+            <div>For any dataset, you should set an optimization time of at least 9 minutes.</div>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'b.2.8')}
+            >
+                <a href="javascript:;" name="b.2.8" className={styles.h2}>B.2.8. Random Seed</a>
+            </Waypoint>
+            This seeds any random numbers generated while training your machine learning models. Setting the seed allows you to reproduce your modeling process by using the same random seed to build similar models.
+        </Fragment>
+    }
 
+    seven(){
+        return <Fragment>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'c')}
+            >
+                <a href="javascript:;" name="c" className={styles.h1}>Appendix C: Model selection for Binary Classification problems</a>
+            </Waypoint>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'c.1')}
+            >
+                <a href="javascript:;" name="c.1" className={styles.h2}>C.1. Simplified view</a>
+            </Waypoint>
+            <img src="/support22.png" alt=""/>
+            <dl>
+                <dd>When in the Model Selection tab for Binary Classification problems, the following is displayed:</dd>
+                <dd>•	Modeling Results: A general grade indicating the general performance levels of the trained models.</dd>
+                <dd>•	Selected Model: Your currently selected machine learning model. This is selected from the list of trained machine learning models displayed below.</dd>
+                <dd>•	Target: The Target Variable that is being predicted by the machine learning model.</dd>
+                <dd>•	Performance: Shows the performance of the selected model. This is usually AUC (area under the curve) for Binary Classification models.</dd>
+                <dd>•	Accuracy: Shows the accuracy of the predictions made by the selected model.</dd>
+                <dd>•	Select your model based on your own criteria: R2-Learn automatically selects a model that it thinks is the most suitable for your business problem from the list of trained models. You modify the means by which it picks its recommendation by selecting one of the following options:</dd>
+            </dl>
+            <dl className={styles.pl1}>
+                <dd>–	R2-Learn’s Default Recommendation: R2-Learn makes a recommendation based on a balance between execution time and performance.</dd>
+                <dd>–	Cost Based: Here, you can quantify the business costs incurred for false positives (Type I errors) and false negatives (Type II errors), and the benefits gained from correct positive and negative predictions. R2-Learn will recommend a model to use based on this data.</dd>
+                <dd><img src="/support23.png" alt=""/></dd>
+            </dl>
+            •	Table of trained models: This section also shows a list of models that have been built with the training data. The listed models each have a:
+            <dl className={styles.pl1}>
+                <dd>–	Model Name: The name of this model. This is usually {'"<algorithm_name>.<model_setting_name>"'}, where {'<model_setting_name>'} is automatically determined if you have selected Automatic Modeling, or is set when configuring your Advanced Modeling Setting.</dd>
+                <dd>–	Accuracy: Shows the proportion of predictions the model makes that match actual outcomes. The higher this value is, the more likely a prediction the model makes is correct.</dd>
+                <dd>–	Performance: Shows the performance metric for this model. This is usually AUC (area under the curve) for Binary Classification models, and MSE (mean square error) for Regression models.</dd>
+                <dd>–	Execution Speed: The amount of time the model will take to process a given number of rows in a dataset.</dd>
+                <dd>–	Variable Impact: Click on check to see the impact each of the model’s variables has on the target variable. Displays the impacts each variable in the model has on the predicted target variable. The higher this value is, the larger the effect a change in this variable has on the outcome predicted by the model.</dd>
+                <dd>–	Model Process Flow: Click on check to display a step-by-step breakdown on how this model is built.</dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'c.2')}
+            >
+                <a href="javascript:;" name="c.2" className={styles.h2}>C.2. Advanced View</a>
+            </Waypoint>
+            <dd><img src="/support24.png" alt=""/></dd>
+            Users can use the Advanced View to view more detailed information about the models available for deployment.
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'c.2.1')}
+            >
+                <a href="javascript:;" name="c.2.1" className={styles.h2}>C.2.1. Top Section</a>
+            </Waypoint>
+            <dl>
+                <dd>The top of the section displays the following:</dd>
+                <dd>•	Modeling Results: A general grade indicating the general performance levels of the trained models.</dd>
+                <dd>•	Model Name Contains: Allows you to filter the model name by algorithm and by Model Setting name.</dd>
+                <dd>•	Model Comparison Charts: Charts the performance of each model for the following performance comparisons:</dd>
+            </dl>
+            <dl className={styles.pl1}>
+                <dd>–	Speed v.s. Accuracy: Charts the speed v.s. accuracy tradeoff for each model.</dd>
+                <dd>–	Lifts Chart: The Lift Chart is used to determine the effectiveness of a model by showing the ratio between results obtained with and without using the predictive model.</dd>
+                <dd>–	ROC Curves: Charts the diagnostic ability of the binary classifier as its threshold varies.</dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'c.2.2')}
+            >
+                <a href="javascript:;" name="c.2.2" className={styles.h2}>C.2.2. Table of Models</a>
+            </Waypoint>
+            <dl>
+                <dd>The table below displays all the models trained with the dataset. Each listed model has a:</dd>
+                <dd>•	Model Name: The name of this model. This is usually {'"<algorithm_name>.<model_setting_name>"'}, where {'<model_setting_name>'} is automatically determined if you have selected Automatic Modeling, or is set when configuring your Advanced Modeling Setting.</dd>
+                <dd>•	F1-Score: This score is a measure of test set accuracy: F1 = 2 * precision * recall / (precision + recall).</dd>
+                <dd>•	Precision: The proportion of all predictions (including true and false positives) that are true positives. Precision = TP/(TP+FP).</dd>
+                <dd>•	Recall: The proportion of positives that the classification model correctly labels as positives. Recall =TP/(TP+FN).</dd>
+                <dd>•	Cutoff Threshold: Many classifiers are able to produce a probability distribution over a set of classes (e.g. 1 or 0). Cut-off threshold is a probability value which can be used to determine whether an observation belongs to a particular class.</dd>
+                <dd>•	Variable List: Shows which of the variables in the training dataset are included in the model.</dd>
+                <dd>•	Validation/Cross Validation: The Validation/Cross Validation dataset is the data that is set aside to fine-tune an initial model to see if relationships between variables are correctly manipulated to create the best model possible.</dd>
+                <dd>•	Holdout: Holdout is the proportion of the original dataset that has been set aside for the final testing of finished models. The data set aside for holdout is not used in the construction or tuning of the initial model, but is instead used to evaluate how well the model performs.</dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'c.2.3')}
+            >
+                <a href="javascript:;" name="c.2.3" className={styles.h2}>C.2.3. Additional Model Details</a>
+            </Waypoint>
+            To view additional model details, click on the + next to the Model Name to expand the model selection.
+            <img src="/support25.png" alt=""/>
+            <dl>
+                <dd>This displays a panel with the following charts:</dd>
+                <dd>1.	Error/Confusion Matrix: This displays a matrix comparing predicted values with actual values, and shows the number of True Positives (TP), False Positives (FP), True Negatives (TN), and False Negatives (FN) predicted by this model.</dd>
+                <dd>2.	ROC Curves (adjustable): Charts the diagnostic ability of the binary classifier as its threshold varies. Click on the slider to adjust the ratio of these values.</dd>
+                <dd>3.	Prediction Distribution (adjustable): This plots Probability Threshold against Probability Density. Click on the slider to adjust the ratio of these values.</dd>
+                <dd>4.	Precision Recall Tradeoff (adjustable): This plots Recall (TP/(TP+FN)) against Precision (TP/(TP+FP)), showing us how accurate the model’s predictions are. Click on the slider to adjust the ratio of these values.</dd>
+                <dd>5.	Lift Chart: The Lift Chart is used to determine the effectiveness of a model by showing the ratio between results obtained with and without using the predictive model.</dd>
+                <dd>6.	Model Process Flow: Shows a step-by-step breakdown on how this model is built.</dd>
+                <dd>7.	Variable Impact: Displays the impacts each variable in the model has on the predicted target variable. The higher this value is, the larger the effect a change in this variable has on the outcome predicted by the model.</dd>
+            </dl>
+        </Fragment>
+    }
+
+    eight(){
+        return <Fragment>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'d')}
+            >
+                <a href="javascript:;" name="d" className={styles.h1}>Appendix D: Model selection for Regression problems</a>
+            </Waypoint>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'d.1')}
+            >
+                <a href="javascript:;" name="d.1" className={styles.h2}>D.1. Simplified View</a>
+            </Waypoint>
+            <img src="/support26.png" alt=""/>
+            When in the Model Selection tab for Regression problems, the following is displayed:
+            <div>•	Selected Model: Your currently selected machine learning model. This is selected from the list of trained machine learning models displayed below.</div>
+            •	Normalized RMSE (Root Mean Square Error): This value will help you compare model performance: the smaller the Normalized RMSE, the better the model predicts data.
+            <div>•	Quality of fit (R²): R² is a statistical measure of how close the regression line fits the given data. The higher the R² value is, the closer the model fits the data.</div>
+            <div className={styles.pl1}>–	Variable Impact: Displays the impacts each variable in the model has on the predicted target variable. The higher this value is, the larger the effect a change in this variable has on the outcome predicted by the model.</div>
+            •	Predicted v.s. Actual Plot (Sorted): Shows how close the values predicted by your models are to actual values. You can change the number of data points shown by clicking on Edit under the chart.
+            <div>•	Table of trained models: This section also shows a list of models that have been built with the training data. The listed models each have a:</div>
+            <dl className={styles.pl1}>
+                <dd>–	Model Name: The name of this model. This is usually {'"<algorithm_name>.<model_setting_name>"'}, where {'<model_setting_name>'} is automatically determined if you have selected Automatic Modeling, or is set when configuring your Advanced Modeling Setting.</dd>
+                <dd>–	Error (Normalised RMSE): RMSE (root of mean square error) is square root of the standard error of the model, and is a measure of how close your model’s predictions are to the actual target variable values.</dd>
+                <dd>–	Execution Speed: The amount of time the model will take to process a given number of rows in a dataset.</dd>
+                <dd>–	Variable Impact: Click on check to see the impact each of the model’s variables has on the target variable. The higher this value is, the larger the effect a change in this variable has on the outcome predicted by the model.</dd>
+                <dd>–	Model Process Flow: Click on check to display a step-by-step breakdown on how this model is built.</dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'d.2')}
+            >
+                <a href="javascript:;" name="d.2" className={styles.h2}>D.2. Advanced View</a>
+            </Waypoint>
+            <img src="/support27.png" alt=""/>
+            Users can use the Advanced View to view more detailed information about the models available for deployment.
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'d.2.1')}
+            >
+                <a href="javascript:;" name="d.2.1" className={styles.h2}>D.2.1. Top Section</a>
+            </Waypoint>
+            The top of the section displays the following:
+            <div>•	Model Name Contains: Allows you to filter the model name by algorithm and by Model Setting name.</div>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'d.2.2')}
+            >
+            <a href="javascript:;" name="d.2.2" className={styles.h2}>D.2.2. Table of Models</a>
+            </Waypoint>
+            <dl>
+                <dd>The table below displays all the models trained with the dataset. Each listed model has a:</dd>
+                <dd>•	Model Name: The name of this model. This is usually {'"<algorithm_name>.<model_setting_name>"'}, where {'<model_setting_name>'} is automatically determined if you have selected Automatic Modeling, or is set when configuring your Advanced Modeling Setting.</dd>
+                <dd>•	RMSE (Root Mean Square Error): RMSE is the square root of MSE. Usually used to compare the likelihood of predictive errors across different models</dd>
+                <dd>•	RMLSE (Root Mean Logarithmic Square Error): This is the square root of the logarithmic value of MSE.</dd>
+                <dd>•	MSE (Mean Square Error): MSE measures the prediction error of the model. It is the sum of the difference between values predicted by the model and actual values, divided by the total number of data points.</dd>
+                <dd>•	MAE (Mean Absolute Error): This measures the prediction error of the model. It is the sum of absolute value of the difference between values predicted by the model and actual values.</dd>
+                <dd>•	R²: R² is a statistical measure of how close the regression line fits the given data. The higher the R² value is, the closer the model fits the data.</dd>
+                <dd>•	R² Adjusted: An Adjusted R² is a modified version of R² which has been adjusted for the number of predictors in the model. It is always lower than R².</dd>
+                <dd>•	Variable List: Shows which of the variables in the training dataset are included in the model.</dd>
+                <dd>•	Validation/Cross Validation: The Validation/Cross Validation dataset is the set of data that is set aside from the original dataset to fine-tune an initial model to see if relationships between variables are correctly manipulated to create the best model possible.</dd>
+                <dd>•	Holdout: The holdout is the proportion of the original dataset that has been set aside for the final testing of finished models. The data set aside for holdout is not used in the construction or tuning of the initial model, but is instead used to evaluate how well the model performs.</dd>
+            </dl>
+            <Waypoint
+                onEnter={this.changeHash.bind(this,'d.2.3')}
+            >
+                <a href="javascript:;" name="d.2.3" className={styles.h2}>D.2.3. Additional Model Details</a>
+            </Waypoint>
+            To view additional model details, click on the + next to the Model Name to expand the model selection.
+            <img src="/support28.png" alt=""/>
+            This displays a panel with the following charts:
+            <div>1.	Fit plot: The fit plot charts the predictive accuracy of a model by plotting actual target variable values in the dataset (x-axis) against predicted target variable values (y-axis). A straight line (y = x) is drawn on the graph, showing all the points on the graph where a predicted target variable value is equal to its corresponding actual target variable value. The more points on the graph that are close to or on the line, the better the predictive performance of the model.</div>
+            2.	Residual plot: A "residual" is the difference between the actual target variable value and the predicted target variable value for a given data point. The residual plot charts actual target variable values (y-axis) against their corresponding residuals (x-axis) to show possible issues with applying the model to the given dataset.
+            Click on Diagnose to get R2-Learn to make recommendations on how to improve your model by comparing the shape of your current model’s residual plot to known residual plot shapes. In the dialog box that opens, select from the following a residual plot shape that most closely resembles your model’s residual plot:
+            <dl className={styles.pl1}>
+                <dd>–	Randomly distributed residual plot.</dd>
+                <dd>–	Y-axis unbalanced residual plot.</dd>
+                <dd>–	X-axis unbalanced residual plot.</dd>
+                <dd>–	Outliers residual plot.</dd>
+                <dd>–	Nonlinear residual plot.</dd>
+                <dd>–	Heteroscedasticity residual plot.</dd>
+                <dd>–	Large Y-axis data points residual plot.</dd>
+            </dl>
+            3.	Model Process Flow: Shows a step-by-step breakdown on how this model is built.
+            <div>4.	Variable Impact: Displays the impacts each variable in the model has on the predicted target variable. The higher this value is, the larger the effect a change in this variable has on the outcome predicted by the model.</div>
         </Fragment>
     }
 
@@ -542,6 +1103,8 @@ export default class Article extends Component {
             {this.four()}
             {this.five()}
             {this.six()}
+            {this.seven()}
+            {this.eight()}
         </section>
     }
 }
