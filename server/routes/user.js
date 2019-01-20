@@ -20,8 +20,8 @@ const sendCodeMail = (code, to) => {
     html: '<div style="padding: 0 5%;font-family: Microsoft YaHei;font-size: 12px;color: #151515">' +
       '  <p style="color: #5B77A9;font-family: Microsoft YaHei;font-size: 24px;text-align:center;font-weight: bold">Reset your password for R2.ai</p >' +
       '  <p>Dear R2.ai user,</p >' +
-      '  <p>Please set your new password from url below(expire one hour).</p >' +
-      '  <p>Your password reset url: ' + config.host + 'resetpassword?code=' + code + '</p >' +
+      '  <p>Please set your new password from url below(expiring in one hour).</p >' +
+      '  <p>Your password reset url: ' + config.host + '/resetpassword?code=' + code + '</p >' +
       '  <p>Thank you for your interests in our community and products.</p >' +
       '</div>'
   }

@@ -495,6 +495,7 @@ class CreateNewVariable extends Component {
     this.showTips = false
   }
 
+  //点击确认按钮
   handleAdd = () => {
     let { name, exp, props: { expression } } = this
     name = name.trim()
@@ -525,19 +526,23 @@ class CreateNewVariable extends Component {
     })
   }
 
+  // 转化括号
   formatBracket = _expression => {
     let expression = _expression
     const bracketExps = []
     let num = 0
 
     while (true) {
+      // 查询第一个)
       const end = expression.indexOf(")") + 1
       if (end === 0) break;
       if (num > 9) return { isPass: false, message: "too many functions" }
+      // 查询截取表达式最后一个(
       const start = expression.lastIndexOf("(", end)
       if (start === -1) return { isPass: false, message: "Unexpected token )" }
       const exp = expression.slice(start + 1, end - 1)
       bracketExps.push(exp)
+      //转化(...)为$?
       expression = expression.slice(0, start) + "$" + num + expression.slice(end)
       num++
     }
@@ -548,9 +553,11 @@ class CreateNewVariable extends Component {
     }
   }
 
+  // 校验基本表达式
   checkSimpleExp = (expression, bracketExps) => {
     if (!expression) return { isPass: false, message: "empty expression" }
     const baseOptReg = new RegExp(/[+\-*/]/)
+    // 根据+-*/切割表达式
     const array = expression.split(baseOptReg)
     let num = 1
     let isVariable = false
@@ -561,9 +568,12 @@ class CreateNewVariable extends Component {
       let type = 'Numerical'
       item = item.trim()
       if (!item) return { isPass: false, message: "error expression" }
+      //判断是否是数字
       if (isNaN(item)) {
+        // 判断是否含有转化的()表达式
         if (item.includes("$")) {
           const index = item.indexOf("$")
+          // 截取函数名称
           const functionName = item.slice(0, index).trim()
           let bracketNum = item.slice(index + 1, index + 2).trim()
           if (!bracketNum || isNaN(bracketNum)) return { isPass: false, message: `error expression` }
@@ -574,12 +584,14 @@ class CreateNewVariable extends Component {
           }
           const other = item.slice(index + 2).trim()
           if (other) return { isPass: false, message: `Unexpected identifier: ${other}` }
+          // 校验参数
           const fnResult = this.checkParams(functionName, bracketExps, bracketNum)
           if (!fnResult.isPass) return fnResult
           num += fnResult.num - 1
           isVariable = fnResult.isVariable
           type = fnResult.type
         }
+        // 判断是否为选择的参数
         if (item.startsWith("@")) {
           item = item.slice(1)
           const { dataHeader, colType } = this.props
@@ -600,14 +612,18 @@ class CreateNewVariable extends Component {
     return { isPass: true, message: `ok`, num, isVariable, type: expType }
   }
 
+  // 校验表达式参数
   checkParams = (functionName, bracketExps, bracketNum) => {
     const exps = bracketExps[bracketNum]
     if (!exps) return { isPass: false, message: `empty parameters` }
+    // 根据, 分割参数
     const expArray = exps.split(",")
+    // 不是函数, 则参数只能为1个
     if (!functionName && expArray.length > 1) return { isPass: false, message: `Unexpected identifier: ${exps}` }
     const isBaseFn = FUNCTIONS.base.find(fn => fn.value === functionName + "()")
     const isSeniorFn = FUNCTIONS.senior.find(fn => fn.value === functionName + "()")
     const currentFn = isBaseFn || isSeniorFn
+    // 判断函数参数个数限制
     if (currentFn.params && currentFn.params !== expArray.length) return { isPass: false, message: `function ${functionName} must have ${currentFn.params} params` }
     let numOfParam = 0
     let isVariable1 = false
@@ -616,10 +632,12 @@ class CreateNewVariable extends Component {
     const params = []
 
     for (const exp of expArray) {
+      // 校验表达式
       const expChecked = this.checkSimpleExp(exp.trim(), bracketExps)
       if (!expChecked.isPass) return expChecked
       const { isVariable, num, type } = expChecked
       if (isVariable) numOfParam++
+      // 报存参数类型
       params.push({
         isVariable,
         num,
@@ -629,12 +647,21 @@ class CreateNewVariable extends Component {
     }
 
     if (isSeniorFn) {
+      // 校验高级函数参数
       const seniorResult = this.checkSeniorParams(currentFn, params, numOfParam)
       if (!seniorResult.isPass) return seniorResult
       isVariable1 = true
       num += seniorResult.num - 1
       fnType = seniorResult.type
+    } else if (isBaseFn) {
+      // 校验一般函数参数
+      if (currentFn.value === 'eq()') {
+        fnType = 'Categorical'
+      } else {
+        fnType = 'Numerical'
+      }
     } else {
+      // 校验非函数参数
       for (let param of params) {
         if (param.type !== 'Numerical') return { isPass: false, message: `parameters must be Numerical` }
       }
@@ -647,16 +674,19 @@ class CreateNewVariable extends Component {
     return { isPass: true, message: `ok`, num, isVariable: isVariable1, type: fnType }
   }
 
+  // 校验高级表达式参数
   checkSeniorParams = (senior, params, numOfParam) => {
     let num = 0
     let type = ''
 
+    // 截取列名参数
     const paramList = params.slice(0, numOfParam)
     if (senior.value !== 'Concat()') {
       for (let param of paramList) {
         if (param.type !== 'Numerical') return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters must be Numerical` }
       }
     }
+    // 截取非列名参数
     const numList = params.slice(numOfParam)
     switch (senior.value) {
       case "Concat()":
@@ -735,7 +765,7 @@ class CreateNewVariable extends Component {
     return { isPass: true, message: "ok", num, type }
   }
 
-
+  // 校验总表达式
   checkExp = _expression => {
     if (!_expression) return { isPass: true, message: "ok", num: 0 }
     if (_expression.includes("$")) return { isPass: false, message: "Unexpected token $" }
@@ -745,6 +775,7 @@ class CreateNewVariable extends Component {
     return { isPass, message, num, type }
   }
 
+  // 计算阶乘
   factorial = (n) => {
     if (n < 2) return 1
     return n * this.factorial(n - 1)
