@@ -7,7 +7,7 @@ const router = new Router()
 const getHost = (req, res, next) => {
   const { query, body } = req
 
-  const {projectId=body.projectId} = query
+  const { projectId = body.projectId } = query
 
   if (!projectId) {
     res.send({
@@ -17,7 +17,7 @@ const getHost = (req, res, next) => {
     })
     return
   }
-  redis.hget(`project:${projectId}`,`host`).then(url => {
+  redis.hget(`project:${projectId}`, `host`).then(url => {
     req.proxyHost = JSON.parse(url)
     req.filename = query.filename
     next()
@@ -51,6 +51,13 @@ const hpm = proxy({
     // proxyRes.headers[""] = res.headers;     // add new header to response
     // delete proxyRes.headers['x-removed'];       // remove header from response
   }
+})
+
+router.get('/host', (req, res) => {
+  console.log(req.query.id)
+  redis.hget(`project:${req.query.id}`, `host`).then(url => {
+    res.json(url)
+  })
 })
 
 router.use("/*", getHost, hpm)
