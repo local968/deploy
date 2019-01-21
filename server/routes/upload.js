@@ -140,14 +140,14 @@ function saveSample() {
 
   if (!fs.existsSync(samplePath)) return console.log("sample not exist")
 
-  if (fs.existsSync(sampleFilePath)) {
-    console.log("sample already exist")
-  } else {
-    try {
-      fs.symlinkSync(samplePath, sampleFilePath)
-    } catch (e) { return console.log(e.message) }
-    console.log("symlink create")
-  }
+  // if (fs.existsSync(sampleFilePath)) {
+  //   console.log("sample already exist")
+  // } else {
+  //   try {
+  //     fs.symlinkSync(samplePath, sampleFilePath)
+  //   } catch (e) { return console.log(e.message) }
+  //   console.log("symlink create")
+  // }
   const files = fs.readdirSync(samplePath)
 
   const array = files.map(f => {
