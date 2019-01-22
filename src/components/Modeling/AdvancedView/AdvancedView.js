@@ -79,7 +79,7 @@ export default class AdvancedView extends Component {
     key: '',
     display: ''
   };
-
+  
   @computed
   get filtedModels() {
     const { models, project ,projectStore} = this.props;
@@ -219,13 +219,15 @@ export default class AdvancedView extends Component {
     };
 
     projectStore.changeNewfiltedModels(_filtedModels);
+    
+    // debugger;
 
     if(!oldfiltedModels){
       projectStore.changeOldfiltedModels(_filtedModels);
       oldfiltedModels = _filtedModels;
     }
 
-    if(stopFilter){
+    if(stopFilter&&oldfiltedModels){
       _filtedModels = oldfiltedModels.sort(sortMethods);
     }else{
       _filtedModels = _filtedModels.sort(sortMethods);
@@ -318,6 +320,8 @@ export default class AdvancedView extends Component {
         } catch (e) { }
       })
     }
+    // props.projectStore.changeStopFilter(true)
+    props.projectStore.changeOldfiltedModels(undefined)
   }
 
   render() {
