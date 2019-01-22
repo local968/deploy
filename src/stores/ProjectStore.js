@@ -23,7 +23,7 @@ class ProjectStore {
   };
   @observable broadcastId = "";
   @observable conflict = false;
-  @observable stopFilter = true;
+  @observable stopFilter = false;
   oldfiltedModels = null;
   newfiltedModels = null;
 
