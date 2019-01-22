@@ -225,7 +225,6 @@ export default class Project {
   @computed
   get defaultTrain() {
     const measurement = this.problemType === "Classification" ? "auc" : "r2"
-    this.models = []
 
     return {
       train2Finished: false,
@@ -427,6 +426,7 @@ export default class Project {
           const { value } = data[key] || {}
           data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
         }
+        console.log(data[key])
       }
     }
     data.updateTime = +new Date()
@@ -435,7 +435,7 @@ export default class Project {
 
   /**---------------------------------------------problem-------------------------------------------------*/
   @action
-  saveProblem = () => {
+  saveProblem = async () => {
     const updObj = {
       statement: this.statement,
       business: this.business,
@@ -443,6 +443,7 @@ export default class Project {
     };
     updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
     if (this.problemType && this.changeProjectType !== this.problemType) {
+      if (this.train2ing) await this.abortTrainByEtl()
       //全部恢复到problem步骤
       const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, updObj, {
         mainStep: 2,
@@ -461,6 +462,7 @@ export default class Project {
   //修改上传文件
   @action
   fastTrackInit = async (name) => {
+    if (this.train2ing) await this.abortTrainByEtl()
     const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, { uploadFileName: [name] }, {
       mainStep: 2,
       curStep: 2,
@@ -528,7 +530,7 @@ export default class Project {
   @action
   endSchema = async () => {
     this.etling = true
-    if (this.train2ing) await this.abortTrain(!!this.models.length)
+    if (this.train2ing) await this.abortTrainByEtl()
     await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
       colType: { ...this.colType },
@@ -557,7 +559,7 @@ export default class Project {
 
     if (!hasChange) return await Promise.resolve()
     this.etling = true
-    if (this.train2ing) await this.abortTrain(!!this.models.length)
+    if (this.train2ing) await this.abortTrainByEtl()
     const data = Object.assign(this.defaultTrain, {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
@@ -1094,12 +1096,17 @@ export default class Project {
       isLoading
     }
     this.isAbort = true
-    socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
+    return socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
       const { status, message, result, id } = returnValue
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
       this.setProperty({ ...result, stopModel: false })
     }))
+  }
+
+  abortTrainByEtl = () => {
+    this.models = []
+    return this.abortTrain()
   }
 
   setModel = data => {
@@ -1248,5 +1255,18 @@ export default class Project {
   handleError = returnValue => {
     const { result, status, command } = returnValue
     if (status < 0) antdMessage.error(`command:${command}, error:${result['process error']}`)
+  }
+
+  getSample = () => {
+    return socketStore.ready()
+      .then(api => api.getSample({ problemType: this.problemType }))
+      .then(res => {
+        return res.list || []
+      })
+      .catch(e => {
+        console.error(e.message, "sample error")
+        antdMessage.error("fetch sample error")
+        return []
+      })
   }
 }

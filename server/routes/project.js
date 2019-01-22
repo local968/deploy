@@ -836,3 +836,17 @@ function mapObjectToArray(obj) {
 wss.register('getFiles', (message, socket) => {
   return getFileInfo(message.files)
 })
+
+wss.register('getSample', (message, socket) => {
+  const type = (message.problemType || '')[0]
+  if (!type || (type !== 'C' && type !== 'R')) return []
+  return redis.smembers(`file:${type}:samples`).then(result => {
+    const list = result.map(r => {
+      try{ 
+        r = JSON.parse(r)
+      }catch(e){}
+      return r
+    })
+    return { list }
+  })
+})

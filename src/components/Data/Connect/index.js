@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import classnames from 'classnames';
+// import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
@@ -8,62 +8,62 @@ import sqlIcon from './sql.svg';
 // import defileIcon from './define.svg';
 import axios from 'axios';
 import { message } from 'antd';
-import { Uploader, ProgressBar } from 'components/Common';
+import { Uploader, ProgressBar, ProcessLoading } from 'components/Common';
 import config from 'config';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 
 import { observable, action, computed } from 'mobx';
 
-const files = {
-  RegressionSample: [
-    {
-      filename: 'regression.house.csv',
-      size: '2.4M',
-      desc: 'house features and price',
-      target: 'price',
-      usecase: 'house features and price',
-    },
-    {
-      filename: 'game.csv',
-      size: '1.6M',
-      desc: 'game sales prediction',
-      target: 'NA_Sales',
-      usecase: 'video game sales',
-    }
-  ],
-  ClassificationSample: [
-    {
-      filename: 'bank.train.csv',
-      size: '366K',
-      desc:
-        'Predict target customers for telemarketing of long term deposits product.',
-      target: 'y',
-      usecase: 'Retail bank telemarketing campaign data',
-    },
-    {
-      filename: 'titanic.train.csv',
-      size: '59K',
-      desc: 'Predict if a passenger on the Titanic boat would survive or not.',
-      target: 'survived',
-      usecase: 'Titanic survival data',
-    },
-    {
-      filename: 'dma1c_dirty.csv',
-      size: '24M',
-      desc: 'Predict diabetic patients blood suger cross control level',
-      target: 'target8',
-      usecase: 'Predict diabetic',
-    },
-    {
-      filename: 'givemecredit_dirty.csv',
-      size: '5.5MB',
-      desc: 'Predict whether or not a loan should be granted',
-      target: 'target',
-      usecase: 'Give me credit',
-    }
-  ]
-};
+// const files = {
+//   RegressionSample: [
+//     {
+//       filename: 'regression.house.csv',
+//       size: '2.4M',
+//       desc: 'house features and price',
+//       target: 'price',
+//       usecase: 'house features and price',
+//     },
+//     {
+//       filename: 'game.csv',
+//       size: '1.6M',
+//       desc: 'game sales prediction',
+//       target: 'NA_Sales',
+//       usecase: 'video game sales',
+//     }
+//   ],
+//   ClassificationSample: [
+//     {
+//       filename: 'bank.train.csv',
+//       size: '366K',
+//       desc:
+//         'Predict target customers for telemarketing of long term deposits product.',
+//       target: 'y',
+//       usecase: 'Retail bank telemarketing campaign data',
+//     },
+//     {
+//       filename: 'titanic.train.csv',
+//       size: '59K',
+//       desc: 'Predict if a passenger on the Titanic boat would survive or not.',
+//       target: 'survived',
+//       usecase: 'Titanic survival data',
+//     },
+//     {
+//       filename: 'dma1c_dirty.csv',
+//       size: '24M',
+//       desc: 'Predict diabetic patients blood suger cross control level',
+//       target: 'target8',
+//       usecase: 'Predict diabetic',
+//     },
+//     {
+//       filename: 'givemecredit_dirty.csv',
+//       size: '5.5MB',
+//       desc: 'Predict whether or not a loan should be granted',
+//       target: 'target',
+//       usecase: 'Give me credit',
+//     }
+//   ]
+// };
 
 @inject('userStore', 'socketStore', 'projectStore')
 @observer
@@ -266,13 +266,12 @@ export default class DataConnect extends Component {
         <div className={styles.uploadRow}>
           {this.block('From R2 Learn', defileIcon)}
         </div> */}
-        {this.sample && (
-          <DataSample
-            project={project}
-            onClose={this.hideSample}
-            selectSample={this.selectSample}
-          />
-        )}
+        {<DataSample
+          project={project}
+          onClose={this.hideSample}
+          selectSample={this.selectSample}
+          visible={this.sample}
+        />}
         {!!(this.uploading || etling) && (
           <div className={styles.sample}>
             <div className={styles.cover} />
@@ -341,24 +340,39 @@ export default class DataConnect extends Component {
 
 @observer
 class DataSample extends Component {
+  constructor(props) {
+    super(props)
+    this.init()
+  }
+
   @observable select = -1
+  @observable loading = true
 
   onSelect = action(index => {
     this.select = index
   })
 
+  init = () => {
+    this.props.project.getSample().then(list => {
+      this.files = list
+      this.loading = false
+    })
+  }
+
   submit = () => {
-    const { project, selectSample } = this.props;
-    const sample = files[project.problemType + 'Sample'];
-    const file = sample[this.select];
+    const { selectSample } = this.props;
+    // const sample = this.files[project.problemType + 'Sample'];
+    const file = (this.files || [])[this.select];
     if (!file) return;
-    selectSample(file.filename);
+    selectSample(file.name);
   };
 
   render() {
-    const { project, onClose } = this.props;
-    const sample = files[project.problemType + 'Sample'];
-    return (
+    const { onClose, visible } = this.props;
+    if (!visible) return null
+    // const sample = this.files[project.problemType + 'Sample'];
+    return this.loading ?
+      <ProcessLoading style={{ position: 'fixed' }} /> :
       <div className={styles.sample}>
         <div className={styles.cover} onClick={onClose} />
         <div className={styles.sampleBlock}>
@@ -371,7 +385,7 @@ class DataSample extends Component {
           <div className={styles.sampleTop}>
             <span>
               Select a sample data if you don’t have a dataset yet and want to
-							try out the application.
+              try out the application.
             		</span>
           </div>
           <div className={styles.sampleTable}>
@@ -379,9 +393,9 @@ class DataSample extends Component {
               <div className={styles.sampleCell}>
                 <span>Name</span>
               </div>
-              <div className={classnames(styles.sampleCell, styles.sampleDesc)}>
+              {/* <div className={classnames(styles.sampleCell, styles.sampleDesc)}>
                 <span>Description</span>
-              </div>
+              </div> */}
               <div className={styles.sampleCell}>
                 <span>File Name</span>
               </div>
@@ -392,7 +406,7 @@ class DataSample extends Component {
                 <span>Data Size</span>
               </div>
             </div>
-            {sample.map((row, index) => {
+            {(this.files || []).map((row, index) => {
               return (
                 <div
                   className={styles.sampleRow}
@@ -408,16 +422,16 @@ class DataSample extends Component {
                     />
                   </div>
                   <div className={styles.sampleCell} title={row.usecase}>
-                    <span>{row.usecase}</span>
+                    <span>{row.name}</span>
                   </div>
-                  <div
+                  {/* <div
                     className={classnames(styles.sampleCell, styles.sampleDesc)}
                     title={row.desc}
                   >
                     <span>{row.desc}</span>
-                  </div>
+                  </div> */}
                   <div className={styles.sampleCell} title={row.filename}>
-                    <span>{row.filename}</span>
+                    <span>{row.name}</span>
                   </div>
                   <div className={styles.sampleCell} title={row.target}>
                     <span>{row.target}</span>
@@ -436,6 +450,5 @@ class DataSample extends Component {
           </div>
         </div>
       </div>
-    );
   }
 }
