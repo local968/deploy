@@ -739,7 +739,7 @@ span.performanceScore {
     border-radius: 5px;
     background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
     padding: 0.05em 0.3em;
-    margin: 0 0.1em;
+    margin: .05em auto;
     cursor: pointer;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }

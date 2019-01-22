@@ -331,6 +331,16 @@ function updateProjectField(id, userId, field, data) {
   })
 }
 
+function getProjectField(id, field) {
+  const key = "project:" + id
+  return redis.hget(key, field).then(result => {
+    try {
+      result = JSON.parse(result)
+    } catch (e) { }
+    return result
+  })
+}
+
 wss.register("addProject", async (message, socket) => {
   // const { userId, user } = socket.session
   // const { createdTime } = user
@@ -716,7 +726,7 @@ wss.register('abortTrain', (message, socket) => {
   })
 })
 
-wss.register('train', (message, socket, progress) => {
+wss.register('train', async (message, socket, progress) => {
   const { userId, user } = socket.session;
   const { projectId, data: updateData, _id: requestId } = message;
   // delete message.data
@@ -724,24 +734,28 @@ wss.register('train', (message, socket, progress) => {
   // const stopId = uuid.v4()
   const data = { ...message, userId, requestId, stopId: requestId };
   let hasModel = false;
-  return checkTraningRestriction(user)
-    // .then(() => moveModels(message.projectId))
-    .then(() => createOrUpdate(projectId, userId, { ...updateData, stopId: requestId }))
-    .then(() => command({ ...data, stopId: requestId }, queueValue => {
-      const { status, result } = queueValue;
-      if (status < 0 || status === 100) return queueValue;
+  try {
+    await checkTraningRestriction(user)
+    await createOrUpdate(projectId, userId, { ...updateData, stopId: requestId })
+    const isAbort = await command({ ...data, stopId: requestId }, async queueValue => {
+      const stopId = await getProjectField(projectId, 'stopId')
+      const { status, result, requestId: trainId } = queueValue;
+      if (status < 0 || status === 100) return false;
+      if (stopId !== trainId) return true
+      let processValue
       if (result.name === "progress") {
-        const { requestId: trainId } = result;
+        // const { requestId: trainId } = result;
         // delete result.requestId
         Reflect.deleteProperty(result, 'requestId')
-        return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
-      }
-      if (result.score) {
+        await createOrUpdate(projectId, userId, { trainModel: result })
+        processValue = { ...result }
+      } else if (result.score) {
         hasModel = true;
-        return createOrUpdate(projectId, userId, { trainModel: null })
-          .then(() => createModel(userId, projectId, result.name, result).then(addSettingModel(userId, projectId)).then(model => progress(model)))
-      }
-      if (result.data) {
+        await createOrUpdate(projectId, userId, { trainModel: null })
+        await createModel(userId, projectId, result.name, result)
+        processValue = await addSettingModel(userId, projectId)
+        // return progress(model)
+      } else if (result.data) {
         const { model: mid, action, data } = result;
         let saveData = {}
         if (action === "chartData") {
@@ -750,38 +764,98 @@ wss.register('train', (message, socket, progress) => {
         if (action === "pointToShow") {
           saveData = { qcut: data }
         }
-        return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
-      }
-      if (result.imageSavePath) {
+        processValue = await updateModel(userId, projectId, mid, saveData)
+        // return progress(model)
+      } else if (result.imageSavePath) {
         const { model: mid, action, imageSavePath } = result
         const saveData = { [action]: imageSavePath }
-        return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
+        processValue = updateModel(userId, projectId, mid, saveData)
+        // return progress(model)
       }
+      return progress(processValue)
     })
-      .then(() => {
-        const statusData = {
-          train2Finished: true,
-          train2ing: false,
-          train2Error: false,
-          selectId: ''
-        }
-        if (!hasModel) statusData.train2Error = true
-        return createOrUpdate(projectId, userId, statusData)
-      }))
-    .catch(err => {
-      const statusData = {
-        train2Finished: false,
-        train2ing: false,
-        train2Error: false,
-        selectId: '',
-        mainStep: 3,
-        curStep: 3,
-        lastSubStep: 1,
-        subStepActive: 1
-      }
-      createOrUpdate(projectId, userId, statusData)
-      return err
-    })
+    if (isAbort) return { result: { status: 100, msg: 'ok' } }
+    const statusData = {
+      train2Finished: true,
+      train2ing: false,
+      train2Error: false,
+      selectId: ''
+    }
+    if (!hasModel) statusData.train2Error = true
+    return await createOrUpdate(projectId, userId, statusData)
+  } catch (err) {
+    const statusData = {
+      train2Finished: false,
+      train2ing: false,
+      train2Error: false,
+      selectId: '',
+      mainStep: 3,
+      curStep: 3,
+      lastSubStep: 1,
+      subStepActive: 1
+    }
+    await createOrUpdate(projectId, userId, statusData)
+    return err
+  }
+  // return checkTraningRestriction(user)
+  //   // .then(() => moveModels(message.projectId))
+  //   .then(() => createOrUpdate(projectId, userId, { ...updateData, stopId: requestId }))
+  //   .then(() => command({ ...data, stopId: requestId }, queueValue => {
+
+  //     const { status, result } = queueValue;
+  //     if (status < 0 || status === 100) return queueValue;
+  //     if (result.name === "progress") {
+  //       const { requestId: trainId } = result;
+  //       // delete result.requestId
+  //       Reflect.deleteProperty(result, 'requestId')
+  //       return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
+  //     }
+  //     if (result.score) {
+  //       hasModel = true;
+  //       return createOrUpdate(projectId, userId, { trainModel: null })
+  //         .then(() => createModel(userId, projectId, result.name, result).then(addSettingModel(userId, projectId)).then(model => progress(model)))
+  //     }
+  //     if (result.data) {
+  //       const { model: mid, action, data } = result;
+  //       let saveData = {}
+  //       if (action === "chartData") {
+  //         saveData = parseChartData(data)//原始数据
+  //       }
+  //       if (action === "pointToShow") {
+  //         saveData = { qcut: data }
+  //       }
+  //       return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
+  //     }
+  //     if (result.imageSavePath) {
+  //       const { model: mid, action, imageSavePath } = result
+  //       const saveData = { [action]: imageSavePath }
+  //       return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
+  //     }
+  //   })
+  //     .then(() => {
+  //   const statusData = {
+  //     train2Finished: true,
+  //     train2ing: false,
+  //     train2Error: false,
+  //     selectId: ''
+  //   }
+  //   if (!hasModel) statusData.train2Error = true
+  //   return createOrUpdate(projectId, userId, statusData)
+  // }))
+  // .catch(err => {
+  //   const statusData = {
+  //     train2Finished: false,
+  //     train2ing: false,
+  //     train2Error: false,
+  //     selectId: '',
+  //     mainStep: 3,
+  //     curStep: 3,
+  //     lastSubStep: 1,
+  //     subStepActive: 1
+  //   }
+  //   createOrUpdate(projectId, userId, statusData)
+  //   return err
+  // })
 })
 
 wss.register("watchProjectList", (message, socket) => {
@@ -842,9 +916,9 @@ wss.register('getSample', (message, socket) => {
   if (!type || (type !== 'C' && type !== 'R')) return []
   return redis.smembers(`file:${type}:samples`).then(result => {
     const list = result.map(r => {
-      try{ 
+      try {
         r = JSON.parse(r)
-      }catch(e){}
+      } catch (e) { }
       return r
     })
     return { list }

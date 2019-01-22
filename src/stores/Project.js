@@ -426,7 +426,6 @@ export default class Project {
           const { value } = data[key] || {}
           data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
         }
-        console.log(data[key])
       }
     }
     data.updateTime = +new Date()

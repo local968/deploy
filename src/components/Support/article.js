@@ -13,7 +13,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'1')}
             >
-                <a href="javascript:" name="1" className={styles.h1}>1. Overview</a>
+                <a name="1" className={styles.h1}>1. Overview</a>
             </WayPoint>
             
             R2-Learn helps companies turn data into machine learning models quickly without needing AI (artificial intelligence) expertise. Built with cutting edge technology, R2-Learn uses AI to guide you through the process of creating, deploying, and keeping up-to-date custom machine learning models using data that you already have.
@@ -21,7 +21,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'1.1')}
             >
-                <a href="javascript:" name="1.1" className={styles.h2}>1.1. Machine learning</a>
+                <a name="1.1" className={styles.h2}>1.1. Machine learning</a>
             </WayPoint>
             Machine learning is a branch of AI where computers are trained to learn from data using complex learning algorithms. With ever increasing computing power, machine learning is able to discover patterns and relations hidden in massive amounts of data that would be difficult for humans to identify and use. Machine learning models are being developed today to classify objects, detect anomalies, predict outcomes, and augment human capacity in general.
             <p className={styles.p}>
@@ -44,7 +44,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'1.2')}
             >
-                <a href='javascript:;' name="1.2" className={styles.h2}>1.2. Machine learning with R2-Learn</a>
+                <a name="1.2" className={styles.h2}>1.2. Machine learning with R2-Learn</a>
             </WayPoint>
             R2-Learn makes it easier for businesses to work with machine learning by using AI to automate large portions of the standard machine learning workflow, reducing the amount of work and human-error that usually comes with the process.
             <p className={styles.p}>
@@ -79,14 +79,14 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'2')}
              >
-                <a name="2"  href="javascript:;" className={styles.h1}>2. Getting started with R2-Learn</a>
+                <a name="2"  className={styles.h1}>2. Getting started with R2-Learn</a>
              </WayPoint>
              This section of the manual helps you get started with your first R2-Learn project.
              To get started with your first project, head on over to Starting a new project.
              <WayPoint
                  onEnter={this.changeHash.bind(this,'2.1')}
              >
-                <a href="javascript:;" name="2.1" className={styles.h2}>2.1. Software requirements</a>
+                <a name="2.1" className={styles.h2}>2.1. Software requirements</a>
              </WayPoint>
              R2-Learn is a web application that can be run in your browser.
              We recommend that you use:
@@ -94,7 +94,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'2.2')}
              >
-                <a href="javascript:;" name="2.2" className={styles.h2}>2.2. Importing data into R2-Learn</a>
+                <a name="2.2" className={styles.h2}>2.2. Importing data into R2-Learn</a>
              </WayPoint>
              You can import data into R2-Learn for:
              <div>•	Building machine learning models, and</div>
@@ -106,7 +106,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'2.2.1')}
              >
-                <a href="javascript:;" name="2.2.1" className={styles.h2}>2.2.1. Importing data from a database</a>
+                <a name="2.2.1" className={styles.h2}>2.2.1. Importing data from a database</a>
              </WayPoint>
              R2-Learn supports importing data from the following databases:
              <div>•	Oracle Database 11G</div>
@@ -116,7 +116,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'2.2.2')}
              >
-                <a href="javascript:;" name="2.2.2" className={styles.h2}>2.2.2. Importing a local file</a>
+                <a name="2.2.2" className={styles.h2}>2.2.2. Importing a local file</a>
              </WayPoint>
              You can import a UTF-8 encoded CSV file containing your training or input data into R2-Learn.
              Your CSV file must:
@@ -129,7 +129,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'2.3')}
              >
-                <a href="javascript:;" name="2.3" className={styles.h2}>2.3. Project home</a>
+                <a name="2.3" className={styles.h2}>2.3. Project home</a>
              </WayPoint>
              
              When you sign in to R2-Learn, you’ll land on the project home page:
@@ -146,7 +146,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'2.4')}
              >
-                 <a href="javascript:;" name="2.4" className={styles.h2}>2.4. Model deployment home page</a>
+                 <a name="2.4" className={styles.h2}>2.4. Model deployment home page</a>
              </WayPoint>
              The model deployment home page shows all the projects you’ve created, and the deployment/validation status of these projects:
              <img src="/support5.png" alt=""/>
@@ -168,14 +168,14 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3')}
              >
-                <a href="javascript:;" name="3" className={styles.h1}>3. Starting a new project</a>
+                <a name="3" className={styles.h1}>3. Starting a new project</a>
              </WayPoint>
              This section will walk you through how to start a new machine learning project, using R2-Learn’s automatic modeling features.
     
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.1')}
              >
-                <a href="javascript:;" name="3.1" className={styles.h2}>3.1. Create a project</a>
+                <a name="3.1" className={styles.h2}>3.1. Create a project</a>
              </WayPoint>
              When you first sign in on R2-Learn, you’ll be greeted with an empty project home page. Click on <strong>Create New Project</strong> to start a new project.
              <img src="/support7.png" alt=""/>
@@ -188,7 +188,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.2')}
              >
-                <a href="javascript:;" name="3.2" className={styles.h2}>3.2. Describe your business problem</a>
+                <a name="3.2" className={styles.h2}>3.2. Describe your business problem</a>
              </WayPoint>
              In the <strong>Problem</strong> section, you’ll be entering your project’s <strong>Problem Description</strong> and <strong>Problem Type.</strong>
              <p>The project’s <strong>Problem Description</strong> (optional) asks you for a <strong>Problem Statement</strong> and a <strong>Business Value </strong>to be documented. Both of these are not used directly to building your machine learning model, but are important for keeping track of projects and making sure that business units that eventually take over the projects are made aware of the kinds of problems that this project’s models are intended to solve.</p>
@@ -202,7 +202,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.3')}
              >
-                <a href="javascript:;" name="3.3" className={styles.h2}>3.3. Working with your data</a>
+                <a name="3.3" className={styles.h2}>3.3. Working with your data</a>
              </WayPoint>
              Now, we’ll start working with your data. The <strong>Data</strong> section walks you through:
              <dl>
@@ -218,7 +218,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.3.1')}
              >
-                <a href="javascript:;" name="3.3.1" className={styles.h2}>3.3.1. Data Connect</a>
+                <a name="3.3.1" className={styles.h2}>3.3.1. Data Connect</a>
              </WayPoint>
              The <strong>Data Connect</strong> tab allows you to select what dataset to use for your machine learning model.
              <img src="/support8.png" alt=""/>
@@ -234,7 +234,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.3.2')}
              >
-                <a href="javascript:;" name="3.3.2" className={styles.h2}>3.3.2. Data Schema</a>
+                <a name="3.3.2" className={styles.h2}>3.3.2. Data Schema</a>
              </WayPoint>
              Once you’ve loaded your training dataset, R2-Learn displays a sample of your data in the <strong>Data Schema </strong>tab for you to inspect. Here, you can:
              <dl>
@@ -275,7 +275,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.3.3')}
              >
-                <a href="javascript:;" name="3.3.3" className={styles.h2}>3.3.3. Data Quality</a>
+                <a name="3.3.3" className={styles.h2}>3.3.3. Data Quality</a>
              </WayPoint>
             When you get to the <strong>Data Quality</strong> tab, R2-Learn attempts to detect possible issues that would prevent accurate modeling. It checks for data quality issues at two levels:
              <dl>
@@ -288,7 +288,7 @@ export default class Article extends Component {
                  <WayPoint
                      onEnter={this.changeHash.bind(this,'3.3.3.1')}
                  >
-                     <a href="javascript:" name="3.3.3.1" className={styles.h2}/>
+                     <a name="3.3.3.1" className={styles.h2}> </a>
                  </WayPoint>
                  <dd>Two possible issue types that R2-Learn identifies and fixes are:</dd>
                  <dd>
@@ -306,7 +306,7 @@ export default class Article extends Component {
                  <WayPoint
                      onEnter={this.changeHash.bind(this,'3.3.3.2')}
                  >
-                     <a href="javascript:;" name="3.3.3.2" className={styles.h2}/>
+                     <a name="3.3.3.2" className={styles.h2}> </a>
                  </WayPoint>
                  <dd>In the <strong>Target Variable Quality</strong> section, R2-Learn identifies and attempts to fix any issues it finds with your target variable.</dd>
              </dl>
@@ -323,7 +323,7 @@ export default class Article extends Component {
                  <WayPoint
                      onEnter={this.changeHash.bind(this,'3.3.3.3')}
                  >
-                     <a href="javascript:;" name="3.3.3.3" className={styles.h2}/>
+                     <a name="3.3.3.3" className={styles.h2}> </a>
                  </WayPoint>
                  <dd>Once you’ve resolved all issues with your target variable, R2-Learn then examines the quality of all the independent variables in your dataset, and displays a summary of its findings here.</dd>
              </dl>
@@ -341,7 +341,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.4')}
              >
-                <a href="javascript:;" name="3.4" className={styles.h2}>3.4. Modeling</a>
+                <a name="3.4" className={styles.h2}>3.4. Modeling</a>
              </WayPoint>
              You’re ready to start building your machine learning model!
              <div>You can choose to build your machine learning model using:</div>
@@ -352,26 +352,26 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.4.1')}
              >
-                <a href="javascript:;" name="3.4.1" className={styles.h2}>3.4.1. Automatic Modeling</a>
+                <a name="3.4.1" className={styles.h2}>3.4.1. Automatic Modeling</a>
              </WayPoint>
              <strong>Automatic Modeling</strong> automatically builds your machine learning model for you, based on the training dataset that you’ve loaded and cleaned in the steps leading up to this point.
              <div>Click <strong>Automatic Modeling</strong> and R2-Learn will start building your model for you.</div>
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.4.2')}
              >
-                <a href="javascript:;" name="3.4.2" className={styles.h2}>3.4.2. Advanced Modeling</a>
+                <a name="3.4.2" className={styles.h2}>3.4.2. Advanced Modeling</a>
              </WayPoint>
              Selecting <strong>Advanced Modeling</strong> gives you more control over the modeling process.
              <div>For information on Advanced modeling, see Appendix: Advanced Modeling.</div>
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.4.3')}
              >
-                <a href="javascript:;" name="3.4.3" className={styles.h2}>3.4.3. Building your model</a>
+                <a name="3.4.3" className={styles.h2}>3.4.3. Building your model</a>
              </WayPoint>
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.4.3.1')}
              >
-                 <a href="javascript:;" name="3.4.3.1" className={styles.h2}/>
+                 <a name="3.4.3.1" className={styles.h2}> </a>
              </WayPoint>
              <p>Once you’ve selected and finished configuring your modeling mode, R2-Learn will start building your machine learning model.</p>
              There is a possibility that the model training process will fail if R2-Learn is unable to train a sufficiently performant machine learning model from the given training dataset. If model training fails, you have to either reconfigure your project to fix dataset quality issues, or choose a new or larger dataset.
@@ -390,7 +390,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4')}
              >
-                <a href="javascript:;" name="4" className={styles.h1}>4. Deploying your models</a>
+                <a name="4" className={styles.h1}>4. Deploying your models</a>
              </WayPoint>
              Deploying your models allow you to make predictions on a new set of input data. This usually involves publishing a REST API endpoint to which you can send data to and receive predictions from.
             <p>R2-Learn handles model deployment for you automatically. Once you’ve successfully created a machine learning model, you can access the deployed model by clicking on its containing project:</p>
@@ -412,7 +412,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4.1')}
              >
-                <a href="javascript:;" name="4.1" className={styles.h2}>4.1. Deployment</a>
+                <a name="4.1" className={styles.h2}>4.1. Deployment</a>
              </WayPoint>
              When you open a project in the Model deployment home page, you’ll be brought to the deployment tab. Here, you can select how you want to use your deployed machine learning models:
              <dl>
@@ -424,7 +424,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4.1.1')}
              >
-                <a href="javascript:;" name="4.1.1" className={styles.h2}>4.1.1. Predict with data source</a>
+                <a name="4.1.1" className={styles.h2}>4.1.1. Predict with data source</a>
              </WayPoint>
              To make a prediction on data imported from a data source:
              <div>1.	Click on <strong>Predict with Data Source</strong>.</div>
@@ -451,7 +451,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4.1.2')}
              >
-                <a href="javascript:;" name="4.1.2" className={styles.h2}>4.1.2. Predict with API</a>
+                <a name="4.1.2" className={styles.h2}>4.1.2. Predict with API</a>
              </WayPoint>
              When you deploy your machine learning model in R2-Learn, a REST API endpoint is automatically generated for you to make requests to.
              <dl>
@@ -479,7 +479,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4.2')}
              >
-                <a href="javascript:;" name="4.2" className={styles.h2}>4.2. Monitor your deployed models</a>
+                <a name="4.2" className={styles.h2}>4.2. Monitor your deployed models</a>
              </WayPoint>
              <dl>
                  <dd>You can monitor and fine-tune the performance of your deployed models in the following tabs:</dd>
@@ -490,7 +490,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4.2.1')}
              >
-                <a href="javascript:" name="4.2.1" className={styles.h2}>4.2.1. Operation Monitor</a>
+                <a name="4.2.1" className={styles.h2}>4.2.1. Operation Monitor</a>
              </WayPoint>
              <dl>
                  <dd>This page displays information about any ongoing or completed operations for your models. For each operation, the operation monitor shows:</dd>
@@ -508,7 +508,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4.2.2')}
              >
-                <a href="javascript:;" name="4.2.2" className={styles.h2}>4.2.2. Performance Monitor</a>
+                <a name="4.2.2" className={styles.h2}>4.2.2. Performance Monitor</a>
              </WayPoint>
              Here, you can upload a validation dataset to run with a model on to validate the performance of that model.
              <dl>
@@ -529,7 +529,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'4.2.3')}
              >
-                <a href="javascript:;" name="4.2.3" className={styles.h2}>4.2.3. Performance Status</a>
+                <a name="4.2.3" className={styles.h2}>4.2.3. Performance Status</a>
              </WayPoint>
              <dl>
                  <dd>Here, you can monitor the status of any ongoing or completed operations. Displayed here is the following information:</dd>
@@ -552,7 +552,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'a')}
              >
-                <a href="javascript:;" name="a" className={styles.h1}>Appendix A: Data Quality Fixes</a>
+                <a name="a" className={styles.h1}>Appendix A: Data Quality Fixes</a>
              </WayPoint>
              <dl>
                  <dd>Some of the issues with data quality that R2-Learn may flag are:</dd>
@@ -568,7 +568,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'a.1')}
              >
-                <a href="javascript:;" name="a.1" className={styles.h2}>A.1. Fixing outliers</a>
+                <a name="a.1" className={styles.h2}>A.1. Fixing outliers</a>
              </WayPoint>
              <strong>•	Valid Range Editing</strong>
              <dl className={styles.pl1}>
@@ -603,7 +603,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'a.2')}
              >
-                <a href="javascript:;" name="a.2" className={styles.h2}>A.2. Fixing missing values</a>
+                <a name="a.2" className={styles.h2}>A.2. Fixing missing values</a>
              </WayPoint>
              <strong>•	Replace with most frequent value</strong>
              <dl className={styles.pl1}>
@@ -647,7 +647,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'a.3')}
              >
-                <a href="javascript:;" name="a.3" className={styles.h2}>A.3. Fixing data type mismatch</a>
+                <a name="a.3" className={styles.h2}>A.3. Fixing data type mismatch</a>
              </WayPoint>
              <strong>•	Replace with mean value</strong>
              <dl className={styles.pl1}>
@@ -697,13 +697,13 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b')}
             >
-              <a href="javascript:;" name="b" className={styles.h1}>Appendix B: Advanced Modeling</a>
+              <a name="b" className={styles.h1}>Appendix B: Advanced Modeling</a>
             </WayPoint>
             When you select <strong>Advanced Modeling</strong>, you can configure the following settings:
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.1')}
             >
-                <a href="javascript:;" name="b.1" className={styles.h2}>B.1. Advanced Variable Settings</a>
+                <a name="b.1" className={styles.h2}>B.1. Advanced Variable Settings</a>
             </WayPoint>
             <dl>
                 <dd>Under this section, you can modify the variables in your data to alter your model. You can change the following in <strong>Advanced Variable Settings</strong>:</dd>
@@ -736,13 +736,13 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2')}
             >
-                <a href="javascript:;" name="b.2" className={styles.h2}>B.2. Advanced Modeling Setting</a>
+                <a name="b.2" className={styles.h2}>B.2. Advanced Modeling Setting</a>
             </WayPoint>
             Here you are able to configure other settings for model building:
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.1')}
             >
-                <a href="javascript:;" name="b.2.1" className={styles.h2}>B.2.1. Create/Edit Model Setting By default</a>
+                <a name="b.2.1" className={styles.h2}>B.2.1. Create/Edit Model Setting By default</a>
             </WayPoint>
             <dl>
                 <dd>When you click on <strong>Advanced Modeling</strong>, R2-Learn creates a new "Model Setting". In the <strong>Advanced Modeling Settings</strong> tab, your new model setting is:</dd>
@@ -753,7 +753,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.2')}
             >
-                <a href="javascript:;" name="b.2.2" className={styles.h2}>B.2.2. Select Algorithm</a>
+                <a name="b.2.2" className={styles.h2}>B.2.2. Select Algorithm</a>
             </WayPoint>
             By default, R2-Learn builds models for each project using all available classifier algorithms. You can remove classifiers from this list to reduce the amount of time modeling takes. The following is a table of classifiers and the problem types they are compatible with:
             <dl className={styles.table}>
@@ -887,14 +887,14 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.3')}
             >
-                <a href="javascript:;" name="b.2.3" className={styles.h2}>B.2.3. Set Max Model Ensemble Size</a>
+                <a name="b.2.3" className={styles.h2}>B.2.3. Set Max Model Ensemble Size</a>
             </WayPoint>
             This is the maximum number of sub-models you R2-Learn that can be combined to form one machine learning model, or an ensemble model For example, if the <strong>Max Model Ensemble Size</strong> is set to 3, then the resulting ensemble can be made up of a maximum number of 3 sub-models.
             <div>The actual number of sub-models in the resulting ensemble would depend on the allotted training time.</div>
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.4')}
             >
-                <a href="javascript:;" name="b.2.4" className={styles.h2}>B.2.4. Train Validation Holdout and Cross Validation</a>
+                <a name="b.2.4" className={styles.h2}>B.2.4. Train Validation Holdout and Cross Validation</a>
             </WayPoint>
             You can choose to build your machine learning models using:
             •	<strong>Train Validation Holdout</strong>: This constructs a machine learning model by partitioning your training dataset into the three subsets:
@@ -915,7 +915,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.5')}
             >
-                <a href="javascript:;" name="b.2.5" className={styles.h2}>B.2.5. Resampling Setting</a>
+                <a name="b.2.5" className={styles.h2}>B.2.5. Resampling Setting</a>
             </WayPoint>
             [Note]	Only available for Binary Classification models.
             <div>If the target variable shows an uneven distribution of sample sizes for each outcome, then you have an unbalanced dataset.</div>
@@ -923,7 +923,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.6')}
             >
-                <a href="javascript:;" name="b.2.6" className={styles.h2}>B.2.6. Set Measurement Metric</a>
+                <a name="b.2.6" className={styles.h2}>B.2.6. Set Measurement Metric</a>
             </WayPoint>
             You can change the measurement metric used to judge the effectiveness of the machine learning model.
             <div>For Binary Classification models, you can select:</div>
@@ -940,14 +940,14 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.7')}
             >
-                <a href="javascript:;" name="b.2.7" className={styles.h2}>B.2.7. Set Max Optimization Time</a>
+                <a name="b.2.7" className={styles.h2}>B.2.7. Set Max Optimization Time</a>
             </WayPoint>
             You can set the maximum optimization time for optimizing the model building parameters. The longer the time allotted for optimization, the better the performance of the resulting machine learning model. For larger training datasets, we recommend you to set a higher maximum optimization time.
             <div>For any dataset, you should set an optimization time of at least 9 minutes.</div>
             <WayPoint
                 onEnter={this.changeHash.bind(this,'b.2.8')}
             >
-                <a href="javascript:;" name="b.2.8" className={styles.h2}>B.2.8. Random Seed</a>
+                <a name="b.2.8" className={styles.h2}>B.2.8. Random Seed</a>
             </WayPoint>
             This seeds any random numbers generated while training your machine learning models. Setting the seed allows you to reproduce your modeling process by using the same random seed to build similar models.
         </Fragment>
@@ -958,12 +958,12 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'c')}
             >
-                <a href="javascript:;" name="c" className={styles.h1}>Appendix C: Model selection for Binary Classification problems</a>
+                <a name="c" className={styles.h1}>Appendix C: Model selection for Binary Classification problems</a>
             </WayPoint>
             <WayPoint
                 onEnter={this.changeHash.bind(this,'c.1')}
             >
-                <a href="javascript:;" name="c.1" className={styles.h2}>C.1. Simplified view</a>
+                <a name="c.1" className={styles.h2}>C.1. Simplified view</a>
             </WayPoint>
             <img src="/support22.png" alt=""/>
             <dl>
@@ -992,14 +992,14 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'c.2')}
             >
-                <a href="javascript:;" name="c.2" className={styles.h2}>C.2. Advanced View</a>
+                <a name="c.2" className={styles.h2}>C.2. Advanced View</a>
             </WayPoint>
             <dd><img src="/support24.png" alt=""/></dd>
             Users can use the <strong>Advanced View</strong> to view more detailed information about the models available for deployment.
             <WayPoint
                 onEnter={this.changeHash.bind(this,'c.2.1')}
             >
-                <a href="javascript:;" name="c.2.1" className={styles.h2}>C.2.1. Top Section</a>
+                <a name="c.2.1" className={styles.h2}>C.2.1. Top Section</a>
             </WayPoint>
             <dl>
                 <dd>The top of the section displays the following:</dd>
@@ -1015,7 +1015,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'c.2.2')}
             >
-                <a href="javascript:;" name="c.2.2" className={styles.h2}>C.2.2. Table of Models</a>
+                <a name="c.2.2" className={styles.h2}>C.2.2. Table of Models</a>
             </WayPoint>
             <dl>
                 <dd>The table below displays all the models trained with the dataset. Each listed model has a:</dd>
@@ -1031,7 +1031,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'c.2.3')}
             >
-                <a href="javascript:;" name="c.2.3" className={styles.h2}>C.2.3. Additional Model Details</a>
+                <a name="c.2.3" className={styles.h2}>C.2.3. Additional Model Details</a>
             </WayPoint>
             To view additional model details, click on the + next to the <strong>Model Name</strong> to expand the model selection.
             <img src="/support25.png" alt=""/>
@@ -1053,12 +1053,12 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'d')}
             >
-                <a href="javascript:;" name="d" className={styles.h1}>Appendix D: Model selection for Regression problems</a>
+                <a name="d" className={styles.h1}>Appendix D: Model selection for Regression problems</a>
             </WayPoint>
             <WayPoint
                 onEnter={this.changeHash.bind(this,'d.1')}
             >
-                <a href="javascript:;" name="d.1" className={styles.h2}>D.1. Simplified View</a>
+                <a name="d.1" className={styles.h2}>D.1. Simplified View</a>
             </WayPoint>
             <img src="/support26.png" alt=""/>
             When in the <strong>Model Selection</strong> tab for Regression problems, the following is displayed:
@@ -1078,21 +1078,21 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'d.2')}
             >
-                <a href="javascript:;" name="d.2" className={styles.h2}>D.2. Advanced View</a>
+                <a name="d.2" className={styles.h2}>D.2. Advanced View</a>
             </WayPoint>
             <img src="/support27.png" alt=""/>
             Users can use the <strong>Advanced View</strong> to view more detailed information about the models available for deployment.
             <WayPoint
                 onEnter={this.changeHash.bind(this,'d.2.1')}
             >
-                <a href="javascript:;" name="d.2.1" className={styles.h2}>D.2.1. Top Section</a>
+                <a name="d.2.1" className={styles.h2}>D.2.1. Top Section</a>
             </WayPoint>
             The top of the section displays the following:
             <div>•	<strong>Model Name Contains</strong>: Allows you to filter the model name by algorithm and by Model Setting name.</div>
             <WayPoint
                 onEnter={this.changeHash.bind(this,'d.2.2')}
             >
-            <a href="javascript:;" name="d.2.2" className={styles.h2}>D.2.2. Table of Models</a>
+            <a name="d.2.2" className={styles.h2}>D.2.2. Table of Models</a>
             </WayPoint>
             <dl>
                 <dd>The table below displays all the models trained with the dataset. Each listed model has a:</dd>
@@ -1110,7 +1110,7 @@ export default class Article extends Component {
             <WayPoint
                 onEnter={this.changeHash.bind(this,'d.2.3')}
             >
-                <a href="javascript:;" name="d.2.3" className={styles.h2}>D.2.3. Additional Model Details</a>
+                <a name="d.2.3" className={styles.h2}>D.2.3. Additional Model Details</a>
             </WayPoint>
             To view additional model details, click on the + next to the <strong>Model Name</strong> to expand the model selection.
             <img src="/support28.png" alt=""/>

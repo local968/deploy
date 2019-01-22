@@ -96,7 +96,7 @@ export default class AdvancedView extends Component {
       }
     };
 
-    let { stopFilter, newfiltedModels, oldfiltedModels } = projectStore;
+    let { stopFilter, oldfiltedModels } = projectStore;
 
     const sortMethods = (aModel, bModel) => {
       switch (currentSort) {

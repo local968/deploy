@@ -98,8 +98,12 @@ class Performance extends Component {
 
 @observer
 class ModelTable extends Component {
+  abortTrain = () => {
+    this.props.abortTrain()
+  }
+
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, abortTrain, isAbort } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -143,19 +147,19 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && (trainModel ? <div className={styles.rowData}>
-            <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div>
-            {!!trainModel && <ProgressBar progress={((trainModel || {}).value || 0)} />}
+          {!train2Finished && <div className={styles.rowData}>
+            {trainModel ? <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div> : null}
+            {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
             {/* <div className={styles.trainingProcessBg}>
               <div className={styles.trainingProcessBlock}>
                 <div className={styles.trainingProcess} style={{ width: `${((trainModel || {}).value || 0)}%` }}></div>
               </div>
               <div className={styles.trainingText}>{`${((trainModel || {}).value || 0).toFixed(2)}%`}</div>
             </div> */}
-            <div className={styles.abortButton} onClick={!isAbort ? abortTrain : null}>
+            <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
               {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>
-          </div> : null)}
+          </div>}
         </div>
       </div>
     );

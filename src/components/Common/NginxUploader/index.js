@@ -261,7 +261,7 @@ class Uploader {
       (index + 1) * this.CHUNK_SIZE >= this.file.size
         ? this.file.size - 1
         : (index + 1) * this.CHUNK_SIZE - 1;
-    let latestLoaded = 0;
+    // let latestLoaded = 0;
     return axios
       .post(this.path, chunk, {
         headers: {
