@@ -72,9 +72,10 @@ export class ClassificationTarget extends Component {
             {Object.keys(targetCounts).map((v, k) => {
               const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
+              const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
                 <div className={styles.targetPercentLabel}>
-                  {!this.rename ? <span title={renameVariable[v] || v}>{renameVariable[v] || v}</span> : <input value={this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)} onChange={this.handleRename.bind(null, v)} />}
+                  {!this.rename ? <span title={value}>{value}</span> : <input value={value} onChange={this.handleRename.bind(null, v)} />}
                 </div>
                 <div className={styles.targetPercentValue}>
                   <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>

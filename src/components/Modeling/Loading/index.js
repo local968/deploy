@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
-import { Progress, Icon } from 'antd';
+import { Icon } from 'antd';
 import { ProgressBar } from 'components/Common';
 
 @inject('projectStore')

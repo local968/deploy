@@ -150,20 +150,23 @@ function saveSample() {
   }
   const files = fs.readdirSync(samplePath)
 
-  const array = files.map(f => {
-    const id = uuid.v4()
-    const filePath = path.join(sampleFilePath, f)
-    return {
-      id,
-      name: f,
-      path: filePath,
-      createdTime: +new Date()
-    }
-  })
   const pipeline = redis.pipeline();
-  array.forEach(v => {
-    pipeline.set(`file:sample:${v.name}`, v.id)
-    pipeline.set(`file:${v.id}`, JSON.stringify(v))
+  files.forEach(f => {
+    const [type, target, name] = f.split("__")
+    const filePath = path.join(sampleFilePath, f)
+    const s = fs.statSync(filePath)
+    const id = uuid.v4()
+    const data = {
+      id,
+      name,
+      path: filePath,
+      createdTime: +new Date(),
+      size: s.size,
+      ext: '.csv'
+    }
+    pipeline.sadd(`file:${type}:samples`, JSON.stringify({ name, target, size: s.size }))
+    pipeline.set(`file:sample:${name}`, id)
+    pipeline.set(`file:${id}`, JSON.stringify(data))
   })
   pipeline.exec()
 }
