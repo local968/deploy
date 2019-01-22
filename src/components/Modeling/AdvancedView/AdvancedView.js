@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
-import { observer,inject } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
@@ -82,7 +82,7 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project ,projectStore} = this.props;
+    const { models, project, projectStore } = this.props;
     let _filtedModels = [...models];
     const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     const metricKey = this.metric.key;
@@ -96,7 +96,7 @@ export default class AdvancedView extends Component {
       }
     };
 
-    let {stopFilter,newfiltedModels,oldfiltedModels} = projectStore;
+    let { stopFilter, newfiltedModels, oldfiltedModels } = projectStore;
 
     const sortMethods = (aModel, bModel) => {
       switch (currentSort) {
@@ -220,14 +220,14 @@ export default class AdvancedView extends Component {
 
     projectStore.changeNewfiltedModels(_filtedModels);
 
-    if(!oldfiltedModels){
+    if (!oldfiltedModels) {
       projectStore.changeOldfiltedModels(_filtedModels);
       oldfiltedModels = _filtedModels;
     }
 
-    if(stopFilter){
+    if (stopFilter) {
       _filtedModels = oldfiltedModels.sort(sortMethods);
-    }else{
+    } else {
       _filtedModels = _filtedModels.sort(sortMethods);
     }
 
@@ -264,8 +264,8 @@ export default class AdvancedView extends Component {
         display: 'auc',
         key: 'auc'
       }] : [{
-        display: 'MAE',
-        key: 'mae'
+        display: 'MSE',
+        key: 'mse'
       }, {
         display: 'RMSE',
         key: 'rmse'
@@ -302,6 +302,7 @@ export default class AdvancedView extends Component {
 
   constructor(props) {
     super(props);
+    this.metric = this.metricOptions.find(m => m.key === props.projectStore.project.currentSetting.setting.measurement)
     autorun(() => {
       const { project } = props;
       if (project && project.measurement)
