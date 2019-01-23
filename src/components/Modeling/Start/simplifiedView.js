@@ -393,7 +393,7 @@ class CreateNewVariable extends Component {
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
     const hasFunction = functionList.find(v => functionStr.includes(v.value.slice(0, -1)))
     const hasConcat = functionList.filter(v => functionStr.includes(v.value.slice(0, -1))).find(v => v.value === "Concat()")
-    this.myFunction = FUNCTIONS.senior.reverse().find(v => functionStr.includes(v.value.slice(0, -1))) || {}
+    this.myFunction = [...FUNCTIONS.senior].reverse().find(v => functionStr.includes(v.value.slice(0, -1))) || {}
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
     const { dataHeader, colType } = this.props
     let valueList = [...dataHeader]
