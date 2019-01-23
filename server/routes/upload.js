@@ -151,6 +151,8 @@ function saveSample() {
   const files = fs.readdirSync(samplePath)
 
   const pipeline = redis.pipeline();
+  pipeline.del(`file:C:samples`)
+  pipeline.del(`file:R:samples`)
   files.forEach(f => {
     const [type, target, name] = f.split("__")
     const filePath = path.join(sampleFilePath, f)
