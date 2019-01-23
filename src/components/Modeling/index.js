@@ -49,7 +49,7 @@ export default class Modeling extends Component {
       if (subStepActive === 1) url = `/project/${id}/modeling/start`
       if (subStepActive === 2) url = `/project/${id}/modeling/result`
       if (!url) return routing.push("/")
-      if (!routing.location.pathname.startsWith(`/project/${project.id}/modeling`)) return
+      if (!routing.location.pathname.startsWith(`/project/${id}/modeling`)) return
       if (routing.location.pathname.includes(url)) return
       return routing.push(url)
     })

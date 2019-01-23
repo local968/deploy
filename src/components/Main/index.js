@@ -30,27 +30,28 @@ export default class Main extends Component {
         }
         this.autorun = autorun(() => {
           const { projectStore: { project }, routing } = this.props;
-          const { curStep } = project || {};
+          if(!project) return
+          const { curStep, id } = project || {};
           if (curStep === this.step) return
           this.step = curStep
           let url = ''
           switch (curStep) {
             case 1:
-              url = `/project/${project.id}/problem`
+              url = `/project/${id}/problem`
               break
             case 2:
-              url = `/project/${project.id}/data`
+              url = `/project/${id}/data`
               break
             case 3:
-              url = `/project/${project.id}/modeling`
+              url = `/project/${id}/modeling`
               break
             case 0:
-              url = `/project/${project.id}/project`
+              url = `/project/${id}/project`
               break
             default:
           }
           if (!url) routing.push('/')
-          if (!routing.location.pathname.startsWith(`/project/${project.id}`)) return
+          if (!routing.location.pathname.startsWith(`/project/${id}`)) return
           if (routing.location.pathname.includes(url)) return
           return routing.push(url)
         })
