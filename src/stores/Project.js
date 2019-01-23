@@ -5,7 +5,7 @@ import moment from 'moment';
 import config from 'config';
 import uuid from 'uuid';
 import Papa from 'papaparse';
-import { message as antdMessage } from 'antd';
+import { message as antdMessage, Modal } from 'antd';
 
 export default class Project {
   @observable models = []
@@ -767,7 +767,10 @@ export default class Project {
     const returnValue = await api.etl(data)
     const { result, status, message } = returnValue;
     if (status !== 200) {
-      antdMessage.error(message || result['process error'])
+      // 出现错误弹出提示框,需要用户确认
+      Modal.error({
+        title: message || result['process error'],
+      });
       this.etling = false
       this.etlProgress = 0
       return false
