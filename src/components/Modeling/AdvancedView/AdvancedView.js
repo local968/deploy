@@ -79,7 +79,7 @@ export default class AdvancedView extends Component {
     key: '',
     display: ''
   };
-  
+
   @computed
   get filtedModels() {
     const { models, project, projectStore } = this.props;
@@ -219,7 +219,7 @@ export default class AdvancedView extends Component {
     };
 
     projectStore.changeNewfiltedModels(_filtedModels);
-    
+
     // debugger;
 
     if (!oldfiltedModels) {
@@ -227,7 +227,7 @@ export default class AdvancedView extends Component {
       oldfiltedModels = _filtedModels;
     }
 
-    if(stopFilter&&oldfiltedModels){
+    if (stopFilter && oldfiltedModels) {
       _filtedModels = oldfiltedModels.sort(sortMethods);
     } else {
       _filtedModels = _filtedModels.sort(sortMethods);
@@ -346,7 +346,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} >
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ minWidth: '80px' }}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
