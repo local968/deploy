@@ -565,6 +565,17 @@
 	width: 100%;
 }
 
+.fixesCell input {
+	display: flex;
+	flex: auto;
+	outline: none;
+	font-size: 0.875rem;
+	font-family: Arial;
+	color: #4a4a4a;
+	width: 100%;
+	text-align: right;
+}
+
 span.fixesEdit {
 	color: #448eed;
 	text-decoration: underline;
