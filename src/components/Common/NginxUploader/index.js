@@ -108,7 +108,7 @@ class Uploader {
     this.startTime = moment().valueOf();
     let latestCalculateTime = this.startTime;
     let latestLoadedSize = this.totalLoaded;
-    this.speedInterval = setInterval(() => {
+    const updateSpeed = () => {
       const currentTime = moment().valueOf();
       const currentLoadedSize = this.totalLoaded;
       const loadingSize = this.speeds.reduce((start, s) => start + s, 0)
@@ -124,7 +124,9 @@ class Uploader {
       if (this.onProgressCallback && typeof this.onProgressCallback === 'function') {
         this.onProgressCallback(this.progress, this.computeText(), this.speed)
       }
-    }, 500);
+    }
+    updateSpeed()
+    this.speedInterval = setInterval(updateSpeed, 500);
   }
 
   stopSpeedCalculate() {
