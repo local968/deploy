@@ -153,23 +153,26 @@ function saveSample() {
   const pipeline = redis.pipeline();
   pipeline.del(`file:C:samples`)
   pipeline.del(`file:R:samples`)
-  files.forEach(f => {
-    const [type, target, name] = f.split("__")
-    const filePath = path.join(sampleFilePath, f)
-    const s = fs.statSync(filePath)
-    const id = uuid.v4()
-    const data = {
-      id,
-      name,
-      path: filePath,
-      createdTime: +new Date(),
-      size: s.size,
-      ext: '.csv'
-    }
-    pipeline.sadd(`file:${type}:samples`, JSON.stringify({ name, target, size: s.size }))
-    pipeline.set(`file:sample:${name}`, id)
-    pipeline.set(`file:${id}`, JSON.stringify(data))
-  })
+  try {
+    files.forEach(f => {
+      const [type, target, name] = f.split("__")
+      const filePath = path.join(sampleFilePath, f)
+      const s = fs.statSync(filePath)
+      const id = uuid.v4()
+      const data = {
+        id,
+        name,
+        path: filePath,
+        createdTime: +new Date(),
+        size: s.size,
+        ext: '.csv'
+      }
+      pipeline.sadd(`file:${type}:samples`, JSON.stringify({ name, target, size: s.size }))
+      pipeline.set(`file:sample:${name}`, id)
+      pipeline.set(`file:${id}`, JSON.stringify(data))
+    })
+  } catch (e) { console.error(e) }
+
   pipeline.exec()
 }
 
