@@ -774,7 +774,7 @@ wss.register('train', async (message, socket, progress) => {
       }
       return progress(processValue)
     })
-    if (isAbort) return { status: 100, msg: 'ok' }
+    if (isAbort) return { status: 200, msg: 'ok' }
     const statusData = {
       train2Finished: true,
       train2ing: false,
