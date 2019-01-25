@@ -740,8 +740,8 @@ wss.register('train', async (message, socket, progress) => {
     const isAbort = await command({ ...data, stopId: requestId }, async queueValue => {
       const stopId = await getProjectField(projectId, 'stopId')
       const { status, result, requestId: trainId } = queueValue;
-      if (status < 0 || status === 100) return false;
-      if (stopId !== trainId) return true
+      if (status < 0 || status === 100) return 1;
+      if (stopId !== trainId) return 2
       let processValue
       if (result.name === "progress") {
         // const { requestId: trainId } = result;
@@ -774,7 +774,7 @@ wss.register('train', async (message, socket, progress) => {
       }
       return progress(processValue)
     })
-    if (isAbort) return { status: 200, msg: 'ok' }
+    if (isAbort === 2) return { status: 200, msg: 'ok' }
     const statusData = {
       train2Finished: true,
       train2ing: false,

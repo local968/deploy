@@ -16,10 +16,10 @@
   }
   .advancedModelTable {
     font-size: 0.875rem;
-    border: 0.5px solid #d8d8d8;
+    /* border: 0.5px solid #d8d8d8; */
     position: relative;
-    max-height: 500px;
-    overflow-y: auto;
+    max-height: 50vh;
+    overflow-y: scroll;
     overflow-x: hidden;
   }
   .advancedModelTable :global(.ant-radio-wrapper) {
@@ -33,14 +33,19 @@
     text-overflow: ellipsis;
     vertical-align: middle;
   }
-  .advancedModelTable .adrow {
+  .adrow {
     display: flex;
     cursor: pointer;
     justify-content: space-around;
     align-items: center;
     text-align: center;
   }
-  .advancedModelTable .adrow .adcell {
+
+  .tableHeader {
+    margin-right: 17px;
+  }
+
+  .adrow .adcell {
     padding: 0.2em;
     border: 0.5px solid #d8d8d8;
     height: 3em;
@@ -213,4 +218,3 @@
     display: inline-block;
     vertical-align: middle;
   }
-  

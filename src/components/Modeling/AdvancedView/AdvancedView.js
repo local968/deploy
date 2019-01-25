@@ -380,7 +380,7 @@ class AdvancedModelTable extends Component {
       if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
       return prev
     }, {});
-    const header = <Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row>;
+    const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
         return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
@@ -389,10 +389,13 @@ class AdvancedModelTable extends Component {
       }
     });
     return (
-      <div className={styles.advancedModelTable} >
+      <React.Fragment>
         {header}
-        {dataSource}
-      </div>
+        <div className={styles.advancedModelTable} >
+
+          {dataSource}
+        </div>
+      </React.Fragment>
     )
   }
 }
