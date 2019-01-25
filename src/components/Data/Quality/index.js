@@ -498,7 +498,7 @@ class Summary extends Component {
     })
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
-        <div className={styles.summaryTitle}><span>Summary of Your Data</span></div>
+        <div className={styles.summaryTitle}><span>Summary of your data</span></div>
         <div className={styles.summaryTypeBox}>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>

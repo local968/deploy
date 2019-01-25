@@ -779,7 +779,8 @@ wss.register('train', async (message, socket, progress) => {
       train2Finished: true,
       train2ing: false,
       train2Error: false,
-      selectId: ''
+      selectId: '',
+      stopId: ''
     }
     if (!hasModel) statusData.train2Error = true
     return await createOrUpdate(projectId, userId, statusData)

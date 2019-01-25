@@ -1104,7 +1104,7 @@ span.fixesEdit {
 .summaryCell {
 	display: flex;
 	flex: none;
-	max-width: 70%;
+	max-width: 55%;
 }
 
 .summaryCell span {
