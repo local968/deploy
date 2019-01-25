@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import logo from './rsquared_logo_color.svg';
 import home from './icon-home.svg';
 import help from './icon-help.svg';
-import community from './community.png'
+// import community from './community.png'
 import switchIcon from './switch.svg';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router';
@@ -39,10 +39,10 @@ export default class Sider extends Component {
             <img alt="support" src={help} />
             <h4 className={styles.nav}>Support</h4>
           </a>
-          <a className={styles.support} onClick={() => routing.push('/community')}>
+          {/* <a className={styles.support} onClick={() => routing.push('/community')}>
             <img alt="support" src={community} className={styles.community} />
             <h4 className={styles.nav}>Community</h4>
-          </a>
+          </a> */}
         </div>
         <a className={styles.bottom} onClick={this.switchClick}>
           <img alt="switch" src={switchIcon} />

@@ -13,7 +13,7 @@ import SignActive from 'components/User/SignActive';
 import ChangePassword from 'components/User/ChangePassword';
 import ResetPassword from 'components/User/ResetPassword';
 import ForgetPassword from 'components/User/ForgetPassword';
-import Community from 'components/Community';
+// import Community from 'components/Community';
 import Support from 'components/Support';
 
 @inject('socketStore')
@@ -27,7 +27,7 @@ class defaultRouter extends Component {
         <Route path="/project/:pid" component={Main} />
         <Route path="/deploy/project/:id" component={Detail} />
         <Route exact path="/changepassword" component={ChangePassword} />
-        <Route exact path="/community" component={Community} />
+        {/* <Route exact path="/community" component={Community} /> */}
         <Route exact path="/support" component={Support} />
         <Redirect to="/" />
       </Switch>
@@ -49,7 +49,7 @@ export class LoginRouter extends Component {
             <Route exact path="/active" component={SignActive} />
             <Route exact path="/resetpassword" component={ResetPassword} />
             <Route exact path="/forgetpassword" component={ForgetPassword} />
-            <Route exact path="/community" component={Community} />
+            {/* <Route exact path="/community" component={Community} /> */}
             <Route exact path="/support" component={Support} />
             <Redirect to="/" />
           </Switch>
