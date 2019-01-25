@@ -133,8 +133,8 @@ class AdvancedModel extends Component {
           <Preview project={project} />
           {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
           <div className={styles.bottom}>
-            <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
-            <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
+            <button className={styles.save} onClick={this.modeling} ><span>Go for Modeling</span></button>
+            <button className={styles.cancel} onClick={closeAdvanced}><span>Cancel</span></button>
           </div>
         </div>
 
