@@ -219,9 +219,6 @@ export default class AdvancedView extends Component {
     };
 
     projectStore.changeNewfiltedModels(_filtedModels);
-
-    // debugger;
-
     if (!oldfiltedModels) {
       projectStore.changeOldfiltedModels(_filtedModels);
       oldfiltedModels = _filtedModels;
