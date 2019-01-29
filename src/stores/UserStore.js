@@ -2,7 +2,7 @@ import { observable, action, when } from 'mobx';
 import axios from 'axios';
 import config from 'config';
 import socketStore from './SocketStore';
-// import testData from './test.json'
+// import testData from './classification.json'
 import testData from './regression.json'
 
 class UserStore {

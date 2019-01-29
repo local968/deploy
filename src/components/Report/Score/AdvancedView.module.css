@@ -235,5 +235,10 @@
   }
 
   .chartContent {
+    width: 400px
+  }
 
+  .chartContent img {
+    max-width: 100%;
+    max-height: 100%;
   }

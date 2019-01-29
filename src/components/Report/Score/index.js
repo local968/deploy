@@ -444,22 +444,26 @@ class RegressionDetailCurves extends Component {
     const { diagnoseType } = this.state;
 
     return (
-      <div className={styles.detailCurves} >
-        <div className={styles.plot} >
-          <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
+      <div className={styles.charts}>
+        <div className={styles.reportChart}>
+          {/* <span className={styles.chartTitle}>Fit Plot</span> */}
+          <div className={styles.chartContent}><img className={styles.img} src={model.fitPlotPath} alt="fit plot" /></div>
         </div>
-        <div className={styles.plot} >
-          <img className={styles.img} src={model.residualPlotPath} alt="residual plot" />
-          <Modal
-            visible={this.state.visible}
-            title='Residual Plot Diagnose'
-            width={1000}
-            onOk={() => this.setState({ visible: false })}
-            onCancel={() => this.setState({ visible: false })}
-          >
-            <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlotPath} />
-          </Modal>
-          <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
+        <div className={styles.reportChart}>
+          {/* <span className={styles.chartTitle}>Residual Plot</span> */}
+          <div className={styles.chartContent}>
+            <img className={styles.img} src={model.residualPlotPath} alt="residual plot" />
+            <Modal
+              visible={this.state.visible}
+              title='Residual Plot Diagnose'
+              width={1000}
+              onOk={() => this.setState({ visible: false })}
+              onCancel={() => this.setState({ visible: false })}
+            >
+              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlotPath} />
+            </Modal>
+            {/* <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} /> */}
+          </div>
         </div>
       </div>
     )
