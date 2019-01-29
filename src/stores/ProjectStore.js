@@ -30,7 +30,7 @@ class ProjectStore {
   @action
   changeStopFilter = (stopFilter) => {
     this.stopFilter = stopFilter;
-    if(!stopFilter){
+    if (!stopFilter) {
       this.oldfiltedModels = this.newfiltedModels
     }
   };
@@ -47,6 +47,15 @@ class ProjectStore {
 
 
   constructor() {
+    if (window.r2Report) {
+      const list = window.r2Report
+      this.list = list.map(row => {
+        const project = new Project(row.id + "", { ...row, ...{ isAbort: false } })
+        project.models.forEach(m => project.setModel(m))
+        return project
+      })
+      return;
+    }
     this.initWatch()
     this.initReload()
     autorun(() => {

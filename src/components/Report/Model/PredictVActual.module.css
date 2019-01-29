@@ -1,0 +1,39 @@
+.predictActual {
+  display: flex;
+  overflow: visible;
+  vertical-align: top;
+  width: 100%;
+  font-size: 1rem;
+  flex: none;
+  flex-direction: column;
+  margin-top: 40px;
+}
+.predictActual .title {
+  font-weight: bold;
+  text-align: center;
+}
+.predictActual .legends {
+  justify-content: flex-end;
+  display: flex;
+  flex: none;
+}
+.predictActual .legends .legend {
+  display: inline-block;
+  margin-right: 3em;
+}
+.predictActual .legends .legend .circle {
+  vertical-align: middle;
+  width: 10px;
+  display: inline-block;
+  height: 10px;
+  border-radius: 50%;
+}
+.predictActual .legends .legend .legendText {
+  display: inline-block;
+}
+.predictActual .loading {
+  display: flex;
+  flex: auto;
+  justify-content: center;
+  align-items: center;
+}

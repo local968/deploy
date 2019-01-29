@@ -1,0 +1,42 @@
+html {
+  font-size: 16px;
+}
+
+.report {
+  font-size: 80px;
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 32px;
+}
+
+.subTitle {
+  font-size: 28px;
+}
+
+.block {
+  margin-bottom: 40px;
+}
+
+.blockTitle {
+  font-size: 24px;
+  text-align: center;
+}
+
+.profile {
+  font-size: 16px;
+}
+
+.correlationMatrix {
+  font-size: 16px;
+}
+
+.blockRow {
+  margin-top: 10px;
+}
+
+.performance {
+  font-size: 16px;
+}

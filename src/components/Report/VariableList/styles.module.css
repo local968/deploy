@@ -1,0 +1,150 @@
+.table {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  /* margin: 0.1em 0; */
+  /* border: solid 0.5px #757575; */
+}
+
+.table span {
+  font-family: SanFranciscoText;
+  color: #4a4a4a;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.tableHeader {
+  display: flex;
+  flex: none;
+  padding: 0.15em 0;
+  border-bottom: 1px solid #757575;
+  padding-right: 0.2em;
+}
+
+.tableTh {
+  display: flex;
+  flex: 1 1;
+  width: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.05em;
+}
+
+.tableTh span {
+  text-align: center;
+}
+
+.tableLoading {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0.1em 0;
+  height: 2.6em;
+  overflow: hidden;
+  position: relative;
+  margin-right: 1px;
+}
+
+.tableBody {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  margin: 0.1em 0;
+  height: 2.6em;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.tableRow {
+  display: flex;
+  flex: none;
+}
+
+.tableTd {
+  display: flex;
+  flex: 1 1;
+  width: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.05em;
+  padding: 0.05em 0;
+  border-bottom: #9b9b9b 1px solid;
+  margin-bottom: -1px;
+  position: relative;
+}
+
+.tableTd span {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* .tableChart {
+  flex: 2 1;
+  cursor: pointer;
+  border-bottom-color: transparent;
+} */
+
+.tableImage {
+  width: 0.4em;
+  height: 0.3em;
+  cursor: pointer;
+}
+
+/* .tableChart span {
+  text-decoration-line: underline;
+  color: #448eed;
+} */
+
+.tableLarge {
+  flex: 2 1;
+}
+
+.tableCheck {
+  flex: none;
+  width: 0.5em;
+  border-bottom-color: transparent;
+}
+
+.tableImportance {
+  flex: 3 1;
+  border-bottom-color: transparent;
+  justify-content: flex-start;
+}
+
+.tableSort {
+  display: flex;
+  margin-right: 0.1em;
+  flex: none;
+  cursor: pointer;
+}
+
+.tableReload {
+  display: flex;
+  margin: 0 0.1em;
+  flex: none;
+  cursor: pointer;
+}
+
+.none span {
+  color: #9b9b9b;
+}
+
+.preImpotance {
+  display: flex;
+  flex: auto;
+  height: 0.15em;
+  background: #ddd;
+  border-radius: 0.15em;
+  overflow: hidden;
+}
+
+.preImpotanceActive {
+  display: flex;
+  flex: none;
+  height: 0.15em;
+  background: #5cca71;
+  width: 100%;
+}
