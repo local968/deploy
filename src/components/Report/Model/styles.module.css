@@ -494,7 +494,7 @@ margin-right: 10px;
   display: flex;
   flex-direction: column;
   padding: 0.1em 0;
-  max-height: 200px;
+  max-height: 4em;
   overflow-y: auto;
   overflow-x: hidden;
 }

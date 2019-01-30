@@ -37,7 +37,16 @@ class Report extends Component {
       </div>
       <div className={styles.block}>
         <h3 className={styles.blockTitle}>Target:Survived</h3>
-        <div className={styles.blockRow}></div>
+        <div className={styles.blockRow}>
+          <div className={styles.target}>
+            <span className={styles.etlTitle}>Before ETL</span>
+            <img className={styles.targetPlot} src={project.histgramPlotsBase64[project.target]} />
+          </div>
+          <div className={styles.target}>
+            <span className={styles.etlTitle}>After ETL</span>
+            <img className={styles.targetPlot} src={project.histgramPlotsBase64[project.target]} />
+          </div>
+        </div>
       </div>
       <div className={styles.block}>
         <h3 className={styles.blockTitle}>Variable List</h3>

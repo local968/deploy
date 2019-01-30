@@ -671,6 +671,27 @@ wss.register('histgramPlot', (message, socket, progress) => {
     }))
 })
 
+wss.register('rawHistgramPlot', (message, socket, progress) => {
+  const { projectId: id, _id: requestId, feature_label } = message
+  const { userId } = socket.session
+  const histgramPlots = feature_label.reduce((start, f) => {
+    start[f] = ''
+    return start
+  }, {})
+  return updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
+      if (progressResult.status < 0 || progressResult.status === 100) {
+        updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
+        return progressResult
+      }
+      const { result } = progressResult
+      const { field, imageSavePath, progress: status } = result;
+      if (status && status === "start") return
+      if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
+      return progress(progressResult)
+    }))
+})
+
 wss.register('univariatePlot', (message, socket, progress) => {
   const { projectId: id, _id: requestId, feature_label } = message
   const { userId } = socket.session

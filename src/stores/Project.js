@@ -1180,15 +1180,15 @@ export default class Project {
 
   /**------------------------------------------------chart---------------------------------------------------------*/
   correlationMatrix = () => {
-    if (this.correlationMatrixLoading) return
+    if (this.correlationMatrixLoading) return Promise.resolve()
     this.correlationMatrixLoading = true
-    socketStore.ready().then(api => {
+    return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'correlationMatrix',
         featureLabel: this.dataHeader.filter(n => n !== this.target)
       };
-      api.correlationMatrix(command).then(returnValue => {
+      return api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
         this.correlationMatrixLoading = false
         if (status < 0) return antdMessage.error(result['process error'])
@@ -1270,5 +1270,94 @@ export default class Project {
         antdMessage.error("fetch sample error")
         return []
       })
+  }
+
+  allPlots = async () => {
+    const api = await socketStore.ready()
+    const univariateCommand = {
+      projectId: this.id,
+      command: 'univariatePlot',
+      feature_label: []
+    }
+    const histogramCommand = {
+      projectId: this.id,
+      command: 'histgramPlot',
+      feature_label: []
+    }
+    const rawHistogramCommand = {
+      projectId: this.id,
+      command: 'rawHistgramPlot',
+      feature_label: [this.target]
+    }
+    await api.univariatePlot(univariateCommand, progressResult => {
+      const { result } = progressResult
+      const { field: plotKey, imageSavePath, progress } = result;
+      if (result.name === 'progress') return
+      if (progress && progress === "start") return
+      this.univariatePlotsBase64[plotKey] = imageSavePath
+    })
+    await api.histgramPlot(histogramCommand, progressResult => {
+      const { result } = progressResult
+      const { field: plotKey, imageSavePath, progress } = result;
+      if (result.name === 'progress') return
+      if (progress && progress === "start") return
+      this.histgramPlotsBase64[plotKey] = imageSavePath
+    })
+    await api.rawHistgramPlot(rawHistogramCommand, progressResult => {
+      const { result } = progressResult
+      const { field: plotKey, imageSavePath, progress } = result;
+      if (result.name === 'progress') return
+      if (progress && progress === "start") return
+      this.rawHistgramPlotsBase64[plotKey] = imageSavePath
+    })
+  }
+
+  getBase64Image = (img) => {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL // return dataURL.replace("data:image/png;base64,", "");
+  }
+
+  translateToBase64 = (imagePath) => {
+    if (!imagePath) return Promise.resolve('')
+    const url = `http://${config.host}:${config.port}/redirect/download/${imagePath}?projectId=${this.id}`
+    return new Promise((resolve, reject) => {
+      var img = document.createElement('img');
+      img.src = url
+      img.onload = () => resolve(this.getBase64Image(img))
+      img.onerror = () => reject()
+    })
+  }
+
+  generateReport = async (modelId) => {
+    const model = this.models.find(m => m.id === modelId)
+    // preImportance
+    this.preImportance = null
+    await this.preTrainImportance()
+    // correlation matrix
+    await this.correlationMatrix()
+    // plots
+    this.univariatePlotsBase64 = {}
+    this.histgramPlotsBase64 = {}
+    this.rawHistgramPlotsBase64 = {}
+    await this.allPlots()
+    // translate image to base64
+    try {
+      await Promise.all(Object.keys(this.univariatePlotsBase64).map(async k => this.univariatePlotsBase64[k] = await this.translateToBase64(this.univariatePlotsBase64[k])))
+      await Promise.all(Object.keys(this.histgramPlotsBase64).map(async k => this.histgramPlotsBase64[k] = await this.translateToBase64(this.histgramPlotsBase64[k])))
+      await Promise.all(Object.keys(this.rawHistgramPlotsBase64).map(async k => this.rawHistgramPlotsBase64[k] = await this.translateToBase64(this.rawHistgramPlotsBase64[k])))
+      if (this.problemType === 'Regression') {
+        // fit plot
+        model.fitPlotBase64 = await this.translateToBase64(model.fitPlot)
+        // residual plot
+        model.residualPlotBase64 = await this.translateToBase64(model.residualPlot)
+      }
+    } catch (e) { }
+    // generate json
+    return JSON.stringify([{ ...this, ...{ models: [model] } }])
   }
 }

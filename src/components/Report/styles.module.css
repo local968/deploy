@@ -40,3 +40,21 @@ html {
 .performance {
   font-size: 16px;
 }
+
+.target:first-child {
+  margin-right: 100px;
+}
+
+.target {
+  display: inline-block;
+}
+
+.etlTitle {
+  font-size: 16px;
+  display: block;
+  text-align: center;
+}
+
+.targetPlot {
+  width: 450px;
+}

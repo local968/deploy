@@ -8,14 +8,6 @@ import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 
-import nonlinearImg from './img-residual-plot-nonlinear.svg';
-import heteroscedasticityImg from './img-residual-plot-heteroscedasticity.svg';
-import largeImg from './img-residual-plot-large-y.svg';
-import yAxisUnbalancedImg from './img-residual-plot-y-axis-unbalanced.svg';
-import outliersImg from './img-residual-plot-outliers.svg';
-import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
-import randomlyImg from './img-residual-plot-randomly.svg';
-
 import { observable, computed, action, autorun, runInAction } from 'mobx';
 import moment from 'moment';
 
@@ -407,23 +399,11 @@ class RegressionDetailCurves extends Component {
     return (
       <div className={styles.charts}>
         <div className={styles.reportChart}>
-          {/* <span className={styles.chartTitle}>Fit Plot</span> */}
-          <div className={styles.chartContent}><img className={styles.img} src={model.fitPlotPath} alt="fit plot" /></div>
+          <div className={styles.chartContent}><img className={styles.img} src={model.fitPlotBase64} alt="fit plot" /></div>
         </div>
         <div className={styles.reportChart}>
-          {/* <span className={styles.chartTitle}>Residual Plot</span> */}
           <div className={styles.chartContent}>
-            <img className={styles.img} src={model.residualPlotPath} alt="residual plot" />
-            <Modal
-              visible={this.state.visible}
-              title='Residual Plot Diagnose'
-              width={1000}
-              onOk={() => this.setState({ visible: false })}
-              onCancel={() => this.setState({ visible: false })}
-            >
-              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlotPath} />
-            </Modal>
-            {/* <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} /> */}
+            <img className={styles.img} src={model.residualPlotBase64} alt="residual plot" />
           </div>
         </div>
       </div>
@@ -594,65 +574,6 @@ class PredictTable extends Component {
         }}
         dataSource={data}
         pagination={false} />
-    );
-  }
-}
-
-class ResidualDiagnose extends Component {
-  render() {
-    const plots = [{
-      plot: randomlyImg,
-      type: 'random',
-      text: 'Randomly Distributed'
-    }, {
-      plot: yAxisUnbalancedImg,
-      type: 'yUnbalanced',
-      text: 'Y-axis Unbalanced'
-    }, {
-      plot: xAxisUnbalancedImg,
-      type: 'xUnbalanced',
-      text: 'X-axis Unbalanced'
-    }, {
-      plot: outliersImg,
-      type: 'outliers',
-      text: 'Outliers'
-    }, {
-      plot: nonlinearImg,
-      type: 'nonlinear',
-      text: 'Nonlinear'
-    }, {
-      plot: heteroscedasticityImg,
-      type: 'heteroscedasticity',
-      text: 'Heteroscedasticity'
-    }, {
-      plot: largeImg,
-      type: 'largey',
-      text: 'Large Y-axis Data Points'
-    }];
-    const { diagnoseType, residualplot } = this.props;
-    const RadioGroup = Radio.Group;
-    // const disabled = diagnoseType === '';
-    // const disabled = false;
-    return (
-      <div className={styles.residualDiagnose} >
-        <div className={styles.plot} >
-          <img width={300} src={residualplot} alt="" />
-        </div>
-        <div className={styles.choosePlot} >
-          <div>Which plot does your residual plot look most similar to?</div>
-          <RadioGroup value={diagnoseType} onChange={this.props.handleDiagnoseType} >
-            {plots.map((p, i) => (
-              <div className={styles.radioWrapper} key={i}>
-                <Radio value={p.type} >{p.text}</Radio>
-                <div>
-                  <img width={200} src={p.plot} alt='plot' />
-                </div>
-              </div>
-            ))}
-          </RadioGroup >
-        </div>
-
-      </div>
     );
   }
 }
