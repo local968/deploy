@@ -951,7 +951,7 @@ export default class Project {
 
   formatNumber(num, n = 3) {
     const float = parseFloat(num)
-    if (float === NaN) return num
+    if (isNaN(float)) return num
     const power = Math.pow(10, n)
     return parseInt(float * power, 10) / power
   }
