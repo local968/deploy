@@ -40,7 +40,7 @@ class Report extends Component {
         <div className={styles.blockRow}>
           <div className={styles.target}>
             <span className={styles.etlTitle}>Before ETL</span>
-            <img className={styles.targetPlot} src={project.histgramPlotsBase64[project.target]} />
+            <img className={styles.targetPlot} src={project.rawHistgramPlotsBase64[project.target]} />
           </div>
           <div className={styles.target}>
             <span className={styles.etlTitle}>After ETL</span>
