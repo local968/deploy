@@ -95,7 +95,7 @@ class PredictedProgress extends Component {
 class Performance extends Component {
   render() {
     const { project } = this.props;
-    const { selectModel: current, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
+    const { selectModel: current, targetColMap, targetArrayTemp, renameVariable } = project;
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     return <div className={styles.performanceBox}>

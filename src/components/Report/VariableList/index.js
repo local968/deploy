@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable } from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon, Table } from 'antd';
+import { Spin, Popover, Icon } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import config from 'config'
@@ -38,7 +38,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, dataHeader, newVariable, newType, id, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
     const variableType = { ...newType, ...colType }
     return <div className={styles.simplified}>
@@ -75,14 +75,14 @@ export default class SimplifiedView extends Component {
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
               return <SimplifiedViewRow
-              key={i}
-              value={h}
-              data={data}
-              map={map}
-              importance={importance}
-              colType={variableType}
-              project={project}
-              lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
+                key={i}
+                value={h}
+                data={data}
+                map={map}
+                importance={importance}
+                colType={variableType}
+                project={project}
+                lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
             })}
           </div>}
       </div>

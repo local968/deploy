@@ -11,8 +11,8 @@ import VariableImpact from './Model/VariableImpact'
 import ModelProcessFlow from './Model/ModelProcessFlow'
 import Score from './Score'
 
-@observer
 @inject('projectStore')
+@observer
 class Report extends Component {
   constructor(props) {
     super(props)

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 
@@ -56,7 +55,7 @@ class Summary extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
+    const { target, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
     const fixedPercent = totalFixedLines / totalRawLines * 100
     const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100

@@ -1,38 +1,12 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
+import { Table, Modal, Select, Radio, Tooltip } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
-import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
-import ModelProcess from './ModelProcess';
-import modelProcess from './icon-model-process-flow-normal.svg';
-import processHover from './icon-model-process-flow-hover.svg';
-import processSelectd from './icon-model-process-flow-selected.svg';
-import ROCCurve from './icon-roc-curve-normal.svg';
-import liftChart from './icon-lift-chart-normal.svg';
-import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
-import predictDist from './icon-prediction-distribution-normal.svg';
-import liftchartHover from './icon-lift-chart-hover.svg';
-import rocHover from './icon-roc-curve-hover.svg';
-import precisionRecallHover from './icon-precision-recall-tradeoff-hover.svg';
-import predictionDistribution from './icon-prediction-distribution-hover.svg';
-import liftchartSelected from './icon-lift-chart-selected.svg';
-import FitPlotHover from './iconMR-FitPlot-Hover.svg';
-import FitPlotNormal from './iconMR-FitPlot-Normal.svg';
-import FitPlotSelected from './iconMR-FitPlot-Selected.svg';
-import ResidualHover from './iconMR-Residual-Hover.svg';
-import ResidualNormal from './iconMR-Residual-Normal.svg';
-import ResidualSelected from './iconMR-ResidualPlot-Selected.svg';
-import rocSelected from './icon-roc-curve-selected.svg';
-import precisionRecallSelected from './icon-precision-recall-tradeoff-selected.svg';
-import predictionDistributionSelected from './icon-prediction-distribution-selected.svg';
-import varImpactHover from './icon-variable-impact-linear-hover.svg';
-import varImpactSelected from './icon-variable-impact-selected.svg';
-import varImpactNormal from './icon-variable-impact-linear-normal.svg';
 
 import nonlinearImg from './img-residual-plot-nonlinear.svg';
 import heteroscedasticityImg from './img-residual-plot-heteroscedasticity.svg';
@@ -45,12 +19,10 @@ import randomlyImg from './img-residual-plot-randomly.svg';
 import { observable, computed, action, autorun, runInAction } from 'mobx';
 import moment from 'moment';
 
-const TabPane = Tabs.TabPane;
 const Option = Select.Option;
-
 @inject('projectStore')
 @observer
-export default class AdvancedView extends Component {
+class AdvancedView extends Component {
 
   @observable currentSettingId = 'all';
 
@@ -275,19 +247,6 @@ export default class AdvancedView extends Component {
     return []
   }
 
-  changeSort = (type) => action(() => {
-    const currentActive = Object.keys(this.sortState).find(key => this.sortState[key]);
-    if (type === currentActive) {
-      this.sortState[type] = this.sortState[type] === 1 ? 2 : 1;
-    } else {
-      this.sortState[currentActive] = false;
-      this.sortState[type] = 1
-    }
-    if (window.localStorage)
-      window.localStorage.setItem(`advancedViewSort:${this.props.project.id}`, JSON.stringify(this.sortState))
-
-  });
-
   changeSetting = action((settingId) => {
     this.currentSettingId = settingId
   });
@@ -338,6 +297,8 @@ export default class AdvancedView extends Component {
   }
 }
 
+export default AdvancedView
+
 @observer
 class AdvancedModelTable extends Component {
 
@@ -347,7 +308,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sortState, changeSort, metric } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, metric } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
@@ -525,7 +486,6 @@ class DetailCurves extends Component {
   }
   render() {
     const { model, model: { mid }, yes, no } = this.props;
-    let hasReset = true;
 
     return (
       <React.Fragment>
@@ -549,44 +509,6 @@ class DetailCurves extends Component {
           </div>
         </div>
       </React.Fragment>
-    )
-  }
-}
-
-class Thumbnail extends Component {
-  state = {
-    clickActive: false,
-    hoverActive: false
-  }
-  componentWillReceiveProps(nextProps) {
-    const { curSelected, value } = nextProps;
-    this.setState({ clickActive: curSelected === value });
-  }
-  handleClick = e => {
-    e.stopPropagation();
-    this.setState({ clickActive: true });
-    this.props.onClick(this.props.value);
-  }
-  handleMouseEnter = () => {
-    this.setState({ hoverActive: true });
-  }
-  handleMouseLeave = () => {
-    this.setState({ hoverActive: false });
-  }
-  render() {
-    const { selectedIcon, hoverIcon, normalIcon, text } = this.props.thumbnail;
-    const { clickActive, hoverActive } = this.state;
-    const icon = clickActive ? selectedIcon : hoverActive ? hoverIcon : normalIcon;
-    return (
-      <div
-        className={styles.thumbnail}
-        onMouseEnter={this.handleMouseEnter}
-        onMouseLeave={this.handleMouseLeave}
-        onClick={this.handleClick}
-      >
-        <img src={icon} alt="icon" />
-        <div>{text}</div>
-      </div>
     )
   }
 }
@@ -676,53 +598,6 @@ class PredictTable extends Component {
   }
 }
 
-class ModelComp extends Component {
-  state = {
-    modelCompVisible: false
-  }
-  handleClick = () => {
-    this.setState({ modelCompVisible: true });
-  }
-  handleCancel = () => {
-    this.setState({ modelCompVisible: false });
-  }
-  render() {
-    const { models } = this.props;
-    return (
-      <div className={styles.modelComp}>
-        <a onClick={this.handleClick} className={styles.comparison}>Model Comparison Charts</a>
-        <Modal
-          width={1000}
-          visible={this.state.modelCompVisible}
-          onCancel={this.handleCancel}
-          closable={false}
-          footer={
-            <Button key="cancel" type="primary" onClick={this.handleCancel}>Close</Button>
-          }
-        >
-          <div>
-            <h4>Model Comparison Charts</h4>
-            <Tabs defaultActiveKey="1">
-              <TabPane tab="Speed vs Accuracy" key="1">
-                <SpeedAndAcc models={models} width={600} height={400} className="speedComp" />
-              </TabPane>
-              <TabPane tab="Lifts Charts" key="3">
-                <LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
-              </TabPane>
-              <TabPane tab="ROC Curves" key="4">
-                <RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
-              </TabPane>
-              {/* <TabPane tab="Learning Curves" key="2">
-                <Learning width={600} height={400} className="learningComp" models={models} model={models[0]} />
-              </TabPane> */}
-            </Tabs>
-          </div>
-        </Modal>
-      </div>
-    );
-  }
-}
-
 class ResidualDiagnose extends Component {
   render() {
     const plots = [{
@@ -777,163 +652,6 @@ class ResidualDiagnose extends Component {
           </RadioGroup >
         </div>
 
-      </div>
-    );
-  }
-}
-
-class DiagnoseResult extends Component {
-  handleNewData = () => {
-    const { updateProject, nextMainStep } = this.props.project
-    updateProject(nextMainStep(2))
-  }
-  handleSetting = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(1, 3))
-    // history.push(`/modeling/${this.props.projectId}/1`);
-  }
-  handleOutlierFix = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(3, 2))
-    // history.push(`/data/${this.props.projectId}/5`);
-  }
-  render() {
-    const { diagnoseType } = this.props;
-    let result;
-    // const type = 'large';
-    switch (diagnoseType) {
-      case 'random':
-        result = <div className={styles.content} >Perfect, your residual plot is randomly distributed. No need to further improve your models. </div>;
-        break;
-      case 'yUnbalanced':
-        result = (
-          <div className={styles.content}>
-            <div>Your plot is unbalanced on y-axis. You might be able to improve your model via:</div>
-            <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform your variables, typically your target variable</li>
-              <li>Checking if your model lacks informative variables</li>
-            </ul>
-            <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
-            </div>
-            <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
-            </div>
-          </div>
-        );
-        break;
-      case 'xUnbalanced':
-        result = (
-          <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is unbalanced on x-axis. You might be able to improve your model via:</div>
-            <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform your variables, typically your predictors</li>
-              <li>Checking if your model lacks informative variables</li>
-            </ul>
-            <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
-            </div>
-            <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
-            </div>
-          </div>
-        );
-        break;
-      case 'outliers':
-        result = (
-          <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is has some outliers. You might be able to improve your model via:</div>
-            <ul className={styles.items} >
-              <li>Deleting the outliers if you decide that they are useless</li>
-              <li>Checking if your model lacks informative variables</li>
-            </ul>
-            <div className={styles.action} >
-              <span>You can delete the outliers in our application</span>
-              <button onClick={this.handleOutlierFix} className={styles.button} >Go to Edit the Fixes for Outliers</button>
-            </div>
-            <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
-            </div>
-            <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
-            </div>
-          </div>
-        );
-        break;
-      case 'nonlinear':
-        result = (
-          <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is nonlinear. You might be able to improve your model via:</div>
-            <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform a variable.</li>
-              <li>Checking if your need to add new a variable</li>
-            </ul>
-            <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
-            </div>
-            <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
-            </div>
-          </div>
-        );
-        break;
-      case 'heteroscedasticity':
-        result = (
-          <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is heteroscedasticity. You might be able to improve your model via:</div>
-            <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform a variable.</li>
-              <li>Checking if your need to add new a variable</li>
-            </ul>
-            <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
-            </div>
-            <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
-            </div>
-          </div>
-        );
-        break;
-      case 'largey':
-        result = (
-          <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot has large y-axis datapoints. You might be able to improve your model via:</div>
-            <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform a variable.</li>
-              <li>Checking if your need to add new a variable</li>
-            </ul>
-            <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
-            </div>
-            <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
-            </div>
-          </div>
-        );
-        break;
-      default: break;
-    }
-    return (
-      <div className={styles.diagnoseResult} >
-        <button onClick={this.props.handleDiagnose} className={styles.button} >Diagnose</button>
-        {result}
       </div>
     );
   }
