@@ -49,7 +49,8 @@ const config = {
       user: "report@r2.ai",
       pass: "IfxMzpWxskXq"
     }
-  }
+  },
+  supportMail: 'support@r2.ai'
 }
 
 module.exports = config

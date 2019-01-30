@@ -145,4 +145,44 @@ router.get('/file', (req, res) => {
 router.get('/session', (req, res) => {
   res.json(req.session)
 })
+
+router.post('/report', (req, res) => {
+  const { type, text, email } = req.body
+  const method = (type === 'Question' && 'we will contact you soon via email.') ||
+    (type === 'Bug' && 'we will try to resolve it as soon as possible.') ||
+    (type === 'Feature' && 'we will take it into consideration.') ||
+    '';
+  if (!method) {
+    return res.status(500).json({ message: "report error" });
+  }
+
+  const transport = nodemailer.createTransport(config.mail)
+  // 用户回执
+  // const userConfig = {
+  //   from: 'report@r2.ai',
+  //   to: email,
+  //   subject: 'R2 Learn - Your feedback received',
+  //   html: `Dear Customer,<br><br>
+  //     We have received your ${type.toLowerCase()} as below:<br>
+  //     "${text}"<br><br>
+  //     Thanks for your ${type === 'Question' ? 'question' : 'valuable feedback'}, ${method}<br><br>
+  //     R2 Support Team | <a href="http://www.r2.ai" target="_blank">www.r2.ai</a><br>`
+  // }
+  // transport.sendMail(userConfig)
+
+  // 提交给support
+  const supportConfig = {
+    from: 'report@r2.ai',
+    to: config.supportMail,
+    subject: 'User feedback',
+    html: `User feedback,<br><br>
+      User ${email}: <br>
+      ${type.toLowerCase()} as below:<br>
+      "${text}"<br>`
+  }
+  transport.sendMail(supportConfig)
+  res.send({
+    message: 'ok'
+  })
+})
 module.exports = router
