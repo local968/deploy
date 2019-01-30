@@ -1,7 +1,7 @@
 import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
 import config from 'config'
-import {debounce} from 'lodash'
+import { debounce } from 'lodash'
 
 export default class Model {
   @observable score;
@@ -25,7 +25,7 @@ export default class Model {
     this._id = name;
     Object.assign(this, model);
 
-    this.updateModel = debounce(this.updateModel,1000)
+    this.updateModel = debounce(this.updateModel, 1000)
   }
 
   @computed
@@ -54,9 +54,9 @@ export default class Model {
     if (Array.isArray(data)) {
       return false;
     }
-    Reflect.deleteProperty(data,'id')
-    Reflect.deleteProperty(data,'name')
-    Reflect.deleteProperty(data,'projectId')
+    Reflect.deleteProperty(data, 'id')
+    Reflect.deleteProperty(data, 'name')
+    Reflect.deleteProperty(data, 'projectId')
 
     for (let key in data) {
       if (typeof data[key] === 'function') {
@@ -70,28 +70,20 @@ export default class Model {
     this.fitIndex = index;
     this.fitIndexModified = true;
     this.updateModel({
-      fitIndex:index,
+      fitIndex: index,
     })
   }
 
   @action
   resetFitIndex() {
     this.fitIndexModified = false;
-    const {initialFitIndex:fitIndex} = this;
+    const { initialFitIndex: fitIndex } = this;
     this.fitIndex = fitIndex;
     this.updateModel({
       fitIndex,
     })
   }
 
-  getScore = (ITP, IFN, IFP, ITN) => {
-    const { problemType, score: { validateScore } } = this
-    if (problemType === 'Classification') {
-      if (!ITP || !IFN || !IFP || !ITN) return validateScore.auc + validateScore.acc
-      return this.getBenefit(ITP, IFN, IFP, ITN).benefit
-    }
-    return 1 - validateScore.rmse + validateScore.r2
-  }
   getBenefit = (ITP, IFN, IFP, ITN) => {
     const data = this.chartData || {}
     const roc = data.roc || {}
@@ -199,9 +191,9 @@ export default class Model {
   }
   updateModel(data) {
     socketStore.ready().then(api => api.updateModel({
-       data,
-       id: this.id,
-       projectId: this.projectId,
+      data,
+      id: this.id,
+      projectId: this.projectId,
     }));
     Object.assign(this, data);
   }
