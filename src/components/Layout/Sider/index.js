@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
+import classnames from 'classnames';
 import logo from './rsquared_logo_color.svg';
 import home from './icon-home.svg';
+import homeActive from './icon-home-active.svg';
 import help from './icon-help.svg';
+import helpActive from './icon-help-active.svg';
 // import community from './community.png'
 import switchIcon from './switch.svg';
 import { inject, observer } from 'mobx-react';
@@ -16,6 +19,7 @@ export default class Sider extends Component {
     const { userStore, routing } = this.props;
     const isLogin = userStore.status === 'login';
     const isDeploy = routing.location.pathname.includes('deploy');
+    const isSupport = routing.location.pathname.includes('support');
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
@@ -29,15 +33,19 @@ export default class Sider extends Component {
               isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')
             }
           >
-            <img alt="home" src={home} />
-            <h4 className={styles.nav}>Home</h4>
+            {!isSupport ? <img alt="home" src={homeActive} /> : <img alt="home" src={home} />}
+            <h4 className={classnames(styles.nav, {
+              [styles.active]: !isSupport
+            })}>Home</h4>
           </a>
           <a className={styles.support}
             onClick={() => {
               routing.push('/support')
             }}>
-            <img alt="support" src={help} />
-            <h4 className={styles.nav}>Support</h4>
+            {isSupport ? <img alt="support" src={helpActive} /> : <img alt="support" src={help} />}
+            <h4 className={classnames(styles.nav, {
+              [styles.active]: isSupport
+            })}>Support</h4>
           </a>
           {/* <a className={styles.support} onClick={() => routing.push('/community')}>
             <img alt="support" src={community} className={styles.community} />

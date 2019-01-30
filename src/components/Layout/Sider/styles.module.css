@@ -31,6 +31,8 @@
 .nav {
   margin: 0;
   font-size: 1.2rem;
+  font-family: ShareTech-Regular;
+  color: white;
 }
 
 .menus {
@@ -47,8 +49,7 @@
   cursor: pointer;
 }
 
-.home .nav {
-  font-family: ShareTech-Regular;
+.nav.active {
   color: #31c4e9;
 }
 
@@ -60,12 +61,6 @@
   flex: 0 0 1.2em;
   justify-content: center;
   cursor: pointer;
-}
-
-.support .nav,
-.bottom .nav {
-  font-family: ShareTech-Regular;
-  color: white;
 }
 
 .home img,
