@@ -6,6 +6,7 @@ import config from 'config';
 import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage, Modal } from 'antd';
+import axios from 'axios'
 
 export default class Project {
   @observable models = []
@@ -1333,10 +1334,51 @@ export default class Project {
     })
   }
 
+  generateReportHtml = async (jsonData) => {
+    const script = 'script'
+    const body = 'body'
+    const link = 'link'
+    const style = 'style'
+    const htmlResp = await axios.get('/index.html')
+    let html = htmlResp.data
+    html = html.replace(`<${link} rel="manifest" href="/manifest.json">`, '')
+    html = html.replace(`<${link} rel="shortcut icon" href="/favicon.ico">`, '')
+
+    const cssVersionStartStr = `<${link} href="/static/css/main.`
+    const cssVersionStart = html.indexOf(cssVersionStartStr) + cssVersionStartStr.length
+    const cssVersionEnd = html.indexOf('.', cssVersionStart)
+    const cssVersion = html.slice(cssVersionStart, cssVersionEnd)
+
+    const cssUrl = `/static/css/main.${cssVersion}.css`
+    const cssLink = `<${link} href="/static/css/main.${cssVersion}.css" rel="stylesheet">`
+    const cssResp = await axios.get(cssUrl)
+    const cssData = cssResp.data
+    const cssTag = `<${style}>${cssData}</${style}>`
+    html = html.replace(cssLink, '')
+
+    const jsVersionStartStr = `<${script} type="text/javascript" src="/static/js/main.`
+    const jsVersionStart = html.indexOf(jsVersionStartStr) + jsVersionStartStr.length
+    const jsVersionEnd = html.indexOf('.', jsVersionStart)
+    const jsVersion = html.slice(jsVersionStart, jsVersionEnd)
+
+    const jsUrl = `/static/js/main.${jsVersion}.js`
+    const jsLink = `<${script} type="text/javascript" src="/static/js/main.${jsVersion}.js"></${script}>`
+    const jsResp = await axios.get(jsUrl)
+    const jsData = jsResp.data
+    const jsTag = `<${script}>` + jsData + `</${script}>`
+    html = html.replace(jsLink, '')
+
+    html = html.replace(`</${body}>`, '')
+    // cannot use replace with js code ($$typeof wrong)
+    html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsTag}${cssTag}</${body}>`
+    return html
+  }
+
   generateReport = async (modelId) => {
     const model = this.models.find(m => m.id === modelId)
     // preImportance
     this.preImportance = null
+    await this.dataView()
     await this.preTrainImportance()
     // correlation matrix
     await this.correlationMatrix()
@@ -1358,6 +1400,24 @@ export default class Project {
       }
     } catch (e) { }
     // generate json
-    return JSON.stringify([{ ...this, ...{ models: [model] } }])
+    const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
+
+    const html = await this.generateReportHtml(json)
+
+    loadFile('report.html', html)
   }
 }
+
+function loadFile(fileName, content) {
+  var aLink = document.createElement('a');
+  var blob = new Blob([content], {
+    type: 'text/plain'
+  });
+  var evt = new Event('click');
+  aLink.download = fileName;
+  aLink.href = URL.createObjectURL(blob);
+  aLink.click();
+  URL.revokeObjectURL(blob);
+}
+
+window.axios = axios

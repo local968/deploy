@@ -134,7 +134,7 @@ class Summary extends Component {
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
-                <div className={styles.summaryCell}><span>{v}</span></div>
+                <div className={styles.summaryCell}><span alt={v}>{v}</span></div>
                 <div className={styles.summaryCell}><span>{percent.clean.toFixed(2)}%</span></div>
               </div>
             })}

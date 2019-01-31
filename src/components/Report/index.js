@@ -36,7 +36,7 @@ class Report extends Component {
         <Summary project={project} />
       </div>
       <div className={styles.block}>
-        <h3 className={styles.blockTitle}>Target:Survived</h3>
+        <h3 className={styles.blockTitle}>Target:{project.target}</h3>
         <div className={styles.blockRow}>
           <div className={styles.target}>
             <span className={styles.etlTitle}>Before ETL</span>
