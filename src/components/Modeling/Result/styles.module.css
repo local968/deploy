@@ -1012,3 +1012,16 @@ span.performanceScore {
     display: block;
     font-size: .5rem;
 }
+
+.reportProgress {
+  font-size: 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reportProgressText {
+  font-size: 16px;
+  margin: 4px;
+  display: flex;
+  flex: auto;
+}

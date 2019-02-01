@@ -63,6 +63,7 @@ export default class RegressionView extends Component {
         trainModel={trainModel}
         abortTrain={abortTrain}
         isAbort={isAbort}
+        project={project}
       />
     </div>
   }
@@ -101,6 +102,7 @@ class ModelTable extends Component {
   abortTrain = () => {
     this.props.abortTrain()
   }
+  exportReport = (modelId) => () => this.props.project.generateReport(modelId)
 
   render() {
     const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;
@@ -134,6 +136,9 @@ class ModelTable extends Component {
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Model Process Flow</span>
             </div>
+            <div className={classnames(styles.cell, styles.cellHeader)}>
+              <span>Report</span>
+            </div>
           </div>
         </div>
         <div className={styles.data}>
@@ -144,6 +149,7 @@ class ModelTable extends Component {
                 model={model}
                 current={current}
                 onSelect={onSelect}
+                exportReport={this.exportReport(model.id)}
               />
             );
           })}
@@ -185,7 +191,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, current } = this.props;
+    const { model, onSelect, current, exportReport } = this.props;
     return (
       <div className={styles.rowBox}>
         <div className={styles.rowData}>
@@ -220,6 +226,9 @@ class ModelDetail extends Component {
           <div className={classnames(styles.cell, styles.compute)}>
             <img src={Process} alt="" />
             <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
+          </div>
+          <div className={classnames(styles.cell, styles.compute)}>
+            <span onClick={exportReport}>Export</span>
           </div>
         </div>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}

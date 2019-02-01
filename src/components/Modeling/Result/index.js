@@ -7,6 +7,8 @@ import { observable } from 'mobx';
 import AdvancedView from '../AdvancedView/AdvancedView';
 import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
+import { ProgressBar } from 'components/Common';
+import { Modal } from 'antd'
 
 const Classification = 'Classification';
 
@@ -72,6 +74,12 @@ export default class ModelResult extends Component {
           visible={current && this.show}
           onClose={this.hideInsights}
           content={<ModelInsights model={current} project={project} />} /> */}
+        <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={false} footer={null}>
+          <div className={styles.reportProgress}>
+            <ProgressBar progress={project.reportProgress} />
+            <span className={styles.reportProgressText}>{project.reportProgressText}</span>
+          </div>
+        </Modal>
       </div>
     );
   }
