@@ -72,7 +72,7 @@ export default class RegressionPredictActualChart extends Component {
           width = this.regressionPredictActualChart.current.clientWidth - 1000 - 100;
         }
 
-        return [y(d[field]) - 1720, x(i) + width]
+        return [y(d[field]) - 2220, x(i) + width]
       })
       .html((d, i) => {
         return (

@@ -102,7 +102,15 @@ class ModelTable extends Component {
   abortTrain = () => {
     this.props.abortTrain()
   }
-  exportReport = (modelId) => () => this.props.project.generateReport(modelId)
+  exportReport = (modelId) => () => {
+    try {
+      this.props.project.generateReport(modelId)
+    } catch (e) {
+      message.error('export report error.')
+      this.props.project.reportProgress = 0
+      this.props.project.reportProgressText = 'init'
+    }
+  }
 
   render() {
     const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;

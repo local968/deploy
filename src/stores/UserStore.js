@@ -14,7 +14,7 @@ class UserStore {
   }
 
   constructor() {
-    window.r2Report = testData
+    // window.r2Report = testData
     if (window.r2Report) {
       this.status = 'unlogin'
       return

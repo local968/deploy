@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Progress, Tooltip, Icon } from 'antd';
+import { Progress, Tooltip, Icon, message } from 'antd';
 import { observable } from 'mobx';
 import { Hint, NumberInput, ProgressBar } from 'components/Common';
 import VariableImpact from "./VariableImpact"
@@ -279,7 +279,15 @@ class ModelTable extends Component {
     this.props.abortTrain()
   }
 
-  exportReport = (modelId) => () => this.props.project.generateReport(modelId)
+  exportReport = (modelId) => () => {
+    try {
+      this.props.project.generateReport(modelId)
+    }catch(e) {
+      message.error('export report error.')
+      this.props.project.reportProgress = 0
+      this.props.project.reportProgressText = 'init'
+    }
+  }
 
   render() {
     const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;

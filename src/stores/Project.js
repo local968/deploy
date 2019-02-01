@@ -1439,7 +1439,7 @@ export default class Project {
     this.changeReportProgress(`generating report file`, 100)
     const html = await this.generateReportHtml(json)
 
-    loadFile('report.html', html)
+    loadFile(model.id + '.html', html)
     this.changeReportProgress(`init`, 0)
   }
 }
