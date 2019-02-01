@@ -896,23 +896,68 @@ export default class Project {
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
-    const { selectId, costOption, criteria } = this
+    const { selectId, costOption, criteria, models, problemType, recommendModel } = this
     if (selectId) {
-      const model = this.models.find(m => m.id === selectId)
+      const model = models.find(m => m.id === selectId)
       if (model) return model
     }
-    let model;
-    const { TP, FN, FP, TN } = criteria === 'cost' ? costOption : { TP: 0, FN: 0, FP: 0, TN: 0 }
-    for (let m of this.models) {
-      if (!model) {
-        model = m;
-        continue;
-      }
-      if (model.getScore(TP, FN, FP, TN) < m.getScore(TP, FN, FP, TN)) {
-        model = m;
+    let model
+    if (problemType === 'Classification') {
+      const { TP, FN, FP, TN } = criteria === 'cost' ? costOption : { TP: 0, FN: 0, FP: 0, TN: 0 }
+      if (TP || FN || FP || TN) {
+        for (let m of models) {
+          if (!model) {
+            model = m;
+            continue;
+          }
+          if (model.getBenefit(TP, FN, FP, TN).benefit < m.getBenefit(TP, FN, FP, TN).benefit) {
+            model = m;
+          }
+        }
       }
     }
+    model = model || recommendModel
     return model
+  }
+
+  @computed
+  get recommendModel() {
+    const { models, problemType, measurement } = this
+    const data = models.map(m => {
+      const { score, id } = m
+      const { validateScore, holdoutScore } = score || {}
+      if (!validateScore || !holdoutScore) return null
+      let validate, holdout
+      if (problemType === 'Classification') {
+        validate = this.formatNumber(validateScore[measurement || 'auc'], 6)
+        holdout = this.formatNumber(holdoutScore[measurement || 'auc'], 6)
+      } else {
+        validate = this.formatNumber(validateScore[measurement || 'r2'], 6)
+        holdout = this.formatNumber(holdoutScore[measurement || 'r2'], 6)
+      }
+      const diff = this.formatNumber(Math.abs(validate - holdout), 6)
+      const base = this.formatNumber(validate / holdout, 6)
+      return { validate, holdout, diff, id, base }
+    }).filter(v => !!v)
+    const holdoutArr = [...data].sort((a, b) => a.holdout - b.holdout)
+    const diffArr = [...data].sort((a, b) => b.diff - a.diff)
+    let recommend
+    [...data].forEach(d => {
+      const { id, base } = d
+      const diffIndex = diffArr.indexOf(d) + 1
+      const holdoutIndex = holdoutArr.indexOf(d) + 1
+      const score = this.formatNumber(base * diffIndex * holdoutIndex, 6)
+      if (!recommend) return recommend = { id, score }
+      if (recommend.score < score) return recommend = { id, score }
+    })
+    return models.find(m => m.id === recommend.id)
+  }
+
+  formatNumber(num, n = 3) {
+    const float = parseFloat(num)
+    if (isNaN(float)) return num
+    const power = Math.pow(10, n)
+    return parseInt(float * power, 10) / power
   }
 
   @action
@@ -1119,9 +1164,9 @@ export default class Project {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
-    const model = new Model(this.id, data)
+    const model = new Model(this.id, { ...data, measurement: this.measurement })
     this.models = [...this.models.filter(m => data.id !== m.id), model]
-    if (data.chartData) {
+    if (data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
       const { index } = model.getBenefit(TP, FP, FN, TN)
       if (index === model.fitIndex) return
@@ -1138,6 +1183,12 @@ export default class Project {
       return
     }
     model.setProperty(data)
+    if (data.chartData && this.criteria === "cost") {
+      const { TP, FP, FN, TN } = this.costOption
+      const { index } = model.getBenefit(TP, FP, FN, TN)
+      if (index === model.fitIndex) return
+      model.updateModel({ fitIndex: index })
+    }
   }
 
   setSelectModel = id => {

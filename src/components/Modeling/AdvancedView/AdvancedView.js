@@ -72,7 +72,7 @@ export default class AdvancedView extends Component {
     'MSE': false,
     'MAE': false,
     'R2': false,
-    'adjustR2': false,
+    'AdjustR2': false,
     'KS': false
   };
   @observable metric = {
@@ -182,7 +182,7 @@ export default class AdvancedView extends Component {
             const bModelData = formatNumber(bModel.score.validateScore.r2)
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'adjustR2':
+        case 'AdjustR2':
           {
             const aModelData = formatNumber(aModel.score.validateScore.adjustR2)
             const bModelData = formatNumber(bModel.score.validateScore.adjustR2)
@@ -367,7 +367,7 @@ class AdvancedModelTable extends Component {
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
-      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',];
+      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', 'Validation', 'Holdout',];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
@@ -437,7 +437,7 @@ class AdvancedModelTable extends Component {
                 return <RowCell key={4} data={score.validateScore.mae} />;
               case 'R2':
                 return <RowCell key={5} data={score.validateScore.r2} />;
-              case 'adjustR2':
+              case 'AdjustR2':
                 return <RowCell key={8} data={score.validateScore.adjustR2} />;
               case 'Validation':
                 return <RowCell key={6} data={score.validateScore[metric]} />;

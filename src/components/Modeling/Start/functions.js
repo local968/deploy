@@ -21,7 +21,7 @@ module.exports = {
     {
       label: "Diff()",
       value: "Diff()",
-      syntax: "syntax: DIff(@var1, @var2, @var3,...row1,row2,...)"
+      syntax: "syntax: Diff(@var1, @var2, @var3,...row1,row2,...)"
     },
     {
       label: "Accumulate()",

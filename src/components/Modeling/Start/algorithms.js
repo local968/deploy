@@ -66,7 +66,7 @@ module.exports = {
     },
     {
       value: 'r2-logistics',
-      label: 'Logistics'
+      label: 'Logistic'
     }
   ],
   Regression: [

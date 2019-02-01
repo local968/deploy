@@ -367,6 +367,20 @@ class DataSample extends Component {
     selectSample(file.name);
   };
 
+  formatSize = size => {
+    let { size: s, n } = this.getSize(size)
+    if (n < 0) n = 1
+    const unit = (n === 1 && 'b') || (n === 2 && 'Kb') || (n === 3 && 'Mb') || (n === 4 && 'Gb') || 'Tb'
+    return (parseInt(s * 100, 10) / 100) + ' ' + unit
+  }
+
+  getSize = (size, n = 1) => {
+    if (n >= 5) return { size, n }
+    const s = size / 1024
+    if (s > 1) return this.getSize(s, ++n)
+    return { size, n }
+  }
+
   render() {
     const { onClose, visible } = this.props;
     if (!visible) return null
@@ -437,7 +451,7 @@ class DataSample extends Component {
                     <span>{row.target}</span>
                   </div>
                   <div className={styles.sampleCell} title={row.size}>
-                    <span>{row.size}</span>
+                    <span>{this.formatSize(row.size)}</span>
                   </div>
                 </div>
               );

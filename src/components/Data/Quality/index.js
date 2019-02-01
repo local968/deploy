@@ -112,7 +112,7 @@ class TargetIssue extends Component {
             <div className={styles.point}></div>
             {problemType === 'Classification' ?
               <span>Your target variable has more than two unique values, which is not suitable for binary classification.</span> :
-              <span>Your target variable has less than {recomm} values, which is not suitable for Regression.</span>}
+              <span>Your target variable has less than {recomm} unique values, which is not suitable for Regression.</span>}
           </div>}
           {issues.rowIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
@@ -120,7 +120,7 @@ class TargetIssue extends Component {
           </div>}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span>Some data issues, highlighted in color, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically</span>
+            <span>Some data issues, highlighted in color, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically.</span>
           </div>}
         </div>}
         {isClean && <div className={styles.cleanTitle}><span>Target variable quality looks good!</span></div>}
