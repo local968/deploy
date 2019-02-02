@@ -745,7 +745,7 @@ class RowCell extends Component {
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={data}
+        title={typeof data === 'object' ? '' : data}
       >
         {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
         {other}
