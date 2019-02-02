@@ -1012,3 +1012,7 @@ span.performanceScore {
     display: block;
     font-size: .5rem;
 }
+
+.nohover:hover {
+  cursor: text;
+}

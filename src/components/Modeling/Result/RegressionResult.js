@@ -36,10 +36,10 @@ export default class RegressionView extends Component {
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
-            <span>Selected Model :<a>&nbsp;{current.name}</a></span>
+            <span>Selected Model :<a className={styles.nohover}>&nbsp;{current.name}</a></span>
           </div>
           <div className={styles.row}>
-            <span>Target :<a>&nbsp;{project.target}</a></span>
+            <span>Target :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
           </div>
           <Performance current={current} />
         </div>
