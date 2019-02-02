@@ -22,6 +22,15 @@
     overflow-y: scroll;
     overflow-x: hidden;
   }
+  .advancedModelTable::-webkit-scrollbar{
+    width: 17px;
+  }
+  .advancedModelTable::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 5px;
+  }
+  .advancedModelTable::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    border-radius: 0;
+  }
   .advancedModelTable :global(.ant-radio-wrapper) {
     vertical-align: middle;
   }
