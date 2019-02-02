@@ -753,7 +753,7 @@ wss.register('train', async (message, socket, progress) => {
         hasModel = true;
         await createOrUpdate(projectId, userId, { trainModel: null })
         await createModel(userId, projectId, result.name, result)
-        processValue = await addSettingModel(userId, projectId)
+        processValue = await addSettingModel(userId, projectId)()
         // return progress(model)
       } else if (result.data) {
         const { model: mid, action, data } = result;
