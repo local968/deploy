@@ -39,7 +39,7 @@ const init = (server, sessionParser) => {
     socket.on('error', (socket, error) => {
       const log = `${ip} - ${req.session.userId} - [${moment().format()}] - error - ${req.headers['user-agent'] || ''}`
       redis.set(`log:${moment().format('YYYY:MM:DD')}:${uuid.v4()}}`, log)
-      console.error(error)
+      // console.error(error)
       socket.isAlive = false;
       console.error('socket error:' + error)
     })
