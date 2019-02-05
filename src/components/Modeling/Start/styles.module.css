@@ -1129,3 +1129,7 @@ span.advancedDesc {
   white-space: nowrap;
   font-size: 0.875rem;
 }
+.advancedSolution {
+  display: flex;
+  flex: none;
+}

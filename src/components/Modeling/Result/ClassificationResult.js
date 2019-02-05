@@ -30,6 +30,8 @@ export default class ClassificationView extends Component {
         if (!m.initialFitIndex) return
         m.updateModel({ fitIndex: m.initialFitIndex })
       })
+    } else {
+      this.handleSubmit()
     }
     this.props.project.updateProject(data)
   }
@@ -69,10 +71,12 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
+    if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
+    const text = (criteria === 'cost' && TP && FN && FP && TN) ? 'Cost Based' : 'Recommend'
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -158,6 +162,8 @@ export default class ClassificationView extends Component {
         trainModel={trainModel}
         abortTrain={abortTrain}
         isAbort={isAbort}
+        recommendId={recommendModel.id}
+        text={text}
       />
     </div>
   }
@@ -279,7 +285,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, isAbort, recommendId, text } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -329,6 +335,8 @@ class ModelTable extends Component {
                 model={model}
                 isSelect={model.id === current.id}
                 onSelect={onSelect}
+                isRecommend={model.id === recommendId}
+                text={text}
               />
             );
           })}
@@ -371,58 +379,60 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect } = this.props;
+    const { model, onSelect, isSelect, isRecommend, text } = this.props;
     return (
       <div className={styles.rowBox}>
-        <div className={styles.rowData}>
-          <div className={styles.modelSelect}>
-            <input
-              type="radio"
-              name="modelSelect"
-              checked={isSelect}
-              onChange={onSelect.bind(null, model)}
-            />
+        <Tooltip placement="left" title={isRecommend ? text : 'Selected'} visible={isSelect || isRecommend} overlayClassName={styles.recommendLabel}>
+          <div className={styles.rowData}>
+            <div className={styles.modelSelect}>
+              <input
+                type="radio"
+                name="modelSelect"
+                checked={isSelect}
+                onChange={onSelect.bind(null, model)}
+              />
+            </div>
+            <div className={classnames(styles.cell, styles.name)}>
+              <Tooltip title={model.name}>{model.name}</Tooltip>
+            </div>
+            <div className={classnames(styles.cell, styles.predict)}>
+              <PredictedProgress
+                predicted={model.predicted[0]}
+                width={1.5}
+                height={0.2}
+                type={'success'}
+              />
+              <div className={styles.space} />
+              <PredictedProgress
+                predicted={model.predicted[1]}
+                width={1.5}
+                height={0.2}
+                type={'predicted'}
+              />
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.validationAcc.toFixed(2)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.score.validateScore.auc.toFixed(2)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>{model.executeSpeed + ' rows/s'}</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Variable} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Process} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
+            </div>
           </div>
-          <div className={classnames(styles.cell, styles.name)}>
-            <Tooltip title={model.name}>{model.name}</Tooltip>
-          </div>
-          <div className={classnames(styles.cell, styles.predict)}>
-            <PredictedProgress
-              predicted={model.predicted[0]}
-              width={1.5}
-              height={0.2}
-              type={'success'}
-            />
-            <div className={styles.space} />
-            <PredictedProgress
-              predicted={model.predicted[1]}
-              width={1.5}
-              height={0.2}
-              type={'predicted'}
-            />
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.validationAcc.toFixed(2)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.score.validateScore.auc.toFixed(2)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>{model.executeSpeed + ' rows/s'}</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Variable} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Process} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
-          </div>
-        </div>
+        </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
         {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}

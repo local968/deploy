@@ -1016,3 +1016,13 @@ span.performanceScore {
 .nohover:hover {
   cursor: text;
 }
+
+.recommendLabel {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.recommendLabel :global(.ant-tooltip-inner) {
+    min-height: 0;
+}

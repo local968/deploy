@@ -20,7 +20,8 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
+    if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
     return <div>
       <div className={styles.result}>
@@ -63,6 +64,7 @@ export default class RegressionView extends Component {
         trainModel={trainModel}
         abortTrain={abortTrain}
         isAbort={isAbort}
+        recommendId={recommendModel.id}
       />
     </div>
   }
@@ -103,7 +105,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, isAbort, recommendId } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -144,6 +146,7 @@ class ModelTable extends Component {
                 model={model}
                 current={current}
                 onSelect={onSelect}
+                isRecommend={model.id === recommendId}
               />
             );
           })}
@@ -185,43 +188,46 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, current } = this.props;
+    const { model, onSelect, current, isRecommend } = this.props;
+    const isSelect = model.id === current.id
     return (
       <div className={styles.rowBox}>
-        <div className={styles.rowData}>
-          <div className={styles.modelSelect}>
-            <input
-              type="radio"
-              name="modelSelect"
-              defaultChecked={model.id === current.id}
-              onChange={onSelect.bind(null, model)}
-            />
+        <Tooltip placement="left" title={isRecommend ? 'Recommend' : 'Selected'} visible={isSelect || isRecommend} overlayClassName={styles.recommendLabel}>
+          <div className={styles.rowData}>
+            <div className={styles.modelSelect}>
+              <input
+                type="radio"
+                name="modelSelect"
+                defaultChecked={isSelect}
+                onChange={onSelect.bind(null, model)}
+              />
+            </div>
+            <div className={classnames(styles.cell, styles.name)}>
+              <Tooltip title={model.name}>{model.name}</Tooltip>
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.score.validateScore.rmse.toFixed(4)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.score.validateScore.r2.toFixed(4)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>{model.executeSpeed + ' rows/s'}</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Variable} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Process} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
+            </div>
           </div>
-          <div className={classnames(styles.cell, styles.name)}>
-            <Tooltip title={model.name}>{model.name}</Tooltip>
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.score.validateScore.rmse.toFixed(4)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.score.validateScore.r2.toFixed(4)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>{model.executeSpeed + ' rows/s'}</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Variable} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Process} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
-          </div>
-        </div>
+        </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {/*{this.visible && <VariableImpact model={model} />}*/}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
