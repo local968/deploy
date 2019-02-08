@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable } from 'mobx';
+import moment from 'moment';
 import { Hint, NumberInput, ProgressBar } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 import ModelProcessFlow from "./ModelProcessFlow"
@@ -286,6 +287,13 @@ class ModelTable extends Component {
 
   render() {
     const { models, onSelect, train2Finished, current, trainModel, isAbort, recommendId, text } = this.props;
+    const modelList = models.sort((a, b) => {
+      const aModelTime = a.name.split('.').splice(1, Infinity).join('.');
+      const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      const bModelTime = b.name.split('.').splice(1, Infinity).join('.');
+      const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      return aModelUnix - bModelUnix
+    })
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -328,7 +336,7 @@ class ModelTable extends Component {
           </div>
         </div>
         <div className={styles.data}>
-          {models.map((model, key) => {
+          {modelList.map((model, key) => {
             return (
               <ModelDetail
                 key={key}
@@ -361,7 +369,6 @@ class ModelTable extends Component {
 
 @observer
 class ModelDetail extends Component {
-
   @observable type = '';
   @observable visible = false;
 
@@ -382,7 +389,14 @@ class ModelDetail extends Component {
     const { model, onSelect, isSelect, isRecommend, text } = this.props;
     return (
       <div className={styles.rowBox}>
-        <Tooltip placement="left" title={isRecommend ? text : 'Selected'} visible={isSelect || isRecommend} overlayClassName={styles.recommendLabel}>
+        <Tooltip
+          placement="left"
+          title={isRecommend ? text : 'Selected'}
+          visible={isSelect || isRecommend}
+          overlayClassName={styles.recommendLabel}
+          autoAdjustOverflow={false}
+          arrowPointAtCenter={true}
+          getPopupContainer={el => el.parentElement}>
           <div className={styles.rowData}>
             <div className={styles.modelSelect}>
               <input
