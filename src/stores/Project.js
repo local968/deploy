@@ -306,7 +306,7 @@ export default class Project {
   }
 
   @action
-  jump = (routeIndex, subStepActive) => ({ subStepActive, curSetting: routeIndex, mainStep: routeIndex, lastSubStep: 1 })
+  jump = (routeIndex, subStepActive) => ({ subStepActive, curStep: routeIndex, lastSubStep: 1 })
 
   @action
   nextMainStep = (routeIndex) => {
