@@ -306,6 +306,9 @@ export default class Project {
   }
 
   @action
+  jump = (routeIndex, subStepActive) => ({ subStepActive, curSetting: routeIndex, mainStep: routeIndex, lastSubStep: 1 })
+
+  @action
   nextMainStep = (routeIndex) => {
     let obj;
     if (routeIndex <= this.mainStep) {
@@ -892,7 +895,7 @@ export default class Project {
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
-    if(this.selectId) return this.models.find(m => m.id === this.selectId)
+    if (this.selectId) return this.models.find(m => m.id === this.selectId)
     return this.recommendModel
   }
 

@@ -922,13 +922,13 @@ class DiagnoseResult extends Component {
     updateProject(nextMainStep(2))
   }
   handleSetting = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(1, 3))
+    const { updateProject, jump } = this.props.project
+    updateProject(jump(3, 1))
     // history.push(`/modeling/${this.props.projectId}/1`);
   }
   handleOutlierFix = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(3, 2))
+    const { updateProject, jump } = this.props.project
+    updateProject(jump(2, 3))
     // history.push(`/data/${this.props.projectId}/5`);
   }
   render() {
