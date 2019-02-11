@@ -257,11 +257,20 @@ export default class AdvancedView extends Component {
     const { project } = this.props
     if (project && project.problemType) {
       return project.problemType === 'Classification' ? [{
-        display: 'acc',
+        display: 'ACC',
         key: 'acc'
       }, {
-        display: 'auc',
+        display: 'AUC',
         key: 'auc'
+      }, {
+        display: 'F1',
+        key: 'f1'
+      }, {
+        display: 'Precision',
+        key: 'precision'
+      }, {
+        display: 'Recall',
+        key: 'recall'
       }] : [{
         display: 'MSE',
         key: 'mse'
@@ -343,7 +352,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ minWidth: '80px' }}>
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '120px', fontSize: '1.125rem' }}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
