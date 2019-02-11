@@ -937,10 +937,10 @@ export default class Project {
         holdout = this.formatNumber(holdoutScore[measurement || 'r2'], 6)
       }
       const diff = this.formatNumber(Math.abs(validate - holdout), 6)
-      const base = this.formatNumber(validate / holdout, 6)
+      const base = problemType === 'Classification' ? this.formatNumber(validate / holdout, 6) : this.formatNumber(holdout / validate, 6)
       return { validate, holdout, diff, id, base }
     }).filter(v => !!v)
-    const holdoutArr = [...data].sort((a, b) => a.holdout - b.holdout)
+    const holdoutArr = problemType === 'Classification' ? [...data].sort((a, b) => a.holdout - b.holdout) : [...data].sort((a, b) => b.holdout - a.holdout)
     const diffArr = [...data].sort((a, b) => b.diff - a.diff)
     let recommend
     [...data].forEach(d => {

@@ -751,6 +751,7 @@ export class FixIssue extends Component {
                 const showMethod = (showType !== 'Categorical' &&
                   method !== mean &&
                   method !== 'drop' &&
+                  method !== 'ignore' &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
