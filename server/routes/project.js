@@ -216,7 +216,7 @@ function deleteModels(id) {
 
 function deleteProject(userId, id) {
   return checkProject(userId, id).then(err => {
-    if (err) return err
+    if (err.status !== 200) return err
     const pipeline = redis.pipeline();
     pipeline.del(`project:${id}`)
     pipeline.zrem(`user:${userId}:projects:updateTime`, id)
@@ -237,7 +237,7 @@ function checkProject(userId, id) {
       } catch (e) { }
     }
     if (result.userId !== userId) return { status: 421, message: "project error" }
-    return null
+    return { status: 200, message: 'ok', data: result }
   })
 }
 
@@ -375,7 +375,7 @@ wss.register("updateProject", (message, socket) => {
 
 
   return checkProject(userId, id).then(err => {
-    if (err) return err
+    if (err.status !== 200) return err
     return createOrUpdate(id, userId, data)
   })
 })
@@ -924,4 +924,10 @@ wss.register('getSample', (message, socket) => {
     })
     return { list }
   })
+})
+
+wss.register("checkProject", (message, socket) => {
+  const userId = socket.session.userId
+  const id = message.id
+  return checkProject(userId, id)
 })

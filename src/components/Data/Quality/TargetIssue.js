@@ -70,7 +70,7 @@ export class ClassificationTarget extends Component {
         })}>
           <div className={styles.targetPercentBox}>
             {Object.keys(targetCounts).map((v, k) => {
-              const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
+              const percent = (targetCounts[v] || 0) / (totalRawLines || 1) * 85
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
