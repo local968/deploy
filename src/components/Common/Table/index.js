@@ -11,7 +11,7 @@ export default class Table extends Component {
   }
 
   updateGrids = () => {
-    this.gridRef.current.forceUpdateGrids()
+    this.gridRef.current && this.gridRef.current.forceUpdateGrids()
   }
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
