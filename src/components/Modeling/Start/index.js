@@ -104,9 +104,9 @@ class AdvancedModel extends Component {
 
   modeling = () => {
     const { project, closeAdvanced } = this.props
-    const { advancedModeling, version, algorithms, dataHeader, newVariable, trainHeader, customHeader, informativesLabel } = project
+    const { advancedModeling, version, algorithms, dataHeader, newVariable, trainHeader, customHeader, informativesLabel, target } = project
     const allVariables = [...dataHeader, ...newVariable]
-    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     if (hasNewOne) project.customHeader.push(checkedVariables)
@@ -119,6 +119,9 @@ class AdvancedModel extends Component {
 
   render() {
     const { project, closeAdvanced } = this.props
+    const { dataHeader, newVariable, trainHeader, target } = project
+    const allVariables = [...dataHeader, ...newVariable]
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     return <div className={styles.advancedModel}>
       <div className={styles.advancedContent}>
         <div className={styles.tabBox}>
@@ -133,7 +136,9 @@ class AdvancedModel extends Component {
           <Preview project={project} />
           {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
           <div className={styles.bottom}>
-            <button className={styles.save} onClick={this.modeling} ><span>Go for Modeling</span></button>
+            <button className={classnames(styles.save, {
+              [styles.disable]: !checkedVariables.length
+            })} onClick={!checkedVariables.length ? null : this.modeling} ><span>Modeling</span></button>
             <button className={styles.cancel} onClick={closeAdvanced}><span>Cancel</span></button>
           </div>
         </div>

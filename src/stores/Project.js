@@ -310,6 +310,9 @@ export default class Project {
   }
 
   @action
+  jump = (routeIndex, subStepActive) => ({ subStepActive, curStep: routeIndex })
+
+  @action
   nextMainStep = (routeIndex) => {
     let obj;
     if (routeIndex <= this.mainStep) {
@@ -446,7 +449,7 @@ export default class Project {
     };
     updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
     if (this.problemType && this.changeProjectType !== this.problemType) {
-      if (this.train2ing) await this.abortTrainByEtl()
+      await this.abortTrainByEtl()
       //全部恢复到problem步骤
       const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, updObj, {
         mainStep: 2,
@@ -465,7 +468,7 @@ export default class Project {
   //修改上传文件
   @action
   fastTrackInit = async (name) => {
-    if (this.train2ing) await this.abortTrainByEtl()
+    await this.abortTrainByEtl()
     const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, { uploadFileName: [name] }, {
       mainStep: 2,
       curStep: 2,
@@ -533,7 +536,7 @@ export default class Project {
   @action
   endSchema = async () => {
     this.etling = true
-    if (this.train2ing) await this.abortTrainByEtl()
+    await this.abortTrainByEtl()
     await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
       colType: { ...this.colType },
@@ -562,7 +565,7 @@ export default class Project {
 
     if (!hasChange) return await Promise.resolve()
     this.etling = true
-    if (this.train2ing) await this.abortTrainByEtl()
+    await this.abortTrainByEtl()
     const data = Object.assign(this.defaultTrain, {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
@@ -896,11 +899,13 @@ export default class Project {
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
-    const { selectId, costOption, criteria, models, problemType, recommendModel } = this
-    if (selectId) {
-      const model = models.find(m => m.id === selectId)
-      if (model) return model
-    }
+    if (this.selectId) return this.models.find(m => m.id === this.selectId)
+    return this.recommendModel
+  }
+
+  @computed
+  get recommendModel() {
+    const { costOption, criteria, models, problemType, defualtRecommendModel } = this
     let model
     if (problemType === 'Classification') {
       const { TP, FN, FP, TN } = criteria === 'cost' ? costOption : { TP: 0, FN: 0, FP: 0, TN: 0 }
@@ -916,12 +921,12 @@ export default class Project {
         }
       }
     }
-    model = model || recommendModel
+    model = model || defualtRecommendModel
     return model
   }
 
   @computed
-  get recommendModel() {
+  get defualtRecommendModel() {
     const { models, problemType, measurement } = this
     const data = models.map(m => {
       const { score, id } = m
@@ -936,10 +941,10 @@ export default class Project {
         holdout = this.formatNumber(holdoutScore[measurement || 'r2'], 6)
       }
       const diff = this.formatNumber(Math.abs(validate - holdout), 6)
-      const base = this.formatNumber(validate / holdout, 6)
+      const base = problemType === 'Classification' ? this.formatNumber(validate / holdout, 6) : this.formatNumber(holdout / validate, 6)
       return { validate, holdout, diff, id, base }
     }).filter(v => !!v)
-    const holdoutArr = [...data].sort((a, b) => a.holdout - b.holdout)
+    const holdoutArr = problemType === 'Classification' ? [...data].sort((a, b) => a.holdout - b.holdout) : [...data].sort((a, b) => b.holdout - a.holdout)
     const diffArr = [...data].sort((a, b) => b.diff - a.diff)
     let recommend
     [...data].forEach(d => {
@@ -1155,9 +1160,10 @@ export default class Project {
     }))
   }
 
-  abortTrainByEtl = () => {
+  abortTrainByEtl = async () => {
     this.models = []
-    return this.abortTrain()
+    if (this.train2ing) return await this.abortTrain()
+    return
   }
 
   setModel = data => {

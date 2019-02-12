@@ -55,7 +55,7 @@ export class ClassificationTarget extends Component {
 
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
-    const { target, targetArrayTemp, colValueCounts, totalRawLines, renameVariable, targetCounts } = project
+    const { targetArrayTemp, totalRawLines, renameVariable, targetCounts } = project
     const error = Object.keys(targetCounts).length < 2
     const isGood = Object.keys(targetCounts).length === 2
     const text = (isGood && 'Target variable quality is good!') || 'Your target variable has more than two unique values'
@@ -70,7 +70,7 @@ export class ClassificationTarget extends Component {
         })}>
           <div className={styles.targetPercentBox}>
             {Object.keys(targetCounts).map((v, k) => {
-              const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
+              const percent = (targetCounts[v] || 0) / (totalRawLines || 1) * 85
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
@@ -610,11 +610,11 @@ export class FixIssue extends Component {
                     <select value={showMethod} onChange={this.mismatchSelect.bind(null, k)}>
                       {showType === 'Categorical' ? [
                         <option value={mode} key="mode">Replace with most frequent value</option>,
-                        <option value="drop" key="drop">Delete the row</option>,
+                        <option value="drop" key="drop">Delete the rows</option>,
                         <option value="ignore" key="ignore">Replace with a unique value</option>
                       ] : [
                           <option value={mean} key='mean'>Replace with mean value</option>,
-                          <option value="drop" key='drop'>Delete the row</option>,
+                          <option value="drop" key='drop'>Delete the rows</option>,
                           <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
                           <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
                           // <option value={mode} key='mode'>Replace with most frequent value</option>,
@@ -690,11 +690,11 @@ export class FixIssue extends Component {
                     <select value={showMethod} onChange={this.nullSelect.bind(null, k)}>
                       {showType === 'Categorical' ? [
                         <option value={mode} key="mode">Replace with most frequent value</option>,
-                        <option value="drop" key="drop">Delete the row</option>,
+                        <option value="drop" key="drop">Delete the rows</option>,
                         <option value='ignore' key='ignore'>Replace with a unique value</option>
                       ] : [
                           <option value={mean} key='mean'>Replace with mean value</option>,
-                          <option value="drop" key='drop'>Delete the row</option>,
+                          <option value="drop" key='drop'>Delete the rows</option>,
                           <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
                           <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
                           // <option value={mode} key='mode'>Replace with most frequent value</option>,
@@ -751,6 +751,7 @@ export class FixIssue extends Component {
                 const showMethod = (showType !== 'Categorical' &&
                   method !== mean &&
                   method !== 'drop' &&
+                  method !== 'ignore' &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
@@ -768,7 +769,7 @@ export class FixIssue extends Component {
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.outlierSelect.bind(null, k)}>
-                      <option value="drop" key='drop'>Delete the row</option>
+                      <option value="drop" key='drop'>Delete the rows</option>
                       <option value="ignore" key='ignore'>Do Nothing</option>
                       <option value={mean} key='mean'>Replace with mean value</option>
                       <option value={median} key='median'>Replace with median value</option>

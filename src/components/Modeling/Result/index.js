@@ -20,7 +20,7 @@ export default class ModelResult extends Component {
 
   deploy = () => {
     const { project } = this.props.projectStore;
-    const current = project.selectModel;
+    const { selectModel: current } = project
     const { newVariable, trainHeader, expression } = project
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
     const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]

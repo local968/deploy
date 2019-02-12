@@ -231,24 +231,48 @@ class ProjectStore {
   initProject = id => {
     return new Promise(resolve => {
       if (this.currentId === id) return resolve(true)
-      when(
-        () => !this.loading && !this.isInit,
-        () => {
-          if (!this.list.length) return resolve(false)
-          const project = this.list.find(row => {
-            return row.id === id
-          })
-          if (project) {
-            project.initProject()
-            project.initModels()
-            this.currentId = id
-            return resolve(true)
-          } else {
+      if (this.list.length) {
+        const project = this.list.find(row => {
+          return row.id === id
+        })
+        if (project) {
+          project.initProject()
+          project.initModels()
+          this.currentId = id
+          return resolve(true)
+        }
+      }
+      socketStore.ready().then(api => {
+        api.checkProject({ id }).then(result => {
+          const { status, data } = result
+          if (status !== 200) {
             return resolve(false)
           }
+          const hiddenProject = new Project(id + '', { ...data, visiable: false })
+          this.list.push(hiddenProject)
+          hiddenProject.initProject()
+          hiddenProject.initModels()
+          this.currentId = id
+          resolve(true)
         })
-    }
-    )
+      })
+      //   when(
+      //     () => !this.loading && !this.isInit,
+      //     () => {
+      //       if (!this.list.length) return resolve(false)
+      //       const project = this.list.find(row => {
+      //         return row.id === id
+      //       })
+      //       if (project) {
+      //         project.initProject()
+      //         project.initModels()
+      //         this.currentId = id
+      //         return resolve(true)
+      //       } else {
+      //         return resolve(false)
+      //       }
+      //     })
+    })
   }
 
   @action

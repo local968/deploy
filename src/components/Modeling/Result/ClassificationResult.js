@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon, message } from 'antd';
 import { observable } from 'mobx';
+import moment from 'moment';
 import { Hint, NumberInput, ProgressBar } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 import ModelProcessFlow from "./ModelProcessFlow"
@@ -30,6 +31,8 @@ export default class ClassificationView extends Component {
         if (!m.initialFitIndex) return
         m.updateModel({ fitIndex: m.initialFitIndex })
       })
+    } else {
+      this.handleSubmit()
     }
     this.props.project.updateProject(data)
   }
@@ -69,10 +72,12 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
+    if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
+    const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? 'Cost Based' : 'Recommend'
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -87,10 +92,10 @@ export default class ClassificationView extends Component {
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
-            <span>Selected Model :<a>&nbsp;{current.name}</a></span>
+            <span>Selected Model :<a className={styles.nohover}>&nbsp;{current.name}</a></span>
           </div>
           <div className={styles.row}>
-            <span>Target :<a>&nbsp;{project.target}</a></span>
+            <span>Target :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
           </div>
         </div>
         <Performance current={current} yes={yes} no={no} />
@@ -159,6 +164,8 @@ export default class ClassificationView extends Component {
         abortTrain={abortTrain}
         isAbort={isAbort}
         project={project}
+        recommendId={recommendModel.id}
+        text={text}
       />
     </div>
   }
@@ -282,7 +289,7 @@ class ModelTable extends Component {
   exportReport = (modelId) => () => {
     try {
       this.props.project.generateReport(modelId)
-    }catch(e) {
+    } catch (e) {
       message.error('export report error.')
       this.props.project.reportProgress = 0
       this.props.project.reportProgressText = 'init'
@@ -290,7 +297,14 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, isAbort, recommendId, text } = this.props;
+    const modelList = models.sort((a, b) => {
+      const aModelTime = a.name.split('.').splice(1, Infinity).join('.');
+      const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      const bModelTime = b.name.split('.').splice(1, Infinity).join('.');
+      const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      return aModelUnix - bModelUnix
+    })
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -336,7 +350,7 @@ class ModelTable extends Component {
           </div>
         </div>
         <div className={styles.data}>
-          {models.map((model, key) => {
+          {modelList.map((model, key) => {
             return (
               <ModelDetail
                 key={key}
@@ -344,6 +358,8 @@ class ModelTable extends Component {
                 isSelect={model.id === current.id}
                 onSelect={onSelect}
                 exportReport={this.exportReport(model.id)}
+                isRecommend={model.id === recommendId}
+                text={text}
               />
             );
           })}
@@ -368,7 +384,6 @@ class ModelTable extends Component {
 
 @observer
 class ModelDetail extends Component {
-
   @observable type = '';
   @observable visible = false;
 
@@ -386,65 +401,74 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect, exportReport } = this.props;
+    const { model, onSelect, isSelect, isRecommend, text, exportReport } = this.props;
     return (
       <div className={styles.rowBox}>
-        <div className={styles.rowData}>
-          <div className={styles.modelSelect}>
-            <input
-              type="radio"
-              name="modelSelect"
-              checked={isSelect}
-              onChange={onSelect.bind(null, model)}
-            />
+        <Tooltip
+          placement="left"
+          title={isRecommend ? text : 'Selected'}
+          visible={isSelect || isRecommend}
+          overlayClassName={styles.recommendLabel}
+          autoAdjustOverflow={false}
+          arrowPointAtCenter={true}
+          getPopupContainer={el => el.parentElement}>
+          <div className={styles.rowData}>
+            <div className={styles.modelSelect}>
+              <input
+                type="radio"
+                name="modelSelect"
+                checked={isSelect}
+                onChange={onSelect.bind(null, model)}
+              />
+            </div>
+            <div className={classnames(styles.cell, styles.name)}>
+              <Tooltip title={model.name}>{model.name}</Tooltip>
+            </div>
+            <div className={classnames(styles.cell, styles.predict)}>
+              <PredictedProgress
+                predicted={model.predicted[0]}
+                width={1.5}
+                height={0.2}
+                type={'success'}
+              />
+              <div className={styles.space} />
+              <PredictedProgress
+                predicted={model.predicted[1]}
+                width={1.5}
+                height={0.2}
+                type={'predicted'}
+              />
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.validationAcc.toFixed(2)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.score.validateScore.auc.toFixed(2)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>{model.executeSpeed + ' rows/s'}</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Variable} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Process} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <span onClick={exportReport}>Export</span>
+            </div>
           </div>
-          <div className={classnames(styles.cell, styles.name)}>
-            <Tooltip title={model.name}>{model.name}</Tooltip>
-          </div>
-          <div className={classnames(styles.cell, styles.predict)}>
-            <PredictedProgress
-              predicted={model.predicted[0]}
-              width={1.5}
-              height={0.2}
-              type={'success'}
-            />
-            <div className={styles.space} />
-            <PredictedProgress
-              predicted={model.predicted[1]}
-              width={1.5}
-              height={0.2}
-              type={'predicted'}
-            />
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.validationAcc.toFixed(2)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.score.validateScore.auc.toFixed(2)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>{model.executeSpeed + ' rows/s'}</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Variable} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Process} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <span onClick={exportReport}>Export</span>
-          </div>
-        </div>
+        </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
         {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
-      </div>
+      </div >
     );
   }
 }

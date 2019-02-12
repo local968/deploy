@@ -377,6 +377,7 @@ span.performanceScore {
     display: flex;
     flex-direction: column;
     flex: none;
+    position: relative;
 }
 
 .cell span {
@@ -394,8 +395,11 @@ span.performanceScore {
     display: flex;
     flex-direction: column;
     padding: 0.2em 0;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: visible;
     max-height: 5em;
+    margin-left: -200px;
+    padding-left: 200px;
 }
 
 .cell {
@@ -1024,4 +1028,13 @@ span.performanceScore {
   margin: 4px;
   display: flex;
   flex: auto;
+}
+.nohover:hover {
+  cursor: text;
+}
+
+.recommendLabel {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    white-space: nowrap;
 }

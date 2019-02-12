@@ -249,22 +249,24 @@ export default class AdvancedView extends Component {
                   </span>}
                 mouseLeaveDelay={0}
                 overlayStyle={{ maxWidth: '100%' }}>
-                <div className={styles.advancedAlgorithm} key={'solution-a'}>
-                  {/* <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} /> */}
-                  <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
-                  <label htmlFor={'R2-solution-a'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-a</label>
-                </div>
-              </Tooltip>
+                <div className={styles.advancedSolution}>
+                  <div className={styles.advancedAlgorithm} key={'solution-a'}>
+                    <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} />
+                    {/* <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} /> */}
+                    <label htmlFor={'R2-solution-a'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-a</label>
+                  </div>
+                  {/* </Tooltip>
               <Tooltip
                 title={<span className={styles.crossWarning}>
                   R2-solution-a & b are mandatory modelling algorithms for Advanced Modelling.
                   </span>}
                 mouseLeaveDelay={0}
-                overlayStyle={{ maxWidth: '100%' }}>
-                <div className={styles.advancedAlgorithm} key={'solution-b'}>
-                  {/* <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} /> */}
-                  <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
-                  <label htmlFor={'R2-solution-b'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-b</label>
+                overlayStyle={{ maxWidth: '100%' }}> */}
+                  <div className={styles.advancedAlgorithm} key={'solution-b'}>
+                    <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} />
+                    {/* <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} /> */}
+                    <label htmlFor={'R2-solution-b'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-b</label>
+                  </div>
                 </div>
               </Tooltip>
               {Algorithms[problemType].map((v, k) => {

@@ -257,11 +257,20 @@ export default class AdvancedView extends Component {
     const { project } = this.props
     if (project && project.problemType) {
       return project.problemType === 'Classification' ? [{
-        display: 'acc',
+        display: 'Accuracy',
         key: 'acc'
       }, {
-        display: 'auc',
+        display: 'AUC',
         key: 'auc'
+      }, {
+        display: 'F1',
+        key: 'f1'
+      }, {
+        display: 'Precision',
+        key: 'precision'
+      }, {
+        display: 'Recall',
+        key: 'recall'
       }] : [{
         display: 'MSE',
         key: 'mse'
@@ -343,7 +352,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ minWidth: '80px' }}>
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '120px', fontSize: '1.125rem' }}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
@@ -745,7 +754,7 @@ class RowCell extends Component {
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={data}
+        title={typeof data === 'object' ? '' : data}
       >
         {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
         {other}
@@ -922,13 +931,13 @@ class DiagnoseResult extends Component {
     updateProject(nextMainStep(2))
   }
   handleSetting = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(1, 3))
+    const { updateProject, jump } = this.props.project
+    updateProject(jump(3, 1))
     // history.push(`/modeling/${this.props.projectId}/1`);
   }
   handleOutlierFix = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(3, 2))
+    const { updateProject, jump } = this.props.project
+    updateProject(jump(2, 3))
     // history.push(`/data/${this.props.projectId}/5`);
   }
   render() {

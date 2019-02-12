@@ -2,6 +2,7 @@ const WebSocket = require('ws')
 const { redis, pubsub } = require('redis')
 const { saveMessage, removeMessage } = require('./reboot')
 const uuid = require('uuid')
+const moment = require('moment')
 
 const _apis = []
 const _subscribes = []
@@ -20,17 +21,25 @@ const init = (server, sessionParser) => {
     socket.send(JSON.stringify({ type: 'api', api: wss.api }))
     // init server side heartbeat
     socket.isAlive = true;
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '';
+    const log = `${ip} - ${req.session.userId} - [${moment().format()}] - ${moment().valueOf()} - connected - ${req.headers['user-agent'] || ''}`
+    redis.set(`log:${moment().format('YYYY:MM:DD')}:${uuid.v4()}}`, log)
     socket.on('pong', function () {
       this.isAlive = true
     });
     socket.on('message', wss.emit.bind(wss, 'message', socket));
     socket.on('close', (socket, code, reason) => {
       socket.isAlive = false;
+      const log = `${ip} - ${req.session.userId} - [${moment().format()}] - ${moment().valueOf()} - closed - ${req.headers['user-agent'] || ''}`
+      redis.set(`log:${moment().format('YYYY:MM:DD')}:${uuid.v4()}}`, log)
       // client closed
       // console.warn('socket closed, reason:' + reason + ' code:' + code)
     })
 
     socket.on('error', (socket, error) => {
+      const log = `${ip} - ${req.session.userId} - [${moment().format()}] - ${moment().valueOf()} - error - ${req.headers['user-agent'] || ''}`
+      redis.set(`log:${moment().format('YYYY:MM:DD')}:${uuid.v4()}}`, log)
+      // console.error(error)
       socket.isAlive = false;
       console.error('socket error:' + error)
     })

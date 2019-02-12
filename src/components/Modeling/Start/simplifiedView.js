@@ -135,7 +135,7 @@ export default class SimplifiedView extends Component {
                 getPath={project.histgramPlot.bind(null, target)}
                 path={histgramPlots[target]}
                 id={id}
-                fetch={project.histgramPlot.hasOwnProperty(target)}
+                fetch={project.histgramPlots.hasOwnProperty(target)}
               />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
@@ -275,7 +275,7 @@ class SimplifiedViewRow extends Component {
             getPath={project.histgramPlot.bind(null, value)}
             path={project.histgramPlots[value]}
             id={id}
-            fetch={project.histgramPlot.hasOwnProperty(value)}
+            fetch={project.histgramPlots.hasOwnProperty(value)}
           />} />}
       </div>
       <div className={styles.tableTd} onClick={this.showUnivariant}>
@@ -848,16 +848,16 @@ class FunctionTips extends Component {
   Concat() {
     return <div className={styles.funcTips}>
       <div className={styles.funcTipsName}><span>Concat()</span></div>
-      <div className={styles.funcTipsContent}><span>Combine function allows you to easily construct new variables by combine certaininterdependent variables (e.g. variables that describe the same object)</span></div>
+      <div className={styles.funcTipsContent}><span>Concat function allows you to easily construct new variables by combine certaininterdependent variables (e.g. variables that describe the same object)</span></div>
       <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
-      <div className={styles.funcTipsContent}><span>Combine(@var1, @var2, @var3,...p1, p2...)</span></div>
+      <div className={styles.funcTipsContent}><span>Concat(@var1, @var2, @var3,...p1, p2...)</span></div>
       <div className={styles.funcTipsTitle}><span>Input:</span></div>
       <div className={styles.funcTipsContent}><span>var1, var2, var3... – 2 or more numerical or categorical variables to be combined; the combination order are decided by the input order. All variables need to start with@.<br />
         p1, p2... - Number of variables in each combination; its number must be largerthan 1 but cannot be larger than the number of specified variables; combinations of p1 variables are created, then combinations of p2 variables are created, and so on.</span></div>
       <div className={styles.funcTipsTitle}><span>Output:</span></div>
       <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
       <div className={styles.funcTipsTitle}><span>Examples:</span></div>
-      <div className={styles.funcTipsContent}><span>Combine(@color, @theme, @size, 2)</span></div>
+      <div className={styles.funcTipsContent}><span>Concat(@color, @theme, @size, 2)</span></div>
       <div className={styles.funcTipsContent}><span>Output:</span></div>
       <div className={styles.funcTipsContent}>
         <Table
@@ -886,7 +886,7 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsContent}><span>Combine(@color, @theme, @size, 3)</span></div>
+      <div className={styles.funcTipsContent}><span>Concat(@color, @theme, @size, 3)</span></div>
       <div className={styles.funcTipsContent}><span>Output:</span></div>
       <div className={styles.funcTipsContent}>
         <Table
@@ -905,7 +905,7 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsContent}><span>Combine(@color, @theme, @size, 2, 3)</span></div>
+      <div className={styles.funcTipsContent}><span>Concat(@color, @theme, @size, 2, 3)</span></div>
       <div className={styles.funcTipsContent}><span>Output:</span></div>
       <div className={styles.funcTipsContent}>
         <Table
@@ -1041,7 +1041,7 @@ class FunctionTips extends Component {
           }]} />
       </div>
       <div className={styles.funcTipsTitle}><span>Notice:</span></div>
-      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory.Thetotal number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory.The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
     </div>
   }
 

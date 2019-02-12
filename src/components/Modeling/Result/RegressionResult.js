@@ -3,9 +3,10 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
+import moment from 'moment';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
-import { Tooltip, Icon } from 'antd'
+import { Tooltip, Icon, message } from 'antd'
 import ModelProcessFlow from "./ModelProcessFlow";
 import Process from "./Process.svg";
 import Variable from "./Variable.svg";
@@ -20,7 +21,8 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
+    if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
     return <div>
       <div className={styles.result}>
@@ -36,10 +38,10 @@ export default class RegressionView extends Component {
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
-            <span>Selected Model :<a>&nbsp;{current.name}</a></span>
+            <span>Selected Model :<a className={styles.nohover}>&nbsp;{current.name}</a></span>
           </div>
           <div className={styles.row}>
-            <span>Target :<a>&nbsp;{project.target}</a></span>
+            <span>Target :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
           </div>
           <Performance current={current} />
         </div>
@@ -64,6 +66,7 @@ export default class RegressionView extends Component {
         abortTrain={abortTrain}
         isAbort={isAbort}
         project={project}
+        recommendId={recommendModel.id}
       />
     </div>
   }
@@ -113,7 +116,14 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, isAbort } = this.props;
+    const { models, onSelect, train2Finished, current, trainModel, isAbort, recommendId } = this.props;
+    const modelList = models.sort((a, b) => {
+      const aModelTime = a.name.split('.').splice(1, Infinity).join('.');
+      const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      const bModelTime = b.name.split('.').splice(1, Infinity).join('.');
+      const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      return aModelUnix - bModelUnix
+    })
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -150,7 +160,7 @@ class ModelTable extends Component {
           </div>
         </div>
         <div className={styles.data}>
-          {models.map((model, key) => {
+          {modelList.map((model, key) => {
             return (
               <ModelDetail
                 key={key}
@@ -158,6 +168,7 @@ class ModelTable extends Component {
                 current={current}
                 onSelect={onSelect}
                 exportReport={this.exportReport(model.id)}
+                isRecommend={model.id === recommendId}
               />
             );
           })}
@@ -199,51 +210,61 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, current, exportReport } = this.props;
+    const { model, onSelect, current, isRecommend, exportReport } = this.props;
+    const isSelect = model.id === current.id
     return (
       <div className={styles.rowBox}>
-        <div className={styles.rowData}>
-          <div className={styles.modelSelect}>
-            <input
-              type="radio"
-              name="modelSelect"
-              defaultChecked={model.id === current.id}
-              onChange={onSelect.bind(null, model)}
-            />
+        <Tooltip
+          placement="left"
+          title={isRecommend ? 'Recommend' : 'Selected'}
+          visible={isSelect || isRecommend}
+          overlayClassName={styles.recommendLabel}
+          autoAdjustOverflow={false}
+          arrowPointAtCenter={true}
+          getPopupContainer={el => el.parentElement}>
+          <div className={styles.rowData}>
+            <div className={styles.modelSelect}>
+              <input
+                type="radio"
+                name="modelSelect"
+                defaultChecked={isSelect}
+                onChange={onSelect.bind(null, model)}
+              />
+            </div>
+            <div className={classnames(styles.cell, styles.name)}>
+              <Tooltip title={model.name}>{model.name}</Tooltip>
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.score.validateScore.rmse.toFixed(4)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>
+                {model.score.validateScore.r2.toFixed(4)}
+              </span>
+            </div>
+            <div className={styles.cell}>
+              <span>{model.executeSpeed + ' rows/s'}</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Variable} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <img src={Process} alt="" />
+              <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
+            </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <span onClick={exportReport}>Export</span>
+            </div>
           </div>
-          <div className={classnames(styles.cell, styles.name)}>
-            <Tooltip title={model.name}>{model.name}</Tooltip>
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.score.validateScore.rmse.toFixed(4)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>
-              {model.score.validateScore.r2.toFixed(4)}
-            </span>
-          </div>
-          <div className={styles.cell}>
-            <span>{model.executeSpeed + ' rows/s'}</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Variable} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <img src={Process} alt="" />
-            <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
-          </div>
-          <div className={classnames(styles.cell, styles.compute)}>
-            <span onClick={exportReport}>Export</span>
-          </div>
-        </div>
+        </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {/*{this.visible && <VariableImpact model={model} />}*/}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
         {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
-      </div>
+      </div >
     );
   }
 }
