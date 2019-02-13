@@ -978,45 +978,6 @@ span.performanceScore {
     font-weight: bold;
 }
 
-.sepCell {
-    display: flex;
-    flex: none;
-    width: 1em;
-    height: .4em;
-    position: relative;
-    flex-direction: column;
-}
-
-.sep {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    display: flex;
-    z-index: -1;
-}
-
-.sep span {
-    width: 100%;
-    border-top: 1px solid;
-    transform: rotate(21.8deg);
-}
-
-.sepText {
-    display: flex;
-    width: 50%;
-    height: 50%;
-    align-items: center;
-}
-
-.sepText span {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    font-size: .5rem;
-}
-
 .nohover:hover {
   cursor: text;
 }

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable } from 'mobx';
 import moment from 'moment';
-import { Hint, NumberInput, ProgressBar } from 'components/Common';
+import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 import ModelProcessFlow from "./ModelProcessFlow"
 import Variable from './Variable.svg'
@@ -125,11 +125,7 @@ export default class ClassificationView extends Component {
             <div className={styles.costBox}>
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
-                  <div className={styles.sepCell}>
-                    <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title='Predicted'>Predicted</span></div>
-                    <div className={styles.sep}><span></span></div>
-                    <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title='Actual'>Actual</span></div>
-                  </div>
+                  <HeaderInfo row='Predicted' col='Actual' />
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
                 </div>

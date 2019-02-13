@@ -16,6 +16,7 @@ import ProcessLoading from './ProcessLoading';
 import Hint from './Hint';
 import Range from './Range';
 import ProgressBar from './ProgressBar';
+import HeaderInfo from './HeaderInfo';
 
 export {
   BlackButton,
@@ -35,5 +36,6 @@ export {
   ProcessLoading,
   Hint,
   Range,
-  ProgressBar
+  ProgressBar,
+  HeaderInfo
 };
