@@ -39,7 +39,7 @@ export default class StartTrain extends Component {
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock}>
+            <div className={styles.trainBlock} onClick={this.fastTrain}>
               <div className={styles.trainRecommend}>
                 <span><Icon type="star" style={{ color: "#50647a" }} theme='filled' />Recommended</span>
               </div>
@@ -61,7 +61,7 @@ export default class StartTrain extends Component {
           </div>
           <div className={styles.trainSep}></div>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock}>
+            <div className={styles.trainBlock} onClick={this.advanced}>
               <div className={styles.trainImg}>
                 <img src={advancedIcon} alt="advanced" />
               </div>

@@ -310,7 +310,7 @@ export default class AdvancedView extends Component {
 
   constructor(props) {
     super(props);
-    this.metric = this.metricOptions.find(m => m.key === props.projectStore.project.currentSetting.setting.measurement)
+    this.metric = this.metricOptions.find(m => m.key === props.projectStore.project.currentSetting.setting.measurement) || this.metricOptions[0]
     autorun(() => {
       const { project } = props;
       if (project && project.measurement)
