@@ -11,6 +11,21 @@ import VariableImpact from './Model/VariableImpact'
 import ModelProcessFlow from './Model/ModelProcessFlow'
 import Score from './Score'
 
+const addComma = number => {
+  if (Number.isNaN(number)) return number
+  number = number.toString().split('')
+  if (number.length <= 3) return number.join('')
+  number.reverse()
+
+  let start = number.length
+  while (start % 3 !== 0) start++
+  start -= 3
+  for (let i = start; i > 2; i -= 3) {
+    number.splice(i, 0, ',')
+  }
+  return number.reverse().join('')
+}
+
 @inject('projectStore')
 @observer
 class Report extends Component {
@@ -30,6 +45,23 @@ class Report extends Component {
         <div className={styles.blockRow}>Problem Type: {project.problemType}</div>
         <div className={styles.blockRow}>Dataset: {project.fileNames[0] || '-'}</div>
         <div className={styles.blockRow}>Data Size: {'-'}</div>
+      </div>
+      <div className={styles.block}>
+        <h3 className={styles.blockTitle}>Data Schema</h3>
+        <div className={styles.schema}>
+          <div className={classnames(styles.schemaRow, styles.schemaHeader)}>
+            <span className={styles.schemaCell}>#row</span>
+            <span className={styles.schemaCell}>#col</span>
+            <span className={styles.schemaCell}>#cat</span>
+            <span className={styles.schemaCell}>#num</span>
+          </div>
+          <div className={styles.schemaRow}>
+            <span className={styles.schemaCell}>{addComma(project.totalRawLines)}</span>
+            <span className={styles.schemaCell}>{addComma(Object.entries(project.colType).length)}</span>
+            <span className={styles.schemaCell}>40</span>
+            <span className={styles.schemaCell}>60</span>
+          </div>
+        </div>
       </div>
       <div className={styles.block}>
         <h3 className={styles.blockTitle}>Summary</h3>

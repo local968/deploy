@@ -22,7 +22,7 @@ html {
 
 .blockTitle {
   font-size: 24px;
-  text-align: center;
+  text-align: left;
 }
 
 .profile {
@@ -52,9 +52,31 @@ html {
 .etlTitle {
   font-size: 16px;
   display: block;
-  text-align: center;
+  text-align: left;
 }
 
 .targetPlot {
   width: 450px;
+}
+
+.schema {
+  font-size: 16px;
+  width: 500px;
+  border-top: 1px solid #aaa;
+  border-left: 1px solid #aaa;
+}
+
+.schemaRow {
+  display: flex;
+}
+
+.schemaHeader {
+  background: #ccc;
+}
+
+.schemaCell {
+  padding: 2px 5px;
+  flex: 1 1 0;
+  border-bottom: 1px solid #aaa;
+  border-right: 1px solid #aaa;
 }

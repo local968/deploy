@@ -1506,7 +1506,6 @@ function loadFile(fileName, content) {
   var blob = new Blob([content], {
     type: 'text/plain'
   });
-  var evt = new Event('click');
   aLink.download = fileName;
   aLink.href = URL.createObjectURL(blob);
   aLink.click();
