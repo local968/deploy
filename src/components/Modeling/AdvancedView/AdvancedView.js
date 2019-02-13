@@ -190,14 +190,14 @@ export default class AdvancedView extends Component {
           }
         case 'Validation':
           {
-            const aModelData = metricKey === 'acc' ? formatNumber(aModel.validationAcc) : formatNumber(aModel.score.validateScore[metricKey])
-            const bModelData = metricKey === 'acc' ? formatNumber(bModel.validationAcc) : formatNumber(bModel.score.validateScore[metricKey])
+            const aModelData = metricKey === 'auc' ? formatNumber(aModel.score.validateScore[metricKey]) : formatNumber(aModel[metricKey + 'Validation'])
+            const bModelData = metricKey === 'auc' ? formatNumber(bModel.score.validateScore[metricKey]) : formatNumber(bModel[metricKey + 'Validation'])
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Holdout':
           {
-            const aModelData = metricKey === 'acc' ? formatNumber(aModel.holdoutAcc) : formatNumber(aModel.score.holdoutScore[metricKey])
-            const bModelData = metricKey === 'acc' ? formatNumber(bModel.holdoutAcc) : formatNumber(bModel.score.holdoutScore[metricKey])
+            const aModelData = metricKey === 'auc' ? formatNumber(aModel.score.holdoutScore[metricKey]) : formatNumber(aModel[metricKey + 'Holdout'])
+            const bModelData = metricKey === 'auc' ? formatNumber(bModel.score.holdoutScore[metricKey]) : formatNumber(bModel[metricKey + 'Holdout'])
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'KS':
@@ -578,11 +578,11 @@ class ClassificationModelRow extends Component {
                   />
                 );
               case 'F1-Score':
-                return <RowCell key={2} data={roc.F1[fitIndex]} />;
+                return <RowCell key={2} data={model.f1Validation} />;
               case 'Precision':
-                return <RowCell key={3} data={roc.Precision[fitIndex]} />;
+                return <RowCell key={3} data={model.precisionValidation} />;
               case 'Recall':
-                return <RowCell key={4} data={roc.Recall[fitIndex]} />;
+                return <RowCell key={4} data={model.recallValidation} />;
               case 'LogLoss':
                 return <RowCell key={5} data={roc.LOGLOSS[fitIndex]} />;
               case 'Cutoff Threshold':
@@ -590,9 +590,9 @@ class ClassificationModelRow extends Component {
               case 'KS':
                 return <RowCell key={7} data={roc.KS[fitIndex]} />;
               case 'Validation':
-                return <RowCell key={8} data={metric === 'acc' ? model.validationAcc : score.validateScore[metric]} />;
+                return <RowCell key={8} data={metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
               case 'Holdout':
-                return <RowCell key={9} data={metric === 'acc' ? model.holdoutAcc : score.holdoutScore[metric]} />;
+                return <RowCell key={9} data={metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
               default:
                 return null
             }

@@ -426,7 +426,7 @@ class ModelDetail extends Component {
             </div>
             <div className={styles.cell}>
               <span>
-                {model.validationAcc.toFixed(2)}
+                {model.accValidation.toFixed(2)}
               </span>
             </div>
             <div className={styles.cell}>

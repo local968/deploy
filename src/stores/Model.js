@@ -122,7 +122,7 @@ export default class Model {
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
   @computed
-  get validationAcc() {
+  get accValidation() {
     const data = this.chartData || {}
     const roc = data.roc || {}
     const { TP, FN, FP, TN } = roc
@@ -130,12 +130,54 @@ export default class Model {
     return (TP[this.fitIndex] + TN[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
   }
   @computed
-  get holdoutAcc() {
+  get accHoldout() {
     const data = this.chartData || {}
     const roc = data.rocHoldout || {}
     const { TP, FN, FP, TN } = roc
     if (!TP || !FN || !FP || !TN) return this.score.holdoutScore.acc
     return (TP[this.fitIndex] + TN[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
+  }
+  @computed
+  get precisionValidation() {
+    const data = this.chartData || {}
+    const roc = data.roc || {}
+    const { TP, FP } = roc
+    if (!TP || !FP) return this.score.validateScore.precision
+    return TP[this.fitIndex] / (TP[this.fitIndex] + FP[this.fitIndex])
+  }
+  @computed
+  get precisionHoldout() {
+    const data = this.chartData || {}
+    const roc = data.rocHoldout || {}
+    const { TP, FP } = roc
+    if (!TP || !FP) return this.score.holdoutScore.precision
+    return TP[this.fitIndex] / (TP[this.fitIndex] + FP[this.fitIndex])
+  }
+  @computed
+  get recallValidation() {
+    const data = this.chartData || {}
+    const roc = data.roc || {}
+    const { TP, FN } = roc
+    if (!TP || !FN) return this.score.validateScore.precision
+    return TP[this.fitIndex] / (TP[this.fitIndex] + FN[this.fitIndex])
+  }
+  @computed
+  get recallHoldout() {
+    const data = this.chartData || {}
+    const roc = data.rocHoldout || {}
+    const { TP, FN } = roc
+    if (!TP || !FN) return this.score.holdoutScore.precision
+    return TP[this.fitIndex] / (TP[this.fitIndex] + FN[this.fitIndex])
+  }
+  @computed
+  get f1Validation() {
+    const { precisionValidation, recallValidation } = this
+    return 2 * precisionValidation * recallValidation / (precisionValidation + recallValidation)
+  }
+  @computed
+  get f1Holdout() {
+    const { precisionHoldout, recallHoldout } = this
+    return 2 * precisionHoldout * recallHoldout / (precisionHoldout + recallHoldout)
   }
   modelProcessFlow(dataFlow) {
     const rawPara = dataFlow || this.dataFlow;
