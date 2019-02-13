@@ -1026,3 +1026,7 @@ span.performanceScore {
     line-height: 1.4;
     white-space: nowrap;
 }
+
+.recommendLabel :global(.ant-tooltip-inner) {
+    min-height: 0;
+}
