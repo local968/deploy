@@ -58,7 +58,7 @@ export class ClassificationTarget extends Component {
     const { targetArrayTemp, totalRawLines, renameVariable, targetCounts } = project
     const error = Object.keys(targetCounts).length < 2
     const isGood = Object.keys(targetCounts).length === 2
-    const text = (isGood && 'Target variable quality is good!') || 'Your target variable has more than two unique values'
+    const text = (isGood && 'Target variable quality is good!') || `Your target variable has ${error ? 'less' : 'more'} than two unique values`
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}

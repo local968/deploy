@@ -88,7 +88,7 @@ class TargetIssue extends Component {
     const warnings = []
     const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
     if (problemType === 'Classification') {
-      if (unique < 2) warnings.push("Your target variable has less than two unique values, It is recommended that you reselect a target variable or upload new data.")
+      if (unique < 2) warnings.push("Your target variable has less than two unique values. It is recommended that you reselect a target variable or upload new data.")
       if (unique === 2) {
         const min = Math.min(...Object.values(targetCounts))
         if (min < 3) warnings.push("It is recommended that you re-select target or upload new data.")

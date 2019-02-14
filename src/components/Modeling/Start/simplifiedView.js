@@ -848,12 +848,12 @@ class FunctionTips extends Component {
   Concat() {
     return <div className={styles.funcTips}>
       <div className={styles.funcTipsName}><span>Concat()</span></div>
-      <div className={styles.funcTipsContent}><span>Concat function allows you to easily construct new variables by combine certaininterdependent variables (e.g. variables that describe the same object)</span></div>
+      <div className={styles.funcTipsContent}><span>Concat function allows you to easily construct new variables by combine certaininter dependent variables (e.g. variables that describe the same object)</span></div>
       <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
       <div className={styles.funcTipsContent}><span>Concat(@var1, @var2, @var3,...p1, p2...)</span></div>
       <div className={styles.funcTipsTitle}><span>Input:</span></div>
       <div className={styles.funcTipsContent}><span>var1, var2, var3... – 2 or more numerical or categorical variables to be combined; the combination order are decided by the input order. All variables need to start with@.<br />
-        p1, p2... - Number of variables in each combination; its number must be largerthan 1 but cannot be larger than the number of specified variables; combinations of p1 variables are created, then combinations of p2 variables are created, and so on.</span></div>
+        p1, p2... - Number of variables in each combination; its number must be larger than 1 but cannot be larger than the number of specified variables; combinations of p1 variables are created, then combinations of p2 variables are created, and so on.</span></div>
       <div className={styles.funcTipsTitle}><span>Output:</span></div>
       <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
       <div className={styles.funcTipsTitle}><span>Examples:</span></div>
@@ -953,7 +953,7 @@ class FunctionTips extends Component {
       <div className={styles.funcTipsContent}><span>DIff(@var1, @var2, @var3,...row1,row2,...)</span></div>
       <div className={styles.funcTipsTitle}><span>Input:</span></div>
       <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be calculated the difference; All variables need to start with@.<br />
-        row1,row2,... – distance to be calculated; its number must be equal to or largerthan 1 but cannot be larger than the length of the variable(suggestion: larger the row, more missing values).</span></div>
+        row1,row2,... – distance to be calculated; its number must be equal to or larger than 1 but cannot be larger than the length of the variable(suggestion: larger the row, more missing values).</span></div>
       <div className={styles.funcTipsTitle}><span>Output:</span></div>
       <div className={styles.funcTipsContent}><span>1 or more numerical variables</span></div>
       <div className={styles.funcTipsTitle}><span>Examples:</span></div>
@@ -1053,7 +1053,7 @@ class FunctionTips extends Component {
       <div className={styles.funcTipsContent}><span>Quantile_bin(@var1, @var2, @var3,b, type1, type2)</span></div>
       <div className={styles.funcTipsTitle}><span>Input:</span></div>
       <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be divided; All variables need to start with@.<br />
-        b – number of groups to be divided; its number must be greater than 1 but cannotbe larger than the length of the variable(suggestion: many groups are meaningless)<br />
+        b – number of groups to be divided; its number must be greater than 1 but cannot be larger than the length of the variable(suggestion: many groups are meaningless)<br />
         type1,type2 – ways to dividing the variables; 0 and 1 are supported.<br />
         0: variable is divided by its percentile, each group is thesame size;<br />
         1: variable is divided by its value, each group is with the same value range.</span></div>
@@ -1133,7 +1133,7 @@ class FunctionTips extends Component {
       <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
       <div className={styles.funcTipsContent}><span>Custom_Quantile_bin(@var, [range_list1], [range_list2]...)</span></div>
       <div className={styles.funcTipsTitle}><span>Input:</span></div>
-      <div className={styles.funcTipsContent}><span>var - 1 numerical variable to be divided; Variable needs to start with@. [range_list1], [range_list2]... - customized range to dividing the variable; its firstnumber should be larger than the minimum value of the variable and the last number should be smaller than the maximum value of the variable; the length of the range_list decides the number of groups.</span></div>
+      <div className={styles.funcTipsContent}><span>var - 1 numerical variable to be divided; Variable needs to start with@. [range_list1], [range_list2]... - customized range to dividing the variable; its first number should be larger than the minimum value of the variable and the last number should be smaller than the maximum value of the variable; the length of the range_list decides the number of groups.</span></div>
       <div className={styles.funcTipsTitle}><span>Output:</span></div>
       <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
       <div className={styles.funcTipsTitle}><span>Examples:</span></div>

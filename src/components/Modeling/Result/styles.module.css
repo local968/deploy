@@ -423,6 +423,7 @@ span.performanceScore {
 
 .cellHeader {
     border: none;
+    cursor: pointer;
 }
 
 .name {
