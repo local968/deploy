@@ -140,7 +140,7 @@ class Report extends Component {
             <span className={styles.metricsCell}>Validation</span>
             <span className={styles.metricsCell} title={vs.auc}>{vs.auc}</span>
             <span className={styles.metricsCell} title={roc.Threshold[fitIndex]}>{roc.Threshold[fitIndex]}</span>
-            <span className={styles.metricsCell} title={model.accValication}>{model.accValication}</span>
+            <span className={styles.metricsCell} title={model.accValidation}>{model.accValidation}</span>
             <span className={styles.metricsCell} title={roc.Precision[fitIndex]}>{roc.Precision[fitIndex]}</span>
             <span className={styles.metricsCell} title={roc.Recall[fitIndex]}>{roc.Recall[fitIndex]}</span>
             <span className={styles.metricsCell} title={roc.F1[fitIndex]}>{roc.F1[fitIndex]}</span>
