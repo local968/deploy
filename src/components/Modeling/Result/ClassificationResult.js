@@ -3,9 +3,9 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon, message } from 'antd';
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import moment from 'moment';
-import { Hint, NumberInput, ProgressBar } from 'components/Common';
+import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 import ModelProcessFlow from "./ModelProcessFlow"
 import Variable from './Variable.svg'
@@ -125,11 +125,7 @@ export default class ClassificationView extends Component {
             <div className={styles.costBox}>
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
-                  <div className={styles.sepCell}>
-                    <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title='Predicted'>Predicted</span></div>
-                    <div className={styles.sep}><span></span></div>
-                    <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title='Actual'>Actual</span></div>
-                  </div>
+                  <HeaderInfo row='Predicted' col='Actual' />
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
                 </div>
@@ -282,6 +278,9 @@ class Performance extends Component {
 
 @observer
 class ModelTable extends Component {
+  @observable sortKey = 'name'
+  @observable sort = 1
+
   abortTrain = () => {
     this.props.abortTrain()
   }
@@ -295,28 +294,55 @@ class ModelTable extends Component {
       this.props.project.reportProgressText = 'init'
     }
   }
+  handleSort = key => {
+    const { sortKey, sort } = this
+    if (key === sortKey) return this.sort = -sort
+    this.sortKey = key
+    this.sort = 1
+  }
+
+  @computed
+  get sortModels() {
+    const { sortKey, sort, props: { models } } = this
+    const fn = (a, b) => {
+      switch (sortKey) {
+        case "acc":
+          return (a.accValidation - b.accValidation) * sort
+        case "auc":
+          return (a.score.validateScore.auc - b.score.validateScore.auc) * sort
+        case 'speed':
+          return (a.executeSpeed - b.executeSpeed) * sort
+        case "name":
+        default:
+          const aArr = a.name.split('.')
+          const bArr = b.name.split('.')
+          const aModelTime = aArr.slice(1).join('.');
+          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          const bModelTime = bArr.slice(1).join('.');
+          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          if (aModelUnix === bModelUnix) {
+            const aName = aArr.slice(0, 1)
+            const bName = bArr.slice(0, 1)
+            return aName > bName ? sort : -sort
+          }
+          return (aModelUnix - bModelUnix) * sort
+      }
+    }
+    return models.sort(fn)
+  }
 
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, isAbort, recommendId, text } = this.props;
-    const modelList = models.sort((a, b) => {
-      const aModelTime = a.name.split('.').splice(1, Infinity).join('.');
-      const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-      const bModelTime = b.name.split('.').splice(1, Infinity).join('.');
-      const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-      return aModelUnix - bModelUnix
-    })
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text } = this.props;
+    const { sortKey, sort } = this
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
           <div className={styles.rowData}>
-            <div
-              className={classnames(
-                styles.cell,
-                styles.name,
-                styles.cellHeader
-              )}
-            >
-              <span>Model Name</span>
+            <div className={classnames(styles.cell, styles.name, styles.cellHeader)} onClick={this.handleSort.bind(null, 'name')} >
+              <span>
+                Model Name
+                {sortKey !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              </span>
             </div>
             <div
               className={classnames(
@@ -325,17 +351,22 @@ class ModelTable extends Component {
                 styles.cellHeader
               )}
             />
-            <div className={classnames(styles.cell, styles.cellHeader)}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'acc')}>
               <span>
                 Accuracy
                 <Hint content={AccuracyHint} placement="right" />
+                {sortKey !== 'acc' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Performance(AUC)</span>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'auc')}>
+              <span>Performance(AUC)
+              {sortKey !== 'auc' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Execution Speed</span>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'speed')}>
+              <span>Execution Speed
+              {sortKey !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Variable Impact</span>
@@ -350,7 +381,7 @@ class ModelTable extends Component {
           </div>
         </div>
         <div className={styles.data}>
-          {modelList.map((model, key) => {
+          {this.sortModels.map((model, key) => {
             return (
               <ModelDetail
                 key={key}
@@ -441,7 +472,7 @@ class ModelDetail extends Component {
             </div>
             <div className={styles.cell}>
               <span>
-                {model.validationAcc.toFixed(2)}
+                {model.accValidation.toFixed(2)}
               </span>
             </div>
             <div className={styles.cell}>

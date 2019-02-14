@@ -23,6 +23,19 @@ export default class ProjectSide extends Component {
         window.removeEventListener('resize', this.reset)
     }
 
+    check = () => {
+        const parent = this.domRef.current.parentElement
+        const prev = this.domRef.current.previousSibling
+        const max = prev.clientWidth
+        const min = parent.clientWidth
+        if (this.min === min && this.max === max) return false
+        this.right = 0
+        parent.scrollLeft = 0
+        this.max = max
+        this.min = min
+        return true
+    }
+
     reset = () => {
         if (this.loading) return
         if (!this.domRef.current) return
@@ -33,13 +46,15 @@ export default class ProjectSide extends Component {
             this.loading = false
             return setTimeout(this.reset, 100)
         }
-        this.right = 0
-        parent.scrollLeft = 0
-        const max = prev.clientWidth
-        const min = parent.clientWidth
-        if (max > min) {
-            parent.onscroll = e => {
-                this.right = Math.min(max - min, e.target.scrollLeft) * -1
+        const checked = this.check()
+        if (checked) {
+            if (this.max > this.min) {
+                const parent = this.domRef.current.parentElement
+                parent.onscroll = e => {
+                    const checkedByscroll = this.check()
+                    if (checkedByscroll) return
+                    this.right = Math.min(this.max - this.min, e.target.scrollLeft) * -1
+                }
             }
         }
         this.loading = false

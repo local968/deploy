@@ -270,6 +270,7 @@
 	flex: none;
 	overflow: hidden;
 	flex-direction: column;
+	justify-content: space-around;
 }
 
 .infoBox {

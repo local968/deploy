@@ -58,8 +58,8 @@ export class ClassificationTarget extends Component {
     const { targetArrayTemp, totalRawLines, renameVariable, targetCounts } = project
     const error = Object.keys(targetCounts).length < 2
     const isGood = Object.keys(targetCounts).length === 2
-    const text = (isGood && 'Target variable quality is good!') || 'Your target variable has more than two unique values'
-    return error ? null : <div className={styles.block}>
+    const text = (isGood && 'Target variable quality is good!') || `Your target variable has ${error ? 'less' : 'more'} than two unique values`
+    return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
         <span>{text}</span>
@@ -116,12 +116,12 @@ export class ClassificationTarget extends Component {
                 <button><span>Load a New Dataset</span></button>
               </div>
             </div>
-            <div className={styles.method}>
+            {!error && <div className={styles.method}>
               <div className={styles.reason}><span>The target variable has some noises</span></div>
               <div className={styles.button} onClick={editTarget}>
                 <button><span>Fix it</span></button>
               </div>
-            </div>
+            </div>}
           </div>
         </div>}
       </div>
@@ -299,16 +299,19 @@ export class SelectTarget extends Component {
       [checked[maxKey]]: 0,
       [checked[1 - maxKey]]: 1
     }
+    // 重置rename
+    const renameVariable = {}
     this[`belongTo${maxKey}`].forEach(v0 => {
       targetMap[v0] = 0
-      this.props.project.renameVariable[v0] = checked[maxKey]
+      renameVariable[v0] = checked[maxKey]
     })
     this[`belongTo${1 - maxKey}`].forEach(v1 => {
       targetMap[v1] = 1
-      this.props.project.renameVariable[v1] = checked[1 - maxKey]
+      renameVariable[v1] = checked[1 - maxKey]
     })
     this.props.project.targetArrayTemp = [checked[maxKey], checked[1 - maxKey]];
     this.props.project.targetMapTemp = targetMap;
+    this.props.project.renameVariable = renameVariable
     this.props.saveTargetFixes()
   }
 
@@ -598,7 +601,7 @@ export class FixIssue extends Component {
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
-                  method !== 0) ? 'others' : method
+                  method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>
@@ -623,7 +626,7 @@ export class FixIssue extends Component {
                           <option value={''} key='others'>Replace with others</option>
                         ]}
                     </select>
-                    {showMethod === 'others' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
+                    {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
                   </div>
                 </div>
               })}
@@ -673,7 +676,7 @@ export class FixIssue extends Component {
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
-                  method !== 0) ? 'others' : method
+                  method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
                   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
@@ -703,7 +706,7 @@ export class FixIssue extends Component {
                           <option value={''} key='others'>Replace with others</option>
                         ]}
                     </select>
-                    {showMethod === 'others' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'missing', k)} />}
+                    {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'missing', k)} />}
                   </div>
                 </div>
               })}
@@ -755,7 +758,7 @@ export class FixIssue extends Component {
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
-                  method !== 0) ? 'others' : method
+                  method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
@@ -777,7 +780,7 @@ export class FixIssue extends Component {
                       <option value={0} key='0'>Replace with 0</option>,
                     <option value={''} key='others'>Replace with others</option>
                     </select>
-                    {showMethod === 'others' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
+                    {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
                   </div>
                 </div>
               })}

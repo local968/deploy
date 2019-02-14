@@ -315,6 +315,7 @@ span.performanceScore {
     text-overflow: ellipsis;
     display: block;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .progressMeans {
@@ -422,6 +423,7 @@ span.performanceScore {
 
 .cellHeader {
     border: none;
+    cursor: pointer;
 }
 
 .name {
@@ -1037,4 +1039,8 @@ span.performanceScore {
     font-size: 0.875rem;
     line-height: 1.4;
     white-space: nowrap;
+}
+
+.recommendLabel :global(.ant-tooltip-inner) {
+    min-height: 0;
 }

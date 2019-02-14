@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import moment from 'moment';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
@@ -102,6 +102,9 @@ class Performance extends Component {
 
 @observer
 class ModelTable extends Component {
+  @observable sortKey = 'name'
+  @observable sort = 1
+
   abortTrain = () => {
     this.props.abortTrain()
   }
@@ -115,15 +118,46 @@ class ModelTable extends Component {
     }
   }
 
+  handleSort = key => {
+    const { sortKey, sort } = this
+    if (key === sortKey) return this.sort = -sort
+    this.sortKey = key
+    this.sort = 1
+  }
+
+  @computed
+  get sortModels() {
+    const { sortKey, sort, props: { models } } = this
+    const fn = (a, b) => {
+      switch (sortKey) {
+        case "rmse":
+          return (a.score.validateScore.rmse - b.score.validateScore.rmse) * sort
+        case "r2":
+          return (a.score.validateScore.r2 - b.score.validateScore.r2) * sort
+        case 'speed':
+          return (a.executeSpeed - b.executeSpeed) * sort
+        case "name":
+        default:
+          const aArr = a.name.split('.')
+          const bArr = b.name.split('.')
+          const aModelTime = aArr.slice(1).join('.');
+          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          const bModelTime = bArr.slice(1).join('.');
+          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          if (aModelUnix === bModelUnix) {
+            const aName = aArr.slice(0, 1)
+            const bName = bArr.slice(0, 1)
+            return aName > bName ? sort : -sort
+          }
+          return (aModelUnix - bModelUnix) * sort
+      }
+    }
+    return models.sort(fn)
+  }
+
   render() {
-    const { models, onSelect, train2Finished, current, trainModel, isAbort, recommendId } = this.props;
-    const modelList = models.sort((a, b) => {
-      const aModelTime = a.name.split('.').splice(1, Infinity).join('.');
-      const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-      const bModelTime = b.name.split('.').splice(1, Infinity).join('.');
-      const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-      return aModelUnix - bModelUnix
-    })
+    const { sortKey, sort } = this
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -134,19 +168,27 @@ class ModelTable extends Component {
                 styles.name,
                 styles.cellHeader
               )}
+              onClick={this.handleSort.bind(null, 'name')}
             >
-              <span>Model Name</span>
-            </div>
-            <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>RMSE</span>
-            </div>
-            <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>
-                R<sup>2</sup>
+              <span>Model Name
+              {sortKey !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Execution Speed</span>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'rmse')}>
+              <span>RMSE
+              {sortKey !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              </span>
+            </div>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'r2')}>
+              <span>
+                R<sup>2</sup>
+                {sortKey !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              </span>
+            </div>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'speed')}>
+              <span>Execution Speed
+              {sortKey !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Variable Impact</span>
@@ -160,7 +202,7 @@ class ModelTable extends Component {
           </div>
         </div>
         <div className={styles.data}>
-          {modelList.map((model, key) => {
+          {this.sortModels.map((model, key) => {
             return (
               <ModelDetail
                 key={key}

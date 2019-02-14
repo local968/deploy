@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Checkbox } from 'antd';
-import {inject, observer} from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import styles from './D3Chart.module.css';
 // import d3tips from './d3-tip';
 
@@ -48,8 +48,6 @@ export default class RocChart extends Component {
   }
 
   drawChart = (data, x, y, svg, height, line, index, color, lineEnable = true, width) => {
-    const lastEl = data[data.length - 1];
-
     if (index === 0) {
       // add the Y gridlines
       svg.append('g')
@@ -71,7 +69,7 @@ export default class RocChart extends Component {
         .attr('transform', 'translate(0,' + height + ')')
         .call(d3.axisBottom(x))
         .append('text')
-        .attr('x', x(lastEl.FPR + 0.1)+10)
+        .attr('x', width - 50)
         .attr('y', -10)
         .attr('fill', '#000')
         .text('false positive rate');
@@ -97,16 +95,16 @@ export default class RocChart extends Component {
     return data;
   };
 
-  newSort(index){
+  newSort(index) {
     clearTimeout(window.changeCutoff);
-    window.changeCutoff = setTimeout(()=>{
+    window.changeCutoff = setTimeout(() => {
       this.props.projectStore.changeStopFilter(false);
       this.props.model.setFitIndex(index);
-    },800)
+    }, 800)
   }
 
   drawFocus = (self, x, y, data, focus) => {
-    const { model,projectStore } = this.props;
+    const { model, projectStore } = this.props;
     const x0 = x.invert(d3.mouse(self)[0]);
 
     const index = this.getNearestPoint(x0, data, 'FPR');
@@ -179,20 +177,37 @@ export default class RocChart extends Component {
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    x.domain([d3.min(data, d => d.FPR), d3.max(data, function (d) { return d.FPR; })]);
-    y.domain([d3.min(data, d => d.TPR), d3.max(data, function (d) { return d.TPR; })]);
-
     if (compareChart) {
       const { models } = this.props;
-      models.forEach((m, index) => {
-        const {chartData} = m
-        if(!chartData){
-          return
-        }
+      let xRange = [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER]
+      let yRange = [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER]
+      const list = models.map(m => {
+        const { chartData } = m
+        if (!chartData) return null
+        const data = parseData(chartData.roc)
+        const xDomain = [d3.min(data, d => d.FPR), d3.max(data, function (d) { return d.FPR; })]
+        const yDomain = [d3.min(data, d => d.TPR), d3.max(data, function (d) { return d.TPR; })]
+        xRange = [xRange[0] < xDomain[0] ? xRange[0] : xDomain[0], xRange[1] > xDomain[1] ? xRange[1] : xDomain[1]]
+        yRange = [yRange[0] < yDomain[0] ? yRange[0] : yDomain[0], yRange[1] > yDomain[1] ? yRange[1] : yDomain[1]]
         const lineEnable = this.state.options.indexOf(m.name) >= 0;
-        this.drawChart(parseData(chartData.roc), x, y, svg, height, line, index, color, lineEnable, width);
-      });
+        return { data, lineEnable }
+      }).filter(l => !!l)
+      x.domain(xRange);
+      y.domain(yRange);
+      list.forEach((d, index) => {
+        this.drawChart(d.data, x, y, svg, height, line, index, color, d.lineEnable, width);
+      })
+      // models.forEach((m, index) => {
+      //   const { chartData } = m
+      //   if (!chartData) {
+      //     return
+      //   }
+      //   const lineEnable = this.state.options.indexOf(m.name) >= 0;
+      //   this.drawChart(parseData(chartData.roc), x, y, svg, height, line, index, color, lineEnable, width);
+      // });
     } else {
+      x.domain([d3.min(data, d => d.FPR), d3.max(data, function (d) { return d.FPR; })]);
+      y.domain([d3.min(data, d => d.TPR), d3.max(data, function (d) { return d.TPR; })]);
       data = this.drawChart(data, x, y, svg, height, line, 0, color, true, width);
     }
 

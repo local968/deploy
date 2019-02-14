@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
 import { Checkbox } from 'antd'
-import { Select, ContinueButton, ProcessLoading, Table, Hint } from 'components/Common';
+import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo } from 'components/Common';
 
 @inject('projectStore')
 @observer
@@ -136,7 +136,7 @@ export default class DataSchema extends Component {
         cn: styles.titleCell
       }
       if (i === index.columnHeader - 1) {
-        headerData.content = <span>row/header</span>;
+        headerData.content = <HeaderInfo row='Header' col='Row' height='34px' width='100%' />
         headerData.title = '';
       } else {
         headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
@@ -225,6 +225,8 @@ export default class DataSchema extends Component {
     const { etling, etlProgress, sortHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated } } = project;
     const targetOption = {};
     const tableData = this.formatTable()
+    const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
+
     //target选择列表
     sortHeader.forEach(h => {
       h = h.trim()
@@ -289,7 +291,7 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || !target} text="Continue" />
+        <ContinueButton onClick={this.doEtl} disabled={etling || !target || (newDataHeader.length <= 1 && newDataHeader.indexOf(target) > -1)} text="Continue" />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>Skip Data Quality Check</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
