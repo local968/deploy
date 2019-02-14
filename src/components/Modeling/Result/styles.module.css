@@ -315,6 +315,7 @@ span.performanceScore {
     text-overflow: ellipsis;
     display: block;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .progressMeans {

@@ -13,7 +13,7 @@ function parseData(chartData) {
   const LIFT = chartData.LIFT;
 
   return Object.values(PERCENTAGE).reduce((result, value, index) => {
-    result.push({PERCENTAGE: value, LIFT: LIFT[index]});
+    result.push({ PERCENTAGE: value, LIFT: LIFT[index] });
     return result;
   }, [])
 }
@@ -30,21 +30,21 @@ export default class PRChart extends Component {
     movable: true
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.renderD3();
   }
-  componentDidUpdate () {
+  componentDidUpdate() {
     d3.select(`.${this.props.className} svg`).remove();
     this.renderD3();
   }
-  handleCheck = (val, {target: {checked}}) => {
+  handleCheck = (val, { target: { checked } }) => {
     const op = new Set(this.state.options);
     if (checked)
       op.add(val);
     else
       op.delete(val);
 
-    this.setState({options: [...op]});
+    this.setState({ options: [...op] });
   }
 
   drawPoints = (data, x, y, svg, color, tool_tip, name) => {
@@ -82,7 +82,7 @@ export default class PRChart extends Component {
         .attr('transform', 'translate(0,' + height + ')')
         .call(d3.axisBottom(x).tickFormat(d3.format('.0%')))
         .append('text')
-        .attr('x', x(1) + 30)
+        .attr('x', x(1) - 30)
         .attr('y', -10)
         .attr('fill', '#000')
         .text('percentage');
@@ -111,7 +111,7 @@ export default class PRChart extends Component {
   drawFocus = (self, x, y, data, focus) => {
     if (!focus) return null;
 
-    const {model} = this.props;
+    const { model } = this.props;
     const x0 = x.invert(d3.mouse(self)[0]);
     const index = this.getNearestPoint(x0, data, 'PERCENTAGE');
     const d = data[index];
@@ -123,7 +123,7 @@ export default class PRChart extends Component {
     // this.props.view.panel.models[panelIndex].getMouseOverData(d);
   };
 
-  getNearestPoint (val, data, key) {
+  getNearestPoint(val, data, key) {
     let index;
     let minOffset = 1;
     data.forEach((d, i) => {
@@ -136,26 +136,26 @@ export default class PRChart extends Component {
     return index;
   }
 
-  render () {
-    const {compareChart} = this.props;
+  render() {
+    const { compareChart } = this.props;
     const names = compareChart && this.props.models.map(m => m.name);
     return (
       <div className={`${styles.chart} ${this.props.className}`}>
         {compareChart && <div className={styles.liftHoverPanel} />}
         {compareChart && <div className={styles.checkbox} >
-          {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{color: d3ColorsCategory20[i]}} key={o} >{o}</Checkbox>)}
+          {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{ color: d3ColorsCategory20[i] }} key={o} >{o}</Checkbox>)}
         </div>}
       </div>
     );
   }
 
   renderD3 = () => {
-    let {height, width} = this.props;
-    const {model, isFocus, compareChart, models} = this.props;
-    const {chartData} = model;
+    let { height, width } = this.props;
+    const { model, isFocus, compareChart } = this.props;
+    const { chartData } = model;
     if (!chartData) return null;
 
-    const margin = {top: 5, right: 20, bottom: 20, left: 50};
+    const margin = { top: 5, right: 20, bottom: 20, left: 50 };
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
 
@@ -185,25 +185,32 @@ export default class PRChart extends Component {
 
     let data = parseData(chartData.lift);
 
-    x.domain([0, d3.max(data, function (d) {return d.PERCENTAGE;})]);
-    y.domain([0, d3.max(data, function (d) {return d.LIFT;})]);
-
     if (compareChart) {
-      models.forEach((m, index) => {
-        const {chartData} = m
-        if(!chartData){
-          return
-        }
-        const modelData = parseData(chartData.lift);
+      const { models } = this.props;
+      let xMax = Number.MIN_SAFE_INTEGER
+      let yMax = Number.MIN_SAFE_INTEGER
+      const list = models.map(m => {
+        const { chartData, name } = m
+        if (!chartData) return null
+        const data = parseData(chartData.lift);
+        const xDomain = d3.max(data, function (d) { return d.PERCENTAGE; })
+        const yDomain = d3.max(data, function (d) { return d.LIFT; })
+        xMax = xMax > xDomain ? xMax : xDomain
+        yMax = yMax > yDomain ? yMax : yDomain
         const lineEnable = this.state.options.indexOf(m.name) >= 0;
-        this.drawChart(modelData, x, y, svg, height, line, index, color, lineEnable, width);
-        if (lineEnable) {
+        return { data, lineEnable, name }
+      }).filter(l => !!l)
+      x.domain([0, xMax]);
+      y.domain([0, yMax]);
+      list.forEach((l, index) => {
+        this.drawChart(l.data, x, y, svg, height, line, index, color, l.lineEnable, width);
+        if (l.lineEnable) {
           const tool_tip = d3tips(`.${styles.liftHoverPanel}`)
             .offset(d => ([y(d.LIFT), x(d.PERCENTAGE) + 60]))
-            .html(function(d) {
+            .html(function (d) {
               return (
                 `
-                  <h4 >${m.name}</h4>
+                  <h4 >${l.name}</h4>
                   <div>percentage: ${d.PERCENTAGE}</div>
                   <div>lift: ${d.LIFT}</div>
                 `
@@ -214,11 +221,13 @@ export default class PRChart extends Component {
         }
       });
     } else {
+      x.domain([0, d3.max(data, function (d) { return d.PERCENTAGE; })]);
+      y.domain([0, d3.max(data, function (d) { return d.LIFT; })]);
       data = this.drawChart(data, x, y, svg, height, line, 0, color, true, width);
     }
 
     if (isFocus) {
-      const {fitIndex} = model;
+      const { fitIndex } = model;
       const initalData = data[fitIndex];
       const focus = svg.append('g')
         .attr('class', styles.focus)
@@ -232,7 +241,7 @@ export default class PRChart extends Component {
         .attr('height', height)
         .on('click', function () {
           _this.drawFocus(this, x, y, data, focus);
-          _this.setState({movable: !_this.state.movable});
+          _this.setState({ movable: !_this.state.movable });
         })
         .on('mousemove', function () {
           if (!_this.state.movable) return;
