@@ -5,8 +5,6 @@ import classnames from 'classnames';
 import Summary from './Summary'
 import CorrelationMatrix from 'components/Modeling/Start/CorrelationMatrix'
 import VariableList from './VariableList'
-import ClassificationPerformance from './Model/ClassificationPerformance'
-import RegressionPerformance from './Model/RegressionPerformance'
 import VariableImpact from './Model/VariableImpact'
 import ModelProcessFlow from './Model/ModelProcessFlow'
 import Score from './Score'
@@ -33,10 +31,22 @@ class Report extends Component {
     super(props)
     props.projectStore.currentId = props.projectStore.list[0].id
   }
+
+  reset = () => {
+    const project = this.props.projectStore.project
+    project.selectModel.resetFitIndex()
+    project.costOption.FN = 0
+    project.costOption.FP = 0
+    project.costOption.TN = 0
+    project.costOption.TP = 0
+  }
+
   render() {
     const { projectStore: { project } } = this.props
+    const { selectModel: model } = project
+    const { score: { validateScore: vs, holdoutScore: hs }, fitIndex, chartData: { roc, rocHoldout: roch } } = model
     return <div className={styles.report}>
-      <h1 className={styles.title}>Report</h1>
+      <h1 className={styles.title}>Project Report: {project.name}</h1>
       <div className={classnames(styles.block, styles.profile)}>
         <h3 className={styles.blockTitle}>Profile</h3>
         <div className={styles.blockRow}>Project Name: {project.name || '-'}</div>
@@ -58,30 +68,17 @@ class Report extends Component {
           <div className={styles.schemaRow}>
             <span className={styles.schemaCell}>{addComma(project.totalRawLines)}</span>
             <span className={styles.schemaCell}>{addComma(Object.entries(project.colType).length)}</span>
-            <span className={styles.schemaCell}>40</span>
-            <span className={styles.schemaCell}>60</span>
+            <span className={styles.schemaCell}>{addComma(Object.entries(project.colType).filter(([k, v]) => v === 'Categorical').length)}</span>
+            <span className={styles.schemaCell}>{addComma(Object.entries(project.colType).filter(([k, v]) => v === 'Numerical').length)}</span>
           </div>
         </div>
       </div>
       <div className={styles.block}>
-        <h3 className={styles.blockTitle}>Summary</h3>
+        <h3 className={styles.blockTitle}>Data Quality:</h3>
         <Summary project={project} />
       </div>
       <div className={styles.block}>
-        <h3 className={styles.blockTitle}>Target:{project.target}</h3>
-        <div className={styles.blockRow}>
-          <div className={styles.target}>
-            <span className={styles.etlTitle}>Before ETL</span>
-            <img className={styles.targetPlot} src={project.rawHistgramPlotsBase64[project.target]} />
-          </div>
-          <div className={styles.target}>
-            <span className={styles.etlTitle}>After ETL</span>
-            <img className={styles.targetPlot} src={project.histgramPlotsBase64[project.target]} />
-          </div>
-        </div>
-      </div>
-      <div className={styles.block}>
-        <h3 className={styles.blockTitle}>Variable List</h3>
+        <h3 className={styles.blockTitle}>Exploratory Data Analysis</h3>
         <div className={styles.blockRow}><VariableList project={project} /></div>
       </div>
       <div className={styles.block}>
@@ -90,22 +87,90 @@ class Report extends Component {
           data={project.correlationMatrixData}
           header={project.correlationMatrixHeader} /></div>
       </div>
+      <h1 className={styles.title}>Model Result: </h1>
       <div className={styles.block}>
-        <h3 className={styles.blockTitle}>Model: {project.selectModel.name}</h3>
-        {project.problemType === 'Classification' && <div className={styles.blockRow}><ClassificationPerformance project={project} /></div>}
-        {project.problemType === 'Regression' && <div className={classnames(styles.blockRow, styles.performance)}><RegressionPerformance project={project} /></div>}
+        <h3 className={styles.blockTitle}>Model Name: {project.selectModel.name}</h3>
+        {/* {project.problemType === 'Classification' && <div className={styles.blockRow}><ClassificationPerformance project={project} /></div>} */}
+        {/* {project.problemType === 'Regression' && <div className={classnames(styles.blockRow, styles.performance)}><RegressionPerformance project={project} /></div>} */}
+      </div>
+      <div className={classnames(styles.block, styles.VariableImpact)}>
+        <h3 className={styles.blockTitle}>Metrics:</h3>
+        {project.problemType === 'Regression' && <div className={styles.metrics}>
+          <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
+            <span className={styles.metricsCell}></span>
+            <span className={styles.metricsCell}>R²</span>
+            <span className={styles.metricsCell}>Adjusted R²</span>
+            <span className={styles.metricsCell}>MSE</span>
+            <span className={styles.metricsCell}>RMSE</span>
+            <span className={styles.metricsCell}>NRMSE</span>
+            <span className={styles.metricsCell}>MAE</span>
+          </div>
+          <div className={styles.metricsRow}>
+            <span className={styles.metricsCell}>Validation</span>
+            <span className={styles.metricsCell} title={vs.r2}>{vs.r2}</span>
+            <span className={styles.metricsCell} title={vs.adjustR2}>{vs.adjustR2}</span>
+            <span className={styles.metricsCell} title={vs.mse}>{vs.mse}</span>
+            <span className={styles.metricsCell} title={vs.rmse}>{vs.rmse}</span>
+            <span className={styles.metricsCell} title={vs.nrmse}>{vs.nrmse}</span>
+            <span className={styles.metricsCell} title={vs.mae}>{vs.mae}</span>
+          </div>
+          <div className={styles.metricsRow}>
+            <span className={styles.metricsCell}>Holdout</span>
+            <span className={styles.metricsCell} title={hs.r2}>{hs.r2}</span>
+            <span className={styles.metricsCell} title={hs.adjustR2}>{hs.adjustR2}</span>
+            <span className={styles.metricsCell} title={hs.mse}>{hs.mse}</span>
+            <span className={styles.metricsCell} title={hs.rmse}>{hs.rmse}</span>
+            <span className={styles.metricsCell} title={hs.nrmse}>{hs.nrmse}</span>
+            <span className={styles.metricsCell} title={hs.mae}>{hs.mae}</span>
+          </div>
+        </div>}
+        {project.problemType === 'Classification' && <div className={styles.metrics}>
+          <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
+            <span className={styles.metricsCell}></span>
+            <span className={styles.metricsCell}>AUC</span>
+            <span className={styles.metricsCell}>Cutoff</span>
+            <span className={styles.metricsCell}>Accuracy</span>
+            <span className={styles.metricsCell}>Precision</span>
+            <span className={styles.metricsCell}>Recall</span>
+            <span className={styles.metricsCell}>F1 Score</span>
+            <span className={styles.metricsCell}>KS</span>
+            <span className={styles.metricsCell}>LogLoss</span>
+          </div>
+          <div className={styles.metricsRow}>
+            <span className={styles.metricsCell}>Validation</span>
+            <span className={styles.metricsCell} title={vs.auc}>{vs.auc}</span>
+            <span className={styles.metricsCell} title={roc.Threshold[fitIndex]}>{roc.Threshold[fitIndex]}</span>
+            <span className={styles.metricsCell} title={model.accValication}>{model.accValication}</span>
+            <span className={styles.metricsCell} title={roc.Precision[fitIndex]}>{roc.Precision[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roc.Recall[fitIndex]}>{roc.Recall[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roc.F1[fitIndex]}>{roc.F1[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roc.KS[fitIndex]}>{roc.KS[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roc.LOGLOSS[fitIndex]}>{roc.LOGLOSS[fitIndex]}</span>
+          </div>
+          <div className={styles.metricsRow}>
+            <span className={styles.metricsCell}>Holdout</span>
+            <span className={styles.metricsCell} title={hs.auc}>{hs.auc}</span>
+            <span className={styles.metricsCell} title={roch.Threshold[fitIndex]}>{roch.Threshold[fitIndex]}</span>
+            <span className={styles.metricsCell} title={model.accHoldout}>{model.accHoldout}</span>
+            <span className={styles.metricsCell} title={roch.Precision[fitIndex]}>{roch.Precision[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roch.Recall[fitIndex]}>{roch.Recall[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roch.F1[fitIndex]}>{roch.F1[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roch.KS[fitIndex]}>{roch.KS[fitIndex]}</span>
+            <span className={styles.metricsCell} title={roch.LOGLOSS[fitIndex]}>{roch.LOGLOSS[fitIndex]}</span>
+          </div>
+        </div>}
       </div>
       <div className={classnames(styles.block, styles.VariableImpact)}>
         <h3 className={styles.blockTitle}>Variable Impact</h3>
         <div className={styles.blockRow}><VariableImpact model={project.selectModel} /></div>
       </div>
+      <div className={classnames(styles.block, styles.score)}>
+        <h3 className={styles.blockTitle}>Score <small onClick={this.reset}> reset</small></h3>
+        <div className={styles.blockRow}><Score models={[project.selectModel]} project={project} /></div>
+      </div>
       <div className={classnames(styles.block, styles.processFlow)}>
         <h3 className={styles.blockTitle}>Process Flow</h3>
         <div className={styles.blockRow}><ModelProcessFlow model={project.selectModel} /></div>
-      </div>
-      <div className={classnames(styles.block, styles.score)}>
-        <h3 className={styles.blockTitle}>Score</h3>
-        <div className={styles.blockRow}><Score models={[project.selectModel]} project={project} /></div>
       </div>
     </div>
   }

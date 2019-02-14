@@ -55,7 +55,7 @@ class Summary extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType } = project
+    const { target, colType, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, mismatchFillMethod, nullFillMethod, outlierFillMethod } = project
     const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
     const fixedPercent = totalFixedLines / totalRawLines * 100
     const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100
@@ -70,6 +70,16 @@ class Summary extends Component {
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
+    const getFixMethod = key => {
+      let result = ''
+      const mismatchDefault = colType[key] === 'Numerical' ? 'mean' : 'mode'
+      const nullDefault = colType[key] === 'Numerical' ? 'mean' : 'mode'
+      const outlierDefault = colType[key] === 'drop'
+      if (mismatchLineCounts[key]) result += ` mismatch->${mismatchFillMethod[key] || mismatchDefault}`
+      if (nullLineCounts[key]) result += ` null->${nullFillMethod[key] || nullDefault}`
+      if (outlierLineCounts[key]) result += ` outlier->${outlierFillMethod[key] || outlierDefault}`
+      return result
+    }
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
         <div className={styles.summaryTitle}><span>Summary of your data</span></div>
@@ -107,7 +117,7 @@ class Summary extends Component {
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
             </div>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryProgressBlock}>
+              <div className={styles.summaryProgressBlock} title={getFixMethod(target)}>
                 <div className={styles.summaryProgress} style={{ width: percentList[0].clean + '%', backgroundColor: '#00c855' }}></div>
                 <div className={styles.summaryProgress} style={{ width: percentList[0].mismatch + '%', backgroundColor: '#819ffc' }}></div>
                 <div className={styles.summaryProgress} style={{ width: percentList[0].missing + '%', backgroundColor: '#ff97a7' }}></div>
@@ -143,7 +153,7 @@ class Summary extends Component {
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
-                <div className={styles.summaryProgressBlock}>
+                <div className={styles.summaryProgressBlock} title={getFixMethod(v)}>
                   <div className={styles.summaryProgress} style={{ width: percent.clean + '%', backgroundColor: '#00c855' }}></div>
                   <div className={styles.summaryProgress} style={{ width: percent.mismatch + '%', backgroundColor: '#819ffc' }}></div>
                   <div className={styles.summaryProgress} style={{ width: percent.missing + '%', backgroundColor: '#ff97a7' }}></div>

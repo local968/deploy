@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Modal, Select, Radio, Tooltip } from 'antd';
+import { Table } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
+import PredictVActual from '../Model/PredictVActual'
+import { NumberInput } from 'components/Common';
 
 import { observable, computed, action, autorun, runInAction } from 'mobx';
 import moment from 'moment';
 
-const Option = Select.Option;
 @inject('projectStore')
 @observer
 class AdvancedView extends Component {
@@ -277,12 +278,12 @@ class AdvancedView extends Component {
 
     return (
       <div className={styles.advancedModelResult}>
-        <div className={styles.metricSelection} >
+        {/* <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
           <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ minWidth: '80px' }}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
-        </div>
+        </div> */}
         <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sortState={this.sortState} changeSort={this.changeSort} metric={this.metric} />
       </div>
     )
@@ -300,25 +301,22 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, metric } = this.props;
+    const { models, project, metric } = this.props;
+    const { problemType, selectModel, targetArray, targetColMap, renameVariable } = project
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',];
-    const replaceR2 = str => str.replace(/R2/g, 'R²');
-    const headerData = texts.reduce((prev, curr) => ({ ...prev, [curr]: replaceR2(curr) }), {});
-    const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
-        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} project={project} />
       } else {
         return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       }
     });
     return (
       <React.Fragment>
-        {header}
         <div className={styles.advancedModelTable} >
           {dataSource}
         </div>
@@ -330,47 +328,9 @@ class AdvancedModelTable extends Component {
 @observer class RegressionModleRow extends Component {
 
   render() {
-    const { model, texts, metric } = this.props;
-    const { score, name } = model;
+    const { model } = this.props;
     return (
       <div >
-        <Row >
-          {texts.map(t => {
-            switch (t) {
-              case 'Model Name':
-                return (
-                  <RowCell key={1} data={<div key={1} >
-                    <Tooltip title={name}>
-                      <span className={styles.modelName} alt={name}>{name}</span>
-                    </Tooltip>
-                  </div>}
-                  />
-                )
-              case 'Normalized RMSE':
-                return <RowCell key={10} data={score.validateScore.nrmse} />;
-              case 'RMSE':
-                return <RowCell key={2} data={score.validateScore.rmse} />;
-              case 'MSLE':
-                return <RowCell key={11} data={score.validateScore.msle} />;
-              case 'RMSLE':
-                return <RowCell key={9} data={score.validateScore.rmsle} />;
-              case 'MSE':
-                return <RowCell key={3} data={score.validateScore.mse} />;
-              case 'MAE':
-                return <RowCell key={4} data={score.validateScore.mae} />;
-              case 'R2':
-                return <RowCell key={5} data={score.validateScore.r2} />;
-              case 'adjustR2':
-                return <RowCell key={8} data={score.validateScore.adjustR2} />;
-              case 'Validation':
-                return <RowCell key={6} data={score.validateScore[metric]} />;
-              case 'Holdout':
-                return <RowCell key={7} data={score.holdoutScore[metric]} />;
-              default:
-                return null
-            }
-          })}
-        </Row>
         <RegressionDetailCurves project={this.props.project} model={model} />
       </div>
     )
@@ -393,11 +353,11 @@ class RegressionDetailCurves extends Component {
   }
 
   render() {
-    const { model } = this.props;
-    const { diagnoseType } = this.state;
+    const { model, project } = this.props;
 
     return (
       <div className={styles.charts}>
+        <PredictVActual model={model} project={project} />
         <div className={styles.reportChart}>
           <div className={styles.chartContent}><img className={styles.img} src={model.fitPlotBase64} alt="fit plot" /></div>
         </div>
@@ -415,45 +375,11 @@ class RegressionDetailCurves extends Component {
 class ClassificationModelRow extends Component {
 
   render() {
-    const { model, texts, metric, yes, no } = this.props;
+    const { model, yes, no, project } = this.props;
     if (!model.chartData) return null;
-    const { name, fitIndex, chartData: { roc }, score } = model;
     return (
       <div >
-        <Row onClick={this.handleResult} >
-          {texts.map(t => {
-            switch (t) {
-              case 'Model Name':
-                return (
-                  <RowCell key={1} data={<div key={1} >
-                    <Tooltip title={name}>
-                      <span className={styles.modelName} alt={name} >{name}</span>
-                    </Tooltip>
-                  </div>}
-                  />
-                );
-              case 'F1-Score':
-                return <RowCell key={2} data={roc.F1[fitIndex]} />;
-              case 'Precision':
-                return <RowCell key={3} data={roc.Precision[fitIndex]} />;
-              case 'Recall':
-                return <RowCell key={4} data={roc.Recall[fitIndex]} />;
-              case 'LogLoss':
-                return <RowCell key={5} data={roc.LOGLOSS[fitIndex]} />;
-              case 'Cutoff Threshold':
-                return <RowCell key={6} data={roc.Threshold[fitIndex]} />;
-              case 'KS':
-                return <RowCell key={7} data={roc.KS[fitIndex]} />;
-              case 'Validation':
-                return <RowCell key={8} data={metric === 'acc' ? model.validationAcc : score.validateScore[metric]} />;
-              case 'Holdout':
-                return <RowCell key={9} data={metric === 'acc' ? model.holdoutAcc : score.holdoutScore[metric]} />;
-              default:
-                return null
-            }
-          })}
-        </Row>
-        <DetailCurves model={model} yes={yes} no={no} />
+        <DetailCurves model={model} yes={yes} no={no} project={project} />
       </div>
     )
   }
@@ -465,11 +391,11 @@ class DetailCurves extends Component {
     this.props.model.resetFitIndex();
   }
   render() {
-    const { model, model: { mid }, yes, no } = this.props;
+    const { model, model: { mid }, yes, no, project } = this.props;
 
     return (
       <React.Fragment>
-        <PredictTable model={model} yes={yes} no={no} />
+        <PredictTable model={model} yes={yes} no={no} project={project} />
         <div className={styles.charts}>
           <div className={styles.reportChart}>
             <span className={styles.chartTitle}>ROC Curve</span>
@@ -492,42 +418,62 @@ class DetailCurves extends Component {
     )
   }
 }
-
-class Row extends Component {
-  render() {
-    const { children, rowStyle, ...other } = this.props;
-    return (
-      <div className={styles.adrow} style={rowStyle} {...other} >
-        {children}
-      </div>
-    );
-  }
-}
-
-class RowCell extends Component {
-  render() {
-    const { data, cellStyle, other, cellClassName, ...rest } = this.props;
-    const fixed3 = (data) => typeof data === 'number' ? data.toFixed(3) : data
-    return (
-      <div
-        {...rest}
-        style={cellStyle}
-        className={classnames(styles.adcell, cellClassName)}
-        title={data}
-      >
-        {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
-        {other}
-      </div>
-    );
-  }
-}
-
-
 @observer
 class PredictTable extends Component {
+  @observable showCost = false
+  @observable costOption = { ...this.props.project.costOption }
+
+  onChange = e => {
+    const criteria = e.target.value
+    this.showCost = criteria === 'cost'
+    const data = { criteria }
+    if (!this.showCost) {
+      const { models } = this.props
+      data.selectId = ''
+      // this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+      // data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+      models.forEach(m => {
+        if (!m.initialFitIndex) return
+        m.updateModel({ fitIndex: m.initialFitIndex })
+      })
+    } else {
+      this.handleSubmit()
+    }
+    this.props.project.updateProject(data)
+  }
+
+  costInput = (row, col) => {
+    const { project } = this.props
+    const isCost = row !== col
+    const field = (row === col ? "T" : "F") + (col === 1 ? "P" : "N")
+    return <div className={styles.costTd}>
+      <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
+      <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benefit:'}</span></div>
+      <div className={styles.costInput}><NumberInput value={project.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
+      <div className={styles.costUnits}><span>units</span></div>
+    </div>
+  }
+
+  handleChange = (field, value) => {
+    const { project } = this.props
+    project.costOption[field] = value
+  }
+
+  handleSubmit = () => {
+    const { project } = this.props
+    const { models } = project
+    const { TP, FN, FP, TN } = this.costOption
+    models.forEach(m => {
+      const benefit = m.getBenefit(TP, FN, FP, TN)
+      if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
+    })
+    project.updateProject({ costOption: { ...this.costOption }, selectId: '' })
+  }
+
   render() {
     const { model, yes, no } = this.props;
     const { fitIndex, chartData } = model;
+    const current = model
     let TN = chartData.roc.TN[fitIndex];
     let FP = chartData.roc.FP[fitIndex];
     let TP = chartData.roc.TP[fitIndex];
@@ -565,15 +511,49 @@ class PredictTable extends Component {
       sum: +TN + +FN + +FP + +TP
     }];
     return (
-      <Table
-        className={styles.predictTable}
-        columns={column}
-        bordered
-        rowKey={re => {
-          return re.rowName;
-        }}
-        dataSource={data}
-        pagination={false} />
+      <div className={styles.costbase}>
+        <Table
+          className={styles.predictTable}
+          columns={column}
+          bordered
+          rowKey={re => {
+            return re.rowName;
+          }}
+          dataSource={data}
+          pagination={false} />
+        <div className={styles.costBlock}>
+          <div className={styles.costBox}>
+            <div className={styles.costTable}>
+              <div className={styles.costRow}>
+                <div className={styles.sepCell}>
+                  <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title='Predicted'>Predicted</span></div>
+                  <div className={styles.sep}><span></span></div>
+                  <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title='Actual'>Actual</span></div>
+                </div>
+                <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
+                <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
+              </div>
+              <div className={styles.costRow}>
+                <div className={classnames(styles.costCell, styles.costCellSmall)}><span title={yes}>{yes}</span></div>
+                <div className={styles.costCell}>{this.costInput(1, 1)}</div>
+                <div className={styles.costCell}>{this.costInput(1, 0)}</div>
+              </div>
+              <div className={styles.costRow}>
+                <div className={classnames(styles.costCell, styles.costCellSmall)}><span title={no}>{no}</span></div>
+                <div className={styles.costCell}>{this.costInput(0, 1)}</div>
+                <div className={styles.costCell}>{this.costInput(0, 0)}</div>
+              </div>
+            </div>
+          </div>
+          {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
+            {/* <div className={styles.costText}><span>The best benefit score based on 3616 row samples size:</span></div> */}
+            <div className={styles.costText}><span>{current.getBenefit(TP, FN, FP, TN).text}</span></div>
+          </div>}
+          <div className={styles.costButton}>
+            <button onClick={this.handleSubmit}><span>Submit</span></button>
+          </div>
+        </div>
+      </div>
     );
   }
 }
