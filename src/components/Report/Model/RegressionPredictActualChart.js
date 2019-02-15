@@ -94,7 +94,7 @@ export default class RegressionPredictActualChart extends Component {
       .attr('cy', d => y(d[field]))
       .attr('fill', color)
       .on('mouseover', tool_tip.show)
-      // .on('mouseout', tool_tip.hide);
+      .on('mouseout', tool_tip.hide);
 
     svg.append('path')
       .datum(data)
