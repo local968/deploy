@@ -48,6 +48,10 @@ class Report extends Component {
   constructor(props) {
     super(props)
     props.projectStore.currentId = props.projectStore.list[0].id
+    if (window.localStorage && window.localStorage.getItem(`reportConfig:${this.props.projectStore.project.selectModel.id}`)) {
+      const config = window.localStorage.getItem(`reportConfig:${this.props.projectStore.project.selectModel.id}`)
+      if (config) this.config = JSON.parse(config)
+    }
   }
 
   reset = () => {
@@ -61,6 +65,7 @@ class Report extends Component {
 
   toggleEdit = action(() => {
     this.isEdit = !this.isEdit
+    if (window.localStorage) window.localStorage.setItem(`reportConfig:${this.props.projectStore.project.selectModel.id}`, JSON.stringify(this.config))
   })
 
   isShow = (name) => {
