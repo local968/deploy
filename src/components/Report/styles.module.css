@@ -12,12 +12,27 @@ html {
   font-size: 32px;
 }
 
+.title small {
+  float: right;
+  font-size: 16px;
+  color: cornflowerblue;
+  line-height: 48px;
+  cursor: pointer;
+}
+
 .subTitle {
   font-size: 28px;
 }
 
 .block {
   margin-bottom: 40px;
+  position: relative;
+}
+
+.block :global(.ant-checkbox-wrapper) {
+  position: absolute;
+  top: 8px;
+  left: -24px;
 }
 
 .blockTitle {

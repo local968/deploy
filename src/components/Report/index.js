@@ -8,6 +8,8 @@ import VariableList from './VariableList'
 import VariableImpact from './Model/VariableImpact'
 import ModelProcessFlow from './Model/ModelProcessFlow'
 import Score from './Score'
+import { observable, action } from 'mobx';
+import { Checkbox } from 'antd';
 
 const addComma = number => {
   if (Number.isNaN(number)) return number
@@ -27,6 +29,22 @@ const addComma = number => {
 @inject('projectStore')
 @observer
 class Report extends Component {
+
+  @observable isEdit = false
+
+  @observable config = {
+    profile: true,
+    dataSchema: true,
+    dataQuality: true,
+    dataAnalysis: true,
+    correlationMatrix: true,
+    modelName: true,
+    metrics: true,
+    variableImpact: true,
+    score: true,
+    processFlow: true
+  }
+
   constructor(props) {
     super(props)
     props.projectStore.currentId = props.projectStore.list[0].id
@@ -41,20 +59,36 @@ class Report extends Component {
     project.costOption.TP = 0
   }
 
+  toggleEdit = action(() => {
+    this.isEdit = !this.isEdit
+  })
+
+  isShow = (name) => {
+    return this.isEdit || this.config[name]
+  }
+
+  checkChange = (name) => action((e) => {
+    this.config[name] = e.target.checked
+  })
+
+  checkBox = (name) => this.isEdit && <Checkbox onChange={this.checkChange(name)} checked={this.config[name]} />
+
   render() {
     const { projectStore: { project } } = this.props
     const { selectModel: model } = project
     const { score: { validateScore: vs, holdoutScore: hs }, fitIndex, chartData: { roc, rocHoldout: roch } } = model
     return <div className={styles.report}>
-      <h1 className={styles.title}>Project Report: {project.name}</h1>
-      <div className={classnames(styles.block, styles.profile)}>
+      <h1 className={styles.title}>Project Report: {project.name}<small onClick={this.toggleEdit}>{this.isEdit ? 'Save' : 'Edit Module'}</small></h1>
+      {this.isShow('profile') && <div className={classnames(styles.block, styles.profile)}>
+        {this.checkBox('profile')}
         <h3 className={styles.blockTitle}>Profile</h3>
         <div className={styles.blockRow}>Project Statement: {project.statement || '-'}</div>
         <div className={styles.blockRow}>Business Value: {project.business || '-'}</div>
         <div className={styles.blockRow}>Problem Type: {project.problemType}</div>
         <div className={styles.blockRow}>Dataset: {project.fileNames[0] || '-'}</div>
-      </div>
-      <div className={styles.block}>
+      </div>}
+      {this.isShow('dataSchema') && <div className={styles.block}>
+        {this.checkBox('dataSchema')}
         <h3 className={styles.blockTitle}>Data Schema</h3>
         <div className={styles.schema}>
           <div className={classnames(styles.schemaRow, styles.schemaHeader)}>
@@ -70,28 +104,33 @@ class Report extends Component {
             <span className={styles.schemaCell}>{addComma(Object.entries(project.colType).filter(([k, v]) => v === 'Numerical').length)}</span>
           </div>
         </div>
-      </div>
-      <div className={styles.block}>
+      </div>}
+      {this.isShow('dataQuality') && <div className={styles.block}>
+        {this.checkBox('dataQuality')}
         <h3 className={styles.blockTitle}>Data Quality:</h3>
         <Summary project={project} />
-      </div>
-      <div className={styles.block}>
+      </div>}
+      {this.isShow('dataAnalysis') && <div className={styles.block}>
+        {this.checkBox('dataAnalysis')}
         <h3 className={styles.blockTitle}>Exploratory Data Analysis</h3>
         <div className={styles.blockRow}><VariableList project={project} /></div>
-      </div>
-      <div className={styles.block}>
+      </div>}
+      {this.isShow('correlationMatrix') && <div className={styles.block}>
+        {this.checkBox('correlationMatrix')}
         <h3 className={styles.blockTitle}>Correlation Matrix</h3>
         <div className={classnames(styles.blockRow, styles.correlationMatrix)}><CorrelationMatrix
           data={project.correlationMatrixData}
           header={project.correlationMatrixHeader} /></div>
-      </div>
+      </div>}
       <h1 className={styles.title}>Model Result: </h1>
-      <div className={styles.block}>
+      {this.isShow('modelName') && <div className={styles.block}>
+        {this.checkBox('modelName')}
         <h3 className={styles.blockTitle}>Model Name: {project.selectModel.name}</h3>
         {/* {project.problemType === 'Classification' && <div className={styles.blockRow}><ClassificationPerformance project={project} /></div>} */}
         {/* {project.problemType === 'Regression' && <div className={classnames(styles.blockRow, styles.performance)}><RegressionPerformance project={project} /></div>} */}
-      </div>
-      <div className={classnames(styles.block, styles.VariableImpact)}>
+      </div>}
+      {this.isShow('metrics') && <div className={classnames(styles.block, styles.VariableImpact)}>
+        {this.checkBox('metrics')}
         <h3 className={styles.blockTitle}>Metrics:</h3>
         {project.problemType === 'Regression' && <div className={styles.metrics}>
           <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
@@ -157,19 +196,22 @@ class Report extends Component {
             <span className={styles.metricsCell} title={roch.LOGLOSS[fitIndex]}>{roch.LOGLOSS[fitIndex]}</span>
           </div>
         </div>}
-      </div>
-      <div className={classnames(styles.block, styles.VariableImpact)}>
+      </div>}
+      {this.isShow('variableImpact') && <div className={classnames(styles.block, styles.VariableImpact)}>
+        {this.checkBox('variableImpact')}
         <h3 className={styles.blockTitle}>Variable Impact</h3>
         <div className={styles.blockRow}><VariableImpact model={project.selectModel} /></div>
-      </div>
-      <div className={classnames(styles.block, styles.score)}>
+      </div>}
+      {this.isShow('score') && <div className={classnames(styles.block, styles.score)}>
+        {this.checkBox('score')}
         <h3 className={styles.blockTitle}>Score <small onClick={this.reset}> reset</small></h3>
         <div className={styles.blockRow}><Score models={[project.selectModel]} project={project} /></div>
-      </div>
-      <div className={classnames(styles.block, styles.processFlow)}>
+      </div>}
+      {this.isShow('processFlow') && <div className={classnames(styles.block, styles.processFlow)}>
+        {this.checkBox('processFlow')}
         <h3 className={styles.blockTitle}>Process Flow</h3>
         <div className={styles.blockRow}><ModelProcessFlow model={project.selectModel} /></div>
-      </div>
+      </div>}
     </div>
   }
 }
