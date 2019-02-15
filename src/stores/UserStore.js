@@ -3,7 +3,7 @@ import axios from 'axios';
 import config from 'config';
 import socketStore from './SocketStore';
 // import testData from './classification.json'
-import testData from './regression.json'
+// import testData from './regression.json'
 
 class UserStore {
 
@@ -14,7 +14,7 @@ class UserStore {
   }
 
   constructor() {
-    window.r2Report = testData
+    // window.r2Report = testData
     if (window.r2Report) {
       this.status = 'unlogin'
       return
