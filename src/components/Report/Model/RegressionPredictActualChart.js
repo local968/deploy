@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import * as d3 from 'd3';
-import d3tips from 'components/D3Chart/d3-tip';
+import d3tips from './d3-tip';
 
 import styles from 'components/D3Chart/D3Chart.module.css';
 
@@ -72,7 +72,8 @@ export default class RegressionPredictActualChart extends Component {
           width = this.regressionPredictActualChart.current.clientWidth - 1000 - 100;
         }
 
-        return [y(d[field]) - 2220, x(i) + width]
+        return [y(d[field]), x(i) + width]
+        // return [0, 0]
       })
       .html((d, i) => {
         return (
@@ -93,7 +94,7 @@ export default class RegressionPredictActualChart extends Component {
       .attr('cy', d => y(d[field]))
       .attr('fill', color)
       .on('mouseover', tool_tip.show)
-      .on('mouseout', tool_tip.hide);
+      // .on('mouseout', tool_tip.hide);
 
     svg.append('path')
       .datum(data)

@@ -76,7 +76,8 @@ class Report extends Component {
   render() {
     const { projectStore: { project } } = this.props
     const { selectModel: model } = project
-    const { score: { validateScore: vs, holdoutScore: hs }, fitIndex, chartData: { roc, rocHoldout: roch } } = model
+    const { score: { validateScore: vs, holdoutScore: hs }, fitIndex, chartData } = model
+    const { roc, rocHoldout: roch } = chartData || {}
     return <div className={styles.report}>
       <h1 className={styles.title}>Project Report: {project.name}<small onClick={this.toggleEdit}>{this.isEdit ? 'Save' : 'Edit Module'}</small></h1>
       {this.isShow('profile') && <div className={classnames(styles.block, styles.profile)}>
