@@ -1496,7 +1496,7 @@ export default class Project {
     this.changeReportProgress(`generating report file`, 100)
     const html = await this.generateReportHtml(json)
 
-    loadFile(model.id + '.html', html)
+    loadFile(`R2Learn_Report_${this.id}.html`, html)
     this.changeReportProgress(`init`, 0)
   }
 }

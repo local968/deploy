@@ -82,7 +82,7 @@ class Summary extends Component {
     }
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
-        <div className={styles.summaryTitle}><span>Summary of your data</span></div>
+        <div className={styles.summaryTitle}><span>Data Quality Issues and Fix Method</span></div>
         <div className={styles.summaryTypeBox}>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
@@ -165,7 +165,7 @@ class Summary extends Component {
         </div>
       </div>
       <div className={styles.summaryRight}>
-        <div className={styles.summaryTitle}><span>R2 Learn will fix the issues</span></div>
+        <div className={styles.summaryTitle}><span>Summary of Fixes</span></div>
         <div className={styles.summaryPie}>
           <div className={styles.summaryChart}>
           </div>

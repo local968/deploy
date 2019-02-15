@@ -25,6 +25,11 @@ html {
   text-align: left;
 }
 
+.blockTitle small {
+  color: cornflowerblue;
+  cursor: pointer;
+}
+
 .profile {
   font-size: 16px;
 }

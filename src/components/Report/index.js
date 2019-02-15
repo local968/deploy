@@ -49,12 +49,10 @@ class Report extends Component {
       <h1 className={styles.title}>Project Report: {project.name}</h1>
       <div className={classnames(styles.block, styles.profile)}>
         <h3 className={styles.blockTitle}>Profile</h3>
-        <div className={styles.blockRow}>Project Name: {project.name || '-'}</div>
         <div className={styles.blockRow}>Project Statement: {project.statement || '-'}</div>
         <div className={styles.blockRow}>Business Value: {project.business || '-'}</div>
         <div className={styles.blockRow}>Problem Type: {project.problemType}</div>
         <div className={styles.blockRow}>Dataset: {project.fileNames[0] || '-'}</div>
-        <div className={styles.blockRow}>Data Size: {'-'}</div>
       </div>
       <div className={styles.block}>
         <h3 className={styles.blockTitle}>Data Schema</h3>
