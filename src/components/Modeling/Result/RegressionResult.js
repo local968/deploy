@@ -190,11 +190,12 @@ class ModelTable extends Component {
         </div>
         <div className={styles.data}>
           {this.sortModels.map((model, key) => {
+            console.log("table")
             return (
               <ModelDetail
                 key={key}
                 model={model}
-                current={current}
+                isSelect={model.id === current.id}
                 onSelect={onSelect}
                 isRecommend={model.id === recommendId}
               />
@@ -238,8 +239,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, current, isRecommend } = this.props;
-    const isSelect = model.id === current.id
+    const { model, onSelect, isSelect, isRecommend } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -255,7 +255,7 @@ class ModelDetail extends Component {
               <input
                 type="radio"
                 name="modelSelect"
-                defaultChecked={isSelect}
+                checked={isSelect}
                 onChange={onSelect.bind(null, model)}
               />
             </div>
