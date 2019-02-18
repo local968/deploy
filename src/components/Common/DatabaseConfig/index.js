@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { observable, runInAction, action } from 'mobx';
+import { observable, runInAction, action, computed } from 'mobx';
 import styles from './styles.module.css';
 import { Modal, Select, Checkbox, Message, Icon } from 'antd';
 import classnames from 'classnames';
@@ -66,7 +66,7 @@ export default class DatabaseConfig extends Component {
     this.localState[key] = value;
   };
 
-  checkForm = () => {
+  checkForm() {
     let failed = false;
     Object.entries(rules).map(([key, fn]) => {
       if (failed) return false;
@@ -81,6 +81,17 @@ export default class DatabaseConfig extends Component {
     });
     return failed;
   };
+
+  @computed
+  get allowSubmit() {
+    let failed = false;
+    Object.entries(rules).map(([key, fn]) => {
+      if (failed) return false;
+      if (!fn(this.localState[key])) failed = true;
+      return true;
+    });
+    return failed;
+  }
 
   @action
   toggleState = (key, value) => {
@@ -328,7 +339,7 @@ export default class DatabaseConfig extends Component {
               <Icon type="loading" />
             </a>
           ) : (
-              <a className={styles.done} onClick={onSubmit}>
+              <a className={classnames(styles.done, { [styles.disabled]: this.allowSubmit })} onClick={this.allowSubmit && onSubmit}>
                 CONNECT
             </a>
             )}

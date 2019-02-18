@@ -152,3 +152,8 @@
 .error {
   border-color: red;
 }
+
+.disabled {
+  background: #ccc;
+  border-color: #ccc;
+}
