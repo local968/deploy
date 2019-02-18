@@ -5,6 +5,7 @@ import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
+import { Hint } from 'components/Common';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
@@ -363,6 +364,15 @@ export default class AdvancedView extends Component {
   }
 }
 
+const questMarks = {
+  Accuracy: 'Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%.',
+  Recall: 'Recall=TP/(TP+FN). It measures the % of positives the classifier labeled as positive. It represents the completeness of the classifier. The higher the recall is the more positives the classifier captures.',
+  'Cutoff Threshold': 'Many classifiers are able to produce a probability distribution over a set of classes (e.g. binary 1/0). Cut-off threshold is a certain probability value which can be used to determine whether an observation belongs to a particular class.',
+  // 'F1-Score': '',
+  Precision: "It measures how many true positives among all predicted (including true and false)  positives. It's TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.",
+  KS: "KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It's calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other."
+}
+
 @observer
 class AdvancedModelTable extends Component {
 
@@ -379,12 +389,13 @@ class AdvancedModelTable extends Component {
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', 'Validation', 'Holdout',];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
+    const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
       if (sortState[curr] === undefined) return { ...prev, [curr]: curr };
-      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='minus' /></div> }
-      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' /></div> }
-      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='minus' /></div> }
+      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
+      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
       return prev
     }, {});
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
