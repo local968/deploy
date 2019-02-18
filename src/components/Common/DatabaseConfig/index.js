@@ -339,7 +339,7 @@ export default class DatabaseConfig extends Component {
               <Icon type="loading" />
             </a>
           ) : (
-              <a className={classnames(styles.done, { [styles.disabled]: this.allowSubmit })} onClick={this.allowSubmit && onSubmit}>
+              <a className={classnames(styles.done, { [styles.disabled]: this.allowSubmit })} onClick={onSubmit}>
                 CONNECT
             </a>
             )}
