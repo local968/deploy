@@ -310,7 +310,8 @@ export default class AdvancedView extends Component {
 
   constructor(props) {
     super(props);
-    this.metric = this.metricOptions.find(m => m.key === props.projectStore.project.currentSetting.setting.measurement) || this.metricOptions[0]
+    const currentSetting = props.projectStore.project.currentSetting
+    this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
     autorun(() => {
       const { project } = props;
       if (project && project.measurement)
@@ -352,7 +353,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '120px', fontSize: '1.125rem' }}>
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
