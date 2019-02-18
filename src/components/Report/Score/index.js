@@ -395,6 +395,10 @@ class DetailCurves extends Component {
 
     return (
       <React.Fragment>
+        <div className={styles.titles}>
+          <div className={styles.blockTitle}>Confusion Matrix</div>
+          <div className={styles.blockTitle}>Cost Based</div>
+        </div>
         <PredictTable model={model} yes={yes} no={no} project={project} />
         <div className={styles.charts}>
           <div className={styles.reportChart}>
