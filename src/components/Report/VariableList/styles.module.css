@@ -52,7 +52,7 @@
   flex: none;
   flex-direction: column;
   margin: 0.1em 0;
-  height: 5em;
+  max-height: 5em;
   overflow-x: hidden;
   overflow-y: scroll;
 }
@@ -200,7 +200,7 @@
 }
 
 .targetName span {
-  font-size: 1.125rem;
+  /* font-size: 1.125rem; */
 }
 
 /* .targetHistogram {
@@ -237,4 +237,13 @@
 
 .blockRow {
   margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 16px;
+}
+
+.title:first-child {
+  margin-bottom: 10px;
 }

@@ -437,13 +437,13 @@
     border-radius: 5px;
     display: flex;
     flex: none;
-    padding: .1em .2em;
+    padding: .05em .1em;
     justify-content: center;
     cursor: pointer;
 }
 
 .costButton span {
-    font-size: 1rem;
+    font-size: .8rem;
     color: #fff;
 }
 

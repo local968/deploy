@@ -44,6 +44,7 @@ export default class SimplifiedView extends Component {
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
     const variableType = { ...newType, ...colType }
     return <div className={styles.simplified}>
+      <div className={styles.title}>Target Variable</div>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
           <div className={classnames(styles.targetCell, styles.targetName)}><span>Target Variable</span></div>
@@ -80,6 +81,7 @@ export default class SimplifiedView extends Component {
           <img className={styles.targetPlot} alt='after' src={project.histgramPlotsBase64[project.target]} />
         </div>
       </div>
+      <div className={styles.title}>Predictor Variables</div>
       <div className={styles.table}>
         <div className={styles.tableHeader}>
           <div className={styles.tableTh}><span>Name</span></div>

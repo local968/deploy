@@ -471,13 +471,14 @@ class PredictTable extends Component {
   }
 
   render() {
-    const { model, yes, no } = this.props;
-    const { fitIndex, chartData } = model;
+    const { model, yes, no, project } = this.props;
+    // const { fitIndex, chartData } = model;
     const current = model
-    let TN = chartData.roc.TN[fitIndex];
-    let FP = chartData.roc.FP[fitIndex];
-    let TP = chartData.roc.TP[fitIndex];
-    let FN = chartData.roc.FN[fitIndex];
+    const { TP, FN, FP, TN } = project.costOption
+    // let TN = chartData.roc.TN[fitIndex];
+    // let FP = chartData.roc.FP[fitIndex];
+    // let TP = chartData.roc.TP[fitIndex];
+    // let FN = chartData.roc.FN[fitIndex];
     const column = [{
       title: '',
       dataIndex: 'rowName',

@@ -70,15 +70,16 @@ class Summary extends Component {
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
+    const fillMethod = method => method === 'ignore' || method === 'drop' ? method : `replace with ${method}`
     const getFixMethod = key => {
-      let result = ''
+      let result = []
       const mismatchDefault = colType[key] === 'Numerical' ? 'mean' : 'mode'
       const nullDefault = colType[key] === 'Numerical' ? 'mean' : 'mode'
       const outlierDefault = colType[key] === 'drop'
-      if (mismatchLineCounts[key]) result += ` mismatch->${mismatchFillMethod[key] || mismatchDefault}`
-      if (nullLineCounts[key]) result += ` null->${nullFillMethod[key] || nullDefault}`
-      if (outlierLineCounts[key]) result += ` outlier->${outlierFillMethod[key] || outlierDefault}`
-      return result
+      if (mismatchLineCounts[key]) result.push(`mismatch: ${fillMethod(mismatchFillMethod[key] || mismatchDefault)}`)
+      if (nullLineCounts[key]) result.push(`missing value: ${fillMethod(nullFillMethod[key] || nullDefault)}`)
+      if (outlierLineCounts[key]) result.push(`outlier: ${fillMethod(outlierFillMethod[key] || outlierDefault)}`)
+      return result.join('\n')
     }
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
