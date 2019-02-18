@@ -42,9 +42,10 @@ router.post('/check', async (req, res) => {
 })
 
 router.post('/', (req, res) => {
-  console.log('upload nginx callback')
+  // console.log('upload nginx callback')
   const form = new formidable.IncomingForm();
   form.parse(req, function (error, fields, files) {
+    console.log('fields:', fields)
     const params = req.query
     if (!params || !params.token || !params.userId || !params.type) return res.json({
       status: 404,
@@ -78,6 +79,7 @@ router.post('/', (req, res) => {
     }, (result) => (result.status < 0 || result.status === 100) && result)
       .then(result => {
         const { lines: lineCount = 0 } = result.result
+        fields.name = decodeURIComponent(fields.name)
         fields.createdTime = moment().unix()
         fields.lineCount = lineCount
         fields.from = 'upload'
