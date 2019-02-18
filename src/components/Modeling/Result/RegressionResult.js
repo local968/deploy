@@ -190,7 +190,6 @@ class ModelTable extends Component {
         </div>
         <div className={styles.data}>
           {this.sortModels.map((model, key) => {
-            console.log("table")
             return (
               <ModelDetail
                 key={key}
