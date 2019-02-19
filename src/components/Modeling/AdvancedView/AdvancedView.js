@@ -762,10 +762,31 @@ class Row extends Component {
   }
 }
 
+const formatNumber = (str) => {
+  if (isNaN(str)) return str
+  str = str.toString()
+  let i, d
+  if (str.indexOf('.')) {
+    i = str.split('.')[0]
+    d = str.split('.')[1]
+  } else {
+    i = str
+  }
+
+  const left = i.length % 3
+  i = i.split('').reduce((prev, curr, index) => {
+    if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
+    if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
+    return prev + curr
+  }, '')
+  if (d) return i + '.' + d.slice(0, 3)
+  return i
+}
+// const fixed3 = (data) => typeof data === 'number' ? data.toFixed(3) : data
+
 class RowCell extends Component {
   render() {
     const { data, cellStyle, other, cellClassName, ...rest } = this.props;
-    const fixed3 = (data) => typeof data === 'number' ? data.toFixed(3) : data
     return (
       <div
         {...rest}
@@ -773,7 +794,7 @@ class RowCell extends Component {
         className={classnames(styles.adcell, cellClassName)}
         title={typeof data === 'object' ? '' : data}
       >
-        {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
+        {other ? <span className={styles.hasotherCell} >{formatNumber(data)}</span> : formatNumber(data)}
         {other}
       </div>
     );
