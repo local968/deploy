@@ -643,6 +643,7 @@ class DetailCurves extends Component {
         break;
       case 'Lift Chart':
         curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
+        hasReset = false;
         break;
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
@@ -692,12 +693,12 @@ class DetailCurves extends Component {
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} >
           <div className={styles.thumbnails} >
-            {thumbnails.slice(0, 4).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+            {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} yes={yes} no={no} />
-          <div className={styles.thumbnails}>
+          {/* <div className={styles.thumbnails}>
             {thumbnails.slice(4, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
-          </div>
+          </div> */}
         </div>
         <div className={styles.rightPanel} >
           {hasReset && <button onClick={this.reset} className={styles.button} >Reset</button>}
@@ -712,6 +713,10 @@ class Thumbnail extends Component {
   state = {
     clickActive: false,
     hoverActive: false
+  }
+  componentDidMount() {
+    const { curSelected, value } = this.props;
+    this.setState({ clickActive: curSelected === value });
   }
   componentWillReceiveProps(nextProps) {
     const { curSelected, value } = nextProps;
