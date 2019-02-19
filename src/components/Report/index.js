@@ -138,7 +138,7 @@ class Report extends Component {
       <h1 className={styles.title}>Model Result</h1>
       {this.isShow('modelName') && <div className={styles.block}>
         {this.checkBox('modelName')}
-        <h3 className={styles.blockTitle}>Model Name{project.selectModel.name}</h3>
+        <h3 className={styles.blockTitle}>Model Name: {project.selectModel.name}</h3>
         {/* {project.problemType === 'Classification' && <div className={styles.blockRow}><ClassificationPerformance project={project} /></div>} */}
         {/* {project.problemType === 'Regression' && <div className={classnames(styles.blockRow, styles.performance)}><RegressionPerformance project={project} /></div>} */}
       </div>}
