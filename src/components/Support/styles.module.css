@@ -94,10 +94,12 @@
   display: block;
   padding: 15px 0;
   font-weight: bold;
+  cursor: default;
 }
 
 .h1:hover {
   color: #4a4a4a;
+  cursor: default;
 }
 
 .h2 {
