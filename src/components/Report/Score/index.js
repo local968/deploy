@@ -466,7 +466,7 @@ class PredictTable extends Component {
   handleSubmit = () => {
     const { project } = this.props
     const { models } = project
-    const { TP, FN, FP, TN } = this.costOption
+    const { TP, FN, FP, TN } = project.costOption
     models.forEach(m => {
       const benefit = m.getBenefit(TP, FN, FP, TN)
       if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
@@ -476,13 +476,13 @@ class PredictTable extends Component {
 
   render() {
     const { model, yes, no, project } = this.props;
-    // const { fitIndex, chartData } = model;
+    const { fitIndex, chartData } = model;
     const current = model
-    const { TP, FN, FP, TN } = project.costOption
-    // let TN = chartData.roc.TN[fitIndex];
-    // let FP = chartData.roc.FP[fitIndex];
-    // let TP = chartData.roc.TP[fitIndex];
-    // let FN = chartData.roc.FN[fitIndex];
+    const { TP: cTP, FN: cFN, FP:cFP, TN:cTN } = project.costOption
+    let TN = chartData.roc.TN[fitIndex];
+    let FP = chartData.roc.FP[fitIndex];
+    let TP = chartData.roc.TP[fitIndex];
+    let FN = chartData.roc.FN[fitIndex];
     const column = [{
       title: '',
       dataIndex: 'rowName',
@@ -550,9 +550,9 @@ class PredictTable extends Component {
               </div>
             </div>
           </div>
-          {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
+          {!!(cTP || cFN || cFP || cTN) && <div className={styles.costTextBox}>
             {/* <div className={styles.costText}><span>The best benefit score based on 3616 row samples size:</span></div> */}
-            <div className={styles.costText}><span>{current.getBenefit(TP, FN, FP, TN).text}</span></div>
+            <div className={styles.costText}><span>{current.getBenefit(cTP, cFN, cFP, cTN).text}</span></div>
           </div>}
           <div className={styles.costButton}>
             <button onClick={this.handleSubmit}><span>Submit</span></button>

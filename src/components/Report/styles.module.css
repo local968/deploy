@@ -9,19 +9,13 @@ html {
 }
 
 .title {
-  font-size: 32px;
+  font-size: 28px;
 }
 
-.title small {
-  float: right;
-  font-size: 16px;
-  color: cornflowerblue;
-  line-height: 48px;
-  cursor: pointer;
-}
 
 .subTitle {
   font-size: 28px;
+  font-family: HelveticaNeue;
 }
 
 .block {
@@ -31,13 +25,24 @@ html {
 
 .block :global(.ant-checkbox-wrapper) {
   position: absolute;
-  top: 8px;
+  top: 6px;
+  left: -24px;
+}
+
+.modelResult {
+  position: relative;
+}
+
+.modelResult :global(.ant-checkbox-wrapper) {
+  position: absolute;
+  top: 6px;
   left: -24px;
 }
 
 .blockTitle {
-  font-size: 24px;
+  font-size: 22px;
   text-align: left;
+  font-family: HelveticaNeue;
 }
 
 .blockTitle small {
@@ -107,4 +112,30 @@ html {
   border-right: 1px solid #aaa;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.modelName {
+  font-size: 13px;
+}
+
+.modelResult .title {
+  font-size: 22px;
+}
+
+.modelResult .blockTitle {
+  font-size: 16px;
+  padding-top: 4px;
+}
+
+.totalTitle {
+  font-size: 28px;
+  text-align: center;
+}
+
+.totalTitle small {
+  float: right;
+  font-size: 16px;
+  color: cornflowerblue;
+  line-height: 48px;
+  cursor: pointer;
 }
