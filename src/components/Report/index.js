@@ -7,7 +7,7 @@ import CorrelationMatrix from 'components/Modeling/Start/CorrelationMatrix'
 import VariableList from './VariableList'
 import VariableImpact from './Model/VariableImpact'
 import ModelProcessFlow from './Model/ModelProcessFlow'
-import Score from './Score'
+import Score, { PredictTable } from './Score'
 import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
 
@@ -109,6 +109,9 @@ class Report extends Component {
     const { selectModel: model } = project
     const { score: { validateScore: vs, holdoutScore: hs }, fitIndex, chartData } = model
     const { roc, rocHoldout: roch } = chartData || {}
+    const { targetArray, targetColMap, renameVariable } = project
+    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
+    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     return <div className={styles.report}>
       <h1 className={styles.totalTitle}>Project Report: {project.name}<small onClick={this.toggleEdit}>{this.isEdit ? 'Save' : 'Edit Module'}</small></h1>
       {this.isShow('profile') && <div className={classnames(styles.block, styles.profile)}>
@@ -147,17 +150,17 @@ class Report extends Component {
         <h3 className={styles.blockTitle}>Exploratory Data Analysis</h3>
         <div className={styles.blockRow}><VariableList project={project} /></div>
       </div>}
-      {this.isShow('correlationMatrix') && <div className={styles.block}>
+      {/* {this.isShow('correlationMatrix') && <div className={styles.block}>
         {this.checkBox('correlationMatrix')}
         <h3 className={styles.blockTitle}>Correlation Matrix</h3>
         <div className={classnames(styles.blockRow, styles.correlationMatrix)}><CorrelationMatrix
           data={project.correlationMatrixData}
           header={project.correlationMatrixHeader} /></div>
-      </div>}
+      </div>} */}
       <div className={styles.modelResult}>
         {this.isShow('modelResult') && <h1 className={styles.title}>Model Result</h1>}
         {this.checkBox('modelResult')}
-        {this.isShow('modelName') && <div className={styles.block}>
+        {this.isShow('modelName') && <div className={classnames(styles.block, styles.marginZero)}>
           {this.checkBox('modelName')}
           <h3 className={styles.blockTitle}>Model Name: <span className={styles.modelName}>{project.selectModel.name}</span></h3>
           {/* {project.problemType === 'Classification' && <div className={styles.blockRow}><ClassificationPerformance project={project} /></div>} */}
@@ -229,6 +232,11 @@ class Report extends Component {
               <span className={styles.metricsCell} title={roch.KS[fitIndex]}>{formatNumber(roch.KS[fitIndex])}</span>
               <span className={styles.metricsCell} title={roch.LOGLOSS[fitIndex]}>{formatNumber(roch.LOGLOSS[fitIndex])}</span>
             </div>
+            <div className={styles.titles}>
+              <div className={styles.metricsTitle}>Confusion Matrix</div>
+              <div className={styles.metricsTitle}>Cost Based</div>
+            </div>
+            <PredictTable model={model} yes={yes} no={no} project={project} />
           </div>}
         </div>}
         {this.isShow('variableImpact') && <div className={classnames(styles.block, styles.VariableImpact)}>
@@ -238,7 +246,7 @@ class Report extends Component {
         </div>}
         {this.isShow('score') && <div className={classnames(styles.block, styles.score)}>
           {this.checkBox('score')}
-          <h3 className={styles.blockTitle}>Score <small onClick={this.reset}> reset</small></h3>
+          <h3 className={styles.blockTitle}>Charts {project.problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>
           <div className={styles.blockRow}><Score models={[project.selectModel]} project={project} /></div>
         </div>}
         {this.isShow('processFlow') && <div className={classnames(styles.block, styles.processFlow)}>

@@ -302,15 +302,13 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project, metric } = this.props;
-    const { problemType, selectModel, targetArray, targetColMap, renameVariable } = project
-    const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
-    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+    const { problemType, selectModel } = project
     const texts = problemType === 'Classification' ?
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',];
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
-        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} project={project} />
+        return <ClassificationModelRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       } else {
         return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       }
@@ -375,11 +373,11 @@ class RegressionDetailCurves extends Component {
 class ClassificationModelRow extends Component {
 
   render() {
-    const { model, yes, no, project } = this.props;
+    const { model } = this.props;
     if (!model.chartData) return null;
     return (
       <div >
-        <DetailCurves model={model} yes={yes} no={no} project={project} />
+        <DetailCurves model={model} />
       </div>
     )
   }
@@ -391,34 +389,27 @@ class DetailCurves extends Component {
     this.props.model.resetFitIndex();
   }
   render() {
-    const { model, model: { mid }, yes, no, project } = this.props;
+    const { model, model: { mid } } = this.props;
 
     return (
-      <React.Fragment>
-        <div className={styles.titles}>
-          <div className={styles.blockTitle}>Confusion Matrix</div>
-          <div className={styles.blockTitle}>Cost Based</div>
+      <div className={styles.charts}>
+        <div className={styles.reportChart}>
+          <span className={styles.chartTitle}>ROC Curve</span>
+          <div className={styles.chartContent}><RocChart height={190} width={400} className={`roc${mid}`} model={model} /></div>
         </div>
-        <PredictTable model={model} yes={yes} no={no} project={project} />
-        <div className={styles.charts}>
-          <div className={styles.reportChart}>
-            <span className={styles.chartTitle}>ROC Curve</span>
-            <div className={styles.chartContent}><RocChart height={190} width={400} className={`roc${mid}`} model={model} /></div>
-          </div>
-          <div className={styles.reportChart}>
-            <span className={styles.chartTitle}>Prediction Distribution</span>
-            <div className={styles.chartContent}><PredictionDistribution height={190} width={400} className={`pd${mid}`} model={model} /></div>
-          </div>
-          <div className={styles.reportChart}>
-            <span className={styles.chartTitle}>Precision Recall Tradeoff</span>
-            <div className={styles.chartContent}><PRChart height={190} width={400} className={`precisionrecall${mid}`} model={model} /></div>
-          </div>
-          <div className={styles.reportChart}>
-            <span className={styles.chartTitle}>Lift Chart</span>
-            <div className={styles.chartContent}><LiftChart height={190} width={400} className={`lift${mid}`} model={model} /></div>
-          </div>
+        <div className={styles.reportChart}>
+          <span className={styles.chartTitle}>Prediction Distribution</span>
+          <div className={styles.chartContent}><PredictionDistribution height={190} width={400} className={`pd${mid}`} model={model} /></div>
         </div>
-      </React.Fragment>
+        <div className={styles.reportChart}>
+          <span className={styles.chartTitle}>Precision Recall Tradeoff</span>
+          <div className={styles.chartContent}><PRChart height={190} width={400} className={`precisionrecall${mid}`} model={model} /></div>
+        </div>
+        <div className={styles.reportChart}>
+          <span className={styles.chartTitle}>Lift Chart</span>
+          <div className={styles.chartContent}><LiftChart height={190} width={400} className={`lift${mid}`} model={model} /></div>
+        </div>
+      </div>
     )
   }
 }
@@ -478,7 +469,7 @@ class PredictTable extends Component {
     const { model, yes, no, project } = this.props;
     const { fitIndex, chartData } = model;
     const current = model
-    const { TP: cTP, FN: cFN, FP:cFP, TN:cTN } = project.costOption
+    const { TP: cTP, FN: cFN, FP: cFP, TN: cTN } = project.costOption
     let TN = chartData.roc.TN[fitIndex];
     let FP = chartData.roc.FP[fitIndex];
     let TP = chartData.roc.TP[fitIndex];
@@ -562,3 +553,5 @@ class PredictTable extends Component {
     );
   }
 }
+
+export { PredictTable }

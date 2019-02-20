@@ -1438,11 +1438,14 @@ export default class Project {
   }
 
   changeReportProgress = action((text, progress) => {
+    setTimeout(action(() => {
+      if (text) this.reportProgressText = text
+    }), 0)
     if (progress) this.reportProgress = progress
-    if (text) this.reportProgressText = text
   })
 
   generateReport = async (modelId) => {
+    this.changeReportProgress('initializing report.', 0)
     const model = this.models.find(m => m.id === modelId)
     // preImportance
     this.preImportance = null

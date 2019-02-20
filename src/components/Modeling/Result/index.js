@@ -76,7 +76,7 @@ export default class ModelResult extends Component {
           content={<ModelInsights model={current} project={project} />} /> */}
         <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={false} footer={null}>
           <div className={styles.reportProgress}>
-            <ProgressBar progress={project.reportProgress} />
+            <ProgressBar progress={project.reportProgress} allowRollBack={true} />
             <span className={styles.reportProgressText}>{project.reportProgressText}</span>
           </div>
         </Modal>

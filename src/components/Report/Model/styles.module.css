@@ -517,7 +517,6 @@ margin-right: 10px;
 
 .detailRow {
   display: flex;
-  padding: 0 0.25em;
   flex: none;
   align-items: center;
 }

@@ -54,10 +54,6 @@ html {
   font-size: 16px;
 }
 
-.correlationMatrix {
-  font-size: 16px;
-}
-
 .blockRow {
   margin-top: 10px;
 }
@@ -92,13 +88,13 @@ html {
 
 .metrics {
   font-size: 16px;
-  width: 800px;
+  width: 100%;
   border-top: 1px solid #aaa;
-  border-left: 1px solid #aaa;
 }
 
 .metricsRow {
   display: flex;
+  border-left: 1px solid #aaa;
 }
 
 .metricsHeader {
@@ -122,6 +118,10 @@ html {
   font-size: 22px;
 }
 
+.modelResult .marginZero {
+  margin-bottom: 0;
+}
+
 .modelResult .blockTitle {
   font-size: 16px;
   padding-top: 4px;
@@ -138,4 +138,15 @@ html {
   color: cornflowerblue;
   line-height: 48px;
   cursor: pointer;
+}
+
+.titles {
+  display: flex;
+  margin-top: 10px;
+}
+
+.metricsTitle {
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 16px;
 }
