@@ -19,6 +19,7 @@ const stores = {
 };
 
 class App extends Component {
+  
   render() {
     return (
       <ErrorBoundary>

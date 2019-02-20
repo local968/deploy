@@ -99,7 +99,7 @@ const api = {
     const previewSize = await redis.get(`user:${userId}:upload`)
     if (parseInt(previewSize) + parseInt(size) >= userStorageRestriction[level]) throw {
       status: 417,
-      message: 'Your usage of storage space has reached the max restricted by your current lisense.',
+      message: 'Your usage of storage space has reached the max restricted by your current license.',
       error: 'storage space full'
     }
     const fileId = uuid.v4()

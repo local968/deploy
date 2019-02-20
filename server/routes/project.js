@@ -254,7 +254,7 @@ const checkTraningRestriction = (user) => {
     return redis.get(restrictQuery).then(count => {
       if (count >= userProjectRestriction[level]) return reject({
         status: -4,
-        message: 'Your usage of "Number of Training" has reached the max restricted by your current lisense.',
+        message: 'Your usage of "Number of Training" has reached the max restricted by your current license.',
         error: 'project number exceed'
       })
       redis.incr(restrictQuery)

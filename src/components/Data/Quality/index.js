@@ -339,7 +339,7 @@ class VariableIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount } } = project;
+    const { issues, dataHeader, etling, etlProgress, variableIssueCount: {nullCount, mismatchCount, outlierCount} } = project;
     const tableData = this.formatTable()
     return <div className={styles.quality}>
       <div className={styles.issue}>

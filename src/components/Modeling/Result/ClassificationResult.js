@@ -304,18 +304,19 @@ class ModelTable extends Component {
           return (a.executeSpeed - b.executeSpeed) * sort
         case "name":
         default:
-          const aArr = a.name.split('.')
-          const bArr = b.name.split('.')
-          const aModelTime = aArr.slice(1).join('.');
-          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-          const bModelTime = bArr.slice(1).join('.');
-          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-          if (aModelUnix === bModelUnix) {
-            const aName = aArr.slice(0, 1)
-            const bName = bArr.slice(0, 1)
-            return aName > bName ? sort : -sort
-          }
-          return (aModelUnix - bModelUnix) * sort
+          // const aArr = a.name.split('.')
+          // const bArr = b.name.split('.')
+          // const aModelTime = aArr.slice(1).join('.');
+          // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          // const bModelTime = bArr.slice(1).join('.');
+          // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          // if (aModelUnix === bModelUnix) {
+          //   const aName = aArr.slice(0, 1)
+          //   const bName = bArr.slice(0, 1)
+          //   return aName > bName ? sort : -sort
+          // }
+          // return (aModelUnix - bModelUnix) * sort
+          return a.name > b.name ? sort : -sort
       }
     }
     return models.sort(fn)

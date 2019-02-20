@@ -17,7 +17,7 @@ export default class PredictVActual extends Component {
         <div className={styles.title} >
           Predicted VS Actual Plot (Sorted)<Hint content={<p>How was the plot created?<br />
             1. Sort the data by the actual target value<br />
-            2. From the smallest target variable, group every 100 data points into one group<br />
+            2. Divide all data points evenly into 100 groups<br />
             3. Calculate the mean value of predicted target values and the actual target values of each group and plot it on the graph<br />
             How do I interprete it?<br />
             We aim to get you a sense of how accurate the model is by comparing the predicted V.S actual value. Also you may find some pattern.</p>} />

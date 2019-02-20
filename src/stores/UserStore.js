@@ -10,6 +10,12 @@ class UserStore {
     id: '',
     email: ''
   }
+  @observable tabKey = '1';
+  @observable videoKey = '1';
+
+  @action change = (name) => (val) => {
+    this[name] = val;
+  }
 
   constructor() {
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
