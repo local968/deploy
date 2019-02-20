@@ -29,9 +29,6 @@ export default class RegressionView extends Component {
           <div className={styles.title}>
             <span>We have recommended a model by default.</span>
           </div>
-          <div className={styles.text}>
-            <span>You can also tell us your business needs to get a more precise recommendation.</span>
-          </div>
           <div className={styles.row}>
             <span>Modeling Results :{' '}</span>
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
@@ -243,7 +240,7 @@ class ModelDetail extends Component {
       <div className={styles.rowBox}>
         <Tooltip
           placement="left"
-          title={isRecommend ? 'Recommend' : 'Selected'}
+          title={isRecommend ? 'Recommended' : 'Selected'}
           visible={isSelect || isRecommend}
           overlayClassName={styles.recommendLabel}
           autoAdjustOverflow={false}

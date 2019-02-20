@@ -256,10 +256,10 @@ export default class DataSchema extends Component {
           />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
-              <span>Select Undesirable Variables</span>
+              <span>Unselect Undesirable Variables</span>
             </div> :
             <div className={styles.schemaSelect} onClick={this.toggleSelect}>
-              <span>Select Undesirable Variables</span>
+              <span>Unselect Undesirable Variables</span>
             </div>
           }
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>Unselect predictors that lead to less wanted modeling results, they could be: <br />1. Variable IDs <br />2. Variables that are derived from the target <br />3. Any other variables you don't need</div>} />

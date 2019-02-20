@@ -159,7 +159,7 @@ class TargetIssue extends Component {
               )}
             </div>
           </div>
-          <ContinueButton disabled={cannotContinue} onClick={changeTab} text='continue' width="100%" />
+          <ContinueButton disabled={cannotContinue} onClick={changeTab} text='Continue' width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
@@ -390,7 +390,7 @@ class VariableIssue extends Component {
           />
         </div>
         <div className={styles.variableBottom}>
-          <ContinueButton onClick={this.showSummary} text='continue' width="15%" />
+          <ContinueButton onClick={this.showSummary} text='Continue' width="15%" />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}

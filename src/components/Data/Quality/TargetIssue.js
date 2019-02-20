@@ -125,7 +125,7 @@ export class ClassificationTarget extends Component {
             <div className={styles.method}>
               <div className={styles.reason}><span>It’s the wrong target variable</span></div>
               <div className={styles.button} onClick={backToSchema}>
-                <button><span>Reselect target variable</span></button>
+                <button><span>Reselect Target Variable</span></button>
               </div>
             </div>
             <div className={styles.method}>
@@ -172,7 +172,7 @@ export class RegressionTarget extends Component {
             <div className={styles.method}>
               <div className={styles.reason}><span>It’s the wrong target variable</span></div>
               <div className={styles.button} onClick={backToSchema}>
-                <button><span>Reselect target variable</span></button>
+                <button><span>Reselect Target Variable</span></button>
               </div>
             </div>
             <div className={styles.method}>
@@ -807,8 +807,8 @@ export class FixIssue extends Component {
         </div>}
       </div>
       <div className={styles.fixesBottom}>
-        <button className={styles.save} onClick={this.save} ><span>save</span></button>
-        <button className={styles.cancel} onClick={closeFixes}><span>cancel</span></button>
+        <button className={styles.save} onClick={this.save} ><span>Save</span></button>
+        <button className={styles.cancel} onClick={closeFixes}><span>Cancel</span></button>
       </div>
       {this.editKey && <Modal content={<EditOutLier width={800}
         height={400} saveEdit={this.saveEdit}
@@ -1198,7 +1198,7 @@ class EditOutLier extends Component {
       <div className={styles.d3Chart}></div>
       <div className={styles.fixesBottom}>
         <button className={styles.save} onClick={this.apply} ><span>Apply</span></button>
-        <button className={styles.cancel} onClick={closeEdit}><span>cancel</span></button>
+        <button className={styles.cancel} onClick={closeEdit}><span>Cancel</span></button>
       </div>
     </div>
   }
