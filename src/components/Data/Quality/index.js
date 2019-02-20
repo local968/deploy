@@ -66,12 +66,6 @@ class TargetIssue extends Component {
     this.closeFixes();
   }
 
-  renameTarget = v => {
-    const { renameVariable, updateProject } = this.props.project
-    const data = Object.assign({}, renameVariable, v)
-    updateProject({ renameVariable: data })
-  }
-
   render() {
     const { project, changeTab } = this.props;
     const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView } = project;
@@ -172,8 +166,7 @@ class TargetIssue extends Component {
             <ClassificationTarget project={project}
               backToConnect={this.backToConnect}
               backToSchema={this.backToSchema}
-              editTarget={this.editTarget}
-              renameTarget={this.renameTarget} /> :
+              editTarget={this.editTarget} /> :
             <RegressionTarget backToConnect={this.backToConnect}
               backToSchema={this.backToSchema}
               hasIssue={issues.targetIssue}

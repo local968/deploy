@@ -24,22 +24,33 @@ export class ClassificationTarget extends Component {
   handleRename = (key, e) => {
     const value = e.target.value
     const { temp } = this
-
+    if (!value) return
     this.temp = Object.assign({}, temp, { [key]: value })
   }
 
   handleSave = () => {
     const { temp } = this
-    const { colValueCounts, target } = this.props.project
-    for (const v of Object.values(temp)) {
-      if (!v) return message.error("")
+    const { targetCounts, renameVariable, updateProject, histgramPlots, target } = this.props.project
+    const deleteKeys = []
+    for (const k of Object.keys(temp)) {
+      if (!temp[k]) return message.error("")
+      if (temp[k] === k) deleteKeys.push(k)
     }
     if (Object.keys(temp).length) {
-      const values = [...Object.keys(colValueCounts[target]).filter(n => !temp.hasOwnProperty(n)), ...Object.values(temp)]
+      const renameValues = Object.entries(renameVariable).map(([k, v]) => {
+        if (!deleteKeys.includes(k) && targetCounts.hasOwnProperty(k)) return v
+        return null
+      }).filter(n => !!n)
+      const values = [...Object.keys(targetCounts), ...Object.values(temp).filter(v => !deleteKeys.includes(v)), ...renameValues]
       if (values.length !== [...new Set(values)].length) return message.error("Cannot be modified to the same name")
       const { targetArrayTemp, targetMapTemp } = this.props.project
       if (!!targetArrayTemp.length) {
         targetArrayTemp.forEach((v, k) => {
+          if (deleteKeys.includes(v)) {
+            delete renameVariable[v]
+            delete temp[v]
+            return
+          }
           if (temp.hasOwnProperty(v)) {
             Object.keys(targetMapTemp).forEach(key => {
               if (targetMapTemp[key] === k) temp[key] = temp[v]
@@ -47,7 +58,14 @@ export class ClassificationTarget extends Component {
           }
         })
       }
-      this.props.renameTarget(temp)
+      const data = Object.assign({}, renameVariable, temp)
+      const updateData = { renameVariable: data }
+      //更新histgramPlot  target的图
+      if(histgramPlots.hasOwnProperty(target)) {
+        delete histgramPlots[target]
+        updateData.histgramPlots = histgramPlots
+      }
+      updateProject(updateData)
     }
     this.rename = false;
     this.temp = {}
