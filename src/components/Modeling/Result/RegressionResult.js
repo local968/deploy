@@ -3,7 +3,6 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable, computed } from 'mobx';
-import moment from 'moment';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
 import { Tooltip, Icon } from 'antd'

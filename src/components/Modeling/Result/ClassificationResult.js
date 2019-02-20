@@ -4,7 +4,6 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
-import moment from 'moment';
 import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 import ModelProcessFlow from "./ModelProcessFlow"

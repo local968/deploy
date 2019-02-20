@@ -122,7 +122,7 @@ export default class Support extends Component {
   }
 
   topTabsClick = (type) => {
-    _change("type", parseInt(type))
+    _change("type", parseInt(type, 10))
   }
 
   changeVideo = (id) => {
@@ -310,7 +310,7 @@ export default class Support extends Component {
 							 className={this.props.userStore.videoKey !== val.id ? styles.tabLeft : styles.tabLeftAction}>
                           {
                             this.props.userStore.videoKey !== val.id ?
-                                <img  src={require('./resource/video.png')} /> :
+                                <img  src={require('./resource/video.png')} alt=""/> :
 								<Icon type="play-circle"
 									  theme="twoTone" />
                           }

@@ -377,7 +377,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.4.3.1')}
              >
-                 <a name="3.4.3.1" className={styles.h2}/>
+                 <a name="3.4.3.1" className={styles.h2}>{''}</a>
              </WayPoint>
              <p>Once you’ve selected and finished configuring your modeling mode, R2-Learn will start building your machine learning model.</p>
              There is a possibility that the model training process will fail if R2-Learn is unable to train a sufficiently performant machine learning model from the given training dataset. If model training fails, you have to either reconfigure your project to fix dataset quality issues or choose a new or larger dataset.
