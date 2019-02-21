@@ -899,7 +899,7 @@ export default class Project {
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
-    if (this.selectId) return this.models.find(m => m.id === this.selectId)
+    if (this.selectId) return this.models.find(m => m.id === this.selectId) || this.recommendModel
     return this.recommendModel
   }
 

@@ -4,6 +4,7 @@ import config from 'config';
 import socketStore from './SocketStore';
 // import testData from './classification.json'
 // import testData from './regression.json'
+// import testData from './test.json'
 
 class UserStore {
 
