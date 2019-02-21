@@ -238,8 +238,8 @@ export default class DataSchema extends Component {
       <div className={styles.schemaInfo}>
         <div className={styles.schemaI}><span>i</span></div>
         <div className={styles.schemaText}>
-          <span>If your data is not with a header, please reload one WITH a header.</span>
-          <span>Please select a variable as the target variable , and select undesirable variables if necessary.</span>
+          <span>If your data does not have a header, please reload one WITH A HEADER.</span>
+          <span>Please select a variable as the target variable, and unselect the undesirable variables if necessary.</span>
         </div>
       </div>
       <div className={styles.schemaContent}>
@@ -256,13 +256,13 @@ export default class DataSchema extends Component {
           />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
-              <span>Select Undesirable Variables</span>
+              <span>Unselect Undesirable Variables</span>
             </div> :
             <div className={styles.schemaSelect} onClick={this.toggleSelect}>
-              <span>Select Undesirable Variables</span>
+              <span>Unselect Undesirable Variables</span>
             </div>
           }
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>Unselect predictors that lead to less wanted modeling results, they could be: <br />1.Variable IDs <br />2.Variables that are derived from the target <br />3.Any other variables you don't need</div>} />
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>Unselect predictors that lead to less wanted modeling results, they could be: <br />1. Variable IDs <br />2. Variables that are derived from the target <br />3. Any other variables you don't need</div>} />
           {isMissed && <div className={styles.schemaMissed} >
             <div className={styles.errorBlock}></div>
             <span>Missing</span>

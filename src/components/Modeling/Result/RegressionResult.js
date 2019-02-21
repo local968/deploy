@@ -3,7 +3,6 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable, computed } from 'mobx';
-import moment from 'moment';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
 import { Tooltip, Icon, message } from 'antd'
@@ -29,9 +28,6 @@ export default class RegressionView extends Component {
         <div className={styles.box}>
           <div className={styles.title}>
             <span>We have recommended a model by default.</span>
-          </div>
-          <div className={styles.text}>
-            <span>You can also tell us your business needs to get a more precise recommendation.</span>
           </div>
           <div className={styles.row}>
             <span>Modeling Results :{' '}</span>
@@ -138,18 +134,19 @@ class ModelTable extends Component {
           return (a.executeSpeed - b.executeSpeed) * sort
         case "name":
         default:
-          const aArr = a.name.split('.')
-          const bArr = b.name.split('.')
-          const aModelTime = aArr.slice(1).join('.');
-          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-          const bModelTime = bArr.slice(1).join('.');
-          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-          if (aModelUnix === bModelUnix) {
-            const aName = aArr.slice(0, 1)
-            const bName = bArr.slice(0, 1)
-            return aName > bName ? sort : -sort
-          }
-          return (aModelUnix - bModelUnix) * sort
+          // const aArr = a.name.split('.')
+          // const bArr = b.name.split('.')
+          // const aModelTime = aArr.slice(1).join('.');
+          // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          // const bModelTime = bArr.slice(1).join('.');
+          // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+          // if (aModelUnix === bModelUnix) {
+          //   const aName = aArr.slice(0, 1)
+          //   const bName = bArr.slice(0, 1)
+          //   return aName > bName ? sort : -sort
+          // }
+          // return (aModelUnix - bModelUnix) * sort
+          return a.name > b.name ? sort : -sort
       }
     }
     return models.sort(fn)
@@ -207,7 +204,7 @@ class ModelTable extends Component {
               <ModelDetail
                 key={key}
                 model={model}
-                current={current}
+                isSelect={model.id === current.id}
                 onSelect={onSelect}
                 exportReport={this.exportReport(model.id)}
                 isRecommend={model.id === recommendId}
@@ -252,13 +249,12 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, current, isRecommend, exportReport } = this.props;
-    const isSelect = model.id === current.id
+    const { model, onSelect, isRecommend, exportReport, isSelect } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
           placement="left"
-          title={isRecommend ? 'Recommend' : 'Selected'}
+          title={isRecommend ? 'Recommended' : 'Selected'}
           visible={isSelect || isRecommend}
           overlayClassName={styles.recommendLabel}
           autoAdjustOverflow={false}
@@ -269,7 +265,7 @@ class ModelDetail extends Component {
               <input
                 type="radio"
                 name="modelSelect"
-                defaultChecked={isSelect}
+                checked={isSelect}
                 onChange={onSelect.bind(null, model)}
               />
             </div>

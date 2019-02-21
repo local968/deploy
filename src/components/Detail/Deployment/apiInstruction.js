@@ -96,7 +96,7 @@ export default class extends Component {
           <div className={styles.block}>
             <span className={styles.title}>cURL Sample:</span>
             <textarea className={styles.dataText} cols='60' rows='10' placeholder='Your csv data' value={this.csvData} onChange={this.onDataChange} />
-            <p className={styles.sampleContent}>curl -X POST --data "token={this.token || '*YOUR DEPLOYMENT TOKEN*'}&deploymentId={deployment.id}&data={this.jsonData && this.jsonData.length > 2 ? this.jsonData.replace(/"/g, '\\"') : '*YOUT JSON FORMAT DATA*'}" {window.location.hostname}:{window.location.port}/api/deploy</p>
+            <p className={styles.sampleContent}>curl -X POST --data "token={this.token || '*YOUR DEPLOYMENT TOKEN*'}&deploymentId={deployment.id}&data={this.jsonData && this.jsonData.length > 2 ? this.jsonData.replace(/"/g, '\\"') : '*YOUT JSON FORMAT DATA*'}" {window.location.origin}/api/deploy</p>
           </div>
         </div>
       </div>

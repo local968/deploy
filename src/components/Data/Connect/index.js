@@ -121,6 +121,37 @@ export default class DataConnect extends Component {
     } catch (e) { }
   })
 
+  onChecks = action(file => {
+    // if(this.props.userStore.uploadSize < file.size) return {
+    //   err: true,
+    //   msg: 'File Error: File must not exceed 50M.'
+    // }
+
+    console.log(this.props.userStore.currentLever , 'this.props.userStore.currentLever')
+
+    if(this.props.userStore.currentLever === '0') {
+      return {
+        err: true,
+        msg: 'No authority.'
+      }
+    }else if( (this.props.userStore.currentLever === '1' && file.size > 50 * 1024 * 1024)|| ( this.props.userStore.currentLever === '2' && file.size > 50 * 1024 * 1024) ) {
+      return {
+        err: true,
+        msg: 'File must not exceed 50M.'
+      }
+    } else if(this.props.userStore.currentLever === '3' && file.size > 200 * 1024 * 1024){
+      return {
+        err: true,
+        msg: 'File must not exceed 200M.'
+      }
+    }
+    return {
+      err: false,
+      msg: 'ok'
+    }
+
+  })
+
   // doEtl = () => {
   //   const { project } = this.props.projectStore
   //   project.etl().then(pass => {
@@ -245,6 +276,7 @@ export default class DataConnect extends Component {
                 onError={this.onError}
                 params={{ userId: userStore.info.id, projectId: project.id }}
                 onProgress={this.onProgress}
+                onCheck={this.onChecks}
                 file={this.file}
               />
             )}

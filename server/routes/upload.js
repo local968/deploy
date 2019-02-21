@@ -23,13 +23,13 @@ router.post('/check', async (req, res) => {
   })
   if (type === 'modeling' && +fileSize >= userModelingRestriction[req.session.user.level]) return res.json({
     status: 416,
-    message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
+    message: 'Your usage of modeling data size has reached the max restricted by your current license.',
     error: 'modeling file too large'
   })
   const size = await redis.get(`user:${userId}:upload`)
   if (+size + +fileSize >= userStorageRestriction[req.session.user.level]) return res.json({
     status: 417,
-    message: 'Your usage of storage space has reached the max restricted by your current lisense.',
+    message: 'Your usage of storage space has reached the max restricted by your current license.',
     error: 'storage space full'
   })
   const token = crypto.createHash('md5').update(userId + type + fileSize + config.secret).digest('hex')

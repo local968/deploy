@@ -66,12 +66,6 @@ class TargetIssue extends Component {
     this.closeFixes();
   }
 
-  renameTarget = v => {
-    const { renameVariable, updateProject } = this.props.project
-    const data = Object.assign({}, renameVariable, v)
-    updateProject({ renameVariable: data })
-  }
-
   render() {
     const { project, changeTab } = this.props;
     const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView } = project;
@@ -165,15 +159,14 @@ class TargetIssue extends Component {
               )}
             </div>
           </div>
-          <ContinueButton disabled={cannotContinue} onClick={changeTab} text='continue' width="100%" />
+          <ContinueButton disabled={cannotContinue} onClick={changeTab} text='Continue' width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
             <ClassificationTarget project={project}
               backToConnect={this.backToConnect}
               backToSchema={this.backToSchema}
-              editTarget={this.editTarget}
-              renameTarget={this.renameTarget} /> :
+              editTarget={this.editTarget} /> :
             <RegressionTarget backToConnect={this.backToConnect}
               backToSchema={this.backToSchema}
               hasIssue={issues.targetIssue}
@@ -339,7 +332,7 @@ class VariableIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount } } = project;
+    const { issues, dataHeader, etling, etlProgress, variableIssueCount: {nullCount, mismatchCount, outlierCount} } = project;
     const tableData = this.formatTable()
     return <div className={styles.quality}>
       <div className={styles.issue}>
@@ -397,7 +390,7 @@ class VariableIssue extends Component {
           />
         </div>
         <div className={styles.variableBottom}>
-          <ContinueButton onClick={this.showSummary} text='continue' width="15%" />
+          <ContinueButton onClick={this.showSummary} text='Continue' width="15%" />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}

@@ -47,7 +47,7 @@ export default class StartTrain extends Component {
                 <img src={autoIcon} alt="auto" />
               </div>
               <div className={styles.trainName}>
-                <span>Easy and simple</span>
+                <span>Easy and Simple</span>
               </div>
               <div className={styles.trainDesc}>
                 <span>
@@ -66,7 +66,7 @@ export default class StartTrain extends Component {
                 <img src={advancedIcon} alt="advanced" />
               </div>
               <div className={styles.trainName}>
-                <span>Detailed and advanced</span>
+                <span>Detailed and Advanced</span>
               </div>
               <div className={styles.trainDesc}>
                 <span>
