@@ -136,7 +136,7 @@ export default class DataSchema extends Component {
         cn: styles.titleCell
       }
       if (i === index.columnHeader - 1) {
-        headerData.content = <HeaderInfo row='Header' col='Row' height='34px' width='100%' />
+        headerData.content = <HeaderInfo row='Header' col='Row' style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739}/>
         headerData.title = '';
       } else {
         headerData.content = <EditHeader value={header} key={i - index.columnHeader} />

@@ -18,16 +18,16 @@
 
 span#sepText {
   width: 100%;
-  border-top: 1px solid;
+  height: 1px;
   padding: 0;
-  transform: rotate(21.8deg);
+  margin: 0;
+  background-color: #000;
 }
 
 .row {
   display: flex;
   width: 50%;
   height: 50%;
-  align-items: center;
 }
 
 span#text {
@@ -36,4 +36,7 @@ span#text {
   text-overflow: ellipsis;
   display: block;
   font-size: .5rem;
+  text-align: center;
+  padding: 0;
+  margin: 0;
 }
