@@ -24,7 +24,6 @@ export class ClassificationTarget extends Component {
   handleRename = (key, e) => {
     const value = e.target.value
     const { temp } = this
-    if (!value) return
     this.temp = Object.assign({}, temp, { [key]: value })
   }
 
@@ -33,7 +32,7 @@ export class ClassificationTarget extends Component {
     const { targetCounts, renameVariable, updateProject, histgramPlots, target } = this.props.project
     const deleteKeys = []
     for (const k of Object.keys(temp)) {
-      if (!temp[k]) return message.error("")
+      if (!temp[k]) delete temp[k]
       if (temp[k] === k) deleteKeys.push(k)
     }
     if (Object.keys(temp).length) {
