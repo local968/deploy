@@ -1309,8 +1309,7 @@ export default class Project {
       };
       if (field === this.target) {
         const newFeatureLabel = {}
-        Object.keys(this.targetColMap).forEach((k, index) => {
-          if(index > 1) return
+        Object.keys(this.targetColMap).slice(0, 2).forEach((k, index) => {
           const rename = this.renameVariable[k]
           if(!!rename) newFeatureLabel[rename] = index
         })
