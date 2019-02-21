@@ -267,7 +267,7 @@ class Performance extends Component {
           strokeColor={'#f5a623'}
         />
         <div className={styles.performanceText}>
-          <span><Hint content='The help text for Cost Based: If you can estimate the business benefit of a correct prediction and the business cost of an incorrect prediction, we can help you optimize the model parameter or select a more appropriate model.' /> Performance (AUC)</span>
+          <span><Hint content='Area under the curve, a popular metric to measure the performance of a classification model. The AUC value typically lies between 0.5 to 1 where 0.5 denotes a bad classifier and 1 denotes an excellent classifier.' /> Performance (AUC)</span>
         </div>
       </div>
       <Predicted model={current} yes={yes} no={no} />
