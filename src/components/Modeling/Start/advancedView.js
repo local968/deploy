@@ -202,7 +202,7 @@ export default class AdvancedView extends Component {
       <div className={styles.advancedRow}>
         <div className={styles.advancedLeft}>
           <div className={styles.advancedBlock}>
-            <div className={styles.advancedTitle}>
+            <div className={classnames(styles.advancedTitle, styles.limit)}>
               <span>Select From Previous Settings:</span>
             </div>
             <div className={styles.advancedOption}>
@@ -277,7 +277,7 @@ export default class AdvancedView extends Component {
               })}
             </div>
           </div>
-          <div className={styles.advancedBlock}>
+          {problemType === "Classification" && < div className={styles.advancedBlock}>
             <div className={styles.advancedResampling}>
               <div className={styles.advancedTitle}>
                 <span>Resampling Setting:</span>
@@ -326,7 +326,26 @@ export default class AdvancedView extends Component {
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
+          {problemType === 'Regression' && <div className={styles.advancedBlock}>
+            <div className={classnames(styles.advancedTitle, styles.limit)}>
+              <span>Set Measurement:</span>
+            </div>
+            <div className={styles.advancedOption}>
+              <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} style={{ width: '35%' }}>
+                {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
+              </Select>
+            </div>
+          </div>}
+          {problemType === 'Regression' && <div className={styles.advancedBlock}>
+            <div className={classnames(styles.advancedTitle, styles.limit)}>
+              <span>Random Seed:</span>
+              <span className={styles.advancedDesc}>Value between 0 - 99999999</span>
+            </div>
+            <div className={styles.advancedOption}>
+              <NumberInput className={styles.advancedSize} value={randSeed} onBlur={this.handleRandSeed} min={0} max={99999999} isInt={true} />
+            </div>
+          </div>}
         </div>
         <div className={styles.advancedRight}>
           <div className={styles.advancedBlock}>

@@ -44,6 +44,7 @@ async function scheduleHandler() {
       const fileName = deployment[`${schedule.type}Options`].file
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
       const file = await api.getFile(fileId)
+      const newFeatureLabel = await api.getFeatureLabel(deployment.projectId)
       const request = {
         requestId: `schedule-${schedule.id}`,
         projectId: deployment.projectId,
@@ -54,6 +55,7 @@ async function scheduleHandler() {
         solution: deployment.modelName,
         actionType: schedule.type
       }
+      if (!!Object.keys(newFeatureLabel || {}).length) request.newFeatureLabel = newFeatureLabel
       if (deployment.modelType !== "Regression") request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
