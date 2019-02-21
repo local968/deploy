@@ -190,14 +190,28 @@ export default class AdvancedView extends Component {
           }
         case 'Validation':
           {
-            const aModelData = metricKey === 'auc' ? formatNumber(aModel.score.validateScore[metricKey]) : formatNumber(aModel[metricKey + 'Validation'])
-            const bModelData = metricKey === 'auc' ? formatNumber(bModel.score.validateScore[metricKey]) : formatNumber(bModel[metricKey + 'Validation'])
+            const { problemType } = project
+            let aModelData, bModelData
+            if (problemType === 'Regression') {
+              aModelData = formatNumber(aModel.score.validateScore[metricKey || 'r2'])
+              bModelData = formatNumber(bModel.score.validateScore[metricKey || 'r2'])
+            } else {
+              aModelData = metricKey === 'auc' ? formatNumber(aModel.score.validateScore[metricKey]) : formatNumber(aModel[metricKey + 'Validation'])
+              bModelData = metricKey === 'auc' ? formatNumber(bModel.score.validateScore[metricKey]) : formatNumber(bModel[metricKey + 'Validation'])
+            }
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Holdout':
           {
-            const aModelData = metricKey === 'auc' ? formatNumber(aModel.score.holdoutScore[metricKey]) : formatNumber(aModel[metricKey + 'Holdout'])
-            const bModelData = metricKey === 'auc' ? formatNumber(bModel.score.holdoutScore[metricKey]) : formatNumber(bModel[metricKey + 'Holdout'])
+            const { problemType } = project
+            let aModelData, bModelData
+            if (problemType === 'Regression') {
+              aModelData = formatNumber(aModel.score.holdoutScore[metricKey || 'r2'])
+              bModelData = formatNumber(bModel.score.holdoutScore[metricKey || 'r2'])
+            } else {
+              aModelData = metricKey === 'auc' ? formatNumber(aModel.score.validateScore[metricKey]) : formatNumber(aModel[metricKey + 'Validation'])
+              bModelData = metricKey === 'auc' ? formatNumber(bModel.score.validateScore[metricKey]) : formatNumber(bModel[metricKey + 'Validation'])
+            }
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'KS':
