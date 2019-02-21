@@ -9,7 +9,7 @@ import { Tooltip, Icon, message } from 'antd'
 import ModelProcessFlow from "./ModelProcessFlow";
 import Process from "./Process.svg";
 import Variable from "./Variable.svg";
-import { ProgressBar } from 'components/Common';
+import { ProgressBar, Hint } from 'components/Common';
 
 
 @observer
@@ -78,7 +78,7 @@ class Performance extends Component {
           <span>{current.score.validateScore.nrmse.toFixed(4)}</span>
         </div>
         <div className={styles.performanceText}>
-          <span>Normalized RMSE</span>
+          <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> Normalized RMSE</span>
         </div>
       </div>
       <div className={styles.space} />
@@ -172,13 +172,13 @@ class ModelTable extends Component {
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'rmse')}>
-              <span>RMSE
+              <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> RMSE
               {sortKey !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'r2')}>
               <span>
-                R<sup>2</sup>
+                <Hint content='R^2 is a statistical measure of how close the data are to the fitted regression line. R^2 = Explained variation / Total variation.' /> R<sup>2</sup>
                 {sortKey !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
