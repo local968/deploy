@@ -1270,6 +1270,7 @@ export default class Project {
 
   univariatePlot = field => {
     if (!field) return
+    if (field === this.target) return
     if (this.univariatePlots.hasOwnProperty(field)) return
     this.univariatePlots[field] = ''
     socketStore.ready().then(api => {
@@ -1306,6 +1307,15 @@ export default class Project {
         command: 'histgramPlot',
         feature_label: [field]
       };
+      if (field === this.target) {
+        const newFeatureLabel = {}
+        Object.keys(this.targetColMap).forEach((k, index) => {
+          if(index > 1) return
+          const rename = this.renameVariable[k]
+          if(!!rename) newFeatureLabel[rename] = index
+        })
+        if(!!Object.keys(newFeatureLabel).length) command.newFeatureLabel = newFeatureLabel
+      }
       // if (field) {
       //   if (this.newVariable.includes(field)) {
       //     command.feature_label = [...this.newVariable]
