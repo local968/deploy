@@ -140,7 +140,7 @@ class Report extends Component {
           </div>
         </div>
       </div>}
-      {this.isShow('dataQuality') && <div className={styles.block}>
+      {!project.noCompute && this.isShow('dataQuality') && <div className={styles.block}>
         {this.checkBox('dataQuality')}
         <h3 className={styles.blockTitle}>Data Quality</h3>
         <Summary project={project} />
