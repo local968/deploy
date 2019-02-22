@@ -111,7 +111,7 @@ export default class ClassificationView extends Component {
           </div>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={this.onChange} checked={criteria === 'cost'} />
-            <label htmlFor='criteria_cost'>Cost Based<Hint content='The help text for Cost Based: If you can estimate the business benefit of a correct prediction and the business cost of an incorrect prediction, we can help you optimize the model parameter or select a more appropriate model.' /></label>
+            <label htmlFor='criteria_cost'>Cost Based<Hint content='If you can estimate the business benefit of a correct prediction and the business cost of an incorrect prediction, we can help you optimize the model parameter or select a more appropriate model.' /></label>
           </div>
           {this.showCost && <div className={styles.costBlock}>
             <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
