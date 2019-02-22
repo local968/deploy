@@ -100,7 +100,7 @@ class TargetIssue extends Component {
             <span>{v}</span>
           </div>)}
         </div>}
-        {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 2 && 's'} Found!</span></div>}
+        {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 1 && 's'} Found!</span></div>}
         {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
           {issues.targetIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
@@ -337,7 +337,7 @@ class VariableIssue extends Component {
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
-          <div className={styles.issueTitle}><span>Issue Found!</span></div> :
+          <div className={styles.issueTitle}><span>Issue{issues.rowIssue + issues.dataIssue > 1 && 's'} Found!</span></div> :
           <div className={styles.cleanTitle}><span>Variable Quality looks good!</span></div>}
         <div className={styles.issueBox}>
           {issues.rowIssue && <div className={styles.issueText}>
