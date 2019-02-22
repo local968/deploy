@@ -76,7 +76,7 @@ export default class ModelResult extends Component {
             <span>Advanced View</span>
           </button>
         </div> */}
-        {view === 'simple' ? <SimpleView models={models} project={project} /> : <AdvancedView models={models} project={project} />}
+        {view === 'simple' ? <SimpleView models={models} project={project} exportReport={this.exportReport}/> : <AdvancedView models={models} project={project} exportReport={this.exportReport}/>}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
