@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Progress, Tooltip, Icon, message } from 'antd';
+import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
 import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
 import VariableImpact from "./VariableImpact"
@@ -70,7 +70,7 @@ export default class ClassificationView extends Component {
   }
 
   render() {
-    const { models, project } = this.props;
+    const { models, project, exportReport } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
@@ -159,6 +159,7 @@ export default class ClassificationView extends Component {
         abortTrain={abortTrain}
         isAbort={isAbort}
         project={project}
+        exportReport={exportReport}
         recommendId={recommendModel.id}
         text={text}
       />
@@ -284,15 +285,6 @@ class ModelTable extends Component {
     this.props.abortTrain()
   }
 
-  exportReport = (modelId) => () => {
-    try {
-      this.props.project.generateReport(modelId)
-    } catch (e) {
-      message.error('export report error.')
-      this.props.project.reportProgress = 0
-      this.props.project.reportProgressText = 'init'
-    }
-  }
   handleSort = key => {
     const { sortKey, sort } = this
     if (key === sortKey) return this.sort = -sort
@@ -332,7 +324,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text,exportReport } = this.props;
     const { sortKey, sort } = this
     return (
       <div className={styles.table}>
@@ -388,7 +380,7 @@ class ModelTable extends Component {
                 model={model}
                 isSelect={model.id === current.id}
                 onSelect={onSelect}
-                exportReport={this.exportReport(model.id)}
+                exportReport={exportReport(model.id)}
                 isRecommend={model.id === recommendId}
                 text={text}
               />

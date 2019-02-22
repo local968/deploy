@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { observable, computed } from 'mobx';
 import VariableImpact from "./VariableImpact"
 import PredictVActual from './PredictVActual';
-import { Tooltip, Icon, message } from 'antd'
+import { Tooltip, Icon } from 'antd'
 import ModelProcessFlow from "./ModelProcessFlow";
 import Process from "./Process.svg";
 import Variable from "./Variable.svg";
@@ -19,7 +19,7 @@ export default class RegressionView extends Component {
   };
 
   render() {
-    const { models, project } = this.props;
+    const { models, project ,exportReport } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
@@ -62,6 +62,7 @@ export default class RegressionView extends Component {
         abortTrain={abortTrain}
         isAbort={isAbort}
         project={project}
+        exportReport={exportReport}
         recommendId={recommendModel.id}
       />
     </div>
@@ -104,15 +105,6 @@ class ModelTable extends Component {
   abortTrain = () => {
     this.props.abortTrain()
   }
-  exportReport = (modelId) => () => {
-    try {
-      this.props.project.generateReport(modelId)
-    } catch (e) {
-      message.error('export report error.')
-      this.props.project.reportProgress = 0
-      this.props.project.reportProgressText = 'init'
-    }
-  }
 
   handleSort = key => {
     const { sortKey, sort } = this
@@ -154,7 +146,7 @@ class ModelTable extends Component {
 
   render() {
     const { sortKey, sort } = this
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId,exportReport } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -206,7 +198,7 @@ class ModelTable extends Component {
                 model={model}
                 isSelect={model.id === current.id}
                 onSelect={onSelect}
-                exportReport={this.exportReport(model.id)}
+                exportReport={exportReport(model.id)}
                 isRecommend={model.id === recommendId}
               />
             );

@@ -1044,3 +1044,47 @@ span.performanceScore {
 .recommendLabel :global(.ant-tooltip-inner) {
     min-height: 0;
 }
+
+.reportCancel {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+  align-self: flex-end;
+  width: 100px;
+}
+
+.reportCancel:hover {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+}
+
+.reportCancel:active {
+  background-image: linear-gradient(to bottom, #243448, #5b657b);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+}

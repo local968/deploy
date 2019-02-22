@@ -3,12 +3,12 @@ import styles from './styles.module.css';
 // import classnames from  'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import AdvancedView from '../AdvancedView/AdvancedView';
 import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
 import { ProgressBar } from 'components/Common';
-import { Modal } from 'antd'
+import { Modal, message, Button } from 'antd'
 
 const Classification = 'Classification';
 
@@ -43,6 +43,16 @@ export default class ModelResult extends Component {
     this.view = view
   }
 
+  exportReport = (modelId) => () => {
+    try {
+      this.cancel = this.props.project.generateReport(modelId)
+    } catch (e) {
+      message.error('export report error.')
+      this.props.project.reportProgress = 0
+      this.props.project.reportProgressText = 'init'
+    }
+  }
+
   render() {
     const { project } = this.props.projectStore;
     const { models } = project
@@ -58,7 +68,7 @@ export default class ModelResult extends Component {
             <span>Advanced View</span>
           </button>
         </div>
-        {view === 'simple' ? <SimpleView models={models} project={project} /> : <AdvancedView models={models} project={project} />}
+        {view === 'simple' ? <SimpleView models={models} project={project} exportReport={this.exportReport} /> : <AdvancedView models={models} project={project} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
@@ -74,10 +84,11 @@ export default class ModelResult extends Component {
           visible={current && this.show}
           onClose={this.hideInsights}
           content={<ModelInsights model={current} project={project} />} /> */}
-        <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={false} footer={null}>
+        <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={true} footer={null} onCancel={this.cancel}>
           <div className={styles.reportProgress}>
             <ProgressBar progress={project.reportProgress} allowRollBack={true} />
             <span className={styles.reportProgressText}>{project.reportProgressText}</span>
+            <Button onClick={this.cancel} className={styles.reportCancel} >Cancel</Button>
           </div>
         </Modal>
       </div>
@@ -89,9 +100,9 @@ export default class ModelResult extends Component {
 @observer
 class SimpleView extends Component {
   render() {
-    const { models, project } = this.props;
+    const { models, project, exportReport } = this.props;
     const { problemType } = project;
-    return problemType === Classification ? <ClassificationResult models={models} project={project} /> : <RegressionResult models={models} project={project} />
+    return problemType === Classification ? <ClassificationResult models={models} project={project} exportReport={exportReport} /> : <RegressionResult models={models} project={project} exportReport={exportReport} />
   }
 }
 
