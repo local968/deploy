@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-// import classnames from  'classnames'
+import classnames from 'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
 import { observable, action } from 'mobx';
@@ -60,15 +60,23 @@ export default class ModelResult extends Component {
     const { view } = this;
     return (
       <div className={styles.modelResult}>
-        <div className={styles.buttonBlock} >
+        <div className={styles.tabBox}>
+          <div className={classnames(styles.tab, {
+            [styles.active]: this.view === 'simple'
+          })} onClick={this.changeView.bind(this, 'simple')}><span>Simplified View</span></div>
+          <div className={classnames(styles.tab, {
+            [styles.active]: this.view === 'advanced'
+          })} onClick={this.changeView.bind(this, 'advanced')}><span>Advanced View</span></div>
+        </div>
+        {/* <div className={styles.buttonBlock} >
           <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
             <span>Simple View</span>
           </button>
           <button className={styles.button} onClick={this.changeView.bind(this, 'advanced')}>
             <span>Advanced View</span>
           </button>
-        </div>
-        {view === 'simple' ? <SimpleView models={models} project={project} exportReport={this.exportReport} /> : <AdvancedView models={models} project={project} />}
+        </div> */}
+        {view === 'simple' ? <SimpleView models={models} project={project} /> : <AdvancedView models={models} project={project} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>

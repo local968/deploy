@@ -63,6 +63,10 @@ export default class Modeling extends Component {
     if (this.sideRef.current) this.sideRef.current.reset()
   }
 
+  resetSide = () => {
+    if (this.sideRef.current) this.sideRef.current.reset()
+  }
+
   enter = step => {
     const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
     if (step === subStepActive) return false;
@@ -81,7 +85,9 @@ export default class Modeling extends Component {
       <div className={styles.modeling}>
         {project && <Switch>
           <Route exact path="/project/:id/modeling/start" component={StartTrain} />
-          <Route exact path="/project/:id/modeling/result" component={trainResult} />
+          <Route exact path="/project/:id/modeling/result" component={props => {
+            return <TrainResult {...props} resetSide={this.resetSide} />
+          }} />
         </Switch>}
         {project && <ProjectSide
           enter={this.enter}
@@ -98,7 +104,7 @@ export default class Modeling extends Component {
 
 @inject('projectStore')
 @observer
-class trainResult extends Component {
+class TrainResult extends Component {
   render() {
     const { project } = this.props.projectStore;
     const { models, train2Error, train2ing } = project;
@@ -107,6 +113,7 @@ class trainResult extends Component {
     return <ModelResult
       models={models}
       project={project}
+      resetSide={this.props.resetSide}
     />
   }
 }

@@ -1089,3 +1089,36 @@ span.performanceScore {
   padding: 0.1em 0.25em;
   margin-right: .25em;
 }
+
+.tabBox {
+    display: flex;
+    flex: none;
+    justify-content: flex-end;
+    border-bottom: 1px solid #979797;
+}
+
+.tab {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    width: 3.2em;
+    border-bottom: 4px solid transparent;
+    cursor: pointer;
+    padding: 0.15em 0;
+    margin-bottom: -1px;
+}
+
+.tab.active {
+    border-bottom-color: #1d2b3c;
+}
+
+.tab span {
+    font-family: HelveticaNeue;
+    font-size: 1.125rem;
+    line-height: 1.15;
+    color: #979797;
+}
+
+.tab.active span {
+    color: #1d2b3c;
+}
