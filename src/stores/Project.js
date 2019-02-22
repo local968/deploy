@@ -1360,6 +1360,7 @@ export default class Project {
   }
 
   allPlots = async (changeReportProgress) => {
+    const variableCount = this.dataHeader.length - 1
     const api = await socketStore.ready()
     const univariateCommand = {
       projectId: this.id,
@@ -1377,20 +1378,26 @@ export default class Project {
       feature_label: [this.target]
     }
     if (changeReportProgress('preparing univariate plot.', 75)) return
+    let univariatePlotCount = 0
     await api.univariatePlot(univariateCommand, progressResult => {
+      univariatePlotCount++
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
       if (result.name === 'progress') return
       if (progress && progress === "start") return
       this.univariatePlotsBase64[plotKey] = imageSavePath
+      changeReportProgress(`preparing univariate plot.(${univariatePlotCount}/${variableCount})`, 75 + 5 * univariatePlotCount / variableCount)
     })
     if (changeReportProgress('preparing histogram plot.', 80)) return
+    let histgramPlotCount = 0
     await api.histgramPlot(histogramCommand, progressResult => {
+      histgramPlotCount++
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
       if (result.name === 'progress') return
       if (progress && progress === "start") return
       this.histgramPlotsBase64[plotKey] = imageSavePath
+      changeReportProgress(`preparing histogram plot.(${histgramPlotCount}/${variableCount})`, 80 + 5 * histgramPlotCount / variableCount)
     })
     if (changeReportProgress('preparing target histogram plot.', 85)) return
     await api.rawHistgramPlot(rawHistogramCommand, progressResult => {
