@@ -1465,7 +1465,7 @@ export default class Project {
 
 
 
-  generateReport = () => {
+  generateReport = (modelId) => {
     let cancel = false
     const changeReportProgress = action((text, progress) => {
       if (!cancel) {
@@ -1535,7 +1535,7 @@ export default class Project {
       loadFile(`R2Learn_Report_${this.id}.html`, html)
       changeReportProgress(`init`, 0)
     }
-    report()
+    report(modelId)
     return action(() => {
       cancel = true
       setTimeout(action(() => {
