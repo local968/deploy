@@ -1469,9 +1469,7 @@ export default class Project {
     let cancel = false
     const changeReportProgress = action((text, progress) => {
       if (!cancel) {
-        setTimeout(action(() => {
-          if (text) this.reportProgressText = text
-        }), 0)
+        if (text) this.reportProgressText = text
         if (progress) this.reportProgress = progress
       }
     })
@@ -1538,10 +1536,13 @@ export default class Project {
       changeReportProgress(`init`, 0)
     }
     report()
-    return () => {
+    return action(() => {
       cancel = true
-      changeReportProgress(`init`, 0)
-    }
+      setTimeout(action(() => {
+        this.reportProgressText = 'init'
+      }), 10)
+      this.reportProgress = 0
+    })
   }
 }
 
