@@ -117,21 +117,26 @@ function query(key, params) {
 }
 
 function createOrUpdate(id, userId, data, isCreate = false) {
-  const params = mapObjectToArray(data)
-  const time = moment().unix();
-  params.push("updateTime", time)
-  if (isCreate) params.push("createTime", time)
-  const pipeline = redis.pipeline();
-  pipeline.hmset(`project:${id}`, params)
-  pipeline.zadd(`user:${userId}:projects:updateTime`, time, id)
-  if (isCreate) pipeline.zadd(`user:${userId}:projects:createTime`, time, id)
-  return pipeline.exec()
-    .then(result => {
-      const err = result.find(([error]) => !!error);
-      const returnValue = err ? { status: 411, message: (isCreate ? "create" : "update") + " project error" } : { status: 200, message: "ok", result: data, id }
-      wss.publish(`user:${userId}:projects`, returnValue)
-      return returnValue
-    })
+  const promise = isCreate ? Promise.resolve({ status: 200, message: 'ok' }) : checkProject(userId, id)
+  return promise.then(checked => {
+    if (checked.status !== 200) return checked
+    const params = mapObjectToArray(data)
+    const time = moment().unix();
+    params.push("updateTime", time)
+    if (isCreate) params.push("createTime", time)
+    const pipeline = redis.pipeline();
+    pipeline.hmset(`project:${id}`, params)
+    pipeline.zadd(`user:${userId}:projects:updateTime`, time, id)
+    if (isCreate) pipeline.zadd(`user:${userId}:projects:createTime`, time, id)
+    return pipeline.exec()
+      .then(result => {
+        const err = result.find(([error]) => !!error);
+        const returnValue = err ? { status: 411, message: (isCreate ? "create" : "update") + " project error" } : { status: 200, message: "ok", result: data, id }
+        wss.publish(`user:${userId}:projects`, returnValue)
+        return returnValue
+      })
+  })
+
 }
 
 function addSettingModel(userId, projectId) {
