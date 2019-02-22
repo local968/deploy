@@ -164,7 +164,7 @@ export default class Deployment extends Component {
           <span className={styles.data}>Deployment Data Definition</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
           <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>Download</a>
-          <span className={styles.email}>
+          {/* <span className={styles.email}>
             Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (
               <input
@@ -189,7 +189,7 @@ export default class Deployment extends Component {
                 Cancel
               </a>
             </div>
-          )}
+          )} */}
         </div>
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
         {cddo.option === 'api' && <ApiInstruction deployment={cd} />}
