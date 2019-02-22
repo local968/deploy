@@ -71,7 +71,7 @@ export default class ClassificationView extends Component {
   }
 
   render() {
-    const { models, project } = this.props;
+    const { models, project, exportReport } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
@@ -112,7 +112,7 @@ export default class ClassificationView extends Component {
           </div>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={this.onChange} checked={criteria === 'cost'} />
-            <label htmlFor='criteria_cost'>Cost Based</label>
+            <label htmlFor='criteria_cost'>Cost Based<Hint content='If you can estimate the business benefit of a correct prediction and the business cost of an incorrect prediction, we can help you optimize the model parameter or select a more appropriate model.' /></label>
           </div>
           {this.showCost && <div className={styles.costBlock}>
             <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
@@ -159,6 +159,8 @@ export default class ClassificationView extends Component {
         trainModel={trainModel}
         abortTrain={abortTrain}
         isAbort={isAbort}
+        project={project}
+        exportReport={exportReport}
         recommendId={recommendModel.id}
         text={text}
       />
@@ -267,7 +269,7 @@ class Performance extends Component {
           strokeColor={'#f5a623'}
         />
         <div className={styles.performanceText}>
-          <span>Performance (AUC)</span>
+          <span><Hint content='Area under the curve, a popular metric to measure the performance of a classification model. The AUC value typically lies between 0.5 to 1 where 0.5 denotes a bad classifier and 1 denotes an excellent classifier.' /> Performance (AUC)</span>
         </div>
       </div>
       <Predicted model={current} yes={yes} no={no} />
@@ -325,7 +327,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text,exportReport } = this.props;
     const { sortKey, sort } = this
     return (
       <div className={styles.table}>
@@ -372,6 +374,9 @@ class ModelTable extends Component {
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Model Process Flow</span>
             </div>
+            <div className={classnames(styles.cell, styles.cellHeader)}>
+              <span>Report</span>
+            </div>
             {/* <div className={classnames(styles.cell, styles.cellHeader)}><span>Process Flow</span></div> */}
           </div>
         </div>
@@ -383,6 +388,7 @@ class ModelTable extends Component {
                 model={model}
                 isSelect={model.id === current.id}
                 onSelect={onSelect}
+                exportReport={exportReport(model.id)}
                 isRecommend={model.id === recommendId}
                 text={text}
               />
@@ -426,7 +432,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect, isRecommend, text } = this.props;
+    const { model, onSelect, isSelect, isRecommend, text, exportReport } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -488,12 +494,15 @@ class ModelDetail extends Component {
               <img src={Process} alt="" />
               <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
             </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <span onClick={exportReport}>Export</span>
+            </div>
           </div>
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
         {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
-      </div>
+      </div >
     );
   }
 }

@@ -6,6 +6,7 @@ import config from 'config';
 import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage, Modal } from 'antd';
+import axios from 'axios'
 
 export default class Project {
   @observable models = []
@@ -141,6 +142,10 @@ export default class Project {
   @observable stopModel = false
   @observable stopEtl = false
   @observable isAbort = false
+
+  @observable reportProgress = 0
+  @observable reportProgressText = 'init'
+  @observable reportCancel = false
 
   constructor(id, args) {
     this.id = id
@@ -895,7 +900,7 @@ export default class Project {
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
-    if (this.selectId) return this.models.find(m => m.id === this.selectId)
+    if (this.selectId) return this.models.find(m => m.id === this.selectId) || this.recommendModel
     return this.recommendModel
   }
 
@@ -1253,15 +1258,15 @@ export default class Project {
 
   /**------------------------------------------------chart---------------------------------------------------------*/
   correlationMatrix = () => {
-    if (this.correlationMatrixLoading) return
+    if (this.correlationMatrixLoading) return Promise.resolve()
     this.correlationMatrixLoading = true
-    socketStore.ready().then(api => {
+    return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
         command: 'correlationMatrix',
         featureLabel: this.dataHeader.filter(n => n !== this.target)
       };
-      api.correlationMatrix(command).then(returnValue => {
+      return api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
         this.correlationMatrixLoading = false
         if (status < 0) return antdMessage.error(result['process error'])
@@ -1353,4 +1358,217 @@ export default class Project {
         return []
       })
   }
+
+  allPlots = async (changeReportProgress) => {
+    const variableCount = this.dataHeader.length - 1
+    const api = await socketStore.ready()
+    const univariateCommand = {
+      projectId: this.id,
+      command: 'univariatePlot',
+      feature_label: []
+    }
+    const histogramCommand = {
+      projectId: this.id,
+      command: 'histgramPlot',
+      feature_label: []
+    }
+    const rawHistogramCommand = {
+      projectId: this.id,
+      command: 'rawHistgramPlot',
+      feature_label: [this.target]
+    }
+    if (changeReportProgress('preparing univariate plot.', 75)) return
+    let univariatePlotCount = 0
+    await api.univariatePlot(univariateCommand, progressResult => {
+      univariatePlotCount++
+      const { result } = progressResult
+      const { field: plotKey, imageSavePath, progress } = result;
+      if (result.name === 'progress') return
+      if (progress && progress === "start") return
+      this.univariatePlotsBase64[plotKey] = imageSavePath
+      changeReportProgress(`preparing univariate plot.(${univariatePlotCount}/${variableCount})`, 75 + 5 * univariatePlotCount / variableCount)
+    })
+    if (changeReportProgress('preparing histogram plot.', 80)) return
+    let histgramPlotCount = 0
+    await api.histgramPlot(histogramCommand, progressResult => {
+      histgramPlotCount++
+      const { result } = progressResult
+      const { field: plotKey, imageSavePath, progress } = result;
+      if (result.name === 'progress') return
+      if (progress && progress === "start") return
+      this.histgramPlotsBase64[plotKey] = imageSavePath
+      changeReportProgress(`preparing histogram plot.(${histgramPlotCount}/${variableCount})`, 80 + 5 * histgramPlotCount / variableCount)
+    })
+    if (changeReportProgress('preparing target histogram plot.', 85)) return
+    await api.rawHistgramPlot(rawHistogramCommand, progressResult => {
+      const { result } = progressResult
+      const { field: plotKey, imageSavePath, progress } = result;
+      if (result.name === 'progress') return
+      if (progress && progress === "start") return
+      this.rawHistgramPlotsBase64[plotKey] = imageSavePath
+    })
+  }
+
+  getBase64Image = (img) => {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL // return dataURL.replace("data:image/png;base64,", "");
+  }
+
+  translateToBase64 = (imagePath) => {
+    if (!imagePath) return Promise.resolve('')
+    const url = `http://${config.host}:${config.port}/redirect/download/${imagePath}?projectId=${this.id}`
+    return new Promise((resolve, reject) => {
+      var img = document.createElement('img');
+      img.src = url
+      img.onload = () => resolve(this.getBase64Image(img))
+      img.onerror = () => reject()
+    })
+  }
+
+  generateReportHtml = async (jsonData) => {
+    const script = 'script'
+    const body = 'body'
+    const link = 'link'
+    const style = 'style'
+    const htmlResp = await axios.get('/index.html')
+    let html = htmlResp.data
+    html = html.replace(`<${link} rel="manifest" href="/manifest.json">`, '')
+    html = html.replace(`<${link} rel="shortcut icon" href="/favicon.ico">`, '')
+
+    const cssVersionStartStr = `<${link} href="/static/css/main.`
+    const cssVersionStart = html.indexOf(cssVersionStartStr) + cssVersionStartStr.length
+    const cssVersionEnd = html.indexOf('.', cssVersionStart)
+    const cssVersion = html.slice(cssVersionStart, cssVersionEnd)
+
+    const cssUrl = `/static/css/main.${cssVersion}.css`
+    const cssLink = `<${link} href="/static/css/main.${cssVersion}.css" rel="stylesheet">`
+    const cssResp = await axios.get(cssUrl)
+    const cssData = cssResp.data
+    const cssTag = `<${style}>${cssData}</${style}>`
+    html = html.replace(cssLink, '')
+
+    const jsVersionStartStr = `<${script} type="text/javascript" src="/static/js/main.`
+    const jsVersionStart = html.indexOf(jsVersionStartStr) + jsVersionStartStr.length
+    const jsVersionEnd = html.indexOf('.', jsVersionStart)
+    const jsVersion = html.slice(jsVersionStart, jsVersionEnd)
+
+    const jsUrl = `/static/js/main.${jsVersion}.js`
+    const jsLink = `<${script} type="text/javascript" src="/static/js/main.${jsVersion}.js"></${script}>`
+    const jsResp = await axios.get(jsUrl)
+    const jsData = jsResp.data
+    const jsTag = `<${script}>` + jsData + `</${script}>`
+    html = html.replace(jsLink, '')
+
+    html = html.replace(`</${body}>`, '')
+    // cannot use replace with js code ($$typeof wrong)
+    html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsTag}${cssTag}</${body}>`
+    return html
+  }
+
+
+
+  generateReport = (modelId) => {
+    let cancel = false
+    const changeReportProgress = action((text, progress) => {
+      if (!cancel) {
+        if (text) this.reportProgressText = text
+        if (progress) this.reportProgress = progress
+      }
+    })
+
+    const report = async (modelId) => {
+      changeReportProgress('initializing report.', 0)
+      const model = this.models.find(m => m.id === modelId)
+      // preImportance
+      this.preImportance = null
+
+      const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
+      await this.dataView()
+      dataViewDisposer()
+      if (cancel) return
+      const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
+      await this.preTrainImportance()
+      preTrainImportanceDisposer()
+      if (cancel) return
+      // correlation matrix
+      changeReportProgress('preparing variable correlation matrix.', 70)
+      await this.correlationMatrix()
+      if (cancel) return
+      // plots
+      this.univariatePlotsBase64 = {}
+      this.histgramPlotsBase64 = {}
+      this.rawHistgramPlotsBase64 = {}
+      await this.allPlots(changeReportProgress)
+      if (cancel) return
+      // translate image to base64
+      try {
+        const univariatePlots = Object.keys(this.univariatePlotsBase64)
+        const histgramPlots = Object.keys(this.histgramPlotsBase64)
+        const rawHistgramPlots = Object.keys(this.rawHistgramPlotsBase64)
+        const imageCount = univariatePlots.length + histgramPlots.length + rawHistgramPlots.length + (this.problemType === 'Regression' ? 2 : 0)
+        let count = 0
+        changeReportProgress(`downloading plots. (0/${imageCount})`, 90)
+        await Promise.all(univariatePlots.map(async (k, index) => {
+          this.univariatePlotsBase64[k] = await this.translateToBase64(this.univariatePlotsBase64[k])
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+        }))
+        if (cancel) return
+        await Promise.all(histgramPlots.map(async k => {
+          this.histgramPlotsBase64[k] = await this.translateToBase64(this.histgramPlotsBase64[k])
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+        }))
+        if (cancel) return
+        await Promise.all(rawHistgramPlots.map(async k => {
+          this.rawHistgramPlotsBase64[k] = await this.translateToBase64(this.rawHistgramPlotsBase64[k])
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+        }))
+        if (cancel) return
+        if (this.problemType === 'Regression') {
+          // fit plot
+          model.fitPlotBase64 = await this.translateToBase64(model.fitPlot)
+          if (cancel) return
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+          // residual plot
+          model.residualPlotBase64 = await this.translateToBase64(model.residualPlot)
+          if (cancel) return
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+        }
+      } catch (e) { }
+      // generate json
+      const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
+
+      changeReportProgress(`generating report file`, 100)
+      const html = await this.generateReportHtml(json)
+      if (cancel) {
+        changeReportProgress(`init`, 0)
+        return
+      }
+      loadFile(`R2Learn_Report_${this.id}.html`, html)
+      changeReportProgress(`init`, 0)
+    }
+    report(modelId)
+    return action(() => {
+      cancel = true
+      setTimeout(action(() => {
+        this.reportProgressText = 'init'
+      }), 10)
+      this.reportProgress = 0
+    })
+  }
+}
+
+function loadFile(fileName, content) {
+  var aLink = document.createElement('a');
+  var blob = new Blob([content], {
+    type: 'text/plain'
+  });
+  aLink.download = fileName;
+  aLink.href = URL.createObjectURL(blob);
+  aLink.click();
+  URL.revokeObjectURL(blob);
 }

@@ -18,18 +18,6 @@
     font-size: 0.875rem;
     /* border: 0.5px solid #d8d8d8; */
     position: relative;
-    max-height: 50vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
-  }
-  .advancedModelTable::-webkit-scrollbar{
-    width: 17px;
-  }
-  .advancedModelTable::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
-    border-radius: 5px;
-  }
-  .advancedModelTable::-webkit-scrollbar-track {/*滚动条里面轨道*/
-    border-radius: 0;
   }
   .advancedModelTable :global(.ant-radio-wrapper) {
     vertical-align: middle;
@@ -51,7 +39,7 @@
   }
 
   .tableHeader {
-    margin-right: 17px;
+    /* margin-right: 17px; */
   }
 
   .adrow .adcell {
@@ -221,9 +209,307 @@
     margin-right: 1rem;
   }
   .headerLabel {
-    max-width: 60%;
+    max-width: 80%;
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
-    vertical-align: bottom;
+    vertical-align: middle;
   }
+
+  .charts {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+
+  .reportChart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+  }
+
+  .chartTitle {
+
+  }
+
+  .chartContent {
+    width: 400px
+  }
+
+  .chartContent img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .costbase {
+    display: flex;
+  }
+
+  .predictTable {
+    flex: 1 1 50%;
+  }
+
+  .costBlock {
+    display: flex;
+    flex: 1 1 50%;
+    flex-direction: column;
+    border-radius: 5px;
+    padding: 0 0.25em;
+    font-size: 100px;
+}
+
+.costTitle {
+    display: flex;
+    flex: none;
+    margin-bottom: 0.1em;
+}
+
+.costTitle span {
+    font-family: SanFranciscoText;
+    font-size: 1rem;
+    line-height: 1.13;
+    color: #000000;
+}
+
+.costContent {
+    display: flex;
+    flex: none;
+}
+
+.costContent span {
+    font-family: SanFranciscoText;
+    font-size: 0.75rem;
+    line-height: 1.33;
+    color: #000000;
+}
+
+.costBox {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.costTable {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+}
+
+.costRow {
+    display: flex;
+    flex: none;
+    padding: 10px 0;
+    margin-bottom: -1px;
+    border-bottom: 1px solid #979797
+}
+
+.costRow:first-child {
+  padding: 0;
+}
+
+.costCell {
+    display: flex;
+    flex: 3 1;
+    width: 0;
+    align-items: center;
+}
+
+.costCell span {
+    font-family: SanFranciscoText;
+    font-size: 0.875rem;
+    line-height: 1.29;
+    color: #000000;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.costCellSmall {
+    flex: none;
+    width: 1em;
+}
+
+.costCellCenter {
+    justify-content: center
+}
+
+.costTd {
+    display: flex;
+    flex: auto;
+    align-items: center;
+    border-left: 1px solid #979797;
+}
+
+.costName {
+    display: flex;
+    flex: 3 1;
+    width: 0;
+}
+
+.costInput {
+    display: flex;
+    flex: 2 1;
+    align-items: center;
+    width: 0;
+    height: 0.3em;
+    margin: 0 0.1em;
+}
+
+.costInput input {
+    font-family: SanFranciscoText;
+    font-size: 0.875rem;
+    line-height: 1.29;
+    color: #000000;
+    width: 100%;
+    height: 100%;
+    padding: 0 5px;
+}
+
+.costUnits {
+    display: flex;
+    flex: 2 1;
+    width: 0;
+}
+
+.costColor {
+    display: flex;
+    flex: none;
+    width: 0.2em;
+    height: 0.2em;
+    margin: 0 0.05em;
+}
+
+.cost11 {
+    background-color: #adaafc;
+}
+
+.cost10 {
+    background-color: #ffcc78;
+}
+
+.cost01 {
+    background-color: #ffcc78;
+}
+
+.cost00 {
+    background-color: #9be44b;
+}
+
+.costClose {
+    display: flex;
+    flex: none;
+    position: absolute;
+    right: 0.1em;
+    top: 0;
+    cursor: pointer;
+}
+
+.costClose span{
+    transform: rotate(45deg);
+    font-size: 2rem;
+    color: #9b9b9b;
+}
+
+.disabled {
+    cursor: not-allowed;
+    background-color: #d3d3d3;
+    color: #aaaaaa;
+    background-image: none;
+}
+
+.costButton {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-top: .1em;
+}
+
+.costButton button {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    flex: none;
+    padding: .05em .1em;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.costButton span {
+    font-size: .8rem;
+    color: #fff;
+}
+
+.costTextBox {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.costText {
+    display: flex;
+    flex: none;
+}
+
+.costText span {
+    font-family: SanFranciscoText;
+    font-size: 0.75rem;
+    line-height: 1.33;
+    color: #000000;
+    font-weight: bold;
+}
+.sepCell {
+  display: flex;
+  flex: none;
+  width: 1em;
+  height: .4em;
+  position: relative;
+  flex-direction: column;
+}
+
+.sep {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  display: flex;
+  z-index: -1;
+}
+
+.sep span {
+  width: 100%;
+  border-top: 1px solid;
+  transform: rotate(21.8deg);
+}
+
+.sepText {
+  display: flex;
+  width: 50%;
+  height: 50%;
+  align-items: center;
+}
+
+.sepText span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  font-size: .5rem;
+}
+
+.titles {
+  display: flex;
+}
+
+.blockTitle {
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 16px;
+}

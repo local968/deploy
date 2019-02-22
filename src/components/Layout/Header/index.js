@@ -214,7 +214,7 @@ class WelcomeHeader extends Component {
         <div className={styles.wheader}>
           <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
           <span className={styles.welcome}>
-            Welcome, {this.props.userStore.info.email}
+            Welcome, {this.props.userStore.info.email.split('@')[0]}
           </span>
           <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
             <div className={styles.down}>

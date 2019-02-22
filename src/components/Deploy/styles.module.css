@@ -72,7 +72,7 @@
 }
 
 .modelName {
-  flex: 1 1 0;
+  flex: 2 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;

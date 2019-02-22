@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {inject, observer} from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import * as d3 from 'd3';
 
 import styles from './D3Chart.module.css';
@@ -10,7 +10,7 @@ function parseData(chartData) {
   const POSITIVE = chartData.POSITIVE;
 
   return Object.values(NEGATIVE).reduce((result, value, index) => {
-    result.push({NEGATIVE: value, POSITIVE: POSITIVE[index], PERCENTAGE: PERCENTAGE[index]});
+    result.push({ NEGATIVE: value, POSITIVE: POSITIVE[index], PERCENTAGE: PERCENTAGE[index] });
     return result;
   }, [])
 }
@@ -22,34 +22,34 @@ export default class AreaChart extends Component {
     movable: true
   };
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.newSort = this.newSort.bind(this)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.renderD3();
   }
-  componentDidUpdate () {
-    if (!this.props.model.fitIndexModified) {
-      d3.select(`.${this.props.className} svg`).remove();
-      this.renderD3();
-    }
+  componentDidUpdate() {
+    // if (!this.props.model.fitIndexModified) {
+    d3.select(`.${this.props.className} svg`).remove();
+    this.renderD3();
+    // }
   }
 
-  render () {
-    const {className} = this.props;
-    const {fitIndexModified} = this.props.model;
-    if (fitIndexModified) { }
-    return <div className={`${styles.areaChart} ${className}`}/>
+  render() {
+    const { className } = this.props;
+    const { fitIndex } = this.props.model;
+    if (fitIndex) { }
+    return <div className={`${styles.areaChart} ${className}`} />
   }
 
   renderD3 = () => {
-    let {height, width, model} = this.props;
-    const margin = {top: 15, right: 20, bottom: 20, left: 50};
+    let { height, width, model } = this.props;
+    const margin = { top: 15, right: 20, bottom: 20, left: 50 };
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
-    const {chartData} = model;
+    const { chartData } = model;
     if (!chartData) return null;
 
     let data = parseData(chartData.density);
@@ -79,7 +79,7 @@ export default class AreaChart extends Component {
       return {
         id,
         values: data.map(function (d) {
-          return {percentage: d.PERCENTAGE, density: d[id]};
+          return { percentage: d.PERCENTAGE, density: d[id] };
         })
       };
     });
@@ -127,26 +127,27 @@ export default class AreaChart extends Component {
     this.drawThreshold(svg, x, height);
   };
 
-    newSort(index){
-      clearTimeout(window.changeCutoff);
-      window.changeCutoff = setTimeout(()=>{
-        this.props.projectStore.changeStopFilter(false);
-        this.props.model.setFitIndex(index);
-      },800)
-    }
+  newSort(index) {
+    clearTimeout(window.changeCutoff);
+    window.changeCutoff = setTimeout(() => {
+      this.props.projectStore.changeStopFilter(false);
+      // this.props.model.setFitIndex(index);
+    }, 800)
+  }
 
   /**
    * 可移动棒
    */
-  drawThreshold(svg, x, height){
-    const {model: {chartData, fitIndex}} = this.props;
+  drawThreshold(svg, x, height) {
+    const { model: { chartData, fitIndex } } = this.props;
     const thresholdLine = svg.append('g');
     const threshold = chartData.roc.Threshold[fitIndex];
+    let index = threshold
 
     const line = thresholdLine
       .append('line')
-      .attr('x1', x(threshold))
-      .attr('x2', x(threshold))
+      .attr('x1', x(index))
+      .attr('x2', x(index))
       .attr('y1', height)
       .attr('y2', 20)
       .attr('class', styles.thresholdLine);
@@ -154,19 +155,20 @@ export default class AreaChart extends Component {
     const dragCircle = d3.drag()
       .on('drag', () => {
         let p = d3.event.x;
-        const index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
-        if(p<0){
-          p=0
-        }else if(p>430){
-            p=430
+        index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
+        if (p < 0) {
+          p = 0
+        } else if (p > 430) {
+          p = 430
         }
         line.attr('x1', p)
           .attr('x2', p);
         circle.attr('cx', p);
         this.props.projectStore.changeStopFilter(true);
-        this.props.model.setFitIndex(index);//stores/Model.js/setFitIndex
         this.newSort(index)
-      });
+      }).on('end', () => {
+        this.props.model.setFitIndex(index);//stores/Model.js/setFitIndex
+      })
 
     const circle = thresholdLine
       .append('circle')
@@ -178,7 +180,7 @@ export default class AreaChart extends Component {
   }
 
   drawLegend = (svg, color) => {
-    const {targetMap} = this.props.model;
+    const { targetMap } = this.props.model;
     const targets = Object.keys(targetMap);
     const legend = svg.append('g').attr('transform', 'translate(' + 0 + ',' + 0 + ')');
     legend.append('circle')
@@ -206,7 +208,7 @@ export default class AreaChart extends Component {
       .text(targets[1]);
   };
 
-  getNearestPoint (val, data, key) {
+  getNearestPoint(val, data, key) {
     let index;
     let minOffset = Number.MAX_SAFE_INTEGER;
     Object.values(data[key]).forEach((d, i) => {

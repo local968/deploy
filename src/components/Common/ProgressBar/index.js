@@ -13,12 +13,12 @@ class ProgressBar extends Component {
   }
 
   componentWillReceiveProps(props) {
-    this.setProgress(props.progress)
+    this.setProgress(props.progress, props.allowRollBack)
   }
 
-  setProgress = progress => {
+  setProgress = (progress, allowRollBack) => {
     if (typeof progress === 'number') {
-      this.value = Math.max(progress, (this.value || 0))
+      this.value = allowRollBack ? progress : Math.max(progress, (this.value || 0))
     } else {
       this.value = 0
     }

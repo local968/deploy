@@ -5,6 +5,7 @@ import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import RocChart from 'components/D3Chart/RocChart';
 import PRChart from 'components/D3Chart/PRChart';
+import { Hint } from 'components/Common';
 import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
@@ -328,7 +329,8 @@ export default class AdvancedView extends Component {
 
   constructor(props) {
     super(props);
-    this.metric = this.metricOptions.find(m => m.key === props.projectStore.project.currentSetting.setting.measurement) || this.metricOptions[0]
+    const currentSetting = props.projectStore.project.currentSetting
+    this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
     autorun(() => {
       const { project } = props;
       if (project && project.measurement)
@@ -370,7 +372,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '120px', fontSize: '1.125rem' }}>
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
@@ -378,6 +380,22 @@ export default class AdvancedView extends Component {
       </div>
     )
   }
+}
+
+const questMarks = {
+  Accuracy: 'Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%.',
+  Recall: 'Recall=TP/(TP+FN). It measures the % of positives the classifier labeled as positive. It represents the completeness of the classifier. The higher the recall is the more positives the classifier captures.',
+  'Cutoff Threshold': 'Many classifiers are able to produce a probability distribution over a set of classes (e.g. binary 1/0). Cut-off threshold is a certain probability value which can be used to determine whether an observation belongs to a particular class.',
+  // 'F1-Score': '',
+  Precision: "It measures how many true positives among all predicted (including true and false)  positives. It's TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.",
+  KS: "KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It's calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other.",
+  'Normalized RMSE': 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
+  R2: 'R^2 is a statistical measure of how close the data are to the fitted regression line. R^2 = Explained variation / Total variation.',
+  RMSE: 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
+  RMSLE: 'RMSLE is similar with RMSE, but use log to y and y_pred first',
+  MSE: 'Mean Squared Error',
+  MAE: 'Mean Absolute Error',
+  AdjustR2: 'The adjusted R^2^ tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.'
 }
 
 @observer
@@ -396,12 +414,13 @@ class AdvancedModelTable extends Component {
       ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout', 'Time'] :
       ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', 'Validation', 'Holdout', 'Time'];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
+    const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
       if (sortState[curr] === undefined) return { ...prev, [curr]: curr };
-      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='minus' /></div> }
-      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' /></div> }
-      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='minus' /></div> }
+      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
+      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
       return prev
     }, {});
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
@@ -653,6 +672,7 @@ class DetailCurves extends Component {
         break;
       case 'Lift Chart':
         curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
+        hasReset = false;
         break;
       case 'Variable Impact':
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
@@ -702,12 +722,12 @@ class DetailCurves extends Component {
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} >
           <div className={styles.thumbnails} >
-            {thumbnails.slice(0, 4).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+            {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} yes={yes} no={no} />
-          <div className={styles.thumbnails}>
+          {/* <div className={styles.thumbnails}>
             {thumbnails.slice(4, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
-          </div>
+          </div> */}
         </div>
         <div className={styles.rightPanel} >
           {hasReset && <button onClick={this.reset} className={styles.button} >Reset</button>}
@@ -722,6 +742,10 @@ class Thumbnail extends Component {
   state = {
     clickActive: false,
     hoverActive: false
+  }
+  componentDidMount() {
+    const { curSelected, value } = this.props;
+    this.setState({ clickActive: curSelected === value });
   }
   componentWillReceiveProps(nextProps) {
     const { curSelected, value } = nextProps;
@@ -767,10 +791,31 @@ class Row extends Component {
   }
 }
 
+const formatNumber = (str) => {
+  if (isNaN(str)) return str
+  str = str.toString()
+  let i, d
+  if (str.indexOf('.')) {
+    i = str.split('.')[0]
+    d = str.split('.')[1]
+  } else {
+    i = str
+  }
+
+  const left = i.length % 3
+  i = i.split('').reduce((prev, curr, index) => {
+    if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
+    if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
+    return prev + curr
+  }, '')
+  if (d) return i + '.' + d.slice(0, 3)
+  return i
+}
+// const fixed3 = (data) => typeof data === 'number' ? data.toFixed(3) : data
+
 class RowCell extends Component {
   render() {
     const { data, cellStyle, other, cellClassName, ...rest } = this.props;
-    const fixed3 = (data) => typeof data === 'number' ? data.toFixed(3) : data
     return (
       <div
         {...rest}
@@ -778,7 +823,7 @@ class RowCell extends Component {
         className={classnames(styles.adcell, cellClassName)}
         title={typeof data === 'object' ? '' : data}
       >
-        {other ? <span className={styles.hasotherCell} >{fixed3(data)}</span> : fixed3(data)}
+        {other ? <span className={styles.hasotherCell} >{formatNumber(data)}</span> : formatNumber(data)}
         {other}
       </div>
     );

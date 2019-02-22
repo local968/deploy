@@ -1,5 +1,6 @@
 .correlationMatrix {
   display: flex;
+  justify-content: center;
 }
 .correlationMatrix .matrix {
   overflow: auto;

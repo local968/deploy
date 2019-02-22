@@ -10,7 +10,7 @@ import { Tooltip, Icon } from 'antd'
 import ModelProcessFlow from "./ModelProcessFlow";
 import Process from "./Process.svg";
 import Variable from "./Variable.svg";
-import { ProgressBar } from 'components/Common';
+import { ProgressBar, Hint } from 'components/Common';
 
 
 @observer
@@ -20,7 +20,7 @@ export default class RegressionView extends Component {
   };
 
   render() {
-    const { models, project } = this.props;
+    const { models, project ,exportReport } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
@@ -62,6 +62,8 @@ export default class RegressionView extends Component {
         trainModel={trainModel}
         abortTrain={abortTrain}
         isAbort={isAbort}
+        project={project}
+        exportReport={exportReport}
         recommendId={recommendModel.id}
       />
     </div>
@@ -78,7 +80,7 @@ class Performance extends Component {
           <span>{current.score.validateScore.nrmse.toFixed(4)}</span>
         </div>
         <div className={styles.performanceText}>
-          <span>Normalized RMSE</span>
+          <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> Normalized RMSE</span>
         </div>
       </div>
       <div className={styles.space} />
@@ -147,7 +149,7 @@ class ModelTable extends Component {
 
   render() {
     const { sortKey, sort } = this
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId,exportReport } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -165,13 +167,13 @@ class ModelTable extends Component {
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'rmse')}>
-              <span>RMSE
+              <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> RMSE
               {sortKey !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'r2')}>
               <span>
-                R<sup>2</sup>
+                <Hint content='R^2 is a statistical measure of how close the data are to the fitted regression line. R^2 = Explained variation / Total variation.' /> R<sup>2</sup>
                 {sortKey !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
@@ -191,6 +193,9 @@ class ModelTable extends Component {
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Model Process Flow</span>
             </div>
+            <div className={classnames(styles.cell, styles.cellHeader)}>
+              <span>Report</span>
+            </div>
           </div>
         </div>
         <div className={styles.data}>
@@ -201,6 +206,7 @@ class ModelTable extends Component {
                 model={model}
                 isSelect={model.id === current.id}
                 onSelect={onSelect}
+                exportReport={exportReport(model.id)}
                 isRecommend={model.id === recommendId}
               />
             );
@@ -243,7 +249,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect, isRecommend } = this.props;
+    const { model, onSelect, isRecommend, exportReport, isSelect } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -290,13 +296,16 @@ class ModelDetail extends Component {
               <img src={Process} alt="" />
               <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
             </div>
+            <div className={classnames(styles.cell, styles.compute)}>
+              <span onClick={exportReport}>Export</span>
+            </div>
           </div>
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {/*{this.visible && <VariableImpact model={model} />}*/}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
         {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
-      </div>
+      </div >
     );
   }
 }

@@ -1,0 +1,152 @@
+html {
+  font-size: 16px;
+}
+
+.report {
+  font-size: 80px;
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 28px;
+}
+
+
+.subTitle {
+  font-size: 28px;
+  font-family: HelveticaNeue;
+}
+
+.block {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.block :global(.ant-checkbox-wrapper) {
+  position: absolute;
+  top: 6px;
+  left: -24px;
+}
+
+.modelResult {
+  position: relative;
+}
+
+.modelResult :global(.ant-checkbox-wrapper) {
+  position: absolute;
+  top: 6px;
+  left: -24px;
+}
+
+.blockTitle {
+  font-size: 22px;
+  text-align: left;
+  font-family: HelveticaNeue;
+}
+
+.blockTitle small {
+  color: cornflowerblue;
+  cursor: pointer;
+}
+
+.profile {
+  font-size: 16px;
+}
+
+.blockRow {
+  margin-top: 10px;
+}
+
+.performance {
+  font-size: 16px;
+}
+
+.schema {
+  font-size: 16px;
+  width: 500px;
+  border-top: 1px solid #aaa;
+  border-left: 1px solid #aaa;
+}
+
+.schemaRow {
+  display: flex;
+}
+
+.schemaHeader {
+  background: #ccc;
+}
+
+.schemaCell {
+  padding: 2px 5px;
+  flex: 1 0 0;
+  border-bottom: 1px solid #aaa;
+  border-right: 1px solid #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metrics {
+  font-size: 16px;
+  width: 100%;
+  border-top: 1px solid #aaa;
+}
+
+.metricsRow {
+  display: flex;
+  border-left: 1px solid #aaa;
+}
+
+.metricsHeader {
+  background: #ccc;
+}
+
+.metricsCell {
+  padding: 2px 5px;
+  flex: 1 0 0;
+  border-bottom: 1px solid #aaa;
+  border-right: 1px solid #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modelName {
+  font-size: 13px;
+}
+
+.modelResult .title {
+  font-size: 22px;
+}
+
+.modelResult .marginZero {
+  margin-bottom: 0;
+}
+
+.modelResult .blockTitle {
+  font-size: 16px;
+  padding-top: 4px;
+}
+
+.totalTitle {
+  font-size: 28px;
+  text-align: center;
+}
+
+.totalTitle small {
+  float: right;
+  font-size: 16px;
+  color: cornflowerblue;
+  line-height: 48px;
+  cursor: pointer;
+}
+
+.titles {
+  display: flex;
+  margin-top: 10px;
+}
+
+.metricsTitle {
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 16px;
+}

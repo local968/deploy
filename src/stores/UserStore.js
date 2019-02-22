@@ -2,6 +2,9 @@ import { observable, action, when } from 'mobx';
 import axios from 'axios';
 import config from 'config';
 import socketStore from './SocketStore';
+// import testData from './classification.json'
+// import testData from './regression.json'
+// import testData from './test.json'
 
 class UserStore {
 
@@ -18,6 +21,11 @@ class UserStore {
   }
 
   constructor() {
+    // window.r2Report = testData
+    if (window.r2Report) {
+      this.status = 'unlogin'
+      return
+    }
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info

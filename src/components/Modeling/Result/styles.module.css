@@ -981,6 +981,57 @@ span.performanceScore {
     font-weight: bold;
 }
 
+.sepCell {
+    display: flex;
+    flex: none;
+    width: 1em;
+    height: .4em;
+    position: relative;
+    flex-direction: column;
+}
+
+.sep {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    display: flex;
+    z-index: -1;
+}
+
+.sep span {
+    width: 100%;
+    border-top: 1px solid;
+    transform: rotate(21.8deg);
+}
+
+.sepText {
+    display: flex;
+    width: 50%;
+    height: 50%;
+    align-items: center;
+}
+
+.sepText span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    font-size: .5rem;
+}
+
+.reportProgress {
+  font-size: 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reportProgressText {
+  font-size: 16px;
+  margin: 4px;
+  display: flex;
+  flex: auto;
+}
 .nohover:hover {
   cursor: text;
 }
@@ -993,4 +1044,48 @@ span.performanceScore {
 
 .recommendLabel :global(.ant-tooltip-inner) {
     min-height: 0;
+}
+
+.reportCancel {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+  align-self: flex-end;
+  width: 100px;
+}
+
+.reportCancel:hover {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+}
+
+.reportCancel:active {
+  background-image: linear-gradient(to bottom, #243448, #5b657b);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
 }
