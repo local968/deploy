@@ -1359,7 +1359,7 @@ export default class Project {
       })
   }
 
-  allPlots = async () => {
+  allPlots = async (changeReportProgress) => {
     const api = await socketStore.ready()
     const univariateCommand = {
       projectId: this.id,
@@ -1376,7 +1376,7 @@ export default class Project {
       command: 'rawHistgramPlot',
       feature_label: [this.target]
     }
-    this.changeReportProgress('preparing univariate plot.', 75)
+    changeReportProgress('preparing univariate plot.', 75)
     await api.univariatePlot(univariateCommand, progressResult => {
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -1384,7 +1384,7 @@ export default class Project {
       if (progress && progress === "start") return
       this.univariatePlotsBase64[plotKey] = imageSavePath
     })
-    this.changeReportProgress('preparing histogram plot.', 80)
+    changeReportProgress('preparing histogram plot.', 80)
     await api.histgramPlot(histogramCommand, progressResult => {
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -1392,7 +1392,7 @@ export default class Project {
       if (progress && progress === "start") return
       this.histgramPlotsBase64[plotKey] = imageSavePath
     })
-    this.changeReportProgress('preparing target histogram plot.', 85)
+    changeReportProgress('preparing target histogram plot.', 85)
     await api.rawHistgramPlot(rawHistogramCommand, progressResult => {
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -1463,35 +1463,39 @@ export default class Project {
     return html
   }
 
-  changeReportProgress = action((text, progress) => {
-    setTimeout(action(() => {
-      if (text) this.reportProgressText = text
-    }), 0)
-    if (progress) this.reportProgress = progress
-  })
+
 
   generateReport = () => {
     let cancel = false
+    const changeReportProgress = action((text, progress) => {
+      if (!cancel) {
+        setTimeout(action(() => {
+          if (text) this.reportProgressText = text
+        }), 0)
+        if (progress) this.reportProgress = progress
+      }
+    })
+
     const report = async (modelId) => {
-      this.changeReportProgress('initializing report.', 0)
+      changeReportProgress('initializing report.', 0)
       const model = this.models.find(m => m.id === modelId)
       // preImportance
       this.preImportance = null
 
-      const dataViewDisposer = autorun(() => this.changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
+      const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
       await this.dataView()
       dataViewDisposer()
-      const preTrainImportanceDisposer = autorun(() => this.changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
+      const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
       await this.preTrainImportance()
       preTrainImportanceDisposer()
       // correlation matrix
-      this.changeReportProgress('preparing variable correlation matrix.', 70)
+      changeReportProgress('preparing variable correlation matrix.', 70)
       await this.correlationMatrix()
       // plots
       this.univariatePlotsBase64 = {}
       this.histgramPlotsBase64 = {}
       this.rawHistgramPlotsBase64 = {}
-      await this.allPlots()
+      await this.allPlots(changeReportProgress)
       // translate image to base64
       try {
         const univariatePlots = Object.keys(this.univariatePlotsBase64)
@@ -1499,44 +1503,44 @@ export default class Project {
         const rawHistgramPlots = Object.keys(this.rawHistgramPlotsBase64)
         const imageCount = univariatePlots.length + histgramPlots.length + rawHistgramPlots.length + (this.problemType === 'Regression' ? 2 : 0)
         let count = 0
-        this.changeReportProgress(`downloading plots. (0/${imageCount})`, 90)
+        changeReportProgress(`downloading plots. (0/${imageCount})`, 90)
         await Promise.all(univariatePlots.map(async (k, index) => {
           this.univariatePlotsBase64[k] = await this.translateToBase64(this.univariatePlotsBase64[k])
-          this.changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }))
         await Promise.all(histgramPlots.map(async k => {
           this.histgramPlotsBase64[k] = await this.translateToBase64(this.histgramPlotsBase64[k])
-          this.changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }))
         await Promise.all(rawHistgramPlots.map(async k => {
           this.rawHistgramPlotsBase64[k] = await this.translateToBase64(this.rawHistgramPlotsBase64[k])
-          this.changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }))
         if (this.problemType === 'Regression') {
           // fit plot
           model.fitPlotBase64 = await this.translateToBase64(model.fitPlot)
-          this.changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
           // residual plot
           model.residualPlotBase64 = await this.translateToBase64(model.residualPlot)
-          this.changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }
       } catch (e) { }
       // generate json
       const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
 
-      this.changeReportProgress(`generating report file`, 100)
+      changeReportProgress(`generating report file`, 100)
       const html = await this.generateReportHtml(json)
       if (cancel) {
-        this.changeReportProgress(`init`, 0)
+        changeReportProgress(`init`, 0)
         return
       }
       loadFile(`R2Learn_Report_${this.id}.html`, html)
-      this.changeReportProgress(`init`, 0)
+      changeReportProgress(`init`, 0)
     }
     report()
     return () => {
       cancel = true
-      this.changeReportProgress(`init`, 0)
+      changeReportProgress(`init`, 0)
     }
   }
 }
