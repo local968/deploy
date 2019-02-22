@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
+import moment from 'moment';
 import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 import ModelProcessFlow from "./ModelProcessFlow"
@@ -301,6 +302,8 @@ class ModelTable extends Component {
           return (a.score.validateScore.auc - b.score.validateScore.auc) * sort
         case 'speed':
           return (a.executeSpeed - b.executeSpeed) * sort
+        case 'time':
+          return ((a.createTime || 0) - (b.createTime || 0)) * sort
         case "name":
         default:
           // const aArr = a.name.split('.')
@@ -356,6 +359,11 @@ class ModelTable extends Component {
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'speed')}>
               <span>Execution Speed
               {sortKey !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              </span>
+            </div>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'time')}>
+              <span>Time
+              {sortKey !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
@@ -468,6 +476,9 @@ class ModelDetail extends Component {
             </div>
             <div className={styles.cell}>
               <span>{model.executeSpeed + ' rows/s'}</span>
+            </div>
+            <div className={styles.cell}>
+              <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
             </div>
             <div className={classnames(styles.cell, styles.compute)}>
               <img src={Variable} alt="" />

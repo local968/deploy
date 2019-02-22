@@ -385,6 +385,7 @@ span.performanceScore {
     font-size: 0.875rem;
     text-overflow: clip;
     white-space: nowrap;
+    height: 1.25rem;
 }
 
 .rowHeader {

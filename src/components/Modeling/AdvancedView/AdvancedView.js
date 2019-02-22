@@ -73,7 +73,8 @@ export default class AdvancedView extends Component {
     'MAE': false,
     'R2': false,
     'AdjustR2': false,
-    'KS': false
+    'KS': false,
+    'Time': false
   };
   @observable metric = {
     key: '',
@@ -222,13 +223,16 @@ export default class AdvancedView extends Component {
             const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex]);
             return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
           }
+        case 'Time':
+          return (this.sortState[currentSort] === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
         case 'Model Name':
         default:
-          const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
-          const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-          const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
-          const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-          return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
+          return (aModel.name > bModel.name ? 1 : -1) * (this.sortState[currentSort] === 1 ? 1 : -1)
+        // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
+        // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+        // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
+        // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+        // return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
       }
     };
 
@@ -389,8 +393,8 @@ class AdvancedModelTable extends Component {
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
-      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
-      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', 'Validation', 'Holdout',];
+      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout', 'Time'] :
+      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', 'Validation', 'Holdout', 'Time'];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
@@ -466,6 +470,8 @@ class AdvancedModelTable extends Component {
                 return <RowCell key={6} data={score.validateScore[metric]} />;
               case 'Holdout':
                 return <RowCell key={7} data={score.holdoutScore[metric]} />;
+              case 'Time':
+                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
                 return null
             }
@@ -607,6 +613,8 @@ class ClassificationModelRow extends Component {
                 return <RowCell key={8} data={metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
               case 'Holdout':
                 return <RowCell key={9} data={metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
+              case 'Time':
+                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
                 return null
             }
