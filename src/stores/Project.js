@@ -1376,7 +1376,7 @@ export default class Project {
       command: 'rawHistgramPlot',
       feature_label: [this.target]
     }
-    changeReportProgress('preparing univariate plot.', 75)
+    if (changeReportProgress('preparing univariate plot.', 75)) return
     await api.univariatePlot(univariateCommand, progressResult => {
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -1384,7 +1384,7 @@ export default class Project {
       if (progress && progress === "start") return
       this.univariatePlotsBase64[plotKey] = imageSavePath
     })
-    changeReportProgress('preparing histogram plot.', 80)
+    if (changeReportProgress('preparing histogram plot.', 80)) return
     await api.histgramPlot(histogramCommand, progressResult => {
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -1392,7 +1392,7 @@ export default class Project {
       if (progress && progress === "start") return
       this.histgramPlotsBase64[plotKey] = imageSavePath
     })
-    changeReportProgress('preparing target histogram plot.', 85)
+    if (changeReportProgress('preparing target histogram plot.', 85)) return
     await api.rawHistgramPlot(rawHistogramCommand, progressResult => {
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -1483,17 +1483,21 @@ export default class Project {
       const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
       await this.dataView()
       dataViewDisposer()
+      if (cancel) return
       const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
       await this.preTrainImportance()
       preTrainImportanceDisposer()
+      if (cancel) return
       // correlation matrix
       changeReportProgress('preparing variable correlation matrix.', 70)
       await this.correlationMatrix()
+      if (cancel) return
       // plots
       this.univariatePlotsBase64 = {}
       this.histgramPlotsBase64 = {}
       this.rawHistgramPlotsBase64 = {}
       await this.allPlots(changeReportProgress)
+      if (cancel) return
       // translate image to base64
       try {
         const univariatePlots = Object.keys(this.univariatePlotsBase64)
@@ -1506,20 +1510,25 @@ export default class Project {
           this.univariatePlotsBase64[k] = await this.translateToBase64(this.univariatePlotsBase64[k])
           changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }))
+        if (cancel) return
         await Promise.all(histgramPlots.map(async k => {
           this.histgramPlotsBase64[k] = await this.translateToBase64(this.histgramPlotsBase64[k])
           changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }))
+        if (cancel) return
         await Promise.all(rawHistgramPlots.map(async k => {
           this.rawHistgramPlotsBase64[k] = await this.translateToBase64(this.rawHistgramPlotsBase64[k])
           changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }))
+        if (cancel) return
         if (this.problemType === 'Regression') {
           // fit plot
           model.fitPlotBase64 = await this.translateToBase64(model.fitPlot)
+          if (cancel) return
           changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
           // residual plot
           model.residualPlotBase64 = await this.translateToBase64(model.residualPlot)
+          if (cancel) return
           changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
         }
       } catch (e) { }
