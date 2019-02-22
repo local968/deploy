@@ -951,19 +951,22 @@ export default class Project {
       return true
     })
     // 有效值都小于0 推荐holdout最大的
-    if (!data.length) return [...filterModels].sort((a, b) => b.holdout - a.holdout)[0]
-    // recommend
-    const holdoutArr = endWithSe ? [...data].sort((a, b) => b.holdout - a.holdout) : [...data].sort((a, b) => a.holdout - b.holdout)
-    const diffArr = [...data].sort((a, b) => b.diff - a.diff)
     let recommend
-    [...data].forEach(d => {
-      const { id, base } = d
-      const diffIndex = diffArr.indexOf(d) + 1
-      const holdoutIndex = holdoutArr.indexOf(d) + 1
-      const score = this.formatNumber(base * diffIndex * holdoutIndex, 6)
-      if (!recommend) return recommend = { id, score }
-      if (recommend.score < score) return recommend = { id, score }
-    })
+    if (!data.length) {
+      recommend = [...filterModels].sort((a, b) => b.holdout - a.holdout)[0]
+    } else {
+      const holdoutArr = endWithSe ? [...data].sort((a, b) => b.holdout - a.holdout) : [...data].sort((a, b) => a.holdout - b.holdout)
+      const diffArr = [...data].sort((a, b) => b.diff - a.diff)
+      data.forEach(d => {
+        const { id, base } = d
+        const diffIndex = diffArr.indexOf(d) + 1
+        const holdoutIndex = holdoutArr.indexOf(d) + 1
+        const score = this.formatNumber(base * diffIndex * holdoutIndex, 6)
+        if (!recommend) return recommend = { id, score }
+        if (recommend.score < score) return recommend = { id, score }
+      })
+    }
+    // recommend
     return models.find(m => m.id === recommend.id)
   }
 
@@ -1311,9 +1314,9 @@ export default class Project {
         const newFeatureLabel = {}
         Object.keys(this.targetColMap).slice(0, 2).forEach((k, index) => {
           const rename = this.renameVariable[k]
-          if(!!rename) newFeatureLabel[rename] = index
+          if (!!rename) newFeatureLabel[rename] = index
         })
-        if(!!Object.keys(newFeatureLabel).length) command.newFeatureLabel = newFeatureLabel
+        if (!!Object.keys(newFeatureLabel).length) command.newFeatureLabel = newFeatureLabel
       }
       // if (field) {
       //   if (this.newVariable.includes(field)) {
