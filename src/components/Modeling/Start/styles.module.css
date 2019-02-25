@@ -864,7 +864,7 @@ span.advancedDesc {
   flex: none;
   flex-wrap: wrap;
   width: 100%;
-  margin: -.25em 0 -.1em; 
+  margin: -.25em 0 -.1em;
 }
 
 .advancedAlgorithm {
@@ -1055,6 +1055,7 @@ button.disable {
   background: #fff;
   padding: 0.1em 12px;
   margin-top: 0.05em;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
 }
 
 .newVariableHintSyntax button {
@@ -1065,10 +1066,13 @@ button.disable {
   border-radius: 5px;
   border: 1px solid #ccc;
   background-color: #fff;
-  margin-left: auto;
-  margin-right: .2em;
-  margin-top: .1em;
   cursor: pointer;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  margin:0.1em auto 0;
+}
+.newVariableHintSyntax button span{
+  color:#fff;
 }
 
 .funcTips {
@@ -1085,6 +1089,7 @@ button.disable {
   max-height: 5em;
   overflow-y: auto;
   overflow-x: hidden;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
 }
 
 .funcTipsName {
