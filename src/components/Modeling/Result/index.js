@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
-import { observable, action } from 'mobx';
+import { observable } from 'mobx';
 import AdvancedView from '../AdvancedView/AdvancedView';
 import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
@@ -16,7 +16,6 @@ const Classification = 'Classification';
 @observer
 export default class ModelResult extends Component {
   @observable show = false
-  @observable view = "simple"
 
   deploy = () => {
     const { project } = this.props.projectStore;
@@ -39,10 +38,6 @@ export default class ModelResult extends Component {
   //   this.show = false
   // }
 
-  changeView = view => {
-    this.view = view
-  }
-
   componentDidUpdate() {
     this.props.resetSide()
   }
@@ -58,19 +53,20 @@ export default class ModelResult extends Component {
   }
 
   render() {
+    const { view, sort, changeView, handleSort } = this.props
     const { project } = this.props.projectStore;
     const { models } = project
     if (!models.length) return null;
-    const { view } = this;
+    // const { view } = this;
     return (
       <div className={styles.modelResult}>
         <div className={styles.tabBox}>
           <div className={classnames(styles.tab, {
-            [styles.active]: this.view === 'simple'
-          })} onClick={this.changeView.bind(this, 'simple')}><span>Simplified View</span></div>
+            [styles.active]: view === 'simple'
+          })} onClick={changeView.bind(null, 'simple')}><span>Simplified View</span></div>
           <div className={classnames(styles.tab, {
-            [styles.active]: this.view === 'advanced'
-          })} onClick={this.changeView.bind(this, 'advanced')}><span>Advanced View</span></div>
+            [styles.active]: view === 'advanced'
+          })} onClick={changeView.bind(null, 'advanced')}><span>Advanced View</span></div>
         </div>
         {/* <div className={styles.buttonBlock} >
           <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
@@ -80,7 +76,9 @@ export default class ModelResult extends Component {
             <span>Advanced View</span>
           </button>
         </div> */}
-        {view === 'simple' ? <SimpleView models={models} project={project} exportReport={this.exportReport}/> : <AdvancedView models={models} project={project} exportReport={this.exportReport}/>}
+        {view === 'simple' ?
+          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={sort.simple} handleSort={handleSort.bind(null, 'simple')}/> :
+          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={sort.advanced} handleSort={handleSort.bind(null, 'advanced')}/>}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
@@ -112,9 +110,11 @@ export default class ModelResult extends Component {
 @observer
 class SimpleView extends Component {
   render() {
-    const { models, project, exportReport } = this.props;
+    const { models, project, exportReport, sort, handleSort } = this.props;
     const { problemType } = project;
-    return problemType === Classification ? <ClassificationResult models={models} project={project} exportReport={exportReport} /> : <RegressionResult models={models} project={project} exportReport={exportReport} />
+    return problemType === Classification ?
+      <ClassificationResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/> :
+      <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/>
   }
 }
 
