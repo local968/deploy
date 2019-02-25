@@ -70,9 +70,9 @@ export default class RocChart extends Component {
         .call(d3.axisBottom(x))
         .append('text')
         .attr('x', width - 50)
-        .attr('y', -10)
+        .attr('y', 25)
         .attr('fill', '#000')
-        .text('false positive rate');
+        .text('False Positive Rate');
 
       svg.append('g')
         .attr('class', styles.axis)
@@ -83,7 +83,7 @@ export default class RocChart extends Component {
         .attr('dy', '.71em')
         .attr('x', 0)
         .attr('fill', '#000')
-        .text('true positive rate');
+        .text('True Positive Rate');
     }
     if (lineEnable) {
       svg.append('path')

@@ -31,6 +31,10 @@
 .prchart svg {
   overflow: visible;
 }
+.chart svg g,
+.prchart svg g{
+  overflow: hidden;
+}
 .speedComp .checkbox {
   top: 27px;
   right: 250px;

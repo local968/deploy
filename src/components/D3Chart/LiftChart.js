@@ -83,9 +83,9 @@ export default class PRChart extends Component {
         .call(d3.axisBottom(x).tickFormat(d3.format('.0%')))
         .append('text')
         .attr('x', x(1) - 30)
-        .attr('y', -10)
+        .attr('y', 25)
         .attr('fill', '#000')
-        .text('percentage');
+        .text('Percentage');
 
       svg.append('g')
         .attr('class', styles.axis)
@@ -96,7 +96,7 @@ export default class PRChart extends Component {
         .attr('dy', '.71em')
         .attr('x', 0)
         .attr('fill', '#000')
-        .text('lift');
+        .text('Lift');
     }
     if (lineEnable) {
       svg.append('path')
