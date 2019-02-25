@@ -173,7 +173,7 @@ class ModelTable extends Component {
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'r2')}>
               <span>
-                <Hint content='R^2 is a statistical measure of how close the data are to the fitted regression line. R^2 = Explained variation / Total variation.' /> R<sup>2</sup>
+                <Hint content='R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.' /> R<sup>2</sup>
                 {sortKey !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>

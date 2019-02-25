@@ -117,10 +117,10 @@ class ProjectHeader extends Component {
     const menu = (
       <Menu className={styles.logout}>
         <Menu.Item key="0">
-          <a onClick={this.changepassword}><Icon type='unlock' />Change password</a>
+          <a onClick={this.changepassword}><Icon type='unlock' />Change Password</a>
         </Menu.Item>
         <Menu.Item key="1">
-          <a onClick={this.logout}><Icon type='logout' />Log out</a>
+          <a onClick={this.logout}><Icon type='logout' />Log Out</a>
         </Menu.Item>
       </Menu>
     );
@@ -202,10 +202,10 @@ class WelcomeHeader extends Component {
     const menu = (
       <Menu className={styles.logout}>
         <Menu.Item key="0">
-          <a onClick={this.changepassword}><Icon type='unlock' />Change password</a>
+          <a onClick={this.changepassword}><Icon type='unlock' />Change Password</a>
         </Menu.Item>
         <Menu.Item key="1">
-          <a onClick={this.logout}><Icon type='logout' />Log out</a>
+          <a onClick={this.logout}><Icon type='logout' />Log Out</a>
         </Menu.Item>
       </Menu>
     );

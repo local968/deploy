@@ -43,6 +43,10 @@ export default class ModelResult extends Component {
     this.view = view
   }
 
+  componentDidUpdate() {
+    this.props.resetSide()
+  }
+
   exportReport = (modelId) => () => {
     try {
       this.cancel = this.props.project.generateReport(modelId)

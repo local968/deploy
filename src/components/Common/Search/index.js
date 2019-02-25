@@ -14,6 +14,7 @@ export default ({ value, onChange, onClick }) => {
 
     return <div className={styles.search}>
         <input
+            placeholder = "Search your project"
             type="text"
             className={styles.searchName}
             value={value}
