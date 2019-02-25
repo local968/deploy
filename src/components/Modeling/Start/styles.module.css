@@ -135,6 +135,7 @@
   flex: none;
   justify-content: center;
   padding-top: 0.15em;
+  z-index: 2;
 }
 
 .tab {
@@ -169,6 +170,7 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
+  background-color: #fff;
 }
 
 .simplifiedLoad {
@@ -841,6 +843,7 @@ span.advancedDesc {
   flex: none;
   flex-direction: column;
   position: relative;
+  z-index: 1;
 }
 
 .advancedPercentValid {
