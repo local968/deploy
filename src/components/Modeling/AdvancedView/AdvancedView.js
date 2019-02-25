@@ -363,7 +363,7 @@ export default class AdvancedView extends Component {
         <div className={styles.middle}>
           <div className={styles.settings}>
             <span className={styles.label}>Model Name Contains:</span>
-            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} >
+            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
               <Option value={'all'}>All</Option>
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
@@ -372,7 +372,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }}>
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
