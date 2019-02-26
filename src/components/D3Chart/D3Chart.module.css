@@ -30,6 +30,8 @@
 .chart svg,
 .prchart svg {
   overflow: visible;
+  padding-bottom: 20px;
+  box-sizing: content-box;
 }
 .chart svg g,
 .prchart svg g{

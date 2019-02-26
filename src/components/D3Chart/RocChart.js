@@ -70,7 +70,7 @@ export default class RocChart extends Component {
         .call(d3.axisBottom(x))
         .append('text')
         .attr('x', width - 50)
-        .attr('y', 25)
+        .attr('y', 35)
         .attr('fill', '#000')
         .text('False Positive Rate');
 

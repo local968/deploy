@@ -126,7 +126,7 @@ export default class SpeedAndAcc extends Component {
         .call(d3.axisBottom(x))
         .append('text')
         .attr('x', 450)
-        .attr('y', 24)
+        .attr('y', 35)
         .attr('fill', '#000')
         .text('Speed(ms/1000 rows)');
 
