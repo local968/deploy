@@ -122,6 +122,14 @@ export default class Model {
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
   @computed
+  get aucValidation() {
+    return this.score.validateScore.auc
+  }
+  @computed
+  get aucHoldout() {
+    return this.score.holdoutScore.auc
+  }
+  @computed
   get accValidation() {
     const data = this.chartData || {}
     const roc = data.roc || {}

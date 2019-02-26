@@ -323,6 +323,7 @@ export default class AdvancedView extends Component {
 
   handleChange = action(value => {
     this.metric = this.metricOptions.find(m => m.key === value);
+    this.props.projectStore.project.measurement = this.metric.key
     // if (window.localStorage)
     //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
   });
@@ -497,7 +498,7 @@ class AdvancedModelTable extends Component {
               case 'Holdout':
                 return <RowCell key={7} data={score.holdoutScore[metric]} />;
               case 'Time':
-                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
+                return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
                 return null
             }
