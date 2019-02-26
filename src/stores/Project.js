@@ -926,53 +926,74 @@ export default class Project {
     return model
   }
 
+  // @computed
+  // get defualtRecommendModel() {
+  //   const { models, measurement, problemType } = this
+  //   const currentMeasurement = measurement || (problemType === 'Classification' ? 'auc' : 'r2')
+  //   const endWithSe = currentMeasurement.endsWith("se")
+  //   const filterModels = models.filter(_m => {
+  //     const { score } = _m
+  //     const { validateScore, holdoutScore } = score || {}
+  //     if (!validateScore || !holdoutScore) return false
+  //     const [validate, holdout] = [parseFloat(validateScore[currentMeasurement]), parseFloat(holdoutScore[currentMeasurement])]
+  //     if (isNaN(validate) || isNaN(holdout)) return false
+  //     // if (validate < 0 || holdout < 0) return false
+  //     return true
+  //   }).map(m => {
+  //     const { score, id } = m
+  //     const { validateScore, holdoutScore } = score || {}
+  //     const validate = this.formatNumber(validateScore[currentMeasurement], 6)
+  //     const holdout = this.formatNumber(holdoutScore[currentMeasurement], 6)
+  //     const diff = this.formatNumber(Math.abs(validate - holdout), 6)
+  //     const base = endWithSe ? this.formatNumber(validate / holdout, 6) : this.formatNumber(holdout / validate, 6)
+  //     return { validate, holdout, diff, id, base }
+  //   })
+  //   // 没有有效值的model就推荐第一个
+  //   if (!filterModels.length) return models[0]
+  //   const data = filterModels.filter(m => {
+  //     const { validate, holdout } = m
+  //     if (validate < 0 || holdout < 0) return false
+  //     return true
+  //   })
+  //   // 有效值都小于0 推荐holdout最大的
+  //   let recommend
+  //   if (!data.length) {
+  //     recommend = [...filterModels].sort((a, b) => b.holdout - a.holdout)[0]
+  //   } else {
+  //     const holdoutArr = endWithSe ? [...data].sort((a, b) => b.holdout - a.holdout) : [...data].sort((a, b) => a.holdout - b.holdout)
+  //     const diffArr = [...data].sort((a, b) => b.diff - a.diff)
+  //     data.forEach(d => {
+  //       const { id, base } = d
+  //       const diffIndex = diffArr.indexOf(d) + 1
+  //       const holdoutIndex = holdoutArr.indexOf(d) + 1
+  //       const score = this.formatNumber(base * diffIndex * holdoutIndex, 6)
+  //       if (!recommend) return recommend = { id, score }
+  //       if (recommend.score < score) return recommend = { id, score }
+  //     })
+  //   }
+  //   // recommend
+  //   return models.find(m => m.id === recommend.id)
+  // }
+
+  //temp
   @computed
   get defualtRecommendModel() {
     const { models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' ? 'auc' : 'r2')
-    const endWithSe = currentMeasurement.endsWith("se")
-    const filterModels = models.filter(_m => {
-      const { score } = _m
-      const { validateScore, holdoutScore } = score || {}
-      if (!validateScore || !holdoutScore) return false
-      const [validate, holdout] = [parseFloat(validateScore[currentMeasurement]), parseFloat(holdoutScore[currentMeasurement])]
-      if (isNaN(validate) || isNaN(holdout)) return false
-      // if (validate < 0 || holdout < 0) return false
-      return true
-    }).map(m => {
+    const sort = currentMeasurement.endsWith("se") ? -1 : 1
+    let recommend
+    models.forEach(m => {
       const { score, id } = m
       const { validateScore, holdoutScore } = score || {}
-      const validate = this.formatNumber(validateScore[currentMeasurement], 6)
-      const holdout = this.formatNumber(holdoutScore[currentMeasurement], 6)
-      const diff = this.formatNumber(Math.abs(validate - holdout), 6)
-      const base = endWithSe ? this.formatNumber(validate / holdout, 6) : this.formatNumber(holdout / validate, 6)
-      return { validate, holdout, diff, id, base }
+      const validate = (validateScore || {})[currentMeasurement]
+      const holdout = (holdoutScore || {})[currentMeasurement]
+      if (!validate || !holdout) return
+      const value = validate + holdout
+      if (!recommend) return recommend = { id, value }
+      if ((recommend.value - value) * sort < 0) recommend = { id, value }
     })
-    // 没有有效值的model就推荐第一个
-    if (!filterModels.length) return models[0]
-    const data = filterModels.filter(m => {
-      const { validate, holdout } = m
-      if (validate < 0 || holdout < 0) return false
-      return true
-    })
-    // 有效值都小于0 推荐holdout最大的
-    let recommend
-    if (!data.length) {
-      recommend = [...filterModels].sort((a, b) => b.holdout - a.holdout)[0]
-    } else {
-      const holdoutArr = endWithSe ? [...data].sort((a, b) => b.holdout - a.holdout) : [...data].sort((a, b) => a.holdout - b.holdout)
-      const diffArr = [...data].sort((a, b) => b.diff - a.diff)
-      data.forEach(d => {
-        const { id, base } = d
-        const diffIndex = diffArr.indexOf(d) + 1
-        const holdoutIndex = holdoutArr.indexOf(d) + 1
-        const score = this.formatNumber(base * diffIndex * holdoutIndex, 6)
-        if (!recommend) return recommend = { id, score }
-        if (recommend.score < score) return recommend = { id, score }
-      })
-    }
-    // recommend
-    return models.find(m => m.id === recommend.id)
+    if (!!recommend) return models.find(m => m.id === recommend.id)
+    return models[0]
   }
 
   formatNumber(num, n = 3) {
