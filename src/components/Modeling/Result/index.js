@@ -53,7 +53,7 @@ export default class ModelResult extends Component {
   }
 
   render() {
-    const { view, sort, changeView, handleSort } = this.props
+    const { view, sort, changeView, handleSort, metric, handleChange } = this.props
     const { project } = this.props.projectStore;
     const { models } = project
     if (!models.length) return null;
@@ -78,7 +78,7 @@ export default class ModelResult extends Component {
         </div> */}
         {view === 'simple' ?
           <SimpleView models={models} project={project} exportReport={this.exportReport} sort={sort.simple} handleSort={handleSort.bind(null, 'simple')}/> :
-          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={sort.advanced} handleSort={handleSort.bind(null, 'advanced')}/>}
+          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={sort.advanced} handleSort={handleSort.bind(null, 'advanced')} metric={metric} handleChange={handleChange}/>}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>

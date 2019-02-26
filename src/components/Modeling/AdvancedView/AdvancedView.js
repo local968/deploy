@@ -77,17 +77,17 @@ export default class AdvancedView extends Component {
   //   'KS': false,
   //   'Time': false
   // };
-  @observable metric = {
-    key: '',
-    display: ''
-  };
+  // @observable metric = {
+  //   key: '',
+  //   display: ''
+  // };
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort } = this.props;
+    const { models, project, projectStore, sort, metric } = this.props;
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
-    const metricKey = this.metric.key;
+    // const metricKey = this.metric.key;
     const formatNumber = number => {
       try {
         return parseFloat(number);
@@ -195,11 +195,11 @@ export default class AdvancedView extends Component {
             const { problemType } = project
             let aModelData, bModelData
             if (problemType === 'Regression') {
-              aModelData = formatNumber(aModel.score.validateScore[metricKey || 'r2'])
-              bModelData = formatNumber(bModel.score.validateScore[metricKey || 'r2'])
+              aModelData = formatNumber(aModel.score.validateScore[metric || 'r2'])
+              bModelData = formatNumber(bModel.score.validateScore[metric || 'r2'])
             } else {
-              aModelData = metricKey === 'auc' ? formatNumber(aModel.score.validateScore[metricKey]) : formatNumber(aModel[metricKey + 'Validation'])
-              bModelData = metricKey === 'auc' ? formatNumber(bModel.score.validateScore[metricKey]) : formatNumber(bModel[metricKey + 'Validation'])
+              aModelData = metric === 'auc' ? formatNumber(aModel.score.validateScore[metric]) : formatNumber(aModel[metric + 'Validation'])
+              bModelData = metric === 'auc' ? formatNumber(bModel.score.validateScore[metric]) : formatNumber(bModel[metric + 'Validation'])
             }
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
@@ -208,11 +208,11 @@ export default class AdvancedView extends Component {
             const { problemType } = project
             let aModelData, bModelData
             if (problemType === 'Regression') {
-              aModelData = formatNumber(aModel.score.holdoutScore[metricKey || 'r2'])
-              bModelData = formatNumber(bModel.score.holdoutScore[metricKey || 'r2'])
+              aModelData = formatNumber(aModel.score.holdoutScore[metric || 'r2'])
+              bModelData = formatNumber(bModel.score.holdoutScore[metric || 'r2'])
             } else {
-              aModelData = metricKey === 'auc' ? formatNumber(aModel.score.holdoutScore[metricKey]) : formatNumber(aModel[metricKey + 'Holdout'])
-              bModelData = metricKey === 'auc' ? formatNumber(bModel.score.holdoutScore[metricKey]) : formatNumber(bModel[metricKey + 'Holdout'])
+              aModelData = metric === 'auc' ? formatNumber(aModel.score.holdoutScore[metric]) : formatNumber(aModel[metric + 'Holdout'])
+              bModelData = metric === 'auc' ? formatNumber(bModel.score.holdoutScore[metric]) : formatNumber(bModel[metric + 'Holdout'])
             }
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
@@ -321,22 +321,21 @@ export default class AdvancedView extends Component {
     this.currentSettingId = settingId
   });
 
-  handleChange = action(value => {
-    this.metric = this.metricOptions.find(m => m.key === value);
-    this.props.projectStore.project.measurement = this.metric.key
-    // if (window.localStorage)
-    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
-  });
+  // handleChange = action(value => {
+  //   this.metric = this.metricOptions.find(m => m.key === value);
+  //   // if (window.localStorage)
+  //   //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
+  // });
 
   constructor(props) {
     super(props);
-    const currentSetting = props.projectStore.project.currentSetting
-    this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
-    autorun(() => {
-      const { project } = props;
-      if (project && project.measurement)
-        this.metric = this.metricOptions.find(metric => metric.key === project.measurement) || this.metricOptions[0]
-    });
+    // const currentSetting = props.projectStore.project.currentSetting
+    // this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
+    // autorun(() => {
+    //   const { project } = props;
+    //   if (project && project.measurement)
+    //     this.metric = this.metricOptions.find(metric => metric.key === project.measurement) || this.metricOptions[0]
+    // });
 
     // if (window.localStorage) {
     //   runInAction(() => {
@@ -353,8 +352,9 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort } = this.props;
-
+    const { project, sort, handleSort, metric, handleChange } = this.props;
+    const {problemType} = project
+    const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2')))
     return (
       <div className={styles.advancedModelResult}>
         <div className={styles.modelResult} >
@@ -373,11 +373,11 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
+          <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
-        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} metric={this.metric} />
+        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} metric={currMetric} />
       </div>
     )
   }

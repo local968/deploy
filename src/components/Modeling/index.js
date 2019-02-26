@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
 import { Route, Switch } from 'react-router-dom';
-import { autorun, observable } from 'mobx'
+import { autorun, observable, action } from 'mobx'
 import StartTrain from './Start';
 import Loading from './Loading';
 import ModelError from './Error';
@@ -29,6 +29,7 @@ const imgs = {
 @observer
 export default class Modeling extends Component {
   @observable right = 0
+  @observable metric = this.props.projectStore.project.measurement
   @observable view = 'simple'
   @observable sort = {
     simple: {
@@ -100,10 +101,17 @@ export default class Modeling extends Component {
     updateProject(nextSubStep(step, 3))
   };
 
+  handleChange = action(value => {
+    console.log(value, "metric")
+    this.metric = value;
+    // if (window.localStorage)
+    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
+  });
+
   render() {
     const { project } = this.props.projectStore;
     const { models, train2Error, train2ing } = project;
-    const { view, sort } = this
+    const { view, sort, metric } = this
     return (
       <div className={styles.modeling}>
         {project && <Switch>
@@ -117,7 +125,9 @@ export default class Modeling extends Component {
               view={view}
               sort={sort}
               changeView={this.changeView}
-              handleSort={this.handleSort} />
+              handleSort={this.handleSort}
+              metric={metric}
+              handleChange={this.handleChange} />
           }} />
         </Switch>}
         {project && <ProjectSide
@@ -136,7 +146,7 @@ export default class Modeling extends Component {
 @observer
 class TrainResult extends Component {
   render() {
-    const { hasModel, isError, isTraining, resetSide, view, sort, changeView, handleSort } = this.props;
+    const { hasModel, isError, isTraining, resetSide, view, sort, changeView, handleSort, metric, handleChange } = this.props;
     if (isError) return <ModelError />;
     if (!hasModel && isTraining) return <Loading />;
     return <ModelResult
@@ -145,6 +155,8 @@ class TrainResult extends Component {
       sort={sort}
       handleSort={handleSort}
       changeView={changeView}
+      metric={metric}
+      handleChange={handleChange}
     />
   }
 }
