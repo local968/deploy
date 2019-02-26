@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import RegressionPredictActualChart from 'components/D3Chart/RegressionPredictActualChart';
 import { Spin } from 'antd'
 import Hint from 'components/Common/Hint'
-import {toJS} from "mobx";
 
 @observer
 export default class PredictVActual extends Component {
@@ -13,7 +12,6 @@ export default class PredictVActual extends Component {
     // const { selectedModel, qcutSize, chartLoading } = this.props.approach;
     // if (!selectedModel) return null;
     // const { modelName } = selectedModel;
-    console.log(toJS(model.qcut))
     return (
       <div className={styles.predictActual}>
         <div className={styles.title} >
