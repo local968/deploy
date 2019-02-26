@@ -49,6 +49,11 @@ export default class Modeling extends Component {
       { label: 'Model Selection', value: 'modelSelection' }
     ];
     this.sideRef = React.createRef();
+    autorun(() => {
+      const { project } = props.projectStore;
+      if (project && project.measurement)
+        this.metric = project.measurement
+    });
   }
 
   componentDidMount() {
