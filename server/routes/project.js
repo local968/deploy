@@ -120,10 +120,10 @@ function createOrUpdate(id, userId, data, isCreate = false) {
   const promise = isCreate ? Promise.resolve({ status: 200, message: 'ok' }) : checkProject(userId, id)
   return promise.then(checked => {
     if (checked.status !== 200) return checked
-    const params = mapObjectToArray(data)
     const time = moment().unix();
-    params.push("updateTime", time)
-    if (isCreate) params.push("createTime", time)
+    data.updateTime = time
+    if (isCreate) data.createTime = time
+    const params = mapObjectToArray(data)
     const pipeline = redis.pipeline();
     pipeline.hmset(`project:${id}`, params)
     pipeline.zadd(`user:${userId}:projects:updateTime`, time, id)
