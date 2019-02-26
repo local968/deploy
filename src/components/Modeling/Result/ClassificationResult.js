@@ -71,7 +71,7 @@ export default class ClassificationView extends Component {
   }
 
   render() {
-    const { models, project, exportReport } = this.props;
+    const { models, project, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
@@ -108,7 +108,7 @@ export default class ClassificationView extends Component {
         <div className={styles.radioGroup}>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='default' id='criteria_default' readOnly onClick={this.onChange} checked={criteria === 'default'} />
-            <label htmlFor='criteria_default'>R2-Learn's Default Selection</label>
+            <label htmlFor='criteria_default'>R2 Learn's Default Selection</label>
           </div>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={this.onChange} checked={criteria === 'cost'} />
@@ -163,6 +163,8 @@ export default class ClassificationView extends Component {
         exportReport={exportReport}
         recommendId={recommendModel.id}
         text={text}
+        sort={sort}
+        handleSort={handleSort}
       />
     </div>
   }
@@ -279,33 +281,30 @@ class Performance extends Component {
 
 @observer
 class ModelTable extends Component {
-  @observable sortKey = 'name'
-  @observable sort = 1
-
   abortTrain = () => {
     this.props.abortTrain()
   }
 
-  handleSort = key => {
-    const { sortKey, sort } = this
-    if (key === sortKey) return this.sort = -sort
-    this.sortKey = key
-    this.sort = 1
-  }
+  // handleSort = key => {
+  //   const { sortKey, sort } = this
+  //   if (key === sortKey) return this.sort = -sort
+  //   this.sortKey = key
+  //   this.sort = 1
+  // }
 
   @computed
   get sortModels() {
-    const { sortKey, sort, props: { models } } = this
+    const { props: { models, sort: {key, value} } } = this
     const fn = (a, b) => {
-      switch (sortKey) {
+      switch (key) {
         case "acc":
-          return (a.accValidation - b.accValidation) * sort
+          return (a.accValidation - b.accValidation) * value
         case "auc":
-          return (a.score.validateScore.auc - b.score.validateScore.auc) * sort
+          return (a.score.validateScore.auc - b.score.validateScore.auc) * value
         case 'speed':
-          return (a.executeSpeed - b.executeSpeed) * sort
+          return (a.executeSpeed - b.executeSpeed) * value
         case 'time':
-          return ((a.createTime || 0) - (b.createTime || 0)) * sort
+          return ((a.createTime || 0) - (b.createTime || 0)) * value
         case "name":
         default:
           // const aArr = a.name.split('.')
@@ -320,23 +319,23 @@ class ModelTable extends Component {
           //   return aName > bName ? sort : -sort
           // }
           // return (aModelUnix - bModelUnix) * sort
-          return a.name > b.name ? sort : -sort
+          return a.name > b.name ? value : -value
       }
     }
     return models.sort(fn)
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text,exportReport } = this.props;
-    const { sortKey, sort } = this
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text,exportReport, sort, handleSort } = this.props;
+    // const { sortKey, sort } = this
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
           <div className={styles.rowData}>
-            <div className={classnames(styles.cell, styles.name, styles.cellHeader)} onClick={this.handleSort.bind(null, 'name')} >
+            <div className={classnames(styles.cell, styles.name, styles.cellHeader)} onClick={handleSort.bind(null, 'name')} >
               <span>
                 Model Name
-                {sortKey !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div
@@ -346,26 +345,26 @@ class ModelTable extends Component {
                 styles.cellHeader
               )}
             />
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'acc')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'acc')}>
               <span>
                 Accuracy
                 <Hint content={AccuracyHint} placement="right" />
-                {sortKey !== 'acc' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'acc' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'auc')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'auc')}>
               <span>Performance(AUC)
-              {sortKey !== 'auc' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              {sort.key !== 'auc' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'speed')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'speed')}>
               <span>Execution Speed
-              {sortKey !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'time')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'time')}>
               <span>Time
-              {sortKey !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>

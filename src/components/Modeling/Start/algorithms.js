@@ -76,7 +76,7 @@ module.exports = {
     },
     {
       value: 'ard_regression',
-      label: 'ARD Rregression'
+      label: 'ARD Regression'
     },
     {
       value: 'decision_tree',

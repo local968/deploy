@@ -44,7 +44,7 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
-import { observable, computed, action, autorun, runInAction } from 'mobx';
+import { observable, computed, action, autorun } from 'mobx';
 import moment from 'moment';
 
 const TabPane = Tabs.TabPane;
@@ -56,27 +56,27 @@ export default class AdvancedView extends Component {
 
   @observable currentSettingId = 'all';
 
-  // undefined = can not sort, false = no sort ,1 = asc, 2 = desc
-  @observable sortState = {
-    'Model Name': 1,
-    'F1-Score': false,
-    'Precision': false,
-    'Recall': false,
-    'LogLoss': false,
-    'Cutoff Threshold': false,
-    'Validation': false,
-    'Holdout': false,
-    'Normalized RMSE': false,
-    'RMSE': false,
-    'MSLE': false,
-    'RMSLE': false,
-    'MSE': false,
-    'MAE': false,
-    'R2': false,
-    'AdjustR2': false,
-    'KS': false,
-    'Time': false
-  };
+  // undefined = can not sort, false = no sort ,1 = asc, -1 = desc
+  // @observable sortState = {
+  //   'Model Name': 1,
+  //   'F1-Score': false,
+  //   'Precision': false,
+  //   'Recall': false,
+  //   'LogLoss': false,
+  //   'Cutoff Threshold': false,
+  //   'Validation': false,
+  //   'Holdout': false,
+  //   'Normalized RMSE': false,
+  //   'RMSE': false,
+  //   'MSLE': false,
+  //   'RMSLE': false,
+  //   'MSE': false,
+  //   'MAE': false,
+  //   'R2': false,
+  //   'AdjustR2': false,
+  //   'KS': false,
+  //   'Time': false
+  // };
   @observable metric = {
     key: '',
     display: ''
@@ -84,9 +84,9 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore } = this.props;
+    const { models, project, projectStore, sort } = this.props;
     let _filtedModels = [...models];
-    const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
+    // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     const metricKey = this.metric.key;
     const formatNumber = number => {
       try {
@@ -101,14 +101,14 @@ export default class AdvancedView extends Component {
     let { stopFilter, oldfiltedModels } = projectStore;
 
     const sortMethods = (aModel, bModel) => {
-      switch (currentSort) {
+      switch (sort.key) {
         case 'F1-Score':
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
             const aModelData = formatNumber(aModel.chartData.roc.F1[aFitIndex]);
             const bModelData = formatNumber(bModel.chartData.roc.F1[bFitIndex]);
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Precision':
           {
@@ -116,7 +116,7 @@ export default class AdvancedView extends Component {
             const bFitIndex = bModel.fitIndex
             const aModelData = formatNumber(aModel.chartData.roc.Precision[aFitIndex])
             const bModelData = formatNumber(bModel.chartData.roc.Precision[bFitIndex])
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Recall':
           {
@@ -124,7 +124,7 @@ export default class AdvancedView extends Component {
             const bFitIndex = bModel.fitIndex
             const aModelData = formatNumber(aModel.chartData.roc.Recall[aFitIndex])
             const bModelData = formatNumber(bModel.chartData.roc.Recall[bFitIndex])
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'LogLoss':
           {
@@ -132,7 +132,7 @@ export default class AdvancedView extends Component {
             const bFitIndex = bModel.fitIndex
             const aModelData = formatNumber(aModel.chartData.roc.LOGLOSS[aFitIndex])
             const bModelData = formatNumber(bModel.chartData.roc.LOGLOSS[bFitIndex])
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Cutoff Threshold':
           {
@@ -140,55 +140,55 @@ export default class AdvancedView extends Component {
             const bFitIndex = bModel.fitIndex
             const aModelData = formatNumber(aModel.chartData.roc.Threshold[aFitIndex])
             const bModelData = formatNumber(bModel.chartData.roc.Threshold[bFitIndex])
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Normalized RMSE':
           {
             const aModelData = formatNumber(aModel.score.validateScore.nrmse)
             const bModelData = formatNumber(bModel.score.validateScore.nrmse)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'RMSE':
           {
             const aModelData = formatNumber(aModel.score.validateScore.rmse)
             const bModelData = formatNumber(bModel.score.validateScore.rmse)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'MSLE':
           {
             const aModelData = formatNumber(aModel.score.validateScore.msle)
             const bModelData = formatNumber(bModel.score.validateScore.msle)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'RMSLE':
           {
             const aModelData = formatNumber(aModel.score.validateScore.rmsle)
             const bModelData = formatNumber(bModel.score.validateScore.rmsle)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'MSE':
           {
             const aModelData = formatNumber(aModel.score.validateScore.mse)
             const bModelData = formatNumber(bModel.score.validateScore.mse)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'MAE':
           {
             const aModelData = formatNumber(aModel.score.validateScore.mae)
             const bModelData = formatNumber(bModel.score.validateScore.mae)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'R2':
           {
             const aModelData = formatNumber(aModel.score.validateScore.r2)
             const bModelData = formatNumber(bModel.score.validateScore.r2)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'AdjustR2':
           {
             const aModelData = formatNumber(aModel.score.validateScore.adjustR2)
             const bModelData = formatNumber(bModel.score.validateScore.adjustR2)
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Validation':
           {
@@ -201,7 +201,7 @@ export default class AdvancedView extends Component {
               aModelData = metricKey === 'auc' ? formatNumber(aModel.score.validateScore[metricKey]) : formatNumber(aModel[metricKey + 'Validation'])
               bModelData = metricKey === 'auc' ? formatNumber(bModel.score.validateScore[metricKey]) : formatNumber(bModel[metricKey + 'Validation'])
             }
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Holdout':
           {
@@ -214,7 +214,7 @@ export default class AdvancedView extends Component {
               aModelData = metricKey === 'auc' ? formatNumber(aModel.score.holdoutScore[metricKey]) : formatNumber(aModel[metricKey + 'Holdout'])
               bModelData = metricKey === 'auc' ? formatNumber(bModel.score.holdoutScore[metricKey]) : formatNumber(bModel[metricKey + 'Holdout'])
             }
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'KS':
           {
@@ -222,13 +222,13 @@ export default class AdvancedView extends Component {
             const bFitIndex = bModel.fitIndex;
             const aModelData = formatNumber(aModel.chartData.roc.KS[aFitIndex]);
             const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex]);
-            return this.sortState[currentSort] === 1 ? aModelData - bModelData : bModelData - aModelData
+            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Time':
-          return (this.sortState[currentSort] === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
+          return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
         case 'Model Name':
         default:
-          return (aModel.name > bModel.name ? 1 : -1) * (this.sortState[currentSort] === 1 ? 1 : -1)
+          return (aModel.name > bModel.name ? 1 : -1) * (sort.value === 1 ? 1 : -1)
         // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
         // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
         // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
@@ -304,18 +304,18 @@ export default class AdvancedView extends Component {
     return []
   }
 
-  changeSort = (type) => action(() => {
-    const currentActive = Object.keys(this.sortState).find(key => this.sortState[key]);
-    if (type === currentActive) {
-      this.sortState[type] = this.sortState[type] === 1 ? 2 : 1;
-    } else {
-      this.sortState[currentActive] = false;
-      this.sortState[type] = 1
-    }
-    if (window.localStorage)
-      window.localStorage.setItem(`advancedViewSort:${this.props.project.id}`, JSON.stringify(this.sortState))
+  // changeSort = (type) => action(() => {
+  //   const currentActive = Object.keys(this.sortState).find(key => this.sortState[key]);
+  //   if (type === currentActive) {
+  //     this.sortState[type] = this.sortState[type] === 1 ? 2 : 1;
+  //   } else {
+  //     this.sortState[currentActive] = false;
+  //     this.sortState[type] = 1
+  //   }
+  //   if (window.localStorage)
+  //     window.localStorage.setItem(`advancedViewSort:${this.props.project.id}`, JSON.stringify(this.sortState))
 
-  });
+  // });
 
   changeSetting = action((settingId) => {
     this.currentSettingId = settingId
@@ -323,8 +323,8 @@ export default class AdvancedView extends Component {
 
   handleChange = action(value => {
     this.metric = this.metricOptions.find(m => m.key === value);
-    if (window.localStorage)
-      window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
+    // if (window.localStorage)
+    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
   });
 
   constructor(props) {
@@ -337,22 +337,22 @@ export default class AdvancedView extends Component {
         this.metric = this.metricOptions.find(metric => metric.key === project.measurement) || this.metricOptions[0]
     });
 
-    if (window.localStorage) {
-      runInAction(() => {
-        try {
-          const storagedSort = JSON.parse(window.localStorage.getItem(`advancedViewSort:${props.project.id}`))
-          const storagedMetric = window.localStorage.getItem(`advancedViewMetric:${props.project.id}`)
-          if (storagedSort) this.sortState = storagedSort
-          if (storagedMetric) this.metric = this.metricOptions.find(m => m.key === storagedMetric);
-        } catch (e) { }
-      })
-    }
+    // if (window.localStorage) {
+    //   runInAction(() => {
+    //     try {
+    //       const storagedSort = JSON.parse(window.localStorage.getItem(`advancedViewSort:${props.project.id}`))
+    //       const storagedMetric = window.localStorage.getItem(`advancedViewMetric:${props.project.id}`)
+    //       // if (storagedSort) this.sortState = storagedSort
+    //       // if (storagedMetric) this.metric = this.metricOptions.find(m => m.key === storagedMetric);
+    //     } catch (e) { }
+    //   })
+    // }
     // props.projectStore.changeStopFilter(true)
     props.projectStore.changeOldfiltedModels(undefined)
   }
 
   render() {
-    const { project } = this.props;
+    const { project, sort, handleSort } = this.props;
 
     return (
       <div className={styles.advancedModelResult}>
@@ -363,7 +363,7 @@ export default class AdvancedView extends Component {
         <div className={styles.middle}>
           <div className={styles.settings}>
             <span className={styles.label}>Model Name Contains:</span>
-            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} >
+            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
               <Option value={'all'}>All</Option>
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
@@ -372,11 +372,11 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >Measurement Metric</span>
-          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }}>
+          <Select size="large" value={this.metric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
-        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sortState={this.sortState} changeSort={this.changeSort} metric={this.metric} />
+        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} metric={this.metric} />
       </div>
     )
   }
@@ -390,12 +390,12 @@ const questMarks = {
   Precision: <p>It measures how many true positives among all predicted (including true and false)  positives. It's TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.</p>,
   KS: "KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It's calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other.",
   'Normalized RMSE': 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
-  R2: 'R^2 is a statistical measure of how close the data are to the fitted regression line. R^2 = Explained variation / Total variation.',
+  R2: 'R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.',
   RMSE: 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
   RMSLE: 'RMSLE is similar with RMSE, but use log to y and y_pred first',
   MSE: 'Mean Squared Error',
   MAE: 'Mean Absolute Error',
-  AdjustR2: 'The adjusted R^2^ tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.',
+  AdjustR2: 'The adjusted R&sup2; tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.',
   LogLoss: <p>Log Loss is -1 * the log of the likelihood function.<br /><br />The likelihood function answers the question "How likely did the model think the actually observed set of outcomes was." If that sounds confusing, an example should help.</p>
 }
 
@@ -408,20 +408,26 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sortState, changeSort, metric } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sort, handleSort, metric } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
       ['Model Name', 'Time', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
       ['Model Name', 'Time', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', 'Validation', 'Holdout'];
+    const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
-      if (sortState[curr] === undefined) return { ...prev, [curr]: curr };
-      if (sortState[curr] === false) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='minus' /></div> }
-      if (sortState[curr] === 1) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
-      if (sortState[curr] === 2) return { ...prev, [curr]: <div onClick={changeSort(curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+      if (curr === sort.key) {
+        if (sort.value === 1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
+        if (sort.value === -1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+      } else {
+        if (arr.includes(curr)) {
+          return { ...prev, [curr]: curr };
+        }
+        return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='minus' /></div> }
+      }
       return prev
     }, {});
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>

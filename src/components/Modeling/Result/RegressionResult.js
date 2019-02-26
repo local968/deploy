@@ -20,7 +20,7 @@ export default class RegressionView extends Component {
   };
 
   render() {
-    const { models, project ,exportReport } = this.props;
+    const { models, project ,exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
@@ -65,6 +65,8 @@ export default class RegressionView extends Component {
         project={project}
         exportReport={exportReport}
         recommendId={recommendModel.id}
+        sort={sort} 
+        handleSort={handleSort}
       />
     </div>
   }
@@ -100,33 +102,33 @@ class Performance extends Component {
 
 @observer
 class ModelTable extends Component {
-  @observable sortKey = 'name'
-  @observable sort = 1
+  // @observable sortKey = 'name'
+  // @observable sort = 1
 
   abortTrain = () => {
     this.props.abortTrain()
   }
 
-  handleSort = key => {
-    const { sortKey, sort } = this
-    if (key === sortKey) return this.sort = -sort
-    this.sortKey = key
-    this.sort = 1
-  }
+  // handleSort = key => {
+  //   const { sortKey, sort } = this
+  //   if (key === sortKey) return this.sort = -sort
+  //   this.sortKey = key
+  //   this.sort = 1
+  // }
 
   @computed
   get sortModels() {
-    const { sortKey, sort, props: { models } } = this
+    const { props: { models, sort: {key, value} } } = this
     const fn = (a, b) => {
-      switch (sortKey) {
+      switch (key) {
         case "rmse":
-          return (a.score.validateScore.rmse - b.score.validateScore.rmse) * sort
+          return (a.score.validateScore.rmse - b.score.validateScore.rmse) * value
         case "r2":
-          return (a.score.validateScore.r2 - b.score.validateScore.r2) * sort
+          return (a.score.validateScore.r2 - b.score.validateScore.r2) * value
         case 'speed':
-          return (a.executeSpeed - b.executeSpeed) * sort
+          return (a.executeSpeed - b.executeSpeed) * value
         case 'time':
-          return ((a.createTime || 0) - (b.createTime || 0)) * sort
+          return ((a.createTime || 0) - (b.createTime || 0)) * value
         case "name":
         default:
           // const aArr = a.name.split('.')
@@ -141,15 +143,15 @@ class ModelTable extends Component {
           //   return aName > bName ? sort : -sort
           // }
           // return (aModelUnix - bModelUnix) * sort
-          return a.name > b.name ? sort : -sort
+          return a.name > b.name ? value : -value
       }
     }
     return models.sort(fn)
   }
 
   render() {
-    const { sortKey, sort } = this
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId,exportReport } = this.props;
+    // const { sortKey, sort } = this
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId,exportReport, sort, handleSort } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -160,31 +162,31 @@ class ModelTable extends Component {
                 styles.name,
                 styles.cellHeader
               )}
-              onClick={this.handleSort.bind(null, 'name')}
+              onClick={handleSort.bind(null, 'name')}
             >
               <span>Model Name
-              {sortKey !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              {sort.key !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'rmse')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'rmse')}>
               <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> RMSE
-              {sortKey !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              {sort.key !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'r2')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'r2')}>
               <span>
-                <Hint content='R^2 is a statistical measure of how close the data are to the fitted regression line. R^2 = Explained variation / Total variation.' /> R<sup>2</sup>
-                {sortKey !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                <Hint content='R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.' /> R<sup>2</sup>
+                {sort.key !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'speed')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'speed')}>
               <span>Execution Speed
-              {sortKey !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.cellHeader)} onClick={this.handleSort.bind(null, 'time')}>
+            <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'time')}>
               <span>Time
-              {sortKey !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+              {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>

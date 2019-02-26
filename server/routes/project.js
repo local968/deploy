@@ -120,10 +120,10 @@ function createOrUpdate(id, userId, data, isCreate = false) {
   const promise = isCreate ? Promise.resolve({ status: 200, message: 'ok' }) : checkProject(userId, id)
   return promise.then(checked => {
     if (checked.status !== 200) return checked
-    const params = mapObjectToArray(data)
     const time = moment().unix();
-    params.push("updateTime", time)
-    if (isCreate) params.push("createTime", time)
+    data.updateTime = time
+    if (isCreate) data.createTime = time
+    const params = mapObjectToArray(data)
     const pipeline = redis.pipeline();
     pipeline.hmset(`project:${id}`, params)
     pipeline.zadd(`user:${userId}:projects:updateTime`, time, id)
@@ -158,12 +158,13 @@ function addSettingModel(userId, projectId) {
 function createModel(userId, id, modelId, params) {
   const mid = uuid.v4()
   const pipeline = redis.pipeline();
-  pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray({ ...params, id: modelId, mid, createTime: moment().unix() }))
+  const saveData = { ...params, id: modelId, mid, createTime: moment().unix() }
+  pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray(saveData))
   pipeline.sadd(`project:${id}:models`, modelId)
   return pipeline.exec().then(list => {
     const err = list.find(([error]) => !!error);
     const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
-    const result = { ...data, model: { ...params, id: modelId, mid }, id }
+    const result = { ...data, model: saveData, id }
     wss.publish(`user:${userId}:projects`, result)
     return result
   })
@@ -241,7 +242,11 @@ function checkProject(userId, id) {
         result[key] = JSON.parse(result[key])
       } catch (e) { }
     }
-    if (result.userId !== userId) return { status: 421, message: "project error" }
+    if (result.userId !== userId) {
+      console.error(`user:${userId}, project:${id} ${!result.userId ? 'delete' : 'error'}`)
+      return { status: 421, message: "project error" }
+      // return {}
+    }
     return { status: 200, message: 'ok', data: result }
   })
 }

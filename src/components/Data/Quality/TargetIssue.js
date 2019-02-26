@@ -192,7 +192,7 @@ export class RowIssue extends Component {
   render() {
     const { backToConnect, totalRawLines } = this.props;
     return <div className={styles.block}>
-      <div className={styles.name}><span>Data Size is too small</span></div>
+      <div className={styles.name}><span>Data size is too small</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
@@ -422,7 +422,7 @@ export class SelectTarget extends Component {
           </div>
         </div>
 
-        <div className={styles.fixesTips}><span>The rest values will be deleted by default</span></div>
+        <div className={styles.fixesTips}><span>The rest values will be deleted by default.</span></div>
       </div>}
       {/* {this.step === 3 && <div className={styles.fixesBox}>
         <div className={styles.fixesText}><span>Select all values that belong to value2 </span></div>

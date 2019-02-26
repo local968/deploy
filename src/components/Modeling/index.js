@@ -29,6 +29,17 @@ const imgs = {
 @observer
 export default class Modeling extends Component {
   @observable right = 0
+  @observable view = 'simple'
+  @observable sort = {
+    simple: {
+      key: 'name',
+      value: 1
+    },
+    advanced: {
+      key: 'Model Name',
+      value: 1
+    }
+  }
 
   constructor(props) {
     super(props);
@@ -67,6 +78,21 @@ export default class Modeling extends Component {
     if (this.sideRef.current) this.sideRef.current.reset()
   }
 
+  changeView = view => {
+    this.view = view
+  }
+
+  handleSort = (view, key) => {
+    const sort = this.sort[view]
+    if (!sort) return
+    if (sort.key === key) sort.value = -sort.value
+    else {
+      sort.key = key
+      sort.value = 1
+    }
+    this.sort = { ...this.sort, [view]: sort }
+  }
+
   enter = step => {
     const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
     if (step === subStepActive) return false;
@@ -77,16 +103,21 @@ export default class Modeling extends Component {
   render() {
     const { project } = this.props.projectStore;
     const { models, train2Error, train2ing } = project;
-    //mobx
-    if (models.length) { }
-    if (train2Error) { }
-    if (train2ing) { }
+    const { view, sort } = this
     return (
       <div className={styles.modeling}>
         {project && <Switch>
           <Route exact path="/project/:id/modeling/start" component={StartTrain} />
-          <Route exact path="/project/:id/modeling/result" component={props => {
-            return <TrainResult {...props} resetSide={this.resetSide} />
+          <Route exact path="/project/:id/modeling/result" component={() => {
+            return <TrainResult
+              resetSide={this.resetSide}
+              hasModel={!!models.length}
+              isError={train2Error}
+              isTraining={train2ing}
+              view={view}
+              sort={sort}
+              changeView={this.changeView}
+              handleSort={this.handleSort} />
           }} />
         </Switch>}
         {project && <ProjectSide
@@ -102,18 +133,18 @@ export default class Modeling extends Component {
   }
 }
 
-@inject('projectStore')
 @observer
 class TrainResult extends Component {
   render() {
-    const { project } = this.props.projectStore;
-    const { models, train2Error, train2ing } = project;
-    if (train2Error) return <ModelError />;
-    if (!models.length && train2ing) return <Loading project={project} />;
+    const { hasModel, isError, isTraining, resetSide, view, sort, changeView, handleSort } = this.props;
+    if (isError) return <ModelError />;
+    if (!hasModel && isTraining) return <Loading />;
     return <ModelResult
-      models={models}
-      project={project}
-      resetSide={this.props.resetSide}
+      resetSide={resetSide}
+      view={view}
+      sort={sort}
+      handleSort={handleSort}
+      changeView={changeView}
     />
   }
 }
