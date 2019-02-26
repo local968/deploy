@@ -111,7 +111,6 @@ export default class Home extends Component {
   render() {
     const { projectStore } = this.props;
     const { toolsOption, total, sortList: sortProjects, changeOption, changePage, keywords } = projectStore;
-    console.log("render1111")
     return <div className={classnames(styles.home)} >
       {this.loading && <ProcessLoading style={{ position: 'fixed' }} />}
       <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} keywords={keywords} changeWords={this.changeWords} />
