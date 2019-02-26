@@ -152,6 +152,10 @@ export default class AdvancedView extends Component {
     this.props.project.crossCount = Math.min((min - 1), 5)
   })
 
+  resetSpeed = action(() => {
+    this.props.project.speedVSaccuracy = 5
+  })
+
   changeSetting = action((e) => {
     const { project } = this.props
     if (e.target.value === 'default') return this.resetSetting(project)
@@ -480,7 +484,7 @@ export default class AdvancedView extends Component {
           <div className={styles.advancedBlock}>
             <div className={styles.advancedBox}>
               <div className={styles.advancedTitle}>
-                <span>Speed VS Accuracy:</span>
+                <span>Speed VS Accuracy:<a className={styles.reset} onClick={this.resetSpeed}>Reset</a></span>
               </div>
               <div className={styles.advancedPercentBlock}>
                 <div className={styles.advancedPercent}>

@@ -242,7 +242,11 @@ function checkProject(userId, id) {
         result[key] = JSON.parse(result[key])
       } catch (e) { }
     }
-    if (result.userId !== userId) return { status: 421, message: "project error" }
+    if (result.userId !== userId) {
+      console.error(`user:${userId}, project:${id} ${!result.userId ? 'delete' : 'error'}`)
+      return { status: 421, message: "project error" }
+      // return {}
+    }
     return { status: 200, message: 'ok', data: result }
   })
 }
