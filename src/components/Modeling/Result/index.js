@@ -44,11 +44,11 @@ export default class ModelResult extends Component {
 
   exportReport = (modelId) => () => {
     try {
-      this.cancel = this.props.project.generateReport(modelId)
+      this.cancel = this.props.projectStore.project.generateReport(modelId)
     } catch (e) {
       message.error('export report error.')
-      this.props.project.reportProgress = 0
-      this.props.project.reportProgressText = 'init'
+      this.props.projectStore.project.reportProgress = 0
+      this.props.projectStore.project.reportProgressText = 'init'
     }
   }
 
