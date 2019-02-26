@@ -83,7 +83,7 @@ export default class PRChart extends Component {
         .call(d3.axisBottom(x).tickFormat(d3.format('.0%')))
         .append('text')
         .attr('x', x(1) - 30)
-        .attr('y', 25)
+        .attr('y', 35)
         .attr('fill', '#000')
         .text('Percentage');
 
