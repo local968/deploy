@@ -640,11 +640,11 @@ export default class Project {
       data.rowIssue = true;
     }
 
-    if (target && (outlierLineCounts[target] + mismatchLineCounts[target] + nullLineCounts[target]) > 0) {
+    if (target && (+outlierLineCounts[target] + +mismatchLineCounts[target] + +nullLineCounts[target]) > 0) {
       data.targetRowIssue = true
     }
 
-    if ((variableIssueCount.nullCount + variableIssueCount.mismatchCount + variableIssueCount.outlierCount) > 0) {
+    if ((+variableIssueCount.nullCount + +variableIssueCount.mismatchCount + +variableIssueCount.outlierCount) > 0) {
       data.dataIssue = true
     }
 

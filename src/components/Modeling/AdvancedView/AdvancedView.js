@@ -44,7 +44,7 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
-import { observable, computed, action, autorun } from 'mobx';
+import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 
 const TabPane = Tabs.TabPane;
