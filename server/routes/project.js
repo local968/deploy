@@ -574,11 +574,12 @@ wss.register('abortEtl', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
-    command.clearListener(stopId)
     return command({ ...message, userId, requestId: message._id, stopId }).then(() => {
+      command.clearListener(stopId)
       const statusData = {
         etling: false,
-        etlProgress: 0
+        etlProgress: 0,
+        stopId: ''
       }
       return createOrUpdate(projectId, userId, statusData)
     })
@@ -739,8 +740,8 @@ wss.register('abortTrain', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
-    command.clearListener(stopId)
     return command({ ...message, userId, requestId, stopId }, () => {
+      command.clearListener(stopId)
       const statusData = {
         train2Finished: true,
         train2ing: false,

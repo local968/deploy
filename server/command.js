@@ -40,7 +40,7 @@ const watchQueue = async () => {
 }
 
 const clearListener = requestId => {
-  pubsub.removeAllListener(requestId)
+  pubsub.removeAllListeners(requestId)
 }
 
 setInterval(watchQueue, 500)
