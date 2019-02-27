@@ -574,6 +574,7 @@ wss.register('abortEtl', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
+    command.clearListener(stopId)
     return command({ ...message, userId, requestId: message._id, stopId }).then(() => {
       const statusData = {
         etling: false,
@@ -738,6 +739,7 @@ wss.register('abortTrain', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
+    command.clearListener(stopId)
     return command({ ...message, userId, requestId, stopId }, () => {
       const statusData = {
         train2Finished: true,
