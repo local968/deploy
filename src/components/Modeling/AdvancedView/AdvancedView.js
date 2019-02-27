@@ -353,7 +353,7 @@ export default class AdvancedView extends Component {
 
   render() {
     const { project, sort, handleSort, metric, handleChange } = this.props;
-    const {problemType} = project
+    const { problemType } = project
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2')))
     return (
       <div className={styles.advancedModelResult}>
@@ -460,8 +460,9 @@ class AdvancedModelTable extends Component {
   }
   render() {
     const { model, texts, metric, checked } = this.props;
-    const { score, name } = model;
+    const { score, name, reason } = model;
     const { detail } = this.state;
+    const { validate, holdout } = reason || {}
     return (
       <div >
         <Row onClick={this.handleResult} >
@@ -478,25 +479,25 @@ class AdvancedModelTable extends Component {
                   />
                 )
               case 'Normalized RMSE':
-                return <RowCell key={10} data={score.validateScore.nrmse} />;
+                return <RowCell key={10} data={score.validateScore.nrmse} title={score.validateScore.nrmse === 'null' ? (validate || {}).nrmse : ""} />;
               case 'RMSE':
-                return <RowCell key={2} data={score.validateScore.rmse} />;
+                return <RowCell key={2} data={score.validateScore.rmse} title={score.validateScore.rmse === 'null' ? (validate || {}).rmse : ""} />;
               case 'MSLE':
-                return <RowCell key={11} data={score.validateScore.msle} />;
+                return <RowCell key={11} data={score.validateScore.msle} title={score.validateScore.msle === 'null' ? (validate || {}).msle : ""} />;
               case 'RMSLE':
-                return <RowCell key={9} data={score.validateScore.rmsle} />;
+                return <RowCell key={9} data={score.validateScore.rmsle} title={score.validateScore.rmsle === 'null' ? (validate || {}).rmsle : ""} />;
               case 'MSE':
-                return <RowCell key={3} data={score.validateScore.mse} />;
+                return <RowCell key={3} data={score.validateScore.mse} title={score.validateScore.mse === 'null' ? (validate || {}).mse : ""} />;
               case 'MAE':
-                return <RowCell key={4} data={score.validateScore.mae} />;
+                return <RowCell key={4} data={score.validateScore.mae} title={score.validateScore.mae === 'null' ? (validate || {}).mae : ""} />;
               case 'R2':
-                return <RowCell key={5} data={score.validateScore.r2} />;
+                return <RowCell key={5} data={score.validateScore.r2} title={score.validateScore.r2 === 'null' ? (validate || {}).r2 : ""} />;
               case 'AdjustR2':
-                return <RowCell key={8} data={score.validateScore.adjustR2} />;
+                return <RowCell key={8} data={score.validateScore.adjustR2} title={score.validateScore.adjustR2 === 'null' ? (validate || {}).adjustR2 : ""} />;
               case 'Validation':
-                return <RowCell key={6} data={score.validateScore[metric]} />;
+                return <RowCell key={6} data={score.validateScore[metric]} title={score.validateScore[metric] === 'null' ? (validate || {})[metric] : ""} />;
               case 'Holdout':
-                return <RowCell key={7} data={score.holdoutScore[metric]} />;
+                return <RowCell key={7} data={score.holdoutScore[metric]} title={score.holdoutScore[metric] === 'null' ? (holdout || {})[metric] : ""} />;
               case 'Time':
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
@@ -823,13 +824,13 @@ const formatNumber = (str) => {
 
 class RowCell extends Component {
   render() {
-    const { data, cellStyle, other, cellClassName, ...rest } = this.props;
+    const { data, cellStyle, other, cellClassName, title, ...rest } = this.props;
     return (
       <div
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={typeof data === 'object' ? '' : data}
+        title={title ? title : typeof data === 'object' ? '' : data}
       >
         {other ? <span className={styles.hasotherCell} >{formatNumber(data)}</span> : formatNumber(data)}
         {other}
