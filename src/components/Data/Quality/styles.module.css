@@ -153,13 +153,13 @@
 
 .error {
 	display: flex;
-	justify-content: center;
+	justify-content: space-around;
 }
 
 .errorBlock {
 	display: flex;
 	flex: none;
-	padding: 0 0.1em;
+	padding: 0 0.05em;
 	border-radius: 0.15em;
 }
 
@@ -1166,7 +1166,6 @@ span.fixesEdit {
 	cursor: pointer;
 }
 
-
 .summaryButton span {
 	font-family: HelveticaNeue;
 	font-size: 1rem;
@@ -1318,4 +1317,12 @@ button.activeButton span {
 	white-space: nowrap;
 	text-decoration: none;
 	text-overflow: ellipsis;
+}
+
+.errorBox {
+	display: flex;
+	flex: auto;
+	margin: 0 -.05em;
+	flex-wrap: nowrap;
+	justify-content: space-around;
 }
