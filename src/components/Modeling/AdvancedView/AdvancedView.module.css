@@ -66,6 +66,9 @@
     overflow: hidden;
     line-height: 3em;
   }
+  .adrow .adcell:first-child {
+    flex: 0 0 400px;
+  }
   .button {
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
     background-image: linear-gradient(to bottom, #5b657b, #243448);
