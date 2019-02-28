@@ -13,6 +13,26 @@ import Process from './Process.svg'
 
 const AccuracyHint = "Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%."
 
+const formatNumber = (str) => {
+  if (isNaN(str)) return str
+  str = str.toString()
+  let i, d
+  if (str.indexOf('.')) {
+    i = str.split('.')[0]
+    d = str.split('.')[1]
+  } else {
+    i = str
+  }
+
+  const left = i.length % 3
+  i = i.split('').reduce((prev, curr, index) => {
+    if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
+    if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
+    return prev + curr
+  }, '')
+  if (d) return i + '.' + d.slice(0, 3)
+  return i
+}
 @observer
 export default class ClassificationView extends Component {
   @observable showCost = false
@@ -294,7 +314,7 @@ class ModelTable extends Component {
 
   @computed
   get sortModels() {
-    const { props: { models, sort: {key, value} } } = this
+    const { props: { models, sort: { key, value } } } = this
     const fn = (a, b) => {
       switch (key) {
         case "acc":
@@ -326,7 +346,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text,exportReport, sort, handleSort } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort } = this.props;
     // const { sortKey, sort } = this
     return (
       <div className={styles.table}>
@@ -471,16 +491,16 @@ class ModelDetail extends Component {
             </div>
             <div className={styles.cell}>
               <span>
-                {model.accValidation.toFixed(2)}
+                {formatNumber(model.accValidation)}
               </span>
             </div>
             <div className={styles.cell}>
               <span>
-                {model.score.validateScore.auc.toFixed(2)}
+                {formatNumber(model.score.validateScore.auc)}
               </span>
             </div>
             <div className={styles.cell}>
-              <span>{model.executeSpeed + ' rows/s'}</span>
+              <span>{formatNumber(model.executeSpeed) + ' rows/s'}</span>
             </div>
             <div className={styles.cell}>
               <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>

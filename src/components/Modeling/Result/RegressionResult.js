@@ -12,6 +12,26 @@ import Process from "./Process.svg";
 import Variable from "./Variable.svg";
 import { ProgressBar, Hint } from 'components/Common';
 
+const formatNumber = (str) => {
+  if (isNaN(str)) return str
+  str = str.toString()
+  let i, d
+  if (str.indexOf('.')) {
+    i = str.split('.')[0]
+    d = str.split('.')[1]
+  } else {
+    i = str
+  }
+
+  const left = i.length % 3
+  i = i.split('').reduce((prev, curr, index) => {
+    if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
+    if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
+    return prev + curr
+  }, '')
+  if (d) return i + '.' + d.slice(0, 3)
+  return i
+}
 
 @observer
 export default class RegressionView extends Component {
@@ -20,7 +40,7 @@ export default class RegressionView extends Component {
   };
 
   render() {
-    const { models, project ,exportReport, sort, handleSort } = this.props;
+    const { models, project, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
@@ -79,7 +99,7 @@ class Performance extends Component {
     return <div className={styles.performanceBox}>
       <div className={styles.performance}>
         <div className={styles.rmsePerformance}>
-          <span>{current.score.validateScore.nrmse.toFixed(4)}</span>
+          <span>{formatNumber(current.score.validateScore.nrmse)}</span>
         </div>
         <div className={styles.performanceText}>
           <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> Normalized RMSE</span>
@@ -88,7 +108,7 @@ class Performance extends Component {
       <div className={styles.space} />
       <div className={styles.performance}>
         <div className={styles.r2Performance}>
-          <span>{current.score.validateScore.r2.toFixed(4)}</span>
+          <span>{formatNumber(current.score.validateScore.r2)}</span>
         </div>
         <div className={styles.performanceText}>
           <span>
@@ -118,7 +138,7 @@ class ModelTable extends Component {
 
   @computed
   get sortModels() {
-    const { props: { models, sort: {key, value} } } = this
+    const { props: { models, sort: { key, value } } } = this
     const fn = (a, b) => {
       switch (key) {
         case "rmse":
@@ -151,7 +171,7 @@ class ModelTable extends Component {
 
   render() {
     // const { sortKey, sort } = this
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId,exportReport, sort, handleSort } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, exportReport, sort, handleSort } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -169,13 +189,13 @@ class ModelTable extends Component {
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'rmse')}>
-              <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /><i style={{width:4}} />RMSE
+              <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /><i style={{ width: 4 }} />RMSE
               {sort.key !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'r2')}>
               <span>
-                <Hint content='R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.' /><i style={{width:4}} />R<sup>2</sup>
+                <Hint content='R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.' /><i style={{ width: 4 }} />R<sup>2</sup>
                 {sort.key !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
@@ -276,16 +296,16 @@ class ModelDetail extends Component {
             </div>
             <div className={styles.cell}>
               <span>
-                {model.score.validateScore.rmse.toFixed(4)}
+                {formatNumber(model.score.validateScore.rmse)}
               </span>
             </div>
             <div className={styles.cell}>
               <span>
-                {model.score.validateScore.r2.toFixed(4)}
+                {formatNumber(model.score.validateScore.r2)}
               </span>
             </div>
             <div className={styles.cell}>
-              <span>{model.executeSpeed + ' rows/s'}</span>
+              <span>{formatNumber(model.executeSpeed) + ' rows/s'}</span>
             </div>
             <div className={styles.cell}>
               <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
