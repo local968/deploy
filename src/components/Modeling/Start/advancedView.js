@@ -6,6 +6,7 @@ import { action } from 'mobx';
 import { NumberInput, Range } from 'components/Common';
 import { Select, message, Tooltip } from 'antd';
 import Algorithms from './algorithms';
+import moment from 'moment';
 
 const Option = Select.Option;
 
@@ -14,7 +15,7 @@ export default class AdvancedView extends Component {
 
   handleName = action((e) => {
     const { project } = this.props
-    project.settings.find(s => s.id === project.settingId).name = e.target.value
+    project.settings.find(s => s.id === project.settingId).name = e.target.value || `custom.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
   })
 
   handleSize = value => {
