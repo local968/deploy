@@ -65,7 +65,7 @@ export default class RegressionView extends Component {
         project={project}
         exportReport={exportReport}
         recommendId={recommendModel.id}
-        sort={sort} 
+        sort={sort}
         handleSort={handleSort}
       />
     </div>
@@ -169,13 +169,13 @@ class ModelTable extends Component {
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'rmse')}>
-              <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> RMSE
+              <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /><i style={{width:4}} />RMSE
               {sort.key !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'r2')}>
               <span>
-                <Hint content='R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.' /> R<sup>2</sup>
+                <Hint content='R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.' /><i style={{width:4}} />R<sup>2</sup>
                 {sort.key !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
