@@ -107,8 +107,8 @@ export default class List extends Component {
                       {s.schedule.result &&
                         s.schedule.status === 'finished' &&
                         (s.schedule.result.problemType === 'Classification'
-                          ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')} AUC:${this.showScore(s.schedule.result.score, 'auc')}`
-                          : `RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`)}
+                          ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')} AUC:${this.showScore(s.schedule.result.score, 'auc')} F1:${this.showScore(s.schedule.result.score, 'f1')} Precision:${this.showScore(s.schedule.result.score, 'precision')} Recall:${this.showScore(s.schedule.result.score, 'recall')}`
+                          : `MSE:${this.showScore(s.schedule.result.score, 'mse')} RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`)}
                     </span>
                     <span className={styles.threshold}>
                       {s.schedule.threshold &&
@@ -184,12 +184,16 @@ const Alert = ({ text }) => (
 const isExcessThreshold = schedule => {
   if (!schedule.result || !schedule.result.score) return false;
   if (!schedule.threshold || !schedule.threshold.type || !schedule.threshold.value) return false
-  const nameMap = { R2: 'r2', RMSE: 'rmse', AUC: 'auc', Accuracy: 'acc' };
+  const nameMap = { R2: 'r2', RMSE: 'rmse', MSE: 'mse', AUC: 'auc', Accuracy: 'acc', F1: 'f1', Precision: 'precision', Recall: 'recall' };
   return {
     R2: (threshold, real) => threshold > real,
     RMSE: (threshold, real) => threshold < real,
+    MSE: (threshold, real) => threshold < real,
     Accuracy: (threshold, real) => threshold > real,
-    AUC: (threshold, real) => threshold > real
+    AUC: (threshold, real) => threshold > real,
+    F1: (threshold, real) => threshold > real,
+    Precision: (threshold, real) => threshold > real,
+    Recall: (threshold, real) => threshold > real
   }[schedule.threshold.type](
     schedule.threshold.value,
     schedule.result.score[nameMap[schedule.threshold.type]]

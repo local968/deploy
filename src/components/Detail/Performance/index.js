@@ -330,8 +330,11 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           value={cdpo.measurementMetric}
           onChange={value => selectionOption('measurementMetric', value)()}
         >
-          <Option value="AUC">AUC</Option>
           <Option value="Accuracy">Accuracy</Option>
+          <Option value="AUC">AUC</Option>
+          <Option value="F1">F1</Option>
+          <Option value="Precision">Precision</Option>
+          <Option value="Recall">Recall</Option>
         </Select>
       )}
       {type === 'Regression' && (
@@ -342,6 +345,7 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
         >
           <Option value="R2">R²</Option>
           <Option value="RMSE">RMSE</Option>
+          <Option value="MSE">MSE</Option>
         </Select>
       )}
     </div>
