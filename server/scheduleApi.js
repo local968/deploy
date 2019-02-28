@@ -99,7 +99,7 @@ const api = {
     const previewSize = await redis.get(`user:${userId}:upload`)
     if (parseInt(previewSize) + parseInt(size) >= userStorageRestriction[level]) throw {
       status: 417,
-      message: 'Your usage of storage space has reached the max restricted by your current lisense.',
+      message: 'Your usage of storage space has reached the max restricted by your current license.',
       error: 'storage space full'
     }
     const fileId = uuid.v4()
@@ -142,6 +142,54 @@ const api = {
   },
   decreaseLines: async (restrictQuery, lineCount) => {
     await redis.incrby(restrictQuery, -lineCount)
+  },
+  getCutOff: async (projectId, modelName) => {
+    return redis.smembers(`project:${projectId}:models`).then(ids => {
+      const pipeline = redis.pipeline();
+      ids.forEach(mid => {
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex', 'chartData')
+      })
+      return pipeline.exec().then(list => {
+        const models = list.map(row => {
+          let [name, fitIndex, chartData] = row[1] || []
+          try {
+            name = JSON.parse(name)
+            fitIndex = JSON.parse(fitIndex)
+            chartData = JSON.parse(chartData)
+          } catch (e) { }
+          return { name, fitIndex, chartData }
+        })
+        const model = models.find(m => m.name === modelName) || {}
+        const cutoff = model.chartData.roc.Threshold[model.fitIndex || 0]
+        return cutoff
+      })
+    })
+  },
+  getFeatureLabel: async projectId => {
+    try {
+      const newFeatureLabel = {}
+      const fields = ['target', 'targetArray', 'colMap', 'renameVariable']
+      const values = await redis.hmget("project:" + projectId, fields)
+      const obj = fields.reduce((start, k, index) => {
+        let value = values[index]
+        try {
+          value = JSON.parse(value)
+        } catch (e) { }
+        start[k] = value
+        return start
+      }, {})
+      const { target, targetArray, colMap, renameVariable } = obj
+      if(!target) return newFeatureLabel
+      const arr = !targetArray.length ? Object.keys((colMap || {})[target]) : targetArray
+      if (!arr.length) return newFeatureLabel
+      arr.slice(0, 2).forEach((k, index) => {
+        const rename = (renameVariable || {})[k]
+        if (!!rename) newFeatureLabel[rename] = index
+      })
+      return newFeatureLabel
+    } catch (e) {
+      return {}
+    }
   }
 }
 

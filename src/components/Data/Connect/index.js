@@ -1,71 +1,71 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import classnames from 'classnames';
+// import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
 import sqlIcon from './sql.svg';
 // import defileIcon from './define.svg';
 import axios from 'axios';
-import { message, Progress } from 'antd';
-import { Uploader } from 'components/Common';
+import { message } from 'antd';
+import { Uploader, ProgressBar, ProcessLoading } from 'components/Common';
 import config from 'config';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 
 import { observable, action, computed } from 'mobx';
 
-const files = {
-  RegressionSample: [
-    {
-      filename: 'regression.house.csv',
-      size: '2.4M',
-      desc: 'house features and price',
-      target: 'price',
-      usecase: 'house features and price',
-    },
-    {
-      filename: 'game.csv',
-      size: '1.6M',
-      desc: 'game sales prediction',
-      target: 'NA_Sales',
-      usecase: 'video game sales',
-    }
-  ],
-  ClassificationSample: [
-    {
-      filename: 'bank.train.csv',
-      size: '366K',
-      desc:
-        'Predict target customers for telemarketing of long term deposits product.',
-      target: 'y',
-      usecase: 'Retail bank telemarketing campaign data',
-    },
-    {
-      filename: 'titanic.train.csv',
-      size: '59K',
-      desc: 'Predict if a passenger on the Titanic boat would survive or not.',
-      target: 'survived',
-      usecase: 'Titanic survival data',
-    },
-    {
-      filename: 'dma1c_dirty.csv',
-      size: '24M',
-      desc: 'Predict diabetic patients blood suger cross control level',
-      target: 'target8',
-      usecase: 'Predict diabetic',
-    },
-    {
-      filename: 'givemecredit_dirty.csv',
-      size: '5.5MB',
-      desc: 'Predict whether or not a loan should be granted',
-      target: 'target',
-      usecase: 'Give me credit',
-    }
-  ]
-};
+// const files = {
+//   RegressionSample: [
+//     {
+//       filename: 'regression.house.csv',
+//       size: '2.4M',
+//       desc: 'house features and price',
+//       target: 'price',
+//       usecase: 'house features and price',
+//     },
+//     {
+//       filename: 'game.csv',
+//       size: '1.6M',
+//       desc: 'game sales prediction',
+//       target: 'NA_Sales',
+//       usecase: 'video game sales',
+//     }
+//   ],
+//   ClassificationSample: [
+//     {
+//       filename: 'bank.train.csv',
+//       size: '366K',
+//       desc:
+//         'Predict target customers for telemarketing of long term deposits product.',
+//       target: 'y',
+//       usecase: 'Retail bank telemarketing campaign data',
+//     },
+//     {
+//       filename: 'titanic.train.csv',
+//       size: '59K',
+//       desc: 'Predict if a passenger on the Titanic boat would survive or not.',
+//       target: 'survived',
+//       usecase: 'Titanic survival data',
+//     },
+//     {
+//       filename: 'dma1c_dirty.csv',
+//       size: '24M',
+//       desc: 'Predict diabetic patients blood suger cross control level',
+//       target: 'target8',
+//       usecase: 'Predict diabetic',
+//     },
+//     {
+//       filename: 'givemecredit_dirty.csv',
+//       size: '5.5MB',
+//       desc: 'Predict whether or not a loan should be granted',
+//       target: 'target',
+//       usecase: 'Give me credit',
+//     }
+//   ]
+// };
 
-@inject('userStore', 'socketStore')
+@inject('userStore', 'socketStore', 'projectStore')
 @observer
 export default class DataConnect extends Component {
   @observable sample = false
@@ -80,24 +80,29 @@ export default class DataConnect extends Component {
   @computed
   get message() {
     if (this.isPause) return 'Paused'
-    if (!this.isSql && this.process === 0) return 'Perparing for upload...'
-    if (!this.isSql && this.process > 0 && this.process < 90) return 'Uploading data...'
-    if (this.process >= 90) return 'Extract-Transform-Load in progress...'
-    if (this.isSql && this.process === 0) return 'Perparing for database connection...'
-    if (this.isSql && this.process >= 20 && this.process < 90) return `Downloaded Data: ${this.sqlProgress} rows`
+    const process = this.props.projectStore.project.etling ? 50 : this.process
+    if (!this.isSql && process === 0) return 'Preparing for upload...'
+    if (!this.isSql && process > 0 && process < 50) return 'Uploading data...'
+    if (process >= 50) return 'Extract-Transform-Load in progress...'
+    if (this.isSql && process === 0) return 'Perparing for database connection...'
+    if (this.isSql && process >= 20 && process < 50) return `Downloaded Data: ${this.sqlProgress} rows`
   }
 
   onUpload = ({ pause, resume }) => {
     this.uploading = true
+    this.isPause = false
     this.pause = pause
     this.resume = resume
   }
 
   upload = action(data => {
-    this.process = 90
+    this.process = 50
     this.file = null
 
-    this.props.project.fastTrackInit(data.fileId);
+    this.props.projectStore.project.fastTrackInit(data.fileId).then(() => {
+      this.process = 0
+      this.uploading = false
+    });
   })
 
   onError = action((error, times) => {
@@ -112,13 +117,48 @@ export default class DataConnect extends Component {
     if (!this.uploading) return
     const [loaded, size] = progress.split("/")
     try {
-      this.process = (parseFloat(loaded) / parseFloat(size)) * 90
+      this.process = (parseFloat(loaded) / parseFloat(size)) * 50
     } catch (e) { }
   })
 
-  doEtl = () => {
-    this.props.project.etl();
-  };
+  onChecks = action(file => {
+    // if(this.props.userStore.uploadSize < file.size) return {
+    //   err: true,
+    //   msg: 'File Error: File must not exceed 50M.'
+    // }
+
+    console.log(this.props.userStore.currentLever , 'this.props.userStore.currentLever')
+
+    if(this.props.userStore.currentLever === '0') {
+      return {
+        err: true,
+        msg: 'No authority.'
+      }
+    }else if( (this.props.userStore.currentLever === '1' && file.size > 50 * 1024 * 1024)|| ( this.props.userStore.currentLever === '2' && file.size > 50 * 1024 * 1024) ) {
+      return {
+        err: true,
+        msg: 'File must not exceed 50M.'
+      }
+    } else if(this.props.userStore.currentLever === '3' && file.size > 200 * 1024 * 1024){
+      return {
+        err: true,
+        msg: 'File must not exceed 200M.'
+      }
+    }
+    return {
+      err: false,
+      msg: 'ok'
+    }
+
+  })
+
+  // doEtl = () => {
+  //   const { project } = this.props.projectStore
+  //   project.etl().then(pass => {
+  //     console.log(pass,"pass")
+  //     if (!pass) project.updateProject({ uploadFileName: [] })
+  //   });
+  // };
 
   showSample = action(() => {
     this.sample = true
@@ -129,15 +169,19 @@ export default class DataConnect extends Component {
   })
 
   selectSample = filename => {
-    if (!!this.process) return false;
+    const process = this.props.projectStore.project.etling ? 50 : this.process
+    if (!!process) return false;
 
     this.uploading = true
 
     axios.post(`http://${config.host}:${config.port}/upload/sample`, { filename }).then(
       action(data => {
         const { fileId } = data.data
-        this.process = 90
-        this.props.project.fastTrackInit(fileId);
+        this.process = 50
+        this.props.projectStore.project.fastTrackInit(fileId).then(() => {
+          this.process = 0
+          this.uploading = false
+        });
       }),
       () => {
         message.error('sample file error, please choose again');
@@ -169,7 +213,8 @@ export default class DataConnect extends Component {
 
   handleDrop = action((e) => {
     e.preventDefault();
-    if (this.process) return false;
+    const process = this.props.projectStore.project.etling ? 50 : this.process
+    if (process) return false;
     let file = e.dataTransfer.files[0];
     this.file = file
   })
@@ -191,6 +236,8 @@ export default class DataConnect extends Component {
   }
 
   closeUpload = () => {
+    const process = this.props.projectStore.project.etling ? 50 : this.process
+    if (process >= 50) this.props.projectStore.project.abortEtl()
     this.pause && this.pause()
     this.uploading = false
     this.process = 0
@@ -198,13 +245,14 @@ export default class DataConnect extends Component {
   }
 
   render() {
-    const { project, userStore, socketStore } = this.props;
-    const { etlProgress } = project
+    const { projectStore: { project }, userStore, socketStore } = this.props;
+    const { etlProgress, etling } = project
+    const process = etling ? 50 : this.process
     window.cn = this
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
-          <span>If your data is ready, choose a data source to connect.</span>
+          <span>Please choose a data source to connect.</span>
         </div>
         {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
@@ -218,7 +266,7 @@ export default class DataConnect extends Component {
         </div> */}
         <div className={styles.uploadRow}>
           {this.block('From R2 Learn', sampleIcon, this.showSample)}
-          {!!this.process ? (
+          {!!(this.uploading || etling) ? (
             this.block('From Computer', localFileIcon)
           ) : (
               <Uploader
@@ -228,6 +276,7 @@ export default class DataConnect extends Component {
                 onError={this.onError}
                 params={{ userId: userStore.info.id, projectId: project.id }}
                 onProgress={this.onProgress}
+                onCheck={this.onChecks}
                 file={this.file}
               />
             )}
@@ -249,36 +298,32 @@ export default class DataConnect extends Component {
         <div className={styles.uploadRow}>
           {this.block('From R2 Learn', defileIcon)}
         </div> */}
-        {this.sample && (
-          <DataSample
-            project={project}
-            onClose={this.hideSample}
-            selectSample={this.selectSample}
-          />
-        )}
-        {!!this.uploading && (
+        {<DataSample
+          project={project}
+          onClose={this.hideSample}
+          selectSample={this.selectSample}
+          visible={this.sample}
+        />}
+        {!!(this.uploading || etling) && (
           <div className={styles.sample}>
             <div className={styles.cover} />
             <div className={styles.progressBlock}>
               <div className={styles.progressTitle}>
                 <span>Data Import</span>
-                {this.process < 90 && <div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
+                {<div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
               </div>
               <div className={styles.progressContent}>
                 <div className={styles.progressLoad}>
                   <img src={r2LoadGif} alt="loading" />
                 </div>
                 <div className={styles.progressing}>
-                  <Progress
-                    percent={this.process + (etlProgress || 0) / 10}
-                    status="active"
-                    strokeWidth={12}
-                    showInfo={false}
+                  <ProgressBar
+                    progress={process + (etlProgress || 0) / 2}
                   />
                 </div>
                 <div className={styles.progressText}>
                   <span>{this.message}</span>
-                  {(this.process < 90 && this.process > 0 && this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
+                  {(process < 50 && process > 0 && !this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
                 </div>
               </div>
             </div>
@@ -301,16 +346,23 @@ export default class DataConnect extends Component {
               if (result.value === 0) {
                 this.process = 20
                 processInterval = setInterval(() => {
-                  if (this.process && this.process < 90) this.process++
+                  if (this.process && this.process < 50) this.process++
                 }, 1000)
               }
               if (result.value) this.sqlProgress = result.value
             }))
             clearInterval(processInterval)
-            if (resp.status !== 200) return message.error(resp.message)
+            if (resp.status !== 200) {
+              this.process = 0
+              this.uploading = false
+              return message.error(resp.message)
+            }
             const fileId = resp.fileId
-            project.fastTrackInit(fileId);
-            this.process = 90
+            this.process = 50
+            project.fastTrackInit(fileId).then(() => {
+              this.process = 0
+              this.uploading = false
+            })
           })}
         />
       </div>
@@ -320,24 +372,53 @@ export default class DataConnect extends Component {
 
 @observer
 class DataSample extends Component {
+  constructor(props) {
+    super(props)
+    this.init()
+  }
+
   @observable select = -1
+  @observable loading = true
 
   onSelect = action(index => {
     this.select = index
   })
 
+  init = () => {
+    this.props.project.getSample().then(list => {
+      this.files = list
+      this.loading = false
+    })
+  }
+
   submit = () => {
-    const { project, selectSample } = this.props;
-    const sample = files[project.problemType + 'Sample'];
-    const file = sample[this.select];
+    const { selectSample } = this.props;
+    // const sample = this.files[project.problemType + 'Sample'];
+    const file = (this.files || [])[this.select];
     if (!file) return;
-    selectSample(file.filename);
+    selectSample(file.name);
   };
 
+  formatSize = size => {
+    let { size: s, n } = this.getSize(size)
+    if (n < 0) n = 1
+    const unit = (n === 1 && 'b') || (n === 2 && 'Kb') || (n === 3 && 'Mb') || (n === 4 && 'Gb') || 'Tb'
+    return (parseInt(s * 100, 10) / 100) + ' ' + unit
+  }
+
+  getSize = (size, n = 1) => {
+    if (n >= 5) return { size, n }
+    const s = size / 1024
+    if (s > 1) return this.getSize(s, ++n)
+    return { size, n }
+  }
+
   render() {
-    const { project, onClose } = this.props;
-    const sample = files[project.problemType + 'Sample'];
-    return (
+    const { onClose, visible } = this.props;
+    if (!visible) return null
+    // const sample = this.files[project.problemType + 'Sample'];
+    return this.loading ?
+      <ProcessLoading style={{ position: 'fixed' }} /> :
       <div className={styles.sample}>
         <div className={styles.cover} onClick={onClose} />
         <div className={styles.sampleBlock}>
@@ -350,17 +431,17 @@ class DataSample extends Component {
           <div className={styles.sampleTop}>
             <span>
               Select a sample data if you don’t have a dataset yet and want to
-							try out the application.
+              try out the application.
             		</span>
           </div>
           <div className={styles.sampleTable}>
             <div className={styles.sampleHeader}>
               <div className={styles.sampleCell}>
-                <span>Use Case Name</span>
+                <span>Name</span>
               </div>
-              <div className={classnames(styles.sampleCell, styles.sampleDesc)}>
+              {/* <div className={classnames(styles.sampleCell, styles.sampleDesc)}>
                 <span>Description</span>
-              </div>
+              </div> */}
               <div className={styles.sampleCell}>
                 <span>File Name</span>
               </div>
@@ -371,7 +452,7 @@ class DataSample extends Component {
                 <span>Data Size</span>
               </div>
             </div>
-            {sample.map((row, index) => {
+            {(this.files || []).map((row, index) => {
               return (
                 <div
                   className={styles.sampleRow}
@@ -387,22 +468,22 @@ class DataSample extends Component {
                     />
                   </div>
                   <div className={styles.sampleCell} title={row.usecase}>
-                    <span>{row.usecase}</span>
+                    <span>{row.name}</span>
                   </div>
-                  <div
+                  {/* <div
                     className={classnames(styles.sampleCell, styles.sampleDesc)}
                     title={row.desc}
                   >
                     <span>{row.desc}</span>
-                  </div>
+                  </div> */}
                   <div className={styles.sampleCell} title={row.filename}>
-                    <span>{row.filename}</span>
+                    <span>{row.name}</span>
                   </div>
                   <div className={styles.sampleCell} title={row.target}>
                     <span>{row.target}</span>
                   </div>
                   <div className={styles.sampleCell} title={row.size}>
-                    <span>{row.size}</span>
+                    <span>{this.formatSize(row.size)}</span>
                   </div>
                 </div>
               );
@@ -415,6 +496,5 @@ class DataSample extends Component {
           </div>
         </div>
       </div>
-    );
   }
 }

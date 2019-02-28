@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Checkbox } from 'antd';
-import styles from './D3Chart.module.less';
+import styles from './D3Chart.module.css';
 import d3tips from './d3-tip';
 
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
+
+d3ColorsCategory20.push(...d3.schemeCategory20)
 
 export default class SpeedAndAcc extends Component {
   state = {
@@ -58,7 +60,10 @@ export default class SpeedAndAcc extends Component {
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    const data = this.resolveData(models);
+    const data = this.resolveData(models)||[]
+    if(!data.length){
+      return
+    }
     x.domain([0, d3.max(data, function (d) {return d.speed + 50;})]);
     y.domain([0, d3.max(data, function (d) {return d.acc + 0.1;})]);
 
@@ -121,7 +126,7 @@ export default class SpeedAndAcc extends Component {
         .call(d3.axisBottom(x))
         .append('text')
         .attr('x', 450)
-        .attr('y', -10)
+        .attr('y', 35)
         .attr('fill', '#000')
         .text('Speed(ms/1000 rows)');
 

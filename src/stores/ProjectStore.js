@@ -1,10 +1,14 @@
-import { observable, action, when, computed } from "mobx";
+import { observable, action, when, computed, autorun } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
 import uuid from "uuid";
+import moment from 'moment'
+import { message as antdMessage } from 'antd'
 
 class ProjectStore {
   @observable loading = true;
+  @observable init = false;
+  @observable isOnline = true;
   @observable watchList = false;
   @observable currentId = "";
 
@@ -16,24 +20,89 @@ class ProjectStore {
     limit: 10,
     offset: 0,
     sort: 'createTime',
-  }
+  };
   @observable broadcastId = "";
-  @observable conflict = false
+  @observable conflict = false;
+  @observable stopFilter = false;
+  oldfiltedModels = null;
+  newfiltedModels = null;
+
+  @action
+  changeStopFilter = (stopFilter) => {
+    this.stopFilter = stopFilter;
+    if (!stopFilter) {
+      this.oldfiltedModels = this.newfiltedModels
+    }
+  };
+
+  @action
+  changeNewfiltedModels = (models) => {
+    this.newfiltedModels = models
+  };
+
+  @action
+  changeOldfiltedModels = (models) => {
+    this.oldfiltedModels = models
+  };
+
 
   constructor() {
+    if (window.r2Report) {
+      const list = window.r2Report
+      this.list = list.map(row => {
+        const project = new Project(row.id + "", { ...row, ...{ isAbort: false } })
+        project.models.forEach(m => project.setModel(m))
+        return project
+      })
+      return;
+    }
+    this.initWatch()
+    this.initReload()
+    autorun(() => {
+      if (this.project) {
+        this.project.clean()
+        this.project.initProject()
+      }
+    })
+  }
+
+  initReload = () => {
+    socketStore.ready().then(api => {
+      api.on('offline', this.offline)
+      api.on('online', this.initWatch)
+    })
+  }
+
+  initWatch = () => {
+    this.isOnline = true
+    if (this.init) return
     this.watchProjectList();
     when(
       () => this.watchList,
-      () => this.queryProjectList()
+      () => {
+        this.queryProjectList().then(() => {
+          if (this.project) {
+            this.project.initProject()
+            this.project.initModels()
+          }
+        })
+      }
     )
+  }
+
+  offline = () => {
+    this.watchList = false;
+    this.init = false
+    this.isOnline = false
+    if (this.project) this.project.clean();
   }
 
   @computed
   get sortList() {
     const sort = this.toolsOption.sort
-    return this.list.sort((a, b) => {
+    return this.list.filter(p => p.visiable).sort((a, b) => {
       return b[sort] - a[sort]
-    })
+    }).slice(0, this.toolsOption.limit)
   }
 
   @computed
@@ -65,19 +134,26 @@ class ProjectStore {
       api.watchProjectList().then(watch => {
         if (watch.status === 200) {
           this.watchList = true
+          this.init = true
           api.on(watch.id, data => {
-            const { status, id, result, model } = data
+            const { status, id, result, model, modelResult } = data
             if (status === 200) {
               const project = this.list.find(p => p.id === id)
-              if (!project) return
-              if (result) project.setProperty(result)
-              if (model) project.setModel(model)
+              if (!project) {
+                if (!result) return
+                if (!result.host) return
+                this.queryProjectList()
+              } else {
+                if (result) project.setProperty(result)
+                if (model) project.setModel(model)
+                if (modelResult) project.setModelField(modelResult)
+              }
             }
           })
           api.on("inProject", data => {
             const { id, broadcastId } = data
-            if(broadcastId === this.broadcastId) return
-            if(id !== this.currentId) return 
+            if (broadcastId === this.broadcastId) return
+            if (id !== this.currentId) return
             this.showConflict()
           })
         }
@@ -88,14 +164,25 @@ class ProjectStore {
   @action
   queryProjectList = () => {
     this.loading = true;
-    socketStore.ready().then(api => {
-      api.queryProjectList(this.toolsOption).then(result => {
+    return socketStore.ready().then(api => {
+      return api.queryProjectList(this.toolsOption).then(result => {
         const { status, message, list, count } = result
         if (status !== 200) {
           this.loading = false;
-          return alert(message)
+          return antdMessage.error(message)
         }
-        this.list = list.map(row => new Project(row.id + "", row))
+        let newList = list.map(row => new Project(row.id + "", row))
+        if (this.currentId) {
+          const current = this.project
+          newList = newList.filter(p => p.id !== current.id)
+          if (newList.length === list.length) {
+            current.visiable = false
+          } else {
+            current.visiable = true
+          }
+          newList.push(current)
+        }
+        this.list = [...newList]
         this.total = count
         this.loading = false;
       })
@@ -113,7 +200,7 @@ class ProjectStore {
           this.loading = false;
           return { error: message }
         }
-        this.list.push(new Project(id + ""))
+        this.list.push(new Project(id + "", { createTime: moment().unix(), updateTime: moment().unix(), visiable: false }))
         this.loading = false;
         return { id }
       })
@@ -129,7 +216,7 @@ class ProjectStore {
         const { status, message } = result
         this.loading = false;
         if (status !== 200) {
-          alert(message)
+          return antdMessage.error(message)
           // return { error: message }
         }
         this.list = this.list.filter(i => {
@@ -143,24 +230,49 @@ class ProjectStore {
   @action
   initProject = id => {
     return new Promise(resolve => {
-      when(
-        () => !this.loading && !this.isInit,
-        () => {
-          if (!this.list.length) return resolve(false)
-          const project = this.list.find(row => {
-            return row.id === id
-          })
-          if (project) {
-            project.queryProject(true)
-            project.initModels()
-            this.currentId = id
-            return resolve(true)
-          } else {
+      if (this.currentId === id) return resolve(true)
+      if (this.list.length) {
+        const project = this.list.find(row => {
+          return row.id === id
+        })
+        if (project) {
+          project.initProject()
+          project.initModels()
+          this.currentId = id
+          return resolve(true)
+        }
+      }
+      socketStore.ready().then(api => {
+        api.checkProject({ id }).then(result => {
+          const { status, data } = result
+          if (status !== 200) {
             return resolve(false)
           }
+          const hiddenProject = new Project(id + '', { ...data, visiable: false })
+          this.list.push(hiddenProject)
+          hiddenProject.initProject()
+          hiddenProject.initModels()
+          this.currentId = id
+          resolve(true)
         })
-    }
-    )
+      })
+      //   when(
+      //     () => !this.loading && !this.isInit,
+      //     () => {
+      //       if (!this.list.length) return resolve(false)
+      //       const project = this.list.find(row => {
+      //         return row.id === id
+      //       })
+      //       if (project) {
+      //         project.initProject()
+      //         project.initModels()
+      //         this.currentId = id
+      //         return resolve(true)
+      //       } else {
+      //         return resolve(false)
+      //       }
+      //     })
+    })
   }
 
   @action
@@ -186,6 +298,12 @@ class ProjectStore {
   notExit = () => {
     this.conflict = false
     this.inProject(this.currentId)
+  }
+
+  @action
+  clean = () => {
+    if (this.currentId) this.project.clean()
+    this.currentId = ''
   }
 }
 

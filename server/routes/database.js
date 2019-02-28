@@ -14,8 +14,8 @@ wss.register('checkDatabase', (message, socket, progress) => command({
 }, (result) => (result.status < 0 || result.status === 100) ? result : progress(result)))
 
 wss.register('downloadFromDatabase', (message, socket, progress) => {
-  const type = message.type
-  const userId = socket.session.userId
+  const {type} = message
+  const {userId} = socket.session
   return command({
     ...message,
     requestId: message._id,
@@ -35,13 +35,13 @@ wss.register('downloadFromDatabase', (message, socket, progress) => {
       if (!path) throw new Error('no path')
       if (type === 'modeling' && parseInt(size) >= userModelingRestriction[socket.session.user.level]) return {
         status: 416,
-        message: 'Your usage of modeling data size has reached the max restricted by your current lisense.',
+        message: 'Your usage of modeling data size has reached the max restricted by your current license.',
         error: 'modeling file too large'
       }
       const previewSize = await redis.get(`user:${userId}:upload`)
       if (parseInt(previewSize) + parseInt(size) >= userStorageRestriction[socket.session.user.level]) return {
         status: 417,
-        message: 'Your usage of storage space has reached the max restricted by your current lisense.',
+        message: 'Your usage of storage space has reached the max restricted by your current license.',
         error: 'storage space full'
       }
       const fileId = uuid.v4()
@@ -62,4 +62,3 @@ wss.register('downloadFromDatabase', (message, socket, progress) => {
       return { fileId, status: 200, message: 'ok' }
     })
 })
-

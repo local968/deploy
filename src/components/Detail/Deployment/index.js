@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Checkbox, Progress, Select } from 'antd';
+import { Icon, Checkbox, Progress, Select, Modal } from 'antd';
 import { action, observable } from 'mobx';
 import moment from 'moment';
 import config from 'config';
@@ -142,6 +142,8 @@ export default class Deployment extends Component {
       }),
       onStart: action(() => {
         this.uploadStatus = 'uploading'
+        this.uploadSpeed = '0 Kb/s'
+        this.uploadPercentage = 0
       }),
       operator: (opeartor) => {
         this.uploadOperator = opeartor
@@ -162,7 +164,7 @@ export default class Deployment extends Component {
           <span className={styles.data}>Deployment Data Definition</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
           <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>Download</a>
-          <span className={styles.email}>
+          {/* <span className={styles.email}>
             Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (
               <input
@@ -187,10 +189,10 @@ export default class Deployment extends Component {
                 Cancel
               </a>
             </div>
-          )}
+          )} */}
         </div>
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
-        {cddo.option === 'api' && <ApiInstruction cddo={cddo} />}
+        {cddo.option === 'api' && <ApiInstruction deployment={cd} />}
         {cddo.option === 'data' && (
           <DataSource
             cddo={cddo}
@@ -198,14 +200,21 @@ export default class Deployment extends Component {
             uploader={uploader}
           />
         )}
-        {this.uploadStatus && <div className={styles.uploading}>
-          <Progress percent={this.uploadPercentage} />
-          <span className={styles.speed}>{this.uploadSpeed}</span>
-          <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
-            ? <span><Icon type="pause" theme="outlined" />Pause</span>
-            : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
-        </div>}
-        {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
+        <Modal
+          visible={!!this.uploadStatus}
+          width={700}
+          maskClosable={false}
+          footer={null}
+          onCancel={action(() => { this.uploadStatus = false; this.uploadOperator.pause() })}>
+          <div className={styles.uploading}>
+            <Progress percent={this.uploadPercentage} />
+            <span className={styles.speed}>{this.uploadSpeed}</span>
+            <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
+              ? <span><Icon type="pause" theme="outlined" />Pause</span>
+              : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+          </div>
+          {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
+        </Modal>
         {cddo.option !== 'api' &&
           cddo.source && (
             <ResultLocation

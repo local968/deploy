@@ -1,25 +1,29 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
-import autoIcon from './mr-one-logo-blue.svg';
+import { observer, inject } from 'mobx-react';
+// import autoIcon from './mr-one-logo-blue.svg';
 import { Modal } from 'components/Common';
 import { observable } from 'mobx';
-import { Spin, message } from 'antd';
+import { message, Icon } from 'antd';
 import AdvancedView from './advancedView';
 import SimplifiedView from './simplifiedView';
+import Preview from './Preview'
+import autoIcon from './icon_automatic_modeling.svg';
+import advancedIcon from './icon_advanced_modeling.svg';
 
+@inject('projectStore')
 @observer
 export default class StartTrain extends Component {
   @observable visible = false
 
   fastTrain = () => {
-    this.props.project.newSetting('auto')
-    this.props.project.fastTrain();
+    this.props.projectStore.project.newSetting('auto')
+    this.props.projectStore.project.fastTrain();
   };
 
   advanced = () => {
-    this.props.project.newSetting('custom')
+    this.props.projectStore.project.newSetting('custom')
     this.visible = true
   }
 
@@ -31,24 +35,23 @@ export default class StartTrain extends Component {
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
-          <span>Data looks good now, It's time to train your model!</span>
+          <span>Data looks good now. It's time to train your model!</span>
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock}>
+            <div className={styles.trainBlock} onClick={this.fastTrain}>
               <div className={styles.trainRecommend}>
-                <span>Recommended</span>
+                <span><Icon type="star" style={{ color: "#50647a" }} theme='filled' />Recommended</span>
               </div>
               <div className={styles.trainImg}>
                 <img src={autoIcon} alt="auto" />
               </div>
               <div className={styles.trainName}>
-                <span>Easy and simple</span>
+                <span>Easy and Simple</span>
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want R2 Learn to build the model automatically, choose
-                  automatic modeling.
+                  If you want R2 Learn to build the model automatically.
                 </span>
               </div>
             </div>
@@ -58,16 +61,16 @@ export default class StartTrain extends Component {
           </div>
           <div className={styles.trainSep}></div>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock}>
+            <div className={styles.trainBlock} onClick={this.advanced}>
               <div className={styles.trainImg}>
-                <img src={autoIcon} alt="auto" />
+                <img src={advancedIcon} alt="advanced" />
               </div>
               <div className={styles.trainName}>
-                <span>Detailed and advanced</span>
+                <span>Detailed and Advanced</span>
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want to have more control over the modeling process, choose advanced modeling.
+                  If you want to have more control over the modeling process.
                 </span>
               </div>
             </div>
@@ -78,7 +81,7 @@ export default class StartTrain extends Component {
         </div>
         <Modal width='13em'
           content={<AdvancedModel
-            project={this.props.project}
+            project={this.props.projectStore.project}
             closeAdvanced={this.closeAdvanced} />}
           title='Advanced Modeling'
           onClose={this.closeAdvanced}
@@ -93,13 +96,6 @@ export default class StartTrain extends Component {
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
-  @observable dataViewLoading = true
-  @observable preImportanceLoading = true
-
-  componentDidMount() {
-    this.props.project.dataView().then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
-  }
 
   switchTab = (num) => {
     if (num !== 1 && num !== 2) return false;
@@ -108,7 +104,12 @@ class AdvancedModel extends Component {
 
   modeling = () => {
     const { project, closeAdvanced } = this.props
-    const { advancedModeling, version, algorithms } = project
+    const { advancedModeling, version, algorithms, dataHeader, newVariable, trainHeader, customHeader, informativesLabel, target } = project
+    const allVariables = [...dataHeader, ...newVariable]
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
+    const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
+    const hasNewOne = key === -1
+    if (hasNewOne) project.customHeader.push(checkedVariables)
     const sortFn = (a, b) => a - b
     if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
     if (!project.version.length) return message.error("You need to select at least one algorithm!")
@@ -116,15 +117,11 @@ class AdvancedModel extends Component {
     advancedModeling()
   }
 
-  reloadTable = () => {
-    this.dataViewLoading = true
-    this.preImportanceLoading = true
-    this.props.project.dataView().then(() => this.dataViewLoading = false)
-    this.props.project.preTrainImportance().then(() => this.preImportanceLoading = false)
-  }
-
   render() {
     const { project, closeAdvanced } = this.props
+    const { dataHeader, newVariable, trainHeader, target } = project
+    const allVariables = [...dataHeader, ...newVariable]
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     return <div className={styles.advancedModel}>
       <div className={styles.advancedContent}>
         <div className={styles.tabBox}>
@@ -136,14 +133,14 @@ class AdvancedModel extends Component {
           })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
         </div>
         <div className={styles.viewBox}>
-          {this.tab === 1 ? <SimplifiedView project={project} reloadTable={this.reloadTable}/> : <AdvancedView project={project} />}
-          {(this.dataViewLoading || this.preImportanceLoading) && <div className={styles.simplifiedLoad}>
-            <Spin size="large" />
-          </div>}
-        </div>
-        <div className={styles.bottom}>
-          <button className={styles.save} onClick={this.modeling} ><span>modeling</span></button>
-          <button className={styles.cancel} onClick={closeAdvanced}><span>cancel</span></button>
+          <Preview project={project} />
+          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
+          <div className={styles.bottom}>
+            <button className={classnames(styles.save, {
+              [styles.disable]: !checkedVariables.length
+            })} onClick={!checkedVariables.length ? null : this.modeling} ><span>Modeling</span></button>
+            <button className={styles.cancel} onClick={closeAdvanced}><span>Cancel</span></button>
+          </div>
         </div>
 
       </div>

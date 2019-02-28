@@ -1,0 +1,36 @@
+.processBg {
+  display: flex;
+  flex: auto;
+  height: .2em;
+  background: #ccc;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.05em;
+}
+
+.text {
+  color: #fff;
+  font-size: 1rem;
+  font-family: SanFranciscoText;
+  position: absolute;
+}
+
+.processBlock {
+  display: flex;
+  flex: none;
+  height: .2em;
+  background: transparent;
+  width: 100%;
+  position: relative;
+}
+
+.process {
+  display: flex;
+  flex: none;
+  height: .2em;
+  background: #1d2b3c;
+  align-items: center;
+  overflow: hidden;
+  transition: width 1s ease-in-out;
+}

@@ -1,30 +1,37 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import ContinueButton from 'components/Common/ContinueButton';
 import { Input } from 'antd';
 import { action } from 'mobx';
 const { TextArea } = Input;
 
-
+@inject('projectStore', 'deploymentStore')
 @observer
 export default class Project extends Component {
   nextStep = () => {
-    const { project } = this.props;
-    project.updateProject(Object.assign({
-      name: project.name || "project " + new Date().toLocaleString(),
-      // description: project.description,
-      business: project.business,
-      statement: project.statement
-    }, project.nextMainStep(1)))
+    const { project } = this.props.projectStore;
+    project.updateProject({ ...project.nextMainStep(1), name: project.name || "Project " + new Date().toLocaleString() })
   }
 
   onChange = action((type, e) => {
-    this.props.project[type] = e.target.value;
+    const { projectStore, deploymentStore } = this.props
+    const { project } = projectStore;
+    project[type] = e.target.value;
+    project.updateProject({
+      name: project.name || "Project " + new Date().toLocaleString(),
+      // description: project.description,
+      business: project.business,
+      statement: project.statement
+    })
+    if (type === 'name') {
+      const deployment = deploymentStore.deployments.find(d => project.id === d.projectId)
+      if (deployment) deploymentStore.change(deployment.id, 'projectName', e.target.value)
+    }
   })
 
   render() {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     return <div className={styles.project}>
       <div className={styles.row}>
         <label>Project Name</label>

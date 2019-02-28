@@ -9,7 +9,7 @@ import deleteDarkIcon from './delete-dark.svg';
 // import duplicateDarkIcon from './duplicate-dark.svg';
 // import shareDarkIcon from './share-dark.svg';
 import checkedIcon from './checked.svg';
-import { Search, Select, Pagination, ProjectLoading, Confirm } from 'components/Common';
+import { Search, Select, Pagination, ProcessLoading, Confirm } from 'components/Common';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import { observable, toJS } from 'mobx';
@@ -45,6 +45,10 @@ export default class Home extends Component {
         this.visible = true
       }
     };
+  }
+
+  componentDidMount() {
+    this.props.projectStore.clean()
   }
 
   selectId = (isSelect, id) => {
@@ -108,12 +112,12 @@ export default class Home extends Component {
     const { projectStore } = this.props;
     const { toolsOption, total, sortList: sortProjects, changeOption, changePage, keywords } = projectStore;
     return <div className={classnames(styles.home)} >
-      {this.loading && <ProjectLoading />}
+      {this.loading && <ProcessLoading style={{ position: 'fixed' }} />}
       <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} keywords={keywords} changeWords={this.changeWords} />
       <div className={classnames(styles.projects)}>
         <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
           <img src={addProjectIcon} alt="New Project" />
-          <span>Create New Project</span>
+          <span>Create a New Project</span>
         </div>
         {sortProjects.filter(p => p.id.includes(keywords) || (p.name || "").includes(keywords)).map((project) => {
           return <Project project={project} selectId={this.selectId} actions={this.actions} key={"project-" + project.id} selected={this.ids.includes(project.id)} />
@@ -128,9 +132,8 @@ export default class Home extends Component {
         onConfirm={this.handleOk}
         confirmText="Yes"
         closeText="No"
-        content={this.deleteNames.length > 1 ?
-          <div>Are you sure to delete the following projects:<br />{this.deleteNames.map((name, k) => <span key={k}>{name.length > 20 ? name : name.slice(0, 20) + "..."}<br /></span>)} </div> :
-          <div>Are you sure to delete project {this.deleteNames.toString()}?</div>} />}
+        content={this.deleteNames.length > 1 ? `Are you sure to delete the following projects: ${this.deleteNames.map((name, k) => { return name.length > 40 ? name.slice(0, 40) + "..." : name })}?` :
+          `Are you sure to delete project ${this.deleteNames.toString()}?`} />}
     </div>
   }
 }
@@ -246,7 +249,7 @@ class Bar extends Component {
     return <div className={styles.bar}>
       <div className={styles.select}>
         <img className={styles.checked} onClick={toggleSelect} src={checkedIcon} alt="checked" />
-        <span><span className={styles.count}>{ids.length}</span> Screen Selected</span>
+        <span><span className={styles.count}>{ids.length}</span> Project{ids.length > 1 && 's'} Selected</span>
       </div>
       <div className={styles.action}>
         {/* <img onClick={actions.bind(null, "share", ids)} src={shareDarkIcon} alt="share" />

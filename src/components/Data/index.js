@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { ProjectSide } from 'components/Common';
-
+import { Route, Switch } from 'react-router-dom';
 import DataConnect from './Connect';
 import DataSchema from './Schema';
 import DataQuality from './Quality';
+import { autorun, observable } from 'mobx'
 
 import dataConnectActive from './data_prograss_a.svg';
 import dataSchemaActive from './data_schema_a.svg';
@@ -21,8 +22,11 @@ const imgs = {
   dataQualityActive: <img src={dataQualityActive} alt="quality" />
 }
 
+@inject('projectStore', 'routing')
 @observer
 export default class Data extends Component {
+  @observable right = 0
+
   constructor(props) {
     super(props);
     this.step = [
@@ -30,10 +34,45 @@ export default class Data extends Component {
       { label: 'Data Schema', value: "dataSchema" },
       { label: 'Data Quality', value: "dataQuality" }
     ]
+    this.sideRef = React.createRef();
+  }
+
+  componentDidMount() {
+    this.autorun = autorun(() => {
+      const { projectStore: { project }, routing } = this.props;
+      if (!project) return
+      const { curStep, subStepActive } = project;
+      if (curStep !== 2) return
+      let url = ''
+      switch (subStepActive) {
+        case 1:
+          url = `/project/${project.id}/data/connect`
+          break
+        case 2:
+          url = `/project/${project.id}/data/schema`
+          break
+        case 3:
+          url = `/project/${project.id}/data/quality`
+          break
+        default:
+      }
+      if (!url) return routing.push('/')
+      if (!routing.location.pathname.startsWith(`/project/${project.id}/data`)) return
+      if (routing.location.pathname.includes(url)) return
+      return routing.push(url)
+    })
+  }
+
+  componentWillUnmount() {
+    this.autorun && this.autorun()
+  }
+
+  componentDidUpdate() {
+    if (this.sideRef.current) this.sideRef.current.reset()
   }
 
   enter = (step) => {
-    const { mainStep, lastSubStep, subStepActive, noCompute, nextSubStep, updateProject } = this.props.project;
+    const { mainStep, lastSubStep, subStepActive, noCompute, nextSubStep, updateProject } = this.props.projectStore.project;
 
     if (step === subStepActive) return false;
 
@@ -44,31 +83,17 @@ export default class Data extends Component {
     updateProject(nextSubStep(step, 2))
   }
 
-  getChild = () => {
-    const { project } = this.props;
-    const { curStep, subStepActive } = project || {};
-
-    let subStep = curStep !== 2 ? 3 : subStepActive;
-
-    switch (subStep) {
-      case 1:
-        return <DataConnect project={project} />;
-      case 2:
-        return <DataSchema project={project} />;
-      case 3:
-        return <DataQuality project={project} />;
-      default:
-        return;
-    }
-  }
-
   render() {
-    const { project } = this.props;
+    const { project } = this.props.projectStore;
     const { mainStep, lastSubStep, noCompute, subStepActive } = project;
-    let maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
+    const maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
     return <div className={styles.data}>
-      {project && this.getChild()}
-      {project && <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive} />}
+      {!!project && <Switch>
+        <Route exact path="/project/:id/data/connect" component={DataConnect} />
+        <Route exact path="/project/:id/data/schema" component={DataSchema} />
+        <Route exact path="/project/:id/data/quality" component={DataQuality} />
+      </Switch>}
+      <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive} ref={this.sideRef} />
     </div>
   }
 }

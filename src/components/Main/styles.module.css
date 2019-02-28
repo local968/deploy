@@ -1,13 +1,17 @@
 .header {
   display: flex;
+  flex: none;
   justify-content: center;
   padding: 1rem 0;
 }
 
-.projectName,
-.dataset {
+.projectName, .dataset {
   margin: 0 2rem;
   font-size: 1rem;
+  max-width: 50%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .label {
@@ -15,4 +19,5 @@
 }
 
 .value {
+  line-height: 1.4;
 }

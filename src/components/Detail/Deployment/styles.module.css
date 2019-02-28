@@ -3,12 +3,14 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow: auto;
 }
 .info {
   display: flex;
   padding: 0.2em;
   border-bottom: 1px dashed #d7d7d7;
   align-items: center;
+  flex: 0 0 .6em;
 }
 .model,
 .data,
@@ -70,6 +72,7 @@
 .deploymentOption {
   margin-top: 0.37em;
   display: flex;
+  flex: 0 0 0.52em;
 }
 .label {
   display: flex;
@@ -159,76 +162,6 @@
   font-size: 1rem;
   line-height: 1rem;
 }
-.row {
-  display: flex;
-}
-.holder {
-  flex: 0 0 3em;
-}
-.apiInstruction {
-  flex: 3 1 0;
-  margin-top: 0.3em;
-  margin-left: 0.3em;
-  max-width: 75%;
-}
-.block {
-  margin-top: 0.1em;
-  position: relative;
-}
-.line {
-  position: absolute;
-  height: 94%;
-  width: 3px;
-  left: 0.14em;
-  top: 0.3em;
-  background: #9b9b9b;
-}
-.title {
-  display: flex;
-}
-.no {
-  display: flex;
-  width: 0.3em;
-  height: 0.3em;
-  border-radius: 50%;
-  color: white;
-  background: #9b9b9b;
-  justify-content: center;
-  align-items: center;
-}
-.noText {
-  font-size: 1.125rem;
-}
-.titleText {
-  font-size: 1.125rem;
-  color: #4a4a4a;
-  line-height: 1.825rem;
-  margin-left: 1.2rem;
-}
-.other {
-  font-size: 1.25rem;
-  line-height: 1.825rem;
-}
-.boldText {
-  font-size: 1.125rem;
-  color: #4a4a4a;
-  line-height: 1.825rem;
-  font-weight: bold;
-  margin-left: 3rem;
-}
-.codeWrapper {
-  padding: 0.1em;
-  border: 1px solid #d8d8d8;
-  background: #f9fafc;
-  margin-left: 0.5em;
-}
-.content {
-  font-size: 1rem;
-  line-height: 2rem;
-  overflow: hidden;
-  overflow-x: auto;
-}
-
 .fixWidth {
   display: inline-block;
   width: 5rem;

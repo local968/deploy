@@ -22,12 +22,21 @@ async function scheduleHandler() {
     let deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return
 
-    const restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+    let restrictQuery
+    try {
+      restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+    } catch (e) {
+      schedule.status = 'issue'
+      schedule.updatedDate = moment().unix()
+      schedule.result = { ['process error']: e.message }
+      await api.upsertSchedule(schedule);
+      return
+    }
     deployment = await api.getDeployment(schedule.deploymentId);
     if (restrictQuery === false) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
-      schedule.result = { ['process error']: 'Your usage of number of deploy lines has reached the max restricted by your current lisense.' }
+      schedule.result = { ['process error']: 'Your usage of number of deploy lines has reached the max restricted by your current license.' };
       await api.upsertSchedule(schedule);
     } else {
       // send command to python
@@ -35,6 +44,7 @@ async function scheduleHandler() {
       const fileName = deployment[`${schedule.type}Options`].file
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
       const file = await api.getFile(fileId)
+      const newFeatureLabel = await api.getFeatureLabel(deployment.projectId)
       const request = {
         requestId: `schedule-${schedule.id}`,
         projectId: deployment.projectId,
@@ -42,8 +52,11 @@ async function scheduleHandler() {
         csvLocation: [file.path],
         ext: [ext],
         command: "deploy2",
-        solution: deployment.modelName
+        solution: deployment.modelName,
+        actionType: schedule.type
       }
+      if (!!Object.keys(newFeatureLabel || {}).length) request.newFeatureLabel = newFeatureLabel
+      if (deployment.modelType !== "Regression") request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
       await command(request, data => {
@@ -54,9 +67,8 @@ async function scheduleHandler() {
       schedule.result = result
       schedule.status = result['process error'] ? 'issue' : 'finished'
       schedule.updatedDate = moment().unix()
-      return api.upsertSchedule(schedule)
+      api.upsertSchedule(schedule)
     }
-
 
     const cdo = deployment[`${schedule.type}Options`];
     const nextTime = generateNextScheduleTime(

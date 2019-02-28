@@ -55,6 +55,7 @@
   flex: auto;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
 }
 
 .trainRecommend {
@@ -72,6 +73,11 @@
   display: flex;
   margin-top: 1.1em;
   flex: none;
+}
+
+.trainImg img {
+  width: 130px;
+  height: 120px;
 }
 
 .trainName {
@@ -129,6 +135,7 @@
   flex: none;
   justify-content: center;
   padding-top: 0.15em;
+  z-index: 2;
 }
 
 .tab {
@@ -162,6 +169,8 @@
   padding: 0.35em 0.65em;
   flex-direction: column;
   position: relative;
+  z-index: 1;
+  background-color: #fff;
 }
 
 .simplifiedLoad {
@@ -214,7 +223,7 @@
   font-size: 0.875rem;
   text-overflow: ellipsis;
   overflow: hidden;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 .large {
@@ -349,12 +358,29 @@
   margin: 0 0.05em;
 }
 
+.tableTh span {
+  text-align: center;
+}
+
+.tableLoading {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0.1em 0;
+  height: 2.6em;
+  overflow: hidden;
+  position: relative;
+  margin-right: 1px;
+}
+
 .tableBody {
   display: flex;
   flex: none;
   flex-direction: column;
   margin: 0.1em 0;
-  max-height: 2.6em;
+  height: 2.6em;
   overflow-x: hidden;
   overflow-y: scroll;
 }
@@ -461,7 +487,7 @@
 .bottom button {
   display: flex;
   padding: 0.1em 0;
-  width: 1.1em;
+  width: 1.5em;
   outline: none;
   border: none;
   margin: 0 0.1em;
@@ -602,7 +628,7 @@
 }
 
 .limit {
-  width: 2.4em;
+  width: 2.6em;
   flex-direction: column;
   flex: none;
 }
@@ -747,7 +773,7 @@ span.advancedDesc {
   flex: none;
   width: 35%;
   flex-direction: column;
-  margin: 0.21em 0;
+  margin: 0.07em 0;
 }
 
 .advancedResampling .advancedOptionBox {
@@ -771,8 +797,7 @@ span.advancedDesc {
   position: relative;
 }
 
-.correlationPlot img,
-.plot img {
+.correlationPlot img, .plot img {
   max-height: 100%;
   max-width: 100%;
 }
@@ -804,6 +829,7 @@ span.advancedDesc {
   flex: none;
   flex-direction: column;
   width: 65%;
+  margin: -.15em 0;
 }
 
 .otherLabel {
@@ -817,6 +843,7 @@ span.advancedDesc {
   flex: none;
   flex-direction: column;
   position: relative;
+  z-index: 1;
 }
 
 .advancedPercentValid {
@@ -840,6 +867,7 @@ span.advancedDesc {
   flex: none;
   flex-wrap: wrap;
   width: 100%;
+  margin: -.25em 0 -.1em;
 }
 
 .advancedAlgorithm {
@@ -865,8 +893,8 @@ span.advancedDesc {
 
 .newVariableBlock {
   position: absolute;
-  left: 100%;
-  bottom: -0.25em;
+  bottom: 100%;
+  left: -0.1em;
   margin: 0.1em;
   display: flex;
   flex: none;
@@ -976,7 +1004,7 @@ span.advancedDesc {
 
 .newVariableSyntax {
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   width: 100%;
   display: flex;
   flex: none;
@@ -1003,11 +1031,12 @@ span.advancedDesc {
   font-size: 0.75rem
 }
 
-.disable {
+button.disable {
   cursor: not-allowed;
   background-color: #d3d3d3;
   color: #aaaaaa;
   background-image: none;
+  border-color: transparent;
 }
 
 .reset {
@@ -1029,4 +1058,90 @@ span.advancedDesc {
   background: #fff;
   padding: 0.1em 12px;
   margin-top: 0.05em;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.newVariableHintSyntax button {
+  display: flex;
+  flex: none;
+  width: .8em;
+  padding: 0.05em 0.2em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  margin:0.1em auto 0;
+}
+.newVariableHintSyntax button span{
+  color:#fff;
+}
+
+.funcTips {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  width: 130%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #fff;
+  padding: 0.1em 12px;
+  margin-top: 0.05em;
+  max-height: 5em;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.funcTipsName {
+  display: flex;
+  flex: none;
+}
+
+.funcTipsName span {
+  font-size: 1.125rem;
+  font-weight: bold;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.funcTipsContent {
+  display: flex;
+  flex: none;
+  margin-bottom: .15em;
+}
+
+.funcTipsContent span {
+  font-size: .875rem;
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.funcTipsTitle {
+  display: flex;
+  flex: none;
+}
+
+.funcTipsTitle span {
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.3;
+  max-width: 100%;
+}
+
+.funcTipsCol {
+  font-size: 0.875rem;
+}
+
+.crossWarning {
+  text-align: center;
+  display: block;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+.advancedSolution {
+  display: flex;
+  flex: none;
 }

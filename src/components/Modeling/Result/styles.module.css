@@ -14,6 +14,72 @@
     color: #1d2b3c;
 }
 
+.process{
+    /*height: 1em;*/
+    padding: 0.2em;
+    border:1px solid #C4CBD7;
+    margin: 0.2em;
+    background-color: #FAFBFC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+
+.process label{
+    font-size: 0.2em;
+}
+
+.process img{
+    width: .3em;
+    margin: 0 .2em;
+}
+.process button{
+    display: flex;
+    align-items: center;
+}
+
+.process button i{
+    display: flex;
+}
+.process label{
+    text-transform:capitalize;
+}
+.many img{
+    width: 15px;
+    margin:0 5px;
+}
+
+.process label{
+    font-size: 0.15em;
+}
+
+.process button span {
+    font-size: 0.875rem;
+    float: left;
+}
+
+.process dl{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.process dd{
+    display: flex;
+    margin-bottom: 0.1em;
+    align-items: center;
+}
+
+.process dd div{
+    margin-left:15px;
+}
+
+.process dd button{
+    display: flex;
+}
+
 .result {
     display: flex;
     flex: none;
@@ -44,7 +110,11 @@
 }
 
 .row span {
+    display: block;
     color: #000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .status {
@@ -163,6 +233,16 @@
     stroke: #ff8000;
 }
 
+.performance span{
+    display: block;
+}
+
+span.performanceScore {
+    font-size: 1.3rem;
+    line-height: 1.4;
+    color: #f5a623;
+}
+
 .performanceText {
     color: #000;
     margin-top: 0.15em;
@@ -222,12 +302,20 @@
 
 .progressTitle {
     margin-right: 0.1em;
+    display: flex;
+    flex: none;
+    width: .5em;
 }
 
 .progressTitle span {
     font-size: 1.25rem;
     font-family: SanFranciscoText;
     color: #000;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .progressMeans {
@@ -235,10 +323,29 @@
     margin-top: 0.2em;
 }
 
-.progressMeans span {
+.progressMean {
+    display: flex;
+    flex: auto;
+    align-items: center;
+    width: 0;
+    justify-content: flex-start;
+}
+
+.progressMeanText {
+    max-width: 65%;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.progressMeanText span {
     font-size: 0.875rem;
     color: #000;
     white-space: nowrap;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
 }
 
 .progressBlock {
@@ -271,12 +378,14 @@
     display: flex;
     flex-direction: column;
     flex: none;
+    position: relative;
 }
 
 .cell span {
     font-size: 0.875rem;
     text-overflow: clip;
     white-space: nowrap;
+    height: 1.25rem;
 }
 
 .rowHeader {
@@ -288,8 +397,11 @@
     display: flex;
     flex-direction: column;
     padding: 0.2em 0;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: visible;
     max-height: 5em;
+    margin-left: -200px;
+    padding-left: 200px;
 }
 
 .cell {
@@ -312,10 +424,12 @@
 
 .cellHeader {
     border: none;
+    cursor: pointer;
 }
 
 .name {
-    width: 1.5em;
+    width: 2.3em;
+    flex: none;
 }
 
 .name span {
@@ -343,6 +457,10 @@
 .compute span {
     color: #448eed;
     text-decoration: underline;
+}
+
+.compute img{
+  margin-right: 10px;
 }
 
 .modelSelect {
@@ -378,6 +496,25 @@
     display: flex;
     flex-direction: column;
     padding: 0.1em 0;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.detailNone {
+    display: flex;
+    flex: none;
+    justify-content: center;
+}
+
+.detailNone span {
+    font-size: 0.875rem;
+    overflow: hidden;
+    max-width: 100%;
+    display: block;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
 .detailRow {
@@ -573,44 +710,6 @@
     align-items: center;
 }
 
-.trainingProcessBg {
-    display: flex;
-    flex: auto;
-    height: .2em;
-    background: #ccc;
-    border-radius: .1em;
-    overflow: hidden;
-    align-items: center;
-    justify-content: center;
-    margin: 0 4% 0 2%;
-}
-
-.trainingText {
-    color: #fff;
-    font-size: 1rem;
-    font-family: SanFranciscoText;
-    position: absolute;
-}
-
-.trainingProcessBlock {
-    display: flex;
-    flex: none;
-    height: .2em;
-    background: transparent;
-    width: 100%;
-    position: relative;
-}
-
-.trainingProcess {
-    display: flex;
-    flex: none;
-    height: .2em;
-    background: #448eed;
-    align-items: center;
-    overflow: hidden;
-    transition: width 1s ease-in-out;
-}
-
 .trainingModel {
     display: flex;
     flex: none;
@@ -618,7 +717,7 @@
     align-items: center;
     padding: 0.08em 0;
     border-bottom: 1px solid #979797;
-    width: 15%;
+    width: 2.3em;
     margin: 0 0.05em;
     position: relative;
 }
@@ -645,14 +744,19 @@
     justify-content: center;
     align-items: center;
     border-radius: 5px;
-    border: solid 1px #1d2b3c;
     background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
-    padding: 0.1em 0.3em;
+    padding: 0.05em 0.3em;
+    margin: .05em auto;
     cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.abortButton :global(.anticon) {
+  font-size: 1rem;
 }
 
 .abortButton span {
-    font-size: 1rem;
+    font-size: .875rem;
     font-weight: bold;
     color: #1d2b3c;
     font-family: SanFranciscoText;
@@ -666,7 +770,7 @@
     top: 0;
     left: 100%;
     width: 5.5em;
-    height: 3em;
+    height: 4em;
     background: #fff;
     z-index: 2;
     border-radius: 5px;
@@ -691,12 +795,11 @@
 .costContent {
     display: flex;
     flex: none;
-    margin-bottom: 0.2em;
 }
 
 .costContent span {
     font-family: SanFranciscoText;
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.33;
     color: #000000;
 }
@@ -736,10 +839,15 @@
     font-size: 0.875rem;
     line-height: 1.29;
     color: #000000;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .costCellSmall {
-    flex: 1 1;
+    flex: none;
+    width: 1em;
 }
 
 .costCellCenter {
@@ -793,7 +901,7 @@
 }
 
 .cost11 {
-    background-color: #9be44b;
+    background-color: #adaafc;
 }
 
 .cost10 {
@@ -801,11 +909,11 @@
 }
 
 .cost01 {
-    background-color: #adaafc;
+    background-color: #ffcc78;
 }
 
 .cost00 {
-    background-color: #e8e8e8;
+    background-color: #9be44b;
 }
 
 .costClose {
@@ -830,6 +938,187 @@
     background-image: none;
 }
 
-.predictActual {
-    
+.costButton {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-top: .1em;
+}
+
+.costButton button {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    flex: none;
+    padding: .1em .2em;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.costButton span {
+    font-size: 1rem;
+    color: #fff;
+}
+
+.costTextBox {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+.costText {
+    display: flex;
+    flex: none;
+}
+
+.costText span {
+    font-family: SanFranciscoText;
+    font-size: 0.75rem;
+    line-height: 1.33;
+    color: #000000;
+    font-weight: bold;
+}
+
+.sepCell {
+    display: flex;
+    flex: none;
+    width: 1em;
+    height: .4em;
+    position: relative;
+    flex-direction: column;
+}
+
+.sep {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    display: flex;
+    z-index: -1;
+}
+
+.sep span {
+    width: 100%;
+    border-top: 1px solid;
+    transform: rotate(21.8deg);
+}
+
+.sepText {
+    display: flex;
+    width: 50%;
+    height: 50%;
+    align-items: center;
+}
+
+.sepText span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    font-size: .5rem;
+}
+
+.reportProgress {
+  font-size: 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reportProgressText {
+  font-size: 16px;
+  margin: 4px;
+  display: flex;
+  flex: auto;
+}
+.nohover:hover {
+  cursor: text;
+}
+
+.recommendLabel {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.recommendLabel :global(.ant-tooltip-inner) {
+    min-height: 0;
+}
+
+.reportCancel {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+  align-self: flex-end;
+  width: 100px;
+}
+
+.reportCancel:hover {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+}
+
+.reportCancel:active {
+  background-image: linear-gradient(to bottom, #243448, #5b657b);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+}
+
+.tabBox {
+    display: flex;
+    flex: none;
+    /* justify-content: flex-end; */
+    border-bottom: 1px solid #979797;
+}
+
+.tab {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    width: 3.2em;
+    border-bottom: 4px solid transparent;
+    cursor: pointer;
+    padding: 0.15em 0;
+    margin-bottom: -1px;
+}
+
+.tab.active {
+    border-bottom-color: #1d2b3c;
+}
+
+.tab span {
+    font-family: HelveticaNeue;
+    font-size: 1.125rem;
+    line-height: 1.15;
+    color: #979797;
+}
+
+.tab.active span {
+    color: #1d2b3c;
 }

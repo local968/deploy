@@ -1,36 +1,25 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import classnames from  'classnames'
+import classnames from 'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
 import { observable } from 'mobx';
 import AdvancedView from '../AdvancedView/AdvancedView';
 import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
+import { ProgressBar } from 'components/Common';
+import { Modal, message, Button } from 'antd'
 
 const Classification = 'Classification';
 
-@inject('deploymentStore', 'routing')
+@inject('deploymentStore', 'routing', 'projectStore')
 @observer
 export default class ModelResult extends Component {
   @observable show = false
-  @observable view = "simple"
 
   deploy = () => {
-    const { project } = this.props;
-    const current = project.selectModel;
-    // const modelList = models.map(m => {
-    //   try {
-    //     const score = m.score.validateScore
-    //     const performance = Object.entries(score).map(([k, v]) => `${k}:${v.toFixed(3)}`).join(" ")
-    //     return {
-    //       name: m.name,
-    //       performance
-    //     }
-    //   } catch (e) {
-    //     return true
-    //   }
-    // }).filter(v => !!v)
+    const { project } = this.props.projectStore;
+    const { selectModel: current } = project
     const { newVariable, trainHeader, expression } = project
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
     const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
@@ -49,29 +38,47 @@ export default class ModelResult extends Component {
   //   this.show = false
   // }
 
-  changeView = view => {
-    const { train2ing } = this.props.project
-    if(train2ing && view !== 'simple') return false
-    this.view = view
+  componentDidUpdate() {
+    this.props.resetSide()
+  }
+
+  exportReport = (modelId) => () => {
+    try {
+      this.cancel = this.props.projectStore.project.generateReport(modelId)
+    } catch (e) {
+      message.error('export report error.')
+      this.props.projectStore.project.reportProgress = 0
+      this.props.projectStore.project.reportProgressText = 'init'
+    }
   }
 
   render() {
-    const { models, project } = this.props;
+    const { view, sort, changeView, handleSort, metric, handleChange } = this.props
+    const { project } = this.props.projectStore;
+    const { models } = project
     if (!models.length) return null;
-    const { view } = this;
+    // const { view } = this;
     return (
       <div className={styles.modelResult}>
-        <div className={styles.buttonBlock} >
+        <div className={styles.tabBox}>
+          <div className={classnames(styles.tab, {
+            [styles.active]: view === 'simple'
+          })} onClick={changeView.bind(null, 'simple')}><span>Simplified View</span></div>
+          <div className={classnames(styles.tab, {
+            [styles.active]: view === 'advanced'
+          })} onClick={changeView.bind(null, 'advanced')}><span>Advanced View</span></div>
+        </div>
+        {/* <div className={styles.buttonBlock} >
           <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
             <span>Simple View</span>
           </button>
-          <button className={classnames(styles.button, {
-            [styles.disabled]: project.train2ing
-          })} onClick={this.changeView.bind(this, 'advanced')}>
+          <button className={styles.button} onClick={this.changeView.bind(this, 'advanced')}>
             <span>Advanced View</span>
           </button>
-        </div>
-        {view === 'simple' ? <SimpleView models={models} project={project} /> : <AdvancedView models={models} project={project} />}
+        </div> */}
+        {view === 'simple' ?
+          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={sort.simple} handleSort={handleSort.bind(null, 'simple')}/> :
+          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={sort.advanced} handleSort={handleSort.bind(null, 'advanced')} metric={metric} handleChange={handleChange}/>}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
@@ -87,6 +94,13 @@ export default class ModelResult extends Component {
           visible={current && this.show}
           onClose={this.hideInsights}
           content={<ModelInsights model={current} project={project} />} /> */}
+        <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={true} footer={null} onCancel={this.cancel} maskClosable={false}>
+          <div className={styles.reportProgress}>
+            <ProgressBar progress={project.reportProgress} allowRollBack={true} />
+            <span className={styles.reportProgressText}>{project.reportProgressText}</span>
+            <Button onClick={this.cancel} className={styles.reportCancel} >Cancel</Button>
+          </div>
+        </Modal>
       </div>
     );
   }
@@ -96,9 +110,11 @@ export default class ModelResult extends Component {
 @observer
 class SimpleView extends Component {
   render() {
-    const { models, project } = this.props;
+    const { models, project, exportReport, sort, handleSort } = this.props;
     const { problemType } = project;
-    return problemType === Classification ? <ClassificationResult models={models} project={project} /> : <RegressionResult models={models} project={project} />
+    return problemType === Classification ?
+      <ClassificationResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/> :
+      <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/>
   }
 }
 

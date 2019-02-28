@@ -115,7 +115,7 @@ export default class Deploy {
     this.modelList && Object.entries(this.modelList).forEach(([settingName, models]) => {
       if (result) return
       models.forEach(model => {
-        if (result) return
+        if (result||!model) return
         if (model.name === modelName) result = model
       })
     })
@@ -126,5 +126,11 @@ export default class Deploy {
   get currentModel() {
     if (!this.modelList) return
     return this.findModel(this.modelName)
+  }
+
+  getDeploymentToken = async () => {
+    const api = await socketStore.ready()
+    const result = await api.getDeploymentToken({ deploymentId: this.id, projectId: this.projectId })
+    return result.token
   }
 }

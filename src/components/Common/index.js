@@ -8,13 +8,15 @@ import Search from './Search';
 import Background from './Background';
 import ContinueButton from './ContinueButton';
 import ProjectSide from './ProjectSide';
-import ProjectLoading from './ProjectLoading';
 import Table from './Table';
 import Modal from './Modal';
 import NumberInput from './NumberInput';
 import Confirm from './Confirm';
-import EtlLoading from './EtlLoading';
+import ProcessLoading from './ProcessLoading';
 import Hint from './Hint';
+import Range from './Range';
+import ProgressBar from './ProgressBar';
+import HeaderInfo from './HeaderInfo';
 
 export {
   BlackButton,
@@ -26,12 +28,14 @@ export {
   Search,
   ContinueButton,
   ProjectSide,
-  ProjectLoading,
   Background,
   Table,
   Modal,
   NumberInput,
   Confirm,
-  EtlLoading,
-  Hint
+  ProcessLoading,
+  Hint,
+  Range,
+  ProgressBar,
+  HeaderInfo
 };

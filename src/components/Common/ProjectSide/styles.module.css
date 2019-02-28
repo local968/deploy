@@ -3,9 +3,14 @@
     width: 8%;
     flex: none;
     flex-direction: column;
-    margin-top: 0.45em;
     position: absolute;
     right: 0;
+    overflow: hidden;
+    background-color: #fff;
+    overflow-y: auto;
+    top: .2em;
+    /* max-height: calc(100% - .4em); */
+    /* border: solid 1px #c4cbd7; */
 }
 
 .sideBox {
@@ -13,7 +18,7 @@
     border: solid 1px #c4cbd7;
     border-right: none;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
 }
 
 .sideBlock {
@@ -39,7 +44,6 @@
     text-align: center;
     word-wrap: break-word;
     word-spacing: 5em;
-    overflow: hidden;
     max-width: 80px;
 }
 

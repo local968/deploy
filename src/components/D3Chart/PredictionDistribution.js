@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import * as d3 from 'd3';
 
-import styles from './D3Chart.module.less';
+import styles from './D3Chart.module.css';
 
 function parseData(chartData) {
   const NEGATIVE = chartData.NEGATIVE;
@@ -10,43 +10,46 @@ function parseData(chartData) {
   const POSITIVE = chartData.POSITIVE;
 
   return Object.values(NEGATIVE).reduce((result, value, index) => {
-    result.push({NEGATIVE: value, POSITIVE: POSITIVE[index], PERCENTAGE: PERCENTAGE[index]});
+    result.push({ NEGATIVE: value, POSITIVE: POSITIVE[index], PERCENTAGE: PERCENTAGE[index] });
     return result;
   }, [])
 }
 
+@inject('projectStore')
 @observer
 export default class AreaChart extends Component {
   state = {
     movable: true
+  };
+
+  constructor(props) {
+    super(props);
+    this.newSort = this.newSort.bind(this)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.renderD3();
   }
-  componentDidUpdate () {
-    if (!this.props.model.fitIndexModified) {
-      d3.select(`.${this.props.className} svg`).remove();
-      this.renderD3();
-    }
+  componentDidUpdate() {
+    // if (!this.props.model.fitIndexModified) {
+    d3.select(`.${this.props.className} svg`).remove();
+    this.renderD3();
+    // }
   }
 
-  render () {
-    const {className} = this.props;
-    const {fitIndex} = this.props.model;
-    return (
-      <div className={`${styles.areaChart} ${className}`}>
-
-      </div>
-    );
+  render() {
+    const { className } = this.props;
+    const { fitIndex } = this.props.model;
+    if (fitIndex) { }
+    return <div className={`${styles.areaChart} ${className}`} />
   }
 
   renderD3 = () => {
-    let {height, width, model} = this.props;
-    const margin = {top: 15, right: 20, bottom: 20, left: 50};
+    let { height, width, model } = this.props;
+    const margin = { top: 15, right: 20, bottom: 20, left: 50 };
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
-    const {chartData} = model;
+    const { chartData } = model;
     if (!chartData) return null;
 
     let data = parseData(chartData.density);
@@ -76,7 +79,7 @@ export default class AreaChart extends Component {
       return {
         id,
         values: data.map(function (d) {
-          return {percentage: d.PERCENTAGE, density: d[id]};
+          return { percentage: d.PERCENTAGE, density: d[id] };
         })
       };
     });
@@ -107,7 +110,7 @@ export default class AreaChart extends Component {
       .call(d3.axisBottom(x))
       .append('text')
       .attr('y', -10)
-      .attr('x', x(1) - 50)
+      .attr('x', x(1) + 55)
       .attr('fill', '#000')
       .text('Probability Threshold');
 
@@ -122,29 +125,51 @@ export default class AreaChart extends Component {
       .text('Probability Density');
     this.drawLegend(svg, color);
     this.drawThreshold(svg, x, height);
+  };
+
+  newSort(index) {
+    clearTimeout(window.changeCutoff);
+    window.changeCutoff = setTimeout(() => {
+      this.props.projectStore.changeStopFilter(false);
+      // this.props.model.setFitIndex(index);
+    }, 800)
   }
 
-  drawThreshold = (svg, x, height) => {
-    const {model: {chartData, fitIndex}} = this.props;
+  /**
+   * 可移动棒
+   */
+  drawThreshold(svg, x, height) {
+    const { model: { chartData, fitIndex } } = this.props;
     const thresholdLine = svg.append('g');
     const threshold = chartData.roc.Threshold[fitIndex];
-    const dragCircle = d3.drag()
-      .on('drag', () => {
-        const p = d3.event.x;
-        const index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
-        line.attr('x1', p)
-          .attr('x2', p);
-        circle.attr('cx', p);
-        this.props.model.setFitIndex(index);
-      });
+    let index = threshold
 
     const line = thresholdLine
       .append('line')
-      .attr('x1', x(threshold))
-      .attr('x2', x(threshold))
+      .attr('x1', x(index))
+      .attr('x2', x(index))
       .attr('y1', height)
       .attr('y2', 20)
       .attr('class', styles.thresholdLine);
+
+    const dragCircle = d3.drag()
+      .on('drag', () => {
+        let p = d3.event.x;
+        index = this.getNearestPoint(x.invert(p), chartData.roc, 'Threshold');
+        if (p < 0) {
+          p = 0
+        } else if (p > 430) {
+          p = 430
+        }
+        line.attr('x1', p)
+          .attr('x2', p);
+        circle.attr('cx', p);
+        this.props.projectStore.changeStopFilter(true);
+        this.newSort(index)
+      }).on('end', () => {
+        this.props.model.setFitIndex(index);//stores/Model.js/setFitIndex
+      })
+
     const circle = thresholdLine
       .append('circle')
       .attr('class', styles.dragCircle)
@@ -155,7 +180,8 @@ export default class AreaChart extends Component {
   }
 
   drawLegend = (svg, color) => {
-    // const {targetValue} = this.props.model.approachStore;
+    const { targetMap } = this.props.model;
+    const targets = Object.keys(targetMap);
     const legend = svg.append('g').attr('transform', 'translate(' + 0 + ',' + 0 + ')');
     legend.append('circle')
       .attr('r', 5)
@@ -163,11 +189,11 @@ export default class AreaChart extends Component {
       .attr('cx', 40)
       .attr('fill', color['NEGATIVE']);
 
-    // legend.append('text')
-    //   .attr('x', '50px')
-    //   .attr('y', '3px')
-    //   .attr('fill', '#000')
-    //   .text(targetValue[0]);
+    legend.append('text')
+      .attr('x', '50px')
+      .attr('y', '3px')
+      .attr('fill', '#000')
+      .text(targets[0]);
 
     legend.append('circle')
       .attr('r', 5)
@@ -175,14 +201,14 @@ export default class AreaChart extends Component {
       .attr('cx', 180)
       .attr('fill', color['POSITIVE']);
 
-    // legend.append('text')
-    //   .attr('x', '190px')
-    //   .attr('y', '3px')
-    //   .attr('fill', '#000')
-    //   .text(targetValue[1]);
-  }
+    legend.append('text')
+      .attr('x', '190px')
+      .attr('y', '3px')
+      .attr('fill', '#000')
+      .text(targets[1]);
+  };
 
-  getNearestPoint (val, data, key) {
+  getNearestPoint(val, data, key) {
     let index;
     let minOffset = Number.MAX_SAFE_INTEGER;
     Object.values(data[key]).forEach((d, i) => {

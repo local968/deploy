@@ -39,9 +39,14 @@ const watchQueue = async () => {
   }
 }
 
+const clearListener = requestId => {
+  pubsub.removeAllListeners(requestId)
+}
+
 setInterval(watchQueue, 500)
 
 command.FINISH = FINISH
 command.SEND = SEND
+command.clearListener = clearListener
 
 module.exports = command

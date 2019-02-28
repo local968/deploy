@@ -3,21 +3,27 @@ import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 import d3tips from './d3-tip';
 
-import styles from './D3Chart.module.less';
+import styles from './D3Chart.module.css';
 
 @observer
 export default class RegressionPredictActualChart extends Component {
-  componentDidMount () {
+
+  constructor(props){
+    super(props);
+    this.regressionPredictActualChart = React.createRef();
+  }
+
+  componentDidMount() {
     this.renderD3();
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     d3.select(`.${styles.regressionPredictActualChart} svg`).remove();
     this.renderD3();
   }
 
   drawAxis = (svg, width, height, x, y1) => {
-    const {target} = this.props.project;
+    const { target } = this.props.project;
     svg.append('g')
       .attr('class', styles.grid)
       .call(d3.axisLeft(y1).ticks(10)
@@ -59,13 +65,21 @@ export default class RegressionPredictActualChart extends Component {
       .x((d, i) => x(i + 1))
       .y(d => y(d[field]));
     const tool_tip = d3tips(`.${styles.hoverPanel}`)
-      .offset((d, i) => ([y(d[field]), x(i) + 400]))
-      .html(function(d, i) {
+      .offset((d, i) => {
+        let width = -150;
+
+        if(this.regressionPredictActualChart.current){
+          width = this.regressionPredictActualChart.current.clientWidth -700 - 100;
+        }
+
+        return [y(d[field]) - 20, x(i) + width]
+      })
+      .html((d, i) => {
         return (
           `
-            <div>Group Number: ${i + 1}</div>
-            <div>Predicted Average: ${d['pred']}</div>
-            <div>Actual Average: ${d['target']}</div>
+            <div class="${styles.hoverText}">Group Number: ${i + 1}</div>
+            <div class="${styles.hoverText}">Predicted Average: ${this.formatNumber(d['pred'])}</div>
+            <div class="${styles.hoverText}">Actual Average: ${this.formatNumber(d['target'])}</div>
           `
         );
       });
@@ -86,26 +100,30 @@ export default class RegressionPredictActualChart extends Component {
       .attr('class', styles.line)
       .attr('d', line)
       .style('stroke', color);
-  }
+  };
 
   render() {
-    const {className} = this.props;
-    
+    const { className } = this.props;
+
     return (
       <div>
-        <div className={`${styles.regressionPredictActualChart} ${className}`}>
-          <div className={styles.hoverPanel}></div>
+        <div ref={this.regressionPredictActualChart} className={`${styles.regressionPredictActualChart} ${className}`}>
+          <div className={styles.hoverPanel}/>
         </div>
       </div>
     );
   }
 
+  formatNumber = (num) => {
+    if (typeof num === "number") return num.toFixed(2)
+    if (typeof num === "string") return num
+  };
+
   renderD3 = () => {
-    let {height, width, data} = this.props;
+    let { height, width, data } = this.props;
     if (!data) return null;
-    console.log(data);
-    data = data.map(d => ({target: d[0], pred: d[1]}));
-    const margin = {top: 15, right: 40, bottom: 30, left: 80};
+    data = data.map(d => ({ target: d[0], pred: d[1] }));
+    const margin = { top: 15, right: 40, bottom: 30, left: 80 };
     width = width - margin.left - margin.right;
     height = height - margin.top - margin.bottom;
 

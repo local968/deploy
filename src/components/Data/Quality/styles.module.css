@@ -115,9 +115,11 @@
 .cell {
 	display: flex;
 	padding: 0.1em;
-	border-bottom: solid 1px #c4cbd7;
+	border-bottom: solid 1px #d8d8d8;
+	border-right: 1px solid #d8d8d8;
 	flex: 0 0 0.4em;
 	align-items: center;
+	height: 30px;
 }
 
 .target {
@@ -151,13 +153,13 @@
 
 .error {
 	display: flex;
-	justify-content: center;
+	justify-content: space-around;
 }
 
 .errorBlock {
 	display: flex;
 	flex: none;
-	padding: 0 0.1em;
+	padding: 0 0.05em;
 	border-radius: 0.15em;
 }
 
@@ -268,6 +270,7 @@
 	flex: none;
 	overflow: hidden;
 	flex-direction: column;
+	justify-content: space-around;
 }
 
 .infoBox {
@@ -365,7 +368,7 @@
 
 .fixesBottom {
 	display: flex;
-	margin-top: 0.2em;
+	margin: 0 0.5em 0.2em;
 	flex: none;
 }
 
@@ -400,20 +403,34 @@
 	display: flex;
 	flex: none;
 	flex-direction: column;
-	margin-top: .1em;
+	/* margin-top: .1em; */
+	margin: -0.2em -0.5em;
+	position: relative;
+}
+
+.fixesBlock {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	padding: 0.2em 0.5em;
+	position: relative;
 }
 
 .fixesBox {
 	display: flex;
 	flex: none;
 	flex-direction: column;
+	margin: 0.2em 0.5em 0;
 }
 
 .fixesCheckBox {
 	display: flex;
 	flex: none;
 	flex-wrap: wrap;
-	margin-top: 0.5rem;
+	margin: 0.1em 0;
+	height: 1.4em;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .fixesCheck {
@@ -549,6 +566,17 @@
 	width: 100%;
 }
 
+.fixesCell input {
+	display: flex;
+	flex: auto;
+	outline: none;
+	font-size: 0.875rem;
+	font-family: Arial;
+	color: #4a4a4a;
+	width: 100%;
+	text-align: right;
+}
+
 span.fixesEdit {
 	color: #448eed;
 	text-decoration: underline;
@@ -575,6 +603,7 @@ span.fixesEdit {
 	display: flex;
 	flex: none;
 	justify-content: space-evenly;
+	margin: .2em .5em 0;
 }
 
 .outlierBlock {
@@ -786,6 +815,28 @@ span.fixesEdit {
 	color: #1d2b3c;
 }
 
+.remapTargetButton {
+	display: flex;
+	flex: none;
+}
+
+.remapTargetButton button {
+	display: flex;
+	flex: none;
+	padding: .1em .2em;
+	border-radius: 5px;
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	background-image: linear-gradient(to bottom, #5b657b, #243448);
+	border: none;
+	outline: none;
+	cursor: pointer;
+	margin-left: .2em;
+}
+
+.remapTargetButton span {
+	color: #fff;
+}
+
 .cleanTargetRow {
 	display: flex;
 	flex: none;
@@ -857,7 +908,8 @@ span.fixesEdit {
 .fixesTips {
 	display: flex;
 	flex: none;
-	height: 1em;
+	padding: .2em 0;
+	border-top: 2px solid #c4cbd7;
 }
 
 .fixesTips span {
@@ -896,7 +948,7 @@ span.fixesEdit {
 	flex: none;
 	width: 100%;
 	flex-wrap: wrap;
-	margin: .2em 0 1.4em
+	margin: .2em 0 0;
 }
 
 .fixesComplete span {
@@ -1009,6 +1061,7 @@ span.fixesEdit {
 	width: 12px;
 	height: 12px;
 	border-radius: 50%;
+	margin-right: .05em;
 }
 
 .summaryType span {
@@ -1052,7 +1105,7 @@ span.fixesEdit {
 .summaryCell {
 	display: flex;
 	flex: none;
-	max-width: 70%;
+	max-width: 55%;
 }
 
 .summaryCell span {
@@ -1072,6 +1125,12 @@ span.fixesEdit {
 	border-radius: 5px;
 	height: 10px;
 	width: 100%;
+}
+
+.summaryProgress {
+	display: flex;
+	flex: none;
+	height: 10px;
 }
 
 .summaryText {
@@ -1107,15 +1166,6 @@ span.fixesEdit {
 	cursor: pointer;
 }
 
-.disabled {
-	cursor: not-allowed;
-	background-color: #d3d3d3;
-	color: #aaaaaa;
-	background-image: none;
-	border: transparent;
-	cursor: not-allowed;
-}
-
 .summaryButton span {
 	font-family: HelveticaNeue;
 	font-size: 1rem;
@@ -1131,6 +1181,15 @@ span.fixesEdit {
 
 .summaryConfirm span {
 	color: #fff;
+}
+
+.disabled {
+	cursor: not-allowed;
+	background-color: #d3d3d3;
+	color: #aaaaaa;
+	background-image: none;
+	border: transparent;
+	cursor: not-allowed;
 }
 
 .summaryPie {
@@ -1206,4 +1265,64 @@ button.save {
 	font-family: HelveticaNeue;
 	font-size: 1rem;
 	line-height: 1.2;
+}
+
+button.activeButton {
+	background-color: #ccc;
+	cursor: pointer;
+	background-image: none;
+}
+
+button.activeButton span {
+	color: #1d2b3c;
+}
+
+.titleCell {
+	display: flex;
+	flex: none;
+	align-items: center;
+	padding: 0 0.1em;
+	border-right: 1px solid #d8d8d8;
+	padding-top: 3px;
+	border-bottom: 3px solid;
+}
+
+.titleCell span {
+	font-size: 0.875rem;
+	overflow: hidden;
+	padding: 0.5em 0;
+	white-space: nowrap;
+	text-decoration: none;
+	text-overflow: ellipsis;
+	width: 100%;
+}
+
+.cell span {
+	font-size: 0.875rem;
+	overflow: hidden;
+	padding: 0.5em 0;
+	white-space: nowrap;
+	text-decoration: none;
+	text-overflow: ellipsis;
+	width: 100%;
+}
+
+.check select {
+	display: flex;
+	flex: auto;
+	border: none;
+	outline: none;
+	font-size: 0.875rem;
+	overflow: hidden;
+	white-space: nowrap;
+	text-decoration: none;
+	text-overflow: ellipsis;
+}
+
+.errorBox {
+	display: flex;
+	flex: auto;
+	margin: 0 -.05em;
+	flex-wrap: nowrap;
+	justify-content: space-around;
 }

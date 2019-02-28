@@ -21,3 +21,37 @@ body {
   font-family: ShareTech-Regular;
   src: url('./ShareTech-Regular.ttf');
 }
+
+.ant-popover-inner-content dt{
+  text-transform:Capitalize;
+}
+
+.ant-dropdown-menu-item > a{
+  font-size: 16px;
+}
+
+.ant-tree-title{
+  white-space: normal;
+}
+
+.ant-tree li .ant-tree-node-content-wrapper{
+  height:auto !important;
+  position: relative;
+  width: 95%;
+}
+.ant-tree li .ant-tree-node-content-wrapper:before{
+  height: 100% !important;
+}
+
+.ant-tree-iconEle{
+  display: none !important
+}
+
+.ant-tree-switcher{
+  background-color: transparent !important;
+  color:#000 !important;
+}
+
+.anticon-file{
+  display: none;
+}
