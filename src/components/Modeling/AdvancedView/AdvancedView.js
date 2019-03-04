@@ -391,12 +391,12 @@ const questMarks = {
   Precision: <p>It measures how many true positives among all predicted (including true and false)  positives. It's TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.</p>,
   KS: "KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It's calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other.",
   'Normalized RMSE': 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
-  R2: 'R&sup2; is a statistical measure of how close the data are to the fitted regression line. R&sup2; = Explained variation / Total variation.',
+  R2: 'R² is a statistical measure of how close the data are to the fitted regression line. R² = Explained variation / Total variation.',
   RMSE: 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
   RMSLE: 'RMSLE is similar with RMSE, but use log to y and y_pred first',
   MSE: 'Mean Squared Error',
   MAE: 'Mean Absolute Error',
-  AdjustR2: 'The adjusted R&sup2; tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.',
+  AdjustR2: 'The adjusted R² tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.',
   LogLoss: <p>Log Loss is -1 * the log of the likelihood function.<br /><br />The likelihood function answers the question "How likely did the model think the actually observed set of outcomes was." If that sounds confusing, an example should help.</p>
 }
 
