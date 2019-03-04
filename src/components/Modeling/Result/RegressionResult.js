@@ -51,7 +51,7 @@ export default class RegressionView extends Component {
             <span>We have recommended a model by default.</span>
           </div>
           <div className={styles.row}>
-            <span>Modeling Results :{' '}</span>
+            <span>Modeling Result :{' '}</span>
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>

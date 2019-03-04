@@ -108,7 +108,7 @@ export default class ClassificationView extends Component {
             <span>You can also tell us your business needs to get a more precise recommendation.</span>
           </div> */}
           <div className={styles.row}>
-            <span>Modeling Results :{' '}</span>
+            <span>Modeling Result :{' '}</span>
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
