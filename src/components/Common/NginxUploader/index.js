@@ -1,6 +1,7 @@
 import moment from 'moment';
 import axios from 'axios';
 import _config from 'config'
+import { formatNumber } from 'util'
 export default (file, config = {}) => {
   config = {
     headers: { backend: _config.uploadBackend },
@@ -90,18 +91,18 @@ class Uploader {
     let unit = ' bytes/s';
     if (speed > 1024 * 1024 * 1024) {
       unit = ' Gb/s';
-      return (speed / (1024 * 1024 * 1024)).toFixed(2) + unit;
+      return formatNumber(speed / (1024 * 1024 * 1024), 2) + unit;
     }
     if (speed > 1024 * 1024) {
       unit = ' Mb/s';
-      return (speed / (1024 * 1024)).toFixed(2) + unit;
+      return formatNumber(speed / (1024 * 1024), 2) + unit;
     }
     if (speed > 1024) {
       unit = ' kb/s';
-      return (speed / 1024).toFixed(2) + unit;
+      return formatNumber(speed / 1024, 2) + unit;
     }
 
-    return speed.toFixed(2) + unit;
+    return formatNumber(speed, 2) + unit;
   };
 
   startSpeedCalculate() {

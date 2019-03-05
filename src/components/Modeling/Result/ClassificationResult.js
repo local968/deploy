@@ -10,29 +10,10 @@ import VariableImpact from "./VariableImpact"
 import ModelProcessFlow from "./ModelProcessFlow"
 import Variable from './Variable.svg'
 import Process from './Process.svg'
+import { formatNumber } from 'util'
 
 const AccuracyHint = "Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%."
 
-const formatNumber = (str) => {
-  if (isNaN(str)) return str
-  str = str.toString()
-  let i, d
-  if (str.indexOf('.')) {
-    i = str.split('.')[0]
-    d = str.split('.')[1]
-  } else {
-    i = str
-  }
-
-  const left = i.length % 3
-  i = i.split('').reduce((prev, curr, index) => {
-    if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
-    if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
-    return prev + curr
-  }, '')
-  if (d) return i + '.' + d.slice(0, 3)
-  return i
-}
 @observer
 export default class ClassificationView extends Component {
   @observable showCost = false

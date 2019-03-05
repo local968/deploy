@@ -17,7 +17,8 @@ module.exports = function override(config, env) {
       stores: path.join(__dirname, 'src/stores'),
       style: path.join(__dirname, 'src/components/Common/basic.module.css'),
       sample: path.join(__dirname, 'sample'),
-      config: path.join(__dirname, 'src/config')
+      config: path.join(__dirname, 'src/config'),
+      util: path.join(__dirname, 'src/util')
     }
   };
   return config;

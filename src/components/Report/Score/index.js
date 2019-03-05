@@ -9,7 +9,7 @@ import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
 import LiftChart from 'components/D3Chart/LiftChart';
 import PredictVActual from '../Model/PredictVActual'
 import { NumberInput } from 'components/Common';
-
+import { formatNumber } from 'util'
 import { observable, computed, action, autorun, runInAction } from 'mobx';
 import moment from 'moment';
 
@@ -50,15 +50,6 @@ class AdvancedView extends Component {
     let _filtedModels = [...models];
     const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     const metricKey = this.metric.key;
-    const formatNumber = number => {
-      try {
-        return parseFloat(number);
-        // return parseInt(number * 1000, 10)
-      } catch (e) {
-        console.log('compare error:', e);
-        return 0
-      }
-    };
 
     let { stopFilter, oldfiltedModels } = projectStore;
 

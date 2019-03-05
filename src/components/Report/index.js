@@ -10,6 +10,7 @@ import ModelProcessFlow from './Model/ModelProcessFlow'
 import Score, { PredictTable } from './Score'
 import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
+import { formatNumber } from 'util'
 
 const addComma = number => {
   if (Number.isNaN(number)) return number
@@ -24,13 +25,6 @@ const addComma = number => {
     number.splice(i, 0, ',')
   }
   return number.reverse().join('')
-}
-
-const formatNumber = number => {
-  if (number.toString().indexOf('.') === -1) return number
-  if (number.toString().split('.').length > 2) return number
-  if (number.toString().split('.')[1].length <= 3) return number
-  return isNaN(number) ? number : parseFloat(number).toFixed(3)
 }
 
 @inject('projectStore')
