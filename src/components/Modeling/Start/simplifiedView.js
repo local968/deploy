@@ -133,11 +133,9 @@ export default class SimplifiedView extends Component {
               />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
-          <div className={styles.targetCell}
-          //classnames(styles.targetCell, {
-            //[styles.none]: colType[target] === 'Categorical'
-          //})} 
-          title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean)}>
+          <div className={classnames(styles.targetCell, {
+            [styles.none]: colType[target] === 'Categorical'
+          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean)}>
             <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean)}</span>
           </div>
           <div className={classnames(styles.targetCell, {
