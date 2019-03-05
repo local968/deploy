@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import * as d3 from 'd3';
+import { formatNumber } from 'util'
 
 @observer
 class Summary extends Component {
@@ -110,7 +111,7 @@ class Summary extends Component {
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span>{target}</span></div>
-              <div className={styles.summaryCell}><span>{percentList[0].clean.toFixed(2)}%</span></div>
+              <div className={styles.summaryCell}><span>{formatNumber(percentList[0].clean, 2)}%</span></div>
             </div>
           </div>
           <div className={styles.summaryTableRight}>
@@ -146,7 +147,7 @@ class Summary extends Component {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
                 <div className={styles.summaryCell}><span alt={v}>{v}</span></div>
-                <div className={styles.summaryCell}><span>{percent.clean.toFixed(2)}%</span></div>
+                <div className={styles.summaryCell}><span>{formatNumber(percent.clean, 2)}%</span></div>
               </div>
             })}
           </div>
@@ -178,7 +179,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{fixedPercent.toFixed(2)}%</span>
+                <span>{formatNumber(fixedPercent, 2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -188,7 +189,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{deletePercent.toFixed(2)}%</span>
+                <span>{formatNumber(deletePercent, 2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -198,7 +199,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{cleanPercent.toFixed(2)}%</span>
+                <span>{formatNumber(cleanPercent, 2)}%</span>
               </div>
             </div>
           </div>

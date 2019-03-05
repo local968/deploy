@@ -20,6 +20,7 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
+import { formatNumber } from 'util'
 
 const { Option, OptGroup } = Select;
 
@@ -138,7 +139,7 @@ export default class Deployment extends Component {
         const done = progress.split('/')[0]
         const total = progress.split('/')[1]
         this.uploadSpeed = speed
-        this.uploadPercentage = parseFloat(((done / total) * 100).toFixed(2))
+        this.uploadPercentage = formatNumber((done / total) * 100, 2)
       }),
       onStart: action(() => {
         this.uploadStatus = 'uploading'
@@ -151,7 +152,7 @@ export default class Deployment extends Component {
       params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' }
     }
     return (
-      <div className={styles.deployment}>
+      <div className={styles.deployment} >
         <div className={styles.info}>
           <span className={styles.model}>Model: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
             {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
@@ -193,13 +194,15 @@ export default class Deployment extends Component {
         </div>
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
         {cddo.option === 'api' && <ApiInstruction deployment={cd} />}
-        {cddo.option === 'data' && (
-          <DataSource
-            cddo={cddo}
-            show={this.show}
-            uploader={uploader}
-          />
-        )}
+        {
+          cddo.option === 'data' && (
+            <DataSource
+              cddo={cddo}
+              show={this.show}
+              uploader={uploader}
+            />
+          )
+        }
         <Modal
           visible={!!this.uploadStatus}
           width={700}
@@ -215,15 +218,18 @@ export default class Deployment extends Component {
           </div>
           {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
         </Modal>
-        {cddo.option !== 'api' &&
+        {
+          cddo.option !== 'api' &&
           cddo.source && (
             <ResultLocation
               cddo={cddo}
               selectionOption={this.selectionOption}
               show={this.show}
             />
-          )}
-        {cddo.option !== 'api' &&
+          )
+        }
+        {
+          cddo.option !== 'api' &&
           cddo.source &&
           cddo.location && (
             <DeployFrequency
@@ -231,8 +237,10 @@ export default class Deployment extends Component {
               cddo={cddo}
               selectionOption={this.selectionOption}
             />
-          )}
-        {cddo.option !== 'api' &&
+          )
+        }
+        {
+          cddo.option !== 'api' &&
           cddo.source &&
           cddo.location &&
           cddo.frequency && (
@@ -257,7 +265,8 @@ export default class Deployment extends Component {
                 </div>
               </div>
             </div>
-          )}
+          )
+        }
         <DatabaseConfig
           options={cddo.sourceOptions}
           visible={this.dialog === 'databasesource'}
@@ -308,7 +317,7 @@ export default class Deployment extends Component {
             this.closeDialog();
           })}
         />
-      </div>
+      </div >
     );
   }
 }

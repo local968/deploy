@@ -15,6 +15,7 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
+import { formatNumber } from 'util'
 
 const Option = Select.Option;
 
@@ -94,7 +95,7 @@ export default class Performance extends Component {
         const done = progress.split('/')[0]
         const total = progress.split('/')[1]
         this.uploadSpeed = speed
-        this.uploadPercentage = parseFloat(((done / total) * 100).toFixed(2))
+        this.uploadPercentage = formatNumber((done / total) * 100, 2)
       }),
       onStart: action(() => {
         this.uploadStatus = 'uploading'

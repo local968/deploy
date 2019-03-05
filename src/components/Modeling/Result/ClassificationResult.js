@@ -251,7 +251,7 @@ class PredictedProgress extends Component {
             height: (height || 0.27) + 'em'
           }}
         >
-          <span>{((1 - predicted) * 100).toFixed(0) + '%'}</span>
+          <span>{formatNumber((1 - predicted) * 100, 0) + '%'}</span>
         </div>}
       </div>
     );
@@ -268,7 +268,7 @@ class Performance extends Component {
           width={84}
           type="circle"
           percent={current.score.validateScore.auc * 100}
-          format={percent => <span className={styles.performanceScore}>{(percent / 100).toFixed(2)}</span>}
+          format={percent => <span className={styles.performanceScore}>{formatNumber(percent / 100, 2)}</span>}
           strokeColor={'#f5a623'}
         />
         <div className={styles.performanceText}>
@@ -397,12 +397,6 @@ class ModelTable extends Component {
           {!train2Finished && <div className={styles.rowData}>
             {trainModel ? <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div> : null}
             {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-            {/* <div className={styles.trainingProcessBg}>
-              <div className={styles.trainingProcessBlock}>
-                <div className={styles.trainingProcess} style={{ width: `${((trainModel || {}).value || 0)}%` }}></div>
-              </div>
-              <div className={styles.trainingText}>{`${((trainModel || {}).value || 0).toFixed(2)}%`}</div>
-            </div> */}
             <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
               {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>

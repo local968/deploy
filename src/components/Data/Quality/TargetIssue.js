@@ -6,6 +6,7 @@ import { Modal, NumberInput } from 'components/Common';
 import { observable } from 'mobx'
 import * as d3 from 'd3';
 import { Icon, message } from 'antd'
+import { formatNumber } from 'util'
 
 @observer
 export class ClassificationTarget extends Component {
@@ -60,7 +61,7 @@ export class ClassificationTarget extends Component {
       const data = Object.assign({}, renameVariable, temp)
       const updateData = { renameVariable: data }
       //更新histgramPlot  target的图
-      if(histgramPlots.hasOwnProperty(target)) {
+      if (histgramPlots.hasOwnProperty(target)) {
         delete histgramPlots[target]
         updateData.histgramPlots = histgramPlots
       }
@@ -227,7 +228,7 @@ export class DataIssue extends Component {
           <div className={styles.progressBox}>
             {!!targetIssues.nullRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {percent.missing < 0.01 ? '<0.01' : percent.missing.toFixed(2)}%</span></div>
+                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {percent.missing < 0.01 ? '<0.01' : formatNumber(percent.missing, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.missing)} style={{ width: percent.missing < 1 ? 1 : percent.missing + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -236,7 +237,7 @@ export class DataIssue extends Component {
             </div>}
             {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {percent.mismatch < 0.01 ? '<0.01' : percent.mismatch.toFixed(2)}%</span></div>
+                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {percent.mismatch < 0.01 ? '<0.01' : formatNumber(percent.mismatch, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.mismatch)} style={{ width: percent.mismatch < 1 ? 1 : percent.mismatch + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -245,7 +246,7 @@ export class DataIssue extends Component {
             </div>}
             {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {percent.outlier < 0.01 ? '<0.01' : percent.outlier.toFixed(2)}%</span></div>
+                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {percent.outlier < 0.01 ? '<0.01' : formatNumber(percent.outlier, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.outlier)} style={{ width: percent.outlier < 1 ? 1 : percent.outlier + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -544,7 +545,7 @@ export class FixIssue extends Component {
   }
 
   formatCell = num => {
-    if (typeof num === "number") return num.toFixed(2)
+    if (typeof num === "number") return formatNumber(num, 2)
     if (typeof num === "string") return num
     return "N/A"
   }
@@ -603,7 +604,7 @@ export class FixIssue extends Component {
                 }
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(1)) + '%)'
+                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
@@ -678,7 +679,7 @@ export class FixIssue extends Component {
                 }
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
+                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
@@ -760,7 +761,7 @@ export class FixIssue extends Component {
                 if (!isShow) return null
                 const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : outlierRange[k];
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
+                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median
                 const method = this.fillMethod.outlier.hasOwnProperty(k) ?
@@ -779,8 +780,8 @@ export class FixIssue extends Component {
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
-                    <span title={outlier[0].toFixed(2) + "-" + outlier[1].toFixed(2)}>
-                      {outlier[0].toFixed(2) + "-" + outlier[1].toFixed(2)}
+                    <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
+                      {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
                     </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>edit</span>
                   </div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>

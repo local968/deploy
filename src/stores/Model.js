@@ -2,6 +2,7 @@ import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
 import config from 'config'
 import { debounce } from 'lodash'
+import { formatNumber } from 'util'
 
 export default class Model {
   @observable score;
@@ -234,7 +235,7 @@ export default class Model {
         if (isNaN(Number(rawPara[key]))) {
           para[choice][prop] = rawPara[key];
         } else {
-          para[choice][prop] = rawPara[key].toFixed(2);
+          para[choice][prop] = formatNumber(rawPara[key], 2);
         }
       }
     });
