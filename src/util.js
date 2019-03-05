@@ -9,14 +9,16 @@ const formatNumber = (str, n = 3) => {
     i = str
   }
 
-  const left = i.length % n
-  i = i.split('').reduce((prev, curr, index) => {
+  const left = i.length % 3
+  let s = i.split('').reduce((prev, curr, index) => {
     if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
     if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
     return prev + curr
   }, '')
-  if (d) return i + '.' + d.slice(0, n)
-  return i
+  if (d) s = i + '.' + d.slice(0, n)
+  const m = parseFloat(s)
+  const isZero = m === -m
+  return !isZero ? s : s.indexOf('-') === 0 ? s.slice(1) : s
 }
 
 export {
