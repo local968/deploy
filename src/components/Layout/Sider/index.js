@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import logo from './rsquared_logo_color.svg';
+import logo from './rsquared_logo_website.svg';
 import home from './icon-home.svg';
 import homeActive from './icon-home-active.svg';
 import help from './icon-help.svg';
