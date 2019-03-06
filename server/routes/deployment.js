@@ -25,7 +25,7 @@ wss.register('watchSchedule', (message, socket) => {
 })
 
 wss.register('watchDeployments', (message, socket) => {
-  const {userId} = socket.session
+  const {userId} = socket.session;
   wss.subscribe(`user:${userId}:deployments`, fetchDeployments(userId), socket)
   return fetchDeployments(userId)()
 })
