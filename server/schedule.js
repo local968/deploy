@@ -77,6 +77,7 @@ async function scheduleHandler() {
       now - 1
     );
     if (!nextTime) return;
+    if (deployment[`${schedule.type}Options`].autoDisable && schedule.status === 'issue') return;
 
     const has = await hasNext(
       schedule.deploymentId,
