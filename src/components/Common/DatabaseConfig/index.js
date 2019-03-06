@@ -138,6 +138,7 @@ export default class DatabaseConfig extends Component {
     const { visible, onClose, onSubmit: submit, title, projectId } = this.props;
     const state = { ...this.localState };
     const onSubmit = () => {
+      if (!this.allowSubmit) return;
       if (this.checkForm()) return;
       this.loading = true;
       socketStore.ready().then(api => {
