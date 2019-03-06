@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
+import { formatNumber } from 'util'
 
 @observer
 export default class VariableImpact extends Component {
@@ -27,7 +28,7 @@ export default class VariableImpact extends Component {
                   style={{ width: row[1] * 7 + 'em' }}
                 />
                 <div className={styles.detailNum}>
-                  <span title={row[1].toFixed(4)}>{row[1].toFixed(4)}</span>
+                  <span title={formatNumber(row[1])}>{formatNumber(row[1])}</span>
                 </div>
               </div>
             );

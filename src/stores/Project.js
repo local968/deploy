@@ -7,6 +7,7 @@ import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage, Modal } from 'antd';
 import axios from 'axios'
+import { formatNumber } from 'util'
 
 export default class Project {
   @observable models = []
@@ -942,10 +943,10 @@ export default class Project {
   //   }).map(m => {
   //     const { score, id } = m
   //     const { validateScore, holdoutScore } = score || {}
-  //     const validate = this.formatNumber(validateScore[currentMeasurement], 6)
-  //     const holdout = this.formatNumber(holdoutScore[currentMeasurement], 6)
-  //     const diff = this.formatNumber(Math.abs(validate - holdout), 6)
-  //     const base = endWithSe ? this.formatNumber(validate / holdout, 6) : this.formatNumber(holdout / validate, 6)
+  //     const validate = formatNumber(validateScore[currentMeasurement], 6)
+  //     const holdout = formatNumber(holdoutScore[currentMeasurement], 6)
+  //     const diff = formatNumber(Math.abs(validate - holdout), 6)
+  //     const base = endWithSe ? formatNumber(validate / holdout, 6) : formatNumber(holdout / validate, 6)
   //     return { validate, holdout, diff, id, base }
   //   })
   //   // 没有有效值的model就推荐第一个
@@ -966,7 +967,7 @@ export default class Project {
   //       const { id, base } = d
   //       const diffIndex = diffArr.indexOf(d) + 1
   //       const holdoutIndex = holdoutArr.indexOf(d) + 1
-  //       const score = this.formatNumber(base * diffIndex * holdoutIndex, 6)
+  //       const score = formatNumber(base * diffIndex * holdoutIndex, 6)
   //       if (!recommend) return recommend = { id, score }
   //       if (recommend.score < score) return recommend = { id, score }
   //     })
@@ -1000,13 +1001,6 @@ export default class Project {
     })
     if (!!recommend) return models.find(m => m.id === recommend.id)
     return models[0]
-  }
-
-  formatNumber(num, n = 3) {
-    const float = parseFloat(num)
-    if (isNaN(float)) return num
-    const power = Math.pow(10, n)
-    return parseInt(float * power, 10) / power
   }
 
   @action

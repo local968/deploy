@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import PredictVActual from './PredictVActual';
+import { formatNumber } from 'util'
 
 
 @observer
@@ -29,7 +30,7 @@ class Performance extends Component {
     return <div className={styles.performanceBox}>
       <div className={styles.performance}>
         <div className={styles.rmsePerformance}>
-          <span>{current.score.validateScore.nrmse.toFixed(4)}</span>
+          <span>{formatNumber(current.score.validateScore.nrmse)}</span>
         </div>
         <div className={styles.performanceText}>
           <span>Normalized RMSE</span>
@@ -38,7 +39,7 @@ class Performance extends Component {
       <div className={styles.space} />
       <div className={styles.performance}>
         <div className={styles.r2Performance}>
-          <span>{current.score.validateScore.r2.toFixed(4)}</span>
+          <span>{formatNumber(current.score.validateScore.r2)}</span>
         </div>
         <div className={styles.performanceText}>
           <span>

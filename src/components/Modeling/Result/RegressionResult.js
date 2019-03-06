@@ -11,27 +11,7 @@ import ModelProcessFlow from "./ModelProcessFlow";
 import Process from "./Process.svg";
 import Variable from "./Variable.svg";
 import { ProgressBar, Hint } from 'components/Common';
-
-const formatNumber = (str) => {
-  if (isNaN(str)) return str
-  str = str.toString()
-  let i, d
-  if (str.indexOf('.')) {
-    i = str.split('.')[0]
-    d = str.split('.')[1]
-  } else {
-    i = str
-  }
-
-  const left = i.length % 3
-  i = i.split('').reduce((prev, curr, index) => {
-    if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
-    if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
-    return prev + curr
-  }, '')
-  if (d) return i + '.' + d.slice(0, 3)
-  return i
-}
+import { formatNumber } from 'util'
 
 @observer
 export default class RegressionView extends Component {
@@ -51,7 +31,7 @@ export default class RegressionView extends Component {
             <span>We have recommended a model by default.</span>
           </div>
           <div className={styles.row}>
-            <span>Modeling Results :{' '}</span>
+            <span>Modeling Result :{' '}</span>
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
@@ -236,12 +216,6 @@ class ModelTable extends Component {
           {!train2Finished && <div className={styles.rowData}>
             {trainModel ? <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div> : null}
             {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-            {/* <div className={styles.trainingProcessBg}>
-              <div className={styles.trainingProcessBlock}>
-                <div className={styles.trainingProcess} style={{ width: `${((trainModel || {}).value || 0)}%` }}></div>
-              </div>
-              <div className={styles.trainingText}>{`${((trainModel || {}).value || 0).toFixed(2)}%`}</div>
-            </div> */}
             <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
               {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
             </div>

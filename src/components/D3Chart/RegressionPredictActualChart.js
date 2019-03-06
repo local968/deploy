@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 import d3tips from './d3-tip';
-
+import { formatNumber } from 'util'
 import styles from './D3Chart.module.css';
 
 @observer
 export default class RegressionPredictActualChart extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.regressionPredictActualChart = React.createRef();
   }
@@ -68,8 +68,8 @@ export default class RegressionPredictActualChart extends Component {
       .offset((d, i) => {
         let width = -150;
 
-        if(this.regressionPredictActualChart.current){
-          width = this.regressionPredictActualChart.current.clientWidth -700 - 100;
+        if (this.regressionPredictActualChart.current) {
+          width = this.regressionPredictActualChart.current.clientWidth - 700 - 100;
         }
 
         return [y(d[field]) - 20, x(i) + width]
@@ -78,8 +78,8 @@ export default class RegressionPredictActualChart extends Component {
         return (
           `
             <div class="${styles.hoverText}">Group Number: ${i + 1}</div>
-            <div class="${styles.hoverText}">Predicted Average: ${this.formatNumber(d['pred'])}</div>
-            <div class="${styles.hoverText}">Actual Average: ${this.formatNumber(d['target'])}</div>
+            <div class="${styles.hoverText}">Predicted Average: ${formatNumber(d['pred'])}</div>
+            <div class="${styles.hoverText}">Actual Average: ${formatNumber(d['target'])}</div>
           `
         );
       });
@@ -108,16 +108,11 @@ export default class RegressionPredictActualChart extends Component {
     return (
       <div>
         <div ref={this.regressionPredictActualChart} className={`${styles.regressionPredictActualChart} ${className}`}>
-          <div className={styles.hoverPanel}/>
+          <div className={styles.hoverPanel} />
         </div>
       </div>
     );
   }
-
-  formatNumber = (num) => {
-    if (typeof num === "number") return num.toFixed(2)
-    if (typeof num === "string") return num
-  };
 
   renderD3 = () => {
     let { height, width, data } = this.props;

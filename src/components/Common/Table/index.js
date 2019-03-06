@@ -33,9 +33,10 @@ export default class Table extends Component {
     const { columnCount, columnWidth, rowHeight, fixedColumnCount, fixedRowCount, rowCount, data, style } = this.props;
     return !!data.length ? <AutoSizer>
       {({ height, width }) => {
+        const minWidth = width / columnCount
         return <MultiGrid
           columnCount={columnCount}
-          columnWidth={columnWidth}
+          columnWidth={Math.max(minWidth, columnWidth)}
           height={height}
           rowCount={rowCount}
           rowHeight={rowHeight}

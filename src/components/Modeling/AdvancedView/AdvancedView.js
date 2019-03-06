@@ -46,6 +46,7 @@ import randomlyImg from './img-residual-plot-randomly.svg';
 import VariableImpact from '../Result/VariableImpact';
 import { observable, computed, action } from 'mobx';
 import moment from 'moment';
+import { formatNumber } from 'util'
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -88,15 +89,6 @@ export default class AdvancedView extends Component {
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
-    const formatNumber = number => {
-      try {
-        return parseFloat(number);
-        // return parseInt(number * 1000, 10)
-      } catch (e) {
-        console.log('compare error:', e);
-        return 0
-      }
-    };
 
     let { stopFilter, oldfiltedModels } = projectStore;
 
@@ -799,28 +791,6 @@ class Row extends Component {
     );
   }
 }
-
-const formatNumber = (str) => {
-  if (isNaN(str)) return str
-  str = str.toString()
-  let i, d
-  if (str.indexOf('.')) {
-    i = str.split('.')[0]
-    d = str.split('.')[1]
-  } else {
-    i = str
-  }
-
-  const left = i.length % 3
-  i = i.split('').reduce((prev, curr, index) => {
-    if (index === left - 1 && index !== i.length - 1) return prev + curr + ','
-    if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
-    return prev + curr
-  }, '')
-  if (d) return i + '.' + d.slice(0, 3)
-  return i
-}
-// const fixed3 = (data) => typeof data === 'number' ? data.toFixed(3) : data
 
 class RowCell extends Component {
   render() {

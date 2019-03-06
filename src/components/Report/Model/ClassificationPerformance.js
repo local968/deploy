@@ -3,6 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress } from 'antd';
+import { formatNumber } from 'util'
 
 @observer
 class Predicted extends Component {
@@ -84,7 +85,7 @@ class PredictedProgress extends Component {
             height: (height || 0.27) + 'em'
           }}
         >
-          <span>{((1 - predicted) * 100).toFixed(0) + '%'}</span>
+          <span>{formatNumber((1 - predicted) * 100, 0) + '%'}</span>
         </div>}
       </div>
     );
@@ -104,7 +105,7 @@ class Performance extends Component {
           width={100}
           type="circle"
           percent={current.score.validateScore.auc * 100}
-          format={percent => <span className={styles.performanceScore}>{(percent / 100).toFixed(2)}</span>}
+          format={percent => <span className={styles.performanceScore}>{formatNumber(percent / 100, 2)}</span>}
           strokeColor={'#f5a623'}
         />
         <div className={styles.performanceText}>

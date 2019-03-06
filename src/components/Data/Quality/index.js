@@ -7,6 +7,7 @@ import { observable } from 'mobx';
 import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
 import * as d3 from 'd3';
+import { formatNumber } from 'util'
 
 @inject('projectStore')
 @observer
@@ -144,9 +145,9 @@ class TargetIssue extends Component {
             <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
             <div className={classnames(styles.cell, styles.select)}><span>{colType[target]}</span></div>
             <div className={classnames(styles.cell, styles.error)}>
-              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch < 0.01 ? "<0.01" : targetPercent.mismatch.toFixed(2)}%</span></div>}
-              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing < 0.01 ? "<0.01" : targetPercent.missing.toFixed(2)}%</span></div>}
-              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier < 0.01 ? "<0.01" : targetPercent.outlier.toFixed(2)}%</span></div>}
+              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch < 0.01 ? "<0.01" : formatNumber(targetPercent.mismatch, 2)}%</span></div>}
+              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing < 0.01 ? "<0.01" : formatNumber(targetPercent.missing, 2)}%</span></div>}
+              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier < 0.01 ? "<0.01" : formatNumber(targetPercent.outlier, 2)}%</span></div>}
             </div>
             <div className={styles.tableBody}>
               {sortData.map((v, k) => <div key={k} className={classnames(styles.cell, {
@@ -291,15 +292,15 @@ class VariableIssue extends Component {
         cn: styles.cell
       })
       const issues = []
-      
+
       if (variableIssues.mismatchRow[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header] < 0.01 ? '<0.01' : variableIssues.mismatchRow[header].toFixed(2)}%</span></div>)
+        issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header] < 0.01 ? '<0.01' : formatNumber(variableIssues.mismatchRow[header], 2)}%</span></div>)
       }
       if (variableIssues.nullRow[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header] < 0.01 ? '<0.01' : variableIssues.nullRow[header].toFixed(2)}%</span></div>)
+        issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header] < 0.01 ? '<0.01' : formatNumber(variableIssues.nullRow[header], 2)}%</span></div>)
       }
       if (variableIssues.outlierRow[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header] < 0.01 ? '<0.01' : variableIssues.outlierRow[header].toFixed(2)}%</span></div>)
+        issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header] < 0.01 ? '<0.01' : formatNumber(variableIssues.outlierRow[header], 2)}%</span></div>)
       }
       const issueData = {
         content: <div className={styles.errorBox}>{issues}</div>,
@@ -333,7 +334,7 @@ class VariableIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, dataHeader, etling, etlProgress, variableIssueCount: {nullCount, mismatchCount, outlierCount} } = project;
+    const { issues, dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount } } = project;
     const tableData = this.formatTable()
     return <div className={styles.quality}>
       <div className={styles.issue}>
@@ -519,7 +520,7 @@ class Summary extends Component {
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span>{target}</span></div>
-              <div className={styles.summaryCell}><span>{percentList[0].clean.toFixed(2)}%</span></div>
+              <div className={styles.summaryCell}><span>{formatNumber(percentList[0].clean, 2)}%</span></div>
             </div>
           </div>
           <div className={styles.summaryTableRight}>
@@ -555,7 +556,7 @@ class Summary extends Component {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
                 <div className={styles.summaryCell}><span>{v}</span></div>
-                <div className={styles.summaryCell}><span>{percent.clean.toFixed(2)}%</span></div>
+                <div className={styles.summaryCell}><span>{formatNumber(percent.clean, 2)}%</span></div>
               </div>
             })}
           </div>
@@ -587,7 +588,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{fixedPercent.toFixed(2)}%</span>
+                <span>{formatNumber(fixedPercent, 2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -597,7 +598,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{deletePercent.toFixed(2)}%</span>
+                <span>{formatNumber(deletePercent, 2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -607,7 +608,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{cleanPercent.toFixed(2)}%</span>
+                <span>{formatNumber(cleanPercent, 2)}%</span>
               </div>
             </div>
           </div>

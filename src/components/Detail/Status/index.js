@@ -8,7 +8,7 @@ import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 import { Popover } from 'antd';
 import config from 'config'
-// import config from 'config';
+import { formatNumber } from 'util';
 
 const transferR2 = (str) => str === 'R2' ? 'R²' : str
 
@@ -22,8 +22,10 @@ export default class List extends Component {
   };
 
   showScore = (score, type) => {
-    if (!score || !score[type] || !score[type].toFixed || typeof score[type].toFixed !== 'function') return ''
-    return score[type].toFixed(2)
+    let s
+    if (!score || !score[type]) s = formatNumber(score[type], 2)
+    if (s && !isNaN(s)) return s
+    return ''
   }
 
   render() {

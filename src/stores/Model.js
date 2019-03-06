@@ -2,6 +2,7 @@ import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
 import config from 'config'
 import { debounce } from 'lodash'
+import { formatNumber } from 'util'
 
 export default class Model {
   @observable score;
@@ -122,14 +123,6 @@ export default class Model {
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
   @computed
-  get aucValidation() {
-    return this.score.validateScore.auc
-  }
-  @computed
-  get aucHoldout() {
-    return this.score.holdoutScore.auc
-  }
-  @computed
   get accValidation() {
     const data = this.chartData || {}
     const roc = data.roc || {}
@@ -234,7 +227,7 @@ export default class Model {
         if (isNaN(Number(rawPara[key]))) {
           para[choice][prop] = rawPara[key];
         } else {
-          para[choice][prop] = rawPara[key].toFixed(2);
+          para[choice][prop] = formatNumber(rawPara[key], 2);
         }
       }
     });

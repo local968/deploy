@@ -10,6 +10,7 @@ import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
 import config from 'config'
+import { formatNumber } from 'util'
 
 @observer
 export default class SimplifiedView extends Component {
@@ -93,13 +94,6 @@ export default class SimplifiedView extends Component {
     project.trainHeader = [...dataHeader, ...newVariable].filter(v => !filterList.includes(v) && v !== target)
   }
 
-  formatNumber = (num, isNA) => {
-    if (isNA) return "N/A"
-    if (typeof num === "number") return num.toFixed(2)
-    if (typeof num === "string") return num
-    return "N/A"
-  }
-
   render() {
     const { project } = this.props;
     const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
@@ -141,16 +135,22 @@ export default class SimplifiedView extends Component {
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={this.formatNumber(targetData.mean, colType[target] === 'Categorical')}><span>{this.formatNumber(targetData.mean, colType[target] === 'Categorical')}</span></div>
+          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean)}>
+            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean)}</span>
+          </div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] !== 'Categorical'
           })}><span>{targetUnique}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={this.formatNumber(targetData.min, colType[target] === 'Categorical')}><span>{this.formatNumber(targetData.min, colType[target] === 'Categorical')}</span></div>
+          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min)}>
+            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min)}</span>
+          </div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={this.formatNumber(targetData.max, colType[target] === 'Categorical')}><span>{this.formatNumber(targetData.max, colType[target] === 'Categorical')}</span></div>
+          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max)}>
+            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max)}</span>
+          </div>
         </div>
       </div>
       <div className={styles.simplifiedText}><span>You can use check box to create your own variable list.</span></div>
@@ -250,12 +250,6 @@ class SimplifiedViewRow extends Component {
     this.univariant = false
   }
 
-  formatNumber = (num, isNA) => {
-    if (isNA) return "N/A"
-    if (typeof num === "number") return num.toFixed(2)
-    return "N/A"
-  }
-
   render() {
     const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
@@ -303,19 +297,29 @@ class SimplifiedViewRow extends Component {
       })} title={unique}><span>{unique}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={this.formatNumber(data.mean, valueType === 'Categorical')}><span>{this.formatNumber(data.mean, valueType === 'Categorical')}</span></div>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean)}</span>
+      </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={this.formatNumber(data.std, valueType === 'Categorical')}><span>{this.formatNumber(data.std, valueType === 'Categorical')}</span></div>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.std)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.std)}</span>
+      </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={this.formatNumber(data.median, valueType === 'Categorical')}><span>{this.formatNumber(data.median, valueType === 'Categorical')}</span></div>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.median)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.median)}</span>
+      </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={this.formatNumber(data.min, valueType === 'Categorical')}><span>{this.formatNumber(data.min, valueType === 'Categorical')}</span></div>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.min)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.min)}</span>
+      </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={this.formatNumber(data.max, valueType === 'Categorical')}><span>{this.formatNumber(data.max, valueType === 'Categorical')}</span></div>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.max)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.max)}</span>
+      </div>
     </div>
   }
 }
