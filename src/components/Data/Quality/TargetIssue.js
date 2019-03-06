@@ -545,7 +545,7 @@ export class FixIssue extends Component {
   }
 
   formatCell = num => {
-    if (typeof num === "number") return formatNumber(num, 2)
+    if (typeof num === "number") return formatNumber(num, 2, true)
     if (typeof num === "string") return num
     return "N/A"
   }

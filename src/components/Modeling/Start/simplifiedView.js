@@ -135,21 +135,21 @@ export default class SimplifiedView extends Component {
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean)}>
-            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean)}</span>
+          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean, 2, true)}>
+            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean, 2, true)}</span>
           </div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] !== 'Categorical'
           })}><span>{targetUnique}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min)}>
-            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min)}</span>
+          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min, 2, true)}>
+            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min, 2, true)}</span>
           </div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max)}>
-            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max)}</span>
+          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max, 2, true)}>
+            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max, 2, true)}</span>
           </div>
         </div>
       </div>
@@ -297,28 +297,28 @@ class SimplifiedViewRow extends Component {
       })} title={unique}><span>{unique}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean)}</span>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean, 2, true)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean, 2, true)}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.std)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.std)}</span>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.std, 2, true)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.std, 2, true)}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.median)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.median)}</span>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.median, 2, true)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.median, 2, true)}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.min)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.min)}</span>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.min, 2, true)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.min, 2, true)}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.max)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.max)}</span>
+      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.max, 2, true)}>
+        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.max, 2, true)}</span>
       </div>
     </div>
   }

@@ -1,4 +1,4 @@
-const formatNumber = (str, n = 3) => {
+const formatNumber = (str, n = 3, f = false) => {
   if (isNaN(str)) return str
   str = str.toString()
   let i, d
@@ -15,7 +15,21 @@ const formatNumber = (str, n = 3) => {
     if ((index + 1 - left) % 3 === 0 && index !== i.length - 1) return prev + curr + ','
     return prev + curr
   }, '')
-  if (d && n > 0) s = i + '.' + d.slice(0, n)
+  if (n > 0) {
+    let _d
+    if(f) {
+      let a = Array.from(d || '')
+      if(a.length >= n) {
+        a.length = n
+      }else{
+        a = [...a, ...new Array(n - a.length).fill('0')]
+      }
+      _d = '.' + a.join('')
+    }else{
+      _d = d?'.' + d.slice(0, n) : ''
+    }
+    s = i + _d
+  }
   const m = parseFloat(s)
   const isZero = m === -m
   return !isZero ? s : s.indexOf('-') === 0 ? s.slice(1) : s
