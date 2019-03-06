@@ -554,8 +554,8 @@ export default class Project {
     return await this.etl()
   }
 
-  @action
-  endQuality = async () => {
+  @computed
+  get qualityHasChanged() {
     let hasChange = false
     const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
     for (const item of list) {
@@ -564,8 +564,12 @@ export default class Project {
       hasChange = this.hasChanged(before, after)
       if (hasChange) break
     }
+    return hasChange
+  }
 
-    if (!hasChange) return await Promise.resolve()
+  @action
+  endQuality = async () => {
+    if (!this.qualityHasChanged) return await Promise.resolve()
     this.etling = true
     await this.abortTrainByEtl()
     const data = Object.assign(this.defaultTrain, {
@@ -589,7 +593,7 @@ export default class Project {
     }
     this.etling = true
     await this.updateProject(data)
-    if (hasChange) return await this.etl()
+    if (this.qualityHasChanged) return await this.etl()
   }
 
   hasChanged = (before, after) => {

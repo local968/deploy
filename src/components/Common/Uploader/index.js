@@ -7,18 +7,27 @@ import NginxUploader from '../NginxUploader';
 const AllowExt = ["csv", "CSV", "zip", "ZIP", "rar", "RAR", "tar", "TAR", "tgz", "TGZ", 'xls', 'XLS', 'xlsx', 'XLSX']
 
 export default class Uploader extends Component {
-  componentDidUpdate() {
-    const { file } = this.props;
-    if (file) {
-      const { onError, onStart } = this.props;
-      const checkd = this.check(file)
-      if (checkd.err) {
-        return onError(new Error(checkd.msg), 1)
-      }
-      if (onStart && typeof onStart === 'function') onStart()
-      this.upload()
-    }
+  constructor(props) {
+    super(props)
+    this.inputRef = React.createRef()
   }
+
+  show() {
+    if(this.inputRef.current) this.inputRef.current.click()
+  }
+
+  // componentDidUpdate() {
+  //   const { file } = this.props;
+  //   if (file) {
+  //     const { onError, onStart } = this.props;
+  //     const checkd = this.check(file)
+  //     if (checkd.err) {
+  //       return onError(new Error(checkd.msg), 1)
+  //     }
+  //     if (onStart && typeof onStart === 'function') onStart()
+  //     this.upload()
+  //   }
+  // }
 
   check = file => {
     const ext = file.name.split('.').pop()
@@ -109,6 +118,7 @@ export default class Uploader extends Component {
           type="file"
           onChange={this._onChange}
           accept={AllowExt.map(n => "." + n).join(",")}
+          ref={this.inputRef}
         />
       </React.Fragment>
     );

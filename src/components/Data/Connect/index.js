@@ -8,7 +8,7 @@ import sqlIcon from './sql.svg';
 // import defileIcon from './define.svg';
 import axios from 'axios';
 import { message } from 'antd';
-import { Uploader, ProgressBar, ProcessLoading } from 'components/Common';
+import { Uploader, ProgressBar, ProcessLoading, Confirm } from 'components/Common';
 import config from 'config';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
@@ -68,6 +68,11 @@ import { observable, action, computed } from 'mobx';
 @inject('userStore', 'socketStore', 'projectStore')
 @observer
 export default class DataConnect extends Component {
+  constructor(props) {
+    super(props)
+    this.uploadRef = React.createRef()
+  }
+
   @observable sample = false
   @observable sql = false
   @observable file = null
@@ -76,6 +81,8 @@ export default class DataConnect extends Component {
   @observable isPause = false
   @observable isSql = false
   @observable sqlProgress = 0
+  @observable visiable = false
+  @observable key = ''
 
   @computed
   get message() {
@@ -198,9 +205,28 @@ export default class DataConnect extends Component {
     this.sql = false;
   })
 
-  block = (label, img, onClick) => {
+  onClick = key => {
+    const { project } = this.props.projectStore
+    if(this.uploading || project.etling) return
+    this.key = key
+    if (!!((project || {}).models || []).length) return this.visiable = true
+    this.onConfirm()
+  }
+
+  onConfirm = () => {
+    if (!this.key) return
+    this.onClose()
+    if (this.key === 'upload') return this.uploadRef.current.show()
+    this[this.key] = true
+  }
+
+  onClose = () => {
+    this.visiable = false
+  }
+
+  block = (label, img, key) => {
     return (
-      <div className={styles.uploadBlock} onClick={onClick}>
+      <div className={styles.uploadBlock} onClick={this.onClick.bind(null, key)}>
         <div className={styles.blockImg}>
           <img src={img} alt={label} />
         </div>
@@ -265,7 +291,20 @@ export default class DataConnect extends Component {
           <a>Edit</a>
         </div> */}
         <div className={styles.uploadRow}>
-          {this.block('From R2 Learn', sampleIcon, this.showSample)}
+          {this.block('From R2 Learn', sampleIcon, 'sample')}
+          {this.block('From Computer', localFileIcon, 'upload')}
+          {this.block('From SQL', sqlIcon, 'sql'}
+          <Uploader
+            onStart={this.onUpload}
+            onComplete={this.upload}
+            onError={this.onError}
+            params={{ userId: userStore.info.id, projectId: project.id }}
+            onProgress={this.onProgress}
+            onCheck={this.onChecks}
+            file={this.file}
+            ref={this.uploadRef}
+          />
+          {/* {this.block('From R2 Learn', sampleIcon, this.showSample)}
           {!!(this.uploading || etling) ? (
             this.block('From Computer', localFileIcon)
           ) : (
@@ -279,8 +318,8 @@ export default class DataConnect extends Component {
                 onCheck={this.onChecks}
                 file={this.file}
               />
-            )}
-          {this.block('From SQL', sqlIcon, this.showSql)}
+            )} */}
+          {/*{this.block('From SQL', sqlIcon, this.showSql)}*/}
         </div>
         {/* <div className={styles.cutoff}>
           <div className={styles.line} />
@@ -365,6 +404,7 @@ export default class DataConnect extends Component {
             })
           })}
         />
+        {<Confirm width={'6em'} visible={this.visiable} title='Warning' content='This action may wipe out all of your previous work (e.g. models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
       </div>
     );
   }

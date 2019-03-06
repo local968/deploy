@@ -49,10 +49,14 @@
   border-color: transparent;
 }
 
-.modalConfirm span {
+#modalConfirmText {
   color: #fff;
 }
 
 .modalCancel {
   background: #fff;
+}
+
+#modalCloseText {
+  color: #4a4a4a;
 }

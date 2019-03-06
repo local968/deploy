@@ -4,7 +4,8 @@ import { observer, inject } from 'mobx-react';
 import { Radio } from 'antd';
 import Hint from 'components/Common/Hint';
 import ContinueButton from 'components/Common/ContinueButton';
-import { action } from 'mobx';
+import Confirm from 'components/Common/Confirm';
+import { observable, action } from 'mobx';
 
 const RadioGroup = Radio.Group;
 const selectable = [
@@ -16,18 +17,31 @@ const selectable = [
 @observer
 class Problem extends Component {
 
+  @observable visiable = false
+
   componentWillUnmount() {
     this.props.projectStore.project.changeProjectType = this.props.projectStore.project.problemType
   }
 
   nextStep = () => {
     const { project } = this.props.projectStore;
-    project.saveProblem()
+    if (project.problemType && project.problemType !== project.changeProjectType) return this.visiable = true
+    this.onConfirm()
   }
 
   onChange = action((type, e) => {
     this.props.projectStore.project[type] = e.target.value;
   })
+
+  onClose = () => {
+    this.visiable = false
+  }
+
+  onConfirm = () => {
+    const { project } = this.props.projectStore;
+    project.saveProblem()
+    this.onClose()
+  }
 
   render() {
     const { changeProjectType } = this.props.projectStore.project || {}
@@ -45,6 +59,7 @@ class Problem extends Component {
         </RadioGroup>
       </div>
       <ContinueButton onClick={this.nextStep} disabled={!changeProjectType} text="Continue" />
+      {<Confirm width={'6em'} visible={this.visiable} title='Warning' content='This action may wipe out all of your previous work (e.g. data set, models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
     </div>
   }
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
-import { ContinueButton, Modal, ProcessLoading, Table } from 'components/Common';
+import { ContinueButton, Modal, ProcessLoading, Table, Confirm } from 'components/Common';
 import { observable } from 'mobx';
 import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
@@ -218,6 +218,7 @@ class TargetIssue extends Component {
 class VariableIssue extends Component {
   @observable visible = false
   @observable summary = false
+  @observable warning = false
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project
@@ -235,7 +236,9 @@ class VariableIssue extends Component {
 
   showSummary = () => {
     const { project } = this.props
-    project.endQuality().then(() => this.summary = true).catch(() => { message.error("error!!") })
+    if (!project.qualityHasChanged) return this.summary = true
+    if (!!project.models.length) return this.warning = true
+    this.onConfirm()
   }
 
   closeSummary = () => {
@@ -246,6 +249,15 @@ class VariableIssue extends Component {
     this.props.project.fixFillMethod()
     message.info('Thank you for fixing the issues. The changes will be applied in training section.')
     this.closeFixes();
+  }
+
+  onClose = () => {
+    this.warning = false
+  }
+
+  onConfirm = () => {
+    this.props.project.endQuality().then(() => this.summary = true).catch(() => { message.error("error!!") })
+    this.onClose()
   }
 
   formatTable = () => {
@@ -420,6 +432,7 @@ class VariableIssue extends Component {
         closeByMask={true}
         showClose={true}
       />
+      {<Confirm width={'6em'} visible={this.warning} title='Warning' content='This action may wipe out all of your previous work (e.g. models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
     </div>
   }
 }

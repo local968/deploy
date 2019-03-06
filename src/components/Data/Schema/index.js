@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
 import { Checkbox } from 'antd'
-import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo } from 'components/Common';
+import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confirm } from 'components/Common';
 
 @inject('projectStore')
 @observer
@@ -12,6 +12,7 @@ export default class DataSchema extends Component {
   @observable checkList = this.props.projectStore.project.sortHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
   @observable showSelect = false
   @observable dataType = { ...this.props.projectStore.project.colType }
+  @observable visiable = false
 
   constructor(props) {
     super(props)
@@ -32,7 +33,17 @@ export default class DataSchema extends Component {
       data.outlierFillMethodTemp = { [target]: 'drop' }
     }
     project.setProperty(data)
-    project.endSchema()
+    if(!!project.models.length) return this.visiable = true
+    this.onConfirm()
+  }
+
+  onClose = () => {
+    this.visiable = false
+  }
+
+  onConfirm = () => {
+    this.props.projectStore.project.endSchema()
+    this.onClose()
   }
 
   targetSelect = (value) => {
@@ -298,6 +309,7 @@ export default class DataSchema extends Component {
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
+      {<Confirm width={'6em'} visible={this.visiable} title='Warning' content='This action may wipe out all of your previous work (e.g. models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
     </div>
   }
 }
