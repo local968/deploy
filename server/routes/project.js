@@ -949,6 +949,25 @@ wss.register("updateModel", (message, socket) => {
   return updateModel(userId, projectId, mid, data)
 })
 
+wss.register("permutationImportance", (message, socket) => {
+  const { userId } = socket.session
+  const { projectId, id: mid, command: commandText, _id: requestId } = message
+  return updateModel(userId, projectId, mid, { importanceLoading: true })
+    .then(() => command({
+      command: commandText,
+      projectId,
+      solution: mid,
+      userId,
+      requestId
+    }, progressValue => {
+      const { result, status } = progressValue
+      if (status < 0 || status === 100) return progressValue
+      const { name, model, featureImportanceDetail } = result
+      if (name === 'progress') return
+      if (model === mid) return updateModel(userId, projectId, mid, { featureImportanceDetail, importanceLoading: false })
+    }))
+})
+
 function mapObjectToArray(obj) {
   const arr = [];
   Object.entries(obj).forEach(([k, v]) => {

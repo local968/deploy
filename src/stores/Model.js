@@ -20,6 +20,8 @@ export default class Model {
   @observable problemType
   @observable fitIndexModified;
   @observable filtedModels;
+  @observable importanceLoading = false
+  @observable featureImportanceDetail = {}
 
   constructor(projectId, model, name) {
     this.projectId = projectId;
@@ -48,6 +50,7 @@ export default class Model {
     this[type] = Object.assign({}, { ...this[type] }, obj)
   }
 
+  @action
   setProperty(data) {
     if (typeof data !== 'object') {
       return false;
@@ -231,6 +234,19 @@ export default class Model {
         }
       }
     });
+  }
+  permutationImportance = () => {
+    const arr = Object.keys(this.featureImportanceDetail || {})
+    if (!!arr.length) return
+    this.importanceLoading = true
+    socketStore.ready().then(api => {
+      const command = {
+        command: 'permutationImportance',
+        projectId: this.projectId,
+        id: this.id
+      }
+      api.permutationImportance(command)
+    })
   }
   updateModel(data) {
     socketStore.ready().then(api => api.updateModel({
