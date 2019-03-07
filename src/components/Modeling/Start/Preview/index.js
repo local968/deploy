@@ -24,10 +24,9 @@ export default class Preview extends Component {
       }
     } else {
       this.loading = false
-      if (this.cleanPath === cleanPath) return
+      if(this.cleanPath === cleanPath) return
       this.cleanPath = cleanPath
-      this.cleanData = []
-      this.cleanPath && readData(this.cleanPath).then(data => {
+      readData(cleanPath).then(data => {
         this.cleanData = data
       })
     }
@@ -102,9 +101,10 @@ export default class Preview extends Component {
   }
 
   render() {
-    const { sortHeader, target, trainHeader, newVariable } = this.props.project
+    const { sortHeader, target, trainHeader, newVariable, cleanPath } = this.props.project
     const header = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
-    const tableData = this.formatTable()
+    const tableData = cleanPath ? this.formatTable() : []
+    // console.log(tableData.length, "tableData", cleanPath)
     return <div className={classnames(styles.content, {
       [styles.active]: this.visiable
     })}>
