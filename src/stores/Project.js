@@ -58,6 +58,8 @@ export default class Project {
   @observable fileNames = [];
   // @observable cleanData = []
   @observable originPath = '';
+
+  @observable etlCleanDataLoading = false
   @observable cleanPath = ''
 
   @observable noComputeTemp = false;
@@ -360,14 +362,7 @@ export default class Project {
     data.id = this.id
 
     return socketStore.ready().then(api => {
-      return api.updateProject(data).then(result => {
-        const { status, message } = result
-        this.loading = false;
-        if (status !== 200) {
-          return alert(message)
-        }
-        this.setProperty(data)
-      })
+      return api.updateProject(data)
     })
   }
 
@@ -896,7 +891,8 @@ export default class Project {
           expression,
           newType,
           correlationMatrixData: null,
-          correlationMatrixHeader: null
+          correlationMatrixHeader: null,
+          cleanPath: ''
         })
         return true
       })
@@ -1382,6 +1378,20 @@ export default class Project {
         antdMessage.error("fetch sample error")
         return []
       })
+  }
+
+  etlCleanData = () => {
+    const { dataHeader, trainHeader, newVariable } = this
+    const fields = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
+    return socketStore.ready().then(api => {
+      const command = {
+        feature_label: fields,
+        command: 'etlCleanData',
+        projectId: this.id
+      }
+      this.etlCleanDataLoading = true
+      return api.etlCleanData(command)
+    })
   }
 
   allPlots = async (changeReportProgress) => {

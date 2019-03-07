@@ -732,6 +732,24 @@ const _sendToCommand = (message, socket, progress) => sendToCommand({ ...message
 // wss.register('pointToShow', _sendToCommand)
 wss.register('createNewVariable', _sendToCommand)
 
+wss.register('etlCleanData', (message, socket, progress) => {
+  const { projectId } = message
+  const { userId } = socket.session
+  return createOrUpdate(projectId, userId, { etlCleanDataLoading: true }).then(() => {
+    return sendToCommand({ ...message, userId, requestId: message._id }, progress).then(returnValue => {
+      const { result, status } = returnValue
+      const saveData = {
+        etlCleanDataLoading: false
+      }
+      if (status === 100) {
+        const cleanPath = ((result || {}).result || {}).path || ''
+        if (cleanPath) saveData.cleanPath = cleanPath
+      }
+      return createOrUpdate(projectId, userId, saveData)
+    })
+  })
+})
+
 wss.register('abortTrain', (message, socket) => {
   const { projectId, isLoading, _id: requestId } = message
   const { userId } = socket.session

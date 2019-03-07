@@ -3,17 +3,23 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
-import { observable } from 'mobx';
+import { observable, autorun } from 'mobx';
 import { Table } from 'components/Common';
 
 @observer
 export default class Preview extends Component {
-  @observable visiable = false
-  @observable cleanData = []
-
   constructor(props) {
     super(props)
+    const { cleanPath, etlCleanData, etlCleanDataLoading } = this.props.project
+    this.autorun = autorun(() => {
+      if (!cleanPath) {
+        !etlCleanDataLoading && etlCleanData()
+      }
+    })
   }
+
+  @observable visiable = false
+  @observable cleanData = []
 
   showTable = () => {
     const { cleanPath, readData } = this.props.project
