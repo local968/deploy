@@ -42,7 +42,7 @@ export default class Preview extends Component {
 
   formatTable = () => {
     const { cleanData, visiable } = this
-    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, sortHeader, newVariable } = this.props.project;
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, sortHeader, newVariable, newType } = this.props.project;
     if (!visiable) return []
     if (!cleanData.length) return []
     const header = cleanData[0]
@@ -51,6 +51,7 @@ export default class Preview extends Component {
     const realColumn = headerList.length
     // const realData = cleanData.slice(1).filter(r => r.length === realColumn)
     const data = cleanData.slice(1).map(row => indexs.map(i => row[i]))
+    const types = {...colType, ...newType}
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -78,7 +79,7 @@ export default class Preview extends Component {
         cn: styles.titleCell
       })
 
-      const colValue = colType[header] === 'Numerical' ? 'Numerical' : 'Categorical'
+      const colValue = types[header] === 'Numerical' ? 'Numerical' : 'Categorical'
       selectArr.push({
         content: <span>{colValue}</span>,
         title: colValue,
