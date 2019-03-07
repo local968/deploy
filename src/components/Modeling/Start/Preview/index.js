@@ -8,28 +8,33 @@ import { Table } from 'components/Common';
 
 @observer
 export default class Preview extends Component {
-  constructor(props) {
-    super(props)
-    const { cleanPath, etlCleanData, etlCleanDataLoading } = this.props.project
-    this.autorun = autorun(() => {
-      if (!cleanPath) {
-        !etlCleanDataLoading && etlCleanData()
-      }
-    })
-  }
-
   @observable visiable = false
   @observable cleanData = []
+  @observable loading = false
+
+  componentDidUpdate() {
+    const { readData, cleanPath, etlCleanData, etlCleanDataLoading } = this.props.project;
+    if (!cleanPath) {
+      if (!this.loading) {
+        this.cleanData = []
+        if (!etlCleanDataLoading) {
+          this.loading = true
+          etlCleanData()
+        }
+      }
+    } else {
+      this.loading = false
+      if (this.cleanPath === cleanPath) return
+      this.cleanPath = cleanPath
+      this.cleanData = []
+      this.cleanPath && readData(this.cleanPath).then(data => {
+        this.cleanData = data
+      })
+    }
+  }
 
   showTable = () => {
-    const { cleanPath, readData } = this.props.project
     this.visiable = true
-    if (this.cleanPath === cleanPath) return
-    this.cleanPath = cleanPath
-    this.cleanData = []
-    readData(this.cleanPath).then(data => {
-      this.cleanData = data
-    })
   }
 
   hideTable = () => {
@@ -38,18 +43,15 @@ export default class Preview extends Component {
 
   formatTable = () => {
     const { cleanData, visiable } = this
-    const { colType, target, will_be_drop_500_lines, renameVariable } = this.props.project;
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, sortHeader, newVariable } = this.props.project;
     if (!visiable) return []
     if (!cleanData.length) return []
     const header = cleanData[0]
-    const index = header.indexOf(target)
-    if (index === -1) return []
-    const headerList = [target, ...header.filter(h => h !== target)]
+    const headerList = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
+    const indexs = headerList.map(h => header.indexOf(h))
     const realColumn = headerList.length
-    const realData = cleanData.slice(1).filter(r => r.length === realColumn)
-    const data = index === 0 ? realData : realData.map(row => {
-      return [row[index], ...row.slice(0, index), ...row.slice(index + 1)]
-    })
+    // const realData = cleanData.slice(1).filter(r => r.length === realColumn)
+    const data = cleanData.slice(1).map(row => indexs.map(i => row[i]))
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -100,7 +102,8 @@ export default class Preview extends Component {
   }
 
   render() {
-    const { dataHeader, target } = this.props.project
+    const { sortHeader, target, trainHeader, newVariable } = this.props.project
+    const header = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
     const tableData = this.formatTable()
     return <div className={classnames(styles.content, {
       [styles.active]: this.visiable
@@ -109,13 +112,13 @@ export default class Preview extends Component {
       <div className={styles.arrow}>{this.visiable ? <Icon type="caret-right" theme="filled" /> : <Icon type="caret-left" theme="filled" />}</div>
       <div className={styles.header}>
         <div className={styles.text}><span>Target Variable:</span><span className={styles.value} title={target}>{target}</span></div>
-        <div className={styles.text}><span>Total Variables:</span><span className={styles.value} title={dataHeader.length}>{dataHeader.length}</span></div>
+        <div className={styles.text}><span>Total Variables:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
       </div>
       <div className={styles.table}>
         <Table
           columnWidth={110}
           rowHeight={34}
-          columnCount={dataHeader.length}
+          columnCount={header.length}
           rowCount={tableData.length}
           fixedColumnCount={0}
           fixedRowCount={3}

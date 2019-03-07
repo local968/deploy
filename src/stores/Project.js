@@ -1381,8 +1381,8 @@ export default class Project {
   }
 
   etlCleanData = () => {
-    const { dataHeader, trainHeader, newVariable } = this
-    const fields = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
+    const { dataHeader, newVariable } = this
+    const fields = [...dataHeader, ...newVariable]
     return socketStore.ready().then(api => {
       const command = {
         feature_label: fields,
