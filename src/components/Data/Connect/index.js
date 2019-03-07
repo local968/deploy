@@ -293,7 +293,7 @@ export default class DataConnect extends Component {
         <div className={styles.uploadRow}>
           {this.block('From R2 Learn', sampleIcon, 'sample')}
           {this.block('From Computer', localFileIcon, 'upload')}
-          {this.block('From SQL', sqlIcon, 'sql'}
+          {this.block('From SQL', sqlIcon, 'sql')}
           <Uploader
             onStart={this.onUpload}
             onComplete={this.upload}

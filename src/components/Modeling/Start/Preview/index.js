@@ -13,14 +13,17 @@ export default class Preview extends Component {
 
   constructor(props) {
     super(props)
-    const { cleanPath, readData } = props.project
-    readData(cleanPath).then(data => {
-      this.cleanData = data
-    })
   }
 
   showTable = () => {
+    const { cleanPath, readData } = this.props.project
     this.visiable = true
+    if (this.cleanPath === cleanPath) return
+    this.cleanPath = cleanPath
+    this.cleanData = []
+    readData(this.cleanPath).then(data => {
+      this.cleanData = data
+    })
   }
 
   hideTable = () => {
@@ -30,13 +33,6 @@ export default class Preview extends Component {
   formatTable = () => {
     const { cleanData, visiable } = this
     const { colType, target, will_be_drop_500_lines, renameVariable } = this.props.project;
-    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
-    // const { checkList, showSelect } = this.state;
-    // const index = rawHeader.indexOf(target)
-    // const sortData = cleanData.map(row => {
-    //   const value = row[index]
-    //   return [value, ...row.slice(0, index), ...row.slice(index + 1)]
-    // })
     if (!visiable) return []
     if (!cleanData.length) return []
     const header = cleanData[0]
@@ -84,7 +80,7 @@ export default class Preview extends Component {
     }
 
     const tableData = data.map((row, index) => row.map((v, i) => {
-      if(i === 0) v = renameVariable[v] || v
+      if (i === 0) v = renameVariable[v] || v
       return {
         content: <span>{v}</span>,
         title: v,
