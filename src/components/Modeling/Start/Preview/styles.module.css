@@ -19,11 +19,25 @@
 }
 
 .icon {
-  font-size: 30px;
+  font-size: 1rem;
   right: 100%;
   top: 0;
   position: absolute;
   cursor: pointer;
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  border-radius: 4px;
+  align-items: center;
+  padding-right: 10px;
+  color: #fff;
+  padding: 10px;
+}
+
+.icon span {
+  font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 .arrow {

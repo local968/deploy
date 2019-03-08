@@ -24,7 +24,7 @@ export default class Preview extends Component {
       }
     } else {
       this.loading = false
-      if(this.cleanPath === cleanPath) return
+      if (this.cleanPath === cleanPath) return
       this.cleanPath = cleanPath
       readData(cleanPath).then(data => {
         this.cleanData = data
@@ -51,7 +51,7 @@ export default class Preview extends Component {
     const realColumn = headerList.length
     // const realData = cleanData.slice(1).filter(r => r.length === realColumn)
     const data = cleanData.slice(1).map(row => indexs.map(i => row[i]))
-    const types = {...colType, ...newType}
+    const types = { ...colType, ...newType }
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -109,8 +109,11 @@ export default class Preview extends Component {
     return <div className={classnames(styles.content, {
       [styles.active]: this.visiable
     })}>
-      <div className={styles.icon} onClick={this.visiable ? this.hideTable : this.showTable}><Icon type="profile" theme="filled" /></div>
-      <div className={styles.arrow}>{this.visiable ? <Icon type="caret-right" theme="filled" /> : <Icon type="caret-left" theme="filled" />}</div>
+      <div className={styles.icon} onClick={this.visiable ? this.hideTable : this.showTable}>
+        <Icon type="double-right" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />
+        <span>View Data Table</span>
+      </div>
+      <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
         <div className={styles.text}><span>Target Variable:</span><span className={styles.value} title={target}>{target}</span></div>
         <div className={styles.text}><span>Total Variables:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
