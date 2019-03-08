@@ -28,7 +28,7 @@ const formatNumber = (str, n = 3, f = false) => {
     } else {
       _d = d ? '.' + d.slice(0, n) : ''
     }
-    s = i + _d
+    s += _d
   }
   const m = parseFloat(s)
   const isZero = m === -m

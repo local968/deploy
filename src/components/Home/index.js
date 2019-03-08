@@ -237,6 +237,7 @@ class Tools extends Component {
         pageSize={toolsOption.limit}
         total={total}
         onChange={changePage}
+        // hideOnSinglePage={true}
       />
     </div>
   }
