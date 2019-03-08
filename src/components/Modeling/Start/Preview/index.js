@@ -111,7 +111,7 @@ export default class Preview extends Component {
     })}>
       <div className={styles.icon} onClick={this.visiable ? this.hideTable : this.showTable}>
         <Icon type="double-right" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />
-        <span>View Data Table</span>
+        {!this.visiable && <span >View Data Table</span>}
       </div>
       <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
