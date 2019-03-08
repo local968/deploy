@@ -94,6 +94,12 @@ export default class SimplifiedView extends Component {
     project.trainHeader = [...dataHeader, ...newVariable].filter(v => !filterList.includes(v) && v !== target)
   }
 
+  renderCell = (value, isNA) => {
+    if (isNA) return 'N/A'
+    if (isNaN(parseFloat(value))) return value || 'N/A'
+    return formatNumber(value, 2, true)
+  }
+
   render() {
     const { project } = this.props;
     const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
@@ -135,21 +141,21 @@ export default class SimplifiedView extends Component {
           <div className={styles.targetCell}><span>{colType[target]}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean, 2, true)}>
-            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.mean, 2, true)}</span>
+          })} title={this.renderCell(targetData.mean, colType[target] === 'Categorical')}>
+            <span>{this.renderCell(targetData.mean, colType[target] === 'Categorical')}</span>
           </div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] !== 'Categorical'
           })}><span>{targetUnique}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min, 2, true)}>
-            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.min, 2, true)}</span>
+          })} title={this.renderCell(targetData.min, colType[target] === 'Categorical')}>
+            <span>{this.renderCell(targetData.min, colType[target] === 'Categorical')}</span>
           </div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
-          })} title={formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max, 2, true)}>
-            <span>{formatNumber(colType[target] === 'Categorical' ? 'N/A' : targetData.max, 2, true)}</span>
+          })} title={this.renderCell(targetData.max, colType[target] === 'Categorical')}>
+            <span>{this.renderCell(targetData.max, colType[target] === 'Categorical')}</span>
           </div>
         </div>
       </div>
@@ -250,6 +256,12 @@ class SimplifiedViewRow extends Component {
     this.univariant = false
   }
 
+  renderCell = (value, isNA) => {
+    if (isNA) return 'N/A'
+    if (isNaN(parseFloat(value))) return value || 'N/A'
+    return formatNumber(value, 2, true)
+  }
+
   render() {
     const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
@@ -297,28 +309,28 @@ class SimplifiedViewRow extends Component {
       })} title={unique}><span>{unique}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean, 2, true)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.mean, 2, true)}</span>
+      })} title={this.renderCell(data.mean, valueType === 'Categorical')}>
+        <span>{this.renderCell(data.mean, valueType === 'Categorical')}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.std, 2, true)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.std, 2, true)}</span>
+      })} title={this.renderCell(data.std, valueType === 'Categorical')}>
+        <span>{this.renderCell(data.std, valueType === 'Categorical')}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.median, 2, true)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.median, 2, true)}</span>
+      })} title={this.renderCell(data.median, valueType === 'Categorical')}>
+        <span>{this.renderCell(data.median, valueType === 'Categorical')}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.min, 2, true)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.min, 2, true)}</span>
+      })} title={this.renderCell(data.min, valueType === 'Categorical')}>
+        <span>{this.renderCell(data.min, valueType === 'Categorical')}</span>
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType === 'Categorical'
-      })} title={formatNumber(valueType === 'Categorical' ? 'N/A' : data.max, 2, true)}>
-        <span>{formatNumber(valueType === 'Categorical' ? 'N/A' : data.max, 2, true)}</span>
+      })} title={this.renderCell(data.max, valueType === 'Categorical')}>
+        <span>{this.renderCell(data.max, valueType === 'Categorical')}</span>
       </div>
     </div>
   }
