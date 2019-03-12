@@ -253,16 +253,16 @@ function checkProject(userId, id) {
 
 const checkTraningRestriction = (user) => {
   return new Promise((resolve, reject) => {
-    let level
-    try {
-      level = parseInt(user.level, 10)
-    } catch (e) {
-      return reject({ message: "modeling error", status: -2 })
-    }
+    // let level
+    // try {
+    //   level = parseInt(user.level, 10)
+    // } catch (e) {
+    //   return reject({ message: "modeling error", status: -2 })
+    // }
     const duration = moment.duration(moment().unix() - user.createdTime)
     const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
     return redis.get(restrictQuery).then(count => {
-      if (count >= userProjectRestriction[level]) return reject({
+      if (count >= userProjectRestriction[user.level]) return reject({
         status: -4,
         message: 'Your usage of "Number of Training" has reached the max restricted by your current license.',
         error: 'project number exceed'

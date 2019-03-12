@@ -984,13 +984,13 @@ export default class Project {
     const sort = currentMeasurement.endsWith("se") ? -1 : 1
     let recommend
     models.forEach(m => {
+      const { score } = m
+      const { validateScore, holdoutScore } = score || {}
       let validate, holdout
       if (problemType === 'Classification') {
-        validate = m[measurement + 'Validation']
-        holdout = m[measurement + 'Holdout']
+        validate = measurement === 'auc' ? (validateScore || {}).auc : m[measurement + 'Validation']
+        holdout = measurement === 'auc' ? (holdoutScore || {}).auc : m[measurement + 'Holdout']
       } else {
-        const { score } = m
-        const { validateScore, holdoutScore } = score || {}
         validate = (validateScore || {})[currentMeasurement]
         holdout = (holdoutScore || {})[currentMeasurement]
       }
