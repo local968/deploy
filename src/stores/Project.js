@@ -586,9 +586,8 @@ export default class Project {
       if (min < 3) return await Promise.reject()
       if (min < 5) data.crossCount = min - 1
     }
-    this.etling = true
     await this.updateProject(data)
-    if (this.qualityHasChanged) return await this.etl()
+    await this.etl()
   }
 
   hasChanged = (before, after) => {
