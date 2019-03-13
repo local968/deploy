@@ -84,13 +84,13 @@ export default class DatabaseConfig extends Component {
 
   @computed
   get allowSubmit() {
-    let failed = false;
+    let allow = true;
     Object.entries(rules).map(([key, fn]) => {
-      if (failed) return false;
-      if (!fn(this.localState[key])) failed = true;
+      if (!allow) return false;
+      if (!fn(this.localState[key])) allow = false;
       return true;
     });
-    return failed;
+    return allow;
   }
 
   @action
@@ -340,7 +340,7 @@ export default class DatabaseConfig extends Component {
               <Icon type="loading" />
             </a>
           ) : (
-              <a className={classnames(styles.done, { [styles.disabled]: this.allowSubmit })} onClick={onSubmit}>
+              <a className={classnames(styles.done, { [styles.disabled]: !this.allowSubmit })} onClick={onSubmit}>
                 CONNECT
             </a>
             )}
