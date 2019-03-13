@@ -23,9 +23,8 @@ export default class List extends Component {
 
   showScore = (score, type) => {
     let s
-    if (!score || !score[type]) s = formatNumber(score[type], 2)
-    if (s && !isNaN(s)) return s
-    return ''
+    if (score && score[type]) s = formatNumber(score[type], 2)
+    return s || ''
   }
 
   render() {
