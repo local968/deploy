@@ -36,10 +36,10 @@ const sessionParser = session({
 });
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false, limit: '200mb' }))
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '200mb' }))
 app.use(sessionParser);
 app.use(routes)
 app.use(messageRouter)
