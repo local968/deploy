@@ -97,7 +97,7 @@ export default class SimplifiedView extends Component {
   renderCell = (value, isNA) => {
     if (isNA) return 'N/A'
     if (isNaN(parseFloat(value))) return value || 'N/A'
-    return formatNumber(value, 2, true)
+    return formatNumber(value, 2)
   }
 
   render() {
@@ -259,7 +259,7 @@ class SimplifiedViewRow extends Component {
   renderCell = (value, isNA) => {
     if (isNA) return 'N/A'
     if (isNaN(parseFloat(value))) return value || 'N/A'
-    return formatNumber(value, 2, true)
+    return formatNumber(value, 2)
   }
 
   render() {
