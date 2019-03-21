@@ -25,7 +25,7 @@ class Problem extends Component {
 
   nextStep = () => {
     const { project } = this.props.projectStore;
-    if (project.problemType && project.problemType !== project.changeProjectType) return this.visiable = true
+    if (!!project.uploadFileName.length && project.problemType && project.problemType !== project.changeProjectType) return this.visiable = true
     this.onConfirm()
   }
 
@@ -44,7 +44,7 @@ class Problem extends Component {
   }
 
   render() {
-    const { changeProjectType } = this.props.projectStore.project || {}
+    const { changeProjectType, models } = this.props.projectStore.project || {}
     return <div className={styles.problem}>
       <div className={styles.title}><span>Choose Problem Type</span></div>
       <div className={styles.radioBox}>
@@ -59,7 +59,7 @@ class Problem extends Component {
         </RadioGroup>
       </div>
       <ContinueButton onClick={this.nextStep} disabled={!changeProjectType} text="Continue" />
-      {<Confirm width={'6em'} visible={this.visiable} title='Warning' content='This action may wipe out all of your previous work (e.g. data set, models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
+      {<Confirm width={'6em'} visible={this.visiable} title='Warning' content={`This action may wipe out all of your previous work (e.g. dataset${!!models.length ? ', models' : ''}). Please proceed with caution.`} onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
     </div>
   }
 }
