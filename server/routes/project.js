@@ -479,7 +479,7 @@ wss.register("queryModelList", message => {
 
 wss.register('etl', (message, socket, progress) => {
   const { userId } = socket.session
-  const { firstEtl, noCompute, projectId: id, csvLocation: files, _id: requestId } = message
+  const { firstEtl, noCompute, saveIssue, projectId: id, csvLocation: files, _id: requestId } = message
 
   return setDefaultData(id, userId).then(setResult => {
     if (setResult.status !== 200) return setResult
@@ -489,6 +489,7 @@ wss.register('etl', (message, socket, progress) => {
       const data = { ...message, userId: userId, requestId, csvLocation, ext, noCompute: firstEtl || noCompute, stopId: requestId }
       // delete data.firstEtl
       Reflect.deleteProperty(data, 'firstEtl')
+      Reflect.deleteProperty(data, 'saveIssue')
       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation')
       if (!ext) Reflect.deleteProperty(data, 'ext')
       return createOrUpdate(id, userId, { etling: true, stopId: requestId })
@@ -517,6 +518,13 @@ wss.register('etl', (message, socket, progress) => {
           result.nullFillMethodTemp = result.nullFillMethod
           result.mismatchFillMethodTemp = result.mismatchFillMethod
           result.outlierFillMethodTemp = result.outlierFillMethod
+
+          //保存原始错误
+          if (saveIssue) {
+            result.nullLineCountsOrigin = result.nullLineCounts
+            result.mismatchLineCountsOrigin = result.mismatchLineCounts
+            result.outlierLineCountsOrigin = result.outlierLineCounts
+          }
 
           result.etling = false
           result.etlProgress = 0

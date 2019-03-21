@@ -251,7 +251,7 @@ class PredictedProgress extends Component {
             height: (height || 0.27) + 'em'
           }}
         >
-          <span>{formatNumber((1 - predicted) * 100, 0) + '%'}</span>
+          <span>{failedPercent + '%'}</span>
         </div>}
       </div>
     );

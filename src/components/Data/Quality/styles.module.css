@@ -1169,7 +1169,7 @@ span.fixesEdit {
 .summaryButton span {
 	font-family: HelveticaNeue;
 	font-size: 1rem;
-	font-weight: bold;
+	/* font-weight: bold; */
 	text-align: left;
 	color: #1d2b3c;
 	line-height: 1.3;

@@ -91,6 +91,10 @@ export default class Project {
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
   @observable missingReason = {}
+  //原始issue
+  @observable nullLineCountsOrigin = {}
+  @observable mismatchLineCountsOrigin = {}
+  @observable outlierLineCountsOrigin = {}
 
 
   @observable targetMapTemp = {};
@@ -546,7 +550,7 @@ export default class Project {
       subStepActive: 2,
       lastSubStep: 2
     }))
-    return await this.etl()
+    return await this.etl(true)
   }
 
   @computed
@@ -626,7 +630,7 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCounts, mismatchLineCounts, nullLineCounts } = this;
+    const { problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin } = this;
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
@@ -639,7 +643,7 @@ export default class Project {
       data.rowIssue = true;
     }
 
-    if (target && (+outlierLineCounts[target] + +mismatchLineCounts[target] + +nullLineCounts[target]) > 0) {
+    if (target && (+outlierLineCountsOrigin[target] + +mismatchLineCountsOrigin[target] + +nullLineCountsOrigin[target]) > 0) {
       data.targetRowIssue = true
     }
 
@@ -706,7 +710,18 @@ export default class Project {
     return arr
   }
 
-  etl = async () => {
+  @computed
+  get targetIssuesCountsOrigin() {
+    const { target, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin, colType } = this;
+    const arr = {
+      mismatchRow: colType[target] !== "Categorical" ? (mismatchLineCountsOrigin[target] || 0) : 0,
+      nullRow: nullLineCountsOrigin[target] || 0,
+      outlierRow: colType[target] !== "Categorical" ? (outlierLineCountsOrigin[target] || 0) : 0,
+    }
+    return arr
+  }
+
+  etl = async (saveIssue = false) => {
     const { id, problemType, dataHeader, uploadFileName } = this;
 
     const command = 'etl';
@@ -714,6 +729,7 @@ export default class Project {
     const data = {
       projectId: id,
       time: moment().valueOf(),
+      saveIssue,
       command
     }
 

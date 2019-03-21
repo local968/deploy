@@ -57,28 +57,28 @@ class TargetIssue extends Component {
 
   saveTargetFixes = () => {
     this.props.project.fixTarget()
-    message.info('Thank you for fixing the issues. The changes will be applied in training section.')
+    message.info('Thank you for fixing the issues. The changes will be applied in training section.', 5)
     this.closeTarget();
   }
 
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
-    message.info('Thank you for fixing the issues. The changes will be applied in training section.')
+    message.info('Thank you for fixing the issues. The changes will be applied in training section.', 5)
     this.closeFixes();
   }
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView } = project;
+    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
     const nullCount = Number.isInteger(nullLineCounts[target]) ? nullLineCounts[target] : 0
     const mismatchCount = Number.isInteger(mismatchLineCounts[target]) ? mismatchLineCounts[target] : 0
     const outlierCount = Number.isInteger(outlierLineCounts[target]) ? outlierLineCounts[target] : 0
     const targetPercent = {
-      missing: nullCount * 100 / (totalRawLines || 1),
-      mismatch: mismatchCount * 100 / (totalRawLines || 1),
-      outlier: outlierCount * 100 / (totalRawLines || 1),
+      missing: nullCount === 0 ? 0 : (nullCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(nullCount * 100 / (totalRawLines || 1), 2),
+      mismatch: mismatchCount === 0 ? 0 : (mismatchCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(mismatchCount * 100 / (totalRawLines || 1), 2),
+      outlier: outlierCount === 0 ? 0 : (outlierCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(outlierCount * 100 / (totalRawLines || 1), 2)
     }
     const warnings = []
     const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
@@ -145,9 +145,9 @@ class TargetIssue extends Component {
             <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
             <div className={classnames(styles.cell, styles.select)}><span>{colType[target]}</span></div>
             <div className={classnames(styles.cell, styles.error)}>
-              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch < 0.01 ? "<0.01" : formatNumber(targetPercent.mismatch, 2)}%</span></div>}
-              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing < 0.01 ? "<0.01" : formatNumber(targetPercent.missing, 2)}%</span></div>}
-              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier < 0.01 ? "<0.01" : formatNumber(targetPercent.outlier, 2)}%</span></div>}
+              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch}%</span></div>}
+              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing}%</span></div>}
+              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier}%</span></div>}
             </div>
             <div className={styles.tableBody}>
               {sortData.map((v, k) => <div key={k} className={classnames(styles.cell, {
@@ -177,19 +177,15 @@ class TargetIssue extends Component {
             totalRawLines={totalRawLines} />}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
-            targetIssues={{
-              nullRow: nullLineCounts[target] ? nullLineCounts[target] : 0,
-              mismatchRow: colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0,
-              outlierRow: colType[target] === 'Numerical' ? outlierLineCounts[target] : 0,
-            }}
+            targetIssues={targetIssuesCountsOrigin}
             totalRawLines={totalRawLines}
             totalLines={totalLines}
             percent={targetPercent} />}
         </div>
         <Modal content={<FixIssue project={project}
-          nullCount={nullCount}
-          mismatchCount={mismatchCount}
-          outlierCount={outlierCount}
+          nullCount={targetIssuesCountsOrigin.nullRow}
+          mismatchCount={targetIssuesCountsOrigin.mismatchRow}
+          outlierCount={targetIssuesCountsOrigin.outlierRow}
           closeFixes={this.closeFixes}
           saveDataFixes={this.saveDataFixes}
           isTarget={true} />}
@@ -247,7 +243,7 @@ class VariableIssue extends Component {
 
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
-    message.info('Thank you for fixing the issues. The changes will be applied in training section.')
+    message.info('Thank you for fixing the issues. The changes will be applied in training section.', 5)
     this.closeFixes();
   }
 

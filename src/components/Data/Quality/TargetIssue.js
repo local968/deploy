@@ -228,7 +228,7 @@ export class DataIssue extends Component {
           <div className={styles.progressBox}>
             {!!targetIssues.nullRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {percent.missing < 0.01 ? '<0.01' : formatNumber(percent.missing, 2)}%</span></div>
+                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {formatNumber(percent.missing, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.missing)} style={{ width: percent.missing < 1 ? 1 : percent.missing + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -237,7 +237,7 @@ export class DataIssue extends Component {
             </div>}
             {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {percent.mismatch < 0.01 ? '<0.01' : formatNumber(percent.mismatch, 2)}%</span></div>
+                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {formatNumber(percent.mismatch, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.mismatch)} style={{ width: percent.mismatch < 1 ? 1 : percent.mismatch + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -246,7 +246,7 @@ export class DataIssue extends Component {
             </div>}
             {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {percent.outlier < 0.01 ? '<0.01' : formatNumber(percent.outlier, 2)}%</span></div>
+                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {formatNumber(percent.outlier, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.outlier)} style={{ width: percent.outlier < 1 ? 1 : percent.outlier + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
@@ -574,7 +574,7 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -595,16 +595,17 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(mismatchLineCounts).map((k, i) => {
+              {Object.keys(mismatchLineCountsOrigin).map((k, i) => {
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = mismatchLineCounts[k]
-                if (!num) {
+                const originNum = mismatchLineCountsOrigin[k]
+                if (!originNum) {
                   return null;
                 }
+                const num = mismatchLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
+                const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
@@ -670,16 +671,17 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(nullLineCounts).map((k, i) => {
+              {Object.keys(nullLineCountsOrigin).map((k, i) => {
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = nullLineCounts[k]
-                if (!num) {
+                const originNum = nullLineCountsOrigin[k]
+                if (!originNum) {
                   return null;
                 }
+                const num = nullLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
+                const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
@@ -749,19 +751,20 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(outlierLineCounts).map((k, i) => {
+              {Object.keys(outlierLineCountsOrigin).map((k, i) => {
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = outlierLineCounts[k]
-                if (!num) {
+                const originNum = outlierLineCountsOrigin[k]
+                if (!originNum) {
                   return null;
                 }
+                const num = outlierLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const isShow = showType === 'Numerical';
                 if (!isShow) return null
                 const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : outlierRange[k];
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
+                const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median
                 const method = this.fillMethod.outlier.hasOwnProperty(k) ?

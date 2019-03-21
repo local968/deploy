@@ -33,7 +33,7 @@
   align-items: center;
   padding-right: 10px;
   color: #fff;
-  padding: 10px 5px;
+  padding: 5px;
 }
 
 .icon span {
@@ -43,12 +43,13 @@
 
 .arrow {
   font-size: 10px;
-  height: 30px;
+  /* height: 30px; */
   left: 0;
   top: 0;
-  line-height: 30px;
+  /* line-height: 30px; */
   text-align: center;
   position: absolute;
+  padding: 5px 0;
 }
 
 .header {
