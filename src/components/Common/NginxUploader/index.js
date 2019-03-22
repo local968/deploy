@@ -113,9 +113,9 @@ class Uploader {
       const currentTime = moment().valueOf();
       const currentLoadedSize = this.totalLoaded;
       const loadingSize = this.speeds.reduce((start, s) => start + s, 0)
-      this.speed =
-        (currentLoadedSize - latestLoadedSize + loadingSize) /
-        ((currentTime - latestCalculateTime) / 1000);
+      const speed = (currentLoadedSize - latestLoadedSize + loadingSize) /
+      ((currentTime - latestCalculateTime) / 1000)
+      this.speed = isNaN(speed) ? 0 : speed
       if (this.speed < 0) console.log(currentLoadedSize, latestLoadedSize, loadingSize, this.speed, "err")
       if (this.temp.length > 4) this.temp.shift()
       this.temp.push(this.speed)

@@ -210,7 +210,7 @@ export default class Deployment extends Component {
           footer={null}
           onCancel={action(() => { this.uploadStatus = false; this.uploadOperator.pause() })}>
           <div className={styles.uploading}>
-            <Progress percent={this.uploadPercentage} />
+            <Progress percent={isNaN(this.uploadPercentage) ? 0 : parseFloat(this.uploadPercentage)} />
             <span className={styles.speed}>{this.uploadSpeed}</span>
             <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
               ? <span><Icon type="pause" theme="outlined" />Pause</span>
