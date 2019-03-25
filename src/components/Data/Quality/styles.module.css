@@ -94,7 +94,8 @@
 
 .contentBox {
 	display: flex;
-	flex: auto;
+  flex: auto;
+  min-height: 0;
 }
 
 .list {
@@ -109,7 +110,8 @@
 	border: solid 1px #00b570;
 	flex-direction: column;
 	width: 100%;
-	flex: auto;
+  flex: auto;
+  min-height: 0;
 }
 
 .cell {
