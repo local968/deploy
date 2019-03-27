@@ -9,7 +9,7 @@ import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confir
 @inject('projectStore')
 @observer
 export default class DataSchema extends Component {
-  @observable checkList = this.props.projectStore.project.sortHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
+  @observable checkList = this.props.projectStore.project.rawHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
   @observable showSelect = false
   @observable dataType = { ...this.props.projectStore.project.colType }
   @observable visiable = false
@@ -21,8 +21,8 @@ export default class DataSchema extends Component {
 
   doEtl = () => {
     const { project } = this.props.projectStore
-    const { sortHeader, target } = project;
-    const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
+    const { rawHeader, target } = project;
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
     const data = {
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
@@ -33,7 +33,7 @@ export default class DataSchema extends Component {
       data.outlierFillMethodTemp = { [target]: 'drop' }
     }
     project.setProperty(data)
-    if(!!project.models.length) return this.visiable = true
+    if (!!project.models.length) return this.visiable = true
     this.onConfirm()
   }
 
@@ -84,16 +84,20 @@ export default class DataSchema extends Component {
   }
 
   formatTable = () => {
-    const { target, headerTemp: { temp }, sortData, sortHeader, renameVariable, etling } = this.props.projectStore.project;
+    const { target, headerTemp: { temp }, uploadData, rawHeader, renameVariable, etling } = this.props.projectStore.project;
     if (etling) return []
     const { showSelect, checkList } = this
-    if (!sortData.length) return []
+    if (!uploadData.length) return []
     // return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
-    const headerList = [...sortHeader]
+    const headerList = target ? [target, ...rawHeader.filter(v => v !== target)] : rawHeader
+    const targetIndex = target ? rawHeader.indexOf(target) : -1
     // const notShowIndex = sortHeader.filter(v => !sortHeader.includes(v)).map(v => sortHeader.indexOf(v))
-    const data = [...sortData]
+    const data = targetIndex > -1 ? uploadData.map(row => {
+      const value = row[targetIndex]
+      return [value, ...row.slice(0, targetIndex), ...row.slice(targetIndex + 1)]
+    }) : uploadData
     // if(!sortData.length) return []
     /**
      * 根据showSelect, indexPosition变化
@@ -147,7 +151,7 @@ export default class DataSchema extends Component {
         cn: styles.titleCell
       }
       if (i === index.columnHeader - 1) {
-        headerData.content = <HeaderInfo row='Header' col='Row' style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739}/>
+        headerData.content = <HeaderInfo row='Header' col='Row' style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
         headerData.title = '';
       } else {
         headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
@@ -233,13 +237,13 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { etling, etlProgress, sortHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, rawHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated } } = project;
     const targetOption = {};
     const tableData = this.formatTable()
-    const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
 
     //target选择列表
-    sortHeader.forEach(h => {
+    rawHeader.forEach(h => {
       h = h.trim()
       if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = h
       if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = h
@@ -291,7 +295,7 @@ export default class DataSchema extends Component {
             ref={this.tableRef}
             columnWidth={110}
             rowHeight={34}
-            columnCount={sortHeader.length + 1}
+            columnCount={rawHeader.length + 1}
             rowCount={tableData.length}
             fixedColumnCount={1}
             fixedRowCount={this.showSelect ? 3 : 2}

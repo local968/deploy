@@ -153,7 +153,7 @@ export default class Support extends Component {
 			} else {
 				message.error((res.data || {}).message || "report error")
 			}
-		})
+		}).catch(()=>window.stores.userStore._status())
 	}
 
 	render() {
@@ -161,9 +161,6 @@ export default class Support extends Component {
 		const expandedKeys = toJS(_data.expandedKeys);
 		return (
 			<section style={{ width: "100%" , background: '#fff' }}>
-				{/*<header className={styles.header}>*/}
-				{/*Welcome to R<span>2</span>.ai support*/}
-				{/*</header>*/}
 				<div className={styles.main}>
 					<div className={styles.support}>
 						<div className={styles.report}>
@@ -173,26 +170,12 @@ export default class Support extends Component {
                   <TabPane tab="Request a Feature" key={2}>{}</TabPane>
                   <TabPane tab="Ask a Question" key={3}>{}</TabPane>
                 </Tabs>
-
-
-
-
-
-								{/*<div className={classnames(styles.type, {*/}
-									{/*[styles.checked]: _data.type === 1*/}
-								{/*})} onClick={this.changeType.bind(this, 1)}><span>Report a Bug</span></div>*/}
-								{/*<div className={classnames(styles.type, {*/}
-									{/*[styles.checked]: _data.type === 2*/}
-								{/*})} onClick={this.changeType.bind(this, 2)}><span>Request a Feature</span></div>*/}
-								{/*<div className={classnames(styles.type, {*/}
-									{/*[styles.checked]: _data.type === 3*/}
-								{/*})} onClick={this.changeType.bind(this, 3)}><span>Ask a Question</span></div>*/}
 							</div>
 							<div className={styles.text}>
 								<TextArea className={styles.textArea} rows={4} value={_data.text} onChange={this.handleChangeArea} />
 							</div>
 							<div className={styles.email}>
-								<Input placeholder='Enter your email' value={_data.email} onChange={this.handleChange} />
+								<Input placeholder='Enter your email' value={_data.email} onChange={this.handleChange} disabled/>
 							</div>
 							<div className={styles.button}>
 								<div className={classnames(styles.type, styles.checked)} onClick={this.submit.bind(this)}>
