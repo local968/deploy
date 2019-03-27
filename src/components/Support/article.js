@@ -50,7 +50,7 @@ export default class Article extends Component {
             <p className={styles.p}>
                 The R2-Learn machine learning workflow is as follows:
             </p>
-            <img src="/support2.png" alt=""/>
+            <img style={{width:'55%'}} src="/support2.png" alt=""/>
             <dl>
                 <dd><strong>1.	Create a project:</strong> Start a project in R2-Learn to begin building a machine learning model.</dd>
                 <dd><strong>2.	Describe your business problem:</strong> Describe the business problem that you’re trying to solve. This helps document the intent of the project and its desired outcome.</dd>
@@ -377,7 +377,7 @@ export default class Article extends Component {
              <WayPoint
                  onEnter={this.changeHash.bind(this,'3.4.3.1')}
              >
-                 <a name="3.4.3.1" className={styles.h2}>{''}</a>
+                 <a name="3.4.3.1" className={styles.h2}/>
              </WayPoint>
              <p>Once you’ve selected and finished configuring your modeling mode, R2-Learn will start building your machine learning model.</p>
              There is a possibility that the model training process will fail if R2-Learn is unable to train a sufficiently performant machine learning model from the given training dataset. If model training fails, you have to either reconfigure your project to fix dataset quality issues or choose a new or larger dataset.
