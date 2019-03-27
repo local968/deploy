@@ -91,8 +91,8 @@ export default class DataSchema extends Component {
     // return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
-    const headerList = [target, ...rawHeader.filter(v => v !== target)]
-    const targetIndex = rawHeader.indexOf(target)
+    const headerList = target ? [target, ...rawHeader.filter(v => v !== target)] : rawHeader
+    const targetIndex = target ? rawHeader.indexOf(target) : -1
     // const notShowIndex = sortHeader.filter(v => !sortHeader.includes(v)).map(v => sortHeader.indexOf(v))
     const data = targetIndex > -1 ? uploadData.map(row => {
       const value = row[targetIndex]
