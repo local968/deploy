@@ -257,7 +257,7 @@ export default class DataSchema extends Component {
           <span>Please select a variable as the target variable, and unselect the undesirable variables if necessary.</span>
         </div>
       </div>
-      <div className={styles.schemaContent}>
+      <div className={styles.schemaContent} id='schemaContent'>
         <div className={styles.schemaTools}>
           <Select
             title={"Target Variable"}
@@ -268,6 +268,7 @@ export default class DataSchema extends Component {
             value={target}
             disabled={isMissed || isDuplicated}
             selectOption={{ showSearch: true }}
+            getPopupContainer = {() => document.getElementById('schemaContent')}
           />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
