@@ -105,7 +105,10 @@
   .detailCurves .leftPanel .thumbnails {
     display: flex;
   }
-  .detailCurves .leftPanel .thumbnails .thumbnail {
+.detailCurves .leftPanel .thumbnails img{
+  width: 52px;
+}
+.detailCurves .leftPanel .thumbnails .thumbnail {
     flex-basis: 200px;
     text-align: center;
   }
