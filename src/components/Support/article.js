@@ -229,8 +229,7 @@ export default class Article extends Component {
         <dd>•	Upload a local file.</dd>
         </dl>
         If you’re just getting to know R2-Learn, you can use one of the sample datasets provided instead.
-        <div>After loading your dataset, you can <strong>hange the maximum number of rows</strong>c or records that R2-Learn will use to develop your machine learning model.</div>
-        [Important]The dataset that you load into R2-Learn must have a header row.
+            [Important]The dataset that you load into R2-Learn must have a header row.
         <div>
         <strong>[Note]	We currently only support importing data by either local file or database. For Free Trail, Basic, and Essential package, we currently only support importing data by local file.</strong>
         </div>
@@ -303,7 +302,7 @@ export default class Article extends Component {
         <dd>[Note] 	A null value represents an absence of data ("no value") and is different from "zero value".</dd>
         <dd>•	<strong>Outlier:</strong>When working with continuous values, a data point is considered an outlier if is outside the expected range for the given dataset. It is important to inspect data points that are outliers, and determine if they are genuine deviations from the trend shown in the data, or bad data points.</dd>
         </dl>
-        A list of available fixes for these issues can be found in Appendix A: Data Quality Fixes.
+        A list of available fixes for these issues can be found in <a href="#a">Appendix A: Data Quality Fixes.</a>
         <dl>
         <dt>Target Variable Quality</dt>
         <WayPoint
