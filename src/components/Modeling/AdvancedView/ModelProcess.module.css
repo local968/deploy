@@ -1,7 +1,7 @@
 .modelProcess {
   display: flex;
   padding: 2em 1em;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   overflow: auto;
   text-align: center;
