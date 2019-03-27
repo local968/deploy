@@ -281,9 +281,9 @@ export default class Project {
 
   @computed
   get sortHeader() {
-    const { target, rawHeader } = this
-    if (!target) return rawHeader
-    return [target, ...rawHeader.filter(v => target !== v)]
+    const { target, dataHeader } = this
+    if (!target) return dataHeader
+    return [target, ...dataHeader.filter(v => target !== v)]
   }
 
   @computed
