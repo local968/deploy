@@ -288,13 +288,16 @@ export default class Project {
 
   @computed
   get sortData() {
-    const { target, rawHeader, uploadData } = this
+    const { target, sortHeader, uploadData, rawHeader } = this
     if (!uploadData.length) return []
     if (!target) return uploadData
-    const index = rawHeader.indexOf(target)
-    return uploadData.filter(r => r.length === rawHeader.length).map(row => {
-      const value = row[index]
-      return [value, ...row.slice(0, index), ...row.slice(index + 1)]
+    return uploadData.map(row => {
+      const newRow = []
+      sortHeader.forEach(v => {
+        const index = rawHeader.indexOf(v)
+        if(index > -1) newRow.push(row[index])
+      })
+      return newRow
     })
   }
 
