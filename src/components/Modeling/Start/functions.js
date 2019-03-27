@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   base: [
     { label: "exp()", value: "exp()", syntax: "syntax: exp(@var)", params: 1 },
     { label: "log2()", value: "log2()", syntax: "syntax: log2(@var)", params: 1 },

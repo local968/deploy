@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   Classification: [
     {
       value: 'adaboost',

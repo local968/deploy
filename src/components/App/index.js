@@ -8,6 +8,7 @@ import Layout from 'components/App/Layout';
 import Sider from 'components/Layout/Sider';
 import Header from 'components/Layout/Header';
 import Report from 'components/Report'
+import Test from 'components/Test';
 import ErrorBoundary from 'components/Common/ErrorBoundary';
 import Stores from 'stores';
 import styles from './styles.module.css';
@@ -20,7 +21,7 @@ const stores = {
 };
 
 class App extends Component {
-  
+
   render() {
     return (
       <ErrorBoundary>
@@ -33,6 +34,7 @@ class App extends Component {
                 <ErrorBoundary>
                   <Layout />
                 </ErrorBoundary>
+                <Test />
               </div>
             </div>
           </Router>}

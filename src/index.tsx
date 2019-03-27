@@ -19,4 +19,3 @@ window.alert = msg=>{
       onOk() {},
     });
   }
-  
