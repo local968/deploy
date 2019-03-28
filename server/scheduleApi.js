@@ -44,6 +44,13 @@ const api = {
     })
   }),
   getDeployment: (deploymentId) => redis.get(`deployment:${deploymentId}`).then(deployment => JSON.parse(deployment)),
+  updateDeployment: (deployment) => {
+    redis.set(`deployment:${deployment.id}`, JSON.stringify(deployment)).then(result => {
+      wss.publish(`user:${deployment.userId}:deployments`, { type: 'update' })
+    }, error => {
+      console.error(error)
+    })
+  },
   deleteDeploymentSchedules: (deploymentId) => {
     let _deployment;
     return api.getDeployment(deploymentId).then(deployment => {
@@ -179,7 +186,7 @@ const api = {
         return start
       }, {})
       const { target, targetArray, colMap, renameVariable } = obj
-      if(!target) return newFeatureLabel
+      if (!target) return newFeatureLabel
       const arr = !targetArray.length ? Object.keys((colMap || {})[target]) : targetArray
       if (!arr.length) return newFeatureLabel
       arr.slice(0, 2).forEach((k, index) => {
