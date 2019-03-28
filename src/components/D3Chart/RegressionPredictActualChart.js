@@ -69,7 +69,7 @@ export default class RegressionPredictActualChart extends Component {
         let width = -150;
 
         if (this.regressionPredictActualChart.current) {
-          width = this.regressionPredictActualChart.current.clientWidth - 700 - 100;
+          width = this.regressionPredictActualChart.current.clientWidth - 700 - 100 - 50;
         }
 
         return [y(d[field]) - 20, x(i) + width]
