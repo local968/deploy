@@ -3,11 +3,11 @@ import styles from "./styles.module.css";
 import WayPoint from 'react-waypoint';
 
 export default class Article extends Component {
-    
+
     changeHash(hash){
         this.props.changeSelectedKeys(hash)
     }
-    
+
     one(){
         return <Fragment>
         <WayPoint
@@ -15,7 +15,7 @@ export default class Article extends Component {
             >
             <a name="1" className={styles.h1}>1. Overview</a>
         </WayPoint>
-        
+
         R2-Learn helps companies turn data into machine learning models quickly without needing AI (artificial intelligence) expertise. Built with cutting edge technology, R2-Learn uses AI to guide you through the process of creating, deploying, and keeping up-to-date custom machine learning models using data that you already have.
         <div>This section introduces the key concepts of machine learning and how they relate to R2-Learn.</div>
         <WayPoint
@@ -40,7 +40,7 @@ export default class Article extends Component {
         </dl>
         <img src="/support1.png" alt=""/>
             A well-trained data scientist is usually responsible for the workflow illustrated above. It has many steps and decision points. Making the correct decision at each point is critical to the quality of the machine learning model, which in turn determines how accurate predictions made with this model are. Data scientists today largely rely on their experience and intuition to find the best model for the task at hand, which can be very slow, tedious, expensive and flawed process.
-        
+
         <WayPoint
         onEnter={this.changeHash.bind(this,'1.2')}
             >
@@ -73,7 +73,7 @@ export default class Article extends Component {
         Once deployed, you can monitor your model’s predictive performance and update models when they fall below a specified threshold.
         </Fragment>
     }
-    
+
     two(){
         return <Fragment>
         <WayPoint
@@ -103,7 +103,7 @@ export default class Article extends Component {
             <div>•	Importing data from a database</div>
             [Note]We currently only support importing data by either local file or database. For Free Trail, Basic, and Essential package, we currently only support importing data by local file.
         <div>•	Importing a local file</div>
-        
+
         <WayPoint
         onEnter={this.changeHash.bind(this,'2.2.1')}
             >
@@ -126,13 +126,13 @@ export default class Article extends Component {
             <div>•	Be UTF-8 encoded.</div>
         <div>•	It must contain all the variables required by the deployed model, and</div>
         <div>•	Names of variables contained in the CSV file must be the same as the variable names that are used in the training dataset.</div>
-        
+
         <WayPoint
         onEnter={this.changeHash.bind(this,'2.3')}
             >
             <a name="2.3" className={styles.h2}>2.3. Project home</a>
         </WayPoint>
-        
+
         When you sign in to R2-Learn, you’ll land on the project home page:
             <img src="/support4.png" alt=""/>
             On the project homepage, you can:
@@ -163,7 +163,7 @@ export default class Article extends Component {
         For more information on how to deploy models, see <strong>Deploying your models</strong>.
         </Fragment>
     }
-    
+
     three(){
         return <Fragment>
         <WayPoint
@@ -199,7 +199,7 @@ export default class Article extends Component {
         <dd>•	<strong>Continuous Values (Regression):</strong> To predict a continuous/numeric value. For example, how much a product would cost given a set of variables.</dd>
         </dl>
         Once you’ve set your <strong>Problem Type</strong>, click <strong>Continue</strong> to move on to connecting your data into R2-Learn.
-        
+
         <WayPoint
         onEnter={this.changeHash.bind(this,'3.3')}
             >
@@ -215,7 +215,7 @@ export default class Article extends Component {
         <p>
         Once the user loads data via R2-Learn’s data connecting interface, R2-Learn detects the data types, checks the data quality and fixes the minor issues automatically or prompts the user to fix them manually.
         </p>
-        
+
         <WayPoint
         onEnter={this.changeHash.bind(this,'3.3.1')}
             >
@@ -233,7 +233,7 @@ export default class Article extends Component {
         <div>
         <strong>[Note]	We currently only support importing data by either local file or database. For Free Trail, Basic, and Essential package, we currently only support importing data by local file.</strong>
         </div>
-        
+
         <WayPoint
         onEnter={this.changeHash.bind(this,'3.3.2')}
             >
@@ -254,7 +254,7 @@ export default class Article extends Component {
         <dd>•	<strong>Categorical:</strong>Data in the column should be treated as distinct categories.</dd>
         </dl>
             [Important]	Accurately identifying the data type contained in each column will significantly affect your machine learning model. Consult the owner of the dataset if you are unsure how to classify the type of data the columns contain.
-        
+
         <dl>
         <dd>R2-Learn attempts to automatically identify the data types of each column depending on where you’ve loaded your data from:</dd>
         <dd>•	If you’ve loaded your dataset by <strong>connecting to a database</strong>, data type information for each column is captured from the database and displayed here.</dd>
@@ -273,7 +273,7 @@ export default class Article extends Component {
         For example, in a dataset for training a model to predict the yearly income of a person, we can safely remove a variable that contains the monthly income of a person. Columns are dimmed in the main display when removed from your model.
         <p>When you’ve selected your target variable and removed any unwanted columns or variables from your dataset, click <strong>Continue</strong> to move on to Data Quality.</p>
         <p>If you are sure the dataset is clean enough to skip data extraction, transformation, and loading, you can click Skip <strong>data quality check</strong> to move on to Modeling.</p>
-        
+
         <WayPoint
         onEnter={this.changeHash.bind(this,'3.3.3')}
             >
@@ -412,7 +412,7 @@ four(){
         <dl>
         <dd>•	<strong>The model being used: </strong>Select a model to run a deployment or other operations on.</dd>
     <dd>•	<strong>Deployment Data Definition:</strong> Click <strong>Download</strong> to download a csv file containing a list of the variables used by your model.</dd>
-    <dd>•	<strong>Email to Receive Alert:</strong> Click to enter an email address to send deployment-related alerts to.</dd>
+    {/* <dd>•	<strong>Email to Receive Alert:</strong> Click to enter an email address to send deployment-related alerts to.</dd> */}
     </dl>
     <WayPoint
     onEnter={this.changeHash.bind(this,'4.1')}
@@ -454,7 +454,7 @@ four(){
         <dl>
         <dd> –	<strong>Auto disables if any issue occurs</strong> Select this option to stop the deployment if R2-Learn encounters an issue.</dd>
     </dl>
-    
+
     {/*<WayPoint*/}
     {/*onEnter={this.changeHash.bind(this,'4.1.2')}*/}
     {/*>*/}
@@ -512,7 +512,7 @@ four(){
     <dd>•	<strong>Download Result</strong>: After an operation completes, you can download the result dataset. An extra column named {'“<target_variable_name>_pred“'} that contains the predicted value for each data point is attached. For Binary Classification models, anther column named {'“<target_variable_name>_probability_1”'} that contains the probability also attached.</dd>
     <dd>•	<strong>Cancel Ongoing Deployment</strong>: Stops an ongoing operation.</dd>
     </dl>
-    
+
     <WayPoint
     onEnter={this.changeHash.bind(this,'4.2.2')}
         >
@@ -534,7 +534,7 @@ four(){
     <div>•	<strong>Deploy Frequency</strong>: You can schedule repeating operations here.</div>
     [Note]We currently only support importing data by either local file or database. For Free Trail, Basic, and Essential package, we currently only support importing data by local file.
     <div>•	<strong>Auto Disable if any issue occurs</strong>: Enabling this option sets the operation to terminate if it encounters any issues.</div>
-    
+
     <WayPoint
     onEnter={this.changeHash.bind(this,'4.2.3')}
         >
@@ -610,7 +610,7 @@ five(){
     <dd>–	Applicable to only numerical variables.</dd>
     <dd>–	For example, if a column has values [1, 6, 5, 8, 50] with a valid range of (3,10), then the outlier values [1] and [50] will be replaced with the value [6], giving us a resulting dataset of [6, 6, 5, 8, 6].</dd>
     </dl>
-    
+
     <strong>•	Delete the row</strong>
     <dl className={styles.pl1}>
         <dd>–	Remove the row that contains the outlier value.</dd>
@@ -703,7 +703,7 @@ five(){
     <dd>–	Applicable to only numerical variables</dd>
     <dd>–	For example, if a column has the following values [6, 5, 8], then all mismatched values will be replaced with the value 6.</dd>
     </dl>
-    
+
     <strong>•	Replace with 0</strong>
     <dl className={styles.pl1}>
         <dd>–	Replaces the missing values with 0.</dd>
@@ -736,7 +736,7 @@ six(){
     <dd> b.	Enter a unique name for your new variable.</dd>
     <dd> c.	Click on the field after the equal ("=") sign to open a dropdown menu listing all possible operations. You can perform the following operations on your existing numerical variables to create your new variable, except con() function where both numerical and categorical variables are supported:</dd>
     </dl>
-    
+
     <dl className={styles.pl1}>
         <dd>–	Replace mismatched values with the median of the remaining values in the column</dd>
     <dd>–	Applicable to only numerical variables</dd>
@@ -789,7 +789,7 @@ six(){
     <li>Regression</li>
     </ul>
     </dt>
-    
+
     <dd>
     <ul>
     <li>R2-solution-a</li>
@@ -797,7 +797,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>R2-solution-b</li>
@@ -805,7 +805,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>AdaBoost</li>
@@ -813,7 +813,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>ARD (Automatic Relevance Determination) Regression</li>
@@ -821,7 +821,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>NaiveBayes-Bernoulli</li>
@@ -829,7 +829,7 @@ six(){
     <li/>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>Bernoulli Naive Bayes</li>
@@ -837,7 +837,7 @@ six(){
     <li/>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>Decision Tree</li>
@@ -845,7 +845,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>Extra Trees</li>
@@ -853,7 +853,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>NaiveBayes-Gaussian</li>
@@ -861,7 +861,7 @@ six(){
     <li/>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>GP Regression</li>
@@ -869,7 +869,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>GBDT</li>
@@ -877,7 +877,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>KNN</li>
@@ -913,7 +913,7 @@ six(){
     <li/>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>Online Passive Aggressive</li>
@@ -921,7 +921,7 @@ six(){
     <li/>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>QDA</li>
@@ -929,7 +929,7 @@ six(){
     <li/>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>Random Forest</li>
@@ -937,7 +937,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>Linear Incremental Model</li>
@@ -952,7 +952,7 @@ six(){
     <li/>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>XGBoost</li>
@@ -960,7 +960,7 @@ six(){
     <li>✓</li>
     </ul>
     </dd>
-    
+
     <dd>
     <ul>
     <li>Ridge Regression</li>
@@ -1149,9 +1149,9 @@ eight(){
     <div>•	<strong>Selected Model</strong>: Your currently selected machine learning model. This is selected from the list of trained machine learning models displayed below.</div>
             •	<strong>Normalized RMSE (Normalized Root Mean Square Error)</strong>: This value will help you compare model performance: the smaller the Normalized RMSE, the better the model predicts data.
     <div>•	<strong>Goodness of Fit (R²)</strong>:  R² is a statistical measure of how close the regression line fits the given data. The higher the R² value is, the closer the model fits the data.</div>
-    
+
     {/*<div className={styles.pl1}>–	<strong>Variable Impact</strong>: Displays the impacts each variable in the model has on the predicted target variable. The higher this value is, the larger the effect a change in this variable has on the outcome predicted by the model.</div>*/}
-            
+
             •	<strong>Predicted v.s. Actual Plot (Sorted)</strong>: Shows how close the values predicted by your models are to actual values. You can change the number of data points shown by clicking on Edit under the chart.
     <div>•	<strong>Table of trained models</strong>: This section also shows a list of models that have been built with the training data. The listed models each have a:</div>
     <dl className={styles.pl1}>
