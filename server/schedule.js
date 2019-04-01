@@ -70,6 +70,12 @@ async function scheduleHandler() {
       api.upsertSchedule(schedule)
     }
 
+    if (deployment[`${schedule.type}Options`].autoDisable && schedule.status === 'issue') {
+      deployment.enable = false
+      api.updateDeployment(deployment)
+      return
+    }
+
     const cdo = deployment[`${schedule.type}Options`];
     const nextTime = generateNextScheduleTime(
       cdo.frequency,
@@ -77,11 +83,6 @@ async function scheduleHandler() {
       now - 1
     );
     if (!nextTime) return;
-    if (deployment[`${schedule.type}Options`].autoDisable && schedule.status === 'issue') {
-      deployment.enable = false
-      api.updateDeployment(deployment)
-      return
-    }
 
     const has = await hasNext(
       schedule.deploymentId,
