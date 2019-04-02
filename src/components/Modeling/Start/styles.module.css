@@ -268,7 +268,9 @@
 .tool {
   display: flex;
   flex: none;
-  height: 0.4em;
+  line-height: 0.4em;
+  overflow: hidden;
+  flex-wrap: wrap;
 }
 
 .toolSelect {
@@ -316,7 +318,6 @@
 }
 
 .toolButton span {
-  line-height: 1.2;
   font-family: SanFranciscoText;
   font-size: 1rem;
   color: #ffffff;
