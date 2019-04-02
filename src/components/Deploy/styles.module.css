@@ -1,5 +1,6 @@
 .home {
   composes: content from 'style';
+  overflow: auto;
 }
 
 .filter {

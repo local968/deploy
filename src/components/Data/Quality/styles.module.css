@@ -176,7 +176,7 @@
 	flex: 1 0;
 	padding-left: 0.5em;
 	flex-direction: column;
-	overflow: hidden;
+	/* overflow: hidden; */
 	border-top: 2px solid #979797;
 }
 
