@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Icon } from 'antd';
-import { observable, autorun } from 'mobx';
+import { Icon, Tooltip } from 'antd';
+import { observable } from 'mobx';
 import { Table } from 'components/Common';
+import dataIcon from './data.svg';
 
 @observer
 export default class Preview extends Component {
@@ -110,8 +111,10 @@ export default class Preview extends Component {
       [styles.active]: this.visiable
     })}>
       <div className={styles.icon} onClick={this.visiable ? this.hideTable : this.showTable}>
-        <Icon type="double-right" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />
-        {!this.visiable && <span >View Data Table</span>}
+        {<Tooltip title={`${this.visiable ? 'Close' : 'View'} Data Table`} mouseLeaveDelay={0}>
+          <img src={dataIcon} alt={"view"} />
+        </Tooltip>}
+        {/* {!this.visiable && <span >View Data Table</span>} */}
       </div>
       <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
