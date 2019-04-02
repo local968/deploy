@@ -5,6 +5,7 @@
     flex: auto;
     background-color: #e0e4e9;
     flex-direction: column;
+    min-height: 0;
 }
 
 .projects {
