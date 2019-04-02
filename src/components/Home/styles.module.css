@@ -13,6 +13,7 @@
     flex-wrap: wrap;
     flex-direction: row;
     overflow: auto;
+    min-height: 0;
 }
 
 .scrollY{
@@ -106,7 +107,7 @@
 }
 
 .time {
-    display: block; 
+    display: block;
     flex: auto;
     font-size: .75rem;
     text-overflow: ellipsis;
