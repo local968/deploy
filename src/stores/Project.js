@@ -230,7 +230,8 @@ export default class Project {
       nullFillMethodTemp: {},
       outlierFillMethodTemp: {},
       outlierDictTemp: {},
-      preImportanceLoading: false
+      preImportanceLoading: false,
+      cleanPath: ''
     }
   }
 
