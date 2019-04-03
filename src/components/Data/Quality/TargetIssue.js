@@ -229,7 +229,7 @@ export class DataIssue extends Component {
             {!!targetIssues.nullRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
                 <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {formatNumber(percent.missing, 2)}%</span></div>
-                <div className={classnames(styles.progress, styles.missing)} style={{ width: percent.missing < 1 ? 1 : percent.missing + "%" }}></div>
+                <div className={classnames(styles.progress, styles.missing)} style={{ width: ((typeof percent.missing === 'number') ? percent.missing : 1) + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
                 <span>Will be fixed</span>
@@ -238,7 +238,7 @@ export class DataIssue extends Component {
             {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
                 <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {formatNumber(percent.mismatch, 2)}%</span></div>
-                <div className={classnames(styles.progress, styles.mismatch)} style={{ width: percent.mismatch < 1 ? 1 : percent.mismatch + "%" }}></div>
+                <div className={classnames(styles.progress, styles.mismatch)} style={{ width: ((typeof percent.mismatch === 'number') ? percent.mismatch : 1) + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
                 <span>Will be fixed</span>
@@ -247,7 +247,7 @@ export class DataIssue extends Component {
             {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
                 <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {formatNumber(percent.outlier, 2)}%</span></div>
-                <div className={classnames(styles.progress, styles.outlier)} style={{ width: percent.outlier < 1 ? 1 : percent.outlier + "%" }}></div>
+                <div className={classnames(styles.progress, styles.outlier)} style={{ width: ((typeof percent.outlier === 'number') ? percent.outlier : 1) + "%" }}></div>
               </div>
               {/* <div className={styles.right}>
                 <span>Will be ignore</span>
