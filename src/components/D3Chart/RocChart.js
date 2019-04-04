@@ -21,6 +21,9 @@ function parseData(chartData) {
 @inject('projectStore')
 @observer
 export default class RocChart extends Component {
+  constructor(props) {
+    super(props);
+  }
   state = {
     movable: false,
     options: this.props.compareChart && this.props.models.map(m => m.name),
@@ -28,11 +31,6 @@ export default class RocChart extends Component {
   static defaultProps = {
     isFocus: true,
     compareChart: false
-  }
-  
-  constructor(props){
-    super(props)
-    this.renderD3 = this.renderD3.bind(this);
   }
 
   componentDidMount() {
@@ -145,7 +143,7 @@ export default class RocChart extends Component {
     if (fitIndex) { }
 
     return (
-      <div className={`${styles.chart} ${this.props.className}`}>
+      <div className={styles.chart + ' ' +this.props.className}>
         {compareChart && <div className={styles.checkbox} >
           {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{ color: d3ColorsCategory20[i] }} key={o} >{o}</Checkbox>)}
         </div>}
@@ -225,21 +223,20 @@ export default class RocChart extends Component {
 
       focus.append('circle')
         .attr('r', 4.5);
-
-      const _this = this;
+    
       svg.append('rect')
         .attr('class', styles.overlay)
         .attr('width', width)
         .attr('height', height)
-        .on('mousedown', function () {
-          _this.setState({ movable: true });
+        .on('mousedown',  ()=> {
+          this.setState({ movable: true });
         })
-        .on('mousemove', function () {
-          if (!_this.state.movable) return;
-          _this.drawFocus(this, x, y, data, focus);
+        .on('mousemove',  ()=> {
+          if (!this.state.movable) return;
+          this.drawFocus(this, x, y, data, focus);
         })
-        .on('mouseup', function () {
-          _this.setState({ movable: false });
+        .on('mouseup',  ()=> {
+          this.setState({ movable: false });
         });
     }
   }
