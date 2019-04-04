@@ -23,6 +23,11 @@ export default class PRChart extends Component {
   static defaultProps = {
     isFocus: false,
     compareChart: false
+  };
+  
+  constructor(props) {
+    super(props);
+    this.renderD3 = this.renderD3.bind(this);
   }
 
   state = {

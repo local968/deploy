@@ -24,7 +24,8 @@ export default class AreaChart extends Component {
 
   constructor(props) {
     super(props);
-    this.newSort = this.newSort.bind(this)
+    this.newSort = this.newSort.bind(this);
+    this.renderD3 = this.renderD3.bind(this);
   }
 
   componentDidMount() {

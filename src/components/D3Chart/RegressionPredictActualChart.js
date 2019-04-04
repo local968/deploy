@@ -11,6 +11,7 @@ export default class RegressionPredictActualChart extends Component {
   constructor(props) {
     super(props);
     this.regressionPredictActualChart = React.createRef();
+    this.renderD3 = this.renderD3.bind(this);
   }
 
   componentDidMount() {

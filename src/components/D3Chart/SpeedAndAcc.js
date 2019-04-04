@@ -12,6 +12,12 @@ export default class SpeedAndAcc extends Component {
   state = {
     options: this.props.models.map(m => m.name),
   }
+  
+  constructor(props) {
+    super(props);
+    this.renderD3 = this.renderD3.bind(this);
+  }
+  
   componentDidMount () {
     this.renderD3();
   }
