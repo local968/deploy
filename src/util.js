@@ -16,19 +16,22 @@ const formatNumber = (str, n = 3, f = false) => {
     return prev + curr
   }, '')
   if (n > 0) {
-    let _d
-    if (f) {
-      let a = Array.from(d || '')
-      if (a.length >= n) {
-        a.length = n
-      } else {
-        a = [...a, ...new Array(n - a.length).fill('0')]
-      }
-      _d = '.' + a.join('')
+    let a = Array.from(d || '')
+    if (a.length >= n) {
+      a.length = n
     } else {
-      _d = d ? '.' + d.slice(0, n) : ''
+      a = [...a, ...new Array(n - a.length).fill('0')]
     }
-    s += _d
+    if (!f) {
+      let i = a.length
+      for (; i > -1; i--) {
+        if (i === 0) break
+        if (a[i - 1] !== '0') break
+      }
+      a = a.slice(0, i)
+    }
+    const _d = a.join('')
+    s += _d ? "." + _d : ""
   }
   const m = parseFloat(s)
   const isZero = m === -m
