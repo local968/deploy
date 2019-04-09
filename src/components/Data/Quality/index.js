@@ -233,7 +233,7 @@ class VariableIssue extends Component {
   showSummary = () => {
     const { project } = this.props
     if (!project.qualityHasChanged) return this.summary = true
-    if (!!project.models.length) return this.warning = true
+    if (project.train2ing || !!project.models.length) return this.warning = true
     this.onConfirm()
   }
 

@@ -33,7 +33,7 @@ export default class DataSchema extends Component {
       data.outlierFillMethodTemp = { [target]: 'drop' }
     }
     project.setProperty(data)
-    if (!!project.models.length) return this.visiable = true
+    if (project.train2ing || !!project.models.length) return this.visiable = true
     this.onConfirm()
   }
 

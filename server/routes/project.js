@@ -2,7 +2,8 @@ const { redis } = require('redis')
 const wss = require('../webSocket')
 const uuid = require('uuid')
 const moment = require('moment')
-const command = require('../command')
+// const command = require('../command')
+const mq = require('../amqp')
 
 const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
 
@@ -274,9 +275,9 @@ const checkTraningRestriction = (user) => {
 }
 
 function sendToCommand(data, progress) {
-  return command(data, (result) => {
+  return mq(data, (result) => {
     return (result.status < 0 || result.status === 100) ? result : progress(result)
-  })
+  }, null)
 }
 
 function getFileInfo(files) {
@@ -366,7 +367,7 @@ wss.register("addProject", async (message, socket) => {
     error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
   }
   const id = await redis.incr("node:project:count")
-  const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id })
+  const { result } = await mq({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
   return createOrUpdate(id, userId, { id, userId, host: result.host }, true)
 })
 
@@ -493,7 +494,7 @@ wss.register('etl', (message, socket, progress) => {
       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation')
       if (!ext) Reflect.deleteProperty(data, 'ext')
       return createOrUpdate(id, userId, { etling: true, stopId: requestId })
-        .then(() => command(data, processData => {
+        .then(() => mq(data, processData => {
           let { result, status } = processData;
           if (status < 0 || status === 100) return processData
           const { name, path, key, originHeader, value, fields } = result
@@ -501,7 +502,7 @@ wss.register('etl', (message, socket, progress) => {
           if (name === "csvHeader") createOrUpdate(id, userId, { originPath: path, rawHeader: originHeader, cleanHeader: fields, dataHeader: fields })
           if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
           return null
-        }).then(returnValue => {
+        }, true).then(returnValue => {
           let { result, status } = returnValue;
           if (status < 0) {
             return createOrUpdate(id, userId, { etlProgress: 0, etling: false }).then(() => {
@@ -582,8 +583,8 @@ wss.register('abortEtl', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
-    return command({ ...message, userId, requestId: message._id, stopId }).then(() => {
-      command.clearListener(stopId)
+    return mq({ ...message, userId, requestId: message._id, stopId }, null, true).then(() => {
+      mq.clearListener(stopId)
       const statusData = {
         etling: false,
         etlProgress: 0,
@@ -596,7 +597,7 @@ wss.register('abortEtl', (message, socket) => {
 
 wss.register('dataView', (message, socket, progress) => {
   return createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: true })
-    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+    .then(() => mq({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
       const { status, result } = progressResult
       if (status === 1) {
@@ -609,7 +610,7 @@ wss.register('dataView', (message, socket, progress) => {
       }
       if (status < 0 || status === 100) return progressResult
       return null
-    }).then(async returnValue => {
+    }, true).then(async returnValue => {
       const { status, result } = returnValue
       if (status === 100) {
         const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
@@ -639,7 +640,7 @@ wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(
 
 wss.register('preTrainImportance', (message, socket, progress) =>
   createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
-    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+    .then(() => mq({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
       const { status, result } = progressResult
       if (status === 1) {
@@ -652,7 +653,7 @@ wss.register('preTrainImportance', (message, socket, progress) =>
       }
       if (status < 0 || status === 100) return progressResult
       return null
-    })
+    }, true)
       // .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
       .then(returnValue => {
         const { status, result } = returnValue
@@ -678,7 +679,7 @@ wss.register('histgramPlot', (message, socket, progress) => {
     return start
   }, {})
   return updateProjectField(id, userId, "histgramPlots", histgramPlots)
-    .then(() => command({ ...message, userId, requestId }, progressResult => {
+    .then(() => mq({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "histgramPlots", histgramPlots)
         return progressResult
@@ -688,7 +689,7 @@ wss.register('histgramPlot', (message, socket, progress) => {
       if (status && status === "start") return
       if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
       return progress(progressResult)
-    }))
+    }, true))
 })
 
 wss.register('rawHistgramPlot', (message, socket, progress) => {
@@ -699,7 +700,7 @@ wss.register('rawHistgramPlot', (message, socket, progress) => {
     return start
   }, {})
   return updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
-    .then(() => command({ ...message, userId, requestId }, progressResult => {
+    .then(() => mq({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
         return progressResult
@@ -709,7 +710,7 @@ wss.register('rawHistgramPlot', (message, socket, progress) => {
       if (status && status === "start") return
       if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
       return progress(progressResult)
-    }))
+    }, true))
 })
 
 wss.register('univariatePlot', (message, socket, progress) => {
@@ -720,7 +721,7 @@ wss.register('univariatePlot', (message, socket, progress) => {
     return start
   }, {})
   return updateProjectField(id, userId, "univariatePlots", univariatePlots)
-    .then(() => command({ ...message, userId, requestId }, progressResult => {
+    .then(() => mq({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "univariatePlots", univariatePlots)
         return progressResult
@@ -730,7 +731,7 @@ wss.register('univariatePlot', (message, socket, progress) => {
       if (status === "start") return
       if (univariatePlots.hasOwnProperty(field)) univariatePlots[field] = imageSavePath
       return progress(progressResult)
-    }))
+    }, true))
 })
 
 const _sendToCommand = (message, socket, progress) => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
@@ -766,8 +767,8 @@ wss.register('abortTrain', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
-    return command({ ...message, userId, requestId, stopId }, () => {
-      command.clearListener(stopId)
+    return mq({ ...message, userId, requestId, stopId }, () => {
+      mq.clearListener(stopId)
       const statusData = {
         train2Finished: true,
         train2ing: false,
@@ -782,7 +783,7 @@ wss.register('abortTrain', (message, socket) => {
         statusData.subStepActive = 1
       }
       return createOrUpdate(projectId, userId, statusData)
-    })
+    }, true)
   })
 })
 
@@ -797,11 +798,12 @@ wss.register('train', async (message, socket, progress) => {
   try {
     await checkTraningRestriction(user)
     await createOrUpdate(projectId, userId, { ...updateData, stopId: requestId })
-    const isAbort = await command({ ...data, stopId: requestId }, async queueValue => {
+    const isAbort = await mq({ ...data, stopId: requestId }, async queueValue => {
       const stopId = await getProjectField(projectId, 'stopId')
       const { status, result, requestId: trainId } = queueValue;
       if (status < 0 || status === 100) return 1;
       if (stopId !== trainId) return 2
+      if (!result) return
       let processValue
       if (result.name === "progress") {
         // const { requestId: trainId } = result;
@@ -833,7 +835,7 @@ wss.register('train', async (message, socket, progress) => {
         // return progress(model)
       }
       return progress(processValue)
-    })
+    }, true)
     if (isAbort === 2) return { status: 200, msg: 'ok' }
     const statusData = {
       train2Finished: true,
@@ -961,7 +963,7 @@ wss.register("permutationImportance", (message, socket) => {
   const { userId } = socket.session
   const { projectId, id: mid, command: commandText, _id: requestId } = message
   return updateModel(userId, projectId, mid, { importanceLoading: true })
-    .then(() => command({
+    .then(() => mq({
       command: commandText,
       projectId,
       solution: mid,
@@ -973,7 +975,7 @@ wss.register("permutationImportance", (message, socket) => {
       const { name, model, featureImportanceDetail } = result
       if (name === 'progress') return
       if (model === mid) return updateModel(userId, projectId, mid, { featureImportanceDetail, importanceLoading: false })
-    }))
+    }, true))
 })
 
 function mapObjectToArray(obj) {

@@ -209,7 +209,7 @@ export default class DataConnect extends Component {
     const { project } = this.props.projectStore
     if(this.uploading || project.etling) return
     this.key = key
-    if (!!((project || {}).models || []).length) return this.visiable = true
+    if ((project || {}).train2ing || !!((project || {}).models || []).length) return this.visiable = true
     this.onConfirm()
   }
 

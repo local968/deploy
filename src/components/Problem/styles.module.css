@@ -20,7 +20,6 @@
 .text {
     margin: 0.2em 0;
     display: flex;
-    width: 1.6em;
 }
 
 .text span {

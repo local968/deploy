@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { withRouter } from 'react-router';
-import Route, { LoginRouter } from 'components/App/Route';
+import Route from 'components/App/Route';
+
+import LoginRouter from 'components/App/LoginRoute';
 import styles from './styles.module.css';
 import { Spin } from 'antd';
 
