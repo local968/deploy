@@ -15,7 +15,8 @@ const selectable = [
 ];
 
 const Unsupervised = [
-  { value: 'Clustering', type: 'Clustering', detail: (<p>a grouping of a number of similar things.</p>) },
+  { value: 'Clustering', type: 'Clustering', detail: null },
+  { value: 'Outlier', type: 'Outlier Detection', detail: null }
 ];
 
 interface ProblemProps {
@@ -90,7 +91,7 @@ function Problem(props: ProblemProps) {
         {Unsupervised.map((content, index) => (
           <Radio key={index} value={content.value}>
             {content.type}
-            <Hint content={content.detail} placement="right" />
+            {!!content.detail && <Hint content={content.detail} placement="right" />}
           </Radio>
         ))}
       </RadioGroup>

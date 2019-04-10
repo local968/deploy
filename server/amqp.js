@@ -1,34 +1,39 @@
 const amqp = require('amqplib')
-const uuid = require('uuid')
 const command = require('./command')
+const config = require('config')
 
-const pubEx = 'r2_req'
-const subEx = 'r2_res'
-const pubRouting = '.request'
-const subRouting = '.result'
-const subQueue = 'r2_sub'
+const pubEx = config.PUBEX || 'r2ai_req'
+const pubRouting = config.PUBROUTE || '.r2.request'
 
-const fakerQueue = 'r2_faker'
+const subEx = config.SUBEX || 'r2ai_res'
+const subRouting = config.SUBROUTE || '.r2.result'
+const subQueue = config.SUBQUEUE || 'r2ai_sub'
+
+const fakerQueue = 'r2ai_faker'
 const fakerRouting = '.faker'
-const fakerEx = 'r2_faker'
+const fakerEx = 'r2ai_faker'
 
 const FINISH = 1
 const SEND = 2
 
-const mq = async (command, callback, faker = false) => {
+const mq = async (data, callback, faker = false) => {
   try {
-    const conn = await amqp.connect('amqp://localhost')
     console.log("mq connect")
+    const conn = await amqp.connect('amqp://localhost')
 
+    console.log("init server")
     const server = faker ? await initServer(conn) : { close: () => { } }
+    console.log("init client")
     const client = await initClient(conn, faker)
-    return client.send(command, callback).then(result => {
+
+    return client.send(data, callback).then(result => {
       client.close()
       server.close()
       console.log(result, "result")
       return result
     })
   } catch (e) {
+    console.log({ ...e })
     const error = {
       status: -99,
       message: e.message
@@ -55,9 +60,18 @@ initClient = async (conn, faker) => {
     console.log("client close")
   })
 
+  ch.on("error", (err) => {
+    console.log(err, "client error")
+  })
+
   const send = (msg, callback) => {
     const corr = msg.requestId
+    console.log("send")
     return new Promise(resolve => {
+      const done = (data) => {
+        command.clearListener(corr)
+        resolve(data)
+      }
       ch.consume(subQueue, async msg => {
         if (!msg) return
         console.log("client consume");
@@ -70,9 +84,9 @@ initClient = async (conn, faker) => {
           try {
             data = JSON.parse(data)
           } catch (e) { }
-          if (!callback) return resolve(data)
+          if (!callback) return done(data)
           const result = await callback(data)
-          if (result) return resolve(result)
+          if (result) return done(result)
         }
       }, { noAck: true })
       ch.publish(ex, '*' + routing, Buffer.from(JSON.stringify(msg)), { correlationId: corr })
@@ -102,8 +116,12 @@ initServer = async (conn) => {
     console.log("server close")
   })
 
+  ch.on("error", (err) => {
+    console.log(err, "server error")
+  })
+
   ch.consume(fakerQueue, msg => {
-    if(!msg) return
+    if (!msg) return
     console.log("server consume")
     const { content, properties: { correlationId } } = msg
     const fakerCallback = (msg) => {
@@ -114,7 +132,7 @@ initServer = async (conn) => {
     try {
       data = JSON.parse(data)
     } catch (e) { }
-    console.log(data, "send to command!!!!")
+    console.log(data, fakerCallback, "send to command!!!!")
     command(data, fakerCallback)
     // ch.ack(msg)
   }, { noAck: true })
@@ -136,6 +154,7 @@ clearListener = async requestId => {
     const conn = await amqp.connect('amqp://localhost')
     const server = await initServer(conn)
     server.send(requestId)
+    command.clearListener(requestId)
   } catch (e) {
     return
   }
