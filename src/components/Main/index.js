@@ -10,6 +10,9 @@ import { ProcessLoading, Confirm } from 'components/Common';
 import { message } from 'antd';
 import styles from './styles.module.css';
 
+import Info from 'components/Info';
+import Train from 'components/Train';
+
 @inject('userStore', 'projectStore', 'routing')
 @observer
 export default class Main extends Component {
@@ -30,20 +33,22 @@ export default class Main extends Component {
         }
         this.autorun = autorun(() => {
           const { projectStore: { project }, routing } = this.props;
-          if(!project) return
-          const { curStep, id } = project || {};
+          if (!project) return
+          const { curStep, id, problemType } = project || {};
           if (curStep === this.step) return
           this.step = curStep
+          const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType)
+          console.log(isUnsupervised, problemType)
           let url = ''
           switch (curStep) {
             case 1:
               url = `/project/${id}/problem`
               break
             case 2:
-              url = `/project/${id}/data`
+              url = `/project/${id}/${isUnsupervised ? 'info' : 'data'}`
               break
             case 3:
-              url = `/project/${id}/modeling`
+              url = `/project/${id}/${isUnsupervised ? 'train' : 'modeling'}`
               break
             case 0:
               url = `/project/${id}/project`
@@ -100,6 +105,8 @@ export default class Main extends Component {
         <Route path="/project/:id/data" component={Data} />
         <Route path="/project/:id/modeling" component={Modeling} />
         <Route path="/project/:id/project" component={Project} />
+        <Route path="/project/:id/info" component={Info} />
+        <Route path="/project/:id/train" component={Train} />
       </Switch>}
       {<Confirm
         width="6em"

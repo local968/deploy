@@ -1,0 +1,236 @@
+.advancedModelResult {
+  margin-top: 40px;
+    font-size: 1rem;
+  }
+  .advancedModelResult .modelResult {
+    display: inline-block;
+    padding-bottom: 1.2em;
+  }
+  .advancedModelResult .modelResult .status {
+    color: #f5a623;
+    display: inline-block;
+  }
+  .advancedModelResult .modelComp {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: auto;
+  }
+  .advancedModelTable {
+    font-size: 0.875rem;
+    /* border: 0.5px solid #d8d8d8; */
+    position: relative;
+    max-height: 50vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+  .advancedModelTable::-webkit-scrollbar{
+    width: 17px;
+  }
+  .advancedModelTable::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 5px;
+  }
+  .advancedModelTable::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    border-radius: 0;
+  }
+  .advancedModelTable :global(.ant-radio-wrapper) {
+    vertical-align: middle;
+  }
+  .advancedModelTable .modelName {
+    display: inline-block;
+    width: 80%;
+    font-size: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+  .adrow {
+    display: flex;
+    cursor: pointer;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+  }
+
+  .tableHeader {
+    margin-right: 17px;
+  }
+
+  .adrow .adcell {
+    padding: 0.2em;
+    border: 0.5px solid #d8d8d8;
+    height: 3em;
+    flex: 1;
+    padding: 0 0.5em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 3em;
+  }
+  .adrow .adcell:first-child {
+    flex: 0 0 400px;
+  }
+  .button {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    padding: 1em;
+    margin-left: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  .detailCurves {
+    display: flex;
+  }
+  .detailCurves .rightPanel {
+    flex: 1;
+  }
+  .detailCurves .rightPanel .plot {
+    display: flex;
+    padding: 1em;
+  }
+  .detailCurves .rightPanel .plot img {
+    width: 400px;
+    height: 300px;
+  }
+  .detailCurves .leftPanel {
+    min-width: 300px;
+    padding: 0.5em 3em;
+    background-color: #f0f0f0;
+    min-height: 200px;
+  }
+  .detailCurves .leftPanel .thumbnails {
+    display: flex;
+  }
+.detailCurves .leftPanel .thumbnails img{
+  width: 52px;
+}
+.detailCurves .leftPanel .thumbnails .thumbnail {
+    flex-basis: 200px;
+    text-align: center;
+  }
+  .detailCurves .leftPanel button {
+    margin-right: 0.2em;
+  }
+  .detailCurves .leftPanel .predictTable {
+    background-color: white;
+    margin: 1em 0;
+  }
+  .detailCurves .leftPanel .predictTable th,
+  .detailCurves .leftPanel .predictTable td {
+    padding: 0 8px !important;
+  }
+  .detailCurves .leftPanel .predictTable :global(.ant-table-tbody) :global(.ant-table-row):first-child td:nth-of-type(1),
+  .detailCurves .leftPanel .predictTable :global(.ant-table-tbody) :global(.ant-table-row):nth-of-type(2) td:nth-of-type(1) {
+    background-color: #eaeff5;
+  }
+  .detailCurves .leftPanel .predictTable :global(.ant-table-thead) th {
+    background-color: white;
+  }
+  .detailCurves .leftPanel .predictTable :global(.ant-table-thead) th:nth-of-type(2),
+  .detailCurves .leftPanel .predictTable :global(.ant-table-thead) th:nth-of-type(3) {
+    background-color: #edfddb;
+  }
+  .detailCurves .leftPanel .predictTable tr td {
+    white-space: nowrap;
+  }
+  .residualDiagnose {
+    padding-bottom: 0.5em;
+  }
+  .residualDiagnose .plot {
+    display: inline-block;
+    width: 30%;
+  }
+  .residualDiagnose .choosePlot {
+    display: inline-block;
+    width: 70%;
+    vertical-align: top;
+  }
+  .residualDiagnose .choosePlot .radioWrapper {
+    display: inline-block;
+    margin: 0.1em;
+  }
+  .diagnoseResult {
+    display: inline-block;
+    width: 500px;
+    vertical-align: top;
+    margin-top: 1em;
+  }
+  .diagnoseResult .content {
+    margin-top: 1em;
+  }
+  .diagnoseResult .content .items {
+    margin-left: 2em;
+    list-style-type: initial;
+  }
+  .diagnoseResult .content .action {
+    margin-top: 2em;
+  }
+  .diagnoseResult .content .action span {
+    display: inline-block;
+    width: 250px;
+  }
+  .diagnoseResult .content .action button {
+    width: 205px;
+    float: right;
+  }
+  .diagnoseResult .header {
+    font-weight: bold;
+  }
+  .settings {
+    display: flex;
+    align-items: center;
+  }
+  .settings .label {
+    font-size: 1rem;
+    margin-right: 1rem;
+  }
+  .middle :global(.ant-select-arrow) {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .comparison {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    padding: .8rem 2rem;
+  }
+  .comparison:hover {
+    color: white;
+  }
+  .middle {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+  .settingsSelect {
+    min-width: 14rem;
+  }
+  .adrow :global(.anticon-up) {
+    transition: transform .3s ease;
+    margin-left: .2rem;
+  }
+  .metricSelection {
+    display: flex;
+    text-align: right;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+  .metricSelection .text {
+    line-height: 38px;
+    margin-right: 1rem;
+  }
+  .headerLabel {
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: bottom;
+  }

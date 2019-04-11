@@ -1,0 +1,7 @@
+.modeling {
+    display: flex;
+    flex: auto;
+    background-color: #fff;
+    overflow: auto;
+    position: relative;
+}

@@ -681,6 +681,7 @@ export default class Project {
     return obj
   }
 
+  @computed
   get variableIssueCount() {
     const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target } = this
     const nullCount = Object.values(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
