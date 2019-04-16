@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable } from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon, Table } from 'antd';
+import { Spin, Popover, message as antdMessage, Icon, Table, InputNumber } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
@@ -20,9 +20,7 @@ export default class SimplifiedView extends Component {
   @observable visible = false
 
   componentDidMount() {
-    this.props.project.dataView().then(() => {
-      this.props.project.preTrainImportance()
-    })
+    this.props.project.dataView()
   }
 
   getCorrelationMatrix = () => {
@@ -71,9 +69,7 @@ export default class SimplifiedView extends Component {
   }
 
   reloadTable = () => {
-    this.props.project.dataView().then(() => {
-      this.props.project.preTrainImportance()
-    })
+    this.props.project.dataView()
   }
 
   handleChange = e => {
@@ -94,6 +90,16 @@ export default class SimplifiedView extends Component {
     project.trainHeader = [...dataHeader, ...newVariable].filter(v => !filterList.includes(v) && v !== target)
   }
 
+  handleWeight = key => value => {
+    const { project } = this.props
+    project.setProperty({
+      weights: {
+        ...project.weights,
+        [key]: value
+      }
+    })
+  }
+
   renderCell = (value, isNA) => {
     if (isNA) return 'N/A'
     if (isNaN(parseFloat(value))) return value || 'N/A'
@@ -102,61 +108,27 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
-    const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
-    const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
-    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
+    const { colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
-      <div className={styles.targetTable}>
-        <div className={styles.targetHead}>
-          <div className={classnames(styles.targetCell, styles.targetName)}><span>Target Variable</span></div>
-          <div className={styles.targetCell}><span>Histogram</span></div>
-          <div className={styles.targetCell}><span>Data Type</span></div>
-          <div className={styles.targetCell}><span>Mean</span></div>
-          <div className={styles.targetCell}><span>Unique Value</span></div>
-          <div className={styles.targetCell}><span>Min</span></div>
-          <div className={styles.targetCell}><span>Max</span></div>
+      <div className={styles.chooseScan}>
+        <div className={styles.chooseLabel}><span>Choose a Variable Scaling Method:</span></div>
+        <div className={styles.chooseBox}>
+          <input type='radio' name='scan' value='minMax' id='minMax' />
+          <label htmlFor='minMax'>min_max_scale</label>
         </div>
-        <div className={styles.targetRow}>
-          <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
-          <div className={styles.targetCell} onClick={this.show}>
-            <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-            {<Popover placement='bottomLeft'
-              visible={this.showHistograms}
-              onVisibleChange={this.hide}
-              trigger="click"
-              content={<SimplifiedViewPlot onClose={this.hide}
-                type='histogram'
-                getPath={project.histgramPlot.bind(null, target)}
-                path={histgramPlots[target]}
-                id={id}
-                fetch={project.histgramPlots.hasOwnProperty(target)}
-              />} />}
-          </div>
-          <div className={styles.targetCell}><span>{colType[target]}</span></div>
-          <div className={classnames(styles.targetCell, {
-            [styles.none]: colType[target] === 'Categorical'
-          })} title={this.renderCell(targetData.mean, colType[target] === 'Categorical')}>
-            <span>{this.renderCell(targetData.mean, colType[target] === 'Categorical')}</span>
-          </div>
-          <div className={classnames(styles.targetCell, {
-            [styles.none]: colType[target] !== 'Categorical'
-          })}><span>{targetUnique}</span></div>
-          <div className={classnames(styles.targetCell, {
-            [styles.none]: colType[target] === 'Categorical'
-          })} title={this.renderCell(targetData.min, colType[target] === 'Categorical')}>
-            <span>{this.renderCell(targetData.min, colType[target] === 'Categorical')}</span>
-          </div>
-          <div className={classnames(styles.targetCell, {
-            [styles.none]: colType[target] === 'Categorical'
-          })} title={this.renderCell(targetData.max, colType[target] === 'Categorical')}>
-            <span>{this.renderCell(targetData.max, colType[target] === 'Categorical')}</span>
-          </div>
+        <div className={styles.chooseBox}>
+          <input type='radio' name='scan' value='standard' id='standard' />
+          <label htmlFor='standard'>standard_scale</label>
+        </div>
+        <div className={styles.chooseBox}>
+          <input type='radio' name='scan' value='robust' id='robust' />
+          <label htmlFor='robust'>robust_scale</label>
         </div>
       </div>
       <div className={styles.simplifiedText}><span>You can use check box to create your own variable list.</span></div>
@@ -174,7 +146,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>Create a New Variable</span>
           </div>
-          <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} expression={expression} />
+          <CreateNewVariable dataHeader={dataHeader} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} expression={expression} />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
@@ -196,14 +168,8 @@ export default class SimplifiedView extends Component {
         <div className={styles.tableHeader}>
           <div className={classnames(styles.tableTh, styles.tableCheck)}></div>
           <div className={styles.tableTh}><span>Name</span></div>
+          <div className={styles.tableTh}><span>Weight</span></div>
           <div className={styles.tableTh}><span>Histogram</span></div>
-          <div className={styles.tableTh}><span>Univariant Plot</span></div>
-          <div className={classnames(styles.tableTh, styles.tableImportance)}>
-            <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
-            <span>Importance</span>
-            <div className={styles.tableReload} onClick={this.reloadTable}><span><Icon type="reload" theme="outlined" /></span></div>
-            <Hint themeStyle={{ fontSize: '1rem' }} content='The following column reflects the importance of the predictor to the target variable.' />
-          </div>
           <div className={styles.tableTh}><span>Data Type</span></div>
           <div className={styles.tableTh}><span>Unique Value</span></div>
           <div className={styles.tableTh}><span>Mean</span></div>
@@ -212,23 +178,19 @@ export default class SimplifiedView extends Component {
           <div className={styles.tableTh}><span>Min</span></div>
           <div className={styles.tableTh}><span>Max</span></div>
         </div>
-        {(dataViewsLoading || preImportanceLoading) ?
+        {(dataViewsLoading) ?
           <div className={styles.tableLoading}>
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.sort((a, b) => {
-              return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
-            }).map((h, i) => {
-              if (h === target) return null;
+            {allVariables.map((h, i) => {
               const data = dataViews ? (dataViews[h] || {}) : {}
               const map = targetMap || {};
-              const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} handleWeight={this.handleWeight(h)} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
             })}
           </div>}
       </div>
-      {(dataViewsLoading || preImportanceLoading) && <ProcessLoading progress={dataViewsLoading ? (dataViewProgress / 2) : (importanceProgress / 2 + 50)} style={{ bottom: '0.25em' }} />}
+      {(dataViewsLoading) && <ProcessLoading progress={dataViewsLoading ? (dataViewProgress / 2) : (importanceProgress / 2 + 50)} style={{ bottom: '0.25em' }} />}
     </div>
   }
 }
@@ -242,18 +204,9 @@ class SimplifiedViewRow extends Component {
     this.histograms = true
   }
 
-  showUnivariant = () => {
-    this.univariant = true
-  }
-
   hideHistograms = e => {
     e && e.stopPropagation();
     this.histograms = false
-  }
-
-  hideUnivariant = e => {
-    e && e.stopPropagation();
-    this.univariant = false
   }
 
   renderCell = (value, isNA) => {
@@ -263,13 +216,16 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
+    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
+      <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
+        <InputNumber value={weight || 1} max={99.99} min={0.01} step={0.1} precision={2} onChange={handleWeight} />
+      </div>
       <div className={styles.tableTd} onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
@@ -283,25 +239,6 @@ class SimplifiedViewRow extends Component {
             id={id}
             fetch={project.histgramPlots.hasOwnProperty(value)}
           />} />}
-      </div>
-      <div className={styles.tableTd} onClick={this.showUnivariant}>
-        <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
-        {this.univariant && <Popover placement='topLeft'
-          visible={this.univariant}
-          onVisibleChange={this.hideUnivariant}
-          trigger="click"
-          content={<SimplifiedViewPlot onClose={this.hideUnivariant}
-            type='univariate'
-            getPath={project.univariatePlot.bind(null, value)}
-            path={project.univariatePlots[value]}
-            id={id}
-            fetch={project.univariatePlots.hasOwnProperty(value)}
-          />} />}
-      </div>
-      <div className={classnames(styles.tableTd, styles.tableImportance)}>
-        <div className={styles.preImpotance}>
-          <div className={styles.preImpotanceActive} style={{ width: (importance * 100) + '%' }}></div>
-        </div>
       </div>
       <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
       <div className={classnames(styles.tableTd, {

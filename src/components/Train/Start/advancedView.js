@@ -230,88 +230,87 @@ export default class AdvancedView extends Component {
         </div>
       </div>
       <div className={styles.advancedRow}>
-        <div className={styles.advancedLeft}>
-          <div className={styles.advancedBlock}>
-            <div className={classnames(styles.advancedTitle, styles.limit)}>
-              <span>Select Algorithm:</span>
+        <div className={styles.advancedBlock}>
+          <div className={classnames(styles.advancedTitle, styles.limit)}>
+            <span>Select Algorithm:</span>
+          </div>
+          <div className={styles.advancedOption}>
+            <div className={styles.advancedOptionBox}>
+              <input id="algorithmSelect1" type='radio' name="algorithmSelect" defaultChecked={algorithms.length} onClick={this.handleSelectAll.bind(null, true)} />
+              <label htmlFor="algorithmSelect1">Select All</label>
             </div>
-            <div className={styles.advancedOption}>
-              <div className={styles.advancedOptionBox}>
-                <input id="algorithmSelect1" type='radio' name="algorithmSelect" defaultChecked={algorithms.length} onClick={this.handleSelectAll.bind(null, true)} />
-                <label htmlFor="algorithmSelect1">Select All</label>
-              </div>
-              <div className={styles.advancedOptionBox}>
-                <input id="algorithmSelect2" type='radio' name="algorithmSelect" defaultChecked={!algorithms.length} onClick={this.handleSelectAll.bind(null, false)} />
-                <label htmlFor="algorithmSelect2">Deselect all</label>
-              </div>
+            <div className={styles.advancedOptionBox}>
+              <input id="algorithmSelect2" type='radio' name="algorithmSelect" defaultChecked={!algorithms.length} onClick={this.handleSelectAll.bind(null, false)} />
+              <label htmlFor="algorithmSelect2">Deselect all</label>
             </div>
           </div>
-          <div className={styles.advancedBlock}>
-            <div className={styles.advancedAlgorithmList}>
-              {/* <Tooltip
+        </div>
+        <div className={styles.advancedBlock}>
+          <div className={styles.advancedAlgorithmList}>
+            {/* <Tooltip
                 title={<span className={styles.crossWarning}>
                   R2-solution-a & b are mandatory modelling algorithms for Advanced Modelling.
                   </span>}
                 mouseLeaveDelay={0}
                 overlayStyle={{ maxWidth: '100%' }}> */}
-                <div className={styles.advancedSolution}>
-                  <div className={styles.advancedAlgorithm} key={'solution-a'}>
-                    {/* <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} /> */}
-                    <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
-                    <label htmlFor={'R2-solution-a'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-a</label>
-                  </div>
-                  {/* </Tooltip>
+            <div className={styles.advancedSolution}>
+              <div className={styles.advancedAlgorithm} key={'solution-a'}>
+                {/* <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} /> */}
+                <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
+                <label htmlFor={'R2-solution-a'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-a</label>
+              </div>
+              {/* </Tooltip>
               <Tooltip
                 title={<span className={styles.crossWarning}>
                   R2-solution-a & b are mandatory modelling algorithms for Advanced Modelling.
                   </span>}
                 mouseLeaveDelay={0}
                 overlayStyle={{ maxWidth: '100%' }}> */}
-                  <div className={styles.advancedAlgorithm} key={'solution-b'}>
-                    {/* <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} /> */}
-                    <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
-                    <label htmlFor={'R2-solution-b'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-b</label>
-                  </div>
-                </div>
-              {/* </Tooltip> */}
-              {Algorithms[problemType].map((v, k) => {
-                return <div className={styles.advancedAlgorithm} key={k}>
-                  <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v.value)} onChange={this.handleCheck.bind(null, v.value)} />
-                  <label htmlFor={"algorithm" + k}>{v.label}</label>
-                </div>
-              })}
+              <div className={styles.advancedAlgorithm} key={'solution-b'}>
+                {/* <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} /> */}
+                <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
+                <label htmlFor={'R2-solution-b'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-b</label>
+              </div>
+            </div>
+            {/* </Tooltip> */}
+            {Algorithms[problemType].map((v, k) => {
+              return <div className={styles.advancedAlgorithm} key={k}>
+                <input id={"algorithm" + k} type='checkbox' checked={algorithms.includes(v.value)} onChange={this.handleCheck.bind(null, v.value)} />
+                <label htmlFor={"algorithm" + k}>{v.label}</label>
+              </div>
+            })}
+          </div>
+        </div>
+        {problemType === "Classification" && < div className={styles.advancedBlock}>
+          <div className={styles.advancedResampling}>
+            <div className={styles.advancedTitle}>
+              <span>Resampling Setting:</span>
+            </div>
+            <div className={styles.advancedOptionBox}>
+              <input id="resampling1" type='radio' name="resampling" checked={resampling === "up"} onChange={this.handleResampling.bind(null, 'up')} />
+              <label htmlFor="resampling1">Auto upsampling</label>
+            </div>
+            <div className={styles.advancedOptionBox}>
+              <input id="resampling2" type='radio' name="resampling" checked={resampling === "down"} onChange={this.handleResampling.bind(null, 'down')} />
+              <label htmlFor="resampling2">Auto downsampling</label>
+            </div>
+            <div className={styles.advancedOptionBox}>
+              <input id="resampling3" type='radio' name="resampling" checked={resampling === "no"} onChange={this.handleResampling.bind(null, 'no')} />
+              <label htmlFor="resampling3">No resampling</label>
             </div>
           </div>
-          {problemType === "Classification" && < div className={styles.advancedBlock}>
-            <div className={styles.advancedResampling}>
-              <div className={styles.advancedTitle}>
-                <span>Resampling Setting:</span>
+          <div className={styles.advancedOther}>
+            <div className={styles.advancedBlock}>
+              <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
+                <span>Set Measurement:</span>
               </div>
-              <div className={styles.advancedOptionBox}>
-                <input id="resampling1" type='radio' name="resampling" checked={resampling === "up"} onChange={this.handleResampling.bind(null, 'up')} />
-                <label htmlFor="resampling1">Auto upsampling</label>
-              </div>
-              <div className={styles.advancedOptionBox}>
-                <input id="resampling2" type='radio' name="resampling" checked={resampling === "down"} onChange={this.handleResampling.bind(null, 'down')} />
-                <label htmlFor="resampling2">Auto downsampling</label>
-              </div>
-              <div className={styles.advancedOptionBox}>
-                <input id="resampling3" type='radio' name="resampling" checked={resampling === "no"} onChange={this.handleResampling.bind(null, 'no')} />
-                <label htmlFor="resampling3">No resampling</label>
+              <div className={styles.advancedOption}>
+                <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} >
+                  {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
+                </Select>
               </div>
             </div>
-            <div className={styles.advancedOther}>
-              <div className={styles.advancedBlock}>
-                <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
-                  <span>Set Measurement:</span>
-                </div>
-                <div className={styles.advancedOption}>
-                  <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} >
-                    {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
-                  </Select>
-                </div>
-              </div>
-              {/* <div className={styles.advancedBlock}>
+            {/* <div className={styles.advancedBlock}>
                 <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
                   <span>Set Max Training Time:</span>
                   <span className={styles.advancedDesc}>Max amount of time to evaluate different modules.</span>
@@ -321,49 +320,47 @@ export default class AdvancedView extends Component {
                   <span>Minutes<br />(3 minutes or longer)</span>
                 </div>
               </div> */}
-              <div className={styles.advancedBlock}>
-                <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
-                  <span>Random Seed:</span>
-                  <span className={styles.advancedDesc}>Value between 0 - 99999999</span>
-                </div>
-                <div className={styles.advancedOption}>
-                  <NumberInput className={classnames(styles.advancedSize, styles.inputLarge)} value={randSeed} onBlur={this.handleRandSeed} min={0} max={99999999} isInt={true} />
-                </div>
+            <div className={styles.advancedBlock}>
+              <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
+                <span>Random Seed:</span>
+                <span className={styles.advancedDesc}>Value between 0 - 99999999</span>
+              </div>
+              <div className={styles.advancedOption}>
+                <NumberInput className={classnames(styles.advancedSize, styles.inputLarge)} value={randSeed} onBlur={this.handleRandSeed} min={0} max={99999999} isInt={true} />
               </div>
             </div>
-          </div>}
-          {problemType === 'Regression' && <div className={styles.advancedBlock}>
-            <div className={classnames(styles.advancedTitle, styles.limit)}>
-              <span>Set Measurement:</span>
-            </div>
-            <div className={styles.advancedOption}>
-              <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} style={{ width: '35%' }}>
-                {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
-              </Select>
-            </div>
-          </div>}
-          {problemType === 'Regression' && <div className={styles.advancedBlock}>
-            <div className={classnames(styles.advancedTitle, styles.limit)}>
-              <span>Random Seed:</span>
-              <span className={styles.advancedDesc}>Value between 0 - 99999999</span>
-            </div>
-            <div className={styles.advancedOption}>
-              <NumberInput className={styles.advancedSize} value={randSeed} onBlur={this.handleRandSeed} min={0} max={99999999} isInt={true} />
-            </div>
-          </div>}
-        </div>
-        <div className={styles.advancedRight}>
-          <div className={styles.advancedBlock}>
-            <div className={classnames(styles.advancedTitle, styles.limit)}>
-              <span>Set Model Ensemble Size:</span>
-              <span className={styles.advancedDesc}>Actual number of ensemble models may be less than this number.</span>
-            </div>
-            <div className={styles.advancedOption}>
-              <NumberInput className={styles.advancedSize} value={ensembleSize} onBlur={this.handleSize} min={1} max={30} isInt={true} />
-              <span>(1~30)</span>
-            </div>
           </div>
-          {/* <div className={styles.advancedBlock}>
+        </div>}
+        {problemType === 'Regression' && <div className={styles.advancedBlock}>
+          <div className={classnames(styles.advancedTitle, styles.limit)}>
+            <span>Set Measurement:</span>
+          </div>
+          <div className={styles.advancedOption}>
+            <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} style={{ width: '35%' }}>
+              {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
+            </Select>
+          </div>
+        </div>}
+        {problemType === 'Regression' && <div className={styles.advancedBlock}>
+          <div className={classnames(styles.advancedTitle, styles.limit)}>
+            <span>Random Seed:</span>
+            <span className={styles.advancedDesc}>Value between 0 - 99999999</span>
+          </div>
+          <div className={styles.advancedOption}>
+            <NumberInput className={styles.advancedSize} value={randSeed} onBlur={this.handleRandSeed} min={0} max={99999999} isInt={true} />
+          </div>
+        </div>}
+        <div className={styles.advancedBlock}>
+          <div className={classnames(styles.advancedTitle, styles.limit)}>
+            <span>Set Model Ensemble Size:</span>
+            <span className={styles.advancedDesc}>Actual number of ensemble models may be less than this number.</span>
+          </div>
+          <div className={styles.advancedOption}>
+            <NumberInput className={styles.advancedSize} value={ensembleSize} onBlur={this.handleSize} min={1} max={30} isInt={true} />
+            <span>(1~30)</span>
+          </div>
+        </div>
+        {/* <div className={styles.advancedBlock}>
             <div className={classnames(styles.advancedTitle, styles.limit)}>
               <span>Set Data Range:</span>
             </div>
@@ -378,81 +375,98 @@ export default class AdvancedView extends Component {
               </div>
             </div>
           </div> */}
-          {dataRange === "custom" && <CustomRange customRange={customRange} customFieldList={customFieldList} dataViews={dataViews} customField={customField} project={this.props.project} />}
-          {dataRange === "all" && <div className={styles.advancedBlock}>
-            <div className={styles.advancedTitle}>
-              <span>Run models with:</span>
-            </div>
-            <div className={styles.advancedOption}>
-              <Tooltip
-                title={<span className={styles.crossWarning}>
-                  Performing cross validation on large dataset will take significant amount of time. <br />
-                  Hence we recommend choosing “Train Validation Holdout”.`
+        {dataRange === "custom" && <CustomRange customRange={customRange} customFieldList={customFieldList} dataViews={dataViews} customField={customField} project={this.props.project} />}
+        {dataRange === "all" && <div className={styles.advancedBlock}>
+          <div className={styles.advancedTitle}>
+            <span>Run models with:</span>
+          </div>
+          <div className={styles.advancedOption}>
+            <Tooltip
+              title={<span className={styles.crossWarning}>
+                Performing cross validation on large dataset will take significant amount of time. <br />
+                Hence we recommend choosing “Train Validation Holdout”.`
                   </span>}
-                visible={runWith === "cross" && totalLines > 200000}
-                overlayStyle={{ maxWidth: '100%' }}>
-                <div className={styles.advancedOptionBox}>
-                  <input id="runwith1" type='radio' name="runWith" checked={runWith === "cross"} onChange={this.handleRunWith.bind(null, 'cross')} />
-                  <label htmlFor="runwith1">Cross Validation</label>
-                </div>
-              </Tooltip>
+              visible={runWith === "cross" && totalLines > 200000}
+              overlayStyle={{ maxWidth: '100%' }}>
               <div className={styles.advancedOptionBox}>
-                <input id="runwith2" type='radio' name="runWith" checked={runWith === "holdout"} onChange={this.handleRunWith.bind(null, 'holdout')} />
-                <label htmlFor="runwith2">Train / Validation / Holdout</label>
+                <input id="runwith1" type='radio' name="runWith" checked={runWith === "cross"} onChange={this.handleRunWith.bind(null, 'cross')} />
+                <label htmlFor="runwith1">Cross Validation</label>
               </div>
+            </Tooltip>
+            <div className={styles.advancedOptionBox}>
+              <input id="runwith2" type='radio' name="runWith" checked={runWith === "holdout"} onChange={this.handleRunWith.bind(null, 'holdout')} />
+              <label htmlFor="runwith2">Train / Validation / Holdout</label>
             </div>
-          </div>}
-          {dataRange === "all" && <div className={styles.advancedBlock}>
-            <div className={styles.advancedBox}>
-              <div className={styles.advancedTitle}>
-                <span>Set Percentage of Each Part:<a className={styles.reset} onClick={this.reset}>Reset</a></span>
+          </div>
+        </div>}
+        {dataRange === "all" && <div className={styles.advancedBlock}>
+          <div className={styles.advancedBox}>
+            <div className={styles.advancedTitle}>
+              <span>Set Percentage of Each Part:<a className={styles.reset} onClick={this.reset}>Reset</a></span>
+            </div>
+            {runWith === "holdout" ? <div className={styles.advancedPercentBlock}>
+              <div className={styles.advancedPercent}>
+                <div className={styles.advancedPercentTrain} style={{ width: (100 - validationRate - holdoutRate) + '%' }}></div>
+                <div className={styles.advancedPercentValidation} style={{ width: validationRate + "%" }}></div>
+                <div className={styles.advancedPercentHoldout} style={{ width: holdoutRate + '%' }}></div>
               </div>
-              {runWith === "holdout" ? <div className={styles.advancedPercentBlock}>
+              <Range
+                range={true}
+                step={1}
+                min={1}
+                max={99}
+                onChange={this.handleSlider}
+                value={[100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10), 100 - parseInt(holdoutRate, 10)]}
+                tooltipVisible={false}
+              />
+            </div> : <div className={styles.advancedPercentBlock} >
                 <div className={styles.advancedPercent}>
-                  <div className={styles.advancedPercentTrain} style={{ width: (100 - validationRate - holdoutRate) + '%' }}></div>
-                  <div className={styles.advancedPercentValidation} style={{ width: validationRate + "%" }}></div>
+                  {this.crossPercent()}
                   <div className={styles.advancedPercentHoldout} style={{ width: holdoutRate + '%' }}></div>
                 </div>
                 <Range
-                  range={true}
+                  range={false}
                   step={1}
                   min={1}
                   max={99}
-                  onChange={this.handleSlider}
-                  value={[100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10), 100 - parseInt(holdoutRate, 10)]}
+                  onChange={this.handleDrag}
+                  value={100 - parseInt(holdoutRate, 10)}
                   tooltipVisible={false}
                 />
-              </div> : <div className={styles.advancedPercentBlock} >
-                  <div className={styles.advancedPercent}>
-                    {this.crossPercent()}
-                    <div className={styles.advancedPercentHoldout} style={{ width: holdoutRate + '%' }}></div>
-                  </div>
-                  <Range
-                    range={false}
-                    step={1}
-                    min={1}
-                    max={99}
-                    onChange={this.handleDrag}
-                    value={100 - parseInt(holdoutRate, 10)}
-                    tooltipVisible={false}
-                  />
-                </div>}
-              {runWith === "holdout" ? <div className={styles.advancedPercentBox}>
-                <div className={styles.advancedPercentInput}>
-                  <div className={styles.advancedPercentText}>
-                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)}></div>
-                    <span>Training</span>
-                  </div>
-                  {/* <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} /> */}
-                  <span>{100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)}%</span>
+              </div>}
+            {runWith === "holdout" ? <div className={styles.advancedPercentBox}>
+              <div className={styles.advancedPercentInput}>
+                <div className={styles.advancedPercentText}>
+                  <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)}></div>
+                  <span>Training</span>
                 </div>
+                {/* <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} /> */}
+                <span>{100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)}%</span>
+              </div>
+              <div className={styles.advancedPercentInput}>
+                <div className={styles.advancedPercentText}>
+                  <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)}></div>
+                  <span>Validation</span>
+                </div>
+                {/* <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} /> */}
+                <span>{parseInt(validationRate, 10)}%</span>
+              </div>
+              <div className={styles.advancedPercentInput}>
+                <div className={styles.advancedPercentText}>
+                  <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
+                  <span>Holdout</span>
+                </div>
+                {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
+                <span>{parseInt(holdoutRate, 10)}%</span>
+              </div>
+            </div> : <div className={styles.advancedPercentBox}>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
-                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)}></div>
-                    <span>Validation</span>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
+                    <span>Select Number of CV folds</span>
                   </div>
-                  {/* <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} /> */}
-                  <span>{parseInt(validationRate, 10)}%</span>
+                  <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={10} isInt={true} />
+                  {/* <span>{crossCount}</span> */}
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
@@ -462,61 +476,43 @@ export default class AdvancedView extends Component {
                   {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
                   <span>{parseInt(holdoutRate, 10)}%</span>
                 </div>
-              </div> : <div className={styles.advancedPercentBox}>
-                  <div className={styles.advancedPercentInput}>
-                    <div className={styles.advancedPercentText}>
-                      <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
-                      <span>Select Number of CV folds</span>
-                    </div>
-                    <NumberInput value={crossCount} onBlur={this.changeCrossCount} min={2} max={10} isInt={true} />
-                    {/* <span>{crossCount}</span> */}
-                  </div>
-                  <div className={styles.advancedPercentInput}>
-                    <div className={styles.advancedPercentText}>
-                      <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
-                      <span>Holdout</span>
-                    </div>
-                    {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
-                    <span>{parseInt(holdoutRate, 10)}%</span>
-                  </div>
-                </div>}
+              </div>}
+          </div>
+        </div>}
+        <div className={styles.advancedBlock}>
+          <div className={styles.advancedBox}>
+            <div className={styles.advancedTitle}>
+              <span>Speed VS Accuracy:<a className={styles.reset} onClick={this.resetSpeed}>Reset</a></span>
             </div>
-          </div>}
-          <div className={styles.advancedBlock}>
-            <div className={styles.advancedBox}>
-              <div className={styles.advancedTitle}>
-                <span>Speed VS Accuracy:<a className={styles.reset} onClick={this.resetSpeed}>Reset</a></span>
+            <div className={styles.advancedPercentBlock}>
+              <div className={styles.advancedPercent}>
+                <div className={styles.advancedPercentCross} style={{ width: ((speedVSaccuracy - 1) / 8 * 100) + '%' }}></div>
+                <div className={styles.advancedPercentHoldout} style={{ width: ((9 - speedVSaccuracy) / 8 * 100) + '%' }}></div>
               </div>
-              <div className={styles.advancedPercentBlock}>
-                <div className={styles.advancedPercent}>
-                  <div className={styles.advancedPercentCross} style={{ width: ((speedVSaccuracy - 1) / 8 * 100) + '%' }}></div>
-                  <div className={styles.advancedPercentHoldout} style={{ width: ((9 - speedVSaccuracy) / 8 * 100) + '%' }}></div>
+              <Range
+                range={false}
+                step={1}
+                min={1}
+                max={9}
+                onChange={this.handleSpeed}
+                value={speedVSaccuracy}
+                tooltipVisible={false}
+              />
+            </div>
+            <div className={styles.advancedPercentBox}>
+              <div className={styles.advancedPercentInput}>
+                <div className={styles.advancedPercentText}>
+                  <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
+                  <span>Speed</span>
                 </div>
-                <Range
-                  range={false}
-                  step={1}
-                  min={1}
-                  max={9}
-                  onChange={this.handleSpeed}
-                  value={speedVSaccuracy}
-                  tooltipVisible={false}
-                />
+                <NumberInput value={speedVSaccuracy} onBlur={this.changeSpeed.bind(null, true)} min={1} max={9} isInt={true} />
               </div>
-              <div className={styles.advancedPercentBox}>
-                <div className={styles.advancedPercentInput}>
-                  <div className={styles.advancedPercentText}>
-                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
-                    <span>Speed</span>
-                  </div>
-                  <NumberInput value={speedVSaccuracy} onBlur={this.changeSpeed.bind(null, true)} min={1} max={9} isInt={true} />
+              <div className={styles.advancedPercentInput}>
+                <div className={styles.advancedPercentText}>
+                  <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
+                  <span>Accuracy</span>
                 </div>
-                <div className={styles.advancedPercentInput}>
-                  <div className={styles.advancedPercentText}>
-                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
-                    <span>Accuracy</span>
-                  </div>
-                  <NumberInput value={10 - speedVSaccuracy} onBlur={this.changeSpeed.bind(null, false)} min={1} max={9} isInt={true} />
-                </div>
+                <NumberInput value={10 - speedVSaccuracy} onBlur={this.changeSpeed.bind(null, false)} min={1} max={9} isInt={true} />
               </div>
             </div>
           </div>

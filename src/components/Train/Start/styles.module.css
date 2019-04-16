@@ -1072,10 +1072,11 @@ button.disable {
   cursor: pointer;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   background-image: linear-gradient(to bottom, #5b657b, #243448);
-  margin:0.1em auto 0;
+  margin: 0.1em auto 0;
 }
-.newVariableHintSyntax button span{
-  color:#fff;
+
+.newVariableHintSyntax button span {
+  color: #fff;
 }
 
 .funcTips {
@@ -1141,7 +1142,45 @@ button.disable {
   white-space: nowrap;
   font-size: 0.875rem;
 }
+
 .advancedSolution {
   display: flex;
   flex: none;
+}
+
+.chooseScan {
+  display: flex;
+  flex: none;
+  margin: .3em 0;
+}
+
+.chooseLabel {
+  display: flex;
+  flex: auto;
+}
+
+.chooseLabel span {
+  font-family: HelveticaNeue;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+.chooseBox {
+  display: flex;
+  flex: auto;
+  align-items: center;
+}
+
+.chooseBox label{
+  font-family: HelveticaNeue;
+  font-size: 0.875rem;
+  color: #4a4a4a;
+  cursor: pointer;
+}
+
+.chooseBox input{
+  font-family: HelveticaNeue;
+  font-size: 0.875rem;
+  cursor: pointer;
 }

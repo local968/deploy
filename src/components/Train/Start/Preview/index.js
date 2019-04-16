@@ -103,8 +103,8 @@ export default class Preview extends Component {
   }
 
   render() {
-    const { sortHeader, target, trainHeader, newVariable, cleanPath } = this.props.project
-    const header = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
+    const { dataHeader, trainHeader, newVariable, cleanPath } = this.props.project
+    const header = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
     const tableData = cleanPath ? this.formatTable() : []
     // console.log(tableData.length, "tableData", cleanPath)
     return <div className={classnames(styles.content, {
@@ -118,7 +118,6 @@ export default class Preview extends Component {
       </div>
       <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
-        <div className={styles.text}><span>Target Variable:</span><span className={styles.value} title={target}>{target}</span></div>
         <div className={styles.text}><span>Total Variables:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
       </div>
       <div className={styles.table}>

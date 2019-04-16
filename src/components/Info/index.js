@@ -14,8 +14,6 @@ import dataSchema from './data_schema.svg';
 import dataQualityActive from './data_quality_a.svg';
 import dataQuality from './data_quality_d.svg';
 
-import { useStore } from 'easy-peasy';
-
 const imgs = {
   dataSchema: <img src={dataSchema} alt="schema" />,
   dataQuality: <img src={dataQuality} alt="quality" />,
@@ -89,9 +87,7 @@ export default class Data extends Component {
     const { project } = this.props.projectStore;
     const { mainStep, lastSubStep, noCompute, subStepActive } = project;
     const maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
-    const todos = useStore(state => state.todos.items)
 
-    console.log(todos, "todos")
     return <div className={styles.data}>
       {!!project && <Switch>
         <Route exact path="/project/:id/info/connect" component={DataConnect} />

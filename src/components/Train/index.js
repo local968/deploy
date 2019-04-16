@@ -12,6 +12,7 @@ import modelSelectionIcon from './model_selection_d.svg';
 import startModelingActiveIcon from './start_modeling_a.svg';
 import modelSelectionActiveIcon from './model_selection_a.svg';
 
+import { useStore } from 'easy-peasy';
 // import r2Loading from './R2 LearnLoading2.gif';
 // import { when } from 'mobx';
 
@@ -117,6 +118,9 @@ export default class Modeling extends Component {
     const { project } = this.props.projectStore;
     const { models, train2Error, train2ing } = project;
     const { view, sort, metric } = this
+    const todos = useStore(state => state)
+
+    console.log(todos, "todos")
     return (
       <div className={styles.modeling}>
         {project && <Switch>

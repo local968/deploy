@@ -47,7 +47,6 @@ function Main(props: MainProps) {
           if (curStep === step) return
           step = curStep
           const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType)
-          console.log(isUnsupervised, problemType)
           let url = ''
           switch (curStep) {
             case 1:
