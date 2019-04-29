@@ -1,4 +1,7 @@
+import axios from 'axios';
+import papa from 'papaparse';
 
+const chunkSize = 1 * 1024 * 1024
 
 export default function EsUploader(file, option = {}) {
   let isPause = false
@@ -8,7 +11,7 @@ export default function EsUploader(file, option = {}) {
   let uploader = null
   let rawHeader = []
   let cleanHeader = []
-  const { onProgress, onError, onComplete } = option;
+  const {onProgress, onError, onFinished} = option;
 
   const autoFixHeader = (rawHeader) => {
     const temp = {};
@@ -28,7 +31,8 @@ export default function EsUploader(file, option = {}) {
   }
 
   const upload = async () => {
-    const dataIndex = await actions.createIndex({})
+    const {data} = await axios.get('/etls/createIndex');
+    const {index: dataIndex} = data;
     let chunk = ''
     let header = ''
     papa.parse(file, {
@@ -48,37 +52,48 @@ export default function EsUploader(file, option = {}) {
         else {
           parser.pause()
           isPause = true
-          await actions.upload({
-            index: dataIndex, requestBody: header + '\n' + chunk, option: {
-              headers: { 'content-type': 'text/csv', 'filename': file.name }
-            }
+
+          axios.request({
+            url: `http://localhost:3000/etls/${dataIndex}/upload`,
+            headers: {
+              'Content-Type': "text/plain",
+            },
+            method:"POST",
+            data: header + '\n' + chunk,
+          }).then(() => {
+            onProgress({
+              loaded: loaded,
+              size: file.size
+            })
+            // setUploadStatus('uploaded: ' + no + ' lines')
+            chunk = ''
+            isPause = false
+            if (!isStop) parser.resume()
           })
-          onProgress({
-            loaded: loaded,
-            size: file.size
-          })
-          // setUploadStatus('uploaded: ' + no + ' lines')
-          chunk = ''
-          isPause = false
-          if (!isStop) parser.resume()
         }
       },
-      complete: () => {
+      complete: async () => {
         while (chunk[chunk.length - 1] === '\n') chunk = chunk.slice(0, -1)
-        await actions.upload({
-          index: dataIndex, requestBody: header + '\n' + chunk, option: {
-            headers: { 'content-type': 'text/csv', 'filename': file.name }
-          }
+
+        axios.request({
+          url: `/etls/${dataIndex}/upload`,
+          method:"POST",
+          headers: {
+            'Content-Type': "text/plain",
+          },
+          data: header + '\n' + chunk,
+        }).then(() => {
+          chunk = ''
+          onFinished({
+            fileId: dataIndex,
+            totalRawLines: no,
+            cleanHeader,
+            rawHeader,
+            dataHeader: cleanHeader
+          })
         })
         // setUploadStatus('finished, total uploaded: ' + no + ' lines')
-        chunk = ''
-        onComplete({
-          fileId: dataIndex,
-          totalRawLines: no,
-          cleanHeader,
-          rawHeader,
-          dataHeader: cleanHeader
-        })
+
         // setTotalLines(no)
         // resolve()
       }

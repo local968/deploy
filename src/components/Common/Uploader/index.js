@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import axios from 'axios';
 import config from 'config'
-import NginxUploader from '../NginxUploader';
+// import NginxUploader from '../NginxUploader';
+import EsUploader from '../EsUploader';
 
 const AllowExt = ["csv", "CSV", "zip", "ZIP", "rar", "RAR", "tar", "TAR", "tgz", "TGZ", 'xls', 'XLS', 'xlsx', 'XLSX']
 
@@ -49,7 +50,7 @@ export default class Uploader extends Component {
       if (response.data.status !== 200) return onError(response.data.message)
       const token = response.data.token
       const host = response.data.host
-      this.uploader = NginxUploader(file, {
+      this.uploader = EsUploader(file, {
         host,
         onProgress: onProgress,
         onFinished: onComplete,
