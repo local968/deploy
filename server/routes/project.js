@@ -2,8 +2,8 @@ const { redis } = require('redis')
 const wss = require('../webSocket')
 const uuid = require('uuid')
 const moment = require('moment')
-// const command = require('../command')
-const mq = require('../amqp')
+const command = require('../command')
+// const mq = require('../amqp')
 
 const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
 
@@ -275,7 +275,7 @@ const checkTraningRestriction = (user) => {
 }
 
 function sendToCommand(data, progress) {
-  return mq(data, (result) => {
+  return command(data, (result) => {
     return (result.status < 0 || result.status === 100) ? result : progress(result)
   }, null)
 }
@@ -367,7 +367,7 @@ wss.register("addProject", async (message, socket) => {
     error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
   }
   const id = await redis.incr("node:project:count")
-  // const { result } = await mq({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
+  // const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
   return createOrUpdate(id, userId, { id, userId }, true)
 })
 
@@ -494,7 +494,7 @@ wss.register('etl', (message, socket, progress) => {
       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation')
       if (!ext) Reflect.deleteProperty(data, 'ext')
       return createOrUpdate(id, userId, { etling: true, stopId: requestId })
-        .then(() => mq(data, processData => {
+        .then(() => command(data, processData => {
           let { result, status } = processData;
           if (status < 0 || status === 100) return processData
           const { name, path, key, originHeader, value, fields } = result
@@ -584,7 +584,7 @@ wss.register('abortEtl', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
-    return mq({ ...message, userId, requestId: message._id, stopId }, null, true).then(() => {
+    return command({ ...message, userId, requestId: message._id, stopId }, null, true).then(() => {
       mq.clearListener(stopId)
       const statusData = {
         etling: false,
@@ -598,7 +598,7 @@ wss.register('abortEtl', (message, socket) => {
 
 wss.register('dataView', (message, socket, progress) => {
   return createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: true })
-    .then(() => mq({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
       const { status, result } = progressResult
       if (status === 1) {
@@ -641,7 +641,7 @@ wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(
 
 wss.register('preTrainImportance', (message, socket, progress) =>
   createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
-    .then(() => mq({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
       const { status, result } = progressResult
       if (status === 1) {
@@ -680,7 +680,7 @@ wss.register('histgramPlot', (message, socket, progress) => {
     return start
   }, {})
   return updateProjectField(id, userId, "histgramPlots", histgramPlots)
-    .then(() => mq({ ...message, userId, requestId }, progressResult => {
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "histgramPlots", histgramPlots)
         return progressResult
@@ -701,7 +701,7 @@ wss.register('rawHistgramPlot', (message, socket, progress) => {
     return start
   }, {})
   return updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
-    .then(() => mq({ ...message, userId, requestId }, progressResult => {
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
         return progressResult
@@ -722,7 +722,7 @@ wss.register('univariatePlot', (message, socket, progress) => {
     return start
   }, {})
   return updateProjectField(id, userId, "univariatePlots", univariatePlots)
-    .then(() => mq({ ...message, userId, requestId }, progressResult => {
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "univariatePlots", univariatePlots)
         return progressResult
@@ -768,7 +768,7 @@ wss.register('abortTrain', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' }
-    return mq({ ...message, userId, requestId, stopId }, () => {
+    return command({ ...message, userId, requestId, stopId }, () => {
       mq.clearListener(stopId)
       const statusData = {
         train2Finished: true,
@@ -799,7 +799,7 @@ wss.register('train', async (message, socket, progress) => {
   try {
     await checkTraningRestriction(user)
     await createOrUpdate(projectId, userId, { ...updateData, stopId: requestId })
-    const isAbort = await mq({ ...data, stopId: requestId }, async queueValue => {
+    const isAbort = await command({ ...data, stopId: requestId }, async queueValue => {
       const stopId = await getProjectField(projectId, 'stopId')
       const { status, result, requestId: trainId } = queueValue;
       if (status < 0 || status === 100) return 1;
@@ -964,7 +964,7 @@ wss.register("permutationImportance", (message, socket) => {
   const { userId } = socket.session
   const { projectId, id: mid, command: commandText, _id: requestId } = message
   return updateModel(userId, projectId, mid, { importanceLoading: true })
-    .then(() => mq({
+    .then(() => command({
       command: commandText,
       projectId,
       solution: mid,

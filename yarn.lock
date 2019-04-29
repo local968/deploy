@@ -1012,6 +1012,19 @@
     "@svgr/plugin-svgo" "^4.0.3"
     loader-utils "^1.1.0"
 
+"@types/amqplib@^0.5.11":
+  version "0.5.11"
+  resolved "https://registry.npm.taobao.org/@types/amqplib/download/@types/amqplib-0.5.11.tgz#32b0fe3d8e3aa4c749b300d232da15900908e816"
+  integrity sha1-MrD+PY46pMdJswDSMtoVkAkI6BY=
+  dependencies:
+    "@types/bluebird" "*"
+    "@types/node" "*"
+
+"@types/bluebird@*":
+  version "3.5.26"
+  resolved "https://registry.npm.taobao.org/@types/bluebird/download/@types/bluebird-3.5.26.tgz#a38c438ae84fa02431d6892edf86e46edcbca291"
+  integrity sha1-o4xDiuhPoCQx1oku34bkbty8opE=
+
 "@types/history@*":
   version "4.7.2"
   resolved "https://registry.npm.taobao.org/@types/history/download/@types/history-4.7.2.tgz#0e670ea254d559241b6eeb3894f8754991e73220"
