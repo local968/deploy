@@ -85,7 +85,7 @@ export default function EsUploader(file, option = {}) {
         }).then(() => {
           chunk = ''
           onFinished({
-            fileId: dataIndex,
+            originalIndex: dataIndex,
             totalRawLines: no,
             cleanHeader,
             rawHeader,

@@ -3,19 +3,18 @@ const wss = require('../webSocket')
 const { redis } = require('redis')
 const axios = require('axios')
 const fs = require('fs')
+const config = require('config')
 
 const { createOrUpdate } = require('./project')
 
-const esPath = 'http://192.168.0.23:9200'
-const esServicePath = 'http://localhost:8000'
+const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
 wss.register("originalStats", async (message, socket, progress) => {
   const { userId } = socket.session
   const { index, projectId } = message
   try {
     const { data } = await axios.get(`${esServicePath}/etls/${index}/stats`)
-    fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
-
+    // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
     const colType = {}
     const fields = []
     const colMap = {}
@@ -26,7 +25,6 @@ wss.register("originalStats", async (message, socket, progress) => {
     const mismatchLineCounts = {}
     const outlierLineCounts = {}
     const will_be_drop_500_lines = []
-
     Object.entries(data).forEach(([key, metric]) => {
       const stats = metric.originalStats
       colType[key] = metric.type
@@ -60,7 +58,6 @@ wss.register("originalStats", async (message, socket, progress) => {
       outlierFillMethod: {},
       outlierIndex: {},
       outlierRange: {},
-      totalLines: 119999,
       name: 'etl',
       totalRawLines: 119999,
       uniqueValues: {},
@@ -81,9 +78,10 @@ wss.register("originalStats", async (message, socket, progress) => {
       etling: false,
       etlProgress: 0
     }
-    createOrUpdate(projectId, userId, result)
+    await createOrUpdate(projectId, userId, result)
     return { status: 200, message: 'ok', result }
   } catch (e) {
+    console.log({...e})
     let error = e
     if (e.response && e.response.data) error = e.response.data
     return { status: 500, message: 'get index stats failed', error }
@@ -91,7 +89,7 @@ wss.register("originalStats", async (message, socket, progress) => {
 })
 
 wss.register('newEtl', async (message, socket, process) => {
-  const { userId } = socket
+  const { userId } = socket.session
   const { projectId } = message
   const result = await redis.hgetall(`project:${projectId}`)
   for (let key in result) {
@@ -99,7 +97,7 @@ wss.register('newEtl', async (message, socket, process) => {
       result[key] = JSON.parse(result[key])
     } catch (e) { }
   }
-  // if (result.userId !== userId) return { status: 420, message: 'error' }
+  if (result.userId !== userId) return { status: 420, message: 'error' }
   const project = result
   const stats = project.stats
   stats[project.target].isTarget = true

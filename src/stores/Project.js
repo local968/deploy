@@ -9,7 +9,6 @@ import {message as antdMessage, Modal} from 'antd';
 import axios from 'axios'
 import { formatNumber } from 'util'
 
-const testIndex = 'r2_3e6417df-3b40-43b3-a80b-a5b165387a81'
 export default class Project {
   @observable models = []
   @observable trainModel = null
@@ -64,6 +63,7 @@ export default class Project {
   @observable cleanPath = ''
 
   @observable noComputeTemp = false;
+  @observable originalIndex = ''
 
   //data quality
   @observable mismatchFillMethod = {}
@@ -190,8 +190,8 @@ export default class Project {
     })
   }
 
-  readIndex = async (index = testIndex) => {
-    const url = `http://127.0.0.1:8000/etls/${index}/preview`
+  readIndex = async (index) => {
+    const url = `/etls/${index}/preview`
     const { data } = await axios.get(url)
     const result = data.result.map(row => this.rawHeader.map(h => row[h]))
     return result
@@ -217,7 +217,8 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      rawDataView: null
+      rawDataView: null,
+      originalIndex: ''
     }
   }
 
@@ -405,13 +406,13 @@ export default class Project {
     //   this.fileNames = []
     // }))
     this.autorun.push(autorun(async () => {
-      if (!this.rawHeader) {
+      if (!this.originalIndex) {
         this.uploadData = []
       } else {
         // this.readData(this.originPath).then(data => {
         //   this.uploadData = data.slice(1)
         // })
-        this.uploadData = await this.readIndex()
+        this.uploadData = await this.readIndex(this.originalIndex)
       }
     }))
     // this.autorun.push(autorun(async () => {
@@ -435,6 +436,7 @@ export default class Project {
 
   @action
   setProperty = (data) => {
+    delete data.totalLines
     if (typeof data !== 'object') {
       return false;
     }
@@ -494,19 +496,7 @@ export default class Project {
 
     await this.abortTrainByEtl()
 
-    const {
-      totalRawLines,
-      cleanHeader,
-      rawHeader,
-      dataHeader
-    } = data;
-    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
-      uploadFileName: [data.fileId],
-      totalRawLines,
-      cleanHeader,
-      rawHeader,
-      dataHeader
-    }, {
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, data, {
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
@@ -516,13 +506,13 @@ export default class Project {
     await this.updateProject(backData)
     // const pass = await this.etl()
     const result = await this.originalStats()
-    if (result.status !== 200) this.updateProject({ uploadFileName: [] })
+    if (result.status !== 200) this.updateProject({ uploadFileName: [], originalIndex: '' })
   }
 
   @action
-  originalStats = async (index = testIndex) => {
+  originalStats = async () => {
     const api = await socketStore.ready()
-    return await api.originalStats({ index, projectId: this.id })
+    return await api.originalStats({ index: this.originalIndex, projectId: this.id })
   }
 
   @action
