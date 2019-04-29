@@ -178,6 +178,6 @@ function saveSample() {
   pipeline.exec()
 }
 
-saveSample()
+// saveSample()
 
 module.exports = router

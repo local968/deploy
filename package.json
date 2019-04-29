@@ -49,12 +49,14 @@
     "fdev": "react-app-rewired start & node ./server/index.js",
     "frontend": "react-app-rewired start",
     "server": "node server",
+    "ts-node": "ts-node --project ./tsconfig.server.json server",
     "nodemon": "nodemon server",
     "build": "react-app-rewired build && rm -rf static && mv build static",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.5.11",
     "babel-plugin-import": "^1.11.0",
     "mobx-react-devtools": "^5.0.1",
     "node-sass": "^4.10.0",
@@ -62,7 +64,8 @@
     "react-app-rewire-mobx": "^1.0.9",
     "react-app-rewired": "^2.1.1",
     "react-waypoint": "^8.1.0",
-    "sass-loader": "^6.0.7"
+    "sass-loader": "^6.0.7",
+    "ts-node": "^8.1.0"
   },
   "_moduleAliases": {
     "wss": "server/webSocket",
