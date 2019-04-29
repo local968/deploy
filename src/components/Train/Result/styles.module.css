@@ -1,1124 +1,263 @@
-.modelResult {
-    display: flex;
-    flex: auto;
-    flex-direction: column;
-    padding: 0 10%;
-}
-
-.modelResult span {
-    font-size: 1.125rem;
-    display: flex;
-    font-family: SanFranciscoText;
-    line-height: normal;
-    align-items: center;
-    color: #1d2b3c;
-}
-
-.process{
-    /*height: 1em;*/
-    padding: 0.2em;
-    border:1px solid #C4CBD7;
-    margin: 0.2em;
-    background-color: #FAFBFC;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
+.root {
+  text-align: center;
+  padding-top: 8px;
+  background: white;
+  padding: 0 50px;
+  width: 100%;
+  min-width: 1350px;
+  overflow-y: auto
 }
 
 
-.process label{
-    font-size: 0.2em;
+.header {
+  font-size: 24px;
+  color: black;
+  text-align: left;
+  padding: 12px 0;
+  border-bottom: 1px #1D2B3C solid;
+  margin-bottom: 30px
 }
 
-.process img{
-    width: .3em;
-    margin: 0 .2em;
-}
-.process button{
-    display: flex;
-    align-items: center;
+.body {
 }
 
-.process button i{
-    display: flex;
-}
-.process label{
-    text-transform:capitalize;
-}
-.many img{
-    width: 15px;
-    margin:0 5px;
+.top {
+  display: flex;
+  marginBottom: 40
 }
 
-.process label{
-    font-size: 0.15em;
+.left {
+  flex: 1 1 0
 }
 
-.process button span {
-    font-size: 0.875rem;
-    float: left;
+.right {
+  flex: 1 1 0;
+  fontSize: 50;
+  border: 1px solid;
 }
 
-.process dl{
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0;
+.descriptions {
+  fontSize: 18;
+  color: #1D2B3C;
+  textAlign: left;
+  lineHeight: 40px;
+  marginBottom: 40
 }
 
-.process dd{
-    display: flex;
-    margin-bottom: 0.1em;
-    align-items: center;
+.modelName {
+  color: #448EED
 }
 
-.process dd div{
-    margin-left:15px;
+.scores {
+  display: flex;
+  flexDirection: row;
+  marginBottom: 40
 }
 
-.process dd button{
-    display: flex;
+.score {
+  flex: 0 0 200px
 }
 
-.result {
-    display: flex;
-    flex: none;
-    margin-top: 0.4em;
+.rate {
+  flex: 0 0 200px
 }
 
-.box {
-    display: flex;
-    flex-direction: column;
-    flex: 1 0;
+.cvnn {
+  flex: 0 0 150px
 }
 
-.title {
-    display: flex;
+cluster {
+  flex: 0 0 240px
 }
 
-.title span {
-    font-size: 1.25rem;
+.rSquared {
+  flex: 0 0 200px;
 }
 
-.text {
-    display: flex;
+.blood {
+  fontSize: 48;
+  color: #D0021B;
 }
 
-.row {
-    display: flex;
-    margin-top: 0.15em;
+.orange {
+  fontSize: 48;
+  color: #FF8000;
+  textAlign: left
 }
 
-.row span {
-    display: block;
-    color: #000;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.green {
+  fontSize: 48;
+  color: #4EC078;
 }
 
-.status {
-    display: flex;
-    font-size: 1.5rem;
-    color: #f5a623;
-    font-weight: bold;
+.label {
+  fontSize: 18;
+  fontWeight: bold;
+  textAlign: left;
+  display: block
 }
 
-.line {
-    border-bottom: 3px solid #c4cbd7;
-    margin: 0.2em 0;
-    display: flex;
-}
-
-.selectBlock {
-    display: flex;
-    flex: none;
-    margin-bottom: 0.2em;
-}
-
-.buttonBlock {
-    display: flex;
-    margin-top: 0.3em;
-    margin-bottom: 0.6em;
-    align-items: baseline;
-}
-
-.button {
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-    background-image: linear-gradient(to bottom, #5b657b, #243448);
-    color: #fff;
-    border: 0;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0.1em 0.25em;
-    margin-right: .25em;
-}
-
-.button span {
-    font-size: 1rem;
-    color: #fff;
-    font-weight: normal;
-}
-
-.or {
-    display: flex;
-    margin: 0 0.25em;
-}
-
-.or span {
-    font-size: 1.125rem;
-    font-family: HelveticaNeue;
-    color: #000;
-}
-
-.selectText {
-    margin-right: 0.5em;
-}
-
-.radioGroup {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    position: relative;
-    padding-right: 0.15em;
-}
-
-.radio {
-    display: flex;
-    align-items: center;
-    margin: 5px 0;
-}
-
-.radio label {
-    font-size: 1.125rem;
-    color: #000;
-    font-family: SanFranciscoText;
-    cursor: pointer;
-}
-
-.radio input {
-    width: 0.16em;
-    height: 0.16em;
-    margin-right: 0.1em;
-    cursor: pointer;
-}
-
-.radio input:disabled + label {
-    color: #ccc;
-    cursor: not-allowed;
-}
-
-.radio input:disabled {
-    cursor: not-allowed;
-}
-
-.performanceBox {
-    display: flex;
-    flex: 1 0;
-    /* justify-content: center; */
-}
-
-.performance {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-left: 0.2em;
-    margin-top: 0.2em;
-    justify-content: center;
-}
-
-.performance path:last-child {
-    stroke: #ff8000;
-}
-
-.performance span{
-    display: block;
-}
-
-span.performanceScore {
-    font-size: 1.3rem;
-    line-height: 1.4;
-    color: #f5a623;
-}
-
-.performanceText {
-    color: #000;
-    margin-top: 0.15em;
-    white-space: nowrap;
-}
-
-.progressBox {
-    display: flex;
-    flex-direction: column;
-    margin-top: 0.25em;
-    margin-left: 0.3em;
-}
-
-.progressBlock {
-    margin-top: 0.05em;
-}
-
-.progressLine {
-    display: flex;
-}
-
-.progress {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 80%;
-    min-width: 20%;
-}
-
-.progressSmall {
-    max-width: 87%;
-    min-width: 13%;
-}
-
-.progress span {
-    font-size: 1.125rem;
-    font-weight: bold;
-    color: #fff;
-    line-height: 1.2;
-}
-
-.progressLarge {
-    max-width: 100%;
-}
-
-.success {
-    background-color: #9be44b;
-}
-
-.predicted {
-    background-color: #adaafc;
-}
-
-.different {
-    background-color: #f9cf37;
-}
-
-.progressTitle {
-    margin-right: 0.1em;
-    display: flex;
-    flex: none;
-    width: .5em;
-}
-
-.progressTitle span {
-    font-size: 1.25rem;
-    font-family: SanFranciscoText;
-    color: #000;
-    max-width: 100%;
-    text-overflow: ellipsis;
-    display: block;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.progressMeans {
-    display: flex;
-    margin-top: 0.2em;
-}
-
-.progressMean {
-    display: flex;
-    flex: auto;
-    align-items: center;
-    width: 0;
-    justify-content: flex-start;
-}
-
-.progressMeanText {
-    max-width: 65%;
-    display: flex;
-    flex: none;
-    flex-direction: column;
-}
-
-.progressMeanText span {
-    font-size: 0.875rem;
-    color: #000;
-    white-space: nowrap;
-    max-width: 100%;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    display: block;
-}
-
-.progressBlock {
-    display: flex;
-    align-items: center;
-}
-
-.progressSquare {
-    width: 0.16em;
-    height: 0.16em;
-    margin: 0 0.15em;
+.rateLabel {
+  fontSize: 18;
+  fontWeight: bold;
+  display: block
 }
 
 .table {
-    display: flex;
-    flex-direction: column;
-    flex: none;
-    border: solid 0.5px #979797;
+  display: flex;
+  flexDirection: column;
+  flex: none;
+  border: solid 0.5px #979797;
 }
 
 .rowData {
-    display: flex;
-    padding: 0 0.2em;
-    position: relative;
-    align-items: center;
-    flex: none;
+  display: flex;
+  padding: 0 20px;
+  position: relative;
+  alignItems: center;
+  flex: none
 }
 
 .rowBox {
-    display: flex;
-    flex-direction: column;
-    flex: none;
-    position: relative;
-}
-
-.cell span {
-    font-size: 0.875rem;
-    text-overflow: clip;
-    white-space: nowrap;
-    height: 1.25rem;
-}
-
-.rowHeader {
-    padding: 0.2em 0;
-    border-bottom: solid 1px #9b9b9b;
-}
-
-.data {
-    display: flex;
-    flex-direction: column;
-    padding: 0.2em 0;
-    overflow-y: auto;
-    overflow-x: visible;
-    max-height: 5em;
-    margin-left: -200px;
-    padding-left: 200px;
+  display: flex;
+  flexDirection: column;
+  flex: none;
+  position: relative;
 }
 
 .cell {
-    display: flex;
-    flex: auto;
-    justify-content: center;
-    align-items: center;
-    padding: 0.08em 0;
-    border-bottom: 1px solid #979797;
-    min-width: 1.4em;
-    margin: 0 0.05em;
-    position: relative;
+  display: flex;
+  justifyContent: start;
+  alignItems: center;
+  padding: 8px 0;
+  borderBottom: 1px solid #979797;
+  minWidth: 140;
+  margin: 0 5px;
+  position: relative;
+  flex: 0 0 230px;
+
+}
+
+.cell span {
+  fontSize: 14px;
+  overflow: hidden;
+  textOverflow: ellipsis;
+  whiteSpace: nowrap;
+  height: 16px;
 }
 
 .cell .progress span {
-    font-size: 0.75rem;
-    color: #000;
-    font-weight: normal;
+  fontSize: 12;
+  color: #000;
+  fontWeight: normal;
+}
+
+.ccell {
+  display: flex;
+  justifyContent: start;
+  alignItems: center;
+  padding: 8px 0;
+  borderBottom: 1px solid #979797;
+  minWidth: 125;
+  margin: 0 5px;
+  position: relative;
+  flex: 0 0 125px;
+}
+
+.ccell span {
+  fontSize: 14;
+  overflow: hidden;
+  textOverflow: ellipsis;
+  whiteSpace: nowrap;
+  height: 16px
+}
+
+.ccell .progress span {
+  fontSize: 12;
+  color: #000;
+  fontWeight: normal;
+
+}
+
+.cname {
+  width: 125px;
+  flex: none;
+}
+
+.cname span {
+  overflow: hidden;
+  textOverflow: ellipsis;
+  whiteSpace: nowrap;
+  maxWidth: 100%;
+  display: block
+}
+
+.rowHeader {
+  padding: 20px 0;
+  borderBottom: solid 1px #9b9b9b
+}
+
+.data {
+  display: flex;
+  flexDirection: column;
+  padding: 20px 0;
+  overflowY: auto;
+  overflowX: visible;
+  maxHeight: 500px;
+  marginLeft: -200px;
+  paddingLeft: 200px;
 }
 
 .cellHeader {
-    border: none;
-    cursor: pointer;
+  border: none;
+  cursor: pointer;
+}
+
+.ccellHeader {
+  border: none;
+  cursor: pointer;
 }
 
 .name {
-    width: 2.3em;
-    flex: none;
+  width: 230px;
+  flex: none;
 }
 
 .name span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-    display: block;
-}
-
-.predict {
-    width: 3.1em;
-    border: none;
-}
-
-.space {
-    margin-left: 0.1em;
+  overflow: hidden;
+  textOverflow: ellipsis;
+  whiteSpace: nowrap;
+  maxWidth: 100%;
+  display: block
 }
 
 .compute {
-    border: none;
-    cursor: pointer;
+  border: none;
+  cursor: pointer;
 }
 
 .compute span {
-    color: #448eed;
-    text-decoration: underline;
+  color: #448eed;
+  textDecoration: underline
 }
 
-.compute img{
-  margin-right: 10px;
-}
-
-.modelSelect {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    left: 0.05em;
-}
-
-.rmsePerformance, .r2Performance {
-    display: flex
-}
-
-.rmsePerformance span {
-    font-size: 2.2rem;
-    color: #adaafc;
-}
-
-.r2Performance span {
-    font-size: 2.2rem;
-    color: #9be44b;
-}
-
-.center {
-    display: flex;
-    flex: none;
-    justify-content: center;
-    margin-top: 0.1em;
-}
-
-.detail {
-    display: flex;
-    flex-direction: column;
-    padding: 0.1em 0;
-    max-height: 200px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.detailNone {
-    display: flex;
-    flex: none;
-    justify-content: center;
-}
-
-.detailNone span {
-    font-size: 0.875rem;
-    overflow: hidden;
-    max-width: 100%;
-    display: block;
-    text-overflow: ellipsis;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.detailRow {
-    display: flex;
-    padding: 0 0.25em;
-    flex: none;
-    align-items: center;
-}
-
-.detailRow span {
-    font-size: 0.875rem;
-    overflow: hidden;
-    max-width: 100%;
-    display: block;
-    text-overflow: ellipsis;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.detailName {
-    display: flex;
-    flex: 0 0 1em;
-    width: 1em;
-}
-
-.detailNum {
-    display: flex;
-    flex: 0 0 1em;
-    margin-left: 0.1em;
-}
-
-.detailProcess {
-    height: 0.875rem;
-    background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
-    border-radius: 0.875rem;
-}
-
-/**modelInsights*/
-
-.modelInsights {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-}
-
-.modelInsightsBlock {
-    display: flex;
-    flex: none;
-    margin: 0.05em 0;
-}
-
-.modelInsightsBlock span {
-    font-size: 1.125rem;
-    display: flex;
-    font-family: SanFranciscoText;
-    line-height: 1.2;
-    color: #1d2b3c;
-    margin-right: 1em;
-}
-
-.modelInsightsTable {
-    display: flex;
-    flex: none;
-    margin: 0.05em 0;
-    max-height: 5em;
-}
-
-.modelInsightsCol {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-}
-
-.modelInsightsHeader {
-    display: flex;
-    flex: none;
-    background-color: #13ce66;
-    justify-content: center;
-    align-items: center;
-    padding: 0.1em 0;
-    border-radius: 2px;
-}
-
-.modelInsightsHeader span {
-    color: #fff;
-}
-
-.modelInsightsList {
-    display: flex;
-    flex: auto;
-    flex-direction: column;
-    overflow-y: auto;
-}
-
-.modelInsightsRow {
-    display: flex;
-    flex: none;
-    padding: 0 0.05em;
-    align-items: center;
-    width: 3em;
-    height: 0.5em;
-    cursor: pointer;
-}
-
-.modelInsightsActive {
-    background-color: rgb(233, 242, 253);
-}
-
-.modelInsightsText {
-    display: flex;
-    flex: none;
-    width: 0.8em;
-}
-
-.modelInsightsText span {
-    font-size: 1.125rem;
-    display: block;
-    font-family: SanFranciscoText;
-    line-height: 1.2;
-    color: #1d2b3c;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.modelInsightsProgressBg {
-    display: flex;
-    height: 0.875rem;
-    flex: auto;
-    border-radius: 0.875rem;
-    overflow: hidden;
-    background-color: #ddd;
-}
-
-.modelInsightsProgress {
-    display: flex;
-    flex: none;
-    ;
-    background-color: #13ce66;
-}
-
-.modelInsightsImage {
-    display: flex;
-    flex: auto;
-    flex-direction: column;
-    align-items: center;
-}
-
-.modelInsightsImageTitle {
-    display: flex;
-    flex: none;
-    margin-top: 0.3em;
-}
-
-.modelInsightsImageTitle span {
-    font-size: 1rem;
-    display: block;
-    font-family: SanFranciscoText;
-    line-height: 1.2;
-    color: rgb(68, 142, 237);
-}
-
-.modelInsightsChart {
-    display: flex;
-    flex: auto;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-}
-
-.modelInsightsChart svg {
-    overflow: inherit
-}
-
-.rect {
-    fill: #b0d9f4;
-}
-
-.circle {
-    fill: rgb(68, 142, 237);
-}
-
-.d3line {
-    stroke: rgb(68, 142, 237);
-    stroke-width: 1.5px;
-    fill: transparent;
-}
-
-.modelInsightsLoading {
-    display: flex;
-    flex: auto;
-    justify-content: center;
-    align-items: center;
-}
-
-.trainingModel {
-    display: flex;
-    flex: none;
-    justify-content: center;
-    align-items: center;
-    padding: 0.08em 0;
-    border-bottom: 1px solid #979797;
-    width: 2.3em;
-    margin: 0 0.05em;
-    position: relative;
-}
-
-.trainingModel span {
-    font-size: 0.875rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-    display: block;
-    overflow: hidden;
-}
-
-.trainingAbort {
-    display: flex;
-    flex: none;
-    justify-content: center;
-    margin-top: 0.1em;
-}
-
-.abortButton {
-    display: flex;
-    flex: none;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
-    padding: 0.05em 0.3em;
-    margin: .05em auto;
-    cursor: pointer;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-}
-
-.abortButton :global(.anticon) {
-  font-size: 1rem;
-}
-
-.abortButton span {
-    font-size: .875rem;
-    font-weight: bold;
-    color: #1d2b3c;
-    font-family: SanFranciscoText;
-}
-
-.costBlock {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    position: absolute;
-    top: 0;
-    left: 100%;
-    width: 5.5em;
-    height: 4em;
-    background: #fff;
-    z-index: 2;
-    border-radius: 5px;
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.22);
-    border: solid 1px #979797;
-    padding: 0.2em 0.25em;
-}
-
-.costTitle {
-    display: flex;
-    flex: none;
-    margin-bottom: 0.1em;
-}
-
-.costTitle span {
-    font-family: SanFranciscoText;
-    font-size: 1rem;
-    line-height: 1.13;
-    color: #000000;
-}
-
-.costContent {
-    display: flex;
-    flex: none;
-}
-
-.costContent span {
-    font-family: SanFranciscoText;
-    font-size: 0.75rem;
-    line-height: 1.33;
-    color: #000000;
-}
-
-.costBox {
-    display: flex;
-    flex: auto;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.costTable {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    width: 100%;
-    overflow: hidden;
-}
-
-.costRow {
-    display: flex;
-    flex: none;
-    padding: 10px 0;
-    margin-bottom: -1px;
-    border-bottom: 1px solid #979797
-}
-
-.costCell {
-    display: flex;
-    flex: 3 1;
-    width: 0;
-    align-items: center;
-}
-
-.costCell span {
-    font-family: SanFranciscoText;
-    font-size: 0.875rem;
-    line-height: 1.29;
-    color: #000000;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-}
-
-.costCellSmall {
-    flex: none;
-    width: 1em;
-}
-
-.costCellCenter {
-    justify-content: center
-}
-
-.costTd {
-    display: flex;
-    flex: auto;
-    align-items: center;
-    border-left: 1px solid #979797;
-}
-
-.costName {
-    display: flex;
-    flex: 3 1;
-    width: 0;
-}
-
-.costInput {
-    display: flex;
-    flex: 2 1;
-    align-items: center;
-    width: 0;
-    height: 0.3em;
-    margin: 0 0.1em;
-}
-
-.costInput input {
-    font-family: SanFranciscoText;
-    font-size: 0.875rem;
-    line-height: 1.29;
-    color: #000000;
-    width: 100%;
-    height: 100%;
-    padding: 0 5px;
-}
-
-.costUnits {
-    display: flex;
-    flex: 2 1;
-    width: 0;
-}
-
-.costColor {
-    display: flex;
-    flex: none;
-    width: 0.2em;
-    height: 0.2em;
-    margin: 0 0.05em;
-}
-
-.cost11 {
-    background-color: #adaafc;
-}
-
-.cost10 {
-    background-color: #ffcc78;
-}
-
-.cost01 {
-    background-color: #ffcc78;
-}
-
-.cost00 {
-    background-color: #9be44b;
-}
-
-.costClose {
-    display: flex;
-    flex: none;
-    position: absolute;
-    right: 0.1em;
-    top: 0;
-    cursor: pointer;
-}
-
-.costClose span{
-    transform: rotate(45deg);
-    font-size: 2rem;
-    color: #9b9b9b;
-}
-
-.disabled {
-    cursor: not-allowed;
-    background-color: #d3d3d3;
-    color: #aaaaaa;
-    background-image: none;
-}
-
-.costButton {
-    display: flex;
-    flex: none;
-    justify-content: center;
-    margin-top: .1em;
-}
-
-.costButton button {
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-    background-image: linear-gradient(to bottom, #5b657b, #243448);
-    border: 0;
-    border-radius: 5px;
-    display: flex;
-    flex: none;
-    padding: .1em .2em;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.costButton span {
-    font-size: 1rem;
-    color: #fff;
-}
-
-.costTextBox {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-}
-
-.costText {
-    display: flex;
-    flex: none;
-}
-
-.costText span {
-    font-family: SanFranciscoText;
-    font-size: 0.75rem;
-    line-height: 1.33;
-    color: #000000;
-    font-weight: bold;
-}
-
-.sepCell {
-    display: flex;
-    flex: none;
-    width: 1em;
-    height: .4em;
-    position: relative;
-    flex-direction: column;
-}
-
-.sep {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    display: flex;
-    z-index: -1;
-}
-
-.sep span {
-    width: 100%;
-    border-top: 1px solid;
-    transform: rotate(21.8deg);
-}
-
-.sepText {
-    display: flex;
-    width: 50%;
-    height: 50%;
-    align-items: center;
-}
-
-.sepText span {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    font-size: .5rem;
-}
-
-.reportProgress {
-  font-size: 80px;
+.tabs {
+  borderBottom: 1px #1D2B3C solid;
   display: flex;
-  flex-direction: column;
-}
-
-.reportProgressText {
-  font-size: 16px;
-  margin: 4px;
-  display: flex;
-  flex: auto;
-}
-.nohover:hover {
-  cursor: text;
-}
-
-.recommendLabel {
-    font-size: 0.875rem;
-    line-height: 1.4;
-    white-space: nowrap;
-}
-
-.recommendLabel :global(.ant-tooltip-inner) {
-    min-height: 0;
-}
-
-.reportCancel {
-  background-image: linear-gradient(to bottom, #5b657b, #243448);
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0.1em 0.25em;
-  margin-right: .25em;
-  align-self: flex-end;
-  width: 100px;
-}
-
-.reportCancel:hover {
-  background-image: linear-gradient(to bottom, #5b657b, #243448);
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0.1em 0.25em;
-  margin-right: .25em;
-}
-
-.reportCancel:active {
-  background-image: linear-gradient(to bottom, #243448, #5b657b);
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0.1em 0.25em;
-  margin-right: .25em;
-}
-
-.tabBox {
-    display: flex;
-    flex: none;
-    /* justify-content: flex-end; */
-    border-bottom: 1px solid #979797;
+  justifyContent: flex-end;
+  marginBottom: 40px
 }
 
 .tab {
-    display: flex;
-    flex: none;
-    justify-content: center;
-    width: 3.2em;
-    border-bottom: 4px solid transparent;
-    cursor: pointer;
-    padding: 0.15em 0;
-    margin-bottom: -1px;
+  color: black;
+  fontSize: 18;
+  width: 250px;
+  padding: 10px 0;
+  marginBottom: -1;
+  cursor: pointer
 }
 
-.tab.active {
-    border-bottom-color: #1d2b3c;
-}
-
-.tab span {
-    font-family: HelveticaNeue;
-    font-size: 1.125rem;
-    line-height: 1.15;
-    color: #979797;
-}
-
-.tab.active span {
-    color: #1d2b3c;
+.active {
+  fontWeight: bold;
+  borderBottom: 5px black solid
 }

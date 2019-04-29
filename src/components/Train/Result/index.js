@@ -1,294 +1,231 @@
-import React, { Component } from 'react';
-import styles from './styles.module.css';
-import classnames from 'classnames'
-import { observer, inject } from 'mobx-react';
-import { withRouter } from 'react-router'
-import { observable } from 'mobx';
-import AdvancedView from '../AdvancedView/AdvancedView';
-import ClassificationResult from './ClassificationResult';
-import RegressionResult from './RegressionResult';
-import { ProgressBar } from 'components/Common';
-import { Modal, message, Button } from 'antd'
+import React from 'react';
+import {ContinueButton} from '../../Common/ContinueButton'
+import classes from './styles.module.css';
+import {Icon} from 'antd';
+import {VariableImpact} from './variableImpact'
+import {ModelProcessFlow} from './modelProcessFlow'
+import AdvancedView from './advanced.view'
+import D3D2 from '@src/components/charts/D3D2'
+import Iso from '@src/components/charts/Iso'
+import ParallelPlot from '@src/components/charts/ParallelPlot'
+import Hint from "../../Common/Hint";
+import sample from './sampleModel.json'
 
-const Classification = 'Classification';
+export function ModelingUnResultView(sampleModel = sample) {
+  const type = 'clustering'
 
-@inject('deploymentStore', 'routing', 'projectStore')
-@observer
-export default class ModelResult extends Component {
-  @observable show = false
-
-  deploy = () => {
-    const { project } = this.props.projectStore;
-    const { selectModel: current } = project
-    const { newVariable, trainHeader, expression } = project
-    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
-    const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
-    const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
-
-    this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.name, current.problemType, exps)
-      .then(id => this.props.routing.push('/deploy/project/' + id));
-  };
-
-  // showInsights = () => {
-  //   this.show = true
-  // }
-
-  // hideInsights = () => {
-  //   this.show = false
-  // }
-
-  componentDidUpdate() {
-    this.props.resetSide()
-  }
-
-  exportReport = (modelId) => () => {
-    try {
-      this.cancel = this.props.projectStore.project.generateReport(modelId)
-    } catch (e) {
-      message.error('export report error.')
-      this.props.projectStore.project.reportProgress = 0
-      this.props.projectStore.project.reportProgressText = 'init'
-    }
-  }
-
-  render() {
-    const { view, sort, changeView, handleSort, metric, handleChange } = this.props
-    const { project } = this.props.projectStore;
-    const { models } = project
-    if (!models.length) return null;
-    // const { view } = this;
-    return (
-      <div className={styles.modelResult}>
-        <div className={styles.tabBox}>
-          <div className={classnames(styles.tab, {
-            [styles.active]: view === 'simple'
-          })} onClick={changeView.bind(null, 'simple')}><span>Simplified View</span></div>
-          <div className={classnames(styles.tab, {
-            [styles.active]: view === 'advanced'
-          })} onClick={changeView.bind(null, 'advanced')}><span>Advanced View</span></div>
-        </div>
-        {/* <div className={styles.buttonBlock} >
-          <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
-            <span>Simple View</span>
-          </button>
-          <button className={styles.button} onClick={this.changeView.bind(this, 'advanced')}>
-            <span>Advanced View</span>
-          </button>
-        </div> */}
-        {view === 'simple' ?
-          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={sort.simple} handleSort={handleSort.bind(null, 'simple')}/> :
-          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={sort.advanced} handleSort={handleSort.bind(null, 'advanced')} metric={metric} handleChange={handleChange}/>}
-        <div className={styles.buttonBlock}>
-          {/* <button className={styles.button} onClick={this.showInsights}>
-            <span>Check Model Insights</span>
-          </button>
-          <div className={styles.or}>
-            <span>or</span>
-          </div> */}
-          <button className={styles.button} onClick={this.deploy}>
-            <span>Deploy the Model</span>
-          </button>
-        </div>
-        {/* <Modal title='Model Insights'
-          visible={current && this.show}
-          onClose={this.hideInsights}
-          content={<ModelInsights model={current} project={project} />} /> */}
-        <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={true} footer={null} onCancel={this.cancel} maskClosable={false}>
-          <div className={styles.reportProgress}>
-            <ProgressBar progress={project.reportProgress} allowRollBack={true} />
-            <span className={styles.reportProgressText}>{project.reportProgressText}</span>
-            <Button onClick={this.cancel} className={styles.reportCancel} >Cancel</Button>
+  return <div className={classes.root}>
+    {type === 'outlier' && <h3 className={classes.header}>Modeling result</h3>}
+    {type === 'clustering' && <div className={classes.tabs}>
+      <span className={`${classes.tab} ${classes.active}`}>Simple View</span>
+      <span className={`${classes.tab}`}>Advanced View</span>
+    </div>}
+    {true && <div className={classes.body}>
+      <div className={classes.top}>
+        <div className={classes.left}>
+          <div className={classes.descriptions}>
+            We have recommended a model by default<br/>
+            <small>You can also tell us your business needs to get a more precise recommendation</small>
+            <br/>
+            Selected Model: <span className={classes.modelName}>IsolationForest.custom20190109_21:42:12</span>
           </div>
-        </Modal>
+          {type === 'outlier' && <div className={classes.scores}>
+            <div className={classes.score}>
+              <div className={classes.orange}>0.5</div>
+              <span className={classes.label}>Score <Hint content='123321'/></span>
+            </div>
+            <div className={classes.rate}>
+              <div className={classes.blood}>0.1</div>
+              <span className={classes.rateLabel}>Contamination Rate <Hint content='123321'/></span>
+            </div>
+          </div>}
+          {type === 'clustering' && <div className={classes.scores}>
+            <div className={classes.cvnn}>
+              <div className={classes.orange}>0.5</div>
+              <span className={classes.label}>CVNN <Hint content='123321'/></span>
+            </div>
+            <div className={classes.cluster}>
+              <div className={classes.blood}>0.1</div>
+              <span className={classes.rateLabel}>The Number of Clusters <Hint content='123321'/></span>
+            </div>
+            <div className={classes.rSquared}>
+              <div className={classes.green}>0.85</div>
+              <span className={classes.rateLabel}>R squared <Hint content='123321'/></span>
+            </div>
+          </div>}
+          <ContinueButton text='Mapping Dictionary' width='200px'/>
+        </div>
+        <div className={classes.right}>
+          {/*<D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0'/>*/}
+          {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
+          <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/>
+        </div>
       </div>
-    );
-  }
+      {type === 'clustering' && <ClusteringTable/>}
+      {type === 'outlier' && <OutlierTable/>}
+    </div>}
+    {false && <AdvancedView/>}
+  </div>;
 }
 
-@withRouter
-@observer
-class SimpleView extends Component {
-  render() {
-    const { models, project, exportReport, sort, handleSort } = this.props;
-    const { problemType } = project;
-    return problemType === Classification ?
-      <ClassificationResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/> :
-      <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/>
-  }
+const OutlierTable = () => {
+  const classes = useStyles();
+  return <div className={classes.table}>
+    <div className={classes.rowHeader}>
+      <div className={classes.rowData}>
+        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+          <span>Model Name <Icon type='minus'/></span>
+        </div>
+        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+          <span>Score <Icon type='minus'/></span>
+        </div>
+        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+          <span>Contamination Rate <Icon type='minus'/></span>
+        </div>
+        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+          <span>Variable Impact</span>
+        </div>
+        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+          <span>Model Process Flow</span>
+        </div>
+      </div>
+    </div>
+    <div className={classes.rowBox}>
+      <div className={classes.rowData}>
+        <div className={`${classes.cell}`}>
+          <span>IsolationForest.custom20190429_12:23:12</span>
+        </div>
+        <div className={`${classes.cell}`}>
+          <span>0.5</span>
+        </div>
+        <div className={`${classes.cell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.cell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Variable.svg'} alt=""/> Compute</span>
+        </div>
+        <div className={`${classes.cell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Process.svg'} alt=""/> Compute</span>
+        </div>
+      </div>
+      <VariableImpact model={sampleModel}/>
+      <div className={classes.rowData}>
+        <div className={`${classes.cell}`}>
+          <span>IsolationForest.custom20190429_12:23:12</span>
+        </div>
+        <div className={`${classes.cell}`}>
+          <span>0.5</span>
+        </div>
+        <div className={`${classes.cell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.cell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Variable.svg'} alt=""/> Compute</span>
+        </div>
+        <div className={`${classes.cell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Process.svg'} alt=""/> Compute</span>
+        </div>
+      </div>
+      <ModelProcessFlow model={sampleModel}/>
+    </div>
+  </div>
 }
 
-// @observer
-// class ModelInsights extends Component {
-//   @observable active = 0
-
-//   componentDidMount() {
-//     when(
-//       () => !this.props.model.modelInsightsData,
-//       () => this.props.project.modelInsights()
-//     )
-//   }
-
-//   setActive = i => {
-//     const { active } = this;
-//     if (active === i) return;
-//     this.active = i
-//   }
-
-//   render() {
-//     const { project, model } = this.props;
-//     const { featureImportanceDetail, modelInsightsData, name } = model;
-//     const { active } = this;
-//     const arr = Object.entries(featureImportanceDetail).sort(
-//       (a, b) => b[1] - a[1]
-//     );
-//     return <div className={styles.modelInsights}>
-//       <div className={styles.modelInsightsBlock}><span>Click each predictors to see its value effect.</span></div>
-//       <div className={styles.modelInsightsBlock}><span>Selected Model:  {name}</span><span>Target Variable: {project.target}</span></div>
-//       <div className={styles.modelInsightsTable}>
-//         <div className={styles.modelInsightsCol}>
-//           <div className={styles.modelInsightsHeader}><span>Based on Variable Impact</span></div>
-//           <div className={styles.modelInsightsList}>
-//             {arr.map((row, i) => {
-//               return <div key={i} className={classnames(styles.modelInsightsRow, {
-//                 [styles.modelInsightsActive]: i === active
-//               })} onClick={this.setActive.bind(null, i)}>
-//                 <div className={styles.modelInsightsText} title={row[0]}><span>{row[0]}</span></div>
-//                 <div className={styles.modelInsightsProgressBg}>
-//                   <div className={styles.modelInsightsProgress} style={{ width: (row[1] * 100) + "%" }}></div>
-//                 </div>
-//               </div>
-//             })}
-//           </div>
-//         </div>
-//         {modelInsightsData ? <div className={styles.modelInsightsImage}>
-//           <div className={styles.modelInsightsImageTitle}><span>How do I interpret the graph?</span></div>
-//           <ModelInsightsChart charts={modelInsightsData} field={arr[active][0]} />
-//         </div> : <div className={styles.modelInsightsLoading}>
-//             <Spin size="large" />
-//           </div>}
-//       </div>
-//     </div>
-//   }
-// }
-
-// @observer
-// class ModelInsightsChart extends Component {
-//   componentDidMount() {
-//     this.renderD3()
-//   }
-
-//   componentDidUpdate() {
-//     this.renderD3()
-//   }
-
-//   renderD3 = () => {
-//     d3.select(`.${styles.modelInsightsChart} svg`).remove();
-
-//     const { charts, field } = this.props;
-//     if (!charts[field]) return;
-//     const { x, freq, partial } = charts[field];
-
-//     const padding = { left: 50, bottom: 30, right: 50, top: 10 };
-
-//     const height = 300;
-//     const width = 600;
-//     const realHeight = height - padding.bottom - padding.top;
-//     const realWidth = width - padding.left - padding.right;
-
-//     const data = x.map((v, k) => {
-//       return {
-//         x: v,
-//         y1: freq[k],
-//         y2: partial[k]
-//       }
-//     })
-//     //添加一个 SVG 画布
-//     const svg = d3.select(`.${styles.modelInsightsChart}`)
-//       .append("svg")
-//       .attr("width", width)
-//       .attr("height", height)
-//       .append("g")
-//       .attr('transform', `translate(${padding.left}, 0)`);
-
-//     //x轴的比例尺
-//     const xScale = d3.scaleBand()
-//       .rangeRound([0, realWidth])
-//       .domain(x)
-//       .padding(0.3);
-
-//     //y轴的比例尺
-//     const y1Scale = d3.scaleLinear()
-//       .range([realHeight, 0])
-//       .domain([0, d3.max(freq)])
-//       .clamp(true)
-//       .nice();
-
-//     //y轴的比例尺
-//     const y2Scale = d3.scaleLinear()
-//       .range([realHeight, 0])
-//       .domain([0, d3.max(partial)])
-//       .clamp(true)
-//       .nice();
-
-//     //定义x轴
-//     const xAxis = d3.axisBottom(xScale).tickValues(x);
-
-//     //定义y轴
-//     const y1Axis = d3.axisLeft(y1Scale);
-
-//     //定义y轴
-//     const y2Axis = d3.axisRight(y2Scale);
-
-//     //添加x轴
-//     svg.append("g")
-//       // .attr("class",`${styles.axis}`)
-//       .attr("transform", `translate(0, ${realHeight + padding.top})`)
-//       .call(xAxis);
-
-//     //添加y轴
-//     svg.append("g")
-//       // .attr("class",`${styles.axis}`)
-//       .attr("transform", `translate(0, ${padding.top})`)
-//       .call(y1Axis);
-
-//     //添加y轴
-//     svg.append("g")
-//       // .attr("class",`${styles.axis}`)
-//       .attr("transform", `translate(${realWidth}, ${padding.top})`)
-//       .call(y2Axis);
-
-//     const rects = svg.selectAll(`.${styles.rect}`);
-//     rects.remove();
-//     rects.data(data)
-//       .enter()
-//       .append('rect')
-//       .attr('class', styles.rect)
-//       .attr('x', d => xScale(d.x))
-//       .attr('y', d => y1Scale(d.y1) + padding.top)
-//       .attr('width', xScale.bandwidth())
-//       .attr('height', d => realHeight - y1Scale(d.y1));
-
-//     const circles = svg.selectAll(styles.circle);
-//     circles.remove();
-//     circles.data(data)
-//       .enter().append('circle')
-//       .attr('class', styles.circle)
-//       .attr('r', 6)
-//       .attr('cx', d => xScale(d.x) + xScale.bandwidth() / 2)
-//       .attr('cy', d => y2Scale(d.y2));
-
-//     const line = d3.line()
-//       .x(d => xScale(d.x) + xScale.bandwidth() / 2)
-//       .y(d => y2Scale(d.y2));
-
-//     svg.append('path')
-//       .datum(data)
-//       .attr('class', styles.line)
-//       .attr('d', line);
-//   }
-
-//   render() {
-//     return <div className={styles.modelInsightsChart}></div>
-//   }
-// }
+const ClusteringTable = () => {
+  const classes = useStyles();
+  return <div className={classes.table}>
+    <div className={classes.rowHeader}>
+      <div className={classes.rowData}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>Model Name <Icon type='minus'/></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>CVNN <Icon type='minus'/> <Hint content='123321'/></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>Sihouette Score <Icon type='minus'/> <Hint content='123321'/></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>CH Index <Icon type='minus'/> <Hint content='123321'/></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>R squared <Icon type='minus'/> <Hint content='123321'/></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>#clusters <Icon type='minus'/> <Hint content='123321'/></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>Variable Impact</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>Model Process Flow</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span>Explaination</span>
+        </div>
+      </div>
+    </div>
+    <div className={classes.rowBox}>
+      <div className={classes.rowData}>
+        <div className={`${classes.ccell}`}>
+          <span>IsolationForest.custom20190429_12:23:12</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>0.57</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>4</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Variable.svg'} alt=""/> Compute</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Process.svg'} alt=""/> Compute</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Variable.svg'} alt=""/> Compute</span>
+        </div>
+      </div>
+      <VariableImpact model={sampleModel}/>
+      <div className={classes.rowData}>
+        <div className={`${classes.ccell}`}>
+          <span>IsolationForest.custom20190429_12:23:12</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>0.57</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>X</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>4</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Variable.svg'} alt=""/> Compute</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Process.svg'} alt=""/> Compute</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span><img src={'/static/modeling/Variable.svg'} alt=""/> Compute</span>
+        </div>
+      </div>
+      <ModelProcessFlow model={sampleModel}/>
+    </div>
+  </div>
+}

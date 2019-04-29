@@ -19,7 +19,8 @@
     "noEmit": true,
     "jsx": "preserve",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "checkJs": false
   },
   "include": [
     "src"
