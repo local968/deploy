@@ -45,7 +45,6 @@ router.post('/', (req, res) => {
   // console.log('upload nginx callback')
   const form = new formidable.IncomingForm();
   form.parse(req, function (error, fields, files) {
-    console.log('fields:', fields)
     const params = req.query
     if (!params || !params.token || !params.userId || !params.type) return res.json({
       status: 404,

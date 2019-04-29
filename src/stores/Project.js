@@ -7,8 +7,9 @@ import uuid from 'uuid';
 import Papa from 'papaparse';
 import {message as antdMessage, Modal} from 'antd';
 import axios from 'axios'
-import {formatNumber} from 'util'
+import { formatNumber } from 'util'
 
+const testIndex = 'r2_3e6417df-3b40-43b3-a80b-a5b165387a81'
 export default class Project {
   @observable models = []
   @observable trainModel = null
@@ -47,7 +48,7 @@ export default class Project {
   @observable uploadData = [];
   @observable rawHeader = [];
   @observable colType = [];
-  @observable totalLines = 0;
+  // @observable totalLines = 0;
   @observable totalRawLines = 0;
   @observable firstEtl = true;
   @observable target = '';
@@ -91,6 +92,10 @@ export default class Project {
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
   @observable missingReason = {}
+
+  // @observable totalFixedCount = 0
+  @observable deletedCount = 0
+
   //原始issue
   @observable nullLineCountsOrigin = {}
   @observable mismatchLineCountsOrigin = {}
@@ -183,6 +188,18 @@ export default class Project {
       });
       return
     })
+  }
+
+  readIndex = async (index = testIndex) => {
+    const url = `http://127.0.0.1:8000/etls/${index}/preview`
+    const { data } = await axios.get(url)
+    const result = data.result.map(row => this.rawHeader.map(h => row[h]))
+    return result
+  }
+
+  @computed
+  get totalLines() {
+    return this.totalRawLines - this.deletedCount
   }
 
   @computed
@@ -378,22 +395,23 @@ export default class Project {
   initProject = () => {
     if (this.init) return
     this.init = true
+    // this.autorun.push(autorun(async () => {
+    //   if (this.uploadFileName && this.uploadFileName.length > 0) {
+    //     const api = await socketStore.ready()
+    //     const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
+    //     this.fileNames = fileNames || []
+    //     return
+    //   }
+    //   this.fileNames = []
+    // }))
     this.autorun.push(autorun(async () => {
-      if (this.uploadFileName && this.uploadFileName.length > 0) {
-        const api = await socketStore.ready()
-        const fileNames = (await api.getFiles({files: this.uploadFileName.toJS()})).fileNames
-        this.fileNames = fileNames || []
-        return
-      }
-      this.fileNames = []
-    }))
-    this.autorun.push(autorun(async () => {
-      if (!this.originPath) {
+      if (!this.rawHeader) {
         this.uploadData = []
       } else {
-        this.readData(this.originPath).then(data => {
-          this.uploadData = data.slice(1)
-        })
+        // this.readData(this.originPath).then(data => {
+        //   this.uploadData = data.slice(1)
+        // })
+        this.uploadData = await this.readIndex()
       }
     }))
     // this.autorun.push(autorun(async () => {
@@ -496,8 +514,15 @@ export default class Project {
     })
     this.etling = true
     await this.updateProject(backData)
-    const pass = await this.etl()
-    if (!pass) this.updateProject({uploadFileName: []})
+    // const pass = await this.etl()
+    const result = await this.originalStats()
+    if (result.status !== 200) this.updateProject({ uploadFileName: [] })
+  }
+
+  @action
+  originalStats = async (index = testIndex) => {
+    const api = await socketStore.ready()
+    return await api.originalStats({ index, projectId: this.id })
   }
 
   @action
@@ -554,8 +579,19 @@ export default class Project {
 
   @action
   endSchema = async () => {
-    this.etling = true
+    // this.etling = true
     await this.abortTrainByEtl()
+    const step = this.noComputeTemp ? {
+      curStep: 3,
+      mainStep: 3,
+      subStepActive: 1,
+      lastSubStep: 1
+    } : {
+        curStep: 2,
+        mainStep: 2,
+        subStepActive: 3,
+        lastSubStep: 3
+      }
     await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
       colType: {...this.colType},
@@ -563,16 +599,14 @@ export default class Project {
       noCompute: this.noComputeTemp,
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp,
-      curStep: 2,
-      mainStep: 2,
-      subStepActive: 2,
-      lastSubStep: 2
+      ...step
     }))
-    return await this.etl(true)
+    // return await this.etl(true)
   }
 
   @computed
   get qualityHasChanged() {
+    return true
     let hasChange = false
     const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
     for (const item of list) {
@@ -609,7 +643,16 @@ export default class Project {
       if (min < 5) data.crossCount = min - 1
     }
     await this.updateProject(data)
-    await this.etl()
+    // await this.etl()
+    await this.newEtl()
+  }
+
+  newEtl = async () => {
+    const api = await socketStore.ready()
+    await api.newEtl({ projectId: this.id }, ({ progress }) => {
+      this.etlProgress = progress
+    })
+    this.etling = false
   }
 
   hasChanged = (before, after) => {
