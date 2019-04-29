@@ -473,6 +473,7 @@ export default class Project {
     //修改上传文件
   @action
   fastTrackInit = async (data) => {
+
     await this.abortTrainByEtl()
 
     const {

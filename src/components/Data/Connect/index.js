@@ -103,10 +103,11 @@ export default class DataConnect extends Component {
   }
 
   upload = action(data => {
+
     this.process = 50
     this.file = null
 
-    this.props.projectStore.project.fastTrackInit(data.fileId).then(() => {
+    this.props.projectStore.project.fastTrackInit(data).then(() => {
       this.process = 0
       this.uploading = false
     });
