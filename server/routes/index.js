@@ -6,6 +6,7 @@ const api = require('./api')
 require('./project')
 require('./deployment')
 require('./database')
+require('./etl')
 
 const router = new Router()
 
