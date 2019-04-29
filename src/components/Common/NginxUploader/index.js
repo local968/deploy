@@ -32,8 +32,8 @@ class Uploader {
   constructor(file, config = {}) {
     this.path = config.path || '/upload';
     this.headers = config.headers || {};
-    this.CHUNK_SIZE = parseInt(config.chunkSize, 10) || 4194304;
-    this.concurrency = parseInt(config.concurrency, 10) || 4;
+    this.CHUNK_SIZE = 1024 * 1024;
+    this.concurrency = 1;
     this.file = file;
     if (config.params) {
       this.path += Object.entries(config.params).reduce(

@@ -13,6 +13,7 @@ const REDIS_TYPE = process.env.REDIS_TYPE || '1' // 1 standalone 2 sentinel
 const PASSWORD = process.env.PASSWORD || '7788414'
 const BACKEND = process.env.REACT_APP_NGINX_BACKEND || '1'
 const HOST = process.env.R2HOST || 'http://127.0.0.1:3000/'
+const ETL_SERVICE = process.env.ETL_SERVICE || 'http://192.168.0.133:4005'
 
 const redis = REDIS_TYPE === '2' ?
   {
@@ -50,7 +51,8 @@ const config = {
       pass: "IfxMzpWxskXq"
     }
   },
-  supportMail: 'support@r2.ai'
+  supportMail: 'support@r2.ai',
+  ETL_SERVICE: ETL_SERVICE
 }
 
 module.exports = config
