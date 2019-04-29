@@ -367,8 +367,8 @@ wss.register("addProject", async (message, socket) => {
     error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
   }
   const id = await redis.incr("node:project:count")
-  const { result } = await mq({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
-  return createOrUpdate(id, userId, { id, userId, host: result.host }, true)
+  // const { result } = await mq({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
+  return createOrUpdate(id, userId, { id, userId }, true)
 })
 
 wss.register("updateProject", (message, socket) => {
@@ -574,6 +574,7 @@ wss.register('etl', (message, socket, progress) => {
     })
   })
 })
+
 
 wss.register('abortEtl', (message, socket) => {
   const projectId = message.projectId
