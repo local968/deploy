@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="275" height="255" viewBox="0 0 275 255">
+    <g fill="none" fill-rule="evenodd">
+        <path fill="#FFF" d="M33.567 13.872h224.227v190.912H33.567z"/>
+        <path stroke="#D8D8D8" stroke-linecap="square" d="M34.167 84.972h199.387M34.167 106.092h199.387M34.167 42.733h199.387M34.167 63.853h199.387M34.167 127.642h199.387M34.167 148.762h199.387M34.167 169.881h199.387M34.167 191h199.387"/>
+        <path stroke="#4A4A4A" stroke-linecap="square" d="M34.167 212.12h199.387"/>
+        <path stroke="#D8D8D8" stroke-linecap="square" d="M33.783 22.476h199.388M61.804 211.258v-191.8M89.46 211.258v-191.8M117.116 211.258v-191.8M144.772 211.258v-191.8M172.428 211.258v-191.8M200.084 211.258v-191.8M227.74 211.258v-191.8"/>
+        <ellipse cx="52.884" cy="19.883" fill="#5E88FC" rx="1.276" ry="1.509"/>
+        <ellipse cx="223.847" cy="191.884" fill="#5E88FC" rx="1.276" ry="1.509"/>
+        <ellipse cx="227.283" cy="199.989" fill="#5E88FC" rx="1.276" ry="1.509"/>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="6.177" y="114.571">0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="0" y="135.436">-0.5</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x=".589" y="156.3">-1.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x=".589" y="177.164">-1.5</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x=".589" y="198.028">-2.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="6.177" y="31.114">2.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="6.177" y="51.978">1.5</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="6.177" y="72.843">1.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="6.177" y="93.707">0.5</tspan>
+        </text>
+        <path stroke="#9B9B9B" stroke-dasharray="5" stroke-linecap="square" d="M34.855 105.899H235.01"/>
+        <path stroke="#4A4A4A" stroke-linecap="square" d="M34.148 211.258v-191.8"/>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="99.975" y="251.575">Predicted Target Value</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="20.294" y="13.202">Residual</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="30.867" y="227.35">100</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="58.575" y="227.35">200</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="86.283" y="227.35">300</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="113.991" y="227.35">400</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="141.699" y="227.35">500</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="169.407" y="227.35">600</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="197.115" y="227.35">700</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="224.823" y="227.35">800</tspan>
+        </text>
+        <path stroke="#01B8BE" stroke-dasharray="1,23" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M45 73l12 68 13-63 20 56 18-79 23 94 38-88 6 73 32-61 13 53-64 30-38 46-53-34 5-19 105 37L57 50l67-25 69 25-60.5 16 36.5 68-79 15"/>
+    </g>
+</svg>
