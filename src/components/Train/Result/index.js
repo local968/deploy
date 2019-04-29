@@ -1,17 +1,17 @@
 import React from 'react';
-import {ContinueButton} from '../../Common/ContinueButton'
+import {ContinueButton} from 'components/Common'
 import classes from './styles.module.css';
 import {Icon} from 'antd';
-import {VariableImpact} from './variableImpact'
-import {ModelProcessFlow} from './modelProcessFlow'
-import AdvancedView from './advanced.view'
-import D3D2 from '@src/components/charts/D3D2'
-import Iso from '@src/components/charts/Iso'
-import ParallelPlot from '@src/components/charts/ParallelPlot'
+import VariableImpact from './variableImpact'
+import ModelProcessFlow from './modelProcessFlow'
+import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
+// import D3D2 from '@src/components/charts/D3D2'
+// import Iso from '@src/components/charts/Iso'
+// import ParallelPlot from '@src/components/charts/ParallelPlot'
 import Hint from "../../Common/Hint";
 import sample from './sampleModel.json'
 
-export function ModelingUnResultView(sampleModel = sample) {
+export function ModelResult(sampleModel = sample) {
   const type = 'clustering'
 
   return <div className={classes.root}>
@@ -58,13 +58,13 @@ export function ModelingUnResultView(sampleModel = sample) {
         <div className={classes.right}>
           {/*<D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0'/>*/}
           {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
-          <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/>
+          {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
       </div>
       {type === 'clustering' && <ClusteringTable/>}
       {type === 'outlier' && <OutlierTable/>}
     </div>}
-    {false && <AdvancedView/>}
+    {false && <AdvancedViewUn/>}
   </div>;
 }
 

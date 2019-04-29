@@ -6,7 +6,7 @@ import { autorun, observable, action } from 'mobx'
 import StartTrain from './Start';
 import Loading from './Loading';
 import ModelError from './Error';
-import ModelResult from './Result';
+import {ModelResult} from './Result';
 import { ProjectSide } from 'components/Common';
 import modelSelectionIcon from './model_selection_d.svg';
 import startModelingActiveIcon from './start_modeling_a.svg';
