@@ -43,27 +43,37 @@ async function scheduleHandler() {
       const fileId = deployment[`${schedule.type}Options`].fileId
       const fileName = deployment[`${schedule.type}Options`].file
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
-      const file = await api.getFile(fileId)
       const newFeatureLabel = await api.getFeatureLabel(deployment.projectId)
+      let cmd ='';
+      switch (deployment.modelType) {
+        case 'Clustering':
+          cmd = 'clustering.deploy';
+          break;
+        case 'Outlier':
+          cmd = 'outlier.deploy';
+          break;
+        default:
+          cmd = 'clfreg.deploy';
+      }
       const request = {
         requestId: `schedule-${schedule.id}`,
         projectId: deployment.projectId,
         userId: deployment.userId,
-        csvLocation: [file.path],
+        csvLocation: [fileId],
         ext: [ext],
-        command: "deploy2",
+        command: cmd,
         solution: deployment.modelName,
         actionType: schedule.type
       }
       if (!!Object.keys(newFeatureLabel || {}).length) request.newFeatureLabel = newFeatureLabel
-      if (deployment.modelType !== "Regression") request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
+      if (deployment.modelType === "Classification") request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
       await command(request, data => {
         result = { ...result, ...data.result }
         return data.status === 100 || data.status < 0
       })
-      if (result['process error']) api.decreaseLines(restrictQuery, file.lineCount)
+      if (result['process error']) api.decreaseLines(restrictQuery, deployment.lineCount)
       schedule.result = result
       schedule.status = result['process error'] ? 'issue' : 'finished'
       schedule.updatedDate = moment().unix()

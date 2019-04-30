@@ -86,8 +86,8 @@ export default function EsUploader(file, option = {}) {
             totalRawLines: no,
             cleanHeader,
             rawHeader,
-            dataHeader: cleanHeader
-          })
+            dataHeader: cleanHeader,
+          },file)
         })
         // setUploadStatus('finished, total uploaded: ' + no + ' lines')
 
