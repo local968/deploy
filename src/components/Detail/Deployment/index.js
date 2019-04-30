@@ -123,17 +123,13 @@ export default class Deployment extends Component {
         this.uploadError = error
       }),
       onFinished: action((response, file) => {
-        if (response.status === 200) {
-          cddo.file = file.name
-          cddo.fileId = response.fileId
-          cddo.source = 'file'
-          cd.save()
-          this.uploadPercentage = 100
-          this.uploadStatus = false
-        } else {
-          this.uploadError = response.message
-          console.error(response)
-        }
+        cddo.file = file.name
+        cddo.fileId = response.originalIndex
+        cddo.source = 'file'
+        cd.lineCount = response.totalRawLines
+        cd.save()
+        this.uploadPercentage = 100
+        this.uploadStatus = false
       }),
       onProgress: action((progress, speed) => {
         const done = progress.split('/')[0]

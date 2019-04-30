@@ -100,29 +100,31 @@ wss.register('newEtl', async (message, socket, process) => {
   if (result.userId !== userId) return { status: 420, message: 'error' }
   const project = result
   const stats = project.stats
-  stats[project.target].isTarget = true
 
-  let deletedValues = []
-  if (project.targetArray && project.targetArray.length > 1) {
-    deletedValues = Object.keys(project.colValueCounts).filter(k => !project.targetArray.includes(k))
-  } else {
-    deletedValues = Object.entries(project.colValueCounts).sort((a, b) => b[1] - a[1]).map(([k]) => k)
-  }
+  if(project.problemType && project.problemType !=='Clustering' && project.problemType !== 'Outlier' ){
+    stats[project.target].isTarget = true
+    let deletedValues = []
+    if (project.targetArray && project.targetArray.length > 1) {
+      deletedValues = Object.keys(project.colValueCounts).filter(k => !project.targetArray.includes(k))
+    } else {
+      deletedValues = Object.entries(project.colValueCounts).sort((a, b) => b[1] - a[1]).map(([k]) => k)
+    }
 
-  stats[project.target].mapFillMethod = {
-    ...Object.entries(project.renameVariable).reduce((prev, [key, value]) => {
-      prev[key] = {
-        type: 'replace',
-        value
-      }
-      return prev
-    }, {}),
-    ...deletedValues.reduce((prev, key) => {
-      prev[key] = {
-        type: 'delete'
-      }
-      return prev
-    }, {})
+    stats[project.target].mapFillMethod = {
+      ...Object.entries(project.renameVariable).reduce((prev, [key, value]) => {
+        prev[key] = {
+          type: 'replace',
+          value
+        }
+        return prev
+      }, {}),
+      ...deletedValues.reduce((prev, key) => {
+        prev[key] = {
+          type: 'delete'
+        }
+        return prev
+      }, {})
+    }
   }
 
   for (let key in stats) {

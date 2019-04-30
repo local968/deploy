@@ -402,12 +402,6 @@ async function checkEtl(projectId, userId) {
       }
     })
   }
-
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(true)
-    }, 1000)
-  })
 }
 
 wss.register("addProject", async (message, socket) => {
@@ -913,7 +907,7 @@ wss.register('train', async (message, socket, progress) => {
         const stats = await getProjectField(projectId, 'stats')
         hasModel = true;
         await createOrUpdate(projectId, userId, {trainModel: null})
-        const modelResult = await createModel(userId, projectId, result.name, {...result, stats})
+        const modelResult = await createModel(userId, projectId, result.modelName, {...result, stats})
         processValue = await addSettingModel(userId, projectId)(modelResult)
         // return progress(model)
       } else if (result.data) {
