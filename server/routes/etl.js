@@ -93,9 +93,9 @@ wss.register('newEtl', async (message, socket, process) => {
     stats[project.target].isTarget = true
     let deletedValues = []
     if (project.targetArray && project.targetArray.length > 1) {
-      deletedValues = Object.keys(project.colValueCounts).filter(k => !project.targetArray.includes(k))
+      deletedValues = Object.keys(project.colValueCounts[project.target]).filter(k => !project.targetArray.includes(k))
     } else {
-      deletedValues = Object.entries(project.colValueCounts).sort((a, b) => b[1] - a[1]).map(([k]) => k)
+      deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).map(([k]) => k)
     }
 
     stats[project.target].mapFillMethod = {
@@ -133,17 +133,17 @@ wss.register('newEtl', async (message, socket, process) => {
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
-      console.log('interval', data.task);
       if (data.task) {
-        const status = data.task.status
-        const progress = 95 * (status.created + status.deleted) / status.total || 0
-        process({ progress, status: 1 })
-      }
-      else {
+        if (data.task.status) {
+          const status = data.task.status
+          const progress = 95 * (status.created + status.deleted) / status.total || 0
+          process({ progress, status: 1 })
+        }
+      } else {
         clearInterval(interval)
         process({ progress: 95, status: 1 })
         const { data: { totalFixedCount, deletedCount } } = await axios.post(`${esServicePath}/etls/${project.originalIndex}/fixedLines`, stats)
-        createOrUpdate(projectId, userId, { etlIndex, opaqueId, totalFixedLines: totalFixedCount, deletedCount })
+        createOrUpdate(projectId, userId, { etlIndex, opaqueId, totalFixedLines: totalFixedCount, deletedCount, etlProgress: 0 })
         resolve({
           status: 200,
           message: 'ok',
