@@ -646,6 +646,7 @@ export default class Project {
     await api.newEtl({projectId: this.id}, ({progress}) => {
       this.etlProgress = progress
     })
+    this.etlProgress = 0
     this.etling = false
   }
 
