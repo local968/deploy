@@ -7,7 +7,7 @@ import uuid from 'uuid';
 import Papa from 'papaparse';
 import {message as antdMessage, Modal} from 'antd';
 import axios from 'axios'
-import { formatNumber } from 'util'
+import {formatNumber} from 'util'
 
 export default class Project {
   @observable models = []
@@ -192,7 +192,7 @@ export default class Project {
 
   readIndex = async (index) => {
     const url = `/etls/${index}/preview`
-    const { data } = await axios.get(url)
+    const {data} = await axios.get(url)
     const result = data.result.map(row => this.rawHeader.map(h => row[h]))
     return result
   }
@@ -284,6 +284,7 @@ export default class Project {
       expression: {},
       validationRate: 20,
       holdoutRate: 20,
+      hasSendEtl: false
     }
   }
 
@@ -506,13 +507,13 @@ export default class Project {
     await this.updateProject(backData)
     // const pass = await this.etl()
     const result = await this.originalStats()
-    if (result.status !== 200) this.updateProject({ uploadFileName: [], originalIndex: '' })
+    if (result.status !== 200) this.updateProject({uploadFileName: [], originalIndex: ''})
   }
 
   @action
   originalStats = async () => {
     const api = await socketStore.ready()
-    return await api.originalStats({ index: this.originalIndex, projectId: this.id })
+    return await api.originalStats({index: this.originalIndex, projectId: this.id})
   }
 
   @action
@@ -577,11 +578,11 @@ export default class Project {
       subStepActive: 1,
       lastSubStep: 1
     } : {
-        curStep: 2,
-        mainStep: 2,
-        subStepActive: 3,
-        lastSubStep: 3
-      }
+      curStep: 2,
+      mainStep: 2,
+      subStepActive: 3,
+      lastSubStep: 3
+    }
     await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
       colType: {...this.colType},
@@ -629,7 +630,10 @@ export default class Project {
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
-      if (min < 3) return await Promise.reject()
+      if (min < 3) {
+        console.error("数量太小");
+        return await Promise.reject()
+      }
       if (min < 5) data.crossCount = min - 1
     }
     await this.updateProject(data)
@@ -639,7 +643,7 @@ export default class Project {
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    await api.newEtl({ projectId: this.id }, ({ progress }) => {
+    await api.newEtl({projectId: this.id}, ({progress}) => {
       this.etlProgress = progress
     })
     this.etling = false
@@ -1256,7 +1260,7 @@ export default class Project {
     if (this.etling) return antdMessage.error('modeling error')
     this.train2ing = true
     this.isAbort = false
-    socketStore.ready().then(api => api.train({...trainData, data: updateData}, progressResult => {
+    socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
       // if (this.isAbort) return
       // if (progressResult.name === "progress") {
       //   if (progressResult.trainId) this.trainingId = progressResult.trainId
