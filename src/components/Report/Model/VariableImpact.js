@@ -7,8 +7,8 @@ import { formatNumber } from 'util'
 export default class VariableImpact extends Component {
   render() {
     const { model } = this.props;
-    const { featureImportanceDetail } = model;
-    const arr = Object.entries(featureImportanceDetail).sort(
+    const { featureImportance } = model;
+    const arr = Object.entries(featureImportance).sort(
       (a, b) => b[1] - a[1]
     );
     return (

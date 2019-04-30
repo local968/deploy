@@ -9,7 +9,7 @@ export default class Model {
   @observable backend;
   @observable featureImportance;
   @observable executeSpeed = 0;
-  @observable name = "";
+  @observable modelName = "";
   @observable modelInsightsData = null;
   @observable fitIndex = 0;
   @observable chartData;
@@ -21,11 +21,11 @@ export default class Model {
   @observable fitIndexModified;
   @observable filtedModels;
   @observable importanceLoading = false
-  @observable featureImportanceDetail = {}
+  // @observable featureImportanceDetail = {}
 
-  constructor(projectId, model, name) {
+  constructor(projectId, model, modelName) {
     this.projectId = projectId;
-    this._id = name;
+    this._id = modelName;
     Object.assign(this, model);
 
     this.updateModel = debounce(this.updateModel, 1000)
@@ -59,7 +59,7 @@ export default class Model {
       return false;
     }
     Reflect.deleteProperty(data, 'id')
-    Reflect.deleteProperty(data, 'name')
+    Reflect.deleteProperty(data, 'modelName')
     Reflect.deleteProperty(data, 'projectId')
 
     for (let key in data) {
@@ -236,7 +236,7 @@ export default class Model {
     });
   }
   permutationImportance = () => {
-    const arr = Object.keys(this.featureImportanceDetail || {})
+    const arr = Object.keys(this.featureImportance || {})
     if (!!arr.length) return
     this.importanceLoading = true
     socketStore.ready().then(api => {

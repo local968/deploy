@@ -92,7 +92,7 @@ export default class ModelProcessFlow extends Component {
 	}
 
 	render() {
-		const { dataFlow, name = '' } = this.props.model;
+		const { dataFlow, modelName = '' } = this.props.model;
 		if (dataFlow.length === 1) {
 			return <section className={styles.process}>
 				<label>Raw Data</label>
@@ -129,7 +129,7 @@ export default class ModelProcessFlow extends Component {
 				<label>Prediction</label>
 			</section>
 		} else {
-			let str = name.split('.')[0];
+			let str = modelName.split('.')[0];
 			str = str.substring(0, str.length - 1);
 			return <section className={styles.process}>
 				<label>Raw Data</label>

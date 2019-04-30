@@ -220,7 +220,7 @@ export default class AdvancedView extends Component {
           return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
         case 'Model Name':
         default:
-          return (aModel.name > bModel.name ? 1 : -1) * (sort.value === 1 ? 1 : -1)
+          return (aModel.modelName > bModel.modelName ? 1 : -1) * (sort.value === 1 ? 1 : -1)
         // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
         // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
         // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
@@ -244,7 +244,7 @@ export default class AdvancedView extends Component {
     if (this.currentSettingId === 'all') return _filtedModels;
     const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
     if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
-      return _filtedModels.filter(model => currentSetting.models.find(id => model.name === id))
+      return _filtedModels.filter(model => currentSetting.models.find(id => model.modelName === id))
     return _filtedModels
   }
 
@@ -452,7 +452,7 @@ class AdvancedModelTable extends Component {
   }
   render() {
     const { model, texts, metric, checked } = this.props;
-    const { score, name, reason } = model;
+    const { score, modelName, reason } = model;
     const { detail } = this.state;
     const { validate, holdout } = reason || {}
     return (
@@ -464,8 +464,8 @@ class AdvancedModelTable extends Component {
                 return (
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
-                    <Tooltip title={name}>
-                      <span className={styles.modelName} alt={name}>{name}</span>
+                    <Tooltip title={modelName}>
+                      <span className={styles.modelName} alt={modelName}>{modelName}</span>
                     </Tooltip>
                   </div>}
                   />
@@ -600,7 +600,7 @@ class ClassificationModelRow extends Component {
   render() {
     const { model, texts, metric, checked, yes, no } = this.props;
     if (!model.chartData) return null;
-    const { name, fitIndex, chartData: { roc }, score } = model;
+    const { modelName, fitIndex, chartData: { roc }, score } = model;
     const { detail } = this.state;
     return (
       <div >
@@ -611,8 +611,8 @@ class ClassificationModelRow extends Component {
                 return (
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
-                    <Tooltip title={name}>
-                      <span className={styles.modelName} alt={name} >{name}</span>
+                    <Tooltip title={modelName}>
+                      <span className={styles.modelName} alt={modelName} >{modelName}</span>
                     </Tooltip>
                   </div>}
                   />

@@ -1310,7 +1310,7 @@ export default class Project {
   setModel = data => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
-    if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
+    if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
     const model = new Model(this.id, {...data, measurement: this.measurement})
     this.models = [...this.models.filter(m => data.id !== m.id), model]
     if (data.chartData && this.criteria === "cost") {

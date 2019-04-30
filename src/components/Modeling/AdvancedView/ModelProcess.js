@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 @observer
 export default class ModelProcess extends Component {
   render() {
-    const { name, modelProcessFlow: {flow, flowPara} } = this.props.model;
+    const { modelName, modelProcessFlow: {flow, flowPara} } = this.props.model;
     const processFlow = this.props.model.modelProcessFlow();
     const { report } = this.props;
     const processes = ['Raw Data', 'Data Preprocessing', 'Feature Processing', 'Model Training', 'Prediction'];
@@ -26,20 +26,20 @@ export default class ModelProcess extends Component {
       'Model Training': 'rgb(229, 233, 252)',
       'Prediction': 'rgb(68, 142, 237)'
     };
-    if (name.startsWith('ensemble')) {
+    if (modelName.startsWith('ensemble')) {
       return (
         <div className={`${styles.modelProcess} ${this.props.className}`}>
-          <SubStep name={name} process="Raw Data" color={colors['Raw Data']} legend={!report && legends['Raw Data']} />
+          <SubStep modelName={modelName} process="Raw Data" color={colors['Raw Data']} legend={!report && legends['Raw Data']} />
           <Ensemble colors={colors} model={this.props.model} legends={legends} report={report} />
           <Arrow />
-          <SubStep name={name} process="Ensembled Model" color={colors['Ensembled Model']} legend={!report && legends['Ensembled Model']} />
-          <SubStep name={name} hasArrow={false} process="Prediction" color={colors['Prediction']} legend={!report && legends['Prediction']} />
+          <SubStep modelName={modelName} process="Ensembled Model" color={colors['Ensembled Model']} legend={!report && legends['Ensembled Model']} />
+          <SubStep modelName={modelName} hasArrow={false} process="Prediction" color={colors['Prediction']} legend={!report && legends['Prediction']} />
         </div>
       );
     }
     return (
       <div className={`${styles.modelProcess} ${this.props.className}`}>
-        {processes.map(p => <SubStep name={name} processFlow={processFlow} flowPara={flowPara} flow={flow} key={p} hasArrow={p !== 'Prediction'} process={p} color={colors[p]} legend={legends[p]} />)}
+        {processes.map(p => <SubStep modelName={modelName} processFlow={processFlow} flowPara={flowPara} flow={flow} key={p} hasArrow={p !== 'Prediction'} process={p} color={colors[p]} legend={legends[p]} />)}
       </div>
     );
   }
@@ -52,7 +52,7 @@ class Ensemble extends Component {
     return (
       <div>
         {dataFlow.map((df, i) => {
-          // if (m.name === 'ensemble' || modelSetting !== m.modelSetting) return null;
+          // if (m.modelName === 'ensemble' || modelSetting !== m.modelSetting) return null;
           const subModelFlow = this.props.model.modelProcessFlow(df);
           return (
             <div className={styles.ensembleWrapper} key={i}>

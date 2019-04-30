@@ -910,9 +910,10 @@ wss.register('train', async (message, socket, progress) => {
         await createOrUpdate(projectId, userId, {trainModel: result})
         processValue = {...result}
       } else if (result.score) {
+        const stats = await getProjectField(projectId, 'stats')
         hasModel = true;
         await createOrUpdate(projectId, userId, {trainModel: null})
-        const modelResult = await createModel(userId, projectId, result.name, result)
+        const modelResult = await createModel(userId, projectId, result.name, {...result, stats})
         processValue = await addSettingModel(userId, projectId)(modelResult)
         // return progress(model)
       } else if (result.data) {
@@ -1075,9 +1076,9 @@ wss.register("permutationImportance", (message, socket) => {
     }, progressValue => {
       const {result, status} = progressValue
       if (status < 0 || status === 100) return progressValue
-      const {name, model, featureImportanceDetail} = result
+      const {name, model, featureImportance} = result
       if (name === 'progress') return
-      if (model === mid) return updateModel(userId, projectId, mid, {featureImportanceDetail, importanceLoading: false})
+      if (model === mid) return updateModel(userId, projectId, mid, {featureImportance, importanceLoading: false})
     }, true))
 })
 
