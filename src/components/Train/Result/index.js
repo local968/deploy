@@ -10,6 +10,7 @@ import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
 import { Tooltip, Icon } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
+import D3D2 from "../../Charts/D3D2";
 
 function ModelResult(props) {
   // const type = 'clustering'
@@ -69,7 +70,7 @@ function ModelResult(props) {
           <ContinueButton text='Mapping Dictionary' width='200px' />
         </div>
         <div className={classes.right}>
-          {/*<D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0'/>*/}
+          <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0'/>
           {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
