@@ -43,7 +43,7 @@ import outliersImg from './img-residual-plot-outliers.svg';
 import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
-import VariableImpact from '../Result/variableImpact';
+import VariableImpact from '../Result/VariableImpact';
 import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'

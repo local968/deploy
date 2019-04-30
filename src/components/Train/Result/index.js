@@ -2,7 +2,7 @@ import React from 'react';
 import {ContinueButton} from 'components/Common'
 import classes from './styles.module.css';
 import {Icon} from 'antd';
-import VariableImpact from './variableImpact'
+import VariableImpact from './VariableImpact'
 import ModelProcessFlow from './modelProcessFlow'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
 // import D3D2 from '@src/components/charts/D3D2'
