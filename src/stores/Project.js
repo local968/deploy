@@ -915,7 +915,7 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.dataViewsLoading = true
-      return api.newDataView(command).then(returnValue => {
+      return api.dataView(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
           this.setProperty({ dataViews: null })
