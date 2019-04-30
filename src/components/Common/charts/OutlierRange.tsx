@@ -6,7 +6,7 @@ import { debounce } from "lodash";
 import { Button } from "antd";
 import "./echarts.config";
 import EN from "../../../constant/en";
-import useclasses from "@src/views/data.pre.quality/data.pre.quality.css";
+import useclasses from "../../Data/styles.module.css";
 
 const classes = useclasses;
 

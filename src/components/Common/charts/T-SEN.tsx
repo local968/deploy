@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import ReactEcharts from "echarts-for-react";
 import "./echarts.config";
 
-export default class ParallelPlot extends PureComponent {
+export default class ParallelPlot extends PureComponent<any> {
   constructor(props) {
     super(props);
   }

@@ -1,17 +1,17 @@
-import React, {PureComponent} from "react";
+import React, { PureComponent } from "react";
 import ReactEcharts from "echarts-for-react";
-import {debounce} from "lodash";
+import { debounce } from "lodash";
 import Slider from "rc-slider";
 // @ts-ignore
 import InputNum from "rc-input-number";
 import "./echarts.config";
 import request from "../request";
 import useStyles from "./charts.model.css";
-import styles from "@src/views/modeling.pre.result/modeling.pre.result.css";
+import styles from "../../Modeling/styles.module.css";
 import EN from "../../../constant/en";
-import {Select} from "antd";
+import { Select } from "antd";
 
-const {Option} = Select;
+const { Option } = Select;
 
 const classes = useStyles;
 
@@ -42,7 +42,7 @@ export default class Iso extends PureComponent {
   }
 
   async componentDidMount() {
-    const {url, default_point: point = 0} = this.props as any;
+    const { url, default_point: point = 0 } = this.props as any;
     const result = await request.post({
       url: "/service/graphics/outlier",
       data: {
@@ -68,7 +68,7 @@ export default class Iso extends PureComponent {
   }
 
   getOption() {
-    let {ready, xRange, yRange, value, dot, point} = this.state as any;
+    let { ready, xRange, yRange, value, dot, point } = this.state as any;
     if (!ready) {
       return {
         xAxis: {},
@@ -197,7 +197,7 @@ export default class Iso extends PureComponent {
         min: 0,
         max: 1,
         calculable: true,
-        inRange: {color: [color[0], color[1]]},
+        inRange: { color: [color[0], color[1]] },
         orient: "horizontal",
         show: false
       },
@@ -220,8 +220,8 @@ export default class Iso extends PureComponent {
   }
 
   selection(order) {
-    const {result = {}, show_name} = this.state as any;
-    const {featuresLabel = ["a", "b", "c"]} = result;
+    const { result = {}, show_name } = this.state as any;
+    const { featuresLabel = ["a", "b", "c"] } = result;
 
     const disable = Object.values(show_name).filter(
       itm => itm !== show_name[order]
@@ -236,7 +236,7 @@ export default class Iso extends PureComponent {
     return (
       <Select
         value={show_name[order]}
-        style={{width: 120}}
+        style={{ width: 120 }}
         onChange={name => {
           this.setState({
             show_name: {
@@ -252,8 +252,8 @@ export default class Iso extends PureComponent {
   }
 
   save() {
-    const {show_name} = this.state as any;
-    const {x_name, y_name} = show_name;
+    const { show_name } = this.state as any;
+    const { x_name, y_name } = show_name;
     this.setState({
       x_name,
       y_name
@@ -262,7 +262,7 @@ export default class Iso extends PureComponent {
   }
 
   reset() {
-    const {default_point = 0} = this.props as any;
+    const { default_point = 0 } = this.props as any;
     this.setState({
       slider_value: default_point
     });
@@ -270,8 +270,8 @@ export default class Iso extends PureComponent {
   }
 
   render() {
-    const {slider_value} = this.state as any;
-    const {height = 500, width = 600} = this.props as any;
+    const { slider_value } = this.state as any;
+    const { height = 500, width = 600 } = this.props as any;
 
     return [
       <section key="dl" className={classes.d3d2}>
@@ -288,7 +288,7 @@ export default class Iso extends PureComponent {
         <ReactEcharts
           key="echarts"
           option={this.getOption()}
-          style={{height, width}}
+          style={{ height, width }}
           notMerge={true}
           lazyUpdate={true}
           theme="customed"
@@ -298,19 +298,21 @@ export default class Iso extends PureComponent {
         <Slider
           min={0}
           max={0.5}
-          marks={{
-            0: 0,
-            0.05: "",
-            0.1: 0.1,
-            0.15: "",
-            0.2: 0.2,
-            0.25: "",
-            0.3: 0.3,
-            0.35: "",
-            0.4: 0.4,
-            0.45: "",
-            0.5: 0.5
-          }}
+          marks={
+            {
+              0: 0,
+              0.05: "",
+              0.1: 0.1,
+              0.15: "",
+              0.2: 0.2,
+              0.25: "",
+              0.3: 0.3,
+              0.35: "",
+              0.4: 0.4,
+              0.45: "",
+              0.5: 0.5
+            } as any
+          }
           included={false}
           step={0.01}
           onChange={(slider_value: any) => {
@@ -333,7 +335,7 @@ export default class Iso extends PureComponent {
           step={0.01}
           precision={2}
           value={slider_value}
-          style={{width: 100}}
+          style={{ width: 100 }}
           onChange={(slider_value: any) => {
             this.setState({
               slider_value
