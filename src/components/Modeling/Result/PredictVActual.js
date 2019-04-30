@@ -35,7 +35,7 @@ export default class PredictVActual extends Component {
         {model.qcut ? <RegressionPredictActualChart
           width={700}
           project={project}
-          className={`PredictVActual-${model.name}`}
+          className={`PredictVActual-${model.modelName}`}
           height={200}
           data={model.qcut}
         /> : <div className={styles.loading}><Spin size='large'/></div>}

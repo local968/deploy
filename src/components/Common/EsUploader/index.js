@@ -61,10 +61,7 @@ export default function EsUploader(file, option = {}) {
             method:"POST",
             data: header + '\n' + chunk,
           }).then(() => {
-            onProgress({
-              loaded: loaded,
-              size: file.size
-            })
+            onProgress(`${loaded}/${file.size}`, '')
             // setUploadStatus('uploaded: ' + no + ' lines')
             chunk = ''
             isPause = false

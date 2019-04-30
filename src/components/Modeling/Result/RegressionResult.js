@@ -35,7 +35,7 @@ export default class RegressionView extends Component {
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
-            <span>Selected Model :<a className={styles.nohover}>&nbsp;{current.name}</a></span>
+            <span>Selected Model :<a className={styles.nohover}>&nbsp;{current.modelName}</a></span>
           </div>
           <div className={styles.row}>
             <span>Target :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
@@ -143,7 +143,7 @@ class ModelTable extends Component {
           //   return aName > bName ? sort : -sort
           // }
           // return (aModelUnix - bModelUnix) * sort
-          return a.name > b.name ? value : -value
+          return a.modelName > b.modelName ? value : -value
       }
     }
     return models.sort(fn)
@@ -266,7 +266,7 @@ class ModelDetail extends Component {
               />
             </div>
             <div className={classnames(styles.cell, styles.name)}>
-              <Tooltip title={model.name}>{model.name}</Tooltip>
+              <Tooltip title={model.modelName}>{model.modelName}</Tooltip>
             </div>
             <div className={styles.cell}>
               <span>

@@ -8,15 +8,15 @@ import { Spin } from 'antd'
 export default class VariableImpact extends Component {
   constructor(props) {
     super(props)
-    const { featureImportanceDetail, permutationImportance, importanceLoading } = props.model
-    const keys = Object.keys(featureImportanceDetail)
+    const { featureImportance, permutationImportance, importanceLoading } = props.model
+    const keys = Object.keys(featureImportance)
     if(!keys.length && !importanceLoading) permutationImportance()
   }
 
   render() {
     const { model } = this.props;
-    const { featureImportanceDetail } = model;
-    const arr = Object.entries(featureImportanceDetail).sort(
+    const { featureImportance } = model;
+    const arr = Object.entries(featureImportance).sort(
       (a, b) => b[1] - a[1]
     );
     return (
