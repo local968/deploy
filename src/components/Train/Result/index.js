@@ -33,7 +33,7 @@ function ModelResult(props) {
       <span className={`${classes.tab} ${view === 'simple' ? classes.active : ''}`} onClick={() => changeView('simple')}>Simple View</span>
       <span className={`${classes.tab} ${view === 'advanced' ? classes.active : ''}`} onClick={() => changeView('advanced')}>Advanced View</span>
     </div>}
-    {true && <div className={classes.body}>
+    {view === 'simple' && <div className={classes.body}>
       <div className={classes.top}>
         <div className={classes.left}>
           <div className={classes.descriptions}>
@@ -77,7 +77,7 @@ function ModelResult(props) {
       {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
       {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
     </div>}
-    {problemType === 'Outlier' && <AdvancedViewUn />}
+    {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)}/>}
   </div>;
 }
 
