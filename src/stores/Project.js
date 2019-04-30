@@ -1087,11 +1087,91 @@ export default class Project {
       target,
       dataHeader
     } = this;
-    const command = 'train';
+
+    let command = '';
+    let trainData = {}
 
     const featureLabel = dataHeader.filter(d => d !== target);
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
+
+    switch (problemType) {
+      case 'Clustering':
+        command = 'clustering.train';
+        trainData = {
+          k_type: "auto",
+          k_value: undefined,
+          algorithms: [
+            'KMeans',
+            'GMM',
+            'MeanShift',
+            'SpectralClustering',
+            'AP',
+            'Agg',
+            'DBSCAN',
+            'Birch',
+          ],
+          standard_type: "standard",
+          search_time: 5,
+          metrics_method: "CVNN",
+          feature_label: featureLabel,
+          random_seed: 0,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          apply_weights: {}
+        };
+        break;
+      case 'Outlier':
+        command = 'outlier.train';
+        trainData = {
+          k_type: "auto",
+          k_value: undefined,
+          algorithms: [
+            'IsolationForest',
+            'OneClassSVM',
+            'EllipticEnvelope',
+            'LocalOutlierFactor',
+            'PCA',
+            'HBOS',
+            'CBLOF',
+            'ABOD',
+            'FB',
+          ],
+          standard_type: "standard",
+          search_time: 5,
+          feature_label: featureLabel,
+          random_seed: 0,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          apply_weights: {}
+        };
+        break;
+      default:
+        command = 'clfreg.train';
+        trainData = {
+          problemType,
+          featureLabel,
+          targetLabel: target,
+          projectId: id,
+          version: '1,2',
+          command,
+          sampling: 'no',
+          speedVSaccuracy: 5,
+          ensembleSize: 20,
+          randSeed: 0,
+          measurement: problemType === "Classification" ? "auc" : "r2",
+          settingName: setting.name,
+          holdoutRate: 0.2
+        };
+        if (this.totalRawLines > 10000) {
+          trainData.validationRate = 0.2
+        } else {
+          trainData.nfold = 5
+        }
+    }
+
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -1101,27 +1181,23 @@ export default class Project {
     // fill_method:  无效值
     // model_option: model的额外参数，不同model参数不同
     // kwargs:
-    const trainData = {
-      problemType,
-      featureLabel,
-      targetLabel: target,
-      projectId: id,
-      version: '1,2',
-      command,
-      sampling: 'no',
-      speedVSaccuracy: 5,
-      ensembleSize: 20,
-      randSeed: 0,
-      measurement: problemType === "Classification" ? "auc" : "r2",
-      settingName: setting.name,
-      holdoutRate: 0.2
-    };
+    // const trainData = {
+    //   problemType,
+    //   featureLabel,
+    //   targetLabel: target,
+    //   projectId: id,
+    //   version: '1,2',
+    //   command,
+    //   sampling: 'no',
+    //   speedVSaccuracy: 5,
+    //   ensembleSize: 20,
+    //   randSeed: 0,
+    //   measurement: problemType === "Classification" ? "auc" : "r2",
+    //   settingName: setting.name,
+    //   holdoutRate: 0.2
+    // };
 
-    if (this.totalRawLines > 10000) {
-      trainData.validationRate = 0.2
-    } else {
-      trainData.nfold = 5
-    }
+
 
     this.modeling(trainData, Object.assign({
       train2Finished: false,
@@ -1133,100 +1209,6 @@ export default class Project {
     }, this.nextSubStep(2, 3)))
   }
 
-  advancedModeling = () => {
-    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
-    const {
-      id,
-      problemType,
-      target,
-      trainHeader,
-      dataHeader,
-      // expression,
-      newVariable
-    } = this;
-    const command = 'train';
-
-    const featureLabel = dataHeader.filter(v => !trainHeader.includes(v) && v !== target)
-    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
-
-    // if (newVariableLabel.length) {
-    //   const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
-    //   trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
-    // }
-
-    const {version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy} = this;
-    const setting = {
-      version,
-      validationRate,
-      holdoutRate,
-      randSeed,
-      measurement,
-      runWith,
-      resampling,
-      crossCount,
-      dataRange,
-      customField,
-      customRange,
-      algorithms,
-      speedVSaccuracy
-    }
-    const curSetting = this.settings.find(s => s.id === this.settingId)
-    curSetting.setting = setting
-
-    const trainData = {
-      problemType,
-      featureLabel: [...featureLabel, ...newVariableLabel],
-      targetLabel: target,
-      projectId: id,
-      command,
-      sampling: this.resampling,
-      // maxTime: this.maxTime,
-      randSeed: this.randSeed,
-      speedVSaccuracy: this.speedVSaccuracy,
-      version: this.version.join(","),
-      algorithms: [...this.algorithms],
-      ensembleSize: this.ensembleSize,
-      settingName: curSetting.name,
-      measurement: this.measurement
-    };
-
-    if (this.dataRange === "all") {
-      trainData.holdoutRate = this.holdoutRate / 100
-      if (this.runWith === "holdout") {
-        trainData.validationRate = this.validationRate / 100
-      } else {
-        trainData.nfold = this.crossCount
-      }
-    } else {
-      trainData.splitBy = [this.customField, ...this.customRange]
-    }
-
-    this.modeling(trainData, Object.assign({
-      train2Finished: false,
-      train2ing: true,
-      train2Error: false,
-      selectId: '',
-      validationRate: this.validationRate,
-      holdoutRate: this.holdoutRate,
-      resampling: this.resampling,
-      // maxTime: this.maxTime,
-      measurement: this.measurement,
-      randSeed: this.randSeed,
-      dataRange: this.dataRange,
-      customField: this.customField,
-      customRange: [...this.customRange],
-      algorithms: [...this.algorithms],
-      speedVSaccuracy: this.speedVSaccuracy,
-      ensembleSize: this.ensembleSize,
-      runWith: this.runWith,
-      crossCount: this.crossCount,
-      version: this.version,
-      trainHeader: this.trainHeader,
-      settings: this.settings,
-      settingId: this.settingId,
-      customHeader: this.customHeader
-    }, this.nextSubStep(2, 3)))
-  }
 
   newSetting = (type = 'auto') => {
     const {version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize} = this;
@@ -1261,7 +1243,8 @@ export default class Project {
     if (this.etling) return antdMessage.error('modeling error')
     this.train2ing = true
     this.isAbort = false
-    socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
+    // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
+    socketStore.ready().then(api => api.train({...trainData, data: updateData}, progressResult => {
       // if (this.isAbort) return
       // if (progressResult.name === "progress") {
       //   if (progressResult.trainId) this.trainingId = progressResult.trainId

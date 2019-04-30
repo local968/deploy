@@ -39,6 +39,7 @@ export default class Deploy {
   @observable enable;
   @observable email;
   @observable modelList;
+  @observable lineCount;
 
   @observable deploymentOptions = { ...defaultDeploymentOptions };
   @observable performanceOptions = { ...defaultPerformanceOptions };
@@ -54,6 +55,7 @@ export default class Deploy {
     this.enable = deploy.enable;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
+    this.lineCount = deploy.lineCount;
     this.deploymentOptions = {
       ...defaultDeploymentOptions,
       ...deploy.deploymentOptions
@@ -81,7 +83,8 @@ export default class Deploy {
             email: this.email,
             enable: this.enable,
             deploymentOptions: this.deploymentOptions,
-            performanceOptions: this.performanceOptions
+            performanceOptions: this.performanceOptions,
+            lineCount: this.lineCount
           }
         });
       });

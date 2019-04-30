@@ -61,15 +61,14 @@ export function ModelResult(sampleModel = sample) {
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
       </div>
-      {type === 'clustering' && <ClusteringTable/>}
-      {type === 'outlier' && <OutlierTable/>}
+      {type === 'clustering' && <ClusteringTable sampleModel/>}
+      {type === 'outlier' && <OutlierTable sampleModel/>}
     </div>}
     {false && <AdvancedViewUn/>}
   </div>;
 }
 
-const OutlierTable = () => {
-  const classes = useStyles();
+const OutlierTable = (sampleModel) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
@@ -131,8 +130,7 @@ const OutlierTable = () => {
   </div>
 }
 
-const ClusteringTable = () => {
-  const classes = useStyles();
+const ClusteringTable = (sampleModel) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>

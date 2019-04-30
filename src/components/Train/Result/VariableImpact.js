@@ -8,7 +8,7 @@ import { Spin } from 'antd'
 export default class VariableImpact extends Component {
   constructor(props) {
     super(props)
-    const { featureImportance, permutationImportance, importanceLoading } = props.model
+    const { featureImportance = {}, permutationImportance, importanceLoading } = props.model
     const keys = Object.keys(featureImportance)
     if(!keys.length && !importanceLoading) permutationImportance()
   }

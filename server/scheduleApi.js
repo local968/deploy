@@ -142,9 +142,8 @@ const api = {
     }
     if (!fileId) return restrictQuery
     const count = await redis.get(restrictQuery)
-    const file = await api.getFile(fileId)
-    if (parseInt(count) + parseInt(file.lineCount) >= userDeployRestriction[level]) return false
-    await redis.incrby(restrictQuery, file.lineCount)
+    if (parseInt(count) + parseInt(deployment.lineCount) >= userDeployRestriction[level]) return false
+    await redis.incrby(restrictQuery, deployment.lineCount)
     return restrictQuery
   },
   decreaseLines: async (restrictQuery, lineCount) => {
