@@ -347,7 +347,7 @@ class RegressionDetailCurves extends Component {
     return (
       <div className={styles.charts}>
         <PredictVActual model={model} project={project} />
-        <div className={styles.reportChart}>
+        <div className={styles.reportChart}>6
           <div className={styles.chartContent}><img className={styles.img} src={model.fitPlotBase64} alt="fit plot" /></div>
         </div>
         <div className={styles.reportChart}>
