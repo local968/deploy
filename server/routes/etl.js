@@ -1,8 +1,6 @@
-const command = require('../command')
 const wss = require('../webSocket')
 const { redis } = require('redis')
 const axios = require('axios')
-const fs = require('fs')
 const config = require('config')
 
 const { createOrUpdate } = require('./project')
@@ -16,7 +14,6 @@ wss.register("originalStats", async (message, socket, progress) => {
     const { data } = await axios.get(`${esServicePath}/etls/${index}/stats`)
     // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
     const colType = {}
-    const fields = []
     const colMap = {}
     const colValueCounts = {}
     const rawDataView = {}
@@ -28,7 +25,6 @@ wss.register("originalStats", async (message, socket, progress) => {
     Object.entries(data).forEach(([key, metric]) => {
       const stats = metric.originalStats
       colType[key] = metric.type
-      fields.push(key)
       colMap[key] = Object.entries(metric.originalCategoricalMap).reduce((prev, [key, b], index) => {
         prev[b.key] = index
         return prev
@@ -45,28 +41,20 @@ wss.register("originalStats", async (message, socket, progress) => {
     })
     const result = {
       colType,
-      fields,
       colMap,
       colValueCounts,
       rawDataView,
-      rawHeader: fields,
-      dataHeader: fields,
       nullFillMethod: {},
       nullIndex: {},
       mismatchFillMethod: {},
       mismatchIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
-      outlierRange: {},
-      name: 'etl',
-      totalRawLines: 119999,
-      uniqueValues: {},
-      numberBins: {},
-      warnings: [],
+      outlierRange,
       totalFixedLines: 0,
-      nullLineCounts: {},
-      mismatchLineCounts: {},
-      outlierLineCounts: {},
+      nullLineCounts,
+      mismatchLineCounts,
+      outlierLineCounts,
       will_be_drop_500_lines,
       stats: data,
       originalIndex: index,
@@ -81,7 +69,7 @@ wss.register("originalStats", async (message, socket, progress) => {
     await createOrUpdate(projectId, userId, result)
     return { status: 200, message: 'ok', result }
   } catch (e) {
-    console.log({...e})
+    console.log({ ...e })
     let error = e
     if (e.response && e.response.data) error = e.response.data
     return { status: 500, message: 'get index stats failed', error }
