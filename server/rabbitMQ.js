@@ -1,8 +1,8 @@
-import * as _ from "lodash";
-import amqp from 'amqplib'
-import {pubsub} from './redis';
+const _ = require("lodash");
+const amqp = require("amqplib");
+const { pubsub } = require("redis");
 
-const config = require('config')
+const config = require("config");
 
 const {
   AMQPLIB_PROTOCOL,
@@ -17,18 +17,10 @@ const {
   QUEUE_RESULT
 } = config.mq;
 
-module.exports = class RabbitMQ {
-  // Publisher
-
-  constructor(){
-    this.consumer()
-  }
-
-  amqplib;
-
-  getAmqplib = async () => {
+module.exports = function RabbitMQ(){
+  this.getAmqplib = async () => {
     if (this.amqplib) {
-      return this.amqplib
+      return this.amqplib;
     } else {
       try {
         this.amqplib = await amqp.connect({
@@ -43,13 +35,13 @@ module.exports = class RabbitMQ {
           vhost: AMQPLIB_VHOST
         });
       } catch (e) {
-        console.error(e)
+        console.error(e);
       }
-      return this.amqplib
+      return this.amqplib;
     }
   };
 
-  async publisher(task) {
+  this.publisher = async (task) => {
     const queueName = _.includes(task.command, `${config.requestQueue}.`)
       ? task.command
       : `${config.requestQueue}.${task.command}`;
@@ -59,26 +51,26 @@ module.exports = class RabbitMQ {
     // 创建队列
     await ch.assertQueue(queueName);
 
-    !_.isEmpty(task) && await ch.sendToQueue(queueName, Buffer.from(JSON.stringify(task)));
+    !_.isEmpty(task) &&
+    (await ch.sendToQueue(queueName, Buffer.from(JSON.stringify(task))));
 
     await ch.close();
-
   }
 
   // Consumer
-  async consumer() {
+  this.consumer = async ()=> {
     const mq = await this.getAmqplib();
     const ch = await mq.createChannel();
 
-    const res = await ch.assertExchange('result', 'direct', {durable: true});
-    console.log('res:', res);
+    const res = await ch.assertExchange("result", "direct", { durable: true });
+    console.log("res:", res);
 
-    const queue_lists = QUEUE_RESULT && QUEUE_RESULT.split(';');
+    const queue_lists = QUEUE_RESULT && QUEUE_RESULT.split(";");
 
-    console.log('监听队列列表：', queue_lists);
+    console.log("监听队列列表：", queue_lists);
 
-    _.forEach(queue_lists, (queue) => {
-      this.consume(ch, queue, (msg) => {
+    _.forEach(queue_lists, queue => {
+      this.consume(ch, queue, msg => {
         if (msg) {
           pubsub.lpush(config.resultQueue, msg);
         }
@@ -87,21 +79,43 @@ module.exports = class RabbitMQ {
   }
 
   // consume
-  async consume(ch, queue, callBack) {
-    const q = await ch.assertQueue(queue, {exclusive: false});
+  this.consume = async(ch, queue, callBack)=> {
+    const q = await ch.assertQueue(queue, { exclusive: false });
 
-    await new Promise(resolve => ch.consume(q.queue, (msg) => {
-      resolve(msg);
+    await new Promise(resolve =>
+      ch.consume(
+        q.queue,
+        msg => {
+          resolve(msg);
 
-      const content = msg && msg.content.toString();
-      console.log('收到消息: ', `queue: ${queue}`, content);
-      ch.ack(msg);
+          const content = msg && msg.content.toString();
+          console.log("收到消息: ", `queue: ${queue}`, content);
+          ch.ack(msg);
 
-      if (content && callBack) {
-        callBack(content);
-      }
-    }, {noAck: false})).catch(err => {
+          if (content && callBack) {
+            callBack(content);
+          }
+        },
+        { noAck: false }
+      )
+    ).catch(err => {
       throw err;
     });
   }
+
+  this.consumer();
+
 }
+
+// module.exports = class RabbitMQ {
+//   // Publisher
+//
+//   constructor() {
+//
+//
+//
+//   }
+//
+//   amqplib
+//
+// }
