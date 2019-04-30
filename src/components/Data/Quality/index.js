@@ -458,10 +458,10 @@ class Summary extends Component {
     const arc = d3.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-    const { totalRawLines, totalLines, totalFixedLines } = this.props.project
-    const deleteRows = totalRawLines - totalLines
-    const fixedRows = totalFixedLines
-    const cleanRows = totalLines - totalFixedLines
+    const { totalLines, deletedCount, totalFixedLines } = this.props.project
+    const deleteRows = deletedCount
+    const fixedRows = totalFixedLines - deletedCount
+    const cleanRows = totalLines
     const data = [fixedRows, deleteRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
@@ -485,10 +485,10 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
-    const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
-    const fixedPercent = totalFixedLines / totalRawLines * 100
-    const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100
+    const { target, sortHeader, dataHeader, totalRawLines, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
+    const deletePercent = deletedCount / totalRawLines * 100
+    const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
+    const cleanPercent = totalLines / totalRawLines * 100
     const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
     const variableList = currentHeader.slice(1)
     const percentList = currentHeader.map(v => {

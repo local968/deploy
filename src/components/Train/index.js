@@ -6,7 +6,7 @@ import { autorun, observable, action } from 'mobx'
 import StartTrain from './Start';
 import Loading from './Loading';
 import ModelError from './Error';
-import {ModelResult} from './Result';
+import ModelResult from './Result';
 import { ProjectSide } from 'components/Common';
 import modelSelectionIcon from './model_selection_d.svg';
 import startModelingActiveIcon from './start_modeling_a.svg';
@@ -30,7 +30,6 @@ const imgs = {
 @observer
 export default class Modeling extends Component {
   @observable right = 0
-  @observable metric = this.props.projectStore.project.measurement
   @observable view = 'simple'
   @observable sort = {
     simple: {
@@ -50,11 +49,6 @@ export default class Modeling extends Component {
       { label: 'Model Selection', value: 'modelSelection' }
     ];
     this.sideRef = React.createRef();
-    autorun(() => {
-      const { project } = props.projectStore;
-      if (project && project.measurement)
-        this.metric = project.measurement
-    });
   }
 
   componentDidMount() {
@@ -107,17 +101,10 @@ export default class Modeling extends Component {
     updateProject(nextSubStep(step, 3))
   };
 
-  handleChange = action(value => {
-    console.log(value, "metric")
-    this.metric = value;
-    // if (window.localStorage)
-    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
-  });
-
   render() {
     const { project } = this.props.projectStore;
     const { models, train2Error, train2ing } = project;
-    const { view, sort, metric } = this
+    const { view, sort } = this
     const todos = useStore(state => state)
 
     console.log(todos, "todos")
@@ -134,9 +121,7 @@ export default class Modeling extends Component {
               view={view}
               sort={sort}
               changeView={this.changeView}
-              handleSort={this.handleSort}
-              metric={metric}
-              handleChange={this.handleChange} />
+              handleSort={this.handleSort} />
           }} />
         </Switch>}
         {project && <ProjectSide
