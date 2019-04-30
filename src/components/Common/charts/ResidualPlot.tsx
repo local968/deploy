@@ -1,63 +1,54 @@
-import React from "react";
-import ReactEcharts from "echarts-for-react";
-import { concat } from "lodash";
+import React from 'react';
+import ReactEcharts from 'echarts-for-react';
+import {concat} from 'lodash'
 
-export default function ResidualPlot(props: any) {
-  const {
-    chartDate = {},
-    title = "",
-    x_name = "",
-    y_name = "",
-    width = 500,
-    height = 300
-  } = props as any;
-  const { data } = chartDate;
+export default function ResidualPlot(props:any){
+  const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props as any;
+  const {data=[]} = chartDate;
   // @ts-ignore
   const num = concat(...data);
 
   const max = Math.max(...num);
   const min = Math.min(...num);
 
-  const option = {
+  const option =  {
     title: {
       text: title,
-      x: "center",
-      y: 0
+      x: 'center',
+      y: 0,
     },
     tooltip: {
-      formatter: "{c}"
+      formatter: '{c}',
     },
     xAxis: {
-      name: x_name,
-      axisLine: { show: false },
-      nameLocation: "middle",
-      nameGap: 25
+      name:x_name,
+      axisLine:{show:false},
+      nameLocation:'middle',
+      nameGap:25,
     },
     yAxis: {
-      name: y_name,
-      axisLine: { show: false }
+      name:y_name,
+      axisLine:{show:false},
     },
     series: [
       {
-        type: "scatter",
+        type: 'scatter',
         data,
-        symbolSize: 3
+        symbolSize: 3,
       },
       {
-        type: "line",
-        data: [[min - 1, 0], [max + 1, 0]],
-        symbolSize: 0
-      }
-    ]
+        type:'line',
+        data:[[min-1,0],[max+1,0]],
+        symbolSize: 0,
+      },
+    ],
   };
 
-  return (
-    <ReactEcharts
+  return <ReactEcharts
       option={option}
-      style={{ height, width }}
+      style={{height, width}}
       notMerge={true}
       lazyUpdate={true}
-      theme="customed"
-    />
-  );
+      theme='customed'
+  />
 }

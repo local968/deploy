@@ -94,7 +94,7 @@ export default function FitPlot(){
 	};
 	return <ReactEcharts
 		option={option}
-		style={{height: 400, width: 1000}}
+		style={{height: 300, width: 400}}
 		notMerge={true}
 		lazyUpdate={true}
 		theme='customed'

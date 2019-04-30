@@ -48,6 +48,7 @@ import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
 import FitPlot from "../../Charts/FitPlot";
+import ResidualPlot from "../../Common/charts/ResidualPlot";
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -543,7 +544,8 @@ class RegressionDetailCurves extends Component {
       case 'Residual Plot':
         curComponent = (
           <div className={styles.plot} >
-            <img className={styles.img} src={model.residualPlotPath} alt="residual plot" />
+            {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
+            <ResidualPlot/>
             <Modal
               visible={this.state.visible}
               title='Residual Plot Diagnose'
