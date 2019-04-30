@@ -372,10 +372,11 @@ function getProjectFields(id, fields) {
 }
 
 async function getBaseEtl(id) {
-  const {originalIndex, target, problemType, dataHeader, colType, colMap} = await getProjectFields(id, ['originalIndex', 'target', 'problemType', 'dataHeader', 'colType', 'colMap']);
+  const data = await getProjectFields(id, ['etlIndex', 'target', 'problemType', 'dataHeader', 'colType', 'colMap']);
+  const {etlIndex, target, problemType, dataHeader, colType, colMap} = data;
   return {
     command: 'top.etlBase',
-    csvLocation: [originalIndex],
+    csvLocation: [etlIndex],
     targetLabel: [target],
     problemType: problemType,
     featureLabel: dataHeader,
