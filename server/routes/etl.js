@@ -1,8 +1,6 @@
-const command = require('../command')
 const wss = require('../webSocket')
 const { redis } = require('redis')
 const axios = require('axios')
-const fs = require('fs')
 const config = require('config')
 
 const { createOrUpdate } = require('./project')
@@ -16,7 +14,6 @@ wss.register("originalStats", async (message, socket, progress) => {
     const { data } = await axios.get(`${esServicePath}/etls/${index}/stats`)
     // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
     const colType = {}
-    const fields = []
     const colMap = {}
     const colValueCounts = {}
     const rawDataView = {}
@@ -28,7 +25,6 @@ wss.register("originalStats", async (message, socket, progress) => {
     Object.entries(data).forEach(([key, metric]) => {
       const stats = metric.originalStats
       colType[key] = metric.type
-      fields.push(key)
       colMap[key] = Object.entries(metric.originalCategoricalMap).reduce((prev, [key, b], index) => {
         prev[b.key] = index
         return prev
@@ -45,28 +41,20 @@ wss.register("originalStats", async (message, socket, progress) => {
     })
     const result = {
       colType,
-      fields,
       colMap,
       colValueCounts,
       rawDataView,
-      rawHeader: fields,
-      dataHeader: fields,
       nullFillMethod: {},
       nullIndex: {},
       mismatchFillMethod: {},
       mismatchIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
-      outlierRange: {},
-      name: 'etl',
-      totalRawLines: 119999,
-      uniqueValues: {},
-      numberBins: {},
-      warnings: [],
+      outlierRange,
       totalFixedLines: 0,
-      nullLineCounts: {},
-      mismatchLineCounts: {},
-      outlierLineCounts: {},
+      nullLineCounts,
+      mismatchLineCounts,
+      outlierLineCounts,
       will_be_drop_500_lines,
       stats: data,
       originalIndex: index,
@@ -105,9 +93,9 @@ wss.register('newEtl', async (message, socket, process) => {
     stats[project.target].isTarget = true
     let deletedValues = []
     if (project.targetArray && project.targetArray.length > 1) {
-      deletedValues = Object.keys(project.colValueCounts).filter(k => !project.targetArray.includes(k))
+      deletedValues = Object.keys(project.colValueCounts[project.target]).filter(k => !project.targetArray.includes(k))
     } else {
-      deletedValues = Object.entries(project.colValueCounts).sort((a, b) => b[1] - a[1]).map(([k]) => k)
+      deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).map(([k]) => k)
     }
 
     stats[project.target].mapFillMethod = {
