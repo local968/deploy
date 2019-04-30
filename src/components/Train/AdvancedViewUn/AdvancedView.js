@@ -236,7 +236,7 @@ class RegressionDetailCurves extends Component {
     const { model } = this.props;
     const { curve } = this.state;
     let curComponent = (
-      <div className={styles.plot} >
+      <div className={styles.plot} >3
         <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
       </div>
     );

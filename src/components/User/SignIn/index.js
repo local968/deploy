@@ -13,15 +13,15 @@ export default class SignIn extends Component {
     email: '',
     password: ''
   }
-
+  
   onChangeEmail = action((e) => {
     this.email = e.target.value.toLowerCase()
   })
-
+  
   onChangePassword = action((e) => {
     this.password = e.target.value
   })
-
+  
   login = () => {
     const { email, password, warning } = this
     if (!email) {
@@ -31,30 +31,30 @@ export default class SignIn extends Component {
     } else {
       warning.email = '';
     }
-
+    
     if (!password) {
       warning.password = "Enter your password";
     } else {
       warning.password = '';
     }
-
+    
     if (warning.email || warning.password) {
       return runInAction(() => {
         this.warning = warning
       })
     }
-
+    
     this.props.userStore.login({ email, password })
   }
-
+  
   onKeyUp = (event) => {
     if (event.keyCode === 13) this.login()
   }
-
+  
   register = () => {
     this.props.history.push("/signup")
   }
-
+  
   render() {
     return <div className={styles.signin}>
       <div className={styles.title}><span>Sign In</span></div>
