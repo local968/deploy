@@ -106,9 +106,16 @@ export default class SimplifiedView extends Component {
     return formatNumber(value, 2)
   }
 
+  handleType = (e) => {
+    const value = e.target.value;
+    project.setProperty({
+      standardType: value
+    })
+  }
+
   render() {
     const { project } = this.props;
-    const { colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
@@ -119,15 +126,15 @@ export default class SimplifiedView extends Component {
       <div className={styles.chooseScan}>
         <div className={styles.chooseLabel}><span>Choose a Variable Scaling Method:</span></div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='minMax' id='minMax' />
+          <input type='radio' name='scan' value='minMax' id='minMax' checked={standardType} onChange={this.handleType} />
           <label htmlFor='minMax'>min_max_scale</label>
         </div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='standard' id='standard' />
+          <input type='radio' name='scan' value='standard' id='standard' checked={standardType} onChange={this.handleType} />
           <label htmlFor='standard'>standard_scale</label>
         </div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='robust' id='robust' />
+          <input type='radio' name='scan' value='robust' id='robust' checked={standardType} onChange={this.handleType} />
           <label htmlFor='robust'>robust_scale</label>
         </div>
       </div>

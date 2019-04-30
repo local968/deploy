@@ -14,23 +14,27 @@ export default class Preview extends Component {
   @observable loading = false
 
   componentDidUpdate() {
-    const { readData, cleanPath, etlCleanData, etlCleanDataLoading } = this.props.project;
-    if (!cleanPath) {
-      if (!this.loading) {
-        this.cleanData = []
-        if (!etlCleanDataLoading) {
-          this.loading = true
-          etlCleanData()
-        }
-      }
-    } else {
+    const { readIndex, etlIndex } = this.props.project;
+    this.loading = true
+    readIndex(etlIndex).then(data => {
+      this.cleanData = data
       this.loading = false
-      if (this.cleanPath === cleanPath) return
-      this.cleanPath = cleanPath
-      readData(cleanPath).then(data => {
-        this.cleanData = data
-      })
-    }
+    })
+    // const { readIndex, etlIndex } = this.props.project;
+    // if (!etlIndex) {
+    //   if (!this.loading) {
+    //     this.cleanData = []
+    //     if (!etlCleanDataLoading) {
+    //       this.loading = true
+    //       etlCleanData()
+    //     }
+    //   }
+    // } else {
+    //   this.loading = false
+    //   if (this.etlIndex === etlIndex) return
+    //   this.etlIndex = etlIndex
+      
+    // }
   }
 
   showTable = () => {
@@ -42,8 +46,9 @@ export default class Preview extends Component {
   }
 
   formatTable = () => {
-    const { cleanData, visiable } = this
+    const { cleanData, visiable, loading } = this
     const { colType, will_be_drop_500_lines, renameVariable, trainHeader, sortHeader, newVariable, newType } = this.props.project;
+    if (loading) return []
     if (!visiable) return []
     if (!cleanData.length) return []
     const header = cleanData[0]

@@ -5,9 +5,16 @@
   padding: 0 50px;
   width: 100%;
   min-width: 1350px;
-  overflow-y: auto
 }
 
+.root span {
+  font-size: 1.125rem;
+  display: flex;
+  font-family: SanFranciscoText;
+  line-height: normal;
+  align-items: center;
+  color: #1d2b3c;
+}
 
 .header {
   font-size: 24px;
@@ -23,7 +30,7 @@
 
 .top {
   display: flex;
-  marginBottom: 40
+  margin-bottom: 40px
 }
 
 .left {
@@ -32,16 +39,16 @@
 
 .right {
   flex: 1 1 0;
-  fontSize: 50;
+  font-size: 50px;
   border: 1px solid;
 }
 
 .descriptions {
-  fontSize: 18;
+  font-size: 18px;
   color: #1D2B3C;
-  textAlign: left;
-  lineHeight: 40px;
-  marginBottom: 40
+  text-align: left;
+  line-height: 40px;
+  margin-bottom: 40px
 }
 
 .modelName {
@@ -50,8 +57,8 @@
 
 .scores {
   display: flex;
-  flexDirection: row;
-  marginBottom: 40
+  flex-direction: row;
+  margin-bottom: 40px
 }
 
 .score {
@@ -66,7 +73,7 @@
   flex: 0 0 150px
 }
 
-cluster {
+.cluster {
   flex: 0 0 240px
 }
 
@@ -75,107 +82,114 @@ cluster {
 }
 
 .blood {
-  fontSize: 48;
-  color: #D0021B;
+  font-size: 48px;
+  color: rgb(236, 212, 214);
 }
 
 .orange {
-  fontSize: 48;
+  font-size: 48px;
   color: #FF8000;
-  textAlign: left
+  text-align: left
 }
 
 .green {
-  fontSize: 48;
+  font-size: 48px;
   color: #4EC078;
 }
 
 .label {
-  fontSize: 18;
-  fontWeight: bold;
-  textAlign: left;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
   display: block
 }
 
 .rateLabel {
-  fontSize: 18;
-  fontWeight: bold;
+  font-size: 18px;
+  font-weight: bold;
   display: block
 }
 
 .table {
   display: flex;
-  flexDirection: column;
+  flex-direction: column;
   flex: none;
   border: solid 0.5px #979797;
+}
+
+.rowBody {
+  display: flex;
+  flex: none;
+  flex-direction: column;
 }
 
 .rowData {
   display: flex;
   padding: 0 20px;
   position: relative;
-  alignItems: center;
+  align-items: center;
   flex: none
 }
 
 .rowBox {
   display: flex;
-  flexDirection: column;
+  flex-direction: column;
   flex: none;
   position: relative;
 }
 
 .cell {
   display: flex;
-  justifyContent: start;
-  alignItems: center;
+  justify-content: start;
+  align-items: center;
   padding: 8px 0;
-  borderBottom: 1px solid #979797;
-  minWidth: 140;
+  border-bottom: 1px solid #979797;
+  min-width: 140px;
   margin: 0 5px;
   position: relative;
   flex: 0 0 230px;
-
 }
 
 .cell span {
-  fontSize: 14px;
+  font-size: 14px;
   overflow: hidden;
-  textOverflow: ellipsis;
-  whiteSpace: nowrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   height: 16px;
 }
 
 .cell .progress span {
-  fontSize: 12;
+  font-size: 12px;
   color: #000;
-  fontWeight: normal;
+  font-weight: normal;
 }
 
 .ccell {
   display: flex;
-  justifyContent: start;
-  alignItems: center;
+  justify-content: start;
+  align-items: center;
   padding: 8px 0;
-  borderBottom: 1px solid #979797;
-  minWidth: 125;
+  border-bottom: 1px solid #979797;
+  min-width: 125px;
   margin: 0 5px;
   position: relative;
   flex: 0 0 125px;
+  justify-content: center;
 }
 
 .ccell span {
-  fontSize: 14;
+  font-size: 14px;
   overflow: hidden;
-  textOverflow: ellipsis;
-  whiteSpace: nowrap;
-  height: 16px
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 16px;
+  display: inline-block;
 }
 
 .ccell .progress span {
-  fontSize: 12;
+  font-size: 12px;
   color: #000;
-  fontWeight: normal;
+  font-weight: normal;
 
 }
 
@@ -186,26 +200,25 @@ cluster {
 
 .cname span {
   overflow: hidden;
-  textOverflow: ellipsis;
-  whiteSpace: nowrap;
-  maxWidth: 100%;
+  white-space: nowrap;
+  max-width: 100%;
   display: block
 }
 
 .rowHeader {
   padding: 20px 0;
-  borderBottom: solid 1px #9b9b9b
+  border-bottom: solid 1px #9b9b9b
 }
 
 .data {
   display: flex;
-  flexDirection: column;
+  flex-direction: column;
   padding: 20px 0;
-  overflowY: auto;
-  overflowX: visible;
-  maxHeight: 500px;
-  marginLeft: -200px;
-  paddingLeft: 200px;
+  overflow-y: auto;
+  overflow-x: visible;
+  max-height: 500px;
+  margin-left: -200px;
+  padding-left: 200px;
 }
 
 .cellHeader {
@@ -225,9 +238,9 @@ cluster {
 
 .name span {
   overflow: hidden;
-  textOverflow: ellipsis;
-  whiteSpace: nowrap;
-  maxWidth: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
   display: block
 }
 
@@ -238,26 +251,205 @@ cluster {
 
 .compute span {
   color: #448eed;
-  textDecoration: underline
+  text-decoration: underline
 }
 
 .tabs {
-  borderBottom: 1px #1D2B3C solid;
+  border-bottom: 1px #1D2B3C solid;
   display: flex;
-  justifyContent: flex-end;
-  marginBottom: 40px
+  justify-content: flex-end;
+  margin-bottom: 40px
 }
 
 .tab {
   color: black;
-  fontSize: 18;
+  font-size: 18px;
   width: 250px;
   padding: 10px 0;
-  marginBottom: -1;
+  margin-bottom: -1;
   cursor: pointer
 }
 
 .active {
-  fontWeight: bold;
-  borderBottom: 5px black solid
+  font-weight: bold;
+  border-bottom: 5px black solid
+}
+
+.trainingModel {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  padding: 0.08em 0;
+  border-bottom: 1px solid #979797;
+  width: 2.3em;
+  margin: 0 0.05em;
+  position: relative;
+}
+
+.trainingModel span {
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+  overflow: hidden;
+}
+
+.trainingAbort {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  margin-top: 0.1em;
+}
+
+.abortButton {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+  padding: 0.05em 0.3em;
+  margin: .05em auto;
+  cursor: pointer;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.abortButton :global(.anticon) {
+font-size: 1rem;
+}
+
+.abortButton span {
+  font-size: .875rem;
+  font-weight: bold;
+  color: #1d2b3c;
+  font-family: SanFranciscoText;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  padding: 0.1em 0;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.detailNone {
+  display: flex;
+  flex: none;
+  justify-content: center;
+}
+
+.detailNone span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  max-width: 100%;
+  display: block;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.detailRow {
+  display: flex;
+  padding: 0 0.25em;
+  flex: none;
+  align-items: center;
+}
+
+.detailRow span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  max-width: 100%;
+  display: block;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.detailName {
+  display: flex;
+  flex: 0 0 1em;
+  width: 1em;
+}
+
+.detailNum {
+  display: flex;
+  flex: 0 0 1em;
+  margin-left: 0.1em;
+}
+
+.detailProcess {
+  height: 0.875rem;
+  background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
+  border-radius: 0.875rem;
+}
+
+
+.process{
+  /*height: 1em;*/
+  padding: 0.2em;
+  border:1px solid #C4CBD7;
+  margin: 0.2em;
+  background-color: #FAFBFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+
+.process label{
+  font-size: 0.2em;
+}
+
+.process img{
+  width: .3em;
+  margin: 0 .2em;
+}
+.process button{
+  display: flex;
+  align-items: center;
+}
+
+.process button i{
+  display: flex;
+}
+.process label{
+  text-transform:capitalize;
+}
+.many img{
+  width: 15px;
+  margin:0 5px;
+}
+
+.process label{
+  font-size: 0.15em;
+}
+
+.process button span {
+  font-size: 0.875rem;
+  float: left;
+}
+
+.process dl{
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.process dd{
+  display: flex;
+  margin-bottom: 0.1em;
+  align-items: center;
+}
+
+.process dd div{
+  margin-left:15px;
+}
+
+.process dd button{
+  display: flex;
 }

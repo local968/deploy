@@ -25,11 +25,11 @@ wss.register("originalStats", async (message, socket, progress) => {
     Object.entries(data).forEach(([key, metric]) => {
       const stats = metric.originalStats
       colType[key] = metric.type
-      colMap[key] = Object.entries(metric.originalCategoricalMap).reduce((prev, [key, b], index) => {
+      colMap[key] = metric.originalCategoricalMap.reduce((prev, b, index) => {
         prev[b.key] = index
         return prev
       }, {})
-      colValueCounts[key] = Object.entries(metric.originalCategoricalMap).reduce((prev, [key, b]) => {
+      colValueCounts[key] = metric.originalCategoricalMap.reduce((prev, b) => {
         prev[b.key] = b.doc_count
         return prev
       }, {})

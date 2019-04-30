@@ -21,6 +21,9 @@ export default class Model {
   @observable fitIndexModified;
   @observable filtedModels;
   @observable importanceLoading = false
+  @observable labelWithImportance = {}
+  @observable multiVarPlotData = ''
+  @observable parallelPlotData = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {

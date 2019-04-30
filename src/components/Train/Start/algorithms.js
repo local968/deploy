@@ -1,126 +1,74 @@
 export default {
-  Classification: [
+  Clustering: [
     {
-      value: 'adaboost',
-      label: 'AdaBoost'
+      value: 'KMeans',
+      label: 'KMeans'
     },
     {
-      value: 'bernoulli_nb',
-      label: 'NaiveBayes-Bernoulli'
+      value: 'GMM',
+      label: 'GMM'
     },
     {
-      value: 'decision_tree',
-      label: 'Decision Tree'
+      value: 'MeanShift',
+      label: 'MeanShift'
     },
     {
-      value: 'extra_trees',
-      label: 'Extra Trees'
+      value: 'SpectralClustering',
+      label: 'SpectralClustering'
     },
     {
-      value: 'gaussian_nb',
-      label: 'NaiveBayes-Gaussian'
+      value: 'AP',
+      label: 'AP'
     },
     {
-      value: 'gradient_boosting',
-      label: 'GBDT'
+      value: 'Agg',
+      label: 'Agg'
     },
     {
-      value: 'k_nearest_neighbors',
-      label: 'KNN'
+      value: 'DBSCAN',
+      label: 'DBSCAN'
     },
     {
-      value: 'lda',
-      label: 'LDA'
+      value: 'Birch',
+      label: 'Birch'
     },
-    {
-      value: 'liblinear_svc',
-      label: 'Linear SVM'
-    },
-    {
-      value: 'libsvm_svc',
-      label: 'SVM'
-    },
-    {
-      value: 'multinomial_nb',
-      label: 'NaiveBayes-Multinomial'
-    },
-    {
-      value: 'passive_aggressive',
-      label: 'Online Passive Aggressive'
-    },
-    {
-      value: 'qda',
-      label: 'QDA'
-    },
-    {
-      value: 'random_forest',
-      label: 'Random Forest'
-    },
-    {
-      value: 'sgd',
-      label: 'Linear Incremental Model'
-    },
-    {
-      value: 'xgradient_boosting',
-      label: 'XGBoost'
-    },
-    {
-      value: 'r2-logistics',
-      label: 'Logistic'
-    }
   ],
-  Regression: [
+  Outlier: [
     {
-      value: 'adaboost',
-      label: 'AdaBoost'
+      value: 'IsolationForest',
+      label: 'IsolationForest'
     },
     {
-      value: 'ard_regression',
-      label: 'ARD Regression'
+      value: 'OneClassSVM',
+      label: 'OneClassSVM'
     },
     {
-      value: 'decision_tree',
-      label: 'Decision Tree'
+      value: 'EllipticEnvelope',
+      label: 'EllipticEnvelope'
     },
     {
-      value: 'extra_trees',
-      label: 'Extra Trees'
+      value: 'LocalOutlierFactor',
+      label: 'LocalOutlierFactor'
     },
     {
-      value: 'gaussian_process',
-      label: 'GP Regression'
+      value: 'PCA',
+      label: 'PCA'
     },
     {
-      value: 'gradient_boosting',
-      label: 'GBDT'
+      value: 'HBOS',
+      label: 'HBOS'
     },
     {
-      value: 'k_nearest_neighbors',
-      label: 'KNN'
+      value: 'CBLOF',
+      label: 'CBLOF'
     },
     {
-      value: 'liblinear_svr',
-      label: 'Linear SVM'
+      value: 'ABOD',
+      label: 'ABOD'
     },
     {
-      value: 'libsvm_svr',
-      label: 'SVM'
+      value: 'FB',
+      label: 'FB'
     },
-    {
-      value: 'random_forest',
-      label: 'Random Forest'
-    },
-    {
-      value: 'ridge_regression',
-      label: 'Ridge Regression'
-    },
-    {
-      value: 'sgd',
-      label: 'Linear Incremental Model'
-    },
-    {
-      value: 'xgradient_boosting',
-      label: 'XGBoost'
-    }
   ]
 }
