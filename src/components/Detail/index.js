@@ -14,6 +14,7 @@ import Performance from "./Performance";
 import Status from "./Status";
 import styles from "./styles.module.css";
 
+import EN from '../../constant/en';
 @inject("routing", "deploymentStore")
 @observer
 export default class Detail extends Component {
@@ -24,7 +25,7 @@ export default class Detail extends Component {
     const isUnsupervised = ["Clustering", "Outlier"].includes(cd.modelType);
     return (
       <div className={styles.detail}>
-        <Bread list={["Home"]} />
+        <Bread list={[EN.Home]} />
         <div className={styles.tabs}>
           <div
             className={classnames([styles.tab, styles.deployment], {
@@ -39,7 +40,7 @@ export default class Detail extends Component {
               src={deploymentIcon}
               alt="deployment"
             />
-            <span className={styles.text}>Deployment</span>
+            <span className={styles.text}>{EN.Deployments}</span>
           </div>
           <div
             className={classnames([styles.tab, styles.operation], {
@@ -50,7 +51,7 @@ export default class Detail extends Component {
             }
           >
             <img className={styles.icon} src={operationIcon} alt="operation" />
-            <span className={styles.text}>Operation Monitor</span>
+            <span className={styles.text}>{EN.OperationMonitor}</span>
           </div>
           {!isUnsupervised && (
             <div
@@ -80,7 +81,7 @@ export default class Detail extends Component {
               }
             >
               <img className={styles.icon} src={statusIcon} alt="status" />
-              <span className={styles.text}>Performance Status</span>
+              <span className={styles.text}>{EN.PerformanceStatus}</span>
             </div>
           )}
         </div>

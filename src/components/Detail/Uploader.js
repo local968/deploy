@@ -3,7 +3,7 @@ import axios from 'axios'
 import config from 'config'
 import EsUploader from 'components/Common/EsUploader'
 import { message } from 'antd';
-
+import EN from '../../constant/en';
 const AllowExt = ["csv", "CSV", "zip", "ZIP", "rar", "RAR", "tar", "TAR", "tgz", "TGZ", 'xls', 'XLS', 'xlsx', 'XLSX']
 
 export default class Uploader extends React.Component {
@@ -15,7 +15,7 @@ export default class Uploader extends React.Component {
 
   onChange = (event) => {
     const file = event.target.files[0]
-    if (!this.check(file)) return message.error('File Error: Please Upload a file in one of the following formats: ["csv", "xls", "xlsx", "zip", "rar", "tar", "tgz" ].')
+    if (!this.check(file)) return message.error(EN.Pleaseuploadafileintheformatofcsv)
     typeof this.props.onStart === 'function' && this.props.onStart()
     axios.post(`http://${config.host}:${config.port}/upload/check`, { fileSize: file.size, type: 'deploy', projectId: this.props.params.projectId }).then(response => {
       this.props.params.token = response.data.token
