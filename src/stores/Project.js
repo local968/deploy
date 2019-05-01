@@ -1,13 +1,13 @@
-import { observable, action, computed, toJS, autorun } from "mobx";
+import {observable, action, computed, toJS, autorun} from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
 import config from 'config';
 import uuid from 'uuid';
 import Papa from 'papaparse';
-import { message as antdMessage, Modal } from 'antd';
+import {message as antdMessage, Modal} from 'antd';
 import axios from 'axios'
-import { formatNumber } from 'util'
+import {formatNumber} from 'util'
 
 export default class Project {
   @observable models = []
@@ -64,6 +64,7 @@ export default class Project {
 
   @observable noComputeTemp = false;
   @observable originalIndex = ''
+  @observable etlIndex = ''
 
   //data quality
   @observable mismatchFillMethod = {}
@@ -121,7 +122,7 @@ export default class Project {
   @observable trainHeader = []
   @observable customHeader = []
   @observable criteria = 'defualt';
-  @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
+  @observable costOption = {TP: 0, FP: 0, FN: 0, TN: 0}
 
   // Advanced Modeling Setting
   @observable settingId = '';
@@ -199,7 +200,7 @@ export default class Project {
 
   readIndex = async (index) => {
     const url = `/etls/${index}/preview`
-    const { data } = await axios.get(url)
+    const {data} = await axios.get(url)
     const result = data.result.map(row => this.rawHeader.map(h => row[h]))
     return result
   }
@@ -269,7 +270,7 @@ export default class Project {
       train2ing: false,
       train2Error: false,
       criteria: 'default',
-      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
+      costOption: {TP: 0, FP: 0, FN: 0, TN: 0},
       speedVSaccuracy: 5,
       ensembleSize: 20,
       // maxTime: 10,
@@ -310,14 +311,14 @@ export default class Project {
 
   @computed
   get sortHeader() {
-    const { target, dataHeader } = this
+    const {target, dataHeader} = this
     if (!target) return dataHeader
     return [target, ...dataHeader.filter(v => target !== v)]
   }
 
   @computed
   get sortData() {
-    const { target, sortHeader, uploadData, rawHeader } = this
+    const {target, sortHeader, uploadData, rawHeader} = this
     if (!uploadData.length) return []
     if (!target) return uploadData
     return uploadData.map(row => {
@@ -332,7 +333,7 @@ export default class Project {
 
   @action
   goback = () => {
-    const { mainStep, lastSubStep } = this
+    const {mainStep, lastSubStep} = this
     let backStep = mainStep
     let backSubStep = lastSubStep
     if (lastSubStep === 1) {
@@ -350,7 +351,7 @@ export default class Project {
   }
 
   @action
-  jump = (routeIndex, subStepActive) => ({ subStepActive, curStep: routeIndex })
+  jump = (routeIndex, subStepActive) => ({subStepActive, curStep: routeIndex})
 
   @action
   nextMainStep = (routeIndex) => {
@@ -465,7 +466,7 @@ export default class Project {
       }
       if (key === 'trainModel') {
         if (data[key]) {
-          const { value } = data[key] || {}
+          const {value} = data[key] || {}
           data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
         }
       }
@@ -500,7 +501,7 @@ export default class Project {
   }
 
   /**---------------------------------------------data-------------------------------------------------*/
-  //修改上传文件
+    //修改上传文件
   @action
   fastTrackInit = async (data) => {
 
@@ -516,13 +517,13 @@ export default class Project {
     await this.updateProject(backData)
     // const pass = await this.etl()
     const result = await this.originalStats()
-    if (result.status !== 200) this.updateProject({ uploadFileName: [], originalIndex: '' })
+    if (result.status !== 200) this.updateProject({uploadFileName: [], originalIndex: ''})
   }
 
   @action
   originalStats = async () => {
     const api = await socketStore.ready()
-    return await api.originalStats({ index: this.originalIndex, projectId: this.id })
+    return await api.originalStats({index: this.originalIndex, projectId: this.id})
   }
 
   @action
@@ -587,14 +588,14 @@ export default class Project {
       subStepActive: 1,
       lastSubStep: 1
     } : {
-        curStep: 2,
-        mainStep: 2,
-        subStepActive: 3,
-        lastSubStep: 3
-      }
+      curStep: 2,
+      mainStep: 2,
+      subStepActive: 3,
+      lastSubStep: 3
+    }
     await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
       target: this.target,
-      colType: { ...this.colType },
+      colType: {...this.colType},
       dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
       outlierFillMethod: this.outlierFillMethod,
@@ -652,7 +653,7 @@ export default class Project {
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    await api.newEtl({ projectId: this.id }, ({ progress }) => {
+    await api.newEtl({projectId: this.id}, ({progress}) => {
       this.etlProgress = progress
     })
     this.etlProgress = 0
@@ -681,7 +682,7 @@ export default class Project {
       Object.entries(this.targetMapTemp).forEach(([key, value]) => {
         if (value === k) n += this.colValueCounts[this.target] ? (this.colValueCounts[this.target][key] || 0) : 0
       })
-      return { [v]: n }
+      return {[v]: n}
     }).reduce((start, item) => {
       return Object.assign(start, item)
     }, {})) || {}
@@ -695,7 +696,7 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin } = this;
+    const {problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin} = this;
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
@@ -721,7 +722,7 @@ export default class Project {
 
   @computed
   get variableIssues() {
-    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines } = this;
+    const {dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines} = this;
     const obj = {
       mismatchRow: {},
       nullRow: {},
@@ -730,13 +731,13 @@ export default class Project {
 
     dataHeader.forEach(h => {
       if (colType[h] !== "Categorical" && mismatchLineCounts[h]) {
-        obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
+        obj.mismatchRow = Object.assign(obj.mismatchRow, {[h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100})
       }
       if (nullLineCounts[h]) {
-        obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
+        obj.nullRow = Object.assign(obj.nullRow, {[h]: (nullLineCounts[h] || 0) / (totalRawLines || 1) * 100})
       }
       if (colType[h] !== "Categorical" && outlierLineCounts[h]) {
-        obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
+        obj.outlierRow = Object.assign(obj.outlierRow, {[h]: (outlierLineCounts[h] || 0) / (totalRawLines || 1) * 100})
       }
     })
     return obj
@@ -744,28 +745,28 @@ export default class Project {
 
   @computed
   get variableIssueCount() {
-    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target } = this
-    const nullCount = Object.values(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const {nullLineCounts, mismatchLineCounts, outlierLineCounts, target} = this
+    const nullCount = Object.values(Object.assign({}, nullLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, {[target]: 0}) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
 
-    return { nullCount, mismatchCount, outlierCount }
+    return {nullCount, mismatchCount, outlierCount}
   }
 
   @computed
   get targetColMap() {
-    const { colValueCounts, target } = this
+    const {colValueCounts, target} = this
     let n = 0
     const array = Object.entries(colValueCounts[target] || {}).sort((a, b) => b[1] - a[1]) || []
     const map = array.reduce((start, [k]) => {
-      return Object.assign(start, { [k]: n++ })
+      return Object.assign(start, {[k]: n++})
     }, {})
     return map
   }
 
   @computed
   get targetIssues() {
-    const { target, mismatchIndex, nullIndex, outlierIndex, colType } = this;
+    const {target, mismatchIndex, nullIndex, outlierIndex, colType} = this;
     const arr = {
       mismatchRow: colType[target] !== "Categorical" ? (mismatchIndex[target] || []) : [],
       nullRow: nullIndex[target] || [],
@@ -778,7 +779,7 @@ export default class Project {
 
   @computed
   get targetIssuesCountsOrigin() {
-    const { target, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin, colType } = this;
+    const {target, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin, colType} = this;
     const arr = {
       mismatchRow: colType[target] !== "Categorical" ? (mismatchLineCountsOrigin[target] || 0) : 0,
       nullRow: nullLineCountsOrigin[target] || 0,
@@ -788,7 +789,7 @@ export default class Project {
   }
 
   etl = async (saveIssue = false) => {
-    const { id, problemType, dataHeader, uploadFileName } = this;
+    const {id, problemType, dataHeader, uploadFileName} = this;
 
     const command = 'etl';
 
@@ -800,7 +801,7 @@ export default class Project {
     }
 
     if (this.colType && Object.keys(this.colType).length) {
-      data.colType = { ...this.colType };
+      data.colType = {...this.colType};
     }
 
     if (this.target) {
@@ -825,9 +826,9 @@ export default class Project {
     }
 
     if (this.targetArray && this.targetArray.length) {
-      data.targetMap = { [this.target]: toJS(this.targetMap) };
+      data.targetMap = {[this.target]: toJS(this.targetMap)};
       data.showTargetMap = this.targetArray.map((v, k) => {
-        return { [v]: k }
+        return {[v]: k}
       })
     }
 
@@ -856,7 +857,7 @@ export default class Project {
     // kwargs:
     const api = await socketStore.ready()
     const returnValue = await api.etl(data)
-    const { result, status, message } = returnValue;
+    const {result, status, message} = returnValue;
     if (status !== 200) {
       // 出现错误弹出提示框,需要用户确认
       Modal.error({
@@ -880,10 +881,10 @@ export default class Project {
     }
     this.isAbort = true
     socketStore.ready().then(api => api.abortEtl(command).then(returnValue => {
-      const { status, message, result, id } = returnValue
+      const {status, message, result, id} = returnValue
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
-      this.setProperty({ ...result, stopEtl: false })
+      this.setProperty({...result, stopEtl: false})
     }))
   }
 
@@ -904,31 +905,32 @@ export default class Project {
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
       const command = {
         projectId: this.id,
         command: 'dataView',
         actionType: 'clean',
-        feature_label
+        feature_label,
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.dataViewsLoading = true
-      return api.dataView(command).then(returnValue => {
-        const { status, result } = returnValue
+      return api.newDataView(command).then(returnValue => {
+        const {status, result} = returnValue
         if (status < 0) {
-          this.setProperty({ dataViews: null })
+          this.setProperty({dataViews: null})
           return antdMessage.error(result['process error'])
         }
-        this.setProperty({ dataViews: result.data, dataViewsLoading: false })
+        this.setProperty({dataViews: result.data, dataViewsLoading: false})
       })
     })
   }
 
   @action
   fixTarget = () => {
-    this.updateProject({ targetMapTemp: this.targetMapTemp, targetArrayTemp: this.targetArrayTemp })
+    this.updateProject({targetMapTemp: this.targetMapTemp, targetArrayTemp: this.targetArrayTemp})
   }
 
   @action
@@ -956,7 +958,7 @@ export default class Project {
       };
       return api.createNewVariable(command, progressResult => {
       }).then(returnValue => {
-        const { status, result } = returnValue
+        const {status, result} = returnValue
         if (status < 0) {
           antdMessage.error(result.msg)
           return false
@@ -967,7 +969,7 @@ export default class Project {
           start[v] = type
           return start
         }, {}))
-        const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
+        const expression = Object.assign({}, this.expression, {[variableName]: fullExp})
         this.updateProject({
           newVariable,
           trainHeader,
@@ -991,10 +993,10 @@ export default class Project {
 
   @computed
   get recommendModel() {
-    const { costOption, criteria, models, problemType, defualtRecommendModel } = this
+    const {costOption, criteria, models, problemType, defualtRecommendModel} = this
     let model
     if (problemType === 'Classification') {
-      const { TP, FN, FP, TN } = criteria === 'cost' ? costOption : { TP: 0, FN: 0, FP: 0, TN: 0 }
+      const {TP, FN, FP, TN} = criteria === 'cost' ? costOption : {TP: 0, FN: 0, FP: 0, TN: 0}
       if (TP || FN || FP || TN) {
         for (let m of models) {
           if (!model) {
@@ -1063,13 +1065,13 @@ export default class Project {
   //temp
   @computed
   get defualtRecommendModel() {
-    const { models, measurement, problemType } = this
+    const {models, measurement, problemType} = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (problemType === 'Classification' || problemType === 'Regression') && currentMeasurement.endsWith("se") ? -1 : 1
     let recommend
     models.forEach(m => {
-      const { score } = m
-      const { validateScore, holdoutScore } = score || {}
+      const {score} = m
+      const {validateScore, holdoutScore} = score || {}
       let validate, holdout
       if (problemType === 'Classification') {
         validate = measurement === 'auc' ? (validateScore || {}).auc : m[measurement + 'Validation']
@@ -1086,8 +1088,8 @@ export default class Project {
       }
       if (!validate || !holdout) return
       const value = validate + holdout
-      if (!recommend) return recommend = { id: m.id, value }
-      if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
+      if (!recommend) return recommend = {id: m.id, value}
+      if ((recommend.value - value) * sort < 0) recommend = {id: m.id, value}
     })
     if (!!recommend) return models.find(m => m.id === recommend.id)
     return models[0]
@@ -1213,7 +1215,6 @@ export default class Project {
     // };
 
 
-
     this.modeling(trainData, Object.assign({
       train2Finished: false,
       train2ing: true,
@@ -1226,7 +1227,7 @@ export default class Project {
 
 
   newSetting = (type = 'auto') => {
-    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+    const {version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize} = this;
     const setting = {
       version,
       validationRate,
@@ -1259,7 +1260,7 @@ export default class Project {
     this.train2ing = true
     this.isAbort = false
     // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
-    socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
+    socketStore.ready().then(api => api.train({...trainData, data: updateData}, progressResult => {
       // if (this.isAbort) return
       // if (progressResult.name === "progress") {
       //   if (progressResult.trainId) this.trainingId = progressResult.trainId
@@ -1275,7 +1276,7 @@ export default class Project {
       // this.setModel(result)
     })).then(returnValue => {
       this.trainingId = ''
-      const { status, message } = returnValue
+      const {status, message} = returnValue
       if (status !== 200) {
         antdMessage.error(message)
       }
@@ -1293,10 +1294,10 @@ export default class Project {
     }
     this.isAbort = true
     return socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
-      const { status, message, result, id } = returnValue
+      const {status, message, result, id} = returnValue
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
-      this.setProperty({ ...result, stopModel: false })
+      this.setProperty({...result, stopModel: false})
     }))
   }
 
@@ -1310,13 +1311,13 @@ export default class Project {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
-    const model = new Model(this.id, { ...data, measurement: this.measurement })
+    const model = new Model(this.id, {...data, measurement: this.measurement})
     this.models = [...this.models.filter(m => data.id !== m.id), model]
     if (data.chartData && this.criteria === "cost") {
-      const { TP, FP, FN, TN } = this.costOption
-      const { index } = model.getBenefit(TP, FP, FN, TN)
+      const {TP, FP, FN, TN} = this.costOption
+      const {index} = model.getBenefit(TP, FP, FN, TN)
       if (index === model.fitIndex) return
-      model.updateModel({ fitIndex: index })
+      model.updateModel({fitIndex: index})
     }
   }
 
@@ -1325,25 +1326,25 @@ export default class Project {
     const model = this.models.find(m => data.id === m.id)
     if (!model) {
       if (times > 10) return
-      setTimeout(() => this.setModelField({ ...data, times: times + 1 }), 100)
+      setTimeout(() => this.setModelField({...data, times: times + 1}), 100)
       return
     }
     model.setProperty(data)
     if (data.chartData && this.criteria === "cost") {
-      const { TP, FP, FN, TN } = this.costOption
-      const { index } = model.getBenefit(TP, FP, FN, TN)
+      const {TP, FP, FN, TN} = this.costOption
+      const {index} = model.getBenefit(TP, FP, FN, TN)
       if (index === model.fitIndex) return
-      model.updateModel({ fitIndex: index })
+      model.updateModel({fitIndex: index})
     }
   }
 
   setSelectModel = id => {
-    this.updateProject({ selectId: id })
+    this.updateProject({selectId: id})
   }
 
   initModels = () => {
-    socketStore.ready().then(api => api.queryModelList({ id: this.id })).then(result => {
-      const { status, message, list } = result
+    socketStore.ready().then(api => api.queryModelList({id: this.id})).then(result => {
+      const {status, message, list} = result
       if (status !== 200) return alert(message)
       this.models = []
       list.forEach(m => {
@@ -1359,9 +1360,22 @@ export default class Project {
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
+      let cmd = ''
+      switch (this.problemType) {
+        case 'Clustering':
+          cmd = 'clustering.train';
+          break;
+        case 'Outlier':
+          cmd = 'outlier.train';
+          break;
+        default:
+          cmd = 'clfreg.train';
+      }
+
       const command = {
         projectId: this.id,
-        command: 'preTrainImportance',
+        command: cmd,
         feature_label
       };
       // if (new_label.length) {
@@ -1370,7 +1384,7 @@ export default class Project {
       // }
       this.preImportanceLoading = true
       return api.preTrainImportance(command).then(returnValue => {
-        const { status, result } = returnValue
+        const {status, result} = returnValue
         if (status < 0) {
           return antdMessage.error(result['process error'])
         }
@@ -1394,7 +1408,7 @@ export default class Project {
         featureLabel: this.dataHeader.filter(n => n !== this.target)
       };
       return api.correlationMatrix(command).then(returnValue => {
-        const { status, result } = returnValue
+        const {status, result} = returnValue
         this.correlationMatrixLoading = false
         if (status < 0) return antdMessage.error(result['process error'])
         this.correlationMatrixHeader = result.header;
@@ -1422,12 +1436,12 @@ export default class Project {
       //   }
       // }
       api.univariatePlot(command, progressResult => {
-        const { result } = progressResult
-        const { field: plotKey, imageSavePath, progress } = result;
+        const {result} = progressResult
+        const {field: plotKey, imageSavePath, progress} = result;
         if (progress && progress === "start") return
         const univariatePlots = Object.assign({}, this.univariatePlots);
         univariatePlots[plotKey] = imageSavePath
-        this.setProperty({ univariatePlots })
+        this.setProperty({univariatePlots})
       }).then(this.handleError)
     })
   }
@@ -1458,24 +1472,24 @@ export default class Project {
       //   }
       // }
       api.histgramPlot(command, progressResult => {
-        const { result } = progressResult
-        const { field: plotKey, imageSavePath, progress } = result;
+        const {result} = progressResult
+        const {field: plotKey, imageSavePath, progress} = result;
         if (progress && progress === "start") return
         const histgramPlots = Object.assign({}, this.histgramPlots);
         histgramPlots[plotKey] = imageSavePath
-        this.setProperty({ histgramPlots })
+        this.setProperty({histgramPlots})
       }).then(this.handleError)
     })
   }
 
   handleError = returnValue => {
-    const { result, status, command } = returnValue
+    const {result, status, command} = returnValue
     if (status < 0) antdMessage.error(`command:${command}, error:${result['process error']}`)
   }
 
   getSample = () => {
     return socketStore.ready()
-      .then(api => api.getSample({ problemType: this.problemType }))
+      .then(api => api.getSample({problemType: this.problemType}))
       .then(res => {
         return res.list || []
       })
@@ -1487,7 +1501,7 @@ export default class Project {
   }
 
   etlCleanData = () => {
-    const { dataHeader, newVariable } = this
+    const {dataHeader, newVariable} = this
     const fields = [...dataHeader, ...newVariable]
     return socketStore.ready().then(api => {
       const command = {
@@ -1522,8 +1536,8 @@ export default class Project {
     let univariatePlotCount = 0
     await api.univariatePlot(univariateCommand, progressResult => {
       univariatePlotCount++
-      const { result } = progressResult
-      const { field: plotKey, imageSavePath, progress } = result;
+      const {result} = progressResult
+      const {field: plotKey, imageSavePath, progress} = result;
       if (result.name === 'progress') return
       if (progress && progress === "start") return
       this.univariatePlotsBase64[plotKey] = imageSavePath
@@ -1533,8 +1547,8 @@ export default class Project {
     let histgramPlotCount = 0
     await api.histgramPlot(histogramCommand, progressResult => {
       histgramPlotCount++
-      const { result } = progressResult
-      const { field: plotKey, imageSavePath, progress } = result;
+      const {result} = progressResult
+      const {field: plotKey, imageSavePath, progress} = result;
       if (result.name === 'progress') return
       if (progress && progress === "start") return
       this.histgramPlotsBase64[plotKey] = imageSavePath
@@ -1542,8 +1556,8 @@ export default class Project {
     })
     if (changeReportProgress('preparing target histogram plot.', 85)) return
     await api.rawHistgramPlot(rawHistogramCommand, progressResult => {
-      const { result } = progressResult
-      const { field: plotKey, imageSavePath, progress } = result;
+      const {result} = progressResult
+      const {field: plotKey, imageSavePath, progress} = result;
       if (result.name === 'progress') return
       if (progress && progress === "start") return
       this.rawHistgramPlotsBase64[plotKey] = imageSavePath
@@ -1681,7 +1695,7 @@ export default class Project {
       } catch (e) {
       }
       // generate json
-      const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
+      const json = JSON.stringify([{...this, ...{models: [model]}}])
 
       changeReportProgress(`generating report file`, 100)
       const html = await this.generateReportHtml(json)

@@ -4,9 +4,9 @@ import request from '../Request'
 import { Select } from 'antd';
 const {Option} = Select;
 import useStyles from './charts.css';
-import styles from 'views/modeling.pre.result/modeling.pre.result.css';
 import THREE from './3Variable'
 import EN from "../../constant/en";
+import styles from "../Common/charts/charts.model.css";
 
 const classes = useStyles;
 
