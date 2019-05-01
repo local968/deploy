@@ -7,6 +7,7 @@ import { Popover } from 'antd';
 import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 import config from 'config'
+import EN from '../../../constant/en';
 
 @inject('deploymentStore', 'scheduleStore')
 @observer
@@ -17,19 +18,19 @@ export default class Operation extends Component {
     return (
       <div className={styles.operation}>
         <div className={styles.info}>
-          <span className={styles.model}>Model: {cd.modelName}</span>
+          <span className={styles.model}>{EN.Model}: {cd.modelName}</span>
         </div>
         {scheduleStore.sortedDeploymentSchedules.length === 0 && <Empty />}
         {scheduleStore.sortedDeploymentSchedules.length > 0 && (
           <div className={styles.table}>
             <div className={styles.head}>
-              <span className={styles.modelName}>Model Name</span>
-              <span className={styles.deploymentTime}>Deployment Time</span>
-              <span className={styles.deploymentStyle}>Deployment Style</span>
-              <span className={styles.executionSpeed}>Execution Speed <small>(rows/s)</small></span>
-              <span className={styles.dataSize}>Total Lines</span>
-              <span className={styles.status}>Status</span>
-              <span className={styles.results}>Results</span>
+              <span className={styles.modelName}>{EN.ModelName}</span>
+              <span className={styles.deploymentTime}>{EN.DeploymentTime}</span>
+              <span className={styles.deploymentStyle}>{EN.DeploymentStyle}</span>
+              <span className={styles.executionSpeed}>{EN.ExecutionSpeed} <small>{EN.Rowss}</small></span>
+              <span className={styles.dataSize}>{EN.TotalLines}</span>
+              <span className={styles.status}>{EN.Status}</span>
+              <span className={styles.results}>{EN.Results}</span>
             </div>
             <div className={styles.list}>
               {scheduleStore.sortedDeploymentSchedules.map(s => (
@@ -45,10 +46,10 @@ export default class Operation extends Component {
                         .format('MM/DD/YYYY-hh:mma')}
                   </span>
                   <span className={styles.deploymentStyle}>
-                    Predict with{' '}
+                    {EN.Predictwith}{' '}
                     {s.deployment.deploymentOptions.option === 'data'
-                      ? 'DataSource'
-                      : 'API Source'}
+                      ? EN.DataSource
+                      : EN.APISource}
                   </span>
                   <span className={styles.executionSpeed}>
                     {s.schedule.status === 'finished'
@@ -75,7 +76,7 @@ export default class Operation extends Component {
                       }
                     >
                       <span className={classnames(styles.status, styles.issue)}>
-                        Issue
+                        {EN.Issue}
                       </span>
                     </Popover>
                   )}
@@ -88,7 +89,7 @@ export default class Operation extends Component {
                           s.schedule.actualTime || s.schedule.estimatedTime
                         )
                         .format('MM-DD-YYYY_hh-mm')}-predict.csv`}
-                    >Download</a>) : (<span className={styles.results}> - </span>)}
+                    >{EN.Download}</a>) : (<span className={styles.results}> - </span>)}
                 </div>
               ))}
 
@@ -146,7 +147,7 @@ const Alert = ({ text }) => (
 
 const Empty = () => (
   <div className={styles.emptyTable}>
-    <img src={emptyIcon} className={styles.emptyIcon} alt="empty" />
-    <span className={styles.emptyText}>No deployment report yet</span>
+    <img src={emptyIcon} className={styles.emptyIcon} alt={EN.Empty} />
+    <span className={styles.emptyText}>{EN.NoDeploymentReportYet}</span>
   </div>
 );
