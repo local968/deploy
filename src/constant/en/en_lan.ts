@@ -1007,7 +1007,7 @@ const EN_LAN = {
   ChooseaVariableScalingMethod:'Choose a Variable Scaling Method',
   minmaxscale:'min_max_scale',
   robustscale:'robust_scale',
-
+  FromSQL:'From SQL',
 
 
 

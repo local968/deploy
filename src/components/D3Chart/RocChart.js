@@ -4,7 +4,7 @@ import { Checkbox } from 'antd';
 import { inject, observer } from 'mobx-react';
 import styles from './D3Chart.module.css';
 // import d3tips from './d3-tip';
-
+import EN from '../../constant/en';
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
 d3ColorsCategory20.push(...d3.schemeCategory20)
 
@@ -75,7 +75,7 @@ export default class RocChart extends Component {
         .attr('x', width - 50)
         .attr('y', 35)
         .attr('fill', '#000')
-        .text('False Positive Rate');
+        .text(EN.FalsePositiveDate);
 
       svg.append('g')
         .attr('class', styles.axis)
@@ -86,7 +86,7 @@ export default class RocChart extends Component {
         .attr('dy', '.71em')
         .attr('x', 0)
         .attr('fill', '#000')
-        .text('True Positive Rate');
+        .text(EN.TruePositiveRate);
     }
     if (lineEnable) {
       svg.append('path')

@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './styles.module.css';
 import searchButton from './search-icon.svg';
+import EN from '../../../constant/en'
 
 export default ({ value, onChange, onClick }) => {
     const change = (e) => {
@@ -14,7 +15,7 @@ export default ({ value, onChange, onClick }) => {
 
     return <div className={styles.search}>
         <input
-            placeholder = "Search your project"
+            placeholder = {EN.SearchProject}
             type="text"
             className={styles.searchName}
             value={value}

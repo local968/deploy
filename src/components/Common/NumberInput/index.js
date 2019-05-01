@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observable } from 'mobx'
 import { observer } from 'mobx-react';
 import { message } from 'antd'
+import EN from '../../../constant/en'
 
 @observer
 export default class NumberInput extends Component {
@@ -24,9 +25,9 @@ export default class NumberInput extends Component {
     if (!temp || isNaN(temp)) return this.temp = value
     try {
       const num = parseFloat(temp)
-      if (isInt && num.toString().includes(".")) throw new Error(`The number must be an integer`)
-      if ((min || (!min && min === 0)) && num < min) throw new Error(`The number must be greater than or equal to ${min}`)
-      if ((max || (!max && max === 0)) && num > max) throw new Error(`The number must be less than or equal to ${max}`)
+      if (isInt && num.toString().includes(".")) throw new Error(EN.Thenumbermustbeaninteger)
+      if ((min || (!min && min === 0)) && num < min) throw new Error(`${EN.Thenumbermustbegreaterthanorequalto}${min}`)
+      if ((max || (!max && max === 0)) && num > max) throw new Error(`${EN.Thenumbermustbelessthanorequalto}${max}`)
       onBlur(num)
       this.isFocus = false
     } catch (err) {
@@ -42,3 +43,4 @@ export default class NumberInput extends Component {
     return <input className={className} onBlur={this.handleBlur} value={isFocus ? temp : value} onChange={this.handleChange} style={style} onFocus={this.handleFocus} />
   }
 }
+

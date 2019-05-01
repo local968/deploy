@@ -872,7 +872,7 @@ const EN: any = {
   minmaxscale:'Min Max Scale',
   standardscale:'Standard Scale',
   robustscale:'Robust Scale',
-
+  FromSQL:'来自SQL',
 
 
 

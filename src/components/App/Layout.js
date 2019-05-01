@@ -6,6 +6,7 @@ import Route from 'components/App/Route';
 import LoginRouter from 'components/App/LoginRoute';
 import styles from './styles.module.css';
 import { Spin } from 'antd';
+import EN from '../../constant/en'
 
 @withRouter
 @inject('userStore', 'projectStore')
@@ -17,7 +18,7 @@ export default class Layout extends Component {
     const { init, isOnline } = projectStore
     const useLoginRouter = status === 'unlogin'
     const showMask = status === 'unlogin' ? false : status !== 'unlogin' && !init
-    const text = isOnline ? 'Loading...' : 'reconnecting...'
+    const text = isOnline ? EN.Loading : EN.Reconnecting;
     const style = isOnline ? null : { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
     // const community = ;
     return <div className={styles.route}>
