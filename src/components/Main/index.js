@@ -9,7 +9,7 @@ import Modeling from 'components/Modeling';
 import { ProcessLoading, Confirm } from 'components/Common';
 import { message } from 'antd';
 import styles from './styles.module.css';
-
+import EN from '../../constant/en';
 import Info from 'components/Info';
 import Train from 'components/Train';
 
@@ -28,7 +28,7 @@ export default class Main extends Component {
       () => this.props.userStore.status === "login",
       () => this.props.projectStore.initProject(this.pid).then(init => {
         if (!init) {
-          message.error("Sorry but you don't have the authority for entering this project.")
+          message.error(EN.Sorrybutyoudonthavetheauthority)
           this.props.routing.push("/")
         }
         this.autorun = autorun(() => {
@@ -92,11 +92,11 @@ export default class Main extends Component {
     return <React.Fragment>
       <div className={styles.header}>
         {project && project.name && <div className={styles.projectName}>
-          <span className={styles.label}>Project: </span>
+          <span className={styles.label}>{EN.Project}: </span>
           <span className={styles.value}> {project.name}</span>
         </div>}
         {!!project && !!project.fileNames.length && <div className={styles.dataset}>
-          <span className={styles.label}>Dataset: </span>
+          <span className={styles.label}>{EN.Dataset}: </span>
           <span className={styles.value}> {project.fileNames.toString()}</span>
         </div>}
       </div>
@@ -110,15 +110,15 @@ export default class Main extends Component {
       </Switch>}
       {<Confirm
         width="6em"
-        title={`You have been kicked out`}
+        title={EN.Youhavebeenkickedout}
         visible={conflict}
         onClose={this.exit}
         onConfirm={notExit}
         closeByMask={false}
         showClose={false}
-        confirmText="Go Back to the Project"
-        closeText="Go to Home Page"
-        content={"You have been kicked out of the project by another user."} />}
+        confirmText={EN.GoBacktotheProject}
+        closeText={EN.GotoHomePage}
+        content={EN.Youhavebeenkickedoutof} />}
     </React.Fragment>
   }
 }

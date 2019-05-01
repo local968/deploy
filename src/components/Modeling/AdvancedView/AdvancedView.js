@@ -49,7 +49,7 @@ import moment from 'moment';
 import { formatNumber } from 'util'
 import FitPlot from "../../Charts/FitPlot";
 import ResidualPlot from "../../Common/charts/ResidualPlot";
-
+import EN from '../../../constant/en';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -256,9 +256,9 @@ export default class AdvancedView extends Component {
       const { project } = this.props;
       const { selectModel: current } = project;
       if (project.problemType === 'Classification') {
-        return current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
+        return current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
       } else {
-        return current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
+        return current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : ''
       }
     } catch (e) {
       return 'OK'
@@ -352,21 +352,21 @@ export default class AdvancedView extends Component {
     return (
       <div className={styles.advancedModelResult}>
         <div className={styles.modelResult} >
-          Modeling Results :{' '}
+          {EN.ModelingResults} :{' '}
           <div className={styles.status}>&nbsp;&nbsp;{this.performance}</div>
         </div>
         <div className={styles.middle}>
           <div className={styles.settings}>
-            <span className={styles.label}>Model Name Contains:</span>
+            <span className={styles.label}>{EN.ModelNameContains}:</span>
             <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
-              <Option value={'all'}>All</Option>
+              <Option value={'all'}>{EN.All}</Option>
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
           </div>
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
         <div className={styles.metricSelection} >
-          <span className={styles.text} >Measurement Metric</span>
+          <span className={styles.text} >{EN.MeasurementMetric}</span>
           <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
@@ -378,20 +378,20 @@ export default class AdvancedView extends Component {
 }
 
 const questMarks = {
-  Accuracy: 'Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%.',
-  Recall: 'Recall=TP/(TP+FN). It measures the % of positives the classifier labeled as positive. It represents the completeness of the classifier. The higher the recall is the more positives the classifier captures.',
-  'Cutoff Threshold': 'Many classifiers are able to produce a probability distribution over a set of classes (e.g. binary 1/0). Cut-off threshold is a certain probability value which can be used to determine whether an observation belongs to a particular class.',
-  'F1-Score': <p>The F1-score is the harmonic mean of Precision and Recall, where an F1-score reaches its best value at 1 (perfect precision and recall) and worst at 0.<br /><br />It's 2*Precision*Recall / (Precision+Recall).</p>,
-  Precision: <p>It measures how many true positives among all predicted (including true and false)  positives. It's TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.</p>,
-  KS: "KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It's calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other.",
-  'Normalized RMSE': 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
-  R2: 'R² is a statistical measure of how close the data are to the fitted regression line. R² = Explained variation / Total variation.',
-  RMSE: 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
-  RMSLE: 'RMSLE is similar with RMSE, but use log to y and y_pred first',
-  MSE: 'Mean Squared Error',
-  MAE: 'Mean Absolute Error',
-  AdjustR2: 'The adjusted R² tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.',
-  LogLoss: <p>Log Loss is -1 * the log of the likelihood function.<br /><br />The likelihood function answers the question "How likely did the model think the actually observed set of outcomes was." If that sounds confusing, an example should help.</p>
+  Accuracy: EN.Givenaparticularpopulation,
+  Recall: EN.Itrepresentsthecompleteness,
+  'Cutoff Threshold': EN.Manyclassifiersareabletoproduce,
+  'F1-Score': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
+  Precision: <p>{EN.Itmeasureshowmanytruepositivesamong}</p>,
+  KS: EN.Efficientwaytodetermine,
+  'Normalized RMSE': EN.RootMeanSquareError,
+  R2: EN.R2isastatisticalmeasure,
+  RMSE: EN.RootMeanSquareErrorprediction,
+  RMSLE: EN.RMSLEissimilarwithRMSE,
+  MSE: EN.MeanSquaredErro,
+  MAE: EN.MeanAbsoluteError,
+  AdjustR2: EN.TheadjustedR2tells,
+  LogLoss: <p>{EN.LogLossis}<br /><br />{EN.Thelikelihoodfunctionanswers}</p>
 }
 
 @observer
@@ -508,7 +508,7 @@ class AdvancedModelTable extends Component {
 @observer
 class RegressionDetailCurves extends Component {
   state = {
-    curve: "Variable Impact",
+    curve: EN.VariableImpact,
     visible: false,
     diagnoseType: null
   }
@@ -530,10 +530,10 @@ class RegressionDetailCurves extends Component {
     const { curve, diagnoseType } = this.state;
     let curComponent;
     switch (curve) {
-      case 'Variable Impact':
+      case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
         break;
-      case 'Fit Plot':
+      case EN.FitPlot:
         curComponent = (
           <div className={styles.plot} >
             {/*<img className={styles.img} src={model.fitPlotPath} alt="fit plot" />*/}
@@ -541,14 +541,14 @@ class RegressionDetailCurves extends Component {
           </div>
         )
         break;
-      case 'Residual Plot':
+      case EN.ResidualPlot:
         curComponent = (
           <div className={styles.plot} >
             {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
             <ResidualPlot/>
             <Modal
               visible={this.state.visible}
-              title='Residual Plot Diagnose'
+              title={EN.ResidualPlotDiagnose}
               width={1200}
               onOk={() => this.setState({ visible: false })}
               onCancel={() => this.setState({ visible: false })}
@@ -563,13 +563,13 @@ class RegressionDetailCurves extends Component {
         break
     }
     const thumbnails = [{
-      text: 'Fit Plot',
+      text: EN.FitPlot,
       hoverIcon: FitPlotHover,
       normalIcon: FitPlotNormal,
       selectedIcon: FitPlotSelected,
       type: 'fitplot'
     }, {
-      text: 'Residual Plot',
+      text: EN.ResidualPlot,
       hoverIcon: ResidualHover,
       normalIcon: ResidualNormal,
       selectedIcon: ResidualSelected,
@@ -578,7 +578,7 @@ class RegressionDetailCurves extends Component {
       normalIcon: varImpactNormal,
       hoverIcon: varImpactHover,
       selectedIcon: varImpactSelected,
-      text: 'Variable Impact'
+      text: EN.VariableImpact
     }]
     return (
       <div className={styles.detailCurves} >
@@ -652,7 +652,7 @@ class ClassificationModelRow extends Component {
 
 class DetailCurves extends Component {
   state = {
-    curve: "ROC Curve"
+    curve: EN.ROCCurve
   }
   handleClick = val => {
     this.setState({ curve: val });
@@ -666,24 +666,24 @@ class DetailCurves extends Component {
     let curComponent;
     let hasReset = true;
     switch (curve) {
-      case 'ROC Curve':
+      case EN.ROCCurve:
         curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
         break;
-      case 'Prediction Distribution':
+      case EN.PredictionDistribution:
         curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
         break;
-      case 'Precision Recall Tradeoff':
+      case EN.PrecisionRecallTradeoff:
         curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
         break;
-      case 'Lift Chart':
+      case EN.LiftChart:
         curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
         hasReset = false;
         break;
-      case 'Variable Impact':
+      case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
         hasReset = false;
         break;
-      case 'Model Process Flow':
+      case EN.ModelProcessFlow:
         curComponent = <div style={{ maxWidth: document.body.clientWidth / 2 }} >
           <ModelProcess model={model} className={`modelprocess${mid}`} />
         </div>
@@ -696,32 +696,32 @@ class DetailCurves extends Component {
       normalIcon: ROCCurve,
       hoverIcon: rocHover,
       selectedIcon: rocSelected,
-      text: 'ROC Curve'
+      text: EN.ROCCurve
     }, {
       normalIcon: predictDist,
       hoverIcon: predictionDistribution,
       selectedIcon: predictionDistributionSelected,
-      text: 'Prediction Distribution'
+      text: EN.PredictionDistribution
     }, {
       normalIcon: precisionRecall,
       hoverIcon: precisionRecallHover,
       selectedIcon: precisionRecallSelected,
-      text: 'Precision Recall Tradeoff'
+      text: EN.PrecisionRecallTradeoff
     }, {
       normalIcon: liftChart,
       hoverIcon: liftchartHover,
       selectedIcon: liftchartSelected,
-      text: 'Lift Chart'
+      text: EN.LiftChart
     }, {
       normalIcon: varImpactNormal,
       hoverIcon: varImpactHover,
       selectedIcon: varImpactSelected,
-      text: 'Variable Impact'
+      text: EN.VariableImpact
     }, {
       normalIcon: modelProcess,
       hoverIcon: processHover,
       selectedIcon: processSelectd,
-      text: 'Model Process Flow'
+      text: EN.ModelProcessFlow
     }];
     return (
       <div className={styles.detailCurves} >
@@ -735,7 +735,7 @@ class DetailCurves extends Component {
           </div> */}
         </div>
         <div className={styles.rightPanel} >
-          {hasReset && <button onClick={this.reset} className={styles.button} >Reset</button>}
+          {hasReset && <button onClick={this.reset} className={styles.button} >{EN.Reset}</button>}
           {curComponent}
         </div>
       </div>
@@ -827,10 +827,10 @@ class PredictTable extends Component {
       dataIndex: 'rowName',
       className: styles.actual
     }, {
-      title: `Predict: ${no}`,
+      title: `${EN.Predict}: ${no}`,
       dataIndex: 'col1',
     }, {
-      title: `Predict: ${yes}`,
+      title: `${EN.Predict}: ${yes}`,
       dataIndex: 'col2'
     }, {
       title: '',
@@ -839,12 +839,12 @@ class PredictTable extends Component {
 
     // set default value
     const data = [{
-      rowName: `Actual: ${no}`,
+      rowName: `${EN.Actual}: ${no}`,
       col1: `${Math.round(TN)}(TN)`,
       col2: `${Math.round(FP)}(FP)`,
       sum: +TN + +FP,
     }, {
-      rowName: `Actual: ${yes}`,
+      rowName: `${EN.Actual}: ${yes}`,
       col1: `${Math.round(FN)}(FN)`,
       col2: `${Math.round(TP)}(TP)`,
       sum: Number(FN) + +TP
@@ -882,26 +882,26 @@ class ModelComp extends Component {
     const { models } = this.props;
     return (
       <div className={styles.modelComp}>
-        <a onClick={this.handleClick} className={styles.comparison}>Model Comparison Charts</a>
+        <a onClick={this.handleClick} className={styles.comparison}>{EN.ModelComparisonCharts}</a>
         <Modal
           width={1000}
           visible={this.state.modelCompVisible}
           onCancel={this.handleCancel}
           closable={false}
           footer={
-            <Button key="cancel" type="primary" onClick={this.handleCancel}>Close</Button>
+            <Button key="cancel" type="primary" onClick={this.handleCancel}>{EN.Close}</Button>
           }
         >
           <div>
-            <h4>Model Comparison Charts</h4>
+            <h4>{EN.ModelComparisonCharts}</h4>
             <Tabs defaultActiveKey="1">
-              <TabPane tab="Speed vs Accuracy" key="1">
+              <TabPane tab={EN.SpeedvsAccuracy} key="1">
                 <SpeedAndAcc models={models} width={600} height={400} className="speedComp" />
               </TabPane>
-              <TabPane tab="Lifts Charts" key="3">
+              <TabPane tab={EN.LiftsCharts} key="3">
                 <LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
               </TabPane>
-              <TabPane tab="ROC Curves" key="4">
+              <TabPane tab={EN.ROCCurves} key="4">
                 <RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
               </TabPane>
               {/* <TabPane tab="Learning Curves" key="2">
@@ -920,31 +920,31 @@ class ResidualDiagnose extends Component {
     const plots = [{
       plot: randomlyImg,
       type: 'random',
-      text: 'Randomly Distributed'
+      text: EN.RandomlyDistributed
     }, {
       plot: yAxisUnbalancedImg,
       type: 'yUnbalanced',
-      text: 'Y-axis Unbalanced'
+      text: EN.YaxisUnbalanced
     }, {
       plot: xAxisUnbalancedImg,
       type: 'xUnbalanced',
-      text: 'X-axis Unbalanced'
+      text: EN.XaxisUnbalanced
     }, {
       plot: outliersImg,
       type: 'outliers',
-      text: 'Outliers'
+      text: EN.Outliers
     }, {
       plot: nonlinearImg,
       type: 'nonlinear',
-      text: 'Nonlinear'
+      text: EN.Nonlinear
     }, {
       plot: heteroscedasticityImg,
       type: 'heteroscedasticity',
-      text: 'Heteroscedasticity'
+      text: EN.Heteroscedasticity
     }, {
       plot: largeImg,
       type: 'largey',
-      text: 'Large Y-axis Data Points'
+      text: EN.LargeYaxisDataPoints
     }];
     const { diagnoseType, residualplot } = this.props;
     const RadioGroup = Radio.Group;
@@ -956,7 +956,7 @@ class ResidualDiagnose extends Component {
           <img width={300} src={residualplot} alt="" />
         </div>
         <div className={styles.choosePlot} >
-          <div>Which plot does your residual plot look most similar to?</div>
+          <div>{EN.Whichplotdoesyourresidual}</div>
           <RadioGroup value={diagnoseType} onChange={this.props.handleDiagnoseType} >
             {plots.map((p, i) => (
               <div className={styles.radioWrapper} key={i}>
@@ -995,23 +995,23 @@ class DiagnoseResult extends Component {
     // const type = 'large';
     switch (diagnoseType) {
       case 'random':
-        result = <div className={styles.content} >Perfect, your residual plot is randomly distributed. No need to further improve your models. </div>;
+        result = <div className={styles.content} >{EN.Perfectyourresidualplot} </div>;
         break;
       case 'yUnbalanced':
         result = (
           <div className={styles.content}>
-            <div>Your plot is unbalanced on y-axis. You might be able to improve your model via:</div>
+            <div>{EN.Yourplotisunbalancedonyaxis}</div>
             <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform your variables, typically your target variable</li>
-              <li>Checking if your model lacks informative variables</li>
+              <li>{EN.Lookingforanopportunity}</li>
+              <li>{EN.Checkingifyourmodel}</li>
             </ul>
             <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
+              <span>{EN.Youcantransformorselect}</span>
+              <button onClick={this.handleSetting} className={styles.button} >{EN.GotoAdvancedVariableSetting}</button>
             </div>
             <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
+              <span>{EN.Alternativelyyoucanmodify}</span>
+              <button onClick={this.handleNewData} className={styles.button} >{EN.LoadMyNewData}</button>
             </div>
           </div>
         );
@@ -1019,19 +1019,19 @@ class DiagnoseResult extends Component {
       case 'xUnbalanced':
         result = (
           <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is unbalanced on x-axis. You might be able to improve your model via:</div>
+            <div className={styles.header} >{EN.DiagnoseResults}</div>
+            <div>{EN.Yourplotisunbalancedonxaxis}</div>
             <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform your variables, typically your predictors</li>
-              <li>Checking if your model lacks informative variables</li>
+              <li>{EN.Lookingforanopportunitytousefully}</li>
+              <li>{EN.Checkingifyourmodellack}</li>
             </ul>
             <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
+              <span>{EN.Youcantransformorselectvariables}</span>
+              <button onClick={this.handleSetting} className={styles.button} >{EN.GotoAdvancedVariableSetting}</button>
             </div>
             <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
+              <span>{EN.Alternativelyyoucanmodify}</span>
+              <button onClick={this.handleNewData} className={styles.button} >{EN.LoadMyNewData}</button>
             </div>
           </div>
         );
@@ -1039,23 +1039,23 @@ class DiagnoseResult extends Component {
       case 'outliers':
         result = (
           <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is has some outliers. You might be able to improve your model via:</div>
+            <div className={styles.header} >{EN.DiagnoseResults}</div>
+            <div>{EN.Yourplotishassomeoutliers}</div>
             <ul className={styles.items} >
-              <li>Deleting the outliers if you decide that they are useless</li>
-              <li>Checking if your model lacks informative variables</li>
+              <li>{EN.Deletingtheoutliers}</li>
+              <li>{EN.Checkingifyourmodellack}</li>
             </ul>
             <div className={styles.action} >
-              <span>You can delete the outliers in our application</span>
-              <button onClick={this.handleOutlierFix} className={styles.button} >Go to Edit the Fixes for Outliers</button>
+              <span>{EN.Youcandeletetheoutliers}</span>
+              <button onClick={this.handleOutlierFix} className={styles.button} >{EN.GotoEdittheFixesforOutliers}</button>
             </div>
             <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
+              <span>{EN.Youcantransformorselectvariables}</span>
+              <button onClick={this.handleSetting} className={styles.button} >{EN.GotoAdvancedVariableSetting}</button>
             </div>
             <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
+              <span>{EN.Alternativelyyoucanmodify}</span>
+              <button onClick={this.handleNewData} className={styles.button} >{EN.LoadMyNewData}</button>
             </div>
           </div>
         );
@@ -1063,19 +1063,19 @@ class DiagnoseResult extends Component {
       case 'nonlinear':
         result = (
           <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is nonlinear. You might be able to improve your model via:</div>
+            <div className={styles.header} >{EN.DiagnoseResults}</div>
+            <div>{EN.Yourplotisnonlinear}</div>
             <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform a variable.</li>
-              <li>Checking if your need to add new a variable</li>
+              <li>{EN.Lookingforanopportunityusefully}</li>
+              <li>{EN.Checkingifyourneedtoaddnewavariable}</li>
             </ul>
             <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
+              <span>{EN.Youcantransformorselect}</span>
+              <button onClick={this.handleSetting} className={styles.button} >{EN.GotoAdvancedVariableSetting}</button>
             </div>
             <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
+              <span>{EN.Alternativelyyoucanmodify}</span>
+              <button onClick={this.handleNewData} className={styles.button} >{EN.LoadMyNewData}</button>
             </div>
           </div>
         );
@@ -1083,19 +1083,19 @@ class DiagnoseResult extends Component {
       case 'heteroscedasticity':
         result = (
           <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot is heteroscedasticity. You might be able to improve your model via:</div>
+            <div className={styles.header} >{EN.DiagnoseResults}</div>
+            <div>{EN.Yourplotisheteroscedasticity}</div>
             <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform a variable.</li>
-              <li>Checking if your need to add new a variable</li>
+              <li>{EN.Lookingforanopportunityusefully}</li>
+              <li>{EN.Checkingifyourneedtoaddnewavariable}</li>
             </ul>
             <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
+              <span>{EN.Youcantransformorselect}</span>
+              <button onClick={this.handleSetting} className={styles.button} >{EN.GotoAdvancedVariableSetting}</button>
             </div>
             <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
+              <span>{EN.Alternativelyyoucanmodify}</span>
+              <button onClick={this.handleNewData} className={styles.button} >{EN.LoadMyNewData}</button>
             </div>
           </div>
         );
@@ -1103,19 +1103,19 @@ class DiagnoseResult extends Component {
       case 'largey':
         result = (
           <div className={styles.content}>
-            <div className={styles.header} >Diagnose Results:</div>
-            <div>Your plot has large y-axis datapoints. You might be able to improve your model via:</div>
+            <div className={styles.header} >{EN.DiagnoseResults}</div>
+            <div>{EN.Yourplothaslargeyaxisdatapoints}</div>
             <ul className={styles.items} >
-              <li>Looking for an opportunity to usefully transform a variable.</li>
-              <li>Checking if your need to add new a variable</li>
+              <li>{EN.Lookingforanopportunityusefully}</li>
+              <li>{EN.Checkingifyourneedtoaddnewavariable}</li>
             </ul>
             <div className={styles.action} >
-              <span>You can transform or select variables in our application</span>
-              <button onClick={this.handleSetting} className={styles.button} >Go to Advanced Variable Setting</button>
+              <span>{EN.Youcantransformorselect}</span>
+              <button onClick={this.handleSetting} className={styles.button} >{EN.GotoAdvancedVariableSetting}</button>
             </div>
             <div className={styles.action} >
-              <span>Alternatively, you can modify your data offline and reload it.</span>
-              <button onClick={this.handleNewData} className={styles.button} >Load My New Data</button>
+              <span>{EN.Alternativelyyoucanmodify}</span>
+              <button onClick={this.handleNewData} className={styles.button} >{EN.LoadMyNewData}</button>
             </div>
           </div>
         );
@@ -1124,7 +1124,7 @@ class DiagnoseResult extends Component {
     }
     return (
       <div className={styles.diagnoseResult} >
-        <button onClick={this.props.handleDiagnose} className={styles.button} >Diagnose</button>
+        <button onClick={this.props.handleDiagnose} className={styles.button} >{EN.Diagnose}</button>
         {result}
       </div>
     );

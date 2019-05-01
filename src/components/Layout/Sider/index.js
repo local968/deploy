@@ -10,6 +10,7 @@ import helpActive from './icon-help-active.svg';
 import switchIcon from './switch.svg';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router';
+import EN from '../../../constant/en';
 
 @withRouter
 @inject('userStore', 'deploymentStore', 'routing')
@@ -36,7 +37,7 @@ export default class Sider extends Component {
             {!isSupport ? <img alt="home" src={homeActive} /> : <img alt="home" src={home} />}
             <h4 className={classnames(styles.nav, {
               [styles.active]: !isSupport
-            })}>Home</h4>
+            })}>{EN.Home}</h4>
           </a>
           <a className={styles.support}
             onClick={() => {
@@ -45,7 +46,7 @@ export default class Sider extends Component {
             {isSupport ? <img alt="support" src={helpActive} /> : <img alt="support" src={help} />}
             <h4 className={classnames(styles.nav, {
               [styles.active]: isSupport
-            })}>Support</h4>
+            })}>{EN.Support}</h4>
           </a>
           {/* <a className={styles.support} onClick={() => routing.push('/community')}>
             <img alt="support" src={community} className={styles.community} />
@@ -56,11 +57,11 @@ export default class Sider extends Component {
           <img alt="switch" src={switchIcon} />
           {isDeploy || !isLogin ? (
             <h4 className={styles.nav}>
-              Model<br />Training
+              {EN.Model}<br />{EN.Training}
             </h4>
           ) : (
               <h4 className={styles.nav}>
-                Deployment<br />Console
+                {EN.Deployments}<br />{EN.Console}
             </h4>
             )}
         </a>
