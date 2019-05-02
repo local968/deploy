@@ -11,7 +11,7 @@ import { ProjectSide } from 'components/Common';
 import modelSelectionIcon from './model_selection_d.svg';
 import startModelingActiveIcon from './start_modeling_a.svg';
 import modelSelectionActiveIcon from './model_selection_a.svg';
-
+import EN from '../../constant/en';
 // import r2Loading from './R2 LearnLoading2.gif';
 // import { when } from 'mobx';
 
@@ -45,8 +45,8 @@ export default class Modeling extends Component {
   constructor(props) {
     super(props);
     this.step = [
-      { label: 'Start Modeling', value: 'startModeling' },
-      { label: 'Model Selection', value: 'modelSelection' }
+      { label: EN.StartModeling, value: 'startModeling' },
+      { label: EN.ModelSelection, value: 'modelSelection' }
     ];
     this.sideRef = React.createRef();
     autorun(() => {
