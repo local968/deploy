@@ -3,9 +3,10 @@ import styles from "./styles.module.css";
 import { Tree, Input, message ,Tabs,Icon  } from "antd";
 import { observable, action, toJS } from "mobx";
 import { observer, inject } from "mobx-react";
-import Article from "./article.js";
+import Article from './articleCH';
 import classnames from "classnames";
 import axios from "axios"
+import EN from '../../constant/en';
 const { TreeNode, DirectoryTree } = Tree;
 const TextArea = Input.TextArea
 const _data = observable({
@@ -26,7 +27,7 @@ const TabPane = Tabs.TabPane;
 const videoData = [
   {
     id: '1',
-    name:'R2-Learn Tutorial Video'
+    name:EN.R2LearnTutorialVideo
   }
 ];
 
@@ -149,9 +150,9 @@ export default class Support extends Component {
 				_change('email', this.props.userStore.info.email)
 				_change('text', '')
 				_change('type', 1)
-				message.success("report success")
+				message.success(EN.Reportsuccess)
 			} else {
-				message.error((res.data || {}).message || "report error")
+				message.error((res.data || {}).message || EN.Reporterror)
 			}
 		}).catch(()=>window.stores.userStore._status())
 	}
@@ -166,9 +167,9 @@ export default class Support extends Component {
 						<div className={styles.report}>
 							<div className={styles.types}>
                 <Tabs defaultActiveKey="1" onChange={this.topTabsClick}>
-                  <TabPane tab="Report a Bug" key={1}>{}</TabPane>
-                  <TabPane tab="Request a Feature" key={2}>{}</TabPane>
-                  <TabPane tab="Ask a Question" key={3}>{}</TabPane>
+                  <TabPane tab={EN.ReportBug} key={1}>{}</TabPane>
+                  <TabPane tab={EN.RequestFeature} key={2}>{}</TabPane>
+                  <TabPane tab={EN.AskQuestion} key={3}>{}</TabPane>
                 </Tabs>
 							</div>
 							<div className={styles.text}>
@@ -179,13 +180,14 @@ export default class Support extends Component {
 							</div>
 							<div className={styles.button}>
 								<div className={classnames(styles.type, styles.checked)} onClick={this.submit.bind(this)}>
-									<span>Submit</span>
+									<span>{EN.Submit}</span>
 								</div>
 							</div>
 						</div>
 						<div className={styles.menu}>
               <Tabs defaultActiveKey="1" onChange={this.tabClick}>
-                <TabPane tab="User Manual" key="1"><DirectoryTree
+                <TabPane tab={EN.UserManual} key="1">
+                  <DirectoryTree
                   showLine
                   onSelect={this.onSelect}
                   selectedKeys={selectedKeys}
@@ -195,96 +197,99 @@ export default class Support extends Component {
                   // expandedKeys={expandedKeys}
                   // autoExpandParent={autoExpandParent}
                 >
-                  <TreeNode title="1.Overview" key="1">
-                    <TreeNode title="Machine learning" key="1.1" />
-                    <TreeNode title="Machine learning with R2-Learn" key="1.2" />
+
+                  <TreeNode title={EN.Overview} key="1">
+                    <TreeNode title={EN.Machinelearning} key="1.1" />
+                    <TreeNode title={EN.MachinewithR2} key="1.2" />
                   </TreeNode>
 
-                  <TreeNode title="2. Getting started with R2-Learn" key="2">
-                    <TreeNode title="Software requirements" key="2.1" />
-                    <TreeNode title="Importing data into R2-Learn" key="2.2">
+                  <TreeNode title={EN.GettingstartedwithR2} key="2">
+                    <TreeNode title={EN.Softwarerequirements} key="2.1" />
+                    <TreeNode title={EN.ImportingdataR2} key="2.2">
+
                       <TreeNode
-                        title="Importing data from a database"
+                        title={EN.Importingdatadatabase}
                         key="2.2.1"
                       />
-                      <TreeNode title="Importing a local file" key="2.2.2" />
+
+                      <TreeNode title={EN.Importinglocalfile} key="2.2.2" />
                     </TreeNode>
-                    <TreeNode title="Project home" key="2.3" />
-                    <TreeNode title="Homepage – Deployment Console" key="2.4" />
+                    <TreeNode title={EN.Projecthome} key="2.3" />
+                    <TreeNode title={EN.HomepageDeployment} key="2.4" />
                   </TreeNode>
 
-                  <TreeNode title="3.Starting a new project" key="3">
-                    <TreeNode title="Create a project" key="3.1" />
-                    <TreeNode title="Choose your problem type" key="3.2" />
-                    <TreeNode title="Working with your data" key="3.3">
-                      <TreeNode title="Data Connect" key="3.3.1" />
-                      <TreeNode title="Data Schema" key="3.3.2" />
-                      <TreeNode title="Data Quality" key="3.3.3">
-                        <TreeNode title="Common Issues with Data" key="3.3.3.1" />
-                        <TreeNode title="Target Variable Quality" key="3.3.3.2" />
-                        <TreeNode title="Predictor Variables Quality" key="3.3.3.3" />
+                  <TreeNode title={EN.Startingproject} key="3">
+                    <TreeNode title={EN.Createproject} key="3.1" />
+                    <TreeNode title={EN.Chooseyourproblem} key="3.2" />
+                    <TreeNode title={EN.Workingwithyour} key="3.3">
+                      <TreeNode title={EN.DataConnect} key="3.3.1" />
+                      <TreeNode title={EN.DataSchema} key="3.3.2" />
+                      <TreeNode title={EN.DataQuality} key="3.3.3">
+                        <TreeNode title={EN.CommonIssues} key="3.3.3.1" />
+                        <TreeNode title={EN.TargetVariableQuality} key="3.3.3.2" />
+                        <TreeNode title={EN.PredictorVariablesQuality} key="3.3.3.3" />
                       </TreeNode>
                     </TreeNode>
-                    <TreeNode title="Modeling" key="3.4">
-                      <TreeNode title="Automatic Modeling" key="3.4.1" />
-                      <TreeNode title="Advanced Modeling" key="3.4.2" />
-                      <TreeNode title="Building your model" key="3.4.3">
-                        <TreeNode title="Model Selection" key="3.4.3.1" />
+                    <TreeNode title={EN.Modeling} key="3.4">
+                      <TreeNode title={EN.AutomaticModeling} key="3.4.1" />
+                      <TreeNode title={EN.AdvancedModeling} key="3.4.2" />
+                      <TreeNode title={EN.Buildingyourmodelg} key="3.4.3">
+                        <TreeNode title={EN.ModelSelection} key="3.4.3.1" />
                       </TreeNode>
                     </TreeNode>
                   </TreeNode>
 
-                  <TreeNode title="4.Deploying your models" key="4">
-                    <TreeNode title="Deployment" key="4.1" >
-                      <TreeNode title="Predict with data source" key="4.1.1" />
-                      {/*<TreeNode title="Predict with API" key="4.1.2" />*/}
+                  <TreeNode title={EN.Deployingyourmodels} key="4">
+                    <TreeNode title={EN.Deployments} key="4.1" >
+                      <TreeNode title={EN.Predictwithdata} key="4.1.1" />
                     </TreeNode>
-                    <TreeNode title="Monitor your deployed models" key="4.2">
-                      <TreeNode title="Operation Monitor" key="4.2.1" />
-                      <TreeNode title="Performance Monitor" key="4.2.2" />
-                      <TreeNode title="Performance Status" key="4.2.3" />
-                    </TreeNode>
-                  </TreeNode>
-
-                  <TreeNode title="Appendix A: Data Quality Fixes" key="a">
-                    <TreeNode title="Fixing outliers" key="a.1" />
-                    <TreeNode title="Fixing missing values" key="a.2" />
-                    <TreeNode title="Fixing data type mismatch" key="a.3" />
-                  </TreeNode>
-
-                  <TreeNode title="Appendix B: Advanced Modeling" key="b">
-                    <TreeNode title="Advanced Variable Settings" key="b.1" />
-                    <TreeNode title="Advanced Modeling Setting" key="b.2" >
-                      <TreeNode title="Create/Edit Model Setting By default" key="b.2.1" />
-                      <TreeNode title="Select Algorithm" key="b.2.2" />
-                      <TreeNode title="Set Max Model Ensemble Size" key="b.2.3" />
-                      <TreeNode title="Train Validation Holdout and Cross Validation" key="b.2.4" />
-                      <TreeNode title="Resampling Setting" key="b.2.5" />
-                      <TreeNode title="Set Measurement Metric" key="b.2.6" />
-                      <TreeNode title="Set Speed vs Accuracy" key="b.2.7" />
-                      <TreeNode title="Random Seed" key="b.2.8" />
+                    <TreeNode title={EN.Monitoryourdeployed} key="4.2">
+                      <TreeNode title={EN.OperationMonitor} key="4.2.1" />
+                      <TreeNode title={EN.Monitor} key="4.2.2" />
+                      <TreeNode title={EN.PerformanceStatus} key="4.2.3" />
                     </TreeNode>
                   </TreeNode>
 
-                  <TreeNode title="Appendix C: Model selection for Binary Classification problems" key="c">
-                    <TreeNode title="Simplified view" key="c.1" />
-                    <TreeNode title="Advanced View" key="c.2" >
-                      <TreeNode title="Model Comparison Charts" key="c.2.1" />
-                      <TreeNode title="Table of Models" key="c.2.2" />
-                      <TreeNode title="Additional Model Details" key="c.2.3" />
+                  <TreeNode title={EN.AppendixQuality} key="a">
+                    <TreeNode title={EN.Fixingoutliers} key="a.1" />
+                    <TreeNode title={EN.Fixingmissingvalues} key="a.2" />
+                    <TreeNode title={EN.Fixingdatamismatch} key="a.3" />
+                  </TreeNode>
+
+                  <TreeNode title={EN.AppendixAdvancedModeling} key="b">
+                    <TreeNode title={EN.AdvancedVariableSettings} key="b.1" />
+                    <TreeNode title={EN.AdvancedModelingSetting} key="b.2" >
+                      <TreeNode title={EN.ModelSettingdefault} key="b.2.1" />
+                      <TreeNode title={EN.SelectAlgorithm} key="b.2.2" />
+                      <TreeNode title={EN.SetMaxModelEnsemble} key="b.2.3" />
+                      <TreeNode title={EN.TrainValidationHoldoutValidation} key="b.2.4" />
+                      <TreeNode title={EN.ResamplingSetting} key="b.2.5" />
+                      <TreeNode title={EN.SetMeasurementMetric} key="b.2.6" />
+                      <TreeNode title={EN.SetSpeedvsAccuracy} key="b.2.7" />
+                      <TreeNode title={EN.RandomSeed} key="b.2.8" />
                     </TreeNode>
                   </TreeNode>
 
-                  <TreeNode title="Appendix D: Model selection for Regression problems" key="d">
-                    <TreeNode title="Simplified View" key="d.1" />
-                    <TreeNode title="Advanced View" key="d.2" >
+                  <TreeNode title={EN.AppendixModelselection} key="c">
+                    <TreeNode title={EN.Simplifiedview} key="c.1" />
+                    <TreeNode title={EN.AdvancedView} key="c.2" >
+                      <TreeNode title={EN.ModelComparisonCharts} key="c.2.1" />
+                      <TreeNode title={EN.TableofModels} key="c.2.2" />
+                      <TreeNode title={EN.AdditionalModelDetails} key="c.2.3" />
+                    </TreeNode>
+                  </TreeNode>
+
+                  <TreeNode title={EN.AppendixModelselectionD} key="d">
+                    <TreeNode title={EN.SimplifiedView} key="d.1" />
+                    <TreeNode title={EN.AdvancedView} key="d.2" >
                       {/*<TreeNode title="Top Section" key="d.2.1" />*/}
-                      <TreeNode title="Table of Models" key="d.2.1" />
-                      <TreeNode title="Additional Model Details" key="d.2.2" />
+                      <TreeNode title={EN.TableofModels} key="d.2.1" />
+                      <TreeNode title={EN.AdditionalModelDetails} key="d.2.2" />
+
                     </TreeNode>
                   </TreeNode>
                 </DirectoryTree></TabPane>
-                <TabPane tab="Tutorial Video" key="2">
+                <TabPane tab={EN.TutorialVideo} key="2">
                   {
                     videoData.map( (val) => {
                       return(
@@ -312,9 +317,12 @@ export default class Support extends Component {
                 <Article
                   changeSelectedKeys={this.changeSelectedKeys}
                 /> :
-                <video ref={child => this.videoChange = child}  className={styles.tabVideo} controls autobuffer>
-                  <source ref={child => this.sourceChange = child} src={require('./resource/English_video.mp4')} type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
-              </video>
+                <video ref={child => this.videoChange = child} className={styles.tabVideo} controls autobuffer>
+                  <source
+                    ref={child => this.sourceChange = child}
+                    src={isEN ? require('./resource/English_video.mp4') : require('./resource/Chinese_video.mp4')}
+                    type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'/>
+                </video>
             }
 					</div>
 				</div>

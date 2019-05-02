@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import styles from "./styles.module.css";
 import warnIcon from "./fail.svg";
 import { observable, action, runInAction } from 'mobx';
-
+import EN from '../../../constant/en';
 @inject('userStore')
 @observer
 export default class SignIn extends Component {
@@ -25,15 +25,15 @@ export default class SignIn extends Component {
   login = () => {
     const { email, password, warning } = this
     if (!email) {
-      warning.email = "Enter your email";
+      warning.email = EN.Enteryouremail;
     } else if (!new RegExp(/^[a-zA-Z0-9_-]+(\.([a-zA-Z0-9_-])+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/).test(email)) {
-      warning.email = "Enter a vaild emial address";
+      warning.email = EN.Enteravaildemial;
     } else {
       warning.email = '';
     }
     
     if (!password) {
-      warning.password = "Enter your password";
+      warning.password = EN.EnterNewPassword;
     } else {
       warning.password = '';
     }
@@ -57,21 +57,21 @@ export default class SignIn extends Component {
   
   render() {
     return <div className={styles.signin}>
-      <div className={styles.title}><span>Sign In</span></div>
+      <div className={styles.title}><span>{EN.SignIn}</span></div>
       <div className={styles.row}>
         <div className={styles.warning}>{this.warning.email && <span><img src={warnIcon} alt='warning' />{this.warning.email}</span>}</div>
-        <input type="text" placeholder="Email Address" value={this.email} onChange={this.onChangeEmail} />
+        <input type="text" placeholder={EN.EmailAddress} value={this.email} onChange={this.onChangeEmail} />
       </div>
       <div className={styles.row}>
         <div className={styles.warning}>{this.warning.password && <span><img src={warnIcon} alt='warning' />{this.warning.password}</span>}</div>
-        <input type="password" placeholder="Set a Password" value={this.password} onChange={this.onChangePassword} onKeyUp={this.onKeyUp} />
+        <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword} onKeyUp={this.onKeyUp} />
       </div>
-      <div className={styles.row}><a className={styles.forgetPassword} href="/forgetpassword">Forget Password?</a></div>
+      <div className={styles.row}><a className={styles.forgetPassword} href="/forgetpassword">{EN.ForgetPassword}?</a></div>
       <div className={styles.buttonRow}>
         <button className={styles.button} onClick={this.login}>
-          <span>Sign In</span>
+          <span>{EN.SignIn}</span>
         </button>
-        <div className={styles.signup} onClick={this.register}><span>Sign Up</span></div>
+        <div className={styles.signup} onClick={this.register}><span>{EN.SignUp}</span></div>
       </div>
     </div>
   }

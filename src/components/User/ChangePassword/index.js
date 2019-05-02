@@ -3,6 +3,7 @@ import styles from '../styles.module.css'
 import { action, observable } from 'mobx';
 import { inject, observer } from 'mobx-react'
 import { message } from 'antd'
+import EN from '../../../constant/en';
 
 @inject('userStore')
 @observer
@@ -17,26 +18,26 @@ class ChangePassword extends Component {
   })
 
   submit = () => {
-    if (this.newPassword !== this.repeat) return message.error('The two new passwords you entered were inconsistent')
+    if (this.newPassword !== this.repeat) return message.error(EN.Thetwonewpasswords);
     this.props.userStore.changePassword(this.current, this.newPassword).then(resp => {
       if (resp.data.status === 200) {
         this.props.userStore.status = 'unlogin'
-        message.info('Password change succeeded! Please use your new password to log in.')
+        message.info(EN.Passwordchangesucceeded)
       } else {
         message.error(resp.data.message)
         console.error(resp.data.error)
       }
-    }, error => message.error('Password change failed, please try later.'))
+    }, error => message.error(EN.Passwordchangefailed))
   }
 
   render() {
     return <div className={styles.block}>
-      <h3 className={styles.title}>Change Your Password</h3>
-      <p className={styles.description}>Please enter your current password and your new password below.</p>
-      <input className={styles.input} value={this.current} onChange={this.onChange('current')} type='password' placeholder='Current Password' />
-      <input className={styles.input} value={this.newPassword} onChange={this.onChange('newPassword')} type='password' placeholder='New Password' />
-      <input className={styles.input} value={this.repeat} onChange={this.onChange('repeat')} type='password' placeholder='Confirm Your New Password' />
-      <a className={styles.submit} onClick={this.submit}>Submit</a>
+      <h3 className={styles.title}>{EN.ChangeYourPassword}</h3>
+      <p className={styles.description}>{EN.Pleaseenteryourcurrent}</p>
+      <input className={styles.input} value={this.current} onChange={this.onChange('current')} type='password' placeholder={EN.CurrentPassword} />
+      <input className={styles.input} value={this.newPassword} onChange={this.onChange('newPassword')} type='password' placeholder={EN.NewPassword} />
+      <input className={styles.input} value={this.repeat} onChange={this.onChange('repeat')} type='password' placeholder={EN.ConfirmYour} />
+      <a className={styles.submit} onClick={this.submit}>{EN.Submit}</a>
     </div>
   }
 }

@@ -4,6 +4,7 @@ import { observer, inject } from 'mobx-react';
 import ContinueButton from 'components/Common/ContinueButton';
 import { Input } from 'antd';
 import { action } from 'mobx';
+import EN from '../../constant/en';
 const { TextArea } = Input;
 
 @inject('projectStore', 'deploymentStore')
@@ -34,8 +35,8 @@ export default class Project extends Component {
     const { project } = this.props.projectStore;
     return <div className={styles.project}>
       <div className={styles.row}>
-        <label>Project Name</label>
-        <Input placeholder={"project name"} defaultValue={project ? project.name : ""} onChange={this.onChange.bind(this, "name")} />
+        <label>{EN.ProjectName}</label>
+        <Input placeholder={EN.ProjectN} defaultValue={project ? project.name : ""} onChange={this.onChange.bind(this, "name")} />
       </div>
       {/* <div className={styles.row}>
         <label >Project Description</label>
@@ -43,24 +44,24 @@ export default class Project extends Component {
       </div> */}
       <div className={styles.sep}> </div>
       <div className={styles.textBox}>
-        <label>Problem Statement</label>
+        <label>{EN.ProblemStatement}</label>
         <TextArea
           defaultValue={project ? project.statement : ''}
           className={styles.textarea}
           onChange={this.onChange.bind(this, "statement")}
           rows={4}
-          placeholder='<Problem statement>  e.g. Predict important customers who might churn in the next 30 days so that customer service department can take effectively target and retain these customers.' />
+          placeholder={` ${EN.Problemstatement}${EN.Predictimportantcustomers} ` }/>
       </div>
       <div className={styles.textBox}>
-        <label>Business Value</label>
+        <label>{EN.BusinessValue}</label>
         <TextArea
           defaultValue={project ? project.business : ""}
           className={styles.textarea}
           onChange={this.onChange.bind(this, "business")}
           rows={4}
-          placeholder='<Business value> e.g. This will help proactively retain important customers. Acquiring a new customer is not costlier than retain an existing customer. It is critial to maintain customer satisfaction and loyalty to sustain good revenue opportunity and a strong market presence.' />
+          placeholder={`${EN.Businessvalue}${EN.Thiswillhelpproactively}`} />
       </div>
-      <ContinueButton onClick={this.nextStep} disabled={false} text="Continue" />
+      <ContinueButton onClick={this.nextStep} disabled={false} text={EN.Continue} />
     </div>
   }
 }
