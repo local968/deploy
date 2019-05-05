@@ -15,8 +15,8 @@ const selectable = [
 ];
 
 const Unsupervised = [
-  { value: 'Clustering', type: 'Clustering', detail: null },
-  { value: 'Outlier', type: 'Outlier Detection', detail: null }
+  { value: 'Clustering', type:  EN.Clustering, detail: null },
+  { value: 'Outlier', type:  EN.OutlierDetection, detail: null }
 ];
 
 interface ProblemProps {
@@ -86,7 +86,7 @@ function Problem(props: ProblemProps) {
       </RadioGroup>
     </div>
     <div className={styles.radioBox}>
-      <div className={styles.text}><span>Unsupervised Learning</span></div>
+      <div className={styles.text}><span>{EN.UnsupervisedLearning}</span></div>
       <RadioGroup className={styles.radio} value={changeProjectType} onChange={onChange("changeProjectType")}>
         {Unsupervised.map((content, index) => (
           <Radio key={index} value={content.value}>
