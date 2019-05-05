@@ -11,7 +11,7 @@ export default function EsUploader(file, option = {}) {
   let uploader = null
   let rawHeader = []
   let cleanHeader = []
-  const {onProgress, onError, onFinished} = option;
+  const { onProgress, onError, onFinished } = option;
 
   const autoFixHeader = (rawHeader) => {
     const temp = {};
@@ -31,14 +31,15 @@ export default function EsUploader(file, option = {}) {
   }
 
   const upload = async () => {
-    const {data} = await axios.get('/etls/createIndex');
-    const {index: dataIndex} = data;
+    const { data } = await axios.get('/etls/createIndex');
+    const { index: dataIndex } = data;
     let chunk = ''
     let header = ''
     papa.parse(file, {
       step: (result, parser) => {
         uploader = parser
-        const row = result.data[0]
+        const _row = result.data[0]
+        const row = _row.map(v => encodeURIComponent(v))
         if (!header) {
           rawHeader = autoFixHeader(row)
           cleanHeader = rawHeader
@@ -58,7 +59,7 @@ export default function EsUploader(file, option = {}) {
             headers: {
               'Content-Type': "text/plain",
             },
-            method:"POST",
+            method: "POST",
             data: header + '\n' + chunk,
           }).then(() => {
             onProgress(`${loaded}/${file.size}`, '')
@@ -74,7 +75,7 @@ export default function EsUploader(file, option = {}) {
 
         axios.request({
           url: `/etls/${dataIndex}/upload`,
-          method:"POST",
+          method: "POST",
           headers: {
             'Content-Type': "text/plain",
           },
@@ -87,7 +88,7 @@ export default function EsUploader(file, option = {}) {
             cleanHeader,
             rawHeader,
             dataHeader: cleanHeader,
-          },file)
+          }, file)
         })
         // setUploadStatus('finished, total uploaded: ' + no + ' lines')
 
