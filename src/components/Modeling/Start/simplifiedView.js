@@ -641,7 +641,7 @@ class CreateNewVariable extends Component {
     const isSeniorFn = FUNCTIONS.senior.find(fn => fn.value === functionName + "()")
     const currentFn = isBaseFn || isSeniorFn
     // 判断函数参数个数限制
-    if (currentFn.params && currentFn.params !== expArray.length) return { isPass: false, message: `function ${functionName} must have ${currentFn.params} params` }
+    if (currentFn.params && currentFn.params !== expArray.length) return { isPass: false, message: `${EN.Function} ${functionName} must have ${currentFn.params} params` }
     let numOfParam = 0
     let isVariable1 = false
     let num = 1

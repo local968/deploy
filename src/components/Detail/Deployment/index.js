@@ -258,7 +258,7 @@ export default class Deployment extends Component {
                     }
                   }}
                 >
-                  <BButton className={styles.saveText}>DONE</BButton>
+                  <BButton className={styles.saveText}>{EN.DONE}</BButton>
                 </div>
               </div>
             </div>
@@ -268,7 +268,7 @@ export default class Deployment extends Component {
           options={cddo.sourceOptions}
           visible={this.dialog === 'databasesource'}
           onClose={this.closeDialog}
-          title="Data Source - Database"
+          title={EN.DataSourceDatabase}
           projectId={cd.projectId}
           onSubmit={action(options => {
             // options.csvLocation = options.result.result.csvLocation;
@@ -322,7 +322,7 @@ export default class Deployment extends Component {
 const DeploymentOption = observer(({ cddo, selectionOption }) => (
   <div className={styles.deploymentOption}>
     <span className={styles.label}>
-      <span className={styles.text}>Deployment Option:</span>
+      <span className={styles.text}>{EN.DeploymentOptionText}:</span>
     </span>
     <div className={styles.selections}>
       {cddo.option === 'api' && (
@@ -332,7 +332,7 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
             {EN.PredictWithAPI}
           </span>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -394,7 +394,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
               className={styles.selectionIcon}
             />
             <span className={styles.resultText}>
-              Database
+              {EN.Database}
               <span className={styles.path}>{cddo.sourceOptions.hostname}</span>
             </span>
           </span>
@@ -444,7 +444,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
               alt="database"
               src={databaseIcon}
               className={styles.selectionIcon}
-            />Database
+            />{EN.Database}
           </span>
         </div>
       )}

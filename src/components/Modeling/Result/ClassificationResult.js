@@ -12,7 +12,7 @@ import Variable from './Variable.svg'
 import Process from './Process.svg'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-const AccuracyHint = "Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%."
+const AccuracyHint = EN.Givenaparticularpopulation
 
 @observer
 export default class ClassificationView extends Component {

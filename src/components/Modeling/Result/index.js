@@ -46,7 +46,7 @@ export default class ModelResult extends Component {
     try {
       this.cancel = this.props.projectStore.project.generateReport(modelId)
     } catch (e) {
-      message.error('export report error.')
+      message.error('导出报告错误。')
       this.props.projectStore.project.reportProgress = 0
       this.props.projectStore.project.reportProgressText = 'init'
     }
@@ -94,11 +94,11 @@ export default class ModelResult extends Component {
           visible={current && this.show}
           onClose={this.hideInsights}
           content={<ModelInsights model={current} project={project} />} /> */}
-        <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={true} footer={null} onCancel={this.cancel} maskClosable={false}>
+        <Modal title={EN.ExportingReport} visible={project.reportProgressText !== 'init'} closable={true} footer={null} onCancel={this.cancel} maskClosable={false}>
           <div className={styles.reportProgress}>
             <ProgressBar progress={project.reportProgress} allowRollBack={true} />
             <span className={styles.reportProgressText}>{project.reportProgressText}</span>
-            <Button onClick={this.cancel} className={styles.reportCancel} >Cancel</Button>
+            <Button onClick={this.cancel} className={styles.reportCancel} >{EN.CANCEL}</Button>
           </div>
         </Modal>
       </div>

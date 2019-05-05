@@ -360,7 +360,7 @@ class Bar extends Component {
     return <div className={styles.bar}>
       <div className={styles.select}>
         <img className={styles.checked} onClick={toggleSelect} src={checkedIcon} alt="checked" />
-        <span><span className={styles.count}>{ids.length}</span> Project{ids.length > 1 && 's'} {EN.Selected}</span>
+        <span><span className={styles.count}>{ids.length}</span> {EN.Project}{ids.length > 1 && 's'} {EN.Selected}</span>
       </div>
       <div className={styles.action}>
         {/* <img onClick={actions.bind(null, "share", ids)} src={shareDarkIcon} alt="share" />

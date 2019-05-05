@@ -131,6 +131,17 @@ class ProjectHeader extends Component {
           {step.map((v, k) => {
             let str = v.split('');
             let text = str.shift().toUpperCase() + str.join('');
+            const Problem= EN.Problem;
+            const Project= EN.Project;
+            const Data= EN.Data;
+            const Modeling= EN.Modeling;
+            const zd = {
+              Problem,
+              Project,
+              Data,
+              Modeling,
+            };
+            text = zd[text];
             let line = '';
             if (k !== 0) {
               line = (
@@ -250,7 +261,7 @@ const LoginHeader = props => (
       <div className={styles.loginIcon}>
         <img src={loginIcon} alt="login" />
       </div>
-      <span>{props.pathname === '/' ? 'Sign Up' : 'Sign In'}</span>
+      <span>{props.pathname === '/' ? EN.SignUp : EN.SignIn}</span>
     </div>
   </div>
 );
