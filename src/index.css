@@ -55,3 +55,23 @@ body {
 .anticon-file{
   display: none;
 }
+
+.ant-tree.ant-tree-directory > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before{
+  background: #e7eaf0 !important;
+}
+
+.ant-tree.ant-tree-directory > li span.ant-tree-node-content-wrapper > span, .ant-tree.ant-tree-directory .ant-tree-child-tree > li span.ant-tree-node-content-wrapper > span{
+  color:#1d2b3c !important;
+}
+
+.ant-tabs-nav .ant-tabs-tab:hover{
+  color: #445065 !important;
+}
+
+.ant-tabs-ink-bar{
+  background: #445065 !important;
+}
+
+.ant-tabs-nav .ant-tabs-tab{
+  color: #445065 !important;
+}

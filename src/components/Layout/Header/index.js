@@ -17,7 +17,7 @@ import modelingIcon from './icon_modeling_d.svg';
 import modelingActiveIcon from './icon_modeling_a.svg';
 import down from './combined-shape-copy.svg';
 // import more from './btn-more-option.svg';
-
+import EN from '../../../constant/en';
 const imgs = {
   problem: <img src={problemIcon} alt="problem" />,
   data: <img src={dataIcon} alt="data" />,
@@ -55,28 +55,28 @@ class NormalHeader extends Component {
           <span className={styles.number}>
             {deploymentStore.deployments.length}
           </span>
-          <span className={styles.text}>Total Project</span>
+          <span className={styles.text}>{EN.TotalProject}</span>
         </div>
         <div className={classnames(styles.block, styles.enabled)}>
           <span className={styles.number}>{this.enabledProjectsCount}</span>
-          <span className={styles.text}>Enabled</span>
+          <span className={styles.text}>{EN.Enabled}</span>
         </div>
         <div className={classnames(styles.block, styles.disabled)}>
           <span className={styles.number}>
             {deploymentStore.deployments.length - this.enabledProjectsCount}
           </span>
-          <span className={styles.text}>Disabled</span>
+          <span className={styles.text}>{EN.Disabled}</span>
         </div>
         <div className={styles.gap} />
         <div className={classnames(styles.block, styles.normal)}>
           <span className={styles.number}>{this.normalProjectsCount}</span>
-          <span className={styles.text}>Normal</span>
+          <span className={styles.text}>{EN.Normal}</span>
         </div>
         <div className={classnames(styles.block, styles.issue)}>
           <span className={styles.number}>
             {deploymentStore.deployments.length - this.normalProjectsCount}
           </span>
-          <span className={styles.text}>Issue</span>
+          <span className={styles.text}>{EN.Issue}</span>
         </div>
         <div className={styles.empty} />
         {/* <div className={styles.user}>
@@ -117,10 +117,10 @@ class ProjectHeader extends Component {
     const menu = (
       <Menu className={styles.logout}>
         <Menu.Item key="0">
-          <a onClick={this.changepassword}><Icon type='unlock' />Change Password</a>
+          <a onClick={this.changepassword}><Icon type='unlock' />{EN.ChangePassword}</a>
         </Menu.Item>
         <Menu.Item key="1">
-          <a onClick={this.logout}><Icon type='logout' />Log Out</a>
+          <a onClick={this.logout}><Icon type='logout' />{EN.LogOut}</a>
         </Menu.Item>
       </Menu>
     );
@@ -165,7 +165,7 @@ class ProjectHeader extends Component {
           <div className={styles.notification}>
             <img src={notificationIcon} alt="notification" />
             <span>
-              <span className={styles.num}>1</span> Notification
+              <span className={styles.num}>1</span> {EN.Notification}
             </span>
             <div className={styles.pot} />
           </div>
@@ -202,10 +202,10 @@ class WelcomeHeader extends Component {
     const menu = (
       <Menu className={styles.logout}>
         <Menu.Item key="0">
-          <a onClick={this.changepassword}><Icon type='unlock' />Change Password</a>
+          <a onClick={this.changepassword}><Icon type='unlock' />{EN.ChangePassword}</a>
         </Menu.Item>
         <Menu.Item key="1">
-          <a onClick={this.logout}><Icon type='logout' />Log Out</a>
+          <a onClick={this.logout}><Icon type='logout' />{EN.LogOut}</a>
         </Menu.Item>
       </Menu>
     );
@@ -214,7 +214,7 @@ class WelcomeHeader extends Component {
         <div className={styles.wheader}>
           <img src={mockAvatar} alt="avatar" className={styles.wavatar} />
           <span className={styles.welcome}>
-            Welcome, {this.props.userStore.info.email.split('@')[0]}
+            {EN.Welcome}, {this.props.userStore.info.email.split('@')[0]}
           </span>
           <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
             <div className={styles.down}>
@@ -225,7 +225,7 @@ class WelcomeHeader extends Component {
         <div className={styles.notification}>
           <img src={notificationIcon} alt="notification" />
           <span>
-            <span className={styles.num}>1</span> Notification
+            <span className={styles.num}>1</span> {EN.Notification}
           </span>
           <div className={styles.pot} />
         </div>
@@ -237,7 +237,7 @@ class WelcomeHeader extends Component {
 const LoginHeader = props => (
   <div className={styles.header}>
     <div className={styles.wheader}>
-      <span className={styles.welcome}>Welcome to R2.ai</span>
+      <span className={styles.welcome}>{EN.WelcometoR2ai}</span>
     </div>
     <div
       className={styles.auth}

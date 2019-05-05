@@ -64,6 +64,7 @@ export default class Project {
 
   @observable noComputeTemp = false;
   @observable originalIndex = ''
+  @observable etlIndex = ''
 
   //data quality
   @observable mismatchFillMethod = {}
@@ -150,6 +151,13 @@ export default class Project {
   @observable dataViews = null;
   @observable dataViewsLoading = false;
   @observable dataViewProgress = 0;
+
+  //un
+  @observable weights = {}
+  @observable standardType = 'standard'
+  @observable searchTime = 5
+  @observable kValue = 5
+  @observable kType = 'auto'
 
   @observable stopModel = false
   @observable stopEtl = false
@@ -284,7 +292,9 @@ export default class Project {
       expression: {},
       validationRate: 20,
       holdoutRate: 20,
-      hasSendEtl: false
+      hasSendEtl: false,
+      weights: {},
+      standardType: 'standard'
     }
   }
 
@@ -895,18 +905,19 @@ export default class Project {
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
       const command = {
         projectId: this.id,
         command: 'dataView',
         actionType: 'clean',
-        feature_label
+        feature_label,
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.dataViewsLoading = true
-      return api.dataView(command).then(returnValue => {
+      return api.newDataView(command).then(returnValue => {
         const {status, result} = returnValue
         if (status < 0) {
           this.setProperty({dataViews: null})
@@ -1055,8 +1066,8 @@ export default class Project {
   @computed
   get defualtRecommendModel() {
     const {models, measurement, problemType} = this
-    const currentMeasurement = measurement || (problemType === 'Classification' ? 'auc' : 'r2')
-    const sort = currentMeasurement.endsWith("se") ? -1 : 1
+    const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
+    const sort = (problemType === 'Classification' || problemType === 'Regression') && currentMeasurement.endsWith("se") ? -1 : 1
     let recommend
     models.forEach(m => {
       const {score} = m
@@ -1065,9 +1076,15 @@ export default class Project {
       if (problemType === 'Classification') {
         validate = measurement === 'auc' ? (validateScore || {}).auc : m[measurement + 'Validation']
         holdout = measurement === 'auc' ? (holdoutScore || {}).auc : m[measurement + 'Holdout']
-      } else {
+      } else if (problemType === 'Regression') {
         validate = (validateScore || {})[currentMeasurement]
         holdout = (holdoutScore || {})[currentMeasurement]
+      } else if (problemType === 'Clustering') {
+        validate = score[measurement]
+        holdout = score[measurement]
+      } else if (problemType === 'Outlier') {
+        validate = score[measurement]
+        holdout = score[measurement]
       }
       if (!validate || !holdout) return
       const value = validate + holdout
@@ -1196,7 +1213,6 @@ export default class Project {
     //   settingName: setting.name,
     //   holdoutRate: 0.2
     // };
-
 
 
     this.modeling(trainData, Object.assign({
@@ -1344,9 +1360,22 @@ export default class Project {
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
+      let cmd = ''
+      switch (this.problemType) {
+        case 'Clustering':
+          cmd = 'clustering.train';
+          break;
+        case 'Outlier':
+          cmd = 'outlier.train';
+          break;
+        default:
+          cmd = 'clfreg.train';
+      }
+
       const command = {
         projectId: this.id,
-        command: 'preTrainImportance',
+        command: cmd,
         feature_label
       };
       // if (new_label.length) {

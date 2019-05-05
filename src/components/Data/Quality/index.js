@@ -8,7 +8,7 @@ import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, 
 import { message } from 'antd'
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
-
+import EN from '../../../constant/en';
 @inject('projectStore')
 @observer
 export default class DataQuality extends Component {
@@ -57,13 +57,13 @@ class TargetIssue extends Component {
 
   saveTargetFixes = () => {
     this.props.project.fixTarget()
-    message.info('Thank you for fixing the issues. The changes will be applied in training section.', 5)
+    message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
     this.closeTarget();
   }
 
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
-    message.info('Thank you for fixing the issues. The changes will be applied in training section.', 5)
+    message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
     this.closeFixes();
   }
 
@@ -83,67 +83,67 @@ class TargetIssue extends Component {
     const warnings = []
     const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
     if (problemType === 'Classification') {
-      if (unique < 2) warnings.push("Your target variable has less than two unique values. It is recommended that you reselect a target variable or upload new data.")
+      if (unique < 2) warnings.push(EN.Yourtargetvariablehaslessthantwouniquevalues)
       if (unique === 2) {
         const min = Math.min(...Object.values(targetCounts))
-        if (min < 3) warnings.push("It is recommended that you re-select target or upload new data.")
+        if (min < 3) warnings.push(EN.Itisrecommendedthatyou)
       }
     }
-    if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push("Your target variable is empty, It is recommended that you reselect a target variable or upload new data.")
+    if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push(EN.Yourtargetvariableisempty)
     const cannotContinue = !!warnings.length || (problemType === 'Classification' && issues.targetIssue)
     const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue && !(problemType !== 'Classification' && issues.targetRowIssue)
     return <div className={styles.quality}>
       <div className={styles.issue}>
-        {!!warnings.length && <div className={styles.issueTitle}><span>Warning!</span></div>}
+        {!!warnings.length && <div className={styles.issueTitle}><span>{EN.Warning}!</span></div>}
         {!!warnings.length && <div className={styles.issueBox}>
           {warnings.map((v, k) => <div className={styles.issueText} key={k}>
             <div className={styles.point}></div>
             <span>{v}</span>
           </div>)}
         </div>}
-        {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>Issue{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 1 && 's'} Found!</span></div>}
+        {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>{EN.IssueS}{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 1 && EN.SS} {EN.Found}!</span></div>}
         {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
           {issues.targetIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
             {problemType === 'Classification' ?
-              <span>Your target variable has more than two unique values, which is not suitable for binary classification.</span> :
-              <span>Your target variable has less than {recomm} unique values, which is not suitable for Regression.</span>}
+              <span>{EN.Yourtargetvariablehasmorethantwouniquevalues}</span> :
+              <span>{EN.Yourtargetvariablehaslessthan}{recomm}{EN.Uniquevalueswhichisnot}</span>}
           </div>}
           {issues.rowIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span>Data size is too small</span>
+            <span>{EN.Datasizeistoosmall}</span>
           </div>}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span>Some data issues, highlighted in color, are found. You can fix them by pressing “Edit The Fixes”, or we will fix them automatically.</span>
+            <span>{EN.Somedataissueshighlightedincolor}</span>
           </div>}
         </div>}
-        {isClean && <div className={styles.cleanTitle}><span>Target variable quality looks good!</span></div>}
+        {isClean && <div className={styles.cleanTitle}><span>{EN.Targetvariablequalitylooksgood}</span></div>}
       </div>
       <div className={styles.typeBox}>
         {!!mismatchCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
-          <span>Data Type Mismatch</span>
+          <span>{EN.DataTypeMismatch}</span>
         </div>}
         {!!nullCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
-          <span>Missing Value</span>
+          <span>{EN.MissingValue}</span>
         </div>}
         {!!outlierCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
-          <span>Outlier</span>
+          <span>{EN.Outlier}</span>
         </div>}
         <div className={styles.issueTabs}>
-          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
-          <div className={styles.issueTab} onClick={cannotContinue ? null : changeTab}><span>Predictor Variables</span></div>
+          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
+          <div className={styles.issueTab} onClick={cannotContinue ? null : changeTab}><span>{EN.PredictorVariables}</span></div>
         </div>
       </div>
       <div className={styles.contentBox}>
         <div className={styles.list}>
           <div className={styles.table}>
-            <div className={classnames(styles.cell, styles.target)}><span>Target Variable</span></div>
+            <div className={classnames(styles.cell, styles.target)}><span>{EN.TargetVariable}</span></div>
             <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
-            <div className={classnames(styles.cell, styles.select)}><span>{colType[target]}</span></div>
+            <div className={classnames(styles.cell, styles.select)}><span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
             <div className={classnames(styles.cell, styles.error)}>
               {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch}%</span></div>}
               {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing}%</span></div>}
@@ -160,7 +160,7 @@ class TargetIssue extends Component {
               )}
             </div>
           </div>
-          <ContinueButton disabled={cannotContinue} onClick={changeTab} text='Continue' width="100%" />
+          <ContinueButton disabled={cannotContinue} onClick={changeTab} text={EN.Continue} width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
@@ -191,7 +191,7 @@ class TargetIssue extends Component {
           isTarget={true} />}
           visible={this.visible}
           width='12em'
-          title='How R2 Learn Will Fix the Issues'
+          title={EN.HowR2LearnWillFixtheIssues}
           onClose={this.closeFixes}
           closeByMask={true}
           showClose={true}
@@ -199,7 +199,7 @@ class TargetIssue extends Component {
         <Modal content={<SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes} />}
           visible={this.edit}
           width='5.5em'
-          title='How R2 Learn Will Fix the Issues'
+          title={EN.HowR2LearnWillFixtheIssues}
           onClose={this.closeTarget}
           closeByMask={true}
           showClose={true}
@@ -243,7 +243,7 @@ class VariableIssue extends Component {
 
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
-    message.info('Thank you for fixing the issues. The changes will be applied in training section.', 5)
+    message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
     this.closeFixes();
   }
 
@@ -295,8 +295,8 @@ class VariableIssue extends Component {
 
       const colValue = colType[header] === 'Numerical' ? 'Numerical' : 'Categorical'
       selectArr.push({
-        content: <span>{colValue}</span>,
-        title: colValue,
+        content: <span>{colValue === 'Numerical' ? EN.Numerical : EN.Categorical}</span>,
+        title: colValue  === 'Numerical' ? EN.Numerical : EN.Categorical,
         cn: styles.cell
       })
       const issues = []
@@ -347,21 +347,21 @@ class VariableIssue extends Component {
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
-          <div className={styles.issueTitle}><span>Issue{issues.rowIssue + issues.dataIssue > 1 && 's'} Found!</span></div> :
-          <div className={styles.cleanTitle}><span>Variable Quality looks good!</span></div>}
+          <div className={styles.issueTitle}><span>{EN.IssueS}{issues.rowIssue + issues.dataIssue > 1 && EN.SS} {EN.Found}!</span></div> :
+          <div className={styles.cleanTitle}><span>{EN.VariableQualitylooksgood}</span></div>}
         <div className={styles.issueBox}>
           {issues.rowIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span className={styles.limitText}>For your whole dataset, the number of valid data points will be smaller than the recommended minimum 1000</span>
+            <span className={styles.limitText}>{EN.Foryourwholedataset}</span>
             <div className={styles.button} onClick={this.backToConnect}>
-              <button><span>Load a New Dataset</span></button>
+              <button><span>{EN.LoadaNewDataset}</span></button>
             </div>
           </div>}
           {issues.dataIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span className={styles.limitText}>Some issues are found. R2 learn has generated an automatic fixing solution. You can also create your own fixing solution by clicking “Edit The Fixes” button.</span>
+            <span className={styles.limitText}>{EN.SomeissuesarefoundR2learnhasgenerated}</span>
             <div className={styles.button} onClick={this.editFixes}>
-              <button><span>Edit The Fixes</span></button>
+              <button><span>{EN.EditTheFixes}</span></button>
             </div>
           </div>}
         </div>
@@ -369,19 +369,19 @@ class VariableIssue extends Component {
       <div className={styles.typeBox}>
         {!!mismatchCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
-          <span>Data Type Mismatch</span>
+          <span>{EN.DataTypeMismatch}</span>
         </div>}
         {!!nullCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
-          <span>Missing Value</span>
+          <span>{EN.MissingValue}</span>
         </div>}
         {!!outlierCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
-          <span>Outlier</span>
+          <span>{EN.Outlier}</span>
         </div>}
         <div className={styles.issueTabs}>
-          <div className={styles.issueTab} onClick={changeTab}><span>Target Variable</span></div>
-          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>Predictor Variables</span></div>
+          <div className={styles.issueTab} onClick={changeTab}><span>{EN.TargetVariable}</span></div>
+          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
         </div>
       </div>
       <div className={styles.variableIssue}>
@@ -400,7 +400,7 @@ class VariableIssue extends Component {
           />
         </div>
         <div className={styles.variableBottom}>
-          <ContinueButton onClick={this.showSummary} text='Continue' width="15%" />
+          <ContinueButton onClick={this.showSummary} text={EN.Continue} width="15%" />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
@@ -413,7 +413,7 @@ class VariableIssue extends Component {
         isTarget={false} />}
         visible={this.visible}
         width='12em'
-        title='How R2 Learn Will Fix the Issues'
+        title={EN.HowR2LearnWillFixtheIssues}
         onClose={this.closeFixes}
         closeByMask={true}
         showClose={true}
@@ -423,12 +423,12 @@ class VariableIssue extends Component {
         closeSummary={this.closeSummary} />}
         visible={this.summary}
         width='12em'
-        title='How R2 Learn Will Fix the Issues'
+        title={EN.HowR2LearnWillFixtheIssues}
         onClose={this.closeSummary}
         closeByMask={true}
         showClose={true}
       />
-      {<Confirm width={'6em'} visible={this.warning} title='Warning' content='This action may wipe out all of your previous work (e.g. models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
+      {<Confirm width={'6em'} visible={this.warning} title={EN.Warning} content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm} confirmText={EN.Continue} closeText={EN.CANCEL} />}
     </div>
   }
 }
@@ -458,10 +458,10 @@ class Summary extends Component {
     const arc = d3.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-    const { totalRawLines, totalLines, totalFixedLines } = this.props.project
-    const deleteRows = totalRawLines - totalLines
-    const fixedRows = totalFixedLines
-    const cleanRows = totalLines - totalFixedLines
+    const { totalLines, deletedCount, totalFixedLines } = this.props.project
+    const deleteRows = deletedCount
+    const fixedRows = totalFixedLines - deletedCount
+    const cleanRows = totalLines
     const data = [fixedRows, deleteRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
@@ -485,10 +485,10 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, dataHeader, totalRawLines, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
-    const deletePercent = (totalRawLines - totalLines) / totalRawLines * 100
-    const fixedPercent = totalFixedLines / totalRawLines * 100
-    const cleanPercent = (totalLines - totalFixedLines) / totalRawLines * 100
+    const { target, sortHeader, dataHeader, totalRawLines, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
+    const deletePercent = deletedCount / totalRawLines * 100
+    const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
+    const cleanPercent = totalLines / totalRawLines * 100
     const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
     const variableList = currentHeader.slice(1)
     const percentList = currentHeader.map(v => {
@@ -502,30 +502,30 @@ class Summary extends Component {
     })
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
-        <div className={styles.summaryTitle}><span>Summary of your data</span></div>
+        <div className={styles.summaryTitle}><span>{EN.Summaryofyourdata}</span></div>
         <div className={styles.summaryTypeBox}>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
-            <span>Clean Data</span>
+            <span>{EN.CleanData}</span>
           </div>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }}></div>
-            <span>Data Type Mismatch</span>
+            <span>{EN.DataTypeMismatch}</span>
           </div>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }}></div>
-            <span>Missing Value</span>
+            <span>{EN.MissingValue}</span>
           </div>
           {problemType !== 'Classification' && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }}></div>
-            <span>Outlier</span>
+            <span>{EN.Outlier}</span>
           </div>}
         </div>
         <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Clean Data</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span>{target}</span></div>
@@ -534,7 +534,7 @@ class Summary extends Component {
           </div>
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock}>
@@ -549,13 +549,13 @@ class Summary extends Component {
         <div className={styles.summaryTable} style={{ paddingRight: '.2em' }}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Predictor Variables</span></div>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Clean Data</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
           </div>
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
             </div>
           </div>
         </div>
@@ -585,7 +585,7 @@ class Summary extends Component {
         </div>
       </div>
       <div className={styles.summaryRight}>
-        <div className={styles.summaryTitle}><span>R2 Learn will fix the issues</span></div>
+        <div className={styles.summaryTitle}><span>{EN.HowR2LearnWillFixtheIssues}</span></div>
         <div className={styles.summaryPie}>
           <div className={styles.summaryChart}>
           </div>
@@ -593,7 +593,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#9cebff' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Rows Will Be Fixed</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeFixed}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -603,7 +603,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#c4cbd7' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Rows Will Be Deleted</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeDeleted}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -613,7 +613,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Clean Data</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -625,11 +625,11 @@ class Summary extends Component {
         <div className={styles.summaryBottom}>
           <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
             [styles.disabled]: totalLines === 0
-          })} onClick={totalLines === 0 ? null : this.startTrain}><span>Continue</span></div>
+          })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
           <div className={classnames(styles.summaryButton, {
             [styles.disabled]: !issues.dataIssue
-          })} onClick={issues.dataIssue ? editFixes : null}><span>Edit the Fixes</span></div>
-          <div className={styles.summaryButton} onClick={this.backToConnect}><span>Load a Better Dataset</span></div>
+          })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
+          <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>
         </div>
       </div>
     </div>

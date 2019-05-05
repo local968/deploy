@@ -2,6 +2,8 @@ import { observable, action, computed, when } from 'mobx';
 import userStore from 'stores/UserStore';
 import Deployment from './Deployment';
 import socketStore from 'stores/SocketStore';
+import EN from '../../src/constant/en'
+
 
 const sortStrategies = {
   createdDate: (a, b) =>
@@ -44,12 +46,12 @@ const filter = (keywords, deployments) => {
 
 class DeploymentStore {
   sortByOptions = {
-    createdDate: 'Created Date ∧',
-    rcreatedDate: 'Created Date ∨',
-    projectName: 'Project Name ∧',
-    rprojectName: 'Project Name ∨',
-    modelName: 'Model Name ∧',
-    rmodelName: 'Model Name ∨'
+    createdDate: EN.CreatedDate+ '∧',
+    rcreatedDate: EN.CreatedDate+ '∨',
+    projectName: EN.ProjectName+'∧',
+    rprojectName: EN.ProjectName+'∨',
+    modelName: EN.ModelName + ' ∧',
+    rmodelName: EN.ModelName + ' ∨'
   };
 
   perPageOptions = {

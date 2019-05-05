@@ -9,7 +9,7 @@ import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
 import { ProgressBar } from 'components/Common';
 import { Modal, message, Button } from 'antd'
-
+import EN from '../../../constant/en';
 const Classification = 'Classification';
 
 @inject('deploymentStore', 'routing', 'projectStore')
@@ -63,10 +63,10 @@ export default class ModelResult extends Component {
         <div className={styles.tabBox}>
           <div className={classnames(styles.tab, {
             [styles.active]: view === 'simple'
-          })} onClick={changeView.bind(null, 'simple')}><span>Simplified View</span></div>
+          })} onClick={changeView.bind(null, 'simple')}><span>{EN.SimplifiedView}</span></div>
           <div className={classnames(styles.tab, {
             [styles.active]: view === 'advanced'
-          })} onClick={changeView.bind(null, 'advanced')}><span>Advanced View</span></div>
+          })} onClick={changeView.bind(null, 'advanced')}><span>{EN.AdvancedView}</span></div>
         </div>
         {/* <div className={styles.buttonBlock} >
           <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
@@ -87,7 +87,7 @@ export default class ModelResult extends Component {
             <span>or</span>
           </div> */}
           <button className={styles.button} onClick={this.deploy}>
-            <span>Deploy the Model</span>
+            <span>{EN.DeployTheModel}</span>
           </button>
         </div>
         {/* <Modal title='Model Insights'

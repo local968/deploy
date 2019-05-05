@@ -5,7 +5,7 @@ import moment from 'moment';
 import styles from './list.module.css';
 import emptyIcon from './icon-no-report.svg';
 // import alertIcon from './fail.svg';
-
+import EN from '../../../constant/en';
 @inject('scheduleStore')
 @observer
 export default class List extends Component {
@@ -15,7 +15,7 @@ export default class List extends Component {
       <div className={styles.list}>
         <div className={styles.top}>
           <span className={styles.model}>
-            <span className={styles.modelLabel}>Model:</span>
+            <span className={styles.modelLabel}>{EN.Model}:</span>
             <span className={styles.topModelName} title={cd.modelName}>
               {cd.modelName}
             </span>
@@ -23,15 +23,15 @@ export default class List extends Component {
           </span>
           <div className={styles.items}>
             <div className={styles.item}>
-              <span className={styles.label}>Next Monitor Date</span>
+              <span className={styles.label}>{EN.NextMonitorDate}</span>
               <span className={styles.text}>01/07/2018</span>
             </div>
             <div className={styles.item}>
-              <span className={styles.label}>Validation Data Source</span>
+              <span className={styles.label}>{EN.ValidationDataSource}</span>
               <span className={styles.text}>{cdpo.source}</span>
             </div>
             <div className={styles.item}>
-              <span className={styles.label}>Threshold</span>
+              <span className={styles.label}>{EN.Threshold}</span>
               <span className={styles.text}>
                 {cdpo.measurementMetric}{' '}
                 {cd.modelType === 'Classification' ? ' < ' : ' > '}
@@ -48,22 +48,22 @@ export default class List extends Component {
                 /> */}
               </span>
               <span className={classnames(styles.text, styles.download)}>
-                download
+                {EN.Download}
               </span>
             </div>
           </div>
           <a className={styles.edit} onClick={selectionOption('enable', false)}>
-            Edit
+            {EN.Edit}
           </a>
         </div>
         {scheduleStore.sortedPerformanceSchedules.length === 0 && <Empty />}
         {scheduleStore.sortedPerformanceSchedules.length > 0 && (
           <div className={styles.table}>
             <div className={styles.head}>
-              <span className={styles.modelName}>Model Name</span>
-              <span className={styles.modelInvokeTime}>Model Invoke Time</span>
-              <span className={styles.performance}>Performance</span>
-              <span className={styles.threshold}>Threshold</span>
+              <span className={styles.modelName}>{ModelName}</span>
+              <span className={styles.modelInvokeTime}>{EN.ModelInvokeTime}</span>
+              <span className={styles.performance}>{EN.Performance}</span>
+              <span className={styles.threshold}>{EN.Threshold}</span>
             </div>
             <div className={styles.list}>
               {scheduleStore.sortedPerformanceSchedules.map(s => (
@@ -137,7 +137,7 @@ export default class List extends Component {
 
 const Empty = () => (
   <div className={styles.emptyTable}>
-    <img src={emptyIcon} className={styles.emptyIcon} alt="empty" />
-    <span className={styles.emptyText}>No deployment report yet</span>
+    <img src={emptyIcon} className={styles.emptyIcon} alt={EN.Empty} />
+    <span className={styles.emptyText}>{NoDeploymentReportYet}</span>
   </div>
 );

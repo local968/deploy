@@ -20,7 +20,8 @@
     "jsx": "preserve",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "checkJs": false
+    "checkJs": false,
+    "noImplicitAny": false
   },
   "include": [
     "src"

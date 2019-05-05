@@ -9,6 +9,7 @@ import alertIcon from './fail.svg';
 import { Popover } from 'antd';
 import config from 'config'
 import { formatNumber } from 'util';
+import EN from '../../../constant/en';
 
 const transferR2 = (str) => str === 'R2' ? 'R²' : str
 
@@ -37,7 +38,7 @@ export default class List extends Component {
         <div className={styles.list}>
           <div className={styles.top}>
             <span className={styles.model}>
-              <span className={styles.modelLabel}>Model:</span>
+              <span className={styles.modelLabel}>{EN.Model}:</span>
               <span className={styles.topModelName} title={cd.modelName}>
                 {cd.modelName}
               </span>
@@ -48,19 +49,19 @@ export default class List extends Component {
                 <span className={styles.text}>01/07/2018</span>
               </div> */}
               <div className={styles.item}>
-                <span className={styles.label}>Validation Data Source</span>
+                <span className={styles.label}>{EN.ValidationDataSource}</span>
                 <span className={styles.text}>{cdpo.source}</span>
               </div>
               <div className={styles.item}>
-                <span className={styles.label}>Threshold</span>
+                <span className={styles.label}>{EN.Threshold}</span>
                 <span className={styles.text}>
                   {transferR2(cdpo.measurementMetric)}:{cdpo.metricThreshold}
                 </span>
               </div>
               <div className={styles.item}>
-                <span className={styles.label}>Validation Data Definition</span>
+                <span className={styles.label}>{EN.ValidationDataDefinition}</span>
                 <a href={`/upload/dataDefinition?projectId=${cd.projectId}`} className={classnames(styles.text, styles.download)}>
-                  download
+                  {EN.Download}
                 </a>
               </div>
             </div>
@@ -71,21 +72,21 @@ export default class List extends Component {
                 routing.push(`/deploy/project/${match.params.id}/performance`);
               }}
             >
-              Edit
+              {EN.Edit}
             </a>
           </div>
           {scheduleStore.sortedPerformanceSchedules.length === 0 && <Empty />}
           {scheduleStore.sortedPerformanceSchedules.length > 0 && (
             <div className={styles.table}>
               <div className={styles.head}>
-                <span className={styles.modelName}>Model Name</span>
+                <span className={styles.modelName}>{EN.ModelName}</span>
                 <span className={styles.modelInvokeTime}>
-                  Model Invoke Time
+                  {EN.ModelInvokeTime}
                 </span>
-                <span className={styles.performance}>Performance</span>
-                <span className={styles.threshold}>Threshold</span>
-                <span className={styles.status}>Status</span>
-                <span className={styles.results}>Results</span>
+                <span className={styles.performance}>{EN.Performance}</span>
+                <span className={styles.threshold}>{EN.Threshold}</span>
+                <span className={styles.status}>{EN.Status}</span>
+                <span className={styles.results}>{EN.Results}</span>
               </div>
               <div className={styles.list}>
                 {scheduleStore.sortedPerformanceSchedules.map(s => (
@@ -131,7 +132,7 @@ export default class List extends Component {
                           <Alert text={s.schedule.result['process error']} />
                         } >
                         <span className={classnames(styles.status, styles.issue)} >
-                          Issue
+                          {EN.Issue}
                         </span>
                       </Popover>
                     )}
@@ -145,7 +146,7 @@ export default class List extends Component {
                           )
                           .format('MM-DD-YYYY_hh-mm')}-predict.csv`}
                       >
-                        Download
+                        {EN.Download}
                       </a>
                     ) : (
                         <span className={styles.results}> - </span>
@@ -163,8 +164,8 @@ export default class List extends Component {
 
 const Empty = () => (
   <div className={styles.emptyTable}>
-    <img src={emptyIcon} className={styles.emptyIcon} alt="empty" />
-    <span className={styles.emptyText}>No deployment report yet</span>
+    <img src={emptyIcon} className={styles.emptyIcon} alt={EN.Empty} />
+    <span className={styles.emptyText}>{EN.NoDeploymentReportYet}</span>
   </div>
 );
 

@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 import styles from './styles.module.css';
 import basic from './basic.svg'
 import essential from './essential.svg'
+import EN from '../../constant/en';
 
-const labels = ["Data Size", "Number of Users", "Number of Models", "Number of Predictions Storage Space", "Number of Concurrent Projects", "Data Format", "API Access", "Resource Priority", "Technical Support"];
 
-const basicData = ["50MB", "1", "15/month", "20,000/month", "10GB", "1", "CSV", "No", "Low", "Email"];
+const labels = [EN.DataSize, EN.NumberofUsers, EN.NumberofModels, EN.NumberofPredictions, EN.NumberConcurrentProjects,EN.DataFormat, EN.APIAccess, EN.ResourcePriority, EN.TechnicalSupport];
 
-const essentialData = ["200MB", "1", "150/month", "200,000/month", "100GB", "5", "CSV", "No", "Medium", "Email"];
+const basicData = ["50MB", "1", EN.Fivemonth, EN.TWOmonth, "10GB", "1", "CSV", EN.No, EN.Low, EN.Email];
+
+const essentialData = ["200MB", "1", EN.Fivemonths,EN.TWOmonths, "100GB", "5", "CSV", EN.No, EN.Medium, EN.Email];
 
 const InfoContent = ({describe, img, onClick, data = []}) => {
   return (
@@ -24,7 +26,7 @@ const InfoContent = ({describe, img, onClick, data = []}) => {
           </div>)
         }
       </div>
-      <div onClick={onClick} className={styles.button}>Buy Now</div>
+      <div onClick={onClick} className={styles.button}>{EN.BuyNow}</div>
     </label>)
 };
 
@@ -39,8 +41,7 @@ export default class Upgrade extends Component {
     return (
       <div className={styles.main}>
         <div className={styles.header}>
-          If you enjoy our R2 Learn experience and are interested in product upgrade, please choose the SaaS Offering
-          option, and click on the ‘buy now’ button to start!
+          {EN.Ifyouenjoyour}
         </div>
         <InfoContent describe="Basic" img={basic}
                      data={basicData} onClick={this.open}/>

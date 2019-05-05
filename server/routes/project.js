@@ -1,15 +1,16 @@
-const {redis} = require('redis')
+const { redis } = require('redis')
 const wss = require('../webSocket')
 const uuid = require('uuid')
 const moment = require('moment')
+const axios = require('axios')
 const command = require('../command')
 const _ = require('lodash');
 // const mq = require('../amqp')
 
-const {userProjectRestriction, userConcurrentRestriction} = require('restriction')
+const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
 
 function parseChartData(result) {
-  if (!result) return {chart: null, fitIndex: null, initialFitIndex: null};
+  if (!result) return { chart: null, fitIndex: null, initialFitIndex: null };
   let fitIndex = -1;
   let initialFitIndex = -1;
   const charts = ['density', 'lift', 'roc', 'rocHoldout'];
@@ -21,7 +22,7 @@ function parseChartData(result) {
     }
   });
   if (result.roc) {
-    const {Youden} = result.roc
+    const { Youden } = result.roc
     if (Youden) {
       let max = -Infinity;
       initialFitIndex = 0;
@@ -34,7 +35,7 @@ function parseChartData(result) {
       fitIndex = initialFitIndex
     }
   }
-  return {chartData: result, fitIndex, initialFitIndex};
+  return { chartData: result, fitIndex, initialFitIndex };
 }
 
 function setDefaultData(id, userId) {
@@ -59,10 +60,10 @@ function query(key, params) {
   pipeline.zrevrangebyscore(key, params)
   return pipeline.exec()
     .then(([countResult, dataResult]) => {
-      if (countResult[0] || dataResult[0]) return {count: 0, list: []}
+      if (countResult[0] || dataResult[0]) return { count: 0, list: [] }
       const count = countResult[1]
       const data = dataResult[1]
-      const result = {count, list: []}
+      const result = { count, list: [] }
       if (!Array.isArray(data) || !data.length) {
         return result
       }
@@ -120,7 +121,7 @@ function query(key, params) {
 }
 
 function createOrUpdate(id, userId, data, isCreate = false) {
-  const promise = isCreate ? Promise.resolve({status: 200, message: 'ok'}) : checkProject(userId, id)
+  const promise = isCreate ? Promise.resolve({ status: 200, message: 'ok' }) : checkProject(userId, id)
   return promise.then(checked => {
     if (checked.status !== 200) return checked
     const time = moment().unix();
@@ -137,7 +138,7 @@ function createOrUpdate(id, userId, data, isCreate = false) {
         const returnValue = err ? {
           status: 411,
           message: (isCreate ? "create" : "update") + " project error"
-        } : {status: 200, message: "ok", result: data, id}
+        } : { status: 200, message: "ok", result: data, id }
         wss.publish(`user:${userId}:projects`, returnValue)
         return returnValue
       })
@@ -147,14 +148,14 @@ function createOrUpdate(id, userId, data, isCreate = false) {
 
 function addSettingModel(userId, projectId) {
   return function (result) {
-    const {name: modelName} = result.model
+    const { name: modelName } = result.model
     redis.hmget(`project:${projectId}`, 'settingId', 'settings')
       .then(([settingId, settings]) => {
         if (settingId && settings) {
           settingId = JSON.parse(settingId)
           settings = JSON.parse(settings)
           settings.find(s => s.id === settingId).models.push(modelName)
-          createOrUpdate(projectId, userId, {settings})
+          createOrUpdate(projectId, userId, { settings })
         }
       }, console.error)
     return result
@@ -164,13 +165,13 @@ function addSettingModel(userId, projectId) {
 function createModel(userId, id, modelId, params) {
   const mid = uuid.v4()
   const pipeline = redis.pipeline();
-  const saveData = {...params, id: modelId, mid, createTime: moment().unix()}
+  const saveData = { ...params, id: modelId, mid, createTime: moment().unix() }
   pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray(saveData))
   pipeline.sadd(`project:${id}:models`, modelId)
   return pipeline.exec().then(list => {
     const err = list.find(([error]) => !!error);
-    const data = err ? {status: 412, message: "create model error"} : {status: 200, message: "ok"}
-    const result = {...data, model: saveData, id}
+    const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
+    const result = { ...data, model: saveData, id }
     wss.publish(`user:${userId}:projects`, result)
     return result
   })
@@ -178,7 +179,7 @@ function createModel(userId, id, modelId, params) {
 
 function updateModel(userId, id, mid, params) {
   return redis.hmset(`project:${id}:model:${mid}`, mapObjectToArray(params)).then(() => {
-    const result = {status: 200, message: "ok", modelResult: {...params, id: mid}, id}
+    const result = { status: 200, message: "ok", modelResult: { ...params, id: mid }, id }
     wss.publish(`user:${userId}:projects`, result)
     return result
   })
@@ -193,7 +194,7 @@ function moveModels(id) {
     pipeline.del(`project:${id}:models`)
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
-      if (error) return {status: 414, message: "delete models error", error}
+      if (error) return { status: 414, message: "delete models error", error }
       return {
         status: 200,
         message: 'ok'
@@ -208,7 +209,7 @@ function deleteModels(id) {
   selPipeline.smembers(`project:${id}:models:previous`)
 
   return selPipeline.exec().then(([[nowError, nowIds], [oldError, oldIds]]) => {
-    if (nowError || oldError) return {status: 414, message: "delete models error", error: nowError || oldError}
+    if (nowError || oldError) return { status: 414, message: "delete models error", error: nowError || oldError }
     const pipeline = redis.pipeline();
     [...nowIds, ...oldIds].forEach(mid => {
       pipeline.del(`project:${id}:model:${mid}`)
@@ -217,7 +218,7 @@ function deleteModels(id) {
     pipeline.del(`project:${id}:models:previous`)
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
-      if (error) return {status: 414, message: "delete models error", error}
+      if (error) return { status: 414, message: "delete models error", error }
       return {
         status: 200,
         message: 'ok'
@@ -235,7 +236,7 @@ function deleteProject(userId, id) {
     pipeline.zrem(`user:${userId}:projects:createTime`, id)
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
-      if (error) return {status: 415, message: "delete project error", error}
+      if (error) return { status: 415, message: "delete project error", error }
       return deleteModels(id)
     })
   })
@@ -251,10 +252,10 @@ function checkProject(userId, id) {
     }
     if (result.userId !== userId) {
       console.error(`user:${userId}, project:${id} ${!result.userId ? 'delete' : 'error'}`)
-      return {status: 421, message: "project error"}
+      return { status: 421, message: "project error" }
       // return {}
     }
-    return {status: 200, message: 'ok', data: result}
+    return { status: 200, message: 'ok', data: result }
   })
 }
 
@@ -314,7 +315,7 @@ function getFileInfo(files) {
       const fileext = file.name.split(".").pop()
       ext.push("." + fileext)
     }
-    if (!csvLocation.length) return {status: 416, message: "file not exist"}
+    if (!csvLocation.length) return { status: 416, message: "file not exist" }
     return {
       status: 200,
       message: "ok",
@@ -342,7 +343,7 @@ function updateProjectField(id, userId, field, data) {
         status: 200,
         message: "ok",
         id,
-        result: {[field]: data}
+        result: { [field]: data }
       }
       wss.publish(`user:${userId}:projects`, returnValue)
       return returnValue
@@ -373,7 +374,7 @@ function getProjectFields(id, fields) {
 
 async function getBaseEtl(id) {
   const data = await getProjectFields(id, ['etlIndex', 'target', 'problemType', 'dataHeader', 'colType', 'colMap']);
-  const {etlIndex, target, problemType, dataHeader, colType, colMap} = data;
+  const { etlIndex, target, problemType, dataHeader, colType, colMap } = data;
   return {
     command: 'top.etlBase',
     csvLocation: [etlIndex],
@@ -400,6 +401,8 @@ async function checkEtl(projectId, userId) {
         userId,
         requestId: uuid.v4()
       }
+    }).then(() => {
+      return createOrUpdate(projectId, userId, { hasSendEtl: true })
     })
   }
 }
@@ -411,7 +414,7 @@ wss.register("addProject", async (message, socket) => {
   // const startTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() })
   // const endTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() + 1 })
   // const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
-  const {userId} = socket.session
+  const { userId } = socket.session
   const counts = await redis.zcard(`user:${userId}:projects:createTime`)
   if (counts >= userConcurrentRestriction[socket.session.user.level]) return {
     status: 408,
@@ -420,13 +423,13 @@ wss.register("addProject", async (message, socket) => {
   }
   const id = await redis.incr("node:project:count")
   // const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
-  return createOrUpdate(id, userId, {id, userId}, true)
+  return createOrUpdate(id, userId, { id, userId }, true)
 })
 
 wss.register("updateProject", (message, socket) => {
-  const {userId} = socket.session
+  const { userId } = socket.session
   const data = Object.assign({}, message);
-  const {id} = data
+  const { id } = data
   // delete data.id
   Reflect.deleteProperty(data, 'id')
   // delete data._id
@@ -444,8 +447,8 @@ wss.register("updateProject", (message, socket) => {
 })
 
 wss.register("deleteProjects", (message, socket) => {
-  const {userId} = socket.session
-  const {ids} = message
+  const { userId } = socket.session
+  const { ids } = message
   const array = []
   ids.map(id => {
     array.push(deleteProject(userId, id))
@@ -461,8 +464,8 @@ wss.register("deleteProjects", (message, socket) => {
 })
 
 wss.register("queryProjectList", (message, socket) => {
-  const {userId} = socket.session
-  const {limit, offset, sort} = message;
+  const { userId } = socket.session
+  const { limit, offset, sort } = message;
 
   const key = `user:${userId}:projects:${sort === 'createTime' ? 'createTime' : 'updateTime'}`;
 
@@ -480,8 +483,8 @@ wss.register("queryProjectList", (message, socket) => {
 })
 
 wss.register("queryProject", (message, socket) => {
-  const {userId} = socket.session
-  const {id} = message
+  const { userId } = socket.session
+  const { id } = message
   const key = `project:${id}`;
 
   return redis.hgetall(key).then(result => {
@@ -491,7 +494,7 @@ wss.register("queryProject", (message, socket) => {
       } catch (e) {
       }
     }
-    if (result.userId !== userId) return {status: 420, message: 'error'}
+    if (result.userId !== userId) return { status: 420, message: 'error' }
     return {
       status: 200,
       message: 'ok',
@@ -501,7 +504,7 @@ wss.register("queryProject", (message, socket) => {
 })
 
 wss.register("queryModelList", message => {
-  const {id} = message
+  const { id } = message
   const key = `project:${id}:models`;
 
   return redis.smembers(key).then(ids => {
@@ -511,7 +514,7 @@ wss.register("queryModelList", message => {
     })
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
-      if (error) return {status: 413, message: "query models error", error}
+      if (error) return { status: 413, message: "query models error", error }
       const result = list.map(item => {
         let data = item[1]
         for (let key in data) {
@@ -533,14 +536,14 @@ wss.register("queryModelList", message => {
 })
 
 wss.register('etl', (message, socket, progress) => {
-  const {userId} = socket.session
-  const {firstEtl, noCompute, saveIssue, projectId: id, csvLocation: files, _id: requestId} = message
+  const { userId } = socket.session
+  const { firstEtl, noCompute, saveIssue, projectId: id, csvLocation: files, _id: requestId } = message
 
   return setDefaultData(id, userId).then(setResult => {
     if (setResult.status !== 200) return setResult
     return getFileInfo(files).then((fileInfo) => {
       if (fileInfo.status !== 200) return fileInfo
-      const {csvLocation, ext} = fileInfo
+      const { csvLocation, ext } = fileInfo
       const data = {
         ...message,
         userId: userId,
@@ -555,24 +558,24 @@ wss.register('etl', (message, socket, progress) => {
       Reflect.deleteProperty(data, 'saveIssue')
       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation')
       if (!ext) Reflect.deleteProperty(data, 'ext')
-      return createOrUpdate(id, userId, {etling: true, stopId: requestId})
+      return createOrUpdate(id, userId, { etling: true, stopId: requestId })
         .then(() => command(data, processData => {
-          let {result, status} = processData;
+          let { result, status } = processData;
           if (status < 0 || status === 100) return processData
-          const {name, path, key, originHeader, value, fields} = result
-          if (name === "progress" && key === 'etl') createOrUpdate(id, userId, {etlProgress: value})
+          const { name, path, key, originHeader, value, fields } = result
+          if (name === "progress" && key === 'etl') createOrUpdate(id, userId, { etlProgress: value })
           if (name === "csvHeader") createOrUpdate(id, userId, {
             originPath: path,
             rawHeader: originHeader,
             cleanHeader: fields,
             dataHeader: fields
           })
-          if (name === "cleanCsvHeader") createOrUpdate(id, userId, {cleanPath: path})
+          if (name === "cleanCsvHeader") createOrUpdate(id, userId, { cleanPath: path })
           return null
         }, true).then(returnValue => {
-          let {result, status} = returnValue;
+          let { result, status } = returnValue;
           if (status < 0) {
-            return createOrUpdate(id, userId, {etlProgress: 0, etling: false}).then(() => {
+            return createOrUpdate(id, userId, { etlProgress: 0, etling: false }).then(() => {
               return {
                 status: 418,
                 result,
@@ -629,7 +632,7 @@ wss.register('etl', (message, socket, progress) => {
           //重新做ETL后删除所有模型
           deleteModels(id)
 
-          return createOrUpdate(id, userId, {...result, ...steps}).then(updateResult => {
+          return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
             if (updateResult.status !== 200) return updateResult
             return {
               status: 200,
@@ -651,8 +654,8 @@ wss.register('abortEtl', (message, socket) => {
       stopId = JSON.parse(stopId)
     } catch (e) {
     }
-    if (!stopId) return {status: 200, message: 'ok'}
-    return command({...message, userId, requestId: message._id, stopId}, null, true).then(() => {
+    if (!stopId) return { status: 200, message: 'ok' }
+    return command({ ...message, userId, requestId: message._id, stopId }, null, true).then(() => {
       command.clearListener(stopId)
       const statusData = {
         etling: false,
@@ -665,25 +668,25 @@ wss.register('abortEtl', (message, socket) => {
 })
 
 wss.register('dataView', (message, socket, progress) => {
-  return createOrUpdate(message.projectId, socket.session.userId, {dataViewsLoading: true})
-    .then(() => command({...message, userId: socket.session.userId, requestId: message._id}, async progressResult => {
+  return createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: true })
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
-      const {status, result} = progressResult
+      const { status, result } = progressResult
       if (status === 1) {
         if (!lock) {
-          const {name, value} = result
+          const { name, value } = result
           lock = true
-          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, {dataViewProgress: value})
+          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, { dataViewProgress: value })
           setTimeout(() => lock = false, 500)
         }
       }
       if (status < 0 || status === 100) return progressResult
       return null
     }, true).then(async returnValue => {
-      const {status, result} = returnValue
+      const { status, result } = returnValue
       if (status === 100) {
-        const {result: updateResult} = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
-        await createOrUpdate(message.projectId, socket.session.userId, {dataViewsLoading: false, dataViewProgress: 0})
+        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
+        await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false, dataViewProgress: 0 })
         if (updateResult && updateResult.dataViews) returnValue.result.data = updateResult.dataViews
       }
       return returnValue
@@ -693,16 +696,45 @@ wss.register('dataView', (message, socket, progress) => {
   // sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
 })
 
+const config = require('config')
+const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
+wss.register('newDataView', async (message, socket, progress) => {
+  const { userId } = socket.session
+  const { projectId } = message
+  const etlIndex = await redis.hget("project:" + projectId, 'etlIndex');
+  const stats = await redis.hget("project:" + projectId, 'stats');
+  try {
+    const { data } = await axios.post(`${esServicePath}/etls/${JSON.parse(etlIndex)}/stats`,JSON.parse(stats))
+    console.log(data)
+    // // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
+    const rawDataView = {}
+    Object.entries(data).forEach(([key, metric]) => {
+      const stats = metric.originalStats
+      rawDataView[key] = { ...stats, std: stats.std_deviation }
+    })
+    const result = {
+      rawDataView,
+    }
+    await createOrUpdate(projectId, userId, result)
+    return { status: 200, message: 'ok', result }
+  } catch (e) {
+    console.log({...e})
+    let error = e
+    if (e.response && e.response.data) error = e.response.data
+    return { status: 500, message: 'get index stats failed', error }
+  }
+})
 
-wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(message.projectId, socket.session.userId, {correlationMatrixLoading: true})
-  .then(() => sendToCommand({...message, userId: socket.session.userId, requestId: message._id}, progress)
+
+wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(message.projectId, socket.session.userId, { correlationMatrixLoading: true })
+  .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
     .then(returnValue => {
-      const {status, result} = returnValue
+      const { status, result } = returnValue
       const data = status === 100 ? {
         correlationMatrixHeader: result.header,
         correlationMatrixData: result.data,
         correlationMatrixLoading: false
-      } : {correlationMatrixLoading: false}
+      } : { correlationMatrixLoading: false }
       createOrUpdate(message.projectId, socket.session.userId, data)
       return returnValue
     })))
@@ -710,29 +742,29 @@ wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(
 
 wss.register('preTrainImportance', async (message, socket, progress) => {
 
-  const {userId} = socket.session;
-  const {projectId} = message;
+  const { userId } = socket.session;
+  const { projectId } = message;
 
   await checkEtl(projectId, userId);
 
-  return createOrUpdate(message.projectId, socket.session.userId, {preImportanceLoading: true})
-    .then(() => command({...message, userId: socket.session.userId, requestId: message._id}, async progressResult => {
+  return createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
+    .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
-      const {status, result} = progressResult
+      const { status, result } = progressResult
       if (status === 1) {
         if (!lock) {
-          const {name, value} = result
+          const { name, value } = result
           lock = true
-          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, {importanceProgress: value})
+          if (name === "progress") await createOrUpdate(message.projectId, socket.session.userId, { importanceProgress: value })
           setTimeout(() => lock = false, 500)
         }
       }
       if (status < 0 || status === 100) return progressResult
       return null
     }, true)
-    // .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
+      // .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
       .then(returnValue => {
-        const {status, result} = returnValue
+        const { status, result } = returnValue
         const promise = []
         if (status === 100) {
           result.informativesLabel = result.informativesLabel || []
@@ -746,27 +778,27 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
         }))
         return Promise.all(promise).then(([result1, result2]) => {
           const realResult = Object.assign({}, result, (result1 || {}).result, (result2 || {}).result)
-          return Object.assign({}, returnValue, {result: realResult})
+          return Object.assign({}, returnValue, { result: realResult })
         })
       }))
 })
 
 
 wss.register('histgramPlot', (message, socket, progress) => {
-  const {projectId: id, _id: requestId, feature_label} = message
-  const {userId} = socket.session
+  const { projectId: id, _id: requestId, feature_label } = message
+  const { userId } = socket.session
   const histgramPlots = feature_label.reduce((start, f) => {
     start[f] = ''
     return start
   }, {})
   return updateProjectField(id, userId, "histgramPlots", histgramPlots)
-    .then(() => command({...message, userId, requestId}, progressResult => {
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "histgramPlots", histgramPlots)
         return progressResult
       }
-      const {result} = progressResult
-      const {field, imageSavePath, progress: status} = result;
+      const { result } = progressResult
+      const { field, imageSavePath, progress: status } = result;
       if (status && status === "start") return
       if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
       return progress(progressResult)
@@ -774,20 +806,20 @@ wss.register('histgramPlot', (message, socket, progress) => {
 })
 
 wss.register('rawHistgramPlot', (message, socket, progress) => {
-  const {projectId: id, _id: requestId, feature_label} = message
-  const {userId} = socket.session
+  const { projectId: id, _id: requestId, feature_label } = message
+  const { userId } = socket.session
   const histgramPlots = feature_label.reduce((start, f) => {
     start[f] = ''
     return start
   }, {})
   return updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
-    .then(() => command({...message, userId, requestId}, progressResult => {
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "rawHistgramPlots", histgramPlots)
         return progressResult
       }
-      const {result} = progressResult
-      const {field, imageSavePath, progress: status} = result;
+      const { result } = progressResult
+      const { field, imageSavePath, progress: status } = result;
       if (status && status === "start") return
       if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
       return progress(progressResult)
@@ -795,20 +827,20 @@ wss.register('rawHistgramPlot', (message, socket, progress) => {
 })
 
 wss.register('univariatePlot', (message, socket, progress) => {
-  const {projectId: id, _id: requestId, feature_label} = message
-  const {userId} = socket.session
+  const { projectId: id, _id: requestId, feature_label } = message
+  const { userId } = socket.session
   const univariatePlots = feature_label.reduce((start, f) => {
     start[f] = ''
     return start
   }, {})
   return updateProjectField(id, userId, "univariatePlots", univariatePlots)
-    .then(() => command({...message, userId, requestId}, progressResult => {
+    .then(() => command({ ...message, userId, requestId }, progressResult => {
       if (progressResult.status < 0 || progressResult.status === 100) {
         updateProjectField(id, userId, "univariatePlots", univariatePlots)
         return progressResult
       }
-      const {result} = progressResult
-      const {field, imageSavePath, progress: status = ''} = result;
+      const { result } = progressResult
+      const { field, imageSavePath, progress: status = '' } = result;
       if (status === "start") return
       if (univariatePlots.hasOwnProperty(field)) univariatePlots[field] = imageSavePath
       return progress(progressResult)
@@ -825,18 +857,18 @@ const _sendToCommand = (message, socket, progress) => sendToCommand({
 // wss.register('fitPlotAndResidualPlot', _sendToCommand)
 // wss.register('pointToShow', _sendToCommand)
 wss.register('createNewVariable', async (message, socket, progress) => {
-  const {userId} = socket.session;
-  const {projectId} = message;
+  const { userId } = socket.session;
+  const { projectId } = message;
   await checkEtl(projectId, userId)
   return _sendToCommand(message, socket, progress)
 })
 
 wss.register('etlCleanData', (message, socket, progress) => {
-  const {projectId} = message
-  const {userId} = socket.session
-  return createOrUpdate(projectId, userId, {etlCleanDataLoading: true}).then(() => {
-    return sendToCommand({...message, userId, requestId: message._id}, progress).then(returnValue => {
-      const {result, status} = returnValue
+  const { projectId } = message
+  const { userId } = socket.session
+  return createOrUpdate(projectId, userId, { etlCleanDataLoading: true }).then(() => {
+    return sendToCommand({ ...message, userId, requestId: message._id }, progress).then(returnValue => {
+      const { result, status } = returnValue
       const saveData = {
         etlCleanDataLoading: false
       }
@@ -850,14 +882,14 @@ wss.register('etlCleanData', (message, socket, progress) => {
 })
 
 wss.register('abortTrain', (message, socket) => {
-  const {projectId, isLoading, _id: requestId} = message
-  const {userId} = socket.session
+  const { projectId, isLoading, _id: requestId } = message
+  const { userId } = socket.session
   return redis.hget("project:" + projectId, 'stopId').then(stopId => {
     try {
       stopId = JSON.parse(stopId)
     } catch (e) {
     }
-    if (!stopId) return {status: 200, message: 'ok'}
+    if (!stopId) return { status: 200, message: 'ok' }
     // return command({ ...message, userId, requestId, stopId }, () => {
     command.clearListener(stopId)
     const statusData = {
@@ -879,20 +911,20 @@ wss.register('abortTrain', (message, socket) => {
 })
 
 wss.register('train', async (message, socket, progress) => {
-  const {userId, user} = socket.session;
-  const {projectId, data: updateData, _id: requestId} = message;
+  const { userId, user } = socket.session;
+  const { projectId, data: updateData, _id: requestId } = message;
   // delete message.data
   Reflect.deleteProperty(message, 'data');
   // const stopId = uuid.v4()
-  const data = {...message, userId, requestId, stopId: requestId};
+  const data = { ...message, userId, requestId, stopId: requestId };
   let hasModel = false;
   await checkEtl(projectId, userId)
   try {
     await checkTraningRestriction(user)
-    await createOrUpdate(projectId, userId, {...updateData, stopId: requestId})
-    const isAbort = await command({...data, stopId: requestId}, async queueValue => {
+    await createOrUpdate(projectId, userId, { ...updateData, stopId: requestId })
+    const isAbort = await command({ ...data, stopId: requestId }, async queueValue => {
       const stopId = await getProjectField(projectId, 'stopId')
-      const {status, result, requestId: trainId} = queueValue;
+      const { status, result, requestId: trainId } = queueValue;
       if (status < 0 || status === 100) return 1;
       if (stopId !== trainId) return 2
       if (!result) return
@@ -901,35 +933,35 @@ wss.register('train', async (message, socket, progress) => {
         // const { requestId: trainId } = result;
         // delete result.requestId
         Reflect.deleteProperty(result, 'requestId')
-        await createOrUpdate(projectId, userId, {trainModel: result})
-        processValue = {...result}
+        await createOrUpdate(projectId, userId, { trainModel: result })
+        processValue = { ...result }
       } else if (result.score) {
         const stats = await getProjectField(projectId, 'stats')
         hasModel = true;
-        await createOrUpdate(projectId, userId, {trainModel: null})
-        const modelResult = await createModel(userId, projectId, result.modelName, {...result, stats})
+        await createOrUpdate(projectId, userId, { trainModel: null })
+        const modelResult = await createModel(userId, projectId, result.modelName, { ...result, stats })
         processValue = await addSettingModel(userId, projectId)(modelResult)
         // return progress(model)
       } else if (result.data) {
-        const {model: mid, action, data} = result;
+        const { model: mid, action, data } = result;
         let saveData = {}
         if (action === "chartData") {
           saveData = parseChartData(data)//原始数据
         }
         if (action === "pointToShow") {
-          saveData = {qcut: data}
+          saveData = { qcut: data }
         }
         processValue = await updateModel(userId, projectId, mid, saveData)
         // return progress(model)
       } else if (result.imageSavePath) {
-        const {model: mid, action, imageSavePath} = result
-        const saveData = {[action]: imageSavePath}
+        const { model: mid, action, imageSavePath } = result
+        const saveData = { [action]: imageSavePath }
         processValue = updateModel(userId, projectId, mid, saveData)
         // return progress(model)
       }
       return progress(processValue)
     }, true)
-    if (isAbort === 2) return {status: 200, msg: 'ok'}
+    if (isAbort === 2) return { status: 200, msg: 'ok' }
     const statusData = {
       train2Finished: true,
       train2ing: false,
@@ -1015,7 +1047,7 @@ wss.register('train', async (message, socket, progress) => {
 })
 
 wss.register("watchProjectList", (message, socket) => {
-  const {userId} = socket.session
+  const { userId } = socket.session
   const key = `user:${userId}:projects`
   wss.subscribe(key, (data) => {
     try {
@@ -1037,8 +1069,8 @@ wss.register("testPub", (message, socket) => {
 })
 
 wss.register("inProject", (message, socket) => {
-  const {userId} = socket.session
-  const {id, broadcastId} = message
+  const { userId } = socket.session
+  const { id, broadcastId } = message
   wss.clients.forEach(client => {
     if (client === socket) return
     if (client.session && client.session.userId === userId) client.send(JSON.stringify({
@@ -1051,16 +1083,16 @@ wss.register("inProject", (message, socket) => {
 
 
 wss.register("updateModel", (message, socket) => {
-  const {userId} = socket.session
-  const {projectId} = message
-  const {data, id: mid} = message
+  const { userId } = socket.session
+  const { projectId } = message
+  const { data, id: mid } = message
   return updateModel(userId, projectId, mid, data)
 })
 
 wss.register("permutationImportance", (message, socket) => {
-  const {userId} = socket.session
-  const {projectId, id: mid, command: commandText, _id: requestId} = message
-  return updateModel(userId, projectId, mid, {importanceLoading: true})
+  const { userId } = socket.session
+  const { projectId, id: mid, command: commandText, _id: requestId } = message
+  return updateModel(userId, projectId, mid, { importanceLoading: true })
     .then(() => command({
       command: commandText,
       projectId,
@@ -1068,11 +1100,11 @@ wss.register("permutationImportance", (message, socket) => {
       userId,
       requestId
     }, progressValue => {
-      const {result, status} = progressValue
+      const { result, status } = progressValue
       if (status < 0 || status === 100) return progressValue
-      const {name, model, featureImportance} = result
+      const { name, model, featureImportance } = result
       if (name === 'progress') return
-      if (model === mid) return updateModel(userId, projectId, mid, {featureImportance, importanceLoading: false})
+      if (model === mid) return updateModel(userId, projectId, mid, { featureImportance, importanceLoading: false })
     }, true))
 })
 
@@ -1102,7 +1134,7 @@ wss.register('getSample', (message, socket) => {
       }
       return r
     })
-    return {list}
+    return { list }
   })
 })
 

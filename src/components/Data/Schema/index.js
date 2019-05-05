@@ -5,6 +5,7 @@ import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
 import { Checkbox } from 'antd'
 import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confirm } from 'components/Common';
+import EN from '../../../constant/en';
 
 @inject('projectStore')
 @observer
@@ -151,7 +152,7 @@ export default class DataSchema extends Component {
         cn: styles.titleCell
       }
       if (i === index.columnHeader - 1) {
-        headerData.content = <HeaderInfo row='Header' col='Row' style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
+        headerData.content = <HeaderInfo row={EN.Header} col={EN.Row} style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739}/>
         headerData.title = '';
       } else {
         headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
@@ -190,13 +191,13 @@ export default class DataSchema extends Component {
         }
         const colValue = this.dataType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
-          <option value="Categorical">Categorical</option>
-          <option value="Numerical">Numerical</option>
+          <option value="Categorical">{EN.Categorical}</option>
+          <option value="Numerical">{EN.Numerical}</option>
         </select>
-        selectData.title = colValue
+        selectData.title = colValue === 'Numerical'? EN.Numerical : EN.Categorical
         if (target && target === key) {
           selectData.cn = classnames(styles.cell, styles.target);
-          selectData.content = <span>{colValue}</span>
+          selectData.content = <span>{colValue === 'Numerical'? EN.Numerical : EN.Categorical}</span>
         }
 
       }
@@ -253,14 +254,14 @@ export default class DataSchema extends Component {
       <div className={styles.schemaInfo}>
         <div className={styles.schemaI}><span>i</span></div>
         <div className={styles.schemaText}>
-          <span>If your data does not have a header, please reload one WITH A HEADER.</span>
-          <span>Please select a variable as the target variable, and unselect the undesirable variables if necessary.</span>
+          <span>{EN.Ifyourdatadoesnothaveaheader}</span>
+          <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
         </div>
       </div>
       <div className={styles.schemaContent} id='schemaContent'>
         <div className={styles.schemaTools}>
           <Select
-            title={"Target Variable"}
+            title={EN.TargetVariable}
             dropdownClassName={"targetSelect"}
             autoWidth={"1.6em"}
             options={targetOption}
@@ -272,23 +273,24 @@ export default class DataSchema extends Component {
           />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
-              <span>Unselect Undesirable Variables</span>
+              <span>{EN.UnselectUndesirableVariables}</span>
             </div> :
             <div className={styles.schemaSelect} onClick={this.toggleSelect}>
-              <span>Unselect Undesirable Variables</span>
+              <span>{EN.UnselectUndesirableVariables}</span>
             </div>
           }
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>Unselect predictors that lead to less wanted modeling results, they could be: <br />1. Variable IDs <br />2. Variables that are derived from the target <br />3. Any other variables you don't need</div>} />
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{ EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
+          }</div>} />
           {isMissed && <div className={styles.schemaMissed} >
             <div className={styles.errorBlock}></div>
-            <span>Missing</span>
+            <span>{EN.Missing}</span>
           </div>}
           {isDuplicated && <div className={styles.schemaDuplicated} >
             <div className={styles.errorBlock}></div>
-            <span>Duplicated Header</span>
+            <span>{EN.DuplicatedHeader}</span>
           </div>}
           {(isMissed || isDuplicated) && <div className={styles.schemaSelect} onClick={this.autoFix}>
-            <span>Auto Header Repair</span>
+            <span>{EN.AutoHeaderRepair}</span>
           </div>}
         </div>
         <div className={styles.content}>
@@ -307,14 +309,14 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || !target || (newDataHeader.length <= 1 && newDataHeader.indexOf(target) > -1)} text="Continue" />
+        <ContinueButton onClick={this.doEtl} disabled={etling || !target || (newDataHeader.length <= 1 && newDataHeader.indexOf(target) > -1)} text={EN.Continue} />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
-          <label htmlFor='noCompute'>Skip Data Quality Check</label>
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
+          <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
-      {<Confirm width={'6em'} visible={this.visiable} title='Warning' content='This action may wipe out all of your previous work (e.g. models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
+      {<Confirm width={'6em'} visible={this.visiable} title={EN.Warning} content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm} confirmText={EN.Continue} closeText={EN.Cancel} />}
     </div>
   }
 }

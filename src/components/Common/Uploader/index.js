@@ -4,7 +4,7 @@ import axios from 'axios';
 import config from 'config'
 // import NginxUploader from '../NginxUploader';
 import EsUploader from '../EsUploader';
-
+import EN from '../../../constant/en'
 const AllowExt = ["csv", "CSV", "zip", "ZIP", "rar", "RAR", "tar", "TAR", "tgz", "TGZ", 'xls', 'XLS', 'xlsx', 'XLSX']
 
 export default class Uploader extends Component {
@@ -35,12 +35,12 @@ export default class Uploader extends Component {
     if (!ext || !AllowExt.includes(ext)) {
       return {
         err: true,
-        msg: 'File Error: Please Upload a file in one of the following formats: ["csv", "xls", "xlsx", "zip", "rar", "tar", "tgz" ].'
+        msg: EN.PleaseUploaafileinoneofthefollowingformats
       };
     }
     return {
       err: false,
-      msg: 'ok'
+      msg: EN.OK
     }
   }
 

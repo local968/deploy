@@ -21,6 +21,7 @@ import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
 import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 
 const { Option, OptGroup } = Select;
 
@@ -150,17 +151,17 @@ export default class Deployment extends Component {
     return (
       <div className={styles.deployment} >
         <div className={styles.info}>
-          <span className={styles.model}>Model: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+          <span className={styles.model}>{EN.Model}: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
             {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
               <OptGroup key={settingName} label={settingName}>
                 {models.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}
               </OptGroup>)}
           </Select> : cd.modelName}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
-          <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? 'Save' : 'Change'}</a>
-          <span className={styles.data}>Deployment Data Definition</span>
-          <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
-          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>Download</a>
+          <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ?  EN.Save : EN.Change}</a>
+          <span className={styles.data}>{EN.DeploymentDataDefinition}</span>
+          <Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />
+          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>
           {/* <span className={styles.email}>
             Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (
@@ -209,8 +210,8 @@ export default class Deployment extends Component {
             <Progress percent={isNaN(this.uploadPercentage) ? 0 : parseFloat(this.uploadPercentage)} />
             <span className={styles.speed}>{this.uploadSpeed}</span>
             <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
-              ? <span><Icon type="pause" theme="outlined" />Pause</span>
-              : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+              ? <span><Icon type="pause" theme="outlined" />{EN.Paused}</span>
+              : <span><Icon type="caret-right" theme="outlined" />{EN.Resume}</span>}</span>
           </div>
           {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
         </Modal>
@@ -327,8 +328,8 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
       {cddo.option === 'api' && (
         <div className={styles.selected}>
           <span className={styles.text}>
-            <img alt="api" src={apiIcon} className={styles.selectionIcon} />Predict
-            with API
+            <img alt="api" src={apiIcon} className={styles.selectionIcon} />
+            {EN.PredictWithAPI}
           </span>
           <span className={styles.or}>
             <span className={styles.orText}>or</span>
@@ -342,10 +343,10 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
               alt="data source"
               src={sourceIcon}
               className={styles.selectionIcon}
-            />Predict with Data Source
+            />{EN.PredictWithDataSource}
           </span>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -359,7 +360,7 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
               alt="data source"
               src={sourceIcon}
               className={styles.selectionIcon}
-            />Predict with Data Source
+            />{EN.PredictWithDataSource}
           </span>
         </div>
       )}
@@ -369,8 +370,8 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
           onClick={selectionOption('option', 'api')}
         >
           <span className={styles.text}>
-            <img alt="api" src={apiIcon} className={styles.selectionIcon} />Predict
-            with API
+            <img alt="api" src={apiIcon} className={styles.selectionIcon} />
+            {EN.PredictWithAPI}
           </span>
         </div>
       )}
@@ -381,7 +382,7 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
 const DataSource = observer(({ cddo, show, uploader }) => (
   <div className={styles.dataSource}>
     <span className={styles.label}>
-      <span className={styles.text}>Data Source:</span>
+      <span className={styles.text}>{EN.DataSourceText}:</span>
     </span>
     <div className={styles.selections}>
       {cddo.source === 'database' && (
@@ -409,14 +410,14 @@ const DataSource = observer(({ cddo, show, uploader }) => (
             className={styles.resultText}
             {...uploader}
           >
-            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
-            File
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />
+            {EN.LocalFile}
             <span className={styles.path} title={cddo.file}>
               {cddo.file}
             </span>
           </Uploader>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -456,8 +457,8 @@ const DataSource = observer(({ cddo, show, uploader }) => (
             className={styles.text}
             {...uploader}
           >
-            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
-            File
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />
+            {EN.LocalFile}
           </Uploader>
         </div>
       )}
@@ -482,18 +483,15 @@ const DataSource = observer(({ cddo, show, uploader }) => (
 const ResultLocation = observer(({ cddo, selectionOption, show }) => (
   <div className={styles.resultLocation}>
     <span className={styles.label}>
-      <span className={styles.text}>Result Location:</span>
+      <span className={styles.text}>{EN.ResultLocation}</span>
     </span>
     <div className={styles.selections}>
       {cddo.location === 'app' && (
         <div className={styles.selected}>
           <span className={styles.text}>
-            <img alt="app" src={appIcon} className={styles.selectionIcon} />In
-            App
+            <img alt="app" src={appIcon} className={styles.selectionIcon} />{EN.InApp}
           </span>
-          <span className={styles.or}>
-            {/* <span className={styles.orText}>or</span> */}
-          </span>
+          <span className={styles.or}/>
         </div>
       )}
       {/* {cddo.location === 'database' && (
@@ -532,8 +530,7 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
           onClick={selectionOption('location', 'app')}
         >
           <span className={styles.text}>
-            <img alt="app" src={appIcon} className={styles.selectionIcon} />In
-            App
+            <img alt="app" src={appIcon} className={styles.selectionIcon} />{EN.InApp}
           </span>
         </div>
       )}
@@ -545,7 +542,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
   <React.Fragment>
     <div className={styles.deployFrequency}>
       <span className={styles.label}>
-        <span className={styles.text}>Deploy Frequency:</span>
+        <span className={styles.text}>{EN.DeployFrequency}</span>
       </span>
       <div className={styles.selections}>
         {cddo.frequency === 'once' && (
@@ -553,10 +550,10 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
             <span className={styles.result}>
               <img alt="once" src={onceIcon} className={styles.selectionIcon} />
               <span className={styles.resultText}>
-                One Time<span className={styles.detail}>
-                  <span className={styles.bold}>time:</span>
+                {EN.OneTime}<span className={styles.detail}>
+                  <span className={styles.bold}>{EN.Times}</span>
                   {cddo.frequencyOptions.time === 'completed'
-                    ? ' After completed'
+                    ? EN.Aftercompleted
                     : moment
                       .unix(cddo.frequencyOptions.time)
                       .format('MM/DD/YYYY h:mma')}
@@ -564,7 +561,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
               </span>
             </span>
             <span className={styles.or}>
-              <span className={styles.orText}>or</span>
+              <span className={styles.orText}>{EN.Or}</span>
             </span>
           </div>
         )}
@@ -573,7 +570,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
             <span className={styles.result}>
               <Icon type="sync" className={styles.antdIcon} />
               <span className={styles.resultText}>
-                Redeploy every{' '}
+                {EN.Redeployevery}{' '}
                 {`${cddo.frequencyOptions.repeatFrequency} ${
                   cddo.frequencyOptions.repeatPeriod
                   } ${
@@ -583,12 +580,12 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                     cddo.frequencyOptions.repeatOn
                   )}`}
                 <small className={styles.detail}>
-                  <span className={styles.bold}>Starts:</span>
+                  <span className={styles.bold}>{EN.Starts}:</span>
                   {moment
                     .unix(cddo.frequencyOptions.starts)
                     .format('MM/DD/YYYY h:mma')}
                   <br />
-                  <span className={styles.bold}>Ends:</span>
+                  <span className={styles.bold}>{EN.Ends}:</span>
                   {cddo.frequencyOptions.ends === 'never'
                     ? 'never'
                     : cddo.frequencyOptions.ends > 10000
@@ -600,22 +597,21 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
               </span>
             </span>
             <span className={styles.or}>
-              <span className={styles.orText}>or</span>
+              <span className={styles.orText}>{EN.Or}</span>
             </span>
           </div>
         )}
         {cddo.frequency !== 'once' && (
           <div className={styles.selection} onClick={show('onetime')}>
             <span className={styles.text}>
-              <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
-              Time
+              <img alt="once" src={onceIcon} className={styles.selectionIcon} />{EN.OneTime}
             </span>
           </div>
         )}
         {cddo.frequency !== 'repeat' && (
           <div className={styles.selection} onClick={show('autorepeat')}>
             <span className={styles.text}>
-              <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+              <Icon type="sync" className={styles.antdIcon} />{EN.AutoRepeat}
             </span>
           </div>
         )}
@@ -629,7 +625,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
           onChange={e => selectionOption('autoDisable', e.target.checked)()}
         >
           <span className={styles.checkboxText}>
-            Auto disable if any issue occurs
+            {EN.Autodisableifanyissueoccurs}
           </span>
         </Checkbox>
       </div>

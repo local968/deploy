@@ -3,6 +3,7 @@ import socketStore from "./SocketStore";
 import config from 'config'
 import { debounce } from 'lodash'
 import { formatNumber } from 'util'
+import EN from '../../src/constant/en'
 
 export default class Model {
   @observable score;
@@ -21,6 +22,9 @@ export default class Model {
   @observable fitIndexModified;
   @observable filtedModels;
   @observable importanceLoading = false
+  @observable labelWithImportance = {}
+  @observable multiVarPlotData = ''
+  @observable parallelPlotData = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {
@@ -206,7 +210,7 @@ export default class Model {
       this.extractParameters(rawPara, para, 'regressor:' + algorithm, algorithm);
     }
     const chain = {
-      'Raw Data': ['Raw Data'],
+      'Raw Data': [EN.RawData],
       'Data Preprocessing': [
         'one hot encoding',
         'Imputation',
@@ -217,7 +221,7 @@ export default class Model {
         preprocessor
       ],
       'Model Training': [algorithm],
-      Prediction: ['Prediction']
+      Prediction: [EN.Prediction]
     };
     return { flow: chain, flowPara: para };
   }

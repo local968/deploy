@@ -115,7 +115,7 @@ export default class AdvancedView extends Component {
             </Select>
           </div>
         </div>
-        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} />
+        <AdvancedModelTable models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} />
       </div>
     )
   }
@@ -134,7 +134,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: {  selectModel }, sort, handleSort, metric } = this.props;
+    const { models, project: {  selectModel }, sort, handleSort } = this.props;
     const texts = ['Model Name', 'Time', 'CVNN','RSquared','RMSSTD','CH','silhouette_cosine','silhouette_euclidean'];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
@@ -154,7 +154,7 @@ class AdvancedModelTable extends Component {
     }, {});
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
     const dataSource = models.map(m => {
-      return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+      return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} />
     });
     return (
       <React.Fragment>
@@ -177,7 +177,7 @@ class AdvancedModelTable extends Component {
   }
   render() {
     const { model, texts, checked } = this.props;
-    const { score, name } = model;
+    const { score, modelName } = model;
     const { detail } = this.state;
     return (
       <div >
@@ -189,8 +189,8 @@ class AdvancedModelTable extends Component {
                 return (
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
-                    <Tooltip title={name}>
-                      <span className={styles.modelName} alt={name}>{name}</span>
+                    <Tooltip title={modelName}>
+                      <span className={styles.modelName} alt={modelName}>{modelName}</span>
                     </Tooltip>
                   </div>}
                   />
@@ -236,7 +236,7 @@ class RegressionDetailCurves extends Component {
     const { model } = this.props;
     const { curve } = this.state;
     let curComponent = (
-      <div className={styles.plot} >
+      <div className={styles.plot} >3
         <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
       </div>
     );

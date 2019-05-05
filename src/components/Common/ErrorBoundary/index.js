@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css'
+import EN from '../../../constant/en';
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -25,7 +26,7 @@ export default class ErrorBoundary extends Component {
       // Error path
       return (
         <div className={styles.errorBoundary}>
-          <h2>Something went wrong. Please <a onClick={this.refresh}>refresh</a> or <a onClick={this.goback}>go back</a></h2>
+          <h2>{EN.SomethingwentwrongPlease}<a onClick={this.refresh}>{EN.Refresh}</a> or <a onClick={this.goback}>{EN.Goback}</a></h2>
           <details style={{ whiteSpace: 'pre-wrap' }}>
             {this.state.error && this.state.error.toString()}
             <br />

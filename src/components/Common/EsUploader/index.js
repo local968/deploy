@@ -54,7 +54,7 @@ export default function EsUploader(file, option = {}) {
           isPause = true
 
           axios.request({
-            url: `http://localhost:3000/etls/${dataIndex}/upload`,
+            url: `/etls/${dataIndex}/upload`,
             headers: {
               'Content-Type': "text/plain",
             },

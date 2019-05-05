@@ -51,7 +51,10 @@ const AMQPLIB_HEARTBEAT = process.env.AMQPLIB_HEARTBEAT || "0";
 const AMQPLIB_VHOST = process.env.AMQPLIB_VHOST || "/";
 
 const QUEUE_RESULT = process.env.QUEUE_RESULT || "";
-
+const IS_EN = process.env.IS_EN || false;
+const YOUR_AGE = process.env.YOUR_AGE || '部署行数已达到出当前权限最大限制。';
+const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前权限最大限制。';
+const YOUR_USAGE = process.env.YOUR_USAGE  || '您的并发项目数量已达到当前许可证的最大限制。。';
 const redis =
   REDIS_TYPE === "2"
     ? {
@@ -91,6 +94,9 @@ const config = {
     }
   },
   supportMail: "support@r2.ai",
+  yourAge:YOUR_AGE,
+  yourModel:YOUR_MODEL,
+  yourUsage:YOUR_USAGE,
   services: {
     APP_LOGIN_BFF,
     AUTH_SERVICE,

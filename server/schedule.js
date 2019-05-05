@@ -36,7 +36,7 @@ async function scheduleHandler() {
     if (restrictQuery === false) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
-      schedule.result = { ['process error']: 'Your usage of number of deploy lines has reached the max restricted by your current license.' };
+      schedule.result = { ['process error']: config.yourAge };
       await api.upsertSchedule(schedule);
     } else {
       // send command to python
