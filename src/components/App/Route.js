@@ -13,13 +13,13 @@ class defaultRouter extends Component {
   render() {
     return (
       <Switch>
-        <Route exact path="/" component={() => <Home />} />
-        <Route exact path="/deploy" component={() => <Deploy />} />
-        <Route exact path="/test" component={() => 'test/test'} />
-        <Route path="/project/:pid" component={() => <Main />} />
-        <Route path="/deploy/project/:id" component={() => <Detail />} />
-        <Route exact path="/changepassword" component={() => <ChangePassword />} />
-        <Route exact path="/support" component={() => <Support />} />
+        <Route exact path="/" component={(props) => <Home {...props} />} />
+        <Route exact path="/deploy" component={(props) => <Deploy {...props} />} />
+        <Route exact path="/test" component={(props) => 'test/test'} />
+        <Route path="/project/:pid" component={(props) => <Main {...props} />} />
+        <Route path="/deploy/project/:id" component={(props) => <Detail {...props} />} />
+        <Route exact path="/changepassword" component={(props) => <ChangePassword {...props} />} />
+        <Route exact path="/support" component={(props) => <Support {...props} />} />
         <Redirect to="/" />
       </Switch>
     )

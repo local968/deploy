@@ -17,12 +17,12 @@ export default class LoginRouter extends Component {
         <Background />
         <div className={styles.content}>
           <Switch>
-            <Route exact path="/" component={SignIn} />
-            <Route exact path="/signup" component={SignUp} />
-            <Route exact path="/active" component={SignActive} />
-            <Route exact path="/resetpassword" component={ResetPassword} />
-            <Route exact path="/forgetpassword" component={ForgetPassword} />
-            <Route exact path="/support" component={Support} />
+            <Route exact path="/" component={(props) => <SignIn {...props} />} />
+            <Route exact path="/signup" component={(props) => <SignUp {...props} />} />
+            <Route exact path="/active" component={(props) => <SignActive {...props} />} />
+            <Route exact path="/resetpassword" component={(props) => <ResetPassword {...props} />} />
+            <Route exact path="/forgetpassword" component={(props) => <ForgetPassword {...props} />} />
+            <Route exact path="/support" component={(props) => <Support {...props} />} />
             <Redirect to="/" />
           </Switch>
         </div>
