@@ -17,7 +17,6 @@ wss.register("originalStats", async (message, socket, progress) => {
     const colMap = {}
     const colValueCounts = {}
     const rawDataView = {}
-    const outlierRange = {}
     const nullLineCounts = {}
     const mismatchLineCounts = {}
     const outlierLineCounts = {}
@@ -34,10 +33,10 @@ wss.register("originalStats", async (message, socket, progress) => {
         return prev
       }, {})
       rawDataView[key] = { ...stats, std: stats.std_deviation }
-      outlierRange[key] = [stats.high, stats.low]
-      nullLineCounts[key] = stats.numerical.missingValue
-      mismatchLineCounts[key] = stats.numerical.missingValue
-      outlierLineCounts[key] = stats.numerical.missingValue
+      const issue = stats.numerical || {}
+      nullLineCounts[key] = issue.missingValue || 0
+      mismatchLineCounts[key] = issue.mismatch || 0
+      outlierLineCounts[key] = issue.outlierCount || 0
     })
     const result = {
       colType,
@@ -50,7 +49,6 @@ wss.register("originalStats", async (message, socket, progress) => {
       mismatchIndex: {},
       outlierFillMethod: {},
       outlierIndex: {},
-      outlierRange,
       totalFixedLines: 0,
       nullLineCounts,
       mismatchLineCounts,
@@ -58,6 +56,9 @@ wss.register("originalStats", async (message, socket, progress) => {
       will_be_drop_500_lines,
       stats: data,
       originalIndex: index,
+      nullLineCountsOrigin: nullLineCounts,
+      mismatchLineCountsOrigin: mismatchLineCounts,
+      outlierLineCountsOrigin: outlierLineCounts,
 
       mainStep: 2,
       curStep: 2,
@@ -66,10 +67,11 @@ wss.register("originalStats", async (message, socket, progress) => {
       etling: false,
       etlProgress: 0
     }
+    console.log(mismatchLineCounts, nullLineCounts, outlierLineCounts)
     await createOrUpdate(projectId, userId, result)
     return { status: 200, message: 'ok', result }
   } catch (e) {
-    console.log({...e})
+    console.log({ ...e })
     let error = e
     if (e.response && e.response.data) error = e.response.data
     return { status: 500, message: 'get index stats failed', error }
@@ -89,13 +91,13 @@ wss.register('newEtl', async (message, socket, process) => {
   const project = result
   const stats = project.stats
 
-  if(project.problemType && project.problemType !=='Clustering' && project.problemType !== 'Outlier' ){
+  if (project.problemType && project.problemType !== 'Clustering' && project.problemType !== 'Outlier') {
     stats[project.target].isTarget = true
     let deletedValues = []
     if (project.targetArray && project.targetArray.length > 1) {
       deletedValues = Object.keys(project.colValueCounts[project.target]).filter(k => !project.targetArray.includes(k))
     } else {
-      deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).map(([k]) => k)
+      deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).slice(2).map(([k]) => k)
     }
 
     stats[project.target].mapFillMethod = {

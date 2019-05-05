@@ -113,11 +113,11 @@ export class ClassificationTarget extends Component {
                 <button onClick={editTarget}><span>{EN.RemapTarget}</span></button>
               </div>}
             </div> : <div className={styles.cleanTargetRename}>
-              <div className={styles.cleanTargetButton}>
-                <button onClick={this.handleSave} className={styles.save}><span>{EN.Save}</span></button>
-                <button onClick={this.hideRename}><span>{EN.Cancel}</span></button>
-              </div>
-            </div>}
+                <div className={styles.cleanTargetButton}>
+                  <button onClick={this.handleSave} className={styles.save}><span>{EN.Save}</span></button>
+                  <button onClick={this.hideRename}><span>{EN.Cancel}</span></button>
+                </div>
+              </div>}
           </div>}
         </div>
         {!isGood && <div className={styles.methods}>
@@ -256,7 +256,7 @@ export class DataIssue extends Component {
             </div>}
           </div>
           {(totalRawLines > 1000 && totalLines < 1000) && <div className={styles.progressBox}>
-            <div className={styles.progressText}><span>{EN.CleanDataS }({totalLines} {EN.Rows})</span><span>{EN.Rowsminimum}</span></div>
+            <div className={styles.progressText}><span>{EN.CleanDataS}({totalLines} {EN.Rows})</span><span>{EN.Rowsminimum}</span></div>
             <div className={styles.progress} style={{ width: totalLines / 10 + "%" }}></div>
           </div>}
         </div>
@@ -575,7 +575,7 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -636,15 +636,15 @@ export class FixIssue extends Component {
                         <option value="drop" key="drop">{EN.Deletetherows}</option>,
                         <option value="ignore" key="ignore">{EN.Replacewithauniquevalue}</option>
                       ] : [
-                        <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
-                        <option value="drop" key='drop'>{EN.Deletetherows}</option>,
-                        <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
-                        <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
-                        // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                        <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
-                        <option value={0} key={0}>{EN.ReplaceWith0}</option>,
-                        <option value={''} key='others'>{EN.Replacewithothers}</option>
-                      ]}
+                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
+                          // <option value={mode} key='mode'>Replace with most frequent value</option>,
+                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                          <option value={''} key='others'>{EN.Replacewithothers}</option>
+                        ]}
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
                   </div>
@@ -717,15 +717,15 @@ export class FixIssue extends Component {
                         <option value="drop" key="drop">{EN.Deletetherows}</option>,
                         <option value='ignore' key='ignore'>{EN.Replacewithauniquevalue}</option>
                       ] : [
-                        <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
-                        <option value="drop" key='drop'>{EN.Deletetherows}</option>,
-                        <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
-                        <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
-                        // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                        <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
-                        <option value={0} key={0}>{EN.ReplaceWith0}</option>,
-                        <option value={''} key='others'>{EN.Replacewithothers}</option>
-                      ]}
+                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
+                          // <option value={mode} key='mode'>Replace with most frequent value</option>,
+                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                          <option value={''} key='others'>{EN.Replacewithothers}</option>
+                        ]}
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'missing', k)} />}
                   </div>
@@ -763,7 +763,7 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const isShow = showType === 'Numerical';
                 if (!isShow) return null
-                const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : outlierRange[k];
+                const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : [rawDataView[k].low, rawDataView[k].high];
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
@@ -825,7 +825,7 @@ export class FixIssue extends Component {
         maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}
         visible={this.visible}
         width='12em'
-           title={EN.Outlier}
+        title={EN.Outlier}
         onClose={this.closeEdit}
         closeByMask={true}
         showClose={true}

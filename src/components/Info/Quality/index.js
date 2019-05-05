@@ -108,14 +108,15 @@ class VariableIssue extends Component {
         cn: styles.cell
       })
       const issues = []
+      const isNum = colType[header] === 'Numerical'
 
-      if (mismatchLineCounts[header]) {
+      if (isNum && mismatchLineCounts[header]) {
         issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{mismatchLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.mismatchRow[header] / totalRawLines, 2)}%</span></div>)
       }
       if (nullLineCounts[header]) {
         issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{nullLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.nullRow[header] / totalRawLines, 2)}%</span></div>)
       }
-      if (outlierLineCounts[header]) {
+      if (isNum && outlierLineCounts[header]) {
         issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{outlierLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.outlierRow[header] / totalRawLines, 2)}%</span></div>)
       }
       const issueData = {
@@ -133,13 +134,20 @@ class VariableIssue extends Component {
         title: v,
         cn: styles.cell
       }
-      if (nullIndex[header] && nullIndex[header].includes(rowIndex)) {
+
+      const isNum = colType[header] === 'Numerical'
+      const { low = NaN, high = NaN } = rawDataView[target]
+      const isMissing = !v
+      const isMismatch = isNum ? isNaN(parseFloat(v)) : false
+      const isOutlier = isNum ? (v < low || v > high) : false
+
+      if (isMissing) {
         itemData.cn = classnames(itemData.cn, styles.missing);
       }
-      if (colType[header] === 'Numerical' && mismatchIndex[header] && mismatchIndex[header].includes(rowIndex)) {
+      if (isMismatch) {
         itemData.cn = classnames(itemData.cn, styles.mismatch);
       }
-      if (colType[header] === 'Numerical' && outlierIndex[header] && outlierIndex[header].includes(rowIndex)) {
+      if (isOutlier) {
         itemData.cn = classnames(itemData.cn, styles.outlier);
       }
       return itemData
@@ -196,7 +204,7 @@ class VariableIssue extends Component {
       <div className={styles.variableIssue}>
         <div className={styles.contentBox}>
           <Table
-            columnWidth={110}
+            columnWidth={160}
             rowHeight={34}
             columnCount={dataHeader.length}
             rowCount={tableData.length}
@@ -295,16 +303,17 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { dataHeader, totalRawLines, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, dataIssue } = project
+    const { dataHeader, totalRawLines, colType, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, dataIssue } = project
     const deletePercent = deletedCount / totalRawLines * 100
     const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
     const cleanPercent = totalLines / totalRawLines * 100
     const variableList = dataHeader
     const percentList = dataHeader.map(v => {
+      const isNum = colType[v] === 'Numerical'
       const percent = {
         missing: (nullLineCounts[v] || 0) / (totalRawLines || 1) * 100,
-        mismatch: (mismatchLineCounts[v] || 0) / (totalRawLines || 1) * 100,
-        outlier: (outlierLineCounts[v] || 0) / (totalRawLines || 1) * 100
+        mismatch: (isNum ? (mismatchLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100,
+        outlier: (isNum ? (outlierLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100
       }
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
