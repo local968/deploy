@@ -7,16 +7,16 @@ import ContinueButton from 'components/Common/ContinueButton';
 import Confirm from 'components/Common/Confirm';
 import { action } from 'mobx';
 import { RadioChangeEvent } from 'antd/lib/radio';
-
+import EN from '../../constant/en';
 const RadioGroup = Radio.Group;
 const selectable = [
-  { value: 'Classification', type: 'True or False (Binary Classification)', detail: (<p>To predict if an event is likely to happen or not (e.g. if a customer will make a purchase or not).</p>) },
-  { value: 'Regression', type: 'Continuous Values (Regression)', detail: (<p>To predict a continuous/numeric value (e.g. cost of a purchase)</p>) },
+  { value: 'Classification', type: EN.TrueorFalseBinaryClassification, detail: (<p>{EN.Topredictifaneventislikely}</p>) },
+  { value: 'Regression', type: EN.ContinuousValuesRegression, detail: (<p>{EN.Topredictacontinuous}</p>) },
 ];
 
 const Unsupervised = [
-  { value: 'Clustering', type: 'Clustering', detail: null },
-  { value: 'Outlier', type: 'Outlier Detection', detail: null }
+  { value: 'Clustering', type:  EN.Clustering, detail: null },
+  { value: 'Outlier', type:  EN.OutlierDetection, detail: null }
 ];
 
 interface ProblemProps {
@@ -73,9 +73,9 @@ function Problem(props: ProblemProps) {
   }
 
   return <div className={styles.problem}>
-    <div className={styles.title}><span>Choose Problem Type</span></div>
+    <div className={styles.title}><span>{EN.ChooseProblemType}</span></div>
     <div className={styles.radioBox}>
-      <div className={styles.text}><span>Prediction</span></div>
+      <div className={styles.text}><span>{EN.Prediction}</span></div>
       <RadioGroup className={styles.radio} value={changeProjectType} onChange={onChange("changeProjectType")}>
         {selectable.map((content, index) => (
           <Radio key={index} value={content.value}>
@@ -86,7 +86,7 @@ function Problem(props: ProblemProps) {
       </RadioGroup>
     </div>
     <div className={styles.radioBox}>
-      <div className={styles.text}><span>Unsupervised Learning</span></div>
+      <div className={styles.text}><span>{EN.UnsupervisedLearning}</span></div>
       <RadioGroup className={styles.radio} value={changeProjectType} onChange={onChange("changeProjectType")}>
         {Unsupervised.map((content, index) => (
           <Radio key={index} value={content.value}>
@@ -96,8 +96,8 @@ function Problem(props: ProblemProps) {
         ))}
       </RadioGroup>
     </div>
-    <ContinueButton onClick={nextStep} disabled={!changeProjectType} text="Continue" width={null} />
-    {<Confirm width={'6em'} visible={state.visiable} title='Warning' content={`This action may wipe out all of your previous work (e.g. dataset${!!models.length ? ', models' : ''}). Please proceed with caution.`} onClose={onClose} onConfirm={onConfirm} confirmText='Continue' closeText='Cancel' />}
+    <ContinueButton onClick={nextStep} disabled={!changeProjectType} text={EN.Continue} width={null} />
+    {<Confirm width={'6em'} visible={state.visiable} title={EN.Warning} content={EN.Thisactionmaywipeoutallofyourprevious} onClose={onClose} onConfirm={onConfirm} confirmText={EN.Continue} closeText={EN.CANCEL} />}
   </div>
 }
 

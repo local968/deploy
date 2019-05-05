@@ -8,7 +8,7 @@ import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, 
 import { message } from 'antd'
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
-
+import EN from '../../../constant/en';
 @inject('projectStore')
 @observer
 export default class DataQuality extends Component {
@@ -52,7 +52,7 @@ class VariableIssue extends Component {
 
   saveDataFixes = () => {
     this.props.project.fixFillMethod()
-    message.info('Thank you for fixing the issues. The changes will be applied in training section.', 5)
+    message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
     this.closeFixes();
   }
 
@@ -103,19 +103,20 @@ class VariableIssue extends Component {
 
       const colValue = colType[header] === 'Numerical' ? 'Numerical' : 'Categorical'
       selectArr.push({
-        content: <span>{colValue}</span>,
-        title: colValue,
+        content: <span>{colValue === 'Numerical' ? EN.Numerical : EN.Categorical}</span>,
+        title: colValue === 'Numerical' ? EN.Numerical : EN.Categorical,
         cn: styles.cell
       })
       const issues = []
+      const isNum = colType[header] === 'Numerical'
 
-      if (mismatchLineCounts[header]) {
+      if (isNum && mismatchLineCounts[header]) {
         issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{mismatchLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.mismatchRow[header] / totalRawLines, 2)}%</span></div>)
       }
       if (nullLineCounts[header]) {
         issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{nullLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.nullRow[header] / totalRawLines, 2)}%</span></div>)
       }
-      if (outlierLineCounts[header]) {
+      if (isNum && outlierLineCounts[header]) {
         issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{outlierLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.outlierRow[header] / totalRawLines, 2)}%</span></div>)
       }
       const issueData = {
@@ -133,13 +134,20 @@ class VariableIssue extends Component {
         title: v,
         cn: styles.cell
       }
-      if (nullIndex[header] && nullIndex[header].includes(rowIndex)) {
+
+      const isNum = colType[header] === 'Numerical'
+      const { low = NaN, high = NaN } = rawDataView[target]
+      const isMissing = !v
+      const isMismatch = isNum ? isNaN(parseFloat(v)) : false
+      const isOutlier = isNum ? (v < low || v > high) : false
+
+      if (isMissing) {
         itemData.cn = classnames(itemData.cn, styles.missing);
       }
-      if (colType[header] === 'Numerical' && mismatchIndex[header] && mismatchIndex[header].includes(rowIndex)) {
+      if (isMismatch) {
         itemData.cn = classnames(itemData.cn, styles.mismatch);
       }
-      if (colType[header] === 'Numerical' && outlierIndex[header] && outlierIndex[header].includes(rowIndex)) {
+      if (isOutlier) {
         itemData.cn = classnames(itemData.cn, styles.outlier);
       }
       return itemData
@@ -160,21 +168,21 @@ class VariableIssue extends Component {
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(rowIssue || dataIssue) ?
-          <div className={styles.issueTitle}><span>Issue{+rowIssue + +dataIssue > 1 && 's'} Found!</span></div> :
-          <div className={styles.cleanTitle}><span>Variable Quality looks good!</span></div>}
+          <div className={styles.issueTitle}><span>{EN.IssueS}{+rowIssue + +dataIssue > 1 && EN.SS} {EN.Found}!</span></div> :
+          <div className={styles.cleanTitle}><span>{EN.VariableQualitylooksgood}</span></div>}
         <div className={styles.issueBox}>
           {rowIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span className={styles.limitText}>For your whole dataset, the number of valid data points will be smaller than the recommended minimum 1000</span>
+            <span className={styles.limitText}>{EN.Foryourwholedataset}</span>
             <div className={styles.button} onClick={this.backToConnect}>
-              <button><span>Load a New Dataset</span></button>
+              <button><span>{EN.LoadaNewDataset}</span></button>
             </div>
           </div>}
           {dataIssue && <div className={styles.issueText}>
             <div className={styles.point}></div>
-            <span className={styles.limitText}>Some issues are found. R2 learn has generated an automatic fixing solution. You can also create your own fixing solution by clicking “Edit The Fixes” button.</span>
+            <span className={styles.limitText}>{EN.SomeissuesarefoundR2learnhasgenerated}</span>
             <div className={styles.button} onClick={this.editFixes}>
-              <button><span>Edit The Fixes</span></button>
+              <button><span>{EN.EditTheFixes}</span></button>
             </div>
           </div>}
         </div>
@@ -182,21 +190,21 @@ class VariableIssue extends Component {
       <div className={styles.typeBox}>
         {!!mismatchCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
-          <span>Data Type Mismatch</span>
+          <span>{EN.DataTypeMismatch}</span>
         </div>}
         {!!nullCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.missing)}></div>
-          <span>Missing Value</span>
+          <span>{EN.MissingValue}</span>
         </div>}
         {!!outlierCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
-          <span>Outlier</span>
+          <span>{EN.Outlier}</span>
         </div>}
       </div>
       <div className={styles.variableIssue}>
         <div className={styles.contentBox}>
           <Table
-            columnWidth={110}
+            columnWidth={160}
             rowHeight={34}
             columnCount={dataHeader.length}
             rowCount={tableData.length}
@@ -209,7 +217,7 @@ class VariableIssue extends Component {
           />
         </div>
         <div className={styles.variableBottom}>
-          <ContinueButton onClick={this.showSummary} text='Continue' width="15%" />
+          <ContinueButton onClick={this.showSummary} text={EN.Continue} width="15%" />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
@@ -222,7 +230,7 @@ class VariableIssue extends Component {
         isTarget={false} />}
         visible={this.visible}
         width='12em'
-        title='How R2 Learn Will Fix the Issues'
+        title={EN.HowR2LearnWillFixtheIssues}
         onClose={this.closeFixes}
         closeByMask={true}
         showClose={true}
@@ -233,12 +241,12 @@ class VariableIssue extends Component {
         closeSummary={this.closeSummary} />}
         visible={this.summary}
         width='12em'
-        title='How R2 Learn Will Fix the Issues'
+        title={EN.HowR2LearnWillFixtheIssues}
         onClose={this.closeSummary}
         closeByMask={true}
         showClose={true}
       />
-      {<Confirm width={'6em'} visible={this.warning} title='Warning' content='This action may wipe out all of your previous work (e.g. models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
+      {<Confirm width={'6em'} visible={this.warning} title={EN.Warning} content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm} confirmText={EN.Continue} closeText={EN.CANCEL} />}
     </div>
   }
 }
@@ -295,51 +303,64 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { dataHeader, totalRawLines, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, dataIssue } = project
+    const { dataHeader, totalRawLines, colType, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, dataIssue } = project
     const deletePercent = deletedCount / totalRawLines * 100
     const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
     const cleanPercent = totalLines / totalRawLines * 100
     const variableList = dataHeader
     const percentList = dataHeader.map(v => {
+      const isNum = colType[v] === 'Numerical'
       const percent = {
         missing: (nullLineCounts[v] || 0) / (totalRawLines || 1) * 100,
-        mismatch: (mismatchLineCounts[v] || 0) / (totalRawLines || 1) * 100,
-        outlier: (outlierLineCounts[v] || 0) / (totalRawLines || 1) * 100
+        mismatch: (isNum ? (mismatchLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100,
+        outlier: (isNum ? (outlierLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100
       }
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
-        <div className={styles.summaryTitle}><span>Summary of your data</span></div>
+        <div className={styles.summaryTitle}><span>{EN.Summaryofyourdata}</span></div>
         <div className={styles.summaryTypeBox}>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
-            <span>Clean Data</span>
+            <span>{EN.CleanData}</span>
           </div>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }}></div>
-            <span>Data Type Mismatch</span>
+            <span>{EN.DataTypeMismatch}</span>
           </div>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }}></div>
-            <span>Missing Value</span>
+            <span>{EN.MissingValue}</span>
           </div>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }}></div>
-            <span>Outlier</span>
+            <span>{EN.Outlier}</span>
+          </div>}
+        </div>
+        <div className={styles.summaryTable}>
+          <div className={styles.summaryTableLeft}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
+            </div>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span>{target}</span></div>
+              <div className={styles.summaryCell}><span>{formatNumber(percentList[0].clean, 2)}%</span></div>
+            </div>
           </div>
         </div>
         <div className={styles.summaryTable} style={{ paddingRight: '.2em' }}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Predictor Variables</span></div>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Clean Data</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
           </div>
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
             </div>
           </div>
         </div>
@@ -369,7 +390,7 @@ class Summary extends Component {
         </div>
       </div>
       <div className={styles.summaryRight}>
-        <div className={styles.summaryTitle}><span>R2 Learn will fix the issues</span></div>
+        <div className={styles.summaryTitle}><span>{EN.HowR2LearnWillFixtheIssues}</span></div>
         <div className={styles.summaryPie}>
           <div className={styles.summaryChart}>
           </div>
@@ -377,7 +398,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#9cebff' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Rows Will Be Fixed</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeFixed}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -387,7 +408,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#c4cbd7' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Rows Will Be Deleted</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeDeleted}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -397,7 +418,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Clean Data</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -409,11 +430,11 @@ class Summary extends Component {
         <div className={styles.summaryBottom}>
           <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
             [styles.disabled]: totalLines === 0
-          })} onClick={totalLines === 0 ? null : this.startTrain}><span>Continue</span></div>
+          })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
           <div className={classnames(styles.summaryButton, {
             [styles.disabled]: !dataIssue
-          })} onClick={dataIssue ? editFixes : null}><span>Edit the Fixes</span></div>
-          <div className={styles.summaryButton} onClick={this.backToConnect}><span>Load a Better Dataset</span></div>
+          })} onClick={dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
+          <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>
         </div>
       </div>
     </div>

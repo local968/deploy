@@ -266,12 +266,12 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
               className={styles.selectionIcon}
             />
             <span className={styles.resultText}>
-              Database
+              {EN.Database}
               <span className={styles.path}>{cdpo.sourceOptions.hostname}</span>
             </span>
           </span>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -300,7 +300,7 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
               alt="database"
               src={databaseIcon}
               className={styles.selectionIcon}
-            />Database
+            />{EN.Database}
           </span>
         </div>
       )}

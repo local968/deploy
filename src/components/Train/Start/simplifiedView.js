@@ -107,6 +107,7 @@ export default class SimplifiedView extends Component {
   }
 
   handleType = (e) => {
+    const { project } = this.props
     const value = e.target.value;
     project.setProperty({
       standardType: value
@@ -124,34 +125,34 @@ export default class SimplifiedView extends Component {
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.chooseScan}>
-        <div className={styles.chooseLabel}><span>Choose a Variable Scaling Method:</span></div>
+        <div className={styles.chooseLabel}><span>{EN.ChooseaVariableScalingMethod}:</span></div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='minMax' id='minMax' checked={standardType} onChange={this.handleType} />
-          <label htmlFor='minMax'>min_max_scale</label>
+          <input type='radio' name='scan' value='minMax' id='minMax' checked={standardType === 'minMax'} onChange={this.handleType} />
+          <label htmlFor='minMax'>{EN.minmaxscale}</label>
         </div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='standard' id='standard' checked={standardType} onChange={this.handleType} />
-          <label htmlFor='standard'>standard_scale</label>
+          <input type='radio' name='scan' value='standard' id='standard' checked={standardType === 'standard'} onChange={this.handleType} />
+          <label htmlFor='standard'>{EN.standardscale}</label>
         </div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='robust' id='robust' checked={standardType} onChange={this.handleType} />
-          <label htmlFor='robust'>robust_scale</label>
+          <input type='radio' name='scan' value='robust' id='robust' checked={standardType === 'robust'} onChange={this.handleType} />
+          <label htmlFor='robust'>{EN.robustscale}</label>
         </div>
       </div>
-      <div className={styles.simplifiedText}><span>You can use check box to create your own variable list.</span></div>
+      <div className={styles.simplifiedText}><span>{EN.CreateVariableListTip}</span></div>
       <div className={styles.tool}>
         <div className={styles.toolSelect}>
-          <div className={styles.toolLabel}><span>Current Variable List</span></div>
+          <div className={styles.toolLabel}><span>{EN.CurrentVariableList}</span></div>
           <select value={selectValue} onChange={this.handleChange}>
-            <option value='all'>All Variables ({allVariables.length})</option>
-            <option value='informatives'>informatives ({informativesLabel.length})</option>
-            {customHeader.map((v, k) => <option key={k} value={k}>custom_{k + 1} ({v.length})</option>)}
-            {hasNewOne && <option value={customHeader.length}>custom_{customHeader.length + 1} ({checkedVariables.length})</option>}
+            <option value='all'>{EN.AllVariables} ({allVariables.length})</option>
+            <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option>
+            {customHeader.map((v, k) => <option key={k} value={k}>{EN.Custom}{k + 1} ({v.length})</option>)}
+            {hasNewOne && <option value={customHeader.length}>{EN.Custom}{customHeader.length + 1} ({checkedVariables.length})</option>}
           </select>
         </div>
         <div className={styles.newVariable}>
           <div className={styles.toolButton} onClick={this.showNewVariable}>
-            <span>Create a New Variable</span>
+            <span>{EN.CreateANewVariable}</span>
           </div>
           <CreateNewVariable dataHeader={dataHeader} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} expression={expression} />
         </div>
@@ -168,22 +169,22 @@ export default class SimplifiedView extends Component {
               id={id}
               fetch={(!!project.correlationMatrixHeader && !!project.correlationMatrixData) || project.correlationMatrixLoading}
             />} />}
-          <span>Check Correlation Matrix</span>
+          <span>{EN.CheckCorrelationMatrix}</span>
         </div>
       </div>
       <div className={styles.table}>
         <div className={styles.tableHeader}>
           <div className={classnames(styles.tableTh, styles.tableCheck)}></div>
-          <div className={styles.tableTh}><span>Name</span></div>
-          <div className={styles.tableTh}><span>Weight</span></div>
-          <div className={styles.tableTh}><span>Histogram</span></div>
-          <div className={styles.tableTh}><span>Data Type</span></div>
-          <div className={styles.tableTh}><span>Unique Value</span></div>
-          <div className={styles.tableTh}><span>Mean</span></div>
-          <div className={styles.tableTh}><span>STD</span></div>
-          <div className={styles.tableTh}><span>Median</span></div>
-          <div className={styles.tableTh}><span>Min</span></div>
-          <div className={styles.tableTh}><span>Max</span></div>
+          <div className={styles.tableTh}><span>{EN.Name}</span></div>
+          <div className={styles.tableTh}><span>{EN.Weight}</span></div>
+          <div className={styles.tableTh}><span>{EN.Histogram}</span></div>
+          <div className={styles.tableTh}><span>{EN.DataType}</span></div>
+          <div className={styles.tableTh}><span>{EN.UniqueValue}</span></div>
+          <div className={styles.tableTh}><span>{EN.Mean}</span></div>
+          <div className={styles.tableTh}><span>{EN.STD}</span></div>
+          <div className={styles.tableTh}><span>{EN.Median}</span></div>
+          <div className={styles.tableTh}><span>{EN.Min}</span></div>
+          <div className={styles.tableTh}><span>{EN.Max}</span></div>
         </div>
         {(dataViewsLoading) ?
           <div className={styles.tableLoading}>

@@ -14,7 +14,7 @@ import { StoreProvider } from 'easy-peasy'
 import newStores from 'stores/new'
 import Info from 'components/Info';
 import Train from 'components/Train';
-
+import EN from '../../constant/en';
 interface MainProps {
   userStore: any,
   projectStore: any,
@@ -90,11 +90,11 @@ function Main(props: MainProps) {
   return <React.Fragment>
     <div className={styles.header}>
       {project && project.name && <div className={styles.projectName}>
-        <span className={styles.label}>Project: </span>
+        <span className={styles.label}>{EN.Project}: </span>
         <span className={styles.value}> {project.name}</span>
       </div>}
       {!!project && !!project.fileNames.length && <div className={styles.dataset}>
-        <span className={styles.label}>Dataset: </span>
+        <span className={styles.label}>{EN.Dataset}: </span>
         <span className={styles.value}> {project.fileNames.toString()}</span>
       </div>}
     </div>
@@ -110,15 +110,15 @@ function Main(props: MainProps) {
     </Switch>}
     {<Confirm
       width="6em"
-      title={`You have been kicked out`}
+      title={EN.Youhavebeenkickedout}
       visible={conflict}
       onClose={exit}
       onConfirm={notExit}
       closeByMask={false}
       showClose={false}
-      confirmText="Go Back to the Project"
-      closeText="Go to Home Page"
-      content={"You have been kicked out of the project by another user."} />}
+      confirmText={EN.GoBacktotheProject}
+      closeText={EN.GotoHomePage}
+      content={EN.Youhavebeenkickedoutof} />}
   </React.Fragment>
 }
 

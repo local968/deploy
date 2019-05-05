@@ -198,7 +198,7 @@ class AdvancedView extends Component {
       const { project } = this.props;
       const { selectModel: current } = project;
       if (project.problemType === 'Classification') {
-        return current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
+        return current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
       } else {
         return current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
       }
@@ -347,7 +347,7 @@ class RegressionDetailCurves extends Component {
     return (
       <div className={styles.charts}>
         <PredictVActual model={model} project={project} />
-        <div className={styles.reportChart}>6
+        <div className={styles.reportChart}>
           <div className={styles.chartContent}><img className={styles.img} src={model.fitPlotBase64} alt="fit plot" /></div>
         </div>
         <div className={styles.reportChart}>
@@ -537,7 +537,7 @@ class PredictTable extends Component {
             <div className={styles.costText}><span>{current.getBenefit(cTP, cFN, cFP, cTN).text}</span></div>
           </div>}
           <div className={styles.costButton}>
-            <button onClick={this.handleSubmit}><span>Submit</span></button>
+            <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>
           </div>
         </div>
       </div>

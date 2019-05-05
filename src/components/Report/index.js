@@ -11,7 +11,7 @@ import Score, { PredictTable } from './Score'
 import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
 import { formatNumber } from 'util'
-
+import EN from '../../constant/en';
 const addComma = number => {
   if (Number.isNaN(number)) return number
   number = number.toString().split('')
@@ -107,7 +107,7 @@ class Report extends Component {
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     return <div className={styles.report}>
-      <h1 className={styles.totalTitle}>Project Report: {project.name}<small onClick={this.toggleEdit}>{this.isEdit ? 'Save' : 'Edit Module'}</small></h1>
+      <h1 className={styles.totalTitle}>{EN.ProjectReport}: {project.name}<small onClick={this.toggleEdit}>{this.isEdit ? EN.Save : EN.Edit}</small></h1>
       {this.isShow('profile') && <div className={classnames(styles.block, styles.profile)}>
         {this.checkBox('profile')}
         <h3 className={styles.blockTitle}>Profile</h3>
@@ -118,7 +118,7 @@ class Report extends Component {
       </div>}
       {this.isShow('dataSchema') && <div className={styles.block}>
         {this.checkBox('dataSchema')}
-        <h3 className={styles.blockTitle}>Data Schema</h3>
+        <h3 className={styles.blockTitle}>{EN.DataSchemas}</h3>
         <div className={styles.schema}>
           <div className={classnames(styles.schemaRow, styles.schemaHeader)}>
             <span className={styles.schemaCell}>#row</span>

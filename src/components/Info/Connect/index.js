@@ -12,7 +12,7 @@ import { Uploader, ProgressBar, ProcessLoading, Confirm } from 'components/Commo
 import config from 'config';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
-
+import EN from '../../../constant/en';
 import { observable, action, computed } from 'mobx';
 
 // const files = {
@@ -86,13 +86,13 @@ export default class DataConnect extends Component {
 
   @computed
   get message() {
-    if (this.isPause) return 'Paused'
-    const process = this.props.projectStore.project.etling ? 50 : this.process
-    if (!this.isSql && process === 0) return 'Preparing for upload...'
-    if (!this.isSql && process > 0 && process < 50) return 'Uploading data...'
-    if (process >= 50) return 'Extract-Transform-Load in progress...'
-    if (this.isSql && process === 0) return 'Perparing for database connection...'
-    if (this.isSql && process >= 20 && process < 50) return `Downloaded Data: ${this.sqlProgress} rows`
+    if (this.isPause) return EN.Paused;
+    const process = this.props.projectStore.project.etling ? 50 : this.process;
+    if (!this.isSql && process === 0) return EN.Preparingforupload;
+    if (!this.isSql && process > 0 && process < 50) return EN.Uploadingdata;
+    if (process >= 50) return EN.ExtractTransformLoadinprogress;
+    if (this.isSql && process === 0) return EN.Perparingfordatabaseconnection;
+    if (this.isSql && process >= 20 && process < 50) return `${EN.DownloadedData} ${this.sqlProgress}${EN.Rows}`;
   }
 
   onUpload = ({ pause, resume }) => {
@@ -139,18 +139,18 @@ export default class DataConnect extends Component {
     if(this.props.userStore.currentLever === '0') {
       return {
         err: true,
-        msg: 'No authority.'
-      }
-    }else if( (this.props.userStore.currentLever === '1' && file.size > 50 * 1024 * 1024)|| ( this.props.userStore.currentLever === '2' && file.size > 50 * 1024 * 1024) ) {
+        msg: EN.NoAuthority,
+      };
+    } else if ((+this.props.userStore.currentLever === 1 && file.size > 50 * 1024 * 1024) || (this.props.userStore.currentLever == '2' && file.size > 50 * 1024 * 1024)) {
       return {
         err: true,
-        msg: 'File must not exceed 50M.'
-      }
-    } else if(this.props.userStore.currentLever === '3' && file.size > 200 * 1024 * 1024){
+        msg: EN.FileMustNotExceed + ' 50M.',
+      };
+    } else if (+this.props.userStore.currentLever === 3 && file.size > 200 * 1024 * 1024) {
       return {
         err: true,
-        msg: 'File must not exceed 200M.'
-      }
+        msg: EN.FileMustNotExceed + ' 200M.',
+      };
     }
     return {
       err: false,
@@ -191,7 +191,7 @@ export default class DataConnect extends Component {
         });
       }),
       () => {
-        message.error('sample file error, please choose again');
+        message.error(EN.Samplefileerror);
       }
     );
     this.hideSample();
@@ -278,7 +278,7 @@ export default class DataConnect extends Component {
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
-          <span>Please choose a data source to connect.</span>
+          <span>{EN.Pleasechooseadata}</span>
         </div>
         {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
@@ -291,9 +291,9 @@ export default class DataConnect extends Component {
           <a>Edit</a>
         </div> */}
         <div className={styles.uploadRow}>
-          {this.block('From R2 Learn', sampleIcon, 'sample')}
-          {this.block('From Computer', localFileIcon, 'upload')}
-          {this.block('From SQL', sqlIcon, 'sql')}
+          {this.block(EN.FromR2L, sampleIcon, 'sample')}
+          {this.block(EN.FromComp, localFileIcon, 'upload')}
+          {this.block(EN.FromSQL, sqlIcon, 'sql')}
           <Uploader
             onStart={this.onUpload}
             onComplete={this.upload}
@@ -348,7 +348,7 @@ export default class DataConnect extends Component {
             <div className={styles.cover} />
             <div className={styles.progressBlock}>
               <div className={styles.progressTitle}>
-                <span>Data Import</span>
+                <span>{EN.DataImport}</span>
                 {<div className={styles.close} onClick={this.closeUpload}><span>X</span></div>}
               </div>
               <div className={styles.progressContent}>
@@ -362,7 +362,10 @@ export default class DataConnect extends Component {
                 </div>
                 <div className={styles.progressText}>
                   <span>{this.message}</span>
-                  {(process < 50 && process > 0 && !this.isSql) && <div className={styles.progressButton}>{!this.isPause ? <span onClick={this.handleParse}>pause</span> : <span onClick={this.handleResume}>resume</span>}</div>}
+                  {(process < 50 && process > 0 && !this.isSql) &&
+                  <div className={styles.progressButton}>{!this.isPause ?
+                    <span onClick={this.handleParse}>{EN.Paused}</span> :
+                    <span onClick={this.handleResume}>{EN.Resume}</span>}</div>}
                 </div>
               </div>
             </div>
@@ -372,7 +375,7 @@ export default class DataConnect extends Component {
           options={{}}
           visible={this.sql}
           onClose={this.hideSql}
-          title="Data Source - Database"
+          title={EN.DataSourceDatabase}
           projectId={project.id}
           onSubmit={action(async options => {
             this.hideSql();
@@ -404,7 +407,9 @@ export default class DataConnect extends Component {
             })
           })}
         />
-        {<Confirm width={'6em'} visible={this.visiable} title='Warning' content='This action may wipe out all of your previous work (e.g. models). Please proceed with caution.' onClose={this.onClose} onConfirm={this.onConfirm} confirmText='Continue' closeText='Cancel' />}
+        {<Confirm width={'6em'} visible={this.visiable} title={EN.Warning}
+                  content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm}
+                  confirmText={EN.Continue} closeText={EN.CANCEL}/>}
       </div>
     );
   }
@@ -463,33 +468,32 @@ class DataSample extends Component {
         <div className={styles.cover} onClick={onClose} />
         <div className={styles.sampleBlock}>
           <div className={styles.sampleTitle}>
-            <span>Choose Sample Data</span>
+            <span>{EN.ChooseSampleD}</span>
             <div className={styles.close} onClick={onClose}>
               <span>X</span>
             </div>
           </div>
           <div className={styles.sampleTop}>
             <span>
-              Select a sample data if you don’t have a dataset yet and want to
-              try out the application.
-            		</span>
+              {EN.SelectSampleData}
+            </span>
           </div>
           <div className={styles.sampleTable}>
             <div className={styles.sampleHeader}>
               <div className={styles.sampleCell}>
-                <span>Name</span>
+                <span>{EN.Name}</span>
               </div>
               {/* <div className={classnames(styles.sampleCell, styles.sampleDesc)}>
                 <span>Description</span>
               </div> */}
               <div className={styles.sampleCell}>
-                <span>File Name</span>
+                <span>{EN.FileName}</span>
               </div>
               <div className={styles.sampleCell}>
-                <span>Target Variable</span>
+                <span>{EN.TargetVariable}</span>
               </div>
               <div className={styles.sampleCell}>
-                <span>Data Size</span>
+                <span>{EN.DataSize}</span>
               </div>
             </div>
             {(this.files || []).map((row, index) => {
@@ -530,7 +534,7 @@ class DataSample extends Component {
             })}
             <div className={styles.sampleButton}>
               <button onClick={this.submit} className={styles.submit}>
-                <span>Load Sample Data</span>
+                <span>{EN.LoadSampleData}</span>
               </button>
             </div>
           </div>

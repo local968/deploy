@@ -7,6 +7,7 @@ import { observable } from 'mobx'
 import * as d3 from 'd3';
 import { Icon, message } from 'antd'
 import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 
 @observer
 export class FixIssue extends Component {
@@ -108,25 +109,25 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
-              <span>Data Type Mismatch</span>
+              <span>{EN.DataTypeMismatch}</span>
             </div>
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Variable Name</span></div>
-              <div className={styles.fixesTd}><span>Data Type</span></div>
-              <div className={styles.fixesTd}><span>Quantity of Mismatch</span></div>
-              <div className={styles.fixesTd}><span>Mean</span></div>
-              <div className={styles.fixesTd}><span>Median</span></div>
-              <div className={styles.fixesTd}><span>Most Frequent Value</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.VariableName}</span></div>
+              <div className={styles.fixesTd}><span>{EN.DataType}</span></div>
+              <div className={styles.fixesTd}><span>{EN.QuantityofMismatch}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Median}</span></div>
+              <div className={styles.fixesTd}><span>{EN.MostFrequentValue}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(mismatchLineCountsOrigin).map((k, i) => {
@@ -165,18 +166,18 @@ export class FixIssue extends Component {
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.mismatchSelect.bind(null, k)}>
                       {showType === 'Categorical' ? [
-                        <option value={mode} key="mode">Replace with most frequent value</option>,
-                        <option value="drop" key="drop">Delete the rows</option>,
-                        <option value="ignore" key="ignore">Replace with a unique value</option>
+                        <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
+                        <option value="drop" key="drop">{EN.Deletetherows}</option>,
+                        <option value="ignore" key="ignore">{EN.Replacewithauniquevalue}</option>
                       ] : [
-                          <option value={mean} key='mean'>Replace with mean value</option>,
-                          <option value="drop" key='drop'>Delete the rows</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
+                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
                           // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                          <option value={median} key='median'>Replace with median value</option>,
-                          <option value={0} key={0}>Replace with 0</option>,
-                          <option value={''} key='others'>Replace with others</option>
+                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                          <option value={''} key='others'>{EN.Replacewithothers}</option>
                         ]}
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
@@ -190,19 +191,19 @@ export class FixIssue extends Component {
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.missing)}></div>
-              <span>Missing Value</span>
+              <span>{EN.MissingValue}</span>
             </div>
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
-              <div className={styles.fixesTd}><span>Variable Name</span></div>
-              <div className={styles.fixesTd}><span>Missing Reason</span></div>
-              <div className={styles.fixesTd}><span>Data Type</span></div>
-              <div className={styles.fixesTd}><span>Quantity of Missing Value</span></div>
-              <div className={styles.fixesTd}><span>Mean</span></div>
-              <div className={styles.fixesTd}><span>Median</span></div>
-              <div className={styles.fixesTd}><span>Most Frequent Value</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
+              <div className={styles.fixesTd}><span>{EN.VariableName}</span></div>
+              <div className={styles.fixesTd}><span>{EN.MissingReason}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Data}</span></div>
+              <div className={styles.fixesTd}><span>{EN.QuantityofMissingValue}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Median}</span></div>
+              <div className={styles.fixesTd}><span>{EN.MostFrequentValue}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(nullLineCountsOrigin).map((k, i) => {
@@ -234,9 +235,9 @@ export class FixIssue extends Component {
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
                   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
-                    <option value='none' key="none">I don`t know</option>
-                    <option value="blank" key="blank">Left blank on purpose</option>
-                    <option value='fail' key='fail'>Failed to Collect or Data Error</option>
+                    <option value='none' key="none">{EN.Idonknow}</option>
+                    <option value="blank" key="blank">{EN.Leftblankonpurpose}</option>
+                    <option value='fail' key='fail'>{EN.FailedtoCollectorDataError}</option>
                   </select></div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
@@ -246,18 +247,18 @@ export class FixIssue extends Component {
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.nullSelect.bind(null, k)}>
                       {showType === 'Categorical' ? [
-                        <option value={mode} key="mode">Replace with most frequent value</option>,
-                        <option value="drop" key="drop">Delete the rows</option>,
-                        <option value='ignore' key='ignore'>Replace with a unique value</option>
+                        <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
+                        <option value="drop" key="drop">{EN.Deletetherows}</option>,
+                        <option value='ignore' key='ignore'>{EN.Replacewithauniquevalue}</option>
                       ] : [
-                          <option value={mean} key='mean'>Replace with mean value</option>,
-                          <option value="drop" key='drop'>Delete the rows</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
+                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
                           // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                          <option value={median} key='median'>Replace with median value</option>,
-                          <option value={0} key={0}>Replace with 0</option>,
-                          <option value={''} key='others'>Replace with others</option>
+                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                          <option value={''} key='others'>{EN.Replacewithothers}</option>
                         ]}
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'missing', k)} />}
@@ -271,18 +272,18 @@ export class FixIssue extends Component {
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.outlier)}></div>
-              <span>Outlier</span>
+              <span>{EN.Outlier}</span>
             </div>
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
-              <div className={styles.fixesTd}><span>Variable Name</span></div>
-              <div className={styles.fixesTd}><span>Valid Range</span></div>
-              <div className={styles.fixesTd}><span>Data Type</span></div>
-              <div className={styles.fixesTd}><span>Quantity of Outlier</span></div>
-              <div className={styles.fixesTd}><span>Mean</span></div>
-              <div className={styles.fixesTd}><span>Median</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
+              <div className={styles.fixesTd}><span>{EN.VariableName}</span></div>
+              <div className={styles.fixesTd}><span>{EN.ValidRange}</span></div>
+              <div className={styles.fixesTd}><span>{EN.DataType}</span></div>
+              <div className={styles.fixesTd}><span>{EN.QuantityofOutlier}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Median}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(outlierLineCountsOrigin).map((k, i) => {
@@ -296,7 +297,7 @@ export class FixIssue extends Component {
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const isShow = showType === 'Numerical';
                 if (!isShow) return null
-                const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : outlierRange[k];
+                const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : [rawDataView[k].low, rawDataView[k].high];
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
@@ -319,7 +320,7 @@ export class FixIssue extends Component {
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
-                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>edit</span>
+                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>{EN.Edit}</span>
                   </div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
@@ -327,13 +328,13 @@ export class FixIssue extends Component {
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.outlierSelect.bind(null, k)}>
-                      <option value="drop" key='drop'>Delete the rows</option>
-                      <option value="ignore" key='ignore'>Do Nothing</option>
-                      <option value={mean} key='mean'>Replace with mean value</option>
-                      <option value={median} key='median'>Replace with median value</option>
+                      <option value="drop" key='drop'>{EN.Deletetherows}</option>
+                      <option value="ignore" key='ignore'>{EN.DoNothing}</option>
+                      <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>
+                      <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>
                       {/* <option value={mode} key='mode'>Replace with most frequent value</option> */}
-                      <option value={0} key='0'>Replace with 0</option>,
-                    <option value={''} key='others'>Replace with others</option>
+                      <option value={0} key='0'>{EN.ReplaceWith0}</option>,
+                      <option value={''} key='others'>{EN.Replacewithothers}</option>
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
                   </div>
@@ -344,8 +345,8 @@ export class FixIssue extends Component {
         </div>}
       </div>
       <div className={styles.fixesBottom}>
-        <button className={styles.save} onClick={this.save} ><span>Save</span></button>
-        <button className={styles.cancel} onClick={closeFixes}><span>Cancel</span></button>
+        <button className={styles.save} onClick={this.save} ><span>{EN.Save}</span></button>
+        <button className={styles.cancel} onClick={closeFixes}><span>{EN.CANCEL}</span></button>
       </div>
       {this.editKey && <Modal content={<EditOutLier width={800}
         height={400} saveEdit={this.saveEdit}
@@ -358,7 +359,7 @@ export class FixIssue extends Component {
         maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}
         visible={this.visible}
         width='12em'
-        title='Outlier'
+        title={EN.Outlier}
         onClose={this.closeEdit}
         closeByMask={true}
         showClose={true}
@@ -723,19 +724,19 @@ class EditOutLier extends Component {
     return <div className={styles.fixesContent}>
       <div className={styles.outlierBox}>
         <div className={styles.outlierBlock}>
-          <div className={styles.outliertext}><span>min</span></div>
+          <div className={styles.outliertext}><span>{EN.Min}</span></div>
           <div className={styles.input}><input value={focus === 'min' ? temp : this.renderNum(min)} onChange={this.change} onFocus={this.focusInput.bind(null, 'min')} onBlur={this.blur} /></div>
         </div>
         <div className={styles.outlierBlock}>
-          <div className={styles.outliertext}><span>max</span></div>
+          <div className={styles.outliertext}><span>{EN.Max}</span></div>
           <div className={styles.input}><input value={focus === 'max' ? temp : this.renderNum(max)} onChange={this.change} onFocus={this.focusInput.bind(null, 'max')} onBlur={this.blur} /></div>
         </div>
-        <div className={styles.outlierBlock}><button onClick={this.reset}><span>Reset to default</span></button></div>
+        <div className={styles.outlierBlock}><button onClick={this.reset}><span>{EN.Resettodefault}</span></button></div>
       </div>
       <div className={styles.d3Chart}></div>
       <div className={styles.fixesBottom}>
-        <button className={styles.save} onClick={this.apply} ><span>Apply</span></button>
-        <button className={styles.cancel} onClick={closeEdit}><span>Cancel</span></button>
+        <button className={styles.save} onClick={this.apply} ><span>{EN.Apply}</span></button>
+        <button className={styles.cancel} onClick={closeEdit}><span>{EN.Cancel}</span></button>
       </div>
     </div>
   }
