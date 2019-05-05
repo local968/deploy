@@ -13,6 +13,7 @@ import dataSchemaActive from './data_schema_a.svg';
 import dataSchema from './data_schema.svg';
 import dataQualityActive from './data_quality_a.svg';
 import dataQuality from './data_quality_d.svg';
+import EN from '../../constant/en';
 
 const imgs = {
   dataSchema: <img src={dataSchema} alt="schema" />,
@@ -30,10 +31,10 @@ export default class Data extends Component {
   constructor(props) {
     super(props);
     this.step = [
-      { label: 'Data Connect', value: "dataConnect" },
-      { label: 'Data Schema', value: "dataSchema" },
-      { label: 'Data Quality', value: "dataQuality" }
-    ]
+      { label: EN.DataConnects, value: "dataConnect" },
+      { label: EN.DataSchemas, value: "dataSchema" },
+      { label: EN.DataQualitys, value: "dataQuality" }
+    ];
     this.sideRef = React.createRef();
   }
 

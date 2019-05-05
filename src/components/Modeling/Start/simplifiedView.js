@@ -1096,7 +1096,7 @@ class FunctionTips extends Component {
             key: 1,
             className: styles.funcTipsCol
           }, {
-            title: 'age_val_b3',
+            title:EN.agevalb3,
             dataIndex: 2,
             key: 2,
             className: styles.funcTipsCol
