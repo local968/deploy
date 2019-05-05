@@ -93,7 +93,7 @@ export default class ClassificationView extends Component {
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
-            <span>{EN.SelectedModel} :<a className={styles.nohover}>&nbsp;{current.name}</a></span>
+            <span>{EN.SelectedModel} :<a className={styles.nohover}>&nbsp;{current.modelName}</a></span>
           </div>
           <div className={styles.row}>
             <span>{EN.Target} :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
