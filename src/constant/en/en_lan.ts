@@ -1043,7 +1043,8 @@ const EN_LAN = {
   generatingreportfile: 'generating report file',
   init: 'init',
   Weight:'Weight',
-
+  BeforeETL:'Before ETL',
+  AfterETL:'After ETL',
 };
 
 

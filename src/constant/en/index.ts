@@ -908,6 +908,9 @@ const EN: any = {
   generatingreportfile: '生成报告',
   init: '完成',
   Weight:'重量',
+  BeforeETL:'ETL前',
+  AfterETL:'ETL后',
+
 
 };
 
