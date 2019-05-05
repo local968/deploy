@@ -9,6 +9,35 @@ const _ = require('lodash');
 
 const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
 
+async function parseNewChartData(url) {
+  try {
+    const result = await axios.get(url)
+    const data = result.data
+
+    let fitIndex = -1;
+    let initialFitIndex = -1;
+    if (data.roc) {
+      const { Youden } = data.roc
+      if (Youden) {
+        let max = -Infinity;
+        initialFitIndex = 0;
+        for (let i = 1; i < Object.keys(Youden).length; i++) {
+          if (Youden[i] > max) {
+            initialFitIndex = i;
+            max = Youden[i];
+          }
+        }
+        fitIndex = initialFitIndex
+      }
+    }
+
+    return { chartData: data, fitIndex, initialFitIndex }
+  } catch (e) {
+    console.log(e, "error")
+    return { chartData: url }
+  }
+}
+
 function parseChartData(result) {
   if (!result) return { chart: null, fitIndex: null, initialFitIndex: null };
   let fitIndex = -1;
@@ -704,21 +733,21 @@ wss.register('newDataView', async (message, socket, progress) => {
   const etlIndex = await redis.hget("project:" + projectId, 'etlIndex');
   const stats = await redis.hget("project:" + projectId, 'stats');
   try {
-    const { data } = await axios.post(`${esServicePath}/etls/${JSON.parse(etlIndex)}/stats`,JSON.parse(stats))
+    const { data } = await axios.post(`${esServicePath}/etls/${JSON.parse(etlIndex)}/stats`, JSON.parse(stats))
     console.log(data)
     // // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
-    const rawDataView = {}
+    const dataViews = {}
     Object.entries(data).forEach(([key, metric]) => {
       const stats = metric.originalStats
-      rawDataView[key] = { ...stats, std: stats.std_deviation }
+      dataViews[key] = { ...stats, std: stats.std_deviation }
     })
     const result = {
-      rawDataView,
+      dataViews,
     }
     await createOrUpdate(projectId, userId, result)
     return { status: 200, message: 'ok', result }
   } catch (e) {
-    console.log({...e})
+    console.log({ ...e })
     let error = e
     if (e.response && e.response.data) error = e.response.data
     return { status: 500, message: 'get index stats failed', error }
@@ -936,10 +965,13 @@ wss.register('train', async (message, socket, progress) => {
         await createOrUpdate(projectId, userId, { trainModel: result })
         processValue = { ...result }
       } else if (result.score) {
+        const { chartData: chartDataUrl } = result
+        let chartData = chartDataUrl
+        if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl)
         const stats = await getProjectField(projectId, 'stats')
         hasModel = true;
         await createOrUpdate(projectId, userId, { trainModel: null })
-        const modelResult = await createModel(userId, projectId, result.modelName, { ...result, stats })
+        const modelResult = await createModel(userId, projectId, result.modelName, { ...result, stats, chartData })
         processValue = await addSettingModel(userId, projectId)(modelResult)
         // return progress(model)
       } else if (result.data) {
