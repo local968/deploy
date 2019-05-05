@@ -12,6 +12,8 @@ import Test from 'components/Test';
 import ErrorBoundary from 'components/Common/ErrorBoundary';
 import Stores from 'stores';
 import styles from './styles.module.css';
+import { LocaleProvider } from 'antd';
+import zh_CN from 'antd/lib/locale-provider/zh_CN';
 const browserHistory = window.r2Report ? createHashHistory() : createBrowserHistory();
 const routingStore = new RouterStore();
 const history = syncHistoryWithStore(browserHistory, routingStore);
@@ -25,6 +27,7 @@ class App extends Component {
   render() {
     return (
       <ErrorBoundary>
+  <LocaleProvider locale={zh_CN}>
         <Provider {...stores}>
           {window.r2Report ? <Report /> : <Router history={history}>
             <div className={styles.app}>
@@ -39,6 +42,7 @@ class App extends Component {
             </div>
           </Router>}
         </Provider>
+   </LocaleProvider>
       </ErrorBoundary>
     );
   }

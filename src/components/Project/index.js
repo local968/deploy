@@ -12,7 +12,7 @@ const { TextArea } = Input;
 export default class Project extends Component {
   nextStep = () => {
     const { project } = this.props.projectStore;
-    project.updateProject({ ...project.nextMainStep(1), name: project.name || "Project " + new Date().toLocaleString() })
+    project.updateProject({ ...project.nextMainStep(1), name: project.name || EN.Project + new Date().toLocaleString() })
   }
 
   onChange = action((type, e) => {
@@ -20,7 +20,7 @@ export default class Project extends Component {
     const { project } = projectStore;
     project[type] = e.target.value;
     project.updateProject({
-      name: project.name || "Project " + new Date().toLocaleString(),
+      name: project.name || EN.Project + new Date().toLocaleString(),
       // description: project.description,
       business: project.business,
       statement: project.statement

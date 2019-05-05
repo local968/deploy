@@ -67,7 +67,7 @@ export default class Detail extends Component {
                 src={performanceIcon}
                 alt="performance"
               />
-              <span className={styles.text}>Performance Monitor</span>
+              <span className={styles.text}>{EN.PerformanceMonitor}</span>
             </div>
           )}
 
