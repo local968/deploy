@@ -24,6 +24,8 @@ const _change = action((name, value) => (_data[name] = value));
 
 const TabPane = Tabs.TabPane;
 
+const isEN = false;
+
 const videoData = [
   {
     id: '1',

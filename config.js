@@ -96,7 +96,7 @@ const config = {
   supportMail: "support@r2.ai",
   yourAge:YOUR_AGE,
   yourModel:YOUR_MODEL,
-  yourUsage:YOUR_USAGE
+  yourUsage:YOUR_USAGE,
   services: {
     APP_LOGIN_BFF,
     AUTH_SERVICE,
