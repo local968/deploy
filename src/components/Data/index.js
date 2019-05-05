@@ -90,9 +90,9 @@ export default class Data extends Component {
     const maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
     return <div className={styles.data}>
       {!!project && <Switch>
-        <Route exact path="/project/:id/data/connect" component={DataConnect} />
-        <Route exact path="/project/:id/data/schema" component={DataSchema} />
-        <Route exact path="/project/:id/data/quality" component={DataQuality} />
+        <Route exact path="/project/:id/data/connect" component={(props) => <DataConnect {...props} />} />
+        <Route exact path="/project/:id/data/schema" component={(props) => <DataSchema {...props} />} />
+        <Route exact path="/project/:id/data/quality" component={(props) => <DataQuality {...props} />} />
       </Switch>}
       <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive} ref={this.sideRef} />
     </div>

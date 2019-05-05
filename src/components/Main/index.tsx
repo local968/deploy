@@ -99,13 +99,13 @@ function Main(props: MainProps) {
       </div>}
     </div>
     {!project ? <ProcessLoading style={{ position: 'fixed' }} /> : <Switch>
-      <Route path="/project/:id/problem" component={Problem} />
-      <Route path="/project/:id/data" component={Data} />
-      <Route path="/project/:id/modeling" component={Modeling} />
-      <Route path="/project/:id/project" component={Project} />
+      <Route path="/project/:id/problem" component={(props) => <Problem {...props} />} />
+      <Route path="/project/:id/data" component={(props) => <Data {...props} />} />
+      <Route path="/project/:id/modeling" component={(props) => <Modeling {...props} />} />
+      <Route path="/project/:id/project" component={(props) => <Project {...props} />} />
       <StoreProvider store={newStores}>
-        <Route path="/project/:id/info" component={Info} />
-        <Route path="/project/:id/train" component={Train} />
+        <Route path="/project/:id/info" component={(props) => <Info {...props} />} />
+        <Route path="/project/:id/train" component={(props) => <Train {...props} />} />
       </StoreProvider>
     </Switch>}
     {<Confirm
