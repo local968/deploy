@@ -907,6 +907,7 @@ const EN: any = {
   downloadingplots: '导出图示。',
   generatingreportfile: '生成报告',
   init: '完成',
+  Weight:'重量',
 
 };
 
