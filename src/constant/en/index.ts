@@ -912,6 +912,17 @@ const EN: any = {
   AfterETL:'ETL后',
   DataQualityIssuesandFixMethod:'数据质量问题和修复方法',
   SummaryofFixes:'修复摘要',
+  Profile:'信息',
+  ProjectStatement:'项目声明',
+  ProblemType:'问题类型',
+  ExploratoryDataAnalysis:'探索性数据分析',
+  ModelResult:'模型结果',
+  Metrics:'度量',
+  ConfusionMatrix:'混乱矩阵',
+  Charts:'图表',
+  VariableImpactnotavailableforthisalgorithm:'变量影响不适用于此算法',
+
+
 };
 
 export default EN;

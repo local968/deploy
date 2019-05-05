@@ -1047,8 +1047,15 @@ const EN_LAN = {
   AfterETL:'After ETL',
   DataQualityIssuesandFixMethod:'Data Quality Issues and Fix Method',
   SummaryofFixes:'Summary of Fixes',
-
-
+  Profile:'Profile',
+  ProjectStatement:'Project Statement',
+  ProblemType:'Problem Type',
+  ExploratoryDataAnalysis:'Exploratory Data Analysis',
+  ModelResult:'Model Result',
+  Metrics:'Metrics',
+  ConfusionMatrix:'Confusion Matrix',
+  Charts:'Charts',
+  VariableImpactnotavailableforthisalgorithm:'Variable Impact not available for this algorithm',
 };
 
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import { formatNumber } from 'util'
-
+import EN from '../../../constant/en';
 @observer
 export default class VariableImpact extends Component {
   render() {
@@ -15,7 +15,7 @@ export default class VariableImpact extends Component {
       <div className={styles.detail}>
         {!arr.length ?
           <div className={styles.detailNone}>
-            <span title='Variable Impact not available for this algorithm'>Variable Impact not available for this algorithm</span>
+            <span title='Variable Impact not available for this algorithm'>{EN.VariableImpactnotavailableforthisalgorithm}</span>
           </div>
           : arr.map((row, index) => {
             return (
