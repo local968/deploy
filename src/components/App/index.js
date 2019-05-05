@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import createBrowserHistory from 'history/createBrowserHistory';
-import createHashHistory from 'history/createHashHistory';
+import { createBrowserHistory, createHashHistory } from 'history';
 import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { Router } from 'react-router-dom';

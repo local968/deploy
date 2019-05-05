@@ -22,7 +22,6 @@ export default class LoginRouter extends Component {
             <Route exact path="/active" component={SignActive} />
             <Route exact path="/resetpassword" component={ResetPassword} />
             <Route exact path="/forgetpassword" component={ForgetPassword} />
-            {/* <Route exact path="/community" component={Community} /> */}
             <Route exact path="/support" component={Support} />
             <Redirect to="/" />
           </Switch>
