@@ -66,7 +66,7 @@ class VariableIssue extends Component {
   }
 
   formatTable = () => {
-    const { colType, uploadData, dataHeader, nullIndex, mismatchIndex, outlierIndex, mismatchLineCounts, outlierLineCounts, nullLineCounts, totalRawLines, etling } = this.props.project;
+    const { colType, uploadData, dataHeader, mismatchLineCounts, outlierLineCounts, nullLineCounts, totalRawLines, etling, rawDataView } = this.props.project;
     if (etling) return []
     if (!uploadData.length) return []
     const headerList = [...dataHeader]
@@ -111,13 +111,13 @@ class VariableIssue extends Component {
       const isNum = colType[header] === 'Numerical'
 
       if (isNum && mismatchLineCounts[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{mismatchLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.mismatchRow[header] / totalRawLines, 2)}%</span></div>)
+        issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{mismatchLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(mismatchLineCounts[header] / totalRawLines, 2)}%</span></div>)
       }
       if (nullLineCounts[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{nullLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.nullRow[header] / totalRawLines, 2)}%</span></div>)
+        issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{nullLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(nullLineCounts[header] / totalRawLines, 2)}%</span></div>)
       }
       if (isNum && outlierLineCounts[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{outlierLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(variableIssues.outlierRow[header] / totalRawLines, 2)}%</span></div>)
+        issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{outlierLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(outlierLineCounts[header] / totalRawLines, 2)}%</span></div>)
       }
       const issueData = {
         content: <div className={styles.errorBox}>{issues}</div>,
@@ -126,7 +126,6 @@ class VariableIssue extends Component {
       }
       issueArr.push(issueData)
     }
-
     const tableData = data.map((row, rowIndex) => row.map((v, k) => {
       const header = headerList[k] && headerList[k].trim();
       const itemData = {
@@ -136,7 +135,7 @@ class VariableIssue extends Component {
       }
 
       const isNum = colType[header] === 'Numerical'
-      const { low = NaN, high = NaN } = rawDataView[target]
+      const { low = NaN, high = NaN } = isNum ? rawDataView[header] : {}
       const isMissing = !v
       const isMismatch = isNum ? isNaN(parseFloat(v)) : false
       const isOutlier = isNum ? (v < low || v > high) : false
@@ -152,7 +151,6 @@ class VariableIssue extends Component {
       }
       return itemData
     }))
-
     return [indexArr, headerArr, selectArr, issueArr, ...tableData].filter(row => row.length === realColumn)
   }
 
@@ -321,50 +319,7 @@ class Summary extends Component {
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
         <div className={styles.summaryTitle}><span>{EN.Summaryofyourdata}</span></div>
-        <div className={styles.summaryTypeBox}>
-          <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
-            <span>{EN.CleanData}</span>
-          </div>
-          <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }}></div>
-            <span>{EN.DataTypeMismatch}</span>
-          </div>
-          <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }}></div>
-            <span>{EN.MissingValue}</span>
-          </div>
-          <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }}></div>
-            <span>{EN.Outlier}</span>
-          </div>}
-        </div>
-        <div className={styles.summaryTable}>
-          <div className={styles.summaryTableLeft}>
-            <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
-            </div>
-            <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span>{target}</span></div>
-              <div className={styles.summaryCell}><span>{formatNumber(percentList[0].clean, 2)}%</span></div>
-            </div>
-          </div>
-        </div>
-        <div className={styles.summaryTable} style={{ paddingRight: '.2em' }}>
-          <div className={styles.summaryTableLeft}>
-            <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
-            </div>
-          </div>
-          <div className={styles.summaryTableRight}>
-            <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
-            </div>
-          </div>
-        </div>
-        <div className={styles.summaryTable} style={{ overflow: 'scroll' }}>
+        <div className={styles.summaryTable} style={{ maxHeight: '4em' }}>
           <div className={styles.summaryTableLeft}>
             {variableList.map((v, k) => {
               const percent = percentList[k]

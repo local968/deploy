@@ -28,6 +28,7 @@ export default class DataSchema extends Component {
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
     }
+    console.log([...rawHeader], [...project.dataHeader], [...this.checkList],newDataHeader, 'adasdqadas')
     project.setProperty(data)
     if (project.train2ing || !!project.models.length) return this.visiable = true
     this.onConfirm()
@@ -170,7 +171,7 @@ export default class DataSchema extends Component {
           <option value="Categorical">{EN.Categorical}</option>
           <option value="Numerical">{EN.Numerical}</option>
         </select>
-        selectData.title = colValue === 'Numerical'? EN.Numerical : EN.Categorical
+        selectData.title = colValue === 'Numerical' ? EN.Numerical : EN.Categorical
       }
       selectArr.push(selectData)
     }
@@ -226,7 +227,7 @@ export default class DataSchema extends Component {
               <span>{EN.UnselectUndesirableVariables}</span>
             </div>
           }
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{ EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
           }</div>} />
           {isMissed && <div className={styles.schemaMissed} >
             <div className={styles.errorBlock}></div>
@@ -256,7 +257,7 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || (newDataHeader.length < 1)} text={EN.Continue}  />
+        <ContinueButton onClick={this.doEtl} disabled={etling || (newDataHeader.length < 1)} text={EN.Continue} />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />

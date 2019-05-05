@@ -40,8 +40,8 @@ export default function EsUploader(file, option = {}) {
         uploader = parser
         const row = result.data[0]
         if (!header) {
-          rawHeader = row
-          cleanHeader = autoFixHeader(row)
+          rawHeader = autoFixHeader(row)
+          cleanHeader = rawHeader
           return header = '__no,' + cleanHeader.toString()
         }
         if (row.toString() === '') return
