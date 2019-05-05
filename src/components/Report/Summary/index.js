@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
-
+import EN from '../../../constant/en';
 @observer
 class Summary extends Component {
   componentDidMount() {
@@ -84,30 +84,30 @@ class Summary extends Component {
     }
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
-        <div className={styles.summaryTitle}><span>Data Quality Issues and Fix Method</span></div>
+        <div className={styles.summaryTitle}><span>{EN.DataQualityIssuesandFixMethod}</span></div>
         <div className={styles.summaryTypeBox}>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
-            <span>Clean Data</span>
+            <span>{EN.CleanData}</span>
           </div>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }}></div>
-            <span>Data Type Mismatch</span>
+            <span>{EN.mismatch}</span>
           </div>
           <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }}></div>
-            <span>Missing Value</span>
+            <span>{EN.MissingValue}</span>
           </div>
           {problemType !== 'Classification' && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }}></div>
-            <span>Outlier</span>
+            <span>{EN.Outlier}</span>
           </div>}
         </div>
         <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Target Variable</span></div>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Clean Data</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span>{target}</span></div>
@@ -116,7 +116,7 @@ class Summary extends Component {
           </div>
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock} title={getFixMethod(target)}>
@@ -131,13 +131,13 @@ class Summary extends Component {
         <div className={styles.summaryTable} style={{ paddingRight: '.2em' }}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Predictor Variables</span></div>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Clean Data</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
           </div>
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>Data Composition </span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition }</span></div>
             </div>
           </div>
         </div>
@@ -167,7 +167,7 @@ class Summary extends Component {
         </div>
       </div>
       <div className={styles.summaryRight}>
-        <div className={styles.summaryTitle}><span>Summary of Fixes</span></div>
+        <div className={styles.summaryTitle}><span>{EN.SummaryofFixes}</span></div>
         <div className={styles.summaryPie}>
           <div className={styles.summaryChart}>
           </div>
@@ -175,7 +175,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#9cebff' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Rows Will Be Fixed</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeFixed}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -185,7 +185,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#c4cbd7' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Rows Will Be Deleted</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeDeleted}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
@@ -195,7 +195,7 @@ class Summary extends Component {
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }}></div>
-                <span style={{ fontWeight: 'bold' }}>Clean Data</span>
+                <span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span>
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>

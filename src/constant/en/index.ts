@@ -910,8 +910,8 @@ const EN: any = {
   Weight:'重量',
   BeforeETL:'ETL前',
   AfterETL:'ETL后',
-
-
+  DataQualityIssuesandFixMethod:'数据质量问题和修复方法',
+  SummaryofFixes:'修复摘要',
 };
 
 export default EN;

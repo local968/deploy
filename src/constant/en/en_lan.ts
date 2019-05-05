@@ -1045,6 +1045,10 @@ const EN_LAN = {
   Weight:'Weight',
   BeforeETL:'Before ETL',
   AfterETL:'After ETL',
+  DataQualityIssuesandFixMethod:'Data Quality Issues and Fix Method',
+  SummaryofFixes:'Summary of Fixes',
+
+
 };
 
 
