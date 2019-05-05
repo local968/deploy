@@ -207,7 +207,7 @@ export default class Project {
 
   @computed
   get totalLines() {
-    return this.totalRawLines - this.deletedCount
+    return this.totalRawLines - this.totalFixedLines
   }
 
   @computed

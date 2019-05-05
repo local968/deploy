@@ -67,7 +67,6 @@ wss.register("originalStats", async (message, socket, progress) => {
       etling: false,
       etlProgress: 0
     }
-    console.log(mismatchLineCounts, nullLineCounts, outlierLineCounts)
     await createOrUpdate(projectId, userId, result)
     return { status: 200, message: 'ok', result }
   } catch (e) {

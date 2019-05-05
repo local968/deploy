@@ -774,9 +774,8 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
   const { userId } = socket.session;
   const { projectId } = message;
 
-  await checkEtl(projectId, userId);
-
   return createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
+    .then(() => checkEtl(projectId, userId))
     .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
       const { status, result } = progressResult
@@ -947,10 +946,11 @@ wss.register('train', async (message, socket, progress) => {
   // const stopId = uuid.v4()
   const data = { ...message, userId, requestId, stopId: requestId };
   let hasModel = false;
-  await checkEtl(projectId, userId)
   try {
     await checkTraningRestriction(user)
     await createOrUpdate(projectId, userId, { ...updateData, stopId: requestId })
+    await checkEtl(projectId, userId)
+    console.log('finish etl')
     const isAbort = await command({ ...data, stopId: requestId }, async queueValue => {
       const stopId = await getProjectField(projectId, 'stopId')
       const { status, result, requestId: trainId } = queueValue;
@@ -966,12 +966,12 @@ wss.register('train', async (message, socket, progress) => {
         processValue = { ...result }
       } else if (result.score) {
         const { chartData: chartDataUrl } = result
-        let chartData = chartDataUrl
+        let chartData = { chartData: chartDataUrl }
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl)
         const stats = await getProjectField(projectId, 'stats')
         hasModel = true;
         await createOrUpdate(projectId, userId, { trainModel: null })
-        const modelResult = await createModel(userId, projectId, result.modelName, { ...result, stats, chartData })
+        const modelResult = await createModel(userId, projectId, result.modelName, { ...result, ...chartData, stats })
         processValue = await addSettingModel(userId, projectId)(modelResult)
         // return progress(model)
       } else if (result.data) {
