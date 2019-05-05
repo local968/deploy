@@ -11,6 +11,7 @@ import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
 import config from 'config'
 import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 
 @observer
 export default class SimplifiedView extends Component {
