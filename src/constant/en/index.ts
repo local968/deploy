@@ -927,7 +927,12 @@ const EN: any = {
   minutesorlonger: '5分钟或更长时间',
   NoMoreThan:'不超过',
   Auto:'自动',
-
+  SimpleView:'简单视图',
+  Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation:'您还可以告诉我们您的业务需求，以获得更精确的建议',
+  ContaminationRate:'污染率',
+  TheNumberofClusters:'集群数量',
+  Score:'评分',
+  SihouetteScore:'剪影分数',
 };
 
 export default EN;

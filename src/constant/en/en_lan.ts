@@ -1062,7 +1062,12 @@ const EN_LAN = {
   minutesorlonger: '5 minutes or longer',
   NoMoreThan:'No More Than',
   Auto:'Auto',
-
+  SimpleView:'Simple View',
+  Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation:'You can also tell us your business needs to get a more precise recommendation',
+  ContaminationRate:'Contamination Rate',
+  TheNumberofClusters:'The Number of Clusters',
+  Score:'Score',
+  SihouetteScore:'Sihouette Score',
 
 
 };
