@@ -10,7 +10,7 @@ export default function EsUploader(file, option = {}) {
   let isStop = false
   let uploader = null
   let rawHeader = []
-  let cleanHeader = []
+  // let cleanHeader = []
   const { onProgress, onError, onFinished } = option;
 
   const autoFixHeader = (rawHeader) => {
@@ -42,8 +42,8 @@ export default function EsUploader(file, option = {}) {
         const row = _row.map(v => encodeURIComponent(v))
         if (!header) {
           rawHeader = autoFixHeader(row)
-          cleanHeader = rawHeader
-          return header = '__no,' + cleanHeader.toString()
+          // cleanHeader = rawHeader
+          return header = '__no,' + rawHeader.toString()
         }
         if (row.toString() === '') return
         chunk += no + ',' + row.toString()
@@ -82,12 +82,13 @@ export default function EsUploader(file, option = {}) {
           data: header + '\n' + chunk,
         }).then(() => {
           chunk = ''
+          const header = rawHeader.map(v => decodeURIComponent(v))
           onFinished({
             originalIndex: dataIndex,
             totalRawLines: no,
-            cleanHeader,
-            rawHeader,
-            dataHeader: cleanHeader,
+            cleanHeader: header,
+            rawHeader: header,
+            dataHeader: header,
           }, file)
         })
         // setUploadStatus('finished, total uploaded: ' + no + ' lines')

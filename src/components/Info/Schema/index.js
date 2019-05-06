@@ -28,7 +28,6 @@ export default class DataSchema extends Component {
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
     }
-    console.log([...rawHeader], [...project.dataHeader], [...this.checkList],newDataHeader, 'adasdqadas')
     project.setProperty(data)
     if (project.train2ing || !!project.models.length) return this.visiable = true
     this.onConfirm()

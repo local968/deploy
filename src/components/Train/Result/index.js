@@ -11,14 +11,14 @@ import { Tooltip, Icon } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
-
+import EN from '../../../constant/en';
 function ModelResult(props) {
   // const type = 'clustering'
   const { resetSide, view, sort, handleSort, changeView, projectStore } = props
   const { project } = projectStore
   const { problemType, models, selectModel } = project
 
-  if(!selectModel || !models.length) return null
+  if (!selectModel || !models.length) return null
 
   React.useEffect(() => {
     resetSide()
@@ -28,29 +28,42 @@ function ModelResult(props) {
     project.abortTrain()
   }
 
+  const deploy = () => {
+    // const { project } = this.props.projectStore;
+    const { selectModel: current } = project
+    const { newVariable, trainHeader, expression } = project
+    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
+    const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+    const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+
+    this.props.deploymentStore
+      .addDeployment(project.id, project.name, current.modelName, current.problemType, exps)
+      .then(id => this.props.routing.push('/deploy/project/' + id));
+  };
+
   return <div className={classes.root}>
-    {problemType === 'Outlier' && <h3 className={classes.header}>Modeling result</h3>}
+    {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
     {problemType === "Clustering" && <div className={classes.tabs}>
-      <span className={`${classes.tab} ${view === 'simple' ? classes.active : ''}`} onClick={() => changeView('simple')}>Simple View</span>
-      <span className={`${classes.tab} ${view === 'advanced' ? classes.active : ''}`} onClick={() => changeView('advanced')}>Advanced View</span>
+      <span className={`${classes.tab} ${view === 'simple' ? classes.active : ''}`} onClick={() => changeView('simple')}>{EN.SimpleView}</span>
+      <span className={`${classes.tab} ${view === 'advanced' ? classes.active : ''}`} onClick={() => changeView('advanced')}>{EN.AdvancedView}</span>
     </div>}
     {view === 'simple' && <div className={classes.body}>
       <div className={classes.top}>
         <div className={classes.left}>
           <div className={classes.descriptions}>
-            We have recommended a model by default<br />
-            <small>You can also tell us your business needs to get a more precise recommendation</small>
+            {EN.RecommendedAModel}<br />
+            <small>{EN.Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation}</small>
             <br />
-            Selected Model: <span className={classes.modelName}>{selectModel.modelName}</span>
+            {EN.SelectedModel}: <span className={classes.modelName}>{selectModel.modelName}</span>
           </div>
           {problemType === 'Outlier' && <div className={classes.scores}>
             <div className={classes.score}>
-              <div className={classes.orange}>{formatNumber(selectModel.score.score, 2)}</div>
+              <div className={classes.orange}>{formatNumber(selectModel.score.score)}</div>
               <span className={classes.label}>Score <Hint content='123321' /></span>
             </div>
             <div className={classes.rate}>
-              <div className={classes.blood}>0.1</div>
-              <span className={classes.rateLabel}>Contamination Rate <Hint content='123321' /></span>
+              <div className={classes.blood}>{formatNumber(selectModel.dataFlow[0].contamination || 0)}</div>
+              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.ContaminationRate} <Hint content='123321' /></span>
             </div>
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
@@ -60,7 +73,7 @@ function ModelResult(props) {
             </div>
             <div className={classes.cluster}>
               <div className={classes.blood}>{Object.keys(selectModel.labelWithImportance).length}</div>
-              <span className={classes.rateLabel}>The Number of Clusters <Hint content='123321' /></span>
+              <span className={classes.rateLabel}>{EN.TheNumberofClusters} <Hint content='123321' /></span>
             </div>
             <div className={classes.rSquared}>
               <div className={classes.green}>{formatNumber(selectModel.score.RSquared, 2)}</div>
@@ -70,7 +83,7 @@ function ModelResult(props) {
           <ContinueButton text='Mapping Dictionary' width='200px' />
         </div>
         <div className={classes.right}>
-          <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0'/>
+          <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0' />
           {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
@@ -78,15 +91,20 @@ function ModelResult(props) {
       {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
       {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
     </div>}
-    {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)}/>}
+    {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
+    <div className={classes.buttonBlock}>
+      <button className={classes.button} onClick={deploy}>
+        <span>{EN.DeployTheModel}</span>
+      </button>
+    </div>
   </div>;
 }
 
-export default inject('projectStore')(observer(ModelResult))
+export default inject('projectStore', 'deploymentStore')(observer(ModelResult))
 
 const OutlierTable = (props) => {
   const { models, sort, handleSort, project, abortTrain } = props
-
+  const { train2Finished, trainModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
@@ -107,19 +125,19 @@ const OutlierTable = (props) => {
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
         <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
-          <span onClick={() => handleSort('name')}>Model Name {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+          <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
-          <span onClick={() => handleSort('score')}>Score {sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+          <span onClick={() => handleSort('score')}>{EN.Score} {sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
-          <span onClick={() => handleSort('rate')}>Contamination Rate {sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+          <span onClick={() => handleSort('rate')}>{EN.ContaminationRate}{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
-          <span>Variable Impact</span>
+          <span>{EN.VariableImpact}</span>
         </div>
         <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
-          <span>Model Process Flow</span>
+          <span>{EN.ModelProcessFlow}</span>
         </div>
       </div>
     </div>
@@ -128,10 +146,10 @@ const OutlierTable = (props) => {
         return <OutlierRow model={m} />
       })}
       {!train2Finished && <div className={classes.rowData}>
-        {trainModel ? <div className={classes.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div> : null}
+        {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
         {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
         <div className={classes.abortButton} onClick={!isAbort ? abortTrain : null}>
-          {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
+          {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
         </div>
       </div>}
     </div>
@@ -162,16 +180,16 @@ const OutlierRow = (props) => {
         <span>{model.modelName}</span>
       </div>
       <div className={`${classes.cell}`}>
-        <span>{model.score.score}</span>
+        <span>{formatNumber(model.score.score)}</span>
       </div>
       <div className={`${classes.cell}`}>
-        <span>X</span>
+        <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
       </div>
       <div className={`${classes.cell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> Compute</span>
+        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
       </div>
       <div className={`${classes.cell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> Compute</span>
+        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
       </div>
     </div>
     <div className={classes.rowData}>
@@ -211,13 +229,13 @@ const ClusteringTable = (props) => {
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('name')}>Model Name {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+          <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('cvnn')}>CVNN {sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('sihouette')}>Sihouette Score {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
+          <span onClick={() => handleSort('sihouette')}>{EN.SihouetteScore} {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('ch')}>CH Index {sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
@@ -229,10 +247,10 @@ const ClusteringTable = (props) => {
           <span onClick={() => handleSort('cluster')}>#clusters {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>Variable Impact</span>
+          <span>{EN.VariableImpact}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>Model Process Flow</span>
+          <span>{EN.ModelProcessFlow}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>Explaination</span>
@@ -244,10 +262,10 @@ const ClusteringTable = (props) => {
         return <ClusteringRow model={m} />
       })}
       {!train2Finished && <div className={classes.rowData}>
-        {trainModel ? <div className={classes.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div> : null}
+        {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
         {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
         <div className={classes.abortButton} onClick={!isAbort ? abortTrain : null}>
-          {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
+          {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
         </div>
       </div>}
     </div>
@@ -293,13 +311,13 @@ const ClusteringRow = (props) => {
         <span>{clusters}</span>
       </div>
       <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> Compute</span>
+        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
       </div>
       <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> Compute</span>
+        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
       </div>
       <div className={`${classes.ccell} ${classes.compute}`}>
-        <span><img src={'/static/modeling/Variable.svg'} alt="" /> Compute</span>
+        <span><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
       </div>
     </div>
     <div className={classes.rowData}>

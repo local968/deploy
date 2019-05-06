@@ -66,11 +66,12 @@ class VariableIssue extends Component {
   }
 
   formatTable = () => {
-    const { colType, uploadData, dataHeader, mismatchLineCounts, outlierLineCounts, nullLineCounts, totalRawLines, etling, rawDataView } = this.props.project;
+    const { colType, uploadData, rawHeader, dataHeader, totalRawLines, etling, rawDataView, variableIssues, problemType } = this.props.project;
     if (etling) return []
     if (!uploadData.length) return []
     const headerList = [...dataHeader]
-    const data = [...uploadData]
+    const notShowIndex = rawHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
+    const data = uploadData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -110,14 +111,14 @@ class VariableIssue extends Component {
       const issues = []
       const isNum = colType[header] === 'Numerical'
 
-      if (isNum && mismatchLineCounts[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{mismatchLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(mismatchLineCounts[header] / totalRawLines, 2)}%</span></div>)
+      if (isNum && variableIssues.mismatchRow[header]) {
+        issues.push(<div className={classnames(styles.errorBlock, styles.mismatch)} key={"mismatch" + header}><span>{variableIssues.mismatchRow[header] < 0.01 ? '<0.01' : formatNumber(variableIssues.mismatchRow[header], 2)}%</span></div>)
       }
-      if (nullLineCounts[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{nullLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(nullLineCounts[header] / totalRawLines, 2)}%</span></div>)
+      if (variableIssues.nullRow[header]) {
+        issues.push(<div className={classnames(styles.errorBlock, styles.missing)} key={"missing" + header}><span>{variableIssues.nullRow[header] < 0.01 ? '<0.01' : formatNumber(variableIssues.nullRow[header], 2)}%</span></div>)
       }
-      if (isNum && outlierLineCounts[header]) {
-        issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{outlierLineCounts[header] / totalRawLines < 0.01 ? '<0.01' : formatNumber(outlierLineCounts[header] / totalRawLines, 2)}%</span></div>)
+      if (isNum && variableIssues.outlierRow[header]) {
+        issues.push(<div className={classnames(styles.errorBlock, styles.outlier)} key={"outlier" + header}><span>{variableIssues.outlierRow[header] < 0.01 ? '<0.01' : formatNumber(variableIssues.outlierRow[header], 2)}%</span></div>)
       }
       const issueData = {
         content: <div className={styles.errorBox}>{issues}</div>,
@@ -126,40 +127,41 @@ class VariableIssue extends Component {
       }
       issueArr.push(issueData)
     }
-    const tableData = data.map((row, rowIndex) => row.map((v, k) => {
-      const header = headerList[k] && headerList[k].trim();
-      const itemData = {
-        content: <span>{v}</span>,
-        title: v,
-        cn: styles.cell
-      }
+    const tableData = data.map((row, rowIndex) =>
+      row.map((v, k) => {
+        const header = headerList[k] && headerList[k].trim();
+        const itemData = {
+          content: <span>{v}</span>,
+          title: v,
+          cn: styles.cell
+        }
 
-      const isNum = colType[header] === 'Numerical'
-      const { low = NaN, high = NaN } = isNum ? rawDataView[header] : {}
-      const isMissing = !v
-      const isMismatch = isNum ? isNaN(parseFloat(v)) : false
-      const isOutlier = isNum ? (v < low || v > high) : false
+        const isNum = colType[header] === 'Numerical'
+        const { low = NaN, high = NaN } = isNum ? rawDataView[header] : {}
+        const isMissing = !v
+        const isMismatch = isNum ? isNaN(parseFloat(v)) : false
+        const isOutlier = (problemType === 'Clustering' && isNum) ? (v < low || v > high) : false
 
-      if (isMissing) {
-        itemData.cn = classnames(itemData.cn, styles.missing);
-      }
-      if (isMismatch) {
-        itemData.cn = classnames(itemData.cn, styles.mismatch);
-      }
-      if (isOutlier) {
-        itemData.cn = classnames(itemData.cn, styles.outlier);
-      }
-      return itemData
-    }))
+        if (isMissing) {
+          itemData.cn = classnames(itemData.cn, styles.missing);
+        }
+        if (isMismatch) {
+          itemData.cn = classnames(itemData.cn, styles.mismatch);
+        }
+        if (isOutlier) {
+          itemData.cn = classnames(itemData.cn, styles.outlier);
+        }
+        return itemData
+      }))
     return [indexArr, headerArr, selectArr, issueArr, ...tableData].filter(row => row.length === realColumn)
   }
 
   render() {
     const { project, changeTab } = this.props;
-    const { dataHeader, etling, etlProgress, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalRawLines } = project;
-    const nullCount = Object.values(nullLineCounts).reduce((sum, n) => sum + n, 0)
-    const mismatchCount = Object.values(mismatchLineCounts).reduce((sum, n) => sum + n, 0)
-    const outlierCount = Object.values(outlierLineCounts).reduce((sum, n) => sum + n, 0)
+    const { dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount }, totalRawLines } = project;
+    // const nullCount = Object.values(nullLineCounts).reduce((sum, n) => sum + n, 0)
+    // const mismatchCount = Object.values(mismatchLineCounts).reduce((sum, n) => sum + n, 0)
+    // const outlierCount = Object.values(outlierLineCounts).reduce((sum, n) => sum + n, 0)
     const rowIssue = totalRawLines < 1000
     const dataIssue = +nullCount + +mismatchCount + +outlierCount > 0
     const tableData = this.formatTable()
@@ -301,7 +303,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { dataHeader, totalRawLines, colType, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, dataIssue } = project
+    const { dataHeader, totalRawLines, colType, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, issues } = project
     const deletePercent = deletedCount / totalRawLines * 100
     const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
     const cleanPercent = totalLines / totalRawLines * 100
@@ -309,9 +311,9 @@ class Summary extends Component {
     const percentList = dataHeader.map(v => {
       const isNum = colType[v] === 'Numerical'
       const percent = {
-        missing: (nullLineCounts[v] || 0) / (totalRawLines || 1) * 100,
-        mismatch: (isNum ? (mismatchLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100,
-        outlier: (isNum ? (outlierLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100
+        missing: nullRow[v] || 0,
+        mismatch: mismatchRow[v] || 0,
+        outlier: outlierRow[v] || 0
       }
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
@@ -384,11 +386,11 @@ class Summary extends Component {
         </div>
         <div className={styles.summaryBottom}>
           <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
-            [styles.disabled]: totalLines === 0
-          })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
+            [styles.disabled]: totalRawLines - deletedCount === 0
+          })} onClick={totalRawLines - deletedCount === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
           <div className={classnames(styles.summaryButton, {
-            [styles.disabled]: !dataIssue
-          })} onClick={dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
+            [styles.disabled]: !issues.dataIssue
+          })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
           <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>
         </div>
       </div>

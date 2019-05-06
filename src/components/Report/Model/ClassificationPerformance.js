@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress } from 'antd';
 import { formatNumber } from 'util'
-
+import EN from '../../../constant/en';
 @observer
 class Predicted extends Component {
   render() {
@@ -30,15 +30,15 @@ class Predicted extends Component {
         <div className={styles.progressMeans}>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.success)} />
-            <div className={styles.progressMeanText} title={`Actual: ${no} Predicted: ${no}`}><span>Actual: {no}</span><span>Predicted: {no}</span></div>
+            <div className={styles.progressMeanText} title={`Actual: ${no} Predicted: ${no}`}><span>{EN.Actual}: {no}</span><span>{EN.Predicted}: {no}</span></div>
           </div>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.predicted)} />
-            <div className={styles.progressMeanText} title={`Actual: ${yes} Predicted: ${yes}`}><span>Actual: {yes}</span><span>Predicted: {yes}</span></div>
+            <div className={styles.progressMeanText} title={`Actual: ${yes} Predicted: ${yes}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {yes}</span></div>
           </div>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.different)} />
-            <div className={styles.progressMeanText} title={`Actual & Predicted Different`}><span>Actual &</span><span>Predicted</span><span>Different</span></div>
+            <div className={styles.progressMeanText} title={`Actual & Predicted Different`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>
           </div>
         </div>
       </div>
@@ -109,7 +109,7 @@ class Performance extends Component {
           strokeColor={'#f5a623'}
         />
         <div className={styles.performanceText}>
-          <span>Performance (AUC)</span>
+          <span>{EN.PerformanceAUC}</span>
         </div>
       </div>
       <Predicted model={current} yes={yes} no={no} />

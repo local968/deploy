@@ -772,7 +772,7 @@ export class FixIssue extends Component {
                   this.fillMethod.outlier[k] :
                   outlierFillMethodTemp.hasOwnProperty(k) ?
                     outlierFillMethodTemp[k] :
-                    'drop'
+                    'ignore'
                 const showMethod = (showType !== 'Categorical' &&
                   method !== mean &&
                   method !== 'drop' &&
@@ -794,8 +794,8 @@ export class FixIssue extends Component {
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.outlierSelect.bind(null, k)}>
-                      <option value="drop" key='drop'>{EN.Deletetherows}</option>
                       <option value="ignore" key='ignore'>{EN.DoNothing}</option>
+                      <option value="drop" key='drop'>{EN.Deletetherows}</option>
                       <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>
                       <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>
                       {/* <option value={mode} key='mode'>Replace with most frequent value</option> */}

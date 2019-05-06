@@ -7,9 +7,8 @@ import { NumberInput, Range } from "components/Common";
 import { Select, message, Tooltip } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
-import EN from "../../../constant/en";
 import InputNumber from "antd/es/input-number";
-
+import EN from '../../../constant/en';
 const Option = Select.Option;
 
 @observer
@@ -47,7 +46,7 @@ export default class AdvancedView extends Component {
     if (!value) {
       algorithms = [];
     } else {
-      algorithms = Algorithms[problemType].map(v => v.value);
+      algorithms = Algorithms[project.problemType].map(v => v.value);
     }
     project.setProperty({
       algorithms
@@ -115,20 +114,28 @@ export default class AdvancedView extends Component {
     });
   };
 
+  handleType = (e) => {
+    const { project } = this.props
+    const value = e.target.value;
+    project.setProperty({
+      standardType: value
+    })
+  }
+
   render() {
     const { project } = this.props;
     const measurementList =
       project.problemType === "Outlier"
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-          [{ value: "Accuracy", label: "Accuracy" }]
+        [{ value: "score", label: EN.Accuracy }]
         : [
-            { value: "CVNN", label: "CVNN" },
-            { value: "RSquared", label: "RSquared" },
-            { value: "RMSSTD", label: "RMSSTD" },
-            { value: "CH", label: "CH" },
-            { value: "silhouette_cosine", label: "silhouette_cosine" },
-            { value: "silhouette_euclidean", label: "silhouette_euclidean" }
-          ];
+          { value: "CVNN", label: "CVNN" },
+          { value: "RSquared", label: "RSquared" },
+          { value: "RMSSTD", label: "RMSSTD" },
+          { value: "CH", label: "CH" },
+          { value: "silhouette_cosine", label: "silhouette_cosine" },
+          { value: "silhouette_euclidean", label: "silhouette_euclidean" }
+        ];
     // const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
     // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
 
@@ -171,26 +178,25 @@ export default class AdvancedView extends Component {
         <div className={styles.advancedRow}>
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
-              <div className={`${styles.advancedTitle}`}>
-                <span>{"Specify the Number of Clusters to Form:"}:</span>
-              </div>
+              {project.problemType === "Outlier" ? <div className={`${styles.advancedTitle}`}>
+                <span>{EN.ChooseaVariableScalingMethod}</span>
+              </div> : <div className={`${styles.advancedTitle}`}>
+                  <span>{EN.SelectAlgorithm}</span>
+                </div>}
             </div>
             <div className={styles.advancedBlock}>
               {project.problemType === "Outlier" ? (
-                <div className={styles.chooseScan}>
-                  <div className={styles.chooseLabel}>
-                    <span>Choose a Variable Scaling Method:</span>
-                  </div>
+                <div className={styles.chooseScan} style={{ flex: 'auto' }}>
                   <div className={styles.chooseBox}>
                     <input
                       type="radio"
                       name="scan"
                       value="minMax"
                       id="minMax"
-                      checked={project.standardType}
+                      checked={project.standardType === 'minMax'}
                       onChange={this.handleType}
                     />
-                    <label htmlFor="minMax">min_max_scale</label>
+                    <label htmlFor="minMax">{EN.minmaxscale}</label>
                   </div>
                   <div className={styles.chooseBox}>
                     <input
@@ -198,10 +204,10 @@ export default class AdvancedView extends Component {
                       name="scan"
                       value="standard"
                       id="standard"
-                      checked={project.standardType}
+                      checked={project.standardType === 'standard'}
                       onChange={this.handleType}
                     />
-                    <label htmlFor="standard">standard_scale</label>
+                    <label htmlFor="standard">Standard Scale</label>
                   </div>
                   <div className={styles.chooseBox}>
                     <input
@@ -209,44 +215,44 @@ export default class AdvancedView extends Component {
                       name="scan"
                       value="robust"
                       id="robust"
-                      checked={project.standardType}
+                      checked={project.standardType === 'robust'}
                       onChange={this.handleType}
                     />
-                    <label htmlFor="robust">robust_scale</label>
+                    <label htmlFor="robust">Robust Scale</label>
                   </div>
                 </div>
               ) : (
-                <div className={styles.advancedOption}>
-                  <div className={styles.advancedOptionBox}>
-                    <input
-                      id="number_auto"
-                      type="radio"
-                      name="numberselect"
-                      defaultChecked={project.kType === "auto"}
-                      onClick={this.handleMode("auto")}
-                    />
-                    <label htmlFor="number_auto">{"Auto"}</label>
+                  <div className={styles.advancedOption}>
+                    <div className={styles.advancedOptionBox}>
+                      <input
+                        id="number_auto"
+                        type="radio"
+                        name="numberselect"
+                        defaultChecked={project.kType === "auto"}
+                        onClick={this.handleMode("auto")}
+                      />
+                      <label htmlFor="number_auto">{EN.Auto}</label>
+                    </div>
+                    <div className={styles.advancedOptionBox}>
+                      <input
+                        id="number_custom"
+                        type="radio"
+                        name="numberselect"
+                        defaultChecked={project.kType === "no_more_than"}
+                        onClick={this.handleMode("no_more_than")}
+                      />
+                      <label htmlFor="number_custom">{EN.NoMoreThan}</label>
+                      <InputNumber
+                        value={project.kValue}
+                        max={15}
+                        min={2}
+                        step={0}
+                        precision={0}
+                        onChange={this.handleNum}
+                      />
+                    </div>
                   </div>
-                  <div className={styles.advancedOptionBox}>
-                    <input
-                      id="number_custom"
-                      type="radio"
-                      name="numberselect"
-                      defaultChecked={project.kType === "no_more_than"}
-                      onClick={this.handleMode("no_more_than")}
-                    />
-                    <label htmlFor="number_custom">{"No More Than"}</label>
-                    <InputNumber
-                      value={project.kValue}
-                      max={15}
-                      min={2}
-                      step={0}
-                      precision={0}
-                      onChange={this.handleNum}
-                    />
-                  </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
         </div>
@@ -287,7 +293,7 @@ export default class AdvancedView extends Component {
                       <input
                         id={"algorithm" + k}
                         type="checkbox"
-                        checked={!project.algorithms.includes(v.value)}
+                        checked={project.algorithms.includes(v.value)}
                         onChange={this.handleCheck.bind(null, v.value)}
                       />
                       <label htmlFor={"algorithm" + k}>{v.label}</label>
@@ -298,10 +304,10 @@ export default class AdvancedView extends Component {
             </div>
           </div>
         </div>
-        <div className={styles.advancedRow}>
+        {project.problemType === "Clustering" && <div className={styles.advancedRow}>
           <div className={styles.advancedBlock}>
             <div className={styles.advancedTitle}>
-              <span>Set Measurement:</span>
+              <span>{EN.SetMeasurement}:</span>
             </div>
             <div className={styles.advancedOption}>
               <Select
@@ -319,9 +325,9 @@ export default class AdvancedView extends Component {
           </div>
           <div className={styles.advancedBlock} style={{ marginLeft: "30px" }}>
             <div className={styles.advancedTitle}>
-              <span>Random Seed:</span>
+              <span>{EN.RandomSeed}:</span>
               <span className={styles.advancedDesc}>
-                Value between 0 - 99999999
+                {EN.ValueBetween} 0 - 99999999
               </span>
             </div>
             <div className={styles.advancedOption}>
@@ -335,13 +341,13 @@ export default class AdvancedView extends Component {
               />
             </div>
           </div>
-        </div>
+        </div>}
         <div className={styles.advancedRow}>
           <div className={styles.advancedBlock}>
             <div className={`${styles.advancedTitle} ${styles.otherLabel}`}>
-              <span>Set Max Training Time:</span>
+              <span>{EN.SetMaxTrainingTime}:</span>
               <span className={styles.advancedDesc}>
-                Max amount of time to evaluate different modules.
+                {EN.Maxamountoftimetoevaluatedifferentmodules}
               </span>
             </div>
             <div className={styles.advancedOption}>
@@ -353,12 +359,30 @@ export default class AdvancedView extends Component {
                 isInt={true}
               />
               <span>
-                Minutes
+                {EN.Minutes}
                 <br />
-                (5 minutes or longer)
+                ({EN.minutesorlonger})
               </span>
             </div>
           </div>
+          {project.problemType === "Outlier" && <div className={styles.advancedBlock} style={{ marginLeft: "30px" }}>
+            <div className={styles.advancedTitle}>
+              <span>{EN.RandomSeed}:</span>
+              <span className={styles.advancedDesc}>
+                {EN.ValueBetween} 0 - 99999999
+              </span>
+            </div>
+            <div className={styles.advancedOption}>
+              <NumberInput
+                className={`${styles.advancedSize} ${styles.inputLarge}`}
+                value={project.randSeed}
+                onBlur={this.handleRandSeed}
+                min={0}
+                max={99999999}
+                isInt={true}
+              />
+            </div>
+          </div>}
         </div>
       </div>
     );

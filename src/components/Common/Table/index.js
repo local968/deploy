@@ -45,6 +45,7 @@ export default class Table extends Component {
           fixedColumnCount={fixedColumnCount}
           style={style}
           ref={this.gridRef}
+          data={data}
         />
       }}
     </AutoSizer> : <div style={{ display: 'flex', flex: 'auto', justifyContent: 'center', alignItems: 'center', border: '1px solid #ccc' }}><Spin size='large' /></div>

@@ -263,7 +263,26 @@ export default class Project {
   @computed
   get defaultTrain() {
     const measurement = this.problemType === "Classification" ? "auc" : "r2"
-
+    const algorithms = (this.problemType === "Clustering" && [
+      'KMeans',
+      'GMM',
+      'MeanShift',
+      'SpectralClustering',
+      'AP',
+      'Agg',
+      'DBSCAN',
+      'Birch',
+    ]) || (this.problemType === "Outlier" && [
+      'IsolationForest',
+      'OneClassSVM',
+      'EllipticEnvelope',
+      'LocalOutlierFactor',
+      'PCA',
+      'HBOS',
+      'CBLOF',
+      'ABOD',
+      'FB',
+    ]) || []
     return {
       train2Finished: false,
       train2ing: false,
@@ -280,7 +299,7 @@ export default class Project {
       dataRange: 'all',
       customField: '',
       customRange: [],
-      algorithms: [],
+      algorithms: algorithms,
       measurement,
       selectId: '',
       version: [1, 2],
@@ -703,7 +722,7 @@ export default class Project {
 
     if (problemType === "Classification") {
       data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
-    } else {
+    } else if (problemType === "Regression") {
       const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 1000
       data.targetIssue = unique < Math.min((rawHeader.length - 1) * 6, 1000)
     }
@@ -725,7 +744,7 @@ export default class Project {
 
   @computed
   get variableIssues() {
-    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines } = this;
+    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines, problemType, target } = this;
     const obj = {
       mismatchRow: {},
       nullRow: {},
@@ -733,13 +752,13 @@ export default class Project {
     }
 
     dataHeader.forEach(h => {
-      if (colType[h] !== "Categorical" && mismatchLineCounts[h]) {
+      if (colType[h] === "Numerical" && mismatchLineCounts[h]) {
         obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
       if (nullLineCounts[h]) {
         obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
-      if (colType[h] !== "Categorical" && outlierLineCounts[h]) {
+      if ((problemType === 'Clustering' || h === target) && colType[h] === "Numerical" && outlierLineCounts[h]) {
         obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
     })
@@ -748,10 +767,10 @@ export default class Project {
 
   @computed
   get variableIssueCount() {
-    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target } = this
+    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType } = this
     const nullCount = Object.values(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
 
     return { nullCount, mismatchCount, outlierCount }
   }
@@ -1364,17 +1383,17 @@ export default class Project {
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
-      let cmd = ''
-      switch (this.problemType) {
-        case 'Clustering':
-          cmd = 'clustering.train';
-          break;
-        case 'Outlier':
-          cmd = 'outlier.train';
-          break;
-        default:
-          cmd = 'clfreg.train';
-      }
+      let cmd = 'clfreg.preTrainImportance'
+      // switch (this.problemType) {
+      //   case 'Clustering':
+      //     cmd = 'clustering.train';
+      //     break;
+      //   case 'Outlier':
+      //     cmd = 'outlier.train';
+      //     break;
+      //   default:
+      //     cmd = 'clfreg.train';
+      // }
 
       const command = {
         projectId: this.id,

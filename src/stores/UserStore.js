@@ -26,6 +26,7 @@ class UserStore {
       this.status = 'unlogin'
       return
     }
+    
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info

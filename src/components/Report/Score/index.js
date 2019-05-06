@@ -11,6 +11,7 @@ import PredictVActual from '../Model/PredictVActual'
 import { NumberInput } from 'components/Common';
 import { formatNumber } from 'util'
 import { observable, computed, action, autorun, runInAction } from 'mobx';
+import EN from '../../../constant/en';
 import moment from 'moment';
 
 @inject('projectStore')
@@ -385,19 +386,19 @@ class DetailCurves extends Component {
     return (
       <div className={styles.charts}>
         <div className={styles.reportChart}>
-          <span className={styles.chartTitle}>ROC Curve</span>
+          <span className={styles.chartTitle}>{EN.ROCCurves}</span>
           <div className={styles.chartContent}><RocChart height={190} width={400} className={`roc${mid}`} model={model} /></div>
         </div>
         <div className={styles.reportChart}>
-          <span className={styles.chartTitle}>Prediction Distribution</span>
+          <span className={styles.chartTitle}>{EN.PredictionDistribution}</span>
           <div className={styles.chartContent}><PredictionDistribution height={190} width={400} className={`pd${mid}`} model={model} /></div>
         </div>
         <div className={styles.reportChart}>
-          <span className={styles.chartTitle}>Precision Recall Tradeoff</span>
+          <span className={styles.chartTitle}>{EN.PrecisionRecallTradeoff}</span>
           <div className={styles.chartContent}><PRChart height={190} width={400} className={`precisionrecall${mid}`} model={model} /></div>
         </div>
         <div className={styles.reportChart}>
-          <span className={styles.chartTitle}>Lift Chart</span>
+          <span className={styles.chartTitle}>{EN.LiftChart}</span>
           <div className={styles.chartContent}><LiftChart height={190} width={400} className={`lift${mid}`} model={model} /></div>
         </div>
       </div>
@@ -434,9 +435,9 @@ class PredictTable extends Component {
     const field = (row === col ? "T" : "F") + (col === 1 ? "P" : "N")
     return <div className={styles.costTd}>
       <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
-      <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benefit:'}</span></div>
+      <div className={styles.costName}><span>{isCost ? EN.Cost : EN.Benefit}</span></div>
       <div className={styles.costInput}><NumberInput value={project.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
-      <div className={styles.costUnits}><span>units</span></div>
+      <div className={styles.costUnits}><span>{EN.Units}</span></div>
     </div>
   }
 
@@ -513,9 +514,9 @@ class PredictTable extends Component {
             <div className={styles.costTable}>
               <div className={styles.costRow}>
                 <div className={styles.sepCell}>
-                  <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title='Predicted'>Predicted</span></div>
+                  <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title='Predicted'>{EN.Predicted}</span></div>
                   <div className={styles.sep}><span></span></div>
-                  <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title='Actual'>Actual</span></div>
+                  <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title='Actual'>{EN.Actual}</span></div>
                 </div>
                 <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
                 <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
