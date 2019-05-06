@@ -6,7 +6,7 @@ const {Option} = Select;
 import useStyles from './charts.css';
 import THREE from './3Variable'
 import EN from "../../constant/en";
-import styles from "../Common/charts/charts.model.css";
+// import styles from '@src/views/modeling.pre.result/modeling.pre.result.css';
 
 const classes = useStyles;
 
@@ -30,7 +30,7 @@ export default class D3D2 extends PureComponent {
 	async componentDidMount() {
 		const { url } = this.props;
 		const result = await request.post({
-			url: '/service/graphics/residual-plot-diagnosis',
+			url: '/graphics/residual-plot-diagnosis',
 			data: {
 				url,
 			},
@@ -133,7 +133,7 @@ export default class D3D2 extends PureComponent {
 				<dd>Var2:{this.selection('y_name')}</dd>
 				<dd>Var3:{this.selection('z_name')}</dd>
 				<dd>
-					<button className={styles.button} onClick={this.save.bind(this)}>
+					<button className={'styles.button'} onClick={this.save.bind(this)}>
 						<span>{EN.Save}</span>
 					</button>
 				</dd>

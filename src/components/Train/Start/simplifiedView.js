@@ -235,7 +235,7 @@ class SimplifiedViewRow extends Component {
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.99} min={0.01} step={0.1} precision={2} onChange={handleWeight} />
       </div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>
+      <div className={styles.tableTd} onClick={this.showHistograms}>1
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}
