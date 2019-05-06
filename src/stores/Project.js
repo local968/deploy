@@ -581,8 +581,7 @@ export default class Project {
     let isMissed = false;
     let isDuplicated = false;
     this.rawHeader.forEach((h, i) => {
-      h = h.trim();
-      if (!h) {
+      if (!h.trim()) {
         isMissed = true;
         return;
       }

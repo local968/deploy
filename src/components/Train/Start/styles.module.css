@@ -892,18 +892,19 @@ span.advancedDesc {
 }
 
 .newVariableBlock {
-  position: absolute;
-  bottom: 100%;
-  left: -0.1em;
-  margin: 0.1em;
+  position: relative;
+  /* bottom: 100%; */
+  /* left: -0.1em; */
+  /* margin: 0.1em; */
   display: flex;
   flex: none;
   flex-direction: column;
-  background: #fff;
-  border-radius: 5px;
-  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3);
+  /* background: #fff; */
+  /* border-radius: 5px; */
+  /* box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3); */
   z-index: 2;
-  padding: 0.1em;
+  /* padding: 0.1em; */
+  font-size: 100px;
 }
 
 .newVariableRow {
