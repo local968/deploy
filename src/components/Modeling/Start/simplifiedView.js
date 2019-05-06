@@ -14,6 +14,8 @@ import { formatNumber } from 'util'
 import request from 'components/Request'
 import EN from '../../../constant/en';
 import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
+import HistogramNumerical from "../../Charts/HistogramNumerical";
+import HistogramCategorical from "../../Charts/HistogramCategorical";
 
 @observer
 export default class SimplifiedView extends Component {
@@ -196,7 +198,7 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.targetRow}>
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
-          <div className={styles.targetCell} onClick={this.show}>3
+          <div className={styles.targetCell} onClick={this.show}>
             <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
             {<Popover placement='bottomLeft'
               visible={this.showHistograms}
@@ -301,10 +303,45 @@ export default class SimplifiedView extends Component {
 @observer
 class SimplifiedViewRow extends Component {
   @observable histograms = false
-  @observable univariant = false
+	@observable univariant = false
+	@observable chartData = {};
 
   showHistograms = () => {
-    this.histograms = true
+  	const {value,project} = this.props;
+	  // this.histograms = true
+	  if (!this.chartData[value]) {
+		  const data = {
+			  field: value,
+			  id: project.etlIndex,
+		  };
+		  if (project.colType[value] === "Numerical") {
+			  const {min, max} = project.dataViews[value];
+			  data.interval = (max - min) / 100;
+			  request.post({
+				  url: '/graphics/histogram-numerical',
+				  data,
+			  }).then((result) => this.showback(result.data,value));
+		  } else {
+		  	// console.log(project.dataViews[value])
+			  const {uniqueValues} = project.dataViews[value];
+			  // data.size = uniqueValues>200?200:uniqueValues;
+			  data.size = uniqueValues;
+			  request.post({
+				  url: '/graphics/histogram-categorical',
+				  data,
+			  }).then((result) => this.showback(result.data,value));
+		  }
+	  }else{
+		  this.histograms = true;
+	  }
+	
+  };
+	showback = (result,value) => {
+	  this.chartData = {
+		  ...this.chartData,
+		  [value]: result,
+	  };
+	  this.histograms = true;
   }
 
   showUnivariant = () => {
@@ -335,18 +372,15 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>4
+      <div className={styles.tableTd} onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}
           onVisibleChange={this.hideHistograms}
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
-            type='histgram'
-            getPath={project.histgramPlot.bind(null, value)}
-            path={project.histgramPlots[value]}
-            id={id}
-            fetch={project.histgramPlots.hasOwnProperty(value)}
+                                       type={colType[value]}
+                                       data={this.chartData[value]}
           />} />}
       </div>
       <div className={styles.tableTd} onClick={this.showUnivariant}>
@@ -437,21 +471,46 @@ class CorrelationPlot extends Component {
   }
 }
 
-@observer
-class SimplifiedViewPlot extends Component {
-  constructor(props) {
-    super(props)
-    if (!props.fetch) props.getPath()
-  }
+// @observer
+// class SimplifiedViewPlot extends Component {
+//   constructor(props) {
+//     super(props)
+//     if (!props.fetch) props.getPath()
+//   }
+//
+//   render() {
+//     const { onClose, path, type, id, style } = this.props;
+//     const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
+//     return <div className={styles.plot} style={style}>
+//       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+//       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
+//     </div>
+//   }
+// }
 
-  render() {
-    const { onClose, path, type, id, style } = this.props;
-    const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
-    return <div className={styles.plot} style={style}>
-      <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-      {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
-    </div>
-  }
+class SimplifiedViewPlot extends Component{
+	
+	render(){
+		const { type, style, data } = this.props;
+		if (type === 'Numerical') {
+			return <div className={styles.plot} style={style}>
+				{/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+				<HistogramNumerical
+					x_name={type}
+					y_name={'count'}
+					title={`Feature:${type}`}
+					data={data}
+				/>
+			</div>
+		}
+		return <div className={styles.plot} style={style}>
+			{/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+			<HistogramCategorical
+				x_name={`Feature:${type}`}
+				data={data}
+			/>
+		</div>
+	}
 }
 
 @observer
