@@ -154,11 +154,11 @@ export default class Deployment extends Component {
           <span className={styles.model}>{EN.Model}: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
             {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
               <OptGroup key={settingName} label={settingName}>
-                {models.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}
+                {models.map(model => <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>)}
               </OptGroup>)}
           </Select> : cd.modelName}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
-          <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ?  EN.Save : EN.Change}</a>
+          <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
           <span className={styles.data}>{EN.DeploymentDataDefinition}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />
           <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>
@@ -491,7 +491,7 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
           <span className={styles.text}>
             <img alt="app" src={appIcon} className={styles.selectionIcon} />{EN.InApp}
           </span>
-          <span className={styles.or}/>
+          <span className={styles.or} />
         </div>
       )}
       {/* {cddo.location === 'database' && (
