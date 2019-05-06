@@ -177,7 +177,7 @@ function createOrUpdate(id, userId, data, isCreate = false) {
 
 function addSettingModel(userId, projectId) {
   return function (result) {
-    const { name: modelName } = result.model
+    const { modelName } = result.model
     redis.hmget(`project:${projectId}`, 'settingId', 'settings')
       .then(([settingId, settings]) => {
         if (settingId && settings) {

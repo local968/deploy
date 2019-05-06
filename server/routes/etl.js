@@ -118,23 +118,22 @@ wss.register('newEtl', async (message, socket, process) => {
 
   for (let key in stats) {
     const mismatch = project.mismatchFillMethod[key]
-    if (mismatch === 'delete') stats[key].mismatchFillMethod = { type: 'delete' }
-    if (mismatch && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
+    if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
+    else if (mismatch && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
 
     const missingValue = project.nullFillMethod[key]
-    if (missingValue === 'delete') stats[key].missingValueFillMethod = { type: 'delete' }
-    if (missingValue && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
+    if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
+    else if (missingValue && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
 
     const outlier = project.outlierFillMethod[key]
-    if (outlier === 'delete') stats[key].outlierFillMethod = { type: 'delete' }
-    if (outlier && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
+    if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
+    else if (outlier && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
   }
   const response = await axios.post(`${esServicePath}/etls/${project.originalIndex}/etl`, stats)
   const { etlIndex, opaqueId } = response.data
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
-      console.log('interval', data.task);
       if (data.task) {
         const status = data.task.status
         const progress = 95 * (status.created + status.deleted) / status.total || 0

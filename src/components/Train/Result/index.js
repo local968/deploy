@@ -102,7 +102,7 @@ function ModelResult(props) {
 
 export default inject('projectStore', 'deploymentStore')(observer(ModelResult))
 
-const OutlierTable = (props) => {
+const OutlierTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain } = props
   const { train2Finished, trainModel } = project
   const sortModels = React.useMemo(() => {
@@ -154,9 +154,9 @@ const OutlierTable = (props) => {
       </div>}
     </div>
   </div >
-}
+})
 
-const OutlierRow = (props) => {
+const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const { model } = props
@@ -197,9 +197,9 @@ const OutlierRow = (props) => {
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
     </div>
   </div>
-}
+})
 
-const ClusteringTable = (props) => {
+const ClusteringTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain } = props
   const { train2Finished, trainModel, isAbort } = project
 
@@ -270,9 +270,9 @@ const ClusteringTable = (props) => {
       </div>}
     </div>
   </div >
-}
+})
 
-const ClusteringRow = (props) => {
+const ClusteringRow = observer((props) => {
   const { model } = props
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
@@ -325,4 +325,4 @@ const ClusteringRow = (props) => {
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
     </div>
   </div>
-}
+})

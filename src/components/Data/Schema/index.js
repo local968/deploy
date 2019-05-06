@@ -32,6 +32,11 @@ export default class DataSchema extends Component {
     if (target && this.dataType[target] === 'Numerical') {
       data.outlierFillMethod = { [target]: 'drop' }
       data.outlierFillMethodTemp = { [target]: 'drop' }
+      data.nullFillMethod = { [target]: 'drop' }
+      data.nullFillMethodTemp = { [target]: 'drop' }
+    }else{
+      data.nullFillMethod = { [target]: 'drop' }
+      data.nullFillMethodTemp = { [target]: 'drop' }
     }
     project.setProperty(data)
     if (project.train2ing || !!project.models.length) return this.visiable = true
