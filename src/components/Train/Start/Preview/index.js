@@ -5,6 +5,8 @@ import { observer } from 'mobx-react';
 import { Icon, Tooltip } from 'antd';
 import { observable } from 'mobx';
 import { Table } from 'components/Common';
+import EN from '../../../../constant/en';
+
 import dataIcon from './data.svg';
 
 @observer
@@ -87,7 +89,7 @@ export default class Preview extends Component {
 
       const colValue = types[header] === 'Numerical' ? 'Numerical' : 'Categorical'
       selectArr.push({
-        content: <span>{colValue}</span>,
+        content: <span>{colValue=== 'Numerical' ? EN.Numerical : EN.Categorical}</span>,
         title: colValue,
         cn: styles.cell
       })
@@ -116,14 +118,14 @@ export default class Preview extends Component {
       [styles.active]: this.visiable
     })}>
       <div className={styles.icon} onClick={this.visiable ? this.hideTable : this.showTable}>
-        {<Tooltip title={`${this.visiable ? 'Close' : 'View'} Data Table`} mouseLeaveDelay={0}>
+        {<Tooltip title={`${this.visiable ? EN.CloseDataTable : EN.ViewDataTable}`} mouseLeaveDelay={0}>
           <img src={dataIcon} alt={"view"} />
         </Tooltip>}
         {/* {!this.visiable && <span >View Data Table</span>} */}
       </div>
       <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
-        <div className={styles.text}><span>Total Variables:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
+        <div className={styles.text}><span>{EN.TotalVariables}:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
       </div>
       <div className={styles.table}>
         <Table

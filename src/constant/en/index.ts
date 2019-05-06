@@ -921,7 +921,12 @@ const EN: any = {
   ConfusionMatrix:'混乱矩阵',
   Charts:'图表',
   VariableImpactnotavailableforthisalgorithm:'变量影响不适用于此算法',
-
+  SetMaxTrainingTime:'设置最长训练时间',
+  Maxamountoftimetoevaluatedifferentmodules:'评估不同模块的最长时间。',
+  Minutes:'分钟',
+  minutesorlonger: '5分钟或更长时间',
+  NoMoreThan:'不超过',
+  Auto:'自动',
 
 };
 

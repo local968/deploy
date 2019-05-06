@@ -7,9 +7,8 @@ import { NumberInput, Range } from "components/Common";
 import { Select, message, Tooltip } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
-import EN from "../../../constant/en";
 import InputNumber from "antd/es/input-number";
-
+import EN from '../../../constant/en';
 const Option = Select.Option;
 
 @observer
@@ -120,7 +119,7 @@ export default class AdvancedView extends Component {
     const measurementList =
       project.problemType === "Outlier"
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-          [{ value: "Accuracy", label: "Accuracy" }]
+          [{ value: "Accuracy", label: EN.Accuracy }]
         : [
             { value: "CVNN", label: "CVNN" },
             { value: "RSquared", label: "RSquared" },
@@ -172,14 +171,14 @@ export default class AdvancedView extends Component {
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
               <div className={`${styles.advancedTitle}`}>
-                <span>{"Specify the Number of Clusters to Form:"}:</span>
+               <span>{EN.SelectAlgorithm}:</span>
               </div>
             </div>
             <div className={styles.advancedBlock}>
               {project.problemType === "Outlier" ? (
                 <div className={styles.chooseScan}>
                   <div className={styles.chooseLabel}>
-                    <span>Choose a Variable Scaling Method:</span>
+                    <span>{EN.ChooseaVariableScalingMethod}:</span>
                   </div>
                   <div className={styles.chooseBox}>
                     <input
@@ -190,7 +189,7 @@ export default class AdvancedView extends Component {
                       checked={project.standardType}
                       onChange={this.handleType}
                     />
-                    <label htmlFor="minMax">min_max_scale</label>
+                    <label htmlFor="minMax">{EN.minmaxscale}</label>
                   </div>
                   <div className={styles.chooseBox}>
                     <input
@@ -212,7 +211,7 @@ export default class AdvancedView extends Component {
                       checked={project.standardType}
                       onChange={this.handleType}
                     />
-                    <label htmlFor="robust">robust_scale</label>
+                    <label htmlFor="robust">{EN.robustscale}</label>
                   </div>
                 </div>
               ) : (
@@ -225,7 +224,7 @@ export default class AdvancedView extends Component {
                       defaultChecked={project.kType === "auto"}
                       onClick={this.handleMode("auto")}
                     />
-                    <label htmlFor="number_auto">{"Auto"}</label>
+                    <label htmlFor="number_auto">{EN.Auto}</label>
                   </div>
                   <div className={styles.advancedOptionBox}>
                     <input
@@ -235,7 +234,7 @@ export default class AdvancedView extends Component {
                       defaultChecked={project.kType === "no_more_than"}
                       onClick={this.handleMode("no_more_than")}
                     />
-                    <label htmlFor="number_custom">{"No More Than"}</label>
+                    <label htmlFor="number_custom">{EN.NoMoreThan}</label>
                     <InputNumber
                       value={project.kValue}
                       max={15}
@@ -301,7 +300,7 @@ export default class AdvancedView extends Component {
         <div className={styles.advancedRow}>
           <div className={styles.advancedBlock}>
             <div className={styles.advancedTitle}>
-              <span>Set Measurement:</span>
+              <span>{EN.SetMeasurement}:</span>
             </div>
             <div className={styles.advancedOption}>
               <Select
@@ -319,9 +318,9 @@ export default class AdvancedView extends Component {
           </div>
           <div className={styles.advancedBlock} style={{ marginLeft: "30px" }}>
             <div className={styles.advancedTitle}>
-              <span>Random Seed:</span>
+              <span>{EN.RandomSeed}:</span>
               <span className={styles.advancedDesc}>
-                Value between 0 - 99999999
+                {EN.ValueBetween} 0 - 99999999
               </span>
             </div>
             <div className={styles.advancedOption}>
@@ -339,9 +338,9 @@ export default class AdvancedView extends Component {
         <div className={styles.advancedRow}>
           <div className={styles.advancedBlock}>
             <div className={`${styles.advancedTitle} ${styles.otherLabel}`}>
-              <span>Set Max Training Time:</span>
+              <span>{EN.SetMaxTrainingTime}:</span>
               <span className={styles.advancedDesc}>
-                Max amount of time to evaluate different modules.
+                {EN.Maxamountoftimetoevaluatedifferentmodules}
               </span>
             </div>
             <div className={styles.advancedOption}>
@@ -353,9 +352,9 @@ export default class AdvancedView extends Component {
                 isInt={true}
               />
               <span>
-                Minutes
+                {EN.Minutes}
                 <br />
-                (5 minutes or longer)
+                ({EN.minutesorlonger})
               </span>
             </div>
           </div>
