@@ -120,7 +120,7 @@ export default class Modeling extends Component {
     return (
       <div className={styles.modeling}>
         {project && <Switch>
-          <Route exact path="/project/:id/modeling/start" component={StartTrain} />
+          <Route exact path="/project/:id/modeling/start" component={(props) => <StartTrain {...props} />} />
           <Route exact path="/project/:id/modeling/result" component={() => {
             return <TrainResult
               resetSide={this.resetSide}

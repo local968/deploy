@@ -16,32 +16,32 @@ const PASSWORD = process.env.PASSWORD || "7788414";
 const BACKEND = process.env.REACT_APP_NGINX_BACKEND || "1";
 const HOST = process.env.R2HOST || "http://127.0.0.1:3000/";
 
-const APP_LOGIN_BFF = process.env.APP_LOGIN_BFF || "http://192.168.0.134:4001";
-const AUTH_SERVICE = process.env.AUTH_SERVICE || "http://192.168.0.134:4002";
+const APP_LOGIN_BFF = process.env.APP_LOGIN_BFF || "http://192.168.0.88:4001";
+const AUTH_SERVICE = process.env.AUTH_SERVICE || "http://192.168.0.88:4002";
 const DEPLOYMENT_SERVICE =
-  process.env.DEPLOYMENT_SERVICE || "http://192.168.0.134:4003";
-const DSL_SERVICE = process.env.DSL_SERVICE || "http://192.168.0.134:4004";
+  process.env.DEPLOYMENT_SERVICE || "http://192.168.0.88:4003";
+const DSL_SERVICE = process.env.DSL_SERVICE || "http://192.168.0.88:4004";
 const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:8000";
 const GRAPHIC_SERVICE =
-  process.env.GRAPHIC_SERVICE || "http://192.168.0.134:4006";
-const JOB_SERVICE = process.env.JOB_SERVICE || "http://192.168.0.134:4007";
-const MODEL_SERVICE = process.env.MODEL_SERVICE || "http://192.168.0.134:4008";
-const PLAN_SERVICE = process.env.PLAN_SERVICE || "http://192.168.0.134:4009";
+  process.env.GRAPHIC_SERVICE || "http://192.168.0.88:4006";
+const JOB_SERVICE = process.env.JOB_SERVICE || "http://192.168.0.88:4007";
+const MODEL_SERVICE = process.env.MODEL_SERVICE || "http://192.168.0.88:4008";
+const PLAN_SERVICE = process.env.PLAN_SERVICE || "http://192.168.0.88:4009";
 const PROJECT_SERVICE =
-  process.env.PROJECT_SERVICE || "http://192.168.0.134:4010";
-const PROPELLER_BFF = process.env.PROPELLER_BFF || "http://192.168.0.134:4011";
-const SAAS_BFF = process.env.SAAS_BFF || "http://192.168.0.134:4012";
+  process.env.PROJECT_SERVICE || "http://192.168.0.88:4010";
+const PROPELLER_BFF = process.env.PROPELLER_BFF || "http://192.168.0.88:4011";
+const SAAS_BFF = process.env.SAAS_BFF || "http://192.168.0.88:4012";
 const SAAS_LOGIN_BFF =
-  process.env.SAAS_LOGIN_BFF || "http://192.168.0.134:4013";
+  process.env.SAAS_LOGIN_BFF || "http://192.168.0.88:4013";
 const SCHEDULE_SERVICE =
-  process.env.SCHEDULE_SERVICE || "http://192.168.0.134:4014";
+  process.env.SCHEDULE_SERVICE || "http://192.168.0.88:4014";
 const SCHEMA_SERVICE =
-  process.env.SCHEMA_SERVICE || "http://192.168.0.134:4015";
-const TASK_SERVICE = process.env.TASK_SERVICE || "http://192.168.0.134:4016";
-const USER_SERVICE = process.env.USER_SERVICE || "http://192.168.0.134:4017";
+  process.env.SCHEMA_SERVICE || "http://192.168.0.88:4015";
+const TASK_SERVICE = process.env.TASK_SERVICE || "http://192.168.0.88:4016";
+const USER_SERVICE = process.env.USER_SERVICE || "http://192.168.0.88:4017";
 
-const AMQPLIB_PROTOCOL = process.env.AMQPLIB_PROTOCOL || "amqp.js.ts";
-const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "192.168.0.134";
+const AMQPLIB_PROTOCOL = process.env.AMQPLIB_PROTOCOL || "amqp";
+const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "192.168.0.88";
 const AMQPLIB_PORT = process.env.AMQPLIB_PORT || "5672";
 const AMQPLIB_USERNAME = process.env.AMQPLIB_USERNAME || "admin";
 const AMQPLIB_PASSWORD = process.env.AMQPLIB_PASSWORD || "admin";
@@ -50,7 +50,7 @@ const AMQPLIB_FRAMEMAX = process.env.AMQPLIB_FRAMEMAX || "0";
 const AMQPLIB_HEARTBEAT = process.env.AMQPLIB_HEARTBEAT || "0";
 const AMQPLIB_VHOST = process.env.AMQPLIB_VHOST || "/";
 
-const QUEUE_RESULT = process.env.QUEUE_RESULT || "";
+const QUEUE_RESULT = process.env.QUEUE_RESULT || "result.top.pipeline;result.top.ping;result.top.listCommand;result.top.histgramPlot;result.top.etlBase;result.top.dataView;result.top.createNewVariable;result.top.correlationMatrix;result.top.univariatePlot;result.outlier.train;result.outlier.preTrainImportance;result.outlier.ping;result.outlier.outlierPlot;result.outlier.listCommand;result.outlier.etl;result.outlier.deploy;result.outlier.applyWeights;result.clustering.train;result.clustering.ssPlot;result.clustering.preTrainImportance;result.clustering.ping;result.clustering.listCommand;result.clustering.etlOutlier;result.clustering.etl;result.clustering.doOutlier;result.clustering.deploy;result.clustering.applyWeights;result.clfreg.univariatePlot;result.clfreg.train;result.clfreg.preTrainImportance;result.clfreg.permutationImportance;result.clfreg.etl;result.clfreg.deploy";
 const IS_EN = process.env.IS_EN || false;
 const YOUR_AGE = process.env.YOUR_AGE || '部署行数已达到出当前权限最大限制。';
 const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前权限最大限制。';

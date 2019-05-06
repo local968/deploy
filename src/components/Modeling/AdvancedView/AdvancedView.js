@@ -47,7 +47,7 @@ import VariableImpact from '../Result/VariableImpact';
 import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
-import FitPlot from "../../Charts/FitPlot";
+// import FitPlot from "../../Charts/FitPlot";
 import ResidualPlot from "../../Charts/ResidualPlot";
 import EN from '../../../constant/en';
 import ROCCurves from "../../Charts/ROCCurves";
@@ -57,6 +57,7 @@ import SingleLiftCharts from '../../Charts/SingleLiftCharts'
 import SpeedvsAccuracys from "../../Charts/SpeedvsAccuracys";
 import LiftChart2 from "../../Charts/LiftChart2";
 import RocChart2 from "../../Charts/RocChart2";
+import FitPlot2 from "../../Charts/FitPlot2";
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -531,22 +532,45 @@ class RegressionDetailCurves extends Component {
   handleDiagnoseType = e => {
     this.setState({ diagnoseType: e.target.value });
   }
+  
+  setChartDate(){
+    const url = project.selectModel.fitAndResidualPlot;
+      request.post({
+         url:'/service/graphics/fit-plot',
+         data:{
+           url,
+         },
+       }).then(chartDate=>{
+        // setChartDate(data)
+        this.setState({
+          chartDate
+        })
+    });
+  }
 
   render() {
     const { model } = this.props;
-    const { curve, diagnoseType } = this.state;
+    const { curve, diagnoseType,chartDate} = this.state;
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
         break;
       case EN.FitPlot:
-        curComponent = (
-          <div className={styles.plot} >
-            {/*<img className={styles.img} src={model.fitPlotPath} alt="fit plot" />*/}
-            <FitPlot/>
+        // curComponent = (
+        //   <div className={styles.plot} >
+        //     {/*<img className={styles.img} src={model.fitPlotPath} alt="fit plot" />*/}
+        //     <FitPlot/>
+        //   </div>
+        // )
+        curComponent = <div className={styles.plot}>
+                  {chartDate&&<FitPlot2
+                      title={EN.FitPlot}
+                      x_name = {EN.Truevalue}
+                      y_name = {EN.Predictvalue}
+                      chartDate = {chartDate}
+                  />}
           </div>
-        )
         break;
       case EN.ResidualPlot:
         curComponent = (

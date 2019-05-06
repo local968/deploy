@@ -13,6 +13,7 @@ import Variable from "./Variable.svg";
 import { ProgressBar, Hint } from 'components/Common';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import PredictedVsActualPlot from "../../Charts/PredictedVsActualPlot";
 
 @observer
 export default class RegressionView extends Component {
@@ -43,7 +44,13 @@ export default class RegressionView extends Component {
           </div>
           <Performance current={current} />
         </div>
-        <PredictVActual model={current} project={project} />
+        
+        {/*<PredictVActual model={current} project={project} />*/}
+        <PredictedVsActualPlot
+            x_name = {EN.PointNumber}
+            y_name = {EN.price + EN.NewAverage}
+            url={project.selectModel.pointToShow}
+        />
       </div>
       <div className={styles.line} />
       {/* <div className={styles.selectBlock}>
