@@ -6,7 +6,7 @@ export default {
     { label: "ln()", value: "ln()", syntax: "语法: ln(@var)", params: 1 },
     { label: "pow()", value: "pow()", syntax: "语法﷨: pow(@var, base)", params: 2 },
     { label: "log()", value: "log()", syntax: "语法: log(@var, base)", params: 2 },
-    { label: "eq()", value: "eq()", syntax: "语法: eq(@var, base)", params: 2 },
+    { label: "eq()", value: "eq()", syntax: "语法: eq(@var1, @var2)", params: 2 },
     { label: "sum()", value: "sum()", syntax: "语法: sum(@var1, @var2, @var3, ...)" },
     { label: "min()", value: "min()", syntax: "语法: min(@var1, @var2, @var3, ...)" },
     { label: "max()", value: "max()", syntax: "语法: max(@var1, @var2, @var3, ...)" },
