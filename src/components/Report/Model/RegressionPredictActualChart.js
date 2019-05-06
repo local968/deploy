@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import d3tips from './d3-tip';
 import { formatNumber } from 'util'
 import styles from 'components/D3Chart/D3Chart.module.css';
-
+import EN from '../../../constant/en';
 @observer
 export default class RegressionPredictActualChart extends Component {
 
@@ -47,7 +47,7 @@ export default class RegressionPredictActualChart extends Component {
       .attr('x', 550)
       .attr('y', 30)
       .attr('fill', '#000')
-      .text('Point Number');
+      .text(EN.PointNumber);
 
     svg.append('g')
       .attr('class', styles.axis)
@@ -57,7 +57,7 @@ export default class RegressionPredictActualChart extends Component {
       .attr('x', 0)
       .attr('fill', '#000')
       .style('text-anchor', 'start')
-      .text('Average ' + target);
+      .text(EN.Average + target);
   }
 
   drawLine = (svg, data, height, x, y, field, color) => {
@@ -78,9 +78,9 @@ export default class RegressionPredictActualChart extends Component {
       .html((d, i) => {
         return (
           `
-            <div class="${styles.hoverText}">Group Number: ${i + 1}</div>
-            <div class="${styles.hoverText}">Predicted Average: ${formatNumber(d['pred'])}</div>
-            <div class="${styles.hoverText}">Actual Average: ${formatNumber(d['target'])}</div>
+            <div class="${styles.hoverText}">${EN.GroupNumber}: ${i + 1}</div>
+            <div class="${styles.hoverText}">${EN.PredictedAverage}: ${formatNumber(d['pred'])}</div>
+            <div class="${styles.hoverText}">${EN.ActualAverage}: ${formatNumber(d['target'])}</div>
           `
         );
       });

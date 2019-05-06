@@ -469,10 +469,10 @@ export default class Article extends Component {
       {/*<dd>•	Your R2-Learn model name. For example, Ridge1.auto.09.11.2018_18:05:24.</dd>*/}
       {/*</dl>*/}
       {/*<div>To run a prediction using R2-Learn’s REST API with cURL and save the results to output.csv, run the following command in your terminal:</div>*/}
-      {/*<code>curl -F 'data=@path/to/local/file' http://service2.newa-tech.com/api/user_name/project_name/model_name/api_key -o output.csv</code>*/}
+      {/*<code>curl -F 'data=@path/to/local/file' http:/2.newa-tech.com/api/user_name/project_name/model_name/api_key -o output.csv</code>*/}
       {/*<div>You will need to write the URL encoded version of your project name and model name into the request. For example, project 11/09/2018, 18:04:13 as a URL encoded string is project%2011%2F09%2F2018%2C%2018%3A04%3A13, and Ridge1.auto.09.11.2018_18:05:24 as a URL encoded string is Ridge1.auto.09.11.2018_18%3A05%3A24.</div>*/}
       {/*<div>Your resulting cURL API request should look something like this:</div>*/}
-      {/*<code>curl -F 'data=@/home/r2user/input_data.csv' http://service2.newa-tech.com/api/r2user/project%2011%2F09%2F2018%2C%2018%3A04%3A13/Ridge1.auto.09.11.2018_18%3A05%3A24/apikey912ec803b2ce49e4a -o /home/r2user/output.csv</code>*/}
+      {/*<code>curl -F 'data=@/home/r2user/input_data.csv' http:/2.newa-tech.com/api/r2user/project%2011%2F09%2F2018%2C%2018%3A04%3A13/Ridge1.auto.09.11.2018_18%3A05%3A24/apikey912ec803b2ce49e4a -o /home/r2user/output.csv</code>*/}
       {/*<div>You can also write the API request in Python:</div>*/}
       {/*<code>*/}
       {/*# API code*/}
@@ -480,7 +480,7 @@ export default class Article extends Component {
       {/*# Make predictions on your data*/}
       {/*<div>data = {`"file": open('/path/to/your/data.csv', 'rb')`}</div>*/}
       {/*{*/}
-      {/*`Response = requests.post('//service2.newa-tech.com/api/<user_name>/<project_namr>/<model_name>/<api_key>', data)`*/}
+      {/*`Response = requests.post('/2.newa-tech.com/api/<user_name>/<project_namr>/<model_name>/<api_key>', data)`*/}
       {/*}*/}
       {/*</code>*/}
       <WayPoint

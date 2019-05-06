@@ -235,7 +235,7 @@ class SimplifiedViewRow extends Component {
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.99} min={0.01} step={0.1} precision={2} onChange={handleWeight} />
       </div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>
+      <div className={styles.tableTd} onClick={this.showHistograms}>1
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}
@@ -461,12 +461,12 @@ class CreateNewVariable extends Component {
   handleAdd = () => {
     let { name, exp, props: { expression } } = this
     name = name.trim()
-    if (!name) return antdMessage.error("name is empty")
-    if (expression.hasOwnProperty(name)) return antdMessage.error(`new variable ${name} is exist`)
-    if (name.includes("_")) return antdMessage.error(`name cannot contain _`)
+    if (!name) return antdMessage.error(EN.Nameisempty)
+    if (expression.hasOwnProperty(name)) return antdMessage.error(`${EN.Newvariable} ${name} ${EN.Isexist}`)
+    if (name.includes("_")) return antdMessage.error(EN.Namecannotcontain)
     const checked = this.checkExp(exp)
     if (!checked.isPass) return antdMessage.error(checked.message)
-    if (!checked.num) return antdMessage.error("expression is empty")
+    if (!checked.num) return antdMessage.error(EN.Expressionisempty)
     const { num, type } = checked
     const nameArray = []
     if (num === 1) {
@@ -498,10 +498,10 @@ class CreateNewVariable extends Component {
       // 查询第一个)
       const end = expression.indexOf(")") + 1
       if (end === 0) break;
-      if (num > 9) return { isPass: false, message: "too many functions" }
+      if (num > 9) return { isPass: false, message: EN.Toomanyfunctions }
       // 查询截取表达式最后一个(
       const start = expression.lastIndexOf("(", end)
-      if (start === -1) return { isPass: false, message: "Unexpected token )" }
+      if (start === -1) return { isPass: false, message: EN.Unexpectedtoken }
       const exp = expression.slice(start + 1, end - 1)
       bracketExps.push(exp)
       //转化(...)为$?
@@ -517,7 +517,7 @@ class CreateNewVariable extends Component {
 
   // 校验基本表达式
   checkSimpleExp = (expression, bracketExps) => {
-    if (!expression) return { isPass: false, message: "empty expression" }
+    if (!expression) return { isPass: false, message: EN.Emptyexpression }
     const baseOptReg = new RegExp(/[+\-*/]/)
     // 根据+-*/切割表达式
     const array = expression.split(baseOptReg)
@@ -529,7 +529,7 @@ class CreateNewVariable extends Component {
       //Categorical
       let type = 'Numerical'
       item = item.trim()
-      if (!item) return { isPass: false, message: "error expression" }
+      if (!item) return { isPass: false, message: EN.Errorexpression }
       //判断是否是数字
       if (isNaN(item)) {
         // 判断是否含有转化的()表达式
@@ -538,14 +538,14 @@ class CreateNewVariable extends Component {
           // 截取函数名称
           const functionName = item.slice(0, index).trim()
           let bracketNum = item.slice(index + 1, index + 2).trim()
-          if (!bracketNum || isNaN(bracketNum)) return { isPass: false, message: `error expression` }
+          if (!bracketNum || isNaN(bracketNum)) return { isPass: false, message: EN.Errorexpression }
           try {
             bracketNum = parseInt(bracketNum, 10)
           } catch (e) {
-            return { isPass: false, message: `error expression` }
+            return { isPass: false, message: EN.Errorexpression }
           }
           const other = item.slice(index + 2).trim()
-          if (other) return { isPass: false, message: `Unexpected identifier: ${other}` }
+          if (other) return { isPass: false, message: `${EN.Unexpectedidentifier} ${other}` }
           // 校验参数
           const fnResult = this.checkParams(functionName, bracketExps, bracketNum)
           if (!fnResult.isPass) return fnResult
@@ -557,7 +557,7 @@ class CreateNewVariable extends Component {
         if (item.startsWith("@")) {
           item = item.slice(1)
           const { dataHeader, colType } = this.props
-          if (!item || !dataHeader.includes(item)) return { isPass: false, message: `unknown variable: ${item}` }
+          if (!item || !dataHeader.includes(item)) return { isPass: false, message: `${EN.Unknownvariable} ${item}` }
           isVariable = true
           type = colType[item] === 'Numerical' ? 'Numerical' : 'Categorical'
         }
@@ -566,27 +566,27 @@ class CreateNewVariable extends Component {
     }
     if (typeArray.length > 1) {
       const index = typeArray.indexOf('Categorical')
-      if (index !== -1) return { isPass: false, message: `error expression: ${array[index]}` }
+      if (index !== -1) return { isPass: false, message: `${EN.Errorexpression}: ${array[index]}` }
       expType = 'Numerical'
     } else {
       expType = typeArray[0]
     }
-    return { isPass: true, message: `ok`, num, isVariable, type: expType }
+    return { isPass: true, message: EN.OK, num, isVariable, type: expType }
   }
 
   // 校验表达式参数
   checkParams = (functionName, bracketExps, bracketNum) => {
     const exps = bracketExps[bracketNum]
-    if (!exps) return { isPass: false, message: `empty parameters` }
+    if (!exps) return { isPass: false, message: EN.Emptyparameter }
     // 根据, 分割参数
     const expArray = exps.split(",")
     // 不是函数, 则参数只能为1个
-    if (!functionName && expArray.length > 1) return { isPass: false, message: `Unexpected identifier: ${exps}` }
+    if (!functionName && expArray.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${exps}` }
     const isBaseFn = FUNCTIONS.base.find(fn => fn.value === functionName + "()")
     const isSeniorFn = FUNCTIONS.senior.find(fn => fn.value === functionName + "()")
     const currentFn = isBaseFn || isSeniorFn
     // 判断函数参数个数限制
-    if (currentFn.params && currentFn.params !== expArray.length) return { isPass: false, message: `function ${functionName} must have ${currentFn.params} params` }
+    if (currentFn.params && currentFn.params !== expArray.length) return { isPass: false, message: `${EN.Function} ${functionName} must have ${currentFn.params} params` }
     let numOfParam = 0
     let isVariable1 = false
     let num = 1
@@ -625,7 +625,7 @@ class CreateNewVariable extends Component {
     } else {
       // 校验非函数参数
       for (let param of params) {
-        if (param.type !== 'Numerical') return { isPass: false, message: `parameters must be Numerical` }
+        if (param.type !== 'Numerical') return { isPass: false, message: EN.ParametersmustbeNumerical }
       }
       fnType = 'Numerical'
     }
@@ -645,7 +645,7 @@ class CreateNewVariable extends Component {
     const paramList = params.slice(0, numOfParam)
     if (senior.value !== 'Concat()') {
       for (let param of paramList) {
-        if (param.type !== 'Numerical') return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters must be Numerical` }
+        if (param.type !== 'Numerical') return { isPass: false, message: `${EN.Function} ${senior.value.slice(0, -2)} ${EN.ParametersmustbeNumerical}` }
       }
     }
     // 截取非列名参数
@@ -653,18 +653,18 @@ class CreateNewVariable extends Component {
     switch (senior.value) {
       case "Concat()":
         type = 'Categorical'
-        if (numOfParam < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters error` }
+        if (numOfParam < 1) return { isPass: false, message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}` }
         const concatResults = numList.map(num => {
           let n = num.exp
-          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
+          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           try {
             n = parseInt(n, 10)
           } catch (e) {
-            return { isPass: false, message: `${n} must be integer` }
+            return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           }
-          if (n < 2) return { isPass: false, message: `${n} must greater than 1` }
-          if (n > numOfParam) return { isPass: false, message: `${n} must less than ${numOfParam + 1}` }
-          return { isPass: true, message: "ok", num: this.factorial(numOfParam) / this.factorial(n) / this.factorial(numOfParam - n) }
+          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan}` }
+          if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}` }
+          return { isPass: true, message: EN.OK, num: this.factorial(numOfParam) / this.factorial(n) / this.factorial(numOfParam - n) }
         })
         for (let numResult of concatResults) {
           if (!numResult.isPass) return numResult
@@ -675,13 +675,13 @@ class CreateNewVariable extends Component {
         type = 'Numerical'
         const diffResults = numList.map(num => {
           let n = num.exp
-          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} must be integer` }
+          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           try {
             n = parseInt(n, 10)
           } catch (e) {
-            return { isPass: false, message: `${n} must be integer` }
+            return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           }
-          return { isPass: true, message: "ok", num: numOfParam }
+          return { isPass: true, message: EN.OK, num: numOfParam }
         })
         for (let numResult of diffResults) {
           if (!numResult.isPass) return numResult
@@ -696,9 +696,9 @@ class CreateNewVariable extends Component {
         type = 'Categorical'
         const quantileBinArray = ["0", "1"]
         const [b, type1, type2] = numList
-        if (isNaN(b.exp) || b.exp.includes(".")) return { isPass: false, message: `${b.exp} must be integer` }
-        if (!quantileBinArray.includes(type1.exp.trim())) return { isPass: false, message: `${type1.exp} is not supported` }
-        if (type2 && !quantileBinArray.includes(type2.exp.trim())) return { isPass: false, message: `${type2.exp} is not supported` }
+        if (isNaN(b.exp) || b.exp.includes(".")) return { isPass: false, message: `${b.exp} ${EN.Mustbeinteger}` }
+        if (!quantileBinArray.includes(type1.exp.trim())) return { isPass: false, message: `${type1.exp} ${EN.Isnotsupported}` }
+        if (type2 && !quantileBinArray.includes(type2.exp.trim())) return { isPass: false, message: `${type2.exp} ${EN.Isnotsupported}` }
         num = numOfParam * (type2 ? 2 : 1)
         break;
       case "Custom_Quantile_bin()":
@@ -708,12 +708,12 @@ class CreateNewVariable extends Component {
           const str = n.trim()
           const first = str.slice(0, 1)
           const last = str.slice(-1)
-          if (first !== "[" || last !== "]") return { isPass: false, message: `Unexpected identifier: ${n}` }
+          if (first !== "[" || last !== "]") return { isPass: false, message: `${EN.Unexpectedidentifier} ${n}` }
           const array = str.slice(1, -1).split("|")
           for (let item of array) {
-            if (!item || isNaN(item.trim())) return { isPass: false, message: `${item} must be number` }
+            if (!item || isNaN(item.trim())) return { isPass: false, message: `${item} ${EN.Mustbenumbe}` }
           }
-          return { isPass: true, message: "ok", num: 1 }
+          return { isPass: true, message: EN.OK, num: 1 }
         })
         for (let numResult of numResults) {
           if (!numResult.isPass) return numResult
@@ -723,14 +723,14 @@ class CreateNewVariable extends Component {
       default:
         break;
     }
-    if (num < 1) return { isPass: false, message: `function: ${senior.value.slice(0, -2)} parameters error` }
-    return { isPass: true, message: "ok", num, type }
+    if (num < 1) return { isPass: false, message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}` }
+    return { isPass: true, message: EN.OK, num, type }
   }
 
   // 校验总表达式
   checkExp = _expression => {
-    if (!_expression) return { isPass: true, message: "ok", num: 0 }
-    if (_expression.includes("$")) return { isPass: false, message: "Unexpected token $" }
+    if (!_expression) return { isPass: true, message:EN.OK, num: 0 }
+    if (_expression.includes("$")) return { isPass: false, message:EN.Unexpectedtoken$ }
 
     const { bracketExps, expression } = this.formatBracket(_expression)
     const { isPass, message, num, type } = this.checkSimpleExp(expression, bracketExps)
@@ -768,11 +768,11 @@ class CreateNewVariable extends Component {
     return visible && <div className={styles.newVariableBlock}>
       <div className={styles.newVariableRow}>
         <div className={styles.newVariableName}>
-          <input className={styles.newVariableInput} placeholder="name" value={this.name} onChange={this.handleNameChange} />
+          <input className={styles.newVariableInput} placeholder={EN.NAME}  value={this.name} onChange={this.handleNameChange} />
         </div>
         <span>=</span>
         <div className={styles.newVariableFx}>
-          <input className={styles.newVariableInput} placeholder="fx" ref={this.fxRef} value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onSelect={this.onSelect} />
+          <input className={styles.newVariableInput} placeholder={EN.FX} ref={this.fxRef} value={this.exp} onChange={this.handleChange} onKeyDown={this.onKeyDown} onSelect={this.onSelect} />
           {this.isIn && <div className={styles.newVariableEmpty} onClick={this.deleteFx}><span>X</span></div>}
           {this.hintStatus && <div className={styles.newVariableHintList}>
             {this.hints.map((v, k) => {
@@ -787,7 +787,7 @@ class CreateNewVariable extends Component {
             <FunctionTips value={hintFunctionSyntax.value} /> :
             <div className={styles.newVariableHintSyntax}>
               <span>{hintFunctionSyntax.syntax}</span>
-              {hintIsSenior && <button onClick={this.showAll}><span>Tips</span></button>}
+              {hintIsSenior && <button onClick={this.showAll}><span>{EN.Tips}</span></button>}
             </div>)}
           {!!functionSyntax && <div className={styles.newVariableSyntax} style={(this.hintStatus && !!this.hints.length) ? { right: '100%' } : null}><span>{functionSyntax.syntax}</span></div>}
         </div>
@@ -796,10 +796,10 @@ class CreateNewVariable extends Component {
         <button className={classnames(styles.newVariableButton, styles.newVariableAdd, {
           [styles.disable]: this.loading
         })} onClick={this.loading ? null : this.handleAdd}>
-          <span>{this.loading ? <Icon type="loading" theme="outlined" /> : 'Add'}</span>
+          <span>{this.loading ? <Icon type="loading" theme="outlined" /> : EN.ADD}</span>
         </button>
         <button className={classnames(styles.newVariableButton, styles.newVariableCancel)} onClick={onClose}>
-          <span>Cancel</span>
+          <span>{EN.Cancel}</span>
         </button>
       </div>
     </div>
@@ -809,18 +809,18 @@ class CreateNewVariable extends Component {
 class FunctionTips extends Component {
   Concat() {
     return <div className={styles.funcTips}>
-      <div className={styles.funcTipsName}><span>Concat()</span></div>
-      <div className={styles.funcTipsContent}><span>Concat function allows you to easily construct new variables by combine certaininter dependent variables (e.g. variables that describe the same object)</span></div>
-      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
-      <div className={styles.funcTipsContent}><span>Concat(@var1, @var2, @var3,...p1, p2...)</span></div>
-      <div className={styles.funcTipsTitle}><span>Input:</span></div>
-      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 2 or more numerical or categorical variables to be combined; the combination order are decided by the input order. All variables need to start with@.<br />
-        p1, p2... - Number of variables in each combination; its number must be larger than 1 but cannot be larger than the number of specified variables; combinations of p1 variables are created, then combinations of p2 variables are created, and so on.</span></div>
-      <div className={styles.funcTipsTitle}><span>Output:</span></div>
-      <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
-      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
-      <div className={styles.funcTipsContent}><span>Concat(@color, @theme, @size, 2)</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsName}><span>{EN.Concat}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Concatfunctionallowsyou}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Concatvar1}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Var1var2var3}<br />
+        {EN.Numberofvariables}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Categoricalvariables}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Examples}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Concatcolor}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -848,8 +848,8 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsContent}><span>Concat(@color, @theme, @size, 3)</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Concatolor3}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -867,8 +867,8 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsContent}><span>Concat(@color, @theme, @size, 2, 3)</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Concat23}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -902,25 +902,25 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
-      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
     </div>
   }
 
   Diff() {
     return <div className={styles.funcTips}>
-      <div className={styles.funcTipsName}><span>Diff()</span></div>
-      <div className={styles.funcTipsContent}><span>Diff function allows you to easily construct new variables by calculating the difference between two rows of selected variables.</span></div>
-      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
-      <div className={styles.funcTipsContent}><span>DIff(@var1, @var2, @var3,...row1,row2,...)</span></div>
-      <div className={styles.funcTipsTitle}><span>Input:</span></div>
-      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be calculated the difference; All variables need to start with@.<br />
-        row1,row2,... – distance to be calculated; its number must be equal to or larger than 1 but cannot be larger than the length of the variable(suggestion: larger the row, more missing values).</span></div>
-      <div className={styles.funcTipsTitle}><span>Output:</span></div>
-      <div className={styles.funcTipsContent}><span>1 or more numerical variables</span></div>
-      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
-      <div className={styles.funcTipsContent}><span>Diff (@tax, 1,2)</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsName}><span>{EN.Diff}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Difffunctionallowsyoutoeasily}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.DIffrow1}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Ormorenumericalvariables}<br />
+        {EN.Distancetobecalculated}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Numericalvariable}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Difftax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -950,24 +950,24 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
-      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
     </div>
   }
 
   Accumulate() {
     return <div className={styles.funcTips}>
-      <div className={styles.funcTipsName}><span>Accumulate()</span></div>
-      <div className={styles.funcTipsContent}><span>Accumulate function allows you to easily construct new variables by accumulating values from all previous rows.</span></div>
-      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
-      <div className={styles.funcTipsContent}><span>Accumulate(@var1, @var2, @var3,...)</span></div>
-      <div className={styles.funcTipsTitle}><span>Input:</span></div>
-      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be accumulated; All variables need to start with@.</span></div>
-      <div className={styles.funcTipsTitle}><span>Output:</span></div>
-      <div className={styles.funcTipsContent}><span>1 or more numerical variables</span></div>
-      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
-      <div className={styles.funcTipsContent}><span>Accumulate (@daily_sales, @daily_cost)</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsName}><span>{EN.Accumulate}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Accumulatefunction}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Accumulatevar1var2}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Morenumericalvariables}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Numericalvariable}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Accumulatedaily_sales}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -1002,28 +1002,28 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
-      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory.The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreatedcsystem}</span></div>
     </div>
   }
 
   Quantile_bin() {
     return <div className={styles.funcTips}>
-      <div className={styles.funcTipsName}><span>Quantile_bin()</span></div>
-      <div className={styles.funcTipsContent}><span>Quantile_bin function allows you to easily construct new variables by dividing selected variables into certain groups depending on its frequency or value.</span></div>
-      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
-      <div className={styles.funcTipsContent}><span>Quantile_bin(@var1, @var2, @var3,b, type1, type2)</span></div>
-      <div className={styles.funcTipsTitle}><span>Input:</span></div>
-      <div className={styles.funcTipsContent}><span>var1, var2, var3... – 1 or more numerical variables to be divided; All variables need to start with@.<br />
-        b – number of groups to be divided; its number must be greater than 1 but cannot be larger than the length of the variable(suggestion: many groups are meaningless)<br />
-        type1,type2 – ways to dividing the variables; 0 and 1 are supported.<br />
-        0: variable is divided by its percentile, each group is thesame size;<br />
-        1: variable is divided by its value, each group is with the same value range.</span></div>
-      <div className={styles.funcTipsTitle}><span>Output:</span></div>
-      <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
-      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
-      <div className={styles.funcTipsContent}><span>Quantile_bin(@age, 3, 1)</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsName}><span>{EN.Quantile_bin}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Quantile_binfunctionallows}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Quantile_binvar1var2}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Allvariablesneedtostartwith}<br />
+        {EN.Numberofgroupstobedivided}<br />
+        {EN.Type1type2}<br />
+        {EN.Variableisdividedbyitspercentile}<br />
+        {EN.Eachgroupiswiththesamevaluerange}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Categoricalvariables}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Quantile_binage}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -1041,14 +1041,14 @@ class FunctionTips extends Component {
             key: 1,
             className: styles.funcTipsCol
           }, {
-            title: 'age_val_b3',
+            title:EN.agevalb3,
             dataIndex: 2,
             key: 2,
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsContent}><span>Quantile_bin(@age1, @age2, 4, 1, 0))</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Quantile_binage1}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -1083,24 +1083,24 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
-      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
     </div>
   }
 
   Custom_Quantile_bin() {
     return <div className={styles.funcTips}>
-      <div className={styles.funcTipsName}><span>Custom_Quantile_bin()</span></div>
-      <div className={styles.funcTipsContent}><span>Custom_Quantile_bin function allows you to easily construct new variables by dividing selected variables into certain groups depending on customized range.</span></div>
-      <div className={styles.funcTipsTitle}><span>Syntax:</span></div>
-      <div className={styles.funcTipsContent}><span>Custom_Quantile_bin(@var, [range_list1], [range_list2]...)</span></div>
-      <div className={styles.funcTipsTitle}><span>Input:</span></div>
-      <div className={styles.funcTipsContent}><span>var - 1 numerical variable to be divided; Variable needs to start with@. [range_list1], [range_list2]... - customized range to dividing the variable; its first number should be larger than the minimum value of the variable and the last number should be smaller than the maximum value of the variable; the length of the range_list decides the number of groups.</span></div>
-      <div className={styles.funcTipsTitle}><span>Output:</span></div>
-      <div className={styles.funcTipsContent}><span>1 or more categorical variables</span></div>
-      <div className={styles.funcTipsTitle}><span>Examples:</span></div>
-      <div className={styles.funcTipsContent}><span>Custom_Quantile_bin(@age,[25|50],[20|40|60])</span></div>
-      <div className={styles.funcTipsContent}><span>Output:</span></div>
+      <div className={styles.funcTipsName}><span>{EN.Custom_Quantile_bin}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Custom_Quantile_binfunction}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Custom_Quantile_binrange_list1}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Variableneedstostartwith}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Categoricalvariables}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Custom_Quantile_binage}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}>
         <Table
           bordered={true}
@@ -1129,8 +1129,8 @@ class FunctionTips extends Component {
             className: styles.funcTipsCol
           }]} />
       </div>
-      <div className={styles.funcTipsTitle}><span>Notice:</span></div>
-      <div className={styles.funcTipsContent}><span>If too many new variables are created, system will possibly be out of memory. The total number of the created new variables is suggested to be less than 10 times of the number of the original variables.</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
     </div>
   }
 

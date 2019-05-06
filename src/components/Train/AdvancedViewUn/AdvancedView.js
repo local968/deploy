@@ -10,7 +10,7 @@ import FitPlotSelected from './iconMR-FitPlot-Selected.svg';
 import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
-
+import EN from '../../../constant/en';
 const Option = Select.Option;
 
 @inject('projectStore')
@@ -108,9 +108,9 @@ export default class AdvancedView extends Component {
       <div className={styles.advancedModelResult}>
         <div className={styles.middle}>
           <div className={styles.settings}>
-            <span className={styles.label}>Model Name Contains:</span>
+            <span className={styles.label}>{EN.ModelNameContains}:</span>
             <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
-              <Option value={'all'}>All</Option>
+              <Option value={'all'}>{EN.All}</Option>
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
           </div>

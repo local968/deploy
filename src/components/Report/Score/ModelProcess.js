@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Popover } from 'antd';
 import styles from './ModelProcess.module.css';
 import { observer } from 'mobx-react';
-
+import EN from '../../../constant/en';
 @observer
 export default class ModelProcess extends Component {
   render() {

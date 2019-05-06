@@ -4,6 +4,7 @@ import { observer } from 'mobx-react'
 import Next from './Next.svg'
 import { Popover, Button, Icon, Tag } from 'antd'
 import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 
 @observer
 export default class ModelProcessFlow extends Component {
@@ -95,19 +96,19 @@ export default class ModelProcessFlow extends Component {
 		const { dataFlow, name = '' } = this.props.model;
 		if (dataFlow.length === 1) {
 			return <section className={styles.process}>
-				<label>Raw Data</label>
+				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
-				{this.popOver(this.DP(dataFlow[0]), 'Data Preprocessing')}
+				{this.popOver(this.DP(dataFlow[0]),  EN.DataPreprocessing)}
 				<img src={Next} alt='' />
-				{this.popOver(this.FP(dataFlow[0]), 'Feature Preprocessing')}
+				{this.popOver(this.FP(dataFlow[0]), EN.FeaturePreprocessing)}
 				<img src={Next} alt='' />
 				{this.popOver(this.Third(dataFlow[0]), dataFlow[0].model_name)}
 				<img src={Next} alt='' />
-				<label>Prediction</label>
+				<label>{EN.Prediction}</label>
 			</section>
 		} else if (dataFlow.length > 1) {
 			return <section className={`${styles.process} ${styles.many}`}>
-				<label>Raw Data</label>
+				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
 				<dl>
 					{
@@ -126,17 +127,17 @@ export default class ModelProcessFlow extends Component {
 				<img src={Next} alt='' />
 				<label>Ensembled Model</label>
 				<img src={Next} alt='' />
-				<label>Prediction</label>
+				 <label>{EN.Prediction}</label>
 			</section>
 		} else {
 			let str = name.split('.')[0];
 			str = str.substring(0, str.length - 1);
 			return <section className={styles.process}>
-				<label>Raw Data</label>
-				<img src={Next} alt='' />
-				<label>{str}</label>
-				<img src={Next} alt='' />
-				<label>Prediction</label>
+				<label>{EN.RawData}</label>
+        <img src={Next} alt='' />
+        <label>{str}</label>
+        <img src={Next} alt='' />
+        <label>{EN.Prediction}</label>
 			</section>
 		}
 	}

@@ -48,8 +48,15 @@ import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
 import FitPlot from "../../Charts/FitPlot";
-import ResidualPlot from "../../Common/charts/ResidualPlot";
+import ResidualPlot from "../../Charts/ResidualPlot";
 import EN from '../../../constant/en';
+import ROCCurves from "../../Charts/ROCCurves";
+import PredictionDistributions from "../../Charts/PredictionDistributions";
+import PRCharts from "../../Charts/PRCharts";
+import SingleLiftCharts from '../../Charts/SingleLiftCharts'
+import SpeedvsAccuracys from "../../Charts/SpeedvsAccuracys";
+import LiftChart2 from "../../Charts/LiftChart2";
+import RocChart2 from "../../Charts/RocChart2";
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -667,16 +674,45 @@ class DetailCurves extends Component {
     let hasReset = true;
     switch (curve) {
       case EN.ROCCurve:
-        curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
+       // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
+        curComponent = <ROCCurves
+            height={300} width={500}
+            x_name = {EN.FalsePositiveDate}
+            y_name = {EN.TruePositiveRate}
+            fitIndex = {model.fitIndex}
+            x = {model.chartData.roc.FPR}
+            y = {model.chartData.roc.TPR}
+        />;
         break;
       case EN.PredictionDistribution:
-        curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
+        // curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
+        curComponent = <PredictionDistributions
+            height={300} width={500}
+            x_name = {EN.ProbabilityThreshold}
+            y_name = {EN.ProbabilityDensity}
+            fitIndex = {model.fitIndex}
+            chartData = {model.chartData}
+        />;
         break;
       case EN.PrecisionRecallTradeoff:
-        curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
+        // curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
+        curComponent = <PRCharts
+            height={300} width={500}
+            x_name = {EN.Recall}
+            y_name = {EN.Precision}
+            fitIndex = {model.fitIndex}
+            x = {model.chartData.roc.Recall}
+            y = {model.chartData.roc.Precision}
+        />
         break;
       case EN.LiftChart:
-        curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
+        // curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
+        curComponent = <SingleLiftCharts
+            height={300} width={500}
+            x_name={EN.percentage}
+            y_name={EN.lift}
+            chartData = {model.chartData}
+        />
         hasReset = false;
         break;
       case EN.VariableImpact:
@@ -896,13 +932,37 @@ class ModelComp extends Component {
             <h4>{EN.ModelComparisonCharts}</h4>
             <Tabs defaultActiveKey="1">
               <TabPane tab={EN.SpeedvsAccuracy} key="1">
-                <SpeedAndAcc models={models} width={600} height={400} className="speedComp" />
+                {/*<SpeedAndAcc models={models} width={600} height={400} className="speedComp" />*/}
+                <SpeedvsAccuracys
+                    // width={600}
+                    height={400}
+                    x_name ={EN.Speedms1000rows}
+                    y_name = {EN.Accuracy}
+                    models = {models}
+                />
               </TabPane>
               <TabPane tab={EN.LiftsCharts} key="3">
-                <LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
+                {/*<LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
+                <LiftChart2
+                    models = {models}
+                    x_name = {EN.percentage}
+                    y_name = {EN.lift}
+                    mom = 'lift'
+                    x = 'PERCENTAGE'
+                    y = 'LIFT'
+                    formatter = {true}
+                />
               </TabPane>
               <TabPane tab={EN.ROCCurves} key="4">
-                <RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />
+                {/*<RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
+                <RocChart2
+                    models = {models}
+                    x_name = {EN.FalsePositiveDate}
+                    y_name = {EN.TruePositiveRate}
+                    mom = 'roc'
+                    x = 'FPR'
+                    y = 'TPR'
+                />
               </TabPane>
               {/* <TabPane tab="Learning Curves" key="2">
                 <Learning width={600} height={400} className="learningComp" models={models} model={models[0]} />

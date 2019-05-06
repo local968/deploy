@@ -12,6 +12,7 @@ import Process from "./Process.svg";
 import Variable from "./Variable.svg";
 import { ProgressBar, Hint } from 'components/Common';
 import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 
 @observer
 export default class RegressionView extends Component {
@@ -23,22 +24,22 @@ export default class RegressionView extends Component {
     const { models, project, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
-    const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
+    const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
           <div className={styles.title}>
-            <span>We have recommended a model by default.</span>
+            <span>{EN.RecommendedAModel}</span>
           </div>
           <div className={styles.row}>
-            <span>Modeling Result :{' '}</span>
+            <span>{EN.ModelingResult}:{' '}</span>
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
-            <span>Selected Model :<a className={styles.nohover}>&nbsp;{current.name}</a></span>
+            <span>{EN.SelectedModel} :<a className={styles.nohover}>&nbsp;{current.modelName}</a></span>
           </div>
           <div className={styles.row}>
-            <span>Target :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
+            <span>{EN.Target} :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
           </div>
           <Performance current={current} />
         </div>
@@ -82,7 +83,7 @@ class Performance extends Component {
           <span>{formatNumber(current.score.validateScore.nrmse)}</span>
         </div>
         <div className={styles.performanceText}>
-          <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /> Normalized RMSE</span>
+          <span><Hint content={EN.RootMeanSquareError} /> {EN.NormalizedRMSE}</span>
         </div>
       </div>
       <div className={styles.space} />
@@ -92,7 +93,7 @@ class Performance extends Component {
         </div>
         <div className={styles.performanceText}>
           <span>
-            Goodness of Fit (R<sup>2</sup>)
+            {EN.GoodnessofFit} (R<sup>2</sup>)
             </span>
         </div>
       </div>
@@ -164,39 +165,39 @@ class ModelTable extends Component {
               )}
               onClick={handleSort.bind(null, 'name')}
             >
-              <span>Model Name
+              <span>{EN.ModelName}
               {sort.key !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'rmse')}>
-              <span><Hint content='Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.' /><i style={{ width: 4 }} />RMSE
+              <span><Hint content={EN.RootMeanSquareErrorRMSEmeasures} /><i style={{ width: 4 }} />RMSE
               {sort.key !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'r2')}>
               <span>
-                <Hint content='R² is a statistical measure of how close the data are to the fitted regression line. R² = Explained variation / Total variation.' /><i style={{ width: 4 }} />R<sup>2</sup>
+                <Hint content={EN.R2isastatisticalmeasure} /><i style={{ width: 4 }} />R<sup>2</sup>
                 {sort.key !== 'r2' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'speed')}>
-              <span>Execution Speed
+              <span>{EN.ExecutionSpeed}
               {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'time')}>
-              <span>Time
+              <span>{EN.Time}
               {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Variable Impact</span>
+              <span>{EN.VariableImpact}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Model Process Flow</span>
+             <span>{EN.ModelProcessFlow}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Report</span>
+              <span>{EN.Report}</span>
             </div>
           </div>
         </div>
@@ -214,10 +215,10 @@ class ModelTable extends Component {
             );
           })}
           {!train2Finished && <div className={styles.rowData}>
-            {trainModel ? <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div> : null}
+            {trainModel ? <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
             {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
             <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
-              {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
+              {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
             </div>
           </div>}
         </div>
@@ -250,7 +251,7 @@ class ModelDetail extends Component {
       <div className={styles.rowBox}>
         <Tooltip
           placement="left"
-          title={isRecommend ? 'Recommended' : 'Selected'}
+          title={isRecommend ? EN.Recommended : EN.Selected}
           visible={isSelect || isRecommend}
           overlayClassName={styles.recommendLabel}
           autoAdjustOverflow={false}
@@ -279,21 +280,21 @@ class ModelDetail extends Component {
               </span>
             </div>
             <div className={styles.cell}>
-              <span>{formatNumber(model.executeSpeed) + ' rows/s'}</span>
+              <span>{formatNumber(model.executeSpeed) + EN.Rowss}</span>
             </div>
             <div className={styles.cell}>
               <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
             </div>
             <div className={classnames(styles.cell, styles.compute)}>
               <img src={Variable} alt="" />
-              <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
+              <span onClick={this.toggleImpact.bind(this, 'impact')}>{EN.Compute}</span>
             </div>
             <div className={classnames(styles.cell, styles.compute)}>
               <img src={Process} alt="" />
-              <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
+              <span onClick={this.toggleImpact.bind(this, 'process')}>{EN.Compute}</span>
             </div>
             <div className={classnames(styles.cell, styles.compute)}>
-              <span onClick={exportReport}>Export</span>
+              <span onClick={exportReport}>{EN.Export}</span>
             </div>
           </div>
         </Tooltip>

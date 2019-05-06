@@ -11,6 +11,7 @@ import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
 import config from 'config'
 import { formatNumber } from 'util'
+import request from 'components/Request'
 import EN from '../../../constant/en';
 
 @observer
@@ -19,6 +20,7 @@ export default class SimplifiedView extends Component {
   @observable showHistograms = false
   @observable showCorrelation = false
   @observable visible = false
+  @observable chartData = {};
 
   componentDidMount() {
     this.props.project.dataView().then(() => {
@@ -31,7 +33,52 @@ export default class SimplifiedView extends Component {
   }
 
   show = () => {
-    this.showHistograms = true
+    // this.showHistograms = true
+    const {project={}} = this.props;
+    const { target,colType,etlIndex} = project;
+    
+    console.log(project,etlIndex)
+  
+  
+    if (!this.chartData[target]) {
+      if (colType[target] === "Numerical") {
+        request.post({
+          url: '/graphics/histogram-numerical',
+          data: {
+            field: target,
+            id: etlIndex,
+          },
+        }).then((result) => this.showback(target,result.data));
+      } else {
+        request.post({
+          url: '/graphics/histogram-categorical',
+          data: {
+            field: target,
+            id: etlIndex,
+            // size: cleanMetric[target].etlStats.uniqueValues,
+          },
+        }).then((result) => this.showback(target,result.data));
+      }
+      return
+    }
+  
+    this.showHistograms = true;
+  };
+  
+  showback = (target,result) => {
+    this.chartData = {
+      ...this.chartData,
+      [target]: result,
+    };
+    // setchartData({
+    //   ...chartData,
+    //   [target]: result,
+    // });
+    this.showHistograms = true;
+    // setState({
+    //   ...state,
+    //   showHistograms: true
+    // })
   }
 
   hide = e => {
@@ -125,19 +172,15 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.targetRow}>
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
-          <div className={styles.targetCell} onClick={this.show}>
+          <div className={styles.targetCell} onClick={this.show}>3
             <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
             {<Popover placement='bottomLeft'
               visible={this.showHistograms}
               onVisibleChange={this.hide}
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
-                type='histogram'
-                getPath={project.histgramPlot.bind(null, target)}
-                path={histgramPlots[target]}
-                id={id}
-                fetch={project.histgramPlots.hasOwnProperty(target)}
-              />} />}
+                                           type={colType[target]}
+                                           data={this.chartData[target]} />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
           <div className={classnames(styles.targetCell, {
@@ -271,7 +314,7 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>
+      <div className={styles.tableTd} onClick={this.showHistograms}>4
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}

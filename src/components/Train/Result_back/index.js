@@ -9,7 +9,7 @@ import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
 import { ProgressBar } from 'components/Common';
 import { Modal, message, Button } from 'antd'
-
+import EN from '../../../constant/en';
 const Classification = 'Classification';
 
 @inject('deploymentStore', 'routing', 'projectStore')
@@ -46,7 +46,7 @@ export default class ModelResult extends Component {
     try {
       this.cancel = this.props.projectStore.project.generateReport(modelId)
     } catch (e) {
-      message.error('export report error.')
+      message.error(EN.exportreporterror)
       this.props.projectStore.project.reportProgress = 0
       this.props.projectStore.project.reportProgressText = 'init'
     }
@@ -63,10 +63,10 @@ export default class ModelResult extends Component {
         <div className={styles.tabBox}>
           <div className={classnames(styles.tab, {
             [styles.active]: view === 'simple'
-          })} onClick={changeView.bind(null, 'simple')}><span>Simplified View</span></div>
+          })} onClick={changeView.bind(null, 'simple')}><span>{EN.SimplifiedView}</span></div>
           <div className={classnames(styles.tab, {
             [styles.active]: view === 'advanced'
-          })} onClick={changeView.bind(null, 'advanced')}><span>Advanced View</span></div>
+          })} onClick={changeView.bind(null, 'advanced')}><span>{EN.AdvancedView}</span></div>
         </div>
         {/* <div className={styles.buttonBlock} >
           <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
@@ -87,18 +87,18 @@ export default class ModelResult extends Component {
             <span>or</span>
           </div> */}
           <button className={styles.button} onClick={this.deploy}>
-            <span>Deploy the Model</span>
+            <span>{EN.DeployTheModel}</span>
           </button>
         </div>
         {/* <Modal title='Model Insights'
           visible={current && this.show}
           onClose={this.hideInsights}
           content={<ModelInsights model={current} project={project} />} /> */}
-        <Modal title='Exporting Report' visible={project.reportProgressText !== 'init'} closable={true} footer={null} onCancel={this.cancel} maskClosable={false}>
+        <Modal title={EN.ExportingReport} visible={project.reportProgressText !== 'init'} closable={true} footer={null} onCancel={this.cancel} maskClosable={false}>
           <div className={styles.reportProgress}>
             <ProgressBar progress={project.reportProgress} allowRollBack={true} />
             <span className={styles.reportProgressText}>{project.reportProgressText}</span>
-            <Button onClick={this.cancel} className={styles.reportCancel} >Cancel</Button>
+            <Button onClick={this.cancel} className={styles.reportCancel} >{EN.CANCEL}</Button>
           </div>
         </Modal>
       </div>

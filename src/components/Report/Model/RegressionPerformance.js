@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import PredictVActual from './PredictVActual';
 import { formatNumber } from 'util'
-
+import EN from '../../../constant/en';
 
 @observer
 export default class RegressionView extends Component {
@@ -33,7 +33,7 @@ class Performance extends Component {
           <span>{formatNumber(current.score.validateScore.nrmse)}</span>
         </div>
         <div className={styles.performanceText}>
-          <span>Normalized RMSE</span>
+          <span>{EN.NormalizedRMSE}</span>
         </div>
       </div>
       <div className={styles.space} />
@@ -43,7 +43,7 @@ class Performance extends Component {
         </div>
         <div className={styles.performanceText}>
           <span>
-            Goodness of Fit (R<sup>2</sup>)
+            {EN.GoodnessofFit}(R<sup>2</sup>)
             </span>
         </div>
       </div>

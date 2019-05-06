@@ -11,8 +11,8 @@ import ModelProcessFlow from "./ModelProcessFlow"
 import Variable from './Variable.svg'
 import Process from './Process.svg'
 import { formatNumber } from 'util'
-
-const AccuracyHint = "Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%."
+import EN from '../../../constant/en';
+const AccuracyHint = EN.Givenaparticularpopulation
 
 @observer
 export default class ClassificationView extends Component {
@@ -51,9 +51,9 @@ export default class ClassificationView extends Component {
     const field = (row === col ? "T" : "F") + (col === 1 ? "P" : "N")
     return <div className={styles.costTd}>
       <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
-      <div className={styles.costName}><span>{isCost ? 'Cost:' : 'Benefit:'}</span></div>
+      <div className={styles.costName}><span>{isCost ? EN.Cost : EN.Benefit}</span></div>
       <div className={styles.costInput}><NumberInput value={this.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
-      <div className={styles.costUnits}><span>units</span></div>
+      <div className={styles.costUnits}><span>{EN.Units}</span></div>
     </div>
   }
 
@@ -78,25 +78,25 @@ export default class ClassificationView extends Component {
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
-    const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? 'Cost Based' : 'Recommended'
+    const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
           <div className={styles.title}>
-            <span>We have recommended a model by default.</span>
+            <span>{EN.RecommendedAModel}</span>
           </div>
           {/* <div className={styles.text}>
             <span>You can also tell us your business needs to get a more precise recommendation.</span>
           </div> */}
           <div className={styles.row}>
-            <span>Modeling Result :{' '}</span>
+            <span>{EN.ModelingResult} :{' '}</span>
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
           </div>
           <div className={styles.row}>
-            <span>Selected Model :<a className={styles.nohover}>&nbsp;{current.name}</a></span>
+            <span>{EN.SelectedModel} :<a className={styles.nohover}>&nbsp;{current.modelName}</a></span>
           </div>
           <div className={styles.row}>
-            <span>Target :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
+            <span>{EN.Target} :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
           </div>
         </div>
         <Performance current={current} yes={yes} no={no} />
@@ -104,16 +104,16 @@ export default class ClassificationView extends Component {
       <div className={styles.line} />
       <div className={styles.selectBlock}>
         <div className={styles.selectText}>
-          <span> Select your model based on your own criteria:</span>
+          <span> {EN.Selectyourmodelbasedonyourown}</span>
         </div>
         <div className={styles.radioGroup}>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='default' id='criteria_default' readOnly onClick={this.onChange} checked={criteria === 'default'} />
-            <label htmlFor='criteria_default'>R2 Learn's Default Selection</label>
+            <label htmlFor='criteria_default'>{EN.R2LearnsDefaultSelection}</label>
           </div>
           <div className={styles.radio}>
             <input type="radio" name="criteria" value='cost' id='criteria_cost' readOnly onClick={this.onChange} checked={criteria === 'cost'} />
-            <label htmlFor='criteria_cost'>Cost Based<Hint content='If you can estimate the business benefit of a correct prediction and the business cost of an incorrect prediction, we can help you optimize the model parameter or select a more appropriate model.' /></label>
+            <label htmlFor='criteria_cost'>{EN.BenefitCost}<Hint content={EN.Ifyoucanestimatethebusiness} /></label>
           </div>
           {this.showCost && <div className={styles.costBlock}>
             <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
@@ -147,7 +147,7 @@ export default class ClassificationView extends Component {
               <div className={styles.costText}><span>{current.getBenefit(TP, FN, FP, TN).text}</span></div>
             </div>}
             <div className={styles.costButton}>
-              <button onClick={this.handleSubmit}><span>Submit</span></button>
+              <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>
             </div>
           </div>}
         </div>
@@ -196,15 +196,15 @@ class Predicted extends Component {
         <div className={styles.progressMeans}>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.success)} />
-            <div className={styles.progressMeanText} title={`Actual: ${no} Predicted: ${no}`}><span>Actual: {no}</span><span>Predicted: {no}</span></div>
+            <div className={styles.progressMeanText} title={`Actual: ${no} Predicted: ${no}`}><span>{EN.Actual}: {no}</span><span>{EN.Predicted}: {no}</span></div>
           </div>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.predicted)} />
-            <div className={styles.progressMeanText} title={`Actual: ${yes} Predicted: ${yes}`}><span>Actual: {yes}</span><span>Predicted: {yes}</span></div>
+            <div className={styles.progressMeanText} title={`Actual: ${yes} Predicted: ${yes}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {yes}</span></div>
           </div>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.different)} />
-            <div className={styles.progressMeanText} title={`Actual & Predicted Different`}><span>Actual &</span><span>Predicted</span><span>Different</span></div>
+            <div className={styles.progressMeanText} title={`Actual & Predicted Different`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>
           </div>
         </div>
       </div>
@@ -272,7 +272,7 @@ class Performance extends Component {
           strokeColor={'#f5a623'}
         />
         <div className={styles.performanceText}>
-          <span><Hint content='Area under the curve, a popular metric to measure the performance of a classification model. The AUC value typically lies between 0.5 to 1 where 0.5 denotes a bad classifier and 1 denotes an excellent classifier.' /> Performance (AUC)</span>
+          <span><Hint content={EN.Areaunderthecurve} /> {EN.PerformanceAUC}</span>
         </div>
       </div>
       <Predicted model={current} yes={yes} no={no} />
@@ -335,7 +335,7 @@ class ModelTable extends Component {
           <div className={styles.rowData}>
             <div className={classnames(styles.cell, styles.name, styles.cellHeader)} onClick={handleSort.bind(null, 'name')} >
               <span>
-                Model Name
+                {EN.ModelName}
                 {sort.key !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
@@ -348,31 +348,31 @@ class ModelTable extends Component {
             />
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'acc')}>
               <span>
-                Accuracy
+                {EN.Accuracys}
                 <Hint content={AccuracyHint} placement="right" />
                 {sort.key !== 'acc' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'auc')}>
-              <span>Performance(AUC)
+              <span>{EN.PerformanceAUC}
               {sort.key !== 'auc' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'speed')}>
-              <span>Execution Speed
+              <span>{EN.ExecutionSpeed}
               {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'time')}>
-              <span>Time
+              <span>{EN.Time}
               {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Variable Impact</span>
+              <span>{EN.VariableImpact}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Model Process Flow</span>
+              <span>{EN.ModelProcessFlow}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>Report</span>
@@ -395,10 +395,10 @@ class ModelTable extends Component {
             );
           })}
           {!train2Finished && <div className={styles.rowData}>
-            {trainModel ? <div className={styles.trainingModel}><Tooltip title={'New Model Being Trained'}>{'New Model Being Trained'}</Tooltip></div> : null}
+            {trainModel ? <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
             {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
             <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
-              {isAbort ? <Icon type='loading' /> : <span>Abort Training</span>}
+              {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
             </div>
           </div>}
         </div>
@@ -431,7 +431,7 @@ class ModelDetail extends Component {
       <div className={styles.rowBox}>
         <Tooltip
           placement="left"
-          title={isRecommend ? text : 'Selected'}
+          title={isRecommend ? text : EN.Selected}
           visible={isSelect || isRecommend}
           overlayClassName={styles.recommendLabel}
           autoAdjustOverflow={false}
@@ -475,21 +475,21 @@ class ModelDetail extends Component {
               </span>
             </div>
             <div className={styles.cell}>
-              <span>{formatNumber(model.executeSpeed) + ' rows/s'}</span>
+              <span>{formatNumber(model.executeSpeed) + EN.Rowss}</span>
             </div>
             <div className={styles.cell}>
               <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
             </div>
             <div className={classnames(styles.cell, styles.compute)}>
               <img src={Variable} alt="" />
-              <span onClick={this.toggleImpact.bind(this, 'impact')}>Compute</span>
+              <span onClick={this.toggleImpact.bind(this, 'impact')}>{EN.Compute}</span>
             </div>
             <div className={classnames(styles.cell, styles.compute)}>
               <img src={Process} alt="" />
-              <span onClick={this.toggleImpact.bind(this, 'process')}>Compute</span>
+              <span onClick={this.toggleImpact.bind(this, 'process')}>{EN.Compute}</span>
             </div>
             <div className={classnames(styles.cell, styles.compute)}>
-              <span onClick={exportReport}>Export</span>
+              <span onClick={exportReport}>{EN.Export}</span>
             </div>
           </div>
         </Tooltip>

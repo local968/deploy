@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import RegressionPredictActualChart from 'components/D3Chart/RegressionPredictActualChart';
 import { Spin } from 'antd'
 import Hint from 'components/Common/Hint'
+import EN from '../../../constant/en';
 
 @observer
 export default class PredictVActual extends Component {
@@ -14,22 +15,22 @@ export default class PredictVActual extends Component {
     // const { modelName } = selectedModel;
     return (
       <div className={styles.predictActual}>
-        <div className={styles.title} >
-          Predicted VS Actual Plot (Sorted)<Hint content={<p>How was the plot created?<br />
-            1. Sort the data by the actual target value<br />
-            2. Divide all data points evenly into 100 groups<br />
-            3. Calculate the mean value of predicted target values and the actual target values of each group and plot it on the graph<br />
-            How do I interprete it?<br />
-            We aim to get you a sense of how accurate the model is by comparing the predicted V.S actual value. Also you may find some pattern.</p>} />
+        <div className={styles.title}>
+          {EN.PredictedVSActualPlotSorted}<Hint content={<p>{EN.Howwastheplotcreate}<br/>
+          {EN.Sortthedatabythe}<br/>
+          {EN.Dividealldatapoints}<br/>
+          {EN.Calculatethemeanvalue}<br/>
+          {EN.HowdoIinterprete}<br/>
+          {EN.Weaimtogetyouasense}</p>}/>
         </div>
-        <div className={styles.legends} >
+        <div className={styles.legends}>
           <div className={styles.legend}>
-            <span style={{backgroundColor: 'lightblue'}} className={styles.circle} />
-            <span className={styles.legendText} > Predicted Values </span>
+            <span style={{ backgroundColor: 'lightblue' }} className={styles.circle}/>
+            <span className={styles.legendText}> {EN.PredictedValues} </span>
           </div>
           <div className={styles.legend}>
-            <span style={{backgroundColor: 'black'}} className={styles.circle}/>
-            <span className={styles.legendText}> Actual Values </span>
+            <span style={{ backgroundColor: 'black' }} className={styles.circle}/>
+            <span className={styles.legendText}> {EN.ActualValues} </span>
           </div>
         </div>
         {model.qcut ? <RegressionPredictActualChart
