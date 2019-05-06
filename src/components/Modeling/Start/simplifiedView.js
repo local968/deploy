@@ -4,8 +4,8 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
-import { observable } from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon, Table } from 'antd';
+import {observable, toJS} from 'mobx';
+import { Spin, Popover, message as antdMessage, Icon, Table,Tooltip } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
@@ -13,6 +13,7 @@ import config from 'config'
 import { formatNumber } from 'util'
 import request from 'components/Request'
 import EN from '../../../constant/en';
+import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
 
 @observer
 export default class SimplifiedView extends Component {
@@ -21,6 +22,7 @@ export default class SimplifiedView extends Component {
   @observable showCorrelation = false
   @observable visible = false
   @observable chartData = {};
+  @observable CorrelationMatrixData = {};
 
   componentDidMount() {
     this.props.project.dataView().then(() => {
@@ -34,12 +36,12 @@ export default class SimplifiedView extends Component {
 
   show = () => {
     // this.showHistograms = true
-    const {project={}} = this.props;
-    const { target,colType,etlIndex} = project;
-    
-    console.log(project,etlIndex)
-  
-  
+    const { project = {} } = this.props;
+    const { target, colType, etlIndex } = project;
+
+    console.log(project, etlIndex)
+
+
     if (!this.chartData[target]) {
       if (colType[target] === "Numerical") {
         request.post({
@@ -48,7 +50,7 @@ export default class SimplifiedView extends Component {
             field: target,
             id: etlIndex,
           },
-        }).then((result) => this.showback(target,result.data));
+        }).then((result) => this.showback(target, result.data));
       } else {
         request.post({
           url: '/graphics/histogram-categorical',
@@ -57,15 +59,15 @@ export default class SimplifiedView extends Component {
             id: etlIndex,
             // size: cleanMetric[target].etlStats.uniqueValues,
           },
-        }).then((result) => this.showback(target,result.data));
+        }).then((result) => this.showback(target, result.data));
       }
       return
     }
-  
+
     this.showHistograms = true;
   };
-  
-  showback = (target,result) => {
+
+  showback = (target, result) => {
     this.chartData = {
       ...this.chartData,
       [target]: result,
@@ -90,9 +92,31 @@ export default class SimplifiedView extends Component {
     this.sort = this.sort * -1
   }
 
+  // showCorrelationMatrix = () => {
+  //   this.showCorrelation = true
+  // }
+  
   showCorrelationMatrix = () => {
-    this.showCorrelation = true
-  }
+    const {project} = this.props;
+  
+    const colType = toJS(project.colType);
+    const trainHeader = toJS(project.trainHeader);
+  
+    const fields = Object.entries(colType)
+        .filter(itm => itm[1] === 'Numerical')
+        .map(itm => itm[0])
+        .filter(itm => !trainHeader.includes(itm));
+    request.post({
+      url: '/graphics/correlation-matrix',
+      data: {
+        fields,
+        id: project.etlIndex,
+      },
+    }).then((CorrelationMatrixData) => {
+      this.showCorrelation = true;
+      this.CorrelationMatrixData = CorrelationMatrixData;
+    });
+  };
 
   hideCorrelationMatrix = e => {
     e && e.stopPropagation();
@@ -179,8 +203,8 @@ export default class SimplifiedView extends Component {
               onVisibleChange={this.hide}
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
-                                           type={colType[target]}
-                                           data={this.chartData[target]} />} />}
+                type={colType[target]}
+                data={this.chartData[target]} />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
           <div className={classnames(styles.targetCell, {
@@ -218,7 +242,9 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>{EN.CreateANewVariable}</span>
           </div>
-          <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} expression={expression} />
+          <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable} content={
+            <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} addNewVariable={addNewVariable} expression={expression} />
+          } />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
@@ -226,12 +252,7 @@ export default class SimplifiedView extends Component {
                                             onVisibleChange={this.hideCorrelationMatrix}
                                             trigger="click"
                                             content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
-                                                                      type='correlationMatrix'
-                                                                      getPath={this.getCorrelationMatrix}
-                                                                      data={project.correlationMatrixData}
-                                                                      header={project.correlationMatrixHeader}
-                                                                      id={id}
-                                                                      fetch={(!!project.correlationMatrixHeader && !!project.correlationMatrixData) || project.correlationMatrixLoading}
+                                                                      CorrelationMatrixData={this.CorrelationMatrixData}
                                             />} />}
           <span>{EN.CheckCorrelationMatrix}</span>
         </div>
@@ -380,19 +401,38 @@ class SimplifiedViewRow extends Component {
   }
 }
 
+// @observer
+// class CorrelationPlot extends Component {
+//   constructor(props) {
+//     super(props)
+//     if (!props.fetch) props.getPath()
+//   }
+//   render() {
+//     const { data, header, onClose } = this.props;
+//     return (
+//       <div className={styles.correlationPlot} >
+//         <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+//         {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
+//       </div>
+//     )
+//   }
+// }
+
 @observer
 class CorrelationPlot extends Component {
-  constructor(props) {
-    super(props)
-    if (!props.fetch) props.getPath()
-  }
-  render() {
-    const { data, header, onClose } = this.props;
+  render(){
+    const { onClose, CorrelationMatrixData } = this.props;
+    const { type, value } = CorrelationMatrixData;
     return (
-      <div className={styles.correlationPlot} >
-        <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-        {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
-      </div>
+        <div className={styles.correlationPlot} >
+          <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+          <CorrelationMatrixs
+              value={value}
+              type={type}
+          />
+          {/* {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>} */}
+          {/*<div className={styles.plotLoad}><Spin size="large" /></div>*/}
+        </div>
     )
   }
 }
@@ -827,8 +867,8 @@ class CreateNewVariable extends Component {
 
   // 校验总表达式
   checkExp = _expression => {
-    if (!_expression) return { isPass: true, message:EN.OK, num: 0 }
-    if (_expression.includes("$")) return { isPass: false, message:EN.Unexpectedtoken$ }
+    if (!_expression) return { isPass: true, message: EN.OK, num: 0 }
+    if (_expression.includes("$")) return { isPass: false, message: EN.Unexpectedtoken$ }
 
     const { bracketExps, expression } = this.formatBracket(_expression)
     const { isPass, message, num, type } = this.checkSimpleExp(expression, bracketExps)
@@ -857,16 +897,16 @@ class CreateNewVariable extends Component {
   }
 
   render() {
-    const { visible, onClose } = this.props
+    const { onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
     const functionSyntax = functionList.find(v => v.syntax === this.myFunction.syntax)
     const hintFunctionSyntax = functionList.find(v => v.syntax === this.showFunction.syntax)
     const hintIsSenior = FUNCTIONS.senior.includes(hintFunctionSyntax)
 
-    return visible && <div className={styles.newVariableBlock}>
+    return <div className={styles.newVariableBlock}>
       <div className={styles.newVariableRow}>
         <div className={styles.newVariableName}>
-          <input className={styles.newVariableInput} placeholder={EN.NAME}  value={this.name} onChange={this.handleNameChange} />
+          <input className={styles.newVariableInput} placeholder={EN.NAME} value={this.name} onChange={this.handleNameChange} />
         </div>
         <span>=</span>
         <div className={styles.newVariableFx}>
@@ -1139,7 +1179,7 @@ class FunctionTips extends Component {
             key: 1,
             className: styles.funcTipsCol
           }, {
-            title:EN.agevalb3,
+            title: EN.agevalb3,
             dataIndex: 2,
             key: 2,
             className: styles.funcTipsCol

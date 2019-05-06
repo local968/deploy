@@ -1010,7 +1010,6 @@ const EN_LAN = {
   FromSQL: 'From SQL',
   ProjectReport: 'Project Report',
   Hostname: 'Hostname',
-
   Port: 'Port',
   DatabaseType: 'Database Type',
   TableName: 'Table Name',

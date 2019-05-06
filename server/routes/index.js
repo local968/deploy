@@ -1,22 +1,22 @@
-const { Router } = require('express')
-const user = require('./user')
-const upload = require('./upload')
-const redirect = require('./redirect')
-const redirectEs = require('./redirectEs')
-// const redirectGraphic = require('./redirectGraphic')
-const api = require('./api')
-require('./project')
-require('./deployment')
-require('./database')
-require('./etl')
+const { Router } = require("express");
+const user = require("./user");
+const upload = require("./upload");
+const redirect = require("./redirect");
+const redirectEs = require("./redirectEs");
+// const redirectGraphic = require("./redirectGraphic");
+const api = require("./api");
+require("./project");
+require("./deployment");
+require("./database");
+require("./etl");
 
-const router = new Router()
+const router = new Router();
 
-router.use('/user', user)
-router.use('/upload', upload)
-router.use('/redirect', redirect)
-router.use('/etls', redirectEs)
-// router.use('/graphics', redirectGraphic)
-router.use('/api', api)
+router.use("/user", user);
+router.use("/upload", upload);
+router.use("/redirect", redirect);
+router.use("/etls", redirectEs);
+// router.use("/graphics", redirectGraphic);
+router.use("/api", api);
 
-module.exports = router
+module.exports = router;

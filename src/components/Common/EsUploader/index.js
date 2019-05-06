@@ -18,7 +18,7 @@ export default function EsUploader(file, option = {}) {
     return rawHeader.map((h, i) => {
       h = h.trim();
       if (/^$/.test(h)) {
-        h = `Unnamed: ${i}`;
+        h = `Unnamed_${i}`;
       }
       if (!temp[h]) {
         temp[h] = 1;
@@ -39,12 +39,12 @@ export default function EsUploader(file, option = {}) {
       step: (result, parser) => {
         uploader = parser
         const _row = result.data[0]
-        const row = _row.map(v => encodeURIComponent(v))
         if (!header) {
-          rawHeader = autoFixHeader(row)
+          rawHeader = autoFixHeader(_row).map(v => encodeURIComponent(v))
           // cleanHeader = rawHeader
           return header = '__no,' + rawHeader.toString()
         }
+        const row = _row.map(v => encodeURIComponent(v))
         if (row.toString() === '') return
         chunk += no + ',' + row.toString()
         loaded += row.length
