@@ -62,7 +62,10 @@ export default class Preview extends Component {
     const notShowIndex = rawHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
     const data = cleanData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
 
-    const types = { ...colType, ...newType }
+    const types = { ...colType }
+
+    const realColumn = headerList.length
+
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框

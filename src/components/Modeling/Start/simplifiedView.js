@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
 import {observable, toJS} from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon, Table } from 'antd';
+import { Spin, Popover, message as antdMessage, Icon, Table,Tooltip } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
@@ -36,12 +36,12 @@ export default class SimplifiedView extends Component {
 
   show = () => {
     // this.showHistograms = true
-    const {project={}} = this.props;
-    const { target,colType,etlIndex} = project;
-    
-    console.log(project,etlIndex)
-  
-  
+    const { project = {} } = this.props;
+    const { target, colType, etlIndex } = project;
+
+    console.log(project, etlIndex)
+
+
     if (!this.chartData[target]) {
       if (colType[target] === "Numerical") {
         request.post({
@@ -50,7 +50,7 @@ export default class SimplifiedView extends Component {
             field: target,
             id: etlIndex,
           },
-        }).then((result) => this.showback(target,result.data));
+        }).then((result) => this.showback(target, result.data));
       } else {
         request.post({
           url: '/graphics/histogram-categorical',
@@ -59,15 +59,15 @@ export default class SimplifiedView extends Component {
             id: etlIndex,
             // size: cleanMetric[target].etlStats.uniqueValues,
           },
-        }).then((result) => this.showback(target,result.data));
+        }).then((result) => this.showback(target, result.data));
       }
       return
     }
-  
+
     this.showHistograms = true;
   };
-  
-  showback = (target,result) => {
+
+  showback = (target, result) => {
     this.chartData = {
       ...this.chartData,
       [target]: result,
@@ -203,8 +203,8 @@ export default class SimplifiedView extends Component {
               onVisibleChange={this.hide}
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
-                                           type={colType[target]}
-                                           data={this.chartData[target]} />} />}
+                type={colType[target]}
+                data={this.chartData[target]} />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
           <div className={classnames(styles.targetCell, {
@@ -242,7 +242,9 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>{EN.CreateANewVariable}</span>
           </div>
-          <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} visible={this.visible} addNewVariable={addNewVariable} expression={expression} />
+          <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable} content={
+            <CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} addNewVariable={addNewVariable} expression={expression} />
+          } />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
@@ -865,8 +867,8 @@ class CreateNewVariable extends Component {
 
   // 校验总表达式
   checkExp = _expression => {
-    if (!_expression) return { isPass: true, message:EN.OK, num: 0 }
-    if (_expression.includes("$")) return { isPass: false, message:EN.Unexpectedtoken$ }
+    if (!_expression) return { isPass: true, message: EN.OK, num: 0 }
+    if (_expression.includes("$")) return { isPass: false, message: EN.Unexpectedtoken$ }
 
     const { bracketExps, expression } = this.formatBracket(_expression)
     const { isPass, message, num, type } = this.checkSimpleExp(expression, bracketExps)
@@ -895,16 +897,16 @@ class CreateNewVariable extends Component {
   }
 
   render() {
-    const { visible, onClose } = this.props
+    const { onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
     const functionSyntax = functionList.find(v => v.syntax === this.myFunction.syntax)
     const hintFunctionSyntax = functionList.find(v => v.syntax === this.showFunction.syntax)
     const hintIsSenior = FUNCTIONS.senior.includes(hintFunctionSyntax)
 
-    return visible && <div className={styles.newVariableBlock}>
+    return <div className={styles.newVariableBlock}>
       <div className={styles.newVariableRow}>
         <div className={styles.newVariableName}>
-          <input className={styles.newVariableInput} placeholder={EN.NAME}  value={this.name} onChange={this.handleNameChange} />
+          <input className={styles.newVariableInput} placeholder={EN.NAME} value={this.name} onChange={this.handleNameChange} />
         </div>
         <span>=</span>
         <div className={styles.newVariableFx}>
@@ -1177,7 +1179,7 @@ class FunctionTips extends Component {
             key: 1,
             className: styles.funcTipsCol
           }, {
-            title:EN.agevalb3,
+            title: EN.agevalb3,
             dataIndex: 2,
             key: 2,
             className: styles.funcTipsCol
