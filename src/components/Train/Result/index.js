@@ -49,8 +49,8 @@ function ModelResult(props) {
               <span className={classes.label}>Score <Hint content='123321' /></span>
             </div>
             <div className={classes.rate}>
-              <div className={classes.blood}>{formatNumber(selectModel.score.contamination || 0)}</div>
-              <span className={classes.rateLabel}>{EN.ContaminationRate} <Hint content='123321' /></span>
+              <div className={classes.blood}>{formatNumber(selectModel.dataFlow[0].contamination || 0)}</div>
+              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.ContaminationRate} <Hint content='123321' /></span>
             </div>
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
@@ -165,7 +165,7 @@ const OutlierRow = (props) => {
         <span>{formatNumber(model.score.score)}</span>
       </div>
       <div className={`${classes.cell}`}>
-        <span>{formatNumber(model.score.contamination || 0)}</span>
+        <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
       </div>
       <div className={`${classes.cell} ${classes.compute}`}>
         <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
