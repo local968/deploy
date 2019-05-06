@@ -134,7 +134,6 @@ wss.register('newEtl', async (message, socket, process) => {
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
-      console.log('interval', data.task);
       if (data.task) {
         const status = data.task.status
         const progress = 95 * (status.created + status.deleted) / status.total || 0
