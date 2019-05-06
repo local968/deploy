@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon, Tooltip } from 'antd';
-import { observable } from 'mobx';
+import { observable, autorun } from 'mobx';
 import { Table } from 'components/Common';
 import dataIcon from './data.svg';
 
@@ -13,28 +13,16 @@ export default class Preview extends Component {
   @observable cleanData = []
   @observable loading = false
 
-  componentDidUpdate() {
+  componentDidMount() {
     const { readIndex, etlIndex } = this.props.project;
-    this.loading = true
-    readIndex(etlIndex).then(data => {
-      this.cleanData = data
-      this.loading = false
+    autorun(() => {
+      this.loading = true
+      if (!etlIndex) return this.loading = false
+      readIndex(etlIndex).then(data => {
+        this.cleanData = data
+        this.loading = false
+      })
     })
-    // const { readIndex, etlIndex } = this.props.project;
-    // if (!etlIndex) {
-    //   if (!this.loading) {
-    //     this.cleanData = []
-    //     if (!etlCleanDataLoading) {
-    //       this.loading = true
-    //       etlCleanData()
-    //     }
-    //   }
-    // } else {
-    //   this.loading = false
-    //   if (this.etlIndex === etlIndex) return
-    //   this.etlIndex = etlIndex
-      
-    // }
   }
 
   showTable = () => {
@@ -47,17 +35,21 @@ export default class Preview extends Component {
 
   formatTable = () => {
     const { cleanData, visiable, loading } = this
-    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, sortHeader, newVariable, newType } = this.props.project;
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader } = this.props.project;
     if (loading) return []
     if (!visiable) return []
     if (!cleanData.length) return []
-    const header = cleanData[0]
-    const headerList = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
-    const indexs = headerList.map(h => header.indexOf(h))
+    const headerList = [...dataHeader].filter(h => !trainHeader.includes(h))
+    const notShowIndex = rawHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
+    const data = cleanData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
+
+
+    // const headerList = [...sortHeader,].filter(v => !trainHeader.includes(v))
+    // const indexs = headerList.map(h => header.indexOf(h))
     const realColumn = headerList.length
     // const realData = cleanData.slice(1).filter(r => r.length === realColumn)
-    const data = cleanData.slice(1).map(row => indexs.map(i => row[i]))
-    const types = { ...colType, ...newType }
+    // const data = cleanData.slice(1).map(row => indexs.map(i => row[i]))
+    const types = { ...colType }
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -108,9 +100,9 @@ export default class Preview extends Component {
   }
 
   render() {
-    const { dataHeader, trainHeader, newVariable, cleanPath } = this.props.project
+    const { dataHeader, trainHeader, newVariable } = this.props.project
     const header = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
-    const tableData = cleanPath ? this.formatTable() : []
+    const tableData = this.formatTable()
     // console.log(tableData.length, "tableData", cleanPath)
     return <div className={classnames(styles.content, {
       [styles.active]: this.visiable

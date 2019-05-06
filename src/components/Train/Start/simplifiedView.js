@@ -76,15 +76,15 @@ export default class SimplifiedView extends Component {
   handleChange = e => {
     const value = e.target.value
     const { project } = this.props
-    const { informativesLabel, dataHeader, customHeader, newVariable, target } = project
+    const { dataHeader, customHeader, newVariable, target } = project
     let filterList = []
     if (!value) return
     if (value === 'all') {
       filterList = [...dataHeader, ...newVariable]
     }
-    if (value === 'informatives') {
-      filterList = informativesLabel
-    }
+    // if (value === 'informatives') {
+    //   filterList = informativesLabel
+    // }
     if (!isNaN(value) && value < customHeader.length) {
       filterList = customHeader[value]
     }
@@ -117,11 +117,11 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
-    const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
+    const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
@@ -146,7 +146,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolLabel}><span>{EN.CurrentVariableList}</span></div>
           <select value={selectValue} onChange={this.handleChange}>
             <option value='all'>{EN.AllVariables} ({allVariables.length})</option>
-            <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option>
+            {/* <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option> */}
             {customHeader.map((v, k) => <option key={k} value={k}>{EN.Custom}{k + 1} ({v.length})</option>)}
             {hasNewOne && <option value={customHeader.length}>{EN.Custom}{customHeader.length + 1} ({checkedVariables.length})</option>}
           </select>

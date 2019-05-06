@@ -11,7 +11,7 @@
   font-size: 1.125rem;
   display: flex;
   font-family: SanFranciscoText;
-  line-height: normal;
+  line-height: 1.2;
   align-items: center;
   color: #1d2b3c;
 }
@@ -266,8 +266,9 @@
   font-size: 18px;
   width: 250px;
   padding: 10px 0;
-  margin-bottom: -1;
-  cursor: pointer
+  margin-bottom: -1px;
+  cursor: pointer;
+  justify-content: center;
 }
 
 .active {

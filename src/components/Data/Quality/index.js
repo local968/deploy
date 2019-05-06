@@ -337,7 +337,7 @@ class VariableIssue extends Component {
       const { low = NaN, high = NaN } = rawDataView[header]
       const isMissing = !v
       const isMismatch = isNum ? isNaN(parseFloat(v)) : false
-      const isOutlier = isNum ? (v < low || v > high) : false
+      const isOutlier = (header === target && isNum) ? (v < low || v > high) : false
       if (isMissing) {
         itemData.cn = classnames(itemData.cn, styles.missing);
       }
@@ -498,7 +498,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, nullLineCounts, mismatchLineCounts, outlierLineCounts, totalFixedLines, problemType, issues } = project
+    const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = deletedCount / totalRawLines * 100
     const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
     const cleanPercent = totalLines / totalRawLines * 100
@@ -507,9 +507,9 @@ class Summary extends Component {
     const percentList = currentHeader.map(v => {
       const isNum = colType[v] === 'Numerical'
       const percent = {
-        missing: (nullLineCounts[v] || 0) / (totalRawLines || 1) * 100,
-        mismatch: (isNum ? (mismatchLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100,
-        outlier: (isNum ? (outlierLineCounts[v] || 0) : 0) / (totalRawLines || 1) * 100
+        missing: nullRow[v] || 0,
+        mismatch: mismatchRow[v] || 0,
+        outlier: outlierRow[v] || 0
       }
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
@@ -638,8 +638,8 @@ class Summary extends Component {
         </div>
         <div className={styles.summaryBottom}>
           <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
-            [styles.disabled]: totalLines === 0
-          })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
+            [styles.disabled]: totalRawLines - deletedCount === 0
+          })} onClick={totalRawLines - deletedCount === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
           <div className={classnames(styles.summaryButton, {
             [styles.disabled]: !issues.dataIssue
           })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>

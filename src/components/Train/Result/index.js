@@ -18,7 +18,7 @@ function ModelResult(props) {
   const { project } = projectStore
   const { problemType, models, selectModel } = project
 
-  if(!selectModel || !models.length) return null
+  if (!selectModel || !models.length) return null
 
   React.useEffect(() => {
     resetSide()
@@ -45,11 +45,11 @@ function ModelResult(props) {
           </div>
           {problemType === 'Outlier' && <div className={classes.scores}>
             <div className={classes.score}>
-              <div className={classes.orange}>{formatNumber(selectModel.score.score, 2)}</div>
+              <div className={classes.orange}>{formatNumber(selectModel.score.score)}</div>
               <span className={classes.label}>Score <Hint content='123321' /></span>
             </div>
             <div className={classes.rate}>
-              <div className={classes.blood}>0.1</div>
+              <div className={classes.blood}>{formatNumber(selectModel.score.contamination || 0)}</div>
               <span className={classes.rateLabel}>Contamination Rate <Hint content='123321' /></span>
             </div>
           </div>}
@@ -70,7 +70,7 @@ function ModelResult(props) {
           <ContinueButton text='Mapping Dictionary' width='200px' />
         </div>
         <div className={classes.right}>
-          <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0'/>
+          <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0' />
           {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
@@ -78,7 +78,7 @@ function ModelResult(props) {
       {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
       {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
     </div>}
-    {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)}/>}
+    {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
   </div>;
 }
 
@@ -86,7 +86,7 @@ export default inject('projectStore')(observer(ModelResult))
 
 const OutlierTable = (props) => {
   const { models, sort, handleSort, project, abortTrain } = props
-
+  const { train2Finished, trainModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
@@ -162,10 +162,10 @@ const OutlierRow = (props) => {
         <span>{model.modelName}</span>
       </div>
       <div className={`${classes.cell}`}>
-        <span>{model.score.score}</span>
+        <span>{formatNumber(model.score.score)}</span>
       </div>
       <div className={`${classes.cell}`}>
-        <span>X</span>
+        <span>{formatNumber(model.score.contamination || 0)}</span>
       </div>
       <div className={`${classes.cell} ${classes.compute}`}>
         <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> Compute</span>

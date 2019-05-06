@@ -25,6 +25,8 @@ export default class Model {
   @observable labelWithImportance = {}
   @observable multiVarPlotData = ''
   @observable parallelPlotData = ''
+  @observable outlierPlotData = ''
+  @observable pointToShow = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {
