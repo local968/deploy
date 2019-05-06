@@ -44,7 +44,7 @@ async function scheduleHandler() {
       const fileName = deployment[`${schedule.type}Options`].file
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
       const newFeatureLabel = await api.getFeatureLabel(deployment.projectId)
-      let cmd ='';
+      let cmd = '';
       switch (deployment.modelType) {
         case 'Clustering':
           cmd = 'clustering.deploy';
@@ -66,7 +66,11 @@ async function scheduleHandler() {
         actionType: schedule.type
       }
       if (!!Object.keys(newFeatureLabel || {}).length) request.newFeatureLabel = newFeatureLabel
-      if (deployment.modelType === "Classification") request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
+      if (deployment.modelType === "Classification") {
+        try {
+          request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
+        } catch (e) { console.info(`get cute off failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`) }
+      }
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
       await command(request, data => {
