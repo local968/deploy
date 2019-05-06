@@ -28,6 +28,19 @@ function ModelResult(props) {
     project.abortTrain()
   }
 
+  const deploy = () => {
+    // const { project } = this.props.projectStore;
+    const { selectModel: current } = project
+    const { newVariable, trainHeader, expression } = project
+    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
+    const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+    const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+
+    this.props.deploymentStore
+      .addDeployment(project.id, project.name, current.modelName, current.problemType, exps)
+      .then(id => this.props.routing.push('/deploy/project/' + id));
+  };
+
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
     {problemType === "Clustering" && <div className={classes.tabs}>
@@ -79,10 +92,15 @@ function ModelResult(props) {
       {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
     </div>}
     {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
+    <div className={classes.buttonBlock}>
+      <button className={classes.button} onClick={deploy}>
+        <span>{EN.DeployTheModel}</span>
+      </button>
+    </div>
   </div>;
 }
 
-export default inject('projectStore')(observer(ModelResult))
+export default inject('projectStore', 'deploymentStore')(observer(ModelResult))
 
 const OutlierTable = (props) => {
   const { models, sort, handleSort, project, abortTrain } = props
