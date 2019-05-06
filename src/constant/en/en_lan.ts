@@ -1068,7 +1068,7 @@ const EN_LAN = {
   TheNumberofClusters:'The Number of Clusters',
   Score:'Score',
   SihouetteScore:'Sihouette Score',
-
+  exportreporterror:'export report error.',
 
 };
 

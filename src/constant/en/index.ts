@@ -933,6 +933,10 @@ const EN: any = {
   TheNumberofClusters:'集群数量',
   Score:'评分',
   SihouetteScore:'剪影分数',
+  exportreporterror:'导出报告错误。.',
+
+
+
 };
 
 export default EN;
