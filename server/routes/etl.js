@@ -143,7 +143,7 @@ wss.register('newEtl', async (message, socket, process) => {
         clearInterval(interval)
         process({ progress: 95, status: 1 })
         const { data: { totalFixedCount, deletedCount } } = await axios.post(`${esServicePath}/etls/${project.originalIndex}/fixedLines`, stats)
-        createOrUpdate(projectId, userId, { etlIndex, opaqueId, totalFixedLines: totalFixedCount, deletedCount })
+        createOrUpdate(projectId, userId, { etlIndex, opaqueId, totalFixedLines: totalFixedCount, deletedCount, stats })
         resolve({
           status: 200,
           message: 'ok',

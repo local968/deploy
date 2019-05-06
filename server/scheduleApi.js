@@ -3,7 +3,10 @@ const wss = require('./webSocket')
 const uuid = require('uuid')
 const command = require('./command')
 const moment = require('moment')
+const axios = require('axios')
+const config = require('config')
 const { userDeployRestriction, userStorageRestriction } = require('restriction')
+const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
 const setSchedule = (schedule) => {
   const pipeline = redis.pipeline()
@@ -196,7 +199,36 @@ const api = {
     } catch (e) {
       return {}
     }
+  },
+  getCleanIndex: async (schedule, index, projectId, modelName) => {
+    const result = await redis.hmget(`project:${projectId}:model:${modelName}`, "stats")
+    let [stats] = result
+    stats = JSON.parse(stats)
+
+    return await etl(schedule, index, stats)
   }
+}
+
+const etl = async (schedule, index, stats) => {
+  const response = await axios.post(`${esServicePath}/etls/${index}/etl`, stats)
+  const { etlIndex, opaqueId } = response.data
+  await new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
+      if (data.task) {
+        const status = data.task.status
+        const progress = 100 * (status.created + status.deleted) / status.total || 0
+        schedule.status = `ETL: ${progress.toFixed(2)}%`
+        await api.upsertSchedule(schedule);
+      }
+      else {
+        schedule.status = `Progressing`
+        await api.upsertSchedule(schedule);
+        clearInterval(interval)
+        resolve(etlIndex)
+      }
+    }, 1000)
+  })
 }
 
 module.exports = api

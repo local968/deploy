@@ -40,7 +40,7 @@ async function scheduleHandler() {
       await api.upsertSchedule(schedule);
     } else {
       // send command to python
-      const fileId = deployment[`${schedule.type}Options`].fileId
+      const fileId = await api.getCleanIndex(schedule, deployment[`${schedule.type}Options`].fileId, deployment.projectId, deployment.modelName)
       const fileName = deployment[`${schedule.type}Options`].file
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
       const newFeatureLabel = await api.getFeatureLabel(deployment.projectId)
