@@ -40,9 +40,8 @@ app.use(bodyParser.urlencoded({ extended: false, limit: '200mb' }))
 
 // parse application/json
 
-// const redirectGraphic = require("./routes/redirectGraphic");
-
-// app.use(new express.Router().use("/graphics", redirectGraphic))
+const redirectGraphic = require("./routes/redirectGraphic");
+app.use(new express.Router().use("/graphics", redirectGraphic))
 
 app.use(bodyParser.json({ limit: '200mb' }))
 app.use(sessionParser);

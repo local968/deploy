@@ -16,6 +16,9 @@ import EN from '../../../constant/en';
 import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
 import HistogramNumerical from "../../Charts/HistogramNumerical";
 import HistogramCategorical from "../../Charts/HistogramCategorical";
+import TSENOne from "../../Charts/TSENOne";
+import BoxPlots from "../../Charts/BoxPlots";
+import UnivariantPlots from "../../Charts/UnivariantPlots";
 
 @observer
 export default class SimplifiedView extends Component {
@@ -303,8 +306,9 @@ export default class SimplifiedView extends Component {
 @observer
 class SimplifiedViewRow extends Component {
   @observable histograms = false
-	@observable univariant = false
+	@observable univariant = false;
 	@observable chartData = {};
+    @observable scatterData = {};
 
   showHistograms = () => {
   	const {value,project} = this.props;
@@ -344,9 +348,119 @@ class SimplifiedViewRow extends Component {
 	  this.histograms = true;
   }
 
+  // showUnivariant = () => {
+  //   this.univariant = true
+  // }
   showUnivariant = () => {
-    this.univariant = true
-  }
+	  const {value,project} = this.props;
+    // const { name, categoricalMap } = project.dataViews[value];
+  
+    if (!this.scatterData[value]) {
+      const { target, problemType,etlIndex,colType} = project;
+      const type = colType[value];
+  
+      // const data = {
+      //   field: value,
+      //   id: etlIndex,
+      // };
+      
+      if (problemType === "Regression") {
+        if (type === 'Numerical') {//散点图
+          request.post({
+            url: '/graphics/regression-numerical',
+            data: {
+              y: target,
+              x: value,
+              id: etlIndex,
+            }
+          }).then((result) => this.showbackUnivariant(result, value, target, 'Numerical'));
+        } else {//回归-分类 箱线图
+          request.post({
+            url: '/graphics/regression-categorical',
+            data: {
+              target,
+              value,
+              id: etlIndex,
+            }
+          }).then((result) => this.showbackUnivariant(result, value, target, 'Categorical'));
+        }
+      } else {//Univariant
+        const { min, max } = project.dataViews[value];
+        const data = {
+          target,
+          value,
+          id: etlIndex,
+          interval: Math.floor((max - min) / 20),
+        };
+        if (type === 'Numerical') {
+          request.post({
+            url: '/graphics/classification-numerical',
+            data,
+          }).then((result) =>{
+            this.scatterData = {
+              ...this.scatterData,
+              [value]: {
+                ...result,
+              },
+              [`${value}-msg`]: {
+                type,
+              }
+            };
+            this.univariant = true;
+            
+          });
+        } else {//?
+          request.post({
+            url: '/service/graphics/classification-categorical',
+            data,
+          }).then((result) => {
+            this.scatterData = {
+              ...this.scatterData,
+              [value]: {
+                ...result,
+              },
+              [`${value}-msg`]: {
+                type,
+              }
+            };
+            this.univariant = true;
+          });
+        }
+      }
+      return
+    }
+    this.univariant = true;
+  };
+
+// showUnivariantData(result,type){
+//   const {value} = this.props;
+//   this.scatterData = {
+//      ...this.scatterData,
+//      [value]: {
+//        ...result,
+//      },
+//      [`${value}-msg`]: {
+//        type,
+//      }
+//    };
+//    this.univariant = true;
+//   };
+
+showbackUnivariant = (result, x, y, type) => {
+  const {value} = this.props;
+  this.scatterData = {
+    ...this.scatterData,
+    [value]: {
+      ...result,
+    },
+    [`${value}-msg`]: {
+      x,
+      y,
+      type,
+    }
+  };
+  this.univariant = true;
+  };
 
   hideHistograms = e => {
     e && e.stopPropagation();
@@ -368,7 +482,8 @@ class SimplifiedViewRow extends Component {
     const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
-    const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
+    const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
+    
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
@@ -389,17 +504,15 @@ class SimplifiedViewRow extends Component {
           visible={this.univariant}
           onVisibleChange={this.hideUnivariant}
           trigger="click"
-          content={<SimplifiedViewPlot onClose={this.hideUnivariant}
-            type='univariate'
-            getPath={project.univariatePlot.bind(null, value)}
-            path={project.univariatePlots[value]}
-            id={id}
-            fetch={project.univariatePlots.hasOwnProperty(value)}
+          content={<ScatterPlot onClose={this.hideUnivariant}
+                                type={project.problemType}
+                                data={this.scatterData[value]}
+                                message={this.scatterData[`${value}-msg`]}
           />} />}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
         <div className={styles.preImpotance}>
-          <div className={styles.preImpotanceActive} style={{ width: (importance * 100) + '%' }}></div>
+          <div className={styles.preImpotanceActive} style={{width: (importance * 100) + '%'}}/>
         </div>
       </div>
       <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
@@ -1336,5 +1449,41 @@ class FunctionTips extends Component {
     const key = value.slice(0, -2)
     if (!key || !this[key] || typeof this[key] !== 'function') return null
     return this[key]()
+  }
+}
+
+class ScatterPlot extends Component{
+  render(){
+    const {type, style, data, message} = this.props;
+    if (type === 'Regression') {
+      //散点图
+      if (message.type === 'Numerical') {
+        return <div className={styles.plot} style={style}>
+          {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+          <TSENOne
+              x_name={message.x}
+              y_name={message.y}
+              data={data}
+          />
+        </div>
+      }
+    
+      //箱线图
+      return <div className={styles.plot} style={style}>
+        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+        <BoxPlots
+            x_keys={data.x_keys}
+            value={data.value}
+        />
+      </div>
+    }
+    return <div className={styles.plot} style={style}>
+      <UnivariantPlots
+          x_name={message.x}
+          y_name={message.y}
+          result={data}
+      />
+    </div>
+  
   }
 }
