@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon, Tooltip } from 'antd';
-import { observable } from 'mobx';
+import {autorun, observable} from 'mobx';
 import { Table } from 'components/Common';
 import EN from '../../../../constant/en';
 
