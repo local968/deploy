@@ -1383,17 +1383,17 @@ export default class Project {
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
-      let cmd = ''
-      switch (this.problemType) {
-        case 'Clustering':
-          cmd = 'clustering.train';
-          break;
-        case 'Outlier':
-          cmd = 'outlier.train';
-          break;
-        default:
-          cmd = 'clfreg.train';
-      }
+      let cmd = 'clfreg.preTrainImportance'
+      // switch (this.problemType) {
+      //   case 'Clustering':
+      //     cmd = 'clustering.train';
+      //     break;
+      //   case 'Outlier':
+      //     cmd = 'outlier.train';
+      //     break;
+      //   default:
+      //     cmd = 'clfreg.train';
+      // }
 
       const command = {
         projectId: this.id,

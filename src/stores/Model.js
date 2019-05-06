@@ -246,8 +246,19 @@ export default class Model {
     if (!!arr.length) return
     this.importanceLoading = true
     socketStore.ready().then(api => {
+      let cmd = 'clfreg.permutationImportance'
+      // switch (this.problemType) {
+      //   case 'clfreg.Clustering':
+      //     cmd = 'clustering.train';
+      //     break;
+      //   case 'Outlier':
+      //     cmd = 'outlier.train';
+      //     break;
+      //   default:
+      //     cmd = 'clfreg.train';
+      // }
       const command = {
-        command: 'permutationImportance',
+        command: cmd,
         projectId: this.projectId,
         id: this.id
       }
