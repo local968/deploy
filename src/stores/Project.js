@@ -1246,6 +1246,113 @@ export default class Project {
     }, this.nextSubStep(2, 3)))
   }
 
+  advancedModeling = () => {
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
+    const {
+      id,
+      problemType,
+      target,
+      dataHeader
+    } = this;
+
+    let command = '';
+    let trainData = {}
+
+    const featureLabel = dataHeader.filter(d => d !== target);
+    const setting = this.settings.find(s => s.id === this.settingId)
+    if (!setting || !setting.name) return antdMessage.error("setting error")
+
+    switch (problemType) {
+      case 'Clustering':
+        command = 'clustering.train';
+        trainData = {
+          k_type: this.kType,
+          k_value: this.kValue,
+          algorithms: this.algorithms,
+          standard_type: this.standardType,
+          search_time: this.searchTime,
+          metrics_method: this.measurement,
+          feature_label: featureLabel,
+          random_seed: this.randSeed,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          apply_weights: weights
+        };
+        break;
+      case 'Outlier':
+        command = 'outlier.train';
+        trainData = {
+          algorithms: this.algorithms,
+          standard_type: this.standardType,
+          search_time: this.searchTime,
+          feature_label: featureLabel,
+          random_seed: this.randSeed,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          apply_weights: weights
+        };
+        break;
+      default:
+        command = 'clfreg.train';
+        trainData = {
+          problemType,
+          featureLabel,
+          targetLabel: [target],
+          projectId: id,
+          version: this.version.join(','),
+          command,
+          sampling: this.resampling,
+          speedVSaccuracy: this.speedVSaccuracy,
+          ensembleSize: this.ensembleSize,
+          randSeed: this.randSeed,
+          measurement: this.measurement,
+          settingName: setting.name,
+          holdoutRate: this.holdoutRate / 100
+        };
+        if (this.totalRawLines > 10000) {
+          trainData.validationRate = this.validationRate / 100
+        } else {
+          trainData.nfold = this.crossCount
+        }
+    }
+
+    // id: request ID
+    // projectId: project ID
+    // csv_location: csv 文件相对路径
+    // problem_type: 预测类型 Classification , Regression
+    // feature_label: 特征列名
+    // target_label:  目标列
+    // fill_method:  无效值
+    // model_option: model的额外参数，不同model参数不同
+    // kwargs:
+    // const trainData = {
+    //   problemType,
+    //   featureLabel,
+    //   targetLabel: target,
+    //   projectId: id,
+    //   version: '1,2',
+    //   command,
+    //   sampling: 'no',
+    //   speedVSaccuracy: 5,
+    //   ensembleSize: 20,
+    //   randSeed: 0,
+    //   measurement: problemType === "Classification" ? "auc" : "r2",
+    //   settingName: setting.name,
+    //   holdoutRate: 0.2
+    // };
+
+
+    this.modeling(trainData, Object.assign({
+      train2Finished: false,
+      train2ing: true,
+      train2Error: false,
+      selectId: '',
+      settings: this.settings,
+      settingId: this.settingId
+    }, this.nextSubStep(2, 3)))
+  }
 
   newSetting = (type = 'auto') => {
     const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
