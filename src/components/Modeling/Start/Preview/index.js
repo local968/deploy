@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon, Tooltip } from 'antd';
-import { observable } from 'mobx';
+import { observable, autorun } from 'mobx';
 import { Table } from 'components/Common';
 import EN from '../../../../constant/en';
 
@@ -62,7 +62,10 @@ export default class Preview extends Component {
     const notShowIndex = rawHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
     const data = cleanData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
 
-    const types = { ...colType, ...newType }
+    const types = { ...colType }
+
+    const realColumn = headerList.length
+
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
