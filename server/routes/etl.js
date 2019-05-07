@@ -7,6 +7,22 @@ const { createOrUpdate } = require('./project')
 
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
+wss.register("correlation", async (message, socket, progress) => {
+  const { userId } = socket.session
+  const { projectId } = message
+  const result = await redis.hgetall(`project:${projectId}`)
+  for (let key in result) {
+    try {
+      result[key] = JSON.parse(result[key])
+    } catch (e) { }
+  }
+  if (result.userId !== userId) return { status: 420, message: 'error' }
+  const project = result
+  const keys = Object.entries(project.colType).filter(([key, value]) => value === 'Numerical').map(([key, value]) => key)
+  const { data } = await axios.get(`${esServicePath}/etls/${project.etlIndex}/correlationMatrix?keys=${keys.toString()}`)
+  return data
+})
+
 wss.register("originalStats", async (message, socket, progress) => {
   const { userId } = socket.session
   const { index, projectId } = message
@@ -90,6 +106,10 @@ wss.register('newEtl', async (message, socket, process) => {
   const project = result
   const stats = project.stats
 
+  Object.entries(project.colType).map(([key, value]) => {
+    stats[key].type = value
+  })
+
   if (project.problemType && project.problemType !== 'Clustering' && project.problemType !== 'Outlier') {
     stats[project.target].isTarget = true
     let deletedValues = []
@@ -144,7 +164,7 @@ wss.register('newEtl', async (message, socket, process) => {
         process({ progress: 90, status: 1 })
         const { data: { totalFixedCount, deletedCount } } = await axios.post(`${esServicePath}/etls/${project.originalIndex}/fixedLines`, stats)
         process({ progress: 95, status: 1 })
-        const { data } = await axios.post(`${esServicePath}/etls/${JSON.parse(etlIndex)}/stats`, stats)
+        const { data } = await axios.post(`${esServicePath}/etls/${etlIndex}/stats`, stats)
         const dataViews = {}
         Object.entries(data).forEach(([key, metric]) => {
           const stats = metric.originalStats

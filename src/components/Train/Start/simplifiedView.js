@@ -97,10 +97,6 @@ export default class SimplifiedView extends Component {
     this.visible = false
   }
 
-  reloadTable = () => {
-    this.props.project.dataView()
-  }
-
   handleChange = e => {
     const value = e.target.value
     const { project } = this.props

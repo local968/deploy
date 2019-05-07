@@ -979,7 +979,7 @@ export default class Project {
     return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'createNewVariable',
+        command: 'top.createNewVariable',
         csvScript: allExp.replace(/\|/g, ",")
       };
       return api.createNewVariable(command, progressResult => {
@@ -1775,7 +1775,7 @@ export default class Project {
       this.preImportance = null
 
       const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
-      await this.dataView()
+      // await this.dataView()
       dataViewDisposer()
       if (cancel) return
       const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
