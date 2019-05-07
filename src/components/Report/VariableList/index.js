@@ -165,7 +165,7 @@ class SimplifiedViewRow extends Component {
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
     return <div className={styles.tableRow}>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>2
+      <div className={styles.tableTd} onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}
