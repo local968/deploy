@@ -38,12 +38,8 @@ export default class SimplifiedView extends Component {
   }
 
   show = () => {
-    // this.showHistograms = true
     const { project = {} } = this.props;
     const { target, colType, etlIndex } = project;
-
-    console.log(project, etlIndex)
-
 
     if (!this.chartData[target]) {
       if (colType[target] === "Numerical") {
@@ -75,15 +71,7 @@ export default class SimplifiedView extends Component {
       ...this.chartData,
       [target]: result,
     };
-    // setchartData({
-    //   ...chartData,
-    //   [target]: result,
-    // });
     this.showHistograms = true;
-    // setState({
-    //   ...state,
-    //   showHistograms: true
-    // })
   }
 
   hide = e => {
@@ -324,7 +312,6 @@ class SimplifiedViewRow extends Component {
 		  } else {
 		  	// console.log(project.dataViews[value])
 			  const {uniqueValues} = project.dataViews[value];
-			  // data.size = uniqueValues>200?200:uniqueValues;
 			  data.size = uniqueValues;
 			  request.post({
 				  url: '/graphics/histogram-categorical',

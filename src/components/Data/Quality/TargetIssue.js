@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Modal, NumberInput } from 'components/Common';
 import { observable } from 'mobx'
-import * as d3 from 'd3';
+// import * as d3 from 'd3';
 import { Icon, message } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
@@ -894,288 +894,288 @@ class EditOutLier extends Component {
     this.count = 4;
   }
 
-  componentDidMount() {
-    this.d3Chart()
-  }
+  // componentDidMount() {
+  //   this.d3Chart()
+  // }
+  //
+  // componentDidUpdate() {
+  //   this.d3Chart()
+  // }
 
-  componentDidUpdate() {
-    this.d3Chart()
-  }
-
-  d3Chart = () => {
-    d3.select(`.${styles.d3Chart} svg`).remove();
-    const { width, height, x, y, minX, maxX } = this.props;
-    let { min, max } = this;
-    const padding = { left: 50, bottom: 30, right: 5, top: 100 };
-
-    const realHeight = height - padding.bottom - padding.top;
-    const realWidth = width - padding.left - padding.right;
-    //添加一个 SVG 画布
-    const svg = d3.select(`.${styles.d3Chart}`)
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr('transform', `translate(${padding.left}, 0)`);
-
-    const maxH = d3.max(y) || 1;
-    const dataset = [];
-
-    //x轴的比例尺
-    const xScale = d3.scaleLinear()
-      .domain([minX, maxX])
-      .range([0, realWidth])
-      .clamp(true);
-
-    //y轴的比例尺
-    const yScale = d3.scaleLinear()
-      .domain([0, maxH])
-      .range([realHeight, 0])
-      .clamp(true);
-
-    //定义x轴
-    const xAxis = d3.axisBottom(xScale);
-
-    //定义y轴
-    const yAxis = d3.axisLeft(yScale);
-
-    //添加x轴
-    svg.append("g")
-      .attr("class", `${styles.axis}`)
-      .attr("transform", `translate(0, ${realHeight + padding.top})`)
-      .call(xAxis);
-
-    //添加y轴
-    svg.append("g")
-      .attr("class", `${styles.axis}`)
-      .attr("transform", `translate(0, ${padding.top})`)
-      .call(yAxis);
-
-    const drawDrag = () => {
-      const minDrag = d3.drag()
-        .on('drag', () => {
-          let minTemp = xScale.invert(d3.event.x)
-          if (minTemp > max) minTemp = max;
-          if (minTemp < minX) minTemp = minX;
-          if (minTemp === min) return;
-          min = minTemp;
-          minRect.attr('width', xScale(min))
-          minLine.attr('x1', xScale(min))
-            .attr('x2', xScale(min))
-          minCircle.attr('cx', xScale(min))
-          minText.attr('x', xScale(min))
-            .text(this.renderNum(min))
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            maxCircle.attr('cy', padding.top - 57)
-            maxText.attr('y', padding.top - 53)
-          } else {
-            maxCircle.attr('cy', padding.top - 17)
-            maxText.attr('y', padding.top - 13)
-          }
-
-          drawRect()
-        })
-        .on('end', () => {
-          this.min = min
-        });
-
-      let minDragBlock = svg.append('g');
-      let minRect = minDragBlock.append('rect')
-        .attr('class', `${styles.dragRect}`)
-        .attr('x', xScale(minX))
-        .attr('y', yScale(maxH) + padding.top)
-        .attr('width', xScale(min) - xScale(minX))
-        .attr('height', realHeight)
-
-      let minLine = minDragBlock.append('line')
-        .attr('class', `${styles.dragLine}`)
-        .attr('x1', xScale(min) - xScale(minX))
-        .attr('y1', yScale(maxH) + padding.top)
-        .attr('x2', xScale(min) - xScale(minX))
-        .attr('y2', realHeight + padding.top)
-
-      let minCircle = minDragBlock.append('circle')
-        .attr('class', `${styles.dragCircle}`)
-        .attr('cx', xScale(min))
-        .attr('cy', padding.top - 17)
-        .attr('r', 20)
-        .attr('fill', '#c7f1ee')
-        .call(minDrag);
-
-      let minText = minDragBlock.append('text')
-        .attr('class', `${styles.dragText}`)
-        .text(this.renderNum(min))
-        .attr('x', xScale(min))
-        .attr('y', padding.top - 13)
-        .call(minDrag);
-
-      const maxDrag = d3.drag()
-        .on('drag', () => {
-          let maxTemp = xScale.invert(d3.event.x)
-          if (maxTemp < min) maxTemp = min;
-          if (maxTemp > maxX) maxTemp = maxX;
-          if (maxTemp === max) return;
-          max = maxTemp;
-          maxRect.attr('x', xScale(max))
-            .attr('width', xScale(maxX) - xScale(max))
-          maxLine.attr('x1', xScale(max))
-            .attr('x2', xScale(max))
-          maxCircle.attr('cx', xScale(max))
-          maxText.attr('x', xScale(max))
-            .text(this.renderNum(max))
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            maxCircle.attr('cy', padding.top - 57)
-            maxText.attr('y', padding.top - 53)
-          } else {
-            maxCircle.attr('cy', padding.top - 17)
-            maxText.attr('y', padding.top - 13)
-          }
-          drawRect()
-        })
-        .on('end', () => {
-          this.max = max
-        });
-
-      let maxDragBlock = svg.append('g');
-      let maxRect = maxDragBlock.append('rect')
-        .attr('class', `${styles.dragRect}`)
-        .attr('x', xScale(max))
-        .attr('y', yScale(maxH) + padding.top)
-        .attr('width', xScale(maxX) - xScale(max))
-        .attr('height', realHeight)
-
-      let maxLine = maxDragBlock.append('line')
-        .attr('class', `${styles.dragLine}`)
-        .attr('x1', xScale(max))
-        .attr('y1', yScale(maxH) + padding.top)
-        .attr('x2', xScale(max))
-        .attr('y2', realHeight + padding.top);
-
-      let maxCircle = maxDragBlock.append('circle')
-        .attr('class', `${styles.dragCircle}`)
-        .attr('cx', xScale(max))
-        .attr('cy', () => {
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            return padding.top - 57
-          }
-          return padding.top - 17
-        })
-        .attr('r', 20)
-        .attr('fill', '#ffd287')
-        .call(maxDrag);
-
-      let maxText = maxDragBlock.append('text')
-        .attr('class', `${styles.dragText}`)
-        .text(this.renderNum(max))
-        .attr('x', xScale(max))
-        .attr('y', () => {
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            return padding.top - 53
-          }
-          return padding.top - 13
-        })
-        .call(maxDrag);
-
-    }
-
-    //初始化拖动
-    drawDrag()
-
-    //添加矩形元素
-    const drawRect = () => {
-      // 处理dataset数据
-      for (let i = 1; i < x.length; i++) {
-        if (x[i] <= min || x[i - 1] >= max) {
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
-            class: styles.outer
-          })
-        } else if (x[i] <= max && x[i - 1] >= min) {
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
-            class: styles.rect
-          })
-        } else if (x[i] > max && x[i - 1] < max && x[i - 1] > min) {
-          const left = Math.abs(xScale(x[i - 1]) - xScale(max))
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: left,
-            class: styles.rect
-          })
-          dataset.push({
-            x: xScale(x[i - 1]) + left,
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
-            class: styles.outer
-          })
-        } else if (x[i] > min && x[i - 1] < min && x[i] < max) {
-          const left = Math.abs(xScale(x[i - 1]) - xScale(min))
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: left,
-            class: styles.outer
-          })
-          dataset.push({
-            x: xScale(x[i - 1]) + left,
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
-            class: styles.rect
-          })
-        } else {
-          if (min > max) {
-            dataset.push({
-              x: xScale(x[i - 1]),
-              y: yScale(y[i - 1]) + padding.top,
-              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
-              class: styles.outer
-            })
-          } else {
-            const left = Math.abs(xScale(x[i - 1]) - xScale(min))
-            const middle = Math.abs(xScale(max) - xScale(min))
-            dataset.push({
-              x: xScale(x[i - 1]),
-              y: yScale(y[i - 1]) + padding.top,
-              width: left,
-              class: styles.outer
-            })
-            dataset.push({
-              x: xScale(x[i - 1]) + left,
-              y: yScale(y[i - 1]) + padding.top,
-              width: middle,
-              class: styles.rect
-            })
-            dataset.push({
-              x: xScale(x[i - 1]) + left + middle,
-              y: yScale(y[i - 1]) + padding.top,
-              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left - middle,
-              class: styles.outer
-            })
-          }
-        }
-      }
-
-      const rects = svg.selectAll(`.${styles.rect}`);
-      rects.remove();
-      rects.data(dataset)
-        .enter()
-        .append("rect")
-        .attr("class", (d) => d.class)
-        // .attr("transform",`translate(0,${padding.top})`)
-        .attr("x", (d) => d.x)
-        .attr("y", (d) => d.y)
-        .attr("width", (d) => d.width)
-        .attr("height", (d) => realHeight - d.y + padding.top);
-    }
-
-    //添加矩形元素
-    drawRect()
-  }
+  // d3Chart = () => {
+  //   d3.select(`.${styles.d3Chart} svg`).remove();
+  //   const { width, height, x, y, minX, maxX } = this.props;
+  //   let { min, max } = this;
+  //   const padding = { left: 50, bottom: 30, right: 5, top: 100 };
+  //
+  //   const realHeight = height - padding.bottom - padding.top;
+  //   const realWidth = width - padding.left - padding.right;
+  //   //添加一个 SVG 画布
+  //   const svg = d3.select(`.${styles.d3Chart}`)
+  //     .append("svg")
+  //     .attr("width", width)
+  //     .attr("height", height)
+  //     .append("g")
+  //     .attr('transform', `translate(${padding.left}, 0)`);
+  //
+  //   const maxH = d3.max(y) || 1;
+  //   const dataset = [];
+  //
+  //   //x轴的比例尺
+  //   const xScale = d3.scaleLinear()
+  //     .domain([minX, maxX])
+  //     .range([0, realWidth])
+  //     .clamp(true);
+  //
+  //   //y轴的比例尺
+  //   const yScale = d3.scaleLinear()
+  //     .domain([0, maxH])
+  //     .range([realHeight, 0])
+  //     .clamp(true);
+  //
+  //   //定义x轴
+  //   const xAxis = d3.axisBottom(xScale);
+  //
+  //   //定义y轴
+  //   const yAxis = d3.axisLeft(yScale);
+  //
+  //   //添加x轴
+  //   svg.append("g")
+  //     .attr("class", `${styles.axis}`)
+  //     .attr("transform", `translate(0, ${realHeight + padding.top})`)
+  //     .call(xAxis);
+  //
+  //   //添加y轴
+  //   svg.append("g")
+  //     .attr("class", `${styles.axis}`)
+  //     .attr("transform", `translate(0, ${padding.top})`)
+  //     .call(yAxis);
+  //
+  //   const drawDrag = () => {
+  //     const minDrag = d3.drag()
+  //       .on('drag', () => {
+  //         let minTemp = xScale.invert(d3.event.x)
+  //         if (minTemp > max) minTemp = max;
+  //         if (minTemp < minX) minTemp = minX;
+  //         if (minTemp === min) return;
+  //         min = minTemp;
+  //         minRect.attr('width', xScale(min))
+  //         minLine.attr('x1', xScale(min))
+  //           .attr('x2', xScale(min))
+  //         minCircle.attr('cx', xScale(min))
+  //         minText.attr('x', xScale(min))
+  //           .text(this.renderNum(min))
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           maxCircle.attr('cy', padding.top - 57)
+  //           maxText.attr('y', padding.top - 53)
+  //         } else {
+  //           maxCircle.attr('cy', padding.top - 17)
+  //           maxText.attr('y', padding.top - 13)
+  //         }
+  //
+  //         drawRect()
+  //       })
+  //       .on('end', () => {
+  //         this.min = min
+  //       });
+  //
+  //     let minDragBlock = svg.append('g');
+  //     let minRect = minDragBlock.append('rect')
+  //       .attr('class', `${styles.dragRect}`)
+  //       .attr('x', xScale(minX))
+  //       .attr('y', yScale(maxH) + padding.top)
+  //       .attr('width', xScale(min) - xScale(minX))
+  //       .attr('height', realHeight)
+  //
+  //     let minLine = minDragBlock.append('line')
+  //       .attr('class', `${styles.dragLine}`)
+  //       .attr('x1', xScale(min) - xScale(minX))
+  //       .attr('y1', yScale(maxH) + padding.top)
+  //       .attr('x2', xScale(min) - xScale(minX))
+  //       .attr('y2', realHeight + padding.top)
+  //
+  //     let minCircle = minDragBlock.append('circle')
+  //       .attr('class', `${styles.dragCircle}`)
+  //       .attr('cx', xScale(min))
+  //       .attr('cy', padding.top - 17)
+  //       .attr('r', 20)
+  //       .attr('fill', '#c7f1ee')
+  //       .call(minDrag);
+  //
+  //     let minText = minDragBlock.append('text')
+  //       .attr('class', `${styles.dragText}`)
+  //       .text(this.renderNum(min))
+  //       .attr('x', xScale(min))
+  //       .attr('y', padding.top - 13)
+  //       .call(minDrag);
+  //
+  //     const maxDrag = d3.drag()
+  //       .on('drag', () => {
+  //         let maxTemp = xScale.invert(d3.event.x)
+  //         if (maxTemp < min) maxTemp = min;
+  //         if (maxTemp > maxX) maxTemp = maxX;
+  //         if (maxTemp === max) return;
+  //         max = maxTemp;
+  //         maxRect.attr('x', xScale(max))
+  //           .attr('width', xScale(maxX) - xScale(max))
+  //         maxLine.attr('x1', xScale(max))
+  //           .attr('x2', xScale(max))
+  //         maxCircle.attr('cx', xScale(max))
+  //         maxText.attr('x', xScale(max))
+  //           .text(this.renderNum(max))
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           maxCircle.attr('cy', padding.top - 57)
+  //           maxText.attr('y', padding.top - 53)
+  //         } else {
+  //           maxCircle.attr('cy', padding.top - 17)
+  //           maxText.attr('y', padding.top - 13)
+  //         }
+  //         drawRect()
+  //       })
+  //       .on('end', () => {
+  //         this.max = max
+  //       });
+  //
+  //     let maxDragBlock = svg.append('g');
+  //     let maxRect = maxDragBlock.append('rect')
+  //       .attr('class', `${styles.dragRect}`)
+  //       .attr('x', xScale(max))
+  //       .attr('y', yScale(maxH) + padding.top)
+  //       .attr('width', xScale(maxX) - xScale(max))
+  //       .attr('height', realHeight)
+  //
+  //     let maxLine = maxDragBlock.append('line')
+  //       .attr('class', `${styles.dragLine}`)
+  //       .attr('x1', xScale(max))
+  //       .attr('y1', yScale(maxH) + padding.top)
+  //       .attr('x2', xScale(max))
+  //       .attr('y2', realHeight + padding.top);
+  //
+  //     let maxCircle = maxDragBlock.append('circle')
+  //       .attr('class', `${styles.dragCircle}`)
+  //       .attr('cx', xScale(max))
+  //       .attr('cy', () => {
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           return padding.top - 57
+  //         }
+  //         return padding.top - 17
+  //       })
+  //       .attr('r', 20)
+  //       .attr('fill', '#ffd287')
+  //       .call(maxDrag);
+  //
+  //     let maxText = maxDragBlock.append('text')
+  //       .attr('class', `${styles.dragText}`)
+  //       .text(this.renderNum(max))
+  //       .attr('x', xScale(max))
+  //       .attr('y', () => {
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           return padding.top - 53
+  //         }
+  //         return padding.top - 13
+  //       })
+  //       .call(maxDrag);
+  //
+  //   }
+  //
+  //   //初始化拖动
+  //   drawDrag()
+  //
+  //   //添加矩形元素
+  //   const drawRect = () => {
+  //     // 处理dataset数据
+  //     for (let i = 1; i < x.length; i++) {
+  //       if (x[i] <= min || x[i - 1] >= max) {
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+  //           class: styles.outer
+  //         })
+  //       } else if (x[i] <= max && x[i - 1] >= min) {
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+  //           class: styles.rect
+  //         })
+  //       } else if (x[i] > max && x[i - 1] < max && x[i - 1] > min) {
+  //         const left = Math.abs(xScale(x[i - 1]) - xScale(max))
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: left,
+  //           class: styles.rect
+  //         })
+  //         dataset.push({
+  //           x: xScale(x[i - 1]) + left,
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
+  //           class: styles.outer
+  //         })
+  //       } else if (x[i] > min && x[i - 1] < min && x[i] < max) {
+  //         const left = Math.abs(xScale(x[i - 1]) - xScale(min))
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: left,
+  //           class: styles.outer
+  //         })
+  //         dataset.push({
+  //           x: xScale(x[i - 1]) + left,
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
+  //           class: styles.rect
+  //         })
+  //       } else {
+  //         if (min > max) {
+  //           dataset.push({
+  //             x: xScale(x[i - 1]),
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+  //             class: styles.outer
+  //           })
+  //         } else {
+  //           const left = Math.abs(xScale(x[i - 1]) - xScale(min))
+  //           const middle = Math.abs(xScale(max) - xScale(min))
+  //           dataset.push({
+  //             x: xScale(x[i - 1]),
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: left,
+  //             class: styles.outer
+  //           })
+  //           dataset.push({
+  //             x: xScale(x[i - 1]) + left,
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: middle,
+  //             class: styles.rect
+  //           })
+  //           dataset.push({
+  //             x: xScale(x[i - 1]) + left + middle,
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left - middle,
+  //             class: styles.outer
+  //           })
+  //         }
+  //       }
+  //     }
+  //
+  //     const rects = svg.selectAll(`.${styles.rect}`);
+  //     rects.remove();
+  //     rects.data(dataset)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("class", (d) => d.class)
+  //       // .attr("transform",`translate(0,${padding.top})`)
+  //       .attr("x", (d) => d.x)
+  //       .attr("y", (d) => d.y)
+  //       .attr("width", (d) => d.width)
+  //       .attr("height", (d) => realHeight - d.y + padding.top);
+  //   }
+  //
+  //   //添加矩形元素
+  //   drawRect()
+  // }
 
   change = e => {
     this.temp = e.target.value
@@ -1241,7 +1241,7 @@ class EditOutLier extends Component {
         </div>
         <div className={styles.outlierBlock}><button onClick={this.reset}><span>{EN.Resettodefault}</span></button></div>
       </div>
-      <div className={styles.d3Chart}></div>
+      {/*<div className={styles.d3Chart}></div>*/}
       <div className={styles.fixesBottom}>
         <button className={styles.save} onClick={this.apply} ><span>{EN.Apply}</span></button>
         <button className={styles.cancel} onClick={closeEdit}><span>{EN.Cancel}</span></button>
