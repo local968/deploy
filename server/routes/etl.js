@@ -136,14 +136,22 @@ wss.register('newEtl', async (message, socket, process) => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
       if (data.task) {
         const status = data.task.status
-        const progress = 95 * (status.created + status.deleted) / status.total || 0
+        const progress = 90 * (status.created + status.deleted) / status.total || 0
         process({ progress, status: 1 })
       }
       else {
         clearInterval(interval)
-        process({ progress: 95, status: 1 })
+        process({ progress: 90, status: 1 })
         const { data: { totalFixedCount, deletedCount } } = await axios.post(`${esServicePath}/etls/${project.originalIndex}/fixedLines`, stats)
-        createOrUpdate(projectId, userId, { etlIndex, opaqueId, totalFixedLines: totalFixedCount, deletedCount, stats })
+        process({ progress: 95, status: 1 })
+        const { data } = await axios.post(`${esServicePath}/etls/${JSON.parse(etlIndex)}/stats`, stats)
+        const dataViews = {}
+        Object.entries(data).forEach(([key, metric]) => {
+          const stats = metric.originalStats
+          dataViews[key] = { ...stats, std: stats.std_deviation }
+        })
+        process({ progress: 100, status: 1 })
+        createOrUpdate(projectId, userId, { etlIndex, opaqueId, totalFixedLines: totalFixedCount, deletedCount, stats: data, dataViews })
         resolve({
           status: 200,
           message: 'ok',
