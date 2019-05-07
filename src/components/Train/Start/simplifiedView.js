@@ -20,10 +20,6 @@ export default class SimplifiedView extends Component {
   @observable showCorrelation = false
   @observable visible = false
 
-  componentDidMount() {
-    this.props.project.dataView()
-  }
-
   getCorrelationMatrix = () => {
     this.props.project.correlationMatrix()
   }
@@ -67,10 +63,6 @@ export default class SimplifiedView extends Component {
 
   hideNewVariable = () => {
     this.visible = false
-  }
-
-  reloadTable = () => {
-    this.props.project.dataView()
   }
 
   handleChange = e => {

@@ -30,9 +30,7 @@ export default class SimplifiedView extends Component {
   @observable CorrelationMatrixData = {};
 
   componentDidMount() {
-    this.props.project.dataView().then(() => {
       this.props.project.preTrainImportance()
-    })
   }
 
   getCorrelationMatrix = () => {
@@ -148,9 +146,7 @@ export default class SimplifiedView extends Component {
   }
 
   reloadTable = () => {
-    this.props.project.dataView().then(() => {
       this.props.project.preTrainImportance()
-    })
   }
 
   handleChange = e => {
