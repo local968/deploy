@@ -80,7 +80,7 @@ function ModelResult(props) {
               <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>R squared <Hint content='123321' /></span>
             </div>
           </div>}
-          <ContinueButton text='Mapping Dictionary' width='200px' />
+          <ContinueButton text={EN.MappingDictionary} width='200px' />
         </div>
         <div className={classes.right}>
           <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0' />
@@ -253,7 +253,7 @@ const ClusteringTable = observer((props) => {
           <span>{EN.ModelProcessFlow}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>Explaination</span>
+          <span>{EN.Explaination}</span>
         </div>
       </div>
     </div>
