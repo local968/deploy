@@ -714,7 +714,7 @@ wss.register('dataView', (message, socket, progress) => {
     }, true).then(async returnValue => {
       const { status, result } = returnValue
       if (status === 100) {
-        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'newVariableViews', result.data)
+        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'newVariableViews', result)
         await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false, dataViewProgress: 0 })
         if (updateResult && updateResult.newVariableViews) returnValue.result.data = updateResult.newVariableViews
       }

@@ -25,7 +25,6 @@ export default class Preview extends Component {
       })
     })
     autorun(() => {
-      console.log(newVariablePath, 'newVariablePath')
       if (!newVariablePath) return
       fetchData(newVariablePath).then(data => {
         this.newVariableData = data

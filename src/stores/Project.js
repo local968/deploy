@@ -94,7 +94,7 @@ export default class Project {
   @observable renameVariable = {}
   @observable missingReason = {}
   @observable newVariablePath = ''
-  @observable newVariableViews={}
+  @observable newVariableViews = {}
 
   // @observable totalFixedCount = 0
   @observable deletedCount = 0
@@ -936,7 +936,7 @@ export default class Project {
       //   actionType: isClean ? 'clean' : 'raw',
       //   feature_label
       // };
-      const readyLabels = this.dataViews ? Object.keys(this.dataViews) : []
+      const readyLabels = Object.keys(this.newVariableViews)
       // const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
       const feature_label = this.newVariable.filter(v => !readyLabels.includes(v))
       // const feature_label = [...data_label, ...new_label]
@@ -954,14 +954,14 @@ export default class Project {
       // }
       this.dataViewsLoading = true
       return api.dataView(command)
-      // .then(returnValue => {
-      //   const { status, result } = returnValue
-      //   if (status < 0) {
-      //     // this.setProperty({ dataViews: null })
-      //     return antdMessage.error(result['process error'])
-      //   }
-      //   // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
-      // })
+      .then(returnValue => {
+        const { status, result } = returnValue
+        if (status < 0) {
+          // this.setProperty({ dataViews: null })
+          return antdMessage.error(result['process error'])
+        }
+        // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
+      })
     })
   }
 
@@ -1527,17 +1527,18 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.preImportanceLoading = true
-      return api.preTrainImportance(command).then(returnValue => {
-        const { status, result } = returnValue
-        if (status < 0) {
-          return antdMessage.error(result['process error'])
-        }
-        this.setProperty({
-          preImportance: result.preImportance,
-          informativesLabel: result.informativesLabel,
-          preImportanceLoading: false
+      return api.preTrainImportance(command)
+        .then(returnValue => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            return antdMessage.error(result['process error'])
+          }
+          // this.setProperty({
+          //   preImportance: result.preImportance,
+          //   informativesLabel: result.informativesLabel,
+          //   preImportanceLoading: false
+          // })
         })
-      })
     })
   }
 
@@ -1786,7 +1787,7 @@ export default class Project {
       this.preImportance = null
 
       const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
-      // await this.dataView()
+      await this.dataView()
       dataViewDisposer()
       if (cancel) return
       const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))

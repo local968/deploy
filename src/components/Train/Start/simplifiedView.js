@@ -149,7 +149,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
@@ -222,7 +222,7 @@ export default class SimplifiedView extends Component {
           </div> :
           <div className={styles.tableBody}>
             {allVariables.map((h, i) => {
-              const data = dataViews ? (dataViews[h] || {}) : {}
+              const data = { ...dataViews, ...newVariableViews }[h]
               const map = targetMap || {};
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} handleWeight={this.handleWeight(h)} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
             })}
