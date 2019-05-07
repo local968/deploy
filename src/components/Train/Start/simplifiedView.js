@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import CorrelationMatrix from './CorrelationMatrix';
+// import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
-import { observable } from 'mobx';
+import {observable, toJS} from 'mobx';
 import { Spin, Popover, message as antdMessage, Icon, Table, InputNumber } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
@@ -12,13 +12,23 @@ import FUNCTIONS from './functions';
 import config from 'config'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import HistogramNumerical from "../../Charts/HistogramNumerical";
+import HistogramCategorical from "../../Charts/HistogramCategorical";
+import request from 'components/Request'
+import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
 
 @observer
 export default class SimplifiedView extends Component {
   @observable sort = -1
   @observable showHistograms = false
   @observable showCorrelation = false
-  @observable visible = false
+  @observable visible = false;
+  @observable CorrelationMatrixData = {};
+  
+  
+  componentDidMount() {
+    this.props.project.dataView()
+  }
 
   componentDidMount() {
     this.props.project.dataView()
@@ -41,9 +51,31 @@ export default class SimplifiedView extends Component {
     this.sort = this.sort * -1
   }
 
+  // showCorrelationMatrix = () => {
+  //   this.showCorrelation = true
+  // }
+  
   showCorrelationMatrix = () => {
-    this.showCorrelation = true
-  }
+    const {project} = this.props;
+    
+    const colType = toJS(project.colType);
+    const trainHeader = toJS(project.trainHeader);
+    
+    const fields = Object.entries(colType)
+        .filter(itm => itm[1] === 'Numerical')
+        .map(itm => itm[0])
+        .filter(itm => !trainHeader.includes(itm));
+    request.post({
+      url: '/graphics/correlation-matrix',
+      data: {
+        fields,
+        id: project.etlIndex,
+      },
+    }).then((CorrelationMatrixData) => {
+      this.showCorrelation = true;
+      this.CorrelationMatrixData = CorrelationMatrixData;
+    });
+  };
 
   hideCorrelationMatrix = e => {
     e && e.stopPropagation();
@@ -165,12 +197,7 @@ export default class SimplifiedView extends Component {
             onVisibleChange={this.hideCorrelationMatrix}
             trigger="click"
             content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
-              type='correlationMatrix'
-              getPath={this.getCorrelationMatrix}
-              data={project.correlationMatrixData}
-              header={project.correlationMatrixHeader}
-              id={id}
-              fetch={(!!project.correlationMatrixHeader && !!project.correlationMatrixData) || project.correlationMatrixLoading}
+                                      CorrelationMatrixData={this.CorrelationMatrixData}
             />} />}
           <span>{EN.CheckCorrelationMatrix}</span>
         </div>
@@ -284,19 +311,38 @@ class SimplifiedViewRow extends Component {
   }
 }
 
+// @observer
+// class CorrelationPlot extends Component {
+//   constructor(props) {
+//     super(props)
+//     if (!props.fetch) props.getPath()
+//   }
+//   render() {
+//     const { data, header, onClose } = this.props;
+//     return (
+//       <div className={styles.correlationPlot} >
+//         <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+//         {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
+//       </div>
+//     )
+//   }
+// }
+
 @observer
 class CorrelationPlot extends Component {
-  constructor(props) {
-    super(props)
-    if (!props.fetch) props.getPath()
-  }
-  render() {
-    const { data, header, onClose } = this.props;
+  render(){
+    const { onClose, CorrelationMatrixData } = this.props;
+    const { type, value } = CorrelationMatrixData;
     return (
-      <div className={styles.correlationPlot} >
-        <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-        {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
-      </div>
+        <div className={styles.correlationPlot} >
+          <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+          <CorrelationMatrixs
+              value={value}
+              type={type}
+          />
+          {/* {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>} */}
+          {/*<div className={styles.plotLoad}><Spin size="large" /></div>*/}
+        </div>
     )
   }
 }

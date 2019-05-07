@@ -7,6 +7,22 @@ const { createOrUpdate } = require('./project')
 
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
+wss.register("correlation", async (message, socket, progress) => {
+  const { userId } = socket.session
+  const { projectId } = message
+  const result = await redis.hgetall(`project:${projectId}`)
+  for (let key in result) {
+    try {
+      result[key] = JSON.parse(result[key])
+    } catch (e) { }
+  }
+  if (result.userId !== userId) return { status: 420, message: 'error' }
+  const project = result
+  const keys = Object.entries(project.colType).filter(([key, value]) => value === 'Numerical').map(([key, value]) => key)
+  const { data } = await axios.get(`${esServicePath}/etls/${project.etlIndex}/correlationMatrix?keys=${keys.toString()}`)
+  return data
+})
+
 wss.register("originalStats", async (message, socket, progress) => {
   const { userId } = socket.session
   const { index, projectId } = message
@@ -89,6 +105,10 @@ wss.register('newEtl', async (message, socket, process) => {
   if (result.userId !== userId) return { status: 420, message: 'error' }
   const project = result
   const stats = project.stats
+
+  Object.entries(project.colType).map(([key, value]) => {
+    stats[key].type = value
+  })
 
   if (project.problemType && project.problemType !== 'Clustering' && project.problemType !== 'Outlier') {
     stats[project.target].isTarget = true

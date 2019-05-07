@@ -9,6 +9,7 @@ import { Icon, message } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import OutlierRange from "../../Charts/OutlierRange";
+import request from '../../Request'
 
 @observer
 export class FixIssue extends Component {
@@ -19,7 +20,9 @@ export class FixIssue extends Component {
   @observable outLier = {};
   @observable editKey = '';
   
-  editRange(key, low, high, id){
+  editRange(key, id){
+    const {low,high} = this.props.project.rawDataView[key];
+  
     if (!this.outLier[key]) {
       request.post({
         url: '/graphics/outlier-range',
@@ -39,29 +42,12 @@ export class FixIssue extends Component {
         };
         this.editKey = key;
         this.visible = true;
-        // setOutLier({
-        //   ...outLier,
-        //   [key]: {
-        //     low,
-        //     high,
-        //     data: result.data,
-        //   },
-        // });
-        // seteditKey(key);
-        // setvisible(true);
       });
       return;
     }
     this.editKey = key;
     this.visible = true;
-    // setvisible(true);
-    // seteditKey(key)
   };
-
-  // editRange = (key) => {
-  //   this.visible = true
-  //   this.editKey = key
-  // }
 
   closeEdit = () => {
     this.visible = false
@@ -362,7 +348,7 @@ export class FixIssue extends Component {
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
-                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>{EN.Edit}</span>
+                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k,project.etlIndex)}>{EN.Edit}</span>
                   </div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
@@ -391,17 +377,17 @@ export class FixIssue extends Component {
         <button className={styles.cancel} onClick={closeFixes}><span>{EN.CANCEL}</span></button>
       </div>
       {
-        visible && <Modal
+        this.visible && <Modal
             closeByMask={true}
             showClose={true}
-            visible={visible}
+            visible={this.visible}
             title={EN.Outlier}
             onClose={this.closeEdit}
             content={
               <OutlierRange
                   closeEdit={this.closeEdit}
                   saveEdit={this.saveEdit}
-                  message={this.outLier[editKey]}
+                  message={this.outLier[this.editKey]}
               />
             } />}
       {/*{this.editKey && <Modal content={<EditOutLier width={800}*/}
