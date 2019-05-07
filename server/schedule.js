@@ -63,7 +63,8 @@ async function scheduleHandler() {
         ext: [ext],
         command: cmd,
         solution: deployment.modelName,
-        actionType: schedule.type
+        actionType: schedule.type,
+        frameFormat: 'csv'
       }
       if (!!Object.keys(newFeatureLabel || {}).length) request.newFeatureLabel = newFeatureLabel
       if (deployment.modelType === "Classification") {

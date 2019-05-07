@@ -934,9 +934,9 @@ const EN: any = {
   Score:'评分',
   SihouetteScore:'Sihouette Score',
   exportreporterror:'导出报告异常。',
-  Inputyourcostorbenefitofeveryredictionresult:'Input your cost or benefit of every prediction result: (0 ~ 100)',
-
-
+  Inputyourcostorbenefitofeveryredictionresult:'输入每个预测结果的成本或收益：（0~100）',
+  MappingDictionary:'映射字典',
+  Explaination:'Explaination',
 };
 
 export default EN;

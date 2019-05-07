@@ -25,8 +25,7 @@
   margin-bottom: 30px
 }
 
-.body {
-}
+.body {}
 
 .top {
   display: flex;
@@ -190,7 +189,6 @@
   font-size: 12px;
   color: #000;
   font-weight: normal;
-
 }
 
 .cname {
@@ -318,7 +316,7 @@
 }
 
 .abortButton :global(.anticon) {
-font-size: 1rem;
+  font-size: 1rem;
 }
 
 .abortButton span {
@@ -388,11 +386,10 @@ font-size: 1rem;
   border-radius: 0.875rem;
 }
 
-
-.process{
+.process {
   /*height: 1em;*/
   padding: 0.2em;
-  border:1px solid #C4CBD7;
+  border: 1px solid #C4CBD7;
   margin: 0.2em;
   background-color: #FAFBFC;
   display: flex;
@@ -401,32 +398,34 @@ font-size: 1rem;
   white-space: nowrap;
 }
 
-
-.process label{
+.process label {
   font-size: 0.2em;
 }
 
-.process img{
+.process img {
   width: .3em;
   margin: 0 .2em;
 }
-.process button{
+
+.process button {
   display: flex;
   align-items: center;
 }
 
-.process button i{
+.process button i {
   display: flex;
 }
-.process label{
-  text-transform:capitalize;
-}
-.many img{
-  width: 15px;
-  margin:0 5px;
+
+.process label {
+  text-transform: capitalize;
 }
 
-.process label{
+.many img {
+  width: 15px;
+  margin: 0 5px;
+}
+
+.process label {
   font-size: 0.15em;
 }
 
@@ -435,23 +434,23 @@ font-size: 1rem;
   float: left;
 }
 
-.process dl{
+.process dl {
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
 }
 
-.process dd{
+.process dd {
   display: flex;
   margin-bottom: 0.1em;
   align-items: center;
 }
 
-.process dd div{
-  margin-left:15px;
+.process dd div {
+  margin-left: 15px;
 }
 
-.process dd button{
+.process dd button {
   display: flex;
 }
 
@@ -479,4 +478,125 @@ font-size: 1rem;
   font-size: 1rem;
   color: #fff;
   font-weight: normal;
+}
+
+.dict {
+  display: block;
+  text-align: left;
+}
+
+.dictBlock {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  position: relative;
+  width: 600px;
+  height: 300px;
+}
+
+.titleCell {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0 30px;
+  border-right: 1px solid #d8d8d8;
+  padding-top: 3px;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.titleCell span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
+  height: 34px;
+  font-weight: bold;
+}
+
+.cell {
+  display: flex;
+  flex: none;
+  align-items: center;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: none;
+  padding: 0 20px;
+  margin: 0;
+}
+
+.cell span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 10px;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  border-bottom: solid 1px #d8d8d8;
+  width: 100%;
+  height: 34px;
+}
+
+.dictClose {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 32px;
+  width: 32px;
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dictClose span {
+  transform: rotate(45deg);
+  height: 32px;
+  width: 32px;
+  font-size: 32px;
+  line-height: 1;
+  display: flex;
+  flex: none;
+}
+
+.dictSelect {
+  display: flex;
+  flex: none;
+  margin: 20px 15px;
+  align-items: center;
+}
+
+.dictTable {
+  display: flex;
+  flex: auto;
+}
+
+.explanation {
+  display: flex;
+  flex: auto;
+  height: 160px;
+  margin: 20px 0;
+}
+
+.explanationCell {
+  display: flex;
+  padding: 0.1em;
+  border-bottom: solid 1px #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  flex: 0 0 0.4em;
+  align-items: center;
+  height: 30px;
+}
+
+.explanationCell span {
+  display: inline-block;
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
 }
