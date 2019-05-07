@@ -8,9 +8,11 @@ const fs = require('fs');
 const path = require('path')
 const moment = require('moment')
 const axios = require('axios')
+const Papa = require('papaparse')
 const command = require('../command')
 const { userModelingRestriction, userStorageRestriction } = require('restriction')
-
+const http = require('http')
+const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 const router = new Router()
 
 
@@ -179,9 +181,80 @@ function saveSample() {
   pipeline.exec()
 }
 
-router.get('/download', async (req, res) => {
+router.get('/download/:scheduleId', async (req, res) => {
+  const { scheduleId } = req.params
+  const { filename } = req.query
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
-  res.send('ok')
+  const schedule = {
+    deploymentId: 22,
+    modelName: "r2-solution-a1.auto.05.07.2019_20:30:09",
+    type: "deployment",
+    estimatedTime: 1557238028,
+    ends: "completed",
+    threshold: null,
+    prevSchedule: null,
+    status: "finished",
+    actualTime: null,
+    updatedDate: 1557238042,
+    createdDate: 1557238028,
+    userId: "0b34b5de-c658-4667-ba77-c88c76dca1d6",
+    id: 72,
+    etlIndex: "r2_etl_a477fb13-4cb9-4509-a673-e68e8f48f9f4",
+    result: {
+      name: "r2-solution-a1.auto.05.07.2019_20:30:09",
+      value: 0,
+      requestId: "schedule-72",
+      Data: "http://192.168.0.83:8081/blockData?uid=6dd3c03070d111e983d80135f560a60b",
+      score: {
+      },
+      backend: "r2-solution-a1.auto.05.07.2019_20:30:09",
+      problemType: "Classification",
+      executeSpeed: 473,
+      totalLines: 4515,
+      action: "clfreg.deploy"
+    }
+  }
+
+  const { data: header } = await axios.get(`${esServicePath}/etls/${schedule.etlIndex}/header`)
+  let temp = {}
+  let start = 0
+  let end = 0
+  let counter = 0
+  let resultHeader
+  res.attachment(filename);
+  res.type('csv')
+  http.get(schedule.result.Data, (response) => {
+    Papa.parse(response, {
+      download: true,
+      header: true,
+      step: async (results, parser) => {
+        const row = results.data[0]
+        if (!resultHeader) {
+          resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString()
+          res.write(resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString())
+        }
+        if (counter === 0) start = row['__no']
+        temp[row['__no']] = row
+        counter++
+        if (counter === 500) {
+          end = row['__no']
+          parser.pause()
+          counter = 0
+          const { data } = await axios.get(`${esServicePath}/etls/${schedule.etlIndex}/preview?start=${start}&end=${end}`)
+          const result = data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
+          result.forEach(r => {
+            res.write('\n' + resultHeader.split(',').map(k => r[k]).toString())
+          })
+          temp = {}
+          parser.resume()
+        }
+      },
+      complete: function (results, file) {
+        res.end()
+      }
+    })
+  })
+
 })
 
 // saveSample()
