@@ -539,7 +539,10 @@ export default class Project {
     await this.updateProject(backData)
     // const pass = await this.etl()
     const result = await this.originalStats()
-    if (result.status !== 200) this.updateProject({ uploadFileName: [], originalIndex: '' })
+    if (result.status !== 200) {
+      antdMessage.error(result.message)
+      this.updateProject({ uploadFileName: [], originalIndex: '', etling: false })
+    }
   }
 
   @action
