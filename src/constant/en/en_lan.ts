@@ -1068,6 +1068,9 @@ const EN_LAN = {
   Score:'Score',
   SihouetteScore:'Sihouette Score',
   exportreporterror:'export report error.',
+  Inputyourcostorbenefitofeveryredictionresult:'输入每个预测结果的成本或收益：（0~100）',
+
+
 
 };
 
