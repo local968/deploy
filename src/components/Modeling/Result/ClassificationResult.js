@@ -75,7 +75,7 @@ export default class ClassificationView extends Component {
     const { models, project, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
     if (!current) return null
-    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
+    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
@@ -126,7 +126,7 @@ export default class ClassificationView extends Component {
             <div className={styles.costBox}>
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
-                  <HeaderInfo row='Predicted' col='Actual' />
+                  <HeaderInfo row={EN.Predicted} col={EN.Actual} />
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
                 </div>
@@ -375,7 +375,7 @@ class ModelTable extends Component {
               <span>{EN.ModelProcessFlow}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Report</span>
+              <span>{EN.Report}</span>
             </div>
             {/* <div className={classnames(styles.cell, styles.cellHeader)}><span>Process Flow</span></div> */}
           </div>
