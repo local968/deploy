@@ -72,7 +72,7 @@ export default class Operation extends Component {
                       placement="left"
                       overlayClassName={styles.popover}
                       content={
-                        <Alert text={s.schedule.result['process error']} />
+                        <Alert text={s.schedule.result['processError']} />
                       }
                     >
                       <span className={classnames(styles.status, styles.issue)}>

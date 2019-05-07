@@ -7,10 +7,12 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path')
 const moment = require('moment')
+const axios = require('axios')
 const command = require('../command')
 const { userModelingRestriction, userStorageRestriction } = require('restriction')
 
 const router = new Router()
+
 
 router.post('/check', async (req, res) => {
   const { fileSize, type, projectId } = req.body
@@ -176,6 +178,11 @@ function saveSample() {
 
   pipeline.exec()
 }
+
+router.get('/download', async (req, res) => {
+  // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
+  res.send('ok')
+})
 
 // saveSample()
 

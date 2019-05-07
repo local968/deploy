@@ -215,6 +215,7 @@ const etl = async (schedule, index, stats) => {
   return await new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
+      console.log(data.task)
       if (data.task) {
         if (!data.task.status) return
         const status = data.task.status

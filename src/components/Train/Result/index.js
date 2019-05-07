@@ -51,9 +51,9 @@ function ModelResult(props) {
     const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
     const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
 
-    this.props.deploymentStore
+    props.deploymentStore
       .addDeployment(project.id, project.name, current.modelName, current.problemType, exps)
-      .then(id => this.props.routing.push('/deploy/project/' + id));
+      .then(id => props.routing.push('/deploy/project/' + id));
   };
 
   return <div className={classes.root}>
@@ -120,7 +120,7 @@ function ModelResult(props) {
   </div>;
 }
 
-export default inject('projectStore', 'deploymentStore')(observer(ModelResult))
+export default inject('projectStore', 'deploymentStore', 'routing')(observer(ModelResult))
 
 const OutlierTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain } = props
