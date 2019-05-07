@@ -59,7 +59,7 @@ function ModelResult(props) {
           {problemType === 'Outlier' && <div className={classes.scores}>
             <div className={classes.score}>
               <div className={classes.orange}>{formatNumber(selectModel.score.score)}</div>
-              <span className={classes.label}>Score <Hint content='123321' /></span>
+              <span className={classes.label}>{EN.Score} <Hint content='123321' /></span>
             </div>
             <div className={classes.rate}>
               <div className={classes.blood}>{formatNumber(selectModel.dataFlow[0].contamination || 0)}</div>
