@@ -1068,6 +1068,9 @@ const EN_LAN = {
   Score:'Score',
   SihouetteScore:'Sihouette Score',
   exportreporterror:'export report error.',
+  Inputyourcostorbenefitofeveryredictionresult:'Input your cost or benefit of every prediction result: (0 ~ 100)',
+  MappingDictionary:'Mapping Dictionary',
+  Explaination:'Explaination',
 
 };
 

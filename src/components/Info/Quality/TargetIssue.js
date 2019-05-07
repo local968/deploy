@@ -8,18 +8,60 @@ import * as d3 from 'd3';
 import { Icon, message } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import OutlierRange from "../../Charts/OutlierRange";
 
 @observer
 export class FixIssue extends Component {
   @observable editKey = ''
   @observable visible = false
   @observable progress = 0
-  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} }
+  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
+  @observable outLier = {};
+  @observable editKey = '';
+  
+  editRange(key, low, high, id){
+    if (!this.outLier[key]) {
+      request.post({
+        url: '/graphics/outlier-range',
+        data: {
+          "field": key,
+          id,
+          "interval": 20,
+        },
+      }).then((result) => {
+        this.outLier = {
+          ...this.outLier,
+          [key]: {
+            low,
+            high,
+            data: result.data,
+          },
+        };
+        this.editKey = key;
+        this.visible = true;
+        // setOutLier({
+        //   ...outLier,
+        //   [key]: {
+        //     low,
+        //     high,
+        //     data: result.data,
+        //   },
+        // });
+        // seteditKey(key);
+        // setvisible(true);
+      });
+      return;
+    }
+    this.editKey = key;
+    this.visible = true;
+    // setvisible(true);
+    // seteditKey(key)
+  };
 
-  editRange = (key) => {
-    this.visible = true
-    this.editKey = key
-  }
+  // editRange = (key) => {
+  //   this.visible = true
+  //   this.editKey = key
+  // }
 
   closeEdit = () => {
     this.visible = false
@@ -348,22 +390,36 @@ export class FixIssue extends Component {
         <button className={styles.save} onClick={this.save} ><span>{EN.Save}</span></button>
         <button className={styles.cancel} onClick={closeFixes}><span>{EN.CANCEL}</span></button>
       </div>
-      {this.editKey && <Modal content={<EditOutLier width={800}
-        height={400} saveEdit={this.saveEdit}
-        closeEdit={this.closeEdit}
-        outlierRange={project.outlierRange[this.editKey]}
-        outlierDict={project.outlierDictTemp[this.editKey]}
-        x={project.numberBins[this.editKey][1]}
-        y={project.numberBins[this.editKey][0]}
-        minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}
-        maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}
-        visible={this.visible}
-        width='12em'
-        title={EN.Outlier}
-        onClose={this.closeEdit}
-        closeByMask={true}
-        showClose={true}
-      />}
+      {
+        visible && <Modal
+            closeByMask={true}
+            showClose={true}
+            visible={visible}
+            title={EN.Outlier}
+            onClose={this.closeEdit}
+            content={
+              <OutlierRange
+                  closeEdit={this.closeEdit}
+                  saveEdit={this.saveEdit}
+                  message={this.outLier[editKey]}
+              />
+            } />}
+      {/*{this.editKey && <Modal content={<EditOutLier width={800}*/}
+      {/*  height={400} saveEdit={this.saveEdit}*/}
+      {/*  closeEdit={this.closeEdit}*/}
+      {/*  outlierRange={project.outlierRange[this.editKey]}*/}
+      {/*  outlierDict={project.outlierDictTemp[this.editKey]}*/}
+      {/*  x={project.numberBins[this.editKey][1]}*/}
+      {/*  y={project.numberBins[this.editKey][0]}*/}
+      {/*  minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}*/}
+      {/*  maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}*/}
+      {/*  visible={this.visible}*/}
+      {/*  width='12em'*/}
+      {/*  title={EN.Outlier}*/}
+      {/*  onClose={this.closeEdit}*/}
+      {/*  closeByMask={true}*/}
+      {/*  showClose={true}*/}
+      {/*/>}*/}
     </div>
   }
 }

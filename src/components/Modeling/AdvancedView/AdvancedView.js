@@ -58,6 +58,7 @@ import SpeedvsAccuracys from "../../Charts/SpeedvsAccuracys";
 import LiftChart2 from "../../Charts/LiftChart2";
 import RocChart2 from "../../Charts/RocChart2";
 import FitPlot2 from "../../Charts/FitPlot2";
+import request from '../../Request'
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -533,15 +534,18 @@ class RegressionDetailCurves extends Component {
     this.setState({ diagnoseType: e.target.value });
   }
   
+  componentDidMount() {
+    this.setChartDate()
+  }
+  
   setChartDate(){
-    const url = project.selectModel.fitAndResidualPlot;
+    const url = this.props.project.selectModel.fitAndResidualPlotData;
       request.post({
-         url:'/service/graphics/fit-plot',
+         url:'/graphics/fit-plot',
          data:{
            url,
          },
        }).then(chartDate=>{
-        // setChartDate(data)
         this.setState({
           chartDate
         })
@@ -552,6 +556,7 @@ class RegressionDetailCurves extends Component {
     const { model } = this.props;
     const { curve, diagnoseType,chartDate} = this.state;
     let curComponent;
+    console.log(curve)
     switch (curve) {
       case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
@@ -576,7 +581,13 @@ class RegressionDetailCurves extends Component {
         curComponent = (
           <div className={styles.plot} >
             {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
-            <ResidualPlot/>
+            {/*<ResidualPlot/>*/}
+            {chartDate&&<ResidualPlot
+                title={EN.ResidualPlot}
+                x_name = {EN.Truevalue}
+                y_name = {EN.Predictvalue}
+                chartDate = {chartDate}
+            />}
             <Modal
               visible={this.state.visible}
               title={EN.ResidualPlotDiagnose}

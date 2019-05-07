@@ -75,7 +75,7 @@ export default class ClassificationView extends Component {
     const { models, project, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
     if (!current) return null
-    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && "GOOD") || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
+    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
     const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
@@ -118,15 +118,15 @@ export default class ClassificationView extends Component {
           {this.showCost && <div className={styles.costBlock}>
             <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
             <div className={styles.costTitle}>
-              <span>Input your cost or benefit of every prediction result: (0 ~ 100)</span>
+              <span>{EN.Inputyourcostorbenefitofeveryredictionresult}</span>
             </div>
             <div className={styles.costContent}>
-              <span>Note: If a prediction brings you loss, it is a cost; If a prediction result brings you profit, it is a benefit. All inputs should be measured at the same unit.</span>
+              <span>{EN.NoteIfapredictionbringsyou}</span>
             </div>
             <div className={styles.costBox}>
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
-                  <HeaderInfo row='Predicted' col='Actual' />
+                  <HeaderInfo row={EN.Predicted} col={EN.Actual} />
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
                   <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
                 </div>
@@ -196,15 +196,15 @@ class Predicted extends Component {
         <div className={styles.progressMeans}>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.success)} />
-            <div className={styles.progressMeanText} title={`Actual: ${no} Predicted: ${no}`}><span>{EN.Actual}: {no}</span><span>{EN.Predicted}: {no}</span></div>
+            <div className={styles.progressMeanText} title={`${EN.Actual}: ${no} ${EN.Predicted}: ${no}`}><span>{EN.Actual}: {no}</span><span>{EN.Predicted}: {no}</span></div>
           </div>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.predicted)} />
-            <div className={styles.progressMeanText} title={`Actual: ${yes} Predicted: ${yes}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {yes}</span></div>
+            <div className={styles.progressMeanText} title={`${EN.Actual}: ${yes} ${EN.Predicted}: ${yes}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {yes}</span></div>
           </div>
           <div className={styles.progressMean}>
             <div className={classnames(styles.progressSquare, styles.different)} />
-            <div className={styles.progressMeanText} title={`Actual & Predicted Different`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>
+            <div className={styles.progressMeanText} title={`${EN.Actual} & ${EN.Predicted} ${EN.Different}`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>
           </div>
         </div>
       </div>
@@ -375,7 +375,7 @@ class ModelTable extends Component {
               <span>{EN.ModelProcessFlow}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-              <span>Report</span>
+              <span>{EN.Report}</span>
             </div>
             {/* <div className={classnames(styles.cell, styles.cellHeader)}><span>Process Flow</span></div> */}
           </div>

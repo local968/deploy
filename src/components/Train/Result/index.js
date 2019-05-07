@@ -74,7 +74,7 @@ function ModelResult(props) {
           {problemType === 'Outlier' && <div className={classes.scores}>
             <div className={classes.score}>
               <div className={classes.orange}>{formatNumber(selectModel.score.score)}</div>
-              <span className={classes.label}>Score <Hint content='123321' /></span>
+              <span className={classes.label}>{EN.Score} <Hint content='123321' /></span>
             </div>
             <div className={classes.rate}>
               <div className={classes.blood}>{formatNumber(selectModel.dataFlow[0].contamination || 0)}</div>
@@ -97,7 +97,7 @@ function ModelResult(props) {
           </div>}
           {!!list.length && <div className={classes.dict}>
             <button className={classes.button} onClick={showDict}>
-              <span>{'Mapping Dictionary'}</span>
+              <span>{EN.MappingDictionary}</span>
             </button>
             <Popover trigger='click' placement='bottomLeft' visible={visible} onVisibleChange={hideDict} content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
           </div>}
@@ -273,7 +273,7 @@ const ClusteringTable = observer((props) => {
           <span>{EN.ModelProcessFlow}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>Explanation</span>
+          <span>{EN.Explaination}</span>
         </div>
       </div>
     </div>

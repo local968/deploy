@@ -15,7 +15,7 @@ export default class VariableImpact extends Component {
       <div className={styles.detail}>
         {!arr.length ?
           <div className={styles.detailNone}>
-            <span title='Variable Impact not available for this algorithm'>{EN.VariableImpactnotavailableforthisalgorithm}</span>
+            <span title={EN.VariableImpactnotavailableforthisalgorithm}>{EN.VariableImpactnotavailableforthisalgorithm}</span>
           </div>
           : arr.map((row, index) => {
             return (
