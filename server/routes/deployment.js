@@ -105,7 +105,7 @@ wss.register('getAllModels', async (message, socket) => {
       name: JSON.parse(curr[1][0]),
       score,
       modelId: modelIds[index],
-      performance: Object.entries(score.validateScore || score.score).map(([k, v]) => `${k}:${v.toFixed(3)}`).join("\r\n")
+      performance: Object.entries(score.validateScore || score).map(([k, v]) => `${k}:${v.toFixed(3)}`).join("\r\n")
     })
     return _result
   }, [])

@@ -140,7 +140,7 @@ export default class List extends Component {
                       <a
                         className={styles.results}
                         target="_blank"
-                        href={`http://${config.host}:${config.port}/redirect/download/${s.schedule.result.resultPath}?projectId=${cd.projectId}&filename=${cdpo.file}-${moment
+                        href={`http://${config.host}:${config.port}/upload/download/${s.schedule.id}?filename=${cdpo.file}-${moment
                           .unix(
                             s.schedule.actualTime || s.schedule.estimatedTime
                           )
