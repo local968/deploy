@@ -93,6 +93,8 @@ export default class Project {
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
   @observable missingReason = {}
+  @observable newVariablePath = ''
+  @observable newVariableViews={}
 
   // @observable totalFixedCount = 0
   @observable deletedCount = 0
@@ -211,6 +213,12 @@ export default class Project {
     return this.totalRawLines - this.totalFixedLines
   }
 
+  fetchData = async path => {
+    const api = await socketStore.ready()
+    const result = await api.fetchData({ path })
+    return result.data
+  }
+
   @computed
   get defaultUploadFile() {
     this.noComputeTemp = false
@@ -318,7 +326,9 @@ export default class Project {
       dataViewsLoading: false,
       preImportanceLoading: false,
       preImportance: {},
-      mappingKey: ''
+      mappingKey: '',
+      newVariablePath: '',
+      newVariableViews: {}
     }
   }
 
@@ -927,14 +937,14 @@ export default class Project {
       //   feature_label
       // };
       const readyLabels = this.dataViews ? Object.keys(this.dataViews) : []
-      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
-      const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
-      const feature_label = [...data_label, ...new_label]
+      // const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
+      const feature_label = this.newVariable.filter(v => !readyLabels.includes(v))
+      // const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
       const command = {
         projectId: this.id,
-        command: 'dataView',
+        command: 'top.dataView',
         actionType: 'clean',
         feature_label,
       };
@@ -943,14 +953,15 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.dataViewsLoading = true
-      return api.newDataView(command).then(returnValue => {
-        const { status, result } = returnValue
-        if (status < 0) {
-          this.setProperty({ dataViews: null })
-          return antdMessage.error(result['process error'])
-        }
-        this.setProperty({ dataViews: result.dataViews, dataViewsLoading: false })
-      })
+      return api.dataView(command)
+      // .then(returnValue => {
+      //   const { status, result } = returnValue
+      //   if (status < 0) {
+      //     // this.setProperty({ dataViews: null })
+      //     return antdMessage.error(result['process error'])
+      //   }
+      //   // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
+      // })
     })
   }
 
