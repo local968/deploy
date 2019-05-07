@@ -123,6 +123,7 @@ export default class Project {
   @observable customHeader = []
   @observable criteria = 'defualt';
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
+  @observable mappingKey = ''
 
   // Advanced Modeling Setting
   @observable settingId = '';
@@ -316,7 +317,8 @@ export default class Project {
       dataViews: null,
       dataViewsLoading: false,
       preImportanceLoading: false,
-      preImportance: {}
+      preImportance: {},
+      mappingKey: ''
     }
   }
 
