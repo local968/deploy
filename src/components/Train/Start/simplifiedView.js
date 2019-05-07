@@ -237,9 +237,46 @@ export default class SimplifiedView extends Component {
 class SimplifiedViewRow extends Component {
   @observable histograms = false
   @observable univariant = false
-
-  showHistograms = () => {
-    this.histograms = true
+  @observable chartData = {};
+  
+  
+  showHistograms = value => {
+    // this.histograms = true
+    const { project = {} } = this.props;
+    const { colType, etlIndex } = project;
+    const data = {
+      field: value,
+      id: etlIndex,
+    };
+    
+    if (!this.chartData[value]) {
+      if (colType[value] === "Numerical") {
+        const {min, max} = project.dataViews[value];
+        data.interval = (max - min) / 100;
+        request.post({
+          url: '/graphics/histogram-numerical',
+          data,
+        }).then((result) => this.showback(value, result.data));
+      } else {
+        const {uniqueValues} = project.dataViews[value];
+        data.size = uniqueValues;
+        request.post({
+          url: '/graphics/histogram-categorical',
+          data,
+        }).then((result) => this.showback(value, result.data));
+      }
+      return
+    }
+    
+    this.histograms = true;
+  };
+  
+  showback = (target, result) => {
+    this.chartData = {
+      ...this.chartData,
+      [target]: result,
+    };
+    this.histograms = true;
   }
 
   hideHistograms = e => {
@@ -264,19 +301,15 @@ class SimplifiedViewRow extends Component {
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.99} min={0.01} step={0.1} precision={2} onChange={handleWeight} />
       </div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>
-        <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
+      <div className={styles.tableTd} onClick={this.showHistograms.bind(this,value)}>
+      <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {this.histograms && <Popover placement='topLeft'
           visible={this.histograms}
           onVisibleChange={this.hideHistograms}
           trigger="click"
-          content={<SimplifiedViewPlot onClose={this.hideHistograms}
-            type='histgram'
-            getPath={project.histgramPlot.bind(null, value)}
-            path={project.histgramPlots[value]}
-            id={id}
-            fetch={project.histgramPlots.hasOwnProperty(value)}
-          />} />}
+         content={<SimplifiedViewPlot onClose={this.hide}
+                type={colType[value]}
+                data={this.chartData[value]} />} />}
       </div>
       <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
       <div className={classnames(styles.tableTd, {
@@ -349,17 +382,26 @@ class CorrelationPlot extends Component {
 
 @observer
 class SimplifiedViewPlot extends Component {
-  constructor(props) {
-    super(props)
-    if (!props.fetch) props.getPath()
-  }
-
+  
   render() {
-    const { onClose, path, type, id, style } = this.props;
-    const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
+    const { type, style, data } = this.props;
+    if (type === 'Numerical') {
+      return <div className={styles.plot} style={style}>
+        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+        <HistogramNumerical
+            x_name={type}
+            y_name={'count'}
+            title={`Feature:${type}`}
+            data={data}
+        />
+      </div>
+    }
     return <div className={styles.plot} style={style}>
-      <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-      {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
+      {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+      <HistogramCategorical
+          x_name={`Feature:${type}`}
+          data={data}
+      />
     </div>
   }
 }

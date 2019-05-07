@@ -1,6 +1,6 @@
 import React,{PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
-// import 'echarts-gl'
+import 'echarts-gl'
 
 export default class ThreeVariable extends PureComponent{
 	constructor(props){
@@ -43,10 +43,12 @@ export default class ThreeVariable extends PureComponent{
 			grid3D: {},
 			legend: {
 				orient: 'vertical',
-				top: 20,
+				top: 40,
+				bottom:40,
 				right:0,
 				// data: keys,
 				align: 'left',
+				type: 'scroll',
 			},
 			xAxis3D: {
 				name:x_name
@@ -64,7 +66,7 @@ export default class ThreeVariable extends PureComponent{
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 400, width: 1000}}
+			style={{height: 400, width: 600}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'
