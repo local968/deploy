@@ -402,16 +402,23 @@ function getProjectFields(id, fields) {
 }
 
 async function getBaseEtl(id) {
-  const data = await getProjectFields(id, ['etlIndex', 'target', 'problemType', 'dataHeader', 'colType', 'colMap']);
-  const { etlIndex, target, problemType, dataHeader, colType, colMap } = data;
+  const data = await getProjectFields(id, ['etlIndex', 'target', 'problemType', 'dataHeader', 'colType', 'stats']);
+  const { etlIndex, target, problemType, dataHeader, colType, stats } = data;
+  const colMap = Object.entries(stats).filter(([key, metric]) => metric.type === 'Categorical').reduce((prev, [key, metric]) => {
+    prev[key] = metric.categoricalMap.reduce((p, r, index) => {
+      p[r.key] = index
+      return p
+    }, {})
+    return prev
+  }, {})
   return {
     command: 'top.etlBase',
     csvLocation: [etlIndex],
     targetLabel: [target],
-    problemType: problemType,
+    problemType,
     featureLabel: dataHeader,
-    colType: colType,
-    colMap: colMap,
+    colType,
+    colMap,
   }
 }
 
@@ -935,11 +942,11 @@ wss.register('train', async (message, socket, progress) => {
         await createOrUpdate(projectId, userId, { trainModel: result })
         processValue = { ...result }
       } else if (result.score) {
+        hasModel = true;
         const { chartData: chartDataUrl } = result
         let chartData = { chartData: chartDataUrl }
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl)
         const stats = await getProjectField(projectId, 'stats')
-        hasModel = true;
         await createOrUpdate(projectId, userId, { trainModel: null })
         const modelResult = await createModel(userId, projectId, result.modelName, { ...result, ...chartData, stats })
         processValue = await addSettingModel(userId, projectId)(modelResult)
@@ -971,7 +978,10 @@ wss.register('train', async (message, socket, progress) => {
       selectId: '',
       stopId: ''
     }
-    if (!hasModel) statusData.train2Error = true
+    if (!hasModel) {
+      console.log('failed')
+      statusData.train2Error = true
+    }
     return await createOrUpdate(projectId, userId, statusData)
   } catch (err) {
     const statusData = {
