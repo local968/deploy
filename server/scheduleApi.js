@@ -212,10 +212,11 @@ const api = {
 const etl = async (schedule, index, stats) => {
   const response = await axios.post(`${esServicePath}/etls/${index}/etl`, stats)
   const { etlIndex, opaqueId } = response.data
-  await new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
-      if (data.task && data.task.status) {
+      if (data.task) {
+        if (!data.task.status) return
         const status = data.task.status
         const progress = 100 * (status.created + status.deleted) / status.total || 0
         schedule.status = `ETL: ${progress.toFixed(2)}%`
