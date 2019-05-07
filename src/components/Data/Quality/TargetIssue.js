@@ -8,6 +8,8 @@ import * as d3 from 'd3';
 import { Icon, message } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import OutlierRange from "../../Charts/OutlierRange";
+import request from '../../Request'
 
 @observer
 export class ClassificationTarget extends Component {
@@ -480,12 +482,36 @@ export class FixIssue extends Component {
   @observable editKey = ''
   @observable visible = false
   @observable progress = 0
-  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} }
-
-  editRange = (key) => {
-    this.visible = true
-    this.editKey = key
-  }
+  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
+  @observable outLier = {};
+  
+  editRange(key, id){
+    const {low,high} = this.props.project.rawDataView[key];
+    if (!this.outLier[key]) {
+      request.post({
+        url: '/graphics/outlier-range',
+        data: {
+          "field": key,
+          id,
+          "interval": 20,
+        },
+      }).then((result) => {
+        this.outLier = {
+          ...this.outLier,
+          [key]: {
+            low,
+            high,
+            data: result.data,
+          },
+        };
+        this.editKey = key;
+        this.visible = true;
+      });
+      return;
+    }
+    this.editKey = key;
+    this.visible = true;
+  };
 
   closeEdit = () => {
     this.visible = false
@@ -575,13 +601,14 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
+    console.log(project)
     const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
+              <div className={classnames(styles.typeBlock, styles.mismatch)}/>
               <span>{EN.DataTypeMismatch}</span>
             </div>
           </div>
@@ -780,13 +807,14 @@ export class FixIssue extends Component {
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
-                  method !== 0) ? '' : method
+                  method !== 0) ? '' : method;
+                console.log(project)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
-                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>{EN.Edit}</span>
+                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k,project.etlIndex)}>{EN.Edit}</span>
                   </div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
@@ -814,22 +842,36 @@ export class FixIssue extends Component {
         <button className={styles.save} onClick={this.save} ><span>{EN.Save}</span></button>
         <button className={styles.cancel} onClick={closeFixes}><span>{EN.CANCEL}</span></button>
       </div>
-      {this.editKey && <Modal content={<EditOutLier width={800}
-        height={400} saveEdit={this.saveEdit}
-        closeEdit={this.closeEdit}
-        outlierRange={project.outlierRange[this.editKey]}
-        outlierDict={project.outlierDictTemp[this.editKey]}
-        x={project.numberBins[this.editKey][1]}
-        y={project.numberBins[this.editKey][0]}
-        minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}
-        maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}
-        visible={this.visible}
-        width='12em'
-        title={EN.Outlier}
-        onClose={this.closeEdit}
-        closeByMask={true}
-        showClose={true}
-      />}
+      {
+        this.visible && <Modal
+            closeByMask={true}
+            showClose={true}
+            visible={this.visible}
+            title={EN.Outlier}
+            onClose={this.closeEdit}
+            content={
+              <OutlierRange
+                  closeEdit={this.closeEdit}
+                  saveEdit={this.saveEdit}
+                  message={this.outLier[this.editKey]}
+              />
+            } />}
+      {/*{this.editKey && <Modal content={<EditOutLier width={800}*/}
+      {/*  height={400} saveEdit={this.saveEdit}*/}
+      {/*  closeEdit={this.closeEdit}*/}
+      {/*  outlierRange={project.rawDataView[this.editKey]}*/}
+      {/*  outlierDict={project.outlierDictTemp[this.editKey]}*/}
+      {/*  x={project.numberBins[this.editKey][1]}*/}
+      {/*  y={project.numberBins[this.editKey][0]}*/}
+      {/*  minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}*/}
+      {/*  maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}*/}
+      {/*  visible={this.visible}*/}
+      {/*  width='12em'*/}
+      {/*  title={EN.Outlier}*/}
+      {/*  onClose={this.closeEdit}*/}
+      {/*  closeByMask={true}*/}
+      {/*  showClose={true}*/}
+      {/*/>}*/}
     </div>
   }
 }
