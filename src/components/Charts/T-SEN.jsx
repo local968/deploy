@@ -71,8 +71,9 @@ export default class ParallelPlot extends PureComponent{
 			legend: {
 				orient: 'vertical',
 				top: 40,
+				bottom:40,
 				right: 0,
-				// data: legend,
+				type: 'scroll',
 			},
 			xAxis: [
 				{
@@ -105,19 +106,19 @@ export default class ParallelPlot extends PureComponent{
 				}
 			],
 			series,
-			toolbox: {
-				show : true,
-				feature : {
-					dataZoom: {},
-					brush: {
-						type: ['rect', 'clear']
-					},
-					dataView : {show: true, readOnly: false},
-					magicType : {show: true, type: ['line', 'bar']},
-					restore : {show: true},
-					saveAsImage : {show: true}
-				}
-			}
+			// toolbox: {
+			// 	show : true,
+			// 	feature : {
+			// 		dataZoom: {},
+			// 		brush: {
+			// 			type: ['rect', 'clear']
+			// 		},
+			// 		dataView : {show: true, readOnly: false},
+			// 		magicType : {show: true, type: ['line', 'bar']},
+			// 		restore : {show: true},
+			// 		saveAsImage : {show: true}
+			// 	}
+			// }
 		}
 	}
 	

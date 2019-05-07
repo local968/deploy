@@ -721,9 +721,9 @@ wss.register('dataView', (message, socket, progress) => {
     }, true).then(async returnValue => {
       const { status, result } = returnValue
       if (status === 100) {
-        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'dataViews', result.data)
+        const { result: updateResult } = await updateProjectField(message.projectId, socket.session.userId, 'newVariableViews', result)
         await createOrUpdate(message.projectId, socket.session.userId, { dataViewsLoading: false, dataViewProgress: 0 })
-        if (updateResult && updateResult.dataViews) returnValue.result.data = updateResult.dataViews
+        if (updateResult && updateResult.newVariableViews) returnValue.result.data = updateResult.newVariableViews
       }
       return returnValue
     }))
@@ -865,7 +865,13 @@ wss.register('createNewVariable', async (message, socket, progress) => {
   const { userId } = socket.session;
   const { projectId } = message;
   await checkEtl(projectId, userId)
-  return _sendToCommand(message, socket, progress)
+  const returnValue = await _sendToCommand(message, socket, progress)
+  const { status, result } = returnValue
+  if (status === 100) {
+    const { resultData } = result
+    await createOrUpdate(projectId, userId, { newVariablePath: resultData })
+  }
+  return returnValue
 })
 
 wss.register('etlCleanData', (message, socket, progress) => {
@@ -1154,6 +1160,12 @@ wss.register("checkProject", (message, socket) => {
   const userId = socket.session.userId
   const id = message.id
   return checkProject(userId, id)
+})
+
+wss.register("fetchData", (message, socket) => {
+  // const userId = socket.session.userId
+  const path = message.path
+  return axios.get(path)
 })
 
 module.exports = {

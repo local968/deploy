@@ -3,26 +3,31 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon, Tooltip } from 'antd';
-import {autorun, observable} from 'mobx';
+import { autorun, observable } from 'mobx';
 import { Table } from 'components/Common';
 import EN from '../../../../constant/en';
 
 import dataIcon from './data.svg';
+import axios from 'axios';
 
 @observer
 export default class Preview extends Component {
   @observable visiable = false
   @observable cleanData = []
-  @observable loading = false
+  @observable newVariableData = []
 
   componentDidMount() {
-    const { readIndex, etlIndex } = this.props.project;
+    const { readIndex, etlIndex, newVariablePath, fetchData } = this.props.project;
     autorun(() => {
-      this.loading = true
-      if (!etlIndex) return this.loading = false
+      if (!etlIndex) return
       readIndex(etlIndex).then(data => {
         this.cleanData = data
-        this.loading = false
+      })
+    })
+    autorun(() => {
+      if (!newVariablePath) return
+      fetchData(newVariablePath).then(data => {
+        this.newVariableData = data
       })
     })
   }
@@ -36,33 +41,16 @@ export default class Preview extends Component {
   }
 
   formatTable = () => {
-    // const { cleanData, visiable, loading } = this
-    // const { colType, will_be_drop_500_lines, renameVariable, trainHeader, sortHeader, newVariable, newType } = this.props.project;
-    // if (loading) return []
-    // if (!visiable) return []
-    // if (!cleanData.length) return []
-    // const header = cleanData[0]
-    // const headerList = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
-    // const indexs = headerList.map(h => header.indexOf(h))
-    // const realColumn = headerList.length
-    // // const realData = cleanData.slice(1).filter(r => r.length === realColumn)
-    // const data = cleanData.slice(1).map(row => indexs.map(i => row[i]))
-
-
-
-
-
-
-    const { cleanData, visiable, loading } = this
+    const { cleanData, visiable, newVariableData } = this
     const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader } = this.props.project;
-    if (loading) return []
     if (!visiable) return []
     if (!cleanData.length) return []
-    const headerList = [...dataHeader].filter(h => !trainHeader.includes(h))
+    if (!!newVariable.length && !newVariableData.length) return []
+    const headerList = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
     const notShowIndex = rawHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
-    const data = cleanData.map(row => row.filter((k, i) => !notShowIndex.includes(i)))
+    const data = cleanData.map((row, index) => row.filter((k, i) => !notShowIndex.includes(i)).concat(newVariable.map(n => newVariableData[index][n])))
 
-    const types = { ...colType }
+    const types = { ...colType, ...newType }
 
     const realColumn = headerList.length
 

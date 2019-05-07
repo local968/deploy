@@ -23,7 +23,8 @@ function ModelResult(props) {
   const { problemType, models, selectModel, colType } = project
   const list = Object.entries(colType).filter(t => t[1] === 'Categorical').map(c => c[0])
 
-  const [visible, setVisible] = React.useState(false)
+  const [visible, setVisible] = React.useState(false);
+  console.log('selectModel',selectModel,selectModel.multiVarPlotData);
 
   if (!selectModel || !models.length) return null
 
@@ -103,7 +104,7 @@ function ModelResult(props) {
           </div>}
         </div>
         <div className={classes.right}>
-          <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0' />
+          <D3D2 url={selectModel.multiVarPlotData} />
           {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
