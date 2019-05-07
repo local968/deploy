@@ -1,22 +1,29 @@
 import React from 'react';
-import { ContinueButton, Hint, ProgressBar } from 'components/Common'
+import { ContinueButton, Hint, ProgressBar, Table } from 'components/Common'
 import classes from './styles.module.css';
 import VariableImpact from './VariableImpact'
 import ModelProcessFlow from './modelProcessFlow'
+import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
 // import D3D2 from '@src/components/charts/D3D2'
 // import Iso from '@src/components/charts/Iso'
 // import ParallelPlot from '@src/components/charts/ParallelPlot'
-import { Tooltip, Icon } from 'antd'
+import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
 import EN from '../../../constant/en';
+
+const Option = Select.Option;
+
 function ModelResult(props) {
   // const type = 'clustering'
   const { resetSide, view, sort, handleSort, changeView, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel } = project
+  const { problemType, models, selectModel, colType } = project
+  const list = Object.entries(colType).filter(t => t[1] === 'Categorical').map(c => c[0])
+
+  const [visible, setVisible] = React.useState(false)
 
   if (!selectModel || !models.length) return null
 
@@ -26,6 +33,14 @@ function ModelResult(props) {
 
   const abortTrain = () => {
     project.abortTrain()
+  }
+
+  const showDict = () => {
+    setVisible(true)
+  }
+
+  const hideDict = () => {
+    setVisible(false)
   }
 
   const deploy = () => {
@@ -73,14 +88,19 @@ function ModelResult(props) {
             </div>
             <div className={classes.cluster}>
               <div className={classes.blood}>{Object.keys(selectModel.labelWithImportance).length}</div>
-              <span className={classes.rateLabel}>{EN.TheNumberofClusters} <Hint content='123321' /></span>
+              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.TheNumberofClusters} <Hint content='123321' /></span>
             </div>
             <div className={classes.rSquared}>
               <div className={classes.green}>{formatNumber(selectModel.score.RSquared, 2)}</div>
               <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>R squared <Hint content='123321' /></span>
             </div>
           </div>}
-          <ContinueButton text={EN.MappingDictionary} width='200px' />
+          {!!list.length && <div className={classes.dict}>
+            <button className={classes.button} onClick={showDict}>
+              <span>{EN.MappingDictionary}</span>
+            </button>
+            <Popover trigger='click' placement='bottomLeft' visible={visible} onVisibleChange={hideDict} content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
+          </div>}
         </div>
         <div className={classes.right}>
           <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0' />
@@ -317,12 +337,70 @@ const ClusteringRow = observer((props) => {
         <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
       </div>
       <div className={`${classes.ccell} ${classes.compute}`}>
-        <span><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
+        <span onClick={() => toggleImpact('explanation')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
       </div>
     </div>
     <div className={classes.rowData}>
       {visible && type === 'impact' && <VariableImpact model={model} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
+      {visible && type === 'explanation' && <Explanation model={model} />}
+    </div>
+  </div>
+})
+
+const MappingDict = observer((props) => {
+  const { project, list, hideDict } = props
+  const { colMap, mappingKey } = project
+  const [state, setState] = React.useState({
+    origin: '',
+    encode: ''
+  })
+  const handleChange = key => e => {
+    setState({
+      ...state,
+      [key]: e.target.value
+    })
+  }
+
+  const handleSelect = value => {
+    project.updateProject({ mappingKey: value })
+  }
+  const tableData = React.useMemo(() => {
+    const key = mappingKey || list[0]
+    const mapping = colMap[key]
+    const data = Object.entries(mapping)
+      .filter(r1 => r1[0].toString().includes(state.origin))
+      .filter(r2 => r2[1].toString().includes(state.encode))
+      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.cell })))
+    const header = [
+      { content: <span>Origin<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
+      { content: <span>Encoding <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
+    ]
+    return [header, ...data]
+  })
+  return <div className={classes.dictBlock}>
+    <div className={classes.dictClose} onClick={hideDict}>
+      <span>+</span>
+    </div>
+    <div className={classes.dictSelect}>
+      <span>Please Select a Categorical Variable</span>
+      <Select value={mappingKey || list[0]} style={{ width: 120, marginLeft: 20 }} onChange={handleSelect}>
+        {list.map(l => <Option value={l}>{l}</Option>)}
+      </Select>
+    </div>
+    <div className={classes.dictTable}>
+      <Table
+        columnWidth={300}
+        rowHeight={({ index }) => { return index === 0 ? 68 : 34 }}
+        columnCount={2}
+        rowCount={tableData.length}
+        fixedColumnCount={0}
+        fixedRowCount={1}
+        checked={null}
+        select={null}
+        style={{ border: "1px solid #ccc" }}
+        data={tableData}
+      />
     </div>
   </div>
 })

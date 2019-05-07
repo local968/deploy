@@ -1058,7 +1058,7 @@ const EN_LAN = {
   SetMaxTrainingTime: 'Set Max Training Time',
   Maxamountoftimetoevaluatedifferentmodules: 'Max amount of time to evaluate different modules.',
   Minutes: 'Minutes',
-  minutesorlonger: '5 minutes or longer',
+  minutesorlonger: '10 minutes or longer',
   NoMoreThan:'No More Than',
   Auto:'Auto',
   SimpleView:'Simple View',

@@ -164,7 +164,7 @@ wss.register('newEtl', async (message, socket, process) => {
         process({ progress: 90, status: 1 })
         const { data: { totalFixedCount, deletedCount } } = await axios.post(`${esServicePath}/etls/${project.originalIndex}/fixedLines`, stats)
         process({ progress: 95, status: 1 })
-        const { data } = await axios.post(`${esServicePath}/etls/${JSON.parse(etlIndex)}/stats`, stats)
+        const { data } = await axios.post(`${esServicePath}/etls/${etlIndex}/stats`, stats)
         const dataViews = {}
         Object.entries(data).forEach(([key, metric]) => {
           const stats = metric.originalStats

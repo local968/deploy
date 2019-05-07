@@ -20,7 +20,7 @@
     "uuid": "^3.3.2",
     "ws": "^6.1.0",
     "formidable": "^1.2.1",
-      "rc-input-number": "4.4.2"
+    "rc-input-number": "4.4.2"
   },
   "proxy": "http://localhost:9080",
   "scripts": {

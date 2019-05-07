@@ -725,36 +725,6 @@ wss.register('dataView', (message, socket, progress) => {
   // sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
 })
 
-const config = require('config')
-const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
-wss.register('newDataView', async (message, socket, progress) => {
-  const { userId } = socket.session
-  const { projectId } = message
-  const etlIndex = await redis.hget("project:" + projectId, 'etlIndex');
-  const stats = await redis.hget("project:" + projectId, 'stats');
-  try {
-    const { data } = await axios.post(`${esServicePath}/etls/${JSON.parse(etlIndex)}/stats`, JSON.parse(stats))
-    console.log(data)
-    // // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
-    const dataViews = {}
-    Object.entries(data).forEach(([key, metric]) => {
-      const stats = metric.originalStats
-      dataViews[key] = { ...stats, std: stats.std_deviation }
-    })
-    const result = {
-      dataViews,
-    }
-    await createOrUpdate(projectId, userId, result)
-    return { status: 200, message: 'ok', result }
-  } catch (e) {
-    console.log({ ...e })
-    let error = e
-    if (e.response && e.response.data) error = e.response.data
-    return { status: 500, message: 'get index stats failed', error }
-  }
-})
-
-
 wss.register('correlationMatrix', (message, socket, progress) => createOrUpdate(message.projectId, socket.session.userId, { correlationMatrixLoading: true })
   .then(() => sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
     .then(returnValue => {

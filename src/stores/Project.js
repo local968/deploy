@@ -123,6 +123,7 @@ export default class Project {
   @observable customHeader = []
   @observable criteria = 'defualt';
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
+  @observable mappingKey = ''
 
   // Advanced Modeling Setting
   @observable settingId = '';
@@ -316,7 +317,8 @@ export default class Project {
       dataViews: null,
       dataViewsLoading: false,
       preImportanceLoading: false,
-      preImportance: {}
+      preImportance: {},
+      mappingKey: ''
     }
   }
 
@@ -977,7 +979,7 @@ export default class Project {
     return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'createNewVariable',
+        command: 'top.createNewVariable',
         csvScript: allExp.replace(/\|/g, ",")
       };
       return api.createNewVariable(command, progressResult => {
@@ -1773,7 +1775,7 @@ export default class Project {
       this.preImportance = null
 
       const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
-      await this.dataView()
+      // await this.dataView()
       dataViewDisposer()
       if (cancel) return
       const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
