@@ -26,7 +26,8 @@ export default class Model {
   @observable multiVarPlotData = ''
   @observable parallelPlotData = ''
   @observable outlierPlotData = ''
-  @observable pointToShow = ''
+  @observable pointToShowData = ''
+  @observable fitAndResidualPlotData = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {

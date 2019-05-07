@@ -9536,10 +9536,10 @@ rc-hammerjs@~0.6.0:
     hammerjs "^2.0.8"
     prop-types "^15.5.9"
 
-rc-input-number@~4.4.0:
+rc-input-number@4.4.2, rc-input-number@~4.4.0:
   version "4.4.2"
-  resolved "https://registry.npm.taobao.org/rc-input-number/download/rc-input-number-4.4.2.tgz#3abeaadd2cbef59eb350f09f7c0f8c743b584f13"
-  integrity sha1-Or6q3Sy+9Z6zUPCffA+MdDtYTxM=
+  resolved "https://registry.yarnpkg.com/rc-input-number/-/rc-input-number-4.4.2.tgz#3abeaadd2cbef59eb350f09f7c0f8c743b584f13"
+  integrity sha512-K4HS92Gq1qZretMolhru7hpC0Mtl68fz9XKxxXAo3wrwKcNBFYg+kMMKT9cTaZey+oJ8EMCEk1zWI4YFJgzhZQ==
   dependencies:
     babel-runtime "6.x"
     classnames "^2.2.0"

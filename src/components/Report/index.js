@@ -205,7 +205,7 @@ class Report extends Component {
               <span className={styles.metricsCell}>{EN.LogLoss}</span>
             </div>
             <div className={styles.metricsRow}>
-              <span className={styles.metricsCell}>Validation</span>
+              <span className={styles.metricsCell}>{EN.Validation}</span>
               <span className={styles.metricsCell} title={vs.auc}>{formatNumber(vs.auc)}</span>
               <span className={styles.metricsCell} title={roc.Threshold[fitIndex]}>{formatNumber(roc.Threshold[fitIndex])}</span>
               <span className={styles.metricsCell} title={model.accValidation}>{formatNumber(model.accValidation)}</span>

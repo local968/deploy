@@ -1,6 +1,9 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import request from '../Request';
+import styles from "../Modeling/Result/PredictVActual.module.css";
+import EN from "../../constant/en";
+import Hint from "../Common/Hint";
 
 export default class PredictedVsActualPlot extends PureComponent{
 	constructor(props){
@@ -14,7 +17,7 @@ export default class PredictedVsActualPlot extends PureComponent{
 	async componentDidMount() {
 		const {url} = this.props;
 		const {data} = await request.post({
-			url:'/service/graphics/predicted-vs-actual-plot',
+			url:'/graphics/predicted-vs-actual-plot',
 			data:{
 				url,
 			},
@@ -94,12 +97,22 @@ export default class PredictedVsActualPlot extends PureComponent{
 	}
 
 	render(){
-		return <ReactEcharts
-			option={this.getOption()}
-			style={{height: 400, width: 800}}
-			notMerge={true}
-			lazyUpdate={true}
-			theme='customed'
-		/>
+		return  <div className={styles.predictActual}>
+			<div className={styles.title}>
+				{EN.PredictedVSActualPlotSorted}<Hint content={<p>{EN.Howwastheplotcreate}<br/>
+				{EN.Sortthedatabythe}<br/>
+				{EN.Dividealldatapoints}<br/>
+				{EN.Calculatethemeanvalue}<br/>
+				{EN.HowdoIinterprete}<br/>
+				{EN.Weaimtogetyouasense}</p>}/>
+			</div>
+			<ReactEcharts
+				option={this.getOption()}
+				style={{height: 400, width: 800}}
+				notMerge={true}
+				lazyUpdate={true}
+				theme='customed'
+			/>
+		</div>
 	}
 }

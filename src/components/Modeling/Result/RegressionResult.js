@@ -20,12 +20,15 @@ export default class RegressionView extends Component {
   onSelect = model => {
     this.props.project.setSelectModel(model.id)
   };
+  
 
   render() {
     const { models, project, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
+    console.log(project)
+  
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -49,7 +52,7 @@ export default class RegressionView extends Component {
         <PredictedVsActualPlot
             x_name = {EN.PointNumber}
             y_name = {EN.price + EN.NewAverage}
-            url={project.selectModel.pointToShow}
+            url={project.selectModel.pointToShowData}
         />
       </div>
       <div className={styles.line} />

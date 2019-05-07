@@ -36,32 +36,32 @@ export default class ModelProcessFlow extends Component {
 
 	DP(data) {
 		return <dl>
-			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'One hot encoding')}
-			{this.list(data, 'rescaling:', 'Rescaling')}
-			{this.list(data, 'imputation:', 'Imputation')}
-			{this.list(data, 'balancing:', 'Banlance')}
+      {this.list(data, 'categorical_encoding:one_hot_encoding:', EN.Onehotencoding)}
+      {this.list(data, 'rescaling:', EN.Rescaling)}
+      {this.list(data, 'imputation:',  EN.Imputation)}
+      {this.list(data, 'balancing:', EN.Banlance)}
 		</dl>
 	}
 
 	FP(data) {
 		const name = data['preprocessor:__choice__'];
 		const types = {
-			'extra_trees_preproc_for_classification': 'extreml.rand.trees.prepr.',
-			'extra_trees_preproc_for_regression': 'extreml.rand.trees.prepr.',
-			'fast_ica': 'ICA',
-			'feature_agglomeration': 'Feature Agglomeration',
-			'kernel_pca': 'kernel PCA',
-			'kitchen_sinks': 'Kitchen Sinks',
-			'linear_svc_preprocessor': 'Linear SVM prepr.',
-			'no_preprocessor': 'No Preprocessing',
-			'no_preprocessing': 'No Preprocessing',
-			'nystroem_sampler': 'Nystroem Sampler',
-			'pca': 'PCA',
-			'polynomial': 'Polynomial',
-			'random_trees_embedding': 'Random Trees embed.',
-			'select_percentile_classification': 'Select Percentile',
-			'select_percentile_regression': 'Select Percentile',
-			'select_rates': 'Select Rates'
+      'extra_trees_preproc_for_classification': EN.extremlrandtreesprepr,
+      'extra_trees_preproc_for_regression': EN.extremlrandtreesprepr,
+      'fast_ica': EN.ICA,
+      'feature_agglomeration': EN.FeatureAgglomeration,
+      'kernel_pca': EN.kernelPCA,
+      'kitchen_sinks': EN.KitchenSinks,
+      'linear_svc_preprocessor': EN.LinearSVMprepr,
+      'no_preprocessor': EN.NoPreprocessing,
+      'no_preprocessing': EN.NoPreprocessing,
+      'nystroem_sampler': EN.NystroemSampler,
+      'pca': EN.PCA,
+      'polynomial': EN.Polynomial,
+      'random_trees_embedding': EN.RandomTreesembed,
+      'select_percentile_classification': EN.SelectPercentile,
+      'select_percentile_regression': EN.SelectPercentile,
+      'select_rates': EN.SelectRates
 		};
 
 		return <dl>
@@ -114,9 +114,9 @@ export default class ModelProcessFlow extends Component {
 					{
 						dataFlow.filter(itm => itm.weight).map((itm, index) => {
 							return <dd key={index}>
-								{this.popOver(this.DP(itm), 'Data Preprocessing')}
+								{this.popOver(this.DP(itm), EN.DataPreprocessing)}
 								<img src={Next} alt='' />
-								{this.popOver(this.FP(itm), 'Feature Preprocessing')}
+								{this.popOver(this.FP(itm), EN.FeaturePreprocessing)}
 								<img src={Next} alt='' />
 								{this.popOver(this.Third(itm), itm.model_name)}
 								<Tag>{formatNumber(+itm.weight || 0)}</Tag>
@@ -125,7 +125,7 @@ export default class ModelProcessFlow extends Component {
 					}
 				</dl>
 				<img src={Next} alt='' />
-				<label>Ensembled Model</label>
+				<label>{EN.EnsembledModel}</label>
 				<img src={Next} alt='' />
 				 <label>{EN.Prediction}</label>
 			</section>

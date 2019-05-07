@@ -201,10 +201,10 @@ class AdvancedView extends Component {
       if (project.problemType === 'Classification') {
         return current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
       } else {
-        return current ? (current.score.validateScore.r2 > 0.5 && "Acceptable") || "Not Acceptable" : ''
+        return current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : ''
       }
     } catch (e) {
-      return 'OK'
+      return EN.OK
     }
   }
 
@@ -471,10 +471,10 @@ class PredictTable extends Component {
       dataIndex: 'rowName',
       className: styles.actual
     }, {
-      title: `Predict: ${no}`,
+      title: `${EN.Predict}: ${no}`,
       dataIndex: 'col1',
     }, {
-      title: `Predict: ${yes}`,
+      title: `${EN.Predict}: ${yes}`,
       dataIndex: 'col2'
     }, {
       title: '',
@@ -514,9 +514,9 @@ class PredictTable extends Component {
             <div className={styles.costTable}>
               <div className={styles.costRow}>
                 <div className={styles.sepCell}>
-                  <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title='Predicted'>{EN.Predicted}</span></div>
+                  <div className={styles.sepText} style={{ marginLeft: 'auto' }}><span title={EN.Predicted}>{EN.Predicted}</span></div>
                   <div className={styles.sep}><span></span></div>
-                  <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title='Actual'>{EN.Actual}</span></div>
+                  <div className={styles.sepText} style={{ marginRight: 'auto' }}><span title={EN.Actual}>{EN.Actual}</span></div>
                 </div>
                 <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
                 <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
