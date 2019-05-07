@@ -39,7 +39,7 @@ export default class SimplifiedView extends Component {
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
     const variableType = { ...newType, ...colType }
     return <div className={styles.simplified}>
-      <div className={styles.title}>Target Variable</div>
+      <div className={styles.title}>{EN.TargetVariable}}</div>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
           <div className={classnames(styles.targetCell, styles.targetName)}><span>{EN.TargetVariable}</span></div>
@@ -90,7 +90,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.tableTh}><span>{EN.UnivariantPlot}</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
-            <span>Importance</span>
+            <span>{EN.Importance}</span>
             <Hint themeStyle={{ fontSize: '1rem' }} content={EN.AdvancedModelingImportanceTip} />
           </div>
           <div className={styles.tableTh}><span>{EN.DataType}</span></div>

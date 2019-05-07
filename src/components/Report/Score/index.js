@@ -471,10 +471,10 @@ class PredictTable extends Component {
       dataIndex: 'rowName',
       className: styles.actual
     }, {
-      title: `Predict: ${no}`,
+      title: `${EN.Predict}: ${no}`,
       dataIndex: 'col1',
     }, {
-      title: `Predict: ${yes}`,
+      title: `${EN.Predict}: ${yes}`,
       dataIndex: 'col2'
     }, {
       title: '',
