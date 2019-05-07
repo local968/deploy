@@ -82,7 +82,7 @@ export default class Preview extends Component {
       const colValue = types[header] === 'Numerical' ? 'Numerical' : 'Categorical'
       selectArr.push({
         content: <span>{colValue=== 'Numerical' ? EN.Numerical : EN.Categorical}</span>,
-        title: colValue,
+        title: colValue=== 'Numerical' ? EN.Numerical : EN.Categorical,
         cn: styles.cell
       })
     }
