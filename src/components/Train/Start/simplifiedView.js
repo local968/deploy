@@ -221,7 +221,7 @@ export default class SimplifiedView extends Component {
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.map((h, i) => {
+            {allVariables.filter((h)=>colType[h] !== "Raw").map((h, i) => {
               const data = { ...dataViews, ...newVariableViews }[h]
               const map = targetMap || {};
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} handleWeight={this.handleWeight(h)} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
@@ -311,7 +311,7 @@ class SimplifiedViewRow extends Component {
                 type={colType[value]}
                 data={this.chartData[value]} />} />}
       </div>
-      <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
+      <div className={styles.tableTd} title={valueType}><span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType !== 'Categorical'
       })} title={unique}><span>{unique}</span></div>

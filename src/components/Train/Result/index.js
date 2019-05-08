@@ -5,9 +5,6 @@ import VariableImpact from './VariableImpact'
 import ModelProcessFlow from './modelProcessFlow'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-// import D3D2 from '@src/components/charts/D3D2'
-// import Iso from '@src/components/charts/Iso'
-// import ParallelPlot from '@src/components/charts/ParallelPlot'
 import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
@@ -109,14 +106,8 @@ function ModelResult(props) {
         <div className={classes.right}>
           {
             project.problemType === "Outlier"?
-                <Iso url={selectModel.outlierPlotData}/>
+                <Iso url={selectModel.outlierPlotData} models={props.projectStore.project.models}/>
                 :<D3D2 url={selectModel.multiVarPlotData} />
-            // ()=>{
-            //   // if(project.problemType === "Outlier"){
-            //   //               //   return <Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>
-            //   //               // }
-            //   return <D3D2 url={selectModel.multiVarPlotData} />
-            // }
           }
 
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
@@ -154,23 +145,23 @@ const OutlierTable = observer((props) => {
     }
     return models.sort(fn)
   }, [models, sort])
-
+  
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('score')}>{EN.Score} {sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('rate')}>{EN.ContaminationRate}{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.ModelProcessFlow}</span>
         </div>
       </div>
@@ -210,19 +201,19 @@ const OutlierRow = observer((props) => {
 
   return <div className={classes.rowBody}>
     <div className={classes.rowData}>
-      <div className={`${classes.cell}`}>
+      <div className={`${classes.ccell}`}>
         <span>{model.modelName}</span>
       </div>
-      <div className={`${classes.cell}`}>
+      <div className={`${classes.ccell}`}>
         <span>{formatNumber(model.score.score)}</span>
       </div>
-      <div className={`${classes.cell}`}>
+      <div className={`${classes.ccell}`}>
         <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
       </div>
-      <div className={`${classes.cell} ${classes.compute}`}>
+      <div className={`${classes.ccell} ${classes.compute}`}>
         <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
       </div>
-      <div className={`${classes.cell} ${classes.compute}`}>
+      <div className={`${classes.ccell} ${classes.compute}`}>
         <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
       </div>
     </div>
@@ -364,6 +355,10 @@ const ClusteringRow = observer((props) => {
 
 const MappingDict = observer((props) => {
   const { project, list, hideDict } = props
+  console.log("dddddddddddddddd")
+  console.log(project)
+  console.log( list)
+  console.log(hideDict)
   const { colMap, mappingKey } = project
   const [state, setState] = React.useState({
     origin: '',
@@ -385,10 +380,10 @@ const MappingDict = observer((props) => {
     const data = Object.entries(mapping)
       .filter(r1 => r1[0].toString().includes(state.origin))
       .filter(r2 => r2[1].toString().includes(state.encode))
-      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.cell })))
+      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.ccell })))
     const header = [
-      { content: <span>Origin<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
-      { content: <span>Encoding <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
+      { content: <span>{EN.Origin}<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
+      { content: <span>{EN.Encoding} <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
     ]
     return [header, ...data]
   })
@@ -397,7 +392,7 @@ const MappingDict = observer((props) => {
       <span>+</span>
     </div>
     <div className={classes.dictSelect}>
-      <span>Please Select a Categorical Variable</span>
+      <span>{EN.PleaseSelectaCategoricalVariable}</span>
       <Select value={mappingKey || list[0]} style={{ width: 120, marginLeft: 20 }} onChange={handleSelect}>
         {list.map(l => <Option value={l}>{l}</Option>)}
       </Select>

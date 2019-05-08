@@ -3,6 +3,8 @@ import ReactEcharts from 'echarts-for-react';
 import { debounce } from 'lodash'
 import Slider from 'rc-slider'
 import InputNum from 'rc-input-number'
+import 'rc-input-number/assets/index.css'
+import 'rc-slider/assets/index.css'
 import './echarts.config'
 import request from '../Request'
 import styles from './charts.module.css';
@@ -13,21 +15,27 @@ const {Option} = Select;
 
 const classes = styles;
 
-
 const color = ['#6e698f','#d5d4df','#367de9','#f3ce31'];//背景(开始)/背景(结束）/异常点/正常点
 
 export default class Iso extends PureComponent{
     constructor(props){
         super(props);
+        const {featureImportance} = props.models[0];
+        const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1])
+        const var1 = list[0][0];
+        const var2 = list[1][0];
         this.state = {
             ready:false,
             slider_value:0,
             x_name:'',
             y_name:'',
             show_name:{
-                x_name:'',
-                y_name:'',
+                var1,
+                var2,
             },
+            list:Object.keys(featureImportance),
+            var1,
+            var2,
         };
 
         this.updatePoint = debounce(this.updatePoint, 1000)
@@ -36,7 +44,7 @@ export default class Iso extends PureComponent{
     async componentDidMount() {
         const { url,default_point:point=0} = this.props;
         const result = await request.post({
-            url: '/service/graphics/outlier',
+            url: '/graphics/outlier',
             data: {
                 url,
             },
@@ -193,12 +201,11 @@ export default class Iso extends PureComponent{
     }
 
     selection(order){
-        const {result={},show_name} = this.state;
-        const {featuresLabel=['a','b','c']} = result;
+        const {show_name,list} = this.state;
 
         const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
-        const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{itm}</Option>);
+        const options = list.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{itm}</Option>);
 
         return <Select
           value={show_name[order]} style={{ width: 120 }} onChange={name=>{
@@ -243,9 +250,9 @@ export default class Iso extends PureComponent{
         return [
             <section key='dl' className={classes.d3d2}>
                 <dl>
-                <dt>Choose 2 Variables</dt>
-                <dd>Var1:{this.selection('x_name')}</dd>
-                <dd>Var2:{this.selection('y_name')}</dd>
+                <dt>{EN.Choose2Variables}</dt>
+                <dd>Var1:{this.selection('var1')}</dd>
+                <dd>Var2:{this.selection('var2')}</dd>
                 <dd>
                     <button className={styles.button} onClick={this.save.bind(this)}>
                         <span>{EN.Save}</span>
@@ -287,10 +294,10 @@ export default class Iso extends PureComponent{
                         this.updatePoint(slider_value)
                     }}
                     value={slider_value} />
-                    <a href='javascript:;' onClick={this.reset.bind(this)}>Reset</a>
+                    <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
             </div>,
             <div key = 'adjust' className={classes.adjust}>
-                  You can adjust the contamination rate : <InputNum
+              {EN.Youcanadjustthecontaminationrate}: <InputNum
               min={0}
               max={0.5}
               step={0.01}

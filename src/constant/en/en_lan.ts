@@ -583,6 +583,7 @@ const EN_LAN = {
   YourAdvancedModeling: 'Your Advanced Modeling Setting is reset.',
   SelectFromPreviousSettings: 'Select From Previous Settings',
   NameYourModelSettings: 'Name Your Model Settings',
+  SpecifytheNumberofClusterstoForm:'Specify the Number of Clusters to Form:',
   SelectAlgorithm: 'Select Algorithm',
   SelectAll: 'Select All',
   DeselectAll: 'Deselect all',
@@ -1004,7 +1005,7 @@ const EN_LAN = {
   age2freb4: 'age2_fre_b4',
   agecusb3: 'age_cus_b3',
   agecusb4: 'age_cus_b4',
-  ChooseaVariableScalingMethod: 'Choose a Variable Scaling Method',
+  ChooseaVariableScalingMethod: 'Choose a Variable Scaling Method:',
   minmaxscale: 'min_max_scale',
   robustscale: 'robust_scale',
   FromSQL: 'From SQL',
@@ -1078,8 +1079,13 @@ const EN_LAN = {
   pleaseenteryourtablename:'please enter your table name',
   pleaseenteryourdatabseusername:'please enter your databse username',
   pleaseenteryourdatabsepassword:'please enter your databse password',
-
-
+  PleaseSelectaCategoricalVariable:'Please Select a Categorical Variable',
+  Encoding:'Encoding',
+  Origin:'Origin',
+  Choose2Variables:'Choose 2 Variables',
+  Youcanadjustthecontaminationrate:'You can adjust the contamination rate',
+  Choose2or3Variables:'Choose 2 or 3 Variables',
+  Result:'Result',
 };
 
 

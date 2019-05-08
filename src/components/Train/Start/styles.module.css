@@ -556,6 +556,21 @@
   margin-left: 0.15em;
 }
 
+advancedTitle_Outlier{
+  display: flex;
+  flex: none;
+  justify-content: center;
+  margin-top: -61px;
+}
+
+.advancedTitle_Outlier span {
+  font-family: SanFranciscoText;
+  font-size: 1.125rem;
+  color: #000000;
+  /*line-height: 1.2;*/
+
+}
+
 .advancedTitle {
   display: flex;
   flex: none;
@@ -575,6 +590,7 @@
   flex: 1 1;
   margin-left: 0.2em;
   align-items: center;
+  width: 310px;
 }
 
 .advancedOption select {
@@ -591,7 +607,6 @@
   font-size: 1rem;
   color: #000000;
   line-height: 1.2;
-  max-width: 6em;
   text-align: center;
 }
 
@@ -615,8 +630,12 @@
 .advancedOptionBox {
   display: flex;
   flex: none;
-  margin-right: auto;
+  margin-right: 100px;
   align-items: center;
+}
+
+.advancedOptionBox  input{
+  margin-right: 20px;
 }
 
 .advancedOptionBox label {
@@ -625,10 +644,10 @@
   color: #000000;
   line-height: 1.2;
   cursor: pointer;
+  margin-right: 20px;
 }
 
 .limit {
-  width: 2.6em;
   flex-direction: column;
   flex: none;
 }
@@ -833,7 +852,6 @@ span.advancedDesc {
 }
 
 .otherLabel {
-  width: 2em;
   flex-direction: column;
   flex: none;
 }
@@ -875,6 +893,7 @@ span.advancedDesc {
   flex: none;
   margin: 0.1em;
   align-items: center;
+  width: 30%;
 }
 
 .advancedAlgorithm label {
@@ -1152,7 +1171,7 @@ button.disable {
 .chooseScan {
   display: flex;
   flex: none;
-  margin: .3em 0;
+  /*margin: .3em 0;*/
 }
 
 .chooseLabel {

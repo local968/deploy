@@ -125,7 +125,7 @@ export default class D3D2 extends PureComponent {
 		
 		return <section className={styles.d3d2}>
 			<dl>
-				<dt>Choose 2 or 3 Variables</dt>
+				<dt>{EN.Choose2or3Variables}</dt>
 				<dd>Var1:{this.selection('x_name')}</dd>
 				<dd>Var2:{this.selection('y_name')}</dd>
 				<dd>Var3:{this.selection('z_name')}</dd>
