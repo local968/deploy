@@ -1268,7 +1268,8 @@ export default class Project {
       id,
       problemType,
       target,
-      dataHeader
+      dataHeader,
+      weights
     } = this;
 
     let command = '';
