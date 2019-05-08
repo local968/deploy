@@ -398,7 +398,7 @@ class SimplifiedViewRow extends Component {
           });
         } else {//?
           request.post({
-            url: '/service/graphics/classification-categorical',
+            url: '/graphics/classification-categorical',
             data,
           }).then((result) => {
             this.scatterData = {
