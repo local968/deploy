@@ -187,7 +187,7 @@ router.get('/download/:scheduleId', async (req, res) => {
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const schedule = JSON.parse(await redis.get(`schedule:${scheduleId}`))
 
-  const { data: header } = await axios.get(`${esServicePath}/etls/${schedule.etlIndex}/header`)
+  const { data: header } = await axios.get(`${esServicePath}/etls/${schedule.index}/header`)
   let temp = {}
   let start = 0
   let end = 0
@@ -205,25 +205,25 @@ router.get('/download/:scheduleId', async (req, res) => {
           resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString()
           res.write(resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString())
         }
-        if (counter === 0) start = row['__no']
         temp[row['__no']] = row
         counter++
         end = row['__no']
         if (counter === 500) {
           parser.pause()
           counter = 0
-          const { data } = await axios.get(`${esServicePath}/etls/${schedule.etlIndex}/preview?start=${start}&end=${end}`)
-          const result = data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
+          const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
+          const result = response.data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
           result.forEach(r => {
             res.write('\n' + resultHeader.split(',').map(k => r[k]).toString())
           })
+          start = parseInt(end) + 1
           temp = {}
           parser.resume()
         }
       },
       complete: async (results, file) => {
         counter = 0
-        const { data } = await axios.get(`${esServicePath}/etls/${schedule.etlIndex}/preview?start=${start}&end=${end}`)
+        const { data } = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
         const result = data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
         result.forEach(r => {
           res.write('\n' + resultHeader.split(',').map(k => r[k]).toString())
