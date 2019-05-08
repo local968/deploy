@@ -25,6 +25,7 @@ function ModelResult(props) {
   const list = Object.entries(colType).filter(t => t[1] === 'Categorical').map(c => c[0])
 
   const [visible, setVisible] = React.useState(false);
+  // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
 
   if (!selectModel || !models.length) return null
 
