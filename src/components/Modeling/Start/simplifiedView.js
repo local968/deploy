@@ -466,7 +466,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
+    const { data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
