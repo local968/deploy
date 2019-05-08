@@ -203,8 +203,8 @@ export default class Project {
 
   readIndex = async (index) => {
     const url = `/etls/${index}/preview`
-    const { data } = await axios.get(url)
-    const result = data.result.map(row => this.rawHeader.map(h => row[h]))
+    const { data = {} } = await axios.get(url)
+    const result = (data.result || []).map(row => this.rawHeader.map(h => row[h]))
     return result
   }
 
