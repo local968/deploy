@@ -357,7 +357,7 @@ export default class AdvancedView extends Component {
   render() {
     const { project, sort, handleSort, metric, handleChange } = this.props;
     const { problemType } = project
-    const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2')))
+    const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
       <div className={styles.advancedModelResult}>
         <div className={styles.modelResult} >
