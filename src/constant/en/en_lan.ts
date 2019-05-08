@@ -1084,7 +1084,7 @@ const EN_LAN = {
   Origin:'Origin',
   Choose2Variables:'Choose 2 Variables',
   Youcanadjustthecontaminationrate:'You can adjust the contamination rate',
-
+  Choose2or3Variables:'Choose 2 or 3 Variables',
 
 };
 

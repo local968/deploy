@@ -930,7 +930,7 @@ const EN: any = {
   Auto:'自动',
   SimpleView:'简单视图',
   Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation:'您还可以告诉我们您的业务需求，以获得更精确的建议',
-  ContaminationRate:'Outlier Ratio',
+  ContaminationRate:'异常值比例',
   TheNumberofClusters:'聚类个数',
   Score:'评分',
   SihouetteScore:'Sihouette Score',
@@ -945,11 +945,12 @@ const EN: any = {
   pleaseenteryourtablename:'请输入您的表名',
   pleaseenteryourdatabseusername:'请输入您的数据库用户名',
   pleaseenteryourdatabsepassword:'请输入您的数据库密码',
-  PleaseSelectaCategoricalVariable:'请选择一个分类变量',
-  Encoding:'编码',
-  Origin:'起源',
-  Choose2Variables:'选择2个变量',
-  Youcanadjustthecontaminationrate:'您可以调整Outlier Ratio',
+  PleaseSelectaCategoricalVariable:'请选择一个离散变量',
+  Encoding:'映射值',
+  Origin:'原始值',
+  Choose2Variables:'请选择两个变量',
+  Youcanadjustthecontaminationrate:'滑动改变异常值比例',
+  Choose2or3Variables:'请选择两个或三个变量',
 
 
 
