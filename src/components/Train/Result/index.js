@@ -5,9 +5,6 @@ import VariableImpact from './VariableImpact'
 import ModelProcessFlow from './modelProcessFlow'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-// import D3D2 from '@src/components/charts/D3D2'
-// import Iso from '@src/components/charts/Iso'
-// import ParallelPlot from '@src/components/charts/ParallelPlot'
 import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
@@ -149,24 +146,22 @@ const OutlierTable = observer((props) => {
     return models.sort(fn)
   }, [models, sort])
   
-  console.log('models',models)
-
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('score')}>{EN.Score} {sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('rate')}>{EN.ContaminationRate}{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.ModelProcessFlow}</span>
         </div>
       </div>
@@ -206,19 +201,19 @@ const OutlierRow = observer((props) => {
 
   return <div className={classes.rowBody}>
     <div className={classes.rowData}>
-      <div className={`${classes.cell}`}>
+      <div className={`${classes.ccell}`}>
         <span>{model.modelName}</span>
       </div>
-      <div className={`${classes.cell}`}>
+      <div className={`${classes.ccell}`}>
         <span>{formatNumber(model.score.score)}</span>
       </div>
-      <div className={`${classes.cell}`}>
+      <div className={`${classes.ccell}`}>
         <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
       </div>
-      <div className={`${classes.cell} ${classes.compute}`}>
+      <div className={`${classes.ccell} ${classes.compute}`}>
         <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
       </div>
-      <div className={`${classes.cell} ${classes.compute}`}>
+      <div className={`${classes.ccell} ${classes.compute}`}>
         <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
       </div>
     </div>
@@ -385,7 +380,7 @@ const MappingDict = observer((props) => {
     const data = Object.entries(mapping)
       .filter(r1 => r1[0].toString().includes(state.origin))
       .filter(r2 => r2[1].toString().includes(state.encode))
-      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.cell })))
+      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.ccell })))
     const header = [
       { content: <span>{EN.Origin}<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
       { content: <span>{EN.Encoding} <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
