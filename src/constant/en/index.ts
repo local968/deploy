@@ -945,8 +945,9 @@ const EN: any = {
   pleaseenteryourtablename:'请输入您的表名',
   pleaseenteryourdatabseusername:'请输入您的数据库用户名',
   pleaseenteryourdatabsepassword:'请输入您的数据库密码',
-
-
+  PleaseSelectaCategoricalVariable:'请选择一个分类变量',
+  Encoding:'编码',
+  Origin:'起源',
 };
 
 export default EN;

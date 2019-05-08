@@ -387,8 +387,8 @@ const MappingDict = observer((props) => {
       .filter(r2 => r2[1].toString().includes(state.encode))
       .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.cell })))
     const header = [
-      { content: <span>Origin<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
-      { content: <span>Encoding <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
+      { content: <span>{EN.Origin}<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
+      { content: <span>{EN.Encoding} <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
     ]
     return [header, ...data]
   })
@@ -397,7 +397,7 @@ const MappingDict = observer((props) => {
       <span>+</span>
     </div>
     <div className={classes.dictSelect}>
-      <span>Please Select a Categorical Variable</span>
+      <span>{EN.PleaseSelectaCategoricalVariable}</span>
       <Select value={mappingKey || list[0]} style={{ width: 120, marginLeft: 20 }} onChange={handleSelect}>
         {list.map(l => <Option value={l}>{l}</Option>)}
       </Select>

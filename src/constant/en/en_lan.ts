@@ -1079,8 +1079,9 @@ const EN_LAN = {
   pleaseenteryourtablename:'please enter your table name',
   pleaseenteryourdatabseusername:'please enter your databse username',
   pleaseenteryourdatabsepassword:'please enter your databse password',
-
-
+  PleaseSelectaCategoricalVariable:'Please Select a Categorical Variable',
+  Encoding:'Encoding',
+  Origin:'Origin',
 };
 
 
