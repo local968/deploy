@@ -556,7 +556,6 @@ class RegressionDetailCurves extends Component {
     const { model } = this.props;
     const { curve, diagnoseType,chartDate} = this.state;
     let curComponent;
-    console.log(curve)
     switch (curve) {
       case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
@@ -711,22 +710,23 @@ class DetailCurves extends Component {
       case EN.ROCCurve:
        // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = <ROCCurves
-            height={300} width={500}
+            height={300}
+            width={500}
             x_name = {EN.FalsePositiveDate}
             y_name = {EN.TruePositiveRate}
-            fitIndex = {model.fitIndex}
-            x = {model.chartData.roc.FPR}
-            y = {model.chartData.roc.TPR}
+            model = {model}
         />;
         break;
       case EN.PredictionDistribution:
         // curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = <PredictionDistributions
-            height={300} width={500}
+            height={300}
+            width={500}
             x_name = {EN.ProbabilityThreshold}
             y_name = {EN.ProbabilityDensity}
             fitIndex = {model.fitIndex}
             chartData = {model.chartData}
+            model = {model}
         />;
         break;
       case EN.PrecisionRecallTradeoff:
@@ -735,9 +735,7 @@ class DetailCurves extends Component {
             height={300} width={500}
             x_name = {EN.Recall}
             y_name = {EN.Precision}
-            fitIndex = {model.fitIndex}
-            x = {model.chartData.roc.Recall}
-            y = {model.chartData.roc.Precision}
+            model = {model}
         />
         break;
       case EN.LiftChart:

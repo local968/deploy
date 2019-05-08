@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 
@@ -17,9 +17,6 @@ export default function PredictionDistributions(props){
 		name:'True',
 		value:_.zip(_PERCENTAGE,_POSITIVE),
 	}];
-
-	const point = data[0].value[fitIndex][0];
-
 	const series = data.map(itm=>({
 		type: 'line',
 		areaStyle: {},
@@ -27,7 +24,18 @@ export default function PredictionDistributions(props){
 		data:itm.value,
 		symbol: 'circle',
 	}));
-
+	
+	// const [index,upIndex] = useState(5);
+	const point = data[0].value[fitIndex][0];
+	
+	// useEffect(()=>{
+	// 	props.model.setFitIndex(index);
+	// 	upPoint(data[0].value[index][0]);
+	// },[index]);
+	
+	// console.log(2122,index,data[0].value[index][0])
+	
+	
 	const option = {
 		xAxis: {
 			name:x_name,
@@ -39,17 +47,25 @@ export default function PredictionDistributions(props){
 				value: point,
 				snap: true,
 				lineStyle: {
-					// color: '#004E52',
 					opacity: 0.5,
 					width: 2,
 				},
-
+				label: {
+					show: true,
+					formatter: function (params) {
+						let {value} = params;
+						console.log(params,222)
+						value = value === 1 ?0.99:value;
+						// upIndex(Math.floor(value * 100));
+						props.model.setFitIndex(Math.floor(value * 100));
+						return value
+					},
+					backgroundColor: '#004E52'
+				},
 				handle: {
 					show: true,
-					// color: '#004E52',
 					size:35,
 					margin:43,
-					// icon:'image://https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/home/img/qrcode/zbios_x2_9d645d9.png'
 				},
 			},
 		},
@@ -68,18 +84,8 @@ export default function PredictionDistributions(props){
 			orient: 'vertical',
 			top: 40,
 			right: 0,
-			// data: legend,
 		},
 		series,
-		// toolbox: {
-		// 	show : true,
-		//
-		// 	feature : {
-		// 		dataZoom: {},
-		// 		restore : {show: true},
-		// 		saveAsImage : {show: true},
-		// 	},
-		// },
 	};
 
 	return <ReactEcharts

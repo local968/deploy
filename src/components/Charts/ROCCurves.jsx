@@ -11,19 +11,19 @@ export default class ROCCurves extends PureComponent{
 			ready:false,
 			position:null,
 		};
-		this.updatePoint = _.debounce(this.updatePoint,10);
+		this.updatePoint = _.debounce(this.updatePoint.bind(this),10);
 	}
 	
-	// componentWillReceiveProps(props) {
-	// 	this.prePair(props)
-	// }
-	
 	prePair(){
-		const {x_name='',y_name='',fitIndex=0,x,y} =this.props;
+		const {x_name='',y_name='',model} =this.props;
+		const {chartData,fitIndex=0} = model;
+		const {roc} = chartData;
+		const {FPR:x,TPR:y} = roc;
 		const _x = Object.values(x);
 		const _y = Object.values(y);
 		const data = _.zip(_x,_y);
 		const point = data[fitIndex][0];
+		// console.log(_x,_y,data,point)
 		
 		const result = {
 			x_name,
@@ -36,6 +36,7 @@ export default class ROCCurves extends PureComponent{
 			ready:true,
 			result,
 			_data : [data[fitIndex]],
+			_x,
 		})
 	}
 	
@@ -180,7 +181,9 @@ export default class ROCCurves extends PureComponent{
 		// this.setState({
 		// 	point
 		// })
-		console.log(point)
+		// console.log(this.state._x.indexOf(point));
+		// console.log(point)
+		this.props.model.setFitIndex(this.state._x.indexOf(point));
 	}
 
 	render(){
