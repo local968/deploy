@@ -138,7 +138,7 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: {  selectModel }, sort, handleSort } = this.props;
-    const texts = [EN.ModelName, 'Time', 'CVNN','RSquared','RMSSTD','CH','silhouette_cosine','silhouette_euclidean'];
+    const texts = [EN.ModelName, 'Time', 'CVNN','RSquared','RMSSTD','CH index','silhouette_cosine','silhouette_euclidean'];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
