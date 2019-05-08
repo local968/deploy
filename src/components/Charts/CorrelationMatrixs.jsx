@@ -23,7 +23,7 @@ export default function CorrelationMatrixs(props){
 		animation: true,
 		grid: {
 			x:8 * len,
-			y:4 * len,
+			y:4 * len+20,
 		},
 		xAxis: {
 			type: 'category',

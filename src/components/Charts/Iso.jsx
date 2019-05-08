@@ -15,7 +15,6 @@ const {Option} = Select;
 
 const classes = styles;
 
-
 const color = ['#6e698f','#d5d4df','#367de9','#f3ce31'];//背景(开始)/背景(结束）/异常点/正常点
 
 export default class Iso extends PureComponent{
