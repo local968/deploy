@@ -1326,7 +1326,8 @@ export default class Project {
           randSeed: this.randSeed,
           measurement: this.measurement,
           settingName: setting.name,
-          holdoutRate: this.holdoutRate / 100
+          holdoutRate: this.holdoutRate / 100,
+          algorithms: this.algorithms,
         };
         if (this.totalRawLines > 10000) {
           trainData.validationRate = this.validationRate / 100
