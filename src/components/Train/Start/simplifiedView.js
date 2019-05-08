@@ -368,13 +368,11 @@ class CorrelationPlot extends Component {
     const { type, value } = CorrelationMatrixData;
     return (
         <div className={styles.correlationPlot} >
-          <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+          {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
           <CorrelationMatrixs
               value={value}
               type={type}
           />
-          {/* {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>} */}
-          {/*<div className={styles.plotLoad}><Spin size="large" /></div>*/}
         </div>
     )
   }
