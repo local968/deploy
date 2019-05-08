@@ -275,7 +275,7 @@ export default class SimplifiedView extends Component {
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.sort((a, b) => {
+            {allVariables.filter((h)=>colType[h] !== "Raw").sort((a, b) => {
               return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
             }).map((h, i) => {
               if (h === target) return null;
