@@ -23,7 +23,7 @@ export default class RegressionView extends Component {
   
 
   render() {
-    const { models, project, exportReport, sort, handleSort } = this.props;
+    const { models, project = {}, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';

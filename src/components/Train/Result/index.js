@@ -138,7 +138,7 @@ export default inject('projectStore', 'deploymentStore', 'routing')(observer(Mod
 
 const OutlierTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain } = props
-  const { train2Finished, trainModel } = project
+  const { train2Finished, trainModel, isAbort } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
