@@ -948,6 +948,12 @@ const EN: any = {
   PleaseSelectaCategoricalVariable:'请选择一个分类变量',
   Encoding:'编码',
   Origin:'起源',
+  Choose2Variables:'选择2个变量',
+  Youcanadjustthecontaminationrate:'您可以调整Outlier Ratio',
+
+
+
+
 };
 
 export default EN;

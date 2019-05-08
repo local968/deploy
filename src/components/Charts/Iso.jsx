@@ -251,7 +251,7 @@ export default class Iso extends PureComponent{
         return [
             <section key='dl' className={classes.d3d2}>
                 <dl>
-                <dt>Choose 2 Variables</dt>
+                <dt>{EN.Choose2Variables}</dt>
                 <dd>Var1:{this.selection('var1')}</dd>
                 <dd>Var2:{this.selection('var2')}</dd>
                 <dd>
@@ -295,10 +295,10 @@ export default class Iso extends PureComponent{
                         this.updatePoint(slider_value)
                     }}
                     value={slider_value} />
-                    <a href='javascript:;' onClick={this.reset.bind(this)}>Reset</a>
+                    <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
             </div>,
             <div key = 'adjust' className={classes.adjust}>
-                  You can adjust the contamination rate : <InputNum
+              {EN.Youcanadjustthecontaminationrate}: <InputNum
               min={0}
               max={0.5}
               step={0.01}

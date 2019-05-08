@@ -311,7 +311,7 @@ class SimplifiedViewRow extends Component {
                 type={colType[value]}
                 data={this.chartData[value]} />} />}
       </div>
-      <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
+      <div className={styles.tableTd} title={valueType}><span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType !== 'Categorical'
       })} title={unique}><span>{unique}</span></div>

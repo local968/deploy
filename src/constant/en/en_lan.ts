@@ -1082,6 +1082,10 @@ const EN_LAN = {
   PleaseSelectaCategoricalVariable:'Please Select a Categorical Variable',
   Encoding:'Encoding',
   Origin:'Origin',
+  Choose2Variables:'Choose 2 Variables',
+  Youcanadjustthecontaminationrate:'You can adjust the contamination rate',
+
+
 };
 
 
