@@ -12,6 +12,7 @@ import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
+import Iso from "../../Charts/Iso";
 import EN from '../../../constant/en';
 
 const Option = Select.Option;
@@ -105,8 +106,18 @@ function ModelResult(props) {
           </div>}
         </div>
         <div className={classes.right}>
-          <D3D2 url={selectModel.multiVarPlotData} />
-          {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
+          {
+            project.problemType === "Outlier"?
+                <Iso url={selectModel.outlierPlotData}/>
+                :<D3D2 url={selectModel.multiVarPlotData} />
+            // ()=>{
+            //   // if(project.problemType === "Outlier"){
+            //   //               //   return <Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>
+            //   //               // }
+            //   return <D3D2 url={selectModel.multiVarPlotData} />
+            // }
+          }
+          
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
       </div>
