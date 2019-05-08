@@ -87,7 +87,7 @@ function ModelResult(props) {
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
             <div className={classes.cvnn}>
-              <div className={classes.orange}>{formatNumber(selectModel.score.CVNN, 2)}</div>
+              <div className={classes.orange}>{formatNumber(selectModel.score.CVNN)}</div>
               <span className={classes.label}>CVNN <Hint content='123321' /></span>
             </div>
             <div className={classes.cluster}>
@@ -95,7 +95,7 @@ function ModelResult(props) {
               <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.TheNumberofClusters} <Hint content='123321' /></span>
             </div>
             <div className={classes.rSquared}>
-              <div className={classes.green}>{formatNumber(selectModel.score.RSquared, 2)}</div>
+              <div className={classes.green}>{formatNumber(selectModel.score.RSquared)}</div>
               <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>R squared <Hint content='123321' /></span>
             </div>
           </div>}
@@ -118,7 +118,7 @@ function ModelResult(props) {
             //   return <D3D2 url={selectModel.multiVarPlotData} />
             // }
           }
-          
+
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
       </div>
@@ -327,19 +327,19 @@ const ClusteringRow = observer((props) => {
   return <div className={classes.rowBody}>
     <div className={classes.rowData}>
       <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.modelName, 2)}</span>
+        <span>{formatNumber(model.modelName)}</span>
       </div>
       <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.CVNN, 2)}</span>
+        <span>{formatNumber(model.score.CVNN)}</span>
       </div>
       <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.silhouette_cosine, 2)}</span>
+        <span>{formatNumber(model.score.silhouette_cosine)}</span>
       </div>
       <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.CH, 2)}</span>
+        <span>{formatNumber(model.score.CH)}</span>
       </div>
       <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.RSquared, 2)}</span>
+        <span>{formatNumber(model.score.RSquared)}</span>
       </div>
       <div className={`${classes.ccell}`}>
         <span>{clusters}</span>
