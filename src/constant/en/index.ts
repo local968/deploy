@@ -166,7 +166,7 @@ const EN: any = {
   DeploymentRateLimit: '由于不同级别账户的限制不同，当用户API调用数量/并发数量达到允许的最大数量时，后续请求将作为等待名单放入请求队列。如果队列太长，可能会导致超时。',
   DeploymentId: '部署ID',
   Token: '标记',
-  Showtoken: '显示识别碼',
+  Showtoken: '显示识别码',
   CURLSample: 'cURL 示例',
   DeploymentTime: '部署时间',
   DeploymentStyle: '部署方式',
