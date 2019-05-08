@@ -937,6 +937,15 @@ const EN: any = {
   Inputyourcostorbenefitofeveryredictionresult:'输入每个预测结果的成本或收益：（0~100）',
   MappingDictionary:'映射字典',
   Explaination:'可解释性',
+  pleaseenteryourhostname:'请输入您的主机名',
+  invalidhostport:'无效的主机端口',
+  invaliddatabasetype:'无效的数据库类型',
+  pleaseenteryourdatabasename:'请输入您的数据库名称',
+  pleaseenteryourtablename:'请输入您的表名',
+  pleaseenteryourdatabseusername:'请输入您的数据库用户名',
+  pleaseenteryourdatabsepassword:'请输入您的数据库密码',
+
+
 };
 
 export default EN;
