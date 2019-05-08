@@ -1071,6 +1071,14 @@ const EN_LAN = {
   Inputyourcostorbenefitofeveryredictionresult:'Input your cost or benefit of every prediction result: (0 ~ 100)',
   MappingDictionary:'Mapping Dictionary',
   Explaination:'Explaination',
+  pleaseenteryourhostname:'please enter your host name',
+  invalidhostport:'invalid host port',
+  invaliddatabasetype:'invalid database type',
+  pleaseenteryourdatabasename:'please enter your database name',
+  pleaseenteryourtablename:'please enter your table name',
+  pleaseenteryourdatabseusername:'please enter your databse username',
+  pleaseenteryourdatabsepassword:'please enter your databse password',
+
 
 };
 

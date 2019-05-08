@@ -28,6 +28,8 @@ function ModelResult(props) {
 
   if (!selectModel || !models.length) return null
 
+  console.log('selectModel',selectModel,selectModel.multiVarPlotData);
+
   React.useEffect(() => {
     resetSide()
   })

@@ -86,7 +86,7 @@ const EN: any = {
   Numerical: '连续变量',
   Categorical: '离散变量',
   VariableQualitylooksgood: '数据很干净！',
-  Foryourwholedataset: '对于整个数据集，可用于建模的数据量将小于建议的最小值1000。',
+  Foryourwholedataset: '对于当前数据集，可用于建模的数据量小于建议的最小值1000行。',
   LoadaNewDataset: '上传一份新数据',
   SomeissuesarefoundR2learnhasgenerated: '发现了一些问题。 R2 learn已生成自动修复解决方案。您还可以通过单击“质量修复”按钮来创建自己的修复解决方案。',
   EditTheFixes: '质量修复',
@@ -922,7 +922,7 @@ const EN: any = {
   Charts:'图表',
   VariableImpactnotavailableforthisalgorithm:'该算法不支持计算变量重要性',
   SetMaxTrainingTime:'设置最长训练时间',
-  Maxamountoftimetoevaluatedifferentmodules:'模型优化搜索时间。',
+  Maxamountoftimetoevaluatedifferentmodules:'模型优化搜索时间',
   Minutes:'分钟',
   minutesorlonger: '10分钟或更长时间',
   NoMoreThan:'不超过',
@@ -936,7 +936,16 @@ const EN: any = {
   exportreporterror:'导出报告异常。',
   Inputyourcostorbenefitofeveryredictionresult:'输入每个预测结果的成本或收益：（0~100）',
   MappingDictionary:'映射字典',
-  Explaination:'Explaination',
+  Explaination:'可解释性',
+  pleaseenteryourhostname:'请输入您的主机名',
+  invalidhostport:'无效的主机端口',
+  invaliddatabasetype:'无效的数据库类型',
+  pleaseenteryourdatabasename:'请输入您的数据库名称',
+  pleaseenteryourtablename:'请输入您的表名',
+  pleaseenteryourdatabseusername:'请输入您的数据库用户名',
+  pleaseenteryourdatabsepassword:'请输入您的数据库密码',
+
+
 };
 
 export default EN;
