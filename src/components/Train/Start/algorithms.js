@@ -6,7 +6,7 @@ export default {
     },
     {
       value: 'GMM',
-      label: 'GMM'
+      label: 'GaussianMixture'
     },
     {
       value: 'MeanShift',
@@ -18,11 +18,11 @@ export default {
     },
     {
       value: 'AP',
-      label: 'AP'
+      label: 'AffinityPropagation'
     },
     {
       value: 'Agg',
-      label: 'Agg'
+      label: 'AgglomerativeClustering'
     },
     {
       value: 'DBSCAN',
@@ -36,7 +36,7 @@ export default {
   Outlier: [
     {
       value: 'IsolationForest',
-      label: 'IsolationForest'
+      label: 'Isolation Forest'
     },
     {
       value: 'OneClassSVM',
@@ -48,27 +48,27 @@ export default {
     },
     {
       value: 'LocalOutlierFactor',
-      label: 'LocalOutlierFactor'
+      label: 'Local Outlier Factor'
     },
     {
       value: 'PCA',
-      label: 'PCA'
+      label: 'PCA (Principal Component Analysis)'
     },
     {
       value: 'HBOS',
-      label: 'HBOS'
+      label: 'HBOS (Histogram-based Outlier Score)'
     },
     {
       value: 'CBLOF',
-      label: 'CBLOF'
+      label: 'CBLOF (Clustering-Based Local Outlier Factor)'
     },
     {
       value: 'ABOD',
-      label: 'ABOD'
+      label: 'ABOD (Angle-Based Outlier Detection)'
     },
     {
       value: 'FB',
-      label: 'FB'
+      label: 'FB (Feature Bagging)'
     },
   ]
 }

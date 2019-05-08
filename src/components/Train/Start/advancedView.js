@@ -130,15 +130,19 @@ export default class AdvancedView extends Component {
         [{ value: "score", label: EN.Accuracy }]
         : [
           { value: "CVNN", label: "CVNN" },
-          { value: "RSquared", label: "RSquared" },
-          { value: "RMSSTD", label: "RMSSTD" },
-          { value: "CH", label: "CH" },
-          { value: "silhouette_cosine", label: "silhouette_cosine" },
-          { value: "silhouette_euclidean", label: "silhouette_euclidean" }
+          { value: "CH", label: "CH Index" },
+          { value: "Silhouette Score", label: "Silhouette Score" },
+
+          // { value: "CVNN", label: "CVNN" },
+          // { value: "RSquared", label: "RSquared" },
+          // { value: "RMSSTD", label: "RMSSTD" },
+          // { value: "CH", label: "CH" },
+          // { value: "silhouette_cosine", label: "silhouette_cosine" },
+          // { value: "silhouette_euclidean", label: "silhouette_euclidean" }
         ];
     // const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
     // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
-
+  console.log(project.measurement , 'project.measurement')
     return (
       <div className={styles.advanced}>
         <div className={styles.advancedRow}>
@@ -176,12 +180,13 @@ export default class AdvancedView extends Component {
           </div>
         </div>
         <div className={styles.advancedRow}>
+
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
-              {project.problemType === "Outlier" ? <div className={`${styles.advancedTitle}`}>
+              {project.problemType === "Outlier" ? <div style={{marginTop:'-60px'}} className={`${styles.advancedTitle_Outlier}`}>
                 <span>{EN.ChooseaVariableScalingMethod}</span>
               </div> : <div className={`${styles.advancedTitle}`}>
-                  <span>{EN.SelectAlgorithm}</span>
+                  <span>{EN.SpecifytheNumberofClusterstoForm}</span>
                 </div>}
             </div>
             <div className={styles.advancedBlock}>
@@ -255,6 +260,10 @@ export default class AdvancedView extends Component {
                 )}
             </div>
           </div>
+
+
+
+
         </div>
         <div className={styles.advancedRow}>
           <div className={styles.advancedBox}>
@@ -346,9 +355,9 @@ export default class AdvancedView extends Component {
           <div className={styles.advancedBlock}>
             <div className={`${styles.advancedTitle} ${styles.otherLabel}`}>
               <span>{EN.SetMaxTrainingTime}:</span>
-              <span className={styles.advancedDesc}>
-                {EN.Maxamountoftimetoevaluatedifferentmodules}
-              </span>
+              {/*<span className={styles.advancedDesc}>*/}
+              {/*  {EN.Maxamountoftimetoevaluatedifferentmodules}*/}
+              {/*</span>*/}
             </div>
             <div className={styles.advancedOption}>
               <NumberInput
@@ -358,9 +367,9 @@ export default class AdvancedView extends Component {
                 min={5}
                 isInt={true}
               />
-              <span>
+              <span style={{paddingLeft:10}}>
                 {EN.Minutes}
-                <br />
+                {/*<br />*/}
                 ({EN.minutesorlonger})
               </span>
             </div>
