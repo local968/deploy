@@ -634,6 +634,8 @@ export default class Project {
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
+      nullFillMethod: this.nullFillMethod,
+      nullFillMethodTemp: this.nullFillMethodTemp,
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp,
       ...step
@@ -954,14 +956,14 @@ export default class Project {
       // }
       this.dataViewsLoading = true
       return api.dataView(command)
-      .then(returnValue => {
-        const { status, result } = returnValue
-        if (status < 0) {
-          // this.setProperty({ dataViews: null })
-          return antdMessage.error(result['process error'])
-        }
-        // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
-      })
+        .then(returnValue => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            // this.setProperty({ dataViews: null })
+            return antdMessage.error(result['process error'])
+          }
+          // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
+        })
     })
   }
 
@@ -1326,7 +1328,8 @@ export default class Project {
           randSeed: this.randSeed,
           measurement: this.measurement,
           settingName: setting.name,
-          holdoutRate: this.holdoutRate / 100
+          holdoutRate: this.holdoutRate / 100,
+          algorithms: this.algorithms,
         };
         if (this.totalRawLines > 10000) {
           trainData.validationRate = this.validationRate / 100

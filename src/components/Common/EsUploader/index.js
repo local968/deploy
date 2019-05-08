@@ -83,7 +83,8 @@ export default function EsUploader(file, option = {}) {
         }).then(async () => {
           chunk = ''
           const { data } = await axios.get(`/etls/${dataIndex}/header`)
-          const header = data.split(',').map(v => decodeURIComponent(v)).filter(k => k !== '__no')
+          let header = data.split(',').map(v => decodeURIComponent(v)).filter(k => k !== '__no')
+          header = rawHeader.map(decodeURIComponent).filter(h => header.indexOf(h) !== -1)
           onFinished({
             originalIndex: dataIndex,
             totalRawLines: no,
