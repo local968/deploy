@@ -225,7 +225,7 @@ const etl = async (schedule, index, stats) => {
       }
       else {
         schedule.status = `Progressing`
-        schedule.etlIndex = etlIndex
+        schedule.index = index
         await api.upsertSchedule(schedule);
         clearInterval(interval)
         resolve(etlIndex)
