@@ -109,14 +109,8 @@ function ModelResult(props) {
         <div className={classes.right}>
           {
             project.problemType === "Outlier"?
-                <Iso url={selectModel.outlierPlotData}/>
+                <Iso url={selectModel.outlierPlotData} models={props.projectStore.project.models}/>
                 :<D3D2 url={selectModel.multiVarPlotData} />
-            // ()=>{
-            //   // if(project.problemType === "Outlier"){
-            //   //               //   return <Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>
-            //   //               // }
-            //   return <D3D2 url={selectModel.multiVarPlotData} />
-            // }
           }
           
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
@@ -154,6 +148,8 @@ const OutlierTable = observer((props) => {
     }
     return models.sort(fn)
   }, [models, sort])
+  
+  console.log('models',models)
 
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
@@ -364,6 +360,10 @@ const ClusteringRow = observer((props) => {
 
 const MappingDict = observer((props) => {
   const { project, list, hideDict } = props
+  console.log("dddddddddddddddd")
+  console.log(project)
+  console.log( list)
+  console.log(hideDict)
   const { colMap, mappingKey } = project
   const [state, setState] = React.useState({
     origin: '',
