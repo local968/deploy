@@ -2,7 +2,7 @@
   text-align: center;
   padding-top: 8px;
   background: white;
-  padding: 0 50px;
+  padding: 0 10%;
   width: 100%;
   min-width: 1350px;
 }
@@ -25,7 +25,11 @@
   margin-bottom: 30px
 }
 
-.body {}
+.body {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
 
 .top {
   display: flex;
@@ -120,6 +124,7 @@
   display: flex;
   flex: none;
   flex-direction: column;
+  padding: 5px 0;
 }
 
 .rowData {
@@ -135,6 +140,14 @@
   flex-direction: column;
   flex: none;
   position: relative;
+}
+
+.modelSelect {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 5px;
 }
 
 .cell {
@@ -172,7 +185,7 @@
   min-width: 125px;
   margin: 0 5px;
   position: relative;
-  flex: 0 0 125px;
+  flex: 1 1 125px;
   justify-content: center;
 }
 
@@ -193,7 +206,7 @@
 
 .cname {
   width: 125px;
-  flex: none;
+  flex: 1 1 125px;
 }
 
 .cname span {
@@ -328,6 +341,7 @@
 
 .detail {
   display: flex;
+  flex: auto;
   flex-direction: column;
   padding: 0.1em 0;
   max-height: 200px;
@@ -599,4 +613,9 @@
   text-decoration: none;
   text-overflow: ellipsis;
   width: 100%;
+}
+
+.modelName {
+  width: 3em;
+  flex: none;
 }

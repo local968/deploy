@@ -7,10 +7,14 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path')
 const moment = require('moment')
+const axios = require('axios')
+const Papa = require('papaparse')
 const command = require('../command')
 const { userModelingRestriction, userStorageRestriction } = require('restriction')
-
+const http = require('http')
+const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 const router = new Router()
+
 
 router.post('/check', async (req, res) => {
   const { fileSize, type, projectId } = req.body
@@ -176,6 +180,61 @@ function saveSample() {
 
   pipeline.exec()
 }
+
+router.get('/download/:scheduleId', async (req, res) => {
+  const { scheduleId } = req.params
+  const { filename } = req.query
+  // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
+  const schedule = JSON.parse(await redis.get(`schedule:${scheduleId}`))
+
+  const { data: header } = await axios.get(`${esServicePath}/etls/${schedule.index}/header`)
+  let temp = {}
+  let start = 0
+  let end = 0
+  let counter = 0
+  let resultHeader
+  res.attachment(filename);
+  res.type('csv')
+  http.get(schedule.result.deployData, (response) => {
+    Papa.parse(response, {
+      download: true,
+      header: true,
+      step: async (results, parser) => {
+        const row = results.data[0]
+        if (!resultHeader) {
+          resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString()
+          res.write(resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString())
+        }
+        temp[row['__no']] = row
+        counter++
+        end = row['__no']
+        if (counter === 500) {
+          parser.pause()
+          counter = 0
+          const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
+          const result = response.data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
+          result.forEach(r => {
+            res.write('\n' + resultHeader.split(',').map(k => r[k]).toString())
+          })
+          start = parseInt(end) + 1
+          temp = {}
+          parser.resume()
+        }
+      },
+      complete: async (results, file) => {
+        counter = 0
+        const { data } = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
+        const result = data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
+        result.forEach(r => {
+          res.write('\n' + resultHeader.split(',').map(k => r[k]).toString())
+        })
+        temp = {}
+        res.end()
+      }
+    })
+  })
+
+})
 
 // saveSample()
 

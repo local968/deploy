@@ -165,12 +165,15 @@ export default class DataSchema extends Component {
           const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
           key = header + suffix
         }
-        const colValue = this.dataType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
+        const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
+        const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
-          <option value="Categorical">{EN.Categorical}</option>
+          {!canTransforToCategorical && <option value="Raw">{EN.Categorical}(Raw)</option>}
+          {canTransforToCategorical && <option value="Categorical">{EN.Categorical}</option>}
           <option value="Numerical">{EN.Numerical}</option>
         </select>
-        selectData.title = colValue === 'Numerical' ? EN.Numerical : EN.Categorical
+        selectData.title = { Numerical: EN.Numerical, Categorical: EN.Categorical, Raw: EN.Categorical + '(Raw)' }[colValue]
+
       }
       selectArr.push(selectData)
     }

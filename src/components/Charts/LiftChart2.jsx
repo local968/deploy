@@ -44,7 +44,8 @@ export default function LiftChart2(props){
 		legend: {
 			type:'scroll',
 			orient:'vertical',
-			left:'right',height:'90%',
+			left:'right',
+			height:'90%',
 		},
 		grid:{
 			x2:300,

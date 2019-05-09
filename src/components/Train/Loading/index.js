@@ -8,7 +8,7 @@ import EN from '../../../constant/en';
 @observer
 export default class Loading extends Component {
   render() {
-    const { abortTrain, trainModel, isAbort } = this.props.projectStore.project
+    const { abortTrain, trainModel, isAbort } = this.props.projectStore.project || {}
     return (
       <div className={styles.loading}>
         <div className={styles.training}>

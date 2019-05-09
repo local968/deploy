@@ -3,13 +3,10 @@ import TSEN from './T-SEN'
 import request from '../Request'
 import { Select } from 'antd';
 const {Option} = Select;
-import useStyles from './charts.css';
+import styles from './charts.module.css';
 import THREE from './3Variable'
 import EN from "../../constant/en";
 // import styles from '@src/views/modeling.pre.result/modeling.pre.result.css';
-
-const classes = useStyles;
-
 export default class D3D2 extends PureComponent {
 	constructor(props) {
 		super(props);
@@ -126,14 +123,14 @@ export default class D3D2 extends PureComponent {
 			return <div/>
 		}
 		
-		return <section className={classes.d3d2}>
+		return <section className={styles.d3d2}>
 			<dl>
-				<dt>Choose 2 or 3 Variables</dt>
+				<dt>{EN.Choose2or3Variables}</dt>
 				<dd>Var1:{this.selection('x_name')}</dd>
 				<dd>Var2:{this.selection('y_name')}</dd>
 				<dd>Var3:{this.selection('z_name')}</dd>
 				<dd>
-					<button className={'styles.button'} onClick={this.save.bind(this)}>
+					<button className={styles.button} onClick={this.save.bind(this)}>
 						<span>{EN.Save}</span>
 					</button>
 				</dd>

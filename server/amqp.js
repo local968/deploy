@@ -40,18 +40,6 @@ let client;
 const mq = async (data, callback, faker = false) => {
   try {
     if (!conn) {
-      console.log({
-        protocol: AMQPLIB_PROTOCOL,
-        hostname: AMQPLIB_HOSTNAME,
-        port: AMQPLIB_PORT,
-        username: AMQPLIB_USERNAME,
-        password: AMQPLIB_PASSWORD,
-        locale: AMQPLIB_LOCALE,
-        frameMax: AMQPLIB_FRAMEMAX,
-        heartbeat: AMQPLIB_HEARTBEAT,
-        vhost: AMQPLIB_VHOST
-      });
-
       try {
         conn = await amqp.connect({
           protocol: AMQPLIB_PROTOCOL,

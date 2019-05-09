@@ -5,13 +5,11 @@ import VariableImpact from './VariableImpact'
 import ModelProcessFlow from './modelProcessFlow'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-// import D3D2 from '@src/components/charts/D3D2'
-// import Iso from '@src/components/charts/Iso'
-// import ParallelPlot from '@src/components/charts/ParallelPlot'
 import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
+import Iso from "../../Charts/Iso";
 import EN from '../../../constant/en';
 
 const Option = Select.Option;
@@ -23,9 +21,12 @@ function ModelResult(props) {
   const { problemType, models, selectModel, colType } = project
   const list = Object.entries(colType).filter(t => t[1] === 'Categorical').map(c => c[0])
 
-  const [visible, setVisible] = React.useState(false)
+  const [visible, setVisible] = React.useState(false);
+  // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
 
   if (!selectModel || !models.length) return null
+
+  console.log('selectModel', selectModel, selectModel.multiVarPlotData);
 
   React.useEffect(() => {
     resetSide()
@@ -43,6 +44,13 @@ function ModelResult(props) {
     setVisible(false)
   }
 
+  const onSelect = (model) => () => {
+    if (selectModel.id === model.id) return
+    project.updateProject({
+      selectId: model.id
+    })
+  }
+
   const deploy = () => {
     // const { project } = this.props.projectStore;
     const { selectModel: current } = project
@@ -51,9 +59,9 @@ function ModelResult(props) {
     const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
     const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
 
-    this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.modelName, current.problemType, exps)
-      .then(id => this.props.routing.push('/deploy/project/' + id));
+    props.deploymentStore
+      .addDeployment(project.id, project.name, current.modelName, project.problemType, exps)
+      .then(id => props.routing.push('/deploy/project/' + id));
   };
 
   return <div className={classes.root}>
@@ -83,7 +91,7 @@ function ModelResult(props) {
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
             <div className={classes.cvnn}>
-              <div className={classes.orange}>{formatNumber(selectModel.score.CVNN, 2)}</div>
+              <div className={classes.orange}>{formatNumber(selectModel.score.CVNN)}</div>
               <span className={classes.label}>CVNN <Hint content='123321' /></span>
             </div>
             <div className={classes.cluster}>
@@ -91,7 +99,7 @@ function ModelResult(props) {
               <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.TheNumberofClusters} <Hint content='123321' /></span>
             </div>
             <div className={classes.rSquared}>
-              <div className={classes.green}>{formatNumber(selectModel.score.RSquared, 2)}</div>
+              <div className={classes.green}>{formatNumber(selectModel.score.RSquared)}</div>
               <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>R squared <Hint content='123321' /></span>
             </div>
           </div>}
@@ -103,13 +111,17 @@ function ModelResult(props) {
           </div>}
         </div>
         <div className={classes.right}>
-          <D3D2 url='http://192.168.0.182:8081/blockData?uid=ce732e55681011e9b948000c2959bcd0' />
-          {/*<Iso url='http://192.168.0.182:8081/blockData?uid=de3e5a3a682d11e9b948000c2959bcd0'/>*/}
+          {
+            project.problemType === "Outlier" ?
+              <Iso url={selectModel.outlierPlotData} models={props.projectStore.project.models} />
+              : <D3D2 url={selectModel.multiVarPlotData} />
+          }
+
           {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
       </div>
-      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
-      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
+      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
+      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
     </div>}
     {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
     <div className={classes.buttonBlock}>
@@ -120,11 +132,11 @@ function ModelResult(props) {
   </div>;
 }
 
-export default inject('projectStore', 'deploymentStore')(observer(ModelResult))
+export default inject('projectStore', 'deploymentStore', 'routing')(observer(ModelResult))
 
 const OutlierTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectId } = project
+  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
@@ -144,26 +156,26 @@ const OutlierTable = observer((props) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
           <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('score')}>{EN.Score} {sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('rate')}>{EN.ContaminationRate}{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>
         </div>
-        <div className={`${classes.cell} ${classes.name} ${classes.cellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.ModelProcessFlow}</span>
         </div>
       </div>
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectId} />
+        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
@@ -179,7 +191,7 @@ const OutlierTable = observer((props) => {
 const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
-  const { model, isRecommend, isSelect } = props
+  const { model, isRecommend, isSelect, onSelect } = props
 
   const toggleImpact = (_type) => {
     if (!visible) {//本来是关着的
@@ -197,26 +209,34 @@ const OutlierRow = observer((props) => {
   return <div className={classes.rowBody}>
     <Tooltip
       placement="left"
-      title={isRecommend ? text : EN.Selected}
+      title={isRecommend ? EN.Recommended : EN.Selected}
       visible={isSelect || isRecommend}
-      overlayClassName={styles.recommendLabel}
+      overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
       getPopupContainer={el => el.parentElement}>
       <div className={classes.rowData}>
-        <div className={`${classes.cell}`}>
+        <div className={classes.modelSelect}>
+          <input
+            type="radio"
+            name="modelSelect"
+            checked={isSelect}
+            onChange={onSelect(model)}
+          />
+        </div>
+        <div className={`${classes.ccell} ${classes.modelName}`}>
           <span>{model.modelName}</span>
         </div>
-        <div className={`${classes.cell}`}>
+        <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.score)}</span>
         </div>
-        <div className={`${classes.cell}`}>
+        <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
         </div>
-        <div className={`${classes.cell} ${classes.compute}`}>
+        <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
         </div>
-        <div className={`${classes.cell} ${classes.compute}`}>
+        <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
         </div>
       </div>
@@ -229,8 +249,8 @@ const OutlierRow = observer((props) => {
 })
 
 const ClusteringTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectId } = project
+  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
 
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -257,7 +277,7 @@ const ClusteringTable = observer((props) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
           <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
@@ -288,7 +308,7 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectId} />
+        return <ClusteringRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
@@ -302,7 +322,7 @@ const ClusteringTable = observer((props) => {
 })
 
 const ClusteringRow = observer((props) => {
-  const { model, isRecommend, isSelect } = props
+  const { model, isRecommend, isSelect, onSelect } = props
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const toggleImpact = (_type) => {
@@ -322,27 +342,35 @@ const ClusteringRow = observer((props) => {
   return <div className={classes.rowBody}>
     <Tooltip
       placement="left"
-      title={isRecommend ? text : EN.Selected}
+      title={isRecommend ? EN.Recommended : EN.Selected}
       visible={isSelect || isRecommend}
-      overlayClassName={styles.recommendLabel}
+      overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
       getPopupContainer={el => el.parentElement}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.modelName, 2)}</span>
+        <div className={classes.modelSelect}>
+          <input
+            type="radio"
+            name="modelSelect"
+            checked={isSelect}
+            onChange={onSelect(model)}
+          />
+        </div>
+        <div className={`${classes.ccell} ${classes.modelName}`}>
+          <span>{formatNumber(model.modelName)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.score.CVNN, 2)}</span>
+          <span>{formatNumber(model.score.CVNN)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.score.silhouette_cosine, 2)}</span>
+          <span>{formatNumber(model.score.silhouette_cosine)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.score.CH, 2)}</span>
+          <span>{formatNumber(model.score.CH)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.score.RSquared, 2)}</span>
+          <span>{formatNumber(model.score.RSquared)}</span>
         </div>
         <div className={`${classes.ccell}`}>
           <span>{clusters}</span>
@@ -389,10 +417,10 @@ const MappingDict = observer((props) => {
     const data = Object.entries(mapping)
       .filter(r1 => r1[0].toString().includes(state.origin))
       .filter(r2 => r2[1].toString().includes(state.encode))
-      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.cell })))
+      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.ccell })))
     const header = [
-      { content: <span>Origin<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
-      { content: <span>Encoding <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
+      { content: <span>{EN.Origin}<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
+      { content: <span>{EN.Encoding} <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
     ]
     return [header, ...data]
   })
@@ -401,7 +429,7 @@ const MappingDict = observer((props) => {
       <span>+</span>
     </div>
     <div className={classes.dictSelect}>
-      <span>Please Select a Categorical Variable</span>
+      <span>{EN.PleaseSelectaCategoricalVariable}</span>
       <Select value={mappingKey || list[0]} style={{ width: 120, marginLeft: 20 }} onChange={handleSelect}>
         {list.map(l => <Option value={l}>{l}</Option>)}
       </Select>

@@ -275,7 +275,7 @@ export default class SimplifiedView extends Component {
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.sort((a, b) => {
+            {allVariables.filter((h)=>colType[h] !== "Raw").sort((a, b) => {
               return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
             }).map((h, i) => {
               if (h === target) return null;
@@ -398,7 +398,7 @@ class SimplifiedViewRow extends Component {
           });
         } else {//?
           request.post({
-            url: '/service/graphics/classification-categorical',
+            url: '/graphics/classification-categorical',
             data,
           }).then((result) => {
             this.scatterData = {
@@ -466,7 +466,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
+    const { data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines } = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
@@ -559,13 +559,11 @@ class CorrelationPlot extends Component {
     const { type, value } = CorrelationMatrixData;
     return (
       <div className={styles.correlationPlot} >
-        <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
         <CorrelationMatrixs
           value={value}
           type={type}
         />
-        {/* {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>} */}
-        {/*<div className={styles.plotLoad}><Spin size="large" /></div>*/}
       </div>
     )
   }

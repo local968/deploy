@@ -91,9 +91,9 @@ export default class Data extends Component {
 
     return <div className={styles.data}>
       {!!project && <Switch>
-        <Route exact path="/project/:id/info/connect" component={DataConnect} />
-        <Route exact path="/project/:id/info/schema" component={DataSchema} />
-        <Route exact path="/project/:id/info/quality" component={DataQuality} />
+        <Route exact path="/project/:id/info/connect" component={(props) => <DataConnect {...props} />} />
+        <Route exact path="/project/:id/info/schema" component={(props) => <DataSchema {...props} />} />
+        <Route exact path="/project/:id/info/quality" component={(props) => <DataQuality {...props} />} />
       </Switch>}
       <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive} ref={this.sideRef} />
     </div>

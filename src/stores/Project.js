@@ -141,7 +141,7 @@ export default class Project {
 
   @observable ensembleSize = 20;
   @observable randSeed = 0;
-  @observable measurement = '';
+  @observable measurement = 'CVNN';
   @observable resampling = "no";
   @observable runWith = 'holdout';
   @observable crossCount = 5;
@@ -158,7 +158,7 @@ export default class Project {
   //un
   @observable weights = {}
   @observable standardType = 'standard'
-  @observable searchTime = 5
+  @observable searchTime = 10
   @observable kValue = 5
   @observable kType = 'auto'
 
@@ -203,8 +203,8 @@ export default class Project {
 
   readIndex = async (index) => {
     const url = `/etls/${index}/preview`
-    const { data } = await axios.get(url)
-    const result = data.result.map(row => this.rawHeader.map(h => row[h]))
+    const { data = {} } = await axios.get(url)
+    const result = (data.result || []).map(row => this.rawHeader.map(h => row[h]))
     return result
   }
 
@@ -271,7 +271,7 @@ export default class Project {
 
   @computed
   get defaultTrain() {
-    const measurement = this.problemType === "Classification" ? "auc" : "r2"
+    const measurement = this.problemType === "Classification" ? "auc" : "CVNN"
     const algorithms = (this.problemType === "Clustering" && [
       'KMeans',
       'GMM',
@@ -517,7 +517,7 @@ export default class Project {
       business: this.business,
       problemType: this.changeProjectType
     };
-    updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
+    updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "CVNN"
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl()
       //全部恢复到problem步骤
@@ -634,6 +634,8 @@ export default class Project {
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
+      nullFillMethod: this.nullFillMethod,
+      nullFillMethodTemp: this.nullFillMethodTemp,
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp,
       ...step
@@ -954,14 +956,14 @@ export default class Project {
       // }
       this.dataViewsLoading = true
       return api.dataView(command)
-      .then(returnValue => {
-        const { status, result } = returnValue
-        if (status < 0) {
-          // this.setProperty({ dataViews: null })
-          return antdMessage.error(result['process error'])
-        }
-        // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
-      })
+        .then(returnValue => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            // this.setProperty({ dataViews: null })
+            return antdMessage.error(result['process error'])
+          }
+          // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
+        })
     })
   }
 
@@ -1215,7 +1217,7 @@ export default class Project {
           speedVSaccuracy: 5,
           ensembleSize: 20,
           randSeed: 0,
-          measurement: problemType === "Classification" ? "auc" : "r2",
+          measurement: problemType === "Classification" ? "auc" : "CVNN",
           settingName: setting.name,
           holdoutRate: 0.2
         };
@@ -1268,7 +1270,8 @@ export default class Project {
       id,
       problemType,
       target,
-      dataHeader
+      dataHeader,
+      weights
     } = this;
 
     let command = '';
@@ -1325,7 +1328,8 @@ export default class Project {
           randSeed: this.randSeed,
           measurement: this.measurement,
           settingName: setting.name,
-          holdoutRate: this.holdoutRate / 100
+          holdoutRate: this.holdoutRate / 100,
+          algorithms: this.algorithms,
         };
         if (this.totalRawLines > 10000) {
           trainData.validationRate = this.validationRate / 100

@@ -34,7 +34,7 @@ export default class DataSchema extends Component {
       data.outlierFillMethodTemp = { [target]: 'drop' }
       data.nullFillMethod = { [target]: 'drop' }
       data.nullFillMethodTemp = { [target]: 'drop' }
-    }else{
+    } else {
       data.nullFillMethod = { [target]: 'drop' }
       data.nullFillMethodTemp = { [target]: 'drop' }
     }
@@ -157,7 +157,7 @@ export default class DataSchema extends Component {
         cn: styles.titleCell
       }
       if (i === index.columnHeader - 1) {
-        headerData.content = <HeaderInfo row={EN.Header} col={EN.Row} style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739}/>
+        headerData.content = <HeaderInfo row={EN.Header} col={EN.Row} style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
         headerData.title = '';
       } else {
         headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
@@ -177,6 +177,8 @@ export default class DataSchema extends Component {
       }
       headerArr.push(headerData)
 
+
+
       const selectData = {
         content: '',
         title: '',
@@ -194,15 +196,17 @@ export default class DataSchema extends Component {
           const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
           key = header + suffix
         }
-        const colValue = this.dataType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
+        const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
+        const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
-          <option value="Categorical">{EN.Categorical}</option>
+          {!canTransforToCategorical && <option value="Raw">{EN.Categorical}(Raw)</option>}
+          {canTransforToCategorical && <option value="Categorical">{EN.Categorical}</option>}
           <option value="Numerical">{EN.Numerical}</option>
         </select>
-        selectData.title = colValue === 'Numerical'? EN.Numerical : EN.Categorical
+        selectData.title = { Numerical: EN.Numerical, Categorical: EN.Categorical, Raw: EN.Categorical + '(Raw)' }[colValue]
         if (target && target === key) {
           selectData.cn = classnames(styles.cell, styles.target);
-          selectData.content = <span>{colValue === 'Numerical'? EN.Numerical : EN.Categorical}</span>
+          selectData.content = <span>{{ Numerical: EN.Numerical, Categorical: EN.Categorical, Raw: EN.Categorical + '(Raw)' }[colValue]}</span>
         }
 
       }
@@ -274,7 +278,7 @@ export default class DataSchema extends Component {
             value={target}
             disabled={isMissed || isDuplicated}
             selectOption={{ showSearch: true }}
-            getPopupContainer = {() => document.getElementById('schemaContent')}
+            getPopupContainer={() => document.getElementById('schemaContent')}
           />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
@@ -284,7 +288,7 @@ export default class DataSchema extends Component {
               <span>{EN.UnselectUndesirableVariables}</span>
             </div>
           }
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{ EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
           }</div>} />
           {isMissed && <div className={styles.schemaMissed} >
             <div className={styles.errorBlock}></div>

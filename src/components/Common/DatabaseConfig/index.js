@@ -23,20 +23,20 @@ const setRule = (key, errorMessage, neccessary, rule) => {
   errorMessages[key] = errorMessage;
 };
 
-setRule('sqlHostName', 'place enter your host name', true);
-setRule('sqlPort', 'invalid host port', true, value => !isNaN(value));
+setRule('sqlHostName', EN.pleaseenteryourhostname, true);
+setRule('sqlPort', EN.invalidhostport, true, value => !isNaN(value));
 setRule(
   'databaseType',
-  'invalid database type',
+  EN.invaliddatabasetype,
   true,
   value => database.indexOf(value) !== -1
 );
-setRule('sqlDatabase', 'place enter your database name', true);
-setRule('sqlTable', 'place enter your table name', true);
+setRule('sqlDatabase', EN.pleaseenteryourdatabasename, true);
+setRule('sqlTable', EN.pleaseenteryourtablename, true);
 setRule('sqlQueryStr', false);
 setRule('sqlEncoding', false, value => ['utf8'].indexOf(value) !== -1);
-setRule('sqlUserName', 'place enter your databse username', true);
-setRule('sqlPassword', 'place enter your databse password', true);
+setRule('sqlUserName', EN.pleaseenteryourdatabseusername, true);
+setRule('sqlPassword', EN.pleaseenteryourdatabsepassword, true);
 
 const defaultState = {
   sqlHostName: '',

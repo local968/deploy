@@ -28,7 +28,7 @@ async function scheduleHandler() {
     } catch (e) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
-      schedule.result = { ['process error']: e.message }
+      schedule.result = { ['processError']: e.message }
       await api.upsertSchedule(schedule);
       return
     }
@@ -36,7 +36,7 @@ async function scheduleHandler() {
     if (restrictQuery === false) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
-      schedule.result = { ['process error']: config.yourAge };
+      schedule.result = { ['processError']: config.yourAge };
       await api.upsertSchedule(schedule);
     } else {
       // send command to python
@@ -78,9 +78,9 @@ async function scheduleHandler() {
         result = { ...result, ...data.result }
         return data.status === 100 || data.status < 0
       })
-      if (result['process error']) api.decreaseLines(restrictQuery, deployment.lineCount)
+      if (result['processError']) api.decreaseLines(restrictQuery, deployment.lineCount)
       schedule.result = result
-      schedule.status = result['process error'] ? 'issue' : 'finished'
+      schedule.status = result['processError'] ? 'issue' : 'finished'
       schedule.updatedDate = moment().unix()
       api.upsertSchedule(schedule)
     }

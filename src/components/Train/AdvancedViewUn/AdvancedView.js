@@ -11,6 +11,9 @@ import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import FitPlot2 from "../../Charts/FitPlot2";
+import request from "../../Request";
+import ParallelPlots from "../../Charts/ParallelPlots";
 const Option = Select.Option;
 
 @inject('projectStore')
@@ -135,7 +138,7 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: {  selectModel }, sort, handleSort } = this.props;
-    const texts = ['Model Name', 'Time', 'CVNN','RSquared','RMSSTD','CH','silhouette_cosine','silhouette_euclidean'];
+    const texts = [EN.ModelName, 'Time', 'CVNN','RSquared','RMSSTD','CH index','silhouette_cosine','silhouette_euclidean'];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
@@ -229,19 +232,22 @@ class RegressionDetailCurves extends Component {
   }
 
   handleClick = val => {
-    this.setState({ curve: val });
+    this.setState({curve: val});
   }
 
   render() {
-    const { model } = this.props;
-    const { curve } = this.state;
-    let curComponent = (
-      <div className={styles.plot} >3
-        <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
-      </div>
-    );
+    // const { model } = this.props;
+    const { curve} = this.state;
+    // let curComponent = (
+    //   <div className={styles.plot} >
+    //     <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
+    //   </div>
+    // );
+    let curComponent = <div className={styles.plot}>
+      <ParallelPlots url={this.props.project.selectModel.parallelPlotData}/>
+    </div>
     const thumbnails = [{
-      text: 'Fit Plot',
+      text: 'Parallel Plot',
       hoverIcon: FitPlotHover,
       normalIcon: FitPlotNormal,
       selectedIcon: FitPlotSelected,

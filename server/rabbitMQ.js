@@ -45,7 +45,7 @@ module.exports = function RabbitMQ(){
     const queueName = _.includes(task.command, `${config.requestQueue}.`)
       ? task.command
       : `${config.requestQueue}.${task.command}`;
-
+    console.log(queueName)
     const mq = await this.getAmqplib();
     const ch = await mq.createChannel();
     // 创建队列
