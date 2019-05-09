@@ -7,6 +7,7 @@ import './echarts.config'
 import EN from '../../constant/en';
 import 'rc-input-number/assets/index.css'
 import styles from './styles.module.css';
+import request from "../Request";
 
 export default class OutlierRange extends PureComponent{
 	constructor(props){
@@ -22,41 +23,53 @@ export default class OutlierRange extends PureComponent{
 	}
 
 	componentDidMount() {
-		const {title='',message={}} = this.props;
-		const {low=0,high=0,data=[]} = message;
+		const {title='',message={},field,id,project} = this.props;
+		const {low,high,min,max} = project.rawDataView[field];
+		// const {low=0,high=0,data=[]} = message;
 		const selectArea = [low,high];
 
-		const min = Math.min(...data.map(itm=>itm[0]));
-		const max = Math.max(...data.map(itm=>itm[1]));
-
+		// const min = Math.min(...data.map(itm=>itm[0]));
+		// const max = Math.max(...data.map(itm=>itm[1]));
+		const zoom=0.1*(max-min);
+		
+		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
+		const interval = Math.ceil((max-min)/bin);
 		const chart = this.chart.getEchartsInstance();
-		 this.setState({
-			 title,
-			 min,
-			 max,
-			 selectArea,
-			 data,
-			 chart,
-			 ready:true,
-			 low,
-			 high,
-		},this.setBrush);
-
-
-		chart.on('brushselected',  (params)=> {
-			const {areas=[]} = params.batch[0];
-			if(!areas[0]){
-				return
-			}
-			const area =  areas[0];
-			const {selectArea} = this.state;
-			const [start,end] = selectArea;
-			const [_start,_end] = area.coordRange;
-			if(start!==_start||end!==_end){
-				this.setSelectArea(area.coordRange)
-			}
+		
+		request.post({
+			url: '/graphics/outlier-range',
+			data: {
+				field,
+				id,
+				interval,
+			},
+		}).then((result) => {
+			this.setState({
+				title,
+				min:min-zoom,
+				max:max+zoom,
+				selectArea,
+				data:result.data,
+				chart,
+				ready:true,
+				low,
+				high,
+			},this.setBrush);
+			chart.on('brushselected',  (params)=> {
+				const {areas=[]} = params.batch[0];
+				if(!areas[0]){
+					return
+				}
+				const area =  areas[0];
+				const {selectArea} = this.state;
+				const [start,end] = selectArea;
+				const [_start,_end] = area.coordRange;
+				if(start!==_start||end!==_end){
+					this.setSelectArea(area.coordRange)
+				}
+			});
+			setTimeout(()=>this.reset(),0)
 		});
-		setTimeout(()=>this.reset(),0)
 	}
 
 	setSelectArea(selectArea){

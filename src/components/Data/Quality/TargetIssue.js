@@ -447,32 +447,32 @@ export class FixIssue extends Component {
   @observable visible = false
   @observable progress = 0
   @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
-  @observable outLier = {};
+  // @observable outLier = {};
 
-  editRange(key, id) {
-    const { low, high } = this.props.project.rawDataView[key];
-    if (!this.outLier[key]) {
-      request.post({
-        url: '/graphics/outlier-range',
-        data: {
-          "field": key,
-          id,
-          "interval": 20,
-        },
-      }).then((result) => {
-        this.outLier = {
-          ...this.outLier,
-          [key]: {
-            low,
-            high,
-            data: result.data,
-          },
-        };
-        this.editKey = key;
-        this.visible = true;
-      });
-      return;
-    }
+  editRange(key) {
+    // const { low, high } = this.props.project.rawDataView[key];
+    // if (!this.outLier[key]) {
+    //   request.post({
+    //     url: '/graphics/outlier-range',
+    //     data: {
+    //       "field": key,
+    //       id,
+    //       "interval": 20,
+    //     },
+    //   }).then((result) => {
+    //     this.outLier = {
+    //       ...this.outLier,
+    //       [key]: {
+    //         low,
+    //         high,
+    //         data: result.data,
+    //       },
+    //     };
+    //     this.editKey = key;
+    //     this.visible = true;
+    //   });
+    //   return;
+    // }
     this.editKey = key;
     this.visible = true;
   };
@@ -647,7 +647,7 @@ export class FixIssue extends Component {
         {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.missing)}></div>
+              <div className={classnames(styles.typeBlock, styles.missing)}/>
               <span>{EN.MissingValue}</span>
             </div>
           </div>
@@ -728,7 +728,7 @@ export class FixIssue extends Component {
         {!!outlierCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.outlier)}></div>
+              <div className={classnames(styles.typeBlock, styles.outlier)}/>
               <span>{EN.Outlier}</span>
             </div>
           </div>
@@ -808,34 +808,22 @@ export class FixIssue extends Component {
       </div>
       {
         this.visible && <Modal
-          closeByMask={true}
-          showClose={true}
-          visible={this.visible}
-          title={EN.Outlier}
-          onClose={this.closeEdit}
-          content={
-            <OutlierRange
-              closeEdit={this.closeEdit}
-              saveEdit={this.saveEdit}
-              message={this.outLier[this.editKey]}
-            />
-          } />}
-      {/*{this.editKey && <Modal content={<EditOutLier width={800}*/}
-      {/*  height={400} saveEdit={this.saveEdit}*/}
-      {/*  closeEdit={this.closeEdit}*/}
-      {/*  outlierRange={project.rawDataView[this.editKey]}*/}
-      {/*  outlierDict={project.outlierDictTemp[this.editKey]}*/}
-      {/*  x={project.numberBins[this.editKey][1]}*/}
-      {/*  y={project.numberBins[this.editKey][0]}*/}
-      {/*  minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}*/}
-      {/*  maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}*/}
-      {/*  visible={this.visible}*/}
-      {/*  width='12em'*/}
-      {/*  title={EN.Outlier}*/}
-      {/*  onClose={this.closeEdit}*/}
-      {/*  closeByMask={true}*/}
-      {/*  showClose={true}*/}
-      {/*/>}*/}
+            closeByMask={true}
+            showClose={true}
+            visible={this.visible}
+            title={EN.Outlier}
+            onClose={this.closeEdit}
+            content={
+              <OutlierRange
+                  closeEdit={this.closeEdit}
+                  saveEdit={this.saveEdit}
+                  // message={this.outLier[this.editKey]}
+                  field={this.editKey}
+                  id={project.etlIndex}
+                  project = {project}
+              />
+            } />}
+    
     </div>
   }
 }
