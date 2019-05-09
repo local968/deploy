@@ -952,7 +952,7 @@ const EN: any = {
   Youcanadjustthecontaminationrate:'滑动改变异常值比例',
   Choose2or3Variables:'请选择两个或三个变量',
   Result:'结果',
-
+  Ss:'',
 
 
 };
