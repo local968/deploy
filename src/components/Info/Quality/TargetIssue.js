@@ -167,6 +167,7 @@ export class FixIssue extends Component {
                 }
                 const num = mismatchLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+                if (showType !== 'Numerical') return null
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
@@ -323,6 +324,7 @@ export class FixIssue extends Component {
                 }
                 const num = outlierLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+                if (showType !== 'Numerical') return null
                 const isShow = showType === 'Numerical';
                 if (!isShow) return null
                 const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : [rawDataView[k].low, rawDataView[k].high];

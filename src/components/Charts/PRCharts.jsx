@@ -11,15 +11,15 @@ export default class PRCharts extends PureComponent{
 			ready:false,
 			position:null,
 		};
-		this.updatePoint = _.debounce(this.updatePoint,10);
+		this.updatePoint = _.debounce(this.updatePoint.bind(this),10);
 	}
 	
-	// componentWillReceiveProps(props) {
-	// 	this.prePair(props)
-	// }
-	
 	prePair(){
-		const {x_name='',y_name='',fitIndex=0,x,y} = this.props;
+		const {x_name='',y_name='',model} = this.props;
+		const {chartData,fitIndex=0} = model;
+		const {roc} = chartData;
+		const {Recall:x,Precision:y} = roc;
+		
 		const _x = Object.values(x);
 		const _y = Object.values(y);
 		const data = _.zip(_x,_y);
@@ -36,6 +36,7 @@ export default class PRCharts extends PureComponent{
 			ready:true,
 			result,
 			_data : [data[fitIndex]],
+			_x,
 		})
 	}
 	
@@ -108,21 +109,12 @@ export default class PRCharts extends PureComponent{
 				name:y_name,
 			},
 			grid:{
-				// x2:140,
 				y2:80,
 			},
 			tooltip:{
 				triggerOn: 'none',
 			},
 			series,
-			// toolbox: {
-			// 	show : true,
-			// 	feature : {
-			// 		dataZoom: {},
-			// 		restore : {show: true},
-			// 		saveAsImage : {show: true}
-			// 	}
-			// }
 		};
 	}
 
@@ -180,7 +172,8 @@ export default class PRCharts extends PureComponent{
 		// this.setState({
 		// 	point
 		// })
-		console.log(point)
+		// console.log(point)
+		this.props.model.setFitIndex(this.state._x.indexOf(point));
 	}
 
 	render(){

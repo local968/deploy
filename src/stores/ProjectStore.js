@@ -60,7 +60,8 @@ class ProjectStore {
     this.initReload()
     autorun(() => {
       if (this.project) {
-        this.project.clean()
+        this.project.clean();
+        this.queryProjectList();
         this.project.initProject()
       }
     })

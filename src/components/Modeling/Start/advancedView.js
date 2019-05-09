@@ -181,7 +181,7 @@ export default class AdvancedView extends Component {
       holdoutRate: 20,
       randSeed: 0,
       measurement: project.changeProjectType === "Classification" ? "auc" : "r2",
-      runWith: project.totalRawLines > 10000 ? 'holdout' : 'cross',
+      runWith: project.totalLines > 10000 ? 'holdout' : 'cross',
       resampling: 'no',
       crossCount: Math.min((min - 1), 5),
       dataRange: 'all',
@@ -255,25 +255,25 @@ export default class AdvancedView extends Component {
                   </span>}
                 mouseLeaveDelay={0}
                 overlayStyle={{ maxWidth: '100%' }}> */}
-                <div className={styles.advancedSolution}>
-                  <div className={styles.advancedAlgorithm} key={'solution-a'}>
-                    {/* <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} /> */}
-                    <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
-                    <label htmlFor={'R2-solution-a'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-a</label>
-                  </div>
-                  {/* </Tooltip>
+              <div className={styles.advancedSolution}>
+                <div className={styles.advancedAlgorithm} key={'solution-a'}>
+                  {/* <input id={'R2-solution-a'} type='checkbox' defaultChecked={version.includes(1)} disabled={true} /> */}
+                  <input id={'R2-solution-a'} type='checkbox' checked={version.includes(1)} onChange={this.handleSolution.bind(null, 1)} />
+                  <label htmlFor={'R2-solution-a'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-a</label>
+                </div>
+                {/* </Tooltip>
               <Tooltip
                 title={<span className={styles.crossWarning}>
                   R2-solution-a & b are mandatory modelling algorithms for Advanced Modelling.
                   </span>}
                 mouseLeaveDelay={0}
                 overlayStyle={{ maxWidth: '100%' }}> */}
-                  <div className={styles.advancedAlgorithm} key={'solution-b'}>
-                    {/* <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} /> */}
-                    <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
-                    <label htmlFor={'R2-solution-b'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-b</label>
-                  </div>
+                <div className={styles.advancedAlgorithm} key={'solution-b'}>
+                  {/* <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} /> */}
+                  <input id={'R2-solution-b'} type='checkbox' checked={version.includes(2)} onChange={this.handleSolution.bind(null, 2)} />
+                  <label htmlFor={'R2-solution-b'}><span style={{ color: 'red', margin: '0 4px' }}>*</span>R2-solution-b</label>
                 </div>
+              </div>
               {/* </Tooltip> */}
               {Algorithms[problemType].map((v, k) => {
                 return <div className={styles.advancedAlgorithm} key={k}>
@@ -389,7 +389,7 @@ export default class AdvancedView extends Component {
                 title={<span className={styles.crossWarning}>
                   {EN.Performingcrossvalidation} <br />
                   {EN.Hencewerecommendchoosing}
-                  </span>}
+                </span>}
                 visible={runWith === "cross" && totalLines > 200000}
                 overlayStyle={{ maxWidth: '100%' }}>
                 <div className={styles.advancedOptionBox}>

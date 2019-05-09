@@ -20,24 +20,27 @@ export default class AdvancedView extends Component {
   });
 
   handleMaxTime = value => {
-    const { project } = this.props;
-    project.setProperty({
-      searchTime: value
-    });
+    this.props.project.searchTime = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   searchTime: value
+    // });
   };
 
   handleRandSeed = value => {
-    const { project } = this.props;
-    project.setProperty({
-      randSeed: value
-    });
+    this.props.project.randSeed = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   randSeed: value
+    // });
   };
 
   handleMeasurement = value => {
-    const { project } = this.props;
-    project.setProperty({
-      measurement: value
-    });
+    this.props.project.measurement = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   measurement: value
+    // });
   };
 
   handleSelectAll = value => {
@@ -48,9 +51,10 @@ export default class AdvancedView extends Component {
     } else {
       algorithms = Algorithms[project.problemType].map(v => v.value);
     }
-    project.setProperty({
-      algorithms
-    });
+    this.props.project.algorithms = algorithms
+    // project.setProperty({
+    //   algorithms
+    // });
   };
 
   handleCheck = (key, e) => {
@@ -65,9 +69,10 @@ export default class AdvancedView extends Component {
       if (!algorithms.includes(key)) return;
       _algorithms = algorithms.filter(v => v !== key);
     }
-    project.setProperty({
-      algorithms: _algorithms
-    });
+    this.props.project.algorithms = _algorithms
+    // project.setProperty({
+    //   algorithms: _algorithms
+    // });
   };
 
   changeSetting = e => {
@@ -101,25 +106,28 @@ export default class AdvancedView extends Component {
   };
 
   handleNum = value => {
-    const { project } = this.props;
-    project.setProperty({
-      kValue: value
-    });
+    this.props.project.kValue = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   kValue: value
+    // });
   };
 
   handleMode = type => () => {
-    const { project } = this.props;
-    project.setProperty({
-      kType: type
-    });
+    this.props.project.kType = type
+    // const { project } = this.props;
+    // project.setProperty({
+    //   kType: type
+    // });
   };
 
   handleType = (e) => {
-    const { project } = this.props
-    const value = e.target.value;
-    project.setProperty({
-      standardType: value
-    })
+    this.props.project.kType = e.target.value
+    // const { project } = this.props
+    // const value = e.target.value;
+    // project.setProperty({
+    //   standardType: value
+    // })
   }
 
   render() {
@@ -142,7 +150,6 @@ export default class AdvancedView extends Component {
         ];
     // const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
     // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
-  console.log(project.measurement , 'project.measurement')
     return (
       <div className={styles.advanced}>
         <div className={styles.advancedRow}>
@@ -179,92 +186,48 @@ export default class AdvancedView extends Component {
             </div>
           </div>
         </div>
-        <div className={styles.advancedRow}>
-
+        {project.problemType === "Outlier" ? null : <div className={styles.advancedRow}>
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
-              {project.problemType === "Outlier" ? <div style={{marginTop:'-60px'}} className={`${styles.advancedTitle_Outlier}`}>
-                <span>{EN.ChooseaVariableScalingMethod}</span>
-              </div> : <div className={`${styles.advancedTitle}`}>
-                  <span>{EN.SpecifytheNumberofClusterstoForm}</span>
-                </div>}
+              <div className={`${styles.advancedTitle}`}>
+                <span>{EN.SpecifytheNumberofClusterstoForm}</span>
+              </div>
             </div>
             <div className={styles.advancedBlock}>
-              {project.problemType === "Outlier" ? (
-                <div className={styles.chooseScan} style={{ flex: 'auto' }}>
-                  <div className={styles.chooseBox}>
+              {(
+                <div className={styles.advancedOption}>
+                  <div className={styles.advancedOptionBox}>
                     <input
+                      id="number_auto"
                       type="radio"
-                      name="scan"
-                      value="minMax"
-                      id="minMax"
-                      checked={project.standardType === 'minMax'}
-                      onChange={this.handleType}
+                      name="numberselect"
+                      defaultChecked={project.kType === "auto"}
+                      onClick={this.handleMode("auto")}
                     />
-                    <label htmlFor="minMax">{EN.minmaxscale}</label>
+                    <label htmlFor="number_auto">{EN.Auto}</label>
                   </div>
-                  <div className={styles.chooseBox}>
+                  <div className={styles.advancedOptionBox}>
                     <input
+                      id="number_custom"
                       type="radio"
-                      name="scan"
-                      value="standard"
-                      id="standard"
-                      checked={project.standardType === 'standard'}
-                      onChange={this.handleType}
+                      name="numberselect"
+                      defaultChecked={project.kType === "no_more_than"}
+                      onClick={this.handleMode("no_more_than")}
                     />
-                    <label htmlFor="standard">Standard Scale</label>
-                  </div>
-                  <div className={styles.chooseBox}>
-                    <input
-                      type="radio"
-                      name="scan"
-                      value="robust"
-                      id="robust"
-                      checked={project.standardType === 'robust'}
-                      onChange={this.handleType}
+                    <label htmlFor="number_custom">{EN.NoMoreThan}</label>
+                    <InputNumber
+                      value={project.kValue}
+                      max={15}
+                      min={2}
+                      step={1}
+                      onChange={this.handleNum}
                     />
-                    <label htmlFor="robust">Robust Scale</label>
                   </div>
                 </div>
-              ) : (
-                  <div className={styles.advancedOption}>
-                    <div className={styles.advancedOptionBox}>
-                      <input
-                        id="number_auto"
-                        type="radio"
-                        name="numberselect"
-                        defaultChecked={project.kType === "auto"}
-                        onClick={this.handleMode("auto")}
-                      />
-                      <label htmlFor="number_auto">{EN.Auto}</label>
-                    </div>
-                    <div className={styles.advancedOptionBox}>
-                      <input
-                        id="number_custom"
-                        type="radio"
-                        name="numberselect"
-                        defaultChecked={project.kType === "no_more_than"}
-                        onClick={this.handleMode("no_more_than")}
-                      />
-                      <label htmlFor="number_custom">{EN.NoMoreThan}</label>
-                      <InputNumber
-                        value={project.kValue}
-                        max={15}
-                        min={2}
-                        step={0}
-                        precision={0}
-                        onChange={this.handleNum}
-                      />
-                    </div>
-                  </div>
-                )}
+              )}
             </div>
           </div>
-
-
-
-
-        </div>
+        </div>}
         <div className={styles.advancedRow}>
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
@@ -296,7 +259,44 @@ export default class AdvancedView extends Component {
             </div>
             <div className={styles.advancedBlock}>
               <div className={styles.advancedAlgorithmList}>
-                {Algorithms[project.problemType].map((v, k) => {
+                {project.problemType === 'Clustering' ? Algorithms[project.problemType].map((v, k) => {
+                  const tooLarge = project.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []
+                  const notSupport = project.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift', 'AP'] : []
+                  return (tooLarge.includes(v.value) &&
+                    <Tooltip placement='top' title={'该算法内存消耗大，当前数据量下不推荐使用。'} key={k}>
+                      <div className={classnames(styles.advancedAlgorithm, styles.algorithmNotAllow)} >
+                        <input
+                          id={"algorithm" + k}
+                          type="checkbox"
+                          disabled={tooLarge.includes(v.value)}
+                          checked={!tooLarge.includes(v.value) && project.algorithms.includes(v.value)}
+                          onChange={tooLarge.includes(v.value) ? () => { } : this.handleCheck.bind(null, v.value)}
+                        />
+                        <label htmlFor={"algorithm" + k}>{v.label}</label>
+                      </div>
+                    </Tooltip>) || (notSupport.includes(v.value) &&
+                      <Tooltip placement='top' title={'该算法不支持簇的数目选择。'} key={k}>
+                        <div className={classnames(styles.advancedAlgorithm, styles.algorithmNotAllow)} >
+                          <input
+                            id={"algorithm" + k}
+                            type="checkbox"
+                            disabled={notSupport.includes(v.value)}
+                            checked={!notSupport.includes(v.value) && project.algorithms.includes(v.value)}
+                            onChange={notSupport.includes(v.value) ? () => { } : this.handleCheck.bind(null, v.value)}
+                          />
+                          <label htmlFor={"algorithm" + k}>{v.label}</label>
+                        </div>
+                      </Tooltip>) || <div className={styles.advancedAlgorithm} key={k}>
+                      <input
+                        id={"algorithm" + k}
+                        type="checkbox"
+                        // disabled={notSupport.includes(v.value)}
+                        checked={project.algorithms.includes(v.value)}
+                        onChange={this.handleCheck.bind(null, v.value)}
+                      />
+                      <label htmlFor={"algorithm" + k}>{v.label}</label>
+                    </div>
+                }) : Algorithms[project.problemType].map((v, k) => {
                   return (
                     <div className={styles.advancedAlgorithm} key={k}>
                       <input
@@ -364,10 +364,10 @@ export default class AdvancedView extends Component {
                 className={styles.advancedSize}
                 value={project.searchTime}
                 onBlur={this.handleMaxTime}
-                min={5}
+                min={10}
                 isInt={true}
               />
-              <span style={{paddingLeft:10}}>
+              <span style={{ paddingLeft: 10 }}>
                 {EN.Minutes}
                 {/*<br />*/}
                 ({EN.minutesorlonger})
@@ -393,6 +393,7 @@ export default class AdvancedView extends Component {
             </div>
           </div>}
         </div>
+        {project.problemType === "Outlier" && <div className={styles.empty}></div>}
       </div>
     );
   }

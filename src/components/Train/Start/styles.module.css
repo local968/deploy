@@ -330,7 +330,7 @@
   display: flex;
   flex: none;
   flex-direction: column;
-  margin: 0.1em 0;
+  margin: 0.3em 0;
   border: solid 0.5px #757575;
 }
 
@@ -532,6 +532,7 @@
   display: flex;
   flex: none;
   border-bottom: dashed 1px #c4cbd7;
+  padding: 0.2em 0;
 }
 
 .advancedRow:last-child {
@@ -556,7 +557,7 @@
   margin-left: 0.15em;
 }
 
-advancedTitle_Outlier{
+.advancedTitle_Outlier {
   display: flex;
   flex: none;
   justify-content: center;
@@ -568,7 +569,6 @@ advancedTitle_Outlier{
   font-size: 1.125rem;
   color: #000000;
   /*line-height: 1.2;*/
-
 }
 
 .advancedTitle {
@@ -634,7 +634,7 @@ advancedTitle_Outlier{
   align-items: center;
 }
 
-.advancedOptionBox  input{
+.advancedOptionBox input {
   margin-right: 20px;
 }
 
@@ -1171,7 +1171,7 @@ button.disable {
 .chooseScan {
   display: flex;
   flex: none;
-  /*margin: .3em 0;*/
+  margin: .3em 0;
 }
 
 .chooseLabel {
@@ -1192,15 +1192,30 @@ button.disable {
   align-items: center;
 }
 
-.chooseBox label{
+.chooseBox label {
   font-family: HelveticaNeue;
   font-size: 0.875rem;
   color: #4a4a4a;
   cursor: pointer;
 }
 
-.chooseBox input{
+.chooseBox input {
   font-family: HelveticaNeue;
   font-size: 0.875rem;
   cursor: pointer;
+}
+
+.empty {
+  display: flex;
+  flex: none;
+  height: 1em;
+}
+
+.notAllow, .notAllow img {
+  cursor: not-allowed;
+}
+
+.algorithmNotAllow, .algorithmNotAllow label, .algorithmNotAllow input {
+  color: #ccc;
+  cursor: not-allowed;
 }

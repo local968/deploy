@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 // import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
-import {observable, toJS} from 'mobx';
+import { observable, toJS } from 'mobx';
 import { Spin, Popover, message as antdMessage, Icon, Table, InputNumber } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
@@ -24,8 +24,8 @@ export default class SimplifiedView extends Component {
   @observable showCorrelation = false
   @observable visible = false;
   @observable CorrelationMatrixData = {};
-  
-  
+
+
   componentDidMount() {
     this.props.project.dataView()
   }
@@ -54,17 +54,17 @@ export default class SimplifiedView extends Component {
   // showCorrelationMatrix = () => {
   //   this.showCorrelation = true
   // }
-  
+
   showCorrelationMatrix = () => {
-    const {project} = this.props;
-    
+    const { project } = this.props;
+
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);
-    
+
     const fields = Object.entries(colType)
-        .filter(itm => itm[1] === 'Numerical')
-        .map(itm => itm[0])
-        .filter(itm => !trainHeader.includes(itm));
+      .filter(itm => itm[1] === 'Numerical')
+      .map(itm => itm[0])
+      .filter(itm => !trainHeader.includes(itm));
     request.post({
       url: '/graphics/correlation-matrix',
       data: {
@@ -197,7 +197,7 @@ export default class SimplifiedView extends Component {
             onVisibleChange={this.hideCorrelationMatrix}
             trigger="click"
             content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
-                                      CorrelationMatrixData={this.CorrelationMatrixData}
+              CorrelationMatrixData={this.CorrelationMatrixData}
             />} />}
           <span>{EN.CheckCorrelationMatrix}</span>
         </div>
@@ -221,8 +221,8 @@ export default class SimplifiedView extends Component {
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.filter((h)=>colType[h] !== "Raw").map((h, i) => {
-              const data = { ...dataViews, ...newVariableViews }[h]
+            {allVariables.map((h, i) => {
+              const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} handleWeight={this.handleWeight(h)} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
             })}
@@ -238,8 +238,8 @@ class SimplifiedViewRow extends Component {
   @observable histograms = false
   @observable univariant = false
   @observable chartData = {};
-  
-  
+
+
   showHistograms = value => {
     // this.histograms = true
     const { project = {} } = this.props;
@@ -248,17 +248,17 @@ class SimplifiedViewRow extends Component {
       field: value,
       id: etlIndex,
     };
-    
+
     if (!this.chartData[value]) {
       if (colType[value] === "Numerical") {
-        const {min, max} = project.dataViews[value];
+        const { min, max } = project.dataViews[value];
         data.interval = (max - min) / 100;
         request.post({
           url: '/graphics/histogram-numerical',
           data,
         }).then((result) => this.showback(value, result.data));
       } else {
-        const {uniqueValues} = project.dataViews[value];
+        const { uniqueValues } = project.dataViews[value];
         data.size = uniqueValues;
         request.post({
           url: '/graphics/histogram-categorical',
@@ -267,10 +267,10 @@ class SimplifiedViewRow extends Component {
       }
       return
     }
-    
+
     this.histograms = true;
   };
-  
+
   showback = (target, result) => {
     this.chartData = {
       ...this.chartData,
@@ -301,15 +301,18 @@ class SimplifiedViewRow extends Component {
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.99} min={0.01} step={0.1} precision={2} onChange={handleWeight} />
       </div>
-      <div className={styles.tableTd} onClick={this.showHistograms.bind(this,value)}>
-      <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-        {this.histograms && <Popover placement='topLeft'
-          visible={this.histograms}
+      <div className={classnames(styles.tableTd, {
+        [styles.notAllow]: isRaw
+      })} onClick={this.showHistograms.bind(this, value)}>
+        <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
+        {(!isRaw && this.histograms) ? <Popover placement='topLeft'
+          visible={!isRaw && this.histograms}
           onVisibleChange={this.hideHistograms}
           trigger="click"
-         content={<SimplifiedViewPlot onClose={this.hide}
-                type={colType[value]}
-                data={this.chartData[value]} />} />}
+          content={<SimplifiedViewPlot onClose={this.hide}
+            type={colType[value]}
+            value={value}
+            data={this.chartData[value]} />} /> : null}
       </div>
       <div className={styles.tableTd} title={valueType}><span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
       <div className={classnames(styles.tableTd, {
@@ -363,44 +366,45 @@ class SimplifiedViewRow extends Component {
 
 @observer
 class CorrelationPlot extends Component {
-  render(){
+  render() {
     const { onClose, CorrelationMatrixData } = this.props;
     const { type, value } = CorrelationMatrixData;
     return (
-        <div className={styles.correlationPlot} >
-          <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-          <CorrelationMatrixs
-              value={value}
-              type={type}
-          />
-          {/* {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>} */}
-          {/*<div className={styles.plotLoad}><Spin size="large" /></div>*/}
-        </div>
+      <div className={styles.correlationPlot} >
+        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+        <CorrelationMatrixs
+          value={value}
+          type={type}
+        />
+      </div>
     )
   }
 }
 
 @observer
 class SimplifiedViewPlot extends Component {
-  
+
   render() {
-    const { type, style, data } = this.props;
+    const { type, style, data, value } = this.props;
+    if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
         <HistogramNumerical
-            x_name={type}
-            y_name={'count'}
-            title={`Feature:${type}`}
-            data={data}
+          x_name={value}
+          y_name={'count'}
+          title={`Feature:${value}`}
+          data={data}
         />
       </div>
     }
     return <div className={styles.plot} style={style}>
       {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
       <HistogramCategorical
-          x_name={`Feature:${type}`}
-          data={data}
+        x_name={value}
+        y_name={'count'}
+        title={`Feature:${value}`}
+        data={data}
       />
     </div>
   }

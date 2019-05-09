@@ -29,7 +29,6 @@ const imgs = {
 @observer
 export default class Modeling extends Component {
   @observable right = 0
-  @observable metric = this.props.projectStore.project.measurement
   @observable view = 'simple'
   @observable sort = {
     simple: {
@@ -49,11 +48,6 @@ export default class Modeling extends Component {
       { label: EN.ModelSelection, value: 'modelSelection' }
     ];
     this.sideRef = React.createRef();
-    autorun(() => {
-      const { project } = props.projectStore;
-      if (project && project.measurement)
-        this.metric = project.measurement
-    });
   }
 
   componentDidMount() {
@@ -106,17 +100,10 @@ export default class Modeling extends Component {
     updateProject(nextSubStep(step, 3))
   };
 
-  handleChange = action(value => {
-    console.log(value, "metric")
-    this.metric = value;
-    // if (window.localStorage)
-    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
-  });
-
   render() {
     const { project } = this.props.projectStore;
     const { models, train2Error, train2ing } = project;
-    const { view, sort, metric } = this
+    const { view, sort } = this
     return (
       <div className={styles.modeling}>
         {project && <Switch>
@@ -131,8 +118,7 @@ export default class Modeling extends Component {
               sort={sort}
               changeView={this.changeView}
               handleSort={this.handleSort}
-              metric={metric}
-              handleChange={this.handleChange} />
+            />
           }} />
         </Switch>}
         {project && <ProjectSide
@@ -150,18 +136,19 @@ export default class Modeling extends Component {
 
 @observer
 class TrainResult extends Component {
+  componentDidUpdate() {
+    this.props.resetSide && this.props.resetSide()
+  }
+
   render() {
-    const { hasModel, isError, isTraining, resetSide, view, sort, changeView, handleSort, metric, handleChange } = this.props;
+    const { hasModel, isError, isTraining, view, sort, changeView, handleSort } = this.props;
     if (isError) return <ModelError />;
     if (!hasModel && isTraining) return <Loading />;
     return <ModelResult
-      resetSide={resetSide}
       view={view}
       sort={sort}
       handleSort={handleSort}
       changeView={changeView}
-      metric={metric}
-      handleChange={handleChange}
     />
   }
 }

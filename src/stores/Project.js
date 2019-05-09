@@ -203,14 +203,14 @@ export default class Project {
 
   readIndex = async (index) => {
     const url = `/etls/${index}/preview`
-    const { data } = await axios.get(url)
-    const result = data.result.map(row => this.rawHeader.map(h => row[h]))
+    const { data = {} } = await axios.get(url)
+    const result = (data.result || []).map(row => this.rawHeader.map(h => row[h]))
     return result
   }
 
   @computed
   get totalLines() {
-    return this.totalRawLines - this.totalFixedLines
+    return this.totalRawLines - this.deletedCount
   }
 
   fetchData = async path => {
@@ -221,7 +221,7 @@ export default class Project {
 
   @computed
   get defaultUploadFile() {
-    this.noComputeTemp = false
+    // this.noComputeTemp = false
 
     return {
       cleanHeader: [],
@@ -271,16 +271,16 @@ export default class Project {
 
   @computed
   get defaultTrain() {
-    const measurement = this.problemType === "Classification" ? "auc" : "CVNN"
+    const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score'
     const algorithms = (this.problemType === "Clustering" && [
       'KMeans',
       'GMM',
-      'MeanShift',
-      'SpectralClustering',
-      'AP',
-      'Agg',
-      'DBSCAN',
       'Birch',
+      'Agg',
+      'SpectralClustering',
+      'DBSCAN',
+      'AP',
+      'MeanShift',
     ]) || (this.problemType === "Outlier" && [
       'IsolationForest',
       'OneClassSVM',
@@ -292,6 +292,7 @@ export default class Project {
       'ABOD',
       'FB',
     ]) || []
+
     return {
       train2Finished: false,
       train2ing: false,
@@ -498,6 +499,9 @@ export default class Project {
       if (key === 'problemType') {
         data.changeProjectType = data[key]
       }
+      if (key === 'noCompute') {
+        data.noComputeTemp = data[key]
+      }
       if (key === 'trainModel') {
         if (data[key]) {
           const { value } = data[key] || {}
@@ -517,7 +521,7 @@ export default class Project {
       business: this.business,
       problemType: this.changeProjectType
     };
-    updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "CVNN"
+    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score'
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl()
       //全部恢复到problem步骤
@@ -1162,19 +1166,26 @@ export default class Project {
     switch (problemType) {
       case 'Clustering':
         command = 'clustering.train';
+        const algorithms = this.totalLines > 20000 ? [
+          'KMeans',
+          'GMM',
+          'Birch',
+          'AP',
+          'MeanShift',
+        ] : [
+            'KMeans',
+            'GMM',
+            'Birch',
+            'Agg',
+            'SpectralClustering',
+            'DBSCAN',
+            'AP',
+            'MeanShift',
+          ]
         trainData = {
           k_type: "auto",
           k_value: undefined,
-          algorithms: [
-            'KMeans',
-            'GMM',
-            'MeanShift',
-            'SpectralClustering',
-            'AP',
-            'Agg',
-            'DBSCAN',
-            'Birch',
-          ],
+          algorithms: algorithms,
           standard_type: "standard",
           search_time: 5,
           metrics_method: "CVNN",
@@ -1225,11 +1236,11 @@ export default class Project {
           speedVSaccuracy: 5,
           ensembleSize: 20,
           randSeed: 0,
-          measurement: problemType === "Classification" ? "auc" : "CVNN",
+          measurement: problemType === "Classification" ? "auc" : "r2",
           settingName: setting.name,
           holdoutRate: 0.2
         };
-        if (this.totalRawLines > 10000) {
+        if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
         } else {
           trainData.nfold = 5
@@ -1292,10 +1303,12 @@ export default class Project {
     switch (problemType) {
       case 'Clustering':
         command = 'clustering.train';
+        const disableItems = [...(this.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift', 'AP'] : [])]
+
         trainData = {
           k_type: this.kType,
           k_value: this.kValue,
-          algorithms: this.algorithms,
+          algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
           standard_type: this.standardType,
           search_time: this.searchTime,
           metrics_method: this.measurement,
@@ -1339,7 +1352,7 @@ export default class Project {
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
         };
-        if (this.totalRawLines > 10000) {
+        if (this.runWith === 'holdout') {
           trainData.validationRate = this.validationRate / 100
         } else {
           trainData.nfold = this.crossCount

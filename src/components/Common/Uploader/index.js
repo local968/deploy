@@ -13,8 +13,22 @@ export default class Uploader extends Component {
     this.inputRef = React.createRef()
   }
 
+  componentWillReceiveProps(props) {
+    const { file, onError, onStart } = props
+    if(!file) return
+    const checkd = this.check(file)
+    if (checkd.err) {
+      return onError(new Error(checkd.msg), 1)
+    }
+    if (onStart && typeof onStart === 'function') onStart({
+      pause: this.pause,
+      resume: this.resume
+    })
+    this.upload(file)
+  }
+
   show() {
-    if(this.inputRef.current) this.inputRef.current.click()
+    if (this.inputRef.current) this.inputRef.current.click()
   }
 
   // componentDidUpdate() {

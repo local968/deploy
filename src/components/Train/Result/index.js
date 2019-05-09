@@ -9,8 +9,8 @@ import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
-import Iso from "../../Charts/Iso";
 import EN from '../../../constant/en';
+import ISO2 from "../../Charts/ISO2";
 
 const Option = Select.Option;
 
@@ -18,15 +18,13 @@ function ModelResult(props) {
   // const type = 'clustering'
   const { resetSide, view, sort, handleSort, changeView, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType } = project
-  const list = Object.entries(colType).filter(t => t[1] === 'Categorical').map(c => c[0])
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader } = project
+  const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
 
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
 
   if (!selectModel || !models.length) return null
-
-  console.log('selectModel',selectModel,selectModel.multiVarPlotData);
 
   React.useEffect(() => {
     resetSide()
@@ -42,6 +40,13 @@ function ModelResult(props) {
 
   const hideDict = () => {
     setVisible(false)
+  }
+
+  const onSelect = (model) => () => {
+    if (selectModel.id === model.id) return
+    project.updateProject({
+      selectId: model.id
+    })
   }
 
   const deploy = () => {
@@ -105,16 +110,14 @@ function ModelResult(props) {
         </div>
         <div className={classes.right}>
           {
-            project.problemType === "Outlier"?
-                <Iso url={selectModel.outlierPlotData} models={props.projectStore.project.models}/>
-                :<D3D2 url={selectModel.multiVarPlotData} />
+            project.problemType === "Outlier" ?
+              <ISO2 url={selectModel.outlierPlotData} models={props.projectStore.project.models} />
+              : <D3D2 url={selectModel.multiVarPlotData} />
           }
-
-          {/* <ParallelPlot url='http://192.168.0.182:8081/blockData?uid=c2e0d5c2681111e9b948000c2959bcd0'/> */}
         </div>
       </div>
-      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
-      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} />}
+      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
+      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
     </div>}
     {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
     <div className={classes.buttonBlock}>
@@ -128,8 +131,8 @@ function ModelResult(props) {
 export default inject('projectStore', 'deploymentStore', 'routing')(observer(ModelResult))
 
 const OutlierTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain } = props
-  const { train2Finished, trainModel, isAbort } = project
+  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
@@ -145,11 +148,11 @@ const OutlierTable = observer((props) => {
     }
     return models.sort(fn)
   }, [models, sort])
-  
+
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
           <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
@@ -168,7 +171,7 @@ const OutlierTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} />
+        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
@@ -184,7 +187,7 @@ const OutlierTable = observer((props) => {
 const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
-  const { model } = props
+  const { model, isRecommend, isSelect, onSelect } = props
 
   const toggleImpact = (_type) => {
     if (!visible) {//本来是关着的
@@ -200,23 +203,40 @@ const OutlierRow = observer((props) => {
   }
 
   return <div className={classes.rowBody}>
-    <div className={classes.rowData}>
-      <div className={`${classes.ccell}`}>
-        <span>{model.modelName}</span>
+    <Tooltip
+      placement="left"
+      title={isRecommend ? EN.Recommended : EN.Selected}
+      visible={isSelect || isRecommend}
+      overlayClassName={classes.recommendLabel}
+      autoAdjustOverflow={false}
+      arrowPointAtCenter={true}
+      getPopupContainer={el => el.parentElement}>
+      <div className={classes.rowData}>
+        <div className={classes.modelSelect}>
+          <input
+            type="radio"
+            name="modelSelect"
+            checked={isSelect}
+            onChange={onSelect(model)}
+          />
+        </div>
+        <div className={`${classes.ccell} ${classes.modelName}`}>
+          <span>{model.modelName}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.score)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
+        </div>
       </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.score)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-    </div>
+    </Tooltip>
     <div className={classes.rowData}>
       {visible && type === 'impact' && <VariableImpact model={model} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
@@ -225,8 +245,8 @@ const OutlierRow = observer((props) => {
 })
 
 const ClusteringTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain } = props
-  const { train2Finished, trainModel, isAbort } = project
+  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
 
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -253,7 +273,7 @@ const ClusteringTable = observer((props) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
           <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
@@ -284,7 +304,7 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow model={m} />
+        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
@@ -298,7 +318,7 @@ const ClusteringTable = observer((props) => {
 })
 
 const ClusteringRow = observer((props) => {
-  const { model } = props
+  const { model, isRecommend, isSelect, onSelect } = props
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const toggleImpact = (_type) => {
@@ -316,35 +336,52 @@ const ClusteringRow = observer((props) => {
 
   const clusters = Object.keys(model.labelWithImportance).length
   return <div className={classes.rowBody}>
-    <div className={classes.rowData}>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.modelName)}</span>
+    <Tooltip
+      placement="left"
+      title={isRecommend ? EN.Recommended : EN.Selected}
+      visible={isSelect || isRecommend}
+      overlayClassName={classes.recommendLabel}
+      autoAdjustOverflow={false}
+      arrowPointAtCenter={true}
+      getPopupContainer={el => el.parentElement}>
+      <div className={classes.rowData}>
+        <div className={classes.modelSelect}>
+          <input
+            type="radio"
+            name="modelSelect"
+            checked={isSelect}
+            onChange={onSelect(model)}
+          />
+        </div>
+        <div className={`${classes.ccell} ${classes.modelName}`}>
+          <span>{formatNumber(model.modelName)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.CVNN)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.silhouette_cosine)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.CH)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.RSquared)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{clusters}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('explanation')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
+        </div>
       </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.CVNN)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.silhouette_cosine)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.CH)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.RSquared)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{clusters}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('explanation')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-    </div>
+    </Tooltip>
     <div className={classes.rowData}>
       {visible && type === 'impact' && <VariableImpact model={model} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
@@ -355,10 +392,6 @@ const ClusteringRow = observer((props) => {
 
 const MappingDict = observer((props) => {
   const { project, list, hideDict } = props
-  console.log("dddddddddddddddd")
-  console.log(project)
-  console.log( list)
-  console.log(hideDict)
   const { colMap, mappingKey } = project
   const [state, setState] = React.useState({
     origin: '',

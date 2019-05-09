@@ -19,7 +19,7 @@ export default function HistogramCategorical(props){
   const option = {
     title: {
       text: title,
-      subtext: '',
+      x: 'center',
     },
     xAxis: {
       name:x_name,

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
 import { Spin, Popover, message as antdMessage, Icon, Table, Tooltip } from 'antd';
@@ -197,6 +196,7 @@ export default class SimplifiedView extends Component {
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
                 type={colType[target]}
+                target={target}
                 data={this.chartData[target]} />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
@@ -279,7 +279,7 @@ export default class SimplifiedView extends Component {
               return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
             }).map((h, i) => {
               if (h === target) return null;
-              const data = { ...dataViews, ...newVariableViews }[h]
+              const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
@@ -474,28 +474,33 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>
+      <div className={classnames(styles.tableTd, {
+        [styles.notAllow]: isRaw
+      })} onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-        {this.histograms && <Popover placement='topLeft'
-          visible={this.histograms}
+        {(!isRaw && this.histograms) ? <Popover placement='topLeft'
+          visible={!isRaw && this.histograms}
           onVisibleChange={this.hideHistograms}
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type={colType[value]}
+            target={value}
             data={this.chartData[value]}
-          />} />}
+          />} /> : null}
       </div>
-      <div className={styles.tableTd} onClick={this.showUnivariant}>
+      <div className={classnames(styles.tableTd, {
+        [styles.notAllow]: isRaw
+      })} onClick={this.showUnivariant}>
         <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
-        {this.univariant && <Popover placement='topLeft'
-          visible={this.univariant}
+        {(!isRaw && this.univariant) ? <Popover placement='topLeft'
+          visible={!isRaw && this.univariant}
           onVisibleChange={this.hideUnivariant}
           trigger="click"
           content={<ScatterPlot onClose={this.hideUnivariant}
             type={project.problemType}
             data={this.scatterData[value]}
             message={this.scatterData[`${value}-msg`]}
-          />} />}
+          />} /> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
         <div className={styles.preImpotance}>
@@ -559,13 +564,11 @@ class CorrelationPlot extends Component {
     const { type, value } = CorrelationMatrixData;
     return (
       <div className={styles.correlationPlot} >
-        <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
+        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
         <CorrelationMatrixs
           value={value}
           type={type}
         />
-        {/* {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>} */}
-        {/*<div className={styles.plotLoad}><Spin size="large" /></div>*/}
       </div>
     )
   }
@@ -591,14 +594,15 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
 
   render() {
-    const { type, style, data } = this.props;
+    const { type, style, data, target } = this.props;
+    if (type === 'Raw') return null
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
         <HistogramNumerical
-          x_name={type}
+          x_name={target}
           y_name={'count'}
-          title={`Feature:${type}`}
+          title={`Feature:${target}`}
           data={data}
         />
       </div>
@@ -606,7 +610,8 @@ class SimplifiedViewPlot extends Component {
     return <div className={styles.plot} style={style}>
       {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
       <HistogramCategorical
-        x_name={`Feature:${type}`}
+        x_name={target}
+        title={`Feature:${target}`}
         data={data}
       />
     </div>

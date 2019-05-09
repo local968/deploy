@@ -1146,3 +1146,7 @@ button.disable {
   display: flex;
   flex: none;
 }
+
+.notAllow, .notAllow img {
+  cursor: not-allowed;
+}

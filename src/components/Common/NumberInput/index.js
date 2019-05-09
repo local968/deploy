@@ -26,7 +26,7 @@ export default class NumberInput extends Component {
     try {
       const num = parseFloat(temp)
       if (isInt && num.toString().includes(".")) throw new Error(EN.Thenumbermustbeaninteger)
-      if ((min || (!min && min === 0)) && num < min) throw new Error(`${EN.Thenumbermustbegreaterthanorequalto}${min}`)
+      if ((min || (!min && min === 0)) && num < min) throw new Error(`${EN.Thenumbermustbegreaterthanorequalto}10`)
       if ((max || (!max && max === 0)) && num > max) throw new Error(`${EN.Thenumbermustbelessthanorequalto}${max}`)
       onBlur(num)
       this.isFocus = false

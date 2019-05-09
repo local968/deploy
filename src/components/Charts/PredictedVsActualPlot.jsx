@@ -59,33 +59,21 @@ export default class PredictedVsActualPlot extends PureComponent{
 				type: 'value',
 			},
 			legend: {
-				// orient: 'vertical',
-				// top: 20,
-				// right:0,
 				data: data.map(itm=>itm.name),
-				// itemGap: 20,
-				// itemWidth:50,
-				// itemHeight:3,
 			},
 			tooltip: {
 				trigger: 'axis',
 				formatter: function (params) {
-					const result = data.map((itm,index)=> {
+					const result = params.map((itm)=> {
 						return <dd>
-							{itm.name}:{itm.value[index][1]}
+							{itm.seriesName}:{itm.value[1].toFixed(3)}
 						</dd>;
 					});
 					return `
 						Group Number:${params[0].axisValue}
 						${result.map(itm=>('<br/>' + itm.props.children.join('')))}
 					`
-				// 	return `
-				//     Group Number:${params[0].axisValue}
-				//     <br/>
-				//     Within Groups SS:${params[0].data}
-				// `
 				},
-				// extraCssText:'background-color:#6a6aea;color:#fff;',
 			},
 			series,
 			grid:{

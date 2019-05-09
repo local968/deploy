@@ -234,27 +234,18 @@ export class DataIssue extends Component {
                 <div className={styles.issueRow}><span>{EN.MissingValueS}({targetIssues.nullRow} {EN.Rows}) {formatNumber(percent.missing, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.missing)} style={{ width: ((typeof percent.missing === 'number') ? percent.missing : 1) + "%" }}></div>
               </div>
-              {/* <div className={styles.right}>
-                <span>Will be fixed</span>
-              </div> */}
             </div>}
             {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
                 <div className={styles.issueRow}><span>{EN.mismatch}({targetIssues.mismatchRow} {EN.Rows}) {formatNumber(percent.mismatch, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.mismatch)} style={{ width: ((typeof percent.mismatch === 'number') ? percent.mismatch : 1) + "%" }}></div>
               </div>
-              {/* <div className={styles.right}>
-                <span>Will be fixed</span>
-              </div> */}
             </div>}
             {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
                 <div className={styles.issueRow}><span>{EN.outlierRow} ({targetIssues.outlierRow} {EN.Rows}) {formatNumber(percent.outlier, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.outlier)} style={{ width: ((typeof percent.outlier === 'number') ? percent.outlier : 1) + "%" }}></div>
               </div>
-              {/* <div className={styles.right}>
-                <span>Will be ignore</span>
-              </div> */}
             </div>}
           </div>
           {(totalRawLines > 1000 && totalLines < 1000) && <div className={styles.progressBox}>
@@ -391,7 +382,6 @@ export class SelectTarget extends Component {
           })}
         </div>
         <div className={styles.fixesTips}><span></span></div>
-        {/* <div className={styles.fixesTips}><span>You can rename the selected values by double click the value’s name.</span></div> */}
       </div>}
       {this.step === 2 && <div className={styles.fixesBox}>
         <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{v0}{EN.Or}{v1}{EN.MATAHC} </span></div>
@@ -428,32 +418,6 @@ export class SelectTarget extends Component {
 
         <div className={styles.fixesTips}><span>{EN.Therestvalueswillbedeletedbydefault}</span></div>
       </div>}
-      {/* {this.step === 3 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>Select all values that belong to value2 </span></div>
-        <div className={styles.targetPercentBox}>
-          <div className={styles.targetPercentRow}>
-            <div className={styles.targetPercentLabel}>
-              <span>{this.checked[1]}</span>
-            </div>
-            <div className={styles.targetPercentValue}>
-              <div className={styles.targetPercent} style={{ width: percent1 + '%', backgroundColor: '#adaafc' }}></div>
-              <span>{colValueCounts[target][v1] || 0}</span>
-            </div>
-          </div>
-          <div className={styles.fixesCheckBox}>
-            {Object.keys(targetColMap).filter(v => !checked.includes(v)).map((t, i) => {
-              const disabled = belongTo0.includes(t)
-              return <div className={styles.fixesCheck} key={i}>
-                <input type='checkbox' value={t} id={`belongTo1${t}`} checked={belongTo1.includes(t)} disabled={disabled} onChange={this.handleCheck.bind(null, 1)} />
-                <label className={classnames(styles.fixesCheckBoxLabel, {
-                  [styles.disabledText]: disabled
-                })} htmlFor={`belongTo1${t}`}>{t}</label>
-              </div>
-            })}
-          </div>
-        </div>
-        <div className={styles.fixesTips}><span>The rest values will be deleted by default</span></div>
-      </div>} */}
       {this.step === 3 && <div className={styles.fixesBox}>
         <div className={classnames(styles.fixesIconBox, styles.center)}>
           <div className={classnames(styles.cleanHeaderIcon, styles.largeIcon)}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '2.4rem' }} /></div>
@@ -483,32 +447,32 @@ export class FixIssue extends Component {
   @observable visible = false
   @observable progress = 0
   @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
-  @observable outLier = {};
-  
-  editRange(key, id){
-    const {low,high} = this.props.project.rawDataView[key];
-    if (!this.outLier[key]) {
-      request.post({
-        url: '/graphics/outlier-range',
-        data: {
-          "field": key,
-          id,
-          "interval": 20,
-        },
-      }).then((result) => {
-        this.outLier = {
-          ...this.outLier,
-          [key]: {
-            low,
-            high,
-            data: result.data,
-          },
-        };
-        this.editKey = key;
-        this.visible = true;
-      });
-      return;
-    }
+  // @observable outLier = {};
+
+  editRange(key) {
+    // const { low, high } = this.props.project.rawDataView[key];
+    // if (!this.outLier[key]) {
+    //   request.post({
+    //     url: '/graphics/outlier-range',
+    //     data: {
+    //       "field": key,
+    //       id,
+    //       "interval": 20,
+    //     },
+    //   }).then((result) => {
+    //     this.outLier = {
+    //       ...this.outLier,
+    //       [key]: {
+    //         low,
+    //         high,
+    //         data: result.data,
+    //       },
+    //     };
+    //     this.editKey = key;
+    //     this.visible = true;
+    //   });
+    //   return;
+    // }
     this.editKey = key;
     this.visible = true;
   };
@@ -601,14 +565,13 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    console.log(project)
     const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.mismatch)}/>
+              <div className={classnames(styles.typeBlock, styles.mismatch)} />
               <span>{EN.DataTypeMismatch}</span>
             </div>
           </div>
@@ -632,6 +595,7 @@ export class FixIssue extends Component {
                 }
                 const num = mismatchLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+                if (showType !== 'Numerical') return null
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
@@ -683,7 +647,7 @@ export class FixIssue extends Component {
         {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.missing)}></div>
+              <div className={classnames(styles.typeBlock, styles.missing)}/>
               <span>{EN.MissingValue}</span>
             </div>
           </div>
@@ -764,7 +728,7 @@ export class FixIssue extends Component {
         {!!outlierCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.outlier)}></div>
+              <div className={classnames(styles.typeBlock, styles.outlier)}/>
               <span>{EN.Outlier}</span>
             </div>
           </div>
@@ -788,6 +752,7 @@ export class FixIssue extends Component {
                 }
                 const num = outlierLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+                if (showType !== 'Numerical') return null
                 const isShow = showType === 'Numerical';
                 if (!isShow) return null
                 const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : [rawDataView[k].low, rawDataView[k].high];
@@ -808,13 +773,12 @@ export class FixIssue extends Component {
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
                   method !== 0) ? '' : method;
-                console.log(project)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
-                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k,project.etlIndex)}>{EN.Edit}</span>
+                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k, project.etlIndex)}>{EN.Edit}</span>
                   </div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
@@ -853,25 +817,13 @@ export class FixIssue extends Component {
               <OutlierRange
                   closeEdit={this.closeEdit}
                   saveEdit={this.saveEdit}
-                  message={this.outLier[this.editKey]}
+                  // message={this.outLier[this.editKey]}
+                  field={this.editKey}
+                  id={project.etlIndex}
+                  project = {project}
               />
             } />}
-      {/*{this.editKey && <Modal content={<EditOutLier width={800}*/}
-      {/*  height={400} saveEdit={this.saveEdit}*/}
-      {/*  closeEdit={this.closeEdit}*/}
-      {/*  outlierRange={project.rawDataView[this.editKey]}*/}
-      {/*  outlierDict={project.outlierDictTemp[this.editKey]}*/}
-      {/*  x={project.numberBins[this.editKey][1]}*/}
-      {/*  y={project.numberBins[this.editKey][0]}*/}
-      {/*  minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}*/}
-      {/*  maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}*/}
-      {/*  visible={this.visible}*/}
-      {/*  width='12em'*/}
-      {/*  title={EN.Outlier}*/}
-      {/*  onClose={this.closeEdit}*/}
-      {/*  closeByMask={true}*/}
-      {/*  showClose={true}*/}
-      {/*/>}*/}
+    
     </div>
   }
 }

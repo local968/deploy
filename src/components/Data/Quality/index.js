@@ -471,10 +471,10 @@ class Summary extends Component {
     const arc = d3.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-    const { totalLines, deletedCount, totalFixedLines } = this.props.project
+    const { totalRawLines, deletedCount, totalFixedLines } = this.props.project
     const deleteRows = deletedCount
     const fixedRows = totalFixedLines - deletedCount
-    const cleanRows = totalLines
+    const cleanRows = totalRawLines - totalFixedLines
     const data = [fixedRows, deleteRows, cleanRows]
     const color = ['#9cebff', '#c4cbd7', '#00c855'];
     const dataset = d3.pie()(data);
@@ -501,7 +501,7 @@ class Summary extends Component {
     const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = deletedCount / totalRawLines * 100
     const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
-    const cleanPercent = totalLines / totalRawLines * 100
+    const cleanPercent = (totalRawLines - totalFixedLines) / totalRawLines * 100
     const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
     const variableList = currentHeader.slice(1)
     const percentList = currentHeader.map(v => {
@@ -638,8 +638,8 @@ class Summary extends Component {
         </div>
         <div className={styles.summaryBottom}>
           <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
-            [styles.disabled]: totalRawLines - deletedCount === 0
-          })} onClick={totalRawLines - deletedCount === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
+            [styles.disabled]: totalLines === 0
+          })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
           <div className={classnames(styles.summaryButton, {
             [styles.disabled]: !issues.dataIssue
           })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>

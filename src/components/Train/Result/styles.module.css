@@ -2,7 +2,7 @@
   text-align: center;
   padding-top: 8px;
   background: white;
-  padding: 0 50px;
+  padding: 0 10%;
   width: 100%;
   min-width: 1350px;
 }
@@ -25,7 +25,11 @@
   margin-bottom: 30px
 }
 
-.body {}
+.body {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
 
 .top {
   display: flex;
@@ -114,12 +118,15 @@
   flex-direction: column;
   flex: none;
   border: solid 0.5px #979797;
+  overflow: auto;
+  max-height: 6em;
 }
 
 .rowBody {
   display: flex;
   flex: none;
   flex-direction: column;
+  padding: 5px 0;
 }
 
 .rowData {
@@ -127,7 +134,7 @@
   padding: 0 20px;
   position: relative;
   align-items: center;
-  flex: none
+  flex: auto;
 }
 
 .rowBox {
@@ -135,6 +142,14 @@
   flex-direction: column;
   flex: none;
   position: relative;
+}
+
+.modelSelect {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 5px;
 }
 
 .cell {
@@ -172,7 +187,7 @@
   min-width: 125px;
   margin: 0 5px;
   position: relative;
-  flex: 0 0 125px;
+  flex: 1 1 125px;
   justify-content: center;
 }
 
@@ -193,7 +208,7 @@
 
 .cname {
   width: 125px;
-  flex: none;
+  flex: 1 1 125px;
 }
 
 .cname span {
@@ -204,8 +219,8 @@
 }
 
 .rowHeader {
-  padding: 20px 0;
-  border-bottom: solid 1px #9b9b9b
+  display: flex;
+  flex: none;
 }
 
 .data {
@@ -227,6 +242,8 @@
 .ccellHeader {
   border: none;
   cursor: pointer;
+  padding: 20px 0;
+  border-bottom: solid 1px #9b9b9b
 }
 
 .name {
@@ -328,6 +345,7 @@
 
 .detail {
   display: flex;
+  flex: auto;
   flex-direction: column;
   padding: 0.1em 0;
   max-height: 200px;
@@ -599,4 +617,9 @@
   text-decoration: none;
   text-overflow: ellipsis;
   width: 100%;
+}
+
+.modelName {
+  width: 2.3em;
+  flex: none;
 }

@@ -1086,6 +1086,7 @@ const EN_LAN = {
   Youcanadjustthecontaminationrate:'You can adjust the contamination rate',
   Choose2or3Variables:'Choose 2 or 3 Variables',
   Result:'Result',
+  Ss:'s',
 };
 
 
