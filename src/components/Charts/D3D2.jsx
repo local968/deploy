@@ -6,7 +6,6 @@ const {Option} = Select;
 import styles from './charts.module.css';
 import THREE from './3Variable'
 import EN from "../../constant/en";
-// import styles from '@src/views/modeling.pre.result/modeling.pre.result.css';
 export default class D3D2 extends PureComponent {
 	constructor(props) {
 		super(props);

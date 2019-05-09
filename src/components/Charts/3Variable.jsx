@@ -13,23 +13,8 @@ export default class ThreeVariable extends PureComponent{
 		
 		const {x_name='',y_name='',z_name='',data=[]} = this.props;
 		
-		// const result = {
-		// 	data:[
-		// 		{
-		// 			name:'math',
-		// 			value:[[12, 14, 10], [34, 50, 15], [56, 30, 20], [10, 15, 12], [23, 10, 14]],
-		// 		},{
-		// 			name:'chinese',
-		// 			value:[[1,2,3]],
-		// 		}
-		// 	],
-		// };
-		//
-		// const {data=[]} = result;
 		
-		// const keys = data.map(itm=>itm.name);
-		
-		const series = data.map(itm=>{
+		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
 			return {
 				name:itm.name,
 				type: 'scatter3D',

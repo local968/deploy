@@ -244,7 +244,7 @@ class RegressionDetailCurves extends Component {
     //   </div>
     // );
     let curComponent = <div className={styles.plot}>
-      <ParallelPlots url={this.props.project.selectModel.parallelPlotData}/>
+      <ParallelPlots url={this.props.model.parallelPlotData}/>
     </div>
     const thumbnails = [{
       text: 'Parallel Plot',

@@ -8,26 +8,9 @@ export default class ParallelPlot extends PureComponent{
 	}
 	
 	getOption() {
-			// const  value=[
-			// 	{
-			// 		name:'1',
-			// 		data:[[-161.2, 51.6], [167.5, 59.0], [159.5, 49.2], [157.0, 63.0], [155.8, 53.6]]
-			// 	},{
-			// 		name:'女',
-			// 			data:[[174.0, 65.6], [175.3, 71.8], [193.5, 80.7], [186.5, 72.6], [187.2, 78.8]]
-			// 	},{
-			// 		name:'女2',
-			// 		data:[[174.0, 65.6], [175.3, 71.8], [193.5, 80.7], [186.5, 72.6], [187.2, 78.8]]
-			// 	}
-			// ]
-		
-		
-		const legend = [];
-		
 		const {x_name,y_name,data} = this.props;
 		
-		const series = data.map(itm=>{
-			legend.push(itm.name);
+		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
 			return {
 				name:itm.name,
 				data:itm.value,
