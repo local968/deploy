@@ -64,7 +64,7 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
   if (uploadResponse.data.status !== 200) return uploadResponse.data
   const opaqueId = uploadResponse.data.opaqueId
 
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     let emptyCount = 0
     const interval = setInterval(async () => {
       const countReponse = await axios.get(`${esServicePath}/etls/${index}/count`)
