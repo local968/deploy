@@ -26,8 +26,6 @@ function ModelResult(props) {
 
   if (!selectModel || !models.length) return null
 
-  console.log('selectModel', selectModel, selectModel.multiVarPlotData);
-
   React.useEffect(() => {
     resetSide()
   })
@@ -306,7 +304,7 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
+        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}

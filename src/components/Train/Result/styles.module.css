@@ -119,6 +119,7 @@
   flex: none;
   border: solid 0.5px #979797;
   overflow: auto;
+  max-height: 6em;
 }
 
 .rowBody {

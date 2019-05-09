@@ -90,7 +90,7 @@ export default class AdvancedView extends Component {
     if (this.currentSettingId === 'all') return _filtedModels;
     const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
     if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
-      return _filtedModels.filter(model => currentSetting.models.find(id => model.name === id))
+      return _filtedModels.filter(model => currentSetting.models.find(id => model.id === id))
     return _filtedModels
   }
 
