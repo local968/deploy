@@ -309,6 +309,7 @@ class SimplifiedViewRow extends Component {
           trigger="click"
          content={<SimplifiedViewPlot onClose={this.hide}
                 type={colType[value]}
+                value={value}
                 data={this.chartData[value]} />} />}
       </div>
       <div className={styles.tableTd} title={valueType}><span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
@@ -382,15 +383,15 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
   
   render() {
-    const { type, style, data } = this.props;
-    if(type === 'Raw') return null
+    const { type, style, data,value } = this.props;
+    if(type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
         <HistogramNumerical
-            x_name={type}
+            x_name={value}
             y_name={'count'}
-            title={`Feature:${type}`}
+            title={`Feature:${value}`}
             data={data}
         />
       </div>
@@ -398,7 +399,9 @@ class SimplifiedViewPlot extends Component {
     return <div className={styles.plot} style={style}>
       {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
       <HistogramCategorical
-          x_name={`Feature:${type}`}
+          x_name={value}
+          y_name={'count'}
+          title={`Feature:${value}`}
           data={data}
       />
     </div>
