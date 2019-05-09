@@ -221,7 +221,7 @@ export default class Project {
 
   @computed
   get defaultUploadFile() {
-    this.noComputeTemp = false
+    // this.noComputeTemp = false
 
     return {
       cleanHeader: [],
@@ -497,6 +497,9 @@ export default class Project {
       }
       if (key === 'problemType') {
         data.changeProjectType = data[key]
+      }
+      if (key === 'noCompute') {
+        data.noComputeTemp = data[key]
       }
       if (key === 'trainModel') {
         if (data[key]) {
