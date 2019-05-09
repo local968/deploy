@@ -24,7 +24,7 @@ async function scheduleHandler() {
 
     let restrictQuery
     try {
-      restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+      restrictQuery = await api.checkUserFileRestriction(schedule)
     } catch (e) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
@@ -78,7 +78,7 @@ async function scheduleHandler() {
         result = { ...result, ...data.result }
         return data.status === 100 || data.status < 0
       })
-      if (result['processError']) api.decreaseLines(restrictQuery, deployment.lineCount)
+      if (result['processError']) api.decreaseLines(restrictQuery, await api.getLineCount(deployment[`${schedule.type}Options`].fileId))
       schedule.result = result
       schedule.status = result['processError'] ? 'issue' : 'finished'
       schedule.updatedDate = moment().unix()

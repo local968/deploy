@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 
@@ -25,16 +25,11 @@ export default function PredictionDistributions(props){
 		symbol: 'circle',
 	}));
 	
-	// const [index,upIndex] = useState(5);
 	const point = data[0].value[fitIndex][0];
 	
-	// useEffect(()=>{
-	// 	props.model.setFitIndex(index);
-	// 	upPoint(data[0].value[index][0]);
-	// },[index]);
-	
-	// console.log(2122,index,data[0].value[index][0])
-	
+	const setf = _.debounce((value)=>{
+		props.model.setFitIndex(Math.floor(value * 100))
+	},100);
 	
 	const option = {
 		xAxis: {
@@ -54,11 +49,8 @@ export default function PredictionDistributions(props){
 					show: true,
 					formatter: function (params) {
 						let {value} = params;
-						console.log(params,222)
-						value = value === 1 ?0.99:value;
-						// upIndex(Math.floor(value * 100));
-						props.model.setFitIndex(Math.floor(value * 100));
-						return value
+						setf(value);
+						return value.toFixed(3)
 					},
 					backgroundColor: '#004E52'
 				},
