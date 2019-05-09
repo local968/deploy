@@ -221,7 +221,7 @@ export default class SimplifiedView extends Component {
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.filter((h)=>colType[h] !== "Raw").map((h, i) => {
+            {allVariables.map((h, i) => {
               const data = { ...dataViews, ...newVariableViews }[h]
               const map = targetMap || {};
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} handleWeight={this.handleWeight(h)} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
@@ -383,6 +383,7 @@ class SimplifiedViewPlot extends Component {
   
   render() {
     const { type, style, data } = this.props;
+    if(type === 'Raw') return null
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}

@@ -275,11 +275,11 @@ export default class SimplifiedView extends Component {
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.filter((h)=>colType[h] !== "Raw").sort((a, b) => {
+            {allVariables.sort((a, b) => {
               return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
             }).map((h, i) => {
               if (h === target) return null;
-              const data = { ...dataViews, ...newVariableViews }[h]
+              const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
@@ -590,6 +590,7 @@ class SimplifiedViewPlot extends Component {
 
   render() {
     const { type, style, data } = this.props;
+    if(type === 'Raw') return null
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
