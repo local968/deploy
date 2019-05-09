@@ -108,13 +108,10 @@ export default class ParallelPlot extends PureComponent{
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 400, width: 600}}
+			style={{height: 400, width: 550}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'
-			// onChartReady={this.onChartReadyCallback}
-			// onEvents={EventsDict}
-			// opts={}
 		/>
 	}
 }
