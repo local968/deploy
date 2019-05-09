@@ -222,7 +222,7 @@ export default class SimplifiedView extends Component {
           </div> :
           <div className={styles.tableBody}>
             {allVariables.map((h, i) => {
-              const data = { ...dataViews, ...newVariableViews }[h]
+              const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} handleWeight={this.handleWeight(h)} colType={variableType} project={project} isChecked={checkedVariables.includes(h)} handleCheck={this.handleCheck.bind(null, h)} lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} />
             })}
