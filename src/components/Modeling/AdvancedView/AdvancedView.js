@@ -699,23 +699,32 @@ class ClassificationModelRow extends Component {
 
 class DetailCurves extends Component {
   state = {
-    curve: EN.ROCCurve
+    curve: EN.ROCCurve,
+    show:true,
   }
   handleClick = val => {
     this.setState({ curve: val });
   }
   reset = () => {
     this.props.model.resetFitIndex();
-  }
+    this.setState({
+      show:false
+    })
+    setTimeout(()=>{
+      this.setState({
+        show:true
+      })
+    },0)
+  };
   render() {
     const { model, model: { mid }, yes, no } = this.props;
-    const { curve } = this.state;
+    const { curve,show } = this.state;
     let curComponent;
     let hasReset = true;
     switch (curve) {
       case EN.ROCCurve:
         // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
-        curComponent = <ROCCurves
+        curComponent = show&&<ROCCurves
           height={300}
           width={500}
           x_name={EN.FalsePositiveDate}
@@ -737,7 +746,7 @@ class DetailCurves extends Component {
         break;
       case EN.PrecisionRecallTradeoff:
         // curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
-        curComponent = <PRCharts
+        curComponent = show&&<PRCharts
           height={300} width={500}
           x_name={EN.Recall}
           y_name={EN.Precision}
