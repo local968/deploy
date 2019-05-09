@@ -1214,3 +1214,8 @@ button.disable {
 .notAllow, .notAllow img {
   cursor: not-allowed;
 }
+
+.algorithmNotAllow, .algorithmNotAllow label, .algorithmNotAllow input {
+  color: #ccc;
+  cursor: not-allowed;
+}

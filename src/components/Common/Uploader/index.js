@@ -80,7 +80,6 @@ export default class Uploader extends Component {
   }
 
   _onChange = e => {
-    console.log('_onChange_onChange_onChange_onChange_onChange')
     const files = [...e.target.files];
     e.target.value = null
     if (files.length === 0) return [];
