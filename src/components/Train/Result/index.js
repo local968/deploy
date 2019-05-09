@@ -124,7 +124,7 @@ export default inject('projectStore', 'deploymentStore')(observer(ModelResult))
 
 const OutlierTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain } = props
-  const { train2Finished, trainModel } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectId } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
@@ -163,7 +163,7 @@ const OutlierTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} />
+        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectId} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
@@ -179,7 +179,7 @@ const OutlierTable = observer((props) => {
 const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
-  const { model } = props
+  const { model, isRecommend, isSelect } = props
 
   const toggleImpact = (_type) => {
     if (!visible) {//本来是关着的
@@ -195,23 +195,32 @@ const OutlierRow = observer((props) => {
   }
 
   return <div className={classes.rowBody}>
-    <div className={classes.rowData}>
-      <div className={`${classes.cell}`}>
-        <span>{model.modelName}</span>
+    <Tooltip
+      placement="left"
+      title={isRecommend ? text : EN.Selected}
+      visible={isSelect || isRecommend}
+      overlayClassName={styles.recommendLabel}
+      autoAdjustOverflow={false}
+      arrowPointAtCenter={true}
+      getPopupContainer={el => el.parentElement}>
+      <div className={classes.rowData}>
+        <div className={`${classes.cell}`}>
+          <span>{model.modelName}</span>
+        </div>
+        <div className={`${classes.cell}`}>
+          <span>{formatNumber(model.score.score)}</span>
+        </div>
+        <div className={`${classes.cell}`}>
+          <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
+        </div>
+        <div className={`${classes.cell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
+        </div>
+        <div className={`${classes.cell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
+        </div>
       </div>
-      <div className={`${classes.cell}`}>
-        <span>{formatNumber(model.score.score)}</span>
-      </div>
-      <div className={`${classes.cell}`}>
-        <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
-      </div>
-      <div className={`${classes.cell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-      <div className={`${classes.cell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-    </div>
+    </Tooltip>
     <div className={classes.rowData}>
       {visible && type === 'impact' && <VariableImpact model={model} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
@@ -221,7 +230,7 @@ const OutlierRow = observer((props) => {
 
 const ClusteringTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain } = props
-  const { train2Finished, trainModel, isAbort } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectId } = project
 
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -279,7 +288,7 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow model={m} />
+        return <ClusteringRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectId} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
@@ -293,7 +302,7 @@ const ClusteringTable = observer((props) => {
 })
 
 const ClusteringRow = observer((props) => {
-  const { model } = props
+  const { model, isRecommend, isSelect } = props
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const toggleImpact = (_type) => {
@@ -311,35 +320,44 @@ const ClusteringRow = observer((props) => {
 
   const clusters = Object.keys(model.labelWithImportance).length
   return <div className={classes.rowBody}>
-    <div className={classes.rowData}>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.modelName, 2)}</span>
+    <Tooltip
+      placement="left"
+      title={isRecommend ? text : EN.Selected}
+      visible={isSelect || isRecommend}
+      overlayClassName={styles.recommendLabel}
+      autoAdjustOverflow={false}
+      arrowPointAtCenter={true}
+      getPopupContainer={el => el.parentElement}>
+      <div className={classes.rowData}>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.modelName, 2)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.CVNN, 2)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.silhouette_cosine, 2)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.CH, 2)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.RSquared, 2)}</span>
+        </div>
+        <div className={`${classes.ccell}`}>
+          <span>{clusters}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('explanation')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
+        </div>
       </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.CVNN, 2)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.silhouette_cosine, 2)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.CH, 2)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{formatNumber(model.score.RSquared, 2)}</span>
-      </div>
-      <div className={`${classes.ccell}`}>
-        <span>{clusters}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-      <div className={`${classes.ccell} ${classes.compute}`}>
-        <span onClick={() => toggleImpact('explanation')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
-      </div>
-    </div>
+    </Tooltip>
     <div className={classes.rowData}>
       {visible && type === 'impact' && <VariableImpact model={model} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
