@@ -271,7 +271,7 @@ export default class Project {
 
   @computed
   get defaultTrain() {
-    const measurement = this.problemType === "Classification" ? "auc" : "CVNN"
+    const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score'
     const algorithms = (this.problemType === "Clustering" && [
       'KMeans',
       'GMM',
@@ -517,7 +517,7 @@ export default class Project {
       business: this.business,
       problemType: this.changeProjectType
     };
-    updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "CVNN"
+    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score'
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl()
       //全部恢复到problem步骤
@@ -1217,7 +1217,7 @@ export default class Project {
           speedVSaccuracy: 5,
           ensembleSize: 20,
           randSeed: 0,
-          measurement: problemType === "Classification" ? "auc" : "CVNN",
+          measurement: problemType === "Classification" ? "auc" : "r2",
           settingName: setting.name,
           holdoutRate: 0.2
         };

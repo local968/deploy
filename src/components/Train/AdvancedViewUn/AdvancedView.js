@@ -125,7 +125,7 @@ export default class AdvancedView extends Component {
 }
 
 const questMarks = {
-  'CVNN':"",'RSquared':"",'RMSSTD':"",'CH':"",'silhouette_cosine':"",'silhouette_euclidean':""
+  'CVNN': "", 'RSquared': "", 'RMSSTD': "", 'CH': "", 'silhouette_cosine': "", 'silhouette_euclidean': ""
 }
 
 @observer
@@ -137,13 +137,13 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: {  selectModel }, sort, handleSort } = this.props;
-    const texts = [EN.ModelName, 'Time', 'CVNN','RSquared','RMSSTD','CH index','silhouette_cosine','silhouette_euclidean'];
+    const { models, project: { selectModel }, sort, handleSort } = this.props;
+    const texts = ['Model Name', 'Time', 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
-      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
+      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{curr === 'Model Name' ? EN.ModelName : replaceR2(curr)}</div>;
       if (curr === sort.key) {
         if (sort.value === 1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
         if (sort.value === -1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
@@ -204,11 +204,11 @@ class AdvancedModelTable extends Component {
                 return <RowCell key={2} data={score.RSquared} />;
               case 'RMSSTD':
                 return <RowCell key={11} data={score.RMSSTD} />;
-              case 'CH':
+              case 'CH Index':
                 return <RowCell key={9} data={score.CH} />;
-              case 'silhouette_cosine':
+              case 'Silhouette Cosine':
                 return <RowCell key={3} data={score.silhouette_cosine} />;
-              case 'silhouette_euclidean':
+              case 'Silhouette Euclidean':
                 return <RowCell key={4} data={score.silhouette_euclidean} />;
               case 'Time':
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
@@ -232,19 +232,19 @@ class RegressionDetailCurves extends Component {
   }
 
   handleClick = val => {
-    this.setState({curve: val});
+    this.setState({ curve: val });
   }
 
   render() {
     // const { model } = this.props;
-    const { curve} = this.state;
+    const { curve } = this.state;
     // let curComponent = (
     //   <div className={styles.plot} >
     //     <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
     //   </div>
     // );
     let curComponent = <div className={styles.plot}>
-      <ParallelPlots url={this.props.model.parallelPlotData}/>
+      <ParallelPlots url={this.props.model.parallelPlotData} />
     </div>
     const thumbnails = [{
       text: 'Parallel Plot',
