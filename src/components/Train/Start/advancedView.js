@@ -219,8 +219,7 @@ export default class AdvancedView extends Component {
                       value={project.kValue}
                       max={15}
                       min={2}
-                      step={0}
-                      precision={0}
+                      step={1}
                       onChange={this.handleNum}
                     />
                   </div>
@@ -328,7 +327,7 @@ export default class AdvancedView extends Component {
                 className={styles.advancedSize}
                 value={project.searchTime}
                 onBlur={this.handleMaxTime}
-                min={5}
+                min={10}
                 isInt={true}
               />
               <span style={{ paddingLeft: 10 }}>
