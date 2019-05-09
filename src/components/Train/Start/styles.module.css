@@ -1210,3 +1210,7 @@ button.disable {
   flex: none;
   height: 1em;
 }
+
+.notAllow {
+  cursor: not-allowed;
+}

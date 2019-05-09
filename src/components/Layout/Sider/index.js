@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import logo from './rsquared_logo_website.svg';
@@ -6,7 +6,7 @@ import home from './icon-home.svg';
 import homeActive from './icon-home-active.svg';
 import help from './icon-help.svg';
 import helpActive from './icon-help-active.svg';
-// import community from './community.png'
+import community from './community.png'
 import switchIcon from './switch.svg';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router';
@@ -17,14 +17,15 @@ import EN from '../../../constant/en';
 @observer
 export default class Sider extends Component {
   render() {
-    const { userStore, routing } = this.props;
+    const {userStore, routing} = this.props;
     const isLogin = userStore.status === 'login';
+    const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/lab';
     const isDeploy = routing.location.pathname.includes('deploy');
     const isSupport = routing.location.pathname.includes('support');
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
-          <img className={styles.logoImg} src={logo} alt="logo" />
+          <img className={styles.logoImg} src={logo} alt="logo"/>
           {/* <h2 className={styles.mrone}>R2 Learn</h2> */}
         </div>
         <div className={styles.menus}>
@@ -34,27 +35,27 @@ export default class Sider extends Component {
               isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')
             }
           >
-            {!isSupport ? <img alt="home" src={homeActive} /> : <img alt="home" src={home} />}
+            {!isSupport ? <img alt="home" src={homeActive}/> : <img alt="home" src={home}/>}
             <h4 className={classnames(styles.nav, {
               [styles.active]: !isSupport
             })}>{EN.Home}</h4>
           </a>
           <a className={styles.support}
-            onClick={() => {
-              routing.push('/support')
-            }}>
-            {isSupport ? <img alt="support" src={helpActive} /> : <img alt="support" src={help} />}
+             onClick={() => {
+               routing.push('/support')
+             }}>
+            {isSupport ? <img alt="support" src={helpActive}/> : <img alt="support" src={help}/>}
             <h4 className={classnames(styles.nav, {
               [styles.active]: isSupport
             })}>{EN.Support}</h4>
           </a>
-          {/* <a className={styles.support} onClick={() => routing.push('/community')}>
-            <img alt="support" src={community} className={styles.community} />
-            <h4 className={styles.nav}>Community</h4>
-          </a> */}
+          <a className={styles.support} onClick={() => window.open(jupyterLabUrl, '_blank')}>
+            <img alt="support" src={community} className={styles.community}/>
+            <h4 className={styles.nav}>JupyterLab</h4>
+          </a>
         </div>
         <a className={styles.bottom} onClick={this.switchClick}>
-          <img alt="switch" src={switchIcon} />
+          <img alt="switch" src={switchIcon}/>
           {isDeploy || !isLogin ? (
             <h4 className={styles.nav}>
               {EN.Model}<br />{EN.Training}
@@ -63,14 +64,14 @@ export default class Sider extends Component {
               <h4 className={styles.nav}>
                 {EN.Deployments}<br />{EN.Console}
             </h4>
-            )}
+          )}
         </a>
       </aside>
     );
   }
 
   switchClick = () => {
-    const { location, deploymentStore, userStore, routing } = this.props;
+    const {location, deploymentStore, userStore, routing} = this.props;
     const isDeploy = routing.location.pathname.includes('deploy');
     const userId = userStore.info.id;
     if (location.pathname.indexOf('/deploy/project/') !== -1) {
