@@ -545,7 +545,7 @@ class RegressionDetailCurves extends Component {
   }
 
   setChartDate() {
-    const url = this.props.project.selectModel.fitAndResidualPlotData;
+    const url = this.props.model.fitAndResidualPlotData;
     request.post({
       url: '/graphics/fit-plot',
       data: {
