@@ -778,7 +778,7 @@ const EN: any = {
   SpeedvsAccuracy: '建模速度vs准确率',
   LiftsCharts: 'Lift图',
   ROCCurves: 'ROC曲线',
-  Speedms1000rows: '建模速度(毫秒/1000行)',
+  Speedms1000rows: '建模速度(行/秒)',
   Percentage: '百分比',
   TruePositiveRate: '真阳率',
   FalsePositiveDate: '假阳率',
