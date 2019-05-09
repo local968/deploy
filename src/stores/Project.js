@@ -275,12 +275,12 @@ export default class Project {
     const algorithms = (this.problemType === "Clustering" && [
       'KMeans',
       'GMM',
-      'MeanShift',
-      'SpectralClustering',
-      'AP',
-      'Agg',
-      'DBSCAN',
       'Birch',
+      'Agg',
+      'SpectralClustering',
+      'DBSCAN',
+      'AP',
+      'MeanShift',
     ]) || (this.problemType === "Outlier" && [
       'IsolationForest',
       'OneClassSVM',
@@ -292,6 +292,7 @@ export default class Project {
       'ABOD',
       'FB',
     ]) || []
+
     return {
       train2Finished: false,
       train2ing: false,
@@ -1157,19 +1158,26 @@ export default class Project {
     switch (problemType) {
       case 'Clustering':
         command = 'clustering.train';
+        const algorithms = this.totalLines > 20000 ? [
+          'KMeans',
+          'GMM',
+          'Birch',
+          'AP',
+          'MeanShift',
+        ] : [
+            'KMeans',
+            'GMM',
+            'Birch',
+            'Agg',
+            'SpectralClustering',
+            'DBSCAN',
+            'AP',
+            'MeanShift',
+          ]
         trainData = {
           k_type: "auto",
           k_value: undefined,
-          algorithms: [
-            'KMeans',
-            'GMM',
-            'MeanShift',
-            'SpectralClustering',
-            'AP',
-            'Agg',
-            'DBSCAN',
-            'Birch',
-          ],
+          algorithms: algorithms,
           standard_type: "standard",
           search_time: 5,
           metrics_method: "CVNN",
@@ -1287,10 +1295,12 @@ export default class Project {
     switch (problemType) {
       case 'Clustering':
         command = 'clustering.train';
+        const disableItems = [...(this.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift', 'AP'] : [])]
+
         trainData = {
           k_type: this.kType,
           k_value: this.kValue,
-          algorithms: this.algorithms,
+          algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
           standard_type: this.standardType,
           search_time: this.searchTime,
           metrics_method: this.measurement,

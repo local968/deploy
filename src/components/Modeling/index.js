@@ -136,12 +136,15 @@ export default class Modeling extends Component {
 
 @observer
 class TrainResult extends Component {
+  componentDidUpdate() {
+    this.props.resetSide && this.props.resetSide()
+  }
+
   render() {
-    const { hasModel, isError, isTraining, resetSide, view, sort, changeView, handleSort, handleChange } = this.props;
+    const { hasModel, isError, isTraining, view, sort, changeView, handleSort } = this.props;
     if (isError) return <ModelError />;
     if (!hasModel && isTraining) return <Loading />;
     return <ModelResult
-      resetSide={resetSide}
       view={view}
       sort={sort}
       handleSort={handleSort}

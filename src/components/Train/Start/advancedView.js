@@ -259,7 +259,44 @@ export default class AdvancedView extends Component {
             </div>
             <div className={styles.advancedBlock}>
               <div className={styles.advancedAlgorithmList}>
-                {Algorithms[project.problemType].map((v, k) => {
+                {project.problemType === 'Clustering' ? Algorithms[project.problemType].map((v, k) => {
+                  const tooLarge = project.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []
+                  const notSupport = project.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift', 'AP'] : []
+                  return (tooLarge.includes(v.value) &&
+                    <Tooltip placement='top' title={'该算法内存消耗大，当前数据量下不推荐使用。'} key={k}>
+                      <div className={classnames(styles.advancedAlgorithm, styles.algorithmNotAllow)} >
+                        <input
+                          id={"algorithm" + k}
+                          type="checkbox"
+                          disabled={tooLarge.includes(v.value)}
+                          checked={!tooLarge.includes(v.value) && project.algorithms.includes(v.value)}
+                          onChange={tooLarge.includes(v.value) ? () => { } : this.handleCheck.bind(null, v.value)}
+                        />
+                        <label htmlFor={"algorithm" + k}>{v.label}</label>
+                      </div>
+                    </Tooltip>) || (notSupport.includes(v.value) &&
+                      <Tooltip placement='top' title={'该算法不支持簇的数目选择。'} key={k}>
+                        <div className={classnames(styles.advancedAlgorithm, styles.algorithmNotAllow)} >
+                          <input
+                            id={"algorithm" + k}
+                            type="checkbox"
+                            disabled={notSupport.includes(v.value)}
+                            checked={!notSupport.includes(v.value) && project.algorithms.includes(v.value)}
+                            onChange={notSupport.includes(v.value) ? () => { } : this.handleCheck.bind(null, v.value)}
+                          />
+                          <label htmlFor={"algorithm" + k}>{v.label}</label>
+                        </div>
+                      </Tooltip>) || <div className={styles.advancedAlgorithm} key={k}>
+                      <input
+                        id={"algorithm" + k}
+                        type="checkbox"
+                        // disabled={notSupport.includes(v.value)}
+                        checked={project.algorithms.includes(v.value)}
+                        onChange={this.handleCheck.bind(null, v.value)}
+                      />
+                      <label htmlFor={"algorithm" + k}>{v.label}</label>
+                    </div>
+                }) : Algorithms[project.problemType].map((v, k) => {
                   return (
                     <div className={styles.advancedAlgorithm} key={k}>
                       <input
