@@ -118,6 +118,7 @@
   flex-direction: column;
   flex: none;
   border: solid 0.5px #979797;
+  overflow: auto;
 }
 
 .rowBody {
@@ -217,8 +218,8 @@
 }
 
 .rowHeader {
-  padding: 20px 0;
-  border-bottom: solid 1px #9b9b9b
+  display: flex;
+  flex: none;
 }
 
 .data {
@@ -240,6 +241,8 @@
 .ccellHeader {
   border: none;
   cursor: pointer;
+  padding: 20px 0;
+  border-bottom: solid 1px #9b9b9b
 }
 
 .name {
@@ -616,6 +619,6 @@
 }
 
 .modelName {
-  width: 3em;
+  width: 2.3em;
   flex: none;
 }
