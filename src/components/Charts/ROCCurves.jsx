@@ -23,7 +23,6 @@ export default class ROCCurves extends PureComponent{
 		const _y = Object.values(y);
 		const data = _.zip(_x,_y);
 		const point = data[fitIndex][0];
-		// console.log(_x,_y,data,point)
 		
 		const result = {
 			x_name,

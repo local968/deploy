@@ -8,7 +8,6 @@ import 'rc-slider/assets/index.css'
 import './echarts.config'
 import request from '../Request'
 import styles from './charts.module.css';
-// import styles from '@src/views/modeling.pre.result/modeling.pre.result.css';
 import EN from "../../constant/en";
 import { Select } from 'antd';
 const {Option} = Select;
@@ -63,7 +62,7 @@ export default class Iso extends PureComponent{
     }
 
     getOption() {
-        let {ready,xRange,yRange,value,dot,point} = this.state;
+        let {ready,xRange,yRange,value,dot,point,var1,var2} = this.state;
         if(!ready){
             return {
                 xAxis: {},
@@ -164,6 +163,9 @@ export default class Iso extends PureComponent{
                     boundaryGap:false,
                     alignWithLabel:true,
                     offset:1,
+                    name:var1,
+                    nameLocation:'middle',
+                    nameGap:25,
                 },
                 yAxis: {
                     type: 'category',
@@ -173,6 +175,9 @@ export default class Iso extends PureComponent{
                     },
                     boundaryGap:false,
                     offset:3,
+                    name:var2,
+                    nameLocation:'middle',
+                    nameGap:25,
                 },
                 visualMap: {
                     min:0,
