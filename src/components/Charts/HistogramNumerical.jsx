@@ -21,10 +21,10 @@ export default function HistogramNumerical(props){
 			name:x_name,
 			nameLocation:'middle',
 			nameGap:25,
-      axisLabel:{
-        interval:Math.floor((data.length/5)),
-        formatter: (value)=>value.toFixed(2),
-      },
+	        axisLabel:{
+	            interval:Math.floor((data.length/5)),
+	            formatter: (value)=>value.toFixed(2),
+	        },
 		},
 		yAxis: {
 			type: 'value',

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
 import { Spin, Popover, message as antdMessage, Icon, Table, Tooltip } from 'antd';
@@ -197,6 +196,7 @@ export default class SimplifiedView extends Component {
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
                 type={colType[target]}
+                 target={target}
                 data={this.chartData[target]} />} />}
           </div>
           <div className={styles.targetCell}><span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
@@ -482,6 +482,7 @@ class SimplifiedViewRow extends Component {
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type={colType[value]}
+            target={value}
             data={this.chartData[value]}
           />} />}
       </div>
@@ -589,14 +590,14 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
 
   render() {
-    const { type, style, data } = this.props;
+    const { type, style, data,target } = this.props;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
         <HistogramNumerical
-          x_name={type}
+          x_name={target}
           y_name={'count'}
-          title={`Feature:${type}`}
+          title={`Feature:${target}`}
           data={data}
         />
       </div>
@@ -604,7 +605,8 @@ class SimplifiedViewPlot extends Component {
     return <div className={styles.plot} style={style}>
       {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
       <HistogramCategorical
-        x_name={`Feature:${type}`}
+        x_name={target}
+        title={`Feature:${target}`}
         data={data}
       />
     </div>
