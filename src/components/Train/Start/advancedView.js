@@ -20,24 +20,27 @@ export default class AdvancedView extends Component {
   });
 
   handleMaxTime = value => {
-    const { project } = this.props;
-    project.setProperty({
-      searchTime: value
-    });
+    this.props.project.searchTime = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   searchTime: value
+    // });
   };
 
   handleRandSeed = value => {
-    const { project } = this.props;
-    project.setProperty({
-      randSeed: value
-    });
+    this.props.project.randSeed = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   randSeed: value
+    // });
   };
 
   handleMeasurement = value => {
-    const { project } = this.props;
-    project.setProperty({
-      measurement: value
-    });
+    this.props.project.measurement = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   measurement: value
+    // });
   };
 
   handleSelectAll = value => {
@@ -48,9 +51,10 @@ export default class AdvancedView extends Component {
     } else {
       algorithms = Algorithms[project.problemType].map(v => v.value);
     }
-    project.setProperty({
-      algorithms
-    });
+    this.props.project.algorithms = algorithms
+    // project.setProperty({
+    //   algorithms
+    // });
   };
 
   handleCheck = (key, e) => {
@@ -65,9 +69,10 @@ export default class AdvancedView extends Component {
       if (!algorithms.includes(key)) return;
       _algorithms = algorithms.filter(v => v !== key);
     }
-    project.setProperty({
-      algorithms: _algorithms
-    });
+    this.props.project.algorithms = _algorithms
+    // project.setProperty({
+    //   algorithms: _algorithms
+    // });
   };
 
   changeSetting = e => {
@@ -101,25 +106,28 @@ export default class AdvancedView extends Component {
   };
 
   handleNum = value => {
-    const { project } = this.props;
-    project.setProperty({
-      kValue: value
-    });
+    this.props.project.kValue = value
+    // const { project } = this.props;
+    // project.setProperty({
+    //   kValue: value
+    // });
   };
 
   handleMode = type => () => {
-    const { project } = this.props;
-    project.setProperty({
-      kType: type
-    });
+    this.props.project.kType = type
+    // const { project } = this.props;
+    // project.setProperty({
+    //   kType: type
+    // });
   };
 
   handleType = (e) => {
-    const { project } = this.props
-    const value = e.target.value;
-    project.setProperty({
-      standardType: value
-    })
+    this.props.project.kType = e.target.value
+    // const { project } = this.props
+    // const value = e.target.value;
+    // project.setProperty({
+    //   standardType: value
+    // })
   }
 
   render() {
@@ -142,7 +150,6 @@ export default class AdvancedView extends Component {
         ];
     // const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
     // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
-    console.log(project.measurement, 'project.measurement')
     return (
       <div className={styles.advanced}>
         <div className={styles.advancedRow}>

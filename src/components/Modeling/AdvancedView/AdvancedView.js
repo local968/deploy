@@ -67,6 +67,7 @@ const Option = Select.Option;
 export default class AdvancedView extends Component {
 
   @observable currentSettingId = 'all';
+  @observable metric = this.props.projectStore.project.measurement
 
   // undefined = can not sort, false = no sort ,1 = asc, -1 = desc
   // @observable sortState = {
@@ -329,6 +330,11 @@ export default class AdvancedView extends Component {
   //   // if (window.localStorage)
   //   //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
   // });
+  handleChange = action(value => {
+    this.metric = value;
+    // if (window.localStorage)
+    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
+  });
 
   constructor(props) {
     super(props);
@@ -355,9 +361,9 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort, metric, handleChange } = this.props;
+    const { project, sort, handleSort } = this.props;
     const { problemType } = project
-    const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
+    const currMetric = this.metricOptions.find(m => m.key === (this.metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
       <div className={styles.advancedModelResult}>
         <div className={styles.modelResult} >
@@ -376,7 +382,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >{EN.MeasurementMetric}</span>
-          <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
+          <Select size="large" value={currMetric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
@@ -533,28 +539,28 @@ class RegressionDetailCurves extends Component {
   handleDiagnoseType = e => {
     this.setState({ diagnoseType: e.target.value });
   }
-  
+
   componentDidMount() {
     this.setChartDate()
   }
-  
-  setChartDate(){
+
+  setChartDate() {
     const url = this.props.project.selectModel.fitAndResidualPlotData;
-      request.post({
-         url:'/graphics/fit-plot',
-         data:{
-           url,
-         },
-       }).then(chartDate=>{
-        this.setState({
-          chartDate
-        })
+    request.post({
+      url: '/graphics/fit-plot',
+      data: {
+        url,
+      },
+    }).then(chartDate => {
+      this.setState({
+        chartDate
+      })
     });
   }
 
   render() {
     const { model } = this.props;
-    const { curve, diagnoseType,chartDate} = this.state;
+    const { curve, diagnoseType, chartDate } = this.state;
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
@@ -568,24 +574,24 @@ class RegressionDetailCurves extends Component {
         //   </div>
         // )
         curComponent = <div className={styles.plot}>
-                  {chartDate&&<FitPlot2
-                      title={EN.FitPlot}
-                      x_name = {EN.Truevalue}
-                      y_name = {EN.Predictvalue}
-                      chartDate = {chartDate}
-                  />}
-          </div>
+          {chartDate && <FitPlot2
+            title={EN.FitPlot}
+            x_name={EN.Truevalue}
+            y_name={EN.Predictvalue}
+            chartDate={chartDate}
+          />}
+        </div>
         break;
       case EN.ResidualPlot:
         curComponent = (
           <div className={styles.plot} >
             {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
             {/*<ResidualPlot/>*/}
-            {chartDate&&<ResidualPlot
-                title={EN.ResidualPlot}
-                x_name = {EN.Truevalue}
-                y_name = {EN.Predictvalue}
-                chartDate = {chartDate}
+            {chartDate && <ResidualPlot
+              title={EN.ResidualPlot}
+              x_name={EN.Truevalue}
+              y_name={EN.Predictvalue}
+              chartDate={chartDate}
             />}
             <Modal
               visible={this.state.visible}
@@ -708,43 +714,43 @@ class DetailCurves extends Component {
     let hasReset = true;
     switch (curve) {
       case EN.ROCCurve:
-       // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
+        // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = <ROCCurves
-            height={300}
-            width={500}
-            x_name = {EN.FalsePositiveDate}
-            y_name = {EN.TruePositiveRate}
-            model = {model}
+          height={300}
+          width={500}
+          x_name={EN.FalsePositiveDate}
+          y_name={EN.TruePositiveRate}
+          model={model}
         />;
         break;
       case EN.PredictionDistribution:
         // curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = <PredictionDistributions
-            height={300}
-            width={500}
-            x_name = {EN.ProbabilityThreshold}
-            y_name = {EN.ProbabilityDensity}
-            fitIndex = {model.fitIndex}
-            chartData = {model.chartData}
-            model = {model}
+          height={300}
+          width={500}
+          x_name={EN.ProbabilityThreshold}
+          y_name={EN.ProbabilityDensity}
+          fitIndex={model.fitIndex}
+          chartData={model.chartData}
+          model={model}
         />;
         break;
       case EN.PrecisionRecallTradeoff:
         // curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
         curComponent = <PRCharts
-            height={300} width={500}
-            x_name = {EN.Recall}
-            y_name = {EN.Precision}
-            model = {model}
+          height={300} width={500}
+          x_name={EN.Recall}
+          y_name={EN.Precision}
+          model={model}
         />
         break;
       case EN.LiftChart:
         // curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
         curComponent = <SingleLiftCharts
-            height={300} width={500}
-            x_name={EN.percentage}
-            y_name={EN.lift}
-            chartData = {model.chartData}
+          height={300} width={500}
+          x_name={EN.percentage}
+          y_name={EN.lift}
+          chartData={model.chartData}
         />
         hasReset = false;
         break;
@@ -967,34 +973,34 @@ class ModelComp extends Component {
               <TabPane tab={EN.SpeedvsAccuracy} key="1">
                 {/*<SpeedAndAcc models={models} width={600} height={400} className="speedComp" />*/}
                 <SpeedvsAccuracys
-                    // width={600}
-                    height={400}
-                    x_name ={EN.Speedms1000rows}
-                    y_name = {EN.Accuracy}
-                    models = {models}
+                  // width={600}
+                  height={400}
+                  x_name={EN.Speedms1000rows}
+                  y_name={EN.Accuracy}
+                  models={models}
                 />
               </TabPane>
               <TabPane tab={EN.LiftsCharts} key="3">
                 {/*<LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
                 <LiftChart2
-                    models = {models}
-                    x_name = {EN.percentage}
-                    y_name = {EN.lift}
-                    mom = 'lift'
-                    x = 'PERCENTAGE'
-                    y = 'LIFT'
-                    formatter = {true}
+                  models={models}
+                  x_name={EN.percentage}
+                  y_name={EN.lift}
+                  mom='lift'
+                  x='PERCENTAGE'
+                  y='LIFT'
+                  formatter={true}
                 />
               </TabPane>
               <TabPane tab={EN.ROCCurves} key="4">
                 {/*<RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
                 <RocChart2
-                    models = {models}
-                    x_name = {EN.FalsePositiveDate}
-                    y_name = {EN.TruePositiveRate}
-                    mom = 'roc'
-                    x = 'FPR'
-                    y = 'TPR'
+                  models={models}
+                  x_name={EN.FalsePositiveDate}
+                  y_name={EN.TruePositiveRate}
+                  mom='roc'
+                  x='FPR'
+                  y='TPR'
                 />
               </TabPane>
               {/* <TabPane tab="Learning Curves" key="2">
