@@ -10,9 +10,7 @@ export default class ThreeVariable extends PureComponent{
 	
 	getOption() {
 		const symbolSize = 5;
-		
 		const {x_name='',y_name='',z_name='',data=[]} = this.props;
-		
 		
 		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
 			return {
@@ -26,12 +24,12 @@ export default class ThreeVariable extends PureComponent{
 		return {
 			tooltip: {},
 			grid3D: {},
+			animation:false,
 			legend: {
 				orient: 'vertical',
 				top: 40,
 				bottom:40,
 				right:0,
-				// data: keys,
 				align: 'left',
 				type: 'scroll',
 			},
@@ -51,13 +49,10 @@ export default class ThreeVariable extends PureComponent{
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 400, width: 600}}
+			style={{height: 400, width: 550}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'
-			// onChartReady={this.onChartReadyCallback}
-			// onEvents={EventsDict}
-			// opts={}
 		/>
 	}
 }
