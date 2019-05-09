@@ -565,7 +565,7 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin, dataHeader } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -587,6 +587,7 @@ export class FixIssue extends Component {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(mismatchLineCountsOrigin).map((k, i) => {
+                if(!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
                 const originNum = mismatchLineCountsOrigin[k]
@@ -664,6 +665,7 @@ export class FixIssue extends Component {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(nullLineCountsOrigin).map((k, i) => {
+                if(!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
                 const originNum = nullLineCountsOrigin[k]
@@ -744,6 +746,7 @@ export class FixIssue extends Component {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(outlierLineCountsOrigin).map((k, i) => {
+                if(!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
                 const originNum = outlierLineCountsOrigin[k]

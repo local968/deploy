@@ -102,7 +102,6 @@ export default class Modeling extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { models, train2Error, train2ing } = project;
     const { view, sort } = this
 
     return (
@@ -112,9 +111,7 @@ export default class Modeling extends Component {
           <Route exact path="/project/:id/train/result" component={() => {
             return <TrainResult
               resetSide={this.resetSide}
-              hasModel={!!models.length}
-              isError={train2Error}
-              isTraining={train2ing}
+              project={project}
               view={view}
               sort={sort}
               changeView={this.changeView}
@@ -137,17 +134,16 @@ export default class Modeling extends Component {
 @observer
 class TrainResult extends Component {
   render() {
-    const { hasModel, isError, isTraining, resetSide, view, sort, changeView, handleSort, metric, handleChange } = this.props;
-    if (isError) return <ModelError />;
-    if (!hasModel && isTraining) return <Loading />;
+    const { project, view, sort, handleSort, changeView, resetSide } = this.props;
+    const { models, train2Error, train2ing } = project;
+    if (train2Error) return <ModelError />;
+    if (!models.length && train2ing) return <Loading />;
     return <ModelResult
-      resetSide={resetSide}
       view={view}
       sort={sort}
       handleSort={handleSort}
       changeView={changeView}
-      metric={metric}
-      handleChange={handleChange}
+      resetSide={resetSide}
     />
   }
 }

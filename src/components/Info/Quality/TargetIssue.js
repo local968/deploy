@@ -19,10 +19,10 @@ export class FixIssue extends Component {
   @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
   @observable outLier = {};
   @observable editKey = '';
-  
-  editRange(key, id){
-    const {low,high} = this.props.project.rawDataView[key];
-  
+
+  editRange(key, id) {
+    const { low, high } = this.props.project.rawDataView[key];
+
     if (!this.outLier[key]) {
       request.post({
         url: '/graphics/outlier-range',
@@ -136,8 +136,8 @@ export class FixIssue extends Component {
   }
 
   render() {
-    const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
+    const { closeFixes, project, nullCount, mismatchCount, outlierCount } = this.props;
+    const { dataHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -159,8 +159,7 @@ export class FixIssue extends Component {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(mismatchLineCountsOrigin).map((k, i) => {
-                if (isTarget && k !== target) return null
-                if (!isTarget && k === target) return null
+                if (!dataHeader.includes(k)) return null
                 const originNum = mismatchLineCountsOrigin[k]
                 if (!originNum) {
                   return null;
@@ -236,8 +235,7 @@ export class FixIssue extends Component {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(nullLineCountsOrigin).map((k, i) => {
-                if (isTarget && k !== target) return null
-                if (!isTarget && k === target) return null
+                if (!dataHeader.includes(k)) return null
                 const originNum = nullLineCountsOrigin[k]
                 if (!originNum) {
                   return null;
@@ -316,8 +314,7 @@ export class FixIssue extends Component {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(outlierLineCountsOrigin).map((k, i) => {
-                if (isTarget && k !== target) return null
-                if (!isTarget && k === target) return null
+                if (!dataHeader.includes(k)) return null
                 const originNum = outlierLineCountsOrigin[k]
                 if (!originNum) {
                   return null;
@@ -350,7 +347,7 @@ export class FixIssue extends Component {
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
-                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k,project.etlIndex)}>{EN.Edit}</span>
+                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k, project.etlIndex)}>{EN.Edit}</span>
                   </div>
                   <div className={styles.fixesCell}><span>{showType}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
@@ -380,18 +377,18 @@ export class FixIssue extends Component {
       </div>
       {
         this.visible && <Modal
-            closeByMask={true}
-            showClose={true}
-            visible={this.visible}
-            title={EN.Outlier}
-            onClose={this.closeEdit}
-            content={
-              <OutlierRange
-                  closeEdit={this.closeEdit}
-                  saveEdit={this.saveEdit}
-                  message={this.outLier[this.editKey]}
-              />
-            } />}
+          closeByMask={true}
+          showClose={true}
+          visible={this.visible}
+          title={EN.Outlier}
+          onClose={this.closeEdit}
+          content={
+            <OutlierRange
+              closeEdit={this.closeEdit}
+              saveEdit={this.saveEdit}
+              message={this.outLier[this.editKey]}
+            />
+          } />}
       {/*{this.editKey && <Modal content={<EditOutLier width={800}*/}
       {/*  height={400} saveEdit={this.saveEdit}*/}
       {/*  closeEdit={this.closeEdit}*/}

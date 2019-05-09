@@ -21,14 +21,14 @@ function ModelResult(props) {
   const { problemType, models, selectModel, colType, dataHeader, trainHeader } = project
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
 
+  React.useEffect(() => {
+    resetSide()
+  })
+
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
 
   if (!selectModel || !models.length) return null
-
-  React.useEffect(() => {
-    resetSide()
-  })
 
   const abortTrain = () => {
     project.abortTrain()
@@ -171,7 +171,7 @@ const OutlierTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
+        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} />
       })}
       {!train2Finished && <div className={classes.rowData}>
         {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
