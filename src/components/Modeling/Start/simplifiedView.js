@@ -474,29 +474,33 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={styles.tableTd} onClick={this.showHistograms}>
+      <div className={classnames(styles.tableTd, {
+        [styles.notAllow]: isRaw
+      })} onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-        {this.histograms && <Popover placement='topLeft'
-          visible={this.histograms}
+        {(!isRaw && this.histograms) ? <Popover placement='topLeft'
+          visible={!isRaw && this.histograms}
           onVisibleChange={this.hideHistograms}
           trigger="click"
           content={<SimplifiedViewPlot onClose={this.hideHistograms}
             type={colType[value]}
             target={value}
             data={this.chartData[value]}
-          />} />}
+          />} /> : null}
       </div>
-      <div className={styles.tableTd} onClick={this.showUnivariant}>
+      <div className={classnames(styles.tableTd, {
+        [styles.notAllow]: isRaw
+      })} onClick={this.showUnivariant}>
         <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
-        {this.univariant && <Popover placement='topLeft'
-          visible={this.univariant}
+        {(!isRaw && this.univariant) ? <Popover placement='topLeft'
+          visible={!isRaw && this.univariant}
           onVisibleChange={this.hideUnivariant}
           trigger="click"
           content={<ScatterPlot onClose={this.hideUnivariant}
             type={project.problemType}
             data={this.scatterData[value]}
             message={this.scatterData[`${value}-msg`]}
-          />} />}
+          />} /> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
         <div className={styles.preImpotance}>
