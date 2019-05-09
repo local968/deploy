@@ -6,10 +6,7 @@ import {Button} from 'antd'
 import './echarts.config'
 import EN from '../../constant/en';
 import 'rc-input-number/assets/index.css'
-// import useclasses from '@src/views/data.pre.quality/data.pre.quality.css';
 import styles from './styles.module.css';
-
-// const classes = useclasses;
 
 export default class OutlierRange extends PureComponent{
 	constructor(props){
