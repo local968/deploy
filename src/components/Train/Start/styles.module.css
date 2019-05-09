@@ -1211,6 +1211,6 @@ button.disable {
   height: 1em;
 }
 
-.notAllow {
+.notAllow, .notAllow img {
   cursor: not-allowed;
 }

@@ -134,7 +134,7 @@
   padding: 0 20px;
   position: relative;
   align-items: center;
-  flex: none
+  flex: auto;
 }
 
 .rowBox {
