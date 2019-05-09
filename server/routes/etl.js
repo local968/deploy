@@ -141,15 +141,15 @@ wss.register('newEtl', async (message, socket, process) => {
   for (let key in stats) {
     const mismatch = project.mismatchFillMethod[key]
     if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
-    else if (mismatch && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
+    else if ((mismatch || mismatch === 0) && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
 
     const missingValue = project.nullFillMethod[key]
     if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
-    else if (missingValue && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
+    else if ((missingValue || missingValue === 0) && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
 
     const outlier = project.outlierFillMethod[key]
     if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
-    else if (outlier && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
+    else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
   }
   const response = await axios.post(`${esServicePath}/etls/${project.originalIndex}/etl`, stats)
   const { etlIndex, opaqueId } = response.data
@@ -157,9 +157,11 @@ wss.register('newEtl', async (message, socket, process) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
       if (data.task) {
-        const status = data.task.status
-        const progress = 90 * (status.created + status.deleted) / status.total || 0
-        process({ progress, status: 1 })
+        if (data.task.status && data.task.status) {
+          const status = data.task.status
+          const progress = 90 * (status.created + status.deleted) / status.total || 0
+          process({ progress, status: 1 })
+        }
       }
       else {
         clearInterval(interval)
@@ -183,3 +185,8 @@ wss.register('newEtl', async (message, socket, process) => {
     }, 1000)
   })
 });
+
+wss.register('getHeader', async (message, socket, process) => {
+  const { data } = await axios.get(`${esServicePath}/etls/${message.index}/header`)
+  return { header: data.split(',').filter(k => k !== '__no') }
+})

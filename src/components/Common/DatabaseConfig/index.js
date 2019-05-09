@@ -136,6 +136,10 @@ export default class DatabaseConfig extends Component {
 
   render() {
     const { visible, onClose, onSubmit: submit, title, projectId } = this.props;
+    const _onClose = (...args) => {
+      this.loading = false
+      onClose(...args)
+    }
     const state = { ...this.localState };
     const onSubmit = () => {
       if (!this.allowSubmit) return;
@@ -147,8 +151,8 @@ export default class DatabaseConfig extends Component {
           projectId
         }).then(resp => {
           this.loading = false;
-          if (resp.result.connectionOK === false) {
-            Message.error(resp.result.result);
+          if (resp.status !== 200) {
+            Message.error(resp.error);
           } else {
             if (state.rememberMyPassword) {
               storage.setItem('DatabaseConnectionPassword', state.sqlPassword);
@@ -187,7 +191,7 @@ export default class DatabaseConfig extends Component {
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlHostName'
               })}
-              placeholder={EN.Eg+"db.abc.com"}
+              placeholder={EN.Eg + "db.abc.com"}
               value={state['sqlHostName']}
               onChange={this.inputChange('sqlHostName')}
             />
@@ -201,7 +205,7 @@ export default class DatabaseConfig extends Component {
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlPort'
               })}
-              placeholder={EN.Eg+"12345"}
+              placeholder={EN.Eg + "12345"}
               value={state['sqlPort']}
               onChange={this.inputChange('sqlPort')}
             />
@@ -326,13 +330,13 @@ export default class DatabaseConfig extends Component {
               onChange={this.checkboxChange('rememberMyConnectionProfile')}
             >
               <span className={styles.checkboxText}>
-               {EN.RememberMyConnectionProfile}
+                {EN.RememberMyConnectionProfile}
               </span>
             </Checkbox>
           </div>
         </div>
         <div className={styles.btns}>
-          <a className={styles.cancel} onClick={onClose}>
+          <a className={styles.cancel} onClick={_onClose}>
             {EN.CANCEL}
           </a>
           {this.loading ? (
@@ -342,7 +346,7 @@ export default class DatabaseConfig extends Component {
           ) : (
               <a className={classnames(styles.done, { [styles.disabled]: !this.allowSubmit })} onClick={onSubmit}>
                 {EN.CONNECT}
-            </a>
+              </a>
             )}
         </div>
       </Modal>

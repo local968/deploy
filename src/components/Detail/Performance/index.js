@@ -80,17 +80,12 @@ export default class Performance extends Component {
         this.uploadError = error
       }),
       onFinished: action((response, file) => {
-        if (response.status === 200) {
-          cdpo.file = file.name
-          cdpo.fileId = response.fileId
-          cdpo.source = 'file'
-          cd.save()
-          this.uploadPercentage = 100
-          this.uploadStatus = false
-        } else {
-          this.uploadError = response.message
-          console.error(response)
-        }
+        cdpo.file = file.name
+        cdpo.fileId = response.originalIndex
+        cdpo.source = 'file'
+        cd.save()
+        this.uploadPercentage = 100
+        this.uploadStatus = false
       }),
       onProgress: action((progress, speed) => {
         const done = progress.split('/')[0]
