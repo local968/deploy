@@ -127,7 +127,6 @@ export default class Deployment extends Component {
         cddo.file = file.name
         cddo.fileId = response.originalIndex
         cddo.source = 'file'
-        cd.lineCount = response.totalRawLines
         cd.save()
         this.uploadPercentage = 100
         this.uploadStatus = false
