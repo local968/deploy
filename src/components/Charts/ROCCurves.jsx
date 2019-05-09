@@ -10,13 +10,20 @@ export default class ROCCurves extends PureComponent{
 		this.state = {
 			ready:false,
 			position:null,
+			startIndex:props.model.fitIndex,
 		};
 		this.updatePoint = _.debounce(this.updatePoint.bind(this),10);
 	}
 	
-	prePair(){
+	// componentWillReceiveProps(nextProps) {
+	// 	if(nextProps.model.fitIndex === this.state.startIndex){
+	// 		this.prePair(nextProps.model.fitIndex);
+	// 	}
+	// }
+	
+	prePair(fitIndex=this.props.model.fitIndex){
 		const {x_name='',y_name='',model} =this.props;
-		const {chartData,fitIndex=0} = model;
+		const {chartData} = model;
 		const {roc} = chartData;
 		const {FPR:x,TPR:y} = roc;
 		const _x = Object.values(x);
@@ -85,8 +92,6 @@ export default class ROCCurves extends PureComponent{
 						result,
 						myChart,
 						point,
-						// that:t,
-						// updatePoint:echarts.util.curry(t.updatePoint),
 						ondrag: echarts.util.curry(t.onPointDragging),
 						updatePoint:t.updatePoint,
 						z: 100
@@ -108,21 +113,12 @@ export default class ROCCurves extends PureComponent{
 				name:y_name,
 			},
 			grid:{
-				// x2:140,
 				y2:80,
 			},
 			tooltip:{
 				triggerOn: 'none',
 			},
 			series,
-			// toolbox: {
-			// 	show : true,
-			// 	feature : {
-			// 		dataZoom: {},
-			// 		restore : {show: true},
-			// 		saveAsImage : {show: true}
-			// 	}
-			// }
 		};
 	}
 
@@ -133,6 +129,7 @@ export default class ROCCurves extends PureComponent{
 
 		const _data = data.filter(itm=>itm[0] === point)||data[0];
 		_data[0] = myChart.convertFromPixel('grid', this.position);
+		
 		const _x = _data[0][0];
 		const next_point = data.filter(itm=>itm[0]>point)[0];
 
@@ -177,11 +174,6 @@ export default class ROCCurves extends PureComponent{
 	}
 
 	updatePoint(point){
-		// this.setState({
-		// 	point
-		// })
-		// console.log(this.state._x.indexOf(point));
-		// console.log(point)
 		this.props.model.setFitIndex(this.state._x.indexOf(point));
 	}
 
