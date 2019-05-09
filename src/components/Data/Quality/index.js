@@ -471,7 +471,7 @@ class Summary extends Component {
     const arc = d3.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-    const { totalLines, deletedCount, totalFixedLines } = this.props.project
+    const { totalRawLines, deletedCount, totalFixedLines } = this.props.project
     const deleteRows = deletedCount
     const fixedRows = totalFixedLines - deletedCount
     const cleanRows = totalRawLines - totalFixedLines
