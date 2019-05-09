@@ -185,3 +185,8 @@ wss.register('newEtl', async (message, socket, process) => {
     }, 1000)
   })
 });
+
+wss.register('getHeader', async (message, socket, process) => {
+  const { data } = await axios.get(`${esServicePath}/etls/${message.index}/header`)
+  return { header: data.split(',').filter(k => k !== '__no') }
+})

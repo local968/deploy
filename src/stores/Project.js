@@ -541,6 +541,14 @@ export default class Project {
 
     await this.abortTrainByEtl()
 
+    if (!data.cleanHeader || !data.rawHeader || !data.dataHeader) {
+      const api = await socketStore.ready()
+      const { header } = await api.getHeader({ index: data.originalIndex })
+      data.cleanHeader = header
+      data.rawHeader = header
+      data.dataHeader = header
+    }
+
     const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, data, {
       mainStep: 2,
       curStep: 2,
