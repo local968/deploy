@@ -210,7 +210,7 @@ export default class Project {
 
   @computed
   get totalLines() {
-    return this.totalRawLines - this.totalFixedLines
+    return this.totalRawLines - this.deletedCount
   }
 
   fetchData = async path => {
@@ -1221,7 +1221,7 @@ export default class Project {
           settingName: setting.name,
           holdoutRate: 0.2
         };
-        if (this.totalRawLines > 10000) {
+        if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
         } else {
           trainData.nfold = 5
@@ -1331,7 +1331,7 @@ export default class Project {
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
         };
-        if (this.totalRawLines > 10000) {
+        if (this.runWith === 'holdout') {
           trainData.validationRate = this.validationRate / 100
         } else {
           trainData.nfold = this.crossCount

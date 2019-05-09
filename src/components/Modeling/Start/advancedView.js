@@ -181,7 +181,7 @@ export default class AdvancedView extends Component {
       holdoutRate: 20,
       randSeed: 0,
       measurement: project.changeProjectType === "Classification" ? "auc" : "r2",
-      runWith: project.totalRawLines > 10000 ? 'holdout' : 'cross',
+      runWith: project.totalLines > 10000 ? 'holdout' : 'cross',
       resampling: 'no',
       crossCount: Math.min((min - 1), 5),
       dataRange: 'all',
