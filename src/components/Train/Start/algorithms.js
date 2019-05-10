@@ -17,10 +17,6 @@ export default {
       label: 'SpectralClustering'
     },
     {
-      value: 'AP',
-      label: 'AffinityPropagation'
-    },
-    {
       value: 'Agg',
       label: 'AgglomerativeClustering'
     },

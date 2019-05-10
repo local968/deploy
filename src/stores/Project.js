@@ -279,7 +279,6 @@ export default class Project {
       'Agg',
       'SpectralClustering',
       'DBSCAN',
-      'AP',
       'MeanShift',
     ]) || (this.problemType === "Outlier" && [
       'IsolationForest',
@@ -1206,7 +1205,6 @@ export default class Project {
           'KMeans',
           'GMM',
           'Birch',
-          'AP',
           'MeanShift',
         ] : [
             'KMeans',
@@ -1215,7 +1213,6 @@ export default class Project {
             'Agg',
             'SpectralClustering',
             'DBSCAN',
-            'AP',
             'MeanShift',
           ]
         trainData = {
@@ -1339,7 +1336,7 @@ export default class Project {
     switch (problemType) {
       case 'Clustering':
         command = 'clustering.train';
-        const disableItems = [...(this.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift', 'AP'] : [])]
+        const disableItems = [...(this.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : [])]
 
         trainData = {
           k_type: this.kType,
