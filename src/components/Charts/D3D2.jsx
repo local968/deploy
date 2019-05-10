@@ -95,7 +95,9 @@ export default class D3D2 extends PureComponent {
 			});
 			data.filter(itm => itm.name === labels[index])[0].value.push(val);
 		});
-		if (z_name) {
+		
+		const names = [x_name, y_name, z_name].filter(itm=>itm);
+		if (names.length === 3) {
 			return <THREE
 				x_name={x_name}
 				y_name={y_name}
@@ -105,8 +107,8 @@ export default class D3D2 extends PureComponent {
 		}
 		
 		return <TSEN
-			x_name={x_name}
-			y_name={y_name}
+			x_name={names[0]}
+			y_name={names[1]}
 			data={data}/>
 	}
 	
