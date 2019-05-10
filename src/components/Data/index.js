@@ -8,21 +8,6 @@ import DataSchema from './Schema';
 import DataQuality from './Quality';
 import { autorun, observable } from 'mobx'
 
-import dataConnectActive from './data_prograss_a.svg';
-import dataSchemaActive from './data_schema_a.svg';
-import dataSchema from './data_schema.svg';
-import dataQualityActive from './data_quality_a.svg';
-import dataQuality from './data_quality_d.svg';
-import EN from '../../constant/en';
-
-const imgs = {
-  dataSchema: <img src={dataSchema} alt="schema" />,
-  dataQuality: <img src={dataQuality} alt="quality" />,
-  dataConnectActive: <img src={dataConnectActive} alt="connect" />,
-  dataSchemaActive: <img src={dataSchemaActive} alt="schema" />,
-  dataQualityActive: <img src={dataQualityActive} alt="quality" />
-}
-
 @inject('projectStore', 'routing')
 @observer
 export default class Data extends Component {
@@ -30,11 +15,6 @@ export default class Data extends Component {
 
   constructor(props) {
     super(props);
-    this.step = [
-      { label: EN.DataConnects, value: "dataConnect" },
-      { label: EN.DataSchemas, value: "dataSchema" },
-      { label: EN.DataQualitys, value: "dataQuality" }
-    ];
     this.sideRef = React.createRef();
   }
 
@@ -86,15 +66,13 @@ export default class Data extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { mainStep, lastSubStep, noCompute, subStepActive } = project;
-    const maxStep = noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep);
     return <div className={styles.data}>
       {!!project && <Switch>
         <Route exact path="/project/:id/data/connect" component={(props) => <DataConnect {...props} />} />
         <Route exact path="/project/:id/data/schema" component={(props) => <DataSchema {...props} />} />
         <Route exact path="/project/:id/data/quality" component={(props) => <DataQuality {...props} />} />
       </Switch>}
-      <ProjectSide enter={this.enter} list={this.step} step={maxStep} imgs={imgs} current={subStepActive} ref={this.sideRef} />
+      <ProjectSide enter={this.enter} project={project} keyword='data' ref={this.sideRef} />
     </div>
   }
 }

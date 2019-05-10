@@ -19,8 +19,8 @@ export default class DataQuality extends Component {
   }
 
   render() {
-    const { project } = this.props.projectStore;
-    return this.step !== 1 ? <VariableIssue project={project} changeTab={this.changeTab.bind(null, 1)} /> : <TargetIssue project={project} changeTab={this.changeTab.bind(null, 2)} />
+    // const { project } = this.props.projectStore;
+    return this.step !== 1 ? <VariableIssue project={this.props.projectStore.project} changeTab={this.changeTab.bind(null, 1)} /> : <TargetIssue project={this.props.projectStore.project} changeTab={this.changeTab.bind(null, 2)} />
   }
 }
 
@@ -459,7 +459,7 @@ class Summary extends Component {
 
   startTrain = () => {
     const { project } = this.props
-    project.updateProject(project.nextMainStep(3))
+    project.updateProject({ ...project.nextMainStep(3), runWith: project.totalLines < 10000 ? 'cross' : 'holdout' })
   }
 
   renderD3 = () => {

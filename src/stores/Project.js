@@ -304,7 +304,7 @@ export default class Project {
       // maxTime: 10,
       randSeed: 0,
       resampling: 'no',
-      runWith: (this.totalLines > 0 && this.totalLines < 10000) ? 'cross' : 'holdout',
+      runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
       crossCount: 5,
       dataRange: 'all',
       customField: '',

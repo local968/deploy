@@ -8,10 +8,6 @@ import Loading from './Loading';
 import ModelError from './Error';
 import ModelResult from './Result';
 import { ProjectSide } from 'components/Common';
-import modelSelectionIcon from './model_selection_d.svg';
-import startModelingActiveIcon from './start_modeling_a.svg';
-import modelSelectionActiveIcon from './model_selection_a.svg';
-import EN from '../../constant/en';
 // import r2Loading from './R2 LearnLoading2.gif';
 // import { when } from 'mobx';
 
@@ -19,12 +15,6 @@ import EN from '../../constant/en';
 //     defualt: 'defualt',
 //     costBased: 'costBased'
 // }
-const imgs = {
-  modelSelection: <img src={modelSelectionIcon} alt="selection" />,
-  startModelingActive: <img src={startModelingActiveIcon} alt="start" />,
-  modelSelectionActive: <img src={modelSelectionActiveIcon} alt="selection" />
-};
-
 @inject('projectStore', 'routing')
 @observer
 export default class Modeling extends Component {
@@ -43,10 +33,6 @@ export default class Modeling extends Component {
 
   constructor(props) {
     super(props);
-    this.step = [
-      { label: EN.StartModeling, value: 'startModeling' },
-      { label: EN.ModelSelection, value: 'modelSelection' }
-    ];
     this.sideRef = React.createRef();
   }
 
@@ -120,10 +106,8 @@ export default class Modeling extends Component {
         </Switch>}
         {project && <ProjectSide
           enter={this.enter}
-          list={this.step}
-          step={project.lastSubStep}
-          current={project.subStepActive}
-          imgs={imgs}
+          project={project}
+          keyword='modeling'
           ref={this.sideRef}
         />}
       </div>
