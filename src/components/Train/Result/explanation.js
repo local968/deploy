@@ -6,8 +6,8 @@ const Explanation = (props) => {
   const { model } = props;
   const { labelWithImportance } = model
   const tableData = React.useMemo(() => {
-    const fields = [{ content: <span title={'Cluster'}>Cluster</span>, cn: classes.explanationCell }]
-    const values = [{ content: <span title={'Important Variables'}>Important Variables</span>, cn: classes.explanationCell }]
+    const fields = [{ content: <span title={'Cluster'}>{EN.Cluster}</span>, cn: classes.explanationCell }]
+    const values = [{ content: <span title={'Important Variables'}>{EN.ImportantVariables}</span>, cn: classes.explanationCell }]
     Object.entries(labelWithImportance).map(([k, v]) => {
       fields.push({ content: <span title={k}>{k}</span>, cn: classes.explanationCell })
       values.push({ content: <span title={v.join(',')}>{v.join(',')}</span>, cn: classes.explanationCell })

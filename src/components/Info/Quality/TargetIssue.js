@@ -138,12 +138,13 @@ export class FixIssue extends Component {
   render() {
     const { closeFixes, project, nullCount, mismatchCount, outlierCount } = this.props;
     const { dataHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
+    console.log(project)
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
+              <div className={classnames(styles.typeBlock, styles.mismatch)}/>
               <span>{EN.DataTypeMismatch}</span>
             </div>
           </div>
@@ -218,7 +219,7 @@ export class FixIssue extends Component {
         {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.missing)}></div>
+              <div className={classnames(styles.typeBlock, styles.missing)}/>
               <span>{EN.MissingValue}</span>
             </div>
           </div>
@@ -298,7 +299,7 @@ export class FixIssue extends Component {
         {!!outlierCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.outlier)}></div>
+              <div className={classnames(styles.typeBlock, styles.outlier)}/>
               <span>{EN.Outlier}</span>
             </div>
           </div>
@@ -374,7 +375,7 @@ export class FixIssue extends Component {
       <div className={styles.fixesBottom}>
         <button className={styles.save} onClick={this.save} ><span>{EN.Save}</span></button>
         <button className={styles.cancel} onClick={closeFixes}><span>{EN.CANCEL}</span></button>
-      </div>
+      </div>123
       {
         this.visible && <Modal
           closeByMask={true}
@@ -386,25 +387,11 @@ export class FixIssue extends Component {
             <OutlierRange
               closeEdit={this.closeEdit}
               saveEdit={this.saveEdit}
-              message={this.outLier[this.editKey]}
+              field={this.editKey}
+              id={project.etlIndex}
+              project = {project}
             />
           } />}
-      {/*{this.editKey && <Modal content={<EditOutLier width={800}*/}
-      {/*  height={400} saveEdit={this.saveEdit}*/}
-      {/*  closeEdit={this.closeEdit}*/}
-      {/*  outlierRange={project.outlierRange[this.editKey]}*/}
-      {/*  outlierDict={project.outlierDictTemp[this.editKey]}*/}
-      {/*  x={project.numberBins[this.editKey][1]}*/}
-      {/*  y={project.numberBins[this.editKey][0]}*/}
-      {/*  minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}*/}
-      {/*  maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}*/}
-      {/*  visible={this.visible}*/}
-      {/*  width='12em'*/}
-      {/*  title={EN.Outlier}*/}
-      {/*  onClose={this.closeEdit}*/}
-      {/*  closeByMask={true}*/}
-      {/*  showClose={true}*/}
-      {/*/>}*/}
     </div>
   }
 }

@@ -57,7 +57,6 @@ export default class Iso extends PureComponent{
         });
 
         const {feature1Range:xRange=[],feature2Range:yRange=[],background:value=[],dotScore:dot=[]} = result;
-        console.log(dot)
         this.setState({
             xRange,
             yRange,
@@ -133,7 +132,7 @@ export default class Iso extends PureComponent{
         }else{
             data1 = dot.map(itm=>[itm[0],itm[1]]);
         }
-
+        
         data1.unshift([-100,-1,0]);
         data2.unshift([-100,-1,0]);
 
@@ -146,6 +145,7 @@ export default class Iso extends PureComponent{
             name:'正常',
             animation:true,
             silent:true,
+            z:3,
         },{
             type:'scatter',
             data:data2,
@@ -153,7 +153,9 @@ export default class Iso extends PureComponent{
             visualMap:false,
             symbolSize:5,
             name:'异常',
-            animation:false,
+            animation:true,
+            silent:true,
+            z:3,
         });
 
         return {

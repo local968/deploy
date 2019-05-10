@@ -80,25 +80,25 @@ function ModelResult(props) {
           {problemType === 'Outlier' && <div className={classes.scores}>
             <div className={classes.score}>
               <div className={classes.orange}>{formatNumber(selectModel.score.score)}</div>
-              <span className={classes.label}>{EN.Score} <Hint content='123321' /></span>
+              <span className={classes.label}>{EN.Score} <Hint content={EN.ScoreHint} /></span>
             </div>
             <div className={classes.rate}>
               <div className={classes.blood}>{formatNumber(selectModel.dataFlow[0].contamination || 0)}</div>
-              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.ContaminationRate} <Hint content='123321' /></span>
+              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.ContaminationRate} <Hint content={EN.ContaminationRateHint} /></span>
             </div>
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
             <div className={classes.cvnn}>
               <div className={classes.orange}>{formatNumber(selectModel.score.CVNN)}</div>
-              <span className={classes.label}>CVNN <Hint content='123321' /></span>
+              <span className={classes.label}>CVNN <Hint content={EN.CVNNHint} /></span>
             </div>
             <div className={classes.cluster}>
               <div className={classes.blood}>{Object.keys(selectModel.labelWithImportance).length}</div>
-              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.TheNumberofClusters} <Hint content='123321' /></span>
+              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.TheNumberofClusters} <Hint content={EN.TheNumberofClustersHint} /></span>
             </div>
             <div className={classes.rSquared}>
               <div className={classes.green}>{formatNumber(selectModel.score.RSquared)}</div>
-              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>R squared <Hint content='123321' /></span>
+              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>R squared <Hint content={EN.squaredHint} /></span>
             </div>
           </div>}
           {!!list.length && <div className={classes.dict}>
@@ -277,19 +277,19 @@ const ClusteringTable = observer((props) => {
           <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cvnn')}>CVNN {sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
+          <span onClick={() => handleSort('cvnn')}>CVNN {sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('sihouette')}>{EN.SihouetteScore} {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
+          <span onClick={() => handleSort('sihouette')}>{EN.SihouetteScore} {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('ch')}>CH Index {sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
+          <span onClick={() => handleSort('ch')}>CH Index {sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CHIndexHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('rsquared')}>R squared {sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
+          <span onClick={() => handleSort('rsquared')}>R squared {sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cluster')}>#clusters {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content='123321' /></span>
+          <span onClick={() => handleSort('cluster')}>{EN.clusters} {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.clustersHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>

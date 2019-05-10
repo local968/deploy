@@ -1059,7 +1059,7 @@ const EN_LAN = {
   SetMaxTrainingTime: 'Set Max Training Time',
   Maxamountoftimetoevaluatedifferentmodules: 'Max amount of time to evaluate different modules.',
   Minutes: 'Minutes',
-  minutesorlonger: '10 minutes or longer',
+  minutesorlonger: '5 minutes or longer',
   NoMoreThan:'No More Than',
   Auto:'Auto',
   SimpleView:'Simple View',
@@ -1087,6 +1087,21 @@ const EN_LAN = {
   Choose2or3Variables:'Choose 2 or 3 Variables',
   Result:'Result',
   Ss:'s',
+  ScoreHint:'ScoreHint',
+  ContaminationRateHint:'ContaminationRateHint',
+  CVNNHint:'CVNNHint',
+  TheNumberofClustersHint:'TheNumberofClustersHint',
+  squaredHint:'squaredHint',
+  SihouetteScoreHint:'SihouetteScoreHint',
+  CHIndexHint:'CHIndexHint',
+  clustersHint:'clustersHint',
+  RMSSTDHint:'RMSSTDHint',
+  clusters:'#clusters',
+  ImportantVariables:'Important Variables',
+  Cluster:'Cluster',
+  ClusteringHint:'To group a set of objects in such a way that objects in the same cluster are more similar to each other than to those in other clusters. (e.g. customer segmentation)',
+  OutlierDetectionHint:'To identify rare events which raise suspicions by differing significantly from the majority of the data. (e.g. Credit Card Fraud Detection)',
+
 };
 
 

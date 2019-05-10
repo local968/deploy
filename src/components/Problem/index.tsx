@@ -15,8 +15,8 @@ const selectable = [
 ];
 
 const Unsupervised = [
-  { value: 'Clustering', type:  EN.Clustering, detail: null },
-  { value: 'Outlier', type:  EN.OutlierDetection, detail: null }
+  { value: 'Clustering', type:  EN.Clustering, detail: EN.ClusteringHint },
+  { value: 'Outlier', type:  EN.OutlierDetection, detail: EN.OutlierDetectionHint }
 ];
 
 interface ProblemProps {

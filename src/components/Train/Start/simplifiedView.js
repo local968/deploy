@@ -259,7 +259,7 @@ class SimplifiedViewRow extends Component {
         }).then((result) => this.showback(value, result.data));
       } else {
         const { uniqueValues } = project.dataViews[value];
-        data.size = uniqueValues;
+        data.size = uniqueValues>8?8:uniqueValues;
         request.post({
           url: '/graphics/histogram-categorical',
           data,

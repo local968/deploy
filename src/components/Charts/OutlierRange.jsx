@@ -39,7 +39,7 @@ export default class OutlierRange extends PureComponent{
 		request.post({
 			url: '/graphics/outlier-range',
 			data: {
-				field,
+				field:field+'.double',
 				id,
 				interval,
 			},

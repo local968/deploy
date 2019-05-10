@@ -125,7 +125,7 @@ export default class AdvancedView extends Component {
 }
 
 const questMarks = {
-  'CVNN': "", 'RSquared': "", 'RMSSTD': "", 'CH': "", 'silhouette_cosine': "", 'silhouette_euclidean': ""
+  'CVNN': EN.CVNNHint, 'RSquared': EN.squaredHint, 'RMSSTD':EN.RMSSTDHint, 'CH': "", 'silhouette_cosine': "", 'silhouette_euclidean': ""
 }
 
 @observer
@@ -138,7 +138,7 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: { selectModel }, sort, handleSort } = this.props;
-    const texts = ['Model Name', 'Time', 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
+    const texts = ['Model Name', 'Time', 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette1 Cosine', 'Silhouette Euclidean'];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''

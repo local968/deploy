@@ -923,9 +923,9 @@ const EN: any = {
   Charts:'图表',
   VariableImpactnotavailableforthisalgorithm:'该算法不支持计算变量重要性',
   SetMaxTrainingTime:'设置最长训练时间',
-  Maxamountoftimetoevaluatedifferentmodules:'模型优化搜索时间',
+  Maxamountoftimetoevaluatedifferentmodules:'单个模型估计搜索时间',
   Minutes:'分钟',
-  minutesorlonger: '10分钟或更长时间',
+  minutesorlonger: '5分钟或更长时间',
   NoMoreThan:'不超过',
   Auto:'自动',
   SimpleView:'简单视图',
@@ -953,7 +953,20 @@ const EN: any = {
   Choose2or3Variables:'请选择两个或三个变量',
   Result:'结果',
   Ss:'',
-
+  ScoreHint:'ScoreHint',
+  ContaminationRateHint:'ContaminationRateHint',
+  CVNNHint:'CVNNHint',
+  TheNumberofClustersHint:'TheNumberofClustersHint',
+  squaredHint:'squaredHint',
+  SihouetteScoreHint:'SihouetteScoreHint',
+  CHIndexHint:'CHIndexHint',
+  clustersHint:'clustersHint',
+  RMSSTDHint:'RMSSTDHint',
+  clusters:'聚类类别',
+  ImportantVariables:'重要变量',
+  Cluster:'聚类类别',
+  ClusteringHint:'对样本进行分类，把更为相似归为同一类。（例如：客户分群与画像）',
+  OutlierDetectionHint:'识别与其他样本差异过大的低频、可疑样本。（例如：信用卡欺诈行为侦测）',
 
 };
 
