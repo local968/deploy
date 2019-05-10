@@ -140,13 +140,16 @@ wss.register('newEtl', async (message, socket, process) => {
 
   for (let key in stats) {
     const mismatch = project.mismatchFillMethod[key]
+    const value = project.colType[key] === 'Numerical' ? project.rawDataView[key].mean : project.rawDataView[key].mode
     if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
     else if ((mismatch || mismatch === 0) && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
+    else stats[key].mismatchFillMethod = { type: 'replace', value }
 
     const missingValue = project.nullFillMethod[key]
     if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
     else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
     else if ((missingValue || missingValue === 0) && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
+    else stats[key].mismatchFillMethod = { type: 'replace', value }
 
     const outlier = project.outlierFillMethod[key]
     if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
