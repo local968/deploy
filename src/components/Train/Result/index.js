@@ -94,7 +94,7 @@ function ModelResult(props) {
             </div>
             <div className={classes.cluster}>
               <div className={classes.blood}>{Object.keys(selectModel.labelWithImportance).length}</div>
-              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.TheNumberofClusters} <Hint content={EN.TheNumberofClustersHint} /></span>
+              <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.TheNumberofClusters}</span>
             </div>
             <div className={classes.rSquared}>
               <div className={classes.green}>{formatNumber(selectModel.score.RSquared)}</div>
@@ -289,7 +289,7 @@ const ClusteringTable = observer((props) => {
           <span onClick={() => handleSort('rsquared')}>R squared {sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cluster')}>{EN.clusters} {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.clustersHint} /></span>
+          <span onClick={() => handleSort('cluster')}>{EN.clusters} {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>
@@ -298,7 +298,8 @@ const ClusteringTable = observer((props) => {
           <span>{EN.ModelProcessFlow}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.Explaination}</span>
+          <span>{EN.Explaination}<Hint content={EN.ExplainationHint} /></span>
+
         </div>
       </div>
     </div>
