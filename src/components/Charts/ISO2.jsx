@@ -57,6 +57,7 @@ export default class Iso extends PureComponent{
         });
 
         const {feature1Range:xRange=[],feature2Range:yRange=[],background:value=[],dotScore:dot=[]} = result;
+        console.log(dot)
         this.setState({
             xRange,
             yRange,

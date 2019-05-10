@@ -1,6 +1,7 @@
 .d3d2{
     display: flex;
-    /*margin-right: 100px;*/
+    border:1px solid rgba(196,203,215,1);
+    margin-bottom: 20px;
 }
 
 .d3d2 dl {
@@ -15,7 +16,19 @@
     margin-bottom: 0;
     flex: 0 0 180px;
     justify-content: center;
-    border-right: 1px solid;
+    border-right:1px solid rgba(196,203,215,1);
+}
+
+.d3d2 dt {
+    padding-bottom: 10px;
+}
+
+.d3d2 svg{
+    font-size: 8px;
+}
+
+.d3d2 dd {
+    padding-bottom: 13px;
 }
 
 .d3d2 >div{
