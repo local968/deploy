@@ -199,7 +199,7 @@ class AdvancedView extends Component {
       const { project } = this.props;
       const { selectModel: current } = project;
       if (project.problemType === 'Classification') {
-        return current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : ''
+        return current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && EN.OK) || EN.NotSatisfied : ''
       } else {
         return current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : ''
       }
