@@ -1126,6 +1126,28 @@ wss.register("permutationImportance", (message, socket) => {
     }, true))
 })
 
+wss.register('outlierPlot', (message, socket) => {
+  const { userId } = socket.session
+  const { projectId, id: mid, command: commandText, _id: requestId, featureList, randomSeed } = message
+
+  return updateModel(userId, projectId, mid, { outlierPlotLoading: true })
+    .then(() => command({
+      command: commandText,
+      projectId,
+      solution: mid,
+      userId,
+      requestId,
+      featureList,
+      randomSeed
+    }, progressValue => {
+      const { result, status } = progressValue
+      if (status < 0 || status === 100) return progressValue
+      const { name, model, featureImportance } = result
+      if (name === 'progress') return
+      if (model === mid) return updateModel(userId, projectId, mid, { featureImportance, importanceLoading: false })
+    }, true))
+})
+
 function mapObjectToArray(obj) {
   const arr = [];
   Object.entries(obj).forEach(([k, v]) => {

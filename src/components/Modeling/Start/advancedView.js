@@ -105,6 +105,7 @@ export default class AdvancedView extends Component {
       return
     }
     this.props.project.algorithms = Algorithms[problemType].map(v => v.value)
+    this.props.project.version = [1, 2]
     // if (problemType === "Classification") {
     //   this.props.project.algorithms = Classification
     //   return
@@ -441,7 +442,7 @@ export default class AdvancedView extends Component {
               {runWith === "holdout" ? <div className={styles.advancedPercentBox}>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
-                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)}/>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentTrain)} />
                     <span>{EN.Training}</span>
                   </div>
                   {/* <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} /> */}
@@ -449,7 +450,7 @@ export default class AdvancedView extends Component {
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
-                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)}/>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentValidation)} />
                     <span>{EN.Validation}</span>
                   </div>
                   {/* <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} /> */}

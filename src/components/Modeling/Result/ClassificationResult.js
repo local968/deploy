@@ -18,16 +18,18 @@ const AccuracyHint = EN.Givenaparticularpopulation
 export default class ClassificationView extends Component {
   @observable showCost = false
   @observable costOption = { ...this.props.project.costOption }
+  @observable showTip = false;
+  @observable distribution = this.props.project.distribution || ''
+  totalLines = this.props.project.totalLines;
 
   onChange = e => {
-    const criteria = e.target.value
-    this.showCost = criteria === 'cost'
-    const data = { criteria }
+    const criteria = e.target.value;
+    this.showCost = criteria === 'cost';
+    this.showTip = false;
+    const data = { criteria };
     if (!this.showCost) {
-      const { models } = this.props
-      data.selectId = ''
-      // this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
-      // data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+      const { models } = this.props;
+      data.selectId = '';
       models.forEach(m => {
         if (!m.initialFitIndex) return
         m.updateModel({ fitIndex: m.initialFitIndex })
@@ -35,59 +37,122 @@ export default class ClassificationView extends Component {
     } else {
       this.handleSubmit()
     }
-    this.props.project.updateProject(data)
-  }
+    this.props.project.updateProject(data);
+  };
 
   onSelect = model => {
     this.props.project.setSelectModel(model.id)
   };
 
   onHide = () => {
-    this.showCost = false
-  }
+    this.showCost = false;
+    this.showTip = false;
+  };
 
-  costInput = (row, col) => {
-    const isCost = row !== col
-    const field = (row === col ? "T" : "F") + (col === 1 ? "P" : "N")
+  costInput = (row, col, defaultValue = false) => {
+    const field = (row === col ? "T" : "F") + (col === 1 ? "P" : "N");
+    const { project = {} } = this.props;
+    const target = project.targetArray.length ? project.targetArray : Object.keys(project.targetColMap);
+    let targetArray = defaultValue ? ['no', 'yes'] : target;
+    let event = targetArray[row];
+    if (project.renameVariable && project.renameVariable[event]) {
+      event = project.renameVariable[event]
+    }
+    const correct = col === row ? EN.correctly : EN.incorrectly;
+    const bool = row === col ? EN.True : EN.False;
+    const posNeg = col === 1 ? EN.Positive : EN.Negative;
     return <div className={styles.costTd}>
-      <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}></div>
-      <div className={styles.costName}><span>{isCost ? EN.Cost : EN.Benefit}</span></div>
-      <div className={styles.costInput}><NumberInput value={this.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
+      <div className={styles.newCostTitle}>
+        <p>{EN.Predict} {`<${event}>`} {correct}</p>
+        <p>({bool}{posNeg},{field})</p>
+      </div>
+      <div className={styles.costInput}><NumberInput disabled={defaultValue} value={defaultValue || this.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0.00} max={1000000000.00} isInt={false} digits={2} cut={true} /></div>
       <div className={styles.costUnits}><span>{EN.Units}</span></div>
-    </div>
-  }
-
+    </div>;
+  };
   handleChange = (field, value) => {
     this.costOption[field] = value
+  };
+
+  handleChangeEvent = value => {
+    this.distribution = value
+    // const { project, models } = this.props;
+    // const { targetCounts, distribution } = project
+    // if (distribution === value) return
+    // const { TP, FN, FP, TN } = this.costOption;
+    // const [v0, v1] = Object.values(targetCounts)
+    // const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+    // const percentNew = distribution ? distribution / 100 : percent0
+    // models.forEach(m => {
+    //   const benefit = m.getBenefit(TP, FN, FP, TN, percentNew, percent0)
+    //   if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
+    // })
+    // project.updateProject({ distribution: value })
   }
 
   handleSubmit = () => {
-    const { models, project } = this.props
-    const { TP, FN, FP, TN } = this.costOption
+    const { models, project } = this.props;
+    const { targetCounts } = project
+    const { TP, FN, FP, TN } = this.costOption;
+    const [v0, v1] = Object.values(targetCounts)
+    const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+    const percentNew = typeof this.distribution === 'number' ? this.distribution / 100 : percent0
     models.forEach(m => {
-      const benefit = m.getBenefit(TP, FN, FP, TN)
+      const benefit = m.getBenefit(TP, FN, FP, TN, percentNew, percent0)
       if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
     })
-    project.updateProject({ costOption: { ...this.costOption }, selectId: '' })
+    project.updateProject({ costOption: { ...this.costOption }, selectId: '', distribution: this.distribution })
+  }
+
+  reset = () => {
+    const { models, project } = this.props;
+    const { targetCounts } = project
+    const [v0, v1] = Object.values(targetCounts)
+    const percent = parseInt(v1 / (v0 + v1) * 10000, 0)
+    this.distribution = percent / 100
+    this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+    models.forEach(m => {
+      if (!m.initialFitIndex) return
+      m.updateModel({ fitIndex: m.initialFitIndex })
+    })
+    project.updateProject({ costOption: this.costOption, selectId: '', distribution: percent / 100 })
   }
 
   render() {
-    const { models, project, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort } = project;
-    if (!current) return null
-    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && EN.OK) || EN.NotSatisfied : ''
-    const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp
-    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1]
+    const { models, project = {}, exportReport, sort, handleSort } = this.props;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution } = project;
+    if (!current) return null;
+
+    const { selectModel = {}, targetCounts = {} } = project;
+
+    const { fitIndex = 1, chartData = {} } = selectModel;
+    const { roc = {} } = chartData;
+
+    const Threshold = roc.Threshold && roc.Threshold[fitIndex] || -1;
+
+    const tc = Object.values(targetCounts);
+    // const event = (tc[1] / (tc[0] + tc[1]) * 100).toFixed(3);
+    const event = parseInt(tc[1] / (tc[0] + tc[1]) * 10000, 0)
+    const target = project.targetArray.length ? project.targetArray : Object.keys(project.targetColMap);
+
+    let events = target[1];
+
+    let _target = project.renameVariable[events];
+    if (_target) {
+      events = _target;
+    }
+
+    const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && "OK") || "NotSatisfied" : '';
+    const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp;
+    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
+    const curBenefit = current.getBenefit(TP, FN, FP, TN, typeof distribution === 'number' ? (distribution / 100) : (event / 10000), event / 10000)
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
           <div className={styles.title}>
             <span>{EN.RecommendedAModel}</span>
           </div>
-          {/* <div className={styles.text}>
-            <span>You can also tell us your business needs to get a more precise recommendation.</span>
-          </div> */}
           <div className={styles.row}>
             <span>{EN.ModelingResult} :{' '}</span>
             <div className={styles.status}>&nbsp;&nbsp;{currentPerformance}</div>
@@ -117,38 +182,151 @@ export default class ClassificationView extends Component {
           </div>
           {this.showCost && <div className={styles.costBlock}>
             <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
-            <div className={styles.costTitle}>
-              <span>{EN.Inputyourcostorbenefitofeveryredictionresult}</span>
-            </div>
-            <div className={styles.costContent}>
-              <span>{EN.NoteIfapredictionbringsyou}</span>
-            </div>
+            <section className={styles.newTitle}>
+              <label>{EN.Input}</label>
+              <dl>
+                <dt>
+                  <span>{EN.Basedonyourbizscenario}</span>
+                  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>
+                  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>
+                </dt>
+              </dl>
+              <dl style={{ margin: '0.1em 0' }}>
+                <dt>
+                  <div className={styles.eventInput}>
+                    <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
+                    <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} onBlur={this.handleChangeEvent} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
+                    <span style={{ marginLeft: '0.5em' }}>%</span>
+                    <span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>
+                  </div>
+                </dt>
+                <div className={styles.eventButton}>
+                  <a
+                    className={styles.myButton}
+                    href="javascript:;" onClick={() => {
+                      this.showTip = true;
+                    }
+                    }>{EN.Tips}</a>
+                </div>
+              </dl>
+            </section>
             <div className={styles.costBox}>
               <div className={styles.costTable}>
                 <div className={styles.costRow}>
-                  <HeaderInfo row={EN.Predicted} col={EN.Actual} />
-                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={yes}>{yes}</span></div>
-                  <div className={classnames(styles.costCell, styles.costCellCenter)}><span title={no}>{no}</span></div>
-                </div>
-                <div className={styles.costRow}>
-                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span title={yes}>{yes}</span></div>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost1)} />
+                    <span>{EN.Benefit}</span>
+                  </div>
                   <div className={styles.costCell}>{this.costInput(1, 1)}</div>
-                  <div className={styles.costCell}>{this.costInput(1, 0)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 0)}</div>
                 </div>
                 <div className={styles.costRow}>
-                  <div className={classnames(styles.costCell, styles.costCellSmall)}><span title={no}>{no}</span></div>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost2)} />
+                    <span>{EN.Cost}</span>
+                  </div>
+                  <div className={styles.costCell}>{this.costInput(1, 0)}</div>
                   <div className={styles.costCell}>{this.costInput(0, 1)}</div>
-                  <div className={styles.costCell}>{this.costInput(0, 0)}</div>
                 </div>
               </div>
             </div>
             {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
-              {/* <div className={styles.costText}><span>The best benefit score based on 3616 row samples size:</span></div> */}
-              <div className={styles.costText}><span>{current.getBenefit(TP, FN, FP, TN).text}</span></div>
+              <div><span className={styles.newStext}><b>{EN.Resultbasedonthedataset}{`<${typeof distribution === 'number' ? distribution : (event / 100)}%>`}{EN.Events}</b></span></div>
+              <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoptimalthreshold}{`<${formatNumber(Threshold, 3)}>`}</span></div>
+              <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoverallbenefit}{`<${curBenefit.benefit > Math.pow(10, 7) ? curBenefit.benefit.toPrecision(3) : formatNumber(curBenefit.benefit, 2)}>`}</span></div>
+              {/* <div className={styles.costText}><span>{curBenefit.text}</span></div> */}
             </div>}
             <div className={styles.costButton}>
               <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>
             </div>
+          </div>}
+          {this.showTip && <div className={styles.costBlock}>
+            <a href="javascript:;"
+              style={{
+                marginBottom: 5,
+              }}
+              onClick={() => {
+                this.showTip = false;
+              }}
+              className={styles.myButton}
+            >{EN.Return}</a>
+            <section className={styles.newTitle}>
+              <label>Input:</label>
+              <dl>
+                <dt>
+                  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Boththebenefitandcost}</span></span>
+                  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Eventdistributioninputranges}</span></span>
+                  <span style={{ color: '#f5a623', fontStyle: 'italic' }}>{EN.NoteAllinputsentered}</span>
+                </dt>
+              </dl>
+              <label>{EN.BenefitCost}</label>
+              <dl>
+                <dt>
+                  <span>{EN.Benefitcostiscalculated}</span>
+                  <span><span style={{ display: 'block' }}>(r<sub>modified</sub>/r<sub>0</sub>)*({EN.Benefits}*TP–{EN.Costs}*FN)+(1-r<sub>modified</sub> /1-r<sub>0</sub>)*({EN.Benefits}*TN–{EN.Costs}*FP);</span></span>
+                  <span>{EN.TPTruePositiveTNTrueNegative}</span>
+                </dt>
+              </dl>
+              <label>{EN.EventDistribution}</label>
+              <dl>
+                <dt>
+                  <span>{EN.Eventdistributionistheproportion}r<sub>0</sub>{EN.Isthedefaulteventdistribution}r<sub>modified</sub>{EN.Istheuserprovideddistribution}</span>
+                </dt>
+              </dl>
+              <label>{EN.Example}</label>
+              <dl>
+                <dt>
+                  <span>{EN.Inthisloandefaultexample}</span>
+                </dt>
+              </dl>
+              <ul>
+                <li>{EN.Acorrectpredictionof}</li>
+                <li>{EN.Acorrectpredictionofnondefault}</li>
+                <li>{EN.Anincorrectpredictionofthedefault}</li>
+                <li>{EN.Andanincorrectpredictionofthenondefault}</li>
+                <li>{EN.Thedistributionof}</li>
+              </ul>
+              <p>{EN.Youcaninputthisinformationinto}</p>
+            </section>
+            <section className={styles.newTitle}>
+              <dl style={{ margin: '0.1em 0' }}>
+                <dt>
+                  <div className={styles.eventInput}>
+                    <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
+                    <input value={20} onChange={null} />
+                    <span style={{ marginLeft: '0.5em' }}>%</span>
+                  </div>
+                </dt>
+              </dl>
+            </section>
+            <div className={styles.costBox}>
+              <div className={styles.costTable}>
+                <div className={styles.costRow}>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost1)} />
+                    <span>{EN.Benefit}</span>
+                  </div>
+                  <div className={styles.costCell}>{this.costInput(1, 1, 200)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 0, 100)}</div>
+                </div>
+                <div className={styles.costRow}>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost2)} />
+                    <span>{EN.Cost}</span>
+                  </div>
+                  <div className={styles.costCell}>{this.costInput(1, 0, 200)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 1, 100)}</div>
+                </div>
+              </div>
+            </div>
+            <p>{EN.R2Learnthenautomaticallyfinds}{EN.Thatmaximizethebenefit}</p>
+            <p>{EN.Currentbenefitcostequals}</p>
+            <p>(0.2/0.1)*(200*2000(TP) – 200*100(FN))+(0.8/0.9)*(100*10000(TN)-100*200(FP)) = 11631111.11</p>
+            {/*{!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>*/}
+            {/*<div><span className={styles.newStext}>Result based on the data set of {`<${this.totalLines}>`} records with a distribution of {`<${event.toFixed(3)}%>`} events.: </span></div>*/}
+            {/*<div><span className={styles.newStext}>The optimal threshold:{`<${current.accValidation.toFixed(3)}>`}</span></div>*/}
+            {/*<div className={styles.costText}><span>{current.getBenefit(TP, FN, FP, TN).text}</span></div>*/}
+            {/*</div>}*/}
           </div>}
         </div>
       </div>
@@ -355,17 +533,17 @@ class ModelTable extends Component {
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'auc')}>
               <span>{EN.PerformanceAUC}
-              {sort.key !== 'auc' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'auc' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'speed')}>
               <span>{EN.ExecutionSpeed}
-              {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'time')}>
               <span>{EN.Time}
-              {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>

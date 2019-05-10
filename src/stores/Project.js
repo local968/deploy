@@ -126,6 +126,7 @@ export default class Project {
   @observable criteria = 'defualt';
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
   @observable mappingKey = ''
+  @observable distribution = 0
 
   // Advanced Modeling Setting
   @observable settingId = '';
@@ -328,7 +329,8 @@ export default class Project {
       preImportance: {},
       mappingKey: '',
       newVariablePath: '',
-      newVariableViews: {}
+      newVariableViews: {},
+      distribution: 0
     }
   }
 
@@ -607,7 +609,8 @@ export default class Project {
     let isMissed = false;
     let isDuplicated = false;
     this.rawHeader.forEach((h, i) => {
-      if (!h.trim()) {
+      h = h.trim();
+      if (!h) {
         isMissed = true;
         return;
       }
@@ -1079,24 +1082,30 @@ export default class Project {
 
   @computed
   get recommendModel() {
-    const { costOption, criteria, models, problemType, defualtRecommendModel } = this
+    const { costOption, criteria, models, problemType, defualtRecommendModel, targetCounts, distribution } = this
+    const [v0, v1] = Object.values(targetCounts)
+    const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+    const percentNew = distribution ? distribution / 100 : percent0
     let model
     if (problemType === 'Classification') {
       const { TP, FN, FP, TN } = criteria === 'cost' ? costOption : { TP: 0, FN: 0, FP: 0, TN: 0 }
       if (TP || FN || FP || TN) {
-        for (let m of models) {
-          if (!model) {
-            model = m;
-            continue;
-          }
-          if (model.getBenefit(TP, FN, FP, TN).benefit < m.getBenefit(TP, FN, FP, TN).benefit) {
-            model = m;
+        if (!!defualtRecommendModel.length) {
+          for (let i = 0; i < Math.ceil(defualtRecommendModel.length * 0.3); i++) {
+            if (!model) {
+              model = defualtRecommendModel[i];
+              continue;
+            }
+            if (model.getBenefit(TP, FN, FP, TN, percentNew, percent0).benefit < defualtRecommendModel[i].getBenefit(TP, FN, FP, TN, percentNew, percent0).benefit) {
+              model = defualtRecommendModel[i];
+            }
           }
         }
       }
     }
-    model = model || defualtRecommendModel
-    return model
+    if (model) return model
+    if (!!defualtRecommendModel.length) return defualtRecommendModel[0]
+    return models[0]
   }
 
   // @computed
@@ -1153,32 +1162,35 @@ export default class Project {
   get defualtRecommendModel() {
     const { models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
-    const sort = (problemType === 'Classification' || problemType === 'Regression') && currentMeasurement.endsWith("se") ? -1 : 1
-    let recommend
-    models.forEach(m => {
-      const { score } = m
-      const { validateScore, holdoutScore } = score || {}
-      let validate, holdout
-      if (problemType === 'Classification') {
-        validate = measurement === 'auc' ? (validateScore || {}).auc : m[measurement + 'Validation']
-        holdout = measurement === 'auc' ? (holdoutScore || {}).auc : m[measurement + 'Holdout']
-      } else if (problemType === 'Regression') {
-        validate = (validateScore || {})[currentMeasurement]
-        holdout = (holdoutScore || {})[currentMeasurement]
-      } else if (problemType === 'Clustering') {
-        validate = score[measurement]
-        holdout = score[measurement]
-      } else if (problemType === 'Outlier') {
-        validate = score[measurement]
-        holdout = score[measurement]
-      }
-      if (!validate || !holdout) return
-      const value = validate + holdout
-      if (!recommend) return recommend = { id: m.id, value }
-      if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
-    })
-    if (!!recommend) return models.find(m => m.id === recommend.id)
-    return models[0]
+    const sort = currentMeasurement.endsWith("se") ? -1 : 1
+    return models
+      .map(m => {
+        const { score } = m
+        const { validateScore, holdoutScore } = score || {}
+        let validate, holdout
+        if (problemType === 'Classification') {
+          validate = measurement === 'auc' ? (validateScore || {}).auc : m[measurement + 'Validation']
+          holdout = measurement === 'auc' ? (holdoutScore || {}).auc : m[measurement + 'Holdout']
+        } else if (problemType === 'Regression') {
+          validate = (validateScore || {})[currentMeasurement]
+          holdout = (holdoutScore || {})[currentMeasurement]
+        } else if (problemType === 'Clustering') {
+          validate = score[measurement]
+          holdout = score[measurement]
+        } else if (problemType === 'Outlier') {
+          validate = score[measurement]
+          holdout = score[measurement]
+        }
+        if (!validate || !holdout) return
+        return { id: m.id, value: validate + holdout }
+        // const value = validate + holdout
+        // if (!recommend) return recommend = { id: m.id, value }
+        // if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
+      })
+      .sort((a, b) => (b.value - a.value) * sort)
+      .map(_m => models.find(m => m.id === _m.id))
+    // if (!!recommend) return models.find(m => m.id === recommend.id)
+    // return models[0]
   }
 
   @action
@@ -1514,10 +1526,20 @@ export default class Project {
     if (this.isAbort) return
     if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
     const model = new Model(this.id, { ...data, measurement: this.measurement })
+    if (!!this.models.length) {
+      const { problemType } = model
+      const key = problemType === 'Classification' ? 'auc' : 'r2'
+      const min = problemType === 'Classification' ? 0.5 : 0
+      const isBad = model.score.validateScore[key] < min
+      if (isBad) return
+    }
     this.models = [...this.models.filter(m => data.id !== m.id), model]
     if (data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
-      const { index } = model.getBenefit(TP, FP, FN, TN)
+      const [v0, v1] = Object.values(this.targetCounts)
+      const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+      const percentNew = this.distribution ? this.distribution / 100 : percent0
+      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
       if (index === model.fitIndex) return
       model.updateModel({ fitIndex: index })
     }
@@ -1534,7 +1556,10 @@ export default class Project {
     model.setProperty(data)
     if (data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
-      const { index } = model.getBenefit(TP, FP, FN, TN)
+      const [v0, v1] = Object.values(this.targetCounts)
+      const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+      const percentNew = this.distribution ? this.distribution / 100 : percent0
+      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
       if (index === model.fitIndex) return
       model.updateModel({ fitIndex: index })
     }

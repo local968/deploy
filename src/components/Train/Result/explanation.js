@@ -18,7 +18,7 @@ const Explanation = (props) => {
   return <div className={classes.explanation}>
     <Table
       columnWidth={200}
-      rowHeight={80}
+      rowHeight={60}
       columnCount={Object.keys(labelWithImportance).length + 1}
       rowCount={2}
       fixedColumnCount={1}

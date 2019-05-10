@@ -28,6 +28,8 @@ export default class Model {
   @observable outlierPlotData = ''
   @observable pointToShowData = ''
   @observable fitAndResidualPlotData = ''
+  @observable outlierPlotLoading = false
+  @observable featureList = []
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {
@@ -95,10 +97,10 @@ export default class Model {
     })
   }
 
-  getBenefit = (ITP, IFN, IFP, ITN) => {
-    const data = this.chartData || {}
-    const roc = data.roc || {}
-    const { TP, FN, FP, TN } = roc
+  getBenefit = (ITP, IFN, IFP, ITN, IPN, IPO) => {
+    const data = this.chartData || {};
+    const roc = data.roc || {};
+    const { TP, FN, FP, TN } = roc;
     if (!ITP && !IFN && !IFP && !ITN) return {
       benefit: 0,
       index: this.initialFitIndex
@@ -106,20 +108,21 @@ export default class Model {
     if (!TP && !FN && !FP && !TN) return {
       benefit: 0,
       index: this.initialFitIndex,
-      text: `${ITP} * ${0}(TP) - ${IFN} * ${0}(FN) - ${IFP} * ${0}(FP) + ${ITN} * ${0}(TN) = ${0}`
-    }
-    let maxIndex = this.fitIndex
+      text: `(${IPN}/${IPO})*(${ITP}*${0}(TP)-${IFN}*${0}(FN))+(${1 - IPN}/${1 - IPO})*(${ITN}*${0}(TN)-${IFP}*${0}(FP)) = ${0}`
+    };
+    let maxIndex = this.fitIndex;
     for (let i = 1; i < 100; i++) {
       const benefit = TP[i] * ITP - FN[i] * IFN - FP[i] * IFP + TN[i] * ITN
       const maxBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
       if (benefit > maxBenefit) maxIndex = i
     }
-    const realBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
+    const realBenefit = (IPN / IPO) * (TP[maxIndex] * ITP - FN[maxIndex] * IFN) + ((1 - IPN) / (1 - IPO)) * (TN[maxIndex] * ITN - FP[maxIndex] * IFP)
     // this.fitIndex = maxIndex
     return {
       benefit: realBenefit,
       index: maxIndex,
-      text: `${ITP} * ${TP[maxIndex]}(TP) - ${IFN} * ${FN[maxIndex]}(FN) - ${IFP} * ${FP[maxIndex]}(FP) + ${ITN} * ${TN[maxIndex]}(TN) = ${realBenefit}`
+      text: `(${IPN}/${IPO})*(${ITP}*${TP[maxIndex]}(TP)-${IFN}*${FN[maxIndex]}(FN))+(${1 - IPN}/${1 - IPO})*(${ITN}*${TN[maxIndex]}(TN)-${IFP}*${FP[maxIndex]}(FP)) = ${realBenefit}`
+      //`${ITP} * ${TP[maxIndex]}(TP) - ${IFN} * ${FN[maxIndex]}(FN) - ${IFP} * ${FP[maxIndex]}(FP) + ${ITN} * ${TN[maxIndex]}(TN) = ${realBenefit}`
     }
   }
   @computed
@@ -264,6 +267,27 @@ export default class Model {
         id: this.id
       }
       api.permutationImportance(command)
+    })
+  }
+  saveFeatureList = (featureList) => {
+    if (!Array.isArray(featureList) || featureList.length !== 2) return console.log('error featureList')
+    if (featureList[0] === this.featureList[0] && featureList[1] === this.featureList[1]) return console.log("same")
+    return this.updateModel({ featureList }).then(() => {
+      return this.outlierPlot()
+    })
+  }
+  outlierPlot = () => {
+    this.outlierPlotLoading = true
+    return socketStore.ready().then(api => {
+      let cmd = 'outlier.outlierPlot';
+      const command = {
+        command: cmd,
+        projectId: this.projectId,
+        id: this.id,
+        featureList: this.featureList,
+        randomSeed: 0
+      }
+      return api.outlierPlot(command)
     })
   }
   updateModel(data) {
