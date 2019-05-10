@@ -105,15 +105,17 @@ class AdvancedModel extends Component {
 
   modeling = () => {
     const { project, closeAdvanced } = this.props
-    const { advancedModeling, version, algorithms, dataHeader, newVariable, trainHeader, customHeader, target } = project
+    const { advancedModeling, algorithms, dataHeader, newVariable, trainHeader, customHeader, target, totalLines, kType } = project
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     if (hasNewOne) project.customHeader.push(checkedVariables)
-    const sortFn = (a, b) => a - b
-    if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
-    if (!project.version.length) return message.error(EN.Youneedtoselectatleast)
+    // const sortFn = (a, b) => a - b
+    // if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
+    const disableItems = problemType === 'Clustering' ? [...(totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : [])] : []
+    const trainAlgorithms = algorithms.filter(al => !disableItems.includes(al))
+    if (!trainAlgorithms.length) return message.error(EN.Youneedtoselectatleast)
     closeAdvanced()
     advancedModeling()
   }

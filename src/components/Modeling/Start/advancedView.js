@@ -387,6 +387,7 @@ export default class AdvancedView extends Component {
             </div>
             <div className={styles.advancedOption}>
               <Tooltip
+                getPopupContainer={el => el.parentElement}
                 title={<span className={styles.crossWarning}>
                   {EN.Performingcrossvalidation} <br />
                   {EN.Hencewerecommendchoosing}

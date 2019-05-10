@@ -1142,9 +1142,9 @@ wss.register('outlierPlot', (message, socket) => {
     }, progressValue => {
       const { result, status } = progressValue
       if (status < 0 || status === 100) return progressValue
-      const { name, model, featureImportance } = result
+      const { name, model } = result
       if (name === 'progress') return
-      if (model === mid) return updateModel(userId, projectId, mid, { featureImportance, importanceLoading: false })
+      // if (model === mid) return updateModel(userId, projectId, mid, { outlierPlotLoading: false })
     }, true))
 })
 
