@@ -1531,8 +1531,10 @@ export default class Project {
     if (!!this.models.length) {
       const { problemType } = model
       const key = problemType === 'Classification' ? 'auc' : 'r2'
-      const min = problemType === 'Classification' ? 0.5 : 0
-      const isBad = model.score.validateScore[key] < min
+      const min = problemType === 'Classification' ? 0.5 : 0;
+      const {validateScore} = model.score;
+      if(!validateScore)return;
+      const isBad = validateScore[key] < min
       if (isBad) return
     }
     this.models = [...this.models.filter(m => data.id !== m.id), model]
