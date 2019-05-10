@@ -630,7 +630,6 @@ export default class Project {
 
   @action
   endSchema = async () => {
-    // this.etling = true
     await this.abortTrainByEtl()
     const data = {
       target: this.target,
@@ -643,6 +642,7 @@ export default class Project {
       outlierFillMethodTemp: this.outlierFillMethodTemp,
     }
     if (this.noComputeTemp) {
+      this.etling = true
       if (this.problemType === 'Classification') {
         const min = Math.min(...Object.values(this.targetCounts))
         if (min < 3) {
@@ -659,6 +659,7 @@ export default class Project {
         subStepActive: 1,
         lastSubStep: 1
       })
+      this.etling = false
     } else {
       const step = {
         curStep: 2,
@@ -737,6 +738,7 @@ export default class Project {
     await this.updateProject(data)
     // await this.etl()
     await this.newEtl()
+    this.etling = false
   }
 
   newEtl = async () => {
