@@ -24,8 +24,13 @@ export default class D3D2 extends PureComponent {
 		}
 	}
 	
-	async componentDidMount() {
-		const { url } = this.props;
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.url !== this.props.url){
+			return this.componentDidMount(nextProps.url);
+		}
+	}
+	
+	async componentDidMount(url=this.props.url) {
 		const result = await request.post({
 			url: '/graphics/residual-plot-diagnosis',
 			data: {
