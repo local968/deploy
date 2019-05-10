@@ -43,7 +43,8 @@ export default class Iso extends PureComponent{
     }
 
     async componentDidMount(url=this.props.url) {
-        const { default_point:point=0,models} = this.props;
+        const { models} = this.props;
+        const point = models[0].dataFlow[0].contamination.toFixed(2);
         const {featureImportance} = models[0];
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];
