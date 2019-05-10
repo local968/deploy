@@ -820,9 +820,8 @@ export class FixIssue extends Component {
               <OutlierRange
                   closeEdit={this.closeEdit}
                   saveEdit={this.saveEdit}
-                  // message={this.outLier[this.editKey]}
                   field={this.editKey}
-                  id={project.etlIndex}
+                  id={project.originalIndex}
                   project = {project}
               />
             } />}
