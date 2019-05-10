@@ -33,9 +33,9 @@ export default class ParallelPlot extends PureComponent{
 				showDelay: 0,
 				formatter: function (params) {
 					if (params.value.length > 1) {
-						return params.seriesName + ' :<br/>'
-							+ params.value[0]
-							+ params.value[1];
+						return params.seriesName + '<br/>'
+							+ x_name +':'+ params.value[0].toFixed(3) + '<br/>'
+							+ y_name +':'+ params.value[1].toFixed(3);
 					} else {
 						return params.seriesName + ' :<br/>'
 							+ params.name + ' : '

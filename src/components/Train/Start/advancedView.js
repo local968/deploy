@@ -261,7 +261,7 @@ export default class AdvancedView extends Component {
               <div className={styles.advancedAlgorithmList}>
                 {project.problemType === 'Clustering' ? Algorithms[project.problemType].map((v, k) => {
                   const tooLarge = project.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []
-                  const notSupport = project.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift', 'AP'] : []
+                  const notSupport = project.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : []
                   return (tooLarge.includes(v.value) &&
                     <Tooltip placement='top' title={'该算法内存消耗大，当前数据量下不推荐使用。'} key={k}>
                       <div className={classnames(styles.advancedAlgorithm, styles.algorithmNotAllow)} >

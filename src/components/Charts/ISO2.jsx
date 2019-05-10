@@ -19,29 +19,36 @@ const color = ['#6e698f','#d5d4df','#367de9','#f3ce31'];//背景(开始)/背景(
 export default class Iso extends PureComponent{
     constructor(props){
         super(props);
-        const {featureImportance} = props.models[0];
-        const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1])
-        const var1 = list[0][0];
-        const var2 = list[1][0];
         this.state = {
             ready:false,
             slider_value:0,
             x_name:'',
             y_name:'',
             show_name:{
-                var1,
-                var2,
+                var1:'',
+                var2:'',
             },
-            list:Object.keys(featureImportance),
-            var1,
-            var2,
+            list:[],
+            var1:'',
+            var2:'',
         };
 
-        this.updatePoint = debounce(this.updatePoint, 1000)
+        this.updatePoint = debounce(this.updatePoint, 280)
+    }
+    
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.url !== this.props.url){
+            return this.componentDidMount(nextProps.url);
+        }
     }
 
-    async componentDidMount() {
-        const { url,default_point:point=0} = this.props;
+    async componentDidMount(url=this.props.url) {
+        const { models} = this.props;
+        const point = models[0].dataFlow[0].contamination.toFixed(2);
+        const {featureImportance} = models[0];
+        const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
+        const var1 = list[0][0];
+        const var2 = list[1][0];
         const result = await request.post({
             url: '/graphics/outlier',
             data: {
@@ -58,6 +65,13 @@ export default class Iso extends PureComponent{
             point,
             slider_value:point,
             ready:true,
+            show_name:{
+                var1,
+                var2,
+            },
+            list:Object.keys(featureImportance),
+            var1,
+            var2,
         })
     }
 
@@ -101,6 +115,7 @@ export default class Iso extends PureComponent{
             progressive:0,
             progressiveThreshold:10000,
             data,
+            silent:true,
         };
 
         const series = [heat_map,heat_map];
@@ -128,7 +143,8 @@ export default class Iso extends PureComponent{
             visualMap:false,
             symbolSize:5,
             name:'正常',
-            animation:false,
+            animation:true,
+            silent:true,
         },{
             type:'scatter',
             data:data2,
@@ -190,9 +206,9 @@ export default class Iso extends PureComponent{
                 // toolbox: {
                 //     feature: {
                 //         dataZoom: {},
-                //         brush: {
-                //             type: ['rect'],
-                //         },
+                //         // brush: {
+                //         //     type: ['rect'],
+                //         // },
                 //     },
                 // },
                 series,
@@ -229,10 +245,10 @@ export default class Iso extends PureComponent{
 
     save(){
         const {show_name} = this.state;
-        const {x_name,y_name} = show_name;
+        const {var1,var2} = show_name;
         this.setState({
-            x_name,
-            y_name,
+            var1,
+            var2,
         })
         //this.props.changeUrl(x_name,y_name)
     }
