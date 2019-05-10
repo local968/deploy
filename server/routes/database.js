@@ -28,7 +28,17 @@ wss.register('checkDatabase', async (message, socket, progress) => {
     sql: message.sqlQueryStr,
     encode: message.sqlEncoding
   }
-  return await axios.post(`${esServicePath}/etls/database/check`, databaseConfig)
+  try {
+    const { data } = await axios.post(`${esServicePath}/etls/database/check`, databaseConfig)
+    return data
+  } catch (e) {
+    console.error(e)
+    return {
+      status: 500,
+      message: 'Database check failed. Please check your database connection information'
+    }
+  }
+
 })
 
 wss.register('downloadFromDatabase', async (message, socket, progress) => {
