@@ -402,8 +402,8 @@ function getProjectFields(id, fields) {
 }
 
 async function getBaseEtl(id) {
-  const data = await getProjectFields(id, ['etlIndex', 'target', 'problemType', 'dataHeader', 'colType', 'stats', 'noCompute', 'originalIndex']);
-  const { etlIndex, target, problemType, dataHeader, colType, stats, noCompute, originalIndex } = data;
+  const data = await getProjectFields(id, ['etlIndex', 'target', 'problemType', 'dataHeader', 'colType', 'stats']);
+  const { etlIndex, target, problemType, dataHeader, colType, stats } = data;
   const colMap = Object.entries(stats).filter(([key, metric]) => metric.type === 'Categorical').reduce((prev, [key, metric]) => {
     prev[key] = metric.categoricalMap.reduce((p, r, index) => {
       p[r.key] = index
@@ -413,7 +413,7 @@ async function getBaseEtl(id) {
   }, {})
   return {
     command: 'top.etlBase',
-    csvLocation: noCompute ? [originalIndex] : [etlIndex],
+    csvLocation: [etlIndex],
     targetLabel: [target],
     problemType,
     featureLabel: dataHeader,
