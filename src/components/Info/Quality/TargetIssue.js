@@ -375,7 +375,7 @@ export class FixIssue extends Component {
       <div className={styles.fixesBottom}>
         <button className={styles.save} onClick={this.save} ><span>{EN.Save}</span></button>
         <button className={styles.cancel} onClick={closeFixes}><span>{EN.CANCEL}</span></button>
-      </div>123
+      </div>
       {
         this.visible && <Modal
           closeByMask={true}
@@ -388,7 +388,7 @@ export class FixIssue extends Component {
               closeEdit={this.closeEdit}
               saveEdit={this.saveEdit}
               field={this.editKey}
-              id={project.etlIndex}
+              id={project.originalIndex}
               project = {project}
             />
           } />}

@@ -167,6 +167,7 @@ export default class Iso extends PureComponent{
                     right:0,
                     data: ['正常','异常'],
                     align: 'left',
+                    orient:'vertical',
                 },
                 animation: true,
                 grid: {
