@@ -962,8 +962,11 @@ const EN: any = {
   CHIndexHint:'CHIndexHint',
   clustersHint:'clustersHint',
   RMSSTDHint:'RMSSTDHint',
-
-
+  clusters:'聚类类别',
+  ImportantVariables:'重要变量',
+  Cluster:'聚类类别',
+  ClusteringHint:'对样本进行分类，把更为相似归为同一类。（例如：客户分群与画像）',
+  OutlierDetectionHint:'识别与其他样本差异过大的低频、可疑样本。（例如：信用卡欺诈行为侦测）',
 
 };
 

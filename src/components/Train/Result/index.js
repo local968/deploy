@@ -289,7 +289,7 @@ const ClusteringTable = observer((props) => {
           <span onClick={() => handleSort('rsquared')}>R squared {sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cluster')}>#clusters {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.clustersHint} /></span>
+          <span onClick={() => handleSort('cluster')}>{EN.clusters} {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.clustersHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>
