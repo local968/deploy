@@ -61,9 +61,9 @@ export default class D3D2 extends PureComponent {
 		const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 		
 		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{itm}</Option>);
-		if(order === 'z_name'){
-			options.unshift(<Option key='-000' value=''>null</Option>);
-		}
+		// if(order === 'z_name'){
+			options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
+		// }
 		return <Select value={show_name[order]} style={{ width: 120 }} onChange={name=>{
 			this.setState({
 				show_name:{
