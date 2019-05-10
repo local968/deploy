@@ -145,6 +145,7 @@ wss.register('newEtl', async (message, socket, process) => {
 
     const missingValue = project.nullFillMethod[key]
     if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
+    else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
     else if ((missingValue || missingValue === 0) && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
 
     const outlier = project.outlierFillMethod[key]

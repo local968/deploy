@@ -138,7 +138,7 @@ class VariableIssue extends Component {
 
         const isNum = colType[header] === 'Numerical'
         const { low = NaN, high = NaN } = isNum ? rawDataView[header] : {}
-        const isMissing = !v
+        const isMissing = isNaN(parseFloat(v)) ? !v : false
         const isMismatch = isNum ? isNaN(parseFloat(v)) : false
         const isOutlier = (problemType === 'Clustering' && isNum) ? (v < low || v > high) : false
 

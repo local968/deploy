@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, action, computed } from 'mobx';
 import styles from './styles.module.css';
-import { Modal, Select, Checkbox, Message, Icon } from 'antd';
+import { Modal, Select, Checkbox, message, Icon } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
 import socketStore from "stores/SocketStore";
@@ -71,7 +71,7 @@ export default class DatabaseConfig extends Component {
     Object.entries(rules).map(([key, fn]) => {
       if (failed) return false;
       if (!fn(this.localState[key])) {
-        Message.error(errorMessages[key]);
+        message.error(errorMessages[key]);
         failed = true;
         runInAction(() => {
           this.errorField = key;
@@ -152,7 +152,7 @@ export default class DatabaseConfig extends Component {
         }).then(resp => {
           this.loading = false;
           if (resp.status !== 200) {
-            Message.error(resp.error);
+            message.error(resp.message);
           } else {
             if (state.rememberMyPassword) {
               storage.setItem('DatabaseConnectionPassword', state.sqlPassword);
