@@ -108,7 +108,7 @@ function ModelResult(props) {
             <Popover trigger='click' placement='bottomLeft' visible={visible} onVisibleChange={hideDict} content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
           </div>}
         </div>
-        <div className={classes.right}>
+        <div className={classes.right} style={{flex:1}}>
           {
             project.problemType === "Outlier" ?
               <ISO2 url={selectModel.outlierPlotData} models={props.projectStore.project.models} />

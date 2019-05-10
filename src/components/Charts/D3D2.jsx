@@ -39,17 +39,18 @@ export default class D3D2 extends PureComponent {
 		});
 		const {featuresLabel} = result;
 		
-		const [x_name,y_name] = featuresLabel;
+		const [x_name,y_name,z_name] = featuresLabel;
 		
 		this.setState({
 			result,
 			ready:true,
 			x_name,
 			y_name,
+			z_name,
 			show_name:{
 				x_name,
 				y_name,
-				z_name:'',
+				z_name,
 			},
 		})
 	}
