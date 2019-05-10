@@ -105,7 +105,7 @@ class AdvancedModel extends Component {
 
   modeling = () => {
     const { project, closeAdvanced } = this.props
-    const { advancedModeling, algorithms, dataHeader, newVariable, trainHeader, customHeader, target, totalLines, kType } = project
+    const { advancedModeling,problemType, algorithms, dataHeader, newVariable, trainHeader, customHeader, target, totalLines, kType } = project
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
