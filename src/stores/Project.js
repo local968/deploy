@@ -630,18 +630,7 @@ export default class Project {
   endSchema = async () => {
     // this.etling = true
     await this.abortTrainByEtl()
-    const step = this.noComputeTemp ? {
-      curStep: 3,
-      mainStep: 3,
-      subStepActive: 1,
-      lastSubStep: 1
-    } : {
-        curStep: 2,
-        mainStep: 2,
-        subStepActive: 3,
-        lastSubStep: 3
-      }
-    await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
+    const data = {
       target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
@@ -650,8 +639,55 @@ export default class Project {
       nullFillMethodTemp: this.nullFillMethodTemp,
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp,
-      ...step
-    }))
+    }
+    if (this.noComputeTemp) {
+      if (this.problemType === 'Classification') {
+        const min = Math.min(...Object.values(this.targetCounts))
+        if (min < 3) {
+          console.error("数量太小");
+          return await Promise.reject()
+        }
+        if (min < 5) data.crossCount = min - 1
+      }
+      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data))
+      await this.newEtl()
+      await this.updateProject({
+        curStep: 3,
+        mainStep: 3,
+        subStepActive: 1,
+        lastSubStep: 1
+      })
+    } else {
+      const step = {
+        curStep: 2,
+        mainStep: 2,
+        subStepActive: 3,
+        lastSubStep: 3
+      }
+      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data, step))
+    }
+    // const step = this.noComputeTemp ? {
+    //   curStep: 3,
+    //   mainStep: 3,
+    //   subStepActive: 1,
+    //   lastSubStep: 1
+    // } : {
+    //     curStep: 2,
+    //     mainStep: 2,
+    //     subStepActive: 3,
+    //     lastSubStep: 3
+    //   }
+    // await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
+    //   target: this.target,
+    //   colType: { ...this.colType },
+    //   dataHeader: [...this.dataHeader],
+    //   noCompute: this.noComputeTemp,
+    //   nullFillMethod: this.nullFillMethod,
+    //   nullFillMethodTemp: this.nullFillMethodTemp,
+    //   outlierFillMethod: this.outlierFillMethod,
+    //   outlierFillMethodTemp: this.outlierFillMethodTemp,
+    //   ...step
+    // }))
     // return await this.etl(true)
   }
 

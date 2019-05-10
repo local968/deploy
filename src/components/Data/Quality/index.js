@@ -153,7 +153,7 @@ class TargetIssue extends Component {
             <div className={styles.tableBody}>
               {sortData.map((v, k) => {
                 const { low = NaN, high = NaN } = rawDataView[target]
-                const isMissing = !v
+                const isMissing = isNaN(parseFloat(v)) ? !v : false
                 const isMismatch = isNum ? isNaN(parseFloat(v)) : false
                 const isOutlier = isNum ? (v < low || v > high) : false
                 return <div key={k} className={classnames(styles.cell, {
@@ -335,7 +335,7 @@ class VariableIssue extends Component {
 
       const isNum = colType[header] === 'Numerical'
       const { low = NaN, high = NaN } = rawDataView[header]
-      const isMissing = !v
+      const isMissing = isNaN(parseFloat(v)) ? !v : false
       const isMismatch = isNum ? isNaN(parseFloat(v)) : false
       const isOutlier = (header === target && isNum) ? (v < low || v > high) : false
       if (isMissing) {
