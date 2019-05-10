@@ -217,7 +217,7 @@ export default class AdvancedView extends Component {
                     <label htmlFor="number_custom">{EN.NoMoreThan}</label>
                     <InputNumber
                       value={project.kValue}
-                      max={15}
+                      max={10}
                       min={2}
                       step={1}
                       onChange={this.handleNum}
@@ -364,7 +364,7 @@ export default class AdvancedView extends Component {
                 className={styles.advancedSize}
                 value={project.searchTime}
                 onBlur={this.handleMaxTime}
-                min={10}
+                min={5}
                 isInt={true}
               />
               <span style={{ paddingLeft: 10 }}>
