@@ -203,7 +203,7 @@ const api = {
         if (data.task) emptyCount = 0
         else {
           emptyCount++
-          if (emptyCount >= 5) {
+          if (emptyCount > 10) {
             clearInterval(interval)
             // await redis.incrby(`user:${userId}:upload`, parseInt(size))
             resolve(index)

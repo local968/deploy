@@ -46,8 +46,8 @@ export default class OutlierRange extends PureComponent{
 		}).then((result) => {
 			this.setState({
 				title,
-				min:min-zoom,
-				max:max+zoom,
+				min:+(min-zoom).toFixed(3),
+				max:+(max+zoom).toFixed(3),
 				selectArea,
 				data:result.data,
 				chart,
@@ -115,17 +115,16 @@ export default class OutlierRange extends PureComponent{
 					width: size[0],
 					height: size[1],
 				},
-				style: style,
+				style,
 			};
 		}
-
 		return {
 			// title: {
 			// 	text: 'Profit',
 			// 	left: 'center',
 			// },
 			xAxis: {
-				min,
+				min:Math.min(min,data[0][0]),
 				max,
 				scale: true,
 			},

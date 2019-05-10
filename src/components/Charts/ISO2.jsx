@@ -19,10 +19,6 @@ const color = ['#6e698f','#d5d4df','#367de9','#f3ce31'];//背景(开始)/背景(
 export default class Iso extends PureComponent{
     constructor(props){
         super(props);
-        // const {featureImportance} = props.models[0];
-        // const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1])
-        // const var1 = list[0][0];
-        // const var2 = list[1][0];
         this.state = {
             ready:false,
             slider_value:0,
@@ -37,7 +33,7 @@ export default class Iso extends PureComponent{
             var2:'',
         };
 
-        this.updatePoint = debounce(this.updatePoint, 1000)
+        this.updatePoint = debounce(this.updatePoint, 280)
     }
     
     componentWillReceiveProps(nextProps) {
@@ -46,8 +42,9 @@ export default class Iso extends PureComponent{
         }
     }
 
-    async componentDidMount() {
-        const { url,default_point:point=0,models} = this.props;
+    async componentDidMount(url=this.props.url) {
+        const { models} = this.props;
+        const point = models[0].dataFlow[0].contamination.toFixed(2);
         const {featureImportance} = models[0];
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];
@@ -60,6 +57,7 @@ export default class Iso extends PureComponent{
         });
 
         const {feature1Range:xRange=[],feature2Range:yRange=[],background:value=[],dotScore:dot=[]} = result;
+        console.log(dot)
         this.setState({
             xRange,
             yRange,
@@ -209,9 +207,9 @@ export default class Iso extends PureComponent{
                 // toolbox: {
                 //     feature: {
                 //         dataZoom: {},
-                //         brush: {
-                //             type: ['rect'],
-                //         },
+                //         // brush: {
+                //         //     type: ['rect'],
+                //         // },
                 //     },
                 // },
                 series,
@@ -248,10 +246,10 @@ export default class Iso extends PureComponent{
 
     save(){
         const {show_name} = this.state;
-        const {x_name,y_name} = show_name;
+        const {var1,var2} = show_name;
         this.setState({
-            x_name,
-            y_name,
+            var1,
+            var2,
         })
         //this.props.changeUrl(x_name,y_name)
     }
