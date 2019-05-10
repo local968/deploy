@@ -226,8 +226,7 @@ class VariableIssue extends Component {
         mismatchCount={mismatchCount}
         outlierCount={outlierCount}
         closeFixes={this.closeFixes}
-        saveDataFixes={this.saveDataFixes}
-        isTarget={false} />}
+        saveDataFixes={this.saveDataFixes} />}
         visible={this.visible}
         width='12em'
         title={EN.HowR2LearnWillFixtheIssues}

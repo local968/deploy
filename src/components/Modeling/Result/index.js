@@ -38,6 +38,10 @@ export default class ModelResult extends Component {
   //   this.show = false
   // }
 
+  componentDidMount() {
+    this.props.resetSide()
+  }
+
   componentDidUpdate() {
     this.props.resetSide()
   }
