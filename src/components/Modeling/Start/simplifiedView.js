@@ -377,7 +377,7 @@ class SimplifiedViewRow extends Component {
           target,
           value,
           id: etlIndex,
-          interval: Math.floor((max - min) / 20),
+          interval: Math.floor((max - min) / 20)||1,
         };
         if (type === 'Numerical') {
           request.post({
