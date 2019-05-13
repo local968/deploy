@@ -23,15 +23,16 @@ export default class OutlierRange extends PureComponent{
 	}
 
 	componentDidMount() {
-		const {title='',message={},field,id,project} = this.props;
-		const {low,high,min,max} = project.rawDataView[field];
-		// const {low=0,high=0,data=[]} = message;
-		const selectArea = [low,high];
-
-		// const min = Math.min(...data.map(itm=>itm[0]));
-		// const max = Math.max(...data.map(itm=>itm[1]));
-		const zoom=0.1*(max-min);
-		
+		const {title='',field,id,project} = this.props;
+		const {min,max,low,high} = project.rawDataView[field];
+		let selectArea = [low,high];
+		// console.log(project.outlierDictTemp[field])
+		if(project.outlierDictTemp[field][0]){
+			const [low,high] = project.outlierDictTemp[field];
+			selectArea = [low,high];
+		}
+		// const zoom=0.1*(max-min);
+		const zoom = 0;
 		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
 		const interval = Math.ceil((max-min)/bin);
 		const chart = this.chart.getEchartsInstance();
@@ -80,12 +81,13 @@ export default class OutlierRange extends PureComponent{
 
 	setBrush(){
 		const {chart,selectArea} = this.state;
+		
 		chart.dispatchAction({
 			type: 'brush',
 			areas: [
 				{
 					brushType: 'lineX',
-					coordRange: selectArea,
+					coordRange: [Math.trunc(selectArea[0]*100)/100,Math.trunc(selectArea[1]*100)/100],
 					xAxisIndex: 0,
 				},
 			],
@@ -100,7 +102,14 @@ export default class OutlierRange extends PureComponent{
 				yAxis:{},
 			}
 		}
-
+		
+		const _data = data.map(itm=>{
+			const _min = Math.max(itm[0],min);
+			const _max = Math.min(itm[1],max);
+			return [_min,_max,itm[2]]
+		});
+		
+		
 		function renderItem(params, api) {
 			const yValue = api.value(2);
 			const start = api.coord([api.value(0), yValue]);
@@ -119,12 +128,8 @@ export default class OutlierRange extends PureComponent{
 			};
 		}
 		return {
-			// title: {
-			// 	text: 'Profit',
-			// 	left: 'center',
-			// },
 			xAxis: {
-				min:Math.min(min,data[0][0]),
+				min,
 				max,
 				scale: true,
 			},
@@ -144,7 +149,7 @@ export default class OutlierRange extends PureComponent{
 				encode: {
 					x: [0, 1],
 				},
-				data,
+				data:_data,
 			}],
 			brush: {
 				xAxisIndex: 'all',
