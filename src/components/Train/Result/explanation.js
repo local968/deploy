@@ -25,7 +25,7 @@ const Explanation = (props) => {
       fixedRowCount={0}
       checked={null}
       select={null}
-      style={{ border: "1px solid #ccc" }}
+      // style={{ border: "1px solid #ccc" }}
       data={tableData}
     />
   </div>
