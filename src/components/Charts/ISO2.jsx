@@ -171,7 +171,7 @@ export default class Iso extends PureComponent{
                     position: 'top',
                 },
                 legend: {
-                    top: 20,
+                    top: 5,
                     right:0,
                     data: ['正常','异常'],
                     align: 'left',
