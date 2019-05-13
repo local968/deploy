@@ -1299,25 +1299,6 @@ export default class Project {
         break;
       case 'Classification':
         command = 'clfreg.train';
-        const algorithms = [
-          'adaboost',
-          'bernoulli_nb',
-          'decision_tree',
-          'extra_trees',
-          'gaussian_nb',
-          'gradient_boosting',
-          'k_nearest_neighbors',
-          'lda',
-          'liblinear_svc',
-          'libsvm_svc',
-          'multinomial_nb',
-          'passive_aggressive',
-          'qda',
-          'random_forest',
-          'sgd',
-          'xgradient_boosting',
-          'r2-logistics',
-        ]
         trainData = {
           problemType,
           featureLabel,
@@ -1332,7 +1313,25 @@ export default class Project {
           measurement: problemType === "Classification" ? "auc" : "r2",
           settingName: setting.name,
           holdoutRate: 0.2,
-          algorithms
+          algorithms: [
+            'adaboost',
+            'bernoulli_nb',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_nb',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'lda',
+            'liblinear_svc',
+            'libsvm_svc',
+            'multinomial_nb',
+            'passive_aggressive',
+            'qda',
+            'random_forest',
+            'sgd',
+            'xgradient_boosting',
+            'r2-logistics',
+          ]
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1342,21 +1341,6 @@ export default class Project {
         break;
       case 'Regression':
         command = 'clfreg.train';
-        const algorithms = [
-          'adaboost',
-          'ard_regression',
-          'decision_tree',
-          'extra_trees',
-          'gaussian_process',
-          'gradient_boosting',
-          'k_nearest_neighbors',
-          'liblinear_svr',
-          'libsvm_svr',
-          'random_forest',
-          'ridge_regression',
-          'sgd',
-          'xgradient_boosting',
-        ]
         trainData = {
           problemType,
           featureLabel,
@@ -1371,7 +1355,21 @@ export default class Project {
           measurement: problemType === "Classification" ? "auc" : "r2",
           settingName: setting.name,
           holdoutRate: 0.2,
-          algorithms
+          algorithms: [
+            'adaboost',
+            'ard_regression',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_process',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'liblinear_svr',
+            'libsvm_svr',
+            'random_forest',
+            'ridge_regression',
+            'sgd',
+            'xgradient_boosting',
+          ]
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
