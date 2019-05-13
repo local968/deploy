@@ -108,7 +108,7 @@ function ModelResult(props) {
             <Popover trigger='click' placement='bottomLeft' visible={visible} onVisibleChange={hideDict} content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
           </div>}
         </div>
-        <div className={classes.right} style={{flex:1}}>
+        <div className={classes.right} style={{flex:1,width:200}}>
           {
             project.problemType === "Outlier" ?
               <ISO2 url={selectModel.outlierPlotData} models={props.projectStore.project.models} />
@@ -279,7 +279,7 @@ const ClusteringTable = observer((props) => {
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('cvnn')}>CVNN {sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+        <div style={{width: 100}} className={`${classes.ccell}  ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('sihouette')}>{EN.SihouetteScore} {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>

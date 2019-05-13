@@ -184,7 +184,7 @@
   align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid #979797;
-  min-width: 125px;
+  min-width: 200px;
   margin: 0 5px;
   position: relative;
   flex: 1 1 125px;
@@ -243,7 +243,8 @@
   border: none;
   cursor: pointer;
   padding: 20px 0;
-  border-bottom: solid 1px #9b9b9b
+  border-bottom: solid 1px #9b9b9b;
+  width: 200px;
 }
 
 .name {
