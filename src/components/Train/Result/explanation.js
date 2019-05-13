@@ -1,7 +1,7 @@
 import classes from "./styles.module.css";
 import { Table } from "components/Common";
 import React from 'react'
-
+import EN from '../../../constant/en';
 const Explanation = (props) => {
   const { model } = props;
   const { labelWithImportance } = model
