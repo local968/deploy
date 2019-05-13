@@ -134,9 +134,9 @@ export default class DataConnect extends Component {
     //   msg: 'File Error: File must not exceed 50M.'
     // }
 
-    console.log(this.props.userStore.currentLever , 'this.props.userStore.currentLever')
+    console.log(this.props.userStore.currentLever, 'this.props.userStore.currentLever')
 
-    if(this.props.userStore.currentLever === '0') {
+    if (this.props.userStore.currentLever === '0') {
       return {
         err: true,
         msg: EN.NoAuthority,
@@ -207,7 +207,7 @@ export default class DataConnect extends Component {
 
   onClick = key => {
     const { project } = this.props.projectStore
-    if(this.uploading || project.etling) return
+    if (this.uploading || project.etling) return
     this.key = key
     if ((project || {}).train2ing || !!((project || {}).models || []).length) return this.visiable = true
     this.onConfirm()
@@ -363,9 +363,9 @@ export default class DataConnect extends Component {
                 <div className={styles.progressText}>
                   <span>{this.message}</span>
                   {(process < 50 && process > 0 && !this.isSql) &&
-                  <div className={styles.progressButton}>{!this.isPause ?
-                    <span onClick={this.handleParse}>{EN.Paused}</span> :
-                    <span onClick={this.handleResume}>{EN.Resume}</span>}</div>}
+                    <div className={styles.progressButton}>{!this.isPause ?
+                      <span onClick={this.handleParse}>{EN.Paused}</span> :
+                      <span onClick={this.handleResume}>{EN.Resume}</span>}</div>}
                 </div>
               </div>
             </div>
@@ -379,19 +379,14 @@ export default class DataConnect extends Component {
           projectId={project.id}
           onSubmit={action(async options => {
             this.hideSql();
+            this.isSql = true
             this.uploading = true
-            this.process = 0
             let processInterval;
             const api = await socketStore.ready()
+            this.process = 0
             const resp = await api.downloadFromDatabase({ ...options, type: 'modeling', projectId: project.id }, action(res => {
-              const result = res.result
-              if (result.value === 0) {
-                this.process = 20
-                processInterval = setInterval(() => {
-                  if (this.process && this.process < 50) this.process++
-                }, 1000)
-              }
-              if (result.value) this.sqlProgress = result.value
+              if (this.process < 49.9) this.process += 0.1
+              if (res.count) this.sqlProgress = res.count
             }))
             clearInterval(processInterval)
             if (resp.status !== 200) {
@@ -399,17 +394,20 @@ export default class DataConnect extends Component {
               this.uploading = false
               return message.error(resp.message)
             }
-            const fileId = resp.fileId
             this.process = 50
-            project.fastTrackInit(fileId).then(() => {
+            project.fastTrackInit({
+              originalIndex: resp.index,
+              totalRawLines: this.sqlProgress,
+              fileName: options.sqlTable
+            }).then(() => {
               this.process = 0
               this.uploading = false
             })
           })}
         />
         {<Confirm width={'6em'} visible={this.visiable} title={EN.Warning}
-                  content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm}
-                  confirmText={EN.Continue} closeText={EN.CANCEL}/>}
+          content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm}
+          confirmText={EN.Continue} closeText={EN.CANCEL} />}
       </div>
     );
   }

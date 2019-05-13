@@ -398,7 +398,8 @@ export default class DataConnect extends Component {
             this.process = 50
             project.fastTrackInit({
               originalIndex: resp.index,
-              totalRawLines: this.sqlProgress
+              totalRawLines: this.sqlProgress,
+              fileName: options.sqlTable
             }).then(() => {
               this.process = 0
               this.uploading = false
