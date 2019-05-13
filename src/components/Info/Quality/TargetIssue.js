@@ -267,7 +267,7 @@ export class FixIssue extends Component {
                     <option value="blank" key="blank">{EN.Leftblankonpurpose}</option>
                     <option value='fail' key='fail'>{EN.FailedtoCollectorDataError}</option>
                   </select></div>
-                  <div className={styles.fixesCell}><span>{showType}</span></div>
+                  <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
@@ -350,7 +350,7 @@ export class FixIssue extends Component {
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
                     </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k, project.etlIndex)}>{EN.Edit}</span>
                   </div>
-                  <div className={styles.fixesCell}><span>{showType}</span></div>
+                  <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)} >{this.formatCell(mean)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
