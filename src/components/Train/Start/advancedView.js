@@ -355,9 +355,9 @@ export default class AdvancedView extends Component {
           <div className={styles.advancedBlock}>
             <div className={`${styles.advancedTitle} ${styles.otherLabel}`}>
               <span>{EN.SetMaxTrainingTime}:</span>
-              {/*<span className={styles.advancedDesc}>*/}
-              {/*  {EN.Maxamountoftimetoevaluatedifferentmodules}*/}
-              {/*</span>*/}
+              <span className={styles.advancedDesc}>
+                {EN.Maxamountoftimetoevaluatedifferentmodules}
+              </span>
             </div>
             <div className={styles.advancedOption}>
               <NumberInput
