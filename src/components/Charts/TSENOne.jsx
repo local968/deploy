@@ -18,15 +18,10 @@ export default function TSENOne(props){
 		tooltip: {
 			showDelay: 0,
 			formatter: function (params) {
-				if (params.value.length > 1) {
-					return params.seriesName + ' :<br/>'
-						+ params.value[0]
-						+ params.value[1];
-				} else {
-					return params.seriesName + ' :<br/>'
-						+ params.name + ' : '
-						+ params.value;
-				}
+				return `${x_name}:${params.value[0]}
+						<br/>
+					${y_name}:${params.value[1].toFixed(3)}
+				`;
 			},
 			axisPointer:{
 				show: true,
