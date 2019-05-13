@@ -154,6 +154,12 @@ wss.register('newEtl', async (message, socket, process) => {
     const outlier = project.outlierFillMethod[key]
     if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
     else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
+
+    const range = project.outlierDictTemp[key]
+    if (!!range.length) {
+      stats[key].originalStats.low = range[0]
+      stats[key].originalStats.high = range[1]
+    }
   }
   const response = await axios.post(`${esServicePath}/etls/${project.originalIndex}/etl`, stats)
   const { etlIndex, opaqueId } = response.data
