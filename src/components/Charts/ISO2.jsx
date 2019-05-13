@@ -155,7 +155,7 @@ export default class Iso extends PureComponent{
             name:'异常',
             animation:true,
             silent:true,
-            z:3,
+            z:2,
         });
 
         return {
