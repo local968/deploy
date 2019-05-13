@@ -18,7 +18,7 @@ function ModelResult(props) {
   // const type = 'clustering'
   const { resetSide, view, sort, handleSort, changeView, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader } = project
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
 
   React.useEffect(() => {
@@ -27,9 +27,12 @@ function ModelResult(props) {
 
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
-
+console.log(12)
   if (!selectModel || !models.length) return null
-
+  
+  console.log(selectModel.outlierPlotData)
+  
+  
   const abortTrain = () => {
     project.abortTrain()
   }

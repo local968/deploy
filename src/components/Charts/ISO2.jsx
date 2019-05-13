@@ -37,6 +37,7 @@ export default class Iso extends PureComponent{
     }
     
     componentWillReceiveProps(nextProps) {
+        console.log(1)
         if(nextProps.url !== this.props.url){
             return this.componentDidMount(nextProps.url);
         }
@@ -253,15 +254,15 @@ export default class Iso extends PureComponent{
         this.setState({
             var1,
             var2,
-        })
-        //this.props.changeUrl(x_name,y_name)
+        });
+        this.props.models[0].saveFeatureList([var1,var2]);
     }
 
     reset(){
         const {default_point=0} = this.props;
         this.setState({
             slider_value:default_point,
-        })
+        });
         this.updatePoint(default_point)
     }
 
