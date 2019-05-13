@@ -151,7 +151,7 @@ export default class Project {
   @observable customRange = [];
   @observable algorithms = [];
   @observable selectId = '';
-  @observable version = [1, 2];
+  @observable version = [1, 2, 3];
   @observable dataViews = null;
   @observable dataViewsLoading = false;
   @observable dataViewProgress = 0;
@@ -287,7 +287,39 @@ export default class Project {
       'IsolationForest',
       'MCD',
       'EllipticEnvelope',
-    ]) || []
+    ]) || (this.problemType === "Classification" && [
+      'adaboost',
+      'bernoulli_nb',
+      'decision_tree',
+      'extra_trees',
+      'gaussian_nb',
+      'gradient_boosting',
+      'k_nearest_neighbors',
+      'lda',
+      'liblinear_svc',
+      'libsvm_svc',
+      'multinomial_nb',
+      'passive_aggressive',
+      'qda',
+      'random_forest',
+      'sgd',
+      'xgradient_boosting',
+      'r2-logistics',
+    ]) || (this.problemType === "Regression" && [
+      'adaboost',
+      'ard_regression',
+      'decision_tree',
+      'extra_trees',
+      'gaussian_process',
+      'gradient_boosting',
+      'k_nearest_neighbors',
+      'liblinear_svr',
+      'libsvm_svr',
+      'random_forest',
+      'ridge_regression',
+      'sgd',
+      'xgradient_boosting',
+    ])
 
     return {
       train2Finished: false,
@@ -1265,7 +1297,7 @@ export default class Project {
           apply_weights: {}
         };
         break;
-      default:
+      case 'Classification':
         command = 'clfreg.train';
         trainData = {
           problemType,
@@ -1280,13 +1312,73 @@ export default class Project {
           randSeed: 0,
           measurement: problemType === "Classification" ? "auc" : "r2",
           settingName: setting.name,
-          holdoutRate: 0.2
+          holdoutRate: 0.2,
+          algorithms: [
+            'adaboost',
+            'bernoulli_nb',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_nb',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'lda',
+            'liblinear_svc',
+            'libsvm_svc',
+            'multinomial_nb',
+            'passive_aggressive',
+            'qda',
+            'random_forest',
+            'sgd',
+            'xgradient_boosting',
+            'r2-logistics',
+          ]
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
         } else {
           trainData.nfold = 5
         }
+        break;
+      case 'Regression':
+        command = 'clfreg.train';
+        trainData = {
+          problemType,
+          featureLabel,
+          targetLabel: target,
+          projectId: id,
+          version: '1,2',
+          command,
+          sampling: 'no',
+          speedVSaccuracy: 5,
+          ensembleSize: 20,
+          randSeed: 0,
+          measurement: problemType === "Classification" ? "auc" : "r2",
+          settingName: setting.name,
+          holdoutRate: 0.2,
+          algorithms: [
+            'adaboost',
+            'ard_regression',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_process',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'liblinear_svr',
+            'libsvm_svr',
+            'random_forest',
+            'ridge_regression',
+            'sgd',
+            'xgradient_boosting',
+          ]
+        };
+        if (this.totalLines > 10000) {
+          trainData.validationRate = 0.2
+        } else {
+          trainData.nfold = 5
+        }
+        break;
+      default:
+        return
     }
 
     // id: request ID
@@ -1313,7 +1405,6 @@ export default class Project {
     //   settingName: setting.name,
     //   holdoutRate: 0.2
     // };
-
 
     this.modeling(trainData, Object.assign({
       train2Finished: false,
