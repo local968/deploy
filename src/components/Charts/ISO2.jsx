@@ -37,9 +37,9 @@ export default class Iso extends PureComponent{
     }
     
     componentWillReceiveProps(nextProps) {
-    	const {outlierPlotData,outlierPlotLoading} = nextProps.selectModel;
+    	const {outlierPlotData} = nextProps.selectModel;
         if(outlierPlotData !== this.props.selectModel.outlierPlotData){
-            return this.componentDidMount(outlierPlotData,outlierPlotLoading);
+            return this.componentDidMount(outlierPlotData,false);
         }
     }
 
