@@ -251,7 +251,7 @@ export default class ClassificationView extends Component {
               className={styles.myButton}
             >{EN.Return}</a>
             <section className={styles.newTitle}>
-              <label>Input:</label>
+              <label>{EN.Input}</label>
               <dl>
                 <dt>
                   <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Boththebenefitandcost}</span></span>
