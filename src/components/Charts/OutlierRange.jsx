@@ -8,6 +8,7 @@ import EN from '../../constant/en';
 import 'rc-input-number/assets/index.css'
 import styles from './styles.module.css';
 import request from "../Request";
+import {toJS} from "mobx";
 
 export default class OutlierRange extends PureComponent{
 	constructor(props){
@@ -24,13 +25,14 @@ export default class OutlierRange extends PureComponent{
 
 	componentDidMount() {
 		const {title='',field,id,project} = this.props;
-		const {min,max,low,high} = project.rawDataView[field];
-		let selectArea = [low,high];
-		// console.log(project.outlierDictTemp[field])
-		if(project.outlierDictTemp[field][0]){
-			const [low,high] = project.outlierDictTemp[field];
-			selectArea = [low,high];
+		let {min,max,low,high} = project.rawDataView[field];
+
+		if(toJS(project.outlierDictTemp)[field]){
+			const data = project.outlierDictTemp[field];
+			low = data[0];
+			high = data[1];
 		}
+		let selectArea = [low,high];
 		// const zoom=0.1*(max-min);
 		const zoom = 0;
 		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
