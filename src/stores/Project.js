@@ -282,15 +282,11 @@ export default class Project {
       'DBSCAN',
       'MeanShift',
     ]) || (this.problemType === "Outlier" && [
-      'IsolationForest',
-      'OneClassSVM',
-      'EllipticEnvelope',
-      'LocalOutlierFactor',
-      'PCA',
       'HBOS',
-      'CBLOF',
-      'ABOD',
-      'FB',
+      'PCA',
+      'IsolationForest',
+      'MCD',
+      'EllipticEnvelope',
     ]) || []
 
     return {
@@ -1167,7 +1163,7 @@ export default class Project {
   get defualtRecommendModel() {
     const { models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
-    const sort = currentMeasurement.endsWith("se") ? -1 : 1
+    const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
     return models
       .map(m => {
         const { score } = m
@@ -1253,15 +1249,11 @@ export default class Project {
           k_type: "auto",
           k_value: undefined,
           algorithms: [
-            'IsolationForest',
-            'OneClassSVM',
-            'EllipticEnvelope',
-            'LocalOutlierFactor',
-            'PCA',
             'HBOS',
-            'CBLOF',
-            'ABOD',
-            'FB',
+            'PCA',
+            'IsolationForest',
+            'MCD',
+            'EllipticEnvelope',
           ],
           standard_type: "standard",
           search_time: 5,

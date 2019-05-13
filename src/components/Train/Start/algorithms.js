@@ -31,32 +31,33 @@ export default {
   ],
   Outlier: [
     {
-      value: 'IsolationForest',
-      label: 'Isolation Forest'
-    },
-    {
-      value: 'OneClassSVM',
-      label: 'OneClassSVM'
-    },
-    {
-      value: 'EllipticEnvelope',
-      label: 'EllipticEnvelope'
-    },
-    {
-      value: 'LocalOutlierFactor',
-      label: 'Local Outlier Factor'
+      value: 'HBOS',
+      label: 'HBOS (Histogram-based Outlier Score)'
     },
     {
       value: 'PCA',
       label: 'PCA (Principal Component Analysis)'
     },
     {
-      value: 'HBOS',
-      label: 'HBOS (Histogram-based Outlier Score)'
+      value: 'IsolationForest',
+      label: 'Isolation Forest'
     },
     {
-      value: 'CBLOF',
-      label: 'CBLOF (Clustering-Based Local Outlier Factor)'
+      value: 'MCD',
+      label: 'MCD（Minimum Covariance Determinant）'
+    },
+    {
+      value: 'EllipticEnvelope',
+      label: 'EllipticEnvelope'
+    },
+    {
+      value: 'OneClassSVM',
+      label: 'OneClassSVM'
+    },
+    
+    {
+      value: 'LocalOutlierFactor',
+      label: 'Local Outlier Factor'
     },
     {
       value: 'ABOD',

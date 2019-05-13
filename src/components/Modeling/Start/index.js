@@ -29,7 +29,6 @@ export default class StartTrain extends Component {
   }
 
   closeAdvanced = () => {
-    console.log('close',0)
     this.visible = false
   }
 
