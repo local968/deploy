@@ -32,18 +32,23 @@ export default class Iso extends PureComponent{
             var1:'',
             var2:'',
         };
-
+        this.chart = React.createRef();
         this.updatePoint = debounce(this.updatePoint, 280)
     }
     
     componentWillReceiveProps(nextProps) {
-        console.log(1)
-        if(nextProps.url !== this.props.url){
-            return this.componentDidMount(nextProps.url);
+    	const {outlierPlotData,outlierPlotLoading} = nextProps.selectModel;
+        if(outlierPlotData !== this.props.selectModel.outlierPlotData){
+            return this.componentDidMount(outlierPlotData,outlierPlotLoading);
         }
     }
 
-    async componentDidMount(url=this.props.url) {
+    async componentDidMount(url=this.props.selectModel.outlierPlotData,loading = this.props.selectModel.outlierPlotLoading) {
+        const chart = this.chart.getEchartsInstance();
+        console.log('loading',loading)
+        if(loading){
+            return chart.showLoading();
+        }
         const { models} = this.props;
         const point = models[0].dataFlow[0].contamination.toFixed(2);
         const {featureImportance} = models[0];
@@ -84,6 +89,8 @@ export default class Iso extends PureComponent{
                 yAxis: {},
             }
         }
+        const chart = this.chart.getEchartsInstance();
+        chart.hideLoading();
 
         const x_space = (xRange[1] - xRange[0]) / value[0].length;
         const y_space = (yRange[1] - yRange[0]) / value.length;
@@ -287,6 +294,7 @@ export default class Iso extends PureComponent{
             </dl>
             <ReactEcharts
               key="echarts"
+              ref = {chart=>this.chart=chart}
               option={this.getOption()}
               style={{height, width}}
               notMerge={true}
