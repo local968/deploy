@@ -49,9 +49,10 @@ export default class Iso extends PureComponent{
         if(loading){
             return chart.showLoading();
         }
-        const { models} = this.props;
-        const point = models[0].dataFlow[0].contamination.toFixed(2);
-        const {featureImportance} = models[0];
+        const { selectModel:models} = this.props;
+        console.log(models)
+        const point = models.dataFlow[0].contamination.toFixed(2);
+        const {featureImportance} = models;
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];
         const var2 = list[1][0];
@@ -262,7 +263,7 @@ export default class Iso extends PureComponent{
             var1,
             var2,
         });
-        this.props.models[0].saveFeatureList([var1,var2]);
+        this.props.selectModel.saveFeatureList([var1,var2]);
     }
 
     reset(){

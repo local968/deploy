@@ -114,7 +114,7 @@ console.log(12)
         <div className={classes.right} style={{flex:1,width:200}}>
           {
             project.problemType === "Outlier" ?
-              <ISO2 selectModel={selectModel} models={props.projectStore.project.models} />
+              <ISO2 selectModel={selectModel}/>
               : <D3D2 url={selectModel.multiVarPlotData} />
           }
         </div>
