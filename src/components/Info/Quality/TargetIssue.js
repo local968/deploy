@@ -27,7 +27,7 @@ export class FixIssue extends Component {
       request.post({
         url: '/graphics/outlier-range',
         data: {
-          "field": key,
+          "field": key + '.double',
           id,
           "interval": 20,
         },
