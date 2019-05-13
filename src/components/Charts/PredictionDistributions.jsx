@@ -49,6 +49,9 @@ export default function PredictionDistributions(props){
 					show: true,
 					formatter: function (params) {
 						let {value} = params;
+						if(+value === 1){
+							value = 0.99;
+						}
 						setf(value);
 						return value.toFixed(3)
 					},
