@@ -751,7 +751,11 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
   const { userId } = socket.session;
   const { projectId } = message;
 
-  return createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true })
+  return getProjectField(projectId, 'preImportanceLoading')
+    .then(loading => {
+      if (loading) return
+    })
+    .then(() => createOrUpdate(message.projectId, socket.session.userId, { preImportanceLoading: true }))
     .then(() => checkEtl(projectId, userId))
     .then(() => command({ ...message, userId: socket.session.userId, requestId: message._id }, async progressResult => {
       let lock = false
@@ -1140,12 +1144,22 @@ wss.register('outlierPlot', (message, socket) => {
       featureList,
       randomSeed
     }, progressValue => {
-      const { result, status } = progressValue
+      const { status, result } = progressValue
+      // console.log(progressValue, 'progressValue')
       if (status < 0 || status === 100) return progressValue
-      const { name, model } = result
+      const { name, action } = result
       if (name === 'progress') return
-      // if (model === mid) return updateModel(userId, projectId, mid, { outlierPlotLoading: false })
+      if (action === 'outlierPlot') {
+        const { outlierPlotData, featureList } = result
+        return updateModel(userId, projectId, mid, { outlierPlotLoading: false, outlierPlotData, featureList })
+      }
     }, true))
+  // .then(returnValue => {
+  //   const { result, status } = returnValue
+  //   if (status < 0) return result
+  //   const { outlierPlotData, featureList } = result
+  //   return updateModel(userId, projectId, mid, { outlierPlotLoading: false, outlierPlotData, featureList })
+  // })
 })
 
 function mapObjectToArray(obj) {

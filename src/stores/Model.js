@@ -269,14 +269,11 @@ export default class Model {
       api.permutationImportance(command)
     })
   }
-  saveFeatureList = (featureList) => {
+  saveFeatureList = async (featureList) => {
+    // if (this.outlierPlotLoading) return
     if (!Array.isArray(featureList) || featureList.length !== 2) return console.log('error featureList')
     if (featureList[0] === this.featureList[0] && featureList[1] === this.featureList[1]) return console.log("same")
-    return this.updateModel({ featureList }).then(() => {
-      return this.outlierPlot()
-    })
-  }
-  outlierPlot = () => {
+    // await this.updateModel({ featureList, outlierPlotData: '' })
     this.outlierPlotLoading = true
     return socketStore.ready().then(api => {
       let cmd = 'outlier.outlierPlot';
@@ -284,18 +281,32 @@ export default class Model {
         command: cmd,
         projectId: this.projectId,
         id: this.id,
-        featureList: this.featureList,
+        featureList: [featureList],
         randomSeed: 0
       }
       return api.outlierPlot(command)
     })
   }
+  // outlierPlot = (featureList) => {
+  //   this.outlierPlotLoading = true
+  //   return socketStore.ready().then(api => {
+  //     let cmd = 'outlier.outlierPlot';
+  //     const command = {
+  //       command: cmd,
+  //       projectId: this.projectId,
+  //       id: this.id,
+  //       featureList: [this.featureList],
+  //       randomSeed: 0
+  //     }
+  //     return api.outlierPlot(command)
+  //   })
+  // }
   updateModel(data) {
-    socketStore.ready().then(api => api.updateModel({
+    Object.assign(this, data);
+    return socketStore.ready().then(api => api.updateModel({
       data,
       id: this.id,
       projectId: this.projectId,
     }));
-    Object.assign(this, data);
   }
 }

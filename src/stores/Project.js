@@ -55,7 +55,7 @@ export default class Project {
   @observable validationRate = 20;
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
-  @observable fileNames = [];
+  @observable fileName = '';
   // @observable cleanData = []
   @observable originPath = '';
 
@@ -159,7 +159,7 @@ export default class Project {
   //un
   @observable weights = {}
   @observable standardType = 'standard'
-  @observable searchTime = 10
+  @observable searchTime = 5
   @observable kValue = 5
   @observable kType = 'auto'
 
@@ -321,8 +321,6 @@ export default class Project {
       validationRate: 20,
       holdoutRate: 20,
       hasSendEtl: false,
-      weights: {},
-      standardType: 'standard',
       dataViews: null,
       dataViewsLoading: false,
       preImportanceLoading: false,
@@ -330,7 +328,12 @@ export default class Project {
       mappingKey: '',
       newVariablePath: '',
       newVariableViews: {},
-      distribution: 0
+      distribution: 0,
+      weights: {},
+      standardType: 'standard',
+      searchTime: 5,
+      kValue: 5,
+      kType: 'auto'
     }
   }
 
@@ -1532,8 +1535,8 @@ export default class Project {
       const { problemType } = model
       const key = problemType === 'Classification' ? 'auc' : 'r2'
       const min = problemType === 'Classification' ? 0.5 : 0;
-      const {validateScore} = model.score;
-      if(validateScore){
+      const { validateScore } = model.score;
+      if (validateScore) {
         const isBad = validateScore[key] < min
         if (isBad) return
       }

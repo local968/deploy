@@ -93,9 +93,9 @@ function Main(props: MainProps) {
         <span className={styles.label}>{EN.Project}: </span>
         <span className={styles.value}> {project.name}</span>
       </div>}
-      {!!project && !!project.fileNames.length && <div className={styles.dataset}>
+      {!!project && !!project.fileName && <div className={styles.dataset}>
         <span className={styles.label}>{EN.Dataset}: </span>
-        <span className={styles.value}> {project.fileNames.toString()}</span>
+        <span className={styles.value}> {project.fileName}</span>
       </div>}
     </div>
     {!project ? <ProcessLoading style={{ position: 'fixed' }} /> : <Switch>
