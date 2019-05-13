@@ -18,7 +18,7 @@ export default function TSENOne(props){
 		tooltip: {
 			showDelay: 0,
 			formatter: function (params) {
-				return `${x_name}:${params.value[0]}
+				return `${x_name}:${params.value[0].toFixed(3)}
 						<br/>
 					${y_name}:${params.value[1].toFixed(3)}
 				`;
