@@ -97,7 +97,8 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort, metric } = this.props;
+    const { metric } = this
+    const { models, project, projectStore, sort } = this.props;
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
