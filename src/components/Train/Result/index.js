@@ -151,7 +151,7 @@ const OutlierTable = observer((props) => {
     const { key, value } = sort
     const fn = (a, b) => {
       switch (key) {
-        case "score": modelName
+        case "score":
           return (a.score.score - b.score.score) * value
         case 'rate':
           return ((a.dataFlow[0].contamination || 0) - (b.dataFlow[0].contamination || 0)) * value
