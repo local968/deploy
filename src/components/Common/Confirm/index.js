@@ -18,7 +18,7 @@ export default class Confirm extends Component {
         <div className={styles.modalText}><span>{content}</span></div>
         <div className={styles.modalBox}>
           <button className={classnames(styles.modalButton, styles.modalCancel)} onClick={onClose}><span id={styles.modalCloseText}>{closeText || EN.Cancel}</span></button>
-          <button className={classnames(styles.modalButton, styles.modalConfirm)} onClick={onConfirm}><span id={styles.modalConfirmText}>{confirmText || "OK"}</span></button>
+          <button className={classnames(styles.modalButton, styles.modalConfirm)} onClick={onConfirm}><span id={styles.modalConfirmText}>{confirmText || EN.OK}</span></button>
         </div>
       </div>}>
     </Modal>
