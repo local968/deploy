@@ -50,7 +50,7 @@ export default class Iso extends PureComponent{
         //     return chart.showLoading();
         // }
         const { selectModel:models} = this.props;
-        const point = models.dataFlow[0].contamination.toFixed(2);
+        const point = (models.dataFlow[0].contamination||0).toFixed(2);
         const {featureImportance} = models;
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];
