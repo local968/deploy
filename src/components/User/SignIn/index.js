@@ -19,7 +19,8 @@ function showConfirm(props ,email , password) {
       props.userStore.changeIsWatchVideo(true)
       props.userStore.login({ email, password })
       props.userStore.change('tabKey')('2');
-      props.history.push('/support')
+      props.history.push({pathname: '/support',state: { key
+            : 'loginTo' }})
     },
     onCancel() {
       props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
