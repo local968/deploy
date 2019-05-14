@@ -97,6 +97,7 @@ export default class StartTrain extends Component {
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
+  @observable visiable = false
 
   switchTab = (num) => {
     if (num !== 1 && num !== 2) return false;
@@ -105,7 +106,7 @@ class AdvancedModel extends Component {
 
   modeling = () => {
     const { project, closeAdvanced } = this.props
-    const { advancedModeling,problemType, algorithms, dataHeader, newVariable, trainHeader, customHeader, target, totalLines, kType } = project
+    const { advancedModeling, problemType, algorithms, dataHeader, newVariable, trainHeader, customHeader, target, totalLines, kType } = project
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
@@ -118,6 +119,14 @@ class AdvancedModel extends Component {
     if (!trainAlgorithms.length) return message.error(EN.Youneedtoselectatleast)
     closeAdvanced()
     advancedModeling()
+  }
+
+  showTable = () => {
+    this.visiable = true
+  }
+
+  hideTable = () => {
+    this.visiable = false
   }
 
   render() {
@@ -136,8 +145,8 @@ class AdvancedModel extends Component {
           })} onClick={this.switchTab.bind(null, 2)}><span>{EN.AdvancellcedModeling} {EN.Setting}</span></div>
         </div>
         <div className={styles.viewBox}>
-          <Preview project={project} />
-          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
+          <Preview project={project} visiable={this.visiable} showTable={this.showTable} hideTable={this.hideTable} />
+          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} hidden={this.visiable || this.tab === 1} />}
           <div className={styles.bottom}>
             <button className={classnames(styles.save, {
               [styles.disable]: !checkedVariables.length

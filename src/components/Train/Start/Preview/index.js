@@ -12,7 +12,6 @@ import axios from 'axios';
 
 @observer
 export default class Preview extends Component {
-  @observable visiable = false
   @observable cleanData = []
   @observable newVariableData = []
 
@@ -32,17 +31,12 @@ export default class Preview extends Component {
     })
   }
 
-  showTable = () => {
-    this.visiable = true
-  }
 
-  hideTable = () => {
-    this.visiable = false
-  }
 
   formatTable = () => {
-    const { cleanData, visiable, newVariableData } = this
-    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader } = this.props.project;
+    const { cleanData, newVariableData } = this
+    const { visiable, project } = this.props
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader } = project;
     if (!visiable) return []
     if (!cleanData.length) return []
     if (!!newVariable.length && !newVariableData.length) return []
@@ -106,20 +100,21 @@ export default class Preview extends Component {
   }
 
   render() {
-    const { dataHeader, trainHeader, newVariable } = this.props.project
+    const { visiable, project, hideTable, showTable } = this.props
+    const { dataHeader, trainHeader, newVariable } = project
     const header = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
     const tableData = this.formatTable()
     // console.log(tableData.length, "tableData", cleanPath)
     return <div className={classnames(styles.content, {
-      [styles.active]: this.visiable
+      [styles.active]: visiable
     })}>
-      <div className={styles.icon} onClick={this.visiable ? this.hideTable : this.showTable}>
-        {<Tooltip title={`${this.visiable ? EN.CloseDataTable : EN.ViewDataTable}`} mouseLeaveDelay={0}>
+      <div className={styles.icon} onClick={visiable ? hideTable : showTable}>
+        {<Tooltip title={`${visiable ? EN.CloseDataTable : EN.ViewDataTable}`} mouseLeaveDelay={0}>
           <img src={dataIcon} alt={"view"} />
         </Tooltip>}
-        {/* {!this.visiable && <span >View Data Table</span>} */}
+        {/* {!visiable && <span >View Data Table</span>} */}
       </div>
-      <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${this.visiable ? 0 : 180}deg)` }} />}</div>
+      <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
         <div className={styles.text}><span>{EN.TotalVariables}:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
       </div>

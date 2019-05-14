@@ -393,7 +393,7 @@ export default class AdvancedView extends Component {
                   {EN.Performingcrossvalidation} <br />
                   {EN.Hencewerecommendchoosing}
                 </span>}
-                visible={!hidden && (runWith === "cross" && totalLines < 200000)}
+                visible={!hidden && (runWith === "cross" && totalLines > 200000)}
                 overlayStyle={{ maxWidth: '100%' }}>
                 <div className={styles.advancedOptionBox}>
                   <input id="runwith1" type='radio' name="runWith" checked={runWith === "cross"} onChange={this.handleRunWith.bind(null, 'cross')} />
