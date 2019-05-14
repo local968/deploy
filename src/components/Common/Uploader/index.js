@@ -5,7 +5,7 @@ import config from 'config'
 // import NginxUploader from '../NginxUploader';
 import EsUploader from '../EsUploader';
 import EN from '../../../constant/en'
-const AllowExt = ["csv", "CSV", "zip", "ZIP", "rar", "RAR", "tar", "TAR", "tgz", "TGZ", 'xls', 'XLS', 'xlsx', 'XLSX']
+const AllowExt = ["csv", "CSV"]
 
 export default class Uploader extends Component {
   constructor(props) {
@@ -15,7 +15,7 @@ export default class Uploader extends Component {
 
   componentWillReceiveProps(props) {
     const { file, onError, onStart } = props
-    if(!file) return
+    if (!file) return
     const checkd = this.check(file)
     if (checkd.err) {
       return onError(new Error(checkd.msg), 1)

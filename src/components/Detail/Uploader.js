@@ -4,7 +4,7 @@ import config from 'config'
 import EsUploader from 'components/Common/EsUploader'
 import { message } from 'antd';
 import EN from '../../constant/en';
-const AllowExt = ["csv", "CSV", "zip", "ZIP", "rar", "RAR", "tar", "TAR", "tgz", "TGZ", 'xls', 'XLS', 'xlsx', 'XLSX']
+const AllowExt = ["csv", "CSV"]
 
 export default class Uploader extends React.Component {
 
