@@ -11,6 +11,9 @@ export default function HistogramNumerical(props){
 		height = 330,
 		width = 500,
 	} = props;
+	const nameTextStyle = {
+		color:'#000',
+	};
 	const option = {
 		title: {
 			text: title,
@@ -21,6 +24,7 @@ export default function HistogramNumerical(props){
 			name:x_name,
 			nameLocation:'middle',
 			nameGap:25,
+			nameTextStyle,
 	        axisLabel:{
 	            interval:Math.floor((data.length/5)),
 	            formatter: (value)=>value.toFixed(2),
@@ -29,6 +33,7 @@ export default function HistogramNumerical(props){
 		yAxis: {
 			type: 'value',
 			name:y_name,
+			nameTextStyle,
 		},
 		series: [{
 			data,

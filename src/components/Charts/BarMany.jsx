@@ -94,6 +94,10 @@ export default class BarMany extends PureComponent{
 		
 		const {data,x_name,y_name,title} = result;
 		
+		const nameTextStyle = {
+			color:'#000',
+		};
+		
 		return {
 			title: {
 				text: title,
@@ -102,10 +106,12 @@ export default class BarMany extends PureComponent{
 			xAxis: {
 				type: 'category',
 				name:x_name,
+				nameTextStyle,
 			},
 			yAxis: {
 				type: 'value',
 				name:y_name,
+				nameTextStyle,
 			},
 			series: [{
 				data,

@@ -19,6 +19,9 @@ export default function Bar(){
 		};
 		
 		const {x_name,y_name,data,title} = result;
+		const nameTextStyle = {
+			color:'#000',
+		};
 		
 		const option = {
 			title: {
@@ -28,10 +31,12 @@ export default function Bar(){
 			xAxis: {
 				name:x_name,
 				type: 'category',
+				nameTextStyle,
 				data: data.map(itm=>itm.name),
 			},
 			yAxis: {
 				name:y_name,
+				nameTextStyle,
 				type: 'value'
 			},
 			series: [{

@@ -57,12 +57,17 @@ export default class ParallelPlot extends PureComponent{
 		}
 
 		let parallelAxis = [];
+		
+		const nameTextStyle = {
+			color:'#000',
+		};
 
 		schema.forEach((itm,index)=>{
 			parallelAxis.push({
 				dim:index+1,
 				nameLocation:'start',
 				name:itm,
+				nameTextStyle,
 			})
 		});
 

@@ -33,8 +33,8 @@ export default class OutlierRange extends PureComponent{
 			high = data[1];
 		}
 		let selectArea = [low,high];
-		// const zoom=0.1*(max-min);
-		const zoom = 0;
+		const zoom=0.1*(max-min);
+		// const zoom = 0;
 		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
 		const interval = Math.ceil((max-min)/bin);
 		const chart = this.chart.getEchartsInstance();
@@ -129,13 +129,19 @@ export default class OutlierRange extends PureComponent{
 				style,
 			};
 		}
+		const nameTextStyle = {
+			color:'#000',
+		};
 		return {
 			xAxis: {
 				min,
 				max,
 				scale: true,
+				nameTextStyle,
 			},
-			yAxis: {},
+			yAxis: {
+				nameTextStyle,
+			},
 			toolbox:{
 				show:false,
 			},

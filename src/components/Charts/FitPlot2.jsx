@@ -11,6 +11,9 @@ export default function FitPlot2(props){
 
 	const max = Math.max(...num);
 	const min = Math.min(...num);
+	const nameTextStyle = {
+		color:'#000',
+	};
 
 	const option =  {
 		title: {
@@ -26,10 +29,12 @@ export default function FitPlot2(props){
 			axisLine:{show:false},
 			nameLocation:'middle',
 			nameGap:25,
+			nameTextStyle,
 		},
 		yAxis: {
 			name:y_name,
 			axisLine:{show:false},
+			nameTextStyle,
 		},
 		series: [
 			{

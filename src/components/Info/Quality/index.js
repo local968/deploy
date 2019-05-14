@@ -9,6 +9,7 @@ import { message } from 'antd'
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import Pie2 from "../../Charts/Pie2";
 @inject('projectStore')
 @observer
 export default class DataQuality extends Component {
@@ -348,8 +349,13 @@ class Summary extends Component {
       <div className={styles.summaryRight}>
         <div className={styles.summaryTitle}><span>{EN.HowR2LearnWillFixtheIssues}</span></div>
         <div className={styles.summaryPie}>
-          <div className={styles.summaryChart}>
-          </div>
+          {/*<div className={styles.summaryChart}>*/}
+          {/*</div>*/}
+          <Pie2
+              RowsWillBeFixed = {fixedPercent}
+              RowsWillBeDeleted = {deletePercent}
+              CleanData = {cleanPercent}
+          />
           <div className={styles.summaryParts}>
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>

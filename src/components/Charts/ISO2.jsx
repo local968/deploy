@@ -50,7 +50,7 @@ export default class Iso extends PureComponent{
         //     return chart.showLoading();
         // }
         const { selectModel:models} = this.props;
-        const point = (models.dataFlow[0].contamination||0).toFixed(2);
+        const point = (models.dataFlow[0].contamination||0).toFixed(3);
         const {featureImportance} = models;
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];
@@ -165,6 +165,10 @@ export default class Iso extends PureComponent{
             silent:true,
             z:2,
         });
+        
+        const nameTextStyle = {
+	        color:'#000',
+        };
 
         return {
                 tooltip: {
@@ -194,6 +198,7 @@ export default class Iso extends PureComponent{
                     name:var1,
                     nameLocation:'middle',
                     nameGap:25,
+	                nameTextStyle,
                 },
                 yAxis: {
                     type: 'category',
@@ -206,6 +211,7 @@ export default class Iso extends PureComponent{
                     name:var2,
                     nameLocation:'middle',
                     nameGap:25,
+	                nameTextStyle,
                 },
                 visualMap: {
                     min:0,
@@ -320,7 +326,7 @@ export default class Iso extends PureComponent{
                         0.5:0.5,
                     }}
                     included={false}
-                    step={0.01}
+                    step={0.001}
                     onChange={(slider_value)=>{
                         this.setState({
                             slider_value,
@@ -331,11 +337,12 @@ export default class Iso extends PureComponent{
                     <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
             </div>,
             <div key = 'adjust' className={classes.adjust}>
-              {EN.Youcanadjustthecontaminationrate}: <InputNum
+                <label data-tip="该比例将决定模型部署结果">{EN.Youcanadjustthecontaminationrate}:</label>
+               <InputNum
               min={0}
               max={0.5}
-              step={0.01}
-              precision={2}
+              step={0.001}
+              precision={3}
               value={slider_value}
               style={{ width: 100 }}
               onChange={(slider_value)=>{
