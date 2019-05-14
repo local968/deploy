@@ -215,7 +215,8 @@ const OutlierRow = observer((props) => {
       overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
-      getPopupContainer={el => el.parentElement}>
+      getPopupContainer={el => el.parentElement}
+      >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input
@@ -349,7 +350,8 @@ const ClusteringRow = observer((props) => {
       overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
-      getPopupContainer={el => el.parentElement}>
+      getPopupContainer={el => el.parentElement}
+      >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input

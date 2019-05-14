@@ -156,13 +156,14 @@ wss.register('newEtl', async (message, socket, process) => {
     else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
 
     const range = project.outlierDictTemp[key]
-    if (range && range.length && range.length >= 2) {
+    if (range && range.length && range.length === 2) {
       stats[key].originalStats.low = range[0]
       stats[key].originalStats.high = range[1]
     }
   }
   const response = await axios.post(`${esServicePath}/etls/${project.originalIndex}/etl`, stats)
-  const { etlIndex, opaqueId } = response.data
+  const { etlIndex, opaqueId, error } = response.data
+  if(error) return response.data
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
