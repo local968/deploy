@@ -72,6 +72,11 @@ async function scheduleHandler() {
           request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
         } catch (e) { console.info(`get cute off failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`) }
       }
+      if (deployment.modelType === "Outlier") {
+        try {
+          request.rate = await api.getRate(deployment.projectId, deployment.modelName)
+        } catch (e) { console.info(`get rate failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`) }
+      }
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
       await command(request, data => {

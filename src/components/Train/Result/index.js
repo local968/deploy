@@ -29,6 +29,9 @@ function ModelResult(props) {
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
   if (!selectModel || !models.length) return null
 
+  const isDownload = false
+  // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
+
   const abortTrain = () => {
     project.abortTrain()
   }
@@ -49,6 +52,7 @@ function ModelResult(props) {
   }
 
   const deploy = () => {
+    if (isDownload) return
     // const { project } = this.props.projectStore;
     const { selectModel: current } = project
     const { newVariable, trainHeader, expression } = project
@@ -60,6 +64,11 @@ function ModelResult(props) {
       .addDeployment(project.id, project.name, current.modelName, project.problemType, exps)
       .then(id => props.routing.push('/deploy/project/' + id));
   };
+
+  const download = () => {
+    if (!isDownload) return
+    console.log('download')
+  }
 
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
@@ -126,8 +135,8 @@ function ModelResult(props) {
     </div>}
     {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
     <div className={classes.buttonBlock}>
-      <button className={classes.button} onClick={deploy}>
-        <span>{EN.DeployTheModel}</span>
+      <button className={`${classes.button}`} onClick={isDownload ? download : deploy}>
+        <span>{isDownload ? EN.Download : EN.DeployTheModel}</span>
       </button>
     </div>
   </div>;
@@ -145,7 +154,7 @@ const OutlierTable = observer((props) => {
         case "score": modelName
           return (a.score.score - b.score.score) * value
         case 'rate':
-          return ((a.createTime || 0) - (b.createTime || 0)) * value
+          return ((a.dataFlow[0].contamination || 0) - (b.dataFlow[0].contamination || 0)) * value
         case "name":
         default:
           return a.modelName > b.modelName ? value : -value

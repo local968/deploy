@@ -139,6 +139,27 @@ const api = {
       })
     })
   },
+  getRate: async (projectId, modelName) => {
+    return redis.smembers(`project:${projectId}:models`).then(ids => {
+      const pipeline = redis.pipeline();
+      ids.forEach(mid => {
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex', 'chartData')
+      })
+      return pipeline.exec().then(list => {
+        const models = list.map(row => {
+          let [name, dataFlow] = row[1] || []
+          try {
+            name = JSON.parse(name)
+            dataFlow = JSON.parse(dataFlow)
+          } catch (e) { }
+          return { name, dataFlow }
+        })
+        const model = models.find(m => m.name === modelName) || {}
+        const rate = model.dataFlow[0].contamination
+        return rate
+      })
+    })
+  },
   getFeatureLabel: async projectId => {
     try {
       const newFeatureLabel = {}
