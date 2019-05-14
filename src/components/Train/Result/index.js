@@ -74,7 +74,7 @@ function ModelResult(props) {
             {EN.RecommendedAModel}<br />
             <small>{EN.Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation}</small>
             <br />
-            {EN.SelectedModel}: <span className={classes.modelName}>{selectModel.modelName}</span>
+            {EN.SelectedModel}: <span style={{color:'#448EED'}} className={classes.modelName}>{selectModel.modelName}</span>
           </div>
           {problemType === 'Outlier' && <div className={classes.scores}>
             <div className={classes.score}>
@@ -142,7 +142,7 @@ const OutlierTable = observer((props) => {
     const { key, value } = sort
     const fn = (a, b) => {
       switch (key) {
-        case "score":
+        case "score":modelName
           return (a.score.score - b.score.score) * value
         case 'rate':
           return ((a.createTime || 0) - (b.createTime || 0)) * value
