@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-test copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="433" height="216" rx="5"></rect>
+        <filter x="-4.4%" y="-6.5%" width="108.8%" height="117.6%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="5" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="5.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <polygon id="path-3" points="0.00175609756 0.0234146341 23.9765561 0.0234146341 23.9765561 23.9999707 0.00175609756 23.9999707"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="页面"></g>
+        <g id="Benefit-Cost" transform="translate(-684.000000, -112.000000)">
+            <rect fill="#FFFFFF" x="0" y="0" width="1151" height="636"></rect>
+            <g id="分组-28-copy-2" transform="translate(646.000000, 58.000000)">
+                <g id="Rectangle-49-Copy">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                </g>
+                <g id="icon-test-copy" transform="translate(38.000000, 54.000000)">
+                    <g id="分组">
+                        <mask id="mask-4" fill="white">
+                            <use xlink:href="#path-3"></use>
+                        </mask>
+                        <g id="Clip-2"></g>
+                        <path d="M0,12.0117659 C0,18.6326634 5.36730732,23.9999707 11.9883512,23.9999707 C18.6092488,23.9999707 23.9765561,18.6326634 23.9765561,12.0117659 C23.9765561,5.39072195 18.6092488,0.0234146341 11.9883512,0.0234146341 C5.36730732,0.0234146341 0,5.39072195 0,12.0117659 Z" id="Fill-1" fill="#F9CF37" mask="url(#mask-4)"></path>
+                    </g>
+                    <path d="M13.3549171,5.17840976 L12.3959122,15.4882829 L11.340878,15.4882829 L10.3338732,5.17840976 C10.3019707,4.84273171 10.4418146,4.51106341 10.7534634,4.18340488 C11.0652293,3.85562927 11.4328098,3.69178537 11.8564098,3.69178537 C12.2799805,3.69178537 12.6436683,3.84772683 12.9473268,4.15937561 C13.2511024,4.47105366 13.3869366,4.8107122 13.3549171,5.17840976 Z M11.916322,17.550322 C12.3320195,17.550322 12.6795805,17.6901366 12.9593268,17.9699122 C13.2391024,18.2496585 13.3789171,18.605239 13.3789171,19.0368293 C13.3789171,19.4684195 13.2310829,19.8240878 12.9353268,20.1037463 C12.6396585,20.383522 12.276,20.5233366 11.8444098,20.5233366 C11.4128195,20.5233366 11.0612488,20.3755024 10.7894927,20.0798634 C10.5186439,19.7867122 10.3725366,19.3998146 10.3819024,19.0009171 C10.3819024,18.5773463 10.5297366,18.2296683 10.8253756,17.9579122 C11.121161,17.6861561 11.4848195,17.550322 11.916322,17.550322 Z" id="Fill-3" fill="#FFFFFF"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

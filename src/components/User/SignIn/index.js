@@ -5,13 +5,30 @@ import warnIcon from "./fail.svg";
 import { observable, action, runInAction } from 'mobx';
 import EN from '../../../constant/en';
 import { Modal, Checkbox } from 'antd';
+import copyIcon from './icon-test copy.svg'
+import deleteIcon from './delete.png'
 
 const confirm = Modal.confirm;
 
+const header = (props) => {
+  return (
+    <div>
+      <div className={styles.content_head}>
+        {/*<img onClick={() => {return null}} src={deleteIcon}/>*/}
+      </div>
+      <div className={styles.content_icon}>
+        <img src={copyIcon}/>
+        <p>是否观看教学视频？</p>
+      </div>
+      <Checkbox onChange={(e) => props.userStore.change('isCheck')(e.target.checked)}>不再提示该信息 </Checkbox>
+    </div>
+  )
+}
+
 function showConfirm(props ,email , password) {
   confirm({
-    title: '是否观看教学视频？',
-    content: <div><Checkbox onChange={(e) => props.userStore.change('isCheck')(e.target.checked)}>不再提示该信息 </Checkbox></div>,
+    width: 400,
+    content: header(props),
     okText: '是',
     cancelText: '否',
     onOk() {

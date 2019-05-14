@@ -75,3 +75,17 @@ body {
 .ant-tabs-nav .ant-tabs-tab{
   color: #445065 !important;
 }
+
+.ant-modal-confirm .ant-modal-confirm-btns{
+  float: none !important;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.ant-btn-primary{
+  background: #243448 !important;
+  border-color: #243448 !important;
+}
+.anticon svg{
+  display: none !important;
+}
