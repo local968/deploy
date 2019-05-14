@@ -97,6 +97,7 @@ export default class StartTrain extends Component {
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
+  @observable visiable = false
 
   switchTab = (num) => {
     if (num !== 1 && num !== 2) return false;
@@ -118,6 +119,14 @@ class AdvancedModel extends Component {
     advancedModeling()
   }
 
+  showTable = () => {
+    this.visiable = true
+  }
+
+  hideTable = () => {
+    this.visiable = false
+  }
+
   render() {
     const { project, closeAdvanced } = this.props
     const { dataHeader, newVariable, trainHeader, target } = project
@@ -134,8 +143,8 @@ class AdvancedModel extends Component {
           })} onClick={this.switchTab.bind(null, 2)}><span>{EN.AdvancellcedModeling} {EN.Setting}</span></div>
         </div>
         <div className={styles.viewBox}>
-          <Preview project={project} />
-          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
+          <Preview project={project} visiable={this.visiable} showTable={this.showTable} hideTable={this.hideTable}/>
+          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} hidden={this.visiable || this.tab === 1} />}
           <div className={styles.bottom}>
             <button className={classnames(styles.save, {
               [styles.disable]: !checkedVariables.length
