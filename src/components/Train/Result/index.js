@@ -28,7 +28,7 @@ function ModelResult(props) {
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
   if (!selectModel || !models.length) return null
-  
+
   const abortTrain = () => {
     project.abortTrain()
   }
@@ -74,7 +74,7 @@ function ModelResult(props) {
             {EN.RecommendedAModel}<br />
             <small>{EN.Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation}</small>
             <br />
-            {EN.SelectedModel}: <span style={{color:'#448EED'}} className={classes.modelName}>{selectModel.modelName}</span>
+            {EN.SelectedModel}: <span style={{ display: 'inline-flex', color: '#448EED' }} className={classes.modelName}>{selectModel.modelName}</span>
           </div>
           {problemType === 'Outlier' && <div className={classes.scores}>
             <div className={classes.score}>
@@ -105,18 +105,18 @@ function ModelResult(props) {
               <span>{EN.MappingDictionary}</span>
             </button>
             <Popover
-                trigger='click'
-                getPopupContainer={() => document.getElementsByClassName(classes.dict)[0]}
-                placement='bottomLeft'
-                visible={visible}
-                onVisibleChange={hideDict}
-                content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
+              trigger='click'
+              getPopupContainer={() => document.getElementsByClassName(classes.dict)[0]}
+              placement='bottomLeft'
+              visible={visible}
+              onVisibleChange={hideDict}
+              content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
           </div>}
         </div>
-        <div className={classes.right} style={{flex:1,width:200}}>
+        <div className={classes.right} style={{ flex: 1, width: 200 }}>
           {
             project.problemType === "Outlier" ?
-              <ISO2 selectModel={selectModel}/>
+              <ISO2 selectModel={selectModel} />
               : <D3D2 url={selectModel.multiVarPlotData} />
           }
         </div>
@@ -142,7 +142,7 @@ const OutlierTable = observer((props) => {
     const { key, value } = sort
     const fn = (a, b) => {
       switch (key) {
-        case "score":modelName
+        case "score": modelName
           return (a.score.score - b.score.score) * value
         case 'rate':
           return ((a.createTime || 0) - (b.createTime || 0)) * value
@@ -216,7 +216,7 @@ const OutlierRow = observer((props) => {
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
       getPopupContainer={el => el.parentElement}
-      >
+    >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input
@@ -285,7 +285,7 @@ const ClusteringTable = observer((props) => {
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('cvnn')}>CVNN {sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
         </div>
-        <div style={{width: 100}} className={`${classes.ccell}  ${classes.ccellHeader}`}>
+        <div style={{ width: 100 }} className={`${classes.ccell}  ${classes.ccellHeader}`}>
           <span onClick={() => handleSort('sihouette')}>{EN.SihouetteScore} {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
@@ -351,7 +351,7 @@ const ClusteringRow = observer((props) => {
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
       getPopupContainer={el => el.parentElement}
-      >
+    >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input

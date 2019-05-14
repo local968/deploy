@@ -138,12 +138,12 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: { selectModel }, sort, handleSort } = this.props;
-    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
+    const texts = ['Model Name', 'Time', 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
-      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{curr === 'Model Name' ? EN.ModelName : replaceR2(curr)}</div>;
+      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{curr === 'Model Name' ? EN.ModelName : curr === 'Time' ? EN.Time : replaceR2(curr)}</div>;
       if (curr === sort.key) {
         if (sort.value === 1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
         if (sort.value === -1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
@@ -226,7 +226,7 @@ class AdvancedModelTable extends Component {
 @observer
 class RegressionDetailCurves extends Component {
   state = {
-    curve: "Variable Impact",
+    curve: "Parallel Plot",
     visible: false,
     diagnoseType: null
   }
