@@ -110,18 +110,45 @@ wss.register('newEtl', async (message, socket, process) => {
     stats[key].type = value
   })
 
+  for (let key in stats) {
+    const mismatch = project.mismatchFillMethod[key]
+    const value = project.colType[key] === 'Numerical' ? project.rawDataView[key].mean : project.rawDataView[key].mode
+    if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
+    else if ((mismatch || mismatch === 0) && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
+    else stats[key].mismatchFillMethod = { type: 'replace', value }
+
+    const missingValue = project.nullFillMethod[key]
+    if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
+    else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
+    else if ((missingValue || missingValue === 0) && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
+    else stats[key].missingValueFillMethod = { type: 'replace', value }
+
+    const outlier = project.outlierFillMethod[key]
+    if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
+    else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
+
+    const range = project.outlierDictTemp[key]
+    if (range && range.length && range.length === 2) {
+      stats[key].originalStats.low = range[0]
+      stats[key].originalStats.high = range[1]
+    }
+  }
+
   if (project.problemType && project.problemType !== 'Clustering' && project.problemType !== 'Outlier') {
     stats[project.target].isTarget = true
     if (project.problemType === 'Classification') {
       let deletedValues = []
       if (project.targetArray && project.targetArray.length > 1) {
+        if (project.targetArray.includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
         deletedValues = Object.keys(project.colValueCounts[project.target]).filter(k => !project.targetArray.includes(k))
       } else {
         deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).slice(2).map(([k]) => k)
       }
+      if (Object.keys(project.renameVariable).includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: project.renameVariable[''] }
 
       stats[project.target].mapFillMethod = {
         ...Object.entries(project.renameVariable).reduce((prev, [key, value]) => {
+          if (key === '') return prev
           prev[key] = {
             type: 'replace',
             value
@@ -137,33 +164,9 @@ wss.register('newEtl', async (message, socket, process) => {
       }
     }
   }
-
-  for (let key in stats) {
-    const mismatch = project.mismatchFillMethod[key]
-    const value = project.colType[key] === 'Numerical' ? project.rawDataView[key].mean : project.rawDataView[key].mode
-    if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
-    else if ((mismatch || mismatch === 0) && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
-    else stats[key].mismatchFillMethod = { type: 'replace', value }
-
-    const missingValue = project.nullFillMethod[key]
-    if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
-    else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
-    else if ((missingValue || missingValue === 0) && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
-    else stats[key].mismatchFillMethod = { type: 'replace', value }
-
-    const outlier = project.outlierFillMethod[key]
-    if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
-    else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
-
-    const range = project.outlierDictTemp[key]
-    if (range && range.length && range.length === 2) {
-      stats[key].originalStats.low = range[0]
-      stats[key].originalStats.high = range[1]
-    }
-  }
   const response = await axios.post(`${esServicePath}/etls/${project.originalIndex}/etl`, stats)
   const { etlIndex, opaqueId, error } = response.data
-  if(error) return response.data
+  if (error) return response.data
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)

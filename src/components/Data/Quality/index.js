@@ -152,7 +152,8 @@ class TargetIssue extends Component {
               {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier}%</span></div>}
             </div>
             <div className={styles.tableBody}>
-              {sortData.map((v, k) => {
+              {!!sortData.length && sortData.map((r, k) => {
+                const v = r[targetIndex]
                 const { low = NaN, high = NaN } = rawDataView[target]
                 const isMissing = isNaN(parseFloat(v)) ? !v : false
                 const isMismatch = isNum ? isNaN(parseFloat(v)) : false
@@ -162,7 +163,7 @@ class TargetIssue extends Component {
                   [styles.missing]: isMissing,
                   [styles.outlier]: isOutlier
                 })}>
-                  <span title={renameVariable[v[targetIndex]] || v[targetIndex]}>{renameVariable[v[targetIndex]] || v[targetIndex]}</span>
+                  <span title={renameVariable[v] || v}>{renameVariable[v] || v}</span>
                 </div>
               })}
             </div>
@@ -520,19 +521,19 @@ class Summary extends Component {
         <div className={styles.summaryTitle}><span>{EN.Summaryofyourdata}</span></div>
         <div className={styles.summaryTypeBox}>
           <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{backgroundColor: '#00c855'}}/>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }} />
             <span>{EN.CleanData}</span>
           </div>
           <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{backgroundColor: '#819ffc'}}/>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }} />
             <span>{EN.DataTypeMismatch}</span>
           </div>
           <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{backgroundColor: '#ff97a7'}}/>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
           </div>
           {problemType !== 'Classification' && <div className={styles.summaryType}>
-            <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }}/>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
             <span>{EN.Outlier}</span>
           </div>}
         </div>
@@ -553,10 +554,10 @@ class Summary extends Component {
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock}>
-                <div className={styles.summaryProgress} style={{width: percentList[0].clean + '%', backgroundColor: '#00c855'}}/>
-                <div className={styles.summaryProgress} style={{width: percentList[0].mismatch + '%', backgroundColor: '#819ffc'}}/>
-                <div className={styles.summaryProgress} style={{width: percentList[0].missing + '%', backgroundColor: '#ff97a7'}}/>
-                {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percentList[0].outlier + '%', backgroundColor: '#f9cf37' }}/>}
+                <div className={styles.summaryProgress} style={{ width: percentList[0].clean + '%', backgroundColor: '#00c855' }} />
+                <div className={styles.summaryProgress} style={{ width: percentList[0].mismatch + '%', backgroundColor: '#819ffc' }} />
+                <div className={styles.summaryProgress} style={{ width: percentList[0].missing + '%', backgroundColor: '#ff97a7' }} />
+                {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percentList[0].outlier + '%', backgroundColor: '#f9cf37' }} />}
               </div>
             </div>
           </div>
@@ -589,10 +590,10 @@ class Summary extends Component {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
                 <div className={styles.summaryProgressBlock}>
-                  <div className={styles.summaryProgress} style={{width: percent.clean + '%', backgroundColor: '#00c855'}}/>
-                  <div className={styles.summaryProgress} style={{width: percent.mismatch + '%', backgroundColor: '#819ffc'}}/>
-                  <div className={styles.summaryProgress} style={{width: percent.missing + '%', backgroundColor: '#ff97a7'}}/>
-                  {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }}/>}
+                  <div className={styles.summaryProgress} style={{ width: percent.clean + '%', backgroundColor: '#00c855' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.mismatch + '%', backgroundColor: '#819ffc' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.missing + '%', backgroundColor: '#ff97a7' }} />
+                  {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }} />}
                 </div>
               </div>
             })}
@@ -605,38 +606,38 @@ class Summary extends Component {
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
           <Pie2
-                  RowsWillBeFixed = {fixedPercent}
-                  RowsWillBeDeleted = {deletePercent}
-                  CleanData = {cleanPercent}
+            RowsWillBeFixed={fixedPercent}
+            RowsWillBeDeleted={deletePercent}
+            CleanData={cleanPercent}
           />
           <div className={styles.summaryParts}>
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
-                <div className={styles.summaryCube} style={{backgroundColor: '#9cebff'}}/>
+                <div className={styles.summaryCube} style={{ backgroundColor: '#9cebff' }} />
                 <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeFixed}</span>
               </div>
               <div className={styles.summaryPartText}>
-                <div className={styles.summaryCube}/>
+                <div className={styles.summaryCube} />
                 <span>{formatNumber(fixedPercent, 2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
-                <div className={styles.summaryCube} style={{backgroundColor: '#c4cbd7'}}/>
+                <div className={styles.summaryCube} style={{ backgroundColor: '#c4cbd7' }} />
                 <span style={{ fontWeight: 'bold' }}>{EN.RowsWillBeDeleted}</span>
               </div>
               <div className={styles.summaryPartText}>
-                <div className={styles.summaryCube}/>
+                <div className={styles.summaryCube} />
                 <span>{formatNumber(deletePercent, 2)}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
               <div className={styles.summaryPartText}>
-                <div className={styles.summaryCube} style={{backgroundColor: '#00c855'}}/>
+                <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }} />
                 <span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span>
               </div>
               <div className={styles.summaryPartText}>
-                <div className={styles.summaryCube}/>
+                <div className={styles.summaryCube} />
                 <span>{formatNumber(cleanPercent, 2)}%</span>
               </div>
             </div>

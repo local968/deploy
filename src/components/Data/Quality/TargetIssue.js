@@ -319,8 +319,8 @@ export class SelectTarget extends Component {
     const { checked, belongTo0, belongTo1 } = this;
     const { colValueCounts, target, nullLineCounts } = this.props.project;
     const [v0, v1] = checked
-    const totalOf0 = [v0, ...belongTo0].reduce((start, v) => (v === '' ? nullLineCounts[target] : start += ((colValueCounts[target] || {})[v]) || 0, 0))
-    const totalOf1 = [v1, ...belongTo1].reduce((start, v) => (v === '' ? nullLineCounts[target] : start += ((colValueCounts[target] || {})[v]) || 0, 0))
+    const totalOf0 = [v0, ...belongTo0].reduce((start, v) => start += (v === '' ? nullLineCounts[target] : ((colValueCounts[target] || {})[v] || 0)), 0)
+    const totalOf1 = [v1, ...belongTo1].reduce((start, v) => start += (v === '' ? nullLineCounts[target] : ((colValueCounts[target] || {})[v] || 0)), 0)
     const maxKey = totalOf0 >= totalOf1 ? 0 : 1
     let targetMap = {
       [checked[maxKey]]: 0,
