@@ -14,7 +14,8 @@ import EN from '../../../constant/en';
 import FitPlot2 from "../../Charts/FitPlot2";
 import request from "../../Request";
 import ParallelPlots from "../../Charts/ParallelPlots";
-const Option = Select.Option;
+import ParallelPlot from './parallel-plot.png'
+const {Option} = Select;
 
 @inject('projectStore')
 @observer
@@ -139,7 +140,7 @@ class AdvancedModelTable extends Component {
   render() {
     const { models, project: { selectModel }, sort, handleSort } = this.props;
     const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
-    const arr = []
+    const arr = [];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
@@ -155,7 +156,12 @@ class AdvancedModelTable extends Component {
       }
       return prev
     }, {});
-    const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
+    const header = <div className={styles.tableHeader}>
+      <Row>
+        {texts.map(t => <RowCell data={headerData[t]} key={t} />)}
+        <RowCell data='Parallel Plot' key='para' />
+      </Row>
+    </div>;
     const dataSource = models.map(m => {
       return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} />
     });
@@ -163,7 +169,6 @@ class AdvancedModelTable extends Component {
       <React.Fragment>
         {header}
         <div className={styles.advancedModelTable} >
-
           {dataSource}
         </div>
       </React.Fragment>
@@ -174,19 +179,18 @@ class AdvancedModelTable extends Component {
 @observer class RegressionModleRow extends Component {
   state = {
     detail: false
-  }
+  };
   handleResult = e => {
     this.setState({ detail: !this.state.detail });
-  }
+  };
   render() {
     const { model, texts, checked } = this.props;
     const { score, modelName } = model;
     const { detail } = this.state;
     return (
-      <div >
+      <div className={styles.tb}>
         <Row onClick={this.handleResult} >
           {texts.map(t => {
-
             switch (t) {
               case EN.ModelName:
                 return (
@@ -216,6 +220,7 @@ class AdvancedModelTable extends Component {
                 return null
             }
           })}
+          <RowCell key='Parallel Plot' data={<a className={detail?styles.on:''}>Compute</a>} />
         </Row>
         {detail && <RegressionDetailCurves project={this.props.project} model={model} />}
       </div>
@@ -246,17 +251,22 @@ class RegressionDetailCurves extends Component {
     let curComponent = <div className={styles.plot}>
       <ParallelPlots url={this.props.model.parallelPlotData} />
     </div>
-    const thumbnails = [{
-      text: 'Parallel Plot',
-      hoverIcon: FitPlotHover,
-      normalIcon: FitPlotNormal,
-      selectedIcon: FitPlotSelected,
-      type: 'fitplot'
-    }]
+    // const thumbnails = [{
+    //   text: 'Parallel Plot',
+    //   hoverIcon: FitPlotHover,
+    //   normalIcon: FitPlotNormal,
+    //   selectedIcon: FitPlotSelected,
+    //   type: 'fitplot'
+    // }]
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{ minWidth: 0 }} >
-          {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+        <div className={styles.leftPanel} style={{
+          minWidth: 0,
+          backgroundColor:'transparent',
+          padding: '20px 0 0 190px',
+        }} >
+          <img style={{marginRight:12}} src={ParallelPlot} alt=''/>Parallel Plot
+          {/*{thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}*/}
         </div>
         <div className={styles.rightPanel} >
           {curComponent}
