@@ -28,6 +28,7 @@ const header = (props) => {
 function showConfirm(props ,email , password) {
   confirm({
     width: 400,
+    icon:'',
     content: header(props),
     okText: '是',
     cancelText: '否',

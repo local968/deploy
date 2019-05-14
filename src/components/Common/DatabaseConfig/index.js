@@ -8,7 +8,7 @@ import databaseIcon from './icon-database.svg';
 import socketStore from "stores/SocketStore";
 import EN from '../../../constant/en';
 const Option = Select.Option;
-const database = ['mysql', 'oracle'];
+const database = ['mysql', 'oracle', 'hive'];
 
 const storage = window.localStorage;
 
@@ -221,6 +221,7 @@ export default class DatabaseConfig extends Component {
             >
               <Option value="mysql">mysql</Option>
               <Option value="oracle">oracle</Option>
+              <Option value="hive">hive</Option>
             </Select>
           </div>
         </div>

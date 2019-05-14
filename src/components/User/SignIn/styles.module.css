@@ -100,6 +100,7 @@
 }
 
 .content_head{
+  border-radius: 5px 5px 0px 0;
   width: 400px;
   background: rgb(36, 52, 72);
   height: 30px;
@@ -117,6 +118,7 @@
 
 .content_icon{
   display: flex;
+  margin-left: -20px;
 }
 .content_icon img {
   width: 20px;
