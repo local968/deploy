@@ -18,6 +18,7 @@ export default class ParallelPlot extends PureComponent{
 				symbolSize:5,
 			}
 		});
+		// console.log(data)
 		return {
 			title: {
 				text: '',

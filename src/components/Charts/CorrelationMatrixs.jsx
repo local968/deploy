@@ -51,7 +51,7 @@ export default function CorrelationMatrixs(props){
 			align:'bottom',
 		},
 		series: {
-			name: 'Punch Card',
+			// name: 'Punch Card',
 			type: 'heatmap',
 			data,
 			itemStyle: {

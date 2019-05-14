@@ -156,7 +156,7 @@ wss.register('newEtl', async (message, socket, process) => {
     else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
 
     const range = project.outlierDictTemp[key]
-    if (!!range.length) {
+    if (range && range.length && range.length >= 2) {
       stats[key].originalStats.low = range[0]
       stats[key].originalStats.high = range[1]
     }
