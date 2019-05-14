@@ -27,11 +27,7 @@ function ModelResult(props) {
 
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
-console.log(12)
   if (!selectModel || !models.length) return null
-  
-  console.log(selectModel.outlierPlotData)
-  
   
   const abortTrain = () => {
     project.abortTrain()
@@ -108,7 +104,13 @@ console.log(12)
             <button className={classes.button} onClick={showDict}>
               <span>{EN.MappingDictionary}</span>
             </button>
-            <Popover trigger='click' placement='bottomLeft' visible={visible} onVisibleChange={hideDict} content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
+            <Popover
+                trigger='click'
+                getPopupContainer={() => document.getElementsByClassName(classes.dict)[0]}
+                placement='bottomLeft'
+                visible={visible}
+                onVisibleChange={hideDict}
+                content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
           </div>}
         </div>
         <div className={classes.right} style={{flex:1,width:200}}>
@@ -213,7 +215,8 @@ const OutlierRow = observer((props) => {
       overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
-      getPopupContainer={el => el.parentElement}>
+      getPopupContainer={el => el.parentElement}
+      >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input
@@ -347,7 +350,8 @@ const ClusteringRow = observer((props) => {
       overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
-      getPopupContainer={el => el.parentElement}>
+      getPopupContainer={el => el.parentElement}
+      >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input

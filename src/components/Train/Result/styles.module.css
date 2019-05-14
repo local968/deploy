@@ -502,6 +502,7 @@
 .dict {
   display: block;
   text-align: left;
+  position: relative;
 }
 
 .dictBlock {

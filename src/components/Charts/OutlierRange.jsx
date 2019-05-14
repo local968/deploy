@@ -20,7 +20,7 @@ export default class OutlierRange extends PureComponent{
 			selectArea:[],
 		};
 		this.chart = React.createRef();
-		this.setSelectArea = debounce(this.setSelectArea, 0)
+		this.setSelectArea = debounce(this.setSelectArea, 10)
 	}
 
 	componentDidMount() {
@@ -89,7 +89,7 @@ export default class OutlierRange extends PureComponent{
 			areas: [
 				{
 					brushType: 'lineX',
-					coordRange: [Math.trunc(selectArea[0]*100)/100,Math.trunc(selectArea[1]*100)/100],
+					coordRange: selectArea,
 					xAxisIndex: 0,
 				},
 			],
@@ -227,7 +227,7 @@ export default class OutlierRange extends PureComponent{
 			key="'chart"
 			/>,
 			<div key='bottom' className={styles.fixesBottom}>
-				<button className={styles.save} onClick={()=>saveEdit(selectArea)}><span>{EN.Apply}</span></button>
+				<button className={styles.save} onClick={()=>saveEdit(selectArea)}><span style={{color:'#fff'}}>{EN.Apply}</span></button>
 				<button className={styles.cancel} onClick={closeEdit}><span>{EN.CANCEL}</span></button>
 			</div>,
 		]

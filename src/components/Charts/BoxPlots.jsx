@@ -27,7 +27,7 @@ export default class BoxPlots extends PureComponent{
 			grid: {
 				left: '10%',
 				right: '10%',
-				bottom: '15%',
+				bottom: '25%',
 			},
 			xAxis: {
 				name:x_name,
@@ -42,6 +42,10 @@ export default class BoxPlots extends PureComponent{
 				// axisLabel: {
 				// 	formatter: 'expr {value}'
 				// },
+				axisLabel:{
+					interval:0,
+					rotate:30,
+				},
 				splitLine: {
 					show: false,
 				},
@@ -61,7 +65,7 @@ export default class BoxPlots extends PureComponent{
 					tooltip: {
 						formatter: function (param) {
 							return [
-								'Experiment ' + param.name + ': ',
+								param.name + ': ',
 								'upper: ' + param.data[5],
 								'Q3: ' + param.data[4],
 								'median: ' + param.data[3],

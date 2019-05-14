@@ -46,12 +46,11 @@ export default class Iso extends PureComponent{
     async componentDidMount(url=this.props.selectModel.outlierPlotData,loading = this.props.selectModel.outlierPlotLoading) {
         const chart = this.chart.getEchartsInstance();
         console.log('loading',loading)
-        if(loading){
-            return chart.showLoading();
-        }
+        // if(loading){
+        //     return chart.showLoading();
+        // }
         const { selectModel:models} = this.props;
-        console.log(models)
-        const point = models.dataFlow[0].contamination.toFixed(2);
+        const point = (models.dataFlow[0].contamination||0).toFixed(2);
         const {featureImportance} = models;
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];
@@ -172,7 +171,7 @@ export default class Iso extends PureComponent{
                     position: 'top',
                 },
                 legend: {
-                    top: 20,
+                    top: 5,
                     right:0,
                     data: ['正常','异常'],
                     align: 'left',
