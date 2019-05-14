@@ -25,29 +25,30 @@ export default class OutlierRange extends PureComponent{
 
 	componentDidMount() {
 		const {title='',field,id,project} = this.props;
-		let {min,max,low,high} = project.rawDataView[field];
+		const {rawDataView={}} = project;
+		let {min,max,low,high} = rawDataView[field]||{};
 
 		if(toJS(project.outlierDictTemp)[field]){
 			const data = project.outlierDictTemp[field];
-			low = data[0];
-			high = data[1];
+			low = (parseInt(data[0]*10*10)/100).toFixed(2);
+			high = (parseInt(data[1]*10*10)/100).toFixed(2);
 		}else{
-			low = (parseInt(low*100)/100).toFixed(2);
-			high = (parseInt(high*100)/100).toFixed(2);
+			low = (parseInt(low*10*10)/100).toFixed(2);
+			high = (parseInt(high*10*10)/100).toFixed(2);
 		}
 		let selectArea = [+low,+high];
 		const zoom=0.1*(max-min);
 		// const zoom = 0;
 		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
-		const interval = Math.ceil((max-min)/bin);
+		const interval = ((max-min)/bin).toFixed(2);
 		const chart = this.chart.getEchartsInstance();
 		
 		request.post({
 			url: '/graphics/outlier-range',
 			data: {
-				field:field+'.double',
+				field:field + '.double',
 				id,
-				interval,
+				interval:+interval,
 			},
 		}).then((result) => {
 			this.setState({
@@ -196,6 +197,8 @@ export default class OutlierRange extends PureComponent{
 		const {max,min,selectArea} = this.state;
 		const [start,end] = selectArea;
 		const {closeEdit,saveEdit} = this.props;
+		const _low = (parseInt(Math.max(min,start)*10*10)/100).toFixed(2);
+		const _high = (parseInt(Math.min(max,end)*10*10)/100).toFixed(2);
 		return [
 			<div key="div" className={styles.outlierTop}>
 				<div>最小值:<InputNum
@@ -203,7 +206,7 @@ export default class OutlierRange extends PureComponent{
 					max={max}
 					step={0.01}
 					precision={2}
-					value={start}
+					value={_low}
 					style={{ width: 100 }}
 					onChange={(start)=>{
 						this.setState({
@@ -216,7 +219,7 @@ export default class OutlierRange extends PureComponent{
 					max={max}
 					step={0.01}
 					precision={2}
-					value={end}
+					value={_high}
 					style={{ width: 100 }}
 					onChange={(end)=>{
 						this.setState({
@@ -236,7 +239,7 @@ export default class OutlierRange extends PureComponent{
 			key="'chart"
 			/>,
 			<div key='bottom' className={styles.fixesBottom}>
-				<button className={styles.save} onClick={()=>saveEdit(selectArea)}><span style={{color:'#fff'}}>{EN.Apply}</span></button>
+				<button className={styles.save} onClick={()=>saveEdit([_low,_high])}><span style={{color:'#fff'}}>{EN.Apply}</span></button>
 				<button className={styles.cancel} onClick={closeEdit}><span>{EN.CANCEL}</span></button>
 			</div>,
 		]

@@ -32,6 +32,7 @@ export default class ThreeVariable extends PureComponent{
 				right:0,
 				align: 'left',
 				type: 'scroll',
+				zlevel:20,
 			},
 			xAxis3D: {
 				name:x_name

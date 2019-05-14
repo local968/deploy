@@ -22,6 +22,7 @@ export default function RocChart2(props){
 			symbolSize: 0,
 			data:itm.value,
 			type: 'line',
+			smooth:false,
 		}
 	});
 	

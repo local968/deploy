@@ -153,7 +153,7 @@ export default class Iso extends PureComponent{
             name:'正常',
             animation:true,
             silent:true,
-            z:3,
+            zlevel:3,
         },{
             type:'scatter',
             data:data2,
@@ -163,7 +163,7 @@ export default class Iso extends PureComponent{
             name:'异常',
             animation:true,
             silent:true,
-            z:2,
+            zlevel:2,
         });
         
         const nameTextStyle = {

@@ -58,6 +58,7 @@ export default class ParallelPlot extends PureComponent{
 				bottom:40,
 				right: 0,
 				type: 'scroll',
+				zlevel:20,
 			},
 			xAxis: [
 				{
