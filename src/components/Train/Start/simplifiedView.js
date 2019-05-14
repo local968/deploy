@@ -299,7 +299,7 @@ class SimplifiedViewRow extends Component {
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked} onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
-        <InputNumber value={weight || 1} max={99.99} min={0.01} step={0.1} precision={2} onChange={handleWeight} />
+        <InputNumber value={weight || 1} max={99.9} min={0.1} step={0.1} precision={1} onChange={handleWeight} />
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
