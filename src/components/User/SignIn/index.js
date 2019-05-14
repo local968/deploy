@@ -16,7 +16,7 @@ function showConfirm(props ,email , password) {
     cancelText:'否',
     onOk() {
       props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
-      props.userStore.changeIsWatchVideo(true)
+      props.userStore.change('isWatchVideo')(true);
       props.userStore.login({ email, password })
       props.userStore.change('tabKey')('2');
       props.history.push({pathname: '/support',state: { key
@@ -24,8 +24,8 @@ function showConfirm(props ,email , password) {
     },
     onCancel() {
       props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
-      props.userStore.changeIsWatchVideo(false)
-      props.userStore.login({ email, password })
+      props.userStore.change('isWatchVideo')(false);
+      props.userStore.login({ email, password });
     },
   });
 }
@@ -86,8 +86,7 @@ export default class SignIn extends Component {
   }
 
   onchangeCheck = (e) => {
-    this.props.userStore.changeIsCheck(e.target.checked)
-  console.log(e)
+    this.props.userStore.change('isCheck')(e.target.checked)
 }
 
   render() {

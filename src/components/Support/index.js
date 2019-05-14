@@ -326,7 +326,7 @@ export default class Support extends Component {
                 <Article
                   changeSelectedKeys={this.changeSelectedKeys}
                 /> :
-                <video ref={child => this.videoChange = child} className={styles.tabVideo} controls autobuffer>
+                <video ref={child => this.videoChange = child} className={styles.tabVideo} controls={true} autobuffer="true">
                   <source
                     ref={child => this.sourceChange = child}
                     src={isEN ? require('./resource/English_video.mp4') : require('./resource/Chinese_video.mp4')}
