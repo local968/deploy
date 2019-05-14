@@ -56,10 +56,14 @@ export default class Support extends Component {
 		this.changeSelectedKeys = this.changeSelectedKeys.bind(this);
 		this.onSelect = this.onSelect.bind(this);
 		_change('email', props.userStore.info.email)
+    console.log(this.props.userStore.isWatchVideo  , '1')
+    this.props.userStore.isWatchVideo ? this.props.userStore.change('tabKey')('2'):this.props.userStore.change('tabKey')('1')
 	}
 
-	componentWillUnmount() {
-    this.props.userStore.change('tabKey')('1');
+	componentWillUnmount(props) {
+	  console.log(this.props.userStore.isWatchVideo  , '2')
+    this.props.userStore.changeIsWatchVideo(false)
+    // this.props.userStore.change('tabKey')('1');
     this.props.userStore.change('videoKey')('1');
     _change("type", 1)
   }
@@ -187,7 +191,7 @@ export default class Support extends Component {
 							</div>
 						</div>
 						<div className={styles.menu}>
-              <Tabs defaultActiveKey="1" onChange={this.tabClick}>
+              <Tabs defaultActiveKey={this.props.userStore.tabKey} onChange={this.tabClick}>
                 <TabPane tab={EN.UserManual} key="1">
                   <DirectoryTree
                   showLine

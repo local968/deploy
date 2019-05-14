@@ -15,7 +15,15 @@ class UserStore {
   }
   @observable tabKey = '1';
   @observable videoKey = '1';
+  @observable isWatchVideo = true;
+  @observable isCheck = false;
 
+  @action changeIsCheck  = (val) => {
+    this.isCheck = val;
+  }
+  @action changeIsWatchVideo  = (val) => {
+    this.isWatchVideo = val;
+  }
   @action change = (name) => (val) => {
     this[name] = val;
   }
