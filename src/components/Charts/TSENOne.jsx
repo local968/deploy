@@ -4,6 +4,9 @@ import './echarts.config'
 
 export default function TSENOne(props){
 	const {x_name='',y_name='',data={},width=400,height=400} = props;
+	const nameTextStyle = {
+		color:'#000',
+	};
 	const option = {
 		title: {
 			text: '',
@@ -36,6 +39,7 @@ export default function TSENOne(props){
 			{
 				name: x_name,
 				type: 'value',
+				nameTextStyle,
 				scale: true,
 				axisLabel: {
 					formatter: '{value}',
@@ -52,6 +56,7 @@ export default function TSENOne(props){
 				name: y_name,
 				type: 'value',
 				scale: true,
+				nameTextStyle,
 				axisLabel: {
 					formatter: '{value}',
 				},

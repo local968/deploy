@@ -15,6 +15,10 @@ export default function HistogramCategorical(props){
     height = 330,
     width = 500,
   } = props;
+  
+  const nameTextStyle = {
+    color:'#000',
+  };
 
   const option = {
     title: {
@@ -26,10 +30,12 @@ export default function HistogramCategorical(props){
       type: 'category',
       data: data.map((itm)=>itm.name),
       nameLocation:'middle',
+      nameTextStyle,
       nameGap:25,
     },
     yAxis: {
       name:y_name,
+      nameTextStyle,
       type: 'value',
     },
     series: [{

@@ -10,6 +10,9 @@ export default class BoxPlots extends PureComponent{
 		const {value=[],title='',x_name='',y_name='',x_keys = []} = this.props;
 
 		const data = Echarts.dataTool.prepareBoxplotData(value);
+		const nameTextStyle = {
+			color:'#000',
+		};
 
 		return {
 			title: [
@@ -32,7 +35,7 @@ export default class BoxPlots extends PureComponent{
 			xAxis: {
 				name:x_name,
 				type: 'category',
-				// data: data.axisData,
+				nameTextStyle,
 				data:x_keys,
 				boundaryGap: true,
 				nameGap: 30,
@@ -53,6 +56,7 @@ export default class BoxPlots extends PureComponent{
 			yAxis: {
 				type: 'value',
 				name: y_name,
+				nameTextStyle,
 				splitArea: {
 					show: true,
 				},

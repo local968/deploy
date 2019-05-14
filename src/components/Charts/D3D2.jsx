@@ -91,7 +91,7 @@ export default class D3D2 extends PureComponent {
 		let dot = [x_name, y_name, z_name].map(itm => featuresLabel.indexOf(itm));
 		
 		featureData.map((itm, index) => {
-			const val = itm.filter((it, ind) => dot.includes(ind));
+			const val = dot.map(it=>itm[it]).filter(it=>it);
 			data.filter(itm => itm.name === labels[index])[0].value.push(val);
 		});
 		

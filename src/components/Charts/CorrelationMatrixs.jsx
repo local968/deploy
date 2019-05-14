@@ -15,6 +15,9 @@ export default function CorrelationMatrixs(props){
 	data = data.map((item)=> [item[1], item[0], item[2] || '-']);
 	
 	const len = Math.max(...type.map(itm=>itm.length));
+	const nameTextStyle = {
+		color:'#000',
+	};
 
 	const option = {
 		tooltip: {
@@ -33,10 +36,12 @@ export default function CorrelationMatrixs(props){
 				interval:0,
 				rotate:30,
 			},
+			nameTextStyle,
 		},
 		yAxis: {
 			type: 'category',
 			data: [...type].reverse(),
+			nameTextStyle,
 		},
 		visualMap: {
 			min: -1,

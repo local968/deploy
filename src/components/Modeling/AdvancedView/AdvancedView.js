@@ -422,8 +422,8 @@ class AdvancedModelTable extends Component {
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
-      ['Model Name', 'Time', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
-      ['Model Name', 'Time', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', 'Validation', 'Holdout'];
+      [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
+      [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''

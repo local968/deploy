@@ -42,13 +42,19 @@ export default function SpeedvsAccuracys(props){
 			},
 		}
 	});
+	
+	const nameTextStyle = {
+		color:'#000',
+	};
 
 	const option =  {
 		xAxis: {
+			nameTextStyle,
 			name:x_name,
 		},
 		yAxis: {
 			name:y_name,
+			nameTextStyle,
 		},
 		series,
 		legend: {

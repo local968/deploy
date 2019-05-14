@@ -4,6 +4,31 @@ import styles from "./styles.module.css";
 import warnIcon from "./fail.svg";
 import { observable, action, runInAction } from 'mobx';
 import EN from '../../../constant/en';
+import { Modal, Checkbox } from 'antd';
+
+const confirm = Modal.confirm;
+
+function showConfirm(props ,email , password) {
+  confirm({
+    title: '是否观看教学视频？',
+    content: '',
+    okText:'是',
+    cancelText:'否',
+    onOk() {
+      props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
+      props.userStore.changeIsWatchVideo(true)
+      props.userStore.login({ email, password })
+      props.userStore.change('tabKey')('2');
+      props.history.push('/support')
+    },
+    onCancel() {
+      props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
+      props.userStore.changeIsWatchVideo(false)
+      props.userStore.login({ email, password })
+    },
+  });
+}
+
 @inject('userStore')
 @observer
 export default class SignIn extends Component {
@@ -43,8 +68,12 @@ export default class SignIn extends Component {
         this.warning = warning
       })
     }
-    
-    this.props.userStore.login({ email, password })
+    const isShowModal = localStorage.getItem('checked');
+    if(!isShowModal){
+      showConfirm(this.props , email ,password)
+    }else{
+      this.props.userStore.login({ email, password })
+    }
   }
   
   onKeyUp = (event) => {
@@ -54,7 +83,12 @@ export default class SignIn extends Component {
   register = () => {
     this.props.history.push("/signup")
   }
-  
+
+  onchangeCheck = (e) => {
+    this.props.userStore.changeIsCheck(e.target.checked)
+  console.log(e)
+}
+
   render() {
     return <div className={styles.signin}>
       <div className={styles.title}><span>{EN.SignIn}</span></div>
@@ -67,6 +101,9 @@ export default class SignIn extends Component {
         <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword} onKeyUp={this.onKeyUp} />
       </div>
       <div className={styles.row}><a className={styles.forgetPassword} href="/forgetpassword">{EN.ForgetPassword}?</a></div>
+      {
+        !localStorage.getItem('checked') ? <div><Checkbox onChange={this.onchangeCheck}>不再提示该信息 </Checkbox></div>: null
+      }
       <div className={styles.buttonRow}>
         <button className={styles.button} onClick={this.login}>
           <span>{EN.SignIn}</span>

@@ -92,7 +92,7 @@ export default class DataConnect extends Component {
     if (!this.isSql && process > 0 && process < 50) return EN.Uploadingdata;
     if (process >= 50) return EN.ExtractTransformLoadinprogress;
     if (this.isSql && process === 0) return EN.Perparingfordatabaseconnection;
-    if (this.isSql && process >= 20 && process < 50) return `${EN.DownloadedData} ${this.sqlProgress}${EN.Rows}`;
+    if (this.isSql && process > 0 && process < 50) return `${EN.DownloadedData} ${this.sqlProgress}${EN.Rows}`;
   }
 
   onUpload = ({ pause, resume }) => {
@@ -103,6 +103,7 @@ export default class DataConnect extends Component {
   }
 
   upload = action(data => {
+
     this.process = 50
     this.file = null
 

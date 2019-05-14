@@ -37,7 +37,19 @@
 
 
 .adjust{
-    font-size:14px;
+    font-size:15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.adjust label{
+    display:inline-block;
+}
+
+.adjust label:after{
+    content: attr(data-tip);
+    font-size: 12px;
+    display: block;
 }
 
 .slider{

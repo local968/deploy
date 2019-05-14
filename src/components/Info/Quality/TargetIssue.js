@@ -21,30 +21,30 @@ export class FixIssue extends Component {
   @observable editKey = '';
 
   editRange(key, id) {
-    const { low, high } = this.props.project.rawDataView[key];
-
-    if (!this.outLier[key]) {
-      request.post({
-        url: '/graphics/outlier-range',
-        data: {
-          "field": key + '.double',
-          id,
-          "interval": 20,
-        },
-      }).then((result) => {
-        this.outLier = {
-          ...this.outLier,
-          [key]: {
-            low,
-            high,
-            data: result.data,
-          },
-        };
-        this.editKey = key;
-        this.visible = true;
-      });
-      return;
-    }
+    // const { low, high } = this.props.project.rawDataView[key];
+    //
+    // if (!this.outLier[key]) {
+    //   request.post({
+    //     url: '/graphics/outlier-range',
+    //     data: {
+    //       "field": key + '.double',
+    //       id,
+    //       "interval": 20,
+    //     },
+    //   }).then((result) => {
+    //     this.outLier = {
+    //       ...this.outLier,
+    //       [key]: {
+    //         low,
+    //         high,
+    //         data: result.data,
+    //       },
+    //     };
+    //     this.editKey = key;
+    //     this.visible = true;
+    //   });
+    //   return;
+    // }
     this.editKey = key;
     this.visible = true;
   };
