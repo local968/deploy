@@ -194,7 +194,7 @@ export default class AdvancedView extends Component {
             const bModelData = formatNumber(bModel.score.validateScore.adjustR2)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'Validation':
+        case EN.Validation:
           {
             const { problemType } = project
             let aModelData, bModelData
@@ -207,7 +207,7 @@ export default class AdvancedView extends Component {
             }
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'Holdout':
+        case EN.Holdout:
           {
             const { problemType } = project
             let aModelData, bModelData
@@ -228,9 +228,9 @@ export default class AdvancedView extends Component {
             const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex]);
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'Time':
+        case EN.Time:
           return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
-        case 'Model Name':
+        case EN.ModelName:
         default:
           return (aModel.modelName > bModel.modelName ? 1 : -1) * (sort.value === 1 ? 1 : -1)
         // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
@@ -477,7 +477,7 @@ class AdvancedModelTable extends Component {
         <Row onClick={this.handleResult} >
           {texts.map(t => {
             switch (t) {
-              case 'Model Name':
+              case EN.ModelName:
                 return (
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
@@ -503,11 +503,11 @@ class AdvancedModelTable extends Component {
                 return <RowCell key={5} data={score.validateScore.r2} title={score.validateScore.r2 === 'null' ? (validate || {}).r2 : ""} />;
               case 'AdjustR2':
                 return <RowCell key={8} data={score.validateScore.adjustR2} title={score.validateScore.adjustR2 === 'null' ? (validate || {}).adjustR2 : ""} />;
-              case 'Validation':
+              case EN.Validation:
                 return <RowCell key={6} data={score.validateScore[metric]} title={score.validateScore[metric] === 'null' ? (validate || {})[metric] : ""} />;
-              case 'Holdout':
+              case EN.Holdout:
                 return <RowCell key={7} data={score.holdoutScore[metric]} title={score.holdoutScore[metric] === 'null' ? (holdout || {})[metric] : ""} />;
-              case 'Time':
+              case EN.Time:
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
               default:
                 return null
@@ -658,7 +658,7 @@ class ClassificationModelRow extends Component {
         <Row onClick={this.handleResult} >
           {texts.map(t => {
             switch (t) {
-              case 'Model Name':
+              case EN.ModelName:
                 return (
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
@@ -680,11 +680,11 @@ class ClassificationModelRow extends Component {
                 return <RowCell key={6} data={roc.Threshold[fitIndex]} />;
               case 'KS':
                 return <RowCell key={7} data={roc.KS[fitIndex]} />;
-              case 'Validation':
+              case EN.Validation:
                 return <RowCell key={8} data={metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
-              case 'Holdout':
+              case EN.Holdout:
                 return <RowCell key={9} data={metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
-              case 'Time':
+              case EN.Time:
                 return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
               default:
                 return null
@@ -700,7 +700,7 @@ class ClassificationModelRow extends Component {
 class DetailCurves extends Component {
   state = {
     curve: EN.ROCCurve,
-    show:true,
+    show: true,
   }
   handleClick = val => {
     this.setState({ curve: val });
@@ -708,23 +708,23 @@ class DetailCurves extends Component {
   reset = () => {
     this.props.model.resetFitIndex();
     this.setState({
-      show:false
+      show: false
     })
-    setTimeout(()=>{
+    setTimeout(() => {
       this.setState({
-        show:true
+        show: true
       })
-    },0)
+    }, 0)
   };
   render() {
     const { model, model: { mid }, yes, no } = this.props;
-    const { curve,show } = this.state;
+    const { curve, show } = this.state;
     let curComponent;
     let hasReset = true;
     switch (curve) {
       case EN.ROCCurve:
         // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
-        curComponent = show&&<ROCCurves
+        curComponent = show && <ROCCurves
           height={300}
           width={500}
           x_name={EN.FalsePositiveDate}
@@ -746,7 +746,7 @@ class DetailCurves extends Component {
         break;
       case EN.PrecisionRecallTradeoff:
         // curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
-        curComponent = show&&<PRCharts
+        curComponent = show && <PRCharts
           height={300} width={500}
           x_name={EN.Recall}
           y_name={EN.Precision}

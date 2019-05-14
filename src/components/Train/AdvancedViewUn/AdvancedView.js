@@ -67,9 +67,9 @@ export default class AdvancedView extends Component {
             const bModelData = formatNumber(bModel.score.silhouette_euclidean)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'Time':
+        case EN.Time:
           return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
-        case 'Model Name':
+        case EN.ModelName:
         default:
           return (aModel.name > bModel.name ? 1 : -1) * (sort.value === 1 ? 1 : -1)
       }
@@ -125,7 +125,7 @@ export default class AdvancedView extends Component {
 }
 
 const questMarks = {
-  'CVNN': EN.CVNNHint, 'RSquared': EN.squaredHint, 'RMSSTD':EN.RMSSTDHint, 'CH': "", 'silhouette_cosine': "", 'silhouette_euclidean': ""
+  'CVNN': EN.CVNNHint, 'RSquared': EN.squaredHint, 'RMSSTD': EN.RMSSTDHint, 'CH': "", 'silhouette_cosine': "", 'silhouette_euclidean': ""
 }
 
 @observer
@@ -138,12 +138,12 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: { selectModel }, sort, handleSort } = this.props;
-    const texts = ['Model Name', 'Time', 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
+    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
-      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{curr === 'Model Name' ? EN.ModelName : curr === 'Time' ? EN.Time : replaceR2(curr)}</div>;
+      const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
       if (curr === sort.key) {
         if (sort.value === 1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
         if (sort.value === -1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
@@ -188,7 +188,7 @@ class AdvancedModelTable extends Component {
           {texts.map(t => {
 
             switch (t) {
-              case 'Model Name':
+              case EN.ModelName:
                 return (
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
@@ -210,7 +210,7 @@ class AdvancedModelTable extends Component {
                 return <RowCell key={3} data={score.silhouette_cosine} />;
               case 'Silhouette Euclidean':
                 return <RowCell key={4} data={score.silhouette_euclidean} />;
-              case 'Time':
+              case EN.Time:
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
               default:
                 return null
