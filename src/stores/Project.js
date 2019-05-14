@@ -1278,8 +1278,6 @@ export default class Project {
       case 'Outlier':
         command = 'outlier.train';
         trainData = {
-          k_type: "auto",
-          k_value: undefined,
           algorithms: [
             'HBOS',
             'PCA',
@@ -1529,23 +1527,134 @@ export default class Project {
   }
 
   newSetting = (type = 'auto') => {
-    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
-    const setting = {
-      version,
-      validationRate,
-      holdoutRate,
-      randSeed,
-      measurement,
-      runWith,
-      resampling,
-      crossCount,
-      dataRange,
-      customField,
-      customRange,
-      algorithms,
-      speedVSaccuracy,
-      ensembleSize
+    const { problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+    const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
+
+    let setting
+
+    switch (problemType) {
+      case 'Clustering':
+        setting = type === 'auto' ? {
+          kType,
+          kValue,
+          measurement,
+          algorithms: [
+            'KMeans',
+            'GMM',
+            'Birch',
+            'Agg',
+            'SpectralClustering',
+            'DBSCAN',
+            'MeanShift',
+          ],
+          standardType: 'standard',
+          searchTime: 5,
+          featureLabel,
+          randSeed: 0,
+          weights: {},
+        } : {
+            kType,
+            kValue,
+            measurement,
+            algorithms,
+            standardType,
+            searchTime,
+            featureLabel,
+            randSeed,
+            weights,
+          };
+        break;
+      case 'Outlier':
+        setting = type === 'auto' ? {
+          algorithms: [
+            'HBOS',
+            'PCA',
+            'IsolationForest',
+            'MCD',
+            'EllipticEnvelope',
+          ],
+          standardType: 'standard',
+          searchTime: 5,
+          featureLabel,
+          randSeed: 0,
+          weights: {},
+        } : {
+            algorithms,
+            standardType,
+            searchTime,
+            featureLabel,
+            randSeed,
+            weights,
+          };
+        break;
+      default:
+        setting = type === 'auto' ? {
+          version: [1, 2, 3],
+          validationRate: 20,
+          holdoutRate: 20,
+          randSeed: 0,
+          measurement: problemType === "Classification" ? "auc" : "r2",
+          runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
+          resampling: 'no',
+          crossCount: '5',
+          dataRange: 'all',
+          customField: '',
+          customRange: [],
+          algorithms: problemType === "Classification" ? [
+            'adaboost',
+            'bernoulli_nb',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_nb',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'lda',
+            'liblinear_svc',
+            'libsvm_svc',
+            'multinomial_nb',
+            'passive_aggressive',
+            'qda',
+            'random_forest',
+            'sgd',
+            'xgradient_boosting',
+            'r2-logistics',
+          ] : [
+              'adaboost',
+              'ard_regression',
+              'decision_tree',
+              'extra_trees',
+              'gaussian_process',
+              'gradient_boosting',
+              'k_nearest_neighbors',
+              'liblinear_svr',
+              'libsvm_svr',
+              'random_forest',
+              'ridge_regression',
+              'sgd',
+              'xgradient_boosting',
+            ],
+          speedVSaccuracy: 5,
+          ensembleSize: 20,
+          featureLabel
+        } : {
+            version,
+            validationRate,
+            holdoutRate,
+            randSeed,
+            measurement,
+            runWith,
+            resampling,
+            crossCount,
+            dataRange,
+            customField,
+            customRange,
+            algorithms,
+            speedVSaccuracy,
+            ensembleSize,
+            featureLabel
+          }
     }
+
     const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
     const id = uuid.v4()
     this.settingId = id
