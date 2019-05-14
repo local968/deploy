@@ -296,8 +296,8 @@ class AdvancedModelTable extends Component {
     const { models, project, metric } = this.props;
     const { problemType, selectModel } = project
     const texts = problemType === 'Classification' ?
-      ['Model Name', 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', 'Validation', 'Holdout'] :
-      ['Model Name', 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', 'Validation', 'Holdout',];
+      [EN.ModelName, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
+      [EN.ModelName, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'adjustR2', EN.Validation, EN.Holdout];
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
         return <ClassificationModelRow key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />

@@ -708,7 +708,7 @@ const EN: any = {
   Found: '发现问题',
   YourtargetvariableHas: '您的目标变量的类别个数',
   Less: '少于',
-  More: '多余',
+  More: '多于',
   Thantwouniquealues: '2个',
   Targetvariablequalityisgood: '未检测出目标变量质量问题',
   Optional: '可选的',
