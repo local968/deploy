@@ -14,7 +14,7 @@ const header = (props) => {
   return (
     <div>
       <div className={styles.content_head}>
-        {/*<img onClick={() => {return null}} src={deleteIcon}/>*/}
+        <img onClick={() => {Modal.destroyAll();props.userStore.change('isCheck')(false)}} src={deleteIcon}/>
       </div>
       <div className={styles.content_icon}>
         <img src={copyIcon}/>
