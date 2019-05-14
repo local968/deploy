@@ -869,7 +869,7 @@ const EN: any = {
   age2freb4: 'age2_fre_b4',
   agecusb3: 'age_cus_b3',
   agecusb4: 'age_cus_b4',
-  ChooseaVariableScalingMethod: '请选择标准化方法：',
+  ChooseaVariableScalingMethod: '请选择标准化方法',
   minmaxscale: 'Min Max Scale',
   standardscale: 'Standard Scale',
   robustscale: 'Robust Scale',
@@ -968,6 +968,7 @@ const EN: any = {
   ClusteringHint:'对样本进行分类，把更为相似归为同一类。（例如：客户分群与画像）',
   OutlierDetectionHint:'识别与其他样本差异过大的低频、可疑样本。（例如：信用卡欺诈行为侦测）',
   ExplainationHint:'展示对每一个聚类类别重要的变量。',
+  Doyouwanttotreatnull:'是否选择把缺失值设置为另一个类别？',
 };
 
 export default EN;

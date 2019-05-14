@@ -11,9 +11,9 @@ const confirm = Modal.confirm;
 function showConfirm(props ,email , password) {
   confirm({
     title: '是否观看教学视频？',
-    content: '',
-    okText:'是',
-    cancelText:'否',
+    content: <div><Checkbox onChange={(e) => props.userStore.change('isCheck')(e.target.checked)}>不再提示该信息 </Checkbox></div>,
+    okText: '是',
+    cancelText: '否',
     onOk() {
       props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
       props.userStore.change('isWatchVideo')(true);
@@ -85,9 +85,6 @@ export default class SignIn extends Component {
     this.props.history.push("/signup")
   }
 
-  onchangeCheck = (e) => {
-    this.props.userStore.change('isCheck')(e.target.checked)
-}
 
   render() {
     return <div className={styles.signin}>
@@ -101,9 +98,6 @@ export default class SignIn extends Component {
         <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword} onKeyUp={this.onKeyUp} />
       </div>
       <div className={styles.row}><a className={styles.forgetPassword} href="/forgetpassword">{EN.ForgetPassword}?</a></div>
-      {
-        !localStorage.getItem('checked') ? <div><Checkbox onChange={this.onchangeCheck}>不再提示该信息 </Checkbox></div>: null
-      }
       <div className={styles.buttonRow}>
         <button className={styles.button} onClick={this.login}>
           <span>{EN.SignIn}</span>
