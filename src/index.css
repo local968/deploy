@@ -86,6 +86,7 @@ body {
   background: #243448 !important;
   border-color: #243448 !important;
 }
-.anticon svg{
-  display: none !important;
+
+.ant-checkbox-wrapper{
+  margin-left: -20px !important;
 }
