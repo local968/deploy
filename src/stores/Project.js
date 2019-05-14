@@ -798,10 +798,13 @@ export default class Project {
 
   @computed
   get targetCounts() {
-    return (!this.targetArrayTemp.length ? this.colValueCounts[this.target] : this.targetArrayTemp.map((v, k) => {
+    const { colValueCounts, target, nullLineCounts, targetArrayTemp, targetMapTemp } = this
+    const countData = { ...colValueCounts[target] }
+    if (nullLineCounts[target]) countData[''] = nullLineCounts[target]
+    return (!targetArrayTemp.length ? countData : targetArrayTemp.map((v, k) => {
       let n = 0
-      Object.entries(this.targetMapTemp).forEach(([key, value]) => {
-        if (value === k) n += this.colValueCounts[this.target] ? (this.colValueCounts[this.target][key] || 0) : 0
+      Object.entries(targetMapTemp).forEach(([key, value]) => {
+        if (value === k) n += countData ? (countData[key] || 0) : 0
       })
       return { [v]: n }
     }).reduce((start, item) => {
@@ -817,10 +820,10 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin } = this;
+    const { problemType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin } = this;
 
     if (problemType === "Classification") {
-      data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
+      data.targetIssue = Object.keys(targetCounts).length > 2;
     } else if (problemType === "Regression") {
       const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 1000
       data.targetIssue = unique < Math.min((rawHeader.length - 1) * 6, 1000)
@@ -876,9 +879,11 @@ export default class Project {
 
   @computed
   get targetColMap() {
-    const { colValueCounts, target } = this
+    const { colValueCounts, target, nullLineCounts } = this
+    const countData = { ...colValueCounts[target] }
+    if (nullLineCounts[target]) countData[''] = nullLineCounts[target]
     let n = 0
-    const array = Object.entries(colValueCounts[target] || {}).sort((a, b) => b[1] - a[1]) || []
+    const array = Object.entries(countData || {}).sort((a, b) => b[1] - a[1]) || []
     const map = array.reduce((start, [k]) => {
       return Object.assign(start, { [k]: n++ })
     }, {})

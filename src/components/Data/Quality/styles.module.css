@@ -94,8 +94,8 @@
 
 .contentBox {
 	display: flex;
-  flex: auto;
-  min-height: 0;
+	flex: auto;
+	min-height: 0;
 }
 
 .list {
@@ -110,8 +110,8 @@
 	border: solid 1px #00b570;
 	flex-direction: column;
 	width: 100%;
-  flex: auto;
-  min-height: 0;
+	flex: auto;
+	min-height: 0;
 }
 
 .cell {
@@ -430,7 +430,7 @@
 	flex: none;
 	flex-wrap: wrap;
 	margin: 0.1em 0;
-	height: 1.4em;
+	height: 1.3em;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
@@ -718,12 +718,29 @@ span.fixesEdit {
 	margin-right: .1em;
 }
 
+.targetTitleLabel {
+	display: flex;
+	flex: none;
+	margin: 0.1em 0;
+}
+
+.targetTitleLabel span {
+	font-size: 0.875rem;
+	font-weight: bold;
+	color: #c4cbd7;
+	line-height: 1.2;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .targetPercentBox {
 	display: flex;
 	flex: none;
 	margin: .2em 0;
 	flex-direction: column;
-	max-height: 3em;
+	max-height: 4em;
 	overflow-x: hidden;
 	overflow-y: auto;
 	width: 100%;
