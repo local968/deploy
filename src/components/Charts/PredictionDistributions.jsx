@@ -31,6 +31,10 @@ export default function PredictionDistributions(props){
 		props.model.setFitIndex(Math.floor(value * 100))
 	},100);
 	
+	const nameTextStyle = {
+		color:'#000',
+	};
+	
 	const option = {
 		xAxis: {
 			name:x_name,
@@ -38,6 +42,7 @@ export default function PredictionDistributions(props){
 			boundaryGap: false,
 			min:0,
 			max:1,
+			nameTextStyle,
 			axisPointer: {
 				value: point,
 				snap: true,
@@ -67,6 +72,7 @@ export default function PredictionDistributions(props){
 		yAxis: {
 			type: 'value',
 			name:y_name,
+			nameTextStyle,
 		},
 		grid:{
 			x2:140,

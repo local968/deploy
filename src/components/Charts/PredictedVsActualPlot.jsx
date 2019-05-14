@@ -49,6 +49,9 @@ export default class PredictedVsActualPlot extends PureComponent{
 			name:itm.name,
 			symbolSize: 3,
 		}));
+		const nameTextStyle = {
+			color:'#000',
+		};
 
 		// 指定图表的配置项和数据
 		return {
@@ -58,10 +61,12 @@ export default class PredictedVsActualPlot extends PureComponent{
 			xAxis: {
 				name:x_name,
 				type: 'value',
+				nameTextStyle,
 			},
 			yAxis: {
 				name: y_name,
 				type: 'value',
+				nameTextStyle,
 			},
 			legend: {
 				data: data.map(itm=>itm.name),

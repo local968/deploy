@@ -26,8 +26,11 @@ export default class UnivariantPlots extends PureComponent{
 				},
 			}
 		});
-
-
+		
+		const nameTextStyle = {
+			color:'#000',
+		};
+		
 		return {
 			title : {
 				text: title,
@@ -52,9 +55,11 @@ export default class UnivariantPlots extends PureComponent{
 				type : 'category',
 				name:x_name,
 				data:item,
+				nameTextStyle,
 			},
 			yAxis:  {
 				type: 'value',
+				nameTextStyle,
 				name:y_name,
 			},
 			series,

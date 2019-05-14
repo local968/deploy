@@ -24,10 +24,15 @@ export default function RocChart2(props){
 			type: 'line',
 		}
 	});
+	
+	const nameTextStyle = {
+		color:'#000',
+	};
 
 	const option =  {
 		xAxis: {
 			name:x_name,
+			nameTextStyle,
 			axisLabel: {
 				formatter: value=>{
 					if(formatter){
@@ -39,6 +44,7 @@ export default function RocChart2(props){
 		},
 		yAxis: {
 			name:y_name,
+			nameTextStyle,
 		},
 		series,
 		legend: {
