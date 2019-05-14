@@ -108,7 +108,7 @@ console.log(12)
             <button className={classes.button} onClick={showDict}>
               <span>{EN.MappingDictionary}</span>
             </button>
-            <Popover trigger='click' placement='bottomLeft' visible={visible} onVisibleChange={hideDict} content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
+            <Popover getPopupContainer={el => el.parentElement} trigger='click' placement='bottomLeft' visible={visible} onVisibleChange={hideDict} content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
           </div>}
         </div>
         <div className={classes.right} style={{flex:1,width:200}}>
@@ -213,7 +213,8 @@ const OutlierRow = observer((props) => {
       overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
-      getPopupContainer={el => el.parentElement}>
+      getPopupContainer={el => el.parentElement}
+      >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input
@@ -347,7 +348,8 @@ const ClusteringRow = observer((props) => {
       overlayClassName={classes.recommendLabel}
       autoAdjustOverflow={false}
       arrowPointAtCenter={true}
-      getPopupContainer={el => el.parentElement}>
+      getPopupContainer={el => el.parentElement}
+      >
       <div className={classes.rowData}>
         <div className={classes.modelSelect}>
           <input
