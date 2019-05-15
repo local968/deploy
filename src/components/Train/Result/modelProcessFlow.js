@@ -26,7 +26,7 @@ export default class ModelProcessFlow extends Component {
 						// if (key === 'strategy') {
 						// 	return <dd key={index}>{value}</dd>
 						// }
-						return <dd key={index}>{key}:{value}</dd>
+						return <dd key={index}>{'' + key}:{'' + value}</dd>
 					})
 				}
 			</Fragment>
