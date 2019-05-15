@@ -233,33 +233,20 @@ export default class Deployment extends Component {
         {
           cddo.option !== 'api' &&
           cddo.source &&
-          cddo.location && (
-            <div>
-              <DeployFrequency
-                show={this.show}
-                cddo={cddo}
-                selectionOption={this.selectionOption}
-              />
-            </div>
+          cddo.location &&
+          (
+            <MeasurementMetric
+              cdpo={cdpo}
+              type={cd.modelType}
+              selectionOption={this.selectionOption}
+            />
           )
         }
-        {
-        cddo.option !== 'api' &&
-        cddo.source &&
-        cddo.location &&
-        cddo.frequency && (
-          <MeasurementMetric
-            cdpo={cdpo}
-            type={cd.modelType}
-            selectionOption={this.selectionOption}
-          />
-        )
-      }
         {
           cddo.option !== 'api' &&
           cddo.source &&
           cddo.location &&
-          cddo.frequency && (
+          cdpo.measurementMetric && (
             <MetricThreshold
               cdpo={cdpo}
               type={cd.modelType}
@@ -271,6 +258,24 @@ export default class Deployment extends Component {
           cddo.option !== 'api' &&
           cddo.source &&
           cddo.location &&
+          cdpo.measurementMetric &&
+          cdpo.metricThreshold && (
+            <div>
+              <DeployFrequency
+                show={this.show}
+                cddo={cddo}
+                selectionOption={this.selectionOption}
+              />
+            </div>
+          )
+        }
+
+        {
+          cddo.option !== 'api' &&
+          cddo.source &&
+          cddo.location &&
+          cdpo.measurementMetric &&
+          cdpo.metricThreshold &&
           cddo.frequency && (
             <div className={styles.done}>
               <div className={styles.selections}>
