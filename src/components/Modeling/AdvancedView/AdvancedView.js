@@ -858,8 +858,8 @@ class Thumbnail extends Component {
     return (
       <div
         className={styles.thumbnail}
-        onMouseEnter={this.handleMouseEnter}
-        onMouseLeave={this.handleMouseLeave}
+        // onMouseEnter={this.handleMouseEnter}
+        // onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
         <img src={icon} alt="icon" />
