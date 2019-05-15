@@ -91,7 +91,7 @@ export class ClassificationTarget extends Component {
         <div className={classnames(styles.info, {
           [styles.goodInfo]: isGood
         })}>
-          <div className={styles.targetTitleLabel}><span>Target Values</span></div>
+          <div className={styles.targetTitleLabel}><span>{EN.TargetValues}</span></div>
           <div className={styles.targetPercentBox}>
             {Object.keys(targetCounts).filter(_k => _k !== '').map((v, k) => {
               const percent = (targetCounts[v] || 0) / (totalRawLines || 1) * 85
@@ -108,7 +108,7 @@ export class ClassificationTarget extends Component {
               </div>
             })}
           </div>
-          {hasNull && <div className={styles.targetTitleLabel}><span>Missing Values</span></div>}
+          {hasNull && <div className={styles.targetTitleLabel}><span>{EN.MissingValues}</span></div>}
           {hasNull && <div className={styles.targetPercentBox}>
             <div className={styles.targetPercentRow} key={"targetPercentRowmissing"}>
               <div className={styles.targetPercentLabel}>
