@@ -620,7 +620,7 @@ const EN_LAN = {
   Topredictacontinuous: 'To predict a continuous/numeric value (e.g. cost of a purchase)',
   ChooseProblemType: 'Choose Problem Type',
   Prediction: 'Prediction',
-
+  Predictions: 'Prediction',
 
   //app-bff/src/components/Project
   ProjectN: 'project name',
