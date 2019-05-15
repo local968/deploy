@@ -450,13 +450,13 @@ class AdvancedModelTable extends Component {
       }
     });
     return (
-      <React.Fragment>
+      <div className={styles.advancedModelTableDiv}>
         {header}
         <div className={styles.advancedModelTable} >
 
           {dataSource}
         </div>
-      </React.Fragment>
+      </div>
     )
   }
 }
