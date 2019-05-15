@@ -182,14 +182,13 @@ function saveSample() {
 }
 
 router.get('/download/model', async (req, res) => {
-  const { filename, projectId, mid } = req.query
+  const { filename, projectId, mid, etlIndex } = req.query
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
   const { featureImportance, deployData } = model
   const header = Object.keys(JSON.parse(featureImportance))
   const url = JSON.parse(deployData)
 
-  // const { data: header } = await axios.get(`${esServicePath}/etls/${schedule.index}/header`)
   let temp = {}
   let counter = 0
   let resultHeader
@@ -204,21 +203,21 @@ router.get('/download/model', async (req, res) => {
       step: async (results, parser) => {
         const row = results.data[0]
         if (!resultHeader) {
-          resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString()
-          res.write(resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString() + '\n')
+          resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
+          res.write(Papa.unparse([resultHeader, []], { header: false }))
         }
         const nos = Object.keys(temp)
         const _start = Math.min(...nos, row['__no'])
         const _end = Math.max(...nos, row['__no'])
-        // console.log(_start, _end)
         if (counter >= 500 || _end - _start >= 10000) {
           const start = Math.min(...nos)
           const end = Math.max(...nos)
           parser.pause()
           counter = 0
-          const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
-          const result = response.data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
-          res.write(Papa.unparse(result, { header: false }) + '\n')
+          const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
+          const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+          result.push([])
+          res.write(Papa.unparse(result, { header: false }))
           temp = {}
           parser.resume()
         }
@@ -228,8 +227,9 @@ router.get('/download/model', async (req, res) => {
       complete: async (results, file) => {
         counter = 0
         const nos = Object.keys(temp)
-        const { data } = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
-        const result = data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
+        const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
+        const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+        result.push([])
         res.write(Papa.unparse(result, { header: false }))
         temp = {}
         res.end()
@@ -237,7 +237,6 @@ router.get('/download/model', async (req, res) => {
     })
   })
 })
-
 
 // todo
 // 500行分片下载还是有潜在bug
@@ -249,7 +248,7 @@ router.get('/download/:scheduleId', async (req, res) => {
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const schedule = JSON.parse(await redis.get(`schedule:${scheduleId}`))
 
-  const { data: {header} } = await axios.get(`${esServicePath}/etls/${schedule.index}/headerArray`)
+  const { data: { header } } = await axios.get(`${esServicePath}/etls/${schedule.index}/headerArray`)
   let temp = {}
   let counter = 0
   let resultHeader
@@ -264,7 +263,7 @@ router.get('/download/:scheduleId', async (req, res) => {
       step: async (results, parser) => {
         const row = results.data[0]
         if (!resultHeader) {
-          resultHeader = [...header ,...Object.keys(row).filter(key => key !== '__no')]
+          resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
           res.write(Papa.unparse([resultHeader, []], { header: false }))
         }
         const nos = Object.keys(temp)
