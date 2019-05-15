@@ -675,7 +675,7 @@ export default class Project {
     if (this.noComputeTemp) {
       this.etling = true
       if (this.problemType === 'Classification') {
-        const min = Math.min(...Object.values(this.targetCounts))
+        const min = Math.min(...Object.values(this.targetCounts).slice(0, 2))
         if (min < 3) {
           console.error("数量太小");
           return await Promise.reject()
@@ -1426,13 +1426,14 @@ export default class Project {
       problemType,
       target,
       dataHeader,
-      weights
+      weights,
+      newVariable
     } = this;
 
     let command = '';
     let trainData = {}
 
-    const featureLabel = dataHeader.filter(d => d !== target);
+    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target);
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
