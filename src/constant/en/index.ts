@@ -486,6 +486,7 @@ const EN: any = {
   Topredictifaneventislikely: '预测事件是否可能会发生（例如，客户是否会进行购买）。',
   Topredictacontinuous: '预测一个连续变量（比如：预测购买成本）',
   ChooseProblemType: '请选择问题类型',
+  Predictions: '有监督',
   Prediction: '预测',
   ProjectN: '项目名称',
   ProblemStatement: '问题描述',

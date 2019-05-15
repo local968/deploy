@@ -75,7 +75,7 @@ function Problem(props: ProblemProps) {
   return <div className={styles.problem}>
     <div className={styles.title}><span>{EN.ChooseProblemType}</span></div>
     <div className={styles.radioBox}>
-      <div className={styles.text}><span>{EN.Prediction}</span></div>
+      <div className={styles.text}><span>{EN.Predictions}</span></div>
       <RadioGroup className={styles.radio} value={changeProjectType} onChange={onChange("changeProjectType")}>
         {selectable.map((content, index) => (
           <Radio key={index} value={content.value}>
