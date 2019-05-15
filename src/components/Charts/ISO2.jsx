@@ -50,7 +50,7 @@ export default class Iso extends PureComponent{
         //     return chart.showLoading();
         // }
         const { selectModel:models} = this.props;
-        const point = (models.dataFlow[0].contamination||0).toFixed(3);
+        const point = (parseInt((models.dataFlow[0].contamination||0)*10*10*10)/1000).toFixed(3);
         const {featureImportance} = models;
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];
@@ -69,6 +69,7 @@ export default class Iso extends PureComponent{
             value,
             dot,
             point,
+            default_point:point,
             slider_value:point,
             ready:true,
             show_name:{
@@ -272,7 +273,7 @@ export default class Iso extends PureComponent{
     }
 
     reset(){
-        const {default_point=0} = this.props;
+        const {default_point=0} = this.state;
         this.setState({
             slider_value:default_point,
         });

@@ -15,6 +15,8 @@ import FitPlot2 from "../../Charts/FitPlot2";
 import request from "../../Request";
 import ParallelPlots from "../../Charts/ParallelPlots";
 import ParallelPlot from './parallel-plot.png'
+import IconParallel from './icon-parallel.svg'
+import IconParallel2 from './icon-parallel2.svg'
 const {Option} = Select;
 
 @inject('projectStore')
@@ -220,7 +222,12 @@ class AdvancedModelTable extends Component {
                 return null
             }
           })}
-          <RowCell key='Parallel Plot' data={<a className={detail?styles.on:''}>Compute</a>} />
+          <RowCell key='Parallel Plot' data={<a href='javascript:;' className={detail?styles.on:''}>
+            {
+              detail?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
+            }
+            Compute
+          </a>} />
         </Row>
         {detail && <RegressionDetailCurves project={this.props.project} model={model} />}
       </div>

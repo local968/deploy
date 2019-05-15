@@ -237,11 +237,21 @@
 
   .tb a{
     color: rgba(83, 157, 240, 1);
+    padding:0 2px;
   }
+.tb a img{
+  /*color: rgba(83, 157, 240, 1);*/
+  padding-right: 6px;
+}
 .on{
   background-color: rgba(83, 157, 240, 1);
   color:#fff !important;
   line-height: 34px;
-  padding:0 10px;
+
   display: inline-block;
 }
+
+
+/*.on img{*/
+/*  color:#fff !important;*/
+/*}*/
