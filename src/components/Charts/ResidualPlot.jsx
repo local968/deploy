@@ -5,7 +5,6 @@ import {concat} from 'lodash'
 export default function ResidualPlot(props){
 	const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props;
 	const {data} = chartDate;
-	// @ts-ignore
 	const num = concat(...data);
 
 	const max = Math.max(...num);
@@ -19,6 +18,9 @@ export default function ResidualPlot(props){
 		},
 		tooltip: {
 			formatter: '{c}',
+		},
+		grid:{
+			x:`${Math.floor(max+1)}`.length * 10 +20,
 		},
 		xAxis: {
 			name:x_name,

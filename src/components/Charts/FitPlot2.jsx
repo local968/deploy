@@ -21,6 +21,9 @@ export default function FitPlot2(props){
 			x: 'center',
 			y: 0,
 		},
+		grid:{
+			x:`${Math.floor(max+1)}`.length * 10 +20,
+		},
 		tooltip: {
 			formatter: '{c}',
 		},
