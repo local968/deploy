@@ -969,6 +969,7 @@ const EN: any = {
   OutlierDetectionHint:'识别与其他样本差异过大的低频、可疑样本。（例如：信用卡欺诈行为侦测）',
   ExplainationHint:'展示对每一个聚类类别重要的变量。',
   Doyouwanttotreatnull:'是否选择把缺失值设置为另一个类别？',
+  cannotDeploy:'提示：您选择的模型仅支持对原始训练数据进行部署。',
 };
 
 export default EN;
