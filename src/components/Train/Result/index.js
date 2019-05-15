@@ -5,7 +5,7 @@ import VariableImpact from './VariableImpact'
 import ModelProcessFlow from './modelProcessFlow'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-import { Tooltip, Icon, Popover, Select } from 'antd'
+import { Tooltip, Icon, Popover, Select, message } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
@@ -16,6 +16,7 @@ const Option = Select.Option;
 
 function ModelResult(props) {
   // const type = 'clustering'
+  const [showTips, setShowTips] = React.useState(false)
   const { resetSide, view, sort, handleSort, changeView, projectStore } = props
   const { project } = projectStore
   const { problemType, models, selectModel, colType, dataHeader, trainHeader } = project;
@@ -29,7 +30,7 @@ function ModelResult(props) {
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
   if (!selectModel || !models.length) return null
 
-  const isDownload = false
+  const cannotDeploy = problemType === 'Clustering' && !selectModel.supportDeploy
   // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
 
   const abortTrain = () => {
@@ -52,9 +53,9 @@ function ModelResult(props) {
   }
 
   const deploy = () => {
-    if (isDownload) return
     // const { project } = this.props.projectStore;
     const { selectModel: current } = project
+    if (cannotDeploy) return
     const { newVariable, trainHeader, expression } = project
     const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
     const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
@@ -66,8 +67,7 @@ function ModelResult(props) {
   };
 
   const download = () => {
-    if (!isDownload) return
-    console.log('download')
+    message.info('敬请期待')
   }
 
   return <div className={classes.root}>
@@ -135,8 +135,15 @@ function ModelResult(props) {
     </div>}
     {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
     <div className={classes.buttonBlock}>
-      <button className={`${classes.button}`} onClick={isDownload ? download : deploy}>
-        <span>{isDownload ? EN.Download : EN.DeployTheModel}</span>
+      {cannotDeploy ? <Tooltip title={EN.cannotDeploy} visible={showTips}>
+        <button className={`${classes.button} ${classes.disable}`} onMouseOver={() => setShowTips(true)} onMouseOut={() => setShowTips(false)}>
+          <span>{EN.DeployTheModel}</span>
+        </button>
+      </Tooltip> : <button className={`${classes.button}`} onClick={deploy}>
+          <span>{EN.DeployTheModel}</span>
+        </button>}
+      <button className={`${classes.button}`} onClick={download} style={{ marginLeft: '.1em' }}>
+        <span>{EN.Download}</span>
       </button>
     </div>
   </div>;
