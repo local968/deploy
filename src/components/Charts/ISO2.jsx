@@ -39,17 +39,17 @@ export default class Iso extends PureComponent{
     componentWillReceiveProps(nextProps) {
     	const {outlierPlotData} = nextProps.selectModel;
         if(outlierPlotData !== this.props.selectModel.outlierPlotData){
-            return this.componentDidMount(outlierPlotData,false);
+            return this.componentDidMount(outlierPlotData,false,nextProps);
         }
     }
 
-    async componentDidMount(url=this.props.selectModel.outlierPlotData,loading = this.props.selectModel.outlierPlotLoading) {
+    async componentDidMount(url=this.props.selectModel.outlierPlotData,loading = this.props.selectModel.outlierPlotLoading,props=this.props) {
         const chart = this.chart.getEchartsInstance();
         console.log('loading',loading)
         // if(loading){
         //     return chart.showLoading();
         // }
-        const { selectModel:models} = this.props;
+        const { selectModel:models} = props;
         const point = (parseInt((models.dataFlow[0].contamination||0)*10*10*10)/1000).toFixed(3);
         const {featureImportance} = models;
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);

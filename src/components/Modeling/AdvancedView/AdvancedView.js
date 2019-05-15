@@ -575,19 +575,20 @@ class RegressionDetailCurves extends Component {
             y_name={EN.Predictvalue}
             chartDate={chartDate}
           />}
-        </div>
+        </div>;
         break;
       case EN.ResidualPlot:
+        const Plot = <ResidualPlot
+            title={EN.ResidualPlot}
+            x_name={EN.Truevalue}
+            y_name={EN.Predictvalue}
+            chartDate={chartDate}
+        />;
         curComponent = (
           <div className={styles.plot} >
             {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
             {/*<ResidualPlot/>*/}
-            {chartDate && <ResidualPlot
-              title={EN.ResidualPlot}
-              x_name={EN.Truevalue}
-              y_name={EN.Predictvalue}
-              chartDate={chartDate}
-            />}
+            {chartDate && Plot}
             <Modal
               visible={this.state.visible}
               title={EN.ResidualPlotDiagnose}
@@ -595,11 +596,15 @@ class RegressionDetailCurves extends Component {
               onOk={() => this.setState({ visible: false })}
               onCancel={() => this.setState({ visible: false })}
             >
-              <ResidualDiagnose handleDiagnoseType={this.handleDiagnoseType} diagnoseType={diagnoseType} residualplot={model.residualPlotPath} />
+              <ResidualDiagnose
+                  handleDiagnoseType={this.handleDiagnoseType}
+                  diagnoseType={diagnoseType}
+                  Plot={Plot}
+                  residualplot={model.residualPlotPath} />
             </Modal>
             <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
-        )
+        );
         break;
       default:
         break
@@ -1055,8 +1060,9 @@ class ResidualDiagnose extends Component {
     // const disabled = false;
     return (
       <div className={styles.residualDiagnose} >
-        <div className={styles.plot} >
-          <img width={300} src={residualplot} alt="" />
+        <div className={styles.plot} style={{zoom:0.7}}>
+          {/*<img width={300} src={residualplot} alt="" />*/}
+          {this.props.Plot}
         </div>
         <div className={styles.choosePlot} >
           <div>{EN.Whichplotdoesyourresidual}</div>
