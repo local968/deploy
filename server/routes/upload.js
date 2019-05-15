@@ -212,15 +212,12 @@ router.get('/download/:scheduleId', async (req, res) => {
         const nos = Object.keys(temp)
         const _start = Math.min(...nos, row['__no'])
         const _end = Math.max(...nos, row['__no'])
-        // console.log(_start, _end)
         if (counter >= 500 || _end - _start >= 10000) {
           const start = Math.min(...nos)
           const end = Math.max(...nos)
           parser.pause()
           counter = 0
           const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
-          console.log(start, end, nos)
-          console.log(response.data)
           const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
           result.push([])
           res.write(Papa.unparse(result, { header: false }))
