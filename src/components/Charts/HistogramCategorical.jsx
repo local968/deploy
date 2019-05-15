@@ -32,6 +32,10 @@ export default function HistogramCategorical(props){
       nameLocation:'middle',
       nameTextStyle,
       nameGap:25,
+      axisLabel:{
+        interval:0,
+        rotate:30,
+      },
     },
     yAxis: {
       name:y_name,

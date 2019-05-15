@@ -620,7 +620,7 @@ const EN_LAN = {
   Topredictacontinuous: 'To predict a continuous/numeric value (e.g. cost of a purchase)',
   ChooseProblemType: 'Choose Problem Type',
   Prediction: 'Prediction',
-
+  Predictions: 'Prediction',
 
   //app-bff/src/components/Project
   ProjectN: 'project name',
@@ -1103,6 +1103,7 @@ const EN_LAN = {
   OutlierDetectionHint:'To identify rare events which raise suspicions by differing significantly from the majority of the data. (e.g. Credit Card Fraud Detection)',
   ExplainationHint:'Important variables for each cluster.',
   DoyouwanttotreatnullL:'Do you want to treat null values as one class?',
+  cannotDeploy:'Tip: The model you choose only supports deployment of original training data.',
 };
 
 

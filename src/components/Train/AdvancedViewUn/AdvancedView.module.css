@@ -15,13 +15,17 @@
     display: inline-block;
     margin-left: auto;
   }
+.advancedModelTableDiv {
+  width: 100%;
+  overflow-x: scroll;
+}
   .advancedModelTable {
     font-size: 0.875rem;
     /* border: 0.5px solid #d8d8d8; */
     position: relative;
     max-height: 50vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    /*overflow-y: scroll;*/
+    /*overflow-x: hidden;*/
   }
   .advancedModelTable::-webkit-scrollbar{
     width: 17px;
@@ -46,7 +50,7 @@
   .adrow {
     display: flex;
     cursor: pointer;
-    justify-content: space-around;
+    /*justify-content: space-around;*/
     align-items: center;
     text-align: center;
   }
@@ -59,7 +63,7 @@
     padding: 0.2em;
     border: 0.5px solid #d8d8d8;
     height: 3em;
-    flex: 1;
+    flex: 0 0 150px;
     padding: 0 0.5em;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -237,11 +241,21 @@
 
   .tb a{
     color: rgba(83, 157, 240, 1);
+    padding:0 2px;
   }
+.tb a img{
+  /*color: rgba(83, 157, 240, 1);*/
+  padding-right: 6px;
+}
 .on{
   background-color: rgba(83, 157, 240, 1);
   color:#fff !important;
   line-height: 34px;
-  padding:0 10px;
+
   display: inline-block;
 }
+
+
+/*.on img{*/
+/*  color:#fff !important;*/
+/*}*/

@@ -1,6 +1,9 @@
-const formatNumber = (str, n = 3, f = false) => {
+const formatNumber = (str, n = 3, f = false, m = 'round') => {
   if (isNaN(parseFloat(str))) return str
-  str = str.toString()
+  n = n > 0 ? n : 0
+  const p = Math.pow(10, n)
+  const num = parseInt(Math[m](parseFloat(str) * p, 10)) / p
+  str = num.toString()
   let i, d
   if (str.indexOf('.')) {
     i = str.split('.')[0]
@@ -33,8 +36,8 @@ const formatNumber = (str, n = 3, f = false) => {
     const _d = a.join('')
     s += _d ? "." + _d : ""
   }
-  const m = parseFloat(s)
-  const isZero = m === -m
+  const _s = parseFloat(s)
+  const isZero = _s === -_s
   return !isZero ? s : s.indexOf('-') === 0 ? s.slice(1) : s
 }
 
