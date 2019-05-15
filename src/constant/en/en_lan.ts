@@ -1103,6 +1103,7 @@ const EN_LAN = {
   OutlierDetectionHint:'To identify rare events which raise suspicions by differing significantly from the majority of the data. (e.g. Credit Card Fraud Detection)',
   ExplainationHint:'Important variables for each cluster.',
   DoyouwanttotreatnullL:'Do you want to treat null values as one class?',
+  cannotDeploy:'Tip: The model you choose only supports deployment of original training data.',
 };
 
 
