@@ -44,6 +44,8 @@ export default function TSENOne(props){
 				scale: true,
 				axisLabel: {
 					formatter: '{value}',
+					interval:0,
+					rotate:30,
 				},
 				splitLine: {
 					show: true,
