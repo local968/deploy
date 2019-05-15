@@ -50,7 +50,9 @@ export default class Iso extends PureComponent{
         //     return chart.showLoading();
         // }
         const { selectModel:models} = props;
-        const point = (parseInt((models.dataFlow[0].contamination||0)*10*10*10)/1000).toFixed(3);
+        // const point = (parseInt((models.dataFlow[0].contamination||0)*10*10*10)/1000).toFixed(3);
+        // console.log(point,models.dataFlow[0].contamination)
+        const point = (models.dataFlow[0].contamination||0).toFixed(3);
         const {featureImportance} = models;
         const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
         const var1 = list[0][0];

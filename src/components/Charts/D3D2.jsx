@@ -4,7 +4,7 @@ import request from '../Request'
 import { Select } from 'antd';
 const {Option} = Select;
 import styles from './charts.module.css';
-import THREE from './3Variable'
+import THREE from './3Variable';
 import EN from "../../constant/en";
 
 export default class D3D2 extends PureComponent {

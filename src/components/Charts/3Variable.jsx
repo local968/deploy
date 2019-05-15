@@ -23,16 +23,22 @@ export default class ThreeVariable extends PureComponent{
 		
 		return {
 			tooltip: {},
-			grid3D: {},
+			grid3D: {
+				// right:200
+			},
+			temporalSuperSampling:{
+				enable:true,
+			},
 			animation:false,
 			legend: {
 				orient: 'vertical',
 				top: 40,
 				bottom:40,
 				right:0,
-				align: 'left',
+				align: 'right',
 				type: 'scroll',
 				zlevel:20,
+				animationDurationUpdate:100,
 			},
 			xAxis3D: {
 				name:x_name
@@ -50,7 +56,7 @@ export default class ThreeVariable extends PureComponent{
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 400, width: 550}}
+			style={{height: 400, width: 450}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'

@@ -26,7 +26,7 @@ export default class ParallelPlot extends PureComponent{
 			},
 			grid: {
 				left: '6%',
-				right: '10%',
+				right: '20%',
 				bottom: '4%',
 				containLabel: true
 			},
