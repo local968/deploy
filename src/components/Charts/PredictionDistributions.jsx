@@ -58,7 +58,7 @@ export default function PredictionDistributions(props){
 							value = 0.99;
 						}
 						setf(value);
-						return value.toFixed(3)
+						return value.toFixed(2)
 					},
 					backgroundColor: '#004E52'
 				},

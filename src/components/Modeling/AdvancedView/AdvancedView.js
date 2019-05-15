@@ -568,12 +568,6 @@ class RegressionDetailCurves extends Component {
         curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
         break;
       case EN.FitPlot:
-        // curComponent = (
-        //   <div className={styles.plot} >
-        //     {/*<img className={styles.img} src={model.fitPlotPath} alt="fit plot" />*/}
-        //     <FitPlot/>
-        //   </div>
-        // )
         curComponent = <div className={styles.plot}>
           {chartDate && <FitPlot2
             title={EN.FitPlot}

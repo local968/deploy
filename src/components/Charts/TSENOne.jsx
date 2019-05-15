@@ -14,6 +14,7 @@ export default function TSENOne(props){
 		},
 		grid: {
 			left: '6%',
+			top:'25%',
 			// right: '10%',
 			// bottom: '4%',
 			containLabel: true,
@@ -63,7 +64,7 @@ export default function TSENOne(props){
 				splitLine: {
 					show: true,
 				},
-				nameLocation:'middle',
+				nameLocation:'end',
 				nameGap:25,
 			},
 		],
