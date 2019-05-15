@@ -1104,6 +1104,8 @@ const EN_LAN = {
   ExplainationHint:'Important variables for each cluster.',
   DoyouwanttotreatnullL:'Do you want to treat null values as one class?',
   cannotDeploy:'Tip: The model you choose only supports deployment of original training data.',
+  TargetValues:'Target Values',
+  MissingValues:'Missing Values',
 };
 
 
