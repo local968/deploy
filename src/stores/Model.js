@@ -4,6 +4,7 @@ import config from 'config'
 import { debounce } from 'lodash'
 import { formatNumber } from 'util'
 import EN from '../../src/constant/en'
+import Axios from 'axios';
 
 export default class Model {
   @observable score;

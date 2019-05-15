@@ -11,6 +11,7 @@ import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
 import EN from '../../../constant/en';
 import ISO2 from "../../Charts/ISO2";
+import axios from 'axios'
 
 const Option = Select.Option;
 
@@ -19,7 +20,7 @@ function ModelResult(props) {
   const [showTips, setShowTips] = React.useState(false)
   const { resetSide, view, sort, handleSort, changeView, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
 
   React.useEffect(() => {
@@ -67,7 +68,7 @@ function ModelResult(props) {
   };
 
   const download = () => {
-    message.info('敬请期待')
+    axios.get(`/upload/download/model?projectId=${id}&filename=${123123}&mid=${selectModel.modelName}`)
   }
 
   return <div className={classes.root}>
