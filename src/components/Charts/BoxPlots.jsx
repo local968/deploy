@@ -13,7 +13,11 @@ export default class BoxPlots extends PureComponent{
 		const nameTextStyle = {
 			color:'#000',
 		};
-
+		
+		const {boxData,outliers} = data;
+		
+		const max = Math.max(Math.max(...boxData.map(itm=>Math.max(...itm))),Math.max(...outliers.map(itm=>Math.max(...itm))));
+		
 		return {
 			title: [
 				{
@@ -28,7 +32,8 @@ export default class BoxPlots extends PureComponent{
 				},
 			},
 			grid: {
-				left: '10%',
+				// left: 200,
+				x:`${Math.floor(max+1)}`.length * 10 +20,
 				right: '10%',
 				bottom: '25%',
 			},
@@ -63,7 +68,7 @@ export default class BoxPlots extends PureComponent{
 			},
 			series: [
 				{
-					name: 'boxplot',
+					// name: 'boxplot',
 					type: 'boxplot',
 					data: data.boxData,
 					tooltip: {
