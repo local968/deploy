@@ -960,7 +960,7 @@ wss.register('train', async (message, socket, progress) => {
         await createOrUpdate(projectId, userId, { trainModel: null })
         const modelData = { ...result, ...chartData, stats }
         console.log(message, 'messagemessagemessage')
-        if (message.standard_type) modelData.standardType = message.standardType
+        if (message.standard_type) modelData.standardType = message.standard_type
         const modelResult = await createModel(userId, projectId, result.modelName, modelData)
         processValue = await addSettingModel(userId, projectId)(modelResult)
         // return progress(model)
