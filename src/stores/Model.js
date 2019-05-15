@@ -30,6 +30,7 @@ export default class Model {
   @observable fitAndResidualPlotData = ''
   @observable outlierPlotLoading = false
   @observable featureList = []
+  @observable rate = 0
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {
