@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
-import { Checkbox } from 'antd'
+import { Checkbox, message } from 'antd'
 import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confirm } from 'components/Common';
 import EN from '../../../constant/en';
 
@@ -48,7 +48,11 @@ export default class DataSchema extends Component {
   }
 
   onConfirm = () => {
-    this.props.projectStore.project.endSchema()
+    try {
+      this.props.projectStore.project.endSchema()
+    } catch (e) {
+      message.error(e)
+    }
     this.onClose()
   }
 

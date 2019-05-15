@@ -38,7 +38,11 @@ export default class DataSchema extends Component {
   }
 
   onConfirm = () => {
-    this.props.projectStore.project.endSchema()
+    try {
+      this.props.projectStore.project.endSchema()
+    } catch (e) {
+      message.error(e)
+    }
     this.onClose()
   }
 

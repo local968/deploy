@@ -168,12 +168,14 @@ class AdvancedModelTable extends Component {
       return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} />
     });
     return (
-      <React.Fragment>
-        {header}
-        <div className={styles.advancedModelTable} >
-          {dataSource}
+
+        <div className={styles.advancedModelTableDiv}>
+          {header}
+          <div className={styles.advancedModelTable} >
+            {dataSource}
+          </div>
         </div>
-      </React.Fragment>
+
     )
   }
 }
