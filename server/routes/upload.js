@@ -181,6 +181,10 @@ function saveSample() {
   pipeline.exec()
 }
 
+// todo
+// 500行分片下载还是有潜在bug
+// 可以存在__no 的 end - start > 10000的状况 这个时候es会报错
+// 最优方案还是将结果写入进es再下载
 router.get('/download/:scheduleId', async (req, res) => {
   const { scheduleId } = req.params
   const { filename } = req.query
@@ -189,10 +193,10 @@ router.get('/download/:scheduleId', async (req, res) => {
 
   const { data: header } = await axios.get(`${esServicePath}/etls/${schedule.index}/header`)
   let temp = {}
-  let start = 0
-  let end = 0
   let counter = 0
   let resultHeader
+  // let start = Math.min(...nos, row['__on'])
+  // let end = Math.max(...nos, row['__on'])
   res.attachment(filename);
   res.type('csv')
   http.get(schedule.result.deployData, (response) => {
@@ -203,31 +207,34 @@ router.get('/download/:scheduleId', async (req, res) => {
         const row = results.data[0]
         if (!resultHeader) {
           resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString()
-          res.write(resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString())
+          res.write(resultHeader = header + ',' + Object.keys(row).filter(key => key !== '__no').toString() + '\n')
         }
-        temp[row['__no']] = row
-        counter++
-        end = row['__no']
-        if (counter === 500) {
+        const nos = Object.keys(temp)
+        const _start = Math.min(...nos, row['__no'])
+        const _end = Math.max(...nos, row['__no'])
+        // console.log(_start, _end)
+        if (counter >= 500 || _end - _start >= 10000) {
+          const start = Math.min(...nos)
+          const end = Math.max(...nos)
           parser.pause()
           counter = 0
           const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
+          console.log(start, end, nos)
+          console.log(response.data)
           const result = response.data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
-          result.forEach(r => {
-            res.write('\n' + resultHeader.split(',').map(k => r[k]).toString())
-          })
-          start = parseInt(end) + 1
+          res.write(Papa.unparse(result, { header: false }) + '\n')
           temp = {}
           parser.resume()
         }
+        temp[row['__no']] = row
+        counter++
       },
       complete: async (results, file) => {
         counter = 0
-        const { data } = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
+        const nos = Object.keys(temp)
+        const { data } = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
         const result = data.result.map(esRow => ({ ...esRow, ...temp[esRow['__no']] }))
-        result.forEach(r => {
-          res.write('\n' + resultHeader.split(',').map(k => r[k]).toString())
-        })
+        res.write(Papa.unparse(result, { header: false }))
         temp = {}
         res.end()
       }
