@@ -971,6 +971,8 @@ const EN: any = {
   ExplainationHint:'展示对每一个聚类类别重要的变量。',
   Doyouwanttotreatnull:'是否选择把缺失值设置为另一个类别？',
   cannotDeploy:'提示：您选择的模型仅支持对原始训练数据进行部署。',
+  TargetValues:'目标变量类别',
+  MissingValues:'缺失值',
 };
 
 export default EN;
