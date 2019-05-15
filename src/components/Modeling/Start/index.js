@@ -130,6 +130,7 @@ class AdvancedModel extends Component {
   render() {
     const { project, closeAdvanced } = this.props
     const { dataHeader, newVariable, trainHeader, target } = project
+    console.log(project,9999)
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     return <div className={styles.advancedModel}>

@@ -1073,6 +1073,7 @@ export default class Project {
 
   @action
   addNewVariable = (variableName, variables, exp, type) => {
+    console.log(variableName, variables, exp, type,666)
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     const oldExp = Object.values(this.expression).join(";")
     const allExp = `${oldExp};${fullExp}`
