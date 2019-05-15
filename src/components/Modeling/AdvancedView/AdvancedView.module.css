@@ -20,8 +20,8 @@
     /* border: 0.5px solid #d8d8d8; */
     position: relative;
     max-height: 50vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    /*overflow-y: scroll;*/
+    /*overflow-x: hidden;*/
   }
   .advancedModelTable::-webkit-scrollbar{
     width: 17px;
@@ -46,7 +46,7 @@
   .adrow {
     display: flex;
     cursor: pointer;
-    justify-content: space-around;
+    /*justify-content: space-around;*/
     align-items: center;
     text-align: center;
   }
@@ -54,12 +54,15 @@
   .tableHeader {
     margin-right: 17px;
   }
-
+.advancedModelTableDiv {
+  width: 100%;
+  overflow-x: scroll;
+}
   .adrow .adcell {
     padding: 0.2em;
     border: 0.5px solid #d8d8d8;
     height: 3em;
-    flex: 1;
+    flex: 0 0 150px;
     padding: 0 0.5em;
     white-space: nowrap;
     text-overflow: ellipsis;
