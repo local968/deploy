@@ -34,42 +34,57 @@ export default class Iso extends PureComponent{
             list:[],
             var1:'',
             var2:'',
+            url:'',
+            vars:[],
         };
         this.chart = React.createRef();
         this.updatePoint = debounce(this.updatePoint, 280)
-    
         // this.props.projectStore.project.selectModel)
     }
     
-    componentWillReceiveProps(nextProps) {
-        console.log(8)
-    	const {outlierPlotData} = nextProps.projectStore.project.selectModel;
-        if(outlierPlotData !== this.props.projectStore.project.selectModel.outlierPlotData){
-            return this.componentDidMount(outlierPlotData,false,nextProps);
-        }
+    // componentWillReceiveProps(nextProps) {
+    //     console.log(8)
+    // 	const {outlierPlotData} = nextProps.projectStore.project.selectModel;
+    //     if(outlierPlotData !== this.props.projectStore.project.selectModel.outlierPlotData){
+    //         return this.message(outlierPlotData,false,nextProps);
+    //     }
+    // }
+    
+    componentDidMount() {
+        const chart = this.chart.getEchartsInstance();
+        chart.showLoading();
+        
+        return this.message();
     }
 
-    async componentDidMount() {
+    async message() {
         const chart = this.chart.getEchartsInstance();
+        chart.showLoading();
         const { selectModel:models} = this.props.projectStore.project;
         const {outlierPlotData:url,outlierPlotData:loading} = models;
-        console.log('loading',loading)
-        // if(loading){
-        //     return chart.showLoading();
-        // }
+        // console.log(models)
         // const point = (parseInt((models.dataFlow[0].contamination||0)*10*10*10)/1000).toFixed(3);
         // console.log(point,models.dataFlow[0].contamination)
         const point = (models.dataFlow[0].contamination||0).toFixed(3);
+        let var1,var2,vars=this.state.vars;
         const {featureImportance} = models;
-        const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
-        const var1 = list[0][0];
-        const var2 = list[1][0];
+        if(vars.length){
+            var1 = vars[0];
+            var2 = vars[1];
+        }else{
+            const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
+             var1 = list[0][0];
+             var2 = list[1][0];
+        }
+        
         const result = await request.post({
             url: '/graphics/outlier',
             data: {
                 url,
             },
         });
+    
+        chart.hideLoading();
 
         const {feature1Range:xRange=[],feature2Range:yRange=[],background:value=[],dotScore:dot=[]} = result;
         this.setState({
@@ -88,19 +103,23 @@ export default class Iso extends PureComponent{
             list:Object.keys(featureImportance),
             var1,
             var2,
+            url,
         })
     }
 
     getOption() {
-        let {ready,xRange,yRange,value,dot,point,var1,var2} = this.state;
+        let {ready,xRange,yRange,value,dot,point,var1,var2,url} = this.state;
+        
         if(!ready){
             return {
                 xAxis: {},
                 yAxis: {},
             }
         }
-        const chart = this.chart.getEchartsInstance();
-        chart.hideLoading();
+    
+        if(url !== this.props.projectStore.project.selectModel.outlierPlotData){
+            this.componentDidMount()
+        }
 
         const x_space = (xRange[1] - xRange[0]) / value[0].length;
         const y_space = (yRange[1] - yRange[0]) / value.length;
@@ -274,19 +293,24 @@ export default class Iso extends PureComponent{
     save(){
         const {show_name} = this.state;
         const {var1,var2} = show_name;
-        // this.setState({
-        //     var1,
-        //     var2,
-        // });
+        
+        this.setState({
+            // var1,
+            // var2,
+            vars:[var1,var2],
+        },()=>{
+            const chart = this.chart.getEchartsInstance();
+            chart.showLoading();
+        });
         this.props.projectStore.project.selectModel.saveFeatureList([var1,var2]);
-    
+        
     }
 
     reset(){
         const {default_point=0} = this.state;
-        // this.setState({
-        //     slider_value:default_point,
-        // });
+        this.setState({
+            slider_value:default_point,
+        });
         this.updatePoint(default_point)
     }
 
@@ -297,8 +321,6 @@ export default class Iso extends PureComponent{
             width = 600,
         } = this.props;
         
-        console.log(this.props.projectStore.project.selectModel.outlierPlotData)
-
         return [
             <section key='dl' className={classes.d3d2}>
                 <dl>

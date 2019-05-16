@@ -68,8 +68,6 @@ function ModelResult(props) {
       .then(id => props.routing.push('/deploy/project/' + id));
   };
   
-  console.log(88)
-
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
     {problemType === "Clustering" && <div className={classes.tabs}>
@@ -125,7 +123,7 @@ function ModelResult(props) {
         <div className={classes.right} style={{ flex: 1, width: 200 }}>
           {
             project.problemType === "Outlier" ?
-              <ISO2  />
+              <ISO2/>
               : <D3D2 url={selectModel.multiVarPlotData} />
           }
         </div>
