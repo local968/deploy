@@ -16,6 +16,7 @@ export default class Operation extends Component {
     const { deploymentStore, scheduleStore } = this.props;
     const cd = deploymentStore.currentDeployment || {};
     const cddo = deploymentStore.currentDeployment.deploymentOptions
+    console.log(scheduleStore.sortedDeploymentSchedules , 'scheduleStore.sortedDeploymentSchedules')
     return (
       <div className={styles.operation}>
         <div className={styles.info}>
@@ -65,7 +66,7 @@ export default class Operation extends Component {
                   {s.schedule.status !== 'issue' && (
                     <span className={styles.status}>
                       {s.schedule.status[0].toUpperCase() +
-                        s.schedule.status.substr(1, s.schedule.status.lenght)}
+                      s.schedule.status.substr(1, s.schedule.status.lenght)}
                     </span>
                   )}
                   {s.schedule.status === 'issue' && (

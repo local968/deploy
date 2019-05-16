@@ -1,0 +1,22 @@
+[
+  {
+    "type": "FUNC",
+    "name": "exp",
+    "value": "exp"
+  },
+  {
+    "type": "LPAREN",
+    "name": "(",
+    "value": "("
+  },
+  {
+    "type": "ID",
+    "name": "age",
+    "value": "age"
+  },
+  {
+    "type": "RPAREN",
+    "name": ")",
+    "value": ")"
+  }
+]

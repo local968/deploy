@@ -450,7 +450,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
       {cddo.source !== 'file' && (
         <div
           className={styles.selectionWithoutHover}
-        // onClick={selectionOption('source', 'file')}
+          // onClick={selectionOption('source', 'file')}
         >
           <Uploader
             className={styles.text}
@@ -551,11 +551,11 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
               <span className={styles.resultText}>
                 {EN.OneTime}<span className={styles.detail}>
                   <span className={styles.bold}>{EN.Times}</span>
-                  {cddo.frequencyOptions.time === 'completed'
-                    ? EN.Aftercompleted
-                    : moment
-                      .unix(cddo.frequencyOptions.time)
-                      .format('MM/DD/YYYY h:mma')}
+                {cddo.frequencyOptions.time === 'completed'
+                  ? EN.Aftercompleted
+                  : moment
+                    .unix(cddo.frequencyOptions.time)
+                    .format('MM/DD/YYYY h:mma')}
                 </span>
               </span>
             </span>
@@ -575,9 +575,9 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                   } ${
                   cddo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
                   } ${cddo.frequencyOptions.repeatPeriod &&
-                  dateFormat[cddo.frequencyOptions.repeatPeriod](
-                    cddo.frequencyOptions.repeatOn
-                  )}`}
+                dateFormat[cddo.frequencyOptions.repeatPeriod](
+                  cddo.frequencyOptions.repeatOn
+                )}`}
                 <small className={styles.detail}>
                   <span className={styles.bold}>{EN.Starts}:</span>
                   {moment
