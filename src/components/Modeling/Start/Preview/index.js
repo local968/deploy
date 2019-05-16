@@ -34,12 +34,13 @@ export default class Preview extends Component {
   formatTable = () => {
     const { cleanData, newVariableData } = this
     const { visiable, project } = this.props
-    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader } = project;
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, dataHeader, target } = project;
     if (!visiable) return []
     if (!cleanData.length) return []
     if (!!newVariable.length && !newVariableData.length) return []
     const headerList = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
-    const notShowIndex = rawHeader.filter(v => !headerList.includes(v)).map(v => rawHeader.indexOf(v))
+    const notShowIndex = dataHeader.filter(v => !headerList.includes(v)).map(v => dataHeader.indexOf(v))
+    const targetIndex = headerList.indexOf(target)
     const data = cleanData.map((row, index) => row.filter((k, i) => !notShowIndex.includes(i)).concat(newVariable.map(n => newVariableData[index][n])))
 
     const types = { ...colType, ...newType }
@@ -82,7 +83,7 @@ export default class Preview extends Component {
     }
 
     const tableData = data.map((row, index) => row.map((v, i) => {
-      if (i === 0) v = renameVariable[v] || v
+      if (i === targetIndex) v = renameVariable[v] || v
       return {
         content: <span>{v}</span>,
         title: v,
