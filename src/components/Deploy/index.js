@@ -67,7 +67,10 @@ export default class Home extends Component {
             autoWidth
             options={deploymentStore.perPageOptions}
             value={parseInt(deploymentStore.sortOptions.perPage, 10)}
-            onChange={deploymentStore.changeSort.bind(null, 'perPage')}
+            onChange={(v) => {
+              deploymentStore.changeSort('perPage', v)
+              deploymentStore.changeSort('currentPage', 1)
+            }}
           />
           <Pagination
             current={deploymentStore.sortOptions.currentPage}
