@@ -23,6 +23,7 @@ export default class Detail extends Component {
     runInAction(() => (deploymentStore.currentId = match.params.id));
     const cd = deploymentStore.currentDeployment || {};
     const isUnsupervised = ["Clustering", "Outlier"].includes(cd.modelType);
+    console.log(cd.modelType , 'cd.modelType ' ,isUnsupervised)
     return (
       <div className={styles.detail}>
         <Bread list={[EN.Home]} />
@@ -95,13 +96,23 @@ export default class Detail extends Component {
 
         </div>
         <div className={styles.content}>
-          <Route
-            path="/deploy/project/:id"
-            exact
-            render={() => (
-              <Redirect to={`/deploy/project/${match.params.id}/performance`} />
-            )}
-          />
+          {
+            !isUnsupervised ?
+              <Route
+                path="/deploy/project/:id"
+                exact
+                render={() => (
+                  <Redirect to={`/deploy/project/${match.params.id}/deployment`} />
+                )}
+              /> :
+              <Route
+                path="/deploy/project/:id"
+                exact
+                render={() => (
+                  <Redirect to={`/deploy/project/${match.params.id}/performance`} />
+                )}
+              />
+          }
           {!isUnsupervised &&(  <Route path="/deploy/project/:id/deployment" component={(props) => <Deployment {...props} />} />)}
           {!isUnsupervised &&(  <Route path="/deploy/project/:id/operation" component={(props) => <Operation {...props} />} />)}
 
