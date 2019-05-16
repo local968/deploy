@@ -185,68 +185,98 @@ router.get('/download/model', async (req, res) => {
   const { filename, projectId, mid, etlIndex } = req.query
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  const { featureImportance, deployData, problemType, rate } = model
+  const { featureImportance, deployData } = model
   const header = Object.keys(JSON.parse(featureImportance))
   const url = JSON.parse(deployData)
-  const isOutlier = JSON.parse(problemType) === 'Outlier'
-  const outlier = isOutlier ? JSON.parse(rate) : 0
 
-  let temp = {}
-  let counter = 0
-  let resultHeader
-  // let start = Math.min(...nos, row['__on'])
-  // let end = Math.max(...nos, row['__on'])
-  res.attachment(filename);
-  res.type('csv')
-  http.get(url, (response) => {
-    Papa.parse(response, {
-      download: true,
-      header: true,
-      step: async (results, parser) => {
-        const row = results.data[0]
-        if (!resultHeader) {
-          resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
-          if (isOutlier) { }
-          res.write(Papa.unparse([resultHeader, []], { header: false }))
-        }
-        const nos = Object.keys(temp)
-        const _start = Math.min(...nos, row['__no'])
-        const _end = Math.max(...nos, row['__no'])
-        if (counter >= 500 || _end - _start >= 10000) {
-          const start = Math.min(...nos)
-          const end = Math.max(...nos)
-          parser.pause()
-          counter = 0
-          const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
-          const result = response.data.result.map(esRow => {
-            const _row = resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h]))
-            if (isOutlier) { }
-            return _row
-          })
-          result.push([])
-          res.write(Papa.unparse(result, { header: false }))
-          temp = {}
-          parser.resume()
-        }
-        temp[row['__no']] = row
-        counter++
-      },
-      complete: async (results, file) => {
-        counter = 0
-        const nos = Object.keys(temp)
-        const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
-        const result = response.data.result.map(esRow => {
-          const _row = resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h]))
-          if (isOutlier) { }
-          return _row
-        })
-        result.push([])
-        res.write(Papa.unparse(result, { header: false }))
-        temp = {}
-        res.end()
-      }
+  downloadCsv(url, decodeURIComponent(filename), etlIndex, header, res)
+
+  // let temp = {}
+  // let counter = 0
+  // let resultHeader
+  // // let start = Math.min(...nos, row['__on'])
+  // // let end = Math.max(...nos, row['__on'])
+  // res.attachment(filename);
+  // res.type('csv')
+  // http.get(url, (response) => {
+  //   Papa.parse(response, {
+  //     download: true,
+  //     header: true,
+  //     step: async (results, parser) => {
+  //       const row = results.data[0]
+  //       if (!resultHeader) {
+  //         resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
+  //         res.write(Papa.unparse([resultHeader, []], { header: false }))
+  //       }
+  //       const nos = Object.keys(temp)
+  //       const _start = Math.min(...nos, row['__no'])
+  //       const _end = Math.max(...nos, row['__no'])
+  //       if (counter >= 500 || _end - _start >= 10000) {
+  //         const start = Math.min(...nos)
+  //         const end = Math.max(...nos)
+  //         parser.pause()
+  //         counter = 0
+  //         const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
+  //         const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+  //         result.push([])
+  //         res.write(Papa.unparse(result, { header: false }))
+  //         temp = {}
+  //         parser.resume()
+  //       }
+  //       temp[row['__no']] = row
+  //       counter++
+  //     },
+  //     complete: async (results, file) => {
+  //       counter = 0
+  //       const nos = Object.keys(temp)
+  //       const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
+  //       const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+  //       result.push([])
+  //       res.write(Papa.unparse(result, { header: false }))
+  //       temp = {}
+  //       res.end()
+  //     }
+  //   })
+  // })
+})
+
+router.get('/download/outlier', async (req, res) => {
+  const { filename, mid, rate, etlIndex, projectId } = req.query
+  const { userId } = req.session
+  const requestId = uuid.v4()
+
+  const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
+  const { featureImportance } = model
+  const header = Object.keys(JSON.parse(featureImportance))
+
+  let _rate = rate
+  try {
+    _rate = parseFloat(rate)
+  } catch (e) { }
+
+  try {
+    const deployResult = await command({
+      command: 'outlier.deploy',
+      requestId,
+      projectId,
+      userId,
+      csvLocation: [etlIndex],
+      ext: ['csv'],
+      solution: mid,
+      actionType: 'deployment',
+      frameFormat: 'csv',
+      rate: _rate
+    }, processData => {
+      const { status, result } = processData
+      if (status === 1) return
+      if (status === 100) return result
+      throw new Error(result[processError])
     })
-  })
+
+    downloadCsv(deployResult.deployData, decodeURIComponent(filename), etlIndex, header, res)
+  } catch (e) {
+    return res.status(500).send(e)
+  }
 })
 
 // todo
@@ -260,14 +290,66 @@ router.get('/download/:scheduleId', async (req, res) => {
   const schedule = JSON.parse(await redis.get(`schedule:${scheduleId}`))
 
   const { data: { header } } = await axios.get(`${esServicePath}/etls/${schedule.index}/headerArray`)
+
+  downloadCsv(schedule.result.deployData, filename, schedule.index, header, res)
+
+  // let temp = {}
+  // let counter = 0
+  // let resultHeader
+  // // let start = Math.min(...nos, row['__on'])
+  // // let end = Math.max(...nos, row['__on'])
+  // res.attachment(filename);
+  // res.type('csv')
+  // http.get(schedule.result.deployData, (response) => {
+  //   Papa.parse(response, {
+  //     download: true,
+  //     header: true,
+  //     step: async (results, parser) => {
+  //       const row = results.data[0]
+  //       if (!resultHeader) {
+  //         resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
+  //         res.write(Papa.unparse([resultHeader, []], { header: false }))
+  //       }
+  //       const nos = Object.keys(temp)
+  //       const _start = Math.min(...nos, row['__no'])
+  //       const _end = Math.max(...nos, row['__no'])
+  //       if (counter >= 500 || _end - _start >= 10000) {
+  //         const start = Math.min(...nos)
+  //         const end = Math.max(...nos)
+  //         parser.pause()
+  //         counter = 0
+  //         const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
+  //         const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+  //         result.push([])
+  //         res.write(Papa.unparse(result, { header: false }))
+  //         temp = {}
+  //         parser.resume()
+  //       }
+  //       temp[row['__no']] = row
+  //       counter++
+  //     },
+  //     complete: async (results, file) => {
+  //       counter = 0
+  //       const nos = Object.keys(temp)
+  //       const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
+  //       const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+  //       result.push([])
+  //       res.write(Papa.unparse(result, { header: false }))
+  //       temp = {}
+  //       res.end()
+  //     }
+  //   })
+  // })
+
+})
+
+function downloadCsv(url, filename, index, header, res) {
   let temp = {}
   let counter = 0
   let resultHeader
-  // let start = Math.min(...nos, row['__on'])
-  // let end = Math.max(...nos, row['__on'])
   res.attachment(filename);
   res.type('csv')
-  http.get(schedule.result.deployData, (response) => {
+  http.get(url, (response) => {
     Papa.parse(response, {
       download: true,
       header: true,
@@ -285,7 +367,7 @@ router.get('/download/:scheduleId', async (req, res) => {
           const end = Math.max(...nos)
           parser.pause()
           counter = 0
-          const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${start}&end=${end}`)
+          const response = await axios.get(`${esServicePath}/etls/${index}/preview?start=${start}&end=${end}`)
           const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
           result.push([])
           res.write(Papa.unparse(result, { header: false }))
@@ -298,7 +380,7 @@ router.get('/download/:scheduleId', async (req, res) => {
       complete: async (results, file) => {
         counter = 0
         const nos = Object.keys(temp)
-        const response = await axios.get(`${esServicePath}/etls/${schedule.index}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
+        const response = await axios.get(`${esServicePath}/etls/${index}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
         const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
         result.push([])
         res.write(Papa.unparse(result, { header: false }))
@@ -307,8 +389,7 @@ router.get('/download/:scheduleId', async (req, res) => {
       }
     })
   })
-
-})
+}
 
 // saveSample()
 
