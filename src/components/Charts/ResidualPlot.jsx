@@ -4,7 +4,7 @@ import {concat} from 'lodash'
 
 export default function ResidualPlot(props){
 	const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props;
-	const {data} = chartDate;
+	const {data=[]} = chartDate;
 	const num = concat(...data);
 
 	const max = Math.max(...num);
