@@ -84,6 +84,8 @@ export default class List extends Component {
                 <span className={styles.modelInvokeTime}>
                   {EN.ModelInvokeTime}
                 </span>
+                <span className={styles.deploymentStyle}>{EN.DeploymentStyle}</span>
+                <span className={styles.executionSpeed}>{EN.ExecutionSpeed} <small>{EN.Rowss}</small></span>
                 <span className={styles.performance}>{EN.Performance}</span>
                 <span className={styles.threshold}>{EN.Threshold}</span>
                 <span className={styles.status}>{EN.Status}</span>
@@ -102,6 +104,19 @@ export default class List extends Component {
                           )
                           .format('MM/DD/YYYY-hh:mma')}
                     </span>
+
+
+                    <span className={styles.deploymentStyle}>
+                    {EN.Predictwith}{' '}
+                      {s.deployment.deploymentOptions.option === 'data'
+                        ? EN.DataSource
+                        : EN.APISource}
+                  </span>
+                    <span className={styles.executionSpeed}>
+                    {s.schedule.status === 'finished'
+                      ? s.schedule.result && s.schedule.result.executeSpeed
+                      : ' - '}
+                  </span>
 
                     {
                       s.schedule.result &&
@@ -145,7 +160,7 @@ export default class List extends Component {
                           })}
                         >
                       {
-                        `Accuracy:${this.showScore(s.schedule.result.score, 'acc')}`
+                        `Accuracy:${this.showScore(s.schedule.result.score, 'score')}`
                       }
                     </span>
                       )
@@ -161,7 +176,7 @@ export default class List extends Component {
                           })}
                         >
                       {
-                        `CVNN:${this.showScore(s.schedule.result.score, 'cvnn')} CH:${this.showScore(s.schedule.result.score, 'ch')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_score')}`
+                        `CVNN:${this.showScore(s.schedule.result.score, 'CVNN')} CH:${this.showScore(s.schedule.result.score, 'CH')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_cosine')}`
                       }
                     </span>
                       )
@@ -261,7 +276,7 @@ const Alert = ({ text }) => (
 const isExcessThreshold = schedule => {
   if (!schedule.result || !schedule.result.score) return false;
   if (!schedule.threshold || !schedule.threshold.type || !schedule.threshold.value) return false
-  const nameMap = { R2: 'r2', RMSE: 'rmse', MSE: 'mse', AUC: 'auc', Accuracy: 'acc', F1: 'f1', Precision: 'precision', Recall: 'recall' };
+  const nameMap = { R2: 'r2', RMSE: 'rmse', MSE: 'mse', AUC: 'auc', Accuracy: 'acc', F1: 'f1', Precision: 'precision', Recall: 'recall',CVNN: 'CVNN' ,CH:'CH',Silhouette_Score:'silhouette_cosine'};
   return {
     R2: (threshold, real) => threshold > real,
     RMSE: (threshold, real) => threshold < real,
@@ -270,7 +285,10 @@ const isExcessThreshold = schedule => {
     AUC: (threshold, real) => threshold > real,
     F1: (threshold, real) => threshold > real,
     Precision: (threshold, real) => threshold > real,
-    Recall: (threshold, real) => threshold > real
+    Recall: (threshold, real) => threshold > real,
+    CVNN:(threshold, real) => threshold > real,
+    CH:(threshold, real) => threshold > real,
+    Silhouette_Score:(threshold, real) => threshold > real,
   }[schedule.threshold.type](
     schedule.threshold.value,
     schedule.result.score[nameMap[schedule.threshold.type]]

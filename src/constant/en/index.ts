@@ -973,6 +973,7 @@ const EN: any = {
   TargetValues:'目标变量类别',
   MissingValues:'缺失值',
   PrecisionRecallTradeoff:'精准率召回率曲线',
+  KindlyReminder:'提示',
 };
 
 export default EN;

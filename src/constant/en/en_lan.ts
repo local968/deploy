@@ -1106,6 +1106,7 @@ const EN_LAN = {
   cannotDeploy:'Tip: The model you choose only supports deployment of original training data.',
   TargetValues:'Target Values',
   MissingValues:'Missing Values',
+  KindlyReminder:'Kindly Reminder',
 };
 
 
