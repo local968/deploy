@@ -327,18 +327,18 @@ export class SelectTarget extends Component {
       [checked[1 - maxKey]]: 1
     }
     // 重置rename
-    const renameVariable = {}
+    const otherMap = {}
     this[`belongTo${maxKey}`].forEach(v0 => {
       targetMap[v0] = 0
-      renameVariable[v0] = checked[maxKey]
+      otherMap[v0] = checked[maxKey]
     })
     this[`belongTo${1 - maxKey}`].forEach(v1 => {
       targetMap[v1] = 1
-      renameVariable[v1] = checked[1 - maxKey]
+      otherMap[v1] = checked[1 - maxKey]
     })
     this.props.project.targetArrayTemp = [checked[maxKey], checked[1 - maxKey]];
     this.props.project.targetMapTemp = targetMap;
-    this.props.project.renameVariable = renameVariable
+    this.props.project.otherMap = otherMap
     this.props.saveTargetFixes()
   }
 

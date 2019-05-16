@@ -96,18 +96,16 @@ export default class Detail extends Component {
 
         </div>
         <div className={styles.content}>
-          <Route
-            path="/deploy/project/:id"
-            exact
-            render={() => (
-              <Redirect to={`/deploy/project/${match.params.id}/${!isUnsupervised ? 'deployment' : 'performance'}`} />
-            )}
-          />
           {!isUnsupervised && (<Route path="/deploy/project/:id/deployment" component={(props) => <Deployment {...props} />} />)}
           {!isUnsupervised && (<Route path="/deploy/project/:id/operation" component={(props) => <Operation {...props} />} />)}
 
           <Route path="/deploy/project/:id/performance" component={(props) => <Performance {...props} />} />
           <Route path="/deploy/project/:id/status" component={(props) => <Status {...props} />} />
+          <Route
+            render={() => (
+              <Redirect to={`/deploy/project/${match.params.id}/${!isUnsupervised ? 'deployment' : 'performance'}`} />
+            )}
+          />
         </div>
         {/* <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>
