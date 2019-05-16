@@ -185,9 +185,11 @@ router.get('/download/model', async (req, res) => {
   const { filename, projectId, mid, etlIndex } = req.query
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  const { featureImportance, deployData } = model
+  const { featureImportance, deployData, problemType, rate } = model
   const header = Object.keys(JSON.parse(featureImportance))
   const url = JSON.parse(deployData)
+  const isOutlier = JSON.parse(problemType) === 'Outlier'
+  const outlier = isOutlier ? JSON.parse(rate) : 0
 
   let temp = {}
   let counter = 0
@@ -204,6 +206,7 @@ router.get('/download/model', async (req, res) => {
         const row = results.data[0]
         if (!resultHeader) {
           resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
+          if (isOutlier) { }
           res.write(Papa.unparse([resultHeader, []], { header: false }))
         }
         const nos = Object.keys(temp)
@@ -215,7 +218,11 @@ router.get('/download/model', async (req, res) => {
           parser.pause()
           counter = 0
           const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
-          const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+          const result = response.data.result.map(esRow => {
+            const _row = resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h]))
+            if (isOutlier) { }
+            return _row
+          })
           result.push([])
           res.write(Papa.unparse(result, { header: false }))
           temp = {}
@@ -228,7 +235,11 @@ router.get('/download/model', async (req, res) => {
         counter = 0
         const nos = Object.keys(temp)
         const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
-        const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+        const result = response.data.result.map(esRow => {
+          const _row = resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h]))
+          if (isOutlier) { }
+          return _row
+        })
         result.push([])
         res.write(Papa.unparse(result, { header: false }))
         temp = {}

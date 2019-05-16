@@ -675,7 +675,7 @@ export default class Project {
     if (this.noComputeTemp) {
       this.etling = true
       if (this.problemType === 'Classification') {
-        const min = Math.min(...Object.values(this.targetCounts).slice(0, 2))
+        const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
         if (min < 3) {
           console.error("数量太小");
           return await Promise.reject()
@@ -1266,18 +1266,19 @@ export default class Project {
             'MeanShift',
           ]
         trainData = {
-          k_type: "auto",
-          k_value: undefined,
+          kType: "auto",
+          kValue: undefined,
           algorithms: algorithms,
-          standard_type: "standard",
-          search_time: 5,
-          metrics_method: "CVNN",
-          feature_label: featureLabel,
-          random_seed: 0,
+          standardType: "standard",
+          searchTime: 5,
+          metricsMethod: "CVNN",
+          featureLabel: featureLabel,
+          randomSeed: 0,
           projectId: id,
           command,
           settingName: setting.name,
-          apply_weights: {}
+          applyWeights: {},
+          problemType
         };
         break;
       case 'Outlier':
@@ -1290,14 +1291,15 @@ export default class Project {
             'MCD',
             'EllipticEnvelope',
           ],
-          standard_type: "standard",
-          search_time: 5,
-          feature_label: featureLabel,
-          random_seed: 0,
+          standardType: "standard",
+          searchTime: 5,
+          featureLabel: featureLabel,
+          randomSeed: 0,
           projectId: id,
           command,
           settingName: setting.name,
-          apply_weights: {}
+          applyWeights: {},
+          problemType
         };
         break;
       case 'Classification':
@@ -1443,32 +1445,34 @@ export default class Project {
         const disableItems = [...(this.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : [])]
 
         trainData = {
-          k_type: this.kType,
-          k_value: this.kValue,
+          kType: this.kType,
+          kValue: this.kValue,
           algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
-          standard_type: this.standardType,
-          search_time: this.searchTime,
-          metrics_method: this.measurement,
-          feature_label: featureLabel,
-          random_seed: this.randSeed,
+          standardType: this.standardType,
+          searchTime: this.searchTime,
+          metricsMethod: this.measurement,
+          featureLabel: featureLabel,
+          randomSeed: this.randSeed,
           projectId: id,
           command,
           settingName: setting.name,
-          apply_weights: weights
+          applyWeights: weights,
+          problemType
         };
         break;
       case 'Outlier':
         command = 'outlier.train';
         trainData = {
           algorithms: this.algorithms,
-          standard_type: this.standardType,
-          search_time: this.searchTime,
-          feature_label: featureLabel,
-          random_seed: this.randSeed,
+          standardType: this.standardType,
+          searchTime: this.searchTime,
+          featureLabel: featureLabel,
+          randomSeed: this.randSeed,
           projectId: id,
           command,
           settingName: setting.name,
-          apply_weights: weights
+          applyWeights: weights,
+          problemType
         };
         break;
       default:
