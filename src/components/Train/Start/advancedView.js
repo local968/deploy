@@ -139,7 +139,7 @@ export default class AdvancedView extends Component {
         : [
           { value: "CVNN", label: "CVNN" },
           { value: "CH", label: "CH Index" },
-          { value: "Silhouette Score", label: "Silhouette Score" },
+          { value: "silhouette_euclidean", label: "Silhouette Score" },
 
           // { value: "CVNN", label: "CVNN" },
           // { value: "RSquared", label: "RSquared" },

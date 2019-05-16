@@ -363,7 +363,7 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
         >
           <Option value="CVNN">CVNN</Option>
           <Option value="CH">CH Index</Option>
-          <Option value="Silhouette Score">Silhouette Score</Option>
+          <Option value="silhouette_euclidean">Silhouette Score</Option>
         </Select>
       )}
 

@@ -108,7 +108,7 @@ export default class List extends Component {
 
                     <span className={styles.deploymentStyle}>
                     {EN.Predictwith}{' '}
-                      {s.deployment.deploymentOptions.option === 'data'
+                      {s.deployment.performanceOptions.source === 'file'
                         ? EN.DataSource
                         : EN.APISource}
                   </span>
@@ -161,6 +161,7 @@ export default class List extends Component {
                         >
                       {
                         `Accuracy:${this.showScore(s.schedule.result.score, 'score')}`
+
                       }
                     </span>
                       )
@@ -176,7 +177,7 @@ export default class List extends Component {
                           })}
                         >
                       {
-                        `CVNN:${this.showScore(s.schedule.result.score, 'CVNN')} CH:${this.showScore(s.schedule.result.score, 'CH')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_cosine')}`
+                        `CVNN:${this.showScore(s.schedule.result.score, 'CVNN')} CH:${this.showScore(s.schedule.result.score, 'CH')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_euclidean')}`
                       }
                     </span>
                       )
@@ -276,7 +277,7 @@ const Alert = ({ text }) => (
 const isExcessThreshold = schedule => {
   if (!schedule.result || !schedule.result.score) return false;
   if (!schedule.threshold || !schedule.threshold.type || !schedule.threshold.value) return false
-  const nameMap = { R2: 'r2', RMSE: 'rmse', MSE: 'mse', AUC: 'auc', Accuracy: 'acc', F1: 'f1', Precision: 'precision', Recall: 'recall',CVNN: 'CVNN' ,CH:'CH',Silhouette_Score:'silhouette_cosine'};
+  const nameMap = { R2: 'r2', RMSE: 'rmse', MSE: 'mse', AUC: 'auc', Accuracy: 'acc', F1: 'f1', Precision: 'precision', Recall: 'recall',CVNN: 'CVNN' ,CH:'CH',Silhouette_Score:'silhouette_euclidean'};
   return {
     R2: (threshold, real) => threshold > real,
     RMSE: (threshold, real) => threshold < real,
@@ -288,7 +289,7 @@ const isExcessThreshold = schedule => {
     Recall: (threshold, real) => threshold > real,
     CVNN:(threshold, real) => threshold > real,
     CH:(threshold, real) => threshold > real,
-    Silhouette_Score:(threshold, real) => threshold > real,
+    silhouette_euclidean:(threshold, real) => threshold > real,
   }[schedule.threshold.type](
     schedule.threshold.value,
     schedule.result.score[nameMap[schedule.threshold.type]]
