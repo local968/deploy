@@ -15,6 +15,7 @@ export default class Operation extends Component {
   render() {
     const { deploymentStore, scheduleStore } = this.props;
     const cd = deploymentStore.currentDeployment || {};
+    const cddo = deploymentStore.currentDeployment.deploymentOptions
     console.log(scheduleStore.sortedDeploymentSchedules , 'scheduleStore.sortedDeploymentSchedules')
     return (
       <div className={styles.operation}>
@@ -85,7 +86,7 @@ export default class Operation extends Component {
                     <a
                       className={styles.results}
                       target="_blank"
-                      href={`http://${config.host}:${config.port}/upload/download/${s.schedule.id}?filename=${cd.deploymentOptions.file}-${moment
+                      href={`http://${config.host}:${config.port}/upload/download/${s.schedule.id}?filename=${cddo.file === 'string' ? cddo.file : cddo.sourceOptions.databaseType}-${moment
                         .unix(
                           s.schedule.actualTime || s.schedule.estimatedTime
                         )
