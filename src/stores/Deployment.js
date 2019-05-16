@@ -60,10 +60,26 @@ export default class Deploy {
       ...defaultDeploymentOptions,
       ...deploy.deploymentOptions
     };
+    let default_measurementMetric;
+    switch (deploy.modelType) {
+      case 'Classification':
+        default_measurementMetric = 'AUC';
+        break;
+      case 'Regression':
+        default_measurementMetric = 'R2';
+        break;
+      case 'Outlier':
+        default_measurementMetric = 'Accuracy';
+        break;
+      case 'Clustering':
+        default_measurementMetric = 'CVNN';
+        break;
+    }
+
     this.performanceOptions = {
       ...defaultPerformanceOptions,
       metricThreshold: deploy.modelType === 'Classification' ? 0.7 : 0.5,
-      measurementMetric: deploy.modelType === 'Classification' ? 'AUC' : 'R2',
+      measurementMetric: default_measurementMetric,
       ...deploy.performanceOptions
     };
     this.getModelInfo()
