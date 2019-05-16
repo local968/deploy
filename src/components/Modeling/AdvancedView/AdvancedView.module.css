@@ -115,6 +115,10 @@
     flex-basis: 200px;
     text-align: center;
   }
+.thumbnail img{
+  width: 52px;
+  height: 52px;
+}
   .detailCurves .leftPanel button {
     margin-right: 0.2em;
   }

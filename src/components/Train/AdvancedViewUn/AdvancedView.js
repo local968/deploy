@@ -4,15 +4,10 @@ import { Select, Radio, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import { Hint } from 'components/Common';
-import FitPlotHover from './iconMR-FitPlot-Hover.svg';
-import FitPlotNormal from './iconMR-FitPlot-Normal.svg';
-import FitPlotSelected from './iconMR-FitPlot-Selected.svg';
 import { observable, computed, action } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import FitPlot2 from "../../Charts/FitPlot2";
-import request from "../../Request";
 import ParallelPlots from "../../Charts/ParallelPlots";
 import ParallelPlot from './parallel-plot.png'
 import IconParallel from './icon-parallel.svg'

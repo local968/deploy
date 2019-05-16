@@ -94,9 +94,10 @@ export default class ParallelPlot extends PureComponent{
 			title: {
 				text: title,
 			},
-			// grid:{
-			// 	x2:100,
-			// },
+			grid:{
+				// x2:100,
+				// y:150,
+			},
 			legend: {
 				orient: 'vertical',
 				type:'scroll',
@@ -131,7 +132,7 @@ export default class ParallelPlot extends PureComponent{
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 300, width: 710}}
+			style={{height: 310, width: 710}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'

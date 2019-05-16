@@ -10,7 +10,7 @@ const SECRET = process.env.SECRET || "FNcidLwifNC902LCC9f2C";
 const REDIS_SENTINEL_HOSTS =
   process.env.REDIS_SENTINEL_HOSTS ||
   "192.168.0.23:16390,192.168.0.23:16391,192.168.0.23:16392";
-const REDIS_HOST = process.env.REDIS_HOST || "192.168.0.23:6375";
+const REDIS_HOST = process.env.REDIS_HOST || "127.0.0.1:6379";
 const REDIS_TYPE = process.env.REDIS_TYPE || "1"; // 1 standalone 2 sentinel
 const PASSWORD = process.env.PASSWORD || "7788414";
 const BACKEND = process.env.REACT_APP_NGINX_BACKEND || "1";
