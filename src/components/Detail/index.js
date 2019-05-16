@@ -97,7 +97,7 @@ export default class Detail extends Component {
         </div>
         <div className={styles.content}>
           {
-            !isUnsupervised ?
+            !isUnsupervised && (cd.modelType === 'Classification' || cd.modelType === 'Regression') ?
               <Route
                 path="/deploy/project/:id"
                 exact
