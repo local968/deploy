@@ -35,15 +35,13 @@ function showConfirm(props ,email , password) {
     onOk() {
       props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
       props.userStore.change('isWatchVideo')(true);
-      props.userStore.login({ email, password })
+      props.userStore.login({ email, password } , props)
       props.userStore.change('tabKey')('2');
-      props.history.push({pathname: '/support',state: { key
-            : 'loginTo' }})
     },
     onCancel() {
       props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
       props.userStore.change('isWatchVideo')(false);
-      props.userStore.login({ email, password });
+      props.userStore.login({ email, password } );
     },
   });
 }
