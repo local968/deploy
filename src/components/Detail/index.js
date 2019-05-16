@@ -23,6 +23,7 @@ export default class Detail extends Component {
     runInAction(() => (deploymentStore.currentId = match.params.id));
     const cd = deploymentStore.currentDeployment || {};
     const isUnsupervised = ["Clustering", "Outlier"].includes(cd.modelType);
+    console.log(cd.modelType , 'cd.modelType ' ,isUnsupervised)
     return (
       <div className={styles.detail}>
         <Bread list={[EN.Home]} />
