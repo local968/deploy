@@ -263,7 +263,6 @@ const EN: any = {
   VariableImpact: '变量重要性',
   ROCCurve: 'ROC 曲线',
   PredictionDistribution: '预测分布',
-  PrecisionRecallTradeoff: 'Precision Recall Tradeoff',
   LiftChart: 'Lift 图',
   ModelProcessFlow: '模型流程',
   Reset: '重置',
@@ -973,6 +972,8 @@ const EN: any = {
   cannotDeploy:'提示：您选择的模型仅支持对原始训练数据进行部署。',
   TargetValues:'目标变量类别',
   MissingValues:'缺失值',
+  PrecisionRecallTradeoff:'精准率召回率曲线',
+  KindlyReminder:'提示',
 };
 
 export default EN;

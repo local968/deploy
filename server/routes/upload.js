@@ -356,7 +356,7 @@ function downloadCsv(url, filename, index, header, res) {
       step: async (results, parser) => {
         const row = results.data[0]
         if (!resultHeader) {
-          resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
+          resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no')
           res.write(Papa.unparse([resultHeader, []], { header: false }))
         }
         const nos = Object.keys(temp)

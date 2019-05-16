@@ -8,22 +8,14 @@ import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 import config from 'config'
 import EN from '../../../constant/en';
-import {formatNumber} from "util";
-const transferR2 = (str) => str === 'R2' ? 'R²' : str
+
 @inject('deploymentStore', 'scheduleStore')
 @observer
 export default class Operation extends Component {
-  showScore = (score, type) => {
-    console.log(formatNumber(score[type]))
-    let s
-    if (score && score[type]) s = formatNumber(score[type], 2)
-    return s || ''
-  }
-
-
   render() {
     const { deploymentStore, scheduleStore } = this.props;
     const cd = deploymentStore.currentDeployment || {};
+    const cddo = deploymentStore.currentDeployment.deploymentOptions
     console.log(scheduleStore.sortedDeploymentSchedules , 'scheduleStore.sortedDeploymentSchedules')
     return (
       <div className={styles.operation}>
@@ -39,8 +31,6 @@ export default class Operation extends Component {
               <span className={styles.deploymentStyle}>{EN.DeploymentStyle}</span>
               <span className={styles.executionSpeed}>{EN.ExecutionSpeed} <small>{EN.Rowss}</small></span>
               <span className={styles.dataSize}>{EN.TotalLines}</span>
-              <span className={styles.performance}>{EN.Performance}</span>
-              <span className={styles.threshold}>{EN.Threshold}</span>
               <span className={styles.status}>{EN.Status}</span>
               <span className={styles.results}>{EN.Results}</span>
             </div>
@@ -73,29 +63,10 @@ export default class Operation extends Component {
                       ? s.schedule.result && s.schedule.result.totalLines
                       : ' - '}
                   </span>
-
-                  <span
-                    className={classnames(styles.performance, {
-                      [styles.issue]: isExcessThreshold(s.schedule)
-                    })}
-                  >
-                      {s.schedule.result &&
-                      s.schedule.status === 'finished' &&
-                      (s.deployment.modelType === 'Outlier'
-                        ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')}`
-                        : `MSE:${this.showScore(s.schedule.result.score, 'mse')} RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`)}
-                    </span>
-                  <span className={styles.threshold}>
-                      {s.schedule.threshold &&
-                      `${transferR2(s.schedule.threshold.type)}:${
-                        s.schedule.threshold.value
-                        }`}
-                    </span>
-
                   {s.schedule.status !== 'issue' && (
                     <span className={styles.status}>
                       {s.schedule.status[0].toUpperCase() +
-                        s.schedule.status.substr(1, s.schedule.status.lenght)}
+                      s.schedule.status.substr(1, s.schedule.status.lenght)}
                     </span>
                   )}
                   {s.schedule.status === 'issue' && (
@@ -115,7 +86,7 @@ export default class Operation extends Component {
                     <a
                       className={styles.results}
                       target="_blank"
-                      href={`http://${config.host}:${config.port}/upload/download/${s.schedule.id}?filename=${cd.deploymentOptions.file}-${moment
+                      href={`http://${config.host}:${config.port}/upload/download/${s.schedule.id}?filename=${cddo.file === 'string' ? cddo.file : cddo.sourceOptions.databaseType}-${moment
                         .unix(
                           s.schedule.actualTime || s.schedule.estimatedTime
                         )
@@ -182,22 +153,3 @@ const Empty = () => (
     <span className={styles.emptyText}>{EN.NoDeploymentReportYet}</span>
   </div>
 );
-
-const isExcessThreshold = schedule => {
-  if (!schedule.result || !schedule.result.score) return false;
-  if (!schedule.threshold || !schedule.threshold.type || !schedule.threshold.value) return false
-  const nameMap = { R2: 'r2', RMSE: 'rmse', MSE: 'mse', AUC: 'auc', Accuracy: 'acc', F1: 'f1', Precision: 'precision', Recall: 'recall' };
-  return {
-    R2: (threshold, real) => threshold > real,
-    RMSE: (threshold, real) => threshold < real,
-    MSE: (threshold, real) => threshold < real,
-    Accuracy: (threshold, real) => threshold > real,
-    AUC: (threshold, real) => threshold > real,
-    F1: (threshold, real) => threshold > real,
-    Precision: (threshold, real) => threshold > real,
-    Recall: (threshold, real) => threshold > real
-  }[schedule.threshold.type](
-    schedule.threshold.value,
-    schedule.result.score[nameMap[schedule.threshold.type]]
-  );
-};
