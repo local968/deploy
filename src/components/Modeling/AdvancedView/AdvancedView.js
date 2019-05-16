@@ -809,8 +809,8 @@ class DetailCurves extends Component {
     }];
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} >
-          <div className={styles.thumbnails} >
+        <div className={styles.leftPanel} style={{flex:1}}>
+          <div className={styles.thumbnails}>
             {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} yes={yes} no={no} />
@@ -819,8 +819,8 @@ class DetailCurves extends Component {
           </div> */}
         </div>
         <div className={styles.rightPanel} >
-          {hasReset && <button onClick={this.reset} className={styles.button} >{EN.Reset}</button>}
           {curComponent}
+          {hasReset && <button onClick={this.reset} className={styles.button+' '+styles.buttonr} >{EN.Reset}</button>}
         </div>
       </div>
     )
