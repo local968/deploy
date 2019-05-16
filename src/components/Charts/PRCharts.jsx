@@ -20,7 +20,7 @@ export default class PRCharts extends PureComponent{
 		const {roc} = chartData;
 		const {Recall:x,Precision:y} = roc;
 		
-		const _x = Object.values(x);
+		const _x = Object.values(x).map((itm,index)=>itm+index*10**-6);
 		const _y = Object.values(y);
 		const data = _.zip(_x,_y);
 		const point = data[fitIndex][0];
