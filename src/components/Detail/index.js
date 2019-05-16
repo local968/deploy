@@ -102,7 +102,6 @@ export default class Detail extends Component {
           <Route path="/deploy/project/:id/performance" component={(props) => <Performance {...props} />} />
           <Route path="/deploy/project/:id/status" component={(props) => <Status {...props} />} />
           <Route
-            path="/deploy/project/:id"
             render={() => (
               <Redirect to={`/deploy/project/${match.params.id}/${!isUnsupervised ? 'deployment' : 'performance'}`} />
             )}
