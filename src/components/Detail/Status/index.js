@@ -119,40 +119,38 @@ export default class List extends Component {
                   </span>
 
                     {
-                      s.schedule.result &&
-                      s.schedule.status === 'finished' &&
-                      s.schedule.result.problemType === 'Classification' && (
+                      s.deployment.modelType === 'Classification' && (
                         <span
                           className={classnames(styles.performance, {
                             [styles.issue]: isExcessThreshold(s.schedule)
                           })}
                         >
                       {
+                        s.schedule.result && s.schedule.status === 'finished' ?
                         `Accuracy:${this.showScore(s.schedule.result.score, 'acc')} AUC:${this.showScore(s.schedule.result.score, 'auc')} F1:${this.showScore(s.schedule.result.score, 'f1')} Precision:${this.showScore(s.schedule.result.score, 'precision')} Recall:${this.showScore(s.schedule.result.score, 'recall')}`
+                          : ' - '
                       }
                     </span>
                       )
                     }
 
                     {
-                      s.schedule.result &&
-                      s.schedule.status === 'finished' &&
-                      s.schedule.result.problemType === 'Regression' && (
+                      s.deployment.modelType === 'Regression' && (
                         <span
                           className={classnames(styles.performance, {
                             [styles.issue]: isExcessThreshold(s.schedule)
                           })}
                         >
                       {
+                        s.schedule.result && s.schedule.status === 'finished' ?
                         `MSE:${this.showScore(s.schedule.result.score, 'mse')} RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`
+                          : ' - '
                       }
                     </span>
                       )
                     }
 
                     {
-                      s.schedule.result &&
-                      s.schedule.status === 'finished' &&
                       s.deployment.modelType === 'Outlier' && (
                         <span
                           className={classnames(styles.performance, {
@@ -160,7 +158,8 @@ export default class List extends Component {
                           })}
                         >
                       {
-                        `Accuracy:${this.showScore(s.schedule.result.score, 'score')}`
+                        s.schedule.result && s.schedule.status === 'finished' ?
+                        `Accuracy:${this.showScore(s.schedule.result.score, 'score')}`: ' - '
 
                       }
                     </span>
@@ -168,8 +167,6 @@ export default class List extends Component {
                     }
 
                     {
-                      s.schedule.result &&
-                      s.schedule.status === 'finished' &&
                       s.deployment.modelType === 'Clustering' && (
                         <span
                           className={classnames(styles.performance, {
@@ -177,7 +174,9 @@ export default class List extends Component {
                           })}
                         >
                       {
+                        s.schedule.result && s.schedule.status === 'finished' ?
                         `CVNN:${this.showScore(s.schedule.result.score, 'CVNN')} CH:${this.showScore(s.schedule.result.score, 'CH')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_euclidean')}`
+                          : ' - '
                       }
                     </span>
                       )
