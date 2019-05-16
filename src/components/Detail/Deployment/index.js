@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import {Icon, Checkbox, Progress, Select, Modal, InputNumber} from 'antd';
-import {action, computed, observable} from 'mobx';
+import { Icon, Checkbox, Progress, Select, Modal } from 'antd';
+import { action, observable } from 'mobx';
 import moment from 'moment';
 import config from 'config';
 import styles from './styles.module.css';
@@ -22,7 +22,6 @@ import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import classnames from "classnames";
 
 const { Option, OptGroup } = Select;
 
@@ -47,7 +46,7 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-@inject('deploymentStore', 'userStore', 'routing','projectStore')
+@inject('deploymentStore', 'userStore', 'routing')
 @observer
 export default class Deployment extends Component {
   @observable dialog = null;
@@ -63,7 +62,6 @@ export default class Deployment extends Component {
   @action
   selectionOption = (key, value) => () => {
     this.props.deploymentStore.currentDeployment.deploymentOptions[key] = value;
-    this.props.deploymentStore.currentDeployment.performanceOptions[key] = value;
     this.props.deploymentStore.currentDeployment.save();
   };
 
@@ -115,13 +113,9 @@ export default class Deployment extends Component {
   })
 
   render() {
-    const { deploymentStore, userStore, routing, match  } = this.props;
-    console.log(this.props.projectStore)
+    const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
-    const cdpo = cd.performanceOptions;
-    console.log(cd ,'cd')
     const cddo = cd.deploymentOptions;
-    const measureDo = cd
     const uploader = {
       onError: action((error, times) => {
         console.error(error)
@@ -233,11 +227,10 @@ export default class Deployment extends Component {
         {
           cddo.option !== 'api' &&
           cddo.source &&
-          cddo.location &&
-          (
-            <MeasurementMetric
-              cdpo={cdpo}
-              type={cd.modelType}
+          cddo.location && (
+            <DeployFrequency
+              show={this.show}
+              cddo={cddo}
               selectionOption={this.selectionOption}
             />
           )
@@ -246,36 +239,6 @@ export default class Deployment extends Component {
           cddo.option !== 'api' &&
           cddo.source &&
           cddo.location &&
-          cdpo.measurementMetric && (
-            <MetricThreshold
-              cdpo={cdpo}
-              type={cd.modelType}
-              selectionOption={this.selectionOption}
-            />
-          )
-        }
-        {
-          cddo.option !== 'api' &&
-          cddo.source &&
-          cddo.location &&
-          cdpo.measurementMetric &&
-          cdpo.metricThreshold && (
-            <div>
-              <DeployFrequency
-                show={this.show}
-                cddo={cddo}
-                selectionOption={this.selectionOption}
-              />
-            </div>
-          )
-        }
-
-        {
-          cddo.option !== 'api' &&
-          cddo.source &&
-          cddo.location &&
-          cdpo.measurementMetric &&
-          cdpo.metricThreshold &&
           cddo.frequency && (
             <div className={styles.done}>
               <div className={styles.selections}>
@@ -487,7 +450,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
       {cddo.source !== 'file' && (
         <div
           className={styles.selectionWithoutHover}
-        // onClick={selectionOption('source', 'file')}
+          // onClick={selectionOption('source', 'file')}
         >
           <Uploader
             className={styles.text}
@@ -574,8 +537,6 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
   </div>
 ));
 
-
-
 const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
   <React.Fragment>
     <div className={styles.deployFrequency}>
@@ -590,11 +551,11 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
               <span className={styles.resultText}>
                 {EN.OneTime}<span className={styles.detail}>
                   <span className={styles.bold}>{EN.Times}</span>
-                  {cddo.frequencyOptions.time === 'completed'
-                    ? EN.Aftercompleted
-                    : moment
-                      .unix(cddo.frequencyOptions.time)
-                      .format('MM/DD/YYYY h:mma')}
+                {cddo.frequencyOptions.time === 'completed'
+                  ? EN.Aftercompleted
+                  : moment
+                    .unix(cddo.frequencyOptions.time)
+                    .format('MM/DD/YYYY h:mma')}
                 </span>
               </span>
             </span>
@@ -614,9 +575,9 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
                   } ${
                   cddo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
                   } ${cddo.frequencyOptions.repeatPeriod &&
-                  dateFormat[cddo.frequencyOptions.repeatPeriod](
-                    cddo.frequencyOptions.repeatOn
-                  )}`}
+                dateFormat[cddo.frequencyOptions.repeatPeriod](
+                  cddo.frequencyOptions.repeatOn
+                )}`}
                 <small className={styles.detail}>
                   <span className={styles.bold}>{EN.Starts}:</span>
                   {moment
@@ -670,89 +631,3 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
     </div>
   </React.Fragment>
 ));
-
-const MetricThreshold = observer(({ cdpo, selectionOption, type }) => (
-  <div className={styles.block}>
-    <span className={styles.label}>
-      <span className={styles.text}>{EN.MetricThreshold}</span>
-    </span>
-    <div className={styles.selections}>
-      {/* <span className={styles.compare}>
-        {type === 'Classification' ? '<' : '>'}
-      </span> */}
-      <InputNumber
-        className={styles.inputNumber}
-        min={0}
-        max={1}
-        step={0.1}
-        value={cdpo.metricThreshold}
-        onChange={value => {
-          selectionOption('metricThreshold', value || 0)();
-        }}
-      />
-    </div>
-  </div>
-));
-
-const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
-  <div className={styles.block}>
-    <span className={styles.label}>
-      <span className={styles.text}>{EN.MeasurementMetric}</span>
-    </span>
-    <div className={styles.selections}>
-      {type === 'Outlier' && (
-        <Select
-          className={styles.select}
-          value={cdpo.measurementMetric}
-          onChange={value => selectionOption('measurementMetric', value)()}
-        >
-          <Option value="Accuracy">{EN.Accuracy}</Option>
-        </Select>
-      )}
-      {type === 'Clustering' && (
-        <Select
-          className={styles.select}
-          value={cdpo.measurementMetric}
-          onChange={value => selectionOption('measurementMetric', value)()}
-        >
-          <Option value="CVNN">CVNN</Option>
-          <Option value="CH">CH Index</Option>
-          <Option value="Silhouette Score">Silhouette Score</Option>
-        </Select>
-      )}
-    </div>
-  </div>
-));
-
-@observer
-export class Measurement extends Component {
-
-  handleMeasurement = value => {
-    this.props.measureDo.performanceOptions.measurementMetric = value
-  }
-  render() {
-    const {performanceOptions ,modelType } = this.props.measureDo
-    const measurementList =
-      modelType === "Outlier"
-        ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-        [{ value: "score", label: EN.Accuracy }]
-        : [
-          { value: "CVNN", label: "CVNN" },
-          { value: "CH", label: "CH Index" },
-          { value: "Silhouette Score", label: "Silhouette Score" },
-        ];
-
-    return(
-      <div className={styles.advancedBlock}>
-        <div className={styles.advancedTitle}>
-          <span>{EN.SetMeasurement}:</span>
-        </div>
-        <div className={styles.advancedOption}>
-          <Select className={styles.antdAdvancedSize} value={performanceOptions.measurementMetric} onChange={this.handleMeasurement} >
-            {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
-          </Select>
-        </div>
-      </div>
-    )
-  }
-};
