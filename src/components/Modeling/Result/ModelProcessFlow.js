@@ -94,6 +94,7 @@ export default class ModelProcessFlow extends Component {
 
 	render() {
 		const { dataFlow, modelName = '' } = this.props.model;
+		console.log(dataFlow)
 		if (dataFlow.length === 1) {
 			return <section className={styles.process}>
 				<label>{EN.RawData}</label>

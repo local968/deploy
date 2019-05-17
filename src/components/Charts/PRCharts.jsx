@@ -11,7 +11,7 @@ export default class PRCharts extends PureComponent{
 			ready:false,
 			position:null,
 		};
-		this.updatePoint = _.debounce(this.updatePoint.bind(this),10);
+		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
 	}
 	
 	prePair(){
