@@ -96,6 +96,7 @@ export default class Detail extends Component {
 
         </div>
         <div className={styles.content}>
+          <Switch>
           {!isUnsupervised && (<Route path="/deploy/project/:id/deployment" component={(props) => <Deployment {...props} />} />)}
           {!isUnsupervised && (<Route path="/deploy/project/:id/operation" component={(props) => <Operation {...props} />} />)}
 
@@ -106,6 +107,7 @@ export default class Detail extends Component {
               <Redirect to={`/deploy/project/${match.params.id}/${!isUnsupervised ? 'deployment' : 'performance'}`} />
             )}
           />
+          </Switch>
         </div>
         {/* <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>
