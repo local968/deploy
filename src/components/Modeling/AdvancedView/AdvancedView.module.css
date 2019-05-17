@@ -85,11 +85,17 @@
     margin-left: 0.5em;
     margin-bottom: 0.5em;
   }
+  .buttonr{
+      position: absolute;
+      right: 50px;
+      top: 30%;
+  }
   .detailCurves {
     display: flex;
   }
   .detailCurves .rightPanel {
-    flex: 1;
+    flex: 2;
+    position: relative;
   }
   .detailCurves .rightPanel .plot {
     display: flex;
@@ -102,22 +108,30 @@
   .detailCurves .leftPanel {
     min-width: 300px;
     padding: 0.5em 3em;
-    background-color: #f0f0f0;
+    /*background-color: #f0f0f0;*/
     min-height: 200px;
+     border-right: 1px solid #979797;
   }
   .detailCurves .leftPanel .thumbnails {
     display: flex;
+    flex-wrap: wrap;
   }
 .detailCurves .leftPanel .thumbnails img{
   width: 52px;
 }
 .detailCurves .leftPanel .thumbnails .thumbnail {
-    flex-basis: 200px;
+    flex-basis: 50%;
     text-align: center;
   }
+.thumbnail{
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
 .thumbnail img{
   width: 52px;
   height: 52px;
+    margin-right: 3px;
 }
   .detailCurves .leftPanel button {
     margin-right: 0.2em;

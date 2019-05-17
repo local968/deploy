@@ -12,6 +12,7 @@ import Variable from './Variable.svg'
 import Process from './Process.svg'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import ModelProcessFlow2 from "./ModelProcessFlow2";
 const AccuracyHint = EN.Givenaparticularpopulation
 
 @observer
@@ -605,6 +606,7 @@ class ModelDetail extends Component {
 
   render() {
     const { model, onSelect, isSelect, isRecommend, text, exportReport } = this.props;
+    console.log(model.id.includes('Logistic'))
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -673,7 +675,8 @@ class ModelDetail extends Component {
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
-        {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
+        {this.visible && this.type === 'process' &&!model.id.includes('Logistic')&& <ModelProcessFlow model={model} />}
+        {this.visible && this.type === 'process' &&model.id.includes('Logistic')&& <ModelProcessFlow2 model={model} />}
       </div >
     );
   }

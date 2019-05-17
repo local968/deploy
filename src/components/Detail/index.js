@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Bread } from "components/Common";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect , Switch } from "react-router-dom";
 import { inject, observer } from "mobx-react";
 import { runInAction } from "mobx";
 import classnames from "classnames";
@@ -23,80 +23,91 @@ export default class Detail extends Component {
     runInAction(() => (deploymentStore.currentId = match.params.id));
     const cd = deploymentStore.currentDeployment || {};
     const isUnsupervised = ["Clustering", "Outlier"].includes(cd.modelType);
+    console.log(cd.modelType , 'cd.modelType ' ,isUnsupervised)
     return (
       <div className={styles.detail}>
         <Bread list={[EN.Home]} />
         <div className={styles.tabs}>
+          {
+            !isUnsupervised && (
+              <div
+                className={classnames([styles.tab, styles.deployment], {
+                  [styles.active]: location.pathname.indexOf("deployment") >= 0
+                })}
+                onClick={() =>
+                  routing.push(`/deploy/project/${match.params.id}/deployment`)
+                }
+              >
+                <img
+                  className={styles.icon}
+                  src={deploymentIcon}
+                  alt="deployment"
+                />
+                <span className={styles.text}>{EN.Deployments}</span>
+              </div>
+            )
+          }
+
+          {!isUnsupervised && (
+            <div
+              className={classnames([styles.tab, styles.operation], {
+                [styles.active]: location.pathname.indexOf("operation") >= 0
+              })}
+              onClick={() =>
+                routing.push(`/deploy/project/${match.params.id}/operation`)
+              }
+            >
+              <img className={styles.icon} src={operationIcon} alt="operation" />
+              <span className={styles.text}>{EN.OperationMonitor}</span>
+            </div>
+          )}
+
+
+
           <div
-            className={classnames([styles.tab, styles.deployment], {
-              [styles.active]: location.pathname.indexOf("deployment") >= 0
+            className={classnames([styles.tab, styles.performance], {
+              [styles.active]: location.pathname.indexOf("performance") >= 0
             })}
             onClick={() =>
-              routing.push(`/deploy/project/${match.params.id}/deployment`)
+              routing.push(`/deploy/project/${match.params.id}/performance`)
             }
           >
             <img
               className={styles.icon}
-              src={deploymentIcon}
-              alt="deployment"
+              src={performanceIcon}
+              alt="performance"
             />
-            <span className={styles.text}>{EN.Deployments}</span>
+            <span className={styles.text}>{EN.PerformanceMonitor}</span>
           </div>
+
+
+
           <div
-            className={classnames([styles.tab, styles.operation], {
-              [styles.active]: location.pathname.indexOf("operation") >= 0
+            className={classnames([styles.tab, styles.status], {
+              [styles.active]: location.pathname.indexOf("status") >= 0
             })}
             onClick={() =>
-              routing.push(`/deploy/project/${match.params.id}/operation`)
+              routing.push(`/deploy/project/${match.params.id}/status`)
             }
           >
-            <img className={styles.icon} src={operationIcon} alt="operation" />
-            <span className={styles.text}>{EN.OperationMonitor}</span>
+            <img className={styles.icon} src={statusIcon} alt="status" />
+            <span className={styles.text}>{EN.PerformanceStatus}</span>
           </div>
-          {!isUnsupervised && (
-            <div
-              className={classnames([styles.tab, styles.performance], {
-                [styles.active]: location.pathname.indexOf("performance") >= 0
-              })}
-              onClick={() =>
-                routing.push(`/deploy/project/${match.params.id}/performance`)
-              }
-            >
-              <img
-                className={styles.icon}
-                src={performanceIcon}
-                alt="performance"
-              />
-              <span className={styles.text}>{EN.PerformanceMonitor}</span>
-            </div>
-          )}
 
-          {!isUnsupervised && (
-            <div
-              className={classnames([styles.tab, styles.status], {
-                [styles.active]: location.pathname.indexOf("status") >= 0
-              })}
-              onClick={() =>
-                routing.push(`/deploy/project/${match.params.id}/status`)
-              }
-            >
-              <img className={styles.icon} src={statusIcon} alt="status" />
-              <span className={styles.text}>{EN.PerformanceStatus}</span>
-            </div>
-          )}
         </div>
         <div className={styles.content}>
+          <Switch>
+          {!isUnsupervised && (<Route path="/deploy/project/:id/deployment" component={(props) => <Deployment {...props} />} />)}
+          {!isUnsupervised && (<Route path="/deploy/project/:id/operation" component={(props) => <Operation {...props} />} />)}
+
+          <Route path="/deploy/project/:id/performance" component={(props) => <Performance {...props} />} />
+          <Route path="/deploy/project/:id/status" component={(props) => <Status {...props} />} />
           <Route
-            path="/deploy/project/:id"
-            exact
             render={() => (
-              <Redirect to={`/deploy/project/${match.params.id}/deployment`} />
+              <Redirect to={`/deploy/project/${match.params.id}/${!isUnsupervised ? 'deployment' : 'performance'}`} />
             )}
           />
-          <Route path="/deploy/project/:id/deployment" component={(props) => <Deployment {...props} />} />
-          <Route path="/deploy/project/:id/operation" component={(props) => <Operation {...props} />} />
-          {!isUnsupervised && (<Route path="/deploy/project/:id/performance" component={(props) => <Performance {...props} />} />)}
-          {!isUnsupervised && (<Route path="/deploy/project/:id/status" component={(props) => <Status {...props} />} />)}
+          </Switch>
         </div>
         {/* <div className={styles.enableWrap}>
           <span className={styles.enableText}>Enable</span>

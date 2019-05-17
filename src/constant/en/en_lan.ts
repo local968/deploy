@@ -339,7 +339,7 @@ const EN_LAN = {
   ModelingResults: 'Modeling Results',
   Givenaparticularpopulation: 'Given a particular population, the accuracy measures the percentage of the correct predictions; For example, for a population of 100 that has 70 yes and 30 no, if the model predicts 60 yes correctly and 20 no correctly, then its accuracy is (60+20)/100 = 80%.',
   Itrepresentsthecompleteness: 'Recall=TP/(TP+FN). It measures the % of positives the classifier labeled as positive. It represents the completeness of the classifier. The higher the recall is the more positives the classifier captures.',
-  Manyclassifiersareabletoproduce: 'Many classifiers are able to produce a probability distribution over a set of classes (e.g. binary 1/0). Cut-off threshold is a certain probability value which can be used to determine whether an observation belongs to a particular class.',
+  Manyclassifiersareabletoproduce: 'Cutoff Threshold is a critical probability which divides the prediction results into an event group and non-event group. A prediction result that is larger than the threshold goes into the event group, and a prediction result that is smaller than the threshold goes into the non-event group.',
   TheF1scoreistheharmonicmean: 'The F1-score is the harmonic mean of Precision and Recall, where an F1-score reaches its best value at 1 (perfect precision and recall) and worst at 0.',
   PrecisionRecall: 'It\'s 2*Precision*Recall / (Precision+Recall).',
   Itmeasureshowmanytruepositivesamong: 'It measures how many true positives among all predicted (including true and false)  positives. It\'s TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.',
@@ -352,7 +352,7 @@ const EN_LAN = {
   MeanAbsoluteError: 'Mean Absolute Error',
   TheadjustedR2tells: 'The adjusted R² tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.',
   LogLossis: 'Log Loss is -1 * the log of the likelihood function.',
-  Thelikelihoodfunctionanswers: 'The likelihood function answers the question "How likely did the model think the actually observed set of outcomes was." If that sounds confusing, an example should help.',
+  Thelikelihoodfunctionanswers: 'Likelihood loss or cross-entropy loss estimates the error between the real value and the predicted value: the smaller the better. ',
   F1Score: 'F1-Score',
   Precision: 'Precision',
   Recall: 'Recall',
@@ -1106,6 +1106,8 @@ const EN_LAN = {
   cannotDeploy:'Tip: The model you choose only supports deployment of original training data.',
   TargetValues:'Target Values',
   MissingValues:'Missing Values',
+  KindlyReminder:'Kindly Reminder',
+  Null:''
 };
 
 

@@ -90,3 +90,13 @@ body {
 .ant-checkbox-wrapper{
   margin-left: -20px !important;
 }
+.ant-radio-wrapper:hover .ant-radio, .ant-radio:hover .ant-radio-inner, .ant-radio-input:focus + .ant-radio-inner{
+  border-color:#4EC078 !important;
+}
+
+.ant-radio-checked .ant-radio-inner{
+    border-color:#4EC078 !important;
+}
+.ant-radio-inner::after{
+  background-color: #4EC078 !important;
+}

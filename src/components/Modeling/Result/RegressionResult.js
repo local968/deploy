@@ -27,7 +27,6 @@ export default class RegressionView extends Component {
     const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
-    console.log(project)
   
     return <div>
       <div className={styles.result}>

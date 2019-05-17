@@ -20,7 +20,7 @@ function ModelResult(props) {
   const [showTips, setShowTips] = React.useState(false)
   const { resetSide, view, sort, handleSort, changeView, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
 
   React.useEffect(() => {
@@ -32,6 +32,7 @@ function ModelResult(props) {
   if (!selectModel || !models.length) return null
 
   const cannotDeploy = problemType === 'Clustering' && !selectModel.supportDeploy
+  const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
   // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
 
   const abortTrain = () => {
@@ -66,7 +67,7 @@ function ModelResult(props) {
       .addDeployment(project.id, project.name, current.modelName, project.problemType, exps)
       .then(id => props.routing.push('/deploy/project/' + id));
   };
-
+  
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
     {problemType === "Clustering" && <div className={classes.tabs}>
@@ -122,7 +123,7 @@ function ModelResult(props) {
         <div className={classes.right} style={{ flex: 1, width: 200 }}>
           {
             project.problemType === "Outlier" ?
-              <ISO2 selectModel={selectModel} />
+              <ISO2/>
               : <D3D2 url={selectModel.multiVarPlotData} />
           }
         </div>
@@ -139,7 +140,10 @@ function ModelResult(props) {
       </Tooltip> : <button className={`${classes.button}`} onClick={deploy}>
           <span>{EN.DeployTheModel}</span>
         </button>}
-      {problemType === 'Clustering' && <a href={`/upload/download/model?projectId=${id}&filename=${123123}&mid=${selectModel.modelName}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
+      {problemType === 'Clustering' && <a href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
+        <span>{'导出模型结果'}</span>
+      </button></a>}
+      {problemType === 'Outlier' && <a href={`/upload/download/outlier?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&rate=${formatNumber(selectModel.rate)}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
         <span>{'导出模型结果'}</span>
       </button></a>}
     </div>
@@ -246,7 +250,7 @@ const OutlierRow = observer((props) => {
           <span>{formatNumber(model.score.score)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
+          <span>{formatNumber(model.rate|| 0)}</span>
         </div>
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>

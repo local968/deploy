@@ -3,7 +3,8 @@ const formatNumber = (str, n = 3, f = false, m = 'round') => {
   n = n > 0 ? n : 0
   const p = Math.pow(10, n)
   const num = parseInt(Math[m](parseFloat(str) * p, 10)) / p
-  str = num.toString()
+  const ltz = num < 0
+  str = Math.abs(num).toString()
   let i, d
   if (str.indexOf('.')) {
     i = str.split('.')[0]
@@ -36,6 +37,7 @@ const formatNumber = (str, n = 3, f = false, m = 'round') => {
     const _d = a.join('')
     s += _d ? "." + _d : ""
   }
+  s = ltz ? '-' + s : s
   const _s = parseFloat(s)
   const isZero = _s === -_s
   return !isZero ? s : s.indexOf('-') === 0 ? s.slice(1) : s

@@ -344,6 +344,29 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           <Option value="MSE">MSE</Option>
         </Select>
       )}
+
+      {type === 'Outlier' && (
+        <Select
+          className={styles.select}
+          value={cdpo.measurementMetric}
+          onChange={value => selectionOption('measurementMetric', value)()}
+        >
+          <Option value="Accuracy">{EN.Accuracy}</Option>
+        </Select>
+      )}
+
+      {type === 'Clustering' && (
+        <Select
+          className={styles.select}
+          value={cdpo.measurementMetric}
+          onChange={value => selectionOption('measurementMetric', value)()}
+        >
+          <Option value="CVNN">CVNN</Option>
+          <Option value="CH">CH Index</Option>
+          <Option value="silhouette_euclidean">Silhouette Score</Option>
+        </Select>
+      )}
+
     </div>
   </div>
 ));

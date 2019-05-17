@@ -10,12 +10,15 @@ import request from '../Request'
 import styles from './charts.module.css';
 import EN from "../../constant/en";
 import { Select } from 'antd';
+import {inject, observer} from "mobx-react";
 const {Option} = Select;
 
 const classes = styles;
 
 const color = ['#6e698f','#d5d4df','#367de9','#f3ce31'];//背景(开始)/背景(结束）/异常点/正常点
 
+@inject('projectStore')
+@observer
 export default class Iso extends PureComponent{
     constructor(props){
         super(props);
@@ -31,32 +34,39 @@ export default class Iso extends PureComponent{
             list:[],
             var1:'',
             var2:'',
+            url:'',
+            vars:[],
         };
         this.chart = React.createRef();
         this.updatePoint = debounce(this.updatePoint, 280)
     }
     
-    componentWillReceiveProps(nextProps) {
-    	const {outlierPlotData} = nextProps.selectModel;
-        if(outlierPlotData !== this.props.selectModel.outlierPlotData){
-            return this.componentDidMount(outlierPlotData,false,nextProps);
-        }
+    componentDidMount() {
+        const chart = this.chart.getEchartsInstance();
+        chart.showLoading();
+        
+        return this.message();
     }
 
-    async componentDidMount(url=this.props.selectModel.outlierPlotData,loading = this.props.selectModel.outlierPlotLoading,props=this.props) {
+    async message() {
         const chart = this.chart.getEchartsInstance();
-        console.log('loading',loading)
-        // if(loading){
-        //     return chart.showLoading();
-        // }
-        const { selectModel:models} = props;
-        // const point = (parseInt((models.dataFlow[0].contamination||0)*10*10*10)/1000).toFixed(3);
-        // console.log(point,models.dataFlow[0].contamination)
-        const point = (models.dataFlow[0].contamination||0).toFixed(3);
+        chart.showLoading();
+        const { selectModel:models} = this.props.projectStore.project;
+        const {outlierPlotData:url,outlierPlotData:loading,rate,initRate} = models;
+    
+        // const point = (models.dataFlow[0].contamination||0).toFixed(3);
+        const point = (rate).toFixed(3);
+        let var1,var2,vars=this.state.vars;
         const {featureImportance} = models;
-        const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
-        const var1 = list[0][0];
-        const var2 = list[1][0];
+        if(vars.length){
+            var1 = vars[0];
+            var2 = vars[1];
+        }else{
+            const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
+             var1 = list[0][0];
+             var2 = list[1][0];
+        }
+        
         const result = await request.post({
             url: '/graphics/outlier',
             data: {
@@ -71,7 +81,7 @@ export default class Iso extends PureComponent{
             value,
             dot,
             point,
-            default_point:point,
+            default_point:initRate,
             slider_value:point,
             ready:true,
             show_name:{
@@ -81,19 +91,23 @@ export default class Iso extends PureComponent{
             list:Object.keys(featureImportance),
             var1,
             var2,
-        })
+            url,
+        },()=>chart.hideLoading())
     }
 
     getOption() {
-        let {ready,xRange,yRange,value,dot,point,var1,var2} = this.state;
+        let {ready,xRange,yRange,value,dot,point,var1,var2,url} = this.state;
+        
         if(!ready){
             return {
                 xAxis: {},
                 yAxis: {},
             }
         }
-        const chart = this.chart.getEchartsInstance();
-        chart.hideLoading();
+    
+        if(url !== this.props.projectStore.project.selectModel.outlierPlotData){
+            this.componentDidMount()
+        }
 
         const x_space = (xRange[1] - xRange[0]) / value[0].length;
         const y_space = (yRange[1] - yRange[0]) / value.length;
@@ -239,7 +253,9 @@ export default class Iso extends PureComponent{
     updatePoint(point){
         this.setState({
             point,
-        })
+        });
+        // console.log(this.props.projectStore.project.selectModel)
+        this.props.projectStore.project.selectModel.updateModel({rate: point})
     }
 
     selection(order){
@@ -267,11 +283,17 @@ export default class Iso extends PureComponent{
     save(){
         const {show_name} = this.state;
         const {var1,var2} = show_name;
+        
         this.setState({
-            var1,
-            var2,
+            // var1,
+            // var2,
+            vars:[var1,var2],
+        },()=>{
+            const chart = this.chart.getEchartsInstance();
+            chart.showLoading();
         });
-        this.props.selectModel.saveFeatureList([var1,var2]);
+        this.props.projectStore.project.selectModel.saveFeatureList([var1,var2]);
+        
     }
 
     reset(){
@@ -288,7 +310,7 @@ export default class Iso extends PureComponent{
             height = 500,
             width = 600,
         } = this.props;
-
+        
         return [
             <section key='dl' className={classes.d3d2}>
                 <dl>
@@ -336,7 +358,7 @@ export default class Iso extends PureComponent{
                         });
                         this.updatePoint(slider_value)
                     }}
-                    value={slider_value} />
+                    value={+slider_value} />
                     <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
             </div>,
             <div key = 'adjust' className={classes.adjust}>

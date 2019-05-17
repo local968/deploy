@@ -95,6 +95,7 @@ export default class Project {
   @observable missingReason = {}
   @observable newVariablePath = ''
   @observable newVariableViews = {}
+  @observable otherMap = {}
 
   // @observable totalFixedCount = 0
   @observable deletedCount = 0
@@ -265,7 +266,7 @@ export default class Project {
       // nullFillMethodTemp: {},
       // outlierFillMethodTemp: {},
       outlierDictTemp: {},
-
+      otherMap: {},
       cleanPath: ''
     }
   }
@@ -597,7 +598,7 @@ export default class Project {
     const result = await this.originalStats()
     if (result.status !== 200) {
       antdMessage.error(result.message)
-      this.updateProject({ uploadFileName: [], originalIndex: '', etling: false })
+      this.updateProject({ fileName: '', uploadFileName: [], originalIndex: '', etling: false })
     }
   }
 
@@ -1057,7 +1058,7 @@ export default class Project {
 
   @action
   fixTarget = () => {
-    this.updateProject({ targetMapTemp: this.targetMapTemp, targetArrayTemp: this.targetArrayTemp })
+    this.updateProject({ targetMapTemp: this.targetMapTemp, targetArrayTemp: this.targetArrayTemp, otherMap: this.otherMap })
   }
 
   @action
@@ -1073,7 +1074,7 @@ export default class Project {
 
   @action
   addNewVariable = (variableName, variables, exp, type) => {
-    console.log(variableName, variables, exp, type,666)
+    console.log(variableName, variables, exp, type, 666)
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     const oldExp = Object.values(this.expression).join(";")
     const allExp = `${oldExp};${fullExp}`
@@ -1208,17 +1209,17 @@ export default class Project {
         const { validateScore, holdoutScore } = score || {}
         let validate, holdout
         if (problemType === 'Classification') {
-          validate = measurement === 'auc' ? (validateScore || {}).auc : m[measurement + 'Validation']
-          holdout = measurement === 'auc' ? (holdoutScore || {}).auc : m[measurement + 'Holdout']
+          validate = currentMeasurement === 'auc' ? (validateScore || {}).auc : m[currentMeasurement + 'Validation']
+          holdout = currentMeasurement === 'auc' ? (holdoutScore || {}).auc : m[currentMeasurement + 'Holdout']
         } else if (problemType === 'Regression') {
           validate = (validateScore || {})[currentMeasurement]
           holdout = (holdoutScore || {})[currentMeasurement]
         } else if (problemType === 'Clustering') {
-          validate = score[measurement]
-          holdout = score[measurement]
+          validate = score[currentMeasurement]
+          holdout = score[currentMeasurement]
         } else if (problemType === 'Outlier') {
-          validate = score[measurement]
-          holdout = score[measurement]
+          validate = score[currentMeasurement]
+          holdout = score[currentMeasurement]
         }
         if (!validate || !holdout) return
         return { id: m.id, value: validate + holdout }
@@ -1310,7 +1311,7 @@ export default class Project {
           featureLabel,
           targetLabel: target,
           projectId: id,
-          version: '1,2',
+          version: '1,2,3',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,
@@ -1352,7 +1353,7 @@ export default class Project {
           featureLabel,
           targetLabel: target,
           projectId: id,
-          version: '1,2',
+          version: '1,2,3',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,

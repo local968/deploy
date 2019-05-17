@@ -327,18 +327,18 @@ export class SelectTarget extends Component {
       [checked[1 - maxKey]]: 1
     }
     // 重置rename
-    const renameVariable = {}
+    const otherMap = {}
     this[`belongTo${maxKey}`].forEach(v0 => {
       targetMap[v0] = 0
-      renameVariable[v0] = checked[maxKey]
+      otherMap[v0] = checked[maxKey]
     })
     this[`belongTo${1 - maxKey}`].forEach(v1 => {
       targetMap[v1] = 1
-      renameVariable[v1] = checked[1 - maxKey]
+      otherMap[v1] = checked[1 - maxKey]
     })
     this.props.project.targetArrayTemp = [checked[maxKey], checked[1 - maxKey]];
     this.props.project.targetMapTemp = targetMap;
-    this.props.project.renameVariable = renameVariable
+    this.props.project.otherMap = otherMap
     this.props.saveTargetFixes()
   }
 
@@ -405,7 +405,7 @@ export class SelectTarget extends Component {
               <input type='checkbox' onChange={this.check} value={''} checked={checked.includes('')} />
             </div>
             <div className={styles.targetPercentLabel}>
-              <span>{''}</span>
+              <span>{EN.Null}</span>
             </div>
             <div className={styles.targetPercentValue}>
               <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: 'ff97a7' }}></div>
@@ -458,8 +458,8 @@ export class SelectTarget extends Component {
             </div>
           </div>}
           <div className={styles.cleanTargetButton} style={{ margin: '.1em 0' }}>
-            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>{EN.Matchas}{v0}</span></button>
-            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>{EN.Matchas}{v1}</span></button>
+            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>{EN.Matchas}{v0 === '' ? EN.Null : v0}</span></button>
+            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>{EN.Matchas}{v1 === '' ? EN.Null : v1}</span></button>
           </div>
         </div>
 

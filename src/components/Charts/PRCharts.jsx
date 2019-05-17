@@ -11,7 +11,7 @@ export default class PRCharts extends PureComponent{
 			ready:false,
 			position:null,
 		};
-		this.updatePoint = _.debounce(this.updatePoint.bind(this),10);
+		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
 	}
 	
 	prePair(){
@@ -20,7 +20,7 @@ export default class PRCharts extends PureComponent{
 		const {roc} = chartData;
 		const {Recall:x,Precision:y} = roc;
 		
-		const _x = Object.values(x);
+		const _x = Object.values(x).map((itm,index)=>itm+index*10**-6);
 		const _y = Object.values(y);
 		const data = _.zip(_x,_y);
 		const point = data[fitIndex][0];
@@ -102,7 +102,7 @@ export default class PRCharts extends PureComponent{
 				type: 'value',
 				boundaryGap: false,
 				min:0,
-				max:1,
+				max:1.05,
 			},
 			yAxis: {
 				type: 'value',
