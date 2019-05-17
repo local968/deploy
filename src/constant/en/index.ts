@@ -495,7 +495,7 @@ const EN: any = {
   R2LearnTutorialVideo: 'R2-Learn 教学视频',
   Reportsuccess: '报告成功',
   Reporterror: '报告失败',
-  Overview: '1. 预览',
+  Overview: '1. 概览',
   Machinelearning: '机器学习',
   MachinewithR2: '使用R2-Learn进行机器学习',
   GettingstartedwithR2: '2. 开始使用R2-Learn',
