@@ -280,9 +280,9 @@ const EN: any = {
   Yourplotisunbalancedonyaxis: '您的数据在Y轴上不平衡。你可以通过以下方式改进模型:',
   Lookingforanopportunity: '寻找有效转换变量的方法，通常是您的目标变量',
   Checkingifyourmodel: '检查你的模型是否缺少有益变量',
-  Youcantransformorselect: '您可以在我们的应用程序中转换或选择变量',
-  GotoAdvancedVariableSetting: '转到高级变量设置',
-  Alternativelyyoucanmodify: '或者您可以线下修改并重新加载数据',
+  Youcantransformorselect: '您可以对变量进行转换或重新选择',
+  GotoAdvancedVariableSetting: '转到变量设置',
+  Alternativelyyoucanmodify: '您可以线下处理数据后重新上传',
   LoadMyNewData: '上传新数据',
   DiagnoseResults: '诊断结果:',
   Yourplotisunbalancedonxaxis: '您的数据在X轴上不平衡。你可以通过以下方式改进模型:',
@@ -974,7 +974,8 @@ const EN: any = {
   MissingValues:'缺失值',
   PrecisionRecallTradeoff:'精准率召回率曲线',
   KindlyReminder:'提示',
-  Null:'缺失值'
+  Null:'缺失值',
+  VariableFormula:'Variable Formula',
 };
 
 export default EN;

@@ -1,4 +1,5 @@
 import React from "react";
+import {Typography} from "@material-ui/core";
 
 const EN_LAN = {
   /**
@@ -1107,7 +1108,8 @@ const EN_LAN = {
   TargetValues:'Target Values',
   MissingValues:'Missing Values',
   KindlyReminder:'Kindly Reminder',
-  Null:''
+  Null:'',
+  VariableFormula:'Variable Formula',
 };
 
 

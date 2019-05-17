@@ -521,7 +521,7 @@ class SimplifiedViewRow extends Component {
           <div className={styles.preImpotanceActive} style={{width: (importance * 100) + '%'}}/>
         </div>
       </div>
-      <div className={styles.tableTd} title={valueType}><span>{valueType}</span></div>
+      <div className={styles.tableTd} title={valueType=== 'Numerical' ? EN.Numerical : EN.Categorical}><span>{valueType=== 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType !== 'Categorical'
       })} title={unique}><span>{unique}</span></div>
