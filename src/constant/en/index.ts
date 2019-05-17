@@ -822,7 +822,7 @@ const EN: any = {
   addPreRmb: "追加预测（RMB）",
   api: "API 访问",
   support: "技术支持",
-  UnsupervisedLearning: '非监督学习',
+  UnsupervisedLearning: '非监督',
   Clustering: '聚类',
   OutlierDetection: '异常值检测',
   ProbabilityThreshold: '概率阈值',
