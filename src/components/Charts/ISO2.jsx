@@ -53,7 +53,6 @@ export default class Iso extends PureComponent{
         chart.showLoading();
         const { selectModel:models} = this.props.projectStore.project;
         const {outlierPlotData:url,outlierPlotData:loading,rate,initRate} = models;
-        console.log('rate',models)
     
         // const point = (models.dataFlow[0].contamination||0).toFixed(3);
         const point = (rate).toFixed(3);
@@ -359,7 +358,7 @@ export default class Iso extends PureComponent{
                         });
                         this.updatePoint(slider_value)
                     }}
-                    value={slider_value} />
+                    value={+slider_value} />
                     <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
             </div>,
             <div key = 'adjust' className={classes.adjust}>
