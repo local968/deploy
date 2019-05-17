@@ -304,9 +304,9 @@ class Summary extends Component {
   render() {
     const { project, editFixes } = this.props;
     const { dataHeader, totalRawLines, colType, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, issues } = project
-    const deletePercent = deletedCount / totalRawLines * 100
-    const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
-    const cleanPercent = (totalRawLines - totalFixedLines) / totalRawLines * 100
+    const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
+    const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
+    const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
     const variableList = dataHeader
     const percentList = dataHeader.map(v => {
       const isNum = colType[v] === 'Numerical'
@@ -352,9 +352,9 @@ class Summary extends Component {
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
           <Pie2
-              RowsWillBeFixed = {fixedPercent}
-              RowsWillBeDeleted = {deletePercent}
-              CleanData = {cleanPercent}
+            RowsWillBeFixed={fixedPercent}
+            RowsWillBeDeleted={deletePercent}
+            CleanData={cleanPercent}
           />
           <div className={styles.summaryParts}>
             <div className={styles.summaryPart}>
@@ -364,7 +364,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{formatNumber(fixedPercent, 2)}%</span>
+                <span>{fixedPercent}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -374,7 +374,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{formatNumber(deletePercent, 2)}%</span>
+                <span>{deletePercent}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -384,7 +384,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube}></div>
-                <span>{formatNumber(cleanPercent, 2)}%</span>
+                <span>{cleanPercent}%</span>
               </div>
             </div>
           </div>
