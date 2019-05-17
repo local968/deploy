@@ -352,7 +352,7 @@ const EN_LAN = {
   MeanAbsoluteError: 'Mean Absolute Error',
   TheadjustedR2tells: 'The adjusted R² tells you the percentage of variation explained by only the independent variables that actually affect the dependent variable.',
   LogLossis: 'Log Loss is -1 * the log of the likelihood function.',
-  Thelikelihoodfunctionanswers: 'The likelihood function answers the question "How likely did the model think the actually observed set of outcomes was." If that sounds confusing, an example should help.',
+  Thelikelihoodfunctionanswers: 'Likelihood loss or cross-entropy loss estimates the error between the real value and the predicted value: the smaller the better. ',
   F1Score: 'F1-Score',
   Precision: 'Precision',
   Recall: 'Recall',
