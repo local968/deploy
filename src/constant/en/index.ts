@@ -228,7 +228,7 @@ const EN: any = {
   ModelingResults: '模型结果',
   Givenaparticularpopulation: '准确率衡量的是正确预测的百分比; 例如，对于一个有70个yes和30个no的100个数据，如果模型正确预测出60个yes和20个no，那么它的准确率是(60+20)/100 = 80%。',
   Itrepresentsthecompleteness: 'Recall =TP/(TP+FN) 召回率度量分类器正确判为阳类占实际所有阳类的百分比。它代表了分类器的完整性。召回越高，分类器捕获实际阳类的数量越多。',
-  Manyclassifiersareabletoproduce: '分类器会生成一组类别的概率分布(例如：二分类1/0)。截断阈值是一个确定的概率值，用来确定一个观测是否属于一个特定的类。',
+  Manyclassifiersareabletoproduce: '截断阈值是一个决定预测结果为正例或负例的临界概率。大于等于截断阈值的样本会被判断为正例，小于截断阈值的样本则会被判断为负例。',
   TheF1scoreistheharmonicmean: 'F1是精确度和召回率的调和平均值. F1值最佳值为1 (精确度和召回率为完美) , 最差值为0。',
   PrecisionRecall: 'F1 = 2*Precision*Recall / (Precision+Recall)',
   Itmeasureshowmanytruepositivesamong: '它衡量所有预测（包括真假）阳类中有多少实际阳类,方程为真阳(tp) / (真阳(tp) + 假阳(fp))。从计算中可以看出，当值越大，分类器的误报越少。它有点代表分类器的准确性。',
