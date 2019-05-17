@@ -95,6 +95,7 @@
   }
   .detailCurves .rightPanel {
     flex: 2;
+    position: relative;
   }
   .detailCurves .rightPanel .plot {
     display: flex;
