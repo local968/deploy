@@ -39,6 +39,7 @@ export default function EsUploader(file, option = {}) {
       step: (result, parser) => {
         uploader = parser
         const _row = result.data[0]
+        loaded += _row.toString().length
         if (!header) {
           rawHeader = autoFixHeader(_row).map(v => encodeURIComponent(v))
           // cleanHeader = rawHeader
@@ -47,7 +48,6 @@ export default function EsUploader(file, option = {}) {
         const row = _row.map(v => encodeURIComponent(v))
         if (row.toString() === '') return
         chunk += no + ',' + row.toString()
-        loaded += row.length
         no++
         if (chunk.length < chunkSize) chunk += '\n'
         else {
@@ -61,7 +61,7 @@ export default function EsUploader(file, option = {}) {
             },
             method: "POST",
             data: header + '\n' + chunk,
-          }).then(() => {
+          }).then((res) => {
             onProgress(`${loaded}/${file.size}`, '')
             // setUploadStatus('uploaded: ' + no + ' lines')
             chunk = ''
