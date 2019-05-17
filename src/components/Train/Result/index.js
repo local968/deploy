@@ -110,7 +110,7 @@ function ModelResult(props) {
               <span className={classes.label}>{EN.Score} <Hint content={EN.ScoreHint} /></span>
             </div>
             <div className={classes.rate}>
-              <div className={classes.blood}>{formatNumber(selectModel.dataFlow[0].contamination || 0)}</div>
+              <div className={classes.blood}>{formatNumber(selectModel.rate || 0)}</div>
               <span className={classes.rateLabel} style={{ justifyContent: 'center' }}>{EN.ContaminationRate} <Hint content={EN.ContaminationRateHint} /></span>
             </div>
           </div>}
