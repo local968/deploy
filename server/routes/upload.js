@@ -118,9 +118,10 @@ router.get('/dataDefinition', async (req, res) => {
   const rank = await redis.zrank(`user:${userId}:projects:createTime`, projectId)
   if (rank === null) return res.json({ status: 404, message: 'project not found.', error: 'project not found.' })
   const data = JSON.parse(await redis.hget(`project:${projectId}`, 'dataHeader'))
+  const target = JSON.parse(await redis.hget(`project:${projectId}`, 'target'))
   res.attachment('definition.csv');
   res.type('csv')
-  res.send(data.join(','))
+  res.send(data.filter(h => h !== target).join(','))
 })
 
 router.get('/test', async (req, res) => {
