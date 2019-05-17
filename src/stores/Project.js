@@ -598,7 +598,7 @@ export default class Project {
     const result = await this.originalStats()
     if (result.status !== 200) {
       antdMessage.error(result.message)
-      this.updateProject({ uploadFileName: [], originalIndex: '', etling: false })
+      this.updateProject({ fileName: '', uploadFileName: [], originalIndex: '', etling: false })
     }
   }
 

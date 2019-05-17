@@ -303,7 +303,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { dataHeader, totalRawLines, colType, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, issues } = project
+    const { dataHeader, totalRawLines, colType, deletedCount, totalLines, problemType, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, issues } = project
     const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
     const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
     const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
@@ -321,6 +321,37 @@ class Summary extends Component {
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
         <div className={styles.summaryTitle}><span>{EN.Summaryofyourdata}</span></div>
+        <div className={styles.summaryTypeBox}>
+          {!!nullCount && <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }} />
+            <span>{EN.CleanData}</span>
+          </div>}
+          {!!mismatchCount && <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }} />
+            <span>{EN.DataTypeMismatch}</span>
+          </div>}
+          <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
+            <span>{EN.MissingValue}</span>
+          </div>
+          {(problemType !== 'Outlier' && outlierCount) && <div className={styles.summaryType}>
+            <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
+            <span>{EN.Outlier}</span>
+          </div>}
+        </div>
+        <div className={styles.summaryTable}>
+          <div className={styles.summaryTableLeft}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
+            </div>
+          </div>
+          <div className={styles.summaryTableRight}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
+            </div>
+          </div>
+        </div>
         <div className={styles.summaryTable} style={{ maxHeight: '4em' }}>
           <div className={styles.summaryTableLeft}>
             {variableList.map((v, k) => {
