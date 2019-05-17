@@ -50,7 +50,7 @@ export default class RegressionView extends Component {
         {/*<PredictVActual model={current} project={project} />*/}
         <PredictedVsActualPlot
             x_name = {EN.PointNumber}
-            y_name = {EN.price + EN.NewAverage}
+            y_name = {project.target + '的组内平均值'}
             url={project.selectModel.pointToShowData}
         />
       </div>
