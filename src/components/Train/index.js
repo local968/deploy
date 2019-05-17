@@ -20,16 +20,6 @@ import { ProjectSide } from 'components/Common';
 export default class Modeling extends Component {
   @observable right = 0
   @observable view = 'simple'
-  @observable sort = {
-    simple: {
-      key: 'name',
-      value: 1
-    },
-    advanced: {
-      key: 'Model Name',
-      value: 1
-    }
-  }
 
   constructor(props) {
     super(props);
@@ -68,17 +58,6 @@ export default class Modeling extends Component {
     this.view = view
   }
 
-  handleSort = (view, key) => {
-    const sort = this.sort[view]
-    if (!sort) return
-    if (sort.key === key) sort.value = -sort.value
-    else {
-      sort.key = key
-      sort.value = 1
-    }
-    this.sort = { ...this.sort, [view]: sort }
-  }
-
   enter = step => {
     const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
     if (step === subStepActive) return false;
@@ -88,7 +67,7 @@ export default class Modeling extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { view, sort } = this
+    const { view } = this
 
     return (
       <div className={styles.modeling}>
@@ -99,9 +78,7 @@ export default class Modeling extends Component {
               resetSide={this.resetSide}
               project={project}
               view={view}
-              sort={sort}
-              changeView={this.changeView}
-              handleSort={this.handleSort} />
+              changeView={this.changeView} />
           }} />
         </Switch>}
         {project && <ProjectSide
@@ -118,14 +95,12 @@ export default class Modeling extends Component {
 @observer
 class TrainResult extends Component {
   render() {
-    const { project, view, sort, handleSort, changeView, resetSide } = this.props;
+    const { project, view, changeView, resetSide } = this.props;
     const { models, train2Error, train2ing } = project;
     if (train2Error) return <ModelError />;
     if (!models.length && train2ing) return <Loading />;
     return <ModelResult
       view={view}
-      sort={sort}
-      handleSort={handleSort}
       changeView={changeView}
       resetSide={resetSide}
     />

@@ -167,7 +167,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const {project} = this.props;
-    const {target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, newVariableViews, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress} = project;
+    const {target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, addNewVariable2, newVariable, newType, newVariableViews, id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress} = project;
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
@@ -242,7 +242,7 @@ export default class SimplifiedView extends Component {
           {/*<CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} addNewVariable={addNewVariable} expression={expression} />*/}
           {/*} />*/}
           <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable}
-                   content={<Demo onClose={this.hideNewVariable} addNewVariable={addNewVariable}/>}/>
+                   content={<Demo onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType}/>}/>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'

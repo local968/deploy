@@ -67,7 +67,6 @@ const Option = Select.Option;
 export default class AdvancedView extends Component {
 
   @observable currentSettingId = 'all';
-  @observable metric = this.props.projectStore.project.measurement
 
   // undefined = can not sort, false = no sort ,1 = asc, -1 = desc
   // @observable sortState = {
@@ -97,8 +96,7 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { metric } = this
-    const { models, project, projectStore, sort } = this.props;
+    const { models, project, projectStore, sort, metric } = this.props;
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
@@ -331,11 +329,6 @@ export default class AdvancedView extends Component {
   //   // if (window.localStorage)
   //   //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
   // });
-  handleChange = action(value => {
-    this.metric = value;
-    // if (window.localStorage)
-    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
-  });
 
   constructor(props) {
     super(props);
@@ -362,9 +355,9 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort } = this.props;
+    const { project, sort, handleSort, handleChange, metric } = this.props;
     const { problemType } = project
-    const currMetric = this.metricOptions.find(m => m.key === (this.metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
+    const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
       <div className={styles.advancedModelResult}>
         <div className={styles.modelResult} >
@@ -383,7 +376,7 @@ export default class AdvancedView extends Component {
         </div>
         <div className={styles.metricSelection} >
           <span className={styles.text} >{EN.MeasurementMetric}</span>
-          <Select size="large" value={currMetric.key} onChange={this.handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
+          <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
@@ -579,10 +572,10 @@ class RegressionDetailCurves extends Component {
         break;
       case EN.ResidualPlot:
         const Plot = <ResidualPlot
-            title={EN.ResidualPlot}
-            x_name={EN.Truevalue}
-            y_name={EN.Predictvalue}
-            chartDate={chartDate}
+          title={EN.ResidualPlot}
+          x_name={EN.Truevalue}
+          y_name={EN.Predictvalue}
+          chartDate={chartDate}
         />;
         curComponent = (
           <div className={styles.plot} >
@@ -597,10 +590,10 @@ class RegressionDetailCurves extends Component {
               onCancel={() => this.setState({ visible: false })}
             >
               <ResidualDiagnose
-                  handleDiagnoseType={this.handleDiagnoseType}
-                  diagnoseType={diagnoseType}
-                  Plot={Plot}
-                  residualplot={model.residualPlotPath} />
+                handleDiagnoseType={this.handleDiagnoseType}
+                diagnoseType={diagnoseType}
+                Plot={Plot}
+                residualplot={model.residualPlotPath} />
             </Modal>
             <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
           </div>
@@ -809,7 +802,7 @@ class DetailCurves extends Component {
     }];
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{flex:1}}>
+        <div className={styles.leftPanel} style={{ flex: 1 }}>
           <div className={styles.thumbnails}>
             {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
@@ -820,7 +813,7 @@ class DetailCurves extends Component {
         </div>
         <div className={styles.rightPanel} >
           {curComponent}
-          {hasReset && <button onClick={this.reset} className={styles.button+' '+styles.buttonr} >{EN.Reset}</button>}
+          {hasReset && <button onClick={this.reset} className={styles.button + ' ' + styles.buttonr} >{EN.Reset}</button>}
         </div>
       </div>
     )
@@ -1060,7 +1053,7 @@ class ResidualDiagnose extends Component {
     // const disabled = false;
     return (
       <div className={styles.residualDiagnose} >
-        <div className={styles.plot} style={{zoom:0.7}}>
+        <div className={styles.plot} style={{ zoom: 0.7 }}>
           {/*<img width={300} src={residualplot} alt="" />*/}
           {this.props.Plot}
         </div>

@@ -16,6 +16,34 @@ const Classification = 'Classification';
 @observer
 export default class ModelResult extends Component {
   @observable show = false
+  @observable sort = {
+    simple: {
+      key: 'name',
+      value: 1
+    },
+    advanced: {
+      key: 'Model Name',
+      value: 1
+    }
+  }
+  @observable metric = this.props.projectStore.project.measurement
+
+  handleSort = (view, key) => {
+    const sort = this.sort[view]
+    if (!sort) return
+    if (sort.key === key) sort.value = -sort.value
+    else {
+      sort.key = key
+      sort.value = 1
+    }
+    this.sort = { ...this.sort, [view]: sort }
+  }
+
+  handleChange = action(value => {
+    this.metric = value;
+    // if (window.localStorage)
+    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
+  });
 
   deploy = () => {
     const { project } = this.props.projectStore;
@@ -57,7 +85,7 @@ export default class ModelResult extends Component {
   }
 
   render() {
-    const { view, sort, changeView, handleSort } = this.props
+    const { view, changeView } = this.props
     const { project } = this.props.projectStore;
     const { models } = project
     if (!models.length) return null;
@@ -81,8 +109,8 @@ export default class ModelResult extends Component {
           </button>
         </div> */}
         {view === 'simple' ?
-          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={sort.simple} handleSort={handleSort.bind(null, 'simple')}/> :
-          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={sort.advanced} handleSort={handleSort.bind(null, 'advanced')} />}
+          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')}/> :
+          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange}/>}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>

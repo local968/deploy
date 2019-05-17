@@ -18,7 +18,17 @@ const Option = Select.Option;
 function ModelResult(props) {
   // const type = 'clustering'
   const [showTips, setShowTips] = React.useState(false)
-  const { resetSide, view, sort, handleSort, changeView, projectStore } = props
+  const [sort, setSort] = React.useState({
+    simple: {
+      key: 'name',
+      value: 1
+    },
+    advanced: {
+      key: 'Model Name',
+      value: 1
+    }
+  })
+  const { resetSide, view, changeView, projectStore } = props
   const { project } = projectStore
   const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
@@ -54,6 +64,17 @@ function ModelResult(props) {
     })
   }
 
+  const handleSort = (view, key) => {
+    const sort = sort[view]
+    if (!sort) return
+    if (sort.key === key) sort.value = -sort.value
+    else {
+      sort.key = key
+      sort.value = 1
+    }
+    setSort({ ...sort, [view]: sort })
+  }
+
   const deploy = () => {
     // const { project } = this.props.projectStore;
     const { selectModel: current } = project
@@ -67,7 +88,7 @@ function ModelResult(props) {
       .addDeployment(project.id, project.name, current.modelName, project.problemType, exps)
       .then(id => props.routing.push('/deploy/project/' + id));
   };
-  
+
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
     {problemType === "Clustering" && <div className={classes.tabs}>
@@ -123,7 +144,7 @@ function ModelResult(props) {
         <div className={classes.right} style={{ flex: 1, width: 200 }}>
           {
             project.problemType === "Outlier" ?
-              <ISO2/>
+              <ISO2 />
               : <D3D2 url={selectModel.multiVarPlotData} />
           }
         </div>
@@ -250,7 +271,7 @@ const OutlierRow = observer((props) => {
           <span>{formatNumber(model.score.score)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.rate|| 0)}</span>
+          <span>{formatNumber(model.rate || 0)}</span>
         </div>
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>

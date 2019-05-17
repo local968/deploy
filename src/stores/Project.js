@@ -1113,6 +1113,50 @@ export default class Project {
     })
   }
 
+  @action
+  addNewVariable2 = (variables, type) => {
+    // console.log(variableName, variables, exp, type, 666)
+    // const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
+    // const oldExp = Object.values(this.expression).join(";")
+    // const allExp = `${oldExp};${fullExp}`
+    const scripts = variables.map(v => ({ name: v.nameArray.join(','), script: v.exps }))
+
+    return socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'top.createNewVariable',
+        csvScript: scripts
+      };
+      return api.createNewVariable(command, progressResult => {
+      }).then(returnValue => {
+        const { status, result } = returnValue
+        if (status < 0) {
+          antdMessage.error(result.msg)
+          return false
+        }
+        const variablenames = variables.reduce((prev, _v) => [...prev, ..._v.nameArray], [])
+        const newVariable = [...this.newVariable, ...variablenames]
+        const trainHeader = [...this.trainHeader, ...variablenames]
+        const newType = Object.assign({}, this.newType, type)
+        const variableExp = variables.reduce((prev, _v) => {
+          prev[_v.name] = _v.exps
+          return prev
+        }, {})
+        const expression = Object.assign({}, this.expression, variableExp)
+        this.updateProject({
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+          correlationMatrixData: null,
+          correlationMatrixHeader: null,
+          cleanPath: ''
+        })
+        return true
+      })
+    })
+  }
+
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
