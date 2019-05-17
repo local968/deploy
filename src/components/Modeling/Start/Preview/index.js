@@ -14,18 +14,19 @@ import axios from 'axios';
 export default class Preview extends Component {
   @observable cleanData = []
   @observable newVariableData = []
+  @observable loading = false
 
-  componentDidMount() {
-    const { readIndex, etlIndex, newVariablePath, fetchData } = this.props.project;
-    autorun(() => {
-      if (!etlIndex) return
-      readIndex(etlIndex).then(data => {
-        this.cleanData = data
-      })
+  constructor(props) {
+    super(props)
+    const { readIndex, etlIndex, fetchData } = props.project;
+    readIndex(etlIndex).then(data => {
+      this.cleanData = data
     })
     autorun(() => {
-      if (!newVariablePath) return
-      fetchData(newVariablePath).then(data => {
+      if (!props.project.newVariablePath) return
+      this.loading = true
+      fetchData(props.project.newVariablePath).then(data => {
+        this.loading = false
         this.newVariableData = data
       })
     })
@@ -34,14 +35,15 @@ export default class Preview extends Component {
   formatTable = () => {
     const { cleanData, newVariableData } = this
     const { visiable, project } = this.props
-    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, dataHeader, target } = project;
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader, target } = project;
     if (!visiable) return []
+    if (this.loading) return []
     if (!cleanData.length) return []
     if (!!newVariable.length && !newVariableData.length) return []
-    const headerList = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
-    const notShowIndex = dataHeader.filter(v => !headerList.includes(v)).map(v => dataHeader.indexOf(v))
+    const headerList = [...rawHeader.filter(_h => dataHeader.includes(_h)), ...newVariable].filter(h => !trainHeader.includes(h))
+    const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
     const targetIndex = headerList.indexOf(target)
-    const data = cleanData.map((row, index) => row.filter((k, i) => !notShowIndex.includes(i)).concat(newVariable.map(n => newVariableData[index][n])))
+    const data = cleanData.map((row, index) => row.concat(newVariable.map(n => newVariableData[index][n])).filter((k, i) => !notShowIndex.includes(i)))
 
     const types = { ...colType, ...newType }
 
@@ -84,6 +86,7 @@ export default class Preview extends Component {
 
     const tableData = data.map((row, index) => row.map((v, i) => {
       if (i === targetIndex) v = renameVariable[v] || v
+      v = v === 'NEW_VARIABLE_TYPE' ? '' : v
       return {
         content: <span>{v}</span>,
         title: v,
