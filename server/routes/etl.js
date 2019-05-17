@@ -157,7 +157,7 @@ wss.register('newEtl', async (message, socket, process) => {
           if (key === '') return prev
           prev[key] = {
             type: 'replace',
-            value
+            value: value === '' ? 'NEW_VARIABLE_TYPE' : value
           }
           return prev
         }, {}),
