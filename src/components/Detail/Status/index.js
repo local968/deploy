@@ -202,11 +202,18 @@ export default class List extends Component {
                     {/*      : `CVNN:${this.showScore(s.schedule.result.score, 'cvnn')} CH:${this.showScore(s.schedule.result.score, 'ch')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_score')}`)*/}
                     {/*  }*/}
                     {/*</span>*/}
-                    <span className={styles.threshold}>
+                    <span  className={styles.threshold}>
+                    <span>
+                       {s.schedule.threshold &&
+                       `${transferR2(s.schedule.threshold.type)}:`}
+                    </span>
+                      <br/>
+                    <span>
                       {s.schedule.threshold &&
-                        `${transferR2(s.schedule.threshold.type)}:${
+                        `${
                         s.schedule.threshold.value
                         }`}
+                    </span>
                     </span>
                     {s.schedule.status !== 'issue' && (
                       <span className={styles.status}>
