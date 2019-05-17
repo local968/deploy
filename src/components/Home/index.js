@@ -341,7 +341,11 @@ class Tools extends Component {
           20: 20
         }}
         value={toolsOption.limit}
-        onChange={changeOption.bind(null, "limit")}
+        onChange={(v) => {
+          changeOption("limit",v );
+          changePage(1)
+        }
+        }
       />
       <Pagination
         current={toolsOption.current}

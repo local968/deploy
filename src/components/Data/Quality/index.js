@@ -501,9 +501,9 @@ class Summary extends Component {
   render() {
     const { project, editFixes } = this.props;
     const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
-    const deletePercent = deletedCount / totalRawLines * 100
-    const fixedPercent = (totalFixedLines - deletedCount) / totalRawLines * 100
-    const cleanPercent = (totalRawLines - totalFixedLines) / totalRawLines * 100
+    const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
+    const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
+    const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
     const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
     const variableList = currentHeader.slice(1)
     const percentList = currentHeader.map(v => {
@@ -618,7 +618,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} />
-                <span>{formatNumber(fixedPercent, 2)}%</span>
+                <span>{fixedPercent}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -628,7 +628,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} />
-                <span>{formatNumber(deletePercent, 2)}%</span>
+                <span>{deletePercent}%</span>
               </div>
             </div>
             <div className={styles.summaryPart}>
@@ -638,7 +638,7 @@ class Summary extends Component {
               </div>
               <div className={styles.summaryPartText}>
                 <div className={styles.summaryCube} />
-                <span>{formatNumber(cleanPercent, 2)}%</span>
+                <span>{cleanPercent}%</span>
               </div>
             </div>
           </div>
