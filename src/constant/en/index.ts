@@ -241,7 +241,7 @@ const EN: any = {
   MeanAbsoluteError: 'Mean Absolute Error',
   TheadjustedR2tells: 'Adjusted R² 描述了自变量给因变量带来的差异的百分比',
   LogLossis: 'Log Loss 是 -1*似然函数的对数',
-  Thelikelihoodfunctionanswers: '似然函数回答了这个问题：模型认为实际观察到的结果集的可能性有多大。如果这听起来仍然让你困惑，那么举一个例子应该有所帮助。',
+  Thelikelihoodfunctionanswers: '对数似然损失，或称交叉熵损失，用于度量模型的分类误差：越小表示模型效果越好。',
   F1Score: 'F1-Score',
   Precision: 'Precision',
   Recall: 'Recall',
