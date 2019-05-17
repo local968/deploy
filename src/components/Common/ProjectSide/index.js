@@ -65,6 +65,7 @@ export default class ProjectSide extends Component {
         if (!this.domRef.current) return
         const parent = this.domRef.current.parentElement
         const prev = this.domRef.current.previousSibling
+        if (!parent || !prev) return
         const max = prev.clientWidth
         const min = parent.clientWidth
         if (this.min === min && this.max === max) return false
