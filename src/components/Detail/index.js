@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Bread } from "components/Common";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect , Switch } from "react-router-dom";
 import { inject, observer } from "mobx-react";
 import { runInAction } from "mobx";
 import classnames from "classnames";
