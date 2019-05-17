@@ -13,7 +13,7 @@ export default class Article extends Component {
       <WayPoint
         onEnter={this.changeHash.bind(this,'1')}
       >
-        <a name="1" className={styles.h1}>1. 概览</a>
+        <a name="1" className={styles.h1}>1. 预览</a>
       </WayPoint>
 
       R2-Learn可帮助公司快速将数据转换为机器学习模型，而无需AI（人工智能）专业知识。 R2-Learn采用最先进的技术，用AI全程助您使用您的数据创建模型，部署模型，实时迭代模型。
