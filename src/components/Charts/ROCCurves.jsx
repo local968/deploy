@@ -12,7 +12,7 @@ export default class ROCCurves extends PureComponent{
 			position:null,
 			startIndex:props.model.fitIndex,
 		};
-		this.updatePoint = _.debounce(this.updatePoint.bind(this),10);
+		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
 	}
 	
 	// componentWillReceiveProps(nextProps) {

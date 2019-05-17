@@ -108,7 +108,7 @@ export default class List extends Component {
 
                     <span className={styles.deploymentStyle}>
                     {EN.Predictwith}{' '}
-                      {s.deployment.performanceOptions.source === 'file'
+                      {s.deployment.performanceOptions.source === 'file' || s.deployment.performanceOptions.source === 'database'
                         ? EN.DataSource
                         : EN.APISource}
                   </span>

@@ -39,16 +39,7 @@ export default class Iso extends PureComponent{
         };
         this.chart = React.createRef();
         this.updatePoint = debounce(this.updatePoint, 280)
-        // this.props.projectStore.project.selectModel)
     }
-    
-    // componentWillReceiveProps(nextProps) {
-    //     console.log(8)
-    // 	const {outlierPlotData} = nextProps.projectStore.project.selectModel;
-    //     if(outlierPlotData !== this.props.projectStore.project.selectModel.outlierPlotData){
-    //         return this.message(outlierPlotData,false,nextProps);
-    //     }
-    // }
     
     componentDidMount() {
         const chart = this.chart.getEchartsInstance();
@@ -61,11 +52,11 @@ export default class Iso extends PureComponent{
         const chart = this.chart.getEchartsInstance();
         chart.showLoading();
         const { selectModel:models} = this.props.projectStore.project;
-        const {outlierPlotData:url,outlierPlotData:loading} = models;
-        // console.log(models)
-        // const point = (parseInt((models.dataFlow[0].contamination||0)*10*10*10)/1000).toFixed(3);
-        // console.log(point,models.dataFlow[0].contamination)
-        const point = (models.dataFlow[0].contamination||0).toFixed(3);
+        const {outlierPlotData:url,outlierPlotData:loading,rate,initRate} = models;
+        console.log('rate',models)
+    
+        // const point = (models.dataFlow[0].contamination||0).toFixed(3);
+        const point = (rate).toFixed(3);
         let var1,var2,vars=this.state.vars;
         const {featureImportance} = models;
         if(vars.length){
@@ -83,8 +74,6 @@ export default class Iso extends PureComponent{
                 url,
             },
         });
-    
-        chart.hideLoading();
 
         const {feature1Range:xRange=[],feature2Range:yRange=[],background:value=[],dotScore:dot=[]} = result;
         this.setState({
@@ -93,7 +82,7 @@ export default class Iso extends PureComponent{
             value,
             dot,
             point,
-            default_point:point,
+            default_point:initRate,
             slider_value:point,
             ready:true,
             show_name:{
@@ -104,7 +93,7 @@ export default class Iso extends PureComponent{
             var1,
             var2,
             url,
-        })
+        },()=>chart.hideLoading())
     }
 
     getOption() {
@@ -265,7 +254,9 @@ export default class Iso extends PureComponent{
     updatePoint(point){
         this.setState({
             point,
-        })
+        });
+        // console.log(this.props.projectStore.project.selectModel)
+        this.props.projectStore.project.selectModel.updateModel({rate: point})
     }
 
     selection(order){

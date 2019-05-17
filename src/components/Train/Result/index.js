@@ -250,7 +250,7 @@ const OutlierRow = observer((props) => {
           <span>{formatNumber(model.score.score)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.dataFlow[0].contamination || 0)}</span>
+          <span>{formatNumber(model.rate|| 0)}</span>
         </div>
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
