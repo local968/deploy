@@ -1,7 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { List, ListItem, ListItemText, TextField } from '@material-ui/core';
-import Variable from './variable'
 import { Coordinate } from './model/Coordinate';
 import _ from 'lodash'
 // import { useImmer } from 'use-immer';
@@ -20,7 +19,8 @@ const useStyles = makeStyles({
 })
 
 interface VariablesProps {
-  handleClick: (v: Coordinate, i: null) => void
+  handleClick: (v: Coordinate, i: null) => void;
+  variables: Array<Coordinate>;
 }
 
 interface VariablesState {
@@ -28,12 +28,10 @@ interface VariablesState {
 }
 
 function Variables(props: VariablesProps) {
-  const { handleClick } = props;
+  const { handleClick, variables } = props;
   const classes = useStyles()
-  const initState: VariablesState = { variables: Variable };
-  const [state, setState] = React.useState({
-    variables: Variable
-  } as VariablesState);
+  const initState: VariablesState = { variables };
+  const [state, setState] = React.useState(initState as VariablesState);
   const inputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newList: Array<Coordinate> = initState.variables.filter((o) => {
       return o.value && !o.value.indexOf(e.target.value);

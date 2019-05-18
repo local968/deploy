@@ -1,16 +1,16 @@
 export default {
   base: [
-    { label: "exp()", value: "exp()", syntax: "语法: exp(@var)", params: 1 },
-    { label: "log2()", value: "log2()", syntax: "语法: log2(@var)", params: 1 },
-    { label: "log10()", value: "log10()", syntax: "语法: log10(@var)", params: 1 },
-    { label: "ln()", value: "ln()", syntax: "语法: ln(@var)", params: 1 },
-    { label: "pow()", value: "pow()", syntax: "语法﷨: pow(@var, base)", params: 2 },
-    { label: "log()", value: "log()", syntax: "语法: log(@var, base)", params: 2 },
-    { label: "eq()", value: "eq()", syntax: "语法: eq(@var1, @var2)", params: 2 },
-    { label: "sum()", value: "sum()", syntax: "语法: sum(@var1, @var2, @var3, ...)" },
-    { label: "min()", value: "min()", syntax: "语法: min(@var1, @var2, @var3, ...)" },
-    { label: "max()", value: "max()", syntax: "语法: max(@var1, @var2, @var3, ...)" },
-    { label: "mean()", value: "mean()", syntax: "语法: mean(@var1, @var2, @var3, ...)" }
+    { label: "Exp()", value: "Exp()", syntax: "语法: exp(@var)", params: 1 },
+    { label: "Log2()", value: "Log2()", syntax: "语法: log2(@var)", params: 1 },
+    { label: "Log10()", value: "Log10()", syntax: "语法: log10(@var)", params: 1 },
+    { label: "Ln()", value: "Ln()", syntax: "语法: ln(@var)", params: 1 },
+    { label: "Pow()", value: "Pow()", syntax: "语法﷨: pow(@var, base)", params: 2 },
+    { label: "Log()", value: "Log()", syntax: "语法: log(@var, base)", params: 2 },
+    { label: "Eq()", value: "Eq()", syntax: "语法: eq(@var1, @var2)", params: 2 },
+    { label: "Sum()", value: "Sum()", syntax: "语法: sum(@var1, @var2, @var3, ...)" },
+    { label: "Min()", value: "Min()", syntax: "语法: min(@var1, @var2, @var3, ...)" },
+    { label: "Max()", value: "Max()", syntax: "语法: max(@var1, @var2, @var3, ...)" },
+    { label: "Mean()", value: "Mean()", syntax: "语法: mean(@var1, @var2, @var3, ...)" }
   ],
   senior: [
     {

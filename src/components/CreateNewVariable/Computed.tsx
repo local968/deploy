@@ -8,6 +8,7 @@ import {
   Button,
   Typography
 } from '@material-ui/core';
+import map from 'lodash/map';
 // import { useImmer } from 'use-immer';
 import Funcions from './Funcions';
 import Variables from './Variables';
@@ -362,10 +363,11 @@ function Computed(props: ComputedProps) {
 
   const processAndSave = () => {
     const { exps } = state;
-    console.log(exps, 66666)
     const checkd = exps.map(exp => checkExp(exp.value))
     const error = checkd.find(c => !c.isPass)
-    if (error) return alert(error.message)
+    if (error){
+      return alert(error.message)
+    }
     const newType = {}
     const newVariables = checkd.map((l, k) => {
       const { num, type } = l as any
@@ -720,7 +722,13 @@ function Computed(props: ComputedProps) {
   }
   //------------------------------------------check end-----------------------------------------------------------------
 
-
+  const variables: Coordinate[] = map(colType, function(value, name) {
+    return {
+      name,
+      type: Type.ID,
+      value:`@${name}`,
+    };
+  });
   return (
     <Card>
       {/*<CardHeader*/}
@@ -748,16 +756,17 @@ function Computed(props: ComputedProps) {
               />
             </Paper>
           </Grid>
+
           <Grid item xs={3}>
-            <Typography align='left' variant='h6' noWrap gutterBottom>Form Field</Typography>
+            <Typography align='left' variant='h6' noWrap gutterBottom>{EN.Function}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Variables handleClick={handleVariables} />
+              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} />
             </Paper>
           </Grid>
           <Grid item xs={3}>
-            <Typography align='left' variant='h6' noWrap gutterBottom>Function</Typography>
+            <Typography align='left' variant='h6' noWrap gutterBottom>Form Field</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} />
+              <Variables handleClick={handleVariables} variables={variables} />
             </Paper>
           </Grid>
           <Grid item xs={6}>

@@ -3,58 +3,58 @@ import { Type } from './model/Coordinate'
 
 export default [
   {
-    "name": "exp",
-    "value": "exp",
+    "name": "Exp",
+    "value": "Exp",
     "type": Type.Func
   },
   {
-    "name": "log2",
-    "value": "log2",
+    "name": "Log2",
+    "value": "Log2",
     "type": Type.Func
   },
   {
-    "name": "log10",
-    "value": "log10",
+    "name": "Log10",
+    "value": "Log10",
     "type": Type.Func
   },
   {
-    "name": "ln",
-    "value": "ln",
+    "name": "Ln",
+    "value": "Ln",
     "type": Type.Func
   },
   {
-    "name": "pow",
-    "value": "pow",
+    "name": "Pow",
+    "value": "Pow",
     "type": Type.Func
   },
   {
-    "name": "log",
-    "value": "log",
+    "name": "Log",
+    "value": "Log",
     "type": Type.Func
   },
   {
-    "name": "eq",
-    "value": "eq",
+    "name": "Eq",
+    "value": "Eq",
     "type": Type.Func
   },
   {
-    "name": "sum",
-    "value": "sum",
+    "name": "Sum",
+    "value": "Sum",
     "type": Type.Func
   },
   {
-    "name": "min",
-    "value": "min",
+    "name": "Min",
+    "value": "Min",
     "type": Type.Func
   },
   {
-    "name": "max",
-    "value": "max",
+    "name": "Max",
+    "value": "Max",
     "type": Type.Func
   },
   {
-    "name": "mean",
-    "value": "mean",
+    "name": "Mean",
+    "value": "Mean",
     "type": Type.Func
   },
   {
