@@ -976,9 +976,9 @@ const EN: any = {
   PrecisionRecallTradeoff:'精准率召回率曲线',
   KindlyReminder:'提示',
   Null:'缺失值',
-  VariableFormula:'Variable Formula',
-  FormField:'Form Field',
-  ProjectDescription:'Project Description',
+  VariableFormula:'变量公式',
+  FormField:'表格',
+  ProjectDescription:'项目描述',
 };
 
 export default EN;
