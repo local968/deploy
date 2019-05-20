@@ -48,13 +48,13 @@ export default class ModelResult extends Component {
   deploy = () => {
     const { project } = this.props.projectStore;
     const { selectModel: current } = project
-    const { newVariable, trainHeader, expression } = project
-    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
-    const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
-    const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+    // const { newVariable, trainHeader } = project
+    // const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
+    // const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+    // const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
 
     this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.modelName, current.problemType, exps)
+      .addDeployment(project.id, project.name, current.modelName, current.problemType)
       .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 
@@ -109,8 +109,8 @@ export default class ModelResult extends Component {
           </button>
         </div> */}
         {view === 'simple' ?
-          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')}/> :
-          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange}/>}
+          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} /> :
+          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
@@ -145,8 +145,8 @@ class SimpleView extends Component {
     const { models, project, exportReport, sort, handleSort } = this.props;
     const { problemType } = project;
     return problemType === Classification ?
-      <ClassificationResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/> :
-      <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort}/>
+      <ClassificationResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort} /> :
+      <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort} />
   }
 }
 
