@@ -47,19 +47,19 @@ export default class AdvancedView extends Component {
             const bModelData = formatNumber(bModel.score.RMSSTD)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'CH':
+        case 'CH Index':
           {
             const aModelData = formatNumber(aModel.score.CH)
             const bModelData = formatNumber(bModel.score.CH)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'silhouette_cosine':
+        case 'Silhouette Cosine':
           {
             const aModelData = formatNumber(aModel.score.silhouette_cosine)
             const bModelData = formatNumber(bModel.score.silhouette_cosine)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
-        case 'silhouette_euclidean':
+        case 'Silhouette Euclidean':
           {
             const aModelData = formatNumber(aModel.score.silhouette_euclidean)
             const bModelData = formatNumber(bModel.score.silhouette_euclidean)
