@@ -22,7 +22,22 @@ export default class ThreeVariable extends PureComponent{
 		});
 		
 		return {
-			// tooltip: {},
+			tooltip: {
+				formatter: function (params, ticket, callback) {
+					const {seriesName,value,marker} = params;
+					return `
+						${marker}${seriesName}<br/>
+						${x_name}:${value[0].toFixed(3)}<br/>
+						${y_name}:${value[1].toFixed(3)}<br/>
+						${z_name}:${value[2].toFixed(3)}
+					`
+				},
+				// axisPointer:{
+				// 	label:{
+				// 		precision:3
+				// 	}
+				// }
+			},
 			grid3D: {
 				// right:200
 			},
