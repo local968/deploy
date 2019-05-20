@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import AdvancedView from '../AdvancedView/AdvancedView';
 import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
