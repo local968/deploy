@@ -76,21 +76,19 @@ export default class PredictedVsActualPlot extends PureComponent{
 			tooltip: {
 				trigger: 'axis',
 				formatter: function (params) {
-					// const result = params.map((itm)=> {
-					// 	return <dd>
-					// 		{itm.seriesName}: {itm.value[1].toFixed(3)}
-					// 	</dd>;
-					// });
-					// result.map(it=>console.log(it.props.children))
-					// return `
-					// 	组编号: ${params[0].axisValue}
-					// 	${result.map(itm=>('<br/>' + itm.props.children.join('')))}
-					// `
-					return `
+					let result = `
 						组编号: ${params[0].axisValue}<br/>
 						${params[0].seriesName}: ${params[0].value[1].toFixed(3)}<br/>
-						${params[1].seriesName}: ${params[1].value[1].toFixed(3)}<br/>
-					`
+					`;
+					
+					if(params[1]){
+						return `
+						组编号: ${params[0].axisValue}<br/>
+						${params[0].seriesName}: ${params[0].value[1].toFixed(3)}<br/>
+						${params[1].seriesName}: ${params[1].value[1].toFixed(3)}
+					`;
+					}
+					return result
 				},
 			},
 			series,
