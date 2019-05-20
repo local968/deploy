@@ -389,6 +389,7 @@ function Computed(props: ComputedProps) {
       }
     })
     addNewVariable(newVariables, newType)
+    onClose()
   }
 
   const Elevation: number = 1;
