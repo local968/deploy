@@ -65,14 +65,14 @@ function ModelResult(props) {
   }
 
   const handleSort = (view, key) => {
-    const sort = sort[view]
-    if (!sort) return
-    if (sort.key === key) sort.value = -sort.value
+    const _sort = sort[view]
+    if (!_sort) return
+    if (_sort.key === key) _sort.value = -_sort.value
     else {
-      sort.key = key
-      sort.value = 1
+      _sort.key = key
+      _sort.value = 1
     }
-    setSort({ ...sort, [view]: sort })
+    setSort({ ...sort, [view]: _sort })
   }
 
   const deploy = () => {
@@ -190,7 +190,7 @@ const OutlierTable = observer((props) => {
       }
     }
     return models.sort(fn)
-  }, [models, sort])
+  }, [models, sort.key, sort.value])
 
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
@@ -291,7 +291,6 @@ const OutlierRow = observer((props) => {
 const ClusteringTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect } = props
   const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
-
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
@@ -312,7 +311,7 @@ const ClusteringTable = observer((props) => {
       }
     }
     return models.sort(fn)
-  }, [models, sort])
+  }, [models, sort.key, sort.value])
 
   return <div className={classes.table}>
     <div className={classes.rowHeader}>

@@ -334,7 +334,7 @@ class Summary extends Component {
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
           </div>
-          {(problemType !== 'Outlier' && outlierCount) && <div className={styles.summaryType}>
+          {(problemType !== 'Outlier' && !!outlierCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
             <span>{EN.Outlier}</span>
           </div>}
