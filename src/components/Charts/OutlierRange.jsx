@@ -142,6 +142,10 @@ export default class OutlierRange extends PureComponent{
 				max,
 				scale: true,
 				nameTextStyle,
+				axisLabel:{
+					interval:0,
+					rotate:30,
+				},
 			},
 			yAxis: {
 				nameTextStyle,
