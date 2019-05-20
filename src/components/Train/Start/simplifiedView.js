@@ -16,6 +16,7 @@ import HistogramNumerical from "../../Charts/HistogramNumerical";
 import HistogramCategorical from "../../Charts/HistogramCategorical";
 import request from 'components/Request'
 import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
+import Demo from '../../CreateNewVariable'
 
 @observer
 export default class SimplifiedView extends Component {
@@ -188,8 +189,8 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>{EN.CreateANewVariable}</span>
           </div>
-          <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable} content={
-            <CreateNewVariable dataHeader={dataHeader} colType={colType} onClose={this.hideNewVariable} addNewVariable={addNewVariable} expression={expression} />
+          <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable}
+            content={<Demo onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType} />} />
           } />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
@@ -205,7 +206,7 @@ export default class SimplifiedView extends Component {
       </div>
       <div className={styles.table}>
         <div className={styles.tableHeader}>
-          <div className={classnames(styles.tableTh, styles.tableCheck)}/>
+          <div className={classnames(styles.tableTh, styles.tableCheck)} />
           <div className={styles.tableTh}><span>{EN.Name}</span></div>
           <div className={styles.tableTh}><span>{EN.Weight}</span></div>
           <div className={styles.tableTh}><span>{EN.Histogram}</span></div>
@@ -260,7 +261,7 @@ class SimplifiedViewRow extends Component {
         }).then((result) => this.showback(value, result.data));
       } else {
         const { uniqueValues } = project.dataViews[value];
-        data.size = uniqueValues>8?8:uniqueValues;
+        data.size = uniqueValues > 8 ? 8 : uniqueValues;
         request.post({
           url: '/graphics/histogram-categorical',
           data,
@@ -373,9 +374,9 @@ class CorrelationPlot extends Component {
     return (
       <div className={styles.correlationPlot} >
         <div
-            onClick={onClose}
-            style={{zIndex:5}}
-            className={styles.plotClose}><span>X</span></div>
+          onClick={onClose}
+          style={{ zIndex: 5 }}
+          className={styles.plotClose}><span>X</span></div>
         <CorrelationMatrixs
           value={value}
           type={type}
