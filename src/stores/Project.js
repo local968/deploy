@@ -2084,7 +2084,6 @@ export default class Project {
     let html = htmlResp.data
     html = html.replace(`<${link} rel="manifest" href="/manifest.json">`, '')
     html = html.replace(`<${link} rel="shortcut icon" href="/favicon.ico">`, '')
-
     const cssVersionStartStr = `<${link} href="/static/css/main.`
     const cssVersionStart = html.indexOf(cssVersionStartStr) + cssVersionStartStr.length
     const cssVersionEnd = html.indexOf('.', cssVersionStart)
@@ -2116,7 +2115,7 @@ export default class Project {
   }
 
 
-  generateReport = (modelId) => {
+  generateReport = async (modelId) => {
     // let cancel = false
     // const changeReportProgress = action((text, progress) => {
     //   if (!cancel) {
@@ -2200,7 +2199,7 @@ export default class Project {
     const json = c1
 
     // changeReportProgress(`generating report file`, 100)
-    const html =  this.generateReportHtml(json)
+    const html =  await this.generateReportHtml(json)
     // if (cancel) {
     //   // changeReportProgress(`init`, 0)
     //   return
