@@ -109,6 +109,8 @@ export default class ParallelPlot extends PureComponent{
 				itemWidth: 50,
 				itemHeight: 3,
 			},
+			silent:true,
+			progressiveChunkMode:'mod',
 			parallelAxis,
 			parallel: {
 				left: '5%',
@@ -126,6 +128,13 @@ export default class ParallelPlot extends PureComponent{
 				},
 			},
 			series,
+			toolbox: {
+				left: 'right',
+				feature: {
+					restore:{},
+				},
+				z: 202
+			},
 		};
 	}
 
