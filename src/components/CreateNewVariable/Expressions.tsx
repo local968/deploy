@@ -1,5 +1,5 @@
-import React, {ChangeEvent, MouseEvent} from 'react';
-import {withStyles} from '@material-ui/core/styles';  //Coordinate
+import React, { ChangeEvent, MouseEvent } from 'react';
+import { withStyles } from '@material-ui/core/styles';  //Coordinate
 import {
   List,
   ListItem,
@@ -15,11 +15,11 @@ import {
 } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
-import {Exp, Coordinate, Type} from './model/Coordinate';
+import { Exp, Coordinate, Type } from './model/Coordinate';
 import Expression from './Expression'
 import _ from 'lodash'
-import functions from './functions'
-import variables from './variable'
+// import functions from './functions'
+// import variables from './variable'
 
 const useStyles = withStyles({
   form: {
@@ -66,7 +66,9 @@ interface ExpressionsProps {
   addExp: (s: string) => void,
   changeExpLabel: (s: string) => void,
   handleFunction: (v: Coordinate, i: number) => void,
-  handleVariables: (v: Coordinate, i: number) => void
+  handleVariables: (v: Coordinate, i: number) => void,
+  functions: Coordinate[],
+  variables: Coordinate[]
 }
 
 interface ExpressionsState {
@@ -83,7 +85,8 @@ interface recommendObj {
 function Expressions(props: ExpressionsProps) {
   const {
     classes, exps, index, setIndex, addLine, deleteIndex, setRange,
-    deleteExp, left, right, addExp, handleFunction, handleVariables, changeExpLabel
+    deleteExp, left, right, addExp, handleFunction, handleVariables, changeExpLabel,
+    variables, functions
   } = props
   const [state, setState] = React.useState({
     suggestions: [],
@@ -110,7 +113,7 @@ function Expressions(props: ExpressionsProps) {
 
   const getRecommendValue = () => {
     const currentExp: Exp = exps[index];
-    const {value, range: [start, end]} = currentExp
+    const { value, range: [start, end] } = currentExp
     let obj: recommendObj = {
       value: '',
       start: end
@@ -160,7 +163,7 @@ function Expressions(props: ExpressionsProps) {
   }
 
   const estimateAdd = (exp, k, expSize) => {
-    const {label, value} = exp;
+    const { label, value } = exp;
     return !label || !_.size(value) || k + 1 != expSize;
   }
 
@@ -193,24 +196,24 @@ function Expressions(props: ExpressionsProps) {
     className={classes.list}
     subheader={<ListSubheader>
       <form className={classes.form}>
-        <ListItemText className={classes.label} primary='变量名称' primaryTypographyProps={{align: 'left'}}/>
-        <ListItemText className={classes.text} primary=' '/>
-        <ListItemText primary='公式' primaryTypographyProps={{align: 'left'}}/>
+        <ListItemText className={classes.label} primary='变量名称' primaryTypographyProps={{ align: 'left' }} />
+        <ListItemText className={classes.text} primary=' ' />
+        <ListItemText primary='公式' primaryTypographyProps={{ align: 'left' }} />
       </form>
     </ListSubheader>}>
     {exps.map((exp: Exp, k: number) => <ListItem key={k} selected={k === index} onClick={(e) => selectOne(k)(e)}>
       <form className={classes.form}>
         <Input className={classes.label} value={exp.label} onChange={changeInput(k)}
-               inputProps={{style: {backgroundColor: '#fff'}}}/>
-        <ListItemText primary='=' className={classes.text}/>
+          inputProps={{ style: { backgroundColor: '#fff' } }} />
+        <ListItemText primary='=' className={classes.text} />
         <Expression exp={exp} setRange={setRange} deleteExp={deleteExp} left={left} right={right}
-                    addExp={addExp} onFocus={onFocus(k)} sign={k}/>
+          addExp={addExp} onFocus={onFocus(k)} sign={k} />
         <div className={classes.tools}>
           <IconButton onClick={deleteOne(k)} disabled={!!estimateDelete(k, expSize)}>
-            <DeleteIcon/>
+            <DeleteIcon />
           </IconButton>
           <IconButton onClick={addLine} disabled={!!estimateAdd(exp, k, expSize)}>
-            <AddIcon/>
+            <AddIcon />
           </IconButton>
         </div>
       </form>
@@ -219,7 +222,7 @@ function Expressions(props: ExpressionsProps) {
       <Button fullWidth size='large' color='primary' variant="contained" onClick={addLine}>+</Button>
     </ListItem> */}
     <Popper open={state.isOpen && !!recommend.value} anchorEl={input} placement='bottom-start'
-            className={classes.popper}>
+      className={classes.popper}>
       <Paper>
         <ClickAwayListener onClickAway={handleClickAway}>
           <MenuList>

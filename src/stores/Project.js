@@ -1119,7 +1119,13 @@ export default class Project {
     // const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     // const oldExp = Object.values(this.expression).join(";")
     // const allExp = `${oldExp};${fullExp}`
-    const scripts = variables.map(v => ({ name: v.nameArray.join(','), script: v.exps }))
+    const scripts = variables.map(v => ({
+      name: v.nameArray.map(n => ({
+        value: n,
+        type: "ID",
+        name: n
+      })), script: v.exps
+    }))
 
     return socketStore.ready().then(api => {
       const command = {
