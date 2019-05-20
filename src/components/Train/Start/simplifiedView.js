@@ -151,7 +151,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
@@ -191,7 +191,6 @@ export default class SimplifiedView extends Component {
           </div>
           <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable}
             content={<Demo onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType} />} />
-          } />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
