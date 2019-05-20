@@ -79,7 +79,6 @@ async function scheduleHandler() {
       }
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
-      console.log(request, 'requestrequestrequestrequest')
       await command(request, data => {
         result = { ...result, ...data.result }
         return data.status === 100 || data.status < 0

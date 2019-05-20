@@ -158,7 +158,6 @@ function Expressions(props: ExpressionsProps) {
       }
       suggestions = list.filter((i: Coordinate) => (i.value || '').indexOf(_v) > -1)
     }
-    console.log(recommend, suggestions, "suggestions")
     return suggestions
   }
 
@@ -173,7 +172,6 @@ function Expressions(props: ExpressionsProps) {
 
   // todo /\w+[,)]/g
   const selectItem = (v: Coordinate) => () => {
-    console.log(v.type, 666)
     switch (v.type) {
       case Type.Func:
         handleFunction(v, recommend.start)

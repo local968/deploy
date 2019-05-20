@@ -49,7 +49,6 @@ function Expression(props: ExpressionProps) {
     const classes = useStyles()
 
     const onSelect = () => {
-        console.log("aaaaaaaaaaaa")
         const selection: any = getSelection()
         let curRange: [Node, Node] = [selection.anchorNode, selection.extentNode]
         let curOffset: [number, number] = [selection.anchorOffset, selection.extentOffset]
@@ -63,7 +62,6 @@ function Expression(props: ExpressionProps) {
         }
         const left: number = curIndex[0] + (curOffset[0] === (curRange[0].textContent || '').length ? 1 : 0)
         const right: number = curIndex[1] + (curOffset[1] === 0 ? 0 : 1)
-        console.log(left, right, "range")
         if (start === left && end === right) {
             //还原range
             return console.log("same")
@@ -98,7 +96,6 @@ function Expression(props: ExpressionProps) {
         // console.log(state.isDelete, "valuevaluevaluevaluevaluevaluevalue" )
         // if (state.isDelete) return setDelete(false)
         const value: string = e.target.value.trim()
-        console.log(value, "value")
         if (!value) return
         addExp(value)
     }

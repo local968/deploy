@@ -165,7 +165,6 @@ function Computed(props: ComputedProps) {
   };
 
   const setIndex = (k: number) => {
-    console.log(k, 5555)
     setState({
       ...state,
       index: k
@@ -245,7 +244,6 @@ function Computed(props: ComputedProps) {
     const { exps, index } = state;
     const exp = exps[index]
     let { range: [start, end] } = exp
-    console.log(exps, index, 99999)
     const isNumber: boolean = !isNaN(parseFloat(v))
     const isOp: boolean = OPARRAY.includes(v)
     const isLParen: boolean = v === '('
@@ -321,7 +319,6 @@ function Computed(props: ComputedProps) {
 
   const left = () => {
     const { exps, index } = state;
-    console.log(exps, index, 9999)
     const exp: Exp = exps[index]
     const { range: [start] } = exp;
     if (start <= 0) {
@@ -366,7 +363,6 @@ function Computed(props: ComputedProps) {
     const { exps } = state;
     const checkd = exps.map(exp => checkExp(exp.value))
     const error = checkd.find(c => !c.isPass)
-    console.log(checkd, "asd")
     if (error) {
       return alert(error.message)
     }
@@ -393,7 +389,6 @@ function Computed(props: ComputedProps) {
   }
 
   const Elevation: number = 1;
-  console.log(state, 'state');
 
   //------------------------------------------check-----------------------------------------------------------
   // import { Coordinate, Type } from './model/Coordinate';
@@ -409,7 +404,6 @@ function Computed(props: ComputedProps) {
     let num = 1
 
     while (true) {
-      console.log(expression, 'expressionexpression')
       // 查询第一个)
       // for(let i = 0; i< expression.length; i++) {
       //   if(expression[i].type)
@@ -443,9 +437,8 @@ function Computed(props: ComputedProps) {
 
   // 校验基本表达式
   const checkSimpleExp = (expression: (Coordinate | Bracket)[], bracketExps: any) => {
-    console.log(expression, bracketExps)
     if (!expression.length) return { isPass: false, message: EN.Emptyexpression }
-    const baseOptReg = new RegExp(/[+\-*/]/)
+    // const baseOptReg = new RegExp(/[+\-*/]/)
     const length = expression.length
     let start = 0
     let array: (Coordinate | Bracket)[][] = []
@@ -460,7 +453,6 @@ function Computed(props: ComputedProps) {
     if (start < length) array.push(expression.slice(start, length))
 
     // const array = expression.split(baseOptReg)
-    console.log(array, 777)
     let num = 1
     let isVariable = false
     let expType = ''
