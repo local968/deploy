@@ -144,7 +144,15 @@ export default class OutlierRange extends PureComponent{
 				nameTextStyle,
 				axisLabel:{
 					interval:0,
-					rotate:30,
+					rotate:10,
+					formatter:num=>{
+						if(+num>100000){
+							const p = Math.floor(Math.log(+num) / Math.LN10).toFixed(3);
+							const n = (+num * Math.pow(10, -p)).toFixed(3);
+							return +n + 'e' + +p;
+						}
+						return num;
+					}
 				},
 			},
 			yAxis: {
