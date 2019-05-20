@@ -1,7 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { List, ListItem, ListItemText, TextField } from '@material-ui/core';
-import functions from './functions';
 import { Coordinate } from './model/Coordinate';
 // import { useImmer } from 'use-immer';
 
@@ -21,6 +20,7 @@ const useStyles = makeStyles({
 export interface FunctionProps {
   onClick: (v: Coordinate, i: null) => void;
   onMouseOver: (v?: string) => void;
+  functions: Coordinate[]
 }
 
 interface FunctionState {
@@ -29,7 +29,7 @@ interface FunctionState {
 
 function Function(props: FunctionProps) {
   const classes = useStyles();
-  const { onClick, onMouseOver } = props;
+  const { onClick, onMouseOver, functions } = props;
   const initState: FunctionState = { functions }
   const [state, setState] = React.useState(initState as FunctionState);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {

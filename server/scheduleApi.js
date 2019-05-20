@@ -143,19 +143,19 @@ const api = {
     return redis.smembers(`project:${projectId}:models`).then(ids => {
       const pipeline = redis.pipeline();
       ids.forEach(mid => {
-        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex', 'chartData')
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "modelName", 'rate')
       })
       return pipeline.exec().then(list => {
         const models = list.map(row => {
-          let [name, dataFlow] = row[1] || []
+          let [name, rate] = row[1] || []
           try {
             name = JSON.parse(name)
-            dataFlow = JSON.parse(dataFlow)
+            rate = JSON.parse(rate)
           } catch (e) { }
-          return { name, dataFlow }
+          return { name, rate }
         })
         const model = models.find(m => m.name === modelName) || {}
-        const rate = model.dataFlow[0].contamination
+        const rate = model.rate
         return rate
       })
     })

@@ -1,4 +1,4 @@
-const BACKEND_PORT = process.env.BACKEND_PORT || "9080";
+const BACKEND_PORT = process.env.BACKEND_PORT || "8080";
 const REDIS_USERNAME = process.env.REDIS_USERNAME || "redismaster";
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || "redis123321eq";
 const REQUEST_QUEUE = process.env.REQUEST_QUEUE || "task";

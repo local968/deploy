@@ -130,7 +130,7 @@ export default class Performance extends Component {
               src={downloadIcon}
               alt="download"
             />
-            <a className={styles.download} href={`/upload/dataDefinition?projectId=${cd.projectId}`} >
+            <a className={styles.download} href={`/upload/dataDefinition?projectId=${cd.projectId}&type=proformance`} >
               {EN.Download}
             </a>
           </div>
