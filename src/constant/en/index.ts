@@ -1,4 +1,5 @@
 import React from "react";
+import {Typography} from "@material-ui/core";
 
 const EN: any = {
   Loading: '加载中…',
@@ -976,6 +977,8 @@ const EN: any = {
   KindlyReminder:'提示',
   Null:'缺失值',
   VariableFormula:'Variable Formula',
+  FormField:'Form Field',
+  ProjectDescription:'Project Description',
 };
 
 export default EN;

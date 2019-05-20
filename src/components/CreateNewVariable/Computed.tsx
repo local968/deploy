@@ -733,7 +733,7 @@ function Computed(props: ComputedProps) {
       <CardContent>
         <Grid container spacing={16}>
           <Grid item xs={12} className={classes.top}>
-            <Typography align='left' variant='h6' noWrap gutterBottom>Variable Formula</Typography>
+            <Typography align='left' variant='h6' noWrap gutterBottom>{EN.VariableFormula}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
               <Expressions
                 exps={state.exps}
@@ -762,13 +762,13 @@ function Computed(props: ComputedProps) {
             </Paper>
           </Grid>
           <Grid item xs={3}>
-            <Typography align='left' variant='h6' noWrap gutterBottom>Form Field</Typography>
+            <Typography align='left' variant='h6' noWrap gutterBottom>{EN.FormField}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
               <Variables handleClick={handleVariables} variables={variables} />
             </Paper>
           </Grid>
           <Grid item xs={6}>
-            <Typography align='left' variant='h6' noWrap gutterBottom>Project Description</Typography>
+            <Typography align='left' variant='h6' noWrap gutterBottom>{EN.ProjectDescription}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
               <Summary detailKey={state.detailKey} />
             </Paper>
@@ -777,14 +777,14 @@ function Computed(props: ComputedProps) {
       </CardContent>
       <CardActions disableActionSpacing className={classes.actions}>
         <Button variant="contained" onClick={processAndSave} className={classes.save}>
-          OK
+          {EN.OK}
         </Button>
         <Button
           variant="contained"
           className={classes.cancel}
           onClick={onClose}
         >
-          Cancel
+          {EN.CANCEL}
         </Button>
       </CardActions>
     </Card>
