@@ -113,7 +113,7 @@ router.post('/sample', (req, res) => {
 
 router.get('/dataDefinition', async (req, res) => {
   const { userId } = req.session
-  const { projectId } = req.query
+  const { projectId, type } = req.query
   if (!userId) return res.json({ status: 401, message: 'need login', error: 'need login' })
   const rank = await redis.zrank(`user:${userId}:projects:createTime`, projectId)
   if (rank === null) return res.json({ status: 404, message: 'project not found.', error: 'project not found.' })
@@ -121,7 +121,8 @@ router.get('/dataDefinition', async (req, res) => {
   const target = JSON.parse(await redis.hget(`project:${projectId}`, 'target'))
   res.attachment('definition.csv');
   res.type('csv')
-  res.send(data.filter(h => h !== target).join(','))
+  if (type && type === 'proformance') res.send(data.join(','))
+  else res.send(data.filter(h => h !== target).join(','))
 })
 
 router.get('/test', async (req, res) => {
