@@ -83,7 +83,7 @@ export default class Project {
   @observable histgramPlots = {};
   @observable univariatePlots = {};
   @observable newVariable = [];
-  @observable expression = {}
+  @observable expression = []
   @observable newType = {}
   @observable informativesLabel = []
   @observable colValueCounts = {}
@@ -346,7 +346,7 @@ export default class Project {
       customHeader: [],
       newVariable: [],
       newType: {},
-      expression: {},
+      expression: [],
       validationRate: 20,
       holdoutRate: 20,
       hasSendEtl: false,
@@ -1119,7 +1119,7 @@ export default class Project {
     // const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     // const oldExp = Object.values(this.expression).join(";")
     // const allExp = `${oldExp};${fullExp}`
-    const scripts = variables.map(v => ({
+    const scripts = [...this.expression, ...variables].map(v => ({
       name: v.nameArray.map(n => ({
         value: n,
         type: "ID",
@@ -1144,11 +1144,11 @@ export default class Project {
         const newVariable = [...this.newVariable, ...variablenames]
         const trainHeader = [...this.trainHeader, ...variablenames]
         const newType = Object.assign({}, this.newType, type)
-        const variableExp = variables.reduce((prev, _v) => {
-          prev[_v.name] = _v.exps
-          return prev
-        }, {})
-        const expression = Object.assign({}, this.expression, variableExp)
+        // const variableExp = variables.reduce((prev, _v) => {
+        //   prev[_v.name] = _v
+        //   return prev
+        // }, {})
+        const expression = [...this.expression, ...variables]
         this.updateProject({
           newVariable,
           trainHeader,
