@@ -189,10 +189,14 @@
   }
   .diagnoseResult .content .action {
     margin-top: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   .diagnoseResult .content .action span {
     display: inline-block;
     width: 250px;
+    font-size: 8px;
   }
   .diagnoseResult .content .action button {
     width: 205px;
@@ -201,6 +205,9 @@
   .diagnoseResult .header {
     font-weight: bold;
   }
+.header +div{
+  padding: 10px 0;
+}
   .settings {
     display: flex;
     align-items: center;
