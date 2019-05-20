@@ -1,66 +1,66 @@
 export default [
   {
-    "name": "exp",
-    "value": "exp detail 111",
+    "name": "Exp",
+    "value": "语法: exp(@var)",
   },
   {
-    "name": "log2",
-    "value": "log2 detail 111",
+    "name": "Log2",
+    "value": "语法: log2(@var)",
   },
   {
-    "name": "log10",
-    "value": "log10 detail 111",
+    "name": "Log10",
+    "value": "语法: log10(@var)",
   },
   {
-    "name": "ln",
-    "value": "ln detail 111",
+    "name": "Ln",
+    "value": "语法: ln(@var)",
   },
   {
-    "name": "pow",
-    "value": "pow detail 111",
+    "name": "Pow",
+    "value": "语法: pow(@var, base)",
   },
   {
-    "name": "log",
-    "value": "log detail 111",
+    "name": "Log",
+    "value": "语法: log(@var, base)",
   },
   {
-    "name": "eq",
-    "value": "eq detail 111",
+    "name": "Eq",
+    "value": "语法: eq(@var1, @var2)",
   },
   {
-    "name": "sum",
-    "value": "sum detail 111",
+    "name": "Sum",
+    "value": "语法: sum(@var1, @var2, @var3, ...)",
   },
   {
-    "name": "min",
-    "value": "min detail 111",
+    "name": "Min",
+    "value": "语法: min(@var1, @var2, @var3, ...)",
   },
   {
-    "name": "max",
-    "value": "max detail 111",
+    "name": "Max",
+    "value": "语法: max(@var1, @var2, @var3, ...)",
   },
   {
-    "name": "mean",
-    "value": "mean detail 111",
+    "name": "Mean",
+    "value": "语法: mean(@var1, @var2, @var3, ...)",
   },
   {
     "name": "Concat",
-    "value": "Concat detail 111",
+    "value": "语法: Concat(@var1, @var2, @var3,...p1, p2...)",
   },
   {
     "name": "Diff",
-    "value": "Diff detail 111",
+    "value": "语法: Diff(@var1, @var2, @var3,...row1,row2,...)",
   },
   {
     "name": "Accumulate",
-    "value": "Accumulate detail 111",
+    "value": "语法: Accumulate(@var1, @var2, @var3,...)",
   },
   {
     "name": "Quantile_bin",
-    "value": "Quantile_bin detail 111",
+    "value": "语法: Quantile_bin(@var1, @var2, @var3,b, type1, type2)",
   },
   {
     "name": "Custom_Quantile_bin",
-    "value": "Custom_Quantile_bin detail 111",
+    "value": "语法: Custom_Quantile_bin(@var, [range_list1], [range_list2]...)",
   }
 ]

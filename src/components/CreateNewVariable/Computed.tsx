@@ -758,7 +758,7 @@ function Computed(props: ComputedProps) {
           <Grid item xs={3}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.Function}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} functions={[...FUNCTIONS.base, ...FUNCTIONS.senior]} />
+              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} functions={FUNCTIONS} />
             </Paper>
           </Grid>
           <Grid item xs={3}>

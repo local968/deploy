@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import {observer} from 'mobx-react';
 import {Hint, ProcessLoading} from 'components/Common';
 import {observable, toJS} from 'mobx';
-import {Spin, Popover, message as antdMessage, Icon, Table, Tooltip} from 'antd';
+import {Spin, Popover, message as antdMessage, Icon, Table, Tooltip, Modal} from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
@@ -18,7 +18,7 @@ import HistogramCategorical from "../../Charts/HistogramCategorical";
 import TSENOne from "../../Charts/TSENOne";
 import BoxPlots from "../../Charts/BoxPlots";
 import UnivariantPlots from "../../Charts/UnivariantPlots";
-import Demo from '../../CreateNewVariable'
+import CreateNewVariables from '../../CreateNewVariable'
 
 @observer
 export default class SimplifiedView extends Component {
@@ -238,11 +238,9 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>{EN.CreateANewVariable}</span>
           </div>
-          {/*<Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable} content={*/}
-          {/*<CreateNewVariable dataHeader={dataHeader.filter(n => n !== target)} colType={colType} onClose={this.hideNewVariable} addNewVariable={addNewVariable} expression={expression} />*/}
-          {/*} />*/}
-          <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable}
-                   content={<Demo onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType}/>}/>
+          <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
+            <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType}/>
+          </Modal>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
@@ -521,7 +519,8 @@ class SimplifiedViewRow extends Component {
           <div className={styles.preImpotanceActive} style={{width: (importance * 100) + '%'}}/>
         </div>
       </div>
-      <div className={styles.tableTd} title={valueType=== 'Numerical' ? EN.Numerical : EN.Categorical}><span>{valueType=== 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
+      <div className={styles.tableTd} title={valueType === 'Numerical' ? EN.Numerical : EN.Categorical}>
+        <span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.none]: valueType !== 'Categorical'
       })} title={unique}><span>{unique}</span></div>
@@ -579,9 +578,9 @@ class CorrelationPlot extends Component {
     return (
       <div className={styles.correlationPlot}>
         <div
-            onClick={onClose}
-            style={{zIndex:5}}
-            className={styles.plotClose}><span>X</span></div>
+          onClick={onClose}
+          style={{zIndex: 5}}
+          className={styles.plotClose}><span>X</span></div>
         <CorrelationMatrixs
           value={value}
           type={type}
@@ -784,7 +783,7 @@ class CreateNewVariable extends Component {
   //点击确认按钮
   handleAdd = () => {
     let {name, exp, props: {expression}} = this
-    console.log(name, exp,expression,6666 )
+    console.log(name, exp, expression, 6666)
     name = name.trim()
     if (!name) return antdMessage.error(EN.Nameisempty)
     if (expression.hasOwnProperty(name)) return antdMessage.error(`${EN.Newvariable} ${name} ${EN.Isexist}`)

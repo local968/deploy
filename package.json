@@ -25,7 +25,7 @@
     "uuid": "^3.3.2",
     "ws": "^6.1.0"
   },
-  "proxy": "http://localhost:8080",
+  "proxy": "http://localhost:9080",
   "scripts": {
     "start": "node ./server/index.js",
     "dev": "react-app-rewired start & pm2 start deploy2-dev.json",
