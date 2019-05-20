@@ -159,6 +159,16 @@ function Expressions(props: ExpressionsProps) {
     return suggestions
   }
 
+  const estimateAdd = (exp, k, expSize) => {
+    const {label, value} = exp;
+    return !label || !_.size(value) || k + 1 != expSize;
+  }
+
+  const estimateDelete = (k, expSize) => {
+    return k + 1 != expSize || !k;
+  }
+
+  // todo /\w+[,)]/g
   const selectItem = (v: Coordinate) => () => {
     console.log(v.type, 666)
     switch (v.type) {
@@ -174,6 +184,7 @@ function Expressions(props: ExpressionsProps) {
   }
 
   const input: HTMLElement | null = state.el ? document.getElementById(state.el) : null
+  const expSize = _.size(exps)
   if (input) {
     input.focus()
   }
@@ -195,10 +206,10 @@ function Expressions(props: ExpressionsProps) {
         <Expression exp={exp} setRange={setRange} deleteExp={deleteExp} left={left} right={right}
                     addExp={addExp} onFocus={onFocus(k)} sign={k}/>
         <div className={classes.tools}>
-          <IconButton onClick={deleteOne(k)}>
+          <IconButton onClick={deleteOne(k)} disabled={!!estimateDelete(k, expSize)}>
             <DeleteIcon/>
           </IconButton>
-          <IconButton onClick={addLine}>
+          <IconButton onClick={addLine} disabled={!!estimateAdd(exp, k, expSize)}>
             <AddIcon/>
           </IconButton>
         </div>
