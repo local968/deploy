@@ -39,40 +39,13 @@ export default class ModelProcessFlow extends Component {
 		</dl>
 	}
 
-	// FP(data) {
-	// 	const name = data['preprocessor:__choice__'];
-	// 	const types = {
-	// 		'extra_trees_preproc_for_classification': EN.extremlrandtreesprepr,
-	// 		'extra_trees_preproc_for_regression': EN.extremlrandtreesprepr,
-	// 		'fast_ica': EN.ICA,
-	// 		'feature_agglomeration': EN.FeatureAgglomeration,
-	// 		'kernel_pca': EN.kernelPCA,
-	// 		'kitchen_sinks': EN.KitchenSinks,
-	// 		'linear_svc_preprocessor': EN.LinearSVMprepr,
-	// 		'no_preprocessor': EN.NoPreprocessing,
-	// 		'no_preprocessing': EN.NoPreprocessing,
-	// 		'nystroem_sampler': EN.NystroemSampler,
-	// 		'pca': EN.PCA,
-	// 		'polynomial': EN.Polynomial,
-	// 		'random_trees_embedding': EN.RandomTreesembed,
-	// 		'select_percentile_classification': EN.SelectPercentile,
-	// 		'select_percentile_regression': EN.SelectPercentile,
-	// 		'select_rates': EN.SelectRates
-	// 	};
-
-	// 	return <dl>
-	// 		{this.list(data, `preprocessor:${name}:`, types[name], true)}
-	// 	</dl>
-	// }
+	FP() {
+		return <dl>
+			<dd>No Preprocessing</dd>
+		</dl>
+	}
 
 	Third(data) {
-		// let name = data['classifier:__choice__'];
-		// let type = `classifier:${name}:`;
-		// if (!name) {
-		// 	name = data['regressor:__choice__'];
-		// 	type = `regressor:${name}:`;
-		// }
-
 		return <dl>
 			{this.list(data)}
 		</dl>;
@@ -95,8 +68,8 @@ export default class ModelProcessFlow extends Component {
 			<label>{EN.RawData}</label>
 			<img src={Next} alt='' />
 			{this.popOver(this.DP(standardType), EN.DataPreprocessing)}
-			{/* <img src={Next} alt='' />
-				{this.popOver(this.FP(dataFlow[0]), EN.FeaturePreprocessing)} */}
+			<img src={Next} alt='' />
+			{this.popOver(this.FP(), EN.FeaturePreprocessing)}
 			<img src={Next} alt='' />
 			{this.popOver(this.Third(dataFlow[0]), dataFlow[0].model_name)}
 			<img src={Next} alt='' />

@@ -94,7 +94,6 @@ export default class ModelProcessFlow extends Component {
 
 	render() {
 		const { dataFlow, modelName = '' } = this.props.model;
-		console.log(dataFlow)
 		if (dataFlow.length === 1) {
 			return <section className={styles.process}>
 				<label>{EN.RawData}</label>
@@ -115,9 +114,9 @@ export default class ModelProcessFlow extends Component {
 					{
 						dataFlow.filter(itm => itm.weight).map((itm, index) => {
 							return <dd key={index}>
-								{this.popOver(this.DP(itm), 'Data Preprocessing')}
+								{this.popOver(this.DP(itm), EN.DataPreprocessing)}
 								<img src={Next} alt='' />
-								{this.popOver(this.FP(itm), 'Feature Preprocessing')}
+								{this.popOver(this.FP(itm), EN.FeaturePreprocessing)}
 								<img src={Next} alt='' />
 								{this.popOver(this.Third(itm), itm.model_name)}
 								<Tag>{formatNumber(+itm.weight || 0)}</Tag>
