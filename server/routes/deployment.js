@@ -87,25 +87,44 @@ wss.register('updateDeployment', (message, socket) => {
 })
 
 wss.register('getAllModels', async (message, socket) => {
-  const { projectId } = message
+  const { projectId, modelType } = message
   const currModelIds = await redis.smembers(`project:${projectId}:models`)
   const prevModelIds = await redis.smembers(`project:${projectId}:models:previous`)
   const modelIds = [...currModelIds, ...prevModelIds]
   const pipeline = redis.pipeline()
+  let resultCount = 2
   modelIds.map(modelId => {
-    pipeline.hmget(`project:${projectId}:model:${modelId}`, 'modelName', 'score')
+    if (modelType === 'Classification') {
+      pipeline.hmget(`project:${projectId}:model:${modelId}`, 'modelName', 'score', 'chartData', 'fitIndex')
+      resultCount = 4
+    } else {
+      pipeline.hmget(`project:${projectId}:model:${modelId}`, 'modelName', 'score')
+    }
   })
   const modelsResult = await pipeline.exec()
   const models = modelsResult.reduce((prev, curr, index) => {
     const _result = [...prev]
     if (curr[0]) throw { status: 500, message: 'model query failed', error: curr[0] }
-    if (!curr[1] || curr[1].length < 2) return
+    if (!curr[1] || curr[1].length < resultCount) return
     const score = JSON.parse(curr[1][1])
+    let performance
+    if (modelType === 'Classification') {
+      const chartData = JSON.parse(curr[1][2])
+      const fitIndex = JSON.parse(curr[1][3])
+      const notShowArr = ['AUCPR', 'FN', 'FP', 'FPR', 'F_BETA', 'TN', 'TP', 'TPR', 'Youden', 'Threshold']
+      performance = Object.entries(chartData.roc).filter(d => !notShowArr.includes(d[0])).map(([k, v]) => {
+        const value = v[fitIndex]
+        if (k === 'AUCROC') return `AUC:${value && value.toFixed && value.toFixed(3)}`
+        return `${k}:${value && value.toFixed && value.toFixed(3)}`
+      }).join("\r\n")
+    } else {
+      performance = Object.entries(score.validateScore || score).map(([k, v]) => `${k}:${v && v.toFixed && v.toFixed(3)}`).join("\r\n")
+    }
     _result.push({
       name: JSON.parse(curr[1][0]),
       score,
       modelId: modelIds[index],
-      performance: Object.entries(score.validateScore || score).map(([k, v]) => `${k}:${v && v.toFixed && v.toFixed(3)}`).join("\r\n")
+      performance
     })
     return _result
   }, [])

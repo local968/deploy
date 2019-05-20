@@ -125,7 +125,7 @@ export default class Deploy {
 
   getModelInfo = action(async () => {
     const api = await socketStore.ready()
-    const { modelList } = await api.getAllModels({ projectId: this.projectId })
+    const { modelList } = await api.getAllModels({ projectId: this.projectId, modelType: this.modelType })
     this.modelList = modelList
   })
 
@@ -134,7 +134,7 @@ export default class Deploy {
     this.modelList && Object.entries(this.modelList).forEach(([settingName, models]) => {
       if (result) return
       models.forEach(model => {
-        if (result||!model) return
+        if (result || !model) return
         if (model.name === modelName) result = model
       })
     })
