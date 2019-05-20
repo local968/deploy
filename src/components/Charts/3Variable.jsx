@@ -22,7 +22,7 @@ export default class ThreeVariable extends PureComponent{
 		});
 		
 		return {
-			tooltip: {},
+			// tooltip: {},
 			grid3D: {
 				// right:200
 			},
