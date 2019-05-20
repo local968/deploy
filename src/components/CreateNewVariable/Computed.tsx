@@ -18,11 +18,12 @@ import { Exp, Type, Coordinate } from './model/Coordinate';
 import { withStyles } from '@material-ui/core/styles';
 import { string } from "prop-types";
 import EN from '../../constant/en';
+import FUNCTIONS from './functions';
 
-const FUNCTIONS = {
-  base: [] as any[],
-  senior: [] as any[]
-}
+// const FUNCTIONS = {
+//   base: [] as any[],
+//   senior: [] as any[]
+// }
 
 const OPARRAY = ['+', '-', '*', "/"]
 
@@ -164,7 +165,6 @@ function Computed(props: ComputedProps) {
   };
 
   const setIndex = (k: number) => {
-    console.log(k, 5555)
     setState({
       ...state,
       index: k
@@ -244,7 +244,6 @@ function Computed(props: ComputedProps) {
     const { exps, index } = state;
     const exp = exps[index]
     let { range: [start, end] } = exp
-    console.log(exps, index, 99999)
     const isNumber: boolean = !isNaN(parseFloat(v))
     const isOp: boolean = OPARRAY.includes(v)
     const isLParen: boolean = v === '('
@@ -320,7 +319,6 @@ function Computed(props: ComputedProps) {
 
   const left = () => {
     const { exps, index } = state;
-    console.log(exps, index, 9999)
     const exp: Exp = exps[index]
     const { range: [start] } = exp;
     if (start <= 0) {
@@ -365,7 +363,7 @@ function Computed(props: ComputedProps) {
     const { exps } = state;
     const checkd = exps.map(exp => checkExp(exp.value))
     const error = checkd.find(c => !c.isPass)
-    if (error){
+    if (error) {
       return alert(error.message)
     }
     const newType = {}
@@ -387,10 +385,10 @@ function Computed(props: ComputedProps) {
       }
     })
     addNewVariable(newVariables, newType)
+    onClose()
   }
 
   const Elevation: number = 1;
-  console.log(state, 'state');
 
   //------------------------------------------check-----------------------------------------------------------
   // import { Coordinate, Type } from './model/Coordinate';
@@ -405,24 +403,22 @@ function Computed(props: ComputedProps) {
     const bracketExps: any = {}
     let num = 1
 
-    const LPAREN: Coordinate = {
-      value: '(',
-      name: '(',
-      type: Type.Lparen,
-    };
-    const RPAREN: Coordinate = {
-      value: ')',
-      name: ')',
-      type: Type.Rparen,
-    };
-
     while (true) {
       // 查询第一个)
-      const end = expression.indexOf(RPAREN) + 1
+      // for(let i = 0; i< expression.length; i++) {
+      //   if(expression[i].type)
+      // }
+      const end = expression.findIndex(i => (i as any).type == Type.Rparen) + 1
       if (end === 0) break;
       // if (num > 9) return { isPass: false, message: EN.Toomanyfunctions }
       // 查询截取表达式最后一个(
-      const start = expression.lastIndexOf(LPAREN, end)
+      let start = -1
+      for (let i = end - 1; i > -1; i--) {
+        if ((expression[i] as any).type === Type.Lparen) {
+          start = i
+          break
+        }
+      }
       if (start === -1) return { isPass: false, message: EN.Unexpectedtoken }
       const exp: (Coordinate | Bracket)[] = expression.slice(start + 1, end - 1)
       bracketExps[num] = exp
@@ -433,14 +429,16 @@ function Computed(props: ComputedProps) {
 
     return {
       expression,
-      bracketExps
+      bracketExps,
+      isPass: true,
+      message: 'ok'
     }
   }
 
   // 校验基本表达式
   const checkSimpleExp = (expression: (Coordinate | Bracket)[], bracketExps: any) => {
     if (!expression.length) return { isPass: false, message: EN.Emptyexpression }
-    const baseOptReg = new RegExp(/[+\-*/]/)
+    // const baseOptReg = new RegExp(/[+\-*/]/)
     const length = expression.length
     let start = 0
     let array: (Coordinate | Bracket)[][] = []
@@ -455,7 +453,6 @@ function Computed(props: ComputedProps) {
     if (start < length) array.push(expression.slice(start, length))
 
     // const array = expression.split(baseOptReg)
-    console.log(array, 777)
     let num = 1
     let isVariable = false
     let expType = ''
@@ -467,7 +464,8 @@ function Computed(props: ComputedProps) {
       // item = item.trim()
       // 判断是否含有转化的()表达式
       const fnIndex = item.findIndex(it => !!(it as any).index)
-      if (fnIndex) {
+      const idIndex = item.findIndex(it => (it as any).type === Type.ID)
+      if (fnIndex > -1) {
         // 截取函数名称
         const functionName = item.slice(0, fnIndex) as Coordinate[]
         let bracketNum = item[fnIndex] as Bracket
@@ -485,22 +483,20 @@ function Computed(props: ComputedProps) {
         num += fnResult.num - 1
         isVariable = fnResult.isVariable
         type = fnResult.type
-      }
-
-      const idIndex = item.findIndex(it => (it as any).type === Type.ID)
-      // 判断是否为选择的参数
-      if (idIndex) {
+      } else if (idIndex > -1) {
+        // 判断是否为选择的参数
         if (item.length > 1) return { isPass: false, message: `${EN.Unknownvariable} ${item.map((v) => (v as Coordinate).value).join('')}` }
         // item = item.slice(1)
         // if (!item || !dataHeader.includes(item.value))
         const cur: Coordinate = item[0] as Coordinate
         isVariable = true
         type = colType[cur.value || ''] === 'Numerical' ? 'Numerical' : 'Categorical'
+      } else {
+        const isNum = item.every(it => (it as any).type === Type.Number)
+        //判断是否是数字
+        if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${item.map((v) => (v as Coordinate).value).join('')}` }
       }
 
-      const isNum = item.every(it => (it as any).type === Type.Number)
-      //判断是否是数字
-      if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${item.map((v) => (v as Coordinate).value).join('')}` }
       typeArray.push(type)
     }
     if (typeArray.length > 1) {
@@ -536,7 +532,7 @@ function Computed(props: ComputedProps) {
     const isBaseFn = !functionName.length ? false : FUNCTIONS.base.find(fn => fn.value === (functionName[0] as Coordinate).value)
     const isSeniorFn = !functionName.length ? false : FUNCTIONS.senior.find(fn => fn.value === (functionName[0] as Coordinate).value)
     // -----------------end-----------------
-    const currentFn = isBaseFn || isSeniorFn
+    const currentFn: any = isBaseFn || isSeniorFn
     // 判断函数参数个数限制
     if (currentFn.params && currentFn.params !== expArray.length) return {
       isPass: false,
@@ -559,7 +555,7 @@ function Computed(props: ComputedProps) {
       params.push({
         isVariable,
         num,
-        exp,
+        exp: exp.map(_e => ((_e as any).value || '')).join(''),
         type
       })
     }
@@ -722,11 +718,11 @@ function Computed(props: ComputedProps) {
   }
   //------------------------------------------check end-----------------------------------------------------------------
 
-  const variables: Coordinate[] = map(colType, function(value, name) {
+  const variables: Coordinate[] = map(colType, function (value, name) {
     return {
       name,
       type: Type.ID,
-      value:`@${name}`,
+      value: name,
     };
   });
   return (
@@ -753,6 +749,8 @@ function Computed(props: ComputedProps) {
                 changeExpLabel={changeExpLabel}
                 handleFunction={handleFunction}
                 handleVariables={handleVariables}
+                functions={[...FUNCTIONS.base, ...FUNCTIONS.senior]}
+                variables={variables}
               />
             </Paper>
           </Grid>
@@ -760,7 +758,7 @@ function Computed(props: ComputedProps) {
           <Grid item xs={3}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.Function}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} />
+              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} functions={[...FUNCTIONS.base, ...FUNCTIONS.senior]} />
             </Paper>
           </Grid>
           <Grid item xs={3}>

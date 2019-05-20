@@ -79,13 +79,13 @@ function ModelResult(props) {
     // const { project } = this.props.projectStore;
     const { selectModel: current } = project
     if (cannotDeploy) return
-    const { newVariable, trainHeader, expression } = project
-    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
-    const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
-    const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+    // const { newVariable, trainHeader, expression } = project
+    // const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
+    // const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
+    // const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
 
     props.deploymentStore
-      .addDeployment(project.id, project.name, current.modelName, project.problemType, exps)
+      .addDeployment(project.id, project.name, current.modelName, project.problemType)
       .then(id => props.routing.push('/deploy/project/' + id));
   };
 

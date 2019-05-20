@@ -35,7 +35,7 @@ export default class ModelProcessFlow extends Component {
 
 	DP(label) {
 		return <dl>
-			{label}
+			{`${label} scale`}
 		</dl>
 	}
 
