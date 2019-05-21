@@ -771,7 +771,7 @@ const EN: any = {
   PredictedAverage: '预测值（均值）：',
   ActualAverage: '实际值（均值）：',
   DataPreprocessing: '数据预处理',
-  FeaturePreprocessing: '特征与处理',
+  FeaturePreprocessing: '特征预处理',
   ModelTraining: '模型训练',
   RootMeanSquareErrorRMSEmeasures: '均方根误差（RMSE）测量模型的预测误差。标准化（Normalized）RMSE将帮助您比较模型性能：越小越好。',
   Problemstatement: '',
