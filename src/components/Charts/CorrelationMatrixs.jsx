@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactEcharts from 'echarts-for-react';
-import './echarts.config'
+// import './echarts.config'
 
 export default function CorrelationMatrixs(props){
 	const {value=[],type=[''],height=400,width=500} = props;

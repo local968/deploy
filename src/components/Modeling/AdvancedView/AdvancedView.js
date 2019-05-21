@@ -745,7 +745,7 @@ class DetailCurves extends Component {
           height={300} width={500}
           x_name={EN.percentage}
           y_name={EN.lift}
-          chartData={model.chartData}
+          model={model}
         />
         hasReset = false;
         break;
