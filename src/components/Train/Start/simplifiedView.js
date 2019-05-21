@@ -190,7 +190,7 @@ export default class SimplifiedView extends Component {
             <span>{EN.CreateANewVariable}</span>
           </div>
           <Popover visible={this.visible} trigger='click' placement='top' onVisibleChange={this.hideNewVariable}
-            content={<Demo onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType} />} />
+            content={<Demo onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType} expression={expression}/>} />
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'

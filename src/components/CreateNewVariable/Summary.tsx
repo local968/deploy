@@ -1,8 +1,9 @@
 import React from 'react';
-import { Paper } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import {Paper} from '@material-ui/core';
+import {makeStyles} from '@material-ui/styles';
 import details from './details';
-import { Detail } from './model/Coordinate';
+import {Detail} from './model/Coordinate';
+import FunctionTips from './FunctionTips'
 
 const useStyles = makeStyles({
   detail: {
@@ -20,17 +21,18 @@ export interface SummaryProps {
 
 function Summary(props: SummaryProps) {
   const classes = useStyles();
-  const { detailKey } = props;
-  const defaultDetail: Detail = {
-    name: '',
-    value: '',
-  };
-  const current: Detail =
-    details.find(d => d.name === detailKey) || defaultDetail;
+  const {detailKey} = props;
+  const current: Detail | undefined =
+    details.find(d => d.name === detailKey);
   return (
     <Paper className={classes.detail} elevation={0} square={true}>
-      <h3>{current.name}</h3>
-      <p>{current.value}</p>
+      {
+        current ?
+          <div>
+            <h3>{current.name}</h3>
+            <p>{current.value}</p></div> :
+          <FunctionTips value={detailKey}/>
+      }
     </Paper>
   );
 }
