@@ -109,14 +109,14 @@ wss.register('getAllModels', async (message, socket) => {
     const score = JSON.parse(curr[1][1])
     let performance
     if (modelType === 'Classification') {
+      const auc = (score.validateScore || {}).auc
       const chartData = JSON.parse(curr[1][2])
       const fitIndex = JSON.parse(curr[1][3])
-      const notShowArr = ['AUCPR', 'FN', 'FP', 'FPR', 'F_BETA', 'TN', 'TP', 'TPR', 'Youden', 'Threshold']
-      performance = Object.entries(chartData.roc).filter(d => !notShowArr.includes(d[0])).map(([k, v]) => {
+      const notShowArr = ['AUCROC', 'AUCPR', 'FN', 'FP', 'FPR', 'F_BETA', 'TN', 'TP', 'TPR', 'Youden', 'Threshold']
+      performance = [`AUC:${auc && auc.toFixed && auc.toFixed(3)}`, ...Object.entries(chartData.roc).filter(d => !notShowArr.includes(d[0])).map(([k, v]) => {
         const value = v[fitIndex]
-        if (k === 'AUCROC') return `AUC:${value && value.toFixed && value.toFixed(3)}`
         return `${k}:${value && value.toFixed && value.toFixed(3)}`
-      }).join("\r\n")
+      })].join("\r\n")
     } else {
       performance = Object.entries(score.validateScore || score).map(([k, v]) => `${k}:${v && v.toFixed && v.toFixed(3)}`).join("\r\n")
     }

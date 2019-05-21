@@ -32,6 +32,7 @@ export default class Model {
   @observable outlierPlotLoading = false
   @observable featureList = []
   @observable rate = 0
+  @observable pcaPlotData = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {

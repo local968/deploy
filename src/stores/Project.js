@@ -83,7 +83,7 @@ export default class Project {
   @observable histgramPlots = {};
   @observable univariatePlots = {};
   @observable newVariable = [];
-  @observable expression = []
+  @observable expression = {}
   @observable newType = {}
   @observable informativesLabel = []
   @observable colValueCounts = {}
@@ -346,7 +346,7 @@ export default class Project {
       customHeader: [],
       newVariable: [],
       newType: {},
-      expression: [],
+      expression: {},
       validationRate: 20,
       holdoutRate: 20,
       hasSendEtl: false,
@@ -1119,7 +1119,7 @@ export default class Project {
     // const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     // const oldExp = Object.values(this.expression).join(";")
     // const allExp = `${oldExp};${fullExp}`
-    const scripts = [...this.expression, ...variables].map(v => ({
+    const scripts = [...Object.values(this.expression), ...variables].map(v => ({
       name: v.nameArray.map(n => ({
         value: n,
         type: "ID",
@@ -1144,11 +1144,11 @@ export default class Project {
         const newVariable = [...this.newVariable, ...variablenames]
         const trainHeader = [...this.trainHeader, ...variablenames]
         const newType = Object.assign({}, this.newType, type)
-        // const variableExp = variables.reduce((prev, _v) => {
-        //   prev[_v.name] = _v
-        //   return prev
-        // }, {})
-        const expression = [...this.expression, ...variables]
+        const variableExp = variables.reduce((prev, _v) => {
+          prev[_v.name] = _v
+          return prev
+        }, {})
+        const expression = Object.assign({}, this.expression, variableExp)
         this.updateProject({
           newVariable,
           trainHeader,
@@ -1481,13 +1481,14 @@ export default class Project {
       target,
       dataHeader,
       weights,
-      newVariable
+      newVariable,
+      trainHeader
     } = this;
 
     let command = '';
     let trainData = {}
 
-    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target);
+    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d));
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -2089,28 +2090,53 @@ export default class Project {
     const cssVersionEnd = html.indexOf('.', cssVersionStart)
     const cssVersion = html.slice(cssVersionStart, cssVersionEnd)
 
-    const cssUrl = `/static/css/main.${cssVersion}.css`
-    const cssLink = `<${link} href="/static/css/main.${cssVersion}.css" rel="stylesheet">`
+    const cssUrl = `/static/css/main.${cssVersion}.chunk.css`
+    const cssLink = `<${link} href="/static/css/main.${cssVersion}.chunk.css" rel="stylesheet">`
     const cssResp = await axios.get(cssUrl)
     const cssData = cssResp.data
     const cssTag = `<${style}>${cssData}</${style}>`
     html = html.replace(cssLink, '')
 
-    const jsVersionStartStr = `<${script} type="text/javascript" src="/static/js/main.`
+
+    const cssChunkVersionStartStr = `<${link} href="/static/css/2.`
+    const cssChunkVersionStart = html.indexOf(cssChunkVersionStartStr) + cssChunkVersionStartStr.length
+    const cssChunkVersionEnd = html.indexOf('.', cssChunkVersionStart)
+    const cssChunkVersion = html.slice(cssChunkVersionStart, cssChunkVersionEnd)
+
+    const cssChunkUrl = `/static/css/2.${cssChunkVersion}.chunk.css`
+    const cssChunkLink = `<${link} href="/static/css/2.${cssChunkVersion}.chunk.css" rel="stylesheet">`
+    const cssChunkResp = await axios.get(cssChunkUrl)
+    const cssChunkData = cssChunkResp.data
+    const cssChunkTag = `<${style}>${cssChunkData}</${style}>`
+    html = html.replace(cssChunkLink, '')
+
+    const jsVersionStartStr = `<${script} src="/static/js/main.`
     const jsVersionStart = html.indexOf(jsVersionStartStr) + jsVersionStartStr.length
     const jsVersionEnd = html.indexOf('.', jsVersionStart)
     const jsVersion = html.slice(jsVersionStart, jsVersionEnd)
 
-    const jsUrl = `/static/js/main.${jsVersion}.js`
-    const jsLink = `<${script} type="text/javascript" src="/static/js/main.${jsVersion}.js"></${script}>`
+    const jsUrl = `/static/js/main.${jsVersion}.chunk.js`
+    const jsLink = `<${script} src="/static/js/main.${jsVersion}.chunk.js"></${script}>`
     const jsResp = await axios.get(jsUrl)
     const jsData = jsResp.data
     const jsTag = `<${script}>` + jsData + `</${script}>`
     html = html.replace(jsLink, '')
 
+    const jsChunkVersionStartStr = `<${script} src="/static/js/2.`
+    const jsChunkVersionStart = html.indexOf(jsChunkVersionStartStr) + jsChunkVersionStartStr.length
+    const jsChunkVersionEnd = html.indexOf('.', jsChunkVersionStart)
+    const jsChunkVersion = html.slice(jsChunkVersionStart, jsChunkVersionEnd)
+
+    const jsChunkUrl = `/static/js/2.${jsChunkVersion}.chunk.js`
+    const jsChunkLink = `<${script} src="/static/js/2.${jsChunkVersion}.chunk.js"></${script}>`
+    const jsChunkResp = await axios.get(jsChunkUrl)
+    const jsChunkData = jsChunkResp.data
+    const jsChunkTag = `<${script}>` + jsChunkData + `</${script}>`
+    html = html.replace(jsChunkLink, '')
+
     html = html.replace(`</${body}>`, '')
     // cannot use replace with js code ($$typeof wrong)
-    html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsTag}${cssTag}</${body}>`
+    html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsChunkTag}${jsTag}${cssChunkTag}${cssTag}</${body}>`
     return html
   }
 
@@ -2195,11 +2221,11 @@ export default class Project {
     //   loadFile(`R2Learn_Report_${this.id}.html`, html)
     //   changeReportProgress(`init`, 0)
     // }
-   // report(modelId)
-    const json = c1
+    // report(modelId)
+    const json = JSON.stringify(c1)
 
     // changeReportProgress(`generating report file`, 100)
-    const html =  await this.generateReportHtml(json)
+    const html = await this.generateReportHtml(json)
     // if (cancel) {
     //   // changeReportProgress(`init`, 0)
     //   return
