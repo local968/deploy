@@ -1,7 +1,7 @@
-import React, { ChangeEvent } from 'react';
-import { makeStyles } from '@material-ui/styles';
-import { List, ListItem, ListItemText, TextField } from '@material-ui/core';
-import { Coordinate } from './model/Coordinate';
+import React, {ChangeEvent} from 'react';
+import {makeStyles} from '@material-ui/styles';
+import {List, ListItem, ListItemText, TextField} from '@material-ui/core';
+import {Coordinate} from './model/Coordinate';
 import _ from 'lodash'
 // import { useImmer } from 'use-immer';
 
@@ -24,23 +24,23 @@ interface VariablesProps {
 }
 
 interface VariablesState {
-  variables: Array<Coordinate>
+  filterStr: string
 }
 
 function Variables(props: VariablesProps) {
-  const { handleClick, variables } = props;
+  const {handleClick, variables} = props;
   const classes = useStyles()
-  const initState: VariablesState = { variables };
-  const [state, setState] = React.useState(initState as VariablesState);
+  const [state, setState] = React.useState({filterStr: ''});
   const inputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newList: Array<Coordinate> = initState.variables.filter((o) => {
-      return o.value && !o.value.indexOf(e.target.value);
-    });
     setState({
       ...state,
-      variables: newList
+      filterStr: e.target.value
     })
   };
+  const {filterStr} = state;
+  const validVariable = variables.filter((o) => {
+    return o.value && !o.value.indexOf(filterStr);
+  })
   return (
     <List className={classes.list} disablePadding>
       <div className={classes.textFiled}>
@@ -50,9 +50,10 @@ function Variables(props: VariablesProps) {
           margin="normal"
         />
       </div>
-      {_.map(state.variables, (v: Coordinate, i: number) => {
-        return <ListItem style={{ padding: 20 }} button alignItems='flex-start' key={'functions' + i} onClick={handleClick.bind(null, v, null)}>
-          <ListItemText primary={v.name} />
+      {_.map(validVariable, (v: Coordinate, i: number) => {
+        return <ListItem style={{padding: 20}} button alignItems='flex-start' key={'functions' + i}
+                         onClick={handleClick.bind(null, v, null)}>
+          <ListItemText primary={v.name}/>
         </ListItem>
       })}
     </List>

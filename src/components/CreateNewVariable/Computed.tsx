@@ -8,18 +8,18 @@ import {
   Button,
   Typography
 } from '@material-ui/core';
-import map from 'lodash/map';
+import {map, filter, includes} from 'lodash';
 // import { useImmer } from 'use-immer';
 import Funcions from './Funcions';
 import Variables from './Variables';
 import Summary from './Summary';
 import Expressions from './Expressions';
-import { Exp, Type, Coordinate } from './model/Coordinate';
-import { withStyles } from '@material-ui/core/styles';
-import { string } from "prop-types";
+import {Exp, Type, Coordinate} from './model/Coordinate';
+import {withStyles} from '@material-ui/core/styles';
+import {string} from "prop-types";
 import EN from '../../constant/en';
 import FUNCTIONS from './functions';
-import { message } from 'antd';
+import {message} from 'antd';
 
 // const FUNCTIONS = {
 //   base: [] as any[],
@@ -72,11 +72,11 @@ export interface ComputedState {
 }
 
 function initExp(): Exp {
-  return { value: [], label: '', range: [0, 0] }
+  return {value: [], label: '', range: [0, 0]}
 }
 
 function Computed(props: ComputedProps) {
-  const { classes, onClose, addNewVariable, colType, expression } = props
+  const {classes, onClose, addNewVariable, colType, expression} = props
   const [state, setState] = React.useState({
     exps: [initExp()],
     detailKey: '',
@@ -84,7 +84,7 @@ function Computed(props: ComputedProps) {
   } as ComputedState)
 
   const handleFunction = (func: Coordinate, startIndex: number | null) => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const LPAREN: Coordinate = {
       value: '(',
       name: '(',
@@ -96,7 +96,7 @@ function Computed(props: ComputedProps) {
       type: Type.Rparen,
     };
     const newExp: Exp = exps[index]
-    const { range: [start, end], value } = newExp
+    const {range: [start, end], value} = newExp
     const curStart: number = typeof startIndex === 'number' ? startIndex : start
     newExp.value = [
       ...value.slice(0, curStart),
@@ -119,9 +119,9 @@ function Computed(props: ComputedProps) {
   };
 
   const handleVariables = (v: Coordinate, startIndex: number | null) => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const newExp: Exp = exps[index]
-    const { range: [start, end], value } = newExp
+    const {range: [start, end], value} = newExp
     const curStart: number = typeof startIndex === 'number' ? startIndex : start
 
     const splitValue: Coordinate = {
@@ -178,7 +178,7 @@ function Computed(props: ComputedProps) {
   }
 
   const addLine = () => {
-    const { exps } = state
+    const {exps} = state
     exps.push(initExp())
     setState({
       ...state,
@@ -192,7 +192,7 @@ function Computed(props: ComputedProps) {
 
   const deleteIndex = (k: number) => {
     if (k === 0) return
-    const { exps, index } = state
+    const {exps, index} = state
     exps.splice(k, 1)
     setState({
       ...state,
@@ -211,9 +211,9 @@ function Computed(props: ComputedProps) {
   }
 
   const deleteExp = () => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const exp: Exp = exps[index]
-    const { range: [start, end] } = exp
+    const {range: [start, end]} = exp
     if (end <= 0) return;
     const newExp: Array<Coordinate> = [...exp.value];
     const isEq: boolean = start === end
@@ -233,7 +233,7 @@ function Computed(props: ComputedProps) {
   };
 
   const changeExpLabel = (v: string) => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const exp = exps[index];
     exps[index].label = v;
     setState({
@@ -243,9 +243,9 @@ function Computed(props: ComputedProps) {
   };
 
   const addExp = (v: string) => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const exp = exps[index]
-    let { range: [start, end] } = exp
+    let {range: [start, end]} = exp
     const isNumber: boolean = !isNaN(parseFloat(v))
     const isOp: boolean = OPARRAY.includes(v)
     const isLParen: boolean = v === '('
@@ -322,9 +322,9 @@ function Computed(props: ComputedProps) {
   };
 
   const left = () => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const exp: Exp = exps[index]
-    const { range: [start] } = exp;
+    const {range: [start]} = exp;
     if (start <= 0) {
       return;
     }
@@ -336,7 +336,7 @@ function Computed(props: ComputedProps) {
   };
 
   const right = () => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const exp: Exp = exps[index]
     const end: number = exp.range[1]
     if (end >= exp.value.length) {
@@ -350,7 +350,7 @@ function Computed(props: ComputedProps) {
   };
 
   const setRange = (start: number, end: number) => {
-    const { exps, index } = state;
+    const {exps, index} = state;
     const exp: Exp = exps[index]
     const l: number = exp.value.length;
     if (end > l || start < 0) {
@@ -364,7 +364,7 @@ function Computed(props: ComputedProps) {
   };
 
   const processAndSave = () => {
-    const { exps } = state;
+    const {exps} = state;
     const checkd = exps.map(exp => checkExp(exp.value))
     const error = checkd.find(c => !c.isPass)
     if (error) {
@@ -374,7 +374,7 @@ function Computed(props: ComputedProps) {
     // const variables: string[] = [...newVariable]
     const newExps: any[] = []
     for (let i = 0; i < checkd.length; i++) {
-      const { num, type } = checkd[i] as any
+      const {num, type} = checkd[i] as any
       const name = exps[i].label
       if (!name) return message.error(EN.Nameisempty)
       if (expression.hasOwnProperty(name)) return message.error(`${EN.Newvariable} ${name} ${EN.Isexist}`)
@@ -429,11 +429,11 @@ function Computed(props: ComputedProps) {
           break
         }
       }
-      if (start === -1) return { isPass: false, message: EN.Unexpectedtoken }
+      if (start === -1) return {isPass: false, message: EN.Unexpectedtoken}
       const exp: (Coordinate | Bracket)[] = expression.slice(start + 1, end - 1)
       bracketExps[num] = exp
       //转化(...)为$?
-      expression = [...expression.slice(0, start), { index: num }, ...expression.slice(end)]
+      expression = [...expression.slice(0, start), {index: num}, ...expression.slice(end)]
       num++
     }
 
@@ -468,7 +468,7 @@ function Computed(props: ComputedProps) {
     let expType = ''
     const typeArray: string[] = []
     for (let item of array) {
-      if (!item.length) return { isPass: false, message: EN.Errorexpression }
+      if (!item.length) return {isPass: false, message: EN.Errorexpression}
       //Categorical
       let type = 'Numerical'
       // item = item.trim()
@@ -520,17 +520,17 @@ function Computed(props: ComputedProps) {
     }
     if (typeArray.length > 1) {
       const index = typeArray.indexOf('Categorical')
-      if (index !== -1) return { isPass: false, message: `${EN.Errorexpression}: ${array[index]}` }
+      if (index !== -1) return {isPass: false, message: `${EN.Errorexpression}: ${array[index]}`}
       expType = 'Numerical'
     } else {
       expType = typeArray[0]
     }
-    return { isPass: true, message: EN.OK, num, isVariable, type: expType }
+    return {isPass: true, message: EN.OK, num, isVariable, type: expType}
   }
 
   // 校验表达式参数
   const checkParams = (functionName: (Coordinate | Bracket)[], bracketExps: any, bracketNum: number) => {
-    //默认校验函数 暂时 校验数组functionName为总表达式 
+    //默认校验函数 暂时 校验数组functionName为总表达式
     const exps = bracketExps[bracketNum]
     if (!exps.length) return { isPass: false, message: EN.Emptyparameter }
     const length = exps.length
@@ -617,7 +617,7 @@ function Computed(props: ComputedProps) {
     if (!skipParams) {
       // 校验参数
       for (let param of params) {
-        if (param.type === 'Categorical') return { isPass: false, message: EN.ParametersmustbeNumerical }
+        if (param.type === 'Categorical') return {isPass: false, message: EN.ParametersmustbeNumerical}
       }
     }
 
@@ -658,8 +658,8 @@ function Computed(props: ComputedProps) {
           } catch (e) {
             return { isPass: false, message: `${_n} ${EN.Mustbeinteger}` }
           }
-          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan}` }
-          if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}` }
+          if (n < 2) return {isPass: false, message: `${n} ${EN.Mustgreaterthan}`}
+          if (n > numOfParam) return {isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}`}
           return {
             isPass: true,
             message: EN.OK,
@@ -679,9 +679,9 @@ function Computed(props: ComputedProps) {
           try {
             parseInt(n, 10)
           } catch (e) {
-            return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
+            return {isPass: false, message: `${n} ${EN.Mustbeinteger}`}
           }
-          return { isPass: true, message: EN.OK, num: numOfParam }
+          return {isPass: true, message: EN.OK, num: numOfParam}
         })
         for (let numResult of diffResults) {
           if (!numResult.isPass) return numResult
@@ -809,8 +809,8 @@ function Computed(props: ComputedProps) {
       default:
         break;
     }
-    if (num < 1) return { isPass: false, message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}` }
-    return { isPass: true, message: EN.OK, num, type }
+    if (num < 1) return {isPass: false, message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}`}
+    return {isPass: true, message: EN.OK, num, type}
   }
 
   const checkArrayParams = (exps: any[], bracketExps: any, callback: ({ }: any) => { isPass: boolean, message: string }) => {
@@ -859,24 +859,35 @@ function Computed(props: ComputedProps) {
 
   // 校验总表达式
   const checkExp = (_expression: Coordinate[]) => {
-    if (!_expression.length) return { isPass: true, message: EN.Emptyparameter, num: 0 }
+    if (!_expression.length) return {isPass: true, message: EN.Emptyparameter, num: 0}
     // if (_expression.includes("$")) return { isPass: false, message: EN.Unexpectedtoken$ }
 
-    const { bracketExps, expression, isPass: _isPass, message: _message } = formatBracket(_expression)
-    if (!_isPass) return { isPass: _isPass, message: _message }
+    const {bracketExps, expression, isPass: _isPass, message: _message} = formatBracket(_expression)
+    if (!_isPass) return {isPass: _isPass, message: _message}
     // console.log(bracketExps, expression, 666)
     const { isPass, message, num, type } = checkSimpleExp(expression as (Coordinate | Bracket)[], bracketExps, false)
     return { isPass, message, num, type }
   }
   //------------------------------------------check end-----------------------------------------------------------------
 
-  const variables: Coordinate[] = map(colType, function (value, name) {
+  let variables: Coordinate[] = map(colType, function (value, name) {
     return {
       name,
       type: Type.ID,
       value: name,
+      varType: value
     };
   });
+  //参数类型： concat eq 随意  其他的方法都需要 Numerical类型的变量
+  const {exps, index} = state;
+  const currExp = exps[index];
+  const {range, value} = currExp;
+  if (range[0] > 1) {
+    const {name} = value[range[0] - 2];
+    if (!includes(['Concat', 'Eq', '(', ')', ','], name)) {
+      variables = filter(variables, ({varType}) => varType === 'Numerical')
+    }
+  }
   return (
     <Card>
       {/*<CardHeader*/}
@@ -888,8 +899,8 @@ function Computed(props: ComputedProps) {
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.VariableFormula}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
               <Expressions
-                exps={state.exps}
-                index={state.index}
+                exps={exps}
+                index={index}
                 setIndex={setIndex}
                 addLine={addLine}
                 deleteIndex={deleteIndex}
@@ -910,19 +921,19 @@ function Computed(props: ComputedProps) {
           <Grid item xs={3}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.Function}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} functions={FUNCTIONS} />
+              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} functions={FUNCTIONS}/>
             </Paper>
           </Grid>
           <Grid item xs={3}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.FormField}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Variables handleClick={handleVariables} variables={variables} />
+              <Variables handleClick={handleVariables} variables={variables}/>
             </Paper>
           </Grid>
           <Grid item xs={6}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.ProjectDescription}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Summary detailKey={state.detailKey} />
+              <Summary detailKey={state.detailKey}/>
             </Paper>
           </Grid>
         </Grid>
