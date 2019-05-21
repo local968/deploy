@@ -446,7 +446,7 @@ function Computed(props: ComputedProps) {
   }
 
   // 校验基本表达式
-  const checkSimpleExp = (expression: (Coordinate | Bracket)[], bracketExps: any) => {
+  const checkSimpleExp = (expression: (Coordinate | Bracket)[], bracketExps: any, inFunction: boolean) => {
     if (!expression.length) return { isPass: false, message: EN.Emptyexpression }
     // const baseOptReg = new RegExp(/[+\-*/]/)
     const length = expression.length
@@ -487,7 +487,7 @@ function Computed(props: ComputedProps) {
         //   return { isPass: false, message: EN.Errorexpression }
         // }
         const other = item.slice(fnIndex + 1) as Coordinate[]
-        if (other.length) return { isPass: false, message: `${EN.Unexpectedidentifier} ${other.map(v => v.value).join('')}` }
+        if (other.length) return { isPass: false, message: `${EN.Unexpectedidentifier} ${expToString(other as Coordinate[])}` }
         // 校验参数
         const fnResult = checkParams(functionName, bracketExps, bracketNum.index)
         if (!fnResult.isPass) return fnResult
@@ -496,23 +496,24 @@ function Computed(props: ComputedProps) {
         type = fnResult.type
       } else if (idIndex > -1) {
         // 判断是否为选择的参数
-        if (item.length > 1) return { isPass: false, message: `${EN.Unknownvariable} ${item.map((v) => (v as Coordinate).value).join('')}` }
+        if (item.length > 1) return { isPass: false, message: `${EN.Unknownvariable} ${expToString(item as Coordinate[])}` }
         // item = item.slice(1)
         // if (!item || !dataHeader.includes(item.value))
         const cur: Coordinate = item[0] as Coordinate
         isVariable = true
         type = colType[cur.value || ''] === 'Numerical' ? 'Numerical' : 'Categorical'
       } else if (isArray) {
+        if (!inFunction) return { isPass: false, message: `${EN.Unexpectedidentifier} ${expToString(item as Coordinate[])}` }
         //暂时只判断是否为空数组
         item = item.slice(1, -1)
         if (!item.length) return { isPass: false, message: `${EN.Unknownvariable} []` }
-        const arrayResult = checkParams(item, null, 0, false)
-        if (!arrayResult.isPass) return arrayResult
+        // const arrayResult = checkParams(item, null, 0, false)
+        // if (!arrayResult.isPass) return arrayResult
         type = 'Array'
       } else {
         const isNum = item.every(it => (it as any).type === Type.Number)
         //判断是否是数字
-        if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${item.map((v) => (v as Coordinate).value).join('')}` }
+        if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${expToString(item as Coordinate[])}` }
       }
 
       typeArray.push(type)
@@ -528,9 +529,9 @@ function Computed(props: ComputedProps) {
   }
 
   // 校验表达式参数
-  const checkParams = (functionName: (Coordinate | Bracket)[], bracketExps: any, bracketNum: number, checkFunction = true) => {
+  const checkParams = (functionName: (Coordinate | Bracket)[], bracketExps: any, bracketNum: number) => {
     //默认校验函数 暂时 校验数组functionName为总表达式 
-    const exps = checkFunction ? bracketExps[bracketNum] : functionName
+    const exps = bracketExps[bracketNum]
     if (!exps.length) return { isPass: false, message: EN.Emptyparameter }
     const length = exps.length
     let start = 0
@@ -559,28 +560,32 @@ function Computed(props: ComputedProps) {
     let num = 1
     let fnType = ''
     const params: any[] = []
+    let stillVariable = true
     for (const exp of expArray) {
       // 校验表达式
-      const expChecked = checkSimpleExp(exp, bracketExps)
+      const expChecked = checkSimpleExp(exp, bracketExps, !!functionName.length)
       if (!expChecked.isPass) return expChecked
       const { isVariable, num, type } = expChecked
-      if (isVariable) numOfParam++
+      if (stillVariable) {
+        if (isVariable) numOfParam++
+        if (!isVariable) stillVariable = false
+      }
       // 报存参数类型
       params.push({
         isVariable,
         num,
-        exp: exp.map(_e => ((_e as any).value || '')).join(''),
+        exp,
         type
       })
     }
 
-    if (checkFunction) {
-      // 不是函数, 则参数只能为1个
-      if (!functionName.length && expArray.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${exps.map(v => (v as Coordinate).value).join('')}` }
-      if (functionName.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${functionName.map(v => (v as Coordinate).value).join('')}` }
-    }
-    const BaseFn = (checkFunction && !functionName.length) ? false : FUNCTIONS.base.find(fn => fn.value === (functionName[0] as Coordinate).value)
-    const SeniorFn = (checkFunction && !functionName.length) ? false : FUNCTIONS.senior.find(fn => fn.value === (functionName[0] as Coordinate).value)
+    let skipParams = false
+    fnType = 'Numerical'
+    // 不是函数, 则参数只能为1个
+    if (!functionName.length && expArray.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${exps.map(v => (v as Coordinate).value).join('')}` }
+    if (functionName.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${functionName.map(v => (v as Coordinate).value).join('')}` }
+    const BaseFn = !functionName.length ? false : FUNCTIONS.base.find(fn => fn.value === (functionName[0] as Coordinate).value)
+    const SeniorFn = !functionName.length ? false : FUNCTIONS.senior.find(fn => fn.value === (functionName[0] as Coordinate).value)
     // const currentFn = isBaseFn || isSeniorFn
     // 判断函数参数个数限制
     // if (currentFn && currentFn.params && currentFn.params !== expArray.length) return {
@@ -588,11 +593,9 @@ function Computed(props: ComputedProps) {
     //   message: `${EN.Function} ${(functionName[0] as Coordinate).value} must have ${currentFn.params} params`
     // }
 
-    let skipParams = false
-    fnType = 'Numerical'
     if (SeniorFn) {
       // 校验高级函数参数
-      const seniorResult: any = checkSeniorParams(SeniorFn, params, numOfParam)
+      const seniorResult: any = checkSeniorParams(SeniorFn, params, numOfParam, bracketExps)
       if (!seniorResult.isPass) return seniorResult
       isVariable1 = true
       num += seniorResult.num - 1
@@ -606,6 +609,11 @@ function Computed(props: ComputedProps) {
         skipParams = true
       }
     }
+
+    for (let param of params) {
+      num += param.num - 1
+      isVariable1 = isVariable1 || param.isVariable
+    }
     if (!skipParams) {
       // 校验参数
       for (let param of params) {
@@ -613,21 +621,18 @@ function Computed(props: ComputedProps) {
       }
     }
 
-    for (let param of params) {
-      num += param.num - 1
-      isVariable1 = isVariable1 || param.isVariable
-    }
     return { isPass: true, message: `ok`, num, isVariable: isVariable1, type: fnType }
   }
 
   // 校验高级表达式参数
-  const checkSeniorParams = (senior, params: any[], numOfParam: number) => {
+  const checkSeniorParams = (senior, params: any[], numOfParam: number, bracketExps: any) => {
     let num = 0
     let type = ''
 
     // 截取列名参数
     const paramList = params.slice(0, numOfParam)
-    if (senior.value !== 'Concat') {
+    const skipFn = ['Concat', 'Groupby', 'Substring']
+    if (!skipFn.includes(senior.value)) {
       for (let param of paramList) {
         if (param.type !== 'Numerical') return {
           isPass: false,
@@ -645,12 +650,13 @@ function Computed(props: ComputedProps) {
           message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}`
         }
         const concatResults = numList.map(num => {
-          let n = num.exp
-          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
+          let _n: string = expToString(num.exp)
+          if (isNaN(parseFloat(_n)) || _n.includes(".")) return { isPass: false, message: `${_n} ${EN.Mustbeinteger}` }
+          let n: number
           try {
-            n = parseInt(n, 10)
+            n = parseInt(_n, 10)
           } catch (e) {
-            return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
+            return { isPass: false, message: `${_n} ${EN.Mustbeinteger}` }
           }
           if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan}` }
           if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}` }
@@ -668,10 +674,10 @@ function Computed(props: ComputedProps) {
       case "Diff":
         type = 'Numerical'
         const diffResults = numList.map(num => {
-          let n = num.exp
-          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
+          let n = expToString(num.exp)
+          if (isNaN(parseFloat(n)) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           try {
-            n = parseInt(n, 10)
+            parseInt(n, 10)
           } catch (e) {
             return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           }
@@ -690,36 +696,115 @@ function Computed(props: ComputedProps) {
         type = 'Categorical'
         const quantileBinArray = ["0", "1"]
         const [b, type1, type2] = numList
-        if (isNaN(b.exp) || b.exp.includes(".")) return { isPass: false, message: `${b.exp} ${EN.Mustbeinteger}` }
-        if (!quantileBinArray.includes(type1.exp.trim())) return {
+        if (isNaN(parseFloat(expToString(b.exp))) || expToString(b.exp).includes(".")) return { isPass: false, message: `${expToString(b.exp)} ${EN.Mustbeinteger}` }
+        if (!quantileBinArray.includes(expToString(type1.exp).trim())) return {
           isPass: false,
-          message: `${type1.exp} ${EN.Isnotsupported}`
+          message: `${expToString(type1.exp)} ${EN.Isnotsupported}`
         }
-        if (type2 && !quantileBinArray.includes(type2.exp.trim())) return {
+        if (type2 && !quantileBinArray.includes(expToString(type2.exp).trim())) return {
           isPass: false,
-          message: `${type2.exp} ${EN.Isnotsupported}`
+          message: `${expToString(type2.exp)} ${EN.Isnotsupported}`
         }
         num = numOfParam * (type2 ? 2 : 1)
         break;
       case "Custom_Quantile_bin":
         type = 'Categorical'
         const numResults = numList.map(num => {
-          let n = num.exp
+          let n = expToString(num.exp)
           if (num.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${n}` }
-          const str = n.trim()
-          const first = str.slice(0, 1)
-          const last = str.slice(-1)
-          if (first !== "[" || last !== "]") return { isPass: false, message: `${EN.Unexpectedidentifier} ${n}` }
-          const array = str.slice(1, -1).split(",")
-          for (let item of array) {
-            if (!item || isNaN(item.trim())) return { isPass: false, message: `${item} ${EN.Mustbenumbe}` }
-          }
+          // const str = n.trim()
+          // const first = num.exp.slice(0, 1)
+          // const last = num.exp.slice(-1)
+          // if (first.type !== "[" || last.value !== "]") return { isPass: false, message: `${EN.Unexpectedidentifier} ${n}` }
+          const cuschecked = checkArrayParams(num.exp.slice(1, -1), bracketExps, ({ item, type, isVariable }) => {
+            if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+            if (isVariable) return { isPass: false, message: `cannot use variable` }
+            if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumbe}` }
+            return { isPass: true, message: 'ok' }
+          })
+          if (!cuschecked.isPass) return cuschecked
+          // const array = str.slice(1, -1).split(",")
+          // for (let item of array) {
+          //   if (!item || isNaN(parseFloat(item.trim()))) return { isPass: false, message: `${item} ${EN.Mustbenumbe}` }
+          // }
           return { isPass: true, message: EN.OK, num: 1 }
         })
         for (let numResult of numResults) {
           if (!numResult.isPass) return numResult
           num += numResult.num || 0
         }
+        break;
+      case "Groupby":
+        type = 'Categorical'
+        if (numOfParam !== 1) return { isPass: false, message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')}` }
+        if (numList.length !== 2) return { isPass: false, message: `error params ${numList.map(n => expToString(n.exp)).join(',')}` }
+        const [vList, nList] = numList
+        const vExp = expToString(vList.exp)
+        if (vList.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${vExp}` }
+        const vListchecked = checkArrayParams(vList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+          if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+          if (!isVariable) return { isPass: false, message: `must use variable` }
+          return { isPass: true, message: 'ok' }
+        })
+        if (!vListchecked.isPass) return vListchecked
+        if (vListchecked.params > 2) return { isPass: false, message: `cannot > 2` }
+        const nExp = expToString(nList.exp)
+        if (nList.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp}` }
+        const nListValues = paramList[0].type === 'Numerical' ? ['sum', 'mean', 'min', 'max', 'std', 'median'] : ['mode']
+        const nListchecked = checkArrayParams(nList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+          if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+          if (isVariable) return { isPass: false, message: `cannot use variable` }
+          if (!nListValues.includes(item)) return { isPass: false, message: `${EN.Unexpectedidentifier} ${item}` }
+          return { isPass: true, message: 'ok' }
+        })
+        if (!nListchecked.isPass) return nListchecked
+        num = nListchecked.params
+        break;
+      case "Interactive":
+        type = 'Numerical'
+        if (numList.length > 0) return { isPass: false, message: `error params ${numList.map(n => expToString(n.exp)).join(',')}` }
+        num = numOfParam * (numOfParam - 1)
+        break;
+      case "Box_cox":
+        type = 'Numerical'
+        if (numList.length > 1) return { isPass: false, message: `error params ${numList.slice(1).map(n => expToString(n.exp)).join(',')}` }
+        if (numOfParam > 1) return { isPass: false, message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')}` }
+        if (numList[0] && expToString(numList[0].exp) && isNaN(parseFloat(expToString(numList[0].exp)))) return { isPass: false, message: `${expToString(numList[0].exp)} ${EN.Mustbenumbe}` }
+        num = 1
+        break;
+      case "Number_extraction":
+        type = 'Numerical'
+        if (numList.length > 0) return { isPass: false, message: `error params ${numList.map(n => expToString(n.exp)).join(',')}` }
+        if (numOfParam > 1) return { isPass: false, message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')}` }
+        num = 1
+        break;
+      case "Substring":
+        type = 'Categorical'
+        if (numList.length > 1) return { isPass: false, message: `error params ${numList.slice(1).map(n => expToString(n.exp)).join(',')}` }
+        if (numOfParam > 1) return { isPass: false, message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')}` }
+        const subItem = numList[0]
+        if (subItem.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${expToString(subItem.exp)}` }
+        // const subExp = expToString(subItem.exp)
+        // const first = subExp.slice(0, 1)
+        // const last = subExp.slice(-1)
+        // if (first !== "[" || last !== "]") return { isPass: false, message: `${EN.Unexpectedidentifier} ${subExp}` }
+        // const subArray = subItem.exp.slice(1, -1)
+
+        const subchecked = checkArrayParams(subItem.exp.slice(1, -1), bracketExps, ({ item, type, isVariable }) => {
+          if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+          if (isVariable) return { isPass: false, message: `cannot use variable` }
+          if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumbe}` }
+          if (isNaN(parseFloat(item)) || item.includes('.')) return { isPass: false, message: `${item} ${EN.Mustbeinteger}` }
+          return { isPass: true, message: 'ok' }
+        })
+        if (!subchecked.isPass) return subchecked
+        if (subchecked.params !== 2) return { isPass: false, message: `error params ${expToString(subItem.exp)}` }
+        // if (subArray.length !== 2) return { isPass: false, message: `error params ${subExp}` }
+        // for (let item of subArray) {
+        //   if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+        //   if (isNaN(parseFloat(item)) || item.includes('.')) return { isPass: false, message: `${item} ${EN.Mustbeinteger}` }
+        // }
+        num = 1
         break;
       default:
         break;
@@ -728,11 +813,49 @@ function Computed(props: ComputedProps) {
     return { isPass: true, message: EN.OK, num, type }
   }
 
+  const checkArrayParams = (exps: any[], bracketExps: any, callback: ({ }: any) => { isPass: boolean, message: string }) => {
+    if (!exps.length) return { isPass: false, message: EN.Emptyparameter }
+    const length = exps.length
+    let start = 0
+    let skipNum = 0
+    let expArray: (Coordinate | Bracket)[][] = []
+    // 根据, 分割参数
+    for (let i = 0; i < length; i++) {
+      if (i < start) continue
+      if ((exps[i] as any).type === Type.Lc) {
+        skipNum++
+        continue
+      }
+      if ((exps[i] as any).type === Type.RC) {
+        if (skipNum > 0) skipNum--
+        continue
+      }
+      if (skipNum === 0 && (exps[i] as any).type === Type.Split) {
+        expArray.push(exps.slice(start, i))
+        start = i + 1
+      }
+    }
+    if (start < length) expArray.push(exps.slice(start, length))
+
+    for (const exp of expArray) {
+      // 校验表达式
+      const expChecked = checkSimpleExp(exp, bracketExps, true)
+      if (!expChecked.isPass) return expChecked
+      const { isVariable, type } = expChecked
+      const checked = callback({ item: expToString(exp as Coordinate[]), type, isVariable })
+      if (!checked.isPass) return checked
+    }
+    return { isPass: true, message: 'ok', params: expArray.length }
+  }
+
+
   // 计算阶乘
   const factorial = (n: number) => {
     if (n < 2) return 1
     return n * factorial(n - 1)
   }
+
+  const expToString = (exps: Coordinate[]) => exps.map(_e => ((_e as any).value || '')).join('')
 
   // 校验总表达式
   const checkExp = (_expression: Coordinate[]) => {
@@ -742,7 +865,7 @@ function Computed(props: ComputedProps) {
     const { bracketExps, expression, isPass: _isPass, message: _message } = formatBracket(_expression)
     if (!_isPass) return { isPass: _isPass, message: _message }
     // console.log(bracketExps, expression, 666)
-    const { isPass, message, num, type } = checkSimpleExp(expression as (Coordinate | Bracket)[], bracketExps)
+    const { isPass, message, num, type } = checkSimpleExp(expression as (Coordinate | Bracket)[], bracketExps, false)
     return { isPass, message, num, type }
   }
   //------------------------------------------check end-----------------------------------------------------------------
