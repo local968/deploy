@@ -67,7 +67,7 @@ export default class ModelProcessFlow extends Component {
 		return <section className={styles.process}>
 			<label>{EN.RawData}</label>
 			<img src={Next} alt='' />
-			{this.popOver(this.DP(standardType), EN.DataPreprocessing)}
+			{this.popOver(this.FP(), EN.DataPreprocessing)}
 			<img src={Next} alt='' />
 			{this.popOver(this.FP(), EN.FeaturePreprocessing)}
 			<img src={Next} alt='' />

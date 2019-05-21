@@ -3,7 +3,7 @@ import {makeStyles} from '@material-ui/styles';
 import {List, ListItem, ListItemText, TextField, Collapse} from '@material-ui/core';
 import {ExpandLess, ExpandMore} from '@material-ui/icons';
 import {Coordinate} from './model/Coordinate';
-import {flatten, values, map} from 'lodash'
+import {flatten, filter, values, map, mapValues} from 'lodash'
 // import { useImmer } from 'use-immer';
 
 const useStyles = makeStyles({
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 export interface FunctionProps {
   onClick: (v: Coordinate, i: null) => void;
   onMouseOver: (v?: string) => void;
-  functions: object
+  functions: { [key: string]: Array<Coordinate> }
 }
 
 // interface FunctionState {
@@ -38,17 +38,12 @@ export interface FunctionProps {
 function Function(props: FunctionProps) {
   const classes = useStyles();
   const {onClick, onMouseOver, functions} = props;
-  const flattenFuncs = flatten(values(functions));
-  const initState: any = {functions: flattenFuncs, base: true, senior: true};
+  const initState: any = {filterStr: '', base: true, senior: true};
   const [state, setState] = React.useState(initState as any);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value: string = e.target.value;
-    const newFunctions: Array<Coordinate> = initState.functions.filter(o => {
-      return o.value && !o.value.indexOf(value);
-    });
     setState({
       ...state,
-      functions: newFunctions
+      filterStr: e.target.value
     });
   };
   const onCosClick = (k: string) => {
@@ -56,13 +51,15 @@ function Function(props: FunctionProps) {
     setState({...state, [k]: !value})
   }
 
+  const {filterStr} = state;
+  const validFuncs = mapValues(functions, (v) => filter(v, ({value}) => value && value.includes(filterStr)))
   return (
     <List className={classes.list} disablePadding>
       <div className={classes.textFiled}>
         <TextField label="value" onChange={onChange} margin="normal"/>
       </div>
       {
-        map(functions, (v, k) => <div key={k + 'div'}>
+        map(validFuncs, (v, k) => <div key={k + 'div'}>
             <ListItem onClick={() => onCosClick(k)} key={k}>
               <ListItemText primary={k}/>
               {state[k] ? <ExpandMore/> : <ExpandLess/>}
