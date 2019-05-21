@@ -3,12 +3,7 @@ import classnames from 'classnames';
 import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
-import RocChart from 'components/D3Chart/RocChart';
-import PRChart from 'components/D3Chart/PRChart';
 import { Hint } from 'components/Common';
-import PredictionDistribution from 'components/D3Chart/PredictionDistribution';
-import LiftChart from 'components/D3Chart/LiftChart';
-import SpeedAndAcc from 'components/D3Chart/SpeedAndAcc';
 import ModelProcess from './ModelProcess';
 import modelProcess from './icon-model-process-flow-normal.svg';
 import processHover from './icon-model-process-flow-hover.svg';
@@ -710,7 +705,7 @@ class DetailCurves extends Component {
     }, 0)
   };
   render() {
-    const { model, model: { mid }, yes, no } = this.props;
+    const { model, model: { mid }, yes, no ,project} = this.props;
     const { curve, show } = this.state;
     let curComponent;
     let hasReset = true;
@@ -727,13 +722,11 @@ class DetailCurves extends Component {
         break;
       case EN.PredictionDistribution:
         // curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
-        curComponent = <PredictionDistributions
+        curComponent = show && <PredictionDistributions
           height={300}
           width={500}
           x_name={EN.ProbabilityThreshold}
           y_name={EN.ProbabilityDensity}
-          fitIndex={model.fitIndex}
-          chartData={model.chartData}
           model={model}
         />;
         break;

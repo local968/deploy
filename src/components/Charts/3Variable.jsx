@@ -18,6 +18,11 @@ export default class ThreeVariable extends PureComponent{
 				type: 'scatter3D',
 				symbolSize,
 				data:itm.value,
+				emphasis:{
+					label:{
+						show:false
+					}
+				}
 			}
 		});
 		
