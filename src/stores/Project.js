@@ -1481,13 +1481,14 @@ export default class Project {
       target,
       dataHeader,
       weights,
-      newVariable
+      newVariable,
+      trainHeader
     } = this;
 
     let command = '';
     let trainData = {}
 
-    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target);
+    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d));
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -2195,11 +2196,11 @@ export default class Project {
     //   loadFile(`R2Learn_Report_${this.id}.html`, html)
     //   changeReportProgress(`init`, 0)
     // }
-   // report(modelId)
+    // report(modelId)
     const json = c1
 
     // changeReportProgress(`generating report file`, 100)
-    const html =  await this.generateReportHtml(json)
+    const html = await this.generateReportHtml(json)
     // if (cancel) {
     //   // changeReportProgress(`init`, 0)
     //   return
