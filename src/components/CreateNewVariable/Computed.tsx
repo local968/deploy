@@ -1010,7 +1010,7 @@ function Computed(props: ComputedProps) {
       </CardContent>
       <CardActions disableActionSpacing className={classes.actions}>
         <Button variant="contained" onClick={processAndSave} className={classes.save}>
-          {EN.OK}
+          {EN.Yes}
         </Button>
         <Button
           variant="contained"
