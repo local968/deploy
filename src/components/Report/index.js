@@ -134,9 +134,9 @@ class Report extends Component {
             </div>
             <div className={styles.schemaRow}>
               <span className={styles.schemaCell}>{addComma(list[0].totalRawLines)}</span>
-              <span className={styles.schemaCell}>{addCommaObject.keys(list[0].colType).length)}</span>
-              <span className={styles.schemaCell}>{addCommaObject.keys(list[0].colType).filter(([k, v]) => v === 'Categorical').length)}</span>
-              <span className={styles.schemaCell}>{addCommaObject.keys(list[0].colType).filter(([k, v]) => v === 'Numerical').length)}</span>
+              <span className={styles.schemaCell}>{addComma(Object.keys(list[0].colType).length)}</span>
+              <span className={styles.schemaCell}>{addComma(Object.keys(list[0].colType).filter(([k, v]) => v === 'Categorical').length)}</span>
+              <span className={styles.schemaCell}>{addComma(Object.keys(list[0].colType).filter(([k, v]) => v === 'Numerical').length)}</span>
             </div>
           </div>
         </div>}
