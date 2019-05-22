@@ -9,6 +9,7 @@ import { message as antdMessage, Modal } from 'antd';
 import axios from 'axios'
 import { formatNumber } from 'util'
 import c1 from './classification'
+import request from "../components/Request";
 export default class Project {
   @observable models = []
   @observable trainModel = null
@@ -2141,7 +2142,45 @@ export default class Project {
   }
 
 
-  generateReport = async (modelId) => {
+  generateReport = async (modelId , aaa) => {
+console.log(aaa)
+    // aaa.routing.history.push('/report')
+    console.log(this , 'ttttttttttttttttttttttt')
+
+    // const data = {
+    //   field: "sex",
+    //   id: this.etlIndex,
+    // };
+    // const { uniqueValues } = this.dataViews["sex"];
+    // data.size = uniqueValues > 8 ? 8 : uniqueValues;
+    // request.post({
+    //   url: '/graphics/histogram-categorical',
+    //   data,
+    // })
+
+    // this.dataViews.forEach((res) => {
+    //   console.log(res)
+    // })
+
+    request.post({
+      url: '/graphics/list',
+      data: [{
+        "name": "histogram-categorical",
+        "data": {
+          "field": "mitoses",
+          "id": this.etlIndex
+        }},{
+        "name": "histogram-categorical",
+        "data": {
+          "field": "clump_thickness",
+          "id": this.etlIndex
+        }}],
+    }).then(value => {
+      console.log(value)
+      //   chartDate
+      // })
+    });
+
     // let cancel = false
     // const changeReportProgress = action((text, progress) => {
     //   if (!cancel) {
@@ -2152,7 +2191,11 @@ export default class Project {
     //
     // const report = async (modelId) => {
     //   changeReportProgress('initializing report.', 0)
-    //   const model = this.models.find(m => m.id === modelId)
+       const model = this.models.find(m => m.id === modelId)
+
+    const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
+
+    console.log(json ,' jjjjjjjjjjjjjjjj')
     //   // preImportance
     //   this.preImportance = null
     //
@@ -2222,7 +2265,7 @@ export default class Project {
     //   changeReportProgress(`init`, 0)
     // }
     // report(modelId)
-    const json = JSON.stringify(c1)
+    // const json = JSON.stringify(c1)
 
     // changeReportProgress(`generating report file`, 100)
     const html = await this.generateReportHtml(json)
