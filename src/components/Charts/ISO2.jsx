@@ -36,6 +36,7 @@ export default class Iso extends PureComponent{
             var2:'',
             url:'',
             vars:[],
+            modelName:'',
         };
         this.chart = React.createRef();
         this.updatePoint = debounce(this.updatePoint, 280)
@@ -56,7 +57,10 @@ export default class Iso extends PureComponent{
     
         // const point = (models.dataFlow[0].contamination||0).toFixed(3);
         const point = (rate).toFixed(3);
-        let var1,var2,vars=this.state.vars;
+        let var1,var2,vars=[];
+        if(models.modelName === this.state.modelName){
+            vars=this.state.vars;
+        }
         const {featureImportance} = models;
         if(vars.length){
             var1 = vars[0];
@@ -283,10 +287,10 @@ export default class Iso extends PureComponent{
     save(){
         const {show_name} = this.state;
         const {var1,var2} = show_name;
-        
+        const { modelName} = this.props.projectStore.project.selectModel;
+    
         this.setState({
-            // var1,
-            // var2,
+            modelName,
             vars:[var1,var2],
         },()=>{
             const chart = this.chart.getEchartsInstance();
