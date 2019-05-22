@@ -7,9 +7,11 @@ import TSENOne from "./TSENOne";
 import BoxPlots from "./BoxPlots";
 import PredictedVsActualPlot from "./PredictedVsActualPlot";
 import EN from "../../constant/en";
+import Pie2 from "./Pie2";
 
 export default function Chart(props){
-	const {name,data,x_name='',y_name='',title=''} = props;
+	const {x_name='',y_name='',title=''} = props;
+	const {name,data} = props.data;
 	let chart;
 	switch (name) {
 		case 'histogram-categorical':
@@ -62,6 +64,12 @@ export default function Chart(props){
 				data={data.data}
 			/>;
 			break;
+		case 'pie':
+			chart = <Pie2
+				RowsWillBeFixed={data.fixedPercent}
+				RowsWillBeDeleted={data.deletePercent}
+				CleanData={data.cleanPercent}
+			/>
 			
 	}
 	return chart;
