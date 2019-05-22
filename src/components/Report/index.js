@@ -7,11 +7,12 @@ import CorrelationMatrix from 'components/Modeling/Start/CorrelationMatrix'
 import VariableList from './VariableList'
 import VariableImpact from './Model/VariableImpact'
 import ModelProcessFlow from './Model/ModelProcessFlow'
-import Score, { PredictTable } from './Score'
+import AdvancedView, { PredictTable } from './Score'
 import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
 import { formatNumber } from 'util'
 import EN from '../../constant/en';
+
 const addComma = number => {
   if (Number.isNaN(number)) return number
   number = number.toString().split('')
@@ -47,6 +48,8 @@ class Report extends Component {
     processFlow: true
   }
 
+
+
   constructor(props) {
     console.log(props , 'dsadasdasdasdas ' )
     super(props)
@@ -58,6 +61,37 @@ class Report extends Component {
     window.rr = this
     console.log(this , 'this')
   }
+
+
+  @observable show = false
+  @observable sort = {
+    simple: {
+      key: 'name',
+      value: 1
+    },
+    advanced: {
+      key: 'Model Name',
+      value: 1
+    }
+  }
+  @observable metric = this.props.projectStore.list[0].measurement
+
+  handleSort = (view, key) => {
+    const sort = this.sort[view]
+    if (!sort) return
+    if (sort.key === key) sort.value = -sort.value
+    else {
+      sort.key = key
+      sort.value = 1
+    }
+    this.sort = { ...this.sort, [view]: sort }
+  }
+
+  handleChange = action(value => {
+    this.metric = value;
+    // if (window.localStorage)
+    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
+  });
 
   reset = () => {
     const project = this.props.projectStore.list
@@ -248,14 +282,15 @@ class Report extends Component {
             <h3 className={styles.blockTitle}>{EN.Charts} {list[0].problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>
             <div className={styles.blockRow}>
               {/*<Score models={[list[0].selectModel]} project={list[0]} />*/}
+              <AdvancedView models={list[0].models} project={list[0]}  sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} />
             </div>
           </div>}
 
-          {/*{this.isShow('processFlow') && <div className={classnames(styles.block, styles.processFlow)}>*/}
-          {/*  {this.checkBox('processFlow')}*/}
-          {/*  <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>*/}
-          {/*  <div className={styles.blockRow}><ModelProcessFlow model={project.selectModel} /></div>*/}
-          {/*</div>}*/}
+          {this.isShow('processFlow') && <div className={classnames(styles.block, styles.processFlow)}>
+            {this.checkBox('processFlow')}
+            <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>
+            <div className={styles.blockRow}><ModelProcessFlow model={list[0].selectModel} /></div>
+          </div>}
         </div>
       </div>
     )

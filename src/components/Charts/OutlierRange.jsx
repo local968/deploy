@@ -3,7 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import InputNum from 'rc-input-number';
 import { debounce } from 'lodash'
 import {Button} from 'antd'
-import './echarts.config'
+// import './echarts.config'
 import EN from '../../constant/en';
 import 'rc-input-number/assets/index.css'
 import styles from './styles.module.css';

@@ -40,31 +40,34 @@ export default class SimplifiedView extends Component {
   }
 
   show = () => {
+    console.log(1)
     const {project = {}} = this.props;
     const {target, colType, etlIndex} = project;
 
     if (!this.chartData[target]) {
       if (colType[target] === "Numerical") {
         const { min, max } = project.dataViews[target];
-        request.post({
-          url: '/graphics/histogram-numerical',
-          data: {
-            field: target,
-            id: etlIndex,
-            interval : (max - min) / 100
-          },
-        }).then((result) => this.showback(target, result.data));
+        console.log(target , 'target1')
+        // request.post({
+        //   url: '/graphics/histogram-numerical',
+        //   data: {
+        //     field: target,
+        //     id: etlIndex,
+        //     interval : (max - min) / 100
+        //   },
+        // }).then((result) => this.showback(target, result.data));
       } else {
         const {uniqueValues} = project.dataViews[target];
         data.size = uniqueValues > 8 ? 8 : uniqueValues;
-        request.post({
-          url: '/graphics/histogram-categorical',
-          data: {
-            field: target,
-            id: etlIndex,
-            size: uniqueValues > 8 ? 8 : uniqueValues,
-          },
-        }).then((result) => this.showback(target, result.data));
+        console.log(target , 'target2')
+        // request.post({
+        //   url: '/graphics/histogram-categorical',
+        //   data: {
+        //     field: target,
+        //     id: etlIndex,
+        //     size: uniqueValues > 8 ? 8 : uniqueValues,
+        //   },
+        // }).then((result) => this.showback(target, result.data));
       }
       return
     }

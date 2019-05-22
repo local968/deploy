@@ -5,7 +5,7 @@ import Slider from 'rc-slider'
 import InputNum from 'rc-input-number'
 import 'rc-input-number/assets/index.css'
 import 'rc-slider/assets/index.css'
-import './echarts.config'
+// import './echarts.config'
 import request from '../Request'
 import styles from './charts.module.css';
 import EN from "../../constant/en";
