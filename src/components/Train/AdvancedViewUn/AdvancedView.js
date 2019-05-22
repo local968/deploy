@@ -31,38 +31,38 @@ export default class AdvancedView extends Component {
       switch (sort.key) {
         case 'CVNN':
           {
-            const aModelData = formatNumber(aModel.score.CVNN);
-            const bModelData = formatNumber(bModel.score.CVNN);
+            const aModelData = (aModel.score.CVNN);
+            const bModelData = (bModel.score.CVNN);
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'RSquared':
           {
-            const aModelData = formatNumber(aModel.score.RSquared)
-            const bModelData = formatNumber(bModel.score.RSquared)
+            const aModelData = (aModel.score.RSquared)
+            const bModelData = (bModel.score.RSquared)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'RMSSTD':
           {
-            const aModelData = formatNumber(aModel.score.RMSSTD)
-            const bModelData = formatNumber(bModel.score.RMSSTD)
+            const aModelData = (aModel.score.RMSSTD)
+            const bModelData = (bModel.score.RMSSTD)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'CH Index':
           {
-            const aModelData = formatNumber(aModel.score.CH)
-            const bModelData = formatNumber(bModel.score.CH)
+            const aModelData = (aModel.score.CH)
+            const bModelData = (bModel.score.CH)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Silhouette Cosine':
           {
-            const aModelData = formatNumber(aModel.score.silhouette_cosine)
-            const bModelData = formatNumber(bModel.score.silhouette_cosine)
+            const aModelData = (aModel.score.silhouette_cosine)
+            const bModelData = (bModel.score.silhouette_cosine)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case 'Silhouette Euclidean':
           {
-            const aModelData = formatNumber(aModel.score.silhouette_euclidean)
-            const bModelData = formatNumber(bModel.score.silhouette_euclidean)
+            const aModelData = (aModel.score.silhouette_euclidean)
+            const bModelData = (bModel.score.silhouette_euclidean)
             return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
           }
         case EN.Time:
