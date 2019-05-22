@@ -5,6 +5,8 @@ const moment = require('moment')
 const axios = require('axios')
 const command = require('../command')
 const _ = require('lodash');
+const config = require('config')
+const qs = require('querystring')
 // const mq = require('../amqp')
 
 const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
@@ -905,22 +907,25 @@ wss.register('abortTrain', (message, socket) => {
     } catch (e) {
     }
     if (!stopId) return { status: 200, message: 'ok' }
-    // return command({ ...message, userId, requestId, stopId }, () => {
-    command.clearListener(stopId)
-    const statusData = {
-      train2Finished: true,
-      train2ing: false,
-      train2Error: false,
-      trainModel: null,
-      stopId: ''
-    }
-    if (isLoading) {
-      statusData.mainStep = 3
-      statusData.curStep = 3
-      statusData.lastSubStep = 1
-      statusData.subStepActive = 1
-    }
-    return createOrUpdate(projectId, userId, statusData)
+    return axios.get(`${config.services.BACK_API_SERVICE}/putTask?data=${JSON.stringify([{ ...message, userId, requestId, stopId }])}`).then(() => {
+      command.clearListener(stopId)
+      const statusData = {
+        train2Finished: true,
+        train2ing: false,
+        train2Error: false,
+        trainModel: null,
+        stopId: ''
+      }
+      if (isLoading) {
+        statusData.mainStep = 3
+        statusData.curStep = 3
+        statusData.lastSubStep = 1
+        statusData.subStepActive = 1
+      }
+      return createOrUpdate(projectId, userId, statusData)
+    })
+    // return command(, () => {
+
     // }, true)
   })
 })
