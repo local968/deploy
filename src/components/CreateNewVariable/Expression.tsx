@@ -30,6 +30,7 @@ interface ExpressionProps {
   left: () => void,
   right: () => void,
   addExp: (s: string) => void,
+  toogleTooltip: () => void,
   onFocus: (e: MouseEvent<HTMLInputElement>) => void
 }
 
@@ -38,7 +39,7 @@ interface ExpressionProps {
 // }
 
 function Expression(props: ExpressionProps) {
-  const {exp, deleteExp, left, right, addExp, setRange, onFocus, sign} = props //setRange
+  const {exp, deleteExp, left, right, addExp, setRange, onFocus, sign,toogleTooltip} = props //setRange
   // const [state, setState] = React.useState({
   //   isDelete: false
   // } as ExpressionState)
@@ -95,6 +96,7 @@ function Expression(props: ExpressionProps) {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     // console.log(state.isDelete, "valuevaluevaluevaluevaluevaluevalue" )
     // if (state.isDelete) return setDelete(false)
+    toogleTooltip();
     const value: string = e.target.value.trim()
     if (!value) return
     addExp(value)

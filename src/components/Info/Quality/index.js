@@ -322,7 +322,7 @@ class Summary extends Component {
       <div className={styles.summaryLeft}>
         <div className={styles.summaryTitle}><span>{EN.Summaryofyourdata}</span></div>
         <div className={styles.summaryTypeBox}>
-          {!!nullCount && <div className={styles.summaryType}>
+          {<div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }} />
             <span>{EN.CleanData}</span>
           </div>}
@@ -330,10 +330,10 @@ class Summary extends Component {
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }} />
             <span>{EN.DataTypeMismatch}</span>
           </div>}
-          <div className={styles.summaryType}>
+          {!!nullCount && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
-          </div>
+          </div>}
           {(problemType !== 'Outlier' && !!outlierCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
             <span>{EN.Outlier}</span>

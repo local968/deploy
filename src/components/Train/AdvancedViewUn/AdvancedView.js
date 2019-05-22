@@ -12,7 +12,7 @@ import ParallelPlots from "../../Charts/ParallelPlots";
 import ParallelPlot from './parallel-plot.png'
 import IconParallel from './icon-parallel.svg'
 import IconParallel2 from './icon-parallel2.svg'
-const {Option} = Select;
+const { Option } = Select;
 
 @inject('projectStore')
 @observer
@@ -164,12 +164,12 @@ class AdvancedModelTable extends Component {
     });
     return (
 
-        <div className={styles.advancedModelTableDiv}>
-          {header}
-          <div className={styles.advancedModelTable} >
-            {dataSource}
-          </div>
+      <div className={styles.advancedModelTableDiv}>
+        {header}
+        <div className={styles.advancedModelTable} >
+          {dataSource}
         </div>
+      </div>
 
     )
   }
@@ -208,20 +208,20 @@ class AdvancedModelTable extends Component {
               case 'RMSSTD':
                 return <RowCell key={11} data={score.RMSSTD} />;
               case 'CH Index':
-                return <RowCell key={9} data={score.CH} />;
+                return <RowCell key={9} data={score.CH} title={score.CH === 'null' ? EN.ClusterReason : score.CH} />;
               case 'Silhouette Cosine':
-                return <RowCell key={3} data={score.silhouette_cosine} />;
+                return <RowCell key={3} data={score.silhouette_cosine} title={score.silhouette_cosine === 'null' ? EN.ClusterReason : score.silhouette_cosine} />;
               case 'Silhouette Euclidean':
-                return <RowCell key={4} data={score.silhouette_euclidean} />;
+                return <RowCell key={4} data={score.silhouette_euclidean} title={score.silhouette_euclidean === 'null' ? EN.ClusterReason : score.silhouette_euclidean} />;
               case EN.Time:
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
               default:
                 return null
             }
           })}
-          <RowCell key='Parallel Plot' data={<a href='javascript:;' className={detail?styles.on:''}>
+          <RowCell key='Parallel Plot' data={<a href='javascript:;' className={detail ? styles.on : ''}>
             {
-              detail?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
+              detail ? <img src={IconParallel2} alt='' /> : <img src={IconParallel} alt='' />
             }
             Compute
           </a>} />
@@ -266,10 +266,10 @@ class RegressionDetailCurves extends Component {
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} style={{
           minWidth: 0,
-          backgroundColor:'transparent',
+          backgroundColor: 'transparent',
           padding: '20px 0 0 190px',
         }} >
-          <img style={{marginRight:12}} src={ParallelPlot} alt=''/>Parallel Plot
+          <img style={{ marginRight: 12 }} src={ParallelPlot} alt='' />Parallel Plot
           {/*{thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}*/}
         </div>
         <div className={styles.rightPanel} >

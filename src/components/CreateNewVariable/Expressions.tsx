@@ -1,5 +1,5 @@
-import React, { ChangeEvent, MouseEvent } from 'react';
-import { withStyles } from '@material-ui/core/styles';  //Coordinate
+import React, {ChangeEvent, MouseEvent} from 'react';
+import {withStyles} from '@material-ui/core/styles';  //Coordinate
 import {
   List,
   ListItem,
@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
-import { Exp, Coordinate, Type } from './model/Coordinate';
+import {Exp, Coordinate, Type} from './model/Coordinate';
 import Expression from './Expression'
 import _ from 'lodash'
 // import functions from './functions'
@@ -49,6 +49,16 @@ const useStyles = withStyles({
     maxHeight: '300px',
     overflowY: 'auto',
     backgroundColor: '#fff'
+  },
+  suggPape: {
+    maxHeight: '300px',
+    overflowY: 'auto',
+  },
+  grammar: {
+    padding: '8px 12px',
+    maxWidth: '300px',
+    wordWrap: 'break-word',
+    backgroundColor: '#f0f4f8',
   }
 })
 
@@ -63,6 +73,7 @@ interface ExpressionsProps {
   deleteExp: () => void,
   left: () => void,
   right: () => void,
+  func: Coordinate | undefined,
   addExp: (s: string) => void,
   changeExpLabel: (s: string) => void,
   handleFunction: (v: Coordinate, i: number) => void,
@@ -74,6 +85,7 @@ interface ExpressionsProps {
 interface ExpressionsState {
   suggestions: Array<Coordinate>,
   isOpen: boolean,
+  isTipOpen: boolean,
   el: string
 }
 
@@ -86,11 +98,13 @@ function Expressions(props: ExpressionsProps) {
   const {
     classes, exps, index, setIndex, addLine, deleteIndex, setRange,
     deleteExp, left, right, addExp, handleFunction, handleVariables, changeExpLabel,
-    variables, functions
+    variables, functions, func
   } = props
+
   const [state, setState] = React.useState({
     suggestions: [],
     isOpen: false,
+    isTipOpen: false,
     el: '',
   } as ExpressionsState)
 
@@ -113,7 +127,7 @@ function Expressions(props: ExpressionsProps) {
 
   const getRecommendValue = () => {
     const currentExp: Exp = exps[index];
-    const { value, range: [start, end] } = currentExp
+    const {value, range: [start, end]} = currentExp
     let obj: recommendObj = {
       value: '',
       start: end
@@ -133,6 +147,13 @@ function Expressions(props: ExpressionsProps) {
     setState({
       ...state,
       isOpen: false
+    })
+  }
+
+  const hideGrammarTip = () => {
+    setState({
+      ...state,
+      isTipOpen: false
     })
   }
 
@@ -162,7 +183,7 @@ function Expressions(props: ExpressionsProps) {
   }
 
   const estimateAdd = (exp, k, expSize) => {
-    const { label, value } = exp;
+    const {label, value} = exp;
     return !label || !_.size(value) || k + 1 != expSize;
   }
 
@@ -170,7 +191,6 @@ function Expressions(props: ExpressionsProps) {
     return k + 1 != expSize || !k;
   }
 
-  // todo /\w+[,)]/g
   const selectItem = (v: Coordinate) => () => {
     switch (v.type) {
       case Type.Func:
@@ -189,29 +209,29 @@ function Expressions(props: ExpressionsProps) {
   if (input) {
     input.focus()
   }
-
   return <List
     className={classes.list}
     subheader={<ListSubheader>
       <form className={classes.form}>
-        <ListItemText className={classes.label} primary='变量名称' primaryTypographyProps={{ align: 'left' }} />
-        <ListItemText className={classes.text} primary=' ' />
-        <ListItemText primary='公式' primaryTypographyProps={{ align: 'left' }} />
+        <ListItemText className={classes.label} primary='变量名称' primaryTypographyProps={{align: 'left'}}/>
+        <ListItemText className={classes.text} primary=' '/>
+        <ListItemText primary='公式' primaryTypographyProps={{align: 'left'}}/>
       </form>
     </ListSubheader>}>
     {exps.map((exp: Exp, k: number) => <ListItem key={k} selected={k === index} onClick={(e) => selectOne(k)(e)}>
       <form className={classes.form}>
         <Input className={classes.label} value={exp.label} onChange={changeInput(k)}
-          inputProps={{ style: { backgroundColor: '#fff' } }} />
-        <ListItemText primary='=' className={classes.text} />
+               inputProps={{style: {backgroundColor: '#fff'}}}/>
+        <ListItemText primary='=' className={classes.text}/>
         <Expression exp={exp} setRange={setRange} deleteExp={deleteExp} left={left} right={right}
-          addExp={addExp} onFocus={onFocus(k)} sign={k} />
+                    addExp={addExp} onFocus={onFocus(k)} sign={k}
+                    toogleTooltip={() => setState({...state, isTipOpen: true})}/>
         <div className={classes.tools}>
           <IconButton onClick={deleteOne(k)} disabled={!!estimateDelete(k, expSize)}>
-            <DeleteIcon />
+            <DeleteIcon/>
           </IconButton>
           <IconButton onClick={addLine} disabled={!!estimateAdd(exp, k, expSize)}>
-            <AddIcon />
+            <AddIcon/>
           </IconButton>
         </div>
       </form>
@@ -220,8 +240,8 @@ function Expressions(props: ExpressionsProps) {
       <Button fullWidth size='large' color='primary' variant="contained" onClick={addLine}>+</Button>
     </ListItem> */}
     <Popper open={state.isOpen && !!recommend.value} anchorEl={input} placement='bottom-start'
-      className={classes.popper}>
-      <Paper>
+            className={classes.popper}>
+      <Paper className={classes.suggPape}>
         <ClickAwayListener onClickAway={handleClickAway}>
           <MenuList>
             {getSuggestions()
@@ -234,6 +254,14 @@ function Expressions(props: ExpressionsProps) {
                 </MenuItem>
               })}
           </MenuList>
+        </ClickAwayListener>
+      </Paper>
+    </Popper>
+    <Popper open={!!func && state.isTipOpen} anchorEl={input} placement='bottom-end'
+            className={classes.popper}>
+      <Paper>
+        <ClickAwayListener onClickAway={hideGrammarTip}>
+          <div className={classes.grammar}>{func ? func.grammar : null}</div>
         </ClickAwayListener>
       </Paper>
     </Popper>
