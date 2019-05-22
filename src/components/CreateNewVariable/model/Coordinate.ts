@@ -2,6 +2,7 @@ export interface Coordinate {
   name?: string;
   type?: Type;
   value?: string;
+  varType?: string
 }
 
 export enum Type {

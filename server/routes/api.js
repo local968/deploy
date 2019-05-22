@@ -9,6 +9,8 @@ const command = require('../command')
 const api = require('../scheduleApi')
 const { userDeployRestriction } = require('restriction')
 const wss = require('../webSocket')
+const Papa = require('papaparse')
+const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
 const router = new Router()
 
@@ -28,7 +30,7 @@ router.post('/deploy', async (req, res) => {
   const deployment = await api.getDeployment(deploymentId);
   if (!deployment) return errorRes(10001)
   const { projectId, modelName, modelType, userId } = deployment
-  const host = JSON.parse(await redis.hget(`project:${projectId}`, 'host'))
+  // const host = JSON.parse(await redis.hget(`project:${projectId}`, 'host'))
   let lineCount = 0
 
   // token
@@ -41,30 +43,54 @@ router.post('/deploy', async (req, res) => {
   // data format
   if (!req.body.data) return errorRes(10002)
   let data
+  let rawData
   try {
-    data = JSON.parse(req.body.data)
-    lineCount = data.length
+    rawData = JSON.parse(req.body.data)
+    lineCount = rawData.length
   } catch (e) {
     return errorRes(10004)
   }
-  if (!data || !Array.isArray(data) || data.length === 0) return errorRes(10005)
-  data = array2csv(data)
+  if (!rawData || !Array.isArray(rawData) || rawData.length === 0) return errorRes(10005)
+  data = rawData.map((r, i) => {
+    const row = {}
+    for (let key in Object.keys(r)) row[encodeURIComponent(key)] = encodeURIComponent(r[key])
+    r[encodeURIComponent('__no')] = i;
+    return r
+  })
+  data = Papa.unparse(data)
   if (lineCount > 10000 || data.length > 1024 * 1024 * 100) return errorRes(10012)
 
   const name = `api-deploy-${uuid.v4()}`
 
   // upload
-  let fileId
+  let index
   try {
-    const uploadResponse = await uploadData(data, name, userId, projectId, `http://${host}/upload`)
-    if (uploadResponse.data.status === 200) fileId = uploadResponse.data.fileId
-    else return errorRes(10007, uploadResponse.data && uploadResponse.data.message)
+    const createIndexResponse = await axios.get(`${esServicePath}/etls/createIndex`)
+    if (createIndexResponse.data.status !== 200) return errorRes(10016)
+    index = createIndexResponse.data.index
+    const uploadResponse = await axios.request({
+      url: `${esServicePath}/etls/${index}/upload`,
+      headers: { 'Content-Type': "text/plain" },
+      method: "POST",
+      data,
+    })
+    if (uploadResponse.data.status !== 200) return errorRes(10007)
   } catch (e) {
     console.error(e)
     return errorRes(10006)
   }
-  const file = await api.getFile(fileId)
-  if(!file) return errorRes(10015)
+
+  // etl
+  let etlIndex
+  try {
+    const result = await redis.hmget(`project:${projectId}:model:${deployment.modelName}`, "stats")
+    let [stats] = result
+    stats = JSON.parse(stats)
+    etlIndex = await etl(index, stats)
+  } catch (e) {
+    console.error(e)
+    return errorRes(10016)
+  }
 
   // check user level usage
   const [level, createdTime] = await redis.hmget(`user:${userId}`, 'level', 'createdTime')
@@ -77,17 +103,25 @@ router.post('/deploy', async (req, res) => {
   await redis.incrby(restrictQuery, lineCount)
 
   // generate request
+  const commandMap = {
+    'Clustering': 'clustering.deploy',
+    'Outlier': 'outlier.deploy',
+    'Classification': 'clfreg.deploy',
+    'Regression': 'clfreg.deploy'
+  }
   const request = {
     requestId: name,
-    projectId: projectId,
-    userId: userId,
-    csvLocation: [file.path],
+    projectId,
+    userId,
+    csvLocation: [etlIndex],
     ext: ['.csv'],
-    command: "deploy2",
+    command: commandMap[deployment.modelType],
     solution: deployment.modelName,
     actionType: 'deployment'
   }
-  if (modelType !== "Regression") request.cutoff = await api.getCutOff(projectId, modelName)
+  try {
+    if (modelType === "Classification") request.cutoff = await api.getCutOff(projectId, modelName)
+  } catch (e) { }
   if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
   let result = {}
   await command(request, data => {
@@ -96,65 +130,76 @@ router.post('/deploy', async (req, res) => {
   })
 
   // handle result
-  if (result['process error']) {
+  if (result['processError']) {
     api.decreaseLines(restrictQuery, lineCount)
-    return errorRes(10008, result['process error'])
+    return errorRes(10008, result['processError'])
   }
-  if (!result.resultPath || result.resultPath.length === 0) {
-    return errorRes(10009, result.message)
-  }
+  if (!result.deployData || result.deployData.length === 0) return errorRes(10009, result.message)
+
   let resultData
   try {
-    resultData = await axios.get(`http://${host}/download/${result.resultPath}`)
+    const deployResultResponse = await axios.get(result.deployData)
+    if (!deployResultResponse.data || deployResultResponse.data.length === 0) return errorRes(10014)
+    resultData = deployResultResponse.data
   } catch (e) {
     console.error(e)
     return errorRes(10013)
   }
-  if (!resultData.data) return errorRes(10014)
 
   res.json({
-    result: csv2array(resultData.data),
+    result: combineResult(rawData, resultData),
     code: 10000,
     message: 'ok'
   })
 })
 
-function array2csv(data) {
-  let result = ''
-  const keys = [...(data.reduce((prev, curr) => {
-    Object.keys(curr).map(prev.add.bind(prev))
-    return prev
-  }, new Set()))]
-  result += keys.join(',')
-  result += '\n'
-  data.forEach(d => {
-    const line = keys.map(k => d[k] || '')
-    result += line.join(',')
-    result += '\n'
+const combineResult = (source, result) => {
+  return source.map(s => {
+    s = Object.assign({}, s, result.find(r => r.__no === s.__no))
+    delete s.__no
+    return s
   })
-  return result
 }
 
-function csv2array(csv) {
-  const headers = csv.substring(0, csv.indexOf('\n')).split(',')
-  const datas = csv.split('\n').slice(1).map(line => line.split(','))
-  return datas.map(line => line.reduce((prev, curr, index) => {
-    if (curr && curr.length > 0) prev[headers[index]] = curr
-    return prev
-  }, {}))
-}
+// function array2csv(data) {
+//   let result = ''
+//   const keys = [...(data.reduce((prev, curr) => {
+//     Object.keys(curr).map(prev.add.bind(prev))
+//     return prev
+//   }, new Set()))]
+//   result += keys.join(',')
+//   result += '\n'
+//   data.forEach(d => {
+//     const line = keys.map(k => d[k] || '')
+//     result += line.join(',')
+//     result += '\n'
+//   })
+//   return result
+// }
 
-const uploadData = (data, name, userId, projectId, path) => {
-  const token = crypto.createHash('md5').update(userId + 'deploy' + data.length + config.secret).digest('hex')
-  return axios.post(`${path}?token=${token}&userId=${userId}&type=deploy&fileSize=${data.length}&projectId=${projectId}`, data, {
-    headers: {
-      'content-disposition': `attachment; filename="${name}.csv"`,
-      'content-type': 'application/octet-stream',
-      'content-range': `bytes 0-${data.length - 1}/${data.length}`,
-      'session-id': moment().valueOf(),
-      'backend': config.nginxBackend
-    },
-    onUploadProgress: console.log
+// function csv2array(csv) {
+//   const headers = csv.substring(0, csv.indexOf('\n')).split(',')
+//   const datas = csv.split('\n').slice(1).map(line => line.split(','))
+//   return datas.map(line => line.reduce((prev, curr, index) => {
+//     if (curr && curr.length > 0) prev[headers[index]] = curr
+//     return prev
+//   }, {}))
+// }
+
+const etl = async (index, stats) => {
+  const response = await axios.post(`${esServicePath}/etls/${index}/etl`, stats)
+  const { etlIndex, opaqueId } = response.data
+  return await new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
+      if (data.task) {
+        if (!data.task.status) return
+      }
+      else {
+        clearInterval(interval)
+        resolve(etlIndex)
+      }
+    }, 1000)
   })
 }
 
@@ -183,7 +228,9 @@ const errors = {
   10012: 'exceed prediction api limit',
   10013: 'download predict result failed',
   10014: 'predict result is empty',
-  10015: 'file not exist'
+  10015: 'file not exist',
+  10016: 'create index failed',
+  10017: 'etl failed'
 }
 
 
