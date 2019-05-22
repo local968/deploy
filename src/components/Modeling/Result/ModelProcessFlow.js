@@ -61,7 +61,8 @@ export default class ModelProcessFlow extends Component {
 			'random_trees_embedding': 'Random Trees embed.',
 			'select_percentile_classification': 'Select Percentile',
 			'select_percentile_regression': 'Select Percentile',
-			'select_rates': 'Select Rates'
+			'select_rates': 'Select Rates',
+			'liblinear_svc_preprocessor':'Liblinear Svc Preprocessor'
 		};
 
 		return <dl>
