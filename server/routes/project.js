@@ -907,7 +907,7 @@ wss.register('abortTrain', (message, socket) => {
     } catch (e) {
     }
     if (!stopId) return { status: 200, message: 'ok' }
-    return axios.get(`${config.services.BACK_API_SERVICE}/putTask?data=${JSON.stringify([{ ...message, userId, requestId, stopId }])}`).then(() => {
+    return axios.get(`${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([{ ...message, userId, requestId, stopId }])}`).then(() => {
       command.clearListener(stopId)
       const statusData = {
         train2Finished: true,
