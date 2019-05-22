@@ -183,7 +183,7 @@ const OutlierTable = observer((props) => {
         case "score":
           return (a.score.score - b.score.score) * value
         case 'rate':
-          return ((a.dataFlow[0].contamination || 0) - (b.dataFlow[0].contamination || 0)) * value
+          return (a.rate - b.rate) * value
         case "name":
         default:
           return a.modelName > b.modelName ? value : -value
