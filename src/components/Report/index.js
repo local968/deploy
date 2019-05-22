@@ -145,11 +145,11 @@ class Report extends Component {
           <h3 className={styles.blockTitle}>{EN.DataQuality}</h3>
           <Summary project={list[0]} />
         </div>}
-        {/*{this.isShow('dataAnalysis') && <div className={styles.block}>*/}
-        {/*  {this.checkBox('dataAnalysis')}*/}
-        {/*  <h3 className={styles.blockTitle}>{EN.ExploratoryDataAnalysis}</h3>*/}
-        {/*  <div className={styles.blockRow}><VariableList project={project} /></div>*/}
-        {/*</div>}*/}
+        {this.isShow('dataAnalysis') && <div className={styles.block}>
+          {this.checkBox('dataAnalysis')}
+          <h3 className={styles.blockTitle}>{EN.ExploratoryDataAnalysis}</h3>
+          <div className={styles.blockRow}><VariableList project={list[0]} /></div>
+        </div>}
 
 
         <div className={styles.modelResult}>
@@ -164,35 +164,35 @@ class Report extends Component {
           {this.isShow('metrics') && <div className={classnames(styles.block, styles.VariableImpact)}>
             {this.checkBox('metrics')}
             <h3 className={styles.blockTitle}>{EN.Metrics}</h3>
-            {/*{project.problemType === 'Regression' && <div className={styles.metrics}>*/}
-            {/*  <div className={classnames(styles.metricsRow, styles.metricsHeader)}>*/}
-            {/*    <span className={styles.metricsCell}></span>*/}
-            {/*    <span className={styles.metricsCell}>R²</span>*/}
-            {/*    <span className={styles.metricsCell}>Adjusted R²</span>*/}
-            {/*    <span className={styles.metricsCell}>MSE</span>*/}
-            {/*    <span className={styles.metricsCell}>RMSE</span>*/}
-            {/*    <span className={styles.metricsCell}>NRMSE</span>*/}
-            {/*    <span className={styles.metricsCell}>MAE</span>*/}
-            {/*  </div>*/}
-            {/*  <div className={styles.metricsRow}>*/}
-            {/*    <span className={styles.metricsCell}>{EN.Validation}</span>*/}
-            {/*    <span className={styles.metricsCell} title={vs.r2}>{formatNumber(vs.r2)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={vs.adjustR2}>{formatNumber(vs.adjustR2)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={vs.mse}>{formatNumber(vs.mse)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={vs.rmse}>{formatNumber(vs.rmse)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={vs.nrmse}>{formatNumber(vs.nrmse)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={vs.mae}>{formatNumber(vs.mae)}</span>*/}
-            {/*  </div>*/}
-            {/*  <div className={styles.metricsRow}>*/}
-            {/*    <span className={styles.metricsCell}>{EN.Holdout}</span>*/}
-            {/*    <span className={styles.metricsCell} title={hs.r2}>{formatNumber(hs.r2)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={hs.adjustR2}>{formatNumber(hs.adjustR2)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={hs.mse}>{formatNumber(hs.mse)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={hs.rmse}>{formatNumber(hs.rmse)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={hs.nrmse}>{formatNumber(hs.nrmse)}</span>*/}
-            {/*    <span className={styles.metricsCell} title={hs.mae}>{formatNumber(hs.mae)}</span>*/}
-            {/*  </div>*/}
-            {/*</div>}*/}
+            {list[0].problemType === 'Regression' && <div className={styles.metrics}>
+              <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
+                <span className={styles.metricsCell}></span>
+                <span className={styles.metricsCell}>R²</span>
+                <span className={styles.metricsCell}>Adjusted R²</span>
+                <span className={styles.metricsCell}>MSE</span>
+                <span className={styles.metricsCell}>RMSE</span>
+                <span className={styles.metricsCell}>NRMSE</span>
+                <span className={styles.metricsCell}>MAE</span>
+              </div>
+              <div className={styles.metricsRow}>
+                <span className={styles.metricsCell}>{EN.Validation}</span>
+                <span className={styles.metricsCell} title={vs.r2}>{formatNumber(vs.r2)}</span>
+                <span className={styles.metricsCell} title={vs.adjustR2}>{formatNumber(vs.adjustR2)}</span>
+                <span className={styles.metricsCell} title={vs.mse}>{formatNumber(vs.mse)}</span>
+                <span className={styles.metricsCell} title={vs.rmse}>{formatNumber(vs.rmse)}</span>
+                <span className={styles.metricsCell} title={vs.nrmse}>{formatNumber(vs.nrmse)}</span>
+                <span className={styles.metricsCell} title={vs.mae}>{formatNumber(vs.mae)}</span>
+              </div>
+              <div className={styles.metricsRow}>
+                <span className={styles.metricsCell}>{EN.Holdout}</span>
+                <span className={styles.metricsCell} title={hs.r2}>{formatNumber(hs.r2)}</span>
+                <span className={styles.metricsCell} title={hs.adjustR2}>{formatNumber(hs.adjustR2)}</span>
+                <span className={styles.metricsCell} title={hs.mse}>{formatNumber(hs.mse)}</span>
+                <span className={styles.metricsCell} title={hs.rmse}>{formatNumber(hs.rmse)}</span>
+                <span className={styles.metricsCell} title={hs.nrmse}>{formatNumber(hs.nrmse)}</span>
+                <span className={styles.metricsCell} title={hs.mae}>{formatNumber(hs.mae)}</span>
+              </div>
+            </div>}
             {list[0].problemType === 'Classification' && <div className={styles.metrics}>
               <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
                 <span className={styles.metricsCell}></span>
@@ -243,11 +243,13 @@ class Report extends Component {
           {/*</div>}*/}
 
 
-          {/*{this.isShow('score') && <div className={classnames(styles.block, styles.score)}>*/}
-          {/*  {this.checkBox('score')}*/}
-          {/*  <h3 className={styles.blockTitle}>{EN.Charts} {project.problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>*/}
-          {/*  <div className={styles.blockRow}><Score models={[project.selectModel]} project={project} /></div>*/}
-          {/*</div>}*/}
+          {this.isShow('score') && <div className={classnames(styles.block, styles.score)}>
+            {this.checkBox('score')}
+            <h3 className={styles.blockTitle}>{EN.Charts} {list[0].problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>
+            <div className={styles.blockRow}>
+              {/*<Score models={[list[0].selectModel]} project={list[0]} />*/}
+            </div>
+          </div>}
 
           {/*{this.isShow('processFlow') && <div className={classnames(styles.block, styles.processFlow)}>*/}
           {/*  {this.checkBox('processFlow')}*/}
