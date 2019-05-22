@@ -524,15 +524,15 @@ class Summary extends Component {
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }} />
             <span>{EN.CleanData}</span>
           </div>
-          <div className={styles.summaryType}>
+          {!!mismatchRow && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }} />
             <span>{EN.DataTypeMismatch}</span>
-          </div>
-          <div className={styles.summaryType}>
+          </div>}
+          {!!nullCount && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
-          </div>
-          {problemType !== 'Classification' && <div className={styles.summaryType}>
+          </div>}
+          {(problemType !== 'Classification' && !!outlierRow) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
             <span>{EN.Outlier}</span>
           </div>}
