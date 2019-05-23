@@ -260,7 +260,7 @@ export default class AdvancedView extends Component {
             <div className={styles.advancedBlock}>
               <div className={styles.advancedAlgorithmList}>
                 {project.problemType === 'Clustering' ? Algorithms[project.problemType].map((v, k) => {
-                  const tooLarge = project.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []
+                  const tooLarge = project.totalLines > 50000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : project.totalLines > 20000 ? ['SpectralClustering'] : []
                   const notSupport = project.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : []
                   const checked = project.algorithms.includes(v.value)
                   return <AlgorithmCheckBox hidden={hidden} key={k} tooLarge={tooLarge.includes(v.value)} notSupport={notSupport.includes(v.value)} checked={checked} value={v} handleCheck={this.handleCheck} />

@@ -1304,20 +1304,27 @@ export default class Project {
     switch (problemType) {
       case 'Clustering':
         command = 'clustering.train';
-        const algorithms = this.totalLines > 20000 ? [
+        const algorithms = this.totalLines > 50000 ? [
           'KMeans',
           'GMM',
           'Birch',
           'MeanShift',
+        ] : this.totalLines > 20000 ? [
+          'KMeans',
+          'GMM',
+          'Birch',
+          'MeanShift',
+          'Agg',
+          'DBSCAN'
         ] : [
-            'KMeans',
-            'GMM',
-            'Birch',
-            'Agg',
-            'SpectralClustering',
-            'DBSCAN',
-            'MeanShift',
-          ]
+              'KMeans',
+              'GMM',
+              'Birch',
+              'Agg',
+              'SpectralClustering',
+              'DBSCAN',
+              'MeanShift',
+            ]
         trainData = {
           kType: "auto",
           kValue: undefined,
@@ -1496,7 +1503,7 @@ export default class Project {
     switch (problemType) {
       case 'Clustering':
         command = 'clustering.train';
-        const disableItems = [...(this.totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : [])]
+        const disableItems = [...(this.totalLines > 20000 ? ['SpectralClustering'] : []), ...(this.totalLines > 50000 ? ['Agg', 'DBSCAN'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : [])]
 
         trainData = {
           kType: this.kType,
@@ -2142,10 +2149,10 @@ export default class Project {
   }
 
 
-  generateReport = async (modelId , aaa) => {
-console.log(aaa)
+  generateReport = async (modelId, aaa) => {
+    console.log(aaa)
     // aaa.routing.history.push('/report')
-    console.log(this , 'ttttttttttttttttttttttt')
+    console.log(this, 'ttttttttttttttttttttttt')
 
     // const data = {
     //   field: "sex",
@@ -2169,12 +2176,14 @@ console.log(aaa)
         "data": {
           "field": "mitoses",
           "id": this.etlIndex
-        }},{
+        }
+      }, {
         "name": "histogram-categorical",
         "data": {
           "field": "clump_thickness",
           "id": this.etlIndex
-        }}],
+        }
+      }],
     }).then(value => {
       console.log(value)
       //   chartDate
@@ -2191,11 +2200,11 @@ console.log(aaa)
     //
     // const report = async (modelId) => {
     //   changeReportProgress('initializing report.', 0)
-       const model = this.models.find(m => m.id === modelId)
+    const model = this.models.find(m => m.id === modelId)
 
     const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
 
-    console.log(json ,' jjjjjjjjjjjjjjjj')
+    console.log(json, ' jjjjjjjjjjjjjjjj')
     //   // preImportance
     //   this.preImportance = null
     //
