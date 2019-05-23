@@ -1,8 +1,11 @@
 export interface Coordinate {
+  id?: string;
   name?: string;
   type?: Type;
   value?: string;
   varType?: string
+  grammar?: string
+  params?: number
 }
 
 export enum Type {

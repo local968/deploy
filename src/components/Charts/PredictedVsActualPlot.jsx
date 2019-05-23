@@ -21,16 +21,14 @@ export default class PredictedVsActualPlot extends PureComponent{
 	}
 
 	async componentDidMount(url=this.props.url) {
-		let data;
-		if(this.props.data){
-			data = this.props.data
-		}else{
-			data = await request.post({
+		let data = this.props.data;
+		if(!data){
+			data = (await request.post({
 				url:'/graphics/predicted-vs-actual-plot',
 				data:{
 					url,
 				},
-			}).data;
+			})).data;
 		}
 		
 		data[0].name = '真实值';

@@ -3,7 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import InputNum from 'rc-input-number';
 import { debounce } from 'lodash'
 import {Button} from 'antd'
-import './echarts.config'
+// import './echarts.config'
 import EN from '../../constant/en';
 import 'rc-input-number/assets/index.css'
 import styles from './styles.module.css';
@@ -150,6 +150,11 @@ export default class OutlierRange extends PureComponent{
 							const p = Math.floor(Math.log(+num) / Math.LN10).toFixed(3);
 							const n = (+num * Math.pow(10, -p)).toFixed(3);
 							return +n + 'e' + +p;
+						}else if(+num<-100000){
+							num = -num;
+							const p = Math.floor(Math.log(+num) / Math.LN10).toFixed(3);
+							const n = (+num * Math.pow(10, -p)).toFixed(3);
+							return '-'+n + 'e' + +p;
 						}
 						return num;
 					}
@@ -219,7 +224,7 @@ export default class OutlierRange extends PureComponent{
 					step={0.01}
 					precision={2}
 					value={_low}
-					style={{ width: 100 }}
+					style={{ minWidth: 100 }}
 					onChange={(start)=>{
 						this.setState({
 							selectArea:[start,end],
@@ -232,7 +237,7 @@ export default class OutlierRange extends PureComponent{
 					step={0.01}
 					precision={2}
 					value={_high}
-					style={{ width: 100 }}
+					style={{ minWidth: 100 }}
 					onChange={(end)=>{
 						this.setState({
 							selectArea:[start,end],

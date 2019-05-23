@@ -1,9 +1,337 @@
+.modelStart {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  padding: 0 10%;
+}
+
+.startTitle {
+  display: flex;
+  margin: 0.45em 0;
+  font-family: HelveticaNeue;
+}
+
+.startTitle span {
+  font-size: 1.5rem;
+}
+
+.trainBox {
+  display: flex;
+  flex-direction: column;
+  width: 4.5em;
+  height: 4.5em;
+  border-radius: 5px;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
+  border: solid 1px #c4cbd7;
+  position: relative;
+  margin: 0 auto
+}
+
+.train {
+  display: flex;
+  flex: 0 0 0.4em;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  width: 100%;
+  border: none;
+  outline: none;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.train span {
+  font-family: Arial;
+  font-size: 1rem;
+  color: #ffffff;
+  display: flex;
+}
+
+.trainBlock {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.trainRecommend {
+  display: flex;
+  position: absolute;
+  left: 0.3em;
+  top: 0.2em;
+}
+
+.trainRecommend span {
+  font-size: 0.875rem;
+}
+
+.trainImg {
+  display: flex;
+  margin-top: 1.1em;
+  flex: none;
+}
+
+.trainImg img {
+  width: 130px;
+  height: 120px;
+}
+
+.trainName {
+  display: flex;
+  justify-content: center;
+  margin: 0.2em 0;
+}
+
+.trainName span {
+  display: flex;
+  font-size: 1.5rem;
+}
+
+.trainDesc {
+  display: flex;
+  justify-content: center;
+  margin: 0.13em 0.5em;
+}
+
+.trainDesc span {
+  font-size: 0.875rem;
+  display: flex;
+  line-height: 1.43;
+  color: #747473;
+}
+
+.trainWarp {
+  display: flex;
+  flex: none;
+}
+
+.trainSep {
+  display: flex;
+  flex: none;
+  width: 0.4em;
+}
+
+.advancedModel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+
+.advancedContent {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  margin: -0.2em -0.5em;
+}
+
+.tabBox {
+  background-color: #ffffff;
+  box-shadow: 0 -3px 20px 0 rgba(0, 0, 0, 0.27);
+  display: flex;
+  flex: none;
+  justify-content: center;
+  padding-top: 0.15em;
+  z-index: 2;
+}
+
+.tab {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  width: 3.2em;
+  border-bottom: 4px solid transparent;
+  cursor: pointer;
+  padding: 0.15em 0;
+}
+
+.tab.active {
+  border-bottom-color: #1d2b3c;
+}
+
+.tab span {
+  font-family: HelveticaNeue;
+  font-size: 1.125rem;
+  line-height: 1.15;
+  color: #979797;
+}
+
+.tab.active span {
+  color: #1d2b3c;
+}
+
+.simplified {
+  display: flex;
+  flex: none;
+  padding: 0.35em 0.65em;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  background-color: #fff;
+}
+
+.simplifiedLoad {
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0.25em;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.targetTable {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  border: solid 0.5px #979797;
+  max-width: 9em;
+}
+
+.targetHead {
+  display: flex;
+  flex: none;
+  padding: 0.1em 0;
+  margin: 0 0.2em;
+  border-bottom: 1px solid #000;
+}
+
+.targetRow {
+  display: flex;
+  flex: none;
+  padding: 0.1em 0;
+  margin: 0 0.2em;
+}
+
+.targetCell {
+  display: flex;
+  flex: 1 1;
+  width: 0;
+  padding: 0 0.05em;
+  align-items: center;
+  position: relative;
+}
+
+.targetCell span {
+  font-family: SanFranciscoText;
+  color: #4a4a4a;
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.large {
+  flex: 2 1;
+}
+
+.targetName {
+  flex: 2 1;
+}
+
+.targetName span {
+  font-size: 1.125rem;
+}
+
+/* .targetHistogram {
+  flex: 2 1;
+  cursor: pointer;
+} */
+
+.targetHistogram img {
+  margin-right: 0.05em;
+}
+
+.targetHistogram span {
+  text-decoration-line: underline;
+  color: #448eed;
+}
+
+.simplifiedText {
+  display: flex;
+  flex: none;
+  margin: 0.15em 0;
+}
+
+.simplifiedText span {
+  font-family: HelveticaNeue;
+  font-size: 1.125rem;
+  line-height: 1.15;
+  color: #4a4a4a;
+}
+
+.tool {
+  display: flex;
+  flex: none;
+  line-height: 0.4em;
+  flex-wrap: wrap;
+}
+
+.toolSelect {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin-right: 0.45em;
+}
+
+.toolSelect select {
+  font-family: HelveticaNeue;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: #4a4a4a;
+  border-radius: 5px;
+  background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+  border: solid 1px #c4cbd7;
+  height: 100%;
+  padding: 0 1rem;
+}
+
+.toolLabel {
+  display: flex;
+  flex: none;
+  margin-right: 0.15em;
+}
+
+.toolLabel span {
+  height: 1.2;
+  font-family: HelveticaNeue;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+.toolButton {
+  display: flex;
+  flex: none;
+  border-radius: 5px;
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  align-items: center;
+  padding: 0 0.3em;
+  cursor: pointer;
+}
+
+.toolButton span {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.toolCheck {
+  margin-left: auto;
+}
+
 .table {
   display: flex;
   flex: none;
   flex-direction: column;
-  /* margin: 0.1em 0; */
-  /* border: solid 0.5px #757575; */
+  margin: 0.1em 0;
+  border: solid 0.5px #757575;
 }
 
 .table span {
@@ -52,7 +380,7 @@
   flex: none;
   flex-direction: column;
   margin: 0.1em 0;
-  max-height: 5em;
+  height: 2.6em;
   overflow-x: hidden;
   overflow-y: scroll;
 }
@@ -149,113 +477,684 @@
   width: 100%;
 }
 
-.targetTable {
+.bottom {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.2em;
+  flex: none;
+}
+
+.bottom button {
+  display: flex;
+  padding: 0.1em 0;
+  width: 1.5em;
+  outline: none;
+  border: none;
+  margin: 0 0.1em;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid #4a4a4a;
+  border-radius: 5px;
+}
+
+.save {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+}
+
+.save span {
+  font-family: Arial;
+  font-size: 0.875rem;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.cancel {
+  background: #fff;
+  color: #4a4a4a;
+}
+
+.cancel span {
+  font-family: Arial;
+  font-size: 0.875rem;
+  color: #4a4a4a;
+  line-height: 1.1;
+}
+
+.advanced {
   display: flex;
   flex: none;
+  padding: 0.2em 0.65em;
   flex-direction: column;
-  border: solid 0.5px #979797;
-  max-width: 9em;
-  margin-bottom: 20px;
+  position: relative;
 }
 
-.targetHead {
+.advancedRow {
   display: flex;
   flex: none;
-  padding: 0.1em 0;
-  margin: 0 0.2em;
-  border-bottom: 1px solid #000;
+  border-bottom: dashed 1px #c4cbd7;
 }
 
-.targetRow {
-  display: flex;
-  flex: none;
-  padding: 0.1em 0;
-  margin: 0 0.2em;
+.advancedRow:last-child {
+  border-bottom-style: solid;
 }
 
-.targetCell {
+.advancedLeft {
   display: flex;
   flex: 1 1;
   width: 0;
-  padding: 0 0.05em;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  margin-right: 0.15em;
+}
+
+.advancedRight {
+  display: flex;
+  flex: 1 1;
+  width: 0;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  margin-left: 0.15em;
+}
+
+.advancedTitle {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.advancedTitle span {
+  font-family: SanFranciscoText;
+  font-size: 1.125rem;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.advancedOption {
+  display: flex;
+  flex: 1 1;
+  margin-left: 0.2em;
+  align-items: center;
+}
+
+.advancedOption select {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000000;
+  line-height: 1.2;
+  padding: 5px 10px;
+  width: 100%;
+}
+
+.advancedOption span {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000000;
+  line-height: 1.2;
+  max-width: 6em;
+  text-align: center;
+}
+
+.advancedOption input[type='text'] {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000000;
+  line-height: 1rem;
+  padding: 5px 10px;
+  width: 100%;
+  outline: none;
+  border: solid 1px #979797;
+}
+
+.advancedBlock {
+  display: flex;
+  flex: none;
+  margin: 0.15em 0;
+}
+
+.advancedOptionBox {
+  display: flex;
+  flex: none;
+  margin-right: auto;
+  align-items: center;
+}
+
+.advancedOptionBox label {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000000;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.limit {
+  width: 2.6em;
+  flex-direction: column;
+  flex: none;
+}
+
+span.advancedDesc {
+  font-size: 0.75rem;
+  line-height: 1.33;
+}
+
+.advancedSize {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000000;
+  line-height: 1.2;
+  padding: 5px 4px;
+  width: 35%;
+  text-align: center;
+}
+
+.antdAdvancedSize {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000000;
+  line-height: 1.2;
+  text-align: center;
+  width: 100%;
+}
+
+.advancedBox {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+}
+
+.advancedPercentBlock {
+  display: flex;
+  flex: none;
+  margin: 0.15em 0;
+  position: relative;
+  align-items: center;
+  width: 100%;
+}
+
+.advancedPercent {
+  display: flex;
+  flex: none;
+  width: 100%;
+  align-items: center;
+  height: 0.2em;
+  border-radius: 0.2em;
+  overflow: hidden;
+  position: absolute;
+}
+
+.advancedPercentTrain {
+  height: 0.2em;
+  background-color: #9be44b;
+  border-right: 1px solid #000
+}
+
+.advancedPercentValidation {
+  height: 0.2em;
+  background-color: #f9cf37;
+  border-right: 1px solid #000
+}
+
+.advancedPercentHoldout {
+  height: 0.2em;
+  background-color: #31c4e9
+}
+
+.advancedPercentCross {
+  height: 0.2em;
+  background-color: #f9cf37;
+  border-right: 1px solid #000
+}
+
+.range {
+  display: flex;
+  flex: none;
+}
+
+.advancedPercentBox {
+  display: flex;
+  flex: none;
+  justify-content: space-between;
+}
+
+.advancedPercentInput {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.advancedPercentInput input {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.2;
+  display: flex;
+  flex: none;
+  width: 35px;
+  text-align: center;
+}
+
+.advancedPercentInput span {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.2;
+  display: flex;
+  flex: none;
+}
+
+.advancedPercentText {
+  display: flex;
+  flex: none;
+  margin-right: 0.1em;
+}
+
+.advancedPercentText span {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.2;
+}
+
+.advancedPercetColor {
+  display: flex;
+  flex: none;
+  width: 0.2em;
+  margin-right: 0.15em;
+  border: 0;
+}
+
+.inputLarge {
+  width: 100%;
+}
+
+.advancedResampling {
+  display: flex;
+  flex: none;
+  width: 35%;
+  flex-direction: column;
+  margin: 0.07em 0;
+}
+
+.advancedResampling .advancedOptionBox {
+  margin-top: 0.2em;
+}
+
+.correlationPlot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  /* margin-top: 20px; */
+}
+
+.plot {
+  width: 400px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
   align-items: center;
   position: relative;
 }
 
-.targetCell span {
-  font-family: SanFranciscoText;
-  color: #4a4a4a;
-  font-size: 0.875rem;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  line-height: 1.2;
+.correlationPlot img, .plot img {
+  max-height: 100%;
+  max-width: 100%;
 }
 
-.large {
-  flex: 2 1;
+.plotLoad {
+  display: flex;
+  flex: auto;
+  justify-content: center;
+  align-items: center;
 }
 
-.targetName {
-  flex: 2 1;
-}
-
-.targetName span {
-  /* font-size: 1.125rem; */
-}
-
-/* .targetHistogram {
-  flex: 2 1;
+.plotClose {
+  display: flex;
+  position: absolute;
+  right: 0;
+  top: 0;
   cursor: pointer;
-} */
+  flex: none;
+}
 
-.targetHistogram img {
+.plotClose span {
+  font-size: 1.125rem;
+  line-height: 1.1;
+  font-family: Arial;
+}
+
+.advancedOther {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 65%;
+  margin: -.15em 0;
+}
+
+.otherLabel {
+  width: 2em;
+  flex-direction: column;
+  flex: none;
+}
+
+.viewBox {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.advancedPercentValid {
+  height: 0.2em;
+  background-color: #aac0fc;
+}
+
+.advancedPercentInvalid {
+  height: 0.2em;
+  background-color: #e6eaef;
+}
+
+.advancedCustomRange {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+
+.advancedAlgorithmList {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: -.25em 0 -.1em;
+}
+
+.advancedAlgorithm {
+  display: flex;
+  flex: none;
+  margin: 0.1em;
+  align-items: center;
+}
+
+.advancedAlgorithm label {
+  font-family: SanFranciscoText;
+  font-size: 1rem;
+  color: #000000;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.newVariable {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+.newVariableBlock {
+  position: relative;
+  /* bottom: 100%; */
+  /* left: -0.1em; */
+  /* margin: 0.1em; */
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  /* background: #fff; */
+  /* border-radius: 5px; */
+  /* box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3); */
+  z-index: 2;
+  /* padding: 0.1em; */
+  font-size: 100px;
+}
+
+.newVariableRow {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin: 0.05em 0;
+}
+
+.newVariableRow span {
+  display: flex;
+  flex: none;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: #4a4a4a;
+}
+
+.newVariableName {
+  display: flex;
+  width: 1em;
   margin-right: 0.05em;
+  position: relative;
 }
 
-.targetHistogram span {
-  text-decoration-line: underline;
-  color: #448eed;
+.newVariableFx {
+  display: flex;
+  width: 3em;
+  margin-left: 0.05em;
+  position: relative;
 }
 
-.target:first-child {
-  margin-right: 100px;
+.newVariableInput {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #4a4a4a;
+  width: 100%;
+  outline: none;
+  border: solid 1px #c4cbd7;
+  padding: 7px 12px;
 }
 
-.target {
-  display: inline-block;
+.newVariableButton {
+  display: flex;
+  flex: none;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  padding: 0.1em 0.25em;
+  margin-right: 0.1em;
+  margin-top: 0.6em;
+  cursor: pointer;
 }
 
-.etlTitle {
-  font-size: 13px;
-  display: block;
-  text-align: left;
-  font-family: HelveticaNeue;
+.newVariableAdd {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
 }
 
-.targetPlot {
-  width: 450px;
+.newVariableCancel {
+  border: solid 1px #8f97a4;
+  background-color: transparent
 }
 
-.blockRow {
-  margin-top: 10px;
-  margin-bottom: 10px;
+.newVariableAdd span {
+  color: #fff;
 }
 
-.title {
-  font-size: 16px;
-  font-family: HelveticaNeue;
+.newVariableCancel span {
+  color: #1d2b3c;
 }
 
-.title:first-child {
-  margin-bottom: 10px;
+.newVariableHintList {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #fff;
+  margin-top: 0.05em;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+  max-height: 5em;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.correlationMatrix {
-  font-size: 16px;
+.newVariableHint {
+  display: flex;
+  flex: none;
+  padding: 0.1em 12px;
+  cursor: pointer;
+  position: relative;
 }
 
-.subTitle {
-  font-size: 14px;
+.activeHint {
+  background: #ededed;
+}
+
+.newVariableSyntax {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #f0f4f9;
+  padding: 0.1em 12px;
+  margin-bottom: 0.05em;
+}
+
+.newVariableEmpty {
+  display: flex;
+  flex: none;
+  position: absolute;
+  right: 0;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin-right: 0.05em;
+  cursor: pointer;
+}
+
+.newVariableEmpty span {
+  font-size: 0.75rem
+}
+
+button.disable {
+  cursor: not-allowed;
+  background-color: #d3d3d3;
+  color: #aaaaaa;
+  background-image: none;
+  border-color: transparent;
+}
+
+.reset {
+  font-size: 1rem;
+  float: right;
+  border-radius: 5px;
+  color: #445167;
+  text-decoration: underline;
+}
+
+.newVariableHintSyntax {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  width: 100%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #fff;
+  padding: 0.1em 12px;
+  margin-top: 0.05em;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.newVariableHintSyntax button {
+  display: flex;
+  flex: none;
+  width: .8em;
+  padding: 0.05em 0.2em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  margin: 0.1em auto 0;
+}
+
+.newVariableHintSyntax button span {
+  color: #fff;
+}
+
+.funcTips {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  width: 130%;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  background: #fff;
+  padding: 0.1em 12px;
+  margin-top: 0.05em;
+  max-height: 5em;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 7px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.funcTipsName {
+  display: flex;
+  flex: none;
+}
+
+.funcTipsName span {
+  font-size: 1.125rem;
+  font-weight: bold;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.funcTipsContent {
+  display: flex;
+  flex: none;
+  margin-bottom: .15em;
+}
+
+.funcTipsContent span {
+  font-size: .875rem;
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.funcTipsTitle {
+  display: flex;
+  flex: none;
+}
+
+.funcTipsTitle span {
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.3;
+  max-width: 100%;
+}
+
+.funcTipsCol {
+  font-size: 0.875rem;
+}
+
+.crossWarning {
   text-align: center;
-  margin: 15px;
+  display: block;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+span.crossWarning {
+  max-width: 100%;
+  color: #fff;
+  font-size: 0.5rem;
+}
+
+.advancedSolution {
+  display: flex;
+  flex: none;
+}
+
+.notAllow, .notAllow img {
+  cursor: not-allowed;
 }

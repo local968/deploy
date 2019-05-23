@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 import {concat} from 'lodash'
-import './echarts.config'
+// import './echarts.config'
 
 export default function FitPlot2(props){
 	const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props;

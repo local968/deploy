@@ -8,7 +8,7 @@ import {
   Button,
   Typography
 } from '@material-ui/core';
-import {map, filter, includes, get, findLastIndex, slice} from 'lodash';
+import {map, filter, includes, get, findIndex, findLastIndex, slice} from 'lodash';
 // import { useImmer } from 'use-immer';
 import Funcions from './Funcions';
 import Variables from './Variables';
@@ -98,11 +98,12 @@ function Computed(props: ComputedProps) {
     const newExp: Exp = exps[index]
     const {range: [start, end], value} = newExp
     const curStart: number = typeof startIndex === 'number' ? startIndex : start
+    const parenId = (func.value || '') + new Date().getTime();
     newExp.value = [
       ...value.slice(0, curStart),
       func,
-      LPAREN,
-      RPAREN,
+      {...LPAREN, id: parenId},
+      {...RPAREN, id: parenId},
       ...value.slice(end),
     ];
     newExp.range = [curStart + 2, curStart + 2];
@@ -129,12 +130,15 @@ function Computed(props: ComputedProps) {
       value: ',',
       type: Type.Split
     }
-
-    const pre: Coordinate | undefined = [...value.slice(0, start)].pop()
+    const preList = [...value.slice(0, start)];
+    const pre: Coordinate | undefined = preList.pop()
     const next: Coordinate | undefined = [...value.slice(end)].shift()
     let before: Coordinate | undefined, after: Coordinate | undefined
-    if (!!pre && (pre.type !== Type.Lparen) && (pre.type === Type.ID || pre.type === Type.Number || pre.type === Type.Char)) before = splitValue
+    // const aaa = pre
+    if (!!pre && (pre.type === Type.ID || pre.type === Type.Number || pre.type === Type.Char)) before = splitValue
     if (!!next && (next.type === Type.ID || next.type === Type.Number || next.type === Type.Char)) after = splitValue
+    const furtherPre: Coordinate | undefined = (preList || []).pop();
+    if (!!pre && pre.value === '@' && (!furtherPre || furtherPre.value === '(')) before = undefined;
     const arr: Array<Coordinate> = []
     if (before) arr.push(before)
     arr.push(v)
@@ -602,12 +606,11 @@ function Computed(props: ComputedProps) {
     }
     const BaseFn = !functionName.length ? false : FUNCTIONS.base.find(fn => fn.value === (functionName[0] as Coordinate).value)
     const SeniorFn = !functionName.length ? false : FUNCTIONS.senior.find(fn => fn.value === (functionName[0] as Coordinate).value)
-    // const currentFn = isBaseFn || isSeniorFn
     // 判断函数参数个数限制
-    // if (currentFn && currentFn.params && currentFn.params !== expArray.length) return {
-    //   isPass: false,
-    //   message: `${EN.Function} ${(functionName[0] as Coordinate).value} must have ${currentFn.params} params`
-    // }
+    if (BaseFn && BaseFn.params && BaseFn.params !== expArray.length) return {
+      isPass: false,
+      message: `${EN.Function} ${(functionName[0] as Coordinate).value} must have ${BaseFn.params} params`
+    }
 
     if (SeniorFn) {
       // 校验高级函数参数
@@ -937,9 +940,18 @@ function Computed(props: ComputedProps) {
   const {exps, index} = state;
   const currExp = exps[index];
   const {range, value} = currExp;
-  const currIndex = findLastIndex(slice(value, 0, range[1]), v => v.name === '(') - 1
-  const func = value[currIndex]
-  if (range[0] > 1 && func) {
+  const inputIndex = range[1]
+  const pre = slice(value, 0, inputIndex);
+  const next = slice(value, inputIndex);
+  const lParenIndex = findLastIndex(pre, v => {
+    if (v.value === '(') {
+      return findIndex(next, ({value, id}) => (value === ')' && v.id === id)) > -1
+    }
+    return false
+  })
+  const vari = pre.pop() || {};
+  const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
+  if (func) {
     const {name} = func;
     if (!includes(['Concat', 'Eq', '(', ')', ','], name)) {
       variables = filter(variables, ({varType}) => varType === 'Numerical')
@@ -966,6 +978,7 @@ function Computed(props: ComputedProps) {
                 left={left}
                 right={right}
                 addExp={addExp}
+                func={func}
                 changeExpLabel={changeExpLabel}
                 handleFunction={handleFunction}
                 handleVariables={handleVariables}
@@ -997,7 +1010,7 @@ function Computed(props: ComputedProps) {
       </CardContent>
       <CardActions disableActionSpacing className={classes.actions}>
         <Button variant="contained" onClick={processAndSave} className={classes.save}>
-          {EN.OK}
+          {EN.Yes}
         </Button>
         <Button
           variant="contained"

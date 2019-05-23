@@ -979,6 +979,7 @@ const EN: any = {
   VariableFormula:'变量公式',
   FormField:'表格',
   ProjectDescription:'项目描述',
+  ClusterReason:'您的数据在该模型上的预测类别数为1类，故不显示度量指标。',
 };
 
 export default EN;
