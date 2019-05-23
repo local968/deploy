@@ -8,7 +8,7 @@
 .modelResult span {
   font-size: 1.125rem;
   display: flex;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: normal;
   align-items: baseline;
   color: #1d2b3c;
@@ -171,7 +171,7 @@
 
 .or span {
   font-size: 1.125rem;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   color: #000;
 }
 
@@ -196,7 +196,7 @@
 .radio label {
   font-size: 1.125rem;
   color: #000;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   cursor: pointer;
 }
 
@@ -312,7 +312,7 @@ span.performanceScore {
 
 .progressTitle span {
   font-size: 1.25rem;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   color: #000;
   max-width: 100%;
   text-overflow: ellipsis;
@@ -566,7 +566,7 @@ margin-right: 10px;
 .modelInsightsBlock span {
   font-size: 1.125rem;
   display: flex;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: 1.2;
   color: #1d2b3c;
   margin-right: 1em;
@@ -629,7 +629,7 @@ margin-right: 10px;
 .modelInsightsText span {
   font-size: 1.125rem;
   display: block;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: 1.2;
   color: #1d2b3c;
   overflow: hidden;
@@ -669,7 +669,7 @@ margin-right: 10px;
 .modelInsightsImageTitle span {
   font-size: 1rem;
   display: block;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: 1.2;
   color: rgb(68, 142, 237);
 }
@@ -756,7 +756,7 @@ font-size: 1rem;
   font-size: .875rem;
   font-weight: bold;
   color: #1d2b3c;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
 }
 
 .costBlock {
@@ -783,7 +783,7 @@ font-size: 1rem;
 }
 
 .costTitle span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   line-height: 1.13;
   color: #000000;
@@ -795,7 +795,7 @@ font-size: 1rem;
 }
 
 .costContent span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 0.75rem;
   line-height: 1.33;
   color: #000000;
@@ -832,7 +832,7 @@ font-size: 1rem;
 }
 
 .costCell span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 0.875rem;
   line-height: 1.29;
   color: #000000;
@@ -874,7 +874,7 @@ font-size: 1rem;
 }
 
 .costInput input {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 0.875rem;
   line-height: 1.29;
   color: #000000;
@@ -971,7 +971,7 @@ font-size: 1rem;
 }
 
 .costText span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 0.75rem;
   line-height: 1.33;
   color: #000000;

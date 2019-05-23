@@ -28,7 +28,7 @@
 }
 
 .summaryTitle span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 16px;
 	color: #4a4a4a;
 	line-height: 1.2;
@@ -132,7 +132,7 @@
 }
 
 .summaryText span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 0.875rem;
 	color: #4a4a4a;
 	line-height: 1.2;
@@ -160,7 +160,7 @@
 
 
 .summaryButton span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 1rem;
 	font-weight: bold;
 	text-align: left;

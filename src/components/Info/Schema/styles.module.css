@@ -125,7 +125,7 @@
 .checkBox label {
     font-size: 0.875rem;
     line-height: 1.1;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     color: #1d2b3c;
     cursor: pointer;
 }

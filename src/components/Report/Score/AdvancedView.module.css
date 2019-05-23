@@ -272,7 +272,7 @@
 }
 
 .costTitle span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 1rem;
     line-height: 1.13;
     color: #000000;
@@ -284,7 +284,7 @@
 }
 
 .costContent span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.75rem;
     line-height: 1.33;
     color: #000000;
@@ -325,7 +325,7 @@
 }
 
 .costCell span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.875rem;
     line-height: 1.29;
     color: #000000;
@@ -367,7 +367,7 @@
 }
 
 .costInput input {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.875rem;
     line-height: 1.29;
     color: #000000;
@@ -464,7 +464,7 @@
 }
 
 .costText span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.75rem;
     line-height: 1.33;
     color: #000000;
@@ -527,7 +527,7 @@
 .modelResult span {
   font-size: 1.125rem;
   display: flex;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: normal;
   align-items: center;
   color: #1d2b3c;
@@ -690,7 +690,7 @@
 
 .or span {
   font-size: 14px;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   color: #000;
 }
 
@@ -715,7 +715,7 @@
 .radio label {
   font-size: 1.125rem;
   color: #000;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   cursor: pointer;
 }
 
@@ -830,7 +830,7 @@ span.performanceScore {
 
 .progressTitle span {
   font-size: 1.25rem;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   color: #000;
   max-width: 100%;
   text-overflow: ellipsis;
@@ -1090,7 +1090,7 @@ span.performanceScore {
 .modelInsightsBlock span {
   font-size: 1.125rem;
   display: flex;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: 1.2;
   color: #1d2b3c;
   margin-right: 1em;
@@ -1153,7 +1153,7 @@ span.performanceScore {
 .modelInsightsText span {
   font-size: 1.125rem;
   display: block;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: 1.2;
   color: #1d2b3c;
   overflow: hidden;
@@ -1193,7 +1193,7 @@ span.performanceScore {
 .modelInsightsImageTitle span {
   font-size: 1rem;
   display: block;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   line-height: 1.2;
   color: rgb(68, 142, 237);
 }
@@ -1280,7 +1280,7 @@ span.performanceScore {
   font-size: .875rem;
   font-weight: bold;
   color: #1d2b3c;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
 }
 
 .costBlock {
@@ -1329,7 +1329,7 @@ span.performanceScore {
 }
 
 .costTitle span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   line-height: 1.13;
   color: #000000;
@@ -1341,7 +1341,7 @@ span.performanceScore {
 }
 
 .costContent span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 0.75rem;
   line-height: 1.33;
   color: #000000;
@@ -1381,7 +1381,7 @@ span.performanceScore {
 }
 
 .costCell span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 12px;
   line-height: 1.29;
   color: #000000;
@@ -1427,7 +1427,7 @@ span.performanceScore {
 }
 
 .costInput input {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 13px;
   line-height: 1.29;
   color: #000000;
@@ -1539,7 +1539,7 @@ span.performanceScore {
 }
 
 .costText span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 14px;
   line-height: 1.33;
   color: #000000;
@@ -1679,7 +1679,7 @@ span.performanceScore {
 }
 
 .tab span {
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   font-size: 1.125rem;
   line-height: 1.15;
   color: #979797;
@@ -1767,7 +1767,7 @@ span.performanceScore {
 }
 
 .eventInput input {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 0.875rem;
   line-height: 1.29;
   color: #000000;
