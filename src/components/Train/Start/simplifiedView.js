@@ -16,7 +16,7 @@ import HistogramNumerical from "../../Charts/HistogramNumerical";
 import HistogramCategorical from "../../Charts/HistogramCategorical";
 import request from 'components/Request'
 import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
-import CreateNewVariable from '../../CreateNewVariable'
+import CreateNewVariables from '../../CreateNewVariable'
 
 @observer
 export default class SimplifiedView extends Component {
@@ -194,7 +194,7 @@ export default class SimplifiedView extends Component {
             <span>{EN.CreateANewVariable}</span>
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
-            <CreateNewVariable onClose={this.hideNewVariable}
+            <CreateNewVariables onClose={this.hideNewVariable}
                                addNewVariable={addNewVariable2} colType={colType} expression={expression}/>
           </Modal>
         </div>
