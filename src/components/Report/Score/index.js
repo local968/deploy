@@ -1445,8 +1445,8 @@ class DiagnoseResult extends Component {
     }
     return (
       <div className={styles.diagnoseResult} >
-        <button onClick={this.props.handleDiagnose} className={styles.button} >{EN.Diagnose}</button>
-        {result}
+        {/*<button onClick={this.props.handleDiagnose} className={styles.button} >{EN.Diagnose}</button>*/}
+        {/*{result}*/}
       </div>
     );
   }
