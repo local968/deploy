@@ -2152,32 +2152,123 @@ export default class Project {
     html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsChunkTag}${jsTag}${cssChunkTag}${cssTag}</${body}>`
     return html
   }
-
+  
+  histogram(field){
+    const {colType,dataViews,etlIndex} = this;
+    if(colType[this.customField] === 'Numerical'){
+      const { min, max } = dataViews[field];
+      return {
+        "name": "histogram-numerical",
+        "data": {
+          field,
+          id: etlIndex,
+          interval : (max - min) / 100
+        }
+      }
+    }else{
+      const {uniqueValues} = dataViews[field];
+      return {
+        "name": "histogram-categorical",
+        "data": {
+          field,
+          id: etlIndex,
+          size: uniqueValues > 8 ? 8 : uniqueValues,
+        }
+      }
+    }
+  }
+  
+  univariant(value){
+    const {target, problemType, etlIndex, colType,dataViews} = this;
+    const type = colType[value];
+  
+    if (problemType === "Regression") {
+      if (type === 'Numerical') {//散点图
+        return {
+          name:'regression-numerical',
+          data: {
+            y: target,
+            x: value,
+            id: etlIndex,
+          }
+        };
+      } else {//回归-分类 箱线图
+        return {
+          name:'regression-categorical',
+          data: {
+            y: target,
+            x: value,
+            id: etlIndex,
+          }
+        };
+      }
+    }else {//Univariant
+      const {min, max} = dataViews[value];
+      const data = {
+        target,
+        value,
+        id: etlIndex,
+        interval: Math.floor((max - min) / 20) || 1,
+      };
+  
+      if (type === 'Numerical') {
+        return {
+          name:'classification-numerical',
+          data,
+        };
+      } else {//?
+        return {
+          name:'classification-categorical',
+          data,
+        };
+      }
+    }
+  }
 
   //在这里获取所以直方图折线图数据
   allVariableList = (imagePath) => {
-
-    request.post({
-      url: '/graphics/list',
-      data: [{
-        "name": "histogram-categorical",
-        "data": {
-          "field": "mitoses",
-          "id": this.etlIndex
-        }
-      }, {
-        "name": "histogram-categorical",
-        "data": {
-          "field": "clump_thickness",
-          "id": this.etlIndex
-        }
-      }],
-    }).then(value => {
-      console.log(value)
-      //   chartDate
-      // })
+    const {target,colType,dataViews,etlIndex,dataHeader,newVariable,preImportance} = this;
+    
+    const list = [];
+    list.push(this.histogram(target));
+    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
+    allVariables.sort((a, b) => {
+      return preImportance ? -1 * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
     });
-  }
+  
+    for(let itm of allVariables){
+      list.push(this.histogram(itm));
+      list.push(this.univariant(itm));
+    }
+  
+    if(colType[target] === 'Numerical'){
+      const { min, max } = dataViews[target];
+      list.push({
+        "name": "histogram-numerical",
+        "data": {
+          field: target,
+          id: etlIndex,
+          interval : (max - min) / 100
+        }
+      })
+    }else{
+      const {uniqueValues} = dataViews[target];
+      list.push({
+        "name": "histogram-categorical",
+        "data": {
+          field: target,
+          id: etlIndex,
+          size: uniqueValues > 8 ? 8 : uniqueValues,
+        }
+      })
+    }
+    
+
+    return request.post({
+      url: '/graphics/list',
+      data: list,
+    })
+  };
 
 
   // 点击导出的按钮
@@ -2214,13 +2305,11 @@ export default class Project {
     //   changeReportProgress('initializing report.', 0)
 
 
+    const model = this.models.find(m => m.id === modelId);
     //在这里获取所以直方图折线图数据
-    await this.allVariableList()
+    model.graphicList = await this.allVariableList();
 
-
-    const model = this.models.find(m => m.id === modelId)
-
-    const json = JSON.stringify([{...this, ...{models: [model]}}])
+    const json = JSON.stringify([{...this, ...{models: [model]}}]);
 
     console.log(json, ' jjjjjjjjjjjjjjjj')
     //   // preImportance
