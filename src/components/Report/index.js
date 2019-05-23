@@ -147,7 +147,9 @@ class Report extends Component {
     return (
 
       <div className={styles.report}>
-        <h1 className={styles.totalTitle}>{EN.ProjectReport}: {list[0].name}<small onClick={this.toggleEdit}>{this.isEdit ? EN.Save : EN.Edit}</small></h1>
+        <h1 className={styles.totalTitle}>{EN.ProjectReport}: {list[0].name}
+        {/*<small onClick={this.toggleEdit}>{this.isEdit ? EN.Save : EN.Edit}</small>*/}
+        </h1>
         {this.isShow('profile') && <div className={classnames(styles.block, styles.profile)}>
           {this.checkBox('profile')}
           <h3 className={styles.blockTitle}>{EN.Profile}</h3>
@@ -189,15 +191,15 @@ class Report extends Component {
         <div className={styles.modelResult}>
           {this.isShow('modelResult') && <h1 className={styles.title}>{EN.ModelResult}</h1>}
           {this.checkBox('modelResult')}
-          {this.isShow('modelName') && <div className={classnames(styles.block, styles.marginZero)}>
-            {this.checkBox('modelName')}
-            <h3 className={styles.blockTitle}>{EN.ModelName}: <span className={styles.modelName}>{list[0].selectModel.name}</span></h3>
-            {/* {project.problemType === 'Classification' && <div className={styles.blockRow}><ClassificationPerformance project={project} /></div>} */}
-            {/* {project.problemType === 'Regression' && <div className={classnames(styles.blockRow, styles.performance)}><RegressionPerformance project={project} /></div>} */}
-          </div>}
+          {/*{this.isShow('modelName') && <div className={classnames(styles.block, styles.marginZero)}>*/}
+          {/*  {this.checkBox('modelName')}*/}
+          {/*  <h3 className={styles.blockTitle}>{EN.ModelName}: <span className={styles.modelName}>{list[0].selectModel.name}</span></h3>*/}
+          {/*  /!* {project.problemType === 'Classification' && <div className={styles.blockRow}><ClassificationPerformance project={project} /></div>} *!/*/}
+          {/*  /!* {project.problemType === 'Regression' && <div className={classnames(styles.blockRow, styles.performance)}><RegressionPerformance project={project} /></div>} *!/*/}
+          {/*</div>}*/}
           {this.isShow('metrics') && <div className={classnames(styles.block, styles.VariableImpact)}>
             {this.checkBox('metrics')}
-            <h3 className={styles.blockTitle}>{EN.Metrics}</h3>
+            {/*<h3 className={styles.blockTitle}>{EN.Metrics}</h3>*/}
             {list[0].problemType === 'Regression' && <div className={styles.metrics}>
               <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
                 <span className={styles.metricsCell}></span>
@@ -279,7 +281,7 @@ class Report extends Component {
 
           {this.isShow('score') && <div className={classnames(styles.block, styles.score)}>
             {this.checkBox('score')}
-            <h3 className={styles.blockTitle}>{EN.Charts} {list[0].problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>
+            {/*<h3 className={styles.blockTitle}>{EN.Charts} {list[0].problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>*/}
             <div className={styles.blockRow}>
               {/*<Score models={[list[0].selectModel]} project={list[0]} />*/}
               <AdvancedView models={list[0].models} project={list[0]}  sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} />

@@ -166,7 +166,6 @@
 .simplified {
   display: flex;
   flex: none;
-  padding: 0.35em 0.65em;
   flex-direction: column;
   position: relative;
   z-index: 1;
