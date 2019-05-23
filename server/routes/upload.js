@@ -121,7 +121,7 @@ router.get('/dataDefinition', async (req, res) => {
   const target = JSON.parse(await redis.hget(`project:${projectId}`, 'target'))
   res.attachment('definition.csv');
   res.type('csv')
-  if (type && type === 'proformance') res.send(data.join(','))
+  if (type && type === 'performance') res.send(data.join(','))
   else res.send(data.filter(h => h !== target).join(','))
 })
 
