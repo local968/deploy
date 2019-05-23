@@ -32,7 +32,7 @@
 	font-size: 1.125rem;
 	line-height: 1.2;
 	font-weight: bold;
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 }
 
 .cleanTitle {
@@ -45,7 +45,7 @@
 	font-size: 1.125rem;
 	line-height: 1.2;
 	font-weight: bold;
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 }
 
 .issueBox {
@@ -481,7 +481,7 @@
 }
 
 .fixesText span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 0.875rem;
 	font-weight: bold;
 	color: #1d2b3c;
@@ -806,7 +806,7 @@ span.fixesEdit {
 }
 
 .cleanTargetRename span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 0.875;
 	color: #9b9b9b;
 	line-height: 1.2;
@@ -932,7 +932,7 @@ span.fixesEdit {
 }
 
 .fixesTips span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 0.875rem;
 	color: #4a4a4a;
 	line-height: 1.3;
@@ -971,7 +971,7 @@ span.fixesEdit {
 }
 
 .fixesComplete span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 0.875rem;
 	color: #4a4a4a;
 	line-height: 1.8;
@@ -1004,7 +1004,7 @@ span.fixesEdit {
 .checkBox label {
 	font-size: 0.875rem;
 	line-height: 1.1;
-	font-family: SanFranciscoText;
+	font-family: 'Source Han Sans SC';
 	color: #1d2b3c;
 	cursor: pointer;
 }
@@ -1012,7 +1012,7 @@ span.fixesEdit {
 .checkBox span {
 	font-size: 0.875rem;
 	line-height: 1.1;
-	font-family: SanFranciscoText;
+	font-family: 'Source Han Sans SC';
 	color: #9b9b9b;
 }
 
@@ -1055,7 +1055,7 @@ span.fixesEdit {
 }
 
 .summaryTitle span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 1.125rem;
 	color: #4a4a4a;
 	line-height: 1.2;
@@ -1159,7 +1159,7 @@ span.fixesEdit {
 }
 
 .summaryText span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 0.875rem;
 	color: #4a4a4a;
 	line-height: 1.2;
@@ -1186,7 +1186,7 @@ span.fixesEdit {
 }
 
 .summaryButton span {
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 1rem;
 	/* font-weight: bold; */
 	text-align: left;
@@ -1281,7 +1281,7 @@ button.save {
 
 .issueTab span {
 	color: #1d2b3c;
-	font-family: HelveticaNeue;
+	font-family: 'Source Han Sans SC';
 	font-size: 1rem;
 	line-height: 1.2;
 }

@@ -22,7 +22,7 @@
 .number {
   font-size: 2.5rem;
   display: block;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
 }
 
 .text {
@@ -86,7 +86,7 @@
   white-space: nowrap;
   display: block;
   text-align: center;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
 }
 
 .wheader {
@@ -108,7 +108,7 @@
 
 .welcome {
   font-size: 1.125rem;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
 }
 
 .more {
@@ -135,7 +135,7 @@
 
 .notification span {
   font-size: 0.875rem;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   font-weight: normal;
   font-style: normal;
   font-stretch: normal;
@@ -184,7 +184,7 @@ span.num {
 
 .item span {
   font-size: 1.125rem;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   color: #979797;
 }
 
@@ -193,7 +193,7 @@ span.num {
 }
 
 .item.current span {
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   font-weight: bold;
 }
 
@@ -227,7 +227,7 @@ span.num {
 .item .line span {
   font-weight: normal;
   font-size: 0.875rem;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   white-space: nowrap;
   color: #c6c6c6;
 }
