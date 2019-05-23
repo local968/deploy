@@ -10,7 +10,7 @@ import styles from './AdvancedView.module.css';
 // import PredictVActual from '../Model/PredictVActual'
 import { NumberInput } from 'components/Common';
 import { formatNumber } from 'util'
-import { observable, computed, action, autorun, runInAction } from 'mobx';
+import {observable, computed, action, autorun, runInAction, toJS} from 'mobx';
 import EN from '../../../constant/en';
 import moment from 'moment';
 import ROCCurves from "../../Charts/ROCCurves";
@@ -571,22 +571,24 @@ class RegressionDetailCurves extends Component {
   }
 
   setChartDate() {
-    const url = this.props.model.fitAndResidualPlotData;
-    request.post({
-      url: '/graphics/fit-plot',
-      data: {
-        url,
-      },
-    }).then(chartDate => {
-      this.setState({
-        chartDate
-      })
-    });
+    // const url = this.props.model.fitAndResidualPlotData;
+    // request.post({
+    //   url: '/graphics/fit-plot',
+    //   data: {
+    //     url,
+    //   },
+    // }).then(chartDate => {
+    //   this.setState({
+    //     chartDate
+    //   })
+    // });
   }
 
   render() {
     const { model } = this.props;
     const { curve, diagnoseType, chartDate } = this.state;
+    const fitData = toJS(model.graphicList).pop();
+    console.log('fitData',fitData)
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
@@ -594,11 +596,11 @@ class RegressionDetailCurves extends Component {
         break;
       case EN.FitPlot:
         curComponent = <div className={styles.plot}>
-          {chartDate && <FitPlot2
+          {<FitPlot2
             title={EN.FitPlot}
             x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
-            chartDate={chartDate}
+            chartDate={fitData}
           />}
         </div>;
         break;
@@ -607,13 +609,13 @@ class RegressionDetailCurves extends Component {
           title={EN.ResidualPlot}
           x_name={EN.Truevalue}
           y_name={EN.Predictvalue}
-          chartDate={chartDate}
+          chartDate={fitData}
         />;
         curComponent = (
           <div className={styles.plot} >
             {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
             {/*<ResidualPlot/>*/}
-            {chartDate && Plot}
+            {Plot}
             <Modal
               visible={this.state.visible}
               title={EN.ResidualPlotDiagnose}
@@ -654,7 +656,7 @@ class RegressionDetailCurves extends Component {
     }]
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{ minWidth: 0 }} >
+        <div className={styles.leftPanel} style={{ minWidth: 160 }} >
           {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
         </div>
         <div className={styles.rightPanel} >

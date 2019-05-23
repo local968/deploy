@@ -43,37 +43,37 @@ export default class SimplifiedView extends Component {
   }
 
   show = () => {
-    console.log(1)
-    const {project = {}} = this.props;
-    const {target, colType, etlIndex} = project;
-
-    if (!this.chartData[target]) {
-      if (colType[target] === "Numerical") {
-        const { min, max } = project.dataViews[target];
-        console.log(target , 'target1')
-        // request.post({
-        //   url: '/graphics/histogram-numerical',
-        //   data: {
-        //     field: target,
-        //     id: etlIndex,
-        //     interval : (max - min) / 100
-        //   },
-        // }).then((result) => this.showback(target, result.data));
-      } else {
-        const {uniqueValues} = project.dataViews[target];
-        data.size = uniqueValues > 8 ? 8 : uniqueValues;
-        console.log(target , 'target2')
-        // request.post({
-        //   url: '/graphics/histogram-categorical',
-        //   data: {
-        //     field: target,
-        //     id: etlIndex,
-        //     size: uniqueValues > 8 ? 8 : uniqueValues,
-        //   },
-        // }).then((result) => this.showback(target, result.data));
-      }
-      return
-    }
+    // console.log(1)
+    // const {project = {}} = this.props;
+    // const {target, colType, etlIndex} = project;
+    //
+    // if (!this.chartData[target]) {
+    //   if (colType[target] === "Numerical") {
+    //     const { min, max } = project.dataViews[target];
+    //     console.log(target , 'target1')
+    //     // request.post({
+    //     //   url: '/graphics/histogram-numerical',
+    //     //   data: {
+    //     //     field: target,
+    //     //     id: etlIndex,
+    //     //     interval : (max - min) / 100
+    //     //   },
+    //     // }).then((result) => this.showback(target, result.data));
+    //   } else {
+    //     const {uniqueValues} = project.dataViews[target];
+    //     data.size = uniqueValues > 8 ? 8 : uniqueValues;
+    //     console.log(target , 'target2')
+    //     // request.post({
+    //     //   url: '/graphics/histogram-categorical',
+    //     //   data: {
+    //     //     field: target,
+    //     //     id: etlIndex,
+    //     //     size: uniqueValues > 8 ? 8 : uniqueValues,
+    //     //   },
+    //     // }).then((result) => this.showback(target, result.data));
+    //   }
+    //   return
+    // }
 
     this.showHistograms = true;
   };
@@ -100,25 +100,25 @@ export default class SimplifiedView extends Component {
   // }
 
   showCorrelationMatrix = () => {
-    const {project} = this.props;
-
-    const colType = toJS(project.colType);
-    const trainHeader = toJS(project.trainHeader);
-
-    const fields = Object.entries(colType)
-      .filter(itm => itm[1] === 'Numerical')
-      .map(itm => itm[0])
-      .filter(itm => !trainHeader.includes(itm));
-    request.post({
-      url: '/graphics/correlation-matrix',
-      data: {
-        fields,
-        id: project.etlIndex,
-      },
-    }).then((CorrelationMatrixData) => {
+    // const {project} = this.props;
+    //
+    // const colType = toJS(project.colType);
+    // const trainHeader = toJS(project.trainHeader);
+    //
+    // const fields = Object.entries(colType)
+    //   .filter(itm => itm[1] === 'Numerical')
+    //   .map(itm => itm[0])
+    //   .filter(itm => !trainHeader.includes(itm));
+    // request.post({
+    //   url: '/graphics/correlation-matrix',
+    //   data: {
+    //     fields,
+    //     id: project.etlIndex,
+    //   },
+    // }).then((CorrelationMatrixData) => {
       this.showCorrelation = true;
-      this.CorrelationMatrixData = CorrelationMatrixData;
-    });
+      // this.CorrelationMatrixData = CorrelationMatrixData;
+    // });
   };
 
   hideCorrelationMatrix = e => {
@@ -173,6 +173,26 @@ export default class SimplifiedView extends Component {
     if (isNA) return 'N/A'
     if (isNaN(parseFloat(value))) return value || 'N/A'
     return formatNumber(value, 2)
+  };
+  
+  matrix(data){
+    const {project} = this.props;
+    // const colType = toJS(project.colType);
+    const trainHeader = toJS(project.trainHeader);
+    
+    trainHeader.map(itm=>{
+       const ind = data.data.type.indexOf(itm);
+       data.data.type.splice(ind,1);
+       data.data.value.splice(ind,1);
+       data.data.value = data.data.value.map(it=>{
+         it.splice(ind,1);
+         return it
+       })
+    });
+
+    return <Chart
+      data = {data}
+    />
   }
 
   render() {
@@ -180,9 +200,10 @@ export default class SimplifiedView extends Component {
     const {target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading,
       histgramPlots, dataHeader, addNewVariable, addNewVariable2, newVariable, newType, newVariableViews,
       id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress,
-      graphicList,
+	    models,
     } = project;
-    console.log(10098,this.props)
+    const {graphicList:lists} = models[0];
+    const graphicList = JSON.parse(JSON.stringify(lists));
     const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
@@ -190,7 +211,9 @@ export default class SimplifiedView extends Component {
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
-    const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
+    const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2));
+    const top1 = graphicList.shift();
+    const top2 = graphicList.shift();
     return <div className={styles.simplified} style={{zIndex: this.visible ? 3 : 1}}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -206,13 +229,16 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
           <div className={styles.targetCell} onClick={this.show}>
           <img src={histogramIcon} className={styles.tableImage} />
-            {/*{<Popover placement='bottomLeft'*/}
-            {/*          visible={this.showHistograms}*/}
-            {/*          onVisibleChange={this.hide}*/}
-            {/*          trigger="click"*/}
-            {/*          content={<Chart*/}
-            {/*              data={graphicList.shift()}*/}
-            {/*          />}/>}*/}
+            {<Popover placement='bottomLeft'
+                      visible={this.showHistograms}
+                      onVisibleChange={this.hide}
+                      trigger="click"
+                      content={<Chart
+                          x_name={target}
+                          y_name={'count'}
+                          title={`Feature:${target}`}
+                          data={top1}
+                      />}/>}
           </div>
           <div className={styles.targetCell}>
             <span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
@@ -261,9 +287,7 @@ export default class SimplifiedView extends Component {
                                             visible={this.showCorrelation}
                                             onVisibleChange={this.hideCorrelationMatrix}
                                             trigger="click"
-                                            content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
-                                                                      CorrelationMatrixData={this.CorrelationMatrixData}
-                                            />}/>}
+                                            content={this.matrix(top2)}/>}
           <span>{EN.CheckCorrelationMatrix}</span>
         </div>
       </div>
@@ -301,7 +325,9 @@ export default class SimplifiedView extends Component {
               const data = {...dataViews, ...newVariableViews}[h] || {}
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance}
+              return <SimplifiedViewRow
+                  chartDatas = {[graphicList.shift(),graphicList.shift()]}
+                  key={i} value={h} data={data} map={map} importance={importance}
                                         colType={variableType} project={project}
                                         isChecked={checkedVariables.includes(h)}
                                         handleCheck={this.handleCheck.bind(null, h)}
@@ -324,32 +350,32 @@ class SimplifiedViewRow extends Component {
   @observable scatterData = {};
 
   showHistograms = () => {
-    const {value, project} = this.props;
-    // this.histograms = true
-    if (!this.chartData[value]) {
-      const data = {
-        field: value,
-        id: project.etlIndex,
-      };
-      if (project.colType[value] === "Numerical") {
-        const {min, max} = project.dataViews[value];
-        data.interval = (max - min) / 100;
-        request.post({
-          url: '/graphics/histogram-numerical',
-          data,
-        }).then((result) => this.showback(result.data, value));
-      } else {
-        // console.log(project.dataViews[value])
-        const {uniqueValues} = project.dataViews[value];
-        data.size = uniqueValues > 8 ? 8 : uniqueValues;
-        request.post({
-          url: '/graphics/histogram-categorical',
-          data,
-        }).then((result) => this.showback(result.data, value));
-      }
-    } else {
+    // const {value, project} = this.props;
+    // // this.histograms = true
+    // if (!this.chartData[value]) {
+    //   const data = {
+    //     field: value,
+    //     id: project.etlIndex,
+    //   };
+    //   if (project.colType[value] === "Numerical") {
+    //     const {min, max} = project.dataViews[value];
+    //     data.interval = (max - min) / 100;
+    //     request.post({
+    //       url: '/graphics/histogram-numerical',
+    //       data,
+    //     }).then((result) => this.showback(result.data, value));
+    //   } else {
+    //     // console.log(project.dataViews[value])
+    //     const {uniqueValues} = project.dataViews[value];
+    //     data.size = uniqueValues > 8 ? 8 : uniqueValues;
+    //     request.post({
+    //       url: '/graphics/histogram-categorical',
+    //       data,
+    //     }).then((result) => this.showback(result.data, value));
+    //   }
+    // } else {
       this.histograms = true;
-    }
+    // }
 
   };
   showback = (result, value) => {
@@ -360,89 +386,89 @@ class SimplifiedViewRow extends Component {
     this.histograms = true;
   }
 
-  // showUnivariant = () => {
-  //   this.univariant = true
-  // }
   showUnivariant = () => {
-    const {value, project} = this.props;
-    // const { name, categoricalMap } = project.dataViews[value];
-
-    if (!this.scatterData[value]) {
-      const {target, problemType, etlIndex, colType} = project;
-      const type = colType[value];
-
-      // const data = {
-      //   field: value,
-      //   id: etlIndex,
-      // };
-
-      if (problemType === "Regression") {
-        if (type === 'Numerical') {//散点图
-          request.post({
-            url: '/graphics/regression-numerical',
-            data: {
-              y: target,
-              x: value,
-              id: etlIndex,
-            }
-          }).then((result) => this.showbackUnivariant(result, value, target, 'Numerical'));
-        } else {//回归-分类 箱线图
-          request.post({
-            url: '/graphics/regression-categorical',
-            data: {
-              target,
-              value,
-              id: etlIndex,
-            }
-          }).then((result) => this.showbackUnivariant(result, value, target, 'Categorical'));
-        }
-      } else {//Univariant
-        const {min, max} = project.dataViews[value];
-        const data = {
-          target,
-          value,
-          id: etlIndex,
-          interval: Math.floor((max - min) / 20) || 1,
-        };
-        if (type === 'Numerical') {
-          request.post({
-            url: '/graphics/classification-numerical',
-            data,
-          }).then((result) => {
-            this.scatterData = {
-              ...this.scatterData,
-              [value]: {
-                ...result,
-              },
-              [`${value}-msg`]: {
-                type,
-              }
-            };
-            this.univariant = true;
-
-          });
-        } else {//?
-          request.post({
-            url: '/graphics/classification-categorical',
-            data,
-          }).then((result) => {
-            this.scatterData = {
-              ...this.scatterData,
-              [value]: {
-                ...result,
-              },
-              [`${value}-msg`]: {
-                type,
-              }
-            };
-            this.univariant = true;
-          });
-        }
-      }
-      return
-    }
-    this.univariant = true;
-  };
+    this.univariant = true
+  }
+  // showUnivariant = () => {
+  //   const {value, project} = this.props;
+  //   // const { name, categoricalMap } = project.dataViews[value];
+  //
+  //   if (!this.scatterData[value]) {
+  //     const {target, problemType, etlIndex, colType} = project;
+  //     const type = colType[value];
+  //
+  //     // const data = {
+  //     //   field: value,
+  //     //   id: etlIndex,
+  //     // };
+  //
+  //     if (problemType === "Regression") {
+  //       if (type === 'Numerical') {//散点图
+  //         request.post({
+  //           url: '/graphics/regression-numerical',
+  //           data: {
+  //             y: target,
+  //             x: value,
+  //             id: etlIndex,
+  //           }
+  //         }).then((result) => this.showbackUnivariant(result, value, target, 'Numerical'));
+  //       } else {//回归-分类 箱线图
+  //         request.post({
+  //           url: '/graphics/regression-categorical',
+  //           data: {
+  //             target,
+  //             value,
+  //             id: etlIndex,
+  //           }
+  //         }).then((result) => this.showbackUnivariant(result, value, target, 'Categorical'));
+  //       }
+  //     } else {//Univariant
+  //       const {min, max} = project.dataViews[value];
+  //       const data = {
+  //         target,
+  //         value,
+  //         id: etlIndex,
+  //         interval: Math.floor((max - min) / 20) || 1,
+  //       };
+  //       if (type === 'Numerical') {
+  //         request.post({
+  //           url: '/graphics/classification-numerical',
+  //           data,
+  //         }).then((result) => {
+  //           this.scatterData = {
+  //             ...this.scatterData,
+  //             [value]: {
+  //               ...result,
+  //             },
+  //             [`${value}-msg`]: {
+  //               type,
+  //             }
+  //           };
+  //           this.univariant = true;
+  //
+  //         });
+  //       } else {//?
+  //         request.post({
+  //           url: '/graphics/classification-categorical',
+  //           data,
+  //         }).then((result) => {
+  //           this.scatterData = {
+  //             ...this.scatterData,
+  //             [value]: {
+  //               ...result,
+  //             },
+  //             [`${value}-msg`]: {
+  //               type,
+  //             }
+  //           };
+  //           this.univariant = true;
+  //         });
+  //       }
+  //     }
+  //     return
+  //   }
+  //   this.univariant = true;
+  // };
 
   // showUnivariantData(result,type){
   //   const {value} = this.props;
@@ -491,7 +517,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const {data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines} = this.props;
+    const {data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines,chartDatas} = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
@@ -508,10 +534,11 @@ class SimplifiedViewRow extends Component {
                                                 visible={!isRaw && this.histograms}
                                                 onVisibleChange={this.hideHistograms}
                                                 trigger="click"
-                                                content={<SimplifiedViewPlot onClose={this.hideHistograms}
-                                                                             type={colType[value]}
-                                                                             target={value}
-                                                                             data={this.chartData[value]}
+                                                content={<Chart
+                                                    x_name={value}
+                                                    y_name={'count'}
+                                                    title={`Feature:${value}`}
+                                                    data={chartDatas[0]}
                                                 />}/> : null}
       </div>
       <div className={classnames(styles.tableTd, {
@@ -522,10 +549,8 @@ class SimplifiedViewRow extends Component {
                                                 visible={!isRaw && this.univariant}
                                                 onVisibleChange={this.hideUnivariant}
                                                 trigger="click"
-                                                content={<ScatterPlot onClose={this.hideUnivariant}
-                                                                      type={project.problemType}
-                                                                      data={this.scatterData[value]}
-                                                                      message={this.scatterData[`${value}-msg`]}
+                                                content={<Chart
+                                                    data={chartDatas[1]}
                                                 />}/> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>

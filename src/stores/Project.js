@@ -2196,8 +2196,8 @@ export default class Project {
         return {
           name:'regression-categorical',
           data: {
-            y: target,
-            x: value,
+            target,
+            value,
             id: etlIndex,
           }
         };
@@ -2226,11 +2226,25 @@ export default class Project {
   }
 
   //在这里获取所以直方图折线图数据
-  allVariableList = (imagePath) => {
-    const {target,colType,dataViews,etlIndex,dataHeader,newVariable,preImportance} = this;
+  allVariableList = (model) => {
+    const {target,colType,etlIndex,dataHeader,newVariable,preImportance} = this;
     
     const list = [];
     list.push(this.histogram(target));
+
+    const fields = Object.entries(toJS(colType))
+        .filter(itm => itm[1] === 'Numerical')
+        .map(itm => itm[0]);
+  
+    list.push({
+      name:'correlation-matrix',
+      data: {
+        fields,
+        id: etlIndex,
+      }
+    });
+    
+    
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
     allVariables.sort((a, b) => {
       return preImportance ? -1 * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
@@ -2240,6 +2254,17 @@ export default class Project {
       list.push(this.histogram(itm));
       list.push(this.univariant(itm));
     }
+    
+    if(model.fitAndResidualPlotData){
+      list.push({
+        name:'fit-plot',
+        data: {
+          url:model.fitAndResidualPlotData,
+        },
+      });
+    }
+    
+    console.log(model)
 
     return request.post({
       url: '/graphics/list',
@@ -2284,8 +2309,9 @@ export default class Project {
 
     const model = this.models.find(m => m.id === modelId);
     //在这里获取所以直方图折线图数据
-    model.graphicList = await this.allVariableList();
-
+    // changeReportProgress('preparing univariate plot.', 75)
+    model.graphicList = await this.allVariableList(model);
+    // changeReportProgress('preparing univariate plot.', 100)
     const json = JSON.stringify([{...this, ...{models: [model]}}]);
 
     console.log(json, ' jjjjjjjjjjjjjjjj')
