@@ -41,7 +41,7 @@ const TASK_SERVICE = process.env.TASK_SERVICE || "http://192.168.0.88:4016";
 const USER_SERVICE = process.env.USER_SERVICE || "http://192.168.0.88:4017";
 
 const AMQPLIB_PROTOCOL = process.env.AMQPLIB_PROTOCOL || "amqp";
-const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "192.168.0.88";
+const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "127.0.0.1";
 const AMQPLIB_PORT = process.env.AMQPLIB_PORT || "5672";
 const AMQPLIB_USERNAME = process.env.AMQPLIB_USERNAME || "admin";
 const AMQPLIB_PASSWORD = process.env.AMQPLIB_PASSWORD || "admin";
