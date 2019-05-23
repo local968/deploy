@@ -206,13 +206,13 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
           <div className={styles.targetCell} onClick={this.show}>
           <img src={histogramIcon} className={styles.tableImage} />
-            {<Popover placement='bottomLeft'
-                      visible={this.showHistograms}
-                      onVisibleChange={this.hide}
-                      trigger="click"
-                      content={<Chart
-                          data={graphicList.shift()}
-                      />}/>}
+            {/*{<Popover placement='bottomLeft'*/}
+            {/*          visible={this.showHistograms}*/}
+            {/*          onVisibleChange={this.hide}*/}
+            {/*          trigger="click"*/}
+            {/*          content={<Chart*/}
+            {/*              data={graphicList.shift()}*/}
+            {/*          />}/>}*/}
           </div>
           <div className={styles.targetCell}>
             <span>{colType[target] === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>

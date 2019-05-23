@@ -2240,29 +2240,6 @@ export default class Project {
       list.push(this.histogram(itm));
       list.push(this.univariant(itm));
     }
-  
-    if(colType[target] === 'Numerical'){
-      const { min, max } = dataViews[target];
-      list.push({
-        "name": "histogram-numerical",
-        "data": {
-          field: target,
-          id: etlIndex,
-          interval : (max - min) / 100
-        }
-      })
-    }else{
-      const {uniqueValues} = dataViews[target];
-      list.push({
-        "name": "histogram-categorical",
-        "data": {
-          field: target,
-          id: etlIndex,
-          size: uniqueValues > 8 ? 8 : uniqueValues,
-        }
-      })
-    }
-    
 
     return request.post({
       url: '/graphics/list',
