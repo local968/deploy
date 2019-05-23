@@ -58,7 +58,7 @@ export default class Sider extends Component {
           <img alt="switch" src={switchIcon}/>
           {isDeploy || !isLogin ? (
             <h4 className={styles.nav}>
-              {EN.Model}<br/>{EN.Training}
+              {EN.Model}<br/>{EN.TrainingS}
             </h4>
           ) : (
             <h4 className={styles.nav}>
