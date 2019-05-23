@@ -401,7 +401,7 @@ const EN: any = {
   Emptyparameter: '参数为空',
   ParametersmustbeNumerical: '参数必须为数值型',
   Mustbeinteger: '必须为整数',
-  Function: '函数：',
+  Function: '函数',
   Parameterserror: '参数错误',
   Mustgreaterthan: '必须大于１',
   Mustlessthan: '必须小于',
@@ -976,10 +976,12 @@ const EN: any = {
   PrecisionRecallTradeoff:'精准率召回率曲线',
   KindlyReminder:'提示',
   Null:'缺失值',
-  VariableFormula:'变量公式',
-  FormField:'表格',
-  ProjectDescription:'项目描述',
-  ClusterReason:'您的数据在该模型上的预测类别数为1类，故不显示度量指标。',
+  VariableFormula:'创建新变量',
+  FormField:'变量',
+  ProjectDescription:'函数功能说明',
+  base:'基础函数',
+  senior:'R2自定义函数',
+	ClusterReason:'您的数据在该模型上的预测类别数为1类，故不显示度量指标。',
 };
 
 export default EN;

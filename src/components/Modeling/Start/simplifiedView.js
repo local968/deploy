@@ -56,7 +56,6 @@ export default class SimplifiedView extends Component {
         }).then((result) => this.showback(target, result.data));
       } else {
         const {uniqueValues} = project.dataViews[target];
-        data.size = uniqueValues > 8 ? 8 : uniqueValues;
         request.post({
           url: '/graphics/histogram-categorical',
           data: {

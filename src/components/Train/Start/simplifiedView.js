@@ -79,7 +79,6 @@ export default class SimplifiedView extends Component {
   };
 
   hideCorrelationMatrix = e => {
-    console.log(7)
     e && e.stopPropagation();
     this.showCorrelation = false
   }

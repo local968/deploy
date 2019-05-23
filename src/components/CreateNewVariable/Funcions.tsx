@@ -53,7 +53,10 @@ function Function(props: FunctionProps) {
   }
 
   const {filterStr} = state;
-  functions.base = functions.base.filter(itm=>itm.name !== 'Log');
+  const b = functions.base.filter((itm:any)=>['Ln','Log'].includes(itm.name));
+  if(b.length === 2){
+    functions.base = functions.base.filter(itm=>itm.name !== 'Log');
+  }
   const validFuncs = mapValues(functions, (v) => filter(v, ({value}) => value && value.includes(filterStr)))
   // console.log(functions,validFuncs)
   return (

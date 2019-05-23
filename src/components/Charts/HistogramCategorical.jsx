@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactEcharts from 'echarts-for-react';
-// import './echarts.config'
+import './echarts.config'
 
 /**
  * Histogram-Categorical

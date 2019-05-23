@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactEcharts from 'echarts-for-react';
-// import './echarts.config'
+import './echarts.config'
 
 export default function TSENOne(props){
 	const {x_name='',y_name='',data={},width=400,height=400} = props;
