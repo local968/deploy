@@ -144,7 +144,7 @@ wss.register('newEtl', async (message, socket, process) => {
       } else {
         deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).slice(2).map(([k]) => k)
       }
-      if (Object.keys(project.otherMap).includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: project.renameVariable[''] }
+      if (Object.keys(project.otherMap).includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: project.otherMap[''] }
 
       stats[project.target].mapFillMethod = {
         ...deletedValues.reduce((prev, key) => {
