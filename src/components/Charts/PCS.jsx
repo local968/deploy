@@ -5,26 +5,27 @@ import 'echarts-gl'
 export default class PCS extends PureComponent{
 	constructor(props){
 		super(props);
-		this.chart = React.createRef();
 	}
 	
 	getOption() {
-		const data = [
-			[-0.5, 0.8],
-			[0.8, 0.3],
-		];
+		const {data=[],x_name='',y_name=''} = this.props;
 		
 		return {
 			xAxis: {
 				max:1,
 				min:-1,
+				name:x_name,
 			},
 			yAxis: {
 				max:1,
 				min:-1,
+				name:y_name,
 			},
 			title: {
-				text: 'The Correlation between PCs and original variables:'
+				text: 'The Correlation between PCs and original variables:',
+				textStyle:{
+					fontSize:11
+				}
 			},
 			// legend: {
 			//     data: ['line']
@@ -64,13 +65,10 @@ export default class PCS extends PureComponent{
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 600, width: 600}}
+			style={{height: 300, width: 300}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'
-			// onChartReady={this.onChartReadyCallback}
-			// onEvents={EventsDict}
-			// opts={}
 		/>
 	}
 }
