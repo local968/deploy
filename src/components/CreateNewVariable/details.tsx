@@ -34,7 +34,7 @@ export default [
     `
   },
   {
-    "name": "ln",
+    "name": "Ln",
     "value": `
       Ln <br/>
       以e为底数，对所选变量进行Ln转换。<br/>
