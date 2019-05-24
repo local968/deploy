@@ -500,7 +500,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow, nullCount }, totalFixedLines, problemType, issues } = project
+    const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
     const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
     const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
@@ -528,7 +528,7 @@ class Summary extends Component {
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }} />
             <span>{EN.DataTypeMismatch}</span>
           </div>}
-          {!!nullCount && <div className={styles.summaryType}>
+          {!!nullRow && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
           </div>}
