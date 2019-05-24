@@ -121,7 +121,7 @@ router.get('/dataDefinition', async (req, res) => {
   const target = JSON.parse(await redis.hget(`project:${projectId}`, 'target'))
   res.attachment('definition.csv');
   res.type('csv')
-  if (type && type === 'proformance') res.send(data.join(','))
+  if (type && type === 'performance') res.send(data.join(','))
   else res.send(data.filter(h => h !== target).join(','))
 })
 
@@ -291,9 +291,9 @@ router.get('/download/:scheduleId', async (req, res) => {
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const schedule = JSON.parse(await redis.get(`schedule:${scheduleId}`))
 
-  const { data: { header } } = await axios.get(`${esServicePath}/etls/${schedule.index}/headerArray`)
+  const { data: { header } } = await axios.get(`${esServicePath}/etls/${schedule.etlIndex}/headerArray`)
 
-  downloadCsv(schedule.result.deployData, filename, schedule.index, header, res)
+  downloadCsv(schedule.result.deployData, filename, schedule.etlIndex, header, res)
 
   // let temp = {}
   // let counter = 0
@@ -358,26 +358,28 @@ function downloadCsv(url, filename, index, header, res) {
       step: async (results, parser) => {
         const row = results.data[0]
         if (!resultHeader) {
-          resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no')
+          resultHeader = [...header, ...Object.keys(row)]
           res.write(Papa.unparse([resultHeader, []], { header: false }))
         }
         const nos = Object.keys(temp)
         const _start = Math.min(...nos, row['__no'])
         const _end = Math.max(...nos, row['__no'])
-        if (counter >= 500 || _end - _start >= 10000) {
+        if (counter >= 500 || _end - _start >= 5000) {
           const start = Math.min(...nos)
           const end = Math.max(...nos)
           parser.pause()
-          counter = 0
+          counter = 1
           const response = await axios.get(`${esServicePath}/etls/${index}/preview?start=${start}&end=${end}`)
           const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
           result.push([])
           res.write(Papa.unparse(result, { header: false }))
-          temp = {}
+          temp = { [row['__no']]: row }
           parser.resume()
+          flag = true
+        } else {
+          temp[row['__no']] = row
+          counter++
         }
-        temp[row['__no']] = row
-        counter++
       },
       complete: async (results, file) => {
         counter = 0
