@@ -32,11 +32,11 @@ export default {
       "params": 2
     },
     {
-      "name": "ln",
-      "value": "ln",
+      "name": "Ln",
+      "value": "Ln",
       "type": Type.Func,
-      "grammar": `${EN.Syntax}ln(@var, base)`,
-      "params": 2
+      "grammar": `${EN.Syntax}ln(@var)`,
+      "params": 1
     },
     {
       "name": "Eq",
