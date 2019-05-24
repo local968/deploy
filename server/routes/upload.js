@@ -184,14 +184,14 @@ function saveSample() {
 }
 
 router.get('/download/model', async (req, res) => {
-  const { filename, projectId, mid, etlIndex } = req.query
+  const { filename, projectId, mid, etlIndex, url } = req.query
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  const { featureImportance, deployData } = model
+  const { featureImportance } = model
   const header = Object.keys(JSON.parse(featureImportance))
-  const url = JSON.parse(deployData)
+  // const url = JSON.parse()
 
-  downloadCsv(url, decodeURIComponent(filename), etlIndex, header, res)
+  downloadCsv(decodeURIComponent(url), decodeURIComponent(filename), etlIndex, header, res)
 
   // let temp = {}
   // let counter = 0
@@ -242,44 +242,44 @@ router.get('/download/model', async (req, res) => {
   // })
 })
 
-router.get('/download/outlier', async (req, res) => {
-  const { filename, mid, rate, etlIndex, projectId } = req.query
-  const { userId } = req.session
-  const requestId = uuid.v4()
+// router.get('/download/outlier', async (req, res) => {
+//   const { filename, mid, rate, etlIndex, projectId } = req.query
+//   const { userId } = req.session
+//   const requestId = uuid.v4()
 
-  const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  const { featureImportance } = model
-  const header = Object.keys(JSON.parse(featureImportance))
+//   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
+//   const { featureImportance } = model
+//   const header = Object.keys(JSON.parse(featureImportance))
 
-  let _rate = rate
-  try {
-    _rate = parseFloat(rate)
-  } catch (e) { }
+//   let _rate = rate
+//   try {
+//     _rate = parseFloat(rate)
+//   } catch (e) { }
 
-  try {
-    const deployResult = await command({
-      command: 'outlier.deploy',
-      requestId,
-      projectId,
-      userId,
-      csvLocation: [etlIndex],
-      ext: ['csv'],
-      solution: mid,
-      actionType: 'deployment',
-      frameFormat: 'csv',
-      rate: _rate
-    }, processData => {
-      const { status, result } = processData
-      if (status === 1) return
-      if (status === 100) return result
-      throw new Error(result[processError])
-    })
+//   try {
+//     const deployResult = await command({
+//       command: 'outlier.deploy',
+//       requestId,
+//       projectId,
+//       userId,
+//       csvLocation: [etlIndex],
+//       ext: ['csv'],
+//       solution: mid,
+//       actionType: 'deployment',
+//       frameFormat: 'csv',
+//       rate: _rate
+//     }, processData => {
+//       const { status, result } = processData
+//       if (status === 1) return
+//       if (status === 100) return result
+//       throw new Error(result[processError])
+//     })
 
-    downloadCsv(deployResult.deployData, decodeURIComponent(filename), etlIndex, header, res)
-  } catch (e) {
-    return res.status(500).send(e)
-  }
-})
+//     downloadCsv(deployResult.deployData, decodeURIComponent(filename), etlIndex, header, res)
+//   } catch (e) {
+//     return res.status(500).send(e)
+//   }
+// })
 
 // todo
 // 500行分片下载还是有潜在bug

@@ -37,6 +37,13 @@ export default function Chart(props){
 				result={data}
 			/>;
 			break;
+		case 'classification-categorical':
+			chart = <UnivariantPlots
+				x_name={x_name}
+				y_name={y_name}
+				result={data}
+			/>;
+			break;
 		case 'correlation-matrix':
 			chart = <CorrelationMatrixs
 				value={data.value}
