@@ -156,7 +156,7 @@ class Report extends Component {
           <div className={styles.blockRow}>{EN.ProjectStatement}: {list[0].statement || '-'}</div>
           <div className={styles.blockRow}>{EN.BusinessValue}: {list[0].business || '-'}</div>
           <div className={styles.blockRow}>{EN.ProblemType}: {list[0].problemType}</div>
-          <div className={styles.blockRow}>{EN.Dataset}: {list[0].fileNames || '-'}</div>
+          <div className={styles.blockRow}>{EN.Dataset}: {list[0].fileName || '-'}</div>
         </div>}
         {this.isShow('dataSchema') && <div className={styles.block}>
           {this.checkBox('dataSchema')}
