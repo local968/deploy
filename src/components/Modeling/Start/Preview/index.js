@@ -40,10 +40,11 @@ export default class Preview extends Component {
     if (this.loading) return []
     if (!cleanData.length) return []
     if (!!newVariable.length && !newVariableData.length) return []
-    const headerList = [...rawHeader.filter(_h => dataHeader.includes(_h)), ...newVariable].filter(h => !trainHeader.includes(h))
-    const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
+    const headerList = [target, ...rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target), ...newVariable].filter(h => !trainHeader.includes(h))
+    const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
+    // const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
     const targetIndex = headerList.indexOf(target)
-    const data = cleanData.map((row, index) => row.concat(newVariable.map(n => newVariableData[index][n])).filter((k, i) => !notShowIndex.includes(i)))
+    const data = cleanData.map((row, index) => row.concat(newVariable.map(n => newVariableData[index][n])).filter((k, i) => showIndex.includes(i)))
 
     const types = { ...colType, ...newType }
 
@@ -79,7 +80,7 @@ export default class Preview extends Component {
       const colValue = types[header] === 'Numerical' ? 'Numerical' : 'Categorical'
       selectArr.push({
         content: <span>{colValue === 'Numerical' ? EN.Numerical : EN.Categorical}</span>,
-        title: colValue=== 'Numerical' ? EN.Numerical : EN.Categorical,
+        title: colValue === 'Numerical' ? EN.Numerical : EN.Categorical,
         cn: styles.cell
       })
     }
