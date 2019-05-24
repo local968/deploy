@@ -29,14 +29,14 @@ export default {
       "value": "Pow",
       "type": Type.Func,
       "grammar": `${EN.Syntax}pow(@var, base)`,
-      "params": 1
+      "params": 2
     },
     {
-      "name": "Log",
-      "value": "Log",
+      "name": "ln",
+      "value": "ln",
       "type": Type.Func,
-      "grammar": `${EN.Syntax}log(@var, base)`,
-      "params": 1
+      "grammar": `${EN.Syntax}ln(@var, base)`,
+      "params": 2
     },
     {
       "name": "Eq",

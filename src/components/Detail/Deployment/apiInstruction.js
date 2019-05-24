@@ -36,7 +36,7 @@ export default class extends Component {
         <div className={styles.apiInstruction}>
           <div className={styles.mdStyle}>
             <h1>{EN.Introduction}</h1>
-            <p>{EN.WhatDoesOurAPIDo}?</p>
+            <p>{EN.WhatDoesOurAPIDo}</p>
             <p>{EN.WhatDoesOurAPIDoAnswer}</p>
             <h1>{EN.Request}</h1>
             <ul><li>URL: /api/deploy</li><li>HTTP Method: POST (x-www-form-urlencoded)</li><li>Data parameters:<ol><li>deploymentId</li><li>token</li><li>data(JSON string)</li></ol></li></ul>
