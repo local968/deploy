@@ -196,7 +196,7 @@ const deploy = (deployment, threshold = null) => {
     }
   })
 
-  threshold && cdpo && api.getLastWaitingSchedule(deployment.id, 'proformance').then(schedule => {
+  threshold && cdpo && api.getLastWaitingSchedule(deployment.id, 'performance').then(schedule => {
     const nextScheduleTime = generateNextScheduleTime(cdpo.frequency, cdpo.frequencyOptions);
     if (!schedule && !nextScheduleTime) return;
     if (schedule) {

@@ -21,7 +21,7 @@ const AUTH_SERVICE = process.env.AUTH_SERVICE || "http://192.168.0.88:4002";
 const DEPLOYMENT_SERVICE =
   process.env.DEPLOYMENT_SERVICE || "http://192.168.0.88:4003";
 const DSL_SERVICE = process.env.DSL_SERVICE || "http://192.168.0.88:4004";
-const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:8000";
+const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:8000";// http://127.0.0.1:9201  http://192.168.0.23:9200
 const GRAPHIC_SERVICE =
   process.env.GRAPHIC_SERVICE || "http://192.168.0.88:4006";
 const JOB_SERVICE = process.env.JOB_SERVICE || "http://192.168.0.88:4007";
@@ -41,7 +41,7 @@ const TASK_SERVICE = process.env.TASK_SERVICE || "http://192.168.0.88:4016";
 const USER_SERVICE = process.env.USER_SERVICE || "http://192.168.0.88:4017";
 
 const AMQPLIB_PROTOCOL = process.env.AMQPLIB_PROTOCOL || "amqp";
-const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "192.168.0.88";
+const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "127.0.0.1";
 const AMQPLIB_PORT = process.env.AMQPLIB_PORT || "5672";
 const AMQPLIB_USERNAME = process.env.AMQPLIB_USERNAME || "admin";
 const AMQPLIB_PASSWORD = process.env.AMQPLIB_PASSWORD || "admin";

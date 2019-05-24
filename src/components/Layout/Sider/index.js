@@ -11,15 +11,26 @@ import switchIcon from './switch.svg';
 import {inject, observer} from 'mobx-react';
 import {withRouter} from 'react-router';
 import EN from '../../../constant/en';
+import {message} from 'antd';
+
+const errorTip = message.error;
 
 @withRouter
 @inject('userStore', 'deploymentStore', 'routing')
 @observer
 export default class Sider extends Component {
+  state = {labUrl: ''}
+
+  componentDidMount() {
+    axios.get('/jupyterLabUrl')
+      .then(({data}) => this.setState({labUrl: data}))
+      .catch(({response: {data}}) => errorTip(data))
+  }
+
   render() {
+    const {labUrl} = this.state;
     const {userStore, routing} = this.props;
     const isLogin = userStore.status === 'login';
-    const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/notebook/lab';
     const isDeploy = routing.location.pathname.includes('deploy');
     const isSupport = routing.location.pathname.includes('support');
     return (
@@ -49,7 +60,7 @@ export default class Sider extends Component {
               [styles.active]: isSupport
             })}>{EN.Support}</h4>
           </a>
-          <a className={styles.support} onClick={() => window.open(jupyterLabUrl, '_blank')}>
+          <a className={styles.support} onClick={() => labUrl && window.open(labUrl, '_blank')}>
             <img alt="support" src={community} className={styles.community}/>
             <h4 className={styles.nav}>JupyterLab</h4>
           </a>

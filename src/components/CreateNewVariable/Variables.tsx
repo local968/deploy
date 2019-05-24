@@ -39,7 +39,8 @@ function Variables(props: VariablesProps) {
   };
   const {filterStr} = state;
   const validVariable = variables.filter((o) => {
-    return o.value && !o.value.indexOf(filterStr);
+    const str = filterStr.toLowerCase();
+    return o.value && !o.value.toLowerCase().indexOf(str);
   })
   return (
     <List className={classes.list} disablePadding>

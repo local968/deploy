@@ -51,9 +51,9 @@
     text-align: center;
   }
 
-  .tableHeader {
-    margin-right: 17px;
-  }
+  /* .tableHeader { */
+    /* margin-right: 17px; */
+  /* } */
 .advancedModelTableDiv {
   width: 100%;
   overflow-x: scroll;

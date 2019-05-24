@@ -3,7 +3,7 @@ const { redis } = require('redis')
 const axios = require('axios')
 const config = require('config')
 
-const { createOrUpdate } = require('./project')
+const { createOrUpdate, deleteModels } = require('./project')
 
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
@@ -144,7 +144,7 @@ wss.register('newEtl', async (message, socket, process) => {
       } else {
         deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).slice(2).map(([k]) => k)
       }
-      if (Object.keys(project.otherMap).includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: project.renameVariable[''] }
+      if (Object.keys(project.otherMap).includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: project.otherMap[''] }
 
       stats[project.target].mapFillMethod = {
         ...deletedValues.reduce((prev, key) => {
@@ -178,6 +178,8 @@ wss.register('newEtl', async (message, socket, process) => {
         }
       }
       else {
+        //删除模型
+        await deleteModels(project.id)
         clearInterval(interval)
         process({ progress: 90, status: 1 })
         const { data: { totalFixedCount, deletedCount } } = await axios.post(`${esServicePath}/etls/${project.originalIndex}/fixedLines`, stats)
