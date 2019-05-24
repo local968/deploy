@@ -32,7 +32,7 @@ const useStyles = withStyles({
   label: {
     width: 200,
     flex: 'none',
-    padding: 0
+    padding: '4px 0'
   },
   text: {
     display: 'flex',

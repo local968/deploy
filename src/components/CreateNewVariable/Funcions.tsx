@@ -53,7 +53,10 @@ function Function(props: FunctionProps) {
   }
 
   const {filterStr} = state;
-  const validFuncs = mapValues(functions, (v) => filter(v, ({value}) => value && value.includes(filterStr)))
+  const validFuncs = mapValues(functions, (v) => filter(v, ({value}) => {
+    const str = filterStr.toLowerCase();
+    return value && value.toLowerCase().includes(str)
+  }))
   return (
     <List className={classes.list} disablePadding>
       <div className={classes.textFiled}>
@@ -61,7 +64,7 @@ function Function(props: FunctionProps) {
       </div>
       {
         map(validFuncs, (v, k) => <div key={k + 'div'}>
-            <ListItem onClick={() => onCosClick(k)} key={k}>
+            <ListItem onClick={() => onCosClick(k)} key={k} button>
               <ListItemText primary={EN[k]}/>
               {state[k] ? <ExpandMore/> : <ExpandLess/>}
             </ListItem>
@@ -71,6 +74,7 @@ function Function(props: FunctionProps) {
                   map(v, (coor: Coordinate, i: number) => {
                     return (
                       <ListItem
+                        button
                         key={'functions' + i}
                         className={classes.nested}
                         onClick={() => onClick(coor, null)}

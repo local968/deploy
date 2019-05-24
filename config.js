@@ -21,7 +21,7 @@ const AUTH_SERVICE = process.env.AUTH_SERVICE || "http://192.168.0.88:4002";
 const DEPLOYMENT_SERVICE =
   process.env.DEPLOYMENT_SERVICE || "http://192.168.0.88:4003";
 const DSL_SERVICE = process.env.DSL_SERVICE || "http://192.168.0.88:4004";
-const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:8000";
+const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:8000";// http://127.0.0.1:9201  http://192.168.0.23:9200
 const GRAPHIC_SERVICE =
   process.env.GRAPHIC_SERVICE || "http://192.168.0.88:4006";
 const JOB_SERVICE = process.env.JOB_SERVICE || "http://192.168.0.88:4007";
