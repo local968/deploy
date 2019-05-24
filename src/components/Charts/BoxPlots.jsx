@@ -2,7 +2,9 @@ import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 const Echarts = require('echarts');
 import 'echarts/dist/extension/dataTool'
-import './echarts.config'
+import initEcharts from './echarts.config';
+
+initEcharts(Echarts);
 
 export default class BoxPlots extends PureComponent{
 

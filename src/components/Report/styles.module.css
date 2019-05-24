@@ -15,7 +15,7 @@ html {
 
 .subTitle {
   font-size: 28px;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
 }
 
 .block {
@@ -42,7 +42,7 @@ html {
 .blockTitle {
   font-size: 22px;
   text-align: left;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
 }
 
 .blockTitle small {

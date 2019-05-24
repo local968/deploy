@@ -104,123 +104,123 @@ export default class AdvancedView extends Component {
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
-            const aModelData = formatNumber(aModel.chartData.roc.F1[aFitIndex]);
-            const bModelData = formatNumber(bModel.chartData.roc.F1[bFitIndex]);
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.chartData.roc.F1[aFitIndex]);
+            const bModelData = (bModel.chartData.roc.F1[bFitIndex]);
+            return (aModelData - bModelData) * sort.value
           }
         case 'Precision':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = formatNumber(aModel.chartData.roc.Precision[aFitIndex])
-            const bModelData = formatNumber(bModel.chartData.roc.Precision[bFitIndex])
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.chartData.roc.Precision[aFitIndex])
+            const bModelData = (bModel.chartData.roc.Precision[bFitIndex])
+            return (aModelData - bModelData) * sort.value
           }
         case 'Recall':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = formatNumber(aModel.chartData.roc.Recall[aFitIndex])
-            const bModelData = formatNumber(bModel.chartData.roc.Recall[bFitIndex])
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.chartData.roc.Recall[aFitIndex])
+            const bModelData = (bModel.chartData.roc.Recall[bFitIndex])
+            return (aModelData - bModelData) * sort.value
           }
         case 'LogLoss':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = formatNumber(aModel.chartData.roc.LOGLOSS[aFitIndex])
-            const bModelData = formatNumber(bModel.chartData.roc.LOGLOSS[bFitIndex])
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.chartData.roc.LOGLOSS[aFitIndex])
+            const bModelData = (bModel.chartData.roc.LOGLOSS[bFitIndex])
+            return (aModelData - bModelData) * sort.value
           }
         case 'Cutoff Threshold':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = formatNumber(aModel.chartData.roc.Threshold[aFitIndex])
-            const bModelData = formatNumber(bModel.chartData.roc.Threshold[bFitIndex])
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.chartData.roc.Threshold[aFitIndex])
+            const bModelData = (bModel.chartData.roc.Threshold[bFitIndex])
+            return (aModelData - bModelData) * sort.value
           }
         case 'Normalized RMSE':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.nrmse)
-            const bModelData = formatNumber(bModel.score.validateScore.nrmse)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.nrmse)
+            const bModelData = (bModel.score.validateScore.nrmse)
+            return (aModelData - bModelData) * sort.value
           }
         case 'RMSE':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.rmse)
-            const bModelData = formatNumber(bModel.score.validateScore.rmse)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.rmse)
+            const bModelData = (bModel.score.validateScore.rmse)
+            return (aModelData - bModelData) * sort.value
           }
         case 'MSLE':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.msle)
-            const bModelData = formatNumber(bModel.score.validateScore.msle)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.msle)
+            const bModelData = (bModel.score.validateScore.msle)
+            return (aModelData - bModelData) * sort.value
           }
         case 'RMSLE':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.rmsle)
-            const bModelData = formatNumber(bModel.score.validateScore.rmsle)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.rmsle)
+            const bModelData = (bModel.score.validateScore.rmsle)
+            return (aModelData - bModelData) * sort.value
           }
         case 'MSE':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.mse)
-            const bModelData = formatNumber(bModel.score.validateScore.mse)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.mse)
+            const bModelData = (bModel.score.validateScore.mse)
+            return (aModelData - bModelData) * sort.value
           }
         case 'MAE':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.mae)
-            const bModelData = formatNumber(bModel.score.validateScore.mae)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.mae)
+            const bModelData = (bModel.score.validateScore.mae)
+            return (aModelData - bModelData) * sort.value
           }
         case 'R2':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.r2)
-            const bModelData = formatNumber(bModel.score.validateScore.r2)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.r2)
+            const bModelData = (bModel.score.validateScore.r2)
+            return (aModelData - bModelData) * sort.value
           }
         case 'AdjustR2':
           {
-            const aModelData = formatNumber(aModel.score.validateScore.adjustR2)
-            const bModelData = formatNumber(bModel.score.validateScore.adjustR2)
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.score.validateScore.adjustR2)
+            const bModelData = (bModel.score.validateScore.adjustR2)
+            return (aModelData - bModelData) * sort.value
           }
         case EN.Validation:
           {
             const { problemType } = project
             let aModelData, bModelData
             if (problemType === 'Regression') {
-              aModelData = formatNumber(aModel.score.validateScore[metric || 'r2'])
-              bModelData = formatNumber(bModel.score.validateScore[metric || 'r2'])
+              aModelData = (aModel.score.validateScore[metric || 'r2'])
+              bModelData = (bModel.score.validateScore[metric || 'r2'])
             } else {
-              aModelData = metric === 'auc' ? formatNumber(aModel.score.validateScore[metric]) : formatNumber(aModel[metric + 'Validation'])
-              bModelData = metric === 'auc' ? formatNumber(bModel.score.validateScore[metric]) : formatNumber(bModel[metric + 'Validation'])
+              aModelData = metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
+              bModelData = metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
             }
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            return (aModelData - bModelData) * sort.value
           }
         case EN.Holdout:
           {
             const { problemType } = project
             let aModelData, bModelData
             if (problemType === 'Regression') {
-              aModelData = formatNumber(aModel.score.holdoutScore[metric || 'r2'])
-              bModelData = formatNumber(bModel.score.holdoutScore[metric || 'r2'])
+              aModelData = (aModel.score.holdoutScore[metric || 'r2'])
+              bModelData = (bModel.score.holdoutScore[metric || 'r2'])
             } else {
-              aModelData = metric === 'auc' ? formatNumber(aModel.score.holdoutScore[metric]) : formatNumber(aModel[metric + 'Holdout'])
-              bModelData = metric === 'auc' ? formatNumber(bModel.score.holdoutScore[metric]) : formatNumber(bModel[metric + 'Holdout'])
+              aModelData = metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
+              bModelData = metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
             }
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            return (aModelData - bModelData) * sort.value
           }
         case 'KS':
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
-            const aModelData = formatNumber(aModel.chartData.roc.KS[aFitIndex]);
-            const bModelData = formatNumber(bModel.chartData.roc.KS[bFitIndex]);
-            return sort.value === 1 ? aModelData - bModelData : bModelData - aModelData
+            const aModelData = (aModel.chartData.roc.KS[aFitIndex]);
+            const bModelData = (bModel.chartData.roc.KS[bFitIndex]);
+            return (aModelData - bModelData) * sort.value
           }
         case EN.Time:
           return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
@@ -240,7 +240,6 @@ export default class AdvancedView extends Component {
       projectStore.changeOldfiltedModels(_filtedModels);
       oldfiltedModels = _filtedModels;
     }
-
     if (stopFilter && oldfiltedModels) {
       _filtedModels = oldfiltedModels.sort(sortMethods);
     } else {
@@ -705,7 +704,7 @@ class DetailCurves extends Component {
     }, 0)
   };
   render() {
-    const { model, model: { mid }, yes, no ,project} = this.props;
+    const { model, model: { mid }, yes, no, project } = this.props;
     const { curve, show } = this.state;
     let curComponent;
     let hasReset = true;
@@ -745,7 +744,7 @@ class DetailCurves extends Component {
           height={300} width={500}
           x_name={EN.percentage}
           y_name={EN.lift}
-          chartData={model.chartData}
+          model={model}
         />
         hasReset = false;
         break;

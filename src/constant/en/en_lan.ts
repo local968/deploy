@@ -1112,6 +1112,7 @@ const EN_LAN = {
   VariableFormula:'Variable Formula',
   FormField:'Form Field',
   ProjectDescription:'Project Description',
+  ClusterReason:'Since all your data predicted by this model belongs to one cluster, the metrics can not be computed.',
 };
 
 

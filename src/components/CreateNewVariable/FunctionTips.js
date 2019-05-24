@@ -336,7 +336,6 @@ export default class FunctionTips extends Component {
     const {value} = this.props
     const key = value
     if (!key || !this[key] || typeof this[key] !== 'function') return null
-    console.log(this[key](), 777777)
     return this[key]()
   }
 }

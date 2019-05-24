@@ -53,7 +53,7 @@
     font-stretch: normal;
     line-height: 1.22;
     letter-spacing: normal;
-    font-family: HelveticaNeue;
+    font-family: 'Source Han Sans SC';
 }
 
 .tools {
@@ -217,7 +217,7 @@
 
 .bar span {
     font-size: 0.875rem;
-    font-family: HelveticaNeue;
+    font-family: 'Source Han Sans SC';
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;

@@ -24,11 +24,11 @@ yarn-error.log*
 # vscode
 .vscode
 
-package-lock.json
+# package-lock.json
 
 local_config.js
 
 uploads
 config.lua
 /data
-yarn.lock
+# yarn.lock

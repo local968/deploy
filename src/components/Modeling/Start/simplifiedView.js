@@ -45,20 +45,23 @@ export default class SimplifiedView extends Component {
 
     if (!this.chartData[target]) {
       if (colType[target] === "Numerical") {
+        const { min, max } = project.dataViews[target];
         request.post({
           url: '/graphics/histogram-numerical',
           data: {
             field: target,
             id: etlIndex,
+            interval : (max - min) / 100
           },
         }).then((result) => this.showback(target, result.data));
       } else {
+        const {uniqueValues} = project.dataViews[target];
         request.post({
           url: '/graphics/histogram-categorical',
           data: {
             field: target,
             id: etlIndex,
-            // size: cleanMetric[target].etlStats.uniqueValues,
+            size: uniqueValues > 8 ? 8 : uniqueValues,
           },
         }).then((result) => this.showback(target, result.data));
       }

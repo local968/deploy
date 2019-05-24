@@ -51,6 +51,7 @@ const AMQPLIB_HEARTBEAT = process.env.AMQPLIB_HEARTBEAT || "0";
 const AMQPLIB_VHOST = process.env.AMQPLIB_VHOST || "/";
 
 const QUEUE_RESULT = process.env.QUEUE_RESULT || "result.top.pipeline;result.top.ping;result.top.listCommand;result.top.histgramPlot;result.top.etlBase;result.top.dataView;result.top.createNewVariable;result.top.correlationMatrix;result.top.univariatePlot;result.outlier.train;result.outlier.preTrainImportance;result.outlier.ping;result.outlier.outlierPlot;result.outlier.listCommand;result.outlier.etl;result.outlier.deploy;result.outlier.applyWeights;result.clustering.train;result.clustering.ssPlot;result.clustering.preTrainImportance;result.clustering.ping;result.clustering.listCommand;result.clustering.etlOutlier;result.clustering.etl;result.clustering.doOutlier;result.clustering.deploy;result.clustering.applyWeights;result.clfreg.univariatePlot;result.clfreg.train;result.clfreg.preTrainImportance;result.clfreg.permutationImportance;result.clfreg.etl;result.clfreg.deploy";
+const BACK_API_SERVICE = process.env.BACK_API_SERVICE  || 'http://192.168.0.88:8081';
 const IS_EN = process.env.IS_EN || false;
 const YOUR_AGE = process.env.YOUR_AGE || '部署行数已达到出当前权限最大限制。';
 const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前权限最大限制。';
@@ -114,7 +115,8 @@ const config = {
     SCHEDULE_SERVICE,
     SCHEMA_SERVICE,
     TASK_SERVICE,
-    USER_SERVICE
+    USER_SERVICE,
+    BACK_API_SERVICE
   },
   mq: {
     AMQPLIB_PROTOCOL,

@@ -8,8 +8,8 @@ import help from './icon-help.svg';
 import helpActive from './icon-help-active.svg';
 import community from './community.png'
 import switchIcon from './switch.svg';
-import { inject, observer } from 'mobx-react';
-import { withRouter } from 'react-router';
+import {inject, observer} from 'mobx-react';
+import {withRouter} from 'react-router';
 import EN from '../../../constant/en';
 
 @withRouter
@@ -19,7 +19,7 @@ export default class Sider extends Component {
   render() {
     const {userStore, routing} = this.props;
     const isLogin = userStore.status === 'login';
-    const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/lab';
+    const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/notebook/lab';
     const isDeploy = routing.location.pathname.includes('deploy');
     const isSupport = routing.location.pathname.includes('support');
     return (
@@ -58,11 +58,11 @@ export default class Sider extends Component {
           <img alt="switch" src={switchIcon}/>
           {isDeploy || !isLogin ? (
             <h4 className={styles.nav}>
-              {EN.Model}<br />{EN.Training}
+              {EN.Model}<br/>{EN.TrainingS}
             </h4>
           ) : (
-              <h4 className={styles.nav}>
-                {EN.Deployments}<br />{EN.Console}
+            <h4 className={styles.nav}>
+              {EN.Deployments}<br/>{EN.Console}
             </h4>
           )}
         </a>

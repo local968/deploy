@@ -2,12 +2,11 @@
 
 html,
 body {
-  font-family: Arial, sans-serif;
+  font-family: '\534E\6587\7EC6\9ED1', 'Source Han Sans SC', 'HelveticaNeue', Arial, Helvetica, sans-serif;
   font-size: 16px;
   color: #4a4a4a;
   word-break: normal !important;
   margin: 0;
-  font-family: HelveticaNeue, Arial, Helvetica, sans-serif;
 }
 
 @media only screen and (max-width: 1440px) {

@@ -106,7 +106,7 @@ export default class ROCCurves extends PureComponent{
 				type: 'value',
 				boundaryGap: false,
 				min:0,
-				max:1.05,
+				max:1.001,
 			},
 			yAxis: {
 				type: 'value',

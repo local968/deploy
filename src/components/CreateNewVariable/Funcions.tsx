@@ -4,6 +4,7 @@ import {List, ListItem, ListItemText, TextField, Collapse} from '@material-ui/co
 import {ExpandLess, ExpandMore} from '@material-ui/icons';
 import {Coordinate} from './model/Coordinate';
 import {flatten, filter, values, map, mapValues} from 'lodash'
+import EN from "../../constant/en";
 // import { useImmer } from 'use-immer';
 
 const useStyles = makeStyles({
@@ -37,7 +38,7 @@ export interface FunctionProps {
 
 function Function(props: FunctionProps) {
   const classes = useStyles();
-  const {onClick, onMouseOver, functions} = props;
+  let {onClick, onMouseOver, functions} = props;
   const initState: any = {filterStr: '', base: true, senior: true};
   const [state, setState] = React.useState(initState as any);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +53,12 @@ function Function(props: FunctionProps) {
   }
 
   const {filterStr} = state;
+  const b = functions.base.filter((itm:any)=>['Ln','Log'].includes(itm.name));
+  if(b.length === 2){
+    functions.base = functions.base.filter(itm=>itm.name !== 'Log');
+  }
   const validFuncs = mapValues(functions, (v) => filter(v, ({value}) => value && value.includes(filterStr)))
+  // console.log(functions,validFuncs)
   return (
     <List className={classes.list} disablePadding>
       <div className={classes.textFiled}>
@@ -61,7 +67,7 @@ function Function(props: FunctionProps) {
       {
         map(validFuncs, (v, k) => <div key={k + 'div'}>
             <ListItem onClick={() => onCosClick(k)} key={k}>
-              <ListItemText primary={k}/>
+              <ListItemText primary={EN[k]}/>
               {state[k] ? <ExpandMore/> : <ExpandLess/>}
             </ListItem>
             <Collapse in={state[k]} unmountOnExit key={k + 'col'}>
