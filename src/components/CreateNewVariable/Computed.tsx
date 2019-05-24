@@ -655,7 +655,7 @@ function Computed(props: ComputedProps) {
       for (let param of paramList) {
         if (param.type !== 'Numerical') return {
           isPass: false,
-          message: `${EN.Function} ${senior.value.slice(0, -2)} ${EN.ParametersmustbeNumerical}`
+          message: `${EN.Function} ${senior.value} ${EN.ParametersmustbeNumerical}`
         }
       }
     }
@@ -871,7 +871,7 @@ function Computed(props: ComputedProps) {
       default:
         break;
     }
-    if (num < 1) return { isPass: false, message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}` }
+    if (num < 1) return { isPass: false, message: `${EN.Function}: ${senior.value} ${EN.Parameterserror}` }
     return { isPass: true, message: EN.OK, num, type }
   }
 
