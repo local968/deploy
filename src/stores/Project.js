@@ -2155,7 +2155,7 @@ export default class Project {
   
   histogram(field){
     const {colType,dataViews,etlIndex} = this;
-    if(colType[this.customField] === 'Numerical'){
+    if(colType[field] === 'Numerical'){
       const { min, max } = dataViews[field];
       return {
         "name": "histogram-numerical",
@@ -2264,8 +2264,6 @@ export default class Project {
       });
     }
     
-    console.log(model)
-
     return request.post({
       url: '/graphics/list',
       data: list,
