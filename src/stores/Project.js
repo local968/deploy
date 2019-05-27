@@ -2155,6 +2155,9 @@ export default class Project {
   
   histogram(field){
     const {colType,dataViews,etlIndex} = this;
+    if(!dataViews[field]){
+      return;
+    }
     if(colType[field] === 'Numerical'){
       const { min, max } = dataViews[field];
       return {
@@ -2181,6 +2184,10 @@ export default class Project {
   univariant(value) {
     const { target, problemType, etlIndex, colType, dataViews } = this;
     const type = colType[value];
+  
+    if(!dataViews[value]){
+      return;
+    }
 
     if (problemType === "Regression") {
       if (type === 'Numerical') {//散点图
@@ -2275,7 +2282,7 @@ export default class Project {
     
     return request.post({
       url: '/graphics/list',
-      data: list,
+      data: list.filter(itm=>itm),
     })
   };
 
