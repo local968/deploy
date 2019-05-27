@@ -2257,12 +2257,21 @@ export default class Project {
 
     if (model.fitAndResidualPlotData) {
       list.push({
+        name: 'predicted-vs-actual-plot',
+        data: {
+          url: model.pointToShowData,
+        },
+      });
+      
+      list.push({
         name: 'fit-plot',
         data: {
           url: model.fitAndResidualPlotData,
         },
       });
     }
+  
+    
     
     return request.post({
       url: '/graphics/list',

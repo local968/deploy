@@ -66,9 +66,8 @@ export default function Chart(props){
 		case 'predicted-vs-actual-plot':
 			chart = <PredictedVsActualPlot
 				x_name = {EN.PointNumber}
-				x_name = {y_name}
-				// y_name = {'project.target' + '的组内平均值'}
-				data={data.data}
+				y_name = {y_name}
+				data={data}
 			/>;
 			break;
 		case 'pie':

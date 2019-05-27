@@ -19,13 +19,13 @@ import PRCharts from "../../Charts/PRCharts";
 import SingleLiftCharts from "../../Charts/SingleLiftCharts";
 import VariableImpact from "../../Modeling/Result/VariableImpact";
 import ModelProcess from "../../Modeling/AdvancedView/ModelProcess";
-import request from "../../Request";
 import FitPlot2 from "../../Charts/FitPlot2";
 import ResidualPlot from "../../Charts/ResidualPlot";
 import SpeedvsAccuracys from "../../Charts/SpeedvsAccuracys";
 import LiftChart2 from "../../Charts/LiftChart2";
 import RocChart2 from "../../Charts/RocChart2";
 import { Hint } from 'components/Common';
+import Chart from "../../Charts/Chart";
 // import ROCCurve from "../../Modeling/AdvancedView/icon-roc-curve-normal.svg";
 const ROCCurve = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgd2lkdGg9IjUwcHgiIGhlaWdodD0iNTBweCIgdmlld0JveD0iMCAwIDUwIDUwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTQgKDc2NDgwKSAtIGh0dHBzOi8vc2tldGNoYXBwLmNvbSAtLT4NCiAgICA8dGl0bGU+UGFnZSAxPC90aXRsZT4NCiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4NCiAgICA8ZGVmcz4NCiAgICAgICAgPHBvbHlnb24gaWQ9InBhdGgtMSIgcG9pbnRzPSIwLjAwMDQgMC43MjQgNDkuMjc2IDAuNzI0IDQ5LjI3NiA1MCAwLjAwMDQgNTAiPjwvcG9seWdvbj4NCiAgICA8L2RlZnM+DQogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+DQogICAgICAgIDxnIGlkPSI1LTQtMi1Nb2RlbC1TZWxlY3Rpb25fQWR2YW5jZWQtVmlld19Nb2RlbC1FeHBhbmRfUk9DLUN1cmUtQ29weS0yIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjk2LjAwMDAwMCwgLTUyOS4wMDAwMDApIj4NCiAgICAgICAgICAgIDxnIGlkPSJQYWdlLTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI5Ni4wMDAwMDAsIDUyOC4wMDAwMDApIj4NCiAgICAgICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDAuMjc2NDAwKSI+DQogICAgICAgICAgICAgICAgICAgIDxtYXNrIGlkPSJtYXNrLTIiIGZpbGw9IndoaXRlIj4NCiAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+DQogICAgICAgICAgICAgICAgICAgIDwvbWFzaz4NCiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9IkNsaXAtMiI+PC9nPg0KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNDcuMjc2NCw0NSBDNDcuMjc2NCw0Ni42NTQgNDUuOTMwNCw0OCA0NC4yNzY0LDQ4IEw1LjAwMDQsNDggQzMuMzQ1NCw0OCAyLjAwMDQsNDYuNjU0IDIuMDAwNCw0NSBMMi4wMDA0LDUuNzI0IEMyLjAwMDQsNC4wNjkgMy4zNDU0LDIuNzI0IDUuMDAwNCwyLjcyNCBMNDQuMjc2NCwyLjcyNCBDNDUuOTMwNCwyLjcyNCA0Ny4yNzY0LDQuMDY5IDQ3LjI3NjQsNS43MjQgTDQ3LjI3NjQsNDUgWiBNNDQuMjc2NCwwLjcyNCBMNS4wMDA0LDAuNzI0IEMyLjI0MzQsMC43MjQgMC4wMDA0LDIuOTY3IDAuMDAwNCw1LjcyNCBMMC4wMDA0LDQ1IEMwLjAwMDQsNDcuNzU3IDIuMjQzNCw1MCA1LjAwMDQsNTAgTDQ0LjI3NjQsNTAgQzQ3LjAzMzQsNTAgNDkuMjc2NCw0Ny43NTcgNDkuMjc2NCw0NSBMNDkuMjc2NCw1LjcyNCBDNDkuMjc2NCwyLjk2NyA0Ny4wMzM0LDAuNzI0IDQ0LjI3NjQsMC43MjQgTDQ0LjI3NjQsMC43MjQgWiIgaWQ9IkZpbGwtMSIgZmlsbD0iIzFEMkIzQyIgbWFzaz0idXJsKCNtYXNrLTIpIj48L3BhdGg+DQogICAgICAgICAgICAgICAgPC9nPg0KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMC4xMzU3LDIzLjcwMjcgTDI0LjM0ODcsMjcuOTE0NyBMMjIuODcyNywyOC45ODg3IEwxOC44MzM3LDI0Ljk0ODcgQzE5LjI0MTcsMjQuNTIwNyAxOS42Nzc3LDI0LjEwNTcgMjAuMTM1NywyMy43MDI3IE0zNy4wMDA3LDE4LjcwNjcgTDM1LjczOTcsMTkuNjIzNyBMMzQuNzM3NywxOC42MjA3IEMzNS40NjY3LDE4LjYyMDcgMzYuMjIzNywxOC42NTE3IDM3LjAwMDcsMTguNzA2NyBNMzMuMzU3NywxOC42NTU3IEwzNC45MjE3LDIwLjIxOTcgTDMzLjc4MTcsMjEuMDQ5NyBDMzMuNzU3NywyMC45OTQ3IDMzLjcyNTcsMjAuOTQyNyAzMy42ODA3LDIwLjg5NzcgTDMxLjU4MDcsMTguNzk3NyBDMzIuMTU2NywxOC43MzE3IDMyLjc0NzcsMTguNjg0NyAzMy4zNTc3LDE4LjY1NTcgTTMwLjMzMzcsMTguOTY0NyBMMzIuOTczNywyMS42MDQ3IEMzMi45ODA3LDIxLjYxMTcgMzIuOTg5NywyMS42MTM3IDMyLjk5NjcsMjEuNjE5NyBMMzEuODUxNywyMi40NTM3IEwyOC42OTU3LDE5LjI5NzcgQzI5LjIyNDcsMTkuMTY5NyAyOS43NzA3LDE5LjA1ODcgMzAuMzMzNywxOC45NjQ3IE0yNy41ODU3LDE5LjYwMTcgTDMxLjAzMjcsMjMuMDQ5NyBMMjkuNjU5NywyNC4wNDk3IEwyNS44MTg3LDIwLjIwNzcgQzI2LjM4MTcsMTkuOTgyNyAyNi45NzU3LDE5Ljc4NDcgMjcuNTg1NywxOS42MDE3IE0yNC44Mzc3LDIwLjY0MTcgTDI4Ljg0MTcsMjQuNjQ0NyBMMjcuNDExNywyNS42ODU3IEwyMy4yMDY3LDIxLjQ4MDcgQzIzLjcyMzcsMjEuMTc5NyAyNC4yNzM3LDIwLjkwNDcgMjQuODM3NywyMC42NDE3IE0yNS4wOTA3LDI3LjI0MjcgTDIwLjkwMTcsMjMuMDU0NyBDMjEuMzU0NywyMi42OTQ3IDIxLjgzOTcsMjIuMzU1NyAyMi4zMzk3LDIyLjAyNzcgTDI2LjU5MjcsMjYuMjgxNyBMMjUuMTUwNywyNy4zMzE3IEMyNS4xMzA3LDI3LjMwMTcgMjUuMTE2NywyNy4yNjg3IDI1LjA5MDcsMjcuMjQyNyBNMTguMTU3NywyNS42ODc3IEwyMi4wNTQ3LDI5LjU4MzcgTDIwLjYzOTcsMzAuNjE0NyBMMTcuMDczNywyNy4wNDg3IEMxNy40MTM3LDI2LjU4ODcgMTcuNzcxNywyNi4xMzM3IDE4LjE1NzcsMjUuNjg3NyBNMTYuNDg2NywyNy44NzQ3IEwxOS44MjE3LDMxLjIwOTcgTDE4LjY4NTcsMzIuMDM1NyBMMTUuNzI3NywyOS4wNzc3IEMxNS45NjU3LDI4LjY3NjcgMTYuMjE2NywyOC4yNzU3IDE2LjQ4NjcsMjcuODc0NyBNMTUuMjE1NywyOS45ODA3IEwxNy44NjY3LDMyLjYzMTcgTDE2LjY5NzcsMzMuNDgzNyBMMTQuNTM4NywzMS4zMjQ3IEMxNC43NDU3LDMwLjg4MTcgMTQuOTcxNywzMC40MzI3IDE1LjIxNTcsMjkuOTgwNyBNMTQuMTAxNywzMi4zMDI3IEwxNS44Nzg3LDM0LjA3ODcgTDE0Ljk0NDcsMzQuNzU4NyBMMTMuNjM5NywzMy40NTQ3IEMxMy43Nzk3LDMzLjA3OTcgMTMuOTM1NywzMi42OTM3IDE0LjEwMTcsMzIuMzAyNyBNMTMuMjcxNywzNC40OTk3IEwxNC4xMjQ3LDM1LjM1NDcgTDEyLjcxNTcsMzYuMzgwNyBDMTIuODYzNywzNS44MTI3IDEzLjA0NDcsMzUuMTgyNyAxMy4yNzE3LDM0LjQ5OTcgTTM4LjM0NTcsMzguMDE1NyBMMTIuMzQxNywzOC4wMTU3IEMxMi4zNTE3LDM3Ljk2NTcgMTIuMzU5NywzNy45MjE3IDEyLjM3MDcsMzcuODY4NyBMMzguNjE5NywxOC43NjQ3IEMzOS4wMDE3LDE4LjY1NTcgMzkuMjk0NywxOC4zMzA3IDM5LjMzOTcsMTcuOTEzNyBDMzkuMzk4NywxNy4zNjQ3IDM5LjAwMDcsMTYuODcxNyAzOC40NTE3LDE2LjgxMjcgQzIzLjM2NjcsMTUuMTkyNyAxNS41NDQ3LDIzLjY4MzcgMTIuMTYyNywzMS42Mzg3IEwxMi4xNjI3LDEyLjA3ODcgQzEyLjE2MjcsMTEuNTI2NyAxMS43MTU3LDExLjA3ODcgMTEuMTYyNywxMS4wNzg3IEMxMC42MTA3LDExLjA3ODcgMTAuMTYyNywxMS41MjY3IDEwLjE2MjcsMTIuMDc4NyBMMTAuMTYyNywzOS4wMTU3IEMxMC4xNjI3LDM5LjA2MzcgMTAuMTgzNywzOS4xMDQ3IDEwLjE5MDcsMzkuMTUxNyBDMTAuMTk5NywzOS4yMTg3IDEwLjIwNjcsMzkuMjg0NyAxMC4yMzA3LDM5LjM0NzcgQzEwLjI1MTcsMzkuNDA5NyAxMC4yODM3LDM5LjQ2MTcgMTAuMzE2NywzOS41MTY3IEMxMC4zNDk3LDM5LjU3MTcgMTAuMzc4NywzOS42MjQ3IDEwLjQyMDcsMzkuNjcxNyBDMTAuNDY0NywzOS43MjE3IDEwLjUxNTcsMzkuNzU5NyAxMC41Njg3LDM5Ljc5OTcgQzEwLjYxNjcsMzkuODM2NyAxMC42NjM3LDM5Ljg3MzcgMTAuNzIwNywzOS45MDE3IEMxMC43ODE3LDM5LjkzMjcgMTAuODQ3NywzOS45NDg3IDEwLjkxNTcsMzkuOTY2NyBDMTAuOTU4NywzOS45Nzc3IDEwLjk5NTcsNDAuMDAyNyAxMS4wNDI3LDQwLjAwODcgQzExLjA4MTcsNDAuMDEzNyAxMS4xMjA3LDQwLjAxNDcgMTEuMTU4Nyw0MC4wMTQ3IEMxMS4xNTk3LDQwLjAxNDcgMTEuMTYxNyw0MC4wMTU3IDExLjE2MjcsNDAuMDE1NyBMMzguMzQ1Nyw0MC4wMTU3IEMzOC44OTg3LDQwLjAxNTcgMzkuMzQ1NywzOS41Njg3IDM5LjM0NTcsMzkuMDE1NyBDMzkuMzQ1NywzOC40NjM3IDM4Ljg5ODcsMzguMDE1NyAzOC4zNDU3LDM4LjAxNTciIGlkPSJGaWxsLTQiIGZpbGw9IiMxRDJCM0MiPjwvcGF0aD4NCiAgICAgICAgICAgIDwvZz4NCiAgICAgICAgPC9nPg0KICAgIDwvZz4NCjwvc3ZnPg=='
 // import rocHover from "../../Modeling/AdvancedView/icon-roc-curve-hover.svg";
@@ -444,7 +444,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sort, handleSort, metric } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable,target },sort, handleSort, metric } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
@@ -466,19 +466,28 @@ class AdvancedModelTable extends Component {
       }
       return prev
     }, {});
-    const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
-    const dataSource = models.map(m => {
+    const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>;
+    const dataSource = models.map(m=> {
       if (problemType === 'Classification') {
         return <ClassificationModelRow project={this.props.project} no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
       } else {
-        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+        return <RegressionModleRow
+            project={this.props.project} key={m.id} texts={texts}
+            onClickCheckbox={this.onClickCheckbox(m.id)}
+            checked={selectModel.id === m.id}
+            model={m} metric={metric.key} />
       }
     });
+    const graphicList = toJS(models[0].graphicList);
+    graphicList.pop();
     return (
       <div className={styles.advancedModelTableDiv}>
+        <Chart
+            y_name={target + '的组内平均值'}
+            data={graphicList.pop()}
+        />
         {header}
         <div className={styles.advancedModelTable} >
-
           {dataSource}
         </div>
       </div>
@@ -494,12 +503,14 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked } = this.props;
+    const { model, texts, metric, checked,project } = this.props;
     const { score, modelName, reason } = model;
-    const { detail } = this.state;
-    const { validate, holdout } = reason || {}
+    // const { detail } = this.state;
+    const { validate, holdout } = reason || {};
+
+    
     return (
-      <div >
+      <div>
         <Row onClick={this.handleResult} >
           {texts.map(t => {
             switch (t) {
@@ -540,7 +551,7 @@ class AdvancedModelTable extends Component {
             }
           })}
         </Row>
-        { <RegressionDetailCurves project={this.props.project} model={model} />}
+        { <RegressionDetailCurves project={project} model={model} />}
       </div>
     )
   }
@@ -564,31 +575,30 @@ class RegressionDetailCurves extends Component {
 
   handleDiagnoseType = e => {
     this.setState({ diagnoseType: e.target.value });
-  }
+  };
 
-  componentDidMount() {
-    this.setChartDate()
-  }
-
-  setChartDate() {
-    // const url = this.props.model.fitAndResidualPlotData;
-    // request.post({
-    //   url: '/graphics/fit-plot',
-    //   data: {
-    //     url,
-    //   },
-    // }).then(chartDate => {
-    //   this.setState({
-    //     chartDate
-    //   })
-    // });
-  }
+  // componentDidMount() {
+  //   this.setChartDate()
+  // }
+  //
+  // setChartDate() {
+  //   // const url = this.props.model.fitAndResidualPlotData;
+  //   // request.post({
+  //   //   url: '/graphics/fit-plot',
+  //   //   data: {
+  //   //     url,
+  //   //   },
+  //   // }).then(chartDate => {
+  //   //   this.setState({
+  //   //     chartDate
+  //   //   })
+  //   // });
+  // }
 
   render() {
     const { model } = this.props;
     const { curve, diagnoseType, chartDate } = this.state;
     const fitData = toJS(model.graphicList).pop();
-    console.log('fitData',fitData)
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
