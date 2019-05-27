@@ -39,7 +39,7 @@ export default class D3D2 extends PureComponent {
 		});
 		const {featuresLabel} = result;
 		
-		const [x_name,y_name,z_name] = featuresLabel;
+		const [x_name,y_name,z_name=''] = featuresLabel;
 		
 		this.setState({
 			result,
@@ -91,7 +91,7 @@ export default class D3D2 extends PureComponent {
 		let dot = [x_name, y_name, z_name].map(itm => featuresLabel.indexOf(itm));
 		
 		featureData.map((itm, index) => {
-			const val = dot.map(it=>itm[it]).filter(it=>it);
+			const val = dot.map(it=>itm[it]).filter(it=>it === 0 ||it);
 			data.filter(itm => itm.name === labels[index])[0].value.push(val);
 		});
 		

@@ -1,14 +1,14 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 
-export default class ParallelPlot extends PureComponent{
+export default class TSEN extends PureComponent{
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
 	}
 	
 	getOption() {
-		const {x_name,y_name,data} = this.props;
+		const {x_name,y_name,data,title=''} = this.props;
 		
 		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
 			return {
@@ -19,6 +19,12 @@ export default class ParallelPlot extends PureComponent{
 			}
 		});
 		return {
+			title: {
+				text: title,
+				textStyle:{
+					fontSize:11
+				}
+			},
 			grid: {
 				left: '6%',
 				right: '20%',
@@ -109,9 +115,10 @@ export default class ParallelPlot extends PureComponent{
 	}
 	
 	render(){
+		const {width=550,height=400} = this.props;
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 400, width: 550}}
+			style={{height, width}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'
