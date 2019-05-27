@@ -915,7 +915,7 @@ const EN_LAN = {
   NAME: 'name',
   ADD: 'Add',
   Average: 'Average',
-  PointNumber: 'Point Number',
+  PointNumber: 'Group ID',
   NewAverage: '',
   RawData: 'Raw Data',
   GroupNumber: 'Group Number:',
