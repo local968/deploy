@@ -395,21 +395,21 @@ export default class AdvancedView extends Component {
           <div className={styles.status}>&nbsp;&nbsp;{this.performance}</div>
         </div>
         <div className={styles.middle}>
-          <div className={styles.settings}>
-            <span className={styles.label}>{EN.ModelNameContains}:</span>
-            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
-              <Option value={'all'}>{EN.All}</Option>
-              {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
-            </Select>
-          </div>
+          {/*<div className={styles.settings}>*/}
+          {/*  <span className={styles.label}>{EN.ModelNameContains}:</span>*/}
+          {/*  <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>*/}
+          {/*    <Option value={'all'}>{EN.All}</Option>*/}
+          {/*    {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}*/}
+          {/*  </Select>*/}
+          {/*</div>*/}
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
-        <div className={styles.metricSelection} >
-          <span className={styles.text} >{EN.MeasurementMetric}</span>
-          <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
-            {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
-          </Select>
-        </div>
+        {/*<div className={styles.metricSelection} >*/}
+        {/*  <span className={styles.text} >{EN.MeasurementMetric}</span>*/}
+        {/*  <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>*/}
+        {/*    {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}*/}
+        {/*  </Select>*/}
+        {/*</div>*/}
         <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} metric={currMetric} />
       </div>
     )
@@ -927,15 +927,33 @@ class PredictTable extends Component {
   @observable showCost = false
   @observable costOption = { ...this.props.project.costOption }
   @observable showTip = false;
+  @observable distribution = this.props.project.distribution || ''
+  totalLines = this.props.project.totalLines;
   onChange = e => {
-    const criteria = e.target.value
-    this.showCost = criteria === 'cost'
-    const data = { criteria }
+    // const criteria = e.target.value
+    // this.showCost = criteria === 'cost'
+    // const data = { criteria }
+    // if (!this.showCost) {
+    //   const { models } = this.props
+    //   data.selectId = ''
+    //   // this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+    //   // data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+    //   models.forEach(m => {
+    //     if (!m.initialFitIndex) return
+    //     m.updateModel({ fitIndex: m.initialFitIndex })
+    //   })
+    // } else {
+    //   this.handleSubmit()
+    // }
+    // this.props.project.updateProject(data)
+
+    const criteria = e.target.value;
+    this.showCost = criteria === 'cost';
+    this.showTip = false;
+    const data = { criteria };
     if (!this.showCost) {
-      const { models } = this.props
-      data.selectId = ''
-      // this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
-      // data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+      const { models } = this.props;
+      data.selectId = '';
       models.forEach(m => {
         if (!m.initialFitIndex) return
         m.updateModel({ fitIndex: m.initialFitIndex })
@@ -943,7 +961,7 @@ class PredictTable extends Component {
     } else {
       this.handleSubmit()
     }
-    this.props.project.updateProject(data)
+    this.props.project.updateProject(data);
   }
 
   costInput = (row, col) => {
@@ -964,16 +982,44 @@ class PredictTable extends Component {
   }
 
   handleSubmit = () => {
-    const { project } = this.props
+    // const { project } = this.props
+    // const { models } = project
+    // const { TP, FN, FP, TN } = project.costOption
+    // models.forEach(m => {
+    //   const benefit = m.getBenefit(TP, FN, FP, TN)
+    //   if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
+    // })
+    // project.updateProject({ costOption: { ...this.costOption }, selectId: '' })
+
+
+    const {  project } = this.props;
     const { models } = project
-    const { TP, FN, FP, TN } = project.costOption
+    const { targetCounts } = project
+    const { TP, FN, FP, TN } = this.costOption;
+    const [v0, v1] = Object.values(targetCounts)
+    const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+    const percentNew = typeof this.distribution === 'number' ? this.distribution / 100 : percent0
     models.forEach(m => {
-      const benefit = m.getBenefit(TP, FN, FP, TN)
+      const benefit = m.getBenefit(TP, FN, FP, TN, percentNew, percent0)
       if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
     })
-    project.updateProject({ costOption: { ...this.costOption }, selectId: '' })
+    project.updateProject({ costOption: { ...this.costOption }, selectId: '', distribution: this.distribution })
   }
 
+  reset = () => {
+    const {  project } = this.props;
+    const { models } = project
+    const [v0, v1] = Object.values(targetCounts)
+    const percent = parseInt(v1 / (v0 + v1) * 10000, 0)
+    this.distribution = percent / 100
+    this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
+
+    // models.forEach(m => {
+    //   if (!m.initialFitIndex) return
+    //   m.updateModel({ fitIndex: m.initialFitIndex })
+    // })
+    // project.updateProject({ costOption: { ...this.costOption }, selectId: '', distribution: this.distribution })
+  }
   render() {
     // const { model, yes, no, project } = this.props;
     // console.log(this.props , 'sdasdasdsadsd')
@@ -1080,7 +1126,7 @@ class PredictTable extends Component {
                   <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
                   <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} onBlur={this.handleChangeEvent} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
                   <span style={{ marginLeft: '0.5em' }}>%</span>
-                  <span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>
+                  {/*<span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>*/}
                 </div>
               </dt>
               <div className={styles.eventButton}>
@@ -1119,9 +1165,9 @@ class PredictTable extends Component {
             <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoverallbenefit}{`<${curBenefit.benefit > Math.pow(10, 7) ? curBenefit.benefit.toPrecision(3) : formatNumber(curBenefit.benefit, 2)}>`}</span></div>
             {/* <div className={styles.costText}><span>{curBenefit.text}</span></div> */}
           </div>}
-          <div className={styles.costButton}>
-            <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>
-          </div>
+          {/*<div className={styles.costButton}>*/}
+          {/*  <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>*/}
+          {/*</div>*/}
         </div>
 
 
