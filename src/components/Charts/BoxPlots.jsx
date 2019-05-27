@@ -99,7 +99,7 @@ export default class BoxPlots extends PureComponent{
 	render(){
 		const {
 			height = 400,
-			width = 1000,
+			width = 400,
 		} = this.props;
 
 		return <ReactEcharts

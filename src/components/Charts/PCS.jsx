@@ -15,11 +15,16 @@ export default class PCS extends PureComponent{
 				max:1,
 				min:-1,
 				name:x_name,
+				nameGap:5,
+				// nameLocation:'middle'
 			},
 			yAxis: {
 				max:1,
 				min:-1,
 				name:y_name,
+			},
+			grid:{
+				// x2:150
 			},
 			title: {
 				text: 'The Correlation between PCs and original variables:',
@@ -65,7 +70,7 @@ export default class PCS extends PureComponent{
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
-			style={{height: 300, width: 300}}
+			style={{height: 360, width: 300}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'

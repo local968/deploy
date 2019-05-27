@@ -14,15 +14,18 @@ export default function PAW(props){
 	const [tsenD,setTsenD] = useState([]);
 	
 	function setPcsData(data){
-		return data.map(itm=>{
-			const re = [];
-			itm.forEach((it,index)=>{
-				if(pcs.includes(index)){
-					re.push(it)
-				}
-			});
-			return re;
-		})
+		const xs = data[pcs[0]];
+		const ys = data[pcs[1]];
+		// return data.map(itm=>{
+		// 	const re = [];
+		// 	itm.forEach((it,index)=>{
+		// 		if(pcs.includes(index)){
+		// 			re.push(it)
+		// 		}
+		// 	});
+		// 	return re;
+		// })
+		return _.zip(xs,ys);
 	}
 	
 	function setTsenData(pcaData=[],predicts=[]){
@@ -123,8 +126,8 @@ export default function PAW(props){
 					<TSEN
 						x_name = {'PC'+(pcs[0]+1)}
 						y_name = {'PC'+(pcs[1]+1)}
-						width = {350}
-						height={300}
+						width = {380}
+						height={340}
 						data={tsenD}
 						title={'ScatterPlot of PCs:'}
 					/>

@@ -478,14 +478,21 @@ class AdvancedModelTable extends Component {
             model={m} metric={metric.key} />
       }
     });
-    const graphicList = toJS(models[0].graphicList);
-    graphicList.pop();
-    return (
-      <div className={styles.advancedModelTableDiv}>
-        <Chart
+    const RegressChart = ()=>{
+      if (problemType !== 'Classification') {
+        const graphicList = toJS(models[0].graphicList);
+        graphicList.pop();
+        return <Chart
             y_name={target + '的组内平均值'}
             data={graphicList.pop()}
         />
+      }
+      return <React.Fragment/>
+    };
+    
+    return (
+      <div className={styles.advancedModelTableDiv}>
+        <RegressChart/>
         {header}
         <div className={styles.advancedModelTable} >
           {dataSource}
