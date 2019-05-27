@@ -184,12 +184,12 @@ function saveSample() {
 }
 
 router.get('/download/model', async (req, res) => {
-  const { filename, projectId, mid, etlIndex, url } = req.query
+  const { filename, projectId, mid, etlIndex } = req.query
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  const { featureImportance } = model
+  const { featureImportance, deployData } = model
   const header = Object.keys(JSON.parse(featureImportance))
-  // const url = JSON.parse()
+  const url = JSON.parse(deployData)
 
   downloadCsv(decodeURIComponent(url), decodeURIComponent(filename), etlIndex, header, res)
 
@@ -242,44 +242,81 @@ router.get('/download/model', async (req, res) => {
   // })
 })
 
-// router.get('/download/outlier', async (req, res) => {
-//   const { filename, mid, rate, etlIndex, projectId } = req.query
-//   const { userId } = req.session
-//   const requestId = uuid.v4()
+router.get('/download/outlier', async (req, res) => {
+  const { filename, mid, rate, projectId, etlIndex } = req.query
+  // const { userId } = req.session
+  // const requestId = uuid.v4()
 
-//   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-//   const { featureImportance } = model
-//   const header = Object.keys(JSON.parse(featureImportance))
+  const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
+  const { featureImportance, deployData } = model
+  const header = Object.keys(JSON.parse(featureImportance))
+  const url = JSON.parse(deployData)
 
-//   let _rate = rate
-//   try {
-//     _rate = parseFloat(rate)
-//   } catch (e) { }
+  // let _rate = rate
+  // try {
+  //   _rate = parseFloat(rate)
+  // } catch (e) { }
 
-//   try {
-//     const deployResult = await command({
-//       command: 'outlier.deploy',
-//       requestId,
-//       projectId,
-//       userId,
-//       csvLocation: [etlIndex],
-//       ext: ['csv'],
-//       solution: mid,
-//       actionType: 'deployment',
-//       frameFormat: 'csv',
-//       rate: _rate
-//     }, processData => {
-//       const { status, result } = processData
-//       if (status === 1) return
-//       if (status === 100) return result
-//       throw new Error(result[processError])
-//     })
-
-//     downloadCsv(deployResult.deployData, decodeURIComponent(filename), etlIndex, header, res)
-//   } catch (e) {
-//     return res.status(500).send(e)
-//   }
-// })
+  let temp = {}
+  let counter = 0
+  let resultHeader
+  res.attachment(filename);
+  res.type('csv')
+  http.get(url, (response) => {
+    Papa.parse(response, {
+      download: true,
+      header: true,
+      step: async (results, parser) => {
+        const row = results.data[0]
+        if (!resultHeader) {
+          resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no' && key !== 'decision_index')
+          res.write(Papa.unparse([[...resultHeader, 'label'], []], { header: false }))
+        }
+        const nos = Object.keys(temp)
+        const _start = Math.min(...nos, row['__no'])
+        const _end = Math.max(...nos, row['__no'])
+        if (counter >= 500 || _end - _start >= 5000) {
+          const start = Math.min(...nos)
+          const end = Math.max(...nos)
+          parser.pause()
+          counter = 1
+          const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
+          const result = response.data.result.map(esRow => {
+            const rowData = { ...esRow, ...temp[esRow['__no']] }
+            const row = resultHeader.map(h => rowData[h])
+            const label = rowData.decision_index <= rate ? -1 : 1
+            row.push(label)
+            return row
+          })
+          result.push([])
+          res.write(Papa.unparse(result, { header: false }))
+          temp = { [row['__no']]: row }
+          parser.resume()
+          flag = true
+        } else {
+          temp[row['__no']] = row
+          counter++
+        }
+      },
+      complete: async (results, file) => {
+        counter = 0
+        const nos = Object.keys(temp)
+        const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
+        const result = response.data.result.map(esRow => {
+          const rowData = { ...esRow, ...temp[esRow['__no']] }
+          const row = resultHeader.map(h => rowData[h])
+          const label = rowData.decision_index <= rate ? -1 : 1
+          row.push(label)
+          return row
+        })
+        result.push([])
+        res.write(Papa.unparse(result, { header: false }))
+        temp = {}
+        res.end()
+      }
+    })
+  })
+})
 
 // todo
 // 500行分片下载还是有潜在bug

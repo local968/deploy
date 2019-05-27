@@ -90,13 +90,13 @@ function ModelResult(props) {
       .then(id => props.routing.push('/deploy/project/' + id));
   };
 
-  const download = async () => {
-    setDownloading(true)
-    const deplotData = problemType === 'Outlier' ? await project.preDownload() : selectModel.deployData
-    if (!deplotData) return message.error('download error!')
-    window.open(`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&url=${encodeURIComponent(deplotData)}`)
-    setDownloading(false)
-  }
+  // const download = async () => {
+  //   setDownloading(true)
+  //   const deplotData = problemType === 'Outlier' ? await project.preDownload() : selectModel.deployData
+  //   if (!deplotData) return message.error('download error!')
+  //   window.open(`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&url=${encodeURIComponent(deplotData)}`)
+  //   setDownloading(false)
+  // }
 
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
@@ -170,15 +170,15 @@ function ModelResult(props) {
       </Tooltip> : <button className={`${classes.button}`} onClick={deploy}>
           <span>{EN.DeployTheModel}</span>
         </button>}
-      {<button className={`${classes.button}`} onClick={download} style={{ marginLeft: '.1em' }}>
+      {/* {<button className={`${classes.button}`} onClick={download} style={{ marginLeft: '.1em' }}>
         <span>导出模型结果</span>
-      </button>}
-      {/* {problemType === 'Clustering' && <a href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
+      </button>} */}
+      {problemType === 'Clustering' && <a href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
         <span>{'导出模型结果'}</span>
-      </button></a>} */}
-      {/* {problemType === 'Outlier' && <a href={`/upload/download/outlier?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&rate=${formatNumber(selectModel.rate)}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
+      </button></a>}
+      {problemType === 'Outlier' && <a href={`/upload/download/outlier?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&rate=${formatNumber(selectModel.rate)}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
         <span>{'导出模型结果'}</span>
-      </button></a>} */}
+      </button></a>}
     </div>
     {downloading && <ProcessLoading style={{ position: 'fixed' }} />}
   </div>;

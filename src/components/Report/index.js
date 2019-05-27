@@ -28,6 +28,23 @@ const addComma = number => {
   return number.reverse().join('')
 }
 
+const listdisplayProp = {}
+function displayProp(obj){
+  var Categorical = 0 ;
+  var Numerical = 0 ;
+  for(var name in obj){
+    if(obj[name] === 'Categorical'){
+      Categorical += 1;
+    }else if(obj[name] === 'Numerical') {
+      Numerical += 1;
+    }
+  }
+  listdisplayProp.Categorical = Categorical
+  listdisplayProp.Numerical = Numerical
+  return listdisplayProp
+}
+
+
 @inject('projectStore')
 @observer
 class Report extends Component {
@@ -144,6 +161,10 @@ class Report extends Component {
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
 
     console.log(list[0] , 'listlistlistlistlistlist' ,list[0].name)
+
+    console.log(Object.keys(list[0].colType).values() , 'Object.keys(list[0].colType)' ,Object.keys(list[0].colType).filter(([k, v]) => {console.log(v, 'ccccccccc',k)}))
+
+    displayProp(list[0].colType)
     return (
 
       <div className={styles.report}>
@@ -171,8 +192,8 @@ class Report extends Component {
             <div className={styles.schemaRow}>
               <span className={styles.schemaCell}>{addComma(list[0].totalRawLines)}</span>
               <span className={styles.schemaCell}>{addComma(Object.keys(list[0].colType).length)}</span>
-              <span className={styles.schemaCell}>{addComma(Object.keys(list[0].colType).filter(([k, v]) => v === 'Categorical').length)}</span>
-              <span className={styles.schemaCell}>{addComma(Object.keys(list[0].colType).filter(([k, v]) => v === 'Numerical').length)}</span>
+              <span className={styles.schemaCell}>{listdisplayProp.Categorical}</span>
+              <span className={styles.schemaCell}>{listdisplayProp.Numerical}</span>
             </div>
           </div>
         </div>}
