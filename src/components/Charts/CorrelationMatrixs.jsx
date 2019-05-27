@@ -14,10 +14,59 @@ export default function CorrelationMatrixs(props){
 
 	data = data.map((item)=> [item[1], item[0], item[2] || '-']);
 	
-	const len = Math.max(...type.map(itm=>itm.length));
+	const len = Math.max(...type.map(itm=>itm.length),0);
 	const nameTextStyle = {
 		color:'#000',
 	};
+	
+	let series = {
+		type: 'heatmap',
+		data,
+		itemStyle: {
+			emphasis: {
+				shadowBlur: 10,
+				shadowColor: 'rgba(0, 0, 0, 0.5)',
+			},
+		},
+	};
+	if(!len){
+		series = {
+			type: 'tree',
+			
+			data: [{name:'N/A'}],
+			
+			left: '20%',
+			// right: '2%',
+			// top: '8%',
+			// bottom: '20%',
+			
+			symbol: 'emptyCircle',
+			symbolSize:1,
+			
+			orient: 'LR',
+			
+			label: {
+				normal: {
+					position: 'center',
+					rotate: -90,
+					verticalAlign: 'middle',
+					align: 'right',
+					fontSize: 100
+				}
+			},
+			
+			leaves: {
+				label: {
+					normal: {
+						position: 'center',
+						rotate: -0,
+						verticalAlign: 'middle',
+						align: 'left'
+					}
+				}
+			},
+		}
+	}
 
 	const option = {
 		tooltip: {
@@ -55,18 +104,8 @@ export default function CorrelationMatrixs(props){
 			inRange: {color: ['#80BDFD','#fff','#B0E39B']},
 			align:'bottom',
 		},
-		series: {
-			// name: 'Punch Card',
-			type: 'heatmap',
-			data,
-			itemStyle: {
-				emphasis: {
-					shadowBlur: 10,
-					shadowColor: 'rgba(0, 0, 0, 0.5)',
-				},
-			},
-		},
-	}
+		series,
+	};
 	return <ReactEcharts
 		option={option}
 		style={{height:height+6 * len, width:width+6 * len}}
