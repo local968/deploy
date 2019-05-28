@@ -367,10 +367,10 @@ class Summary extends Component {
               const percent = percentList[k]
               return <div className={styles.summaryTableRow} key={k}>
                 <div className={styles.summaryProgressBlock}>
-                  <div className={styles.summaryProgress} style={{ width: percent.clean + '%', backgroundColor: '#00c855' }}></div>
-                  <div className={styles.summaryProgress} style={{ width: percent.mismatch + '%', backgroundColor: '#819ffc' }}></div>
-                  <div className={styles.summaryProgress} style={{ width: percent.missing + '%', backgroundColor: '#ff97a7' }}></div>
-                  <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }}></div>
+                  <div className={styles.summaryProgress} style={{width: percent.clean + '%', backgroundColor: '#00c855'}}/>
+                  <div className={styles.summaryProgress} style={{width: percent.mismatch + '%', backgroundColor: '#819ffc'}}/>
+                  <div className={styles.summaryProgress} style={{width: percent.missing + '%', backgroundColor: '#ff97a7'}}/>
+                  <div className={styles.summaryProgress} style={{width: percent.outlier + '%', backgroundColor: '#f9cf37'}}/>
                 </div>
               </div>
             })}
@@ -383,9 +383,9 @@ class Summary extends Component {
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
           <Pie2
-            RowsWillBeFixed={fixedPercent}
-            RowsWillBeDeleted={deletePercent}
-            CleanData={cleanPercent}
+              RowsWillBeFixed={fixedPercent}
+              RowsWillBeDeleted={deletePercent}
+              CleanData={cleanPercent}
           />
           <div className={styles.summaryParts}>
             <div className={styles.summaryPart}>
