@@ -981,7 +981,9 @@ const ZH_LAN: any = {
   ProjectDescription:'函数功能说明',
   base:'基础函数',
   senior:'R2自定义函数',
-  ClusterReason:'您的数据在该模型上的预测类别数为1类，故不显示度量指标。',
+  ClusterReason: '您的数据在该模型上的预测类别数为1类，故不显示度量指标。',
+  Replacewithlower: '替换为下界',
+  Replacewithupper: '替换为上界'
 };
 
 export default ZH_LAN;

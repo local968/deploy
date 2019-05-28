@@ -144,7 +144,7 @@ export class FixIssue extends Component {
         {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.mismatch)}/>
+              <div className={classnames(styles.typeBlock, styles.mismatch)} />
               <span>{EN.DataTypeMismatch}</span>
             </div>
           </div>
@@ -219,7 +219,7 @@ export class FixIssue extends Component {
         {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.missing)}/>
+              <div className={classnames(styles.typeBlock, styles.missing)} />
               <span>{EN.MissingValue}</span>
             </div>
           </div>
@@ -299,7 +299,7 @@ export class FixIssue extends Component {
         {!!outlierCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.outlier)}/>
+              <div className={classnames(styles.typeBlock, styles.outlier)} />
               <span>{EN.Outlier}</span>
             </div>
           </div>
@@ -330,6 +330,8 @@ export class FixIssue extends Component {
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median
+                const low = !rawDataView ? 'N/A' : rawDataView[k].low
+                const high = !rawDataView ? 'N/A' : rawDataView[k].high
                 const method = this.fillMethod.outlier.hasOwnProperty(k) ?
                   this.fillMethod.outlier[k] :
                   outlierFillMethodTemp.hasOwnProperty(k) ?
@@ -342,6 +344,8 @@ export class FixIssue extends Component {
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
+                  method !== low &&
+                  method !== high &&
                   method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span>{k}</span></div>
@@ -360,7 +364,8 @@ export class FixIssue extends Component {
                       <option value="drop" key='drop'>{EN.Deletetherows}</option>
                       <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>
                       <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>
-                      {/* <option value={mode} key='mode'>Replace with most frequent value</option> */}
+                      <option value={low} key='low'>{EN.Replacewithlower}</option>
+                      <option value={high} key='high'>{EN.Replacewithupper}</option>
                       <option value={0} key='0'>{EN.ReplaceWith0}</option>,
                       <option value={''} key='others'>{EN.Replacewithothers}</option>
                     </select>
@@ -389,7 +394,7 @@ export class FixIssue extends Component {
               saveEdit={this.saveEdit}
               field={this.editKey}
               id={project.originalIndex}
-              project = {project}
+              project={project}
             />
           } />}
     </div>
