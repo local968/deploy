@@ -12,18 +12,11 @@ export default function PredictionDistributions(props){
 	const _NEGATIVE = Object.values(NEGATIVE);
 	const _PERCENTAGE = Object.values(PERCENTAGE);
 	const [point,setPoint] = useState(false);
-	// const [defaultIndex,setDefaultIndex] = useState(false);
-	// console.log(props.model)
 	
 	useEffect(()=>{
-		// console.log(787,fitIndex,+(Threshold[fitIndex].toFixed(3)))
 		const s = +(Threshold[fitIndex].toFixed(3));
-		// console.log(9,s)
 		setPoint(s);
-		// setDefaultIndex(fitIndex)
 	},[]);
-	
-	// console.log(point)
 	
 	const data =  [{
 		name:'False',
@@ -32,6 +25,7 @@ export default function PredictionDistributions(props){
 		name:'True',
 		value:_.zip(_PERCENTAGE,_POSITIVE),
 	}];
+	// console.log('data',data)
 	const series = data.map(itm=>({
 		type: 'line',
 		areaStyle: {},
@@ -40,41 +34,19 @@ export default function PredictionDistributions(props){
 		symbol: 'circle',
 	}));
 	
-	// const point = data[0].value[fitIndex][0];
-	// const point = +(Threshold[fitIndex].toFixed(3));
-	
 	const setf = _.debounce((value)=>{
-		
-		// initialFitIndex === fitIndex&& defaultIndex !== initialFitIndex
-		// console.log( initialFitIndex === fitIndex&& defaultIndex !== initialFitIndex)
-		
 		if(point === value||!value){
 			return
 		}
 		
-		
-		// console.log(point,value)
-		// if(!point)return;
 		const t = Object.values(Threshold).sort((a,b)=>{
 			return Math.abs(a - value) - Math.abs(b - value)
 		})[0];
 		
-		setPoint(value)
-		
+		setPoint(value);
 		
 		const ind = Object.values(Threshold).indexOf(t);
-		// console.log(point,value,ind)
-		
-		// if(defaultIndex !== fitIndex){
 			props.model.setFitIndex(ind)
-		// }
-		
-		// if(pre!==fitIndex){
-		
-		// }else{
-		// 	setPre(true)
-		// }
-		// props.model.setFitIndex(ind)
 	},100);
 	
 	const nameTextStyle = {
@@ -82,7 +54,7 @@ export default function PredictionDistributions(props){
 	};
 	
 	let option;
-	if(!point){
+	if(point === false){
 		option = {
 			xAxis:{},
 			yAxis:{}
