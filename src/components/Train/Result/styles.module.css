@@ -118,8 +118,8 @@
   flex-direction: column;
   flex: none;
   border: solid 0.5px #979797;
-  overflow: auto;
-  max-height: 6em;
+  /* overflow: auto; */
+  /* max-height: 6em; */
 }
 
 .rowBody {
@@ -127,6 +127,7 @@
   flex: none;
   flex-direction: column;
   padding: 5px 0;
+  position: relative;
 }
 
 .rowData {
@@ -142,6 +143,11 @@
   flex-direction: column;
   flex: none;
   position: relative;
+  overflow-y: auto;
+  overflow-x: visible;
+  margin-left: -200px;
+  padding-left: 200px;
+  max-height: 4em;
 }
 
 .modelSelect {
@@ -184,7 +190,7 @@
   align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid #979797;
-  min-width: 200px;
+  /* min-width: 200px; */
   margin: 0 5px;
   position: relative;
   flex: 1 1 125px;
@@ -244,7 +250,7 @@
   cursor: pointer;
   padding: 20px 0;
   border-bottom: solid 1px #9b9b9b;
-  width: 200px;
+  width: 0;
 }
 
 .name {
