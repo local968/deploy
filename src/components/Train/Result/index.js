@@ -315,7 +315,7 @@ const ClusteringTable = observer((props) => {
         case "ch":
           return (a.score.CH - b.score.CH) * value
         case "sihouette":
-          return (a.score.silhouette_cosine - b.score.silhouette_cosine) * value
+          return (a.score.silhouette_euclidean - b.score.silhouette_euclidean) * value
         case "cluster":
           return (Object.keys(a.labelWithImportance).length - Object.keys(b.labelWithImportance).length) * value
         case "name":
@@ -418,7 +418,7 @@ const ClusteringRow = observer((props) => {
           <span>{formatNumber(model.score.CVNN)}</span>
         </div>
         <div className={`${classes.ccell}`}>
-          <span>{formatNumber(model.score.silhouette_cosine)}</span>
+          <span>{formatNumber(model.score.silhouette_euclidean)}</span>
         </div>
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.CH)}</span>
