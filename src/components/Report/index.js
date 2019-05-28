@@ -7,6 +7,7 @@ import CorrelationMatrix from 'components/Modeling/Start/CorrelationMatrix'
 import VariableList from './VariableList'
 import VariableImpact from './Model/VariableImpact'
 import ModelProcessFlow from './Model/ModelProcessFlow'
+import ModelProcessFlow2 from './Model/ModelProcessFlow2'
 import AdvancedView, { PredictTable } from './Score'
 import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
@@ -33,7 +34,7 @@ function displayProp(obj){
   var Categorical = 0 ;
   var Numerical = 0 ;
   for(var name in obj){
-    if(obj[name] === 'Categorical'){
+    if(obj[name] === 'Categorical'||obj[name] === 'Raw' ){
       Categorical += 1;
     }else if(obj[name] === 'Numerical') {
       Numerical += 1;
@@ -309,10 +310,16 @@ class Report extends Component {
             </div>
           </div>}
 
-          {this.isShow('processFlow') && <div className={classnames(styles.block, styles.processFlow)}>
+          {this.isShow('processFlow')&&!model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
             {this.checkBox('processFlow')}
             <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>
             <div className={styles.blockRow}><ModelProcessFlow model={list[0].selectModel} /></div>
+          </div>}
+
+          {this.isShow('processFlow')&&model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
+            {this.checkBox('processFlow')}
+            <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>
+            <div className={styles.blockRow}><ModelProcessFlow2 model={list[0].selectModel} /></div>
           </div>}
         </div>
       </div>
