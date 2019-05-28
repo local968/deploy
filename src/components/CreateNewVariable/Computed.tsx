@@ -130,15 +130,17 @@ function Computed(props: ComputedProps) {
       value: ',',
       type: Type.Split
     }
-    const preList = [...value.slice(0, start)];
+    const preList = [...value.slice(0, curStart)];
     const pre: Coordinate | undefined = preList.pop()
     const next: Coordinate | undefined = [...value.slice(end)].shift()
     let before: Coordinate | undefined, after: Coordinate | undefined
     // const aaa = pre
     if (!!pre && (pre.type === Type.ID || pre.type === Type.Number || pre.type === Type.Char)) before = splitValue
     if (!!next && (next.type === Type.ID || next.type === Type.Number || next.type === Type.Char)) after = splitValue
-    const furtherPre: Coordinate | undefined = (preList || []).pop();
-    if (!!pre && pre.value === '@' && (!furtherPre || furtherPre.value === '(')) before = undefined;
+    // const furtherPre: Coordinate | undefined = (preList || []).pop();
+    // console.log(furtherPre, 'furtherPre')
+    // if (!!pre && pre.value === '@' && (!furtherPre || furtherPre.type === Type.Lparen || furtherPre.type === Type.Op)) before = undefined;
+    // console.log(before, 'before')
     const arr: Array<Coordinate> = []
     if (before) arr.push(before)
     arr.push(v)
