@@ -186,7 +186,7 @@ export class FixIssue extends Component {
                   method !== median &&
                   method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
+                  <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span title={k}>{k}</span></div>
                   <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
@@ -261,7 +261,7 @@ export class FixIssue extends Component {
                   method !== median &&
                   method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={styles.fixesCell}><span>{k}</span></div>
+                  <div className={styles.fixesCell}><span title={k}>{k}</span></div>
                   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
                     <option value='none' key="none">{EN.Idonknow}</option>
                     <option value="blank" key="blank">{EN.Leftblankonpurpose}</option>
@@ -348,7 +348,7 @@ export class FixIssue extends Component {
                   method !== high &&
                   method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={styles.fixesCell}><span>{k}</span></div>
+                  <div className={styles.fixesCell}><span title={k}>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
