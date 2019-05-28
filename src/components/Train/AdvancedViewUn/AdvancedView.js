@@ -10,9 +10,13 @@ import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import ParallelPlots from "../../Charts/ParallelPlots";
 import ParallelPlot from './parallel-plot.png'
+import ParallelPlotOn from './parallel-plot-on.png'
+import PcaIcon from './pca.png'
+import PcaIconOn from './pca-on.png'
 import IconParallel from './icon-parallel.svg'
 import IconParallel2 from './icon-parallel2.svg'
-const { Option } = Select;
+import PAW from "../../Charts/PAW";
+const {Option} = Select;
 
 @inject('projectStore')
 @observer
@@ -157,6 +161,7 @@ class AdvancedModelTable extends Component {
       <Row>
         {texts.map(t => <RowCell data={headerData[t]} key={t} />)}
         <RowCell data='Parallel Plot' key='para' />
+        <RowCell data='PCA' key='pca' />
       </Row>
     </div>;
     const dataSource = models.map(m => {
@@ -177,18 +182,23 @@ class AdvancedModelTable extends Component {
 
 @observer class RegressionModleRow extends Component {
   state = {
-    detail: false
+    detail: false,
+    type:'',
   };
-  handleResult = e => {
-    this.setState({ detail: !this.state.detail });
+  handleResult = _type => {
+    const {type,detail} = this.state;
+    this.setState({
+      detail: type === _type ? !detail:true,
+      type:_type,
+    });
   };
   render() {
     const { model, texts, checked } = this.props;
     const { score, modelName } = model;
-    const { detail } = this.state;
+    const { detail,type } = this.state;
     return (
       <div className={styles.tb}>
-        <Row onClick={this.handleResult} >
+        <Row>
           {texts.map(t => {
             switch (t) {
               case EN.ModelName:
@@ -219,14 +229,28 @@ class AdvancedModelTable extends Component {
                 return null
             }
           })}
-          <RowCell key='Parallel Plot' data={<a href='javascript:;' className={detail ? styles.on : ''}>
+          <RowCell
+              onClick={this.handleResult.bind(this,'Parallel Plot')}
+              key='Parallel Plot' data={<a href='javascript:;' className={detail&&type === 'Parallel Plot'?styles.on:''}>
             {
-              detail ? <img src={IconParallel2} alt='' /> : <img src={IconParallel} alt='' />
+              detail && type === 'Parallel Plot'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
+            }
+            Compute
+          </a>} />
+          <RowCell
+              onClick={this.handleResult.bind(this,'Pca')}
+              key='Pca' data={<a href='javascript:;' className={detail&&type === 'Pca'?styles.on:''}>
+            {
+              detail && type === 'Pca'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
             }
             Compute
           </a>} />
         </Row>
-        {detail && <RegressionDetailCurves project={this.props.project} model={model} />}
+        {detail && <RegressionDetailCurves
+            project={this.props.project}
+            model={model}
+            type={type}
+        />}
       </div>
     )
   }
@@ -234,46 +258,72 @@ class AdvancedModelTable extends Component {
 
 @observer
 class RegressionDetailCurves extends Component {
-  state = {
-    curve: "Parallel Plot",
-    visible: false,
-    diagnoseType: null
+  constructor(props){
+    super(props);
+    this.state = {
+      curve: props.type,
+      visible: false,
+      diagnoseType: null
+    }
   }
-
+  
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.type!==this.state.curve){
+      this.handleClick(nextProps.type)
+    }
+  }
+  
   handleClick = val => {
     this.setState({ curve: val });
+  };
+  
+  curComponent(){
+    const { type,model} = this.props;
+    const {curve} = this.state;
+    if(curve === 'Parallel Plot'){
+      return <ParallelPlots url={model.parallelPlotData} />
+    }
+    
+    if(['Pca'].includes(curve)){
+      return <PAW url={model.pcaPlotData}/>
+    }
   }
 
   render() {
-    // const { model } = this.props;
     const { curve } = this.state;
     // let curComponent = (
     //   <div className={styles.plot} >
     //     <img className={styles.img} src={model.fitPlotPath} alt="fit plot" />
     //   </div>
     // );
-    let curComponent = <div className={styles.plot}>
-      <ParallelPlots url={this.props.model.parallelPlotData} />
-    </div>
-    // const thumbnails = [{
-    //   text: 'Parallel Plot',
-    //   hoverIcon: FitPlotHover,
-    //   normalIcon: FitPlotNormal,
-    //   selectedIcon: FitPlotSelected,
-    //   type: 'fitplot'
-    // }]
+    // let curComponent = <div className={styles.plot}>
+    //   <ParallelPlots url={this.props.model.parallelPlotData} />
+    // </div>;
+    const thumbnails = [{
+      text: 'Parallel Plot',
+      hoverIcon: ParallelPlotOn,
+      normalIcon: ParallelPlot,
+      selectedIcon: ParallelPlotOn,
+      type: "Parallel Plot"
+    },{
+      text: 'Pca',
+      hoverIcon: PcaIcon,
+      normalIcon: PcaIcon,
+      selectedIcon: PcaIconOn,
+      type: 'Pca'
+    }];
     return (
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} style={{
-          minWidth: 0,
+          minWidth: 250,
           backgroundColor: 'transparent',
-          padding: '20px 0 0 190px',
+          padding: '20px 0 0 90px',
         }} >
-          <img style={{ marginRight: 12 }} src={ParallelPlot} alt='' />Parallel Plot
-          {/*{thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}*/}
+          {/*<img style={{marginRight:12}} src={ParallelPlot} alt=''/>Parallel Plot*/}
+          {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
         </div>
         <div className={styles.rightPanel} >
-          {curComponent}
+          <div className={styles.plot}>{this.curComponent()}</div>
         </div>
       </div>
     )
@@ -311,11 +361,11 @@ class Thumbnail extends Component {
     return (
       <div
         className={styles.thumbnail}
-        onMouseEnter={this.handleMouseEnter}
-        onMouseLeave={this.handleMouseLeave}
+        // onMouseEnter={this.handleMouseEnter}
+        // onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
-        <img src={icon} alt="icon" />
+        <img style={{width:50,height:50,margin:5}} src={icon} alt="icon" />
         <div>{text}</div>
       </div>
     )
