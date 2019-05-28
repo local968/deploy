@@ -10,11 +10,10 @@ export default function SpeedvsAccuracys(props){
 			height = 400,
 			width = 950
 		} = props;
-		console.log(123,models)
 
 		const data = models.map(itm=>({
 			name:itm.modelName,
-			value:[itm.executeSpeed,itm.score.trainScore.auc],
+			value:[itm.executeSpeed,itm.accValidation],
 		}));
 	const lineStyle = {
 		normal: {
