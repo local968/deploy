@@ -11,7 +11,7 @@ import Pie2 from "./Pie2";
 
 export default function Chart(props){
 	const {x_name='',y_name='',title=''} = props;
-	const {name,data} = props.data;
+	const {name,data} = props.data||{};
 	let chart;
 	switch (name) {
 		case 'histogram-categorical':
@@ -75,7 +75,10 @@ export default function Chart(props){
 				RowsWillBeFixed={data.fixedPercent}
 				RowsWillBeDeleted={data.deletePercent}
 				CleanData={data.cleanPercent}
-			/>
+			/>;
+			break;
+		default:
+			chart = null;
 			
 	}
 	return chart;

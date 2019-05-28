@@ -152,7 +152,7 @@ export default class Support extends Component {
     const {email, type, text} = toJS(_data)
     const typeText = (type === 1 && 'Bug') || (type === 2 && 'Feature') || (type === 3 && 'Question') || ''
     if (!typeText) return
-    if (!text) return
+    if (!text)  return message.info(EN.Pleaseinputsomecontentsforthesubmissio)
     if (!email) return
     axios.post("/user/report", {type: typeText, text, email}).then(res => {
       if (res.status === 200) {

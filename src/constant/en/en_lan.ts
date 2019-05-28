@@ -1114,7 +1114,8 @@ const EN_LAN = {
   ProjectDescription: 'Project Description',
   ClusterReason: 'Since all your data predicted by this model belongs to one cluster, the metrics can not be computed.',
   Replacewithlower: 'Replace with lower',
-  Replacewithupper: 'Replace with upper'
+  Replacewithupper: 'Replace with upper',
+  Pleaseinputsomecontentsforthesubmissio:'Please input some contents for the submission.',
 };
 
 
