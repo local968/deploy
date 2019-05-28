@@ -7,7 +7,7 @@ const EN_LAN = {
    */
   Loading: 'Loading...',
   Reconnecting: 'reconnecting...',
-
+  Mustbenumbe: 'must be number',
   /**
    *  D:\SASS-Workspace\SASS-CH-EN\packages\app-bff\src\components\Common\AlertError'
    */

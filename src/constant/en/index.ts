@@ -720,7 +720,7 @@ const EN: any = {
   errorcodeifsuccess: 'error code, 10000 if succes',
   humenreadableinformation: 'humen readable information',
   originalerrorinformation: 'original error information, this field only exist if some error appear',
-  dataisnotavalidJSONstring: '数据不是有效的JSON字符串',
+  dataisnotavalidJSONstring: '数据不是有效的JSON字符串',    
   dataisemptyor: '数据为空或不是有效数组',
   fileuploaderror: '文件上传错误',
   fileuploaFrror: '文件上传失败',
