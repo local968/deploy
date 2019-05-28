@@ -365,7 +365,7 @@ function updateProjectField(id, userId, field, data) {
     } catch (e) {
     }
     if (Array.isArray(data) || Array.isArray(result)) {
-      data = [...(result || []), ...(data || [])]
+      data = [...new Set([...(result || []), ...(data || [])])]
     } else if (typeof data === 'object' || typeof result === 'object') {
       data = Object.assign({}, (result || {}), (data || {}))
     }
