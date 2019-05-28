@@ -1207,10 +1207,10 @@ wss.register("checkProject", (message, socket) => {
   return checkProject(userId, id)
 })
 
-wss.register("fetchData", (message, socket) => {
+wss.register("fetchData", async (message, socket) => {
   // const userId = socket.session.userId
   const path = message.path
-  return axios.get(path)
+  return await axios.get(path)
 })
 
 wss.register('preDownload', async (message, socket) => {

@@ -534,7 +534,7 @@ function Computed(props: ComputedProps) {
     }
     if (typeArray.length > 1) {
       const index = typeArray.indexOf('Categorical')
-      if (index !== -1) return { isPass: false, message: `${EN.Errorexpression}: ${array[index]}` }
+      if (index !== -1) return { isPass: false, message: `${EN.Errorexpression}: ${expToString(array[index] as Coordinate[])}` }
       expType = 'Numerical'
     } else {
       expType = typeArray[0]
