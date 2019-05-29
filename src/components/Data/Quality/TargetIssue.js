@@ -77,11 +77,13 @@ export class ClassificationTarget extends Component {
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
     const { targetArrayTemp, totalRawLines, renameVariable, targetCounts } = project
-    const error = Object.keys(targetCounts).length < 2
-    const isGood = Object.keys(targetCounts).length === 2
+    const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length < 2
+    const isMore = Object.keys(targetCounts).length > 2
+    const isGood = targetArrayTemp.length === 2 || (!isLess && !isMore)
     const hasNull = !isGood && Object.keys(targetCounts).includes('')
+    const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas} ${error ? EN.Less : EN.More} ${EN.Thantwouniquealues}`
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas} ${isLess ? EN.Less : EN.More} ${EN.Thantwouniquealues}`
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -93,7 +95,7 @@ export class ClassificationTarget extends Component {
         })}>
           <div className={styles.targetTitleLabel}><span>{EN.TargetValues}</span></div>
           <div className={styles.targetPercentBox}>
-            {Object.keys(targetCounts).filter(_k => _k !== '').map((v, k) => {
+            {Object.keys(targetCounts).filter(_k => isGood || _k !== '').map((v, k) => {
               const percent = (targetCounts[v] || 0) / (totalRawLines || 1) * 85
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
