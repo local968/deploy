@@ -7,8 +7,23 @@ export default class TSEN extends PureComponent{
 		this.chart = React.createRef();
 	}
 	
+	componentDidMount() {
+		const chart = this.chart.getEchartsInstance();
+		chart.showLoading();
+	}
+	
 	getOption() {
-		const {x_name,y_name,data,title=''} = this.props;
+		const {x_name,y_name,data=[],title=''} = this.props;
+		
+		if(data.length){
+			const chart = this.chart.getEchartsInstance();
+			chart.hideLoading();
+		}else{
+			return {
+				xAxis:{},
+				yAxis:{},
+			}
+		}
 		
 		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
 			return {
@@ -28,7 +43,7 @@ export default class TSEN extends PureComponent{
 			grid: {
 				left: '6%',
 				right: '20%',
-				bottom: '4%',
+				bottom: '4.5%',
 				containLabel: true
 			},
 			dataZoom:[{
@@ -94,7 +109,7 @@ export default class TSEN extends PureComponent{
 						show: true
 					},
 					nameLocation:'middle',
-					nameGap:25,
+					nameGap:23,
 				}
 			],
 			series,
@@ -118,6 +133,7 @@ export default class TSEN extends PureComponent{
 		const {width=550,height=400} = this.props;
 		return <ReactEcharts
 			option={this.getOption()}
+			ref = {chart=>this.chart=chart}
 			style={{height, width}}
 			notMerge={true}
 			lazyUpdate={true}

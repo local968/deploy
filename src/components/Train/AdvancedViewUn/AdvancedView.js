@@ -238,8 +238,8 @@ class AdvancedModelTable extends Component {
             Compute
           </a>} />
           <RowCell
-              onClick={this.handleResult.bind(this,'Pca')}
-              key='Pca' data={<a href='javascript:;' className={detail&&type === 'Pca'?styles.on:''}>
+              onClick={this.handleResult.bind(this,'PCA')}
+              key='PCA' data={<a href='javascript:;' className={detail&&type === 'PCA'?styles.on:''}>
             {
               detail && type === 'Pca'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
             }
@@ -284,7 +284,7 @@ class RegressionDetailCurves extends Component {
       return <ParallelPlots url={model.parallelPlotData} />
     }
     
-    if(['Pca'].includes(curve)){
+    if(['PCA'].includes(curve)){
       return <PAW url={model.pcaPlotData}/>
     }
   }
@@ -306,11 +306,11 @@ class RegressionDetailCurves extends Component {
       selectedIcon: ParallelPlotOn,
       type: "Parallel Plot"
     },{
-      text: 'Pca',
+      text: 'PCA',
       hoverIcon: PcaIcon,
       normalIcon: PcaIcon,
       selectedIcon: PcaIconOn,
-      type: 'Pca'
+      type: 'PCA'
     }];
     return (
       <div className={styles.detailCurves} >
