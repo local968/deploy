@@ -994,6 +994,7 @@ wss.register('train', async (message, socket, progress) => {
       train2Finished: true,
       train2ing: false,
       train2Error: false,
+      trainModel: null,
       selectId: '',
       stopId: ''
     }
