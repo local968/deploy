@@ -2,13 +2,16 @@ import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
 import config from 'config'
 import { debounce } from 'lodash'
+import { formatNumber } from 'util'
+import EN from '../../src/constant/en'
+import Axios from 'axios';
 
 export default class Model {
   @observable score;
   @observable backend;
   @observable featureImportance;
   @observable executeSpeed = 0;
-  @observable name = "";
+  @observable modelName = "";
   @observable modelInsightsData = null;
   @observable fitIndex = 0;
   @observable chartData;
@@ -19,10 +22,22 @@ export default class Model {
   @observable problemType
   @observable fitIndexModified;
   @observable filtedModels;
+  @observable importanceLoading = false
+  @observable labelWithImportance = {}
+  @observable multiVarPlotData = ''
+  @observable parallelPlotData = ''
+  @observable outlierPlotData = ''
+  @observable pointToShowData = ''
+  @observable fitAndResidualPlotData = ''
+  @observable outlierPlotLoading = false
+  @observable featureList = []
+  @observable rate = 0
+  @observable pcaPlotData = ''
+  // @observable featureImportanceDetail = {}
 
-  constructor(projectId, model, name) {
+  constructor(projectId, model, modelName) {
     this.projectId = projectId;
-    this._id = name;
+    this._id = modelName;
     Object.assign(this, model);
 
     this.updateModel = debounce(this.updateModel, 1000)
@@ -47,6 +62,7 @@ export default class Model {
     this[type] = Object.assign({}, { ...this[type] }, obj)
   }
 
+  @action
   setProperty(data) {
     if (typeof data !== 'object') {
       return false;
@@ -55,7 +71,7 @@ export default class Model {
       return false;
     }
     Reflect.deleteProperty(data, 'id')
-    Reflect.deleteProperty(data, 'name')
+    Reflect.deleteProperty(data, 'modelName')
     Reflect.deleteProperty(data, 'projectId')
 
     for (let key in data) {
@@ -84,10 +100,10 @@ export default class Model {
     })
   }
 
-  getBenefit = (ITP, IFN, IFP, ITN) => {
-    const data = this.chartData || {}
-    const roc = data.roc || {}
-    const { TP, FN, FP, TN } = roc
+  getBenefit = (ITP, IFN, IFP, ITN, IPN, IPO) => {
+    const data = this.chartData || {};
+    const roc = data.roc || {};
+    const { TP, FN, FP, TN } = roc;
     if (!ITP && !IFN && !IFP && !ITN) return {
       benefit: 0,
       index: this.initialFitIndex
@@ -95,20 +111,21 @@ export default class Model {
     if (!TP && !FN && !FP && !TN) return {
       benefit: 0,
       index: this.initialFitIndex,
-      text: `${ITP} * ${0}(TP) - ${IFN} * ${0}(FN) - ${IFP} * ${0}(FP) + ${ITN} * ${0}(TN) = ${0}`
-    }
-    let maxIndex = this.fitIndex
+      text: `(${IPN}/${IPO})*(${ITP}*${0}(TP)-${IFN}*${0}(FN))+(${1 - IPN}/${1 - IPO})*(${ITN}*${0}(TN)-${IFP}*${0}(FP)) = ${0}`
+    };
+    let maxIndex = this.fitIndex;
     for (let i = 1; i < 100; i++) {
       const benefit = TP[i] * ITP - FN[i] * IFN - FP[i] * IFP + TN[i] * ITN
       const maxBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
       if (benefit > maxBenefit) maxIndex = i
     }
-    const realBenefit = TP[maxIndex] * ITP - FN[maxIndex] * IFN - FP[maxIndex] * IFP + TN[maxIndex] * ITN
+    const realBenefit = (IPN / IPO) * (TP[maxIndex] * ITP - FN[maxIndex] * IFN) + ((1 - IPN) / (1 - IPO)) * (TN[maxIndex] * ITN - FP[maxIndex] * IFP)
     // this.fitIndex = maxIndex
     return {
       benefit: realBenefit,
       index: maxIndex,
-      text: `${ITP} * ${TP[maxIndex]}(TP) - ${IFN} * ${FN[maxIndex]}(FN) - ${IFP} * ${FP[maxIndex]}(FP) + ${ITN} * ${TN[maxIndex]}(TN) = ${realBenefit}`
+      text: `(${IPN}/${IPO})*(${ITP}*${TP[maxIndex]}(TP)-${IFN}*${FN[maxIndex]}(FN))+(${1 - IPN}/${1 - IPO})*(${ITN}*${TN[maxIndex]}(TN)-${IFP}*${FP[maxIndex]}(FP)) = ${realBenefit}`
+      //`${ITP} * ${TP[maxIndex]}(TP) - ${IFN} * ${FN[maxIndex]}(FN) - ${IFP} * ${FP[maxIndex]}(FP) + ${ITN} * ${TN[maxIndex]}(TN) = ${realBenefit}`
     }
   }
   @computed
@@ -120,14 +137,6 @@ export default class Model {
       return [TN[fitIndex] / (TN[fitIndex] + FP[fitIndex]), TP[fitIndex] / (TP[fitIndex] + FN[fitIndex])]
     }
     return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
-  }
-  @computed
-  get aucValidation() {
-    return this.score.validateScore.auc
-  }
-  @computed
-  get aucHoldout() {
-    return this.score.holdoutScore.auc
   }
   @computed
   get accValidation() {
@@ -210,7 +219,7 @@ export default class Model {
       this.extractParameters(rawPara, para, 'regressor:' + algorithm, algorithm);
     }
     const chain = {
-      'Raw Data': ['Raw Data'],
+      'Raw Data': [EN.RawData],
       'Data Preprocessing': [
         'one hot encoding',
         'Imputation',
@@ -221,7 +230,7 @@ export default class Model {
         preprocessor
       ],
       'Model Training': [algorithm],
-      Prediction: ['Prediction']
+      Prediction: [EN.Prediction]
     };
     return { flow: chain, flowPara: para };
   }
@@ -234,17 +243,73 @@ export default class Model {
         if (isNaN(Number(rawPara[key]))) {
           para[choice][prop] = rawPara[key];
         } else {
-          para[choice][prop] = rawPara[key].toFixed(2);
+          para[choice][prop] = formatNumber(rawPara[key], 2);
         }
       }
     });
   }
+  permutationImportance = () => {
+    const arr = Object.keys(this.featureImportance || {})
+    if (!!arr.length) return
+    this.importanceLoading = true
+    socketStore.ready().then(api => {
+      let cmd = 'clfreg.permutationImportance'
+      // switch (this.problemType) {
+      //   case 'clfreg.Clustering':
+      //     cmd = 'clustering.train';
+      //     break;
+      //   case 'Outlier':
+      //     cmd = 'outlier.train';
+      //     break;
+      //   default:
+      //     cmd = 'clfreg.train';
+      // }
+      const command = {
+        command: cmd,
+        projectId: this.projectId,
+        id: this.id
+      }
+      api.permutationImportance(command)
+    })
+  }
+  saveFeatureList = async (featureList) => {
+    // if (this.outlierPlotLoading) return
+    if (!Array.isArray(featureList) || featureList.length !== 2) return console.log('error featureList')
+    if (featureList[0] === this.featureList[0] && featureList[1] === this.featureList[1]) return console.log("same")
+    // await this.updateModel({ featureList, outlierPlotData: '' })
+    this.outlierPlotLoading = true
+    return socketStore.ready().then(api => {
+      let cmd = 'outlier.outlierPlot';
+      const command = {
+        command: cmd,
+        projectId: this.projectId,
+        id: this.id,
+        featureList: [featureList],
+        randomSeed: 0
+      }
+      return api.outlierPlot(command)
+    })
+  }
+  // outlierPlot = (featureList) => {
+  //   this.outlierPlotLoading = true
+  //   return socketStore.ready().then(api => {
+  //     let cmd = 'outlier.outlierPlot';
+  //     const command = {
+  //       command: cmd,
+  //       projectId: this.projectId,
+  //       id: this.id,
+  //       featureList: [this.featureList],
+  //       randomSeed: 0
+  //     }
+  //     return api.outlierPlot(command)
+  //   })
+  // }
   updateModel(data) {
-    socketStore.ready().then(api => api.updateModel({
+    Object.assign(this, data);
+    return socketStore.ready().then(api => api.updateModel({
       data,
       id: this.id,
       projectId: this.projectId,
     }));
-    Object.assign(this, data);
   }
 }

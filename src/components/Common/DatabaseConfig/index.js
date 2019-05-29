@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, action, computed } from 'mobx';
 import styles from './styles.module.css';
-import { Modal, Select, Checkbox, Message, Icon } from 'antd';
+import { Modal, Select, Checkbox, message, Icon } from 'antd';
 import classnames from 'classnames';
 import databaseIcon from './icon-database.svg';
 import socketStore from "stores/SocketStore";
-
+import EN from '../../../constant/en';
 const Option = Select.Option;
-const database = ['mysql', 'oracle'];
+const database = ['mysql', 'oracle', 'hive'];
 
 const storage = window.localStorage;
 
@@ -23,20 +23,20 @@ const setRule = (key, errorMessage, neccessary, rule) => {
   errorMessages[key] = errorMessage;
 };
 
-setRule('sqlHostName', 'place enter your host name', true);
-setRule('sqlPort', 'invalid host port', true, value => !isNaN(value));
+setRule('sqlHostName', EN.pleaseenteryourhostname, true);
+setRule('sqlPort', EN.invalidhostport, true, value => !isNaN(value));
 setRule(
   'databaseType',
-  'invalid database type',
+  EN.invaliddatabasetype,
   true,
   value => database.indexOf(value) !== -1
 );
-setRule('sqlDatabase', 'place enter your database name', true);
-setRule('sqlTable', 'place enter your table name', true);
+setRule('sqlDatabase', EN.pleaseenteryourdatabasename, true);
+setRule('sqlTable', EN.pleaseenteryourtablename, true);
 setRule('sqlQueryStr', false);
 setRule('sqlEncoding', false, value => ['utf8'].indexOf(value) !== -1);
-setRule('sqlUserName', 'place enter your databse username', true);
-setRule('sqlPassword', 'place enter your databse password', true);
+setRule('sqlUserName', EN.pleaseenteryourdatabseusername, true);
+setRule('sqlPassword', EN.pleaseenteryourdatabsepassword, true);
 
 const defaultState = {
   sqlHostName: '',
@@ -71,7 +71,7 @@ export default class DatabaseConfig extends Component {
     Object.entries(rules).map(([key, fn]) => {
       if (failed) return false;
       if (!fn(this.localState[key])) {
-        Message.error(errorMessages[key]);
+        message.error(errorMessages[key]);
         failed = true;
         runInAction(() => {
           this.errorField = key;
@@ -84,13 +84,13 @@ export default class DatabaseConfig extends Component {
 
   @computed
   get allowSubmit() {
-    let failed = false;
+    let allow = true;
     Object.entries(rules).map(([key, fn]) => {
-      if (failed) return false;
-      if (!fn(this.localState[key])) failed = true;
+      if (!allow) return false;
+      if (!fn(this.localState[key])) allow = false;
       return true;
     });
-    return failed;
+    return allow;
   }
 
   @action
@@ -136,8 +136,13 @@ export default class DatabaseConfig extends Component {
 
   render() {
     const { visible, onClose, onSubmit: submit, title, projectId } = this.props;
+    const _onClose = (...args) => {
+      this.loading = false
+      onClose(...args)
+    }
     const state = { ...this.localState };
     const onSubmit = () => {
+      if (!this.allowSubmit) return;
       if (this.checkForm()) return;
       this.loading = true;
       socketStore.ready().then(api => {
@@ -146,8 +151,8 @@ export default class DatabaseConfig extends Component {
           projectId
         }).then(resp => {
           this.loading = false;
-          if (resp.result.connectionOK === false) {
-            Message.error(resp.result.result);
+          if (resp.status !== 200) {
+            message.error(resp.message);
           } else {
             if (state.rememberMyPassword) {
               storage.setItem('DatabaseConnectionPassword', state.sqlPassword);
@@ -179,28 +184,28 @@ export default class DatabaseConfig extends Component {
           {title}
         </div>
         <div className={styles.line}>
-          <div className={styles.label}>Hostname:</div>
+          <div className={styles.label}>{EN.Hostname}:</div>
           <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlHostName'
               })}
-              placeholder="eg., db.abc.com"
+              placeholder={EN.Eg + "db.abc.com"}
               value={state['sqlHostName']}
               onChange={this.inputChange('sqlHostName')}
             />
           </div>
         </div>
         <div className={styles.line}>
-          <div className={styles.label}>Port:</div>
+          <div className={styles.label}>{EN.Port}:</div>
           <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlPort'
               })}
-              placeholder="eg., 12345"
+              placeholder={EN.Eg + "12345"}
               value={state['sqlPort']}
               onChange={this.inputChange('sqlPort')}
             />
@@ -208,7 +213,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.separate} />
         <div className={styles.line}>
-          <div className={styles.label}>Database Type:</div>
+          <div className={styles.label}>{EN.DatabaseType}:</div>
           <div className={styles.options}>
             <Select
               value={state.databaseType}
@@ -216,46 +221,47 @@ export default class DatabaseConfig extends Component {
             >
               <Option value="mysql">mysql</Option>
               <Option value="oracle">oracle</Option>
+              <Option value="hive">hive</Option>
             </Select>
           </div>
         </div>
         <div className={styles.line}>
-          <div className={styles.label}>Database Name:</div>
+          <div className={styles.label}>{EN.DatabaseName}:</div>
           <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlHostName'
               })}
-              placeholder="Your database name"
+              placeholder={EN.Yourdatabaseusername}
               value={state['sqlDatabase']}
               onChange={this.inputChange('sqlDatabase')}
             />
           </div>
         </div>
         <div className={styles.line}>
-          <div className={styles.label}>Table Name:</div>
+          <div className={styles.label}>{EN.TableName}:</div>
           <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlTable'
               })}
-              placeholder="Your table name"
+              placeholder={EN.Yourtablename}
               value={state['sqlTable']}
               onChange={this.inputChange('sqlTable')}
             />
           </div>
         </div>
         <div className={styles.line}>
-          <div className={styles.label}>SQL(optional):</div>
+          <div className={styles.label}>{EN.SQLoptional}:</div>
           <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlQueryStr'
               })}
-              placeholder="SQL for query"
+              placeholder={EN.SQLforquery}
               value={state['sqlQueryStr']}
               onChange={this.inputChange('sqlQueryStr')}
             />
@@ -263,7 +269,7 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.line}>
           <div className={styles.label}>
-            Database Encoding:<br />(optional)
+            {EN.DatabaseEncoding}:<br />({EN.optional})
           </div>
           <div className={styles.options}>
             <Select
@@ -277,28 +283,28 @@ export default class DatabaseConfig extends Component {
         </div>
         <div className={styles.separate} />
         <div className={styles.line}>
-          <div className={styles.label}>Username:</div>
+          <div className={styles.label}>{EN.Username}:</div>
           <div className={styles.options}>
             <input
               type="text"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlUserName'
               })}
-              placeholder="Your database username"
+              placeholder={EN.Yourdatabaseusername}
               value={state['sqlUserName']}
               onChange={this.inputChange('sqlUserName')}
             />
           </div>
         </div>
         <div className={styles.line}>
-          <div className={styles.label}>Password:</div>
+          <div className={styles.label}>{EN.Password}:</div>
           <div className={styles.options}>
             <input
               type="password"
               className={classnames(styles.input, {
                 [styles.error]: this.errorField === 'sqlPassword'
               })}
-              placeholder="Your database password"
+              placeholder={EN.Yourdatabasepassword}
               value={state['sqlPassword']}
               onChange={this.inputChange('sqlPassword')}
             />
@@ -312,7 +318,7 @@ export default class DatabaseConfig extends Component {
               onChange={this.checkboxChange('rememberMyPassword')}
               disabled={!state.rememberMyConnectionProfile}
             >
-              <span className={styles.checkboxText}>Remember My Password</span>
+              <span className={styles.checkboxText}>{EN.RememberMyPassword}</span>
             </Checkbox>
           </div>
         </div>
@@ -325,23 +331,23 @@ export default class DatabaseConfig extends Component {
               onChange={this.checkboxChange('rememberMyConnectionProfile')}
             >
               <span className={styles.checkboxText}>
-                Remember My Connection Profile
+                {EN.RememberMyConnectionProfile}
               </span>
             </Checkbox>
           </div>
         </div>
         <div className={styles.btns}>
-          <a className={styles.cancel} onClick={onClose}>
-            CANCEL
+          <a className={styles.cancel} onClick={_onClose}>
+            {EN.CANCEL}
           </a>
           {this.loading ? (
             <a className={styles.done}>
               <Icon type="loading" />
             </a>
           ) : (
-              <a className={classnames(styles.done, { [styles.disabled]: this.allowSubmit })} onClick={onSubmit}>
-                CONNECT
-            </a>
+              <a className={classnames(styles.done, { [styles.disabled]: !this.allowSubmit })} onClick={onSubmit}>
+                {EN.CONNECT}
+              </a>
             )}
         </div>
       </Modal>

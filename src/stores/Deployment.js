@@ -39,6 +39,7 @@ export default class Deploy {
   @observable enable;
   @observable email;
   @observable modelList;
+  @observable lineCount;
 
   @observable deploymentOptions = { ...defaultDeploymentOptions };
   @observable performanceOptions = { ...defaultPerformanceOptions };
@@ -54,14 +55,31 @@ export default class Deploy {
     this.enable = deploy.enable;
     this.createdDate = deploy.createdDate;
     this.email = deploy.email;
+    this.lineCount = deploy.lineCount;
     this.deploymentOptions = {
       ...defaultDeploymentOptions,
       ...deploy.deploymentOptions
     };
+    let default_measurementMetric;
+    switch (deploy.modelType) {
+      case 'Classification':
+        default_measurementMetric = 'AUC';
+        break;
+      case 'Regression':
+        default_measurementMetric = 'R2';
+        break;
+      case 'Outlier':
+        default_measurementMetric = 'Accuracy';
+        break;
+      case 'Clustering':
+        default_measurementMetric = 'CVNN';
+        break;
+    }
+
     this.performanceOptions = {
       ...defaultPerformanceOptions,
       metricThreshold: deploy.modelType === 'Classification' ? 0.7 : 0.5,
-      measurementMetric: deploy.modelType === 'Classification' ? 'AUC' : 'R2',
+      measurementMetric: default_measurementMetric,
       ...deploy.performanceOptions
     };
     this.getModelInfo()
@@ -81,7 +99,8 @@ export default class Deploy {
             email: this.email,
             enable: this.enable,
             deploymentOptions: this.deploymentOptions,
-            performanceOptions: this.performanceOptions
+            performanceOptions: this.performanceOptions,
+            lineCount: this.lineCount
           }
         });
       });
@@ -106,7 +125,7 @@ export default class Deploy {
 
   getModelInfo = action(async () => {
     const api = await socketStore.ready()
-    const { modelList } = await api.getAllModels({ projectId: this.projectId })
+    const { modelList } = await api.getAllModels({ projectId: this.projectId, modelType: this.modelType })
     this.modelList = modelList
   })
 
@@ -115,7 +134,7 @@ export default class Deploy {
     this.modelList && Object.entries(this.modelList).forEach(([settingName, models]) => {
       if (result) return
       models.forEach(model => {
-        if (result||!model) return
+        if (result || !model) return
         if (model.name === modelName) result = model
       })
     })

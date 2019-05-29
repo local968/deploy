@@ -3,7 +3,10 @@ const wss = require('./webSocket')
 const uuid = require('uuid')
 const command = require('./command')
 const moment = require('moment')
+const axios = require('axios')
+const config = require('config')
 const { userDeployRestriction, userStorageRestriction } = require('restriction')
+const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
 const setSchedule = (schedule) => {
   const pipeline = redis.pipeline()
@@ -44,6 +47,13 @@ const api = {
     })
   }),
   getDeployment: (deploymentId) => redis.get(`deployment:${deploymentId}`).then(deployment => JSON.parse(deployment)),
+  updateDeployment: (deployment) => {
+    redis.set(`deployment:${deployment.id}`, JSON.stringify(deployment)).then(result => {
+      wss.publish(`user:${deployment.userId}:deployments`, { type: 'update' })
+    }, error => {
+      console.error(error)
+    })
+  },
   deleteDeploymentSchedules: (deploymentId) => {
     let _deployment;
     return api.getDeployment(deploymentId).then(deployment => {
@@ -77,49 +87,8 @@ const api = {
     list.map(id => pipeline.get(`schedule:${id}`))
     return pipeline.exec()
   }).then(result => result.map(([error, schedule]) => JSON.parse(schedule))),
-  getFile: (id) => redis.get(`file:${id}`).then(JSON.parse),
-  getDatabaseFile: async (options, userId, projectId, level) => {
-    const resp = await command({
-      ...options,
-      projectId,
-      requestId: uuid.v4(),
-      command: 'sqlData',
-      userId
-    }, (result) => (result.status < 0 || result.status === 100) ? result : false)
-    if (resp.result['process error']) throw {
-      status: 420,
-      message: resp.result.msg,
-      error: resp.result['process error']
-    }
-    const path = resp.result.csvLocation
-    const name = resp.result.filename
-    const size = resp.result.size.toString()
-    const lineCount = resp.result.totalLines
-    if (!path) throw new Error('no path')
-    const previewSize = await redis.get(`user:${userId}:upload`)
-    if (parseInt(previewSize) + parseInt(size) >= userStorageRestriction[level]) throw {
-      status: 417,
-      message: 'Your usage of storage space has reached the max restricted by your current license.',
-      error: 'storage space full'
-    }
-    const fileId = uuid.v4()
-    await redis.set('file:' + fileId, JSON.stringify({
-      name,
-      content_type: "application/octet-stream",
-      path,
-      md5: '',
-      size,
-      from: 'sql',
-      type: 'deploy',
-      createdTime: moment().unix(),
-      lineCount,
-      userId,
-      options
-    }))
-    await redis.incrby(`user:${userId}:upload`, parseInt(size))
-    return fileId
-  },
-  checkUserFileRestriction: async (deploymentId, type) => {
+  checkUserFileRestriction: async (schedule) => {
+    const { deploymentId, type } = schedule
     const deployment = await api.getDeployment(deploymentId)
     const userId = deployment.userId
     const [level, createdTime] = await redis.hmget(`user:${userId}`, 'level', 'createdTime')
@@ -127,7 +96,13 @@ const api = {
     const restrictQuery = `user:${userId}:duration:${duration.years()}-${duration.months()}:deploy`
     const options = deployment[`${type}Options`].sourceOptions
     const source = deployment[`${type}Options`].source
-    const fileId = source === 'database' ? await api.getDatabaseFile(options, userId, deployment.projectId, level) : deployment[`${type}Options`].fileId
+    const fileId = source === 'database' ? await api.getDatabaseData(options, async ({ count }) => {
+      schedule.status = `${count} downloaded.`
+      await api.upsertSchedule(schedule);
+    }) : deployment[`${type}Options`].fileId
+    schedule.status = `checking user limitation.`
+    await api.upsertSchedule(schedule);
+    const lineCount = await api.getLineCount(fileId)
     if (source === 'database') {
       deployment[`${type}Options`].fileId = fileId
       deployment[`${type}Options`].file = `${options.databaseType}-${moment().unix()}`
@@ -135,9 +110,8 @@ const api = {
     }
     if (!fileId) return restrictQuery
     const count = await redis.get(restrictQuery)
-    const file = await api.getFile(fileId)
-    if (parseInt(count) + parseInt(file.lineCount) >= userDeployRestriction[level]) return false
-    await redis.incrby(restrictQuery, file.lineCount)
+    if (parseInt(count) + parseInt(lineCount) >= userDeployRestriction[level]) return false
+    await redis.incrby(restrictQuery, lineCount)
     return restrictQuery
   },
   decreaseLines: async (restrictQuery, lineCount) => {
@@ -165,6 +139,27 @@ const api = {
       })
     })
   },
+  getRate: async (projectId, modelName) => {
+    return redis.smembers(`project:${projectId}:models`).then(ids => {
+      const pipeline = redis.pipeline();
+      ids.forEach(mid => {
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "modelName", 'rate')
+      })
+      return pipeline.exec().then(list => {
+        const models = list.map(row => {
+          let [name, rate] = row[1] || []
+          try {
+            name = JSON.parse(name)
+            rate = JSON.parse(rate)
+          } catch (e) { }
+          return { name, rate }
+        })
+        const model = models.find(m => m.name === modelName) || {}
+        const rate = model.rate
+        return rate
+      })
+    })
+  },
   getFeatureLabel: async projectId => {
     try {
       const newFeatureLabel = {}
@@ -179,7 +174,7 @@ const api = {
         return start
       }, {})
       const { target, targetArray, colMap, renameVariable } = obj
-      if(!target) return newFeatureLabel
+      if (!target) return newFeatureLabel
       const arr = !targetArray.length ? Object.keys((colMap || {})[target]) : targetArray
       if (!arr.length) return newFeatureLabel
       arr.slice(0, 2).forEach((k, index) => {
@@ -190,7 +185,84 @@ const api = {
     } catch (e) {
       return {}
     }
+  },
+  getCleanIndex: async (schedule, index, projectId, modelName) => {
+    const result = await redis.hmget(`project:${projectId}:model:${modelName}`, "stats")
+    let [stats] = result
+    stats = JSON.parse(stats)
+
+    return await etl(schedule, index, stats)
+  },
+
+  getDatabaseData: async (message, onProgress) => {
+    const databaseConfig = {
+      type: message.databaseType,
+      host: message.sqlHostName,
+      port: parseInt(message.sqlPort),
+      user: message.sqlUserName,
+      password: message.sqlPassword,
+      database: message.sqlDatabase,
+      table: message.sqlTable,
+      sql: message.sqlQueryStr,
+      encode: message.sqlEncoding
+    }
+
+    const indexResponse = await axios.get(`${esServicePath}/etls/createIndex`)
+    if (indexResponse.data.status !== 200) return indexResponse.data
+    const index = indexResponse.data.index
+
+    const uploadResponse = await axios.post(`${esServicePath}/etls/database/${index}/upload`, databaseConfig)
+    if (uploadResponse.data.status !== 200) return uploadResponse.data
+    const opaqueId = uploadResponse.data.opaqueId
+
+    return await new Promise((resolve, reject) => {
+      let emptyCount = 0
+      const interval = setInterval(async () => {
+        const countReponse = await axios.get(`${esServicePath}/etls/${index}/count`)
+        if (countReponse.data.status === 200) onProgress({ count: countReponse.data.count })
+        const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
+        if (data.task) emptyCount = 0
+        else {
+          emptyCount++
+          if (emptyCount > 10) {
+            clearInterval(interval)
+            // await redis.incrby(`user:${userId}:upload`, parseInt(size))
+            resolve(index)
+          }
+        }
+      }, 1000)
+    })
+  },
+  getLineCount: async (index) => {
+    const { data } = await axios.get(`${esServicePath}/etls/${index}/count`)
+    if (data.status !== 200) throw data
+    return data.count
   }
+}
+
+const etl = async (schedule, index, stats) => {
+  const response = await axios.post(`${esServicePath}/etls/${index}/etl`, stats)
+  const { etlIndex, opaqueId } = response.data
+  return await new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const { data } = await axios.get(`${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`)
+      if (data.task) {
+        if (!data.task.status) return
+        const status = data.task.status
+        const progress = 100 * (status.created + status.deleted) / status.total || 0
+        schedule.status = `ETL: ${progress.toFixed(2)}%`
+        await api.upsertSchedule(schedule);
+      }
+      else {
+        schedule.status = `Progressing`
+        schedule.index = index
+        schedule.etlIndex = etlIndex
+        await api.upsertSchedule(schedule);
+        clearInterval(interval)
+        resolve(etlIndex)
+      }
+    }, 1000)
+  })
 }
 
 module.exports = api

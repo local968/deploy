@@ -2,52 +2,54 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Icon } from 'antd';
-import { observable } from 'mobx';
+import { Icon, Tooltip } from 'antd';
+import { autorun, observable } from 'mobx';
 import { Table } from 'components/Common';
+import EN from '../../../../constant/en';
+
+import dataIcon from './data.svg';
+import axios from 'axios';
 
 @observer
 export default class Preview extends Component {
-  @observable visiable = false
   @observable cleanData = []
+  @observable newVariableData = []
+  @observable loading = false
 
   constructor(props) {
     super(props)
-    const { cleanPath, readData } = props.project
-    readData(cleanPath).then(data => {
+    const { readIndex, etlIndex, fetchData } = props.project;
+    readIndex(etlIndex).then(data => {
       this.cleanData = data
     })
-  }
-
-  showTable = () => {
-    this.visiable = true
-  }
-
-  hideTable = () => {
-    this.visiable = false
+    autorun(() => {
+      if (!props.project.newVariablePath) return
+      this.loading = true
+      fetchData(props.project.newVariablePath).then(data => {
+        this.loading = false
+        this.newVariableData = data
+      })
+    })
   }
 
   formatTable = () => {
-    const { cleanData, visiable } = this
-    const { colType, target, will_be_drop_500_lines, renameVariable } = this.props.project;
-    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
-    // const { checkList, showSelect } = this.state;
-    // const index = rawHeader.indexOf(target)
-    // const sortData = cleanData.map(row => {
-    //   const value = row[index]
-    //   return [value, ...row.slice(0, index), ...row.slice(index + 1)]
-    // })
+    const { cleanData, newVariableData } = this
+    const { visiable, project } = this.props
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader, target } = project;
     if (!visiable) return []
+    if (this.loading) return []
     if (!cleanData.length) return []
-    const header = cleanData[0]
-    const index = header.indexOf(target)
-    if (index === -1) return []
-    const headerList = [target, ...header.filter(h => h !== target)]
+    if (!!newVariable.length && !newVariableData.length) return []
+    const headerList = [target, ...rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target), ...newVariable].filter(h => !trainHeader.includes(h))
+    const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
+    // const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
+    const targetIndex = headerList.indexOf(target)
+    const data = cleanData.map((row, index) => row.concat(newVariable.map(n => newVariableData[index][n])).filter((k, i) => showIndex.includes(i)))
+
+    const types = { ...colType, ...newType }
+
     const realColumn = headerList.length
-    const realData = cleanData.slice(1).filter(r => r.length === realColumn)
-    const data = index === 0 ? realData : realData.map(row => {
-      return [row[index], ...row.slice(0, index), ...row.slice(index + 1)]
-    })
+
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -75,16 +77,17 @@ export default class Preview extends Component {
         cn: styles.titleCell
       })
 
-      const colValue = colType[header] === 'Numerical' ? 'Numerical' : 'Categorical'
+      const colValue = types[header] === 'Numerical' ? 'Numerical' : 'Categorical'
       selectArr.push({
-        content: <span>{colValue}</span>,
-        title: colValue,
+        content: <span>{colValue === 'Numerical' ? EN.Numerical : EN.Categorical}</span>,
+        title: colValue === 'Numerical' ? EN.Numerical : EN.Categorical,
         cn: styles.cell
       })
     }
 
     const tableData = data.map((row, index) => row.map((v, i) => {
-      if(i === 0) v = renameVariable[v] || v
+      if (i === targetIndex) v = renameVariable[v] || v
+      v = v === 'NEW_VARIABLE_TYPE' ? '' : v
       return {
         content: <span>{v}</span>,
         title: v,
@@ -98,22 +101,30 @@ export default class Preview extends Component {
   }
 
   render() {
-    const { dataHeader, target } = this.props.project
+    const { project, visiable, hideTable, showTable } = this.props
+    const { sortHeader, target, trainHeader, newVariable } = project
+    const header = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
     const tableData = this.formatTable()
+    // console.log(tableData.length, "tableData", cleanPath)
     return <div className={classnames(styles.content, {
-      [styles.active]: this.visiable
+      [styles.active]: visiable
     })}>
-      <div className={styles.icon} onClick={this.visiable ? this.hideTable : this.showTable}><Icon type="profile" theme="filled" /></div>
-      <div className={styles.arrow}>{this.visiable ? <Icon type="caret-right" theme="filled" /> : <Icon type="caret-left" theme="filled" />}</div>
+      <div className={styles.icon} onClick={visiable ? hideTable : showTable}>
+        {<Tooltip title={`${visiable ? EN.CloseDataTable : EN.ViewDataTable}`} mouseLeaveDelay={0}>
+          <img src={dataIcon} alt={"view"} />
+        </Tooltip>}
+        {/* {!this.visiable && <span >View Data Table</span>} */}
+      </div>
+      <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
-        <div className={styles.text}><span>Target Variable:</span><span className={styles.value} title={target}>{target}</span></div>
-        <div className={styles.text}><span>Total Variables:</span><span className={styles.value} title={dataHeader.length}>{dataHeader.length}</span></div>
+        <div className={styles.text}><span>{EN.TargetVariable}:</span><span className={styles.value} title={target}>{target}</span></div>
+        <div className={styles.text}><span>{EN.TotalVariables}:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
       </div>
       <div className={styles.table}>
         <Table
           columnWidth={110}
           rowHeight={34}
-          columnCount={dataHeader.length}
+          columnCount={header.length}
           rowCount={tableData.length}
           fixedColumnCount={0}
           fixedRowCount={3}

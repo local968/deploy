@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
-
+import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 @observer
 export default class VariableImpact extends Component {
   render() {
     const { model } = this.props;
-    const { featureImportanceDetail } = model;
-    const arr = Object.entries(featureImportanceDetail).sort(
+    const { featureImportance } = model;
+    const arr = Object.entries(featureImportance).sort(
       (a, b) => b[1] - a[1]
     );
     return (
       <div className={styles.detail}>
         {!arr.length ?
           <div className={styles.detailNone}>
-            <span title='Variable Impact not available for this algorithm'>Variable Impact not available for this algorithm</span>
+            <span title={EN.VariableImpactnotavailableforthisalgorithm}>{EN.VariableImpactnotavailableforthisalgorithm}</span>
           </div>
           : arr.map((row, index) => {
             return (
@@ -27,7 +28,7 @@ export default class VariableImpact extends Component {
                   style={{ width: row[1] * 7 + 'em' }}
                 />
                 <div className={styles.detailNum}>
-                  <span title={row[1].toFixed(4)}>{row[1].toFixed(4)}</span>
+                  <span title={formatNumber(row[1])}>{formatNumber(row[1])}</span>
                 </div>
               </div>
             );

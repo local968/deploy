@@ -2,12 +2,11 @@
 
 html,
 body {
-  font-family: Arial, sans-serif;
+  font-family: '\534E\6587\7EC6\9ED1', 'Source Han Sans SC', 'HelveticaNeue', Arial, Helvetica, sans-serif;
   font-size: 16px;
   color: #4a4a4a;
   word-break: normal !important;
   margin: 0;
-  font-family: HelveticaNeue, Arial, Helvetica, sans-serif;
 }
 
 @media only screen and (max-width: 1440px) {
@@ -54,4 +53,49 @@ body {
 
 .anticon-file{
   display: none;
+}
+
+.ant-tree.ant-tree-directory > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before{
+  background: #e7eaf0 !important;
+}
+
+.ant-tree.ant-tree-directory > li span.ant-tree-node-content-wrapper > span, .ant-tree.ant-tree-directory .ant-tree-child-tree > li span.ant-tree-node-content-wrapper > span{
+  color:#1d2b3c !important;
+}
+
+.ant-tabs-nav .ant-tabs-tab:hover{
+  color: #445065 !important;
+}
+
+.ant-tabs-ink-bar{
+  background: #445065 !important;
+}
+
+.ant-tabs-nav .ant-tabs-tab{
+  color: #445065 !important;
+}
+
+.ant-modal-confirm .ant-modal-confirm-btns{
+  float: none !important;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.ant-btn-primary{
+  background: #243448 !important;
+  border-color: #243448 !important;
+}
+
+.ant-checkbox-wrapper{
+  margin-left: -20px !important;
+}
+.ant-radio-wrapper:hover .ant-radio, .ant-radio:hover .ant-radio-inner, .ant-radio-input:focus + .ant-radio-inner{
+  border-color:#4EC078 !important;
+}
+
+.ant-radio-checked .ant-radio-inner{
+    border-color:#4EC078 !important;
+}
+.ant-radio-inner::after{
+  background-color: #4EC078 !important;
 }

@@ -20,6 +20,11 @@ export default class PRChart extends Component {
   state = {
     movable: false
   };
+  
+  constructor(props) {
+    super(props);
+    this.renderD3 = this.renderD3.bind(this);
+  }
 
   componentDidMount () {
     this.renderD3();

@@ -1,4 +1,4 @@
-FROM node
-COPY . /r2
-RUN cd /r2 && npm i && npm i -g pm2
-CMD /bin/bash -c "cd r2 && npm run build && pm2 start deploy2.json"
+FROM node:12-stretch-slim
+COPY . /app
+RUN cd /app && npm install --production
+CMD cd /app; npm run start;

@@ -4,6 +4,7 @@ import { action, observable } from 'mobx';
 import { inject, observer } from 'mobx-react'
 import { message } from 'antd'
 
+import EN from '../../../constant/en';
 
 @inject('userStore', 'routing')
 @observer
@@ -28,11 +29,11 @@ class ResetPassword extends Component {
   })
 
   submit = () => {
-    if (this.newPassword !== this.repeat) return message.error('The two new passwords you entered were inconsistent')
+    if (this.newPassword !== this.repeat) return message.error(EN.Thetwonewpasswords)
     this.props.userStore.resetPassword(this.code, this.newPassword).then(resp => {
       if (resp.data.status === 200) {
         this.props.routing.push('/')
-        message.success('Password reset successed.')
+        message.success(EN.Passwordresetsuccessed)
       } else {
         message.error(resp.data.message)
       }
@@ -41,11 +42,11 @@ class ResetPassword extends Component {
 
   render() {
     return <div className={styles.block}>
-      <h3 className={styles.title}>Reset Your Password</h3>
-      <p className={styles.description}>Please enter your new password below to reset.</p>
-      <input className={styles.input} value={this.newPassword} type='password' onChange={this.onChange('newPassword')} placeholder='Enter a New Password' />
-      <input className={styles.input} value={this.repeat} onChange={this.onChange('repeat')} type='password' placeholder='Confirm Password' />
-      <a className={styles.submit} onClick={this.submit}>Reset Password</a>
+      <h3 className={styles.title}>{EN.ResetYourPassword}</h3>
+      <p className={styles.description}>{EN.Pleaseenteryour}</p>
+      <input className={styles.input} value={this.newPassword} type='password' onChange={this.onChange('newPassword')} placeholder={EN.EnterNewPassword} />
+      <input className={styles.input} value={this.repeat} onChange={this.onChange('repeat')} type='password' placeholder={EN.ConfirmPassword} />
+      <a className={styles.submit} onClick={this.submit}>{EN.ResetPassword}</a>
     </div>
   }
 }

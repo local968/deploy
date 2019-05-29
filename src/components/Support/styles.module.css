@@ -22,13 +22,13 @@
 
 .menu {
   flex-basis: 4em;
-  border: 1px solid #C4CBD7;
-  overflow-y: scroll;
+  border: 1px solid #dbdfe4;
+  overflow-y: auto;
   overflow-x: hidden;
   flex: auto;
   padding: 14px;
   margin-top: 14px;
-  box-shadow: 2px 2px 2px #C4CBD7;
+  box-shadow: 0 4px 7px #dbdfe4;
 }
 
 .menu p {
@@ -43,13 +43,13 @@
 .content {
   flex: 1;
   font-size: 12px;
-  border: 1px solid #C4CBD7;
+  border: 1px solid #dbdfe4;
   margin-left: 15px;
   padding: 20px;
   line-height: 1.4;
-  overflow: scroll;
+  overflow: auto;
   height: 100%;
-  box-shadow: 2px 2px 2px #C4CBD7;
+  box-shadow: 0px 4px 7px #dbdfe4;
 }
 
 .content a {
@@ -149,25 +149,16 @@
   display: block;
   padding: 15px 0;
   font-weight: bold;
-  cursor: default;
 }
 
 .h1:hover {
   color: #4a4a4a;
-  cursor: default;
 }
 
 .h2 {
   padding: 15px 0;
   display: block;
   font-size: 13px;
-  color: #4a4a4a;
-  cursor: default;
-}
-
-.h2:hover {
-  color: #4a4a4a;
-  cursor: default;
 }
 
 .p {
@@ -214,9 +205,9 @@
   display: flex;
   flex: none;
   flex-direction: column;
-  border: 1px solid #C4CBD7;
+  border: 1px solid #dbdfe4;
   padding: 14px;
-  box-shadow: 2px 2px 2px #C4CBD7;
+  box-shadow: 0 4px 7px #dbdfe4;
 }
 
 .types {

@@ -8,7 +8,7 @@
 .startTitle {
   display: flex;
   margin: 0.45em 0;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
 }
 
 .startTitle span {
@@ -153,7 +153,7 @@
 }
 
 .tab span {
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   font-size: 1.125rem;
   line-height: 1.15;
   color: #979797;
@@ -218,7 +218,7 @@
 }
 
 .targetCell span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   color: #4a4a4a;
   font-size: 0.875rem;
   text-overflow: ellipsis;
@@ -259,7 +259,7 @@
 }
 
 .simplifiedText span {
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   font-size: 1.125rem;
   line-height: 1.15;
   color: #4a4a4a;
@@ -268,7 +268,8 @@
 .tool {
   display: flex;
   flex: none;
-  height: 0.4em;
+  line-height: 0.4em;
+  flex-wrap: wrap;
 }
 
 .toolSelect {
@@ -279,7 +280,7 @@
 }
 
 .toolSelect select {
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   line-height: 1.2;
   color: #4a4a4a;
@@ -298,7 +299,7 @@
 
 .toolLabel span {
   height: 1.2;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   font-weight: bold;
   color: #4a4a4a;
@@ -316,8 +317,7 @@
 }
 
 .toolButton span {
-  line-height: 1.2;
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #ffffff;
 }
@@ -335,7 +335,7 @@
 }
 
 .table span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   color: #4a4a4a;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -564,7 +564,7 @@
 }
 
 .advancedTitle span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1.125rem;
   color: #000000;
   line-height: 1.2;
@@ -578,7 +578,7 @@
 }
 
 .advancedOption select {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000000;
   line-height: 1.2;
@@ -587,7 +587,7 @@
 }
 
 .advancedOption span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000000;
   line-height: 1.2;
@@ -596,7 +596,7 @@
 }
 
 .advancedOption input[type='text'] {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000000;
   line-height: 1rem;
@@ -620,7 +620,7 @@
 }
 
 .advancedOptionBox label {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000000;
   line-height: 1.2;
@@ -639,7 +639,7 @@ span.advancedDesc {
 }
 
 .advancedSize {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000000;
   line-height: 1.2;
@@ -649,7 +649,7 @@ span.advancedDesc {
 }
 
 .antdAdvancedSize {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000000;
   line-height: 1.2;
@@ -724,7 +724,7 @@ span.advancedDesc {
 }
 
 .advancedPercentInput input {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000;
   line-height: 1.2;
@@ -735,7 +735,7 @@ span.advancedDesc {
 }
 
 .advancedPercentInput span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000;
   line-height: 1.2;
@@ -750,7 +750,7 @@ span.advancedDesc {
 }
 
 .advancedPercentText span {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000;
   line-height: 1.2;
@@ -878,7 +878,7 @@ span.advancedDesc {
 }
 
 .advancedAlgorithm label {
-  font-family: SanFranciscoText;
+  font-family: 'Source Han Sans SC';
   font-size: 1rem;
   color: #000000;
   line-height: 1.2;
@@ -892,18 +892,19 @@ span.advancedDesc {
 }
 
 .newVariableBlock {
-  position: absolute;
-  bottom: 100%;
-  left: -0.1em;
-  margin: 0.1em;
+  position: relative;
+  /* bottom: 100%; */
+  /* left: -0.1em; */
+  /* margin: 0.1em; */
   display: flex;
   flex: none;
   flex-direction: column;
-  background: #fff;
-  border-radius: 5px;
-  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3);
+  /* background: #fff; */
+  /* border-radius: 5px; */
+  /* box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3); */
   z-index: 2;
-  padding: 0.1em;
+  /* padding: 0.1em; */
+  font-size: 100px;
 }
 
 .newVariableRow {
@@ -1072,10 +1073,11 @@ button.disable {
   cursor: pointer;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   background-image: linear-gradient(to bottom, #5b657b, #243448);
-  margin:0.1em auto 0;
+  margin: 0.1em auto 0;
 }
-.newVariableHintSyntax button span{
-  color:#fff;
+
+.newVariableHintSyntax button span {
+  color: #fff;
 }
 
 .funcTips {
@@ -1141,7 +1143,18 @@ button.disable {
   white-space: nowrap;
   font-size: 0.875rem;
 }
+
+span.crossWarning {
+  max-width: 100%;
+  color: #fff;
+  font-size: 0.5rem;
+}
+
 .advancedSolution {
   display: flex;
   flex: none;
+}
+
+.notAllow, .notAllow img {
+  cursor: not-allowed;
 }

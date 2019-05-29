@@ -7,24 +7,25 @@ import { Icon } from 'antd';
 import issueIcon from './fail.svg';
 import runningIcon from './running.svg';
 import normalIcon from './success.svg';
+import EN from '../../constant/en';
 
 const deploymentStatus = {
   normal: (
     <span className={styles.normal}>
-      <img className={styles.statusIcon} src={normalIcon} alt="normal" />Normal
+      <img className={styles.statusIcon} src={normalIcon} alt="normal" />{EN.Normal}
     </span>
   ),
   issue: (
     <span className={styles.issue}>
-      <img className={styles.statusIcon} src={issueIcon} alt="issue" />Issue
+      <img className={styles.statusIcon} src={issueIcon} alt="issue" />{EN.Issue}
     </span>
   ),
   processing: (
     <span className={styles.running}>
-      <img className={styles.statusIcon} src={runningIcon} alt="running" />Running
+      <img className={styles.statusIcon} src={runningIcon} alt="running" />{EN.Running}
     </span>
   ),
-  na: <span className={styles.na}>N/A</span>
+  na: <span className={styles.na}>{EN.NA}</span>
 };
 
 @inject('deploymentStore', 'scheduleStore', 'userStore', 'routing')
@@ -46,7 +47,7 @@ export default class Home extends Component {
     const { deploymentStore, routing, scheduleStore, userStore } = this.props;
     return (
       <div className={styles.home}>
-        <Bread list={['Home']} />
+        <Bread list={[EN.Home]} />
         <div className={styles.filter}>
           <Search
             value={deploymentStore.sortOptions.keywords}
@@ -54,7 +55,7 @@ export default class Home extends Component {
           />
           <Select
             className={styles.selector}
-            title="Sorted by"
+            title={EN.SortBy}
             autoWidth
             options={deploymentStore.sortByOptions}
             value={deploymentStore.sortOptions.sortBy}
@@ -62,11 +63,14 @@ export default class Home extends Component {
           />
           <Select
             className={styles.selector}
-            title="Projects per Page"
+            title={EN.ProPerPage}
             autoWidth
             options={deploymentStore.perPageOptions}
             value={parseInt(deploymentStore.sortOptions.perPage, 10)}
-            onChange={deploymentStore.changeSort.bind(null, 'perPage')}
+            onChange={(v) => {
+              deploymentStore.changeSort('perPage', v)
+              deploymentStore.changeSort('currentPage', 1)
+            }}
           />
           <Pagination
             current={deploymentStore.sortOptions.currentPage}
@@ -84,19 +88,17 @@ export default class Home extends Component {
                 'projectName'
               )}
             >
-              Project Name
+              {EN.ProjectName}
             </span>
             <span
               className={styles.modelName}
               onClick={this.toggle(deploymentStore.sortOptions.sortBy, 'modelName')}
             >
-              Model Name
+              {EN.ModelName}
             </span>
-            <span className={styles.enable}>Enable</span>
-            <span className={styles.deploymentStatus}>Deployment Status</span>
-            <span className={styles.performanceStatus}>Performance Status</span>
-            {/* <span className={styles.operationAlert}>Operation Alert</span>
-            <span className={styles.performanceAlert}>Performance Alert</span> */}
+            <span className={styles.enable}>{EN.Enable}</span>
+            <span className={styles.deploymentStatus}>{EN.DeploymentStatus}</span>
+            <span className={styles.performanceStatus}>{EN.PerformanceStatus}</span>
             <span
               className={styles.createdDate}
               onClick={this.toggle(
@@ -104,9 +106,9 @@ export default class Home extends Component {
                 'createdDate'
               )}
             >
-              Created Date
+              {EN.CreatedDate}
             </span>
-            <span className={styles.owner}>Owner</span>
+            <span className={styles.owner}>{EN.Owner}</span>
             <span className={styles.delete} />
           </div>
           <div className={styles.list}>

@@ -5,6 +5,8 @@ import warnIcon from "./fail.svg";
 import { Checkbox, Icon } from 'antd';
 import { observable, action } from 'mobx';
 
+import EN from '../../../constant/en';
+
 @inject('userStore')
 @observer
 export default class SignUp extends Component {
@@ -39,21 +41,21 @@ export default class SignUp extends Component {
   register = () => {
     const { email, password, confirmPassword, warning, level } = this;
     if (!email) {
-      warning.email = "Enter your email";
+      warning.email = EN.Enteryouremail;
     } else if (!new RegExp(/^[a-zA-Z0-9_-]+(\.([a-zA-Z0-9_-])+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/).test(email)) {
-      warning.email = "Enter a vaild emial address";
+      warning.email = EN.Enteravaildemial;
     } else {
       warning.email = "";
     }
 
     if (!password) {
-      warning.password = "Enter your password";
+      warning.password = EN.Enteryourpassword;
     } else {
       warning.password = "";
     }
 
     if (!confirmPassword || confirmPassword !== password) {
-      warning.confirmPassword = "passwords not match";
+      warning.confirmPassword = EN.Passwordsnotmatch;
     } else {
       warning.confirmPassword = "";
     }
@@ -77,35 +79,35 @@ export default class SignUp extends Component {
     return (this.showLicense ?
       <License back={this.hide} /> :
       <div className={styles.signup}>
-        <div className={styles.title}><span>Sign Up</span></div>
+        <div className={styles.title}><span>{EN.SignUp}</span></div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.email && <span><img src={warnIcon} alt='warning' />{this.warning.email}</span>}</div>
-          <input type="text" placeholder="Email Address" value={this.email} onChange={this.onChangeEmail} />
+          <input type="text" placeholder={EN.EmailAddress} value={this.email} onChange={this.onChangeEmail} />
         </div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.password && <span><img src={warnIcon} alt='warning' />{this.warning.password}</span>}</div>
-          <input type="password" placeholder="Set a Password" value={this.password} onChange={this.onChangePassword} />
+          <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword} />
         </div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.confirmPassword && <span><img src={warnIcon} alt='warning' />{this.warning.confirmPassword}</span>}</div>
-          <input type="password" placeholder="Confirm Password" value={this.confirmPassword} onChange={this.onChangeConfirmPassword} />
+          <input type="password" placeholder={EN.ConfirmPassword} value={this.confirmPassword} onChange={this.onChangeConfirmPassword} />
         </div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.level && <span><img src={warnIcon} alt='warning' />{this.warning.level}</span>}</div>
           <select value={this.level} onChange={this.onChangeLevel}>
-            <option value='0'>Unavailable</option>
-            <option value='1'>Free Trail</option>
-            <option value='2'>Basic</option>
-            <option value='3'>Essential</option>
-            <option value='4'>Enterprise</option>
+            <option value='0'>{EN.Unavailable}</option>
+            <option value='1'>{EN.FreeTrial}</option>
+            <option value='2'>{EN.Basic}</option>
+            <option value='3'>{EN.Essential}</option>
+            <option value='4'>{EN.Enterprise}</option>
           </select>
         </div>
-        <div className={styles.text}><span>By clicking Sign Up,you agree to our&nbsp;<span className={styles.bold} onClick={this.show}>End User License Agreement</span></span></div>
+        <div className={styles.text}><span>{EN.ByclickingSign}&nbsp;<span className={styles.bold} onClick={this.show}>{EN.EndUserLicense}</span></span></div>
         <div className={styles.buttonRow}>
           <button className={styles.button} onClick={this.register}>
-            <span>Sign Up</span>
+            <span>{EN.SignUp}</span>
           </button>
-          <div className={styles.hasAccount} onClick={this.login}><span>Already have an account</span></div>
+          <div className={styles.hasAccount} onClick={this.login}><span>{EN.Alreadyhaveanaccount}</span></div>
         </div>
       </div>)
   }

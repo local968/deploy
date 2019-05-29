@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 import d3tips from './d3-tip';
-
+import { formatNumber } from 'util'
 import styles from './D3Chart.module.css';
-
+import EN from '../../constant/en';
 @observer
 export default class RegressionPredictActualChart extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.regressionPredictActualChart = React.createRef();
+    this.renderD3 = this.renderD3.bind(this);
   }
 
   componentDidMount() {
@@ -47,7 +48,7 @@ export default class RegressionPredictActualChart extends Component {
       .attr('x', 550)
       .attr('y', 30)
       .attr('fill', '#000')
-      .text('Point Number');
+      .text(EN.PointNumber);
 
     svg.append('g')
       .attr('class', styles.axis)
@@ -57,7 +58,7 @@ export default class RegressionPredictActualChart extends Component {
       .attr('x', 0)
       .attr('fill', '#000')
       .style('text-anchor', 'start')
-      .text('Average ' + target);
+      .text(EN.Average+ target + EN.NewAverage);
   }
 
   drawLine = (svg, data, height, x, y, field, color) => {
@@ -68,8 +69,8 @@ export default class RegressionPredictActualChart extends Component {
       .offset((d, i) => {
         let width = -150;
 
-        if(this.regressionPredictActualChart.current){
-          width = this.regressionPredictActualChart.current.clientWidth -700 - 100;
+        if (this.regressionPredictActualChart.current) {
+          width = this.regressionPredictActualChart.current.clientWidth - 700 - 100 - 50;
         }
 
         return [y(d[field]) - 20, x(i) + width]
@@ -77,9 +78,9 @@ export default class RegressionPredictActualChart extends Component {
       .html((d, i) => {
         return (
           `
-            <div class="${styles.hoverText}">Group Number: ${i + 1}</div>
-            <div class="${styles.hoverText}">Predicted Average: ${this.formatNumber(d['pred'])}</div>
-            <div class="${styles.hoverText}">Actual Average: ${this.formatNumber(d['target'])}</div>
+            <div class="${styles.hoverText}">${EN.GroupNumber} ${i + 1}</div>
+            <div class="${styles.hoverText}">${EN.PredictedAverage} ${formatNumber(d['pred'])}</div>
+            <div class="${styles.hoverText}">${EN.ActualAverage} ${formatNumber(d['target'])}</div>
           `
         );
       });
@@ -108,16 +109,11 @@ export default class RegressionPredictActualChart extends Component {
     return (
       <div>
         <div ref={this.regressionPredictActualChart} className={`${styles.regressionPredictActualChart} ${className}`}>
-          <div className={styles.hoverPanel}/>
+          <div className={styles.hoverPanel} />
         </div>
       </div>
     );
   }
-
-  formatNumber = (num) => {
-    if (typeof num === "number") return num.toFixed(2)
-    if (typeof num === "string") return num
-  };
 
   renderD3 = () => {
     let { height, width, data } = this.props;

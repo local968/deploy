@@ -18,20 +18,20 @@ const fetchDeployments = (userId) => () => redis.zrange(`user:${userId}:deployme
 })
 
 wss.register('watchSchedule', (message, socket) => {
-  const {userId} = socket.session
+  const { userId } = socket.session
   const callback = list => ({ status: 200, message: 'ok', list, type: 'watchSchedule' })
   wss.subscribe(`user:${userId}:schedules`, () => scheduleApi.getAllSchedule(userId).then(callback), socket)
   return scheduleApi.getAllSchedule(userId).then(callback)
 })
 
 wss.register('watchDeployments', (message, socket) => {
-  const {userId} = socket.session
+  const { userId } = socket.session;
   wss.subscribe(`user:${userId}:deployments`, fetchDeployments(userId), socket)
   return fetchDeployments(userId)()
 })
 
 wss.register('addDeployment', (message, socket) => {
-  const {userId} = socket.session
+  const { userId } = socket.session
   const createdDate = moment().unix()
   return redis.incr('deploymentId').then(id => {
     const pipeline = redis.pipeline();
@@ -74,8 +74,8 @@ wss.register('removeDeployment', (message, socket) => {
 })
 
 wss.register('updateDeployment', (message, socket) => {
-  const {userId} = socket.session
-  const {data} = message
+  const { userId } = socket.session
+  const { data } = message
   scheduleApi.getDeployment(data.id).then(deployment =>
     redis.set(`deployment:${data.id}`, JSON.stringify({ ...deployment, ...data })).then(result => {
       wss.publish(`user:${userId}:deployments`, { type: 'add', data })
@@ -87,25 +87,44 @@ wss.register('updateDeployment', (message, socket) => {
 })
 
 wss.register('getAllModels', async (message, socket) => {
-  const {projectId} = message
+  const { projectId, modelType } = message
   const currModelIds = await redis.smembers(`project:${projectId}:models`)
   const prevModelIds = await redis.smembers(`project:${projectId}:models:previous`)
   const modelIds = [...currModelIds, ...prevModelIds]
   const pipeline = redis.pipeline()
+  let resultCount = 2
   modelIds.map(modelId => {
-    pipeline.hmget(`project:${projectId}:model:${modelId}`, 'name', 'score')
+    if (modelType === 'Classification') {
+      pipeline.hmget(`project:${projectId}:model:${modelId}`, 'modelName', 'score', 'chartData', 'fitIndex')
+      resultCount = 4
+    } else {
+      pipeline.hmget(`project:${projectId}:model:${modelId}`, 'modelName', 'score')
+    }
   })
   const modelsResult = await pipeline.exec()
   const models = modelsResult.reduce((prev, curr, index) => {
     const _result = [...prev]
     if (curr[0]) throw { status: 500, message: 'model query failed', error: curr[0] }
-    if (!curr[1] || curr[1].length < 2) return
+    if (!curr[1] || curr[1].length < resultCount) return
     const score = JSON.parse(curr[1][1])
+    let performance
+    if (modelType === 'Classification') {
+      const auc = (score.validateScore || {}).auc
+      const chartData = JSON.parse(curr[1][2])
+      const fitIndex = JSON.parse(curr[1][3])
+      const notShowArr = ['AUCROC', 'AUCPR', 'FN', 'FP', 'FPR', 'F_BETA', 'TN', 'TP', 'TPR', 'Youden', 'Threshold']
+      performance = [`AUC:${auc && auc.toFixed && auc.toFixed(3)}`, ...Object.entries(chartData.roc).filter(d => !notShowArr.includes(d[0])).map(([k, v]) => {
+        const value = v[fitIndex]
+        return `${k}:${value && value.toFixed && value.toFixed(3)}`
+      })].join("\r\n")
+    } else {
+      performance = Object.entries(score.validateScore || score).map(([k, v]) => `${k}:${v && v.toFixed && v.toFixed(3)}`).join("\r\n")
+    }
     _result.push({
       name: JSON.parse(curr[1][0]),
       score,
       modelId: modelIds[index],
-      performance: Object.entries(score.validateScore).map(([k, v]) => `${k}:${v.toFixed(3)}`).join("\r\n")
+      performance
     })
     return _result
   }, [])
@@ -119,7 +138,7 @@ wss.register('getAllModels', async (message, socket) => {
 })
 
 wss.register('getProjectDeployment', async (message, socket) => {
-  const {projectId} = message
+  const { projectId } = message
   return fetchDeployments(socket.session.userId)().then(response => {
     if (response.status !== 200) return response
     const deployment = response.list.find(d => d.projectId === projectId)
@@ -129,8 +148,8 @@ wss.register('getProjectDeployment', async (message, socket) => {
 })
 
 wss.register('updateDeploymentModel', async (message, socket) => {
-  const {userId} = socket.session
-  const {deploymentId,modelName} = message
+  const { userId } = socket.session
+  const { deploymentId, modelName } = message
   const deployment = JSON.parse(await redis.get(`deployment:${deploymentId}`))
   deployment.modelName = modelName
   await redis.set(`deployment:${deploymentId}`, JSON.stringify(deployment))

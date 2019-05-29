@@ -3,15 +3,17 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
-import { Checkbox } from 'antd'
-import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo } from 'components/Common';
+import { Checkbox, message } from 'antd'
+import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confirm } from 'components/Common';
+import EN from '../../../constant/en';
 
 @inject('projectStore')
 @observer
 export default class DataSchema extends Component {
-  @observable checkList = this.props.projectStore.project.sortHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
+  @observable checkList = this.props.projectStore.project.rawHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
   @observable showSelect = false
   @observable dataType = { ...this.props.projectStore.project.colType }
+  @observable visiable = false
 
   constructor(props) {
     super(props)
@@ -20,8 +22,8 @@ export default class DataSchema extends Component {
 
   doEtl = () => {
     const { project } = this.props.projectStore
-    const { sortHeader, target } = project;
-    const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
+    const { rawHeader, target } = project;
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
     const data = {
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
@@ -30,9 +32,28 @@ export default class DataSchema extends Component {
     if (target && this.dataType[target] === 'Numerical') {
       data.outlierFillMethod = { [target]: 'drop' }
       data.outlierFillMethodTemp = { [target]: 'drop' }
+      data.nullFillMethod = { [target]: 'drop' }
+      data.nullFillMethodTemp = { [target]: 'drop' }
+    } else {
+      data.nullFillMethod = { [target]: 'drop' }
+      data.nullFillMethodTemp = { [target]: 'drop' }
     }
     project.setProperty(data)
-    project.endSchema()
+    if (project.train2ing || !!project.models.length) return this.visiable = true
+    this.onConfirm()
+  }
+
+  onClose = () => {
+    this.visiable = false
+  }
+
+  onConfirm = () => {
+    try {
+      this.props.projectStore.project.endSchema()
+    } catch (e) {
+      message.error(e)
+    }
+    this.onClose()
   }
 
   targetSelect = (value) => {
@@ -73,16 +94,20 @@ export default class DataSchema extends Component {
   }
 
   formatTable = () => {
-    const { target, headerTemp: { temp }, sortData, sortHeader, renameVariable, etling } = this.props.projectStore.project;
+    const { target, headerTemp: { temp }, uploadData, rawHeader, renameVariable, etling } = this.props.projectStore.project;
     if (etling) return []
     const { showSelect, checkList } = this
-    if (!sortData.length) return []
+    if (!uploadData.length) return []
     // return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
-    const headerList = [...sortHeader]
+    const headerList = target ? [target, ...rawHeader.filter(v => v !== target)] : rawHeader
+    const targetIndex = target ? rawHeader.indexOf(target) : -1
     // const notShowIndex = sortHeader.filter(v => !sortHeader.includes(v)).map(v => sortHeader.indexOf(v))
-    const data = [...sortData]
+    const data = targetIndex > -1 ? uploadData.map(row => {
+      const value = row[targetIndex]
+      return [value, ...row.slice(0, targetIndex), ...row.slice(targetIndex + 1)]
+    }) : uploadData
     // if(!sortData.length) return []
     /**
      * 根据showSelect, indexPosition变化
@@ -136,7 +161,7 @@ export default class DataSchema extends Component {
         cn: styles.titleCell
       }
       if (i === index.columnHeader - 1) {
-        headerData.content = <HeaderInfo row='Header' col='Row' style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739}/>
+        headerData.content = <HeaderInfo row={EN.Header} col={EN.Row} style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
         headerData.title = '';
       } else {
         headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
@@ -156,6 +181,8 @@ export default class DataSchema extends Component {
       }
       headerArr.push(headerData)
 
+
+
       const selectData = {
         content: '',
         title: '',
@@ -173,15 +200,17 @@ export default class DataSchema extends Component {
           const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
           key = header + suffix
         }
-        const colValue = this.dataType[key] === 'Numerical' ? 'Numerical' : 'Categorical'
+        const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
+        const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
-          <option value="Categorical">Categorical</option>
-          <option value="Numerical">Numerical</option>
+          {!canTransforToCategorical && <option value="Raw">{EN.Categorical}(Raw)</option>}
+          {canTransforToCategorical && <option value="Categorical">{EN.Categorical}</option>}
+          <option value="Numerical">{EN.Numerical}</option>
         </select>
-        selectData.title = colValue
+        selectData.title = { Numerical: EN.Numerical, Categorical: EN.Categorical, Raw: EN.Categorical + '(Raw)' }[colValue]
         if (target && target === key) {
           selectData.cn = classnames(styles.cell, styles.target);
-          selectData.content = <span>{colValue}</span>
+          selectData.content = <span>{{ Numerical: EN.Numerical, Categorical: EN.Categorical, Raw: EN.Categorical + '(Raw)' }[colValue]}</span>
         }
 
       }
@@ -222,13 +251,13 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { etling, etlProgress, sortHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, rawHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated } } = project;
     const targetOption = {};
     const tableData = this.formatTable()
-    const newDataHeader = sortHeader.filter(d => !this.checkList.includes(d));
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
 
     //target选择列表
-    sortHeader.forEach(h => {
+    rawHeader.forEach(h => {
       h = h.trim()
       if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = h
       if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = h
@@ -238,14 +267,14 @@ export default class DataSchema extends Component {
       <div className={styles.schemaInfo}>
         <div className={styles.schemaI}><span>i</span></div>
         <div className={styles.schemaText}>
-          <span>If your data does not have a header, please reload one WITH A HEADER.</span>
-          <span>Please select a variable as the target variable, and unselect the undesirable variables if necessary.</span>
+          <span>{EN.Ifyourdatadoesnothaveaheader}</span>
+          <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
         </div>
       </div>
-      <div className={styles.schemaContent}>
+      <div className={styles.schemaContent} id='schemaContent'>
         <div className={styles.schemaTools}>
           <Select
-            title={"Target Variable"}
+            title={EN.TargetVariable}
             dropdownClassName={"targetSelect"}
             autoWidth={"1.6em"}
             options={targetOption}
@@ -253,26 +282,28 @@ export default class DataSchema extends Component {
             value={target}
             disabled={isMissed || isDuplicated}
             selectOption={{ showSearch: true }}
+            getPopupContainer={() => document.getElementById('schemaContent')}
           />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
-              <span>Unselect Undesirable Variables</span>
+              <span>{EN.UnselectUndesirableVariables}</span>
             </div> :
             <div className={styles.schemaSelect} onClick={this.toggleSelect}>
-              <span>Unselect Undesirable Variables</span>
+              <span>{EN.UnselectUndesirableVariables}</span>
             </div>
           }
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>Unselect predictors that lead to less wanted modeling results, they could be: <br />1. Variable IDs <br />2. Variables that are derived from the target <br />3. Any other variables you don't need</div>} />
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
+          }</div>} />
           {isMissed && <div className={styles.schemaMissed} >
             <div className={styles.errorBlock}></div>
-            <span>Missing</span>
+            <span>{EN.Missing}</span>
           </div>}
           {isDuplicated && <div className={styles.schemaDuplicated} >
             <div className={styles.errorBlock}></div>
-            <span>Duplicated Header</span>
+            <span>{EN.DuplicatedHeader}</span>
           </div>}
           {(isMissed || isDuplicated) && <div className={styles.schemaSelect} onClick={this.autoFix}>
-            <span>Auto Header Repair</span>
+            <span>{EN.AutoHeaderRepair}</span>
           </div>}
         </div>
         <div className={styles.content}>
@@ -280,7 +311,7 @@ export default class DataSchema extends Component {
             ref={this.tableRef}
             columnWidth={110}
             rowHeight={34}
-            columnCount={sortHeader.length + 1}
+            columnCount={rawHeader.length + 1}
             rowCount={tableData.length}
             fixedColumnCount={1}
             fixedRowCount={this.showSelect ? 3 : 2}
@@ -291,13 +322,14 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || !target || (newDataHeader.length <= 1 && newDataHeader.indexOf(target) > -1)} text="Continue" />
+        <ContinueButton onClick={this.doEtl} disabled={etling || !target || (newDataHeader.length <= 1 && newDataHeader.indexOf(target) > -1)} text={EN.Continue} />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
-          <label htmlFor='noCompute'>Skip Data Quality Check</label>
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content="If you know the data is clean, you can skip the data quality step." />
+          <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
+      {<Confirm width={'6em'} visible={this.visiable} title={EN.Warning} content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm} confirmText={EN.Continue} closeText={EN.Cancel} />}
     </div>
   }
 }

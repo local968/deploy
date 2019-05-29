@@ -78,6 +78,7 @@ const init = (server, sessionParser) => {
         socket.send(JSON.stringify({ ...returnValue, request: message }))
         await removeMessage(message, socket.session.user)
       } catch (e) {
+        console.error(e)
         // socket closed
       }
       return

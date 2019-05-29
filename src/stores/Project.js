@@ -7,6 +7,9 @@ import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage, Modal } from 'antd';
 import axios from 'axios'
+import { formatNumber } from 'util'
+import c1 from './classification'
+import request from "../components/Request";
 
 export default class Project {
   @observable models = []
@@ -46,7 +49,7 @@ export default class Project {
   @observable uploadData = [];
   @observable rawHeader = [];
   @observable colType = [];
-  @observable totalLines = 0;
+  // @observable totalLines = 0;
   @observable totalRawLines = 0;
   @observable firstEtl = true;
   @observable target = '';
@@ -54,12 +57,16 @@ export default class Project {
   @observable validationRate = 20;
   @observable holdoutRate = 20;
   @observable uploadFileName = [];
-  @observable fileNames = [];
+  @observable fileName = '';
   // @observable cleanData = []
   @observable originPath = '';
+
+  @observable etlCleanDataLoading = false
   @observable cleanPath = ''
 
   @observable noComputeTemp = false;
+  @observable originalIndex = ''
+  @observable etlIndex = ''
 
   //data quality
   @observable mismatchFillMethod = {}
@@ -88,6 +95,17 @@ export default class Project {
   @observable outlierLineCounts = {}
   @observable renameVariable = {}
   @observable missingReason = {}
+  @observable newVariablePath = ''
+  @observable newVariableViews = {}
+  @observable otherMap = {}
+
+  // @observable totalFixedCount = 0
+  @observable deletedCount = 0
+
+  //原始issue
+  @observable nullLineCountsOrigin = {}
+  @observable mismatchLineCountsOrigin = {}
+  @observable outlierLineCountsOrigin = {}
 
 
   @observable targetMapTemp = {};
@@ -110,6 +128,8 @@ export default class Project {
   @observable customHeader = []
   @observable criteria = 'defualt';
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
+  @observable mappingKey = ''
+  @observable distribution = 0
 
   // Advanced Modeling Setting
   @observable settingId = '';
@@ -125,7 +145,7 @@ export default class Project {
 
   @observable ensembleSize = 20;
   @observable randSeed = 0;
-  @observable measurement = '';
+  @observable measurement = 'CVNN';
   @observable resampling = "no";
   @observable runWith = 'holdout';
   @observable crossCount = 5;
@@ -134,10 +154,17 @@ export default class Project {
   @observable customRange = [];
   @observable algorithms = [];
   @observable selectId = '';
-  @observable version = [1, 2];
+  @observable version = [1, 2, 3];
   @observable dataViews = null;
   @observable dataViewsLoading = false;
   @observable dataViewProgress = 0;
+
+  //un
+  @observable weights = {}
+  @observable standardType = 'standard'
+  @observable searchTime = 5
+  @observable kValue = 5
+  @observable kType = 'auto'
 
   @observable stopModel = false
   @observable stopEtl = false
@@ -178,9 +205,27 @@ export default class Project {
     })
   }
 
+  readIndex = async (index) => {
+    const url = `/etls/${index}/preview`
+    const { data = {} } = await axios.get(url)
+    const result = (data.result || []).map(row => this.rawHeader.map(h => row[h]))
+    return result
+  }
+
+  @computed
+  get totalLines() {
+    return this.totalRawLines - this.deletedCount
+  }
+
+  fetchData = async path => {
+    const api = await socketStore.ready()
+    const result = await api.fetchData({ path })
+    return result.data
+  }
+
   @computed
   get defaultUploadFile() {
-    this.noComputeTemp = false
+    // this.noComputeTemp = false
 
     return {
       cleanHeader: [],
@@ -193,43 +238,91 @@ export default class Project {
       firstEtl: true,
       target: '',
       noCompute: false,
-      rawDataView: null
+      rawDataView: null,
+      originalIndex: ''
     }
   }
 
   @computed
   get defaultDataQuality() {
     return {
-      mismatchFillMethod: {},
+      // mismatchFillMethod: {},
       mismatchIndex: {},
-      nullFillMethod: {},
+      // nullFillMethod: {},
       nullIndex: {},
-      outlierFillMethod: {},
+      // outlierFillMethod: {},
       outlierIndex: {},
-      dataViews: null,
-      dataViewsLoading: false,
-      outlierDict: {},
+
+      // outlierDict: {},
       targetMap: {},
       targetArray: [],
       totalFixedLines: 0,
-      nullLineCounts: {},
-      mismatchLineCounts: {},
-      outlierLineCounts: {},
+      // nullLineCounts: {},
+      // mismatchLineCounts: {},
+      // outlierLineCounts: {},
       renameVariable: {},
       missingReason: {},
       targetMapTemp: {},
       targetArrayTemp: [],
-      mismatchFillMethodTemp: {},
-      nullFillMethodTemp: {},
-      outlierFillMethodTemp: {},
+      // mismatchFillMethodTemp: {},
+      // nullFillMethodTemp: {},
+      // outlierFillMethodTemp: {},
       outlierDictTemp: {},
-      preImportanceLoading: false
+      otherMap: {},
+      cleanPath: ''
     }
   }
 
   @computed
   get defaultTrain() {
-    const measurement = this.problemType === "Classification" ? "auc" : "r2"
+    const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score'
+    const algorithms = (this.problemType === "Clustering" && [
+      'KMeans',
+      'GMM',
+      'Birch',
+      'Agg',
+      'SpectralClustering',
+      'DBSCAN',
+      'MeanShift',
+    ]) || (this.problemType === "Outlier" && [
+      'HBOS',
+      'PCA',
+      'IsolationForest',
+      'MCD',
+      'EllipticEnvelope',
+    ]) || (this.problemType === "Classification" && [
+      'adaboost',
+      'bernoulli_nb',
+      'decision_tree',
+      'extra_trees',
+      'gaussian_nb',
+      'gradient_boosting',
+      'k_nearest_neighbors',
+      'lda',
+      'liblinear_svc',
+      'libsvm_svc',
+      'multinomial_nb',
+      'passive_aggressive',
+      'qda',
+      'random_forest',
+      'sgd',
+      'xgradient_boosting',
+      'r2-logistics',
+    ]) || (this.problemType === "Regression" && [
+      'adaboost',
+      'ard_regression',
+      'decision_tree',
+      'extra_trees',
+      'gaussian_process',
+      'gradient_boosting',
+      'k_nearest_neighbors',
+      'liblinear_svr',
+      'libsvm_svr',
+      'random_forest',
+      'ridge_regression',
+      'sgd',
+      'xgradient_boosting',
+    ])
 
     return {
       train2Finished: false,
@@ -242,12 +335,12 @@ export default class Project {
       // maxTime: 10,
       randSeed: 0,
       resampling: 'no',
-      runWith: (this.totalLines > 0 && this.totalLines < 10000) ? 'cross' : 'holdout',
+      runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
       crossCount: 5,
       dataRange: 'all',
       customField: '',
       customRange: [],
-      algorithms: [],
+      algorithms: algorithms,
       measurement,
       selectId: '',
       version: [1, 2],
@@ -258,6 +351,20 @@ export default class Project {
       expression: {},
       validationRate: 20,
       holdoutRate: 20,
+      hasSendEtl: false,
+      dataViews: null,
+      dataViewsLoading: false,
+      preImportanceLoading: false,
+      preImportance: {},
+      mappingKey: '',
+      newVariablePath: '',
+      newVariableViews: {},
+      distribution: 0,
+      weights: {},
+      standardType: 'standard',
+      searchTime: 5,
+      kValue: 5,
+      kType: 'auto'
     }
   }
 
@@ -274,20 +381,23 @@ export default class Project {
 
   @computed
   get sortHeader() {
-    const { target, rawHeader } = this
-    if (!target) return rawHeader
-    return [target, ...rawHeader.filter(v => target !== v)]
+    const { target, dataHeader } = this
+    if (!target) return dataHeader
+    return [target, ...dataHeader.filter(v => target !== v)]
   }
 
   @computed
   get sortData() {
-    const { target, rawHeader, uploadData } = this
+    const { target, sortHeader, uploadData, rawHeader } = this
     if (!uploadData.length) return []
     if (!target) return uploadData
-    const index = rawHeader.indexOf(target)
-    return uploadData.filter(r => r.length === rawHeader.length).map(row => {
-      const value = row[index]
-      return [value, ...row.slice(0, index), ...row.slice(index + 1)]
+    return uploadData.map(row => {
+      const newRow = []
+      sortHeader.forEach(v => {
+        const index = rawHeader.indexOf(v)
+        if (index > -1) newRow.push(row[index])
+      })
+      return newRow
     })
   }
 
@@ -359,14 +469,7 @@ export default class Project {
     data.id = this.id
 
     return socketStore.ready().then(api => {
-      return api.updateProject(data).then(result => {
-        const { status, message } = result
-        this.loading = false;
-        if (status !== 200) {
-          return alert(message)
-        }
-        this.setProperty(data)
-      })
+      return api.updateProject(data)
     })
   }
 
@@ -374,22 +477,23 @@ export default class Project {
   initProject = () => {
     if (this.init) return
     this.init = true
+    // this.autorun.push(autorun(async () => {
+    //   if (this.uploadFileName && this.uploadFileName.length > 0) {
+    //     const api = await socketStore.ready()
+    //     const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
+    //     this.fileNames = fileNames || []
+    //     return
+    //   }
+    //   this.fileNames = []
+    // }))
     this.autorun.push(autorun(async () => {
-      if (this.uploadFileName && this.uploadFileName.length > 0) {
-        const api = await socketStore.ready()
-        const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-        this.fileNames = fileNames || []
-        return
-      }
-      this.fileNames = []
-    }))
-    this.autorun.push(autorun(async () => {
-      if (!this.originPath) {
+      if (!this.originalIndex) {
         this.uploadData = []
       } else {
-        this.readData(this.originPath).then(data => {
-          this.uploadData = data.slice(1)
-        })
+        // this.readData(this.originPath).then(data => {
+        //   this.uploadData = data.slice(1)
+        // })
+        this.uploadData = await this.readIndex(this.originalIndex)
       }
     }))
     // this.autorun.push(autorun(async () => {
@@ -413,6 +517,7 @@ export default class Project {
 
   @action
   setProperty = (data) => {
+    delete data.totalLines
     if (typeof data !== 'object') {
       return false;
     }
@@ -428,6 +533,9 @@ export default class Project {
       }
       if (key === 'problemType') {
         data.changeProjectType = data[key]
+      }
+      if (key === 'noCompute') {
+        data.noComputeTemp = data[key]
       }
       if (key === 'trainModel') {
         if (data[key]) {
@@ -448,7 +556,7 @@ export default class Project {
       business: this.business,
       problemType: this.changeProjectType
     };
-    updObj.measurement = this.changeProjectType === "Classification" ? "auc" : "r2"
+    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score'
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl()
       //全部恢复到problem步骤
@@ -468,9 +576,19 @@ export default class Project {
   /**---------------------------------------------data-------------------------------------------------*/
   //修改上传文件
   @action
-  fastTrackInit = async (name) => {
+  fastTrackInit = async (data) => {
+
     await this.abortTrainByEtl()
-    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, { uploadFileName: [name] }, {
+
+    if (!data.cleanHeader || !data.rawHeader || !data.dataHeader) {
+      const api = await socketStore.ready()
+      const { header } = await api.getHeader({ index: data.originalIndex })
+      data.cleanHeader = header
+      data.rawHeader = header
+      data.dataHeader = header
+    }
+
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, data, {
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
@@ -478,8 +596,18 @@ export default class Project {
     })
     this.etling = true
     await this.updateProject(backData)
-    const pass = await this.etl()
-    if (!pass) this.updateProject({ uploadFileName: [] })
+    // const pass = await this.etl()
+    const result = await this.originalStats()
+    if (result.status !== 200) {
+      antdMessage.error(result.message)
+      this.updateProject({ fileName: '', uploadFileName: [], originalIndex: '', etling: false })
+    }
+  }
+
+  @action
+  originalStats = async () => {
+    const api = await socketStore.ready()
+    return await api.originalStats({ index: this.originalIndex, projectId: this.id })
   }
 
   @action
@@ -536,25 +664,73 @@ export default class Project {
 
   @action
   endSchema = async () => {
-    this.etling = true
     await this.abortTrainByEtl()
-    await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
+    const data = {
       target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
+      nullFillMethod: this.nullFillMethod,
+      nullFillMethodTemp: this.nullFillMethodTemp,
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp,
-      curStep: 2,
-      mainStep: 2,
-      subStepActive: 2,
-      lastSubStep: 2
-    }))
-    return await this.etl()
+    }
+    if (this.noComputeTemp) {
+      this.etling = true
+      if (this.problemType === 'Classification') {
+        const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
+        if (min < 3) {
+          console.error("数量太小");
+          return await Promise.reject()
+        }
+        if (min < 5) data.crossCount = min - 1
+      }
+      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data))
+      await this.newEtl()
+      await this.updateProject({
+        curStep: 3,
+        mainStep: 3,
+        subStepActive: 1,
+        lastSubStep: 1
+      })
+      this.etling = false
+    } else {
+      const step = {
+        curStep: 2,
+        mainStep: 2,
+        subStepActive: 3,
+        lastSubStep: 3
+      }
+      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data, step))
+    }
+    // const step = this.noComputeTemp ? {
+    //   curStep: 3,
+    //   mainStep: 3,
+    //   subStepActive: 1,
+    //   lastSubStep: 1
+    // } : {
+    //     curStep: 2,
+    //     mainStep: 2,
+    //     subStepActive: 3,
+    //     lastSubStep: 3
+    //   }
+    // await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
+    //   target: this.target,
+    //   colType: { ...this.colType },
+    //   dataHeader: [...this.dataHeader],
+    //   noCompute: this.noComputeTemp,
+    //   nullFillMethod: this.nullFillMethod,
+    //   nullFillMethodTemp: this.nullFillMethodTemp,
+    //   outlierFillMethod: this.outlierFillMethod,
+    //   outlierFillMethodTemp: this.outlierFillMethodTemp,
+    //   ...step
+    // }))
+    // return await this.etl(true)
   }
 
-  @action
-  endQuality = async () => {
+  @computed
+  get qualityHasChanged() {
+    return true
     let hasChange = false
     const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
     for (const item of list) {
@@ -563,8 +739,12 @@ export default class Project {
       hasChange = this.hasChanged(before, after)
       if (hasChange) break
     }
+    return hasChange
+  }
 
-    if (!hasChange) return await Promise.resolve()
+  @action
+  endQuality = async () => {
+    if (!this.qualityHasChanged) return await Promise.resolve()
     this.etling = true
     await this.abortTrainByEtl()
     const data = Object.assign(this.defaultTrain, {
@@ -583,12 +763,25 @@ export default class Project {
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
-      if (min < 3) return await Promise.reject()
+      if (min < 3) {
+        console.error("数量太小");
+        return await Promise.reject()
+      }
       if (min < 5) data.crossCount = min - 1
     }
-    this.etling = true
     await this.updateProject(data)
-    if (hasChange) return await this.etl()
+    // await this.etl()
+    await this.newEtl()
+    this.etling = false
+  }
+
+  newEtl = async () => {
+    const api = await socketStore.ready()
+    await api.newEtl({ projectId: this.id }, ({ progress }) => {
+      this.etlProgress = progress
+    })
+    this.etlProgress = 0
+    this.etling = false
   }
 
   hasChanged = (before, after) => {
@@ -608,10 +801,13 @@ export default class Project {
 
   @computed
   get targetCounts() {
-    return (!this.targetArrayTemp.length ? this.colValueCounts[this.target] : this.targetArrayTemp.map((v, k) => {
+    const { colValueCounts, target, nullLineCounts, targetArrayTemp, targetMapTemp } = this
+    const countData = { ...colValueCounts[target] }
+    if (nullLineCounts[target]) countData[''] = nullLineCounts[target]
+    return (!targetArrayTemp.length ? countData : targetArrayTemp.map((v, k) => {
       let n = 0
-      Object.entries(this.targetMapTemp).forEach(([key, value]) => {
-        if (value === k) n += this.colValueCounts[this.target] ? (this.colValueCounts[this.target][key] || 0) : 0
+      Object.entries(targetMapTemp).forEach(([key, value]) => {
+        if (value === k) n += countData ? (countData[key] || 0) : 0
       })
       return { [v]: n }
     }).reduce((start, item) => {
@@ -627,11 +823,11 @@ export default class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetColMap, rawDataView, rawHeader, target, variableIssueCount, outlierLineCounts, mismatchLineCounts, nullLineCounts } = this;
+    const { problemType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin } = this;
 
     if (problemType === "Classification") {
-      data.targetIssue = this.targetArrayTemp.length < 2 && Object.keys(targetColMap).length > 2;
-    } else {
+      data.targetIssue = Object.keys(targetCounts).length > 2;
+    } else if (problemType === "Regression") {
       const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 1000
       data.targetIssue = unique < Math.min((rawHeader.length - 1) * 6, 1000)
     }
@@ -640,7 +836,7 @@ export default class Project {
       data.rowIssue = true;
     }
 
-    if (target && (+outlierLineCounts[target] + +mismatchLineCounts[target] + +nullLineCounts[target]) > 0) {
+    if (target && (+outlierLineCountsOrigin[target] + +mismatchLineCountsOrigin[target] + +nullLineCountsOrigin[target]) > 0) {
       data.targetRowIssue = true
     }
 
@@ -653,7 +849,7 @@ export default class Project {
 
   @computed
   get variableIssues() {
-    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines } = this;
+    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines, problemType, target } = this;
     const obj = {
       mismatchRow: {},
       nullRow: {},
@@ -661,33 +857,36 @@ export default class Project {
     }
 
     dataHeader.forEach(h => {
-      if (colType[h] !== "Categorical" && mismatchLineCounts[h]) {
+      if (colType[h] === "Numerical" && mismatchLineCounts[h]) {
         obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
       if (nullLineCounts[h]) {
         obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
-      if (colType[h] !== "Categorical" && outlierLineCounts[h]) {
+      if ((problemType === 'Clustering' || h === target) && colType[h] === "Numerical" && outlierLineCounts[h]) {
         obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
     })
     return obj
   }
 
+  @computed
   get variableIssueCount() {
-    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target } = this
+    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType } = this
     const nullCount = Object.values(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.values(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = Object.values(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
 
     return { nullCount, mismatchCount, outlierCount }
   }
 
   @computed
   get targetColMap() {
-    const { colValueCounts, target } = this
+    const { colValueCounts, target, nullLineCounts } = this
+    const countData = { ...colValueCounts[target] }
+    if (nullLineCounts[target]) countData[''] = nullLineCounts[target]
     let n = 0
-    const array = Object.entries(colValueCounts[target] || {}).sort((a, b) => b[1] - a[1]) || []
+    const array = Object.entries(countData || {}).sort((a, b) => b[1] - a[1]) || []
     const map = array.reduce((start, [k]) => {
       return Object.assign(start, { [k]: n++ })
     }, {})
@@ -707,7 +906,18 @@ export default class Project {
     return arr
   }
 
-  etl = async () => {
+  @computed
+  get targetIssuesCountsOrigin() {
+    const { target, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin, colType } = this;
+    const arr = {
+      mismatchRow: colType[target] !== "Categorical" ? (mismatchLineCountsOrigin[target] || 0) : 0,
+      nullRow: nullLineCountsOrigin[target] || 0,
+      outlierRow: colType[target] !== "Categorical" ? (outlierLineCountsOrigin[target] || 0) : 0,
+    }
+    return arr
+  }
+
+  etl = async (saveIssue = false) => {
     const { id, problemType, dataHeader, uploadFileName } = this;
 
     const command = 'etl';
@@ -715,6 +925,7 @@ export default class Project {
     const data = {
       projectId: id,
       time: moment().valueOf(),
+      saveIssue,
       command
     }
 
@@ -745,7 +956,9 @@ export default class Project {
 
     if (this.targetArray && this.targetArray.length) {
       data.targetMap = { [this.target]: toJS(this.targetMap) };
-      data.showTargetMap = this.targetArray.map((v, k) => { return { [v]: k } })
+      data.showTargetMap = this.targetArray.map((v, k) => {
+        return { [v]: k }
+      })
     }
 
     if (this.outlierDict && Object.keys(this.outlierDict).length) {
@@ -816,36 +1029,42 @@ export default class Project {
       //   actionType: isClean ? 'clean' : 'raw',
       //   feature_label
       // };
-      const readyLabels = this.dataViews ? Object.keys(this.dataViews) : []
-      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
-      const new_label = this.newVariable.filter(v => !readyLabels.includes(v))
-      const feature_label = [...data_label, ...new_label]
+      const readyLabels = Object.keys(this.newVariableViews)
+      // const data_label = this.dataHeader.filter(v => !readyLabels.includes(v))
+      const feature_label = this.newVariable.filter(v => !readyLabels.includes(v))
+      // const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
       const command = {
         projectId: this.id,
-        command: 'dataView',
+        command: 'top.dataView',
         actionType: 'clean',
-        feature_label
+        feature_label,
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.dataViewsLoading = true
-      return api.dataView(command).then(returnValue => {
-        const { status, result } = returnValue
-        if (status < 0) {
-          this.setProperty({ dataViews: null })
-          return antdMessage.error(result['process error'])
-        }
-        this.setProperty({ dataViews: result.data, dataViewsLoading: false })
-      })
+      return api.dataView(command)
+        .then(returnValue => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            // this.setProperty({ dataViews: null })
+            return antdMessage.error(result['process error'])
+          }
+          // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
+        })
     })
   }
 
   @action
   fixTarget = () => {
-    this.updateProject({ targetMapTemp: this.targetMapTemp, targetArrayTemp: this.targetArrayTemp })
+    this.updateProject({
+      targetMapTemp: this.targetMapTemp,
+      targetArrayTemp: this.targetArrayTemp,
+      otherMap: this.otherMap
+    })
   }
 
   @action
@@ -861,6 +1080,7 @@ export default class Project {
 
   @action
   addNewVariable = (variableName, variables, exp, type) => {
+    console.log(variableName, variables, exp, type, 666)
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     const oldExp = Object.values(this.expression).join(";")
     const allExp = `${oldExp};${fullExp}`
@@ -868,7 +1088,7 @@ export default class Project {
     return socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'createNewVariable',
+        command: 'top.createNewVariable',
         csvScript: allExp.replace(/\|/g, ",")
       };
       return api.createNewVariable(command, progressResult => {
@@ -891,12 +1111,64 @@ export default class Project {
           expression,
           newType,
           correlationMatrixData: null,
-          correlationMatrixHeader: null
+          correlationMatrixHeader: null,
+          cleanPath: ''
         })
         return true
       })
     })
   }
+
+  @action
+  addNewVariable2 = (variables, type) => {
+    // console.log(variableName, variables, exp, type, 666)
+    // const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
+    // const oldExp = Object.values(this.expression).join(";")
+    // const allExp = `${oldExp};${fullExp}`
+    const scripts = [...Object.values(this.expression), ...variables].map(v => ({
+      name: v.nameArray.map(n => ({
+        value: n,
+        type: "ID",
+        name: n
+      })), script: v.exps
+    }))
+
+    return socketStore.ready().then(api => {
+      const command = {
+        projectId: this.id,
+        command: 'top.createNewVariable',
+        csvScript: scripts
+      };
+      return api.createNewVariable(command, progressResult => {
+      }).then(returnValue => {
+        const { status, result } = returnValue
+        if (status < 0) {
+          antdMessage.error(result.msg)
+          return false
+        }
+        const variablenames = variables.reduce((prev, _v) => [...prev, ..._v.nameArray], [])
+        const newVariable = [...this.newVariable, ...variablenames]
+        const trainHeader = [...this.trainHeader, ...variablenames]
+        const newType = Object.assign({}, this.newType, type)
+        const variableExp = variables.reduce((prev, _v) => {
+          prev[_v.name] = _v
+          return prev
+        }, {})
+        const expression = Object.assign({}, this.expression, variableExp)
+        this.updateProject({
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+          correlationMatrixData: null,
+          correlationMatrixHeader: null,
+          cleanPath: ''
+        })
+        return true
+      })
+    })
+  }
+
   /**---------------------------------------------train------------------------------------------------*/
   @computed
   get selectModel() {
@@ -906,24 +1178,30 @@ export default class Project {
 
   @computed
   get recommendModel() {
-    const { costOption, criteria, models, problemType, defualtRecommendModel } = this
+    const { costOption, criteria, models, problemType, defualtRecommendModel, targetCounts, distribution } = this
+    const [v0, v1] = Object.values(targetCounts)
+    const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+    const percentNew = distribution ? distribution / 100 : percent0
     let model
     if (problemType === 'Classification') {
       const { TP, FN, FP, TN } = criteria === 'cost' ? costOption : { TP: 0, FN: 0, FP: 0, TN: 0 }
       if (TP || FN || FP || TN) {
-        for (let m of models) {
-          if (!model) {
-            model = m;
-            continue;
-          }
-          if (model.getBenefit(TP, FN, FP, TN).benefit < m.getBenefit(TP, FN, FP, TN).benefit) {
-            model = m;
+        if (!!defualtRecommendModel.length) {
+          for (let i = 0; i < Math.ceil(defualtRecommendModel.length * 0.3); i++) {
+            if (!model) {
+              model = defualtRecommendModel[i];
+              continue;
+            }
+            if (model.getBenefit(TP, FN, FP, TN, percentNew, percent0).benefit < defualtRecommendModel[i].getBenefit(TP, FN, FP, TN, percentNew, percent0).benefit) {
+              model = defualtRecommendModel[i];
+            }
           }
         }
       }
     }
-    model = model || defualtRecommendModel
-    return model
+    if (model) return model
+    if (!!defualtRecommendModel.length) return defualtRecommendModel[0]
+    return models[0]
   }
 
   // @computed
@@ -942,10 +1220,10 @@ export default class Project {
   //   }).map(m => {
   //     const { score, id } = m
   //     const { validateScore, holdoutScore } = score || {}
-  //     const validate = this.formatNumber(validateScore[currentMeasurement], 6)
-  //     const holdout = this.formatNumber(holdoutScore[currentMeasurement], 6)
-  //     const diff = this.formatNumber(Math.abs(validate - holdout), 6)
-  //     const base = endWithSe ? this.formatNumber(validate / holdout, 6) : this.formatNumber(holdout / validate, 6)
+  //     const validate = formatNumber(validateScore[currentMeasurement], 6)
+  //     const holdout = formatNumber(holdoutScore[currentMeasurement], 6)
+  //     const diff = formatNumber(Math.abs(validate - holdout), 6)
+  //     const base = endWithSe ? formatNumber(validate / holdout, 6) : formatNumber(holdout / validate, 6)
   //     return { validate, holdout, diff, id, base }
   //   })
   //   // 没有有效值的model就推荐第一个
@@ -966,7 +1244,7 @@ export default class Project {
   //       const { id, base } = d
   //       const diffIndex = diffArr.indexOf(d) + 1
   //       const holdoutIndex = holdoutArr.indexOf(d) + 1
-  //       const score = this.formatNumber(base * diffIndex * holdoutIndex, 6)
+  //       const score = formatNumber(base * diffIndex * holdoutIndex, 6)
   //       if (!recommend) return recommend = { id, score }
   //       if (recommend.score < score) return recommend = { id, score }
   //     })
@@ -979,34 +1257,36 @@ export default class Project {
   @computed
   get defualtRecommendModel() {
     const { models, measurement, problemType } = this
-    const currentMeasurement = measurement || (problemType === 'Classification' ? 'auc' : 'r2')
-    const sort = currentMeasurement.endsWith("se") ? -1 : 1
-    let recommend
-    models.forEach(m => {
-      let validate, holdout
-      if (problemType === 'Classification') {
-        validate = m[measurement + 'Validation']
-        holdout = m[measurement + 'Holdout']
-      } else {
+    const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
+    const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
+    return models
+      .map(m => {
         const { score } = m
         const { validateScore, holdoutScore } = score || {}
-        validate = (validateScore || {})[currentMeasurement]
-        holdout = (holdoutScore || {})[currentMeasurement]
-      }
-      if (!validate || !holdout) return
-      const value = validate + holdout
-      if (!recommend) return recommend = { id: m.id, value }
-      if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
-    })
-    if (!!recommend) return models.find(m => m.id === recommend.id)
-    return models[0]
-  }
-
-  formatNumber(num, n = 3) {
-    const float = parseFloat(num)
-    if (isNaN(float)) return num
-    const power = Math.pow(10, n)
-    return parseInt(float * power, 10) / power
+        let validate, holdout
+        if (problemType === 'Classification') {
+          validate = currentMeasurement === 'auc' ? (validateScore || {}).auc : m[currentMeasurement + 'Validation']
+          holdout = currentMeasurement === 'auc' ? (holdoutScore || {}).auc : m[currentMeasurement + 'Holdout']
+        } else if (problemType === 'Regression') {
+          validate = (validateScore || {})[currentMeasurement]
+          holdout = (holdoutScore || {})[currentMeasurement]
+        } else if (problemType === 'Clustering') {
+          validate = score[currentMeasurement]
+          holdout = score[currentMeasurement]
+        } else if (problemType === 'Outlier') {
+          validate = score[currentMeasurement]
+          holdout = score[currentMeasurement]
+        }
+        if (!validate || !holdout) return
+        return { id: m.id, value: validate + holdout }
+        // const value = validate + holdout
+        // if (!recommend) return recommend = { id: m.id, value }
+        // if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
+      })
+      .sort((a, b) => (b.value - a.value) * sort)
+      .map(_m => models.find(m => m.id === _m.id))
+    // if (!!recommend) return models.find(m => m.id === recommend.id)
+    // return models[0]
   }
 
   @action
@@ -1018,11 +1298,159 @@ export default class Project {
       target,
       dataHeader
     } = this;
-    const command = 'train';
+
+    let command = '';
+    let trainData = {}
 
     const featureLabel = dataHeader.filter(d => d !== target);
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
+
+    switch (problemType) {
+      case 'Clustering':
+        command = 'clustering.train';
+        const algorithms = this.totalLines > 50000 ? [
+          'KMeans',
+          'GMM',
+          'Birch',
+          'MeanShift',
+        ] : this.totalLines > 20000 ? [
+          'KMeans',
+          'GMM',
+          'Birch',
+          'MeanShift',
+          'Agg',
+          'DBSCAN'
+        ] : [
+              'KMeans',
+              'GMM',
+              'Birch',
+              'Agg',
+              'SpectralClustering',
+              'DBSCAN',
+              'MeanShift',
+            ]
+        trainData = {
+          kType: "auto",
+          kValue: undefined,
+          algorithms: algorithms,
+          standardType: "standard",
+          searchTime: 5,
+          metricsMethod: "CVNN",
+          featureLabel: featureLabel,
+          randomSeed: 0,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          applyWeights: {},
+          problemType
+        };
+        break;
+      case 'Outlier':
+        command = 'outlier.train';
+        trainData = {
+          algorithms: [
+            'HBOS',
+            'PCA',
+            'IsolationForest',
+            'MCD',
+            'EllipticEnvelope',
+          ],
+          standardType: "standard",
+          searchTime: 5,
+          featureLabel: featureLabel,
+          randomSeed: 0,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          applyWeights: {},
+          problemType
+        };
+        break;
+      case 'Classification':
+        command = 'clfreg.train';
+        trainData = {
+          problemType,
+          featureLabel,
+          targetLabel: target,
+          projectId: id,
+          version: '1,2,3',
+          command,
+          sampling: 'no',
+          speedVSaccuracy: 5,
+          ensembleSize: 20,
+          randSeed: 0,
+          measurement: problemType === "Classification" ? "auc" : "r2",
+          settingName: setting.name,
+          holdoutRate: 0.2,
+          algorithms: [
+            'adaboost',
+            'bernoulli_nb',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_nb',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'lda',
+            'liblinear_svc',
+            'libsvm_svc',
+            'multinomial_nb',
+            'passive_aggressive',
+            'qda',
+            'random_forest',
+            'sgd',
+            'xgradient_boosting',
+            'r2-logistics',
+          ]
+        };
+        if (this.totalLines > 10000) {
+          trainData.validationRate = 0.2
+        } else {
+          trainData.nfold = 5
+        }
+        break;
+      case 'Regression':
+        command = 'clfreg.train';
+        trainData = {
+          problemType,
+          featureLabel,
+          targetLabel: target,
+          projectId: id,
+          version: '1,2,3',
+          command,
+          sampling: 'no',
+          speedVSaccuracy: 5,
+          ensembleSize: 20,
+          randSeed: 0,
+          measurement: problemType === "Classification" ? "auc" : "r2",
+          settingName: setting.name,
+          holdoutRate: 0.2,
+          algorithms: [
+            'adaboost',
+            'ard_regression',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_process',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'liblinear_svr',
+            'libsvm_svr',
+            'random_forest',
+            'ridge_regression',
+            'sgd',
+            'xgradient_boosting',
+          ]
+        };
+        if (this.totalLines > 10000) {
+          trainData.validationRate = 0.2
+        } else {
+          trainData.nfold = 5
+        }
+        break;
+      default:
+        return
+    }
+
     // id: request ID
     // projectId: project ID
     // csv_location: csv 文件相对路径
@@ -1032,27 +1460,21 @@ export default class Project {
     // fill_method:  无效值
     // model_option: model的额外参数，不同model参数不同
     // kwargs:
-    const trainData = {
-      problemType,
-      featureLabel,
-      targetLabel: target,
-      projectId: id,
-      version: '1,2',
-      command,
-      sampling: 'no',
-      speedVSaccuracy: 5,
-      ensembleSize: 20,
-      randSeed: 0,
-      measurement: problemType === "Classification" ? "auc" : "r2",
-      settingName: setting.name,
-      holdoutRate: 0.2
-    };
-
-    if (this.totalRawLines > 10000) {
-      trainData.validationRate = 0.2
-    } else {
-      trainData.nfold = 5
-    }
+    // const trainData = {
+    //   problemType,
+    //   featureLabel,
+    //   targetLabel: target,
+    //   projectId: id,
+    //   version: '1,2',
+    //   command,
+    //   sampling: 'no',
+    //   speedVSaccuracy: 5,
+    //   ensembleSize: 20,
+    //   randSeed: 0,
+    //   measurement: problemType === "Classification" ? "auc" : "r2",
+    //   settingName: setting.name,
+    //   holdoutRate: 0.2
+    // };
 
     this.modeling(trainData, Object.assign({
       train2Finished: false,
@@ -1070,84 +1492,245 @@ export default class Project {
       id,
       problemType,
       target,
-      trainHeader,
       dataHeader,
-      // expression,
-      newVariable
+      weights,
+      newVariable,
+      trainHeader
     } = this;
-    const command = 'train';
 
-    const featureLabel = dataHeader.filter(v => !trainHeader.includes(v) && v !== target)
-    const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
+    let command = '';
+    let trainData = {}
 
-    // if (newVariableLabel.length) {
-    //   const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
-    //   trainData.csvScript = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
-    // }
+    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d));
+    const setting = this.settings.find(s => s.id === this.settingId)
+    if (!setting || !setting.name) return antdMessage.error("setting error")
 
-    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy } = this;
-    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy }
-    const curSetting = this.settings.find(s => s.id === this.settingId)
-    curSetting.setting = setting
+    switch (problemType) {
+      case 'Clustering':
+        command = 'clustering.train';
+        const disableItems = [...(this.totalLines > 20000 ? ['SpectralClustering'] : []), ...(this.totalLines > 50000 ? ['Agg', 'DBSCAN'] : []), ...(this.kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : [])]
 
-    const trainData = {
-      problemType,
-      featureLabel: [...featureLabel, ...newVariableLabel],
-      targetLabel: target,
-      projectId: id,
-      command,
-      sampling: this.resampling,
-      // maxTime: this.maxTime,
-      randSeed: this.randSeed,
-      speedVSaccuracy: this.speedVSaccuracy,
-      version: this.version.join(","),
-      algorithms: [...this.algorithms],
-      ensembleSize: this.ensembleSize,
-      settingName: curSetting.name,
-      measurement: this.measurement
-    };
-
-    if (this.dataRange === "all") {
-      trainData.holdoutRate = this.holdoutRate / 100
-      if (this.runWith === "holdout") {
-        trainData.validationRate = this.validationRate / 100
-      } else {
-        trainData.nfold = this.crossCount
-      }
-    } else {
-      trainData.splitBy = [this.customField, ...this.customRange]
+        trainData = {
+          kType: this.kType,
+          kValue: this.kValue,
+          algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
+          standardType: this.standardType,
+          searchTime: this.searchTime,
+          metricsMethod: this.measurement,
+          featureLabel: featureLabel,
+          randomSeed: this.randSeed,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          applyWeights: weights,
+          problemType
+        };
+        break;
+      case 'Outlier':
+        command = 'outlier.train';
+        trainData = {
+          algorithms: this.algorithms,
+          standardType: this.standardType,
+          searchTime: this.searchTime,
+          featureLabel: featureLabel,
+          randomSeed: this.randSeed,
+          projectId: id,
+          command,
+          settingName: setting.name,
+          applyWeights: weights,
+          problemType
+        };
+        break;
+      default:
+        command = 'clfreg.train';
+        trainData = {
+          problemType,
+          featureLabel,
+          targetLabel: [target],
+          projectId: id,
+          version: this.version.join(','),
+          command,
+          sampling: this.resampling,
+          speedVSaccuracy: this.speedVSaccuracy,
+          ensembleSize: this.ensembleSize,
+          randSeed: this.randSeed,
+          measurement: this.measurement,
+          settingName: setting.name,
+          holdoutRate: this.holdoutRate / 100,
+          algorithms: this.algorithms,
+        };
+        if (this.runWith === 'holdout') {
+          trainData.validationRate = this.validationRate / 100
+        } else {
+          trainData.nfold = this.crossCount
+        }
     }
+
+    // id: request ID
+    // projectId: project ID
+    // csv_location: csv 文件相对路径
+    // problem_type: 预测类型 Classification , Regression
+    // feature_label: 特征列名
+    // target_label:  目标列
+    // fill_method:  无效值
+    // model_option: model的额外参数，不同model参数不同
+    // kwargs:
+    // const trainData = {
+    //   problemType,
+    //   featureLabel,
+    //   targetLabel: target,
+    //   projectId: id,
+    //   version: '1,2',
+    //   command,
+    //   sampling: 'no',
+    //   speedVSaccuracy: 5,
+    //   ensembleSize: 20,
+    //   randSeed: 0,
+    //   measurement: problemType === "Classification" ? "auc" : "r2",
+    //   settingName: setting.name,
+    //   holdoutRate: 0.2
+    // };
+
 
     this.modeling(trainData, Object.assign({
       train2Finished: false,
       train2ing: true,
       train2Error: false,
       selectId: '',
-      validationRate: this.validationRate,
-      holdoutRate: this.holdoutRate,
-      resampling: this.resampling,
-      // maxTime: this.maxTime,
-      measurement: this.measurement,
-      randSeed: this.randSeed,
-      dataRange: this.dataRange,
-      customField: this.customField,
-      customRange: [...this.customRange],
-      algorithms: [...this.algorithms],
-      speedVSaccuracy: this.speedVSaccuracy,
-      ensembleSize: this.ensembleSize,
-      runWith: this.runWith,
-      crossCount: this.crossCount,
-      version: this.version,
-      trainHeader: this.trainHeader,
       settings: this.settings,
-      settingId: this.settingId,
-      customHeader: this.customHeader
+      settingId: this.settingId
     }, this.nextSubStep(2, 3)))
   }
 
   newSetting = (type = 'auto') => {
-    const { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
-    const setting = { version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize }
+    const { problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+    const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
+
+    let setting
+
+    switch (problemType) {
+      case 'Clustering':
+        setting = type === 'auto' ? {
+          kType,
+          kValue,
+          measurement,
+          algorithms: [
+            'KMeans',
+            'GMM',
+            'Birch',
+            'Agg',
+            'SpectralClustering',
+            'DBSCAN',
+            'MeanShift',
+          ],
+          standardType: 'standard',
+          searchTime: 5,
+          featureLabel,
+          randSeed: 0,
+          weights: {},
+        } : {
+            kType,
+            kValue,
+            measurement,
+            algorithms,
+            standardType,
+            searchTime,
+            featureLabel,
+            randSeed,
+            weights,
+          };
+        break;
+      case 'Outlier':
+        setting = type === 'auto' ? {
+          algorithms: [
+            'HBOS',
+            'PCA',
+            'IsolationForest',
+            'MCD',
+            'EllipticEnvelope',
+          ],
+          standardType: 'standard',
+          searchTime: 5,
+          featureLabel,
+          randSeed: 0,
+          weights: {},
+        } : {
+            algorithms,
+            standardType,
+            searchTime,
+            featureLabel,
+            randSeed,
+            weights,
+          };
+        break;
+      default:
+        setting = type === 'auto' ? {
+          version: [1, 2, 3],
+          validationRate: 20,
+          holdoutRate: 20,
+          randSeed: 0,
+          measurement: problemType === "Classification" ? "auc" : "r2",
+          runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
+          resampling: 'no',
+          crossCount: '5',
+          dataRange: 'all',
+          customField: '',
+          customRange: [],
+          algorithms: problemType === "Classification" ? [
+            'adaboost',
+            'bernoulli_nb',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_nb',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'lda',
+            'liblinear_svc',
+            'libsvm_svc',
+            'multinomial_nb',
+            'passive_aggressive',
+            'qda',
+            'random_forest',
+            'sgd',
+            'xgradient_boosting',
+            'r2-logistics',
+          ] : [
+              'adaboost',
+              'ard_regression',
+              'decision_tree',
+              'extra_trees',
+              'gaussian_process',
+              'gradient_boosting',
+              'k_nearest_neighbors',
+              'liblinear_svr',
+              'libsvm_svr',
+              'random_forest',
+              'ridge_regression',
+              'sgd',
+              'xgradient_boosting',
+            ],
+          speedVSaccuracy: 5,
+          ensembleSize: 20,
+          featureLabel
+        } : {
+            version,
+            validationRate,
+            holdoutRate,
+            randSeed,
+            measurement,
+            runWith,
+            resampling,
+            crossCount,
+            dataRange,
+            customField,
+            customRange,
+            algorithms,
+            speedVSaccuracy,
+            ensembleSize,
+            featureLabel
+          }
+    }
+
     const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
     const id = uuid.v4()
     this.settingId = id
@@ -1163,6 +1746,7 @@ export default class Project {
     if (this.etling) return antdMessage.error('modeling error')
     this.train2ing = true
     this.isAbort = false
+    // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
       // if (this.isAbort) return
       // if (progressResult.name === "progress") {
@@ -1213,12 +1797,25 @@ export default class Project {
   setModel = data => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
-    if (this.trainModel && data.name === this.trainModel.name) this.trainModel = null
+    if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
     const model = new Model(this.id, { ...data, measurement: this.measurement })
+    if (!!this.models.length) {
+      const { problemType } = model
+      const key = problemType === 'Classification' ? 'auc' : 'r2'
+      const min = problemType === 'Classification' ? 0.5 : 0;
+      const { validateScore } = model.score;
+      if (validateScore) {
+        const isBad = validateScore[key] < min
+        if (isBad) return
+      }
+    }
     this.models = [...this.models.filter(m => data.id !== m.id), model]
     if (data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
-      const { index } = model.getBenefit(TP, FP, FN, TN)
+      const [v0, v1] = Object.values(this.targetCounts)
+      const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+      const percentNew = this.distribution ? this.distribution / 100 : percent0
+      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
       if (index === model.fitIndex) return
       model.updateModel({ fitIndex: index })
     }
@@ -1235,7 +1832,10 @@ export default class Project {
     model.setProperty(data)
     if (data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
-      const { index } = model.getBenefit(TP, FP, FN, TN)
+      const [v0, v1] = Object.values(this.targetCounts)
+      const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+      const percentNew = this.distribution ? this.distribution / 100 : percent0
+      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
       if (index === model.fitIndex) return
       model.updateModel({ fitIndex: index })
     }
@@ -1263,9 +1863,22 @@ export default class Project {
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
+      let cmd = 'clfreg.preTrainImportance'
+      // switch (this.problemType) {
+      //   case 'Clustering':
+      //     cmd = 'clustering.train';
+      //     break;
+      //   case 'Outlier':
+      //     cmd = 'outlier.train';
+      //     break;
+      //   default:
+      //     cmd = 'clfreg.train';
+      // }
+
       const command = {
         projectId: this.id,
-        command: 'preTrainImportance',
+        command: cmd,
         feature_label
       };
       // if (new_label.length) {
@@ -1273,13 +1886,18 @@ export default class Project {
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
       this.preImportanceLoading = true
-      return api.preTrainImportance(command).then(returnValue => {
-        const { status, result } = returnValue
-        if (status < 0) {
-          return antdMessage.error(result['process error'])
-        }
-        this.setProperty({ preImportance: result.preImportance, informativesLabel: result.informativesLabel, preImportanceLoading: false })
-      })
+      return api.preTrainImportance(command)
+        .then(returnValue => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            return antdMessage.error(result['process error'])
+          }
+          // this.setProperty({
+          //   preImportance: result.preImportance,
+          //   informativesLabel: result.informativesLabel,
+          //   preImportanceLoading: false
+          // })
+        })
     })
   }
 
@@ -1386,6 +2004,20 @@ export default class Project {
       })
   }
 
+  etlCleanData = () => {
+    const { dataHeader, newVariable } = this
+    const fields = [...dataHeader, ...newVariable]
+    return socketStore.ready().then(api => {
+      const command = {
+        feature_label: fields,
+        command: 'etlCleanData',
+        projectId: this.id
+      }
+      this.etlCleanDataLoading = true
+      return api.etlCleanData(command)
+    })
+  }
+
   allPlots = async (changeReportProgress) => {
     const variableCount = this.dataHeader.length - 1
     const api = await socketStore.ready()
@@ -1466,125 +2098,333 @@ export default class Project {
     let html = htmlResp.data
     html = html.replace(`<${link} rel="manifest" href="/manifest.json">`, '')
     html = html.replace(`<${link} rel="shortcut icon" href="/favicon.ico">`, '')
-
     const cssVersionStartStr = `<${link} href="/static/css/main.`
     const cssVersionStart = html.indexOf(cssVersionStartStr) + cssVersionStartStr.length
     const cssVersionEnd = html.indexOf('.', cssVersionStart)
     const cssVersion = html.slice(cssVersionStart, cssVersionEnd)
 
-    const cssUrl = `/static/css/main.${cssVersion}.css`
-    const cssLink = `<${link} href="/static/css/main.${cssVersion}.css" rel="stylesheet">`
+    const cssUrl = `/static/css/main.${cssVersion}.chunk.css`
+    const cssLink = `<${link} href="/static/css/main.${cssVersion}.chunk.css" rel="stylesheet">`
     const cssResp = await axios.get(cssUrl)
     const cssData = cssResp.data
     const cssTag = `<${style}>${cssData}</${style}>`
     html = html.replace(cssLink, '')
 
-    const jsVersionStartStr = `<${script} type="text/javascript" src="/static/js/main.`
+
+    const cssChunkVersionStartStr = `<${link} href="/static/css/2.`
+    const cssChunkVersionStart = html.indexOf(cssChunkVersionStartStr) + cssChunkVersionStartStr.length
+    const cssChunkVersionEnd = html.indexOf('.', cssChunkVersionStart)
+    const cssChunkVersion = html.slice(cssChunkVersionStart, cssChunkVersionEnd)
+
+    const cssChunkUrl = `/static/css/2.${cssChunkVersion}.chunk.css`
+    const cssChunkLink = `<${link} href="/static/css/2.${cssChunkVersion}.chunk.css" rel="stylesheet">`
+    const cssChunkResp = await axios.get(cssChunkUrl)
+    const cssChunkData = cssChunkResp.data
+    const cssChunkTag = `<${style}>${cssChunkData}</${style}>`
+    html = html.replace(cssChunkLink, '')
+
+    const jsVersionStartStr = `<${script} src="/static/js/main.`
     const jsVersionStart = html.indexOf(jsVersionStartStr) + jsVersionStartStr.length
     const jsVersionEnd = html.indexOf('.', jsVersionStart)
     const jsVersion = html.slice(jsVersionStart, jsVersionEnd)
 
-    const jsUrl = `/static/js/main.${jsVersion}.js`
-    const jsLink = `<${script} type="text/javascript" src="/static/js/main.${jsVersion}.js"></${script}>`
+    const jsUrl = `/static/js/main.${jsVersion}.chunk.js`
+    const jsLink = `<${script} src="/static/js/main.${jsVersion}.chunk.js"></${script}>`
     const jsResp = await axios.get(jsUrl)
     const jsData = jsResp.data
     const jsTag = `<${script}>` + jsData + `</${script}>`
     html = html.replace(jsLink, '')
 
+    const jsChunkVersionStartStr = `<${script} src="/static/js/2.`
+    const jsChunkVersionStart = html.indexOf(jsChunkVersionStartStr) + jsChunkVersionStartStr.length
+    const jsChunkVersionEnd = html.indexOf('.', jsChunkVersionStart)
+    const jsChunkVersion = html.slice(jsChunkVersionStart, jsChunkVersionEnd)
+
+    const jsChunkUrl = `/static/js/2.${jsChunkVersion}.chunk.js`
+    const jsChunkLink = `<${script} src="/static/js/2.${jsChunkVersion}.chunk.js"></${script}>`
+    const jsChunkResp = await axios.get(jsChunkUrl)
+    const jsChunkData = jsChunkResp.data
+    const jsChunkTag = `<${script}>` + jsChunkData + `</${script}>`
+    html = html.replace(jsChunkLink, '')
+
     html = html.replace(`</${body}>`, '')
     // cannot use replace with js code ($$typeof wrong)
-    html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsTag}${cssTag}</${body}>`
+    html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsChunkTag}${jsTag}${cssChunkTag}${cssTag}</${body}>`
     return html
   }
-
-
-
-  generateReport = (modelId) => {
-    let cancel = false
-    const changeReportProgress = action((text, progress) => {
-      if (!cancel) {
-        if (text) this.reportProgressText = text
-        if (progress) this.reportProgress = progress
-      }
-    })
-
-    const report = async (modelId) => {
-      changeReportProgress('initializing report.', 0)
-      const model = this.models.find(m => m.id === modelId)
-      // preImportance
-      this.preImportance = null
-
-      const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
-      await this.dataView()
-      dataViewDisposer()
-      if (cancel) return
-      const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
-      await this.preTrainImportance()
-      preTrainImportanceDisposer()
-      if (cancel) return
-      // correlation matrix
-      changeReportProgress('preparing variable correlation matrix.', 70)
-      await this.correlationMatrix()
-      if (cancel) return
-      // plots
-      this.univariatePlotsBase64 = {}
-      this.histgramPlotsBase64 = {}
-      this.rawHistgramPlotsBase64 = {}
-      await this.allPlots(changeReportProgress)
-      if (cancel) return
-      // translate image to base64
-      try {
-        const univariatePlots = Object.keys(this.univariatePlotsBase64)
-        const histgramPlots = Object.keys(this.histgramPlotsBase64)
-        const rawHistgramPlots = Object.keys(this.rawHistgramPlotsBase64)
-        const imageCount = univariatePlots.length + histgramPlots.length + rawHistgramPlots.length + (this.problemType === 'Regression' ? 2 : 0)
-        let count = 0
-        changeReportProgress(`downloading plots. (0/${imageCount})`, 90)
-        await Promise.all(univariatePlots.map(async (k, index) => {
-          this.univariatePlotsBase64[k] = await this.translateToBase64(this.univariatePlotsBase64[k])
-          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
-        }))
-        if (cancel) return
-        await Promise.all(histgramPlots.map(async k => {
-          this.histgramPlotsBase64[k] = await this.translateToBase64(this.histgramPlotsBase64[k])
-          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
-        }))
-        if (cancel) return
-        await Promise.all(rawHistgramPlots.map(async k => {
-          this.rawHistgramPlotsBase64[k] = await this.translateToBase64(this.rawHistgramPlotsBase64[k])
-          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
-        }))
-        if (cancel) return
-        if (this.problemType === 'Regression') {
-          // fit plot
-          model.fitPlotBase64 = await this.translateToBase64(model.fitPlot)
-          if (cancel) return
-          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
-          // residual plot
-          model.residualPlotBase64 = await this.translateToBase64(model.residualPlot)
-          if (cancel) return
-          changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
-        }
-      } catch (e) { }
-      // generate json
-      const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
-
-      changeReportProgress(`generating report file`, 100)
-      const html = await this.generateReportHtml(json)
-      if (cancel) {
-        changeReportProgress(`init`, 0)
-        return
-      }
-      loadFile(`R2Learn_Report_${this.id}.html`, html)
-      changeReportProgress(`init`, 0)
+  
+  histogram(field){
+    const {colType,dataViews,etlIndex} = this;
+    if(!dataViews[field]){
+      return;
     }
-    report(modelId)
+    if(colType[field] === 'Numerical'){
+      const { min, max } = dataViews[field];
+      return {
+        "name": "histogram-numerical",
+        "data": {
+          field,
+          id: etlIndex,
+          interval: (max - min) / 100
+        }
+      }
+    } else {
+      const { uniqueValues } = dataViews[field];
+      return {
+        "name": "histogram-categorical",
+        "data": {
+          field,
+          id: etlIndex,
+          size: uniqueValues > 8 ? 8 : uniqueValues,
+        }
+      }
+    }
+  }
+
+  univariant(value) {
+    const { target, problemType, etlIndex, colType, dataViews } = this;
+    const type = colType[value];
+  
+    if(!dataViews[value]){
+      return;
+    }
+
+    if (problemType === "Regression") {
+      if (type === 'Numerical') {//散点图
+        return {
+          name: 'regression-numerical',
+          data: {
+            y: target,
+            x: value,
+            id: etlIndex,
+          }
+        };
+      } else {//回归-分类 箱线图
+        return {
+          name: 'regression-categorical',
+          data: {
+            target,
+            value,
+            id: etlIndex,
+          }
+        };
+      }
+    } else {//Univariant
+      const { min, max } = dataViews[value];
+      const data = {
+        target,
+        value,
+        id: etlIndex,
+        interval: Math.floor((max - min) / 20) || 1,
+      };
+
+      if (type === 'Numerical') {
+        return {
+          name: 'classification-numerical',
+          data,
+        };
+      } else {//?
+        return {
+          name: 'classification-categorical',
+          data,
+        };
+      }
+    }
+  }
+
+  //在这里获取所以直方图折线图数据
+  allVariableList = (model) => {
+    const { target, colType, etlIndex, dataHeader, newVariable, preImportance } = this;
+
+    const list = [];
+    list.push(this.histogram(target));
+
+    const fields = Object.entries(toJS(colType))
+      .filter(itm => itm[1] === 'Numerical')
+      .map(itm => itm[0]);
+
+    list.push({
+      name: 'correlation-matrix',
+      data: {
+        fields,
+        id: etlIndex,
+      }
+    });
+
+
+    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
+    allVariables.sort((a, b) => {
+      return preImportance ? -1 * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
+    });
+
+    for (let itm of allVariables) {
+      list.push(this.histogram(itm));
+      list.push(this.univariant(itm));
+    }
+
+    if (model.fitAndResidualPlotData) {
+      list.push({
+        name: 'predicted-vs-actual-plot',
+        data: {
+          url: model.pointToShowData,
+        },
+      });
+      
+      list.push({
+        name: 'fit-plot',
+        data: {
+          url: model.fitAndResidualPlotData,
+        },
+      });
+    }
+  
+    
+    
+    return request.post({
+      url: '/graphics/list',
+      data: list.filter(itm=>itm),
+    })
+  };
+
+
+  // 点击导出的按钮
+  generateReport = async (modelId, aaa) => {
+    console.log(aaa)
+    // aaa.routing.history.push('/report')
+    console.log(this, 'ttttttttttttttttttttttt')
+
+    // const data = {
+    //   field: "sex",
+    //   id: this.etlIndex,
+    // };
+    // const { uniqueValues } = this.dataViews["sex"];
+    // data.size = uniqueValues > 8 ? 8 : uniqueValues;
+    // request.post({
+    //   url: '/graphics/histogram-categorical',
+    //   data,
+    // })
+
+    // this.dataViews.forEach((res) => {
+    //   console.log(res)
+    // })
+
+
+    // let cancel = false
+    // const changeReportProgress = action((text, progress) => {
+    //   if (!cancel) {
+    //     if (text) this.reportProgressText = text
+    //     if (progress) this.reportProgress = progress
+    //   }
+    // })
+    //
+    // const report = async (modelId) => {
+    //   changeReportProgress('initializing report.', 0)
+
+
+    const model = this.models.find(m => m.id === modelId);
+    //在这里获取所以直方图折线图数据
+    // changeReportProgress('preparing univariate plot.', 75)
+    model.graphicList = await this.allVariableList(model);
+    // changeReportProgress('preparing univariate plot.', 100)
+    const json = JSON.stringify([{ ...this, ...{ models: [model] } }]);
+
+    console.log(json, ' jjjjjjjjjjjjjjjj')
+    //   // preImportance
+    //   this.preImportance = null
+    //
+    //   const dataViewDisposer = autorun(() => changeReportProgress('preparing variable data.', this.dataViewProgress ? this.dataViewProgress / 10 : 0))
+    //   await this.dataView()
+    //   dataViewDisposer()
+    //   if (cancel) return
+    //   const preTrainImportanceDisposer = autorun(() => changeReportProgress('preparing variable preimportance.', 10 + (this.importanceProgress ? this.importanceProgress / 2 : 0)))
+    //   await this.preTrainImportance()
+    //   preTrainImportanceDisposer()
+    //   if (cancel) return
+    //   // correlation matrix
+    //   changeReportProgress('preparing variable correlation matrix.', 70)
+    //   await this.correlationMatrix()
+    //   if (cancel) return
+    //   // plots
+    //   this.univariatePlotsBase64 = {}
+    //   this.histgramPlotsBase64 = {}
+    //   this.rawHistgramPlotsBase64 = {}
+    //   await this.allPlots(changeReportProgress)
+    //   if (cancel) return
+    //   // translate image to base64
+    //   try {
+    //     const univariatePlots = Object.keys(this.univariatePlotsBase64)
+    //     const histgramPlots = Object.keys(this.histgramPlotsBase64)
+    //     const rawHistgramPlots = Object.keys(this.rawHistgramPlotsBase64)
+    //     const imageCount = univariatePlots.length + histgramPlots.length + rawHistgramPlots.length + (this.problemType === 'Regression' ? 2 : 0)
+    //     let count = 0
+    //     changeReportProgress(`downloading plots. (0/${imageCount})`, 90)
+    //     await Promise.all(univariatePlots.map(async (k, index) => {
+    //       this.univariatePlotsBase64[k] = await this.translateToBase64(this.univariatePlotsBase64[k])
+    //       changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+    //     }))
+    //     if (cancel) return
+    //     await Promise.all(histgramPlots.map(async k => {
+    //       this.histgramPlotsBase64[k] = await this.translateToBase64(this.histgramPlotsBase64[k])
+    //       changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+    //     }))
+    //     if (cancel) return
+    //     await Promise.all(rawHistgramPlots.map(async k => {
+    //       this.rawHistgramPlotsBase64[k] = await this.translateToBase64(this.rawHistgramPlotsBase64[k])
+    //       changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+    //     }))
+    //     if (cancel) return
+    //     if (this.problemType === 'Regression') {
+    //       // fit plot
+    //       model.fitPlotBase64 = await this.translateToBase64(model.fitPlot)
+    //       if (cancel) return
+    //       changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+    //       // residual plot
+    //       model.residualPlotBase64 = await this.translateToBase64(model.residualPlot)
+    //       if (cancel) return
+    //       changeReportProgress(`downloading plots. (${++count}/${imageCount})`, 90 + (count / imageCount * 10))
+    //     }
+    //   } catch (e) {
+    //   }
+    //   // generate json
+    //   const json = JSON.stringify([{ ...this, ...{ models: [model] } }])
+    //
+    //   changeReportProgress(`generating report file`, 100)
+    //   const html = await this.generateReportHtml(json)
+    //   if (cancel) {
+    //     changeReportProgress(`init`, 0)
+    //     return
+    //   }
+    //   loadFile(`R2Learn_Report_${this.id}.html`, html)
+    //   changeReportProgress(`init`, 0)
+    // }
+    // report(modelId)
+    // const json = JSON.stringify(c1)
+
+    // changeReportProgress(`generating report file`, 100)
+    const html = await this.generateReportHtml(json)
+    // if (cancel) {
+    //   // changeReportProgress(`init`, 0)
+    //   return
+    // }
+    loadFile(`R2Learn_Report_${this.id}.html`, html)
+    // changeReportProgress(`init`, 0)
     return action(() => {
-      cancel = true
+      // cancel = true
       setTimeout(action(() => {
         this.reportProgressText = 'init'
       }), 10)
       this.reportProgress = 0
+    })
+  }
+
+  preDownload = () => {
+    const { selectModel, problemType, etlIndex, id } = this
+    if (problemType !== 'Outlier') return
+    return socketStore.ready().then(api => {
+      return api.preDownload({ mid: selectModel.id, rate: selectModel.rate, etlIndex, projectId: id }).then(result => {
+        if (result.status === 100) return result.data.deployData
+        return ''
+      })
     })
   }
 }

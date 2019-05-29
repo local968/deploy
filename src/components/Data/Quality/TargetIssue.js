@@ -4,8 +4,12 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Modal, NumberInput } from 'components/Common';
 import { observable } from 'mobx'
-import * as d3 from 'd3';
+// import * as d3 from 'd3';
 import { Icon, message } from 'antd'
+import { formatNumber } from 'util'
+import EN from '../../../constant/en';
+import OutlierRange from "../../Charts/OutlierRange";
+import request from '../../Request'
 
 @observer
 export class ClassificationTarget extends Component {
@@ -60,7 +64,7 @@ export class ClassificationTarget extends Component {
       const data = Object.assign({}, renameVariable, temp)
       const updateData = { renameVariable: data }
       //更新histgramPlot  target的图
-      if(histgramPlots.hasOwnProperty(target)) {
+      if (histgramPlots.hasOwnProperty(target)) {
         delete histgramPlots[target]
         updateData.histgramPlots = histgramPlots
       }
@@ -75,7 +79,9 @@ export class ClassificationTarget extends Component {
     const { targetArrayTemp, totalRawLines, renameVariable, targetCounts } = project
     const error = Object.keys(targetCounts).length < 2
     const isGood = Object.keys(targetCounts).length === 2
-    const text = (isGood && 'Target variable quality is good!') || `Your target variable has ${error ? 'less' : 'more'} than two unique values`
+    const hasNull = !isGood && Object.keys(targetCounts).includes('')
+    const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas} ${error ? EN.Less : EN.More} ${EN.Thantwouniquealues}`
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -85,8 +91,9 @@ export class ClassificationTarget extends Component {
         <div className={classnames(styles.info, {
           [styles.goodInfo]: isGood
         })}>
+          <div className={styles.targetTitleLabel}><span>{EN.TargetValues}</span></div>
           <div className={styles.targetPercentBox}>
-            {Object.keys(targetCounts).map((v, k) => {
+            {Object.keys(targetCounts).filter(_k => _k !== '').map((v, k) => {
               const percent = (targetCounts[v] || 0) / (totalRawLines || 1) * 85
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
@@ -101,42 +108,54 @@ export class ClassificationTarget extends Component {
               </div>
             })}
           </div>
+          {hasNull && <div className={styles.targetTitleLabel}><span>{EN.MissingValues}</span></div>}
+          {hasNull && <div className={styles.targetPercentBox}>
+            <div className={styles.targetPercentRow} key={"targetPercentRowmissing"}>
+              <div className={styles.targetPercentLabel}>
+                <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || '')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || '')}</span>
+              </div>
+              <div className={styles.targetPercentValue}>
+                <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}></div>
+                <span>{targetCounts['']}</span>
+              </div>
+            </div>
+          </div>}
           {isGood && <div className={styles.cleanTargetBlock}>
             {!this.rename ? <div className={styles.cleanTargetRename}>
               <div className={styles.cleanTargetButton}>
-                <button onClick={this.showRename}><span>Change Target Variable Value</span></button>
+                <button onClick={this.showRename}><span>{EN.ChangeTargetVariableValue}</span></button>
               </div>
-              <span>(optional)</span>
+              <span>({EN.Optional})</span>
               {!!targetArrayTemp.length && <div className={styles.remapTargetButton}>
-                <button onClick={editTarget}><span>Remap Target</span></button>
+                <button onClick={editTarget}><span>{EN.RemapTarget}</span></button>
               </div>}
             </div> : <div className={styles.cleanTargetRename}>
                 <div className={styles.cleanTargetButton}>
-                  <button onClick={this.handleSave} className={styles.save}><span>Save</span></button>
-                  <button onClick={this.hideRename}><span>Cancel</span></button>
+                  <button onClick={this.handleSave} className={styles.save}><span>{EN.Save}</span></button>
+                  <button onClick={this.hideRename}><span>{EN.Cancel}</span></button>
                 </div>
               </div>}
           </div>}
         </div>
         {!isGood && <div className={styles.methods}>
-          <div className={styles.reasonTitle}><span>Possible Reasons</span></div>
+          <div className={styles.reasonTitle}><span>{EN.PossibleReasons}</span></div>
           <div className={styles.methodBox}>
             <div className={styles.method}>
-              <div className={styles.reason}><span>It’s the wrong target variable</span></div>
+              <div className={styles.reason}><span>{EN.Itsthewrongtargetvariable}</span></div>
               <div className={styles.button} onClick={backToSchema}>
-                <button><span>Reselect Target Variable</span></button>
+                <button><span>{EN.ReselectTargetVariable}</span></button>
               </div>
             </div>
             <div className={styles.method}>
-              <div className={styles.reason}><span>It’s general data quality issue</span></div>
+              <div className={styles.reason}><span>{EN.Itsgeneraldataqualityissue}</span></div>
               <div className={styles.button} onClick={backToConnect}>
-                <button><span>Load a New Dataset</span></button>
+                <button><span>{EN.LoadaNewDataset}</span></button>
               </div>
             </div>
             {!error && <div className={styles.method}>
-              <div className={styles.reason}><span>The target variable has some noises</span></div>
+              <div className={styles.reason}><span>{EN.Thetargetvariablehassomenoise}</span></div>
               <div className={styles.button} onClick={editTarget}>
-                <button><span>Fix it</span></button>
+                <button><span>{EN.Fixit}</span></button>
               </div>
             </div>}
           </div>
@@ -151,33 +170,33 @@ export class RegressionTarget extends Component {
   render() {
     const { backToConnect, backToSchema, hasIssue, unique, recomm } = this.props;
     return !hasIssue ? null : <div className={styles.block}>
-      <div className={styles.name}><span>Target Variable Unique Value</span></div>
+      <div className={styles.name}><span>{EN.TargetVariableUniqueValue}</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.infoBox}>
             <div className={styles.infoBlock}>
               <div className={styles.num}><span>{unique}</span></div>
-              <div className={styles.text}><span>Your Unique Value</span></div>
+              <div className={styles.text}><span>{EN.YourUniqueValue}</span></div>
             </div>
             <div className={styles.infoBlock}>
               <div className={styles.num}><span>{recomm}+</span></div>
-              <div className={styles.text}><span>Recommended</span></div>
+              <div className={styles.text}><span>{EN.Recommended}</span></div>
             </div>
           </div>
         </div>
         <div className={styles.methods}>
-          <div className={styles.reasonTitle}><span>Possible Reasons</span></div>
+          <div className={styles.reasonTitle}><span>{EN.PossibleReasons}</span></div>
           <div className={styles.methodBox}>
             <div className={styles.method}>
-              <div className={styles.reason}><span>It’s the wrong target variable</span></div>
+              <div className={styles.reason}><span>{EN.Itsthewrongtargetvariable}</span></div>
               <div className={styles.button} onClick={backToSchema}>
-                <button><span>Reselect Target Variable</span></button>
+                <button><span>{EN.ReselectTargetVariable}</span></button>
               </div>
             </div>
             <div className={styles.method}>
-              <div className={styles.reason}><span>It’s general data quality issue</span></div>
+              <div className={styles.reason}><span>{EN.Itsgeneraldataqualityissue}</span></div>
               <div className={styles.button} onClick={backToConnect}>
-                <button><span>Load a New Dataset</span></button>
+                <button><span>{EN.LoadaNewDataset}</span></button>
               </div>
             </div>
           </div>
@@ -192,20 +211,20 @@ export class RowIssue extends Component {
   render() {
     const { backToConnect, totalRawLines } = this.props;
     return <div className={styles.block}>
-      <div className={styles.name}><span>Data size is too small</span></div>
+      <div className={styles.name}><span>{EN.Datasizeistoosmall}</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
-            <div className={styles.progressText}><span>All Data ({totalRawLines} rows)</span><span>1000 rows (minimum)</span></div>
+            <div className={styles.progressText}><span>{EN.AllDatatotalRawLinesrows} ({totalRawLines} {EN.Rows})</span><span>{EN.Rowsminimum}</span></div>
             <div className={styles.progress} style={{ width: totalRawLines / 10 + "%" }}></div>
           </div>
         </div>
         <div className={styles.methods}>
           <div className={styles.methodBox}>
             <div className={styles.method}>
-              <div className={styles.reason}><span>Data size > 1000 rows is recommended</span></div>
+              <div className={styles.reason}><span>{EN.Datasize} > {EN.Rowsisrecommended}</span></div>
               <div className={styles.button} onClick={backToConnect}>
-                <button><span>Load a New Dataset</span></button>
+                <button><span>{EN.LoadaNewDataset}</span></button>
               </div>
             </div>
           </div>
@@ -221,40 +240,31 @@ export class DataIssue extends Component {
     const { backToConnect, editFixes, targetIssues, totalLines, percent, totalRawLines } = this.props;
 
     return <div className={styles.block}>
-      <div className={styles.name}><span>Data issues are found</span></div>
+      <div className={styles.name}><span>{EN.Dataissuesarefound}</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
             {!!targetIssues.nullRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Missing Value ({targetIssues.nullRow} rows) {percent.missing < 0.01 ? '<0.01' : percent.missing.toFixed(2)}%</span></div>
-                <div className={classnames(styles.progress, styles.missing)} style={{ width: percent.missing < 1 ? 1 : percent.missing + "%" }}></div>
+                <div className={styles.issueRow}><span>{EN.MissingValueS}({targetIssues.nullRow} {EN.Rows}) {formatNumber(percent.missing, 2)}%</span></div>
+                <div className={classnames(styles.progress, styles.missing)} style={{ width: ((typeof percent.missing === 'number') ? percent.missing : 1) + "%" }}></div>
               </div>
-              {/* <div className={styles.right}>
-                <span>Will be fixed</span>
-              </div> */}
             </div>}
             {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Data Type Mismatch ({targetIssues.mismatchRow} rows) {percent.mismatch < 0.01 ? '<0.01' : percent.mismatch.toFixed(2)}%</span></div>
-                <div className={classnames(styles.progress, styles.mismatch)} style={{ width: percent.mismatch < 1 ? 1 : percent.mismatch + "%" }}></div>
+                <div className={styles.issueRow}><span>{EN.mismatch}({targetIssues.mismatchRow} {EN.Rows}) {formatNumber(percent.mismatch, 2)}%</span></div>
+                <div className={classnames(styles.progress, styles.mismatch)} style={{ width: ((typeof percent.mismatch === 'number') ? percent.mismatch : 1) + "%" }}></div>
               </div>
-              {/* <div className={styles.right}>
-                <span>Will be fixed</span>
-              </div> */}
             </div>}
             {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>Outlier ({targetIssues.outlierRow} rows) {percent.outlier < 0.01 ? '<0.01' : percent.outlier.toFixed(2)}%</span></div>
-                <div className={classnames(styles.progress, styles.outlier)} style={{ width: percent.outlier < 1 ? 1 : percent.outlier + "%" }}></div>
+                <div className={styles.issueRow}><span>{EN.outlierRow} ({targetIssues.outlierRow} {EN.Rows}) {formatNumber(percent.outlier, 2)}%</span></div>
+                <div className={classnames(styles.progress, styles.outlier)} style={{ width: ((typeof percent.outlier === 'number') ? percent.outlier : 1) + "%" }}></div>
               </div>
-              {/* <div className={styles.right}>
-                <span>Will be ignore</span>
-              </div> */}
             </div>}
           </div>
           {(totalRawLines > 1000 && totalLines < 1000) && <div className={styles.progressBox}>
-            <div className={styles.progressText}><span>Clean Data ({totalLines} rows)</span><span>1000 rows (minimum)</span></div>
+            <div className={styles.progressText}><span>{EN.CleanDataS}({totalLines} {EN.Rows})</span><span>{EN.Rowsminimum}</span></div>
             <div className={styles.progress} style={{ width: totalLines / 10 + "%" }}></div>
           </div>}
         </div>
@@ -262,15 +272,15 @@ export class DataIssue extends Component {
         <div className={styles.methods}>
           <div className={styles.methodBox}>
             <div className={styles.method}>
-              <div className={styles.reason}><span>R2 Learn will fix these issues automatically</span></div>
+              <div className={styles.reason}><span>{EN.R2Learnwillfixtheseissuesautomatically}</span></div>
               <div className={styles.button} onClick={editFixes}>
-                <button><span>Edit the Fixes</span></button>
+                <button><span>{EN.EdittheFixes}</span></button>
               </div>
             </div>
             {(totalRawLines > 1000 && totalLines < 1000) && <div className={styles.method}>
-              <div className={styles.reason}><span>Data size will be smaller than the minimum size after delete</span></div>
+              <div className={styles.reason}><span>{EN.Datasizewillbesmallerthantheminimumsizeafterdelete}</span></div>
               <div className={styles.button} onClick={backToConnect}>
-                <button><span>Load a New Dataset</span></button>
+                <button><span>{EN.LoadaNewDataset}</span></button>
               </div>
             </div>}
           </div>
@@ -307,28 +317,28 @@ export class SelectTarget extends Component {
 
   save = () => {
     const { checked, belongTo0, belongTo1 } = this;
-    const { colValueCounts, target } = this.props.project;
+    const { colValueCounts, target, nullLineCounts } = this.props.project;
     const [v0, v1] = checked
-    const totalOf0 = [v0, ...belongTo0].reduce((start, v) => start += ((colValueCounts[target] || {})[v]) || 0, 0)
-    const totalOf1 = [v1, ...belongTo1].reduce((start, v) => start += ((colValueCounts[target] || {})[v]) || 0, 0)
+    const totalOf0 = [v0, ...belongTo0].reduce((start, v) => start += (v === '' ? nullLineCounts[target] : ((colValueCounts[target] || {})[v] || 0)), 0)
+    const totalOf1 = [v1, ...belongTo1].reduce((start, v) => start += (v === '' ? nullLineCounts[target] : ((colValueCounts[target] || {})[v] || 0)), 0)
     const maxKey = totalOf0 >= totalOf1 ? 0 : 1
     let targetMap = {
       [checked[maxKey]]: 0,
       [checked[1 - maxKey]]: 1
     }
     // 重置rename
-    const renameVariable = {}
+    const otherMap = {}
     this[`belongTo${maxKey}`].forEach(v0 => {
       targetMap[v0] = 0
-      renameVariable[v0] = checked[maxKey]
+      otherMap[v0] = checked[maxKey]
     })
     this[`belongTo${1 - maxKey}`].forEach(v1 => {
       targetMap[v1] = 1
-      renameVariable[v1] = checked[1 - maxKey]
+      otherMap[v1] = checked[1 - maxKey]
     })
     this.props.project.targetArrayTemp = [checked[maxKey], checked[1 - maxKey]];
     this.props.project.targetMapTemp = targetMap;
-    this.props.project.renameVariable = renameVariable
+    this.props.project.otherMap = otherMap
     this.props.saveTargetFixes()
   }
 
@@ -356,10 +366,12 @@ export class SelectTarget extends Component {
   render() {
     const { closeTarget, project } = this.props;
 
-    const { targetColMap, target, colValueCounts, totalRawLines } = project
+    const { targetColMap, target, colValueCounts, totalRawLines, nullLineCounts } = project
     const { checked } = this
     const [v0, v1] = checked
     const currentBelong = [...this.belongTo0, ...this.belongTo1]
+    const hasNull = Object.keys(targetColMap).includes('')
+    const nullPercent = (nullLineCounts[target] || 0) / (totalRawLines || 1) * 85
     const disabledArray = Object.keys(targetColMap).filter(h => {
       if (this.belong !== 0 && this.belong !== 1) return true
       const arr = this['belongTo' + (1 - this.belong)]
@@ -367,9 +379,9 @@ export class SelectTarget extends Component {
     })
     return <div className={styles.fixesContent}>
       {this.step === 1 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>Please select two valid values from all unique values in your target variable</span></div>
+        <div className={styles.fixesText}><span>{EN.Pleaseselecttwovalid}</span></div>
         <div className={styles.targetPercentBox}>
-          {Object.keys(targetColMap).map((v, k) => {
+          {Object.keys(targetColMap).filter(_k => _k !== '').map((v, k) => {
             const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
             const backgroundColor = (v0 === v && '#9be44b') || (v1 === v && '#adaafc') || '#c4cbd7'
             return <div className={styles.targetPercentRow} key={k}>
@@ -386,11 +398,25 @@ export class SelectTarget extends Component {
             </div>
           })}
         </div>
+        {hasNull && <div className={styles.fixesText}><span>{EN.Doyouwanttotreatnull}</span></div>}
+        {hasNull && <div className={styles.targetPercentBox}>
+          <div className={styles.targetPercentRow} key={`missing${this.step}`}>
+            <div className={styles.targetPercentCheckBox}>
+              <input type='checkbox' onChange={this.check} value={''} checked={checked.includes('')} />
+            </div>
+            <div className={styles.targetPercentLabel}>
+              <span>{EN.Null}</span>
+            </div>
+            <div className={styles.targetPercentValue}>
+              <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: 'ff97a7' }}></div>
+              <span>{nullLineCounts[target] || 0}</span>
+            </div>
+          </div>
+        </div>}
         <div className={styles.fixesTips}><span></span></div>
-        {/* <div className={styles.fixesTips}><span>You can rename the selected values by double click the value’s name.</span></div> */}
       </div>}
       {this.step === 2 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>Select all values that match as {v0} or {v1} </span></div>
+        <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{v0}{EN.Or}{v1}{EN.MATAHC} </span></div>
         <div className={styles.targetPercentBox}>
           {this.checked.map((t, i) => {
             const percent = (colValueCounts[target][t] || 0) / (totalRawLines || 1) * 85
@@ -405,8 +431,8 @@ export class SelectTarget extends Component {
               </div>
             </div>
           })}
-          <div className={styles.fixesCheckBox}>
-            {Object.keys(targetColMap).filter(v => !checked.includes(v)).map((t, i) => {
+          {!!Object.keys(targetColMap).filter(_k => _k !== '').filter(v => !checked.includes(v)).length && <div className={styles.fixesCheckBox}>
+            {Object.keys(targetColMap).filter(_k => _k !== '').filter(v => !checked.includes(v)).map((t, i) => {
               const disabled = disabledArray.includes(t)
               return <div className={styles.fixesCheck} key={i}>
                 <input type='checkbox' value={t} id={`belong${t}`} checked={currentBelong.includes(t)} disabled={disabled} onChange={disabled ? null : this.handleCheck} />
@@ -415,59 +441,48 @@ export class SelectTarget extends Component {
                 })} htmlFor={`belong${t}`}>{t}</label>
               </div>
             })}
-          </div>
+          </div>}
+          {(hasNull && !checked.includes('')) && <div className={styles.fixesText}><span>{EN.Doyouwanttotreatnull}</span></div>}
+          {(hasNull && !checked.includes('')) && <div className={styles.targetPercentBox}>
+            <div className={styles.targetPercentRow} key={`missing${this.step}`}>
+              <div className={styles.targetPercentCheckBox}>
+                <input type='checkbox' value={''} id={`belong`} checked={currentBelong.includes('')} disabled={disabledArray.includes('')} onChange={disabledArray.includes('') ? null : this.handleCheck} />
+              </div>
+              <div className={styles.targetPercentLabel}>
+                <span>{''}</span>
+              </div>
+              <div className={styles.targetPercentValue}>
+                <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: 'ff97a7' }}></div>
+                <span>{nullLineCounts[target] || 0}</span>
+              </div>
+            </div>
+          </div>}
           <div className={styles.cleanTargetButton} style={{ margin: '.1em 0' }}>
-            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>Match as {v0}</span></button>
-            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>Match as {v1}</span></button>
+            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>{EN.Matchas}{v0 === '' ? EN.Null : v0}</span></button>
+            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>{EN.Matchas}{v1 === '' ? EN.Null : v1}</span></button>
           </div>
         </div>
 
-        <div className={styles.fixesTips}><span>The rest values will be deleted by default.</span></div>
+        <div className={styles.fixesTips}><span>{EN.Therestvalueswillbedeletedbydefault}</span></div>
       </div>}
-      {/* {this.step === 3 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>Select all values that belong to value2 </span></div>
-        <div className={styles.targetPercentBox}>
-          <div className={styles.targetPercentRow}>
-            <div className={styles.targetPercentLabel}>
-              <span>{this.checked[1]}</span>
-            </div>
-            <div className={styles.targetPercentValue}>
-              <div className={styles.targetPercent} style={{ width: percent1 + '%', backgroundColor: '#adaafc' }}></div>
-              <span>{colValueCounts[target][v1] || 0}</span>
-            </div>
-          </div>
-          <div className={styles.fixesCheckBox}>
-            {Object.keys(targetColMap).filter(v => !checked.includes(v)).map((t, i) => {
-              const disabled = belongTo0.includes(t)
-              return <div className={styles.fixesCheck} key={i}>
-                <input type='checkbox' value={t} id={`belongTo1${t}`} checked={belongTo1.includes(t)} disabled={disabled} onChange={this.handleCheck.bind(null, 1)} />
-                <label className={classnames(styles.fixesCheckBoxLabel, {
-                  [styles.disabledText]: disabled
-                })} htmlFor={`belongTo1${t}`}>{t}</label>
-              </div>
-            })}
-          </div>
-        </div>
-        <div className={styles.fixesTips}><span>The rest values will be deleted by default</span></div>
-      </div>} */}
       {this.step === 3 && <div className={styles.fixesBox}>
         <div className={classnames(styles.fixesIconBox, styles.center)}>
           <div className={classnames(styles.cleanHeaderIcon, styles.largeIcon)}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '2.4rem' }} /></div>
         </div>
-        <div className={classnames(styles.fixesText, styles.center)}><span>Thank you for fixing data issues.</span></div>
+        <div className={classnames(styles.fixesText, styles.center)}><span>{EN.Thankyouforfixingddatassues}。</span></div>
         <div className={styles.fixesCheckBox}>
           <div className={styles.fixesTextBottom}>
             <div className={styles.fixesComplete}>
-              <span>The changes will not show up until they are applied in training section.</span>
+              <span>{EN.Thechangeswillnotshowupuntil}</span>
             </div>
           </div>
         </div>
       </div>}
       <div className={styles.fixesBottom}>
-        <button className={styles.cancel} onClick={this.step > 1 ? this.backStep : closeTarget}><span>{this.step > 1 ? 'Back' : 'Cancel'}</span></button>
+        <button className={styles.cancel} onClick={this.step > 1 ? this.backStep : closeTarget}><span>{this.step > 1 ? EN.Back : EN.CANCEL}</span></button>
         <button className={classnames(styles.save, {
           [styles.disabled]: !this.canSave
-        })} onClick={this.step < 3 ? this.nextStep : this.save} disabled={!this.canSave} ><span>{this.step < 3 ? 'Next' : "Done"}</span></button>
+        })} onClick={this.step < 3 ? this.nextStep : this.save} disabled={!this.canSave} ><span>{this.step < 3 ? EN.Next : EN.DONE}</span></button>
       </div>
     </div>
   }
@@ -478,12 +493,36 @@ export class FixIssue extends Component {
   @observable editKey = ''
   @observable visible = false
   @observable progress = 0
-  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} }
+  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
+  // @observable outLier = {};
 
-  editRange = (key) => {
-    this.visible = true
-    this.editKey = key
-  }
+  editRange(key) {
+    // const { low, high } = this.props.project.rawDataView[key];
+    // if (!this.outLier[key]) {
+    //   request.post({
+    //     url: '/graphics/outlier-range',
+    //     data: {
+    //       "field": key,
+    //       id,
+    //       "interval": 20,
+    //     },
+    //   }).then((result) => {
+    //     this.outLier = {
+    //       ...this.outLier,
+    //       [key]: {
+    //         low,
+    //         high,
+    //         data: result.data,
+    //       },
+    //     };
+    //     this.editKey = key;
+    //     this.visible = true;
+    //   });
+    //   return;
+    // }
+    this.editKey = key;
+    this.visible = true;
+  };
 
   closeEdit = () => {
     this.visible = false
@@ -544,7 +583,7 @@ export class FixIssue extends Component {
   }
 
   formatCell = num => {
-    if (typeof num === "number") return num.toFixed(2)
+    if (typeof num === "number") return formatNumber(num, 2, true)
     if (typeof num === "string") return num
     return "N/A"
   }
@@ -573,37 +612,40 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierRange, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp } = project
+    const { colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin, dataHeader } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
-              <span>Data Type Mismatch</span>
+              <div className={classnames(styles.typeBlock, styles.mismatch)} />
+              <span>{EN.DataTypeMismatch}</span>
             </div>
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Variable Name</span></div>
-              <div className={styles.fixesTd}><span>Data Type</span></div>
-              <div className={styles.fixesTd}><span>Quantity of Mismatch</span></div>
-              <div className={styles.fixesTd}><span>Mean</span></div>
-              <div className={styles.fixesTd}><span>Median</span></div>
-              <div className={styles.fixesTd}><span>Most Frequent Value</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.VariableName}</span></div>
+              <div className={styles.fixesTd}><span>{EN.DataType}</span></div>
+              <div className={styles.fixesTd}><span>{EN.QuantityofMismatch}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Median}</span></div>
+              <div className={styles.fixesTd}><span>{EN.MostFrequentValue}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(mismatchLineCounts).map((k, i) => {
+              {Object.keys(mismatchLineCountsOrigin).map((k, i) => {
+                if (!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = mismatchLineCounts[k]
-                if (!num) {
+                const originNum = mismatchLineCountsOrigin[k]
+                if (!originNum) {
                   return null;
                 }
+                const num = mismatchLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+                if (showType !== 'Numerical') return null
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(1)) + '%)'
+                const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
@@ -620,8 +662,8 @@ export class FixIssue extends Component {
                   method !== median &&
                   method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span>{k}</span></div>
-                  <div className={styles.fixesCell}><span>{showType}</span></div>
+                  <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span title={k}>{k}</span></div>
+                  <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
@@ -629,18 +671,18 @@ export class FixIssue extends Component {
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.mismatchSelect.bind(null, k)}>
                       {showType === 'Categorical' ? [
-                        <option value={mode} key="mode">Replace with most frequent value</option>,
-                        <option value="drop" key="drop">Delete the rows</option>,
-                        <option value="ignore" key="ignore">Replace with a unique value</option>
+                        <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
+                        <option value="drop" key="drop">{EN.Deletetherows}</option>,
+                        <option value="ignore" key="ignore">{EN.Replacewithauniquevalue}</option>
                       ] : [
-                          <option value={mean} key='mean'>Replace with mean value</option>,
-                          <option value="drop" key='drop'>Delete the rows</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
+                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
                           // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                          <option value={median} key='median'>Replace with median value</option>,
-                          <option value={0} key={0}>Replace with 0</option>,
-                          <option value={''} key='others'>Replace with others</option>
+                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                          <option value={''} key='others'>{EN.Replacewithothers}</option>
                         ]}
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
@@ -653,32 +695,34 @@ export class FixIssue extends Component {
         {!!nullCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.missing)}></div>
-              <span>Missing Value</span>
+              <div className={classnames(styles.typeBlock, styles.missing)} />
+              <span>{EN.MissingValue}</span>
             </div>
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
-              <div className={styles.fixesTd}><span>Variable Name</span></div>
-              <div className={styles.fixesTd}><span>Missing Reason</span></div>
-              <div className={styles.fixesTd}><span>Data Type</span></div>
-              <div className={styles.fixesTd}><span>Quantity of Missing Value</span></div>
-              <div className={styles.fixesTd}><span>Mean</span></div>
-              <div className={styles.fixesTd}><span>Median</span></div>
-              <div className={styles.fixesTd}><span>Most Frequent Value</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
+              <div className={styles.fixesTd}><span>{EN.VariableName}</span></div>
+              <div className={styles.fixesTd}><span>{EN.MissingReason}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Data}</span></div>
+              <div className={styles.fixesTd}><span>{EN.QuantityofMissingValue}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Median}</span></div>
+              <div className={styles.fixesTd}><span>{EN.MostFrequentValue}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(nullLineCounts).map((k, i) => {
+              {Object.keys(nullLineCountsOrigin).map((k, i) => {
+                if (!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = nullLineCounts[k]
-                if (!num) {
+                const originNum = nullLineCountsOrigin[k]
+                if (!originNum) {
                   return null;
                 }
+                const num = nullLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
+                const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
@@ -695,13 +739,13 @@ export class FixIssue extends Component {
                   method !== median &&
                   method !== 0) ? '' : method
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={styles.fixesCell}><span>{k}</span></div>
+                  <div className={styles.fixesCell}><span title={k}>{k}</span></div>
                   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
-                    <option value='none' key="none">I don`t know</option>
-                    <option value="blank" key="blank">Left blank on purpose</option>
-                    <option value='fail' key='fail'>Failed to Collect or Data Error</option>
+                    <option value='none' key="none">{EN.Idonknow}</option>
+                    <option value="blank" key="blank">{EN.Leftblankonpurpose}</option>
+                    <option value='fail' key='fail'>{EN.FailedtoCollectorDataError}</option>
                   </select></div>
-                  <div className={styles.fixesCell}><span>{showType}</span></div>
+                  <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
@@ -709,18 +753,18 @@ export class FixIssue extends Component {
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.nullSelect.bind(null, k)}>
                       {showType === 'Categorical' ? [
-                        <option value={mode} key="mode">Replace with most frequent value</option>,
-                        <option value="drop" key="drop">Delete the rows</option>,
-                        <option value='ignore' key='ignore'>Replace with a unique value</option>
+                        <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
+                        <option value="drop" key="drop">{EN.Deletetherows}</option>,
+                        <option value='ignore' key='ignore'>{EN.Replacewithauniquevalue}</option>
                       ] : [
-                          <option value={mean} key='mean'>Replace with mean value</option>,
-                          <option value="drop" key='drop'>Delete the rows</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>Replace with min value</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>Replace with max value</option>,
+                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
                           // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                          <option value={median} key='median'>Replace with median value</option>,
-                          <option value={0} key={0}>Replace with 0</option>,
-                          <option value={''} key='others'>Replace with others</option>
+                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                          <option value={''} key='others'>{EN.Replacewithothers}</option>
                         ]}
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'missing', k)} />}
@@ -733,41 +777,44 @@ export class FixIssue extends Component {
         {!!outlierCount && <div className={styles.fixesArea}>
           <div className={styles.typeBox}>
             <div className={styles.type}>
-              <div className={classnames(styles.typeBlock, styles.outlier)}></div>
-              <span>Outlier</span>
+              <div className={classnames(styles.typeBlock, styles.outlier)} />
+              <span>{EN.Outlier}</span>
             </div>
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
-              <div className={styles.fixesTd}><span>Variable Name</span></div>
-              <div className={styles.fixesTd}><span>Valid Range</span></div>
-              <div className={styles.fixesTd}><span>Data Type</span></div>
-              <div className={styles.fixesTd}><span>Quantity of Outlier</span></div>
-              <div className={styles.fixesTd}><span>Mean</span></div>
-              <div className={styles.fixesTd}><span>Median</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>Fix</span></div>
+              <div className={styles.fixesTd}><span>{EN.VariableName}</span></div>
+              <div className={styles.fixesTd}><span>{EN.ValidRange}</span></div>
+              <div className={styles.fixesTd}><span>{EN.DataType}</span></div>
+              <div className={styles.fixesTd}><span>{EN.QuantityofOutlier}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
+              <div className={styles.fixesTd}><span>{EN.Median}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(outlierLineCounts).map((k, i) => {
+              {Object.keys(outlierLineCountsOrigin).map((k, i) => {
+                if (!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const num = outlierLineCounts[k]
-                if (!num) {
+                const originNum = outlierLineCountsOrigin[k]
+                if (!originNum) {
                   return null;
                 }
+                const num = outlierLineCounts[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+                if (showType !== 'Numerical') return null
                 const isShow = showType === 'Numerical';
                 if (!isShow) return null
-                const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : outlierRange[k];
+                const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : [rawDataView[k].low, rawDataView[k].high];
                 const percnet = num / (totalRawLines || 1) * 100
-                const rowText = num + ' (' + (percnet < 0.01 ? '<0.01' : percnet.toFixed(2)) + '%)'
+                const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median
                 const method = this.fillMethod.outlier.hasOwnProperty(k) ?
                   this.fillMethod.outlier[k] :
                   outlierFillMethodTemp.hasOwnProperty(k) ?
                     outlierFillMethodTemp[k] :
-                    'drop'
+                    'ignore'
                 const showMethod = (showType !== 'Categorical' &&
                   method !== mean &&
                   method !== 'drop' &&
@@ -775,27 +822,27 @@ export class FixIssue extends Component {
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
                   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
                   method !== median &&
-                  method !== 0) ? '' : method
+                  method !== 0) ? '' : method;
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={styles.fixesCell}><span>{k}</span></div>
+                  <div className={styles.fixesCell}><span title={k}>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
-                    <span title={outlier[0].toFixed(2) + "-" + outlier[1].toFixed(2)}>
-                      {outlier[0].toFixed(2) + "-" + outlier[1].toFixed(2)}
-                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(null, k)}>edit</span>
+                    <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
+                      {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
+                    </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k, project.etlIndex)}>{EN.Edit}</span>
                   </div>
-                  <div className={styles.fixesCell}><span>{showType}</span></div>
+                  <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)} >{this.formatCell(mean)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={showMethod} onChange={this.outlierSelect.bind(null, k)}>
-                      <option value="drop" key='drop'>Delete the rows</option>
-                      <option value="ignore" key='ignore'>Do Nothing</option>
-                      <option value={mean} key='mean'>Replace with mean value</option>
-                      <option value={median} key='median'>Replace with median value</option>
+                      <option value="ignore" key='ignore'>{EN.DoNothing}</option>
+                      <option value="drop" key='drop'>{EN.Deletetherows}</option>
+                      <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>
+                      <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>
                       {/* <option value={mode} key='mode'>Replace with most frequent value</option> */}
-                      <option value={0} key='0'>Replace with 0</option>,
-                    <option value={''} key='others'>Replace with others</option>
+                      <option value={0} key='0'>{EN.ReplaceWith0}</option>,
+                      <option value={''} key='others'>{EN.Replacewithothers}</option>
                     </select>
                     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
                   </div>
@@ -806,25 +853,26 @@ export class FixIssue extends Component {
         </div>}
       </div>
       <div className={styles.fixesBottom}>
-        <button className={styles.save} onClick={this.save} ><span>Save</span></button>
-        <button className={styles.cancel} onClick={closeFixes}><span>Cancel</span></button>
+        <button className={styles.save} onClick={this.save} ><span>{EN.Save}</span></button>
+        <button className={styles.cancel} onClick={closeFixes}><span>{EN.CANCEL}</span></button>
       </div>
-      {this.editKey && <Modal content={<EditOutLier width={800}
-        height={400} saveEdit={this.saveEdit}
-        closeEdit={this.closeEdit}
-        outlierRange={project.outlierRange[this.editKey]}
-        outlierDict={project.outlierDictTemp[this.editKey]}
-        x={project.numberBins[this.editKey][1]}
-        y={project.numberBins[this.editKey][0]}
-        minX={Math.floor((rawDataView[this.editKey] || {}).min || 0)}
-        maxX={Math.ceil((rawDataView[this.editKey] || {}).max || 0)} />}
-        visible={this.visible}
-        width='12em'
-        title='Outlier'
-        onClose={this.closeEdit}
-        closeByMask={true}
-        showClose={true}
-      />}
+      {
+        this.visible && <Modal
+          closeByMask={true}
+          showClose={true}
+          visible={this.visible}
+          title={EN.Outlier}
+          onClose={this.closeEdit}
+          content={
+            <OutlierRange
+              closeEdit={this.closeEdit}
+              saveEdit={this.saveEdit}
+              field={this.editKey}
+              id={project.originalIndex}
+              project={project}
+            />
+          } />}
+
     </div>
   }
 }
@@ -847,288 +895,288 @@ class EditOutLier extends Component {
     this.count = 4;
   }
 
-  componentDidMount() {
-    this.d3Chart()
-  }
+  // componentDidMount() {
+  //   this.d3Chart()
+  // }
+  //
+  // componentDidUpdate() {
+  //   this.d3Chart()
+  // }
 
-  componentDidUpdate() {
-    this.d3Chart()
-  }
-
-  d3Chart = () => {
-    d3.select(`.${styles.d3Chart} svg`).remove();
-    const { width, height, x, y, minX, maxX } = this.props;
-    let { min, max } = this;
-    const padding = { left: 50, bottom: 30, right: 5, top: 100 };
-
-    const realHeight = height - padding.bottom - padding.top;
-    const realWidth = width - padding.left - padding.right;
-    //添加一个 SVG 画布
-    const svg = d3.select(`.${styles.d3Chart}`)
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr('transform', `translate(${padding.left}, 0)`);
-
-    const maxH = d3.max(y) || 1;
-    const dataset = [];
-
-    //x轴的比例尺
-    const xScale = d3.scaleLinear()
-      .domain([minX, maxX])
-      .range([0, realWidth])
-      .clamp(true);
-
-    //y轴的比例尺
-    const yScale = d3.scaleLinear()
-      .domain([0, maxH])
-      .range([realHeight, 0])
-      .clamp(true);
-
-    //定义x轴
-    const xAxis = d3.axisBottom(xScale);
-
-    //定义y轴
-    const yAxis = d3.axisLeft(yScale);
-
-    //添加x轴
-    svg.append("g")
-      .attr("class", `${styles.axis}`)
-      .attr("transform", `translate(0, ${realHeight + padding.top})`)
-      .call(xAxis);
-
-    //添加y轴
-    svg.append("g")
-      .attr("class", `${styles.axis}`)
-      .attr("transform", `translate(0, ${padding.top})`)
-      .call(yAxis);
-
-    const drawDrag = () => {
-      const minDrag = d3.drag()
-        .on('drag', () => {
-          let minTemp = xScale.invert(d3.event.x)
-          if (minTemp > max) minTemp = max;
-          if (minTemp < minX) minTemp = minX;
-          if (minTemp === min) return;
-          min = minTemp;
-          minRect.attr('width', xScale(min))
-          minLine.attr('x1', xScale(min))
-            .attr('x2', xScale(min))
-          minCircle.attr('cx', xScale(min))
-          minText.attr('x', xScale(min))
-            .text(this.renderNum(min))
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            maxCircle.attr('cy', padding.top - 57)
-            maxText.attr('y', padding.top - 53)
-          } else {
-            maxCircle.attr('cy', padding.top - 17)
-            maxText.attr('y', padding.top - 13)
-          }
-
-          drawRect()
-        })
-        .on('end', () => {
-          this.min = min
-        });
-
-      let minDragBlock = svg.append('g');
-      let minRect = minDragBlock.append('rect')
-        .attr('class', `${styles.dragRect}`)
-        .attr('x', xScale(minX))
-        .attr('y', yScale(maxH) + padding.top)
-        .attr('width', xScale(min) - xScale(minX))
-        .attr('height', realHeight)
-
-      let minLine = minDragBlock.append('line')
-        .attr('class', `${styles.dragLine}`)
-        .attr('x1', xScale(min) - xScale(minX))
-        .attr('y1', yScale(maxH) + padding.top)
-        .attr('x2', xScale(min) - xScale(minX))
-        .attr('y2', realHeight + padding.top)
-
-      let minCircle = minDragBlock.append('circle')
-        .attr('class', `${styles.dragCircle}`)
-        .attr('cx', xScale(min))
-        .attr('cy', padding.top - 17)
-        .attr('r', 20)
-        .attr('fill', '#c7f1ee')
-        .call(minDrag);
-
-      let minText = minDragBlock.append('text')
-        .attr('class', `${styles.dragText}`)
-        .text(this.renderNum(min))
-        .attr('x', xScale(min))
-        .attr('y', padding.top - 13)
-        .call(minDrag);
-
-      const maxDrag = d3.drag()
-        .on('drag', () => {
-          let maxTemp = xScale.invert(d3.event.x)
-          if (maxTemp < min) maxTemp = min;
-          if (maxTemp > maxX) maxTemp = maxX;
-          if (maxTemp === max) return;
-          max = maxTemp;
-          maxRect.attr('x', xScale(max))
-            .attr('width', xScale(maxX) - xScale(max))
-          maxLine.attr('x1', xScale(max))
-            .attr('x2', xScale(max))
-          maxCircle.attr('cx', xScale(max))
-          maxText.attr('x', xScale(max))
-            .text(this.renderNum(max))
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            maxCircle.attr('cy', padding.top - 57)
-            maxText.attr('y', padding.top - 53)
-          } else {
-            maxCircle.attr('cy', padding.top - 17)
-            maxText.attr('y', padding.top - 13)
-          }
-          drawRect()
-        })
-        .on('end', () => {
-          this.max = max
-        });
-
-      let maxDragBlock = svg.append('g');
-      let maxRect = maxDragBlock.append('rect')
-        .attr('class', `${styles.dragRect}`)
-        .attr('x', xScale(max))
-        .attr('y', yScale(maxH) + padding.top)
-        .attr('width', xScale(maxX) - xScale(max))
-        .attr('height', realHeight)
-
-      let maxLine = maxDragBlock.append('line')
-        .attr('class', `${styles.dragLine}`)
-        .attr('x1', xScale(max))
-        .attr('y1', yScale(maxH) + padding.top)
-        .attr('x2', xScale(max))
-        .attr('y2', realHeight + padding.top);
-
-      let maxCircle = maxDragBlock.append('circle')
-        .attr('class', `${styles.dragCircle}`)
-        .attr('cx', xScale(max))
-        .attr('cy', () => {
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            return padding.top - 57
-          }
-          return padding.top - 17
-        })
-        .attr('r', 20)
-        .attr('fill', '#ffd287')
-        .call(maxDrag);
-
-      let maxText = maxDragBlock.append('text')
-        .attr('class', `${styles.dragText}`)
-        .text(this.renderNum(max))
-        .attr('x', xScale(max))
-        .attr('y', () => {
-          if (Math.abs(xScale(max) - xScale(min)) < 40) {
-            return padding.top - 53
-          }
-          return padding.top - 13
-        })
-        .call(maxDrag);
-
-    }
-
-    //初始化拖动
-    drawDrag()
-
-    //添加矩形元素
-    const drawRect = () => {
-      // 处理dataset数据
-      for (let i = 1; i < x.length; i++) {
-        if (x[i] <= min || x[i - 1] >= max) {
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
-            class: styles.outer
-          })
-        } else if (x[i] <= max && x[i - 1] >= min) {
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
-            class: styles.rect
-          })
-        } else if (x[i] > max && x[i - 1] < max && x[i - 1] > min) {
-          const left = Math.abs(xScale(x[i - 1]) - xScale(max))
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: left,
-            class: styles.rect
-          })
-          dataset.push({
-            x: xScale(x[i - 1]) + left,
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
-            class: styles.outer
-          })
-        } else if (x[i] > min && x[i - 1] < min && x[i] < max) {
-          const left = Math.abs(xScale(x[i - 1]) - xScale(min))
-          dataset.push({
-            x: xScale(x[i - 1]),
-            y: yScale(y[i - 1]) + padding.top,
-            width: left,
-            class: styles.outer
-          })
-          dataset.push({
-            x: xScale(x[i - 1]) + left,
-            y: yScale(y[i - 1]) + padding.top,
-            width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
-            class: styles.rect
-          })
-        } else {
-          if (min > max) {
-            dataset.push({
-              x: xScale(x[i - 1]),
-              y: yScale(y[i - 1]) + padding.top,
-              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
-              class: styles.outer
-            })
-          } else {
-            const left = Math.abs(xScale(x[i - 1]) - xScale(min))
-            const middle = Math.abs(xScale(max) - xScale(min))
-            dataset.push({
-              x: xScale(x[i - 1]),
-              y: yScale(y[i - 1]) + padding.top,
-              width: left,
-              class: styles.outer
-            })
-            dataset.push({
-              x: xScale(x[i - 1]) + left,
-              y: yScale(y[i - 1]) + padding.top,
-              width: middle,
-              class: styles.rect
-            })
-            dataset.push({
-              x: xScale(x[i - 1]) + left + middle,
-              y: yScale(y[i - 1]) + padding.top,
-              width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left - middle,
-              class: styles.outer
-            })
-          }
-        }
-      }
-
-      const rects = svg.selectAll(`.${styles.rect}`);
-      rects.remove();
-      rects.data(dataset)
-        .enter()
-        .append("rect")
-        .attr("class", (d) => d.class)
-        // .attr("transform",`translate(0,${padding.top})`)
-        .attr("x", (d) => d.x)
-        .attr("y", (d) => d.y)
-        .attr("width", (d) => d.width)
-        .attr("height", (d) => realHeight - d.y + padding.top);
-    }
-
-    //添加矩形元素
-    drawRect()
-  }
+  // d3Chart = () => {
+  //   d3.select(`.${styles.d3Chart} svg`).remove();
+  //   const { width, height, x, y, minX, maxX } = this.props;
+  //   let { min, max } = this;
+  //   const padding = { left: 50, bottom: 30, right: 5, top: 100 };
+  //
+  //   const realHeight = height - padding.bottom - padding.top;
+  //   const realWidth = width - padding.left - padding.right;
+  //   //添加一个 SVG 画布
+  //   const svg = d3.select(`.${styles.d3Chart}`)
+  //     .append("svg")
+  //     .attr("width", width)
+  //     .attr("height", height)
+  //     .append("g")
+  //     .attr('transform', `translate(${padding.left}, 0)`);
+  //
+  //   const maxH = d3.max(y) || 1;
+  //   const dataset = [];
+  //
+  //   //x轴的比例尺
+  //   const xScale = d3.scaleLinear()
+  //     .domain([minX, maxX])
+  //     .range([0, realWidth])
+  //     .clamp(true);
+  //
+  //   //y轴的比例尺
+  //   const yScale = d3.scaleLinear()
+  //     .domain([0, maxH])
+  //     .range([realHeight, 0])
+  //     .clamp(true);
+  //
+  //   //定义x轴
+  //   const xAxis = d3.axisBottom(xScale);
+  //
+  //   //定义y轴
+  //   const yAxis = d3.axisLeft(yScale);
+  //
+  //   //添加x轴
+  //   svg.append("g")
+  //     .attr("class", `${styles.axis}`)
+  //     .attr("transform", `translate(0, ${realHeight + padding.top})`)
+  //     .call(xAxis);
+  //
+  //   //添加y轴
+  //   svg.append("g")
+  //     .attr("class", `${styles.axis}`)
+  //     .attr("transform", `translate(0, ${padding.top})`)
+  //     .call(yAxis);
+  //
+  //   const drawDrag = () => {
+  //     const minDrag = d3.drag()
+  //       .on('drag', () => {
+  //         let minTemp = xScale.invert(d3.event.x)
+  //         if (minTemp > max) minTemp = max;
+  //         if (minTemp < minX) minTemp = minX;
+  //         if (minTemp === min) return;
+  //         min = minTemp;
+  //         minRect.attr('width', xScale(min))
+  //         minLine.attr('x1', xScale(min))
+  //           .attr('x2', xScale(min))
+  //         minCircle.attr('cx', xScale(min))
+  //         minText.attr('x', xScale(min))
+  //           .text(this.renderNum(min))
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           maxCircle.attr('cy', padding.top - 57)
+  //           maxText.attr('y', padding.top - 53)
+  //         } else {
+  //           maxCircle.attr('cy', padding.top - 17)
+  //           maxText.attr('y', padding.top - 13)
+  //         }
+  //
+  //         drawRect()
+  //       })
+  //       .on('end', () => {
+  //         this.min = min
+  //       });
+  //
+  //     let minDragBlock = svg.append('g');
+  //     let minRect = minDragBlock.append('rect')
+  //       .attr('class', `${styles.dragRect}`)
+  //       .attr('x', xScale(minX))
+  //       .attr('y', yScale(maxH) + padding.top)
+  //       .attr('width', xScale(min) - xScale(minX))
+  //       .attr('height', realHeight)
+  //
+  //     let minLine = minDragBlock.append('line')
+  //       .attr('class', `${styles.dragLine}`)
+  //       .attr('x1', xScale(min) - xScale(minX))
+  //       .attr('y1', yScale(maxH) + padding.top)
+  //       .attr('x2', xScale(min) - xScale(minX))
+  //       .attr('y2', realHeight + padding.top)
+  //
+  //     let minCircle = minDragBlock.append('circle')
+  //       .attr('class', `${styles.dragCircle}`)
+  //       .attr('cx', xScale(min))
+  //       .attr('cy', padding.top - 17)
+  //       .attr('r', 20)
+  //       .attr('fill', '#c7f1ee')
+  //       .call(minDrag);
+  //
+  //     let minText = minDragBlock.append('text')
+  //       .attr('class', `${styles.dragText}`)
+  //       .text(this.renderNum(min))
+  //       .attr('x', xScale(min))
+  //       .attr('y', padding.top - 13)
+  //       .call(minDrag);
+  //
+  //     const maxDrag = d3.drag()
+  //       .on('drag', () => {
+  //         let maxTemp = xScale.invert(d3.event.x)
+  //         if (maxTemp < min) maxTemp = min;
+  //         if (maxTemp > maxX) maxTemp = maxX;
+  //         if (maxTemp === max) return;
+  //         max = maxTemp;
+  //         maxRect.attr('x', xScale(max))
+  //           .attr('width', xScale(maxX) - xScale(max))
+  //         maxLine.attr('x1', xScale(max))
+  //           .attr('x2', xScale(max))
+  //         maxCircle.attr('cx', xScale(max))
+  //         maxText.attr('x', xScale(max))
+  //           .text(this.renderNum(max))
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           maxCircle.attr('cy', padding.top - 57)
+  //           maxText.attr('y', padding.top - 53)
+  //         } else {
+  //           maxCircle.attr('cy', padding.top - 17)
+  //           maxText.attr('y', padding.top - 13)
+  //         }
+  //         drawRect()
+  //       })
+  //       .on('end', () => {
+  //         this.max = max
+  //       });
+  //
+  //     let maxDragBlock = svg.append('g');
+  //     let maxRect = maxDragBlock.append('rect')
+  //       .attr('class', `${styles.dragRect}`)
+  //       .attr('x', xScale(max))
+  //       .attr('y', yScale(maxH) + padding.top)
+  //       .attr('width', xScale(maxX) - xScale(max))
+  //       .attr('height', realHeight)
+  //
+  //     let maxLine = maxDragBlock.append('line')
+  //       .attr('class', `${styles.dragLine}`)
+  //       .attr('x1', xScale(max))
+  //       .attr('y1', yScale(maxH) + padding.top)
+  //       .attr('x2', xScale(max))
+  //       .attr('y2', realHeight + padding.top);
+  //
+  //     let maxCircle = maxDragBlock.append('circle')
+  //       .attr('class', `${styles.dragCircle}`)
+  //       .attr('cx', xScale(max))
+  //       .attr('cy', () => {
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           return padding.top - 57
+  //         }
+  //         return padding.top - 17
+  //       })
+  //       .attr('r', 20)
+  //       .attr('fill', '#ffd287')
+  //       .call(maxDrag);
+  //
+  //     let maxText = maxDragBlock.append('text')
+  //       .attr('class', `${styles.dragText}`)
+  //       .text(this.renderNum(max))
+  //       .attr('x', xScale(max))
+  //       .attr('y', () => {
+  //         if (Math.abs(xScale(max) - xScale(min)) < 40) {
+  //           return padding.top - 53
+  //         }
+  //         return padding.top - 13
+  //       })
+  //       .call(maxDrag);
+  //
+  //   }
+  //
+  //   //初始化拖动
+  //   drawDrag()
+  //
+  //   //添加矩形元素
+  //   const drawRect = () => {
+  //     // 处理dataset数据
+  //     for (let i = 1; i < x.length; i++) {
+  //       if (x[i] <= min || x[i - 1] >= max) {
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+  //           class: styles.outer
+  //         })
+  //       } else if (x[i] <= max && x[i - 1] >= min) {
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+  //           class: styles.rect
+  //         })
+  //       } else if (x[i] > max && x[i - 1] < max && x[i - 1] > min) {
+  //         const left = Math.abs(xScale(x[i - 1]) - xScale(max))
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: left,
+  //           class: styles.rect
+  //         })
+  //         dataset.push({
+  //           x: xScale(x[i - 1]) + left,
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
+  //           class: styles.outer
+  //         })
+  //       } else if (x[i] > min && x[i - 1] < min && x[i] < max) {
+  //         const left = Math.abs(xScale(x[i - 1]) - xScale(min))
+  //         dataset.push({
+  //           x: xScale(x[i - 1]),
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: left,
+  //           class: styles.outer
+  //         })
+  //         dataset.push({
+  //           x: xScale(x[i - 1]) + left,
+  //           y: yScale(y[i - 1]) + padding.top,
+  //           width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left,
+  //           class: styles.rect
+  //         })
+  //       } else {
+  //         if (min > max) {
+  //           dataset.push({
+  //             x: xScale(x[i - 1]),
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: Math.abs(xScale(x[i]) - xScale(x[i - 1])),
+  //             class: styles.outer
+  //           })
+  //         } else {
+  //           const left = Math.abs(xScale(x[i - 1]) - xScale(min))
+  //           const middle = Math.abs(xScale(max) - xScale(min))
+  //           dataset.push({
+  //             x: xScale(x[i - 1]),
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: left,
+  //             class: styles.outer
+  //           })
+  //           dataset.push({
+  //             x: xScale(x[i - 1]) + left,
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: middle,
+  //             class: styles.rect
+  //           })
+  //           dataset.push({
+  //             x: xScale(x[i - 1]) + left + middle,
+  //             y: yScale(y[i - 1]) + padding.top,
+  //             width: Math.abs(xScale(x[i]) - xScale(x[i - 1])) - left - middle,
+  //             class: styles.outer
+  //           })
+  //         }
+  //       }
+  //     }
+  //
+  //     const rects = svg.selectAll(`.${styles.rect}`);
+  //     rects.remove();
+  //     rects.data(dataset)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("class", (d) => d.class)
+  //       // .attr("transform",`translate(0,${padding.top})`)
+  //       .attr("x", (d) => d.x)
+  //       .attr("y", (d) => d.y)
+  //       .attr("width", (d) => d.width)
+  //       .attr("height", (d) => realHeight - d.y + padding.top);
+  //   }
+  //
+  //   //添加矩形元素
+  //   drawRect()
+  // }
 
   change = e => {
     this.temp = e.target.value
@@ -1185,19 +1233,19 @@ class EditOutLier extends Component {
     return <div className={styles.fixesContent}>
       <div className={styles.outlierBox}>
         <div className={styles.outlierBlock}>
-          <div className={styles.outliertext}><span>min</span></div>
+          <div className={styles.outliertext}><span>{EN.Min}</span></div>
           <div className={styles.input}><input value={focus === 'min' ? temp : this.renderNum(min)} onChange={this.change} onFocus={this.focusInput.bind(null, 'min')} onBlur={this.blur} /></div>
         </div>
         <div className={styles.outlierBlock}>
-          <div className={styles.outliertext}><span>max</span></div>
+          <div className={styles.outliertext}><span>{EN.Max}</span></div>
           <div className={styles.input}><input value={focus === 'max' ? temp : this.renderNum(max)} onChange={this.change} onFocus={this.focusInput.bind(null, 'max')} onBlur={this.blur} /></div>
         </div>
-        <div className={styles.outlierBlock}><button onClick={this.reset}><span>Reset to default</span></button></div>
+        <div className={styles.outlierBlock}><button onClick={this.reset}><span>{EN.Resettodefault}</span></button></div>
       </div>
-      <div className={styles.d3Chart}></div>
+      {/*<div className={styles.d3Chart}></div>*/}
       <div className={styles.fixesBottom}>
-        <button className={styles.save} onClick={this.apply} ><span>Apply</span></button>
-        <button className={styles.cancel} onClick={closeEdit}><span>Cancel</span></button>
+        <button className={styles.save} onClick={this.apply} ><span>{EN.Apply}</span></button>
+        <button className={styles.cancel} onClick={closeEdit}><span>{EN.Cancel}</span></button>
       </div>
     </div>
   }

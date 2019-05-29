@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "components ": [
+        "src/components"
+      ],
+      "stores ": [
+        "src/stores"
+      ],
+      "style ": [
+        "src/components/Common/basic.module.css"
+      ],
+      "sample ": [
+        "sample"
+      ],
+      "config ": [
+        "src/config"
+      ],
+      "util ": [
+        "src/util"
+      ]
+    }
+  }
+}

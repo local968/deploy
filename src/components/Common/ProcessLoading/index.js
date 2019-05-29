@@ -3,6 +3,7 @@ import styles from './styles.module.css';
 import { Progress, Spin } from 'antd';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
+import { formatNumber } from 'util'
 
 @observer
 class ProcessLoading extends Component {
@@ -32,7 +33,7 @@ class ProcessLoading extends Component {
             percent={this.value}
             // status="active"
             strokeWidth={12}
-            format={percent => <div className={styles.text}>{percent.toFixed(2)}%</div>}
+            format={percent => <div className={styles.text}>{formatNumber(percent, 2)}%</div>}
             type="circle"
           /> :
           <Spin tip="Loading..." size="large"></Spin>}

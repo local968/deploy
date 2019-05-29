@@ -12,7 +12,8 @@ export default ({
   value,
   dropdownClassName,
   disabled,
-  selectOption
+  selectOption,
+   getPopupContainer = () => document.body
 }) => {
   if (options) {
     return (
@@ -30,6 +31,7 @@ export default ({
             onChange={onChange}
             value={value}
             disabled={disabled}
+            getPopupContainer={getPopupContainer}
             filterOption={(input, option) =>
               option.props.children
                 .toLowerCase()

@@ -1,6 +1,7 @@
 import moment from 'moment';
 import axios from 'axios';
 import _config from 'config'
+import { formatNumber } from 'util'
 export default (file, config = {}) => {
   config = {
     headers: { backend: _config.uploadBackend },
@@ -31,8 +32,8 @@ class Uploader {
   constructor(file, config = {}) {
     this.path = config.path || '/upload';
     this.headers = config.headers || {};
-    this.CHUNK_SIZE = parseInt(config.chunkSize, 10) || 4194304;
-    this.concurrency = parseInt(config.concurrency, 10) || 4;
+    this.CHUNK_SIZE = 1024 * 1024;
+    this.concurrency = 1;
     this.file = file;
     if (config.params) {
       this.path += Object.entries(config.params).reduce(
@@ -90,18 +91,18 @@ class Uploader {
     let unit = ' bytes/s';
     if (speed > 1024 * 1024 * 1024) {
       unit = ' Gb/s';
-      return (speed / (1024 * 1024 * 1024)).toFixed(2) + unit;
+      return formatNumber(speed / (1024 * 1024 * 1024), 2) + unit;
     }
     if (speed > 1024 * 1024) {
       unit = ' Mb/s';
-      return (speed / (1024 * 1024)).toFixed(2) + unit;
+      return formatNumber(speed / (1024 * 1024), 2) + unit;
     }
     if (speed > 1024) {
       unit = ' kb/s';
-      return (speed / 1024).toFixed(2) + unit;
+      return formatNumber(speed / 1024, 2) + unit;
     }
 
-    return speed.toFixed(2) + unit;
+    return formatNumber(speed, 2) + unit;
   };
 
   startSpeedCalculate() {
@@ -112,9 +113,9 @@ class Uploader {
       const currentTime = moment().valueOf();
       const currentLoadedSize = this.totalLoaded;
       const loadingSize = this.speeds.reduce((start, s) => start + s, 0)
-      this.speed =
-        (currentLoadedSize - latestLoadedSize + loadingSize) /
-        ((currentTime - latestCalculateTime) / 1000);
+      const speed = (currentLoadedSize - latestLoadedSize + loadingSize) /
+      ((currentTime - latestCalculateTime) / 1000)
+      this.speed = isNaN(speed) ? 0 : speed
       if (this.speed < 0) console.log(currentLoadedSize, latestLoadedSize, loadingSize, this.speed, "err")
       if (this.temp.length > 4) this.temp.shift()
       this.temp.push(this.speed)

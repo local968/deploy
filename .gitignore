@@ -35,3 +35,6 @@ config.lua
 start_dev.sh
 static
 .idea
+start.sh
+
+config.js

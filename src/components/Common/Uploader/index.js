@@ -2,35 +2,59 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import axios from 'axios';
 import config from 'config'
-import NginxUploader from '../NginxUploader';
-
-const AllowExt = ["csv", "CSV", "zip", "ZIP", "rar", "RAR", "tar", "TAR", "tgz", "TGZ", 'xls', 'XLS', 'xlsx', 'XLSX']
+// import NginxUploader from '../NginxUploader';
+import EsUploader from '../EsUploader';
+import EN from '../../../constant/en'
+const AllowExt = ["csv", "CSV"]
 
 export default class Uploader extends Component {
-  componentDidUpdate() {
-    const { file } = this.props;
-    if (file) {
-      const { onError, onStart } = this.props;
-      const checkd = this.check(file)
-      if (checkd.err) {
-        return onError(new Error(checkd.msg), 1)
-      }
-      if (onStart && typeof onStart === 'function') onStart()
-      this.upload()
-    }
+  constructor(props) {
+    super(props)
+    this.inputRef = React.createRef()
   }
+
+  componentWillReceiveProps(props) {
+    const { file, onError, onStart } = props
+    if (!file) return
+    const checkd = this.check(file)
+    if (checkd.err) {
+      return onError(new Error(checkd.msg), 1)
+    }
+    if (onStart && typeof onStart === 'function') onStart({
+      pause: this.pause,
+      resume: this.resume
+    })
+    this.upload(file)
+  }
+
+  show() {
+    if (this.inputRef.current) this.inputRef.current.click()
+  }
+
+  // componentDidUpdate() {
+  //   const { file } = this.props;
+  //   if (file) {
+  //     const { onError, onStart } = this.props;
+  //     const checkd = this.check(file)
+  //     if (checkd.err) {
+  //       return onError(new Error(checkd.msg), 1)
+  //     }
+  //     if (onStart && typeof onStart === 'function') onStart()
+  //     this.upload()
+  //   }
+  // }
 
   check = file => {
     const ext = file.name.split('.').pop()
     if (!ext || !AllowExt.includes(ext)) {
       return {
         err: true,
-        msg: 'File Error: Please Upload a file in one of the following formats: ["csv", "xls", "xlsx", "zip", "rar", "tar", "tgz" ].'
+        msg: EN.PleaseUploaafileinoneofthefollowingformats
       };
     }
     return {
       err: false,
-      msg: 'ok'
+      msg: EN.OK
     }
   }
 
@@ -40,7 +64,7 @@ export default class Uploader extends Component {
       if (response.data.status !== 200) return onError(response.data.message)
       const token = response.data.token
       const host = response.data.host
-      this.uploader = NginxUploader(file, {
+      this.uploader = EsUploader(file, {
         host,
         onProgress: onProgress,
         onFinished: onComplete,
@@ -109,6 +133,7 @@ export default class Uploader extends Component {
           type="file"
           onChange={this._onChange}
           accept={AllowExt.map(n => "." + n).join(",")}
+          ref={this.inputRef}
         />
       </React.Fragment>
     );

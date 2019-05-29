@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Popover } from 'antd';
 import styles from './ModelProcess.module.css';
 import { observer } from 'mobx-react';
-
+import EN from '../../../constant/en';
 @observer
 export default class ModelProcess extends Component {
   render() {
@@ -112,7 +112,7 @@ class SubStep extends Component {
             trigger="click"
           >
             <div onClick={this.handleClick} className={styles.popoverLegend}>
-              <i className="fa fa-caret-right fa-2x" aria-hidden="true" style={{ verticalAlign: 'middle' }}></i>
+              <i className="fa fa-caret-right fa-2x" aria-hidden="true" style={{ verticalAlign: 'middle' }}>{}</i>
             </div>
           </Popover>
         }

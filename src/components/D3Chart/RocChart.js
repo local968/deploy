@@ -4,7 +4,7 @@ import { Checkbox } from 'antd';
 import { inject, observer } from 'mobx-react';
 import styles from './D3Chart.module.css';
 // import d3tips from './d3-tip';
-
+import EN from '../../constant/en';
 const d3ColorsCategory20 = ['#2073F0', '#FF0000', '#FF8800', '#880000', '#2E8B57', '#00FF99', '#BE7347', '#DB1C82', '#00BBFF', '#FF5511', '#0000FF', '#240B42', '#00FFCC', '#9900FF', '#00FF00', '#CC00FF', '#888800', '#5500FF', '#000088', '#77FF00'];
 d3ColorsCategory20.push(...d3.schemeCategory20)
 
@@ -21,6 +21,9 @@ function parseData(chartData) {
 @inject('projectStore')
 @observer
 export default class RocChart extends Component {
+  constructor(props) {
+    super(props);
+  }
   state = {
     movable: false,
     options: this.props.compareChart && this.props.models.map(m => m.name),
@@ -72,7 +75,7 @@ export default class RocChart extends Component {
         .attr('x', width - 50)
         .attr('y', 35)
         .attr('fill', '#000')
-        .text('False Positive Rate');
+        .text(EN.FalsePositiveDate);
 
       svg.append('g')
         .attr('class', styles.axis)
@@ -83,7 +86,7 @@ export default class RocChart extends Component {
         .attr('dy', '.71em')
         .attr('x', 0)
         .attr('fill', '#000')
-        .text('True Positive Rate');
+        .text(EN.TruePositiveRate);
     }
     if (lineEnable) {
       svg.append('path')
@@ -140,7 +143,7 @@ export default class RocChart extends Component {
     if (fitIndex) { }
 
     return (
-      <div className={`${styles.chart} ${this.props.className}`}>
+      <div className={styles.chart + ' ' +this.props.className}>
         {compareChart && <div className={styles.checkbox} >
           {names.map((o, i) => <Checkbox defaultChecked={true} onClick={this.handleCheck.bind(this, o)} style={{ color: d3ColorsCategory20[i] }} key={o} >{o}</Checkbox>)}
         </div>}
@@ -220,21 +223,20 @@ export default class RocChart extends Component {
 
       focus.append('circle')
         .attr('r', 4.5);
-
-      const _this = this;
+    
       svg.append('rect')
         .attr('class', styles.overlay)
         .attr('width', width)
         .attr('height', height)
-        .on('mousedown', function () {
-          _this.setState({ movable: true });
+        .on('mousedown',  ()=> {
+          this.setState({ movable: true });
         })
-        .on('mousemove', function () {
-          if (!_this.state.movable) return;
-          _this.drawFocus(this, x, y, data, focus);
+        .on('mousemove',  ()=> {
+          if (!this.state.movable) return;
+          this.drawFocus(this, x, y, data, focus);
         })
-        .on('mouseup', function () {
-          _this.setState({ movable: false });
+        .on('mouseup',  ()=> {
+          this.setState({ movable: false });
         });
     }
   }

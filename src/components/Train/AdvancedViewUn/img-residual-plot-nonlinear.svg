@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="273" height="255" viewBox="0 0 273 255">
+    <g fill="none" fill-rule="evenodd">
+        <path fill="#FFF" d="M31.567 13.872h200v190h-200z"/>
+        <path stroke="#D8D8D8" stroke-linecap="square" d="M32.167 84.972h199.387M32.167 106.092h199.387M32.167 42.733h199.387M32.167 63.853h199.387M32.167 127.642h199.387M32.167 148.762h199.387M32.167 169.881h199.387M32.167 191h199.387"/>
+        <path stroke="#4A4A4A" stroke-linecap="square" d="M32.167 212.12h199.387"/>
+        <path stroke="#D8D8D8" stroke-linecap="square" d="M31.783 22.476h199.388M59.804 211.258v-191.8M87.46 211.258v-191.8M115.116 211.258v-191.8M142.772 211.258v-191.8M170.428 211.258v-191.8M198.084 211.258v-191.8M225.74 211.258v-191.8"/>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="4.177" y="114.571">0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="0" y="135.436">-0.5</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x=".589" y="156.3">-1.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x=".589" y="177.164">-1.5</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x=".589" y="198.028">-2.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="4.177" y="31.114">2.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="4.177" y="51.978">1.5</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="4.177" y="72.843">1.0</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="4.177" y="93.707">0.5</tspan>
+        </text>
+        <path stroke="#9B9B9B" stroke-dasharray="5" stroke-linecap="square" d="M32.855 105.899H233.01"/>
+        <path stroke="#4A4A4A" stroke-linecap="square" d="M32.148 211.258v-191.8"/>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="97.975" y="251.575">Predicted Target Value</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="18.294" y="13.202">Residual</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="28.867" y="227.35">100</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="56.575" y="227.35">200</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="84.283" y="227.35">300</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="111.991" y="227.35">400</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="139.699" y="227.35">500</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="167.407" y="227.35">600</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="195.115" y="227.35">700</tspan>
+        </text>
+        <text fill="#4A4A4A" font-family="ArialMT, Arial" font-size="14">
+            <tspan x="222.823" y="227.35">800</tspan>
+        </text>
+        <path stroke="#01B8BE" stroke-dasharray="1,29" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M67 85h23L42 201 67 92l60.5-47L67 64l18 8.088L76 64c20.003-25.333 35.003-38 45-38 20 0 20.27 4.995 35 6 23.64 1.613-79.055 90.023-89 60-4.252-12.836 21.399-45.837 18-60-5.801-24.173 88.613 19.926 89 13 .762-13.65-22.238-9.983-69 11 8.05-23.11 15.55-28.443 22.5-16 3.525 6.312 11.885 16.852 23.5 32.088.626.821 6.262-31.247 13-16.088 15.905 35.785 40.7 138.927 40 151-.618 10.65-55.112-148.751-53-143 4.442 12.093-3.391 12.093-23.5 0l-4.493 21L141 77l-29.707-13L127.5 77 67 85z"/>
+    </g>
+</svg>

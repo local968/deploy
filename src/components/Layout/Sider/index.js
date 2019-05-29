@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import logo from './rsquared_logo_color.svg';
+import logo from './rsquared_logo_website.svg';
 import home from './icon-home.svg';
 import homeActive from './icon-home-active.svg';
 import help from './icon-help.svg';
@@ -10,12 +10,25 @@ import community from './community.png'
 import switchIcon from './switch.svg';
 import {inject, observer} from 'mobx-react';
 import {withRouter} from 'react-router';
+import EN from '../../../constant/en';
+import {message} from 'antd';
+
+const errorTip = message.error;
 
 @withRouter
 @inject('userStore', 'deploymentStore', 'routing')
 @observer
 export default class Sider extends Component {
+  state = {labUrl: ''}
+
+  componentDidMount() {
+    axios.get('/jupyterLabUrl')
+      .then(({data}) => this.setState({labUrl: data}))
+      .catch(({response: {data}}) => errorTip(data))
+  }
+
   render() {
+    const {labUrl} = this.state;
     const {userStore, routing} = this.props;
     const isLogin = userStore.status === 'login';
     const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/lab';
@@ -37,7 +50,7 @@ export default class Sider extends Component {
             {!isSupport ? <img alt="home" src={homeActive}/> : <img alt="home" src={home}/>}
             <h4 className={classnames(styles.nav, {
               [styles.active]: !isSupport
-            })}>Home</h4>
+            })}>{EN.Home}</h4>
           </a>
           <a className={styles.support}
              onClick={() => {
@@ -46,9 +59,9 @@ export default class Sider extends Component {
             {isSupport ? <img alt="support" src={helpActive}/> : <img alt="support" src={help}/>}
             <h4 className={classnames(styles.nav, {
               [styles.active]: isSupport
-            })}>Support</h4>
+            })}>{EN.Support}</h4>
           </a>
-          <a className={styles.support} onClick={() => window.open(jupyterLabUrl, '_blank')}>
+          <a className={styles.support} onClick={() => labUrl && window.open(labUrl, '_blank')}>
             <img alt="support" src={community} className={styles.community}/>
             <h4 className={styles.nav}>JupyterLab</h4>
           </a>
@@ -57,11 +70,11 @@ export default class Sider extends Component {
           <img alt="switch" src={switchIcon}/>
           {isDeploy || !isLogin ? (
             <h4 className={styles.nav}>
-              Model<br/>Training
+              {EN.Model}<br/>{EN.TrainingS}
             </h4>
           ) : (
             <h4 className={styles.nav}>
-              Deployment<br/>Console
+              {EN.Deployments}<br/>{EN.Console}
             </h4>
           )}
         </a>

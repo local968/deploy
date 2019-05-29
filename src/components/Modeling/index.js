@@ -8,10 +8,6 @@ import Loading from './Loading';
 import ModelError from './Error';
 import ModelResult from './Result';
 import { ProjectSide } from 'components/Common';
-import modelSelectionIcon from './model_selection_d.svg';
-import startModelingActiveIcon from './start_modeling_a.svg';
-import modelSelectionActiveIcon from './model_selection_a.svg';
-
 // import r2Loading from './R2 LearnLoading2.gif';
 // import { when } from 'mobx';
 
@@ -19,41 +15,16 @@ import modelSelectionActiveIcon from './model_selection_a.svg';
 //     defualt: 'defualt',
 //     costBased: 'costBased'
 // }
-const imgs = {
-  modelSelection: <img src={modelSelectionIcon} alt="selection" />,
-  startModelingActive: <img src={startModelingActiveIcon} alt="start" />,
-  modelSelectionActive: <img src={modelSelectionActiveIcon} alt="selection" />
-};
 
 @inject('projectStore', 'routing')
 @observer
 export default class Modeling extends Component {
   @observable right = 0
-  @observable metric = this.props.projectStore.project.measurement
   @observable view = 'simple'
-  @observable sort = {
-    simple: {
-      key: 'name',
-      value: 1
-    },
-    advanced: {
-      key: 'Model Name',
-      value: 1
-    }
-  }
 
   constructor(props) {
     super(props);
-    this.step = [
-      { label: 'Start Modeling', value: 'startModeling' },
-      { label: 'Model Selection', value: 'modelSelection' }
-    ];
     this.sideRef = React.createRef();
-    autorun(() => {
-      const { project } = props.projectStore;
-      if (project && project.measurement)
-        this.metric = project.measurement
-    });
   }
 
   componentDidMount() {
@@ -88,17 +59,6 @@ export default class Modeling extends Component {
     this.view = view
   }
 
-  handleSort = (view, key) => {
-    const sort = this.sort[view]
-    if (!sort) return
-    if (sort.key === key) sort.value = -sort.value
-    else {
-      sort.key = key
-      sort.value = 1
-    }
-    this.sort = { ...this.sort, [view]: sort }
-  }
-
   enter = step => {
     const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
     if (step === subStepActive) return false;
@@ -106,41 +66,26 @@ export default class Modeling extends Component {
     updateProject(nextSubStep(step, 3))
   };
 
-  handleChange = action(value => {
-    console.log(value, "metric")
-    this.metric = value;
-    // if (window.localStorage)
-    //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
-  });
-
   render() {
     const { project } = this.props.projectStore;
-    const { models, train2Error, train2ing } = project;
-    const { view, sort, metric } = this
+    const { view } = this
     return (
       <div className={styles.modeling}>
         {project && <Switch>
-          <Route exact path="/project/:id/modeling/start" component={StartTrain} />
+          <Route exact path="/project/:id/modeling/start" component={(props) => <StartTrain {...props} />} />
           <Route exact path="/project/:id/modeling/result" component={() => {
             return <TrainResult
               resetSide={this.resetSide}
-              hasModel={!!models.length}
-              isError={train2Error}
-              isTraining={train2ing}
+              project={project}
               view={view}
-              sort={sort}
               changeView={this.changeView}
-              handleSort={this.handleSort}
-              metric={metric}
-              handleChange={this.handleChange} />
+            />
           }} />
         </Switch>}
         {project && <ProjectSide
           enter={this.enter}
-          list={this.step}
-          step={project.lastSubStep}
-          current={project.subStepActive}
-          imgs={imgs}
+          project={project}
+          keyword='modeling'
           ref={this.sideRef}
         />}
       </div>
@@ -151,17 +96,14 @@ export default class Modeling extends Component {
 @observer
 class TrainResult extends Component {
   render() {
-    const { hasModel, isError, isTraining, resetSide, view, sort, changeView, handleSort, metric, handleChange } = this.props;
-    if (isError) return <ModelError />;
-    if (!hasModel && isTraining) return <Loading />;
+    const { project, view, changeView, resetSide } = this.props;
+    const { models, train2Error, train2ing } = project;
+    if (train2Error) return <ModelError />;
+    if (!models.length && train2ing) return <Loading />;
     return <ModelResult
-      resetSide={resetSide}
       view={view}
-      sort={sort}
-      handleSort={handleSort}
       changeView={changeView}
-      metric={metric}
-      handleChange={handleChange}
+      resetSide={resetSide}
     />
   }
 }

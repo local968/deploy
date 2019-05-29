@@ -5,7 +5,7 @@ import moment from 'moment';
 import styles from './styles.module.css';
 import { Modal, DatePicker } from 'antd';
 import classnames from 'classnames';
-
+import EN from '../../../constant/en'
 @observer
 export default class OneTime extends Component {
   @observable time = 'completed';
@@ -28,9 +28,9 @@ export default class OneTime extends Component {
         visible={visible}
         footer={null}
       >
-        <div className={styles.title}>One Time Settings</div>
+        <div className={styles.title}>{EN.OneTimeSettings}</div>
         <div className={styles.line}>
-          <span className={styles.label}>Starts</span>
+          <span className={styles.label}>{EN.Startss}</span>
           <div
             className={styles.options}
             onClick={() => {
@@ -50,7 +50,7 @@ export default class OneTime extends Component {
               }}
               value={this.time === 'completed' ? null : moment.unix(this.time)}
               format="MM/DD/YYYY HH:mma"
-              placeholder="Select Time"
+              placeholder={EN.SelectTime}
               onChange={date => runInAction(() => (this.time = date.unix()))}
             />
           </div>
@@ -66,18 +66,18 @@ export default class OneTime extends Component {
                 [styles.active]: this.time === 'completed'
               })}
             />
-            <span className={styles.text}>Start after settings completed</span>
+            <span className={styles.text}>{EN.Startaftersettingscompleted}</span>
           </div>
         </div>
         <div className={styles.btns}>
           <a className={styles.cancel} onClick={onClose}>
-            CANCEL
+            {EN.CANCEL}
           </a>
           <a
             className={styles.done}
             onClick={() => onSubmit({ time: this.time })}
           >
-            DONE
+            {EN.DONE}
           </a>
         </div>
       </Modal>

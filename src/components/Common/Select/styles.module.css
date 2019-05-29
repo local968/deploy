@@ -35,7 +35,7 @@
   height: 100%;
   display: block;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
 }
 

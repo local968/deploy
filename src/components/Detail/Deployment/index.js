@@ -20,6 +20,8 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
+import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 
 const { Option, OptGroup } = Select;
 
@@ -122,23 +124,18 @@ export default class Deployment extends Component {
         this.uploadError = error
       }),
       onFinished: action((response, file) => {
-        if (response.status === 200) {
-          cddo.file = file.name
-          cddo.fileId = response.fileId
-          cddo.source = 'file'
-          cd.save()
-          this.uploadPercentage = 100
-          this.uploadStatus = false
-        } else {
-          this.uploadError = response.message
-          console.error(response)
-        }
+        cddo.file = file.name
+        cddo.fileId = response.originalIndex
+        cddo.source = 'file'
+        cd.save()
+        this.uploadPercentage = 100
+        this.uploadStatus = false
       }),
       onProgress: action((progress, speed) => {
         const done = progress.split('/')[0]
         const total = progress.split('/')[1]
         this.uploadSpeed = speed
-        this.uploadPercentage = parseFloat(((done / total) * 100).toFixed(2))
+        this.uploadPercentage = formatNumber((done / total) * 100, 2)
       }),
       onStart: action(() => {
         this.uploadStatus = 'uploading'
@@ -151,19 +148,19 @@ export default class Deployment extends Component {
       params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' }
     }
     return (
-      <div className={styles.deployment}>
+      <div className={styles.deployment} >
         <div className={styles.info}>
-          <span className={styles.model}>Model: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+          <span className={styles.model}>{EN.Model}: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
             {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
               <OptGroup key={settingName} label={settingName}>
-                {models.map(model => <Option key={model.name} alt={model.performance} value={model.name}>{model.name}</Option>)}
+                {models.map(model => <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>)}
               </OptGroup>)}
           </Select> : cd.modelName}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
-          <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? 'Save' : 'Change'}</a>
-          <span className={styles.data}>Deployment Data Definition</span>
-          <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
-          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>Download</a>
+          <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
+          <span className={styles.data}>{EN.DeploymentDataDefinition}</span>
+          <Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />
+          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>
           {/* <span className={styles.email}>
             Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (
@@ -193,13 +190,15 @@ export default class Deployment extends Component {
         </div>
         <DeploymentOption cddo={cddo} selectionOption={this.selectionOption} />
         {cddo.option === 'api' && <ApiInstruction deployment={cd} />}
-        {cddo.option === 'data' && (
-          <DataSource
-            cddo={cddo}
-            show={this.show}
-            uploader={uploader}
-          />
-        )}
+        {
+          cddo.option === 'data' && (
+            <DataSource
+              cddo={cddo}
+              show={this.show}
+              uploader={uploader}
+            />
+          )
+        }
         <Modal
           visible={!!this.uploadStatus}
           width={700}
@@ -207,23 +206,26 @@ export default class Deployment extends Component {
           footer={null}
           onCancel={action(() => { this.uploadStatus = false; this.uploadOperator.pause() })}>
           <div className={styles.uploading}>
-            <Progress percent={this.uploadPercentage} />
+            <Progress percent={isNaN(this.uploadPercentage) ? 0 : parseFloat(this.uploadPercentage)} />
             <span className={styles.speed}>{this.uploadSpeed}</span>
             <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
-              ? <span><Icon type="pause" theme="outlined" />Pause</span>
-              : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+              ? <span><Icon type="pause" theme="outlined" />{EN.Paused}</span>
+              : <span><Icon type="caret-right" theme="outlined" />{EN.Resume}</span>}</span>
           </div>
           {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
         </Modal>
-        {cddo.option !== 'api' &&
+        {
+          cddo.option !== 'api' &&
           cddo.source && (
             <ResultLocation
               cddo={cddo}
               selectionOption={this.selectionOption}
               show={this.show}
             />
-          )}
-        {cddo.option !== 'api' &&
+          )
+        }
+        {
+          cddo.option !== 'api' &&
           cddo.source &&
           cddo.location && (
             <DeployFrequency
@@ -231,8 +233,10 @@ export default class Deployment extends Component {
               cddo={cddo}
               selectionOption={this.selectionOption}
             />
-          )}
-        {cddo.option !== 'api' &&
+          )
+        }
+        {
+          cddo.option !== 'api' &&
           cddo.source &&
           cddo.location &&
           cddo.frequency && (
@@ -253,16 +257,17 @@ export default class Deployment extends Component {
                     }
                   }}
                 >
-                  <BButton className={styles.saveText}>DONE</BButton>
+                  <BButton className={styles.saveText}>{EN.DONE}</BButton>
                 </div>
               </div>
             </div>
-          )}
+          )
+        }
         <DatabaseConfig
           options={cddo.sourceOptions}
           visible={this.dialog === 'databasesource'}
           onClose={this.closeDialog}
-          title="Data Source - Database"
+          title={EN.DataSourceDatabase}
           projectId={cd.projectId}
           onSubmit={action(options => {
             // options.csvLocation = options.result.result.csvLocation;
@@ -308,7 +313,7 @@ export default class Deployment extends Component {
             this.closeDialog();
           })}
         />
-      </div>
+      </div >
     );
   }
 }
@@ -316,17 +321,17 @@ export default class Deployment extends Component {
 const DeploymentOption = observer(({ cddo, selectionOption }) => (
   <div className={styles.deploymentOption}>
     <span className={styles.label}>
-      <span className={styles.text}>Deployment Option:</span>
+      <span className={styles.text}>{EN.DeploymentOptionText}:</span>
     </span>
     <div className={styles.selections}>
       {cddo.option === 'api' && (
         <div className={styles.selected}>
           <span className={styles.text}>
-            <img alt="api" src={apiIcon} className={styles.selectionIcon} />Predict
-            with API
+            <img alt="api" src={apiIcon} className={styles.selectionIcon} />
+            {EN.PredictWithAPI}
           </span>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -337,10 +342,10 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
               alt="data source"
               src={sourceIcon}
               className={styles.selectionIcon}
-            />Predict with Data Source
+            />{EN.PredictWithDataSource}
           </span>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -354,7 +359,7 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
               alt="data source"
               src={sourceIcon}
               className={styles.selectionIcon}
-            />Predict with Data Source
+            />{EN.PredictWithDataSource}
           </span>
         </div>
       )}
@@ -364,8 +369,8 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
           onClick={selectionOption('option', 'api')}
         >
           <span className={styles.text}>
-            <img alt="api" src={apiIcon} className={styles.selectionIcon} />Predict
-            with API
+            <img alt="api" src={apiIcon} className={styles.selectionIcon} />
+            {EN.PredictWithAPI}
           </span>
         </div>
       )}
@@ -376,7 +381,7 @@ const DeploymentOption = observer(({ cddo, selectionOption }) => (
 const DataSource = observer(({ cddo, show, uploader }) => (
   <div className={styles.dataSource}>
     <span className={styles.label}>
-      <span className={styles.text}>Data Source:</span>
+      <span className={styles.text}>{EN.DataSourceText}:</span>
     </span>
     <div className={styles.selections}>
       {cddo.source === 'database' && (
@@ -388,7 +393,7 @@ const DataSource = observer(({ cddo, show, uploader }) => (
               className={styles.selectionIcon}
             />
             <span className={styles.resultText}>
-              Database
+              {EN.Database}
               <span className={styles.path}>{cddo.sourceOptions.hostname}</span>
             </span>
           </span>
@@ -404,14 +409,14 @@ const DataSource = observer(({ cddo, show, uploader }) => (
             className={styles.resultText}
             {...uploader}
           >
-            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
-            File
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />
+            {EN.LocalFile}
             <span className={styles.path} title={cddo.file}>
               {cddo.file}
             </span>
           </Uploader>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -438,21 +443,21 @@ const DataSource = observer(({ cddo, show, uploader }) => (
               alt="database"
               src={databaseIcon}
               className={styles.selectionIcon}
-            />Database
+            />{EN.Database}
           </span>
         </div>
       )}
       {cddo.source !== 'file' && (
         <div
           className={styles.selectionWithoutHover}
-        // onClick={selectionOption('source', 'file')}
+          // onClick={selectionOption('source', 'file')}
         >
           <Uploader
             className={styles.text}
             {...uploader}
           >
-            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
-            File
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />
+            {EN.LocalFile}
           </Uploader>
         </div>
       )}
@@ -477,18 +482,15 @@ const DataSource = observer(({ cddo, show, uploader }) => (
 const ResultLocation = observer(({ cddo, selectionOption, show }) => (
   <div className={styles.resultLocation}>
     <span className={styles.label}>
-      <span className={styles.text}>Result Location:</span>
+      <span className={styles.text}>{EN.ResultLocation}</span>
     </span>
     <div className={styles.selections}>
       {cddo.location === 'app' && (
         <div className={styles.selected}>
           <span className={styles.text}>
-            <img alt="app" src={appIcon} className={styles.selectionIcon} />In
-            App
+            <img alt="app" src={appIcon} className={styles.selectionIcon} />{EN.InApp}
           </span>
-          <span className={styles.or}>
-            {/* <span className={styles.orText}>or</span> */}
-          </span>
+          <span className={styles.or} />
         </div>
       )}
       {/* {cddo.location === 'database' && (
@@ -527,8 +529,7 @@ const ResultLocation = observer(({ cddo, selectionOption, show }) => (
           onClick={selectionOption('location', 'app')}
         >
           <span className={styles.text}>
-            <img alt="app" src={appIcon} className={styles.selectionIcon} />In
-            App
+            <img alt="app" src={appIcon} className={styles.selectionIcon} />{EN.InApp}
           </span>
         </div>
       )}
@@ -540,7 +541,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
   <React.Fragment>
     <div className={styles.deployFrequency}>
       <span className={styles.label}>
-        <span className={styles.text}>Deploy Frequency:</span>
+        <span className={styles.text}>{EN.DeployFrequency}</span>
       </span>
       <div className={styles.selections}>
         {cddo.frequency === 'once' && (
@@ -548,18 +549,18 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
             <span className={styles.result}>
               <img alt="once" src={onceIcon} className={styles.selectionIcon} />
               <span className={styles.resultText}>
-                One Time<span className={styles.detail}>
-                  <span className={styles.bold}>time:</span>
-                  {cddo.frequencyOptions.time === 'completed'
-                    ? ' After completed'
-                    : moment
-                      .unix(cddo.frequencyOptions.time)
-                      .format('MM/DD/YYYY h:mma')}
+                {EN.OneTime}<span className={styles.detail}>
+                  <span className={styles.bold}>{EN.Times}</span>
+                {cddo.frequencyOptions.time === 'completed'
+                  ? EN.Aftercompleted
+                  : moment
+                    .unix(cddo.frequencyOptions.time)
+                    .format('MM/DD/YYYY h:mma')}
                 </span>
               </span>
             </span>
             <span className={styles.or}>
-              <span className={styles.orText}>or</span>
+              <span className={styles.orText}>{EN.Or}</span>
             </span>
           </div>
         )}
@@ -568,22 +569,22 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
             <span className={styles.result}>
               <Icon type="sync" className={styles.antdIcon} />
               <span className={styles.resultText}>
-                Redeploy every{' '}
+                {EN.Redeployevery}{' '}
                 {`${cddo.frequencyOptions.repeatFrequency} ${
                   cddo.frequencyOptions.repeatPeriod
                   } ${
                   cddo.frequencyOptions.repeatPeriod !== 'day' ? 'on' : ''
                   } ${cddo.frequencyOptions.repeatPeriod &&
-                  dateFormat[cddo.frequencyOptions.repeatPeriod](
-                    cddo.frequencyOptions.repeatOn
-                  )}`}
+                dateFormat[cddo.frequencyOptions.repeatPeriod](
+                  cddo.frequencyOptions.repeatOn
+                )}`}
                 <small className={styles.detail}>
-                  <span className={styles.bold}>Starts:</span>
+                  <span className={styles.bold}>{EN.Starts}:</span>
                   {moment
                     .unix(cddo.frequencyOptions.starts)
                     .format('MM/DD/YYYY h:mma')}
                   <br />
-                  <span className={styles.bold}>Ends:</span>
+                  <span className={styles.bold}>{EN.Ends}:</span>
                   {cddo.frequencyOptions.ends === 'never'
                     ? 'never'
                     : cddo.frequencyOptions.ends > 10000
@@ -595,22 +596,21 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
               </span>
             </span>
             <span className={styles.or}>
-              <span className={styles.orText}>or</span>
+              <span className={styles.orText}>{EN.Or}</span>
             </span>
           </div>
         )}
         {cddo.frequency !== 'once' && (
           <div className={styles.selection} onClick={show('onetime')}>
             <span className={styles.text}>
-              <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
-              Time
+              <img alt="once" src={onceIcon} className={styles.selectionIcon} />{EN.OneTime}
             </span>
           </div>
         )}
         {cddo.frequency !== 'repeat' && (
           <div className={styles.selection} onClick={show('autorepeat')}>
             <span className={styles.text}>
-              <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+              <Icon type="sync" className={styles.antdIcon} />{EN.AutoRepeat}
             </span>
           </div>
         )}
@@ -624,7 +624,7 @@ const DeployFrequency = observer(({ cddo, selectionOption, show }) => (
           onChange={e => selectionOption('autoDisable', e.target.checked)()}
         >
           <span className={styles.checkboxText}>
-            Auto disable if any issue occurs
+            {EN.Autodisableifanyissueoccurs}
           </span>
         </Checkbox>
       </div>

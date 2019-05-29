@@ -11,6 +11,7 @@ import SimplifiedView from './simplifiedView';
 import Preview from './Preview'
 import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
+import EN from '../../../constant/en';
 
 @inject('projectStore')
 @observer
@@ -35,28 +36,28 @@ export default class StartTrain extends Component {
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
-          <span>Data looks good now. It's time to train your model!</span>
+          <span>{EN.PrepareToModel}</span>
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
             <div className={styles.trainBlock} onClick={this.fastTrain}>
               <div className={styles.trainRecommend}>
-                <span><Icon type="star" style={{ color: "#50647a" }} theme='filled' />Recommended</span>
+                <span><Icon type="star" style={{ color: "#50647a" }} theme='filled' />{EN.Recommended}</span>
               </div>
               <div className={styles.trainImg}>
                 <img src={autoIcon} alt="auto" />
               </div>
               <div className={styles.trainName}>
-                <span>Easy and Simple</span>
+                <span>{EN.EasyAndSimple}</span>
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want R2 Learn to build the model automatically.
+                  {EN.EasyAndSimpleTip}
                 </span>
               </div>
             </div>
             <button className={styles.train} onClick={this.fastTrain}>
-              <span>Automatic Modeling</span>
+              <span>{EN.AutomaticModeling}</span>
             </button>
           </div>
           <div className={styles.trainSep}></div>
@@ -66,16 +67,16 @@ export default class StartTrain extends Component {
                 <img src={advancedIcon} alt="advanced" />
               </div>
               <div className={styles.trainName}>
-                <span>Detailed and Advanced</span>
+                <span>{EN.DetailedAndAdvanced}</span>
               </div>
               <div className={styles.trainDesc}>
                 <span>
-                  If you want to have more control over the modeling process.
+                  {EN.DetailedAndAdvancedTip}
                 </span>
               </div>
             </div>
             <button className={styles.train} onClick={this.advanced}>
-              <span>Advanced Modeling</span>
+              <span>{EN.AdvancedModeling}</span>
             </button>
           </div>
         </div>
@@ -83,7 +84,7 @@ export default class StartTrain extends Component {
           content={<AdvancedModel
             project={this.props.projectStore.project}
             closeAdvanced={this.closeAdvanced} />}
-          title='Advanced Modeling'
+          title={EN.AdvancedModeling}
           onClose={this.closeAdvanced}
           visible={this.visible}
           closeByMask={true}
@@ -96,6 +97,7 @@ export default class StartTrain extends Component {
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
+  @observable visiable = false
 
   switchTab = (num) => {
     if (num !== 1 && num !== 2) return false;
@@ -112,14 +114,23 @@ class AdvancedModel extends Component {
     if (hasNewOne) project.customHeader.push(checkedVariables)
     const sortFn = (a, b) => a - b
     if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
-    if (!project.version.length) return message.error("You need to select at least one algorithm!")
+    if (!project.version.length) return message.error(EN.Youneedtoselectatleast)
     closeAdvanced()
     advancedModeling()
+  }
+
+  showTable = () => {
+    this.visiable = true
+  }
+
+  hideTable = () => {
+    this.visiable = false
   }
 
   render() {
     const { project, closeAdvanced } = this.props
     const { dataHeader, newVariable, trainHeader, target } = project
+    console.log(project,9999)
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     return <div className={styles.advancedModel}>
@@ -127,19 +138,19 @@ class AdvancedModel extends Component {
         <div className={styles.tabBox}>
           <div className={classnames(styles.tab, {
             [styles.active]: this.tab === 1
-          })} onClick={this.switchTab.bind(null, 1)}><span>Advanced Variable Setting</span></div>
+          })} onClick={this.switchTab.bind(null, 1)}><span>{EN.AdvancedVariable} {EN.Setting}</span></div>
           <div className={classnames(styles.tab, {
             [styles.active]: this.tab === 2
-          })} onClick={this.switchTab.bind(null, 2)}><span>Advanced Modeling Setting</span></div>
+          })} onClick={this.switchTab.bind(null, 2)}><span>{EN.AdvancellcedModeling} {EN.Setting}</span></div>
         </div>
         <div className={styles.viewBox}>
-          <Preview project={project} />
-          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} />}
+          <Preview project={project} visiable={this.visiable} showTable={this.showTable} hideTable={this.hideTable}/>
+          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} hidden={this.visiable || this.tab === 1} />}
           <div className={styles.bottom}>
             <button className={classnames(styles.save, {
               [styles.disable]: !checkedVariables.length
-            })} onClick={!checkedVariables.length ? null : this.modeling} ><span>Modeling</span></button>
-            <button className={styles.cancel} onClick={closeAdvanced}><span>Cancel</span></button>
+            })} onClick={!checkedVariables.length ? null : this.modeling} ><span>{EN.Modeling}</span></button>
+            <button className={styles.cancel} onClick={closeAdvanced}><span>{EN.Cancel}</span></button>
           </div>
         </div>
 

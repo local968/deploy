@@ -5,7 +5,7 @@ import moment from 'moment';
 import styles from './styles.module.css';
 import { Modal, DatePicker, TimePicker, Select, InputNumber } from 'antd';
 import classnames from 'classnames';
-
+import EN from '../../../constant/en';
 const Option = Select.Option;
 
 const bound = 10000;
@@ -77,9 +77,9 @@ export default class AutoRepeat extends Component {
         visible={visible}
         footer={null}
       >
-        <div className={styles.title}>Auto Repeat Settings</div>
+        <div className={styles.title}>{EN.AutoRepeatSettings}</div>
         <div className={styles.line}>
-          <span className={styles.label}>Repeat every</span>
+          <span className={styles.label}>{EN.Repeatevery}</span>
           <div className={styles.options}>
             <InputNumber
               min={1}
@@ -93,15 +93,15 @@ export default class AutoRepeat extends Component {
               value={state['repeatPeriod']}
               onChange={this.w('repeatPeriod')}
             >
-              <Option value="day">day</Option>
-              <Option value="week">week</Option>
-              <Option value="month">month</Option>
+              <Option value="day">{EN.Day}</Option>
+              <Option value="week">{EN.Week}</Option>
+              <Option value="month">{EN.Month}</Option>
             </Select>
           </div>
         </div>
         {state.repeatPeriod === 'week' && (
           <div className={styles.line}>
-            <span className={styles.label}>Repeat On</span>
+            <span className={styles.label}>{EN.RepeatOn}</span>
             <div className={styles.options}>
               <div
                 className={classnames(styles.day, {
@@ -109,7 +109,7 @@ export default class AutoRepeat extends Component {
                 })}
                 onClick={this.c('repeatOn', 1)}
               >
-                S
+                {EN.S}
               </div>
               <div
                 className={classnames(styles.day, {
@@ -117,7 +117,7 @@ export default class AutoRepeat extends Component {
                 })}
                 onClick={this.c('repeatOn', 2)}
               >
-                M
+                {EN.M}
               </div>
               <div
                 className={classnames(styles.day, {
@@ -125,7 +125,7 @@ export default class AutoRepeat extends Component {
                 })}
                 onClick={this.c('repeatOn', 3)}
               >
-                T
+                {EN.T}
               </div>
               <div
                 className={classnames(styles.day, {
@@ -133,7 +133,7 @@ export default class AutoRepeat extends Component {
                 })}
                 onClick={this.c('repeatOn', 4)}
               >
-                W
+                {EN.W}
               </div>
               <div
                 className={classnames(styles.day, {
@@ -141,7 +141,7 @@ export default class AutoRepeat extends Component {
                 })}
                 onClick={this.c('repeatOn', 5)}
               >
-                T
+                {EN.TH}
               </div>
               <div
                 className={classnames(styles.day, {
@@ -149,7 +149,7 @@ export default class AutoRepeat extends Component {
                 })}
                 onClick={this.c('repeatOn', 6)}
               >
-                F
+                {EN.F}
               </div>
               <div
                 className={classnames(styles.day, {
@@ -157,7 +157,7 @@ export default class AutoRepeat extends Component {
                 })}
                 onClick={this.c('repeatOn', 7)}
               >
-                S
+                {EN.SA}
               </div>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default class AutoRepeat extends Component {
 
         {state.repeatPeriod === 'month' && (
           <div className={styles.line}>
-            <span className={styles.label}>Repeat On</span>
+            <span className={styles.label}>{EN.RepeatOn}</span>
             <div className={styles.options}>
               <InputNumber
                 min={1}
@@ -182,7 +182,7 @@ export default class AutoRepeat extends Component {
         )}
 
         <div className={styles.line}>
-          <span className={styles.label}>Starts</span>
+          <span className={styles.label}>{EN.Starts}</span>
           <div className={styles.options}>
             {/* <i
               className={classnames(styles.pot, {
@@ -194,7 +194,7 @@ export default class AutoRepeat extends Component {
               use12Hours
               format="h:mma"
               value={moment.unix(state.starts)}
-              placeholder="Select Time"
+              placeholder={EN.SelectTime}
               onChange={date => this.changeState('starts', date.unix())}
             />
           </div>
@@ -214,14 +214,14 @@ export default class AutoRepeat extends Component {
           </div>
         </div> */}
         <div className={styles.line}>
-          <span className={styles.label}>Ends</span>
+          <span className={styles.label}>{EN.Ends}</span>
           <div className={styles.options} onClick={this.c('ends', 'never')}>
             <i
               className={classnames([styles.pot], {
                 [styles.active]: state.ends === 'never'
               })}
             />
-            <span className={styles.text}>Never</span>
+            <span className={styles.text}>{EN.Never}</span>
           </div>
         </div>
         <div className={styles.line}>
@@ -233,7 +233,7 @@ export default class AutoRepeat extends Component {
               })}
               onClick={this.c('ends', moment().unix())}
             />
-            <span className={styles.text}>On</span>
+            <span className={styles.text}>{EN.On}</span>
             <div className={styles.vgap} />
             <DatePicker
               showTime={{
@@ -246,7 +246,7 @@ export default class AutoRepeat extends Component {
                   : moment.unix(state.ends)
               }
               format="MM/DD/YYYY h:mma"
-              placeholder="Select Time"
+              placeholder={EN.SelectTime}
               onChange={date => this.changeState('ends', date.unix())}
             />
           </div>
@@ -262,7 +262,7 @@ export default class AutoRepeat extends Component {
                 [styles.active]: state.ends < bound
               })}
             />
-            <span className={styles.text}>After</span>
+            <span className={styles.text}>{EN.After}</span>
             <div className={styles.vgap} />
             <InputNumber
               min={1}
@@ -272,15 +272,15 @@ export default class AutoRepeat extends Component {
               onChange={this.numberChange('ends')}
             />
             <div className={styles.vgap} />
-            <span className={styles.text}>occurrences</span>
+            <span className={styles.text}>{EN.Occurrences}</span>
           </div>
         </div>
         <div className={styles.btns}>
           <a className={styles.cancel} onClick={onClose}>
-            CANCEL
+            {EN.CANCEL}
           </a>
           <a className={styles.done} onClick={() => onSubmit(this.localState)}>
-            DONE
+            {EN.DONE}
           </a>
         </div>
       </Modal>

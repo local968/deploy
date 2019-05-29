@@ -29,7 +29,9 @@
   /* overflow: auto; */
   display: flex;
   flex-direction: column;
-  font-family: HelveticaNeue;
+  font-family: 'Source Han Sans SC';
+  min-height: 0;
+  overflow: scroll;
 }
 
 .warp {

@@ -24,11 +24,11 @@ async function scheduleHandler() {
 
     let restrictQuery
     try {
-      restrictQuery = await api.checkUserFileRestriction(schedule.deploymentId, schedule.type)
+      restrictQuery = await api.checkUserFileRestriction(schedule)
     } catch (e) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
-      schedule.result = { ['process error']: e.message }
+      schedule.result = { ['processError']: e.message }
       await api.upsertSchedule(schedule);
       return
     }
@@ -36,38 +36,64 @@ async function scheduleHandler() {
     if (restrictQuery === false) {
       schedule.status = 'issue'
       schedule.updatedDate = moment().unix()
-      schedule.result = { ['process error']: 'Your usage of number of deploy lines has reached the max restricted by your current license.' };
+      schedule.result = { ['processError']: config.yourAge };
       await api.upsertSchedule(schedule);
     } else {
       // send command to python
-      const fileId = deployment[`${schedule.type}Options`].fileId
+      const fileId = await api.getCleanIndex(schedule, deployment[`${schedule.type}Options`].fileId, deployment.projectId, deployment.modelName)
       const fileName = deployment[`${schedule.type}Options`].file
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
-      const file = await api.getFile(fileId)
       const newFeatureLabel = await api.getFeatureLabel(deployment.projectId)
+      let cmd = '';
+      switch (deployment.modelType) {
+        case 'Clustering':
+          cmd = 'clustering.deploy';
+          break;
+        case 'Outlier':
+          cmd = 'outlier.deploy';
+          break;
+        default:
+          cmd = 'clfreg.deploy';
+      }
       const request = {
         requestId: `schedule-${schedule.id}`,
         projectId: deployment.projectId,
         userId: deployment.userId,
-        csvLocation: [file.path],
+        csvLocation: [fileId],
         ext: [ext],
-        command: "deploy2",
+        command: cmd,
         solution: deployment.modelName,
-        actionType: schedule.type
+        actionType: schedule.type,
+        frameFormat: 'csv'
       }
       if (!!Object.keys(newFeatureLabel || {}).length) request.newFeatureLabel = newFeatureLabel
-      if (deployment.modelType !== "Regression") request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
+      if (deployment.modelType === "Classification") {
+        try {
+          request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
+        } catch (e) { console.info(`get cute off failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`) }
+      }
+      if (deployment.modelType === "Outlier") {
+        try {
+          request.rate = await api.getRate(deployment.projectId, deployment.modelName)
+        } catch (e) { console.info(`get rate failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`) }
+      }
       if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
       let result = {}
       await command(request, data => {
         result = { ...result, ...data.result }
         return data.status === 100 || data.status < 0
       })
-      if (result['process error']) api.decreaseLines(restrictQuery, file.lineCount)
+      if (result['processError']) api.decreaseLines(restrictQuery, await api.getLineCount(deployment[`${schedule.type}Options`].fileId))
       schedule.result = result
-      schedule.status = result['process error'] ? 'issue' : 'finished'
+      schedule.status = result['processError'] ? 'issue' : 'finished'
       schedule.updatedDate = moment().unix()
       api.upsertSchedule(schedule)
+    }
+
+    if (deployment[`${schedule.type}Options`].autoDisable && schedule.status === 'issue') {
+      deployment.enable = false
+      api.updateDeployment(deployment)
+      return
     }
 
     const cdo = deployment[`${schedule.type}Options`];
@@ -170,7 +196,7 @@ const deploy = (deployment, threshold = null) => {
     }
   })
 
-  threshold && cdpo && api.getLastWaitingSchedule(deployment.id, 'proformance').then(schedule => {
+  threshold && cdpo && api.getLastWaitingSchedule(deployment.id, 'performance').then(schedule => {
     const nextScheduleTime = generateNextScheduleTime(cdpo.frequency, cdpo.frequencyOptions);
     if (!schedule && !nextScheduleTime) return;
     if (schedule) {

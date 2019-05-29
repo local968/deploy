@@ -15,6 +15,8 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import Uploader from '../Uploader';
 import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
+import { formatNumber } from 'util'
+import EN from '../../../constant/en';
 
 const Option = Select.Option;
 
@@ -78,23 +80,18 @@ export default class Performance extends Component {
         this.uploadError = error
       }),
       onFinished: action((response, file) => {
-        if (response.status === 200) {
-          cdpo.file = file.name
-          cdpo.fileId = response.fileId
-          cdpo.source = 'file'
-          cd.save()
-          this.uploadPercentage = 100
-          this.uploadStatus = false
-        } else {
-          this.uploadError = response.message
-          console.error(response)
-        }
+        cdpo.file = file.name
+        cdpo.fileId = response.originalIndex
+        cdpo.source = 'file'
+        cd.save()
+        this.uploadPercentage = 100
+        this.uploadStatus = false
       }),
       onProgress: action((progress, speed) => {
         const done = progress.split('/')[0]
         const total = progress.split('/')[1]
         this.uploadSpeed = speed
-        this.uploadPercentage = parseFloat(((done / total) * 100).toFixed(2))
+        this.uploadPercentage = formatNumber((done / total) * 100, 2)
       }),
       onStart: action(() => {
         this.uploadStatus = 'uploading'
@@ -115,7 +112,7 @@ export default class Performance extends Component {
           <React.Fragment> */}
         <div className={styles.block}>
           <span className={styles.label}>
-            <span className={styles.text}>Model</span>
+            <span className={styles.text}>{EN.Model}</span>
           </span>
           <div className={styles.selections}>
             <span className={styles.modelName}>{cd.modelName}</span>
@@ -124,8 +121,8 @@ export default class Performance extends Component {
         </div>
         <div className={styles.block}>
           <span className={styles.label}>
-            <span className={styles.text}>Validation Data Definition</span>
-            <Hint themeStyle={{ fontSize: '1rem' }} content='It contain variables used for validation. The data source for validation should contain all the variables mentioned in validation data definition.' />
+            <span className={styles.text}>{EN.lidationDataDefinition}</span>
+            <Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />
           </span>
           <div className={styles.selections}>
             <img
@@ -133,8 +130,8 @@ export default class Performance extends Component {
               src={downloadIcon}
               alt="download"
             />
-            <a className={styles.download} href={`/upload/dataDefinition?projectId=${cd.projectId}`} >
-              Download
+            <a className={styles.download} href={`/upload/dataDefinition?projectId=${cd.projectId}&type=performance`} >
+              {EN.Download}
             </a>
           </div>
         </div>
@@ -152,11 +149,11 @@ export default class Performance extends Component {
           maskClosable={false}
           onCancel={action(() => { this.uploadStatus = false; this.uploadOperator.pause() })}>
           <div className={styles.uploading}>
-            <Progress percent={this.uploadPercentage} />
+            <Progress percent={isNaN(this.uploadPercentage) ? 0 : parseFloat(this.uploadPercentage)} />
             <span className={styles.speed}>{this.uploadSpeed}</span>
             <span className={styles.pause} onClick={this.pause}>{this.uploadStatus === 'uploading'
-              ? <span><Icon type="pause" theme="outlined" />Pause</span>
-              : <span><Icon type="caret-right" theme="outlined" />Resume</span>}</span>
+              ? <span><Icon type="pause" theme="outlined" />{EN.Paused}</span>
+              : <span><Icon type="caret-right" theme="outlined" />{EN.Resume}</span>}</span>
           </div>
           {this.uploadStatus === 'error' && <div className={styles.uploadError}>{this.uploadError.toString()}</div>}
         </Modal>
@@ -200,7 +197,7 @@ export default class Performance extends Component {
                   }
                 }}
               >
-                <BButton className={styles.saveText}>DONE</BButton>
+                <BButton className={styles.saveText}>{EN.DONE}</BButton>
               </div>
             </div>
           </div>
@@ -211,7 +208,7 @@ export default class Performance extends Component {
           validation
           projectId={cd.projectId}
           onClose={this.closeDialog}
-          title="Validation Data Source - Database"
+          title={EN.ValidationDataSource + " - " + EN.Database}
           onSubmit={action(options => {
             // options.csvLocation = options.result.result.csvLocation;
             cdpo['source'] = 'database';
@@ -252,7 +249,7 @@ export default class Performance extends Component {
 const DataSource = observer(({ cd, cdpo, show, uploader }) => (
   <div className={styles.block}>
     <span className={styles.label}>
-      <span className={styles.text}>Data Source:</span>
+      <span className={styles.text}>{EN.DataSourceText}:</span>
     </span>
     <div className={styles.selections}>
       {cdpo.source === 'database' && (
@@ -264,12 +261,12 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
               className={styles.selectionIcon}
             />
             <span className={styles.resultText}>
-              Database
+              {EN.Database}
               <span className={styles.path}>{cdpo.sourceOptions.hostname}</span>
             </span>
           </span>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -280,14 +277,13 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
             className={styles.resultText}
             {...uploader}
           >
-            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
-            File
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />{EN.LocalFile}
             <span className={styles.path} title={cdpo.file}>
               {cdpo.file}
             </span>
           </Uploader>
           <span className={styles.or}>
-            <span className={styles.orText}>or</span>
+            <span className={styles.orText}>{EN.Or}</span>
           </span>
         </div>
       )}
@@ -299,7 +295,7 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
               alt="database"
               src={databaseIcon}
               className={styles.selectionIcon}
-            />Database
+            />{EN.Database}
           </span>
         </div>
       )}
@@ -309,8 +305,8 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
             className={styles.text}
             {...uploader}
           >
-            <img alt="file" src={fileIcon} className={styles.selectionIcon} />Local
-            File
+            <img alt="file" src={fileIcon} className={styles.selectionIcon} />
+            {EN.LocalFile}
           </Uploader>
         </div>
       )}
@@ -321,7 +317,7 @@ const DataSource = observer(({ cd, cdpo, show, uploader }) => (
 const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
   <div className={styles.block}>
     <span className={styles.label}>
-      <span className={styles.text}>Measurement Metric</span>
+      <span className={styles.text}>{EN.MeasurementMetric}</span>
     </span>
     <div className={styles.selections}>
       {type === 'Classification' && (
@@ -330,8 +326,11 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           value={cdpo.measurementMetric}
           onChange={value => selectionOption('measurementMetric', value)()}
         >
-          <Option value="AUC">AUC</Option>
-          <Option value="Accuracy">Accuracy</Option>
+          <Option value="Accuracy">{EN.Accuracy}</Option>
+          <Option value="AUC">{EN.AUC}</Option>
+          <Option value="F1">F1</Option>
+          <Option value="Precision">{EN.Precision}</Option>
+          <Option value="Recall">{EN.Recall}</Option>
         </Select>
       )}
       {type === 'Regression' && (
@@ -341,9 +340,33 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           onChange={value => selectionOption('measurementMetric', value)()}
         >
           <Option value="R2">R²</Option>
-          <Option value="RMSE">RMSE</Option>
+          <Option value="RMSE">{EN.RMSE}</Option>
+          <Option value="MSE">MSE</Option>
         </Select>
       )}
+
+      {type === 'Outlier' && (
+        <Select
+          className={styles.select}
+          value={cdpo.measurementMetric}
+          onChange={value => selectionOption('measurementMetric', value)()}
+        >
+          <Option value="Accuracy">{EN.Accuracy}</Option>
+        </Select>
+      )}
+
+      {type === 'Clustering' && (
+        <Select
+          className={styles.select}
+          value={cdpo.measurementMetric}
+          onChange={value => selectionOption('measurementMetric', value)()}
+        >
+          <Option value="CVNN">CVNN</Option>
+          <Option value="CH">CH Index</Option>
+          <Option value="silhouette_euclidean">Silhouette Score</Option>
+        </Select>
+      )}
+
     </div>
   </div>
 ));
@@ -351,7 +374,7 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
 const MetricThreshold = observer(({ cdpo, selectionOption, type }) => (
   <div className={styles.block}>
     <span className={styles.label}>
-      <span className={styles.text}>Metric Threshold</span>
+      <span className={styles.text}>{EN.MetricThreshold}</span>
     </span>
     <div className={styles.selections}>
       {/* <span className={styles.compare}>
@@ -375,7 +398,7 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
   <React.Fragment>
     <div className={styles.block}>
       <span className={styles.label}>
-        <span className={styles.text}>Deploy Frequency:</span>
+        <span className={styles.text}>{EN.DeployFrequency}:</span>
       </span>
       <div className={styles.selections}>
         {cdpo.frequency === 'once' && (
@@ -383,10 +406,10 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
             <span className={styles.result}>
               <img alt="once" src={onceIcon} className={styles.selectionIcon} />
               <span className={styles.resultText}>
-                One Time<span className={styles.detail}>
-                  <span className={styles.bold}>time:</span>
+                {EN.OneTime}<span className={styles.detail}>
+                  <span className={styles.bold}>{EN.Times}</span>
                   {cdpo.frequencyOptions.time === 'completed'
-                    ? ' After completed'
+                    ? EN.Aftercompleted
                     : moment
                       .unix(cdpo.frequencyOptions.time)
                       .format('MM/DD/YYYY h:mma')}
@@ -394,7 +417,7 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
               </span>
             </span>
             <span className={styles.or}>
-              <span className={styles.orText}>or</span>
+              <span className={styles.orText}>{EN.Or}</span>
             </span>
           </div>
         )}
@@ -403,7 +426,7 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
             <span className={styles.result}>
               <Icon type="sync" className={styles.antdIcon} />
               <span className={styles.resultText}>
-                Redeploy every{' '}
+                {EN.Redeployevery}{' '}
                 {`${cdpo.frequencyOptions.repeatFrequency} ${
                   cdpo.frequencyOptions.repeatPeriod
                   } ${
@@ -413,14 +436,14 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
                     cdpo.frequencyOptions.repeatOn
                   )}`}
                 <small className={styles.detail}>
-                  <span className={styles.bold}>Starts:</span>
+                  <span className={styles.bold}>{EN.Starts}:</span>
                   {moment
                     .unix(cdpo.frequencyOptions.starts)
                     .format('MM/DD/YYYY h:mma')}
                   <br />
-                  <span className={styles.bold}>Ends:</span>
+                  <span className={styles.bold}>{EN.Ends}:</span>
                   {cdpo.frequencyOptions.ends === 'never'
-                    ? 'never'
+                    ? EN.NeverS
                     : cdpo.frequencyOptions.ends > 10000
                       ? moment
                         .unix(cdpo.frequencyOptions.ends)
@@ -430,22 +453,21 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
               </span>
             </span>
             <span className={styles.or}>
-              <span className={styles.orText}>or</span>
+              <span className={styles.orText}>{EN.Or}</span>
             </span>
           </div>
         )}
         {cdpo.frequency !== 'once' && (
           <div className={styles.selection} onClick={show('onetime')}>
             <span className={styles.text}>
-              <img alt="once" src={onceIcon} className={styles.selectionIcon} />One
-              Time
+              <img alt="once" src={onceIcon} className={styles.selectionIcon} />{EN.OneTime}
             </span>
           </div>
         )}
         {cdpo.frequency !== 'repeat' && (
           <div className={styles.selection} onClick={show('autorepeat')}>
             <span className={styles.text}>
-              <Icon type="sync" className={styles.antdIcon} />Auto Repeat
+              <Icon type="sync" className={styles.antdIcon} />{EN.AutoRepeat}
             </span>
           </div>
         )}
@@ -459,7 +481,7 @@ const DeployFrequency = observer(({ cdpo, selectionOption, show }) => (
           onChange={e => selectionOption('autoDisable', e.target.checked)()}
         >
           <span className={styles.checkboxText}>
-            Auto disable if any issue occurs
+            {EN.Autodisableifanyissueoccurs}
           </span>
         </Checkbox>
       </div>

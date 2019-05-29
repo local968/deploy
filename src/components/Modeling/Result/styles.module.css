@@ -8,16 +8,16 @@
 .modelResult span {
     font-size: 1.125rem;
     display: flex;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     line-height: normal;
-    align-items: baseline;
+    align-items: center;
     color: #1d2b3c;
 }
 
-.process{
+.process {
     /*height: 1em;*/
     padding: 0.2em;
-    border:1px solid #C4CBD7;
+    border: 1px solid #C4CBD7;
     margin: 0.2em;
     background-color: #FAFBFC;
     display: flex;
@@ -26,32 +26,34 @@
     white-space: nowrap;
 }
 
-
-.process label{
+.process label {
     font-size: 0.2em;
 }
 
-.process img{
+.process img {
     width: .3em;
     margin: 0 .2em;
 }
-.process button{
+
+.process button {
     display: flex;
     align-items: center;
 }
 
-.process button i{
+.process button i {
     display: flex;
 }
-.process label{
-    text-transform:capitalize;
-}
-.many img{
-    width: 15px;
-    margin:0 5px;
+
+.process label {
+    text-transform: capitalize;
 }
 
-.process label{
+.many img {
+    width: 15px;
+    margin: 0 5px;
+}
+
+.process label {
     font-size: 0.15em;
 }
 
@@ -60,23 +62,23 @@
     float: left;
 }
 
-.process dl{
+.process dl {
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
 }
 
-.process dd{
+.process dd {
     display: flex;
     margin-bottom: 0.1em;
     align-items: center;
 }
 
-.process dd div{
-    margin-left:15px;
+.process dd div {
+    margin-left: 15px;
 }
 
-.process dd button{
+.process dd button {
     display: flex;
 }
 
@@ -169,7 +171,7 @@
 
 .or span {
     font-size: 1.125rem;
-    font-family: HelveticaNeue;
+    font-family: 'Source Han Sans SC';
     color: #000;
 }
 
@@ -194,7 +196,7 @@
 .radio label {
     font-size: 1.125rem;
     color: #000;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     cursor: pointer;
 }
 
@@ -205,7 +207,7 @@
     cursor: pointer;
 }
 
-.radio input:disabled + label {
+.radio input:disabled+label {
     color: #ccc;
     cursor: not-allowed;
 }
@@ -233,7 +235,7 @@
     stroke: #ff8000;
 }
 
-.performance span{
+.performance span {
     display: block;
 }
 
@@ -309,7 +311,7 @@ span.performanceScore {
 
 .progressTitle span {
     font-size: 1.25rem;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     color: #000;
     max-width: 100%;
     text-overflow: ellipsis;
@@ -459,8 +461,8 @@ span.performanceScore {
     text-decoration: underline;
 }
 
-.compute img{
-  margin-right: 10px;
+.compute img {
+    margin-right: 10px;
 }
 
 .modelSelect {
@@ -569,7 +571,7 @@ span.performanceScore {
 .modelInsightsBlock span {
     font-size: 1.125rem;
     display: flex;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     line-height: 1.2;
     color: #1d2b3c;
     margin-right: 1em;
@@ -632,7 +634,7 @@ span.performanceScore {
 .modelInsightsText span {
     font-size: 1.125rem;
     display: block;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     line-height: 1.2;
     color: #1d2b3c;
     overflow: hidden;
@@ -672,7 +674,7 @@ span.performanceScore {
 .modelInsightsImageTitle span {
     font-size: 1rem;
     display: block;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     line-height: 1.2;
     color: rgb(68, 142, 237);
 }
@@ -752,14 +754,14 @@ span.performanceScore {
 }
 
 .abortButton :global(.anticon) {
-  font-size: 1rem;
+    font-size: 1rem;
 }
 
 .abortButton span {
     font-size: .875rem;
     font-weight: bold;
     color: #1d2b3c;
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
 }
 
 .costBlock {
@@ -767,16 +769,42 @@ span.performanceScore {
     flex: none;
     flex-direction: column;
     position: absolute;
-    top: 0;
-    left: 100%;
-    width: 5.5em;
-    height: 4em;
+    top: -250%;
+    left: 60%;
+    width: 6em;
+    max-height: 6em;
+    overflow-y: auto;
+    overflow-x: hidden;
     background: #fff;
     z-index: 2;
     border-radius: 5px;
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.22);
     border: solid 1px #979797;
     padding: 0.2em 0.25em;
+    height: auto;
+}
+
+.costBlock p{
+    font-size: 0.75rem;
+    margin-bottom: 0;
+}
+
+
+.costBlock::-webkit-scrollbar{
+    width: 10px;
+    background-color: #fff;
+}
+
+.costBlock::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 5px;
+    background-color: #ccc;
+}
+
+.costBlock::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    border-radius: 0;
+}
+.costBlock :global(.ant-radio-wrapper) {
+    vertical-align: middle;
 }
 
 .costTitle {
@@ -786,7 +814,7 @@ span.performanceScore {
 }
 
 .costTitle span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 1rem;
     line-height: 1.13;
     color: #000000;
@@ -798,17 +826,18 @@ span.performanceScore {
 }
 
 .costContent span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.75rem;
     line-height: 1.33;
     color: #000000;
 }
 
 .costBox {
-    display: flex;
     flex: auto;
     flex-direction: column;
     justify-content: center;
+    display: block;
+    margin-bottom: 1rem;
 }
 
 .costTable {
@@ -817,12 +846,14 @@ span.performanceScore {
     flex-direction: column;
     width: 100%;
     overflow: hidden;
+    border:1px solid #ccc;
+    border-width: 1px 0;
 }
 
 .costRow {
     display: flex;
     flex: none;
-    padding: 10px 0;
+    padding: 20px 0;
     margin-bottom: -1px;
     border-bottom: 1px solid #979797
 }
@@ -835,7 +866,7 @@ span.performanceScore {
 }
 
 .costCell span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.875rem;
     line-height: 1.29;
     color: #000000;
@@ -859,31 +890,36 @@ span.performanceScore {
     flex: auto;
     align-items: center;
     border-left: 1px solid #979797;
+    flex-wrap: wrap;
 }
 
 .costName {
     display: flex;
-    flex: 3 1;
+    flex: 2 1;
     width: 0;
+    align-items: center;
 }
 
 .costInput {
     display: flex;
-    flex: 2 1;
+    flex: 5 1;
     align-items: center;
     width: 0;
     height: 0.3em;
     margin: 0 0.1em;
+    /*font-size:0.75rem;*/
+    /*justify-content: center;*/
 }
 
 .costInput input {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.875rem;
     line-height: 1.29;
     color: #000000;
     width: 100%;
     height: 100%;
     padding: 0 5px;
+    text-align: center;
 }
 
 .costUnits {
@@ -916,6 +952,14 @@ span.performanceScore {
     background-color: #9be44b;
 }
 
+.cost1{
+    background-color: #99e63c;
+}
+
+.cost2{
+    background-color: #ffcd71;
+}
+
 .costClose {
     display: flex;
     flex: none;
@@ -925,7 +969,7 @@ span.performanceScore {
     cursor: pointer;
 }
 
-.costClose span{
+.costClose span {
     transform: rotate(45deg);
     font-size: 2rem;
     color: #9b9b9b;
@@ -966,6 +1010,7 @@ span.performanceScore {
     display: flex;
     flex: none;
     flex-direction: column;
+    margin-top: 1rem;
 }
 
 .costText {
@@ -974,7 +1019,7 @@ span.performanceScore {
 }
 
 .costText span {
-    font-family: SanFranciscoText;
+    font-family: 'Source Han Sans SC';
     font-size: 0.75rem;
     line-height: 1.33;
     color: #000000;
@@ -1021,19 +1066,20 @@ span.performanceScore {
 }
 
 .reportProgress {
-  font-size: 80px;
-  display: flex;
-  flex-direction: column;
+    font-size: 80px;
+    display: flex;
+    flex-direction: column;
 }
 
 .reportProgressText {
-  font-size: 16px;
-  margin: 4px;
-  display: flex;
-  flex: auto;
+    font-size: 16px;
+    margin: 4px;
+    display: flex;
+    flex: auto;
 }
+
 .nohover:hover {
-  cursor: text;
+    cursor: text;
 }
 
 .recommendLabel {
@@ -1047,47 +1093,47 @@ span.performanceScore {
 }
 
 .reportCancel {
-  background-image: linear-gradient(to bottom, #5b657b, #243448);
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0.1em 0.25em;
-  margin-right: .25em;
-  align-self: flex-end;
-  width: 100px;
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.1em 0.25em;
+    margin-right: .25em;
+    align-self: flex-end;
+    width: 100px;
 }
 
 .reportCancel:hover {
-  background-image: linear-gradient(to bottom, #5b657b, #243448);
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0.1em 0.25em;
-  margin-right: .25em;
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.1em 0.25em;
+    margin-right: .25em;
 }
 
 .reportCancel:active {
-  background-image: linear-gradient(to bottom, #243448, #5b657b);
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0.1em 0.25em;
-  margin-right: .25em;
+    background-image: linear-gradient(to bottom, #243448, #5b657b);
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.1em 0.25em;
+    margin-right: .25em;
 }
 
 .tabBox {
@@ -1113,7 +1159,7 @@ span.performanceScore {
 }
 
 .tab span {
-    font-family: HelveticaNeue;
+    font-family: 'Source Han Sans SC';
     font-size: 1.125rem;
     line-height: 1.15;
     color: #979797;
@@ -1121,4 +1167,108 @@ span.performanceScore {
 
 .tab.active span {
     color: #1d2b3c;
+}
+
+
+.newTitle span{
+  display: block;
+    font-size: 0.75rem;
+}
+
+.newTitle label{
+    display: block;
+    font-weight: bold;
+    padding: 10px 0;
+    font-size: 0.75rem;
+}
+
+.newTitle dl{
+    display: flex;
+    margin-bottom: 0.25rem;
+}
+
+.newTitle dl dt{
+    flex:4;
+    font-weight: normal;
+}
+
+.newTitle dl dd{
+    flex:1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.newTitle ul{
+    margin-bottom: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 15px;
+}
+
+.newTitle p{
+    font-size: 0.75rem;
+    line-height: 2;
+}
+
+.newTitle li{
+    font-size:0.75rem;
+}
+
+.newStext{
+    font-size: 0.75rem !important;
+}
+
+.newCostTitle{
+    flex-basis: 100%;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.newCostTitle p{
+    margin-bottom: 0.25rem;
+}
+
+.myButton{
+    color:#fff;
+    border:1px solid #ccc;
+    padding:5px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    width: fit-content;
+    background-image: linear-gradient(to bottom, #5b657b, #243448);
+}
+
+.eventInput {
+    display: flex;
+    flex: none;
+    align-items: center;
+}
+
+.eventInput input {
+    font-family: 'Source Han Sans SC';
+    font-size: 0.875rem;
+    line-height: 1.29;
+    color: #000000;
+    width: 7em;
+    text-align: center;
+}
+
+.eventButton {
+    display: flex;
+    flex: 1 1;
+}
+
+.benefitTitle {
+    display: inline-block;
+    font-weight: bold;
+}
+
+.reset {
+    font-size: 1rem;
+    float: right;
+    border-radius: 5px;
+    color: #445167;
+    text-decoration: underline;
 }

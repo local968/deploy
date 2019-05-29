@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
+import { formatNumber } from 'util'
 
 @observer
 class ProgressBar extends Component {
@@ -30,7 +31,7 @@ class ProgressBar extends Component {
       <div className={styles.processBlock}>
         <div className={styles.process} style={{ width: `${this.value}%` }}></div>
       </div>
-      <div className={styles.text}>{`${this.value.toFixed(2)}%`}</div>
+      <div className={styles.text}>{`${formatNumber(this.value, 2)}%`}</div>
     </div>
   }
 }

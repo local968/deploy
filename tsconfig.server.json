@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "checkJs": false,
+    "isolatedModules": false,
+    "strict": false
+  }
+}

@@ -1,4 +1,4 @@
-import { observable, action, when } from 'mobx';
+import {observable, action, when} from 'mobx';
 import axios from 'axios';
 import config from 'config';
 import socketStore from './SocketStore';
@@ -15,17 +15,21 @@ class UserStore {
   }
   @observable tabKey = '1';
   @observable videoKey = '1';
+  @observable isWatchVideo = true;
+  @observable isCheck = false;
 
   @action change = (name) => (val) => {
     this[name] = val;
   }
 
-  constructor() {
+  constructor(props) {
     // window.r2Report = testData
+
     if (window.r2Report) {
       this.status = 'unlogin'
       return
     }
+
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
@@ -37,11 +41,13 @@ class UserStore {
     when(() => this.status === 'login', socketStore.connect.bind(socketStore))
   }
 
-  login(params) {
+  login(params , props) {
     axios.post(`http://${config.host}:${config.port}/user/login`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
+        props && props.history.push({pathname: '/support',state: { key
+              : 'loginTo' }})
       } else {
         alert(res.data.message || 'Login failure')
       }
@@ -71,15 +77,15 @@ class UserStore {
   }
 
   resetPassword(code, password) {
-    return axios.put(`http://${config.host}:${config.port}/user/resetpassword`, { code, password })
+    return axios.put(`http://${config.host}:${config.port}/user/resetpassword`, {code, password})
   }
 
   forgetPassword(email) {
-    return axios.post(`http://${config.host}:${config.port}/user/forgetpassword`, { email })
+    return axios.post(`http://${config.host}:${config.port}/user/forgetpassword`, {email})
   }
 
   changePassword(current, newPassword) {
-    return axios.put(`http://${config.host}:${config.port}/user/changepassword`, { current, newPassword })
+    return axios.put(`http://${config.host}:${config.port}/user/changepassword`, {current, newPassword})
   }
 }
 

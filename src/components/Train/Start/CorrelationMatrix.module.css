@@ -1,0 +1,48 @@
+.correlationMatrix {
+  display: flex;
+  justify-content: center;
+}
+.correlationMatrix .matrix {
+  overflow: auto;
+  width: 400px;
+  height: 400px;
+}
+.correlationMatrix .matrix .correlationRow {
+  white-space: nowrap;
+}
+.correlationMatrix .matrix .horizonText {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: inline-block;
+  line-height: 30px;
+  font-size: 0.75rem;
+}
+.correlationMatrix .matrix .rect {
+  position: relative;
+  display: inline-block;
+}
+.correlationMatrix .matrix .correlationTable {
+  display: flex;
+  flex: auto;
+}
+.correlationMatrix .colorBar {
+  width: 60px;
+  margin-left: 2em;
+  margin-right: .5em;
+  bottom: 0;
+  right: -2em;
+  display: flex;
+}
+.correlationMatrix .colorBar .bar {
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to bottom, #688bfa 0%, #ffffff 50%, #ff0000 100%);
+  display: inline-block;
+  margin-right: 0.3em;
+}
+.correlationMatrix .colorBar .text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  vertical-align: top;
+}
