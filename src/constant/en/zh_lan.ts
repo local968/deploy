@@ -399,7 +399,7 @@ const ZH_LAN: any = {
   Unknownvariable: '未知变量：',
   Unknownfunction: '未知函数：',
   Emptyparameter: '参数为空',
-  ParametersmustbeNumerical: '参数必须为数值型',
+  ParametersmustbeNumerical: '参数必须为连续变量',
   Mustbeinteger: '必须为整数',
   Function: '函数',
   Parameterserror: '参数错误',
@@ -985,6 +985,7 @@ const ZH_LAN: any = {
   Replacewithlower: '替换为下界',
   Replacewithupper: '替换为上界',
   Pleaseinputsomecontentsforthesubmissio:'请输入提交的内容。',
+  ClusterInfReason: '该指标数值溢出'
 };
 
 export default ZH_LAN;

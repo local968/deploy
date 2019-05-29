@@ -218,11 +218,11 @@ class AdvancedModelTable extends Component {
               case 'RMSSTD':
                 return <RowCell key={11} data={score.RMSSTD} />;
               case 'CH Index':
-                return <RowCell key={9} data={score.CH} title={score.CH === 'null' ? EN.ClusterReason : score.CH} />;
+                return <RowCell key={9} data={score.CH} title={score.CH === 'inf' ? EN.ClusterInfReason : score.CH === 'null' ? EN.ClusterReason : score.CH} />;
               case 'Silhouette Cosine':
-                return <RowCell key={3} data={score.silhouette_cosine} title={score.silhouette_cosine === 'null' ? EN.ClusterReason : score.silhouette_cosine} />;
+                return <RowCell key={3} data={score.silhouette_cosine} title={score.silhouette_cosine === 'inf' ? EN.ClusterInfReason : score.silhouette_cosine === 'null' ? EN.ClusterReason : score.silhouette_cosine} />;
               case 'Silhouette Euclidean':
-                return <RowCell key={4} data={score.silhouette_euclidean} title={score.silhouette_euclidean === 'null' ? EN.ClusterReason : score.silhouette_euclidean} />;
+                return <RowCell key={4} data={score.silhouette_euclidean} title={score.silhouette_euclidean === 'inf' ? EN.ClusterInfReason : score.silhouette_euclidean === 'null' ? EN.ClusterReason : score.silhouette_euclidean} />;
               case EN.Time:
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
               default:

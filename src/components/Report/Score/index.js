@@ -1012,7 +1012,7 @@ class PredictTable extends Component {
     const {  project } = this.props;
     const { models } = project
     const { targetCounts } = project
-    const { TP, FN, FP, TN } = this.costOption;
+    // const { TP, FN, FP, TN } = this.costOption;
     const [v0, v1] = Object.values(targetCounts)
     const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
     const percentNew = typeof this.distribution === 'number' ? this.distribution / 100 : percent0
@@ -1052,13 +1052,18 @@ class PredictTable extends Component {
 
 
 
-    const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution } = project;
+    const {  project = {}, model, yes, no } = this.props;
+    const { fitIndex, chartData } = model;
+    let TN = chartData.roc.TN[fitIndex];
+    let FP = chartData.roc.FP[fitIndex];
+    let TP = chartData.roc.TP[fitIndex];
+    let FN = chartData.roc.FN[fitIndex];
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution } = project;
     if (!current) return null;
 
     const { selectModel = {}, targetCounts = {} } = project;
 
-    const { fitIndex = 1, chartData = {} } = selectModel;
+    // const { fitIndex = 1, chartData = {} } = selectModel;
     const { roc = {} } = chartData;
 
     const Threshold = roc.Threshold && roc.Threshold[fitIndex] || -1;
@@ -1077,9 +1082,13 @@ class PredictTable extends Component {
 
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && EN.OK) || EN.NotSatisfied : '';
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp;
-    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+    // const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
     const curBenefit = current.getBenefit(TP, FN, FP, TN, typeof distribution === 'number' ? (distribution / 100) : (event / 10000), event / 10000)
+
+
+
+
 
     const column = [{
       title: '',
@@ -1096,13 +1105,14 @@ class PredictTable extends Component {
       dataIndex: 'sum'
     }];
 
+    // set default value
     const data = [{
-      rowName: `Actual: ${no}`,
+      rowName: `${EN.Actual}: ${no}`,
       col1: `${Math.round(TN)}(TN)`,
       col2: `${Math.round(FP)}(FP)`,
       sum: +TN + +FP,
     }, {
-      rowName: `Actual: ${yes}`,
+      rowName: `${EN.Actual}: ${yes}`,
       col1: `${Math.round(FN)}(FN)`,
       col2: `${Math.round(TP)}(TP)`,
       sum: Number(FN) + +TP
@@ -1113,6 +1123,8 @@ class PredictTable extends Component {
       sum: +TN + +FN + +FP + +TP
     }];
 
+
+    console.log(data, '--------------------------')
 
     return (
       <div className={styles.costbase}>
