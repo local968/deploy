@@ -1126,7 +1126,13 @@ const EN_LAN = {
   ClusterInfReason: 'the value of this metric is overflow',
   DataQualityFixing:'Data Quality Fixing',
   none:'None',
-
+  VarianceExplained:'Variance Explained',
+  PC:'#PC',
+  Eigenvalue:'Eigenvalue',
+  ComulatedProportion:'Comulated Proportion',
+  Choose2PCs:'Choose 2 PCs',
+  PCSTitle:'The Correlation between PCs and original variables:',
+  ScatterPlotOfPCs:'ScatterPlot of PCs:',
 };
 
 

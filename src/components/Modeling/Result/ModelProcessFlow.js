@@ -36,34 +36,51 @@ export default class ModelProcessFlow extends Component {
 	}
 
 	DP(data) {
+		const rescaling = {
+			minmax:'MinMaxScaler',
+			normalize:'Normalizer',
+			quantile_transformer:'QuantileTransformer',
+			robust_scaler:'RobustScaler',
+			standardize:'StandardScaler',
+			none:'No Scaling',
+		}[data['rescaling:__choice__']];
+		
+		const { featureLabel } = this.props.model;
+		const { colType } = this.props.projectStore.project;
+		
+		const variables = featureLabel.filter(itm=>colType[itm] === "Categorical");
+		
 		return <dl>
-			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'One hot encoding')}
-			{this.list(data, 'rescaling:', 'Rescaling')}
-			{this.list(data, 'imputation:', 'Imputation')}
-			{this.list(data, 'balancing:', 'Banlance')}
+			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
+			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd>variables:{variables.join(',')}</dd>}
+			
+			{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}
+			<dt>Banlance:{data['balancing:strategy']}</dt>
+			{this.list(data, `rescaling:${data['rescaling:__choice__']}:`, `Rescaling:${rescaling}`)}
 		</dl>
 	}
 
 	FP(data) {
 		const name = data['preprocessor:__choice__'];
 		const types = {
-			'extra_trees_preproc_for_classification': 'extreml.rand.trees.prepr.',
-			'extra_trees_preproc_for_regression': 'extreml.rand.trees.prepr.',
-			'fast_ica': 'ICA',
-			'feature_agglomeration': 'Feature Agglomeration',
-			'kernel_pca': 'kernel PCA',
-			'kitchen_sinks': 'Kitchen Sinks',
+			'extra_trees_preproc_for_classification': 'SelectFeature_ExtraTreesClassifier',
+			'extra_trees_preproc_for_regression': 'SelectFeature_ExtraTreesRegressor',
+			'fast_ica': 'FastICA',
+			'feature_agglomeration': 'FeatureAgglomeration',
+			'kernel_pca': 'KernelPCA',
+			'kitchen_sinks': 'kernel_approximation_RBFSampler',
 			'linear_svc_preprocessor': 'Linear SVM prepr.',
 			'no_preprocessor': 'No Preprocessing',
-			'no_preprocessing': 'No Preprocessing',
-			'nystroem_sampler': 'Nystroem Sampler',
+			'no_preprocessing': 'No Feature Preprocessing',
+			'nystroem_sampler': 'kernel_approximation_Nystroem',
 			'pca': 'PCA',
-			'polynomial': 'Polynomial',
-			'random_trees_embedding': 'Random Trees embed.',
-			'select_percentile_classification': 'Select Percentile',
-			'select_percentile_regression': 'Select Percentile',
-			'select_rates': 'Select Rates',
-			'liblinear_svc_preprocessor':'Liblinear Svc Preprocessor'
+			'polynomial': 'PolynomialFeatures',
+			'random_trees_embedding': 'RandomTreesEmbedding',
+			'select_percentile_classification': 'SelectPercentile',
+			'select_percentile_regression': 'SelectPercentile',
+			'select_rates': 'GenericUnivariateSelect',
+			'liblinear_svc_preprocessor':'SelectFeature_liblinear_svc',
+			'truncatedSVD':'TruncatedSVD',
 		};
 
 		return <dl>

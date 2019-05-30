@@ -993,7 +993,13 @@ const ZH_LAN: any = {
   ClusterInfReason: '该指标数值溢出',
   DataQualityFixing:'数据质量修复',
   none:'无',
-
+  VarianceExplained:'方差解释比例',
+  PC:'主成分',
+  Eigenvalue:'特征根',
+  ComulatedProportion:'累计解释百分比',
+  Choose2PCs:'请选择两个主成分',
+  PCSTitle:'原始变量和主成分的相关性：',
+  ScatterPlotOfPCs:'主成分散点图：',
 };
 
 export default ZH_LAN;
