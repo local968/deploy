@@ -1116,7 +1116,9 @@ const EN_LAN = {
   Replacewithlower: 'Replace with lower',
   Replacewithupper: 'Replace with upper',
   Pleaseinputsomecontentsforthesubmissio: 'Please input some contents for the submission.',
-  ClusterInfReason: 'the value of this metric is overflow'
+  ClusterInfReason: 'the value of this metric is overflow',
+  DataQualityFixing:'Data Quality Fixing',
+  none:'None',
 };
 
 

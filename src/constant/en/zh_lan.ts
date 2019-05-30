@@ -985,7 +985,9 @@ const ZH_LAN: any = {
   Replacewithlower: '替换为下界',
   Replacewithupper: '替换为上界',
   Pleaseinputsomecontentsforthesubmissio:'请输入提交的内容。',
-  ClusterInfReason: '该指标数值溢出'
+  ClusterInfReason: '该指标数值溢出',
+  DataQualityFixing:'数据质量修复',
+  none:'无',
 };
 
 export default ZH_LAN;
