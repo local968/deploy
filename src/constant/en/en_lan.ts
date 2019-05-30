@@ -1012,6 +1012,7 @@ const EN_LAN = {
   robustscale: 'robust_scale',
   FromSQL: 'From SQL',
   ProjectReport: 'Project Report',
+  standardscale: 'Standard Scale',
   Hostname: 'Hostname',
   Port: 'Port',
   DatabaseType: 'Database Type',
@@ -1116,10 +1117,17 @@ const EN_LAN = {
   ClusterReason: 'Since all your data predicted by this model belongs to one cluster, the metrics can not be computed.',
   Replacewithlower: 'Replace with lower',
   Replacewithupper: 'Replace with upper',
-  Pleaseinputsomecontentsforthesubmissio: 'Please input some contents for the submission.',
+
+  Pleaseinputsomecontentsforthesubmissio:'Please input some contents for the submission.',
+  Variablename:'variable name',
+  formula:'formula',
+  Exportmodelresults:'Export model results',
+
+
   ClusterInfReason: 'the value of this metric is overflow',
   DataQualityFixing:'Data Quality Fixing',
   none:'None',
+
 };
 
 

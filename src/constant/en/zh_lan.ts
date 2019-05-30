@@ -985,10 +985,16 @@ const ZH_LAN: any = {
   ClusterReason: '您的数据在该模型上的预测类别数为1类，故不显示度量指标。',
   Replacewithlower: '替换为下界',
   Replacewithupper: '替换为上界',
-  Pleaseinputsomecontentsforthesubmissio: '请输入提交的内容。',
+  Pleaseinputsomecontentsforthesubmissio:'请输入提交的内容。',
+
+  Variablename:'变量名称',
+  formula:'公式',
+  Exportmodelresults:'导出模型结果',
+
   ClusterInfReason: '该指标数值溢出',
-  DataQualityFixing: '数据质量修复',
-  none: '无',
+  DataQualityFixing:'数据质量修复',
+  none:'无',
+
 };
 
 export default ZH_LAN;

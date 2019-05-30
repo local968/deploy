@@ -3,10 +3,15 @@ import styles from "./styles.module.css";
 import {Tree, Input, message, Tabs, Icon} from "antd";
 import {observable, action, toJS} from "mobx";
 import {observer, inject} from "mobx-react";
-import Article from './articleCH';
+import ArticleCH from './articleCH';
+import Article from './article';
 import classnames from "classnames";
 import axios from "axios"
 import EN from '../../constant/en';
+import config from 'config'
+
+const is_EN = config.isEN;
+
 
 const {TreeNode, DirectoryTree} = Tree;
 const TextArea = Input.TextArea
@@ -152,7 +157,7 @@ export default class Support extends Component {
     const {email, type, text} = toJS(_data)
     const typeText = (type === 1 && 'Bug') || (type === 2 && 'Feature') || (type === 3 && 'Question') || ''
     if (!typeText) return
-    if (!text)  return message.info(EN.Pleaseinputsomecontentsforthesubmissio)
+    if (!text) return message.info(EN.Pleaseinputsomecontentsforthesubmissio)
     if (!email) return
     axios.post("/user/report", {type: typeText, text, email}).then(res => {
       if (res.status === 200) {
@@ -169,6 +174,12 @@ export default class Support extends Component {
   render() {
     const selectedKeys = toJS(_data.selectedKeys);
     const expandedKeys = toJS(_data.expandedKeys);
+
+    const Articles = is_EN ? <Article
+      changeSelectedKeys={this.changeSelectedKeys}
+    /> : <ArticleCH
+      changeSelectedKeys={this.changeSelectedKeys}
+    />
     return (
       <section style={{width: "100%", background: '#fff'}}>
         <div className={styles.main}>
@@ -323,13 +334,12 @@ export default class Support extends Component {
           <div className={styles.content}>
             {
               this.props.userStore.tabKey === '1' ?
-                <Article
-                  changeSelectedKeys={this.changeSelectedKeys}
-                /> :
-                <video ref={child => this.videoChange = child} className={styles.tabVideo} controls={true} autobuffer="true">
+                Articles :
+                <video ref={child => this.videoChange = child} className={styles.tabVideo} controls={true}
+                       autobuffer="true">
                   <source
                     ref={child => this.sourceChange = child}
-                    src={isEN ? require('./resource/English_video.mp4') : require('./resource/Chinese_video.mp4')}
+                    src={is_EN ? require('./resource/English_video.mp4') : require('./resource/Chinese_video.mp4')}
                     type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'/>
                 </video>
             }

@@ -18,6 +18,7 @@ import AddIcon from '@material-ui/icons/Add';
 import {Exp, Coordinate, Type} from './model/Coordinate';
 import Expression from './Expression'
 import _ from 'lodash'
+import EN from '../../constant/en'
 // import functions from './functions'
 // import variables from './variable'
 
@@ -213,9 +214,9 @@ function Expressions(props: ExpressionsProps) {
     className={classes.list}
     subheader={<ListSubheader>
       <form className={classes.form}>
-        <ListItemText className={classes.label} primary='变量名称' primaryTypographyProps={{align: 'left'}}/>
+        <ListItemText className={classes.label} primary={EN.Variablename} primaryTypographyProps={{align: 'left'}}/>
         <ListItemText className={classes.text} primary=' '/>
-        <ListItemText primary='公式' primaryTypographyProps={{align: 'left'}}/>
+        <ListItemText primary={EN.formula} primaryTypographyProps={{align: 'left'}}/>
       </form>
     </ListSubheader>}>
     {exps.map((exp: Exp, k: number) => <ListItem key={k} selected={k === index} onClick={(e) => selectOne(k)(e)}>
