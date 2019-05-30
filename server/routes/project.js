@@ -963,7 +963,7 @@ wss.register('train', async (message, socket, progress) => {
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl)
         const stats = await getProjectField(projectId, 'stats')
         await createOrUpdate(projectId, userId, { trainModel: null })
-        const modelData = { ...result, ...chartData, stats }
+        const modelData = { ...result, ...chartData, stats, featureLabel: data.featureLabel }
         if (message.problemType) modelData.problemType = message.problemType
         if (message.standardType) modelData.standardType = message.standardType
         if (modelData.rate) modelData.initRate = modelData.rate
@@ -994,6 +994,7 @@ wss.register('train', async (message, socket, progress) => {
       train2Finished: true,
       train2ing: false,
       train2Error: false,
+      trainModel: null,
       selectId: '',
       stopId: ''
     }

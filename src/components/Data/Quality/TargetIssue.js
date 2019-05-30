@@ -77,11 +77,13 @@ export class ClassificationTarget extends Component {
   render() {
     const { backToConnect, backToSchema, editTarget, project } = this.props
     const { targetArrayTemp, totalRawLines, renameVariable, targetCounts } = project
-    const error = Object.keys(targetCounts).length < 2
-    const isGood = Object.keys(targetCounts).length === 2
+    const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length < 2
+    const isMore = Object.keys(targetCounts).length > 2
+    const isGood = targetArrayTemp.length === 2 || (!isLess && !isMore)
     const hasNull = !isGood && Object.keys(targetCounts).includes('')
+    const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas} ${error ? EN.Less : EN.More} ${EN.Thantwouniquealues}`
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas} ${isLess ? EN.Less : EN.More} ${EN.Thantwouniquealues}`
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -93,7 +95,7 @@ export class ClassificationTarget extends Component {
         })}>
           <div className={styles.targetTitleLabel}><span>{EN.TargetValues}</span></div>
           <div className={styles.targetPercentBox}>
-            {Object.keys(targetCounts).filter(_k => _k !== '').map((v, k) => {
+            {Object.keys(targetCounts).filter(_k => isGood || _k !== '').map((v, k) => {
               const percent = (targetCounts[v] || 0) / (totalRawLines || 1) * 85
               const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
               const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
@@ -538,8 +540,9 @@ export class FixIssue extends Component {
 
   nullSelect = (key, e) => {
     let value = e.target.value
+    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
     const { missing } = this.fillMethod
-    missing[key] = isNaN(value) ? value : parseFloat(value)
+    missing[key] = value === 'others' ? '' : value
     this.fillMethod.missing = { ...missing }
     // const { nullFillMethodTemp } = this.props.project
     // nullFillMethodTemp[key] = value
@@ -548,8 +551,9 @@ export class FixIssue extends Component {
 
   mismatchSelect = (key, e) => {
     let value = e.target.value
+    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
     const { mismatch } = this.fillMethod
-    mismatch[key] = isNaN(value) ? value : parseFloat(value)
+    mismatch[key] = value === 'others' ? '' : value
     this.fillMethod.mismatch = { ...mismatch }
     // const { mismatchFillMethodTemp } = this.props.project
     // mismatchFillMethodTemp[key] = value
@@ -558,8 +562,9 @@ export class FixIssue extends Component {
 
   outlierSelect = (key, e) => {
     let value = e.target.value
+    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
     const { outlier } = this.fillMethod
-    outlier[key] = isNaN(value) ? value : parseFloat(value)
+    outlier[key] = value === 'others' ? '' : value
     this.fillMethod.outlier = { ...outlier }
     // const { outlierFillMethodTemp } = this.props.project
     // outlierFillMethodTemp[key] = value
@@ -646,21 +651,46 @@ export class FixIssue extends Component {
                 if (showType !== 'Numerical') return null
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
-                const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
+                const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : rawDataView[k].mode)
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
+                const mismatchArray = showType === 'Categorical' ? [{
+                  value: 'mode',
+                  label: EN.Replacewithmostfrequentvalue
+                }, {
+                  value: 'drop',
+                  label: EN.Deletetherows
+                }, {
+                  value: 'ignore',
+                  label: EN.Replacewithauniquevalue
+                }] : [{
+                  value: 'mean',
+                  label: EN.Replacewithmeanvalue
+                }, {
+                  value: 'drop',
+                  label: EN.Deletetherows
+                }, {
+                  value: 'min',
+                  label: EN.Replacewithminvalue
+                }, {
+                  value: 'max',
+                  label: EN.Replacewithmaxvalue
+                }, {
+                  value: 'median',
+                  label: EN.Replacewithmedianvalue
+                }, {
+                  value: 'zero',
+                  label: EN.ReplaceWith0
+                }, {
+                  value: 'others',
+                  label: EN.Replacewithothers
+                }]
                 const method = this.fillMethod.mismatch.hasOwnProperty(k) ?
                   this.fillMethod.mismatch[k] :
                   mismatchFillMethodTemp.hasOwnProperty(k) ?
                     mismatchFillMethodTemp[k] :
-                    (showType === 'Categorical' ? mode : mean)
-                const showMethod = (showType !== 'Categorical' &&
-                  method !== mean &&
-                  method !== 'drop' &&
-                  method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
-                  method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
-                  method !== median &&
-                  method !== 0) ? '' : method
+                    (showType === 'Categorical' ? 'mode' : 'mean')
+                const isOthers = !mismatchArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span title={k}>{k}</span></div>
                   <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
@@ -669,25 +699,57 @@ export class FixIssue extends Component {
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
-                    <select value={showMethod} onChange={this.mismatchSelect.bind(null, k)}>
-                      {showType === 'Categorical' ? [
-                        <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
-                        <option value="drop" key="drop">{EN.Deletetherows}</option>,
-                        <option value="ignore" key="ignore">{EN.Replacewithauniquevalue}</option>
-                      ] : [
-                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
-                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
-                          // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
-                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
-                          <option value={''} key='others'>{EN.Replacewithothers}</option>
-                        ]}
+                    <select value={isOthers ? 'others' : method} onChange={this.mismatchSelect.bind(null, k)}>
+                      {mismatchArray.map(item => {
+                        return <option value={item.value} key={item.value}>{item.label}</option>
+                      })}
                     </select>
-                    {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
+                    {isOthers && <NumberInput value={method} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
                   </div>
                 </div>
+
+                // const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
+                // const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
+                // const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
+                // const method = this.fillMethod.mismatch.hasOwnProperty(k) ?
+                //   this.fillMethod.mismatch[k] :
+                //   mismatchFillMethodTemp.hasOwnProperty(k) ?
+                //     mismatchFillMethodTemp[k] :
+                //     (showType === 'Categorical' ? mode : mean)
+                // const showMethod = (showType !== 'Categorical' &&
+                //   method !== mean &&
+                //   method !== 'drop' &&
+                //   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
+                //   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
+                //   method !== median &&
+                //   method !== 0) ? '' : method
+                // return <div className={styles.fixesRow} key={i}>
+                //   <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span title={k}>{k}</span></div>
+                //   <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
+                //   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
+                //   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
+                //     <select value={showMethod} onChange={this.mismatchSelect.bind(null, k)}>
+                //       {showType === 'Categorical' ? [
+                //         <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
+                //         <option value="drop" key="drop">{EN.Deletetherows}</option>,
+                //         <option value="ignore" key="ignore">{EN.Replacewithauniquevalue}</option>
+                //       ] : [
+                //           <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                //           <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                //           <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                //           <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
+                //           // <option value={mode} key='mode'>Replace with most frequent value</option>,
+                //           <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                //           <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                //           <option value={''} key='others'>{EN.Replacewithothers}</option>
+                //         ]}
+                //     </select>
+                //     {showMethod === '' && <NumberInput value={method} onBlur={this.handleInput.bind(null, 'mismatch', k)} />}
+                //   </div>
+                // </div>
               })}
             </div>
           </div>
@@ -726,18 +788,43 @@ export class FixIssue extends Component {
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
+                const nullArray = showType === 'Categorical' ? [{
+                  value: 'mode',
+                  label: EN.Replacewithmostfrequentvalue
+                }, {
+                  value: 'drop',
+                  label: EN.Deletetherows
+                }, {
+                  value: 'ignore',
+                  label: EN.Replacewithauniquevalue
+                }] : [{
+                  value: 'mean',
+                  label: EN.Replacewithmeanvalue
+                }, {
+                  value: 'drop',
+                  label: EN.Deletetherows
+                }, {
+                  value: 'min',
+                  label: EN.Replacewithminvalue
+                }, {
+                  value: 'max',
+                  label: EN.Replacewithmaxvalue
+                }, {
+                  value: 'median',
+                  label: EN.Replacewithmedianvalue
+                }, {
+                  value: 'zero',
+                  label: EN.ReplaceWith0
+                }, {
+                  value: 'others',
+                  label: EN.Replacewithothers
+                }]
                 const method = this.fillMethod.missing.hasOwnProperty(k) ?
                   this.fillMethod.missing[k] :
                   nullFillMethodTemp.hasOwnProperty(k) ?
                     nullFillMethodTemp[k] :
-                    (showType === 'Categorical' ? mode : mean)
-                const showMethod = (showType !== 'Categorical' &&
-                  method !== mean &&
-                  method !== 'drop' &&
-                  method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
-                  method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
-                  method !== median &&
-                  method !== 0) ? '' : method
+                    (showType === 'Categorical' ? 'mode' : 'mean')
+                const isOthers = !nullArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span title={k}>{k}</span></div>
                   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
@@ -751,25 +838,63 @@ export class FixIssue extends Component {
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
-                    <select value={showMethod} onChange={this.nullSelect.bind(null, k)}>
-                      {showType === 'Categorical' ? [
-                        <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
-                        <option value="drop" key="drop">{EN.Deletetherows}</option>,
-                        <option value='ignore' key='ignore'>{EN.Replacewithauniquevalue}</option>
-                      ] : [
-                          <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
-                          <option value="drop" key='drop'>{EN.Deletetherows}</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
-                          <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
-                          // <option value={mode} key='mode'>Replace with most frequent value</option>,
-                          <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
-                          <option value={0} key={0}>{EN.ReplaceWith0}</option>,
-                          <option value={''} key='others'>{EN.Replacewithothers}</option>
-                        ]}
+                    <select value={isOthers ? 'others' : method} onChange={this.nullSelect.bind(null, k)}>
+                      {nullArray.map(item => {
+                        return <option value={item.value} key={item.value}>{item.label}</option>
+                      })}
                     </select>
-                    {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'missing', k)} />}
+                    {isOthers && <NumberInput value={method} onBlur={this.handleInput.bind(null, 'missing', k)} />}
                   </div>
                 </div>
+
+
+                // const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : (rawDataView[k].mode === 'nan' ? (rawDataView[k].modeNotNull || [])[1] : rawDataView[k].mode))
+                // const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
+                // const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
+                // const method = this.fillMethod.missing.hasOwnProperty(k) ?
+                //   this.fillMethod.missing[k] :
+                //   nullFillMethodTemp.hasOwnProperty(k) ?
+                //     nullFillMethodTemp[k] :
+                //     (showType === 'Categorical' ? mode : mean)
+                // const showMethod = (showType !== 'Categorical' &&
+                //   method !== mean &&
+                //   method !== 'drop' &&
+                //   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
+                //   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
+                //   method !== median &&
+                //   method !== 0) ? '' : method
+                // return <div className={styles.fixesRow} key={i}>
+                //   <div className={styles.fixesCell}><span title={k}>{k}</span></div>
+                //   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
+                //     <option value='none' key="none">{EN.Idonknow}</option>
+                //     <option value="blank" key="blank">{EN.Leftblankonpurpose}</option>
+                //     <option value='fail' key='fail'>{EN.FailedtoCollectorDataError}</option>
+                //   </select></div>
+                //   <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
+                //   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
+                //   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
+                //     <select value={showMethod} onChange={this.nullSelect.bind(null, k)}>
+                //       {showType === 'Categorical' ? [
+                //         <option value={mode} key="mode">{EN.Replacewithmostfrequentvalue}</option>,
+                //         <option value="drop" key="drop">{EN.Deletetherows}</option>,
+                //         <option value='ignore' key='ignore'>{EN.Replacewithauniquevalue}</option>
+                //       ] : [
+                //           <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>,
+                //           <option value="drop" key='drop'>{EN.Deletetherows}</option>,
+                //           <option value={!rawDataView ? 'N/A' : rawDataView[k].min} key='min'>{EN.Replacewithminvalue}</option>,
+                //           <option value={!rawDataView ? 'N/A' : rawDataView[k].max} key='max'>{EN.Replacewithmaxvalue}</option>,
+                //           // <option value={mode} key='mode'>Replace with most frequent value</option>,
+                //           <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>,
+                //           <option value={0} key={0}>{EN.ReplaceWith0}</option>,
+                //           <option value={''} key='others'>{EN.Replacewithothers}</option>
+                //         ]}
+                //     </select>
+                //     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'missing', k)} />}
+                //   </div>
+                // </div>
               })}
             </div>
           </div>
@@ -810,19 +935,30 @@ export class FixIssue extends Component {
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet, 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median
+                const outlierArray = [{
+                  value: 'ignore',
+                  label: EN.DoNothing
+                }, {
+                  value: 'drop',
+                  label: EN.Deletetherows
+                }, {
+                  value: 'mean',
+                  label: EN.Replacewithmeanvalue
+                }, {
+                  value: 'median',
+                  label: EN.Replacewithmedianvalue
+                }, {
+                  value: 'zero',
+                  label: EN.ReplaceWith0
+                }, {
+                  value: 'others',
+                  label: EN.Replacewithothers
+                }]
                 const method = this.fillMethod.outlier.hasOwnProperty(k) ?
                   this.fillMethod.outlier[k] :
                   outlierFillMethodTemp.hasOwnProperty(k) ?
-                    outlierFillMethodTemp[k] :
-                    'ignore'
-                const showMethod = (showType !== 'Categorical' &&
-                  method !== mean &&
-                  method !== 'drop' &&
-                  method !== 'ignore' &&
-                  method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
-                  method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
-                  method !== median &&
-                  method !== 0) ? '' : method;
+                    outlierFillMethodTemp[k] : 'ignore'
+                const isOthers = !outlierArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
                   <div className={styles.fixesCell}><span title={k}>{k}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
@@ -835,18 +971,54 @@ export class FixIssue extends Component {
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)} >{this.formatCell(mean)}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
-                    <select value={showMethod} onChange={this.outlierSelect.bind(null, k)}>
-                      <option value="ignore" key='ignore'>{EN.DoNothing}</option>
-                      <option value="drop" key='drop'>{EN.Deletetherows}</option>
-                      <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>
-                      <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>
-                      {/* <option value={mode} key='mode'>Replace with most frequent value</option> */}
-                      <option value={0} key='0'>{EN.ReplaceWith0}</option>,
-                      <option value={''} key='others'>{EN.Replacewithothers}</option>
+                    <select value={isOthers ? 'others' : method} onChange={this.outlierSelect.bind(null, k)}>
+                      {outlierArray.map(item => {
+                        return <option value={item.value} key={item.value}>{item.label}</option>
+                      })}
                     </select>
-                    {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
+                    {isOthers && <NumberInput value={method} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
                   </div>
                 </div>
+
+                // const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
+                // const median = !rawDataView ? 'N/A' : rawDataView[k].median
+                // const method = this.fillMethod.outlier.hasOwnProperty(k) ?
+                //   this.fillMethod.outlier[k] :
+                //   outlierFillMethodTemp.hasOwnProperty(k) ?
+                //     outlierFillMethodTemp[k] :
+                //     'ignore'
+                // const showMethod = (showType !== 'Categorical' &&
+                //   method !== mean &&
+                //   method !== 'drop' &&
+                //   method !== 'ignore' &&
+                //   method !== (!rawDataView ? 'N/A' : rawDataView[k].min) &&
+                //   method !== (!rawDataView ? 'N/A' : rawDataView[k].max) &&
+                //   method !== median &&
+                //   method !== 0) ? '' : method;
+                // return <div className={styles.fixesRow} key={i}>
+                //   <div className={styles.fixesCell}><span title={k}>{k}</span></div>
+                //   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
+                //     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
+                //       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
+                //     </span><span className={styles.fixesEdit} onClick={this.editRange.bind(this, k, project.etlIndex)}>{EN.Edit}</span>
+                //   </div>
+                //   <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
+                //   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(mean)} >{this.formatCell(mean)}</span></div>
+                //   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
+                //   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
+                //     <select value={showMethod} onChange={this.outlierSelect.bind(null, k)}>
+                //       <option value="ignore" key='ignore'>{EN.DoNothing}</option>
+                //       <option value="drop" key='drop'>{EN.Deletetherows}</option>
+                //       <option value={mean} key='mean'>{EN.Replacewithmeanvalue}</option>
+                //       <option value={median} key='median'>{EN.Replacewithmedianvalue}</option>
+                //       {/* <option value={mode} key='mode'>Replace with most frequent value</option> */}
+                //       <option value={0} key='0'>{EN.ReplaceWith0}</option>,
+                //       <option value={''} key='others'>{EN.Replacewithothers}</option>
+                //     </select>
+                //     {showMethod === '' && <NumberInput value={method || ''} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
+                //   </div>
+                // </div>
               })}
             </div>
           </div>

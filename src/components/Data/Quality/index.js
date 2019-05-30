@@ -70,7 +70,7 @@ class TargetIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin } = project;
+    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
     const isNum = colType[target] === 'Numerical'
@@ -83,7 +83,7 @@ class TargetIssue extends Component {
       outlier: outlierCount === 0 ? 0 : (outlierCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(outlierCount * 100 / (totalRawLines || 1), 2)
     }
     const warnings = []
-    const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
+    const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
     if (problemType === 'Classification') {
       if (unique < 2) warnings.push(EN.Yourtargetvariablehaslessthantwouniquevalues)
       if (unique === 2) {

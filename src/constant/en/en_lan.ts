@@ -1116,10 +1116,17 @@ const EN_LAN = {
   ClusterReason: 'Since all your data predicted by this model belongs to one cluster, the metrics can not be computed.',
   Replacewithlower: 'Replace with lower',
   Replacewithupper: 'Replace with upper',
+
   Pleaseinputsomecontentsforthesubmissio:'Please input some contents for the submission.',
   Variablename:'variable name',
   formula:'formula',
   Exportmodelresults:'Export model results',
+
+
+  ClusterInfReason: 'the value of this metric is overflow',
+  DataQualityFixing:'Data Quality Fixing',
+  none:'None',
+
 };
 
 

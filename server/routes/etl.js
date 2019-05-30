@@ -113,19 +113,43 @@ wss.register('newEtl', async (message, socket, process) => {
   for (let key in stats) {
     const mismatch = project.mismatchFillMethod[key]
     const value = project.colType[key] === 'Numerical' ? project.rawDataView[key].mean : project.rawDataView[key].mode
-    if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
-    else if ((mismatch || mismatch === 0) && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
-    else stats[key].mismatchFillMethod = { type: 'replace', value }
+    if (!isNaN(parseFloat(mismatch))) {
+      stats[key].mismatchFillMethod = parseFloat(mismatch)
+    } else {
+      if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
+      else if (mismatch === 'zero') stats[key].mismatchFillMethod = { type: 'replace', value: 0 }
+      else if (mismatch && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: project.rawDataView[key][mismatch] }
+      else stats[key].mismatchFillMethod = { type: 'replace', value }
+    }
+    // if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
+    // else if ((mismatch || mismatch === 0) && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
+    // else stats[key].mismatchFillMethod = { type: 'replace', value }
 
     const missingValue = project.nullFillMethod[key]
-    if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
-    else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
-    else if ((missingValue || missingValue === 0) && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
-    else stats[key].missingValueFillMethod = { type: 'replace', value }
+    if (!isNaN(parseFloat(missingValue))) {
+      stats[key].missingValueFillMethod = parseFloat(missingValue)
+    } else {
+      if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
+      else if (missingValue === 'zero') stats[key].missingValueFillMethod = { type: 'replace', value: 0 }
+      else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
+      else if (missingValue) stats[key].missingValueFillMethod = { type: 'replace', value: project.rawDataView[key][missingValue] }
+      else stats[key].missingValueFillMethod = { type: 'replace', value }
+    }
+    // if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
+    // else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
+    // else if ((missingValue || missingValue === 0) && missingValue !== 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: missingValue }
+    // else stats[key].missingValueFillMethod = { type: 'replace', value }
 
     const outlier = project.outlierFillMethod[key]
-    if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
-    else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
+    if (!isNaN(parseFloat(outlier))) {
+      stats[key].outlierFillMethod = parseFloat(outlier)
+    } else {
+      if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
+      else if (outlier === 'zero') stats[key].outlierFillMethod = { type: 'replace', value: 0 }
+      else if (outlier && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: project.rawDataView[key][outlier] }
+    }
+    // if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
+    // else if ((outlier || outlier === 0) && outlier !== 'ignore') stats[key].outlierFillMethod = { type: 'replace', value: outlier }
 
     const range = project.outlierDictTemp[key]
     if (range && range.length && range.length === 2) {

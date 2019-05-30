@@ -270,7 +270,7 @@ router.get('/download/outlier', async (req, res) => {
         const row = results.data[0]
         if (!resultHeader) {
           resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no' && key !== 'decision_index')
-          res.write(Papa.unparse([[...resultHeader, 'label'], []], { header: false }))
+          res.write(Papa.unparse([[...resultHeader, 'predict_label'], []], { header: false }))
         }
         const nos = Object.keys(temp)
         const _start = Math.min(...nos, row['__no'])

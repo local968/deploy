@@ -61,7 +61,7 @@ export default function PAW(props){
 		fetchData();
 	}, []);
 	
-	const {corrData=[],ve=[],pcaData=[],predicts} = data;
+	const {corrData=[],ve=[],pcaData=[],predicts,fields} = data;
 	
 	useEffect(() => {
 		setPcsD(setPcsData(corrData));
@@ -115,11 +115,11 @@ export default function PAW(props){
 			</div>
 			<dl>
 				<dt>
-					{/*The Correlation between PCs and original variables:*/}
 					<PCS
 						 data={pcsD}
 					     x_name = {'PC'+(pcs[0]+1)}
 					     y_name = {'PC'+(pcs[1]+1)}
+						 fields = {fields}
 					/>
 				</dt>
 				<dd>
