@@ -1011,6 +1011,7 @@ const EN_LAN = {
   robustscale: 'robust_scale',
   FromSQL: 'From SQL',
   ProjectReport: 'Project Report',
+  standardscale: 'Standard Scale',
   Hostname: 'Hostname',
   Port: 'Port',
   DatabaseType: 'Database Type',
@@ -1116,6 +1117,9 @@ const EN_LAN = {
   Replacewithlower: 'Replace with lower',
   Replacewithupper: 'Replace with upper',
   Pleaseinputsomecontentsforthesubmissio:'Please input some contents for the submission.',
+  Variablename:'variable name',
+  formula:'formula',
+  Exportmodelresults:'Export model results',
 };
 
 

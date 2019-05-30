@@ -174,10 +174,10 @@ function ModelResult(props) {
         <span>导出模型结果</span>
       </button>} */}
       {problemType === 'Clustering' && <a href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
-        <span>{'导出模型结果'}</span>
+        <span>{EN.Exportmodelresults}</span>
       </button></a>}
       {problemType === 'Outlier' && <a href={`/upload/download/outlier?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&rate=${formatNumber(selectModel.rate)}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
-        <span>{'导出模型结果'}</span>
+        <span>{EN.Exportmodelresults}</span>
       </button></a>}
     </div>
     {downloading && <ProcessLoading style={{ position: 'fixed' }} />}

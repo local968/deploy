@@ -985,6 +985,9 @@ const ZH_LAN: any = {
   Replacewithlower: '替换为下界',
   Replacewithupper: '替换为上界',
   Pleaseinputsomecontentsforthesubmissio:'请输入提交的内容。',
+  Variablename:'变量名称',
+  formula:'公式',
+  Exportmodelresults:'导出模型结果',
 };
 
 export default ZH_LAN;
