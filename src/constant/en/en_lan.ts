@@ -1134,6 +1134,7 @@ const EN_LAN = {
   Choose2PCs:'Choose 2 PCs',
   PCSTitle:'The Correlation between PCs and original variables:',
   ScatterPlotOfPCs:'ScatterPlot of PCs:',
+  FeatureCreationSelection:'Feature Creation & Selection',
 };
 
 

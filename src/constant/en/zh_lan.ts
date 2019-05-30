@@ -1001,6 +1001,8 @@ const ZH_LAN: any = {
   Choose2PCs:'请选择两个主成分',
   PCSTitle:'原始变量和主成分的相关性：',
   ScatterPlotOfPCs:'主成分散点图：',
+  FeatureCreationSelection:'新建特征与特征选择',
+
 };
 
 export default ZH_LAN;

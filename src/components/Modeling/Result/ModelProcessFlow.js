@@ -52,7 +52,7 @@ export default class ModelProcessFlow extends Component {
 		
 		return <dl>
 			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
-			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd>variables:{variables.join(',')}</dd>}
+			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd title={variables.join(',')}>variables:<label>{variables.join(',')}</label></dd>}
 			
 			{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}
 			<dt>Banlance:{data['balancing:strategy']}</dt>
@@ -121,23 +121,24 @@ export default class ModelProcessFlow extends Component {
 		</dl>
 	}
 	DQFData(data,title){
+		const { colType } = this.props.projectStore.project;
 		const values = Object.entries(data);
-		const mismatchArray = [{
+		const mismatchArray =  [{
 			value: 'mode',
 			label: EN.Replacewithmostfrequentvalue
 		}, {
 			value: 'drop',
 			label: EN.Deletetherows
 		}, {
-			value: 'ignore',
+			value: 'ignore',//Categorical
 			label: EN.Replacewithauniquevalue
+		}, {
+			value: 'ignore',
+			label: EN.DoNothing
 		},{
 			value: 'mean',
 			label: EN.Replacewithmeanvalue
-		}, {
-			value: 'drop',
-			label: EN.Deletetherows
-		}, {
+		},{
 			value: 'min',
 			label: EN.Replacewithminvalue
 		}, {
@@ -152,6 +153,12 @@ export default class ModelProcessFlow extends Component {
 		}, {
 			value: 'others',
 			label: EN.Replacewithothers
+		},{
+			value: 'low',
+			label: EN.Replacewithlower
+		}, {
+			value: 'high',
+			label: EN.Replacewithupper
 		}];
 		
 		const result = mismatchArray.map(itm=>({
@@ -161,7 +168,15 @@ export default class ModelProcessFlow extends Component {
 		}));
 
 		values.forEach(itm=>{
-			result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			if(itm[1]!=='ignore'){
+				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			}else{
+				if(itm,colType[itm[0]] === 'Categorical'){
+					result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+				}else{
+					result.filter(it=>it.type === itm[1])[1].data.push(itm[0]);
+				}
+			}
 		});
 		
 		const resu = result.filter(itm=>itm.data&&itm.data.length);
@@ -177,6 +192,38 @@ export default class ModelProcessFlow extends Component {
 		</React.Fragment>
 	}
 	
+	FS(){
+		const { featureLabel } = this.props.model;
+		const {rawHeader,expression } = this.props.projectStore.project;
+		
+		const drop = _.pull(rawHeader,...featureLabel);
+		
+		const create = Object.values(expression).map(itm=>{
+			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
+		});
+		
+		if(!drop.length&&!create.length){
+			return null;
+		}
+		
+		const pop = <dl>
+			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
+				Drop these Variables:<label>{drop.join(',')}</label>
+			</dt>
+			<dt style={{display:(create.length?'':'none')}}>
+				Create these Variables:
+			</dt>
+			{
+				create.map((itm,index)=><dd key={index}>{itm}</dd>)
+			}
+		</dl>;
+		
+		return <React.Fragment>
+			<img src={Next} alt='' />
+			{this.popOver(pop,EN.FeatureCreationSelection)}
+		</React.Fragment>
+		
+	}
 
 	popOver(content, text) {
 		return <Popover
@@ -195,6 +242,7 @@ export default class ModelProcessFlow extends Component {
 				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
 				{this.popOver(this.DQF(),EN.DataQualityFixing)}
+				{this.FS()}
 				<img src={Next} alt='' />
 				{this.popOver(this.DP(dataFlow[0]),  EN.DataPreprocessing)}
 				<img src={Next} alt='' />
@@ -209,6 +257,7 @@ export default class ModelProcessFlow extends Component {
 				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
 				{this.popOver(this.DQF(),EN.DataQualityFixing)}
+				{this.FS()}
 				<img src={Next} alt='' />
 				<dl>
 					{
@@ -236,6 +285,7 @@ export default class ModelProcessFlow extends Component {
 				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
 				{this.popOver(this.DQF(),EN.DataQualityFixing)}
+				{this.FS()}
 				<img src={Next} alt='' />
 		        <label>{str}</label>
 		        <img src={Next} alt='' />
