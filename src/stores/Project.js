@@ -990,7 +990,7 @@ export default class Project {
     if (status !== 200) {
       // 出现错误弹出提示框,需要用户确认
       Modal.error({
-        title: message || result['process error'],
+        title: message || result['processError'],
       });
       this.etling = false
       this.etlProgress = 0
@@ -1051,7 +1051,7 @@ export default class Project {
           const { status, result } = returnValue
           if (status < 0) {
             // this.setProperty({ dataViews: null })
-            return antdMessage.error(result['process error'])
+            return antdMessage.error(result['processError'])
           }
           // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
         })
@@ -1894,7 +1894,7 @@ export default class Project {
         .then(returnValue => {
           const { status, result } = returnValue
           if (status < 0) {
-            return antdMessage.error(result['process error'])
+            return antdMessage.error(result['processError'])
           }
           // this.setProperty({
           //   preImportance: result.preImportance,
@@ -1918,7 +1918,7 @@ export default class Project {
       return api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
         this.correlationMatrixLoading = false
-        if (status < 0) return antdMessage.error(result['process error'])
+        if (status < 0) return antdMessage.error(result['processError'])
         this.correlationMatrixHeader = result.header;
         this.correlationMatrixData = result.data;
       })
@@ -1992,7 +1992,7 @@ export default class Project {
 
   handleError = returnValue => {
     const { result, status, command } = returnValue
-    if (status < 0) antdMessage.error(`command:${command}, error:${result['process error']}`)
+    if (status < 0) antdMessage.error(`command:${command}, error:${result['processError']}`)
   }
 
   getSample = () => {

@@ -108,10 +108,10 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
 //     userId
 //   }, (result) => (result.status < 0 || result.status === 100) ? result : progress(result))
 //     .then(async resp => {
-//       if (resp.result['process error']) return {
+//       if (resp.result['processError']) return {
 //         status: 420,
 //         message: resp.result.msg,
-//         error: resp.result['process error']
+//         error: resp.result['processError']
 //       }
 //       const path = resp.result.csvLocation
 //       const name = resp.result.filename
