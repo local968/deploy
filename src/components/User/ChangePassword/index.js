@@ -22,12 +22,19 @@ class ChangePassword extends Component {
     this.props.userStore.changePassword(this.current, this.newPassword).then(resp => {
       if (resp.data.status === 200) {
         this.props.userStore.status = 'unlogin'
+
+        message.destroy();
         message.info(EN.Passwordchangesucceeded)
       } else {
+
+        message.destroy();
         message.error(resp.data.message)
         console.error(resp.data.error)
       }
-    }, error => message.error(EN.Passwordchangefailed))
+    }, error => {
+      message.destroy();
+      message.error(EN.Passwordchangefailed)
+    })
   }
 
   render() {

@@ -993,6 +993,7 @@ const ZH_LAN: any = {
 
   ClusterInfReason: '该指标数值溢出',
   DataQualityFixing:'数据质量修复',
+  none:'无',
   VarianceExplained:'方差解释比例',
   VarianceExplainedTip:`该表格按照特征根的大小降序排列。主成分的特征根越大，对整个数据的代表能力越强，因而也越重要。一般而言，我们选择累计解释百分比达到0.8及以上的全部主成分即可代表整个数据。<br/>
                         比如：在以下例子中，我们认为选择前三个主成分就经具有足够代表性。<br/>
@@ -1021,6 +1022,34 @@ const ZH_LAN: any = {
   ScatterPlotOfPCs:'主成分散点图：',
   FeatureCreationSelection:'新建特征与特征选择',
   PCAIntro:"PCA（主成分分析）是一种传统的降维方法，可以提取出少数几个具有代表性的主成分作为高维数据的代表。",
+  watchtheinstructionalvideos:'是否观看教学视频？',
+  Dontpromptforthismessage:'不再提示该信息 ',
+  YES:'是',
+  NO:'否',
+  Logconversionofthe2:'以2为底数，对所选变量进行Log转换。',
+  VarContinuousvariablestartingwiththesymbol:'var- 连续变量，以@符号开头。',
+  Description:'说明：',
+  Negativenumbersinvariableswill0:'量中存在负数将被自动替换成0',
+  Logconversionofthe10:'以10为底数，对所选变量进行Log转换。',
+  Logconversionofthee:'以e为底数，对所选变量进行Log转换。',
+  Calculatethenthpoweroftheselectedvariable:'计算所选变量的n次方。',
+  Npositiveornegativeintegerordecimal:'n- 正负整数或小数。',
+  Whenthereturnvalueexceedsthememory:'返回数值超出内存后将用系统默认最大最小值替代。',
+  Comparestwovariablesforequality:'比较两个变量是否相等，相等返回1，不相等返回0。',
+  Var1Adiscretevariable:'var1- 离散变量或连续变量，以@符号开头。',
+  Var2Adiscretevariable:'var2- 离散变量或连续变量，以@符号开头。',
+  Return01result:'返回0/1结果',
+  Whenasinglevariableisentered:'输入单个变量时，返回该变量的总和；输入多个变量时，返回行的总和。',
+  Var1var2var3continuousvariables:'var1, var2, var3, ….- 连续变量，以@符号开头。',
+  Whenasinglevariableisenteredtheminimumvalue:'输入单个变量时，返回该变量的最小值；输入多个变量时，返回行的最小值。',
+  Whenasinglevariableisenteredtheminimumvaluemax:'输入单个变量时，返回该变量的最小值；输入多个变量时，返回行的最大值。',
+  Whenasinglevariableisenteredtheminimumvaluemaxmean:'输入单个变量时，返回该变量的均值；输入多个变量时，返回行的均值。',
+
+
+
+
+
+
 };
 
 export default ZH_LAN;

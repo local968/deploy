@@ -18,6 +18,8 @@ class ResetPassword extends Component {
     super(props)
     this.code = getQueryString('code')
     if (!this.code || this.code === '') {
+
+      message.destroy();
       message.error('Wrong code.')
       props.routing.push('/')
       return
@@ -29,12 +31,18 @@ class ResetPassword extends Component {
   })
 
   submit = () => {
-    if (this.newPassword !== this.repeat) return message.error(EN.Thetwonewpasswords)
+    if (this.newPassword !== this.repeat){
+
+      message.destroy();
+      return message.error(EN.Thetwonewpasswords)
+    }
     this.props.userStore.resetPassword(this.code, this.newPassword).then(resp => {
       if (resp.data.status === 200) {
         this.props.routing.push('/')
         message.success(EN.Passwordresetsuccessed)
       } else {
+
+        message.destroy();
         message.error(resp.data.message)
       }
     })

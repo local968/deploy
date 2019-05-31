@@ -54,7 +54,10 @@ export default class AdvancedView extends Component {
   changeCrossCount = value => {
     const { targetCounts, problemType } = this.props.project
     const crossCountMax = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
-    if (value >= crossCountMax) return message.error(`${EN.Oneoftheclasseshasnumber} ${crossCountMax} ${EN.Pleaseselectalowerfoldcv}`)
+    if (value >= crossCountMax) {
+      message.destroy();
+      return message.error(`${EN.Oneoftheclasseshasnumber} ${crossCountMax} ${EN.Pleaseselectalowerfoldcv}`)
+    }
     this.props.project.crossCount = value;
   }
 
@@ -194,6 +197,7 @@ export default class AdvancedView extends Component {
     Object.entries(defaultSetting).forEach(([key, value]) => {
       project[key] = value
     })
+    message.destroy();
     message.info(EN.YourAdvancedModeling)
   })
 
