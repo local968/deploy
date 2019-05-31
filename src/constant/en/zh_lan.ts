@@ -1024,8 +1024,9 @@ const ZH_LAN: any = {
   Whenasinglevariableisenteredtheminimumvalue:'输入单个变量时，返回该变量的最小值；输入多个变量时，返回行的最小值。',
   Whenasinglevariableisenteredtheminimumvaluemax:'输入单个变量时，返回该变量的最小值；输入多个变量时，返回行的最大值。',
   Whenasinglevariableisenteredtheminimumvaluemaxmean:'输入单个变量时，返回该变量的均值；输入多个变量时，返回行的均值。',
-
-
+  Thisratiowilldetermine:'该比例将决定模型部署结果',
+  normal:'正常',
+  abnormal:'异常',
 
 
 

@@ -160,7 +160,7 @@ const EN_LAN = {
   Unselectpredictorsthatleadtolesswantedmodeling: 'Unselect predictors that lead to less wanted modeling results, they could be:',
   VariableIDs: '1. Variable IDs',
   Variablesthatarederivedfromthetarget: '2. Variables that are derived from the target',
-  Anyothervariablesyou: '3. Any other variables you don\'t need',
+  Anyothervariablesyou: "3. Any other variables you don't need",
   DuplicatedHeader: 'Duplicated NormalHeader',
   AutoHeaderRepair: 'Auto NormalHeader Repair',
   SkipDataQualityCheck: 'Skip Data Quality Check',
@@ -178,7 +178,7 @@ const EN_LAN = {
   /**
    * /app-bff/src/components/Deploy
    */
-  CreatedDate: 'Created Date-',
+  CreatedDate: 'Created Date',
   DeploymentStatus: 'Deployment Status',
   Home: 'Home',
   SortBy: 'Sorted by',
@@ -224,8 +224,8 @@ const EN_LAN = {
   InApp: 'In App',
   DeployFrequency: 'Deploy Frequency:',
   OneTime: 'One Time',
-  Time: 'time:',
-  Times: 'time:',
+  Time: 'time',
+  Times: 'time',
   Redeployevery: 'Redeploy every',
   AutoRepeat: 'Auto Repeat',
   Autodisableifanyissueoccurs: 'Auto disable if any issue occurs',
@@ -283,7 +283,7 @@ const EN_LAN = {
   /**
    * /app-bff/src/components/Home
    */
-  CreateProject: 'Create a New Project-',
+  CreateProject: 'Create a New Project',
   DeleteDialogTitle: 'Delete project confirmation',
   ConfirmOfDeletManyProject: 'Are you sure to delete the following projects',
   Areyousuretodeleteproject: 'Are you sure to delete project',
@@ -321,7 +321,7 @@ const EN_LAN = {
 
 
   Dataset: 'Dataset',
-  Sorrybutyoudonthavetheauthority: 'Sorry but you don\'t have the authority for entering this project.',
+  Sorrybutyoudonthavetheauthority: "Sorry but you don't have the authority for entering this project.",
   Youhavebeenkickedout: 'You have been kicked out',
   GoBacktotheProject: 'Go Back to the Project',
   GotoHomePage: 'Go to Home Page',
@@ -342,7 +342,7 @@ const EN_LAN = {
   Itrepresentsthecompleteness: 'Recall=TP/(TP+FN). It measures the % of positives the classifier labeled as positive. It represents the completeness of the classifier. The higher the recall is the more positives the classifier captures.',
   Manyclassifiersareabletoproduce: 'Cutoff Threshold is a critical probability which divides the prediction results into an event group and non-event group. A prediction result that is larger than the threshold goes into the event group, and a prediction result that is smaller than the threshold goes into the non-event group.',
   TheF1scoreistheharmonicmean: 'The F1-score is the harmonic mean of Precision and Recall, where an F1-score reaches its best value at 1 (perfect precision and recall) and worst at 0.',
-  PrecisionRecall: 'It\'s 2*Precision*Recall / (Precision+Recall).',
+  PrecisionRecall: "It's 2*Precision*Recall / (Precision+Recall).",
   Itmeasureshowmanytruepositivesamong: 'It measures how many true positives among all predicted (including true and false)  positives. It\'s TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.',
   Efficientwaytodetermine: 'KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It\'s calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other.',
   RootMeanSquareError: 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
@@ -491,7 +491,7 @@ const EN_LAN = {
   AdvancedModeling: 'Advanced Modeling',
   Youneedtoselectatleast: 'You need to select at least one algorithm!',
   Setting: 'Setting',
-  PrepareToModel: 'Data looks good now. It\'s time to train your model!',
+  PrepareToModel: "Data looks good now. It's time to train your model!",
   AdvancedVariable: 'Advanced Variable',
 
 
@@ -852,7 +852,7 @@ const EN_LAN = {
   Replacewithothers: 'Replace with others',
   MissingReason: 'Missing Reason',
   QuantityofMissingValue: 'Quantityof Missing Value',
-  Idonknow: "I don`t kno",
+  Idonknow: "I don`t know",
   Leftblankonpurpose: 'Left blank on purpose',
   FailedtoCollectorDataError: 'Failed to Collect or Data Error',
   ValidRange: 'Valid Range',
@@ -1007,7 +1007,7 @@ const EN_LAN = {
   age2freb4: 'age2_fre_b4',
   agecusb3: 'age_cus_b3',
   agecusb4: 'age_cus_b4',
-  ChooseaVariableScalingMethod: 'Choose a Variable Scaling Method:',
+  ChooseaVariableScalingMethod: 'Choose a Variable Scaling Method',
   minmaxscale: 'min_max_scale',
   robustscale: 'robust_scale',
   FromSQL: 'From SQL',
@@ -1159,6 +1159,11 @@ const EN_LAN = {
   Whenasinglevariableisenteredtheminimumvaluemaxmean:'When a single variable is entered, the mean of the variable is returned; when multiple variables are entered, the mean of the row is returned.',
   senior:'R2 custom function',
   base:'Basic function',
+  lidationDataDefinition:'Required variable name',
+  DeploymentOptionText:'Option',
+  Thisratiowilldetermine:'This ratio will determine the model deployment results',
+  normal:'normal',
+  abnormal:'abnormal',
 };
 
 
