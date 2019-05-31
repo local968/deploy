@@ -1090,11 +1090,11 @@ const EN_LAN = {
   Choose2or3Variables: 'Choose 2 or 3 Variables',
   Result: 'Result',
   Ss: 's',
-  ScoreHint: 'It evaluates the performance of the model. In general, a larger value indicates better model performance.',
+  ScoreHint: 'It evaluates the performance of the model. It ranges from 0 and 1. In general, a larger value indicates better model performance.',
   ContaminationRateHint: 'The proportion of anomaly to all data.',
   CVNNHint: 'It evaluates intercluster separation and the intracluster compactness. It ranges from 0 and 2. In general, a smaller value indicates better model performance.',
   TheNumberofClustersHint: 'TheNumberofClustersHint',
-  squaredHint: 'It measures the degree of difference between clusters. It ranges from 0 and 1. In the models with the same number of clusters, a larger value indicates that the model is better.',
+  squaredHint: 'It measures that how much (in percentage) the sample can be separated. It ranges from 0 and 1. In the models with the same number of clusters, a larger value indicates that the model is better.',
   SihouetteScoreHint: 'It validates the clustering performance based on the pairwise difference of between- and within-cluster distances. It ranges from -1 and 1. In general, a larger value indicates better model performance.',
   CHIndexHint: 'It evaluates the cluster validity based on the average between- and within-cluster sum of squares. In general, a larger value indicates better model performance.',
   clustersHint: 'clustersHint',
@@ -1184,6 +1184,11 @@ const EN_LAN = {
   Thisratiowilldetermine:'This ratio will determine the model deployment results',
   normal:'normal',
   abnormal:'abnormal',
+  Scaleseachfeaturetothegivenrange:'Scales each feature to the given range - between zero and one. The Formula is (x - min) / (max - min).',
+  Centereachfeaturetothemean:'Center each feature to the mean and scale to unit variance. The Formula is (x - mean) / std.',
+  Centereachfeaturetothemedian:'Center each feature to the median and  scale according to the interquartile range. The Formula is (x - median) / (75th quantile - 25th quantile).  This method is robust to outliers.',
+  Youcangivehigherweightstofeatures:'You can give higher weights to features that you think are important. The value ranges from 0.1 to 99.9 and the adjustment step is 0.1.',
+
 };
 
 

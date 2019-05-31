@@ -231,7 +231,7 @@ export default class OutlierRange extends PureComponent{
 						},this.setBrush);
 					}}
 				/></div>
-				<div>最大值:<InputNum
+				<div>{EN.Max}:<InputNum
 					min={min}
 					max={max}
 					step={0.01}

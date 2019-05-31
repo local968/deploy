@@ -704,7 +704,7 @@ const ZH_LAN: any = {
   FailedtoCollectorDataError: '数据收集错误',
   ValidRange: '有效范围',
   QuantityofOutlier: '异常值数量',
-  DoNothing: '不处理',
+  DoNothing: '删除整行',
   Apply: '应用',
   Found: '发现问题',
   YourtargetvariableHas: '您的目标变量的类别个数',
@@ -955,11 +955,11 @@ const ZH_LAN: any = {
   Choose2or3Variables: '请选择两个或三个变量',
   Result: '结果',
   Ss: '',
-  ScoreHint: '评估异常值检测模型的参考性评分，分数越高代表模型效果越好。',
+  ScoreHint: '评估异常值检测模型的参考性评分，取值范围为0~1，分数越高代表模型效果越好。',
   ContaminationRateHint: '异常样本占所有数据样本的比例。',
   CVNNHint: '综合考虑聚类类别间紧密度与可分割性的指标，该值范围在0到2之间。一般该值越小说明模型效果越好。',
   TheNumberofClustersHint: 'TheNumberofClustersHint',
-  squaredHint: '样本总体方差与聚类类别内方差和的差值占样本总体方差的比例，该值范围在0到1之间。一般该值越大说明模型效果越好。',
+  squaredHint: '聚类类别间方差占样本总体方差的比例，直观理解是样本在多大程度(百分比)上可以被区分开来。该值范围在0到1之间，在聚类类别数k相同情况下，该值越大说明模型效果越好。',
   SihouetteScoreHint: '样本总体轮廓系数的均值，该值范围在-1到1之间。一般该值越大说明模型效果越好。',
   CHIndexHint: '聚类类别间与聚类类别内分散程度的比值，一般该值越大说明模型效果越好。',
   clustersHint: 'clustersHint',
@@ -967,7 +967,7 @@ const ZH_LAN: any = {
   clusters: '聚类类别',
   ImportantVariables: '重要变量',
   Cluster: '聚类类别',
-  ClusteringHint: '对样本进行分类，把更为相似归为同一类。（例如：客户分群与画像）',
+  ClusteringHint: '对样本进行分类，把*相似样本*归为同一类。（例如：客户分群与画像）',
   OutlierDetectionHint: '识别与其他样本差异过大的低频、可疑样本。（例如：信用卡欺诈行为侦测）',
   ExplainationHint: '展示对每一个聚类类别重要的变量。',
   Doyouwanttotreatnull: '是否把缺失值设置为有效类别？',
@@ -1047,10 +1047,10 @@ const ZH_LAN: any = {
   Thisratiowilldetermine:'该比例将决定模型部署结果',
   normal:'正常',
   abnormal:'异常',
-
-
-
-
+  Scaleseachfeaturetothegivenrange:'将每一个特征标准化到0和1之间，公式为: (x - 最小值) / (最大值 - 最小值)。',
+  Centereachfeaturetothemean:'将每一个特征标准化到均值为0，标准差为1，即服从标准正态分布。公式为: (x - 平均值) / 标准差。',
+  Centereachfeaturetothemedian:'将每一个特征进行如下变换，公式为: (x - 中位数) / (上四分位数 - 下四分位数)。该变换对异常值更为稳健。',
+  Youcangivehigherweightstofeatures:'您可以给您认为重要的变量设置更高的权重。取值范围为0.1~99.9，调节步长为0.1。',
 };
 
 export default ZH_LAN;
