@@ -57,11 +57,12 @@ export default class PCS extends PureComponent{
 			},
 			polar: {},
 			tooltip: {
-				trigger: 'axis',
+				trigger: 'item',
 				showContent:true,
+				triggerOn:'mousemove|click',
 				formatter: function (seriesData) {
-					if(seriesData[0]){
-						const {data,dataIndex} = seriesData[0];
+					if(seriesData){
+						const {data,dataIndex} = seriesData;
 						return `
 									${fields[dataIndex]}<br />
 									x:${data[0].toFixed(3)}<br />
@@ -80,7 +81,9 @@ export default class PCS extends PureComponent{
 				axisLabel:{
 					show:false,
 				},
-				// boundaryGap:[0,0],
+				splitLine:{
+					show:false
+				}
 			},
 			radiusAxis: {
 			},

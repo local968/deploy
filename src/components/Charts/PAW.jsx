@@ -119,7 +119,6 @@ export default function PAW(props){
 			</div>
 			<dl>
 				<dt>
-					{/*<span>{EN.PCSTitle}</span>*/}
 					<PCS
 						 data={pcsD}
 					     x_name = {'PC'+(pcs[0]+1)}
@@ -128,7 +127,6 @@ export default function PAW(props){
 					/>
 				</dt>
 				<dd>
-					{/*<span>{EN.ScatterPlotOfPCs}</span>*/}
 					<TSEN
 						x_name = {'PC'+(pcs[0]+1)}
 						y_name = {'PC'+(pcs[1]+1)}
