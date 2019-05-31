@@ -207,7 +207,8 @@ export default class Home extends Component {
                 <span
                   className={styles.delete}
                   onClick={() => {
-                    deploymentStore.delete(deployment.id);
+                    if (window.confirm('Are you sure to delete this model deployment? This action cannot be recovered.'))
+                      deploymentStore.delete(deployment.id);
                   }}
                 >
                   <Icon type="delete" />
