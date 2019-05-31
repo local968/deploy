@@ -993,16 +993,34 @@ const ZH_LAN: any = {
 
   ClusterInfReason: '该指标数值溢出',
   DataQualityFixing:'数据质量修复',
-  none:'无',
   VarianceExplained:'方差解释比例',
+  VarianceExplainedTip:`该表格按照特征根的大小降序排列。主成分的特征根越大，对整个数据的代表能力越强，因而也越重要。一般而言，我们选择累计解释百分比达到0.8及以上的全部主成分即可代表整个数据。<br/>
+                        比如：在以下例子中，我们认为选择前三个主成分就经具有足够代表性。<br/>
+                        <img src="/VarianceExplainedTip.png" alt=""/>
+                        `,
   PC:'主成分',
   Eigenvalue:'特征根',
   ComulatedProportion:'累计解释百分比',
   Choose2PCs:'请选择两个主成分',
+  Choose2PCsTip:`<strong>怎么使用这个功能？</strong><br/>
+                  请选择任意两个主成分。默认显示最重要的两个主成分。<br/>
+                  <strong>首先</strong><br/>
+                  下方左侧的图展示的是主成分和原始变量之间的相关性，利用该图，您可以更方便地理解主成分。<br/>
+                  以下图为例：<br/>
+                  （1）沿着x轴可以看出，PC1和变量x4强正相关，和x6强负相关，PC1被这两个变量主导，其余变量的影响稍弱；<br/>
+                  （2）沿着y轴可以看出，PC2和变量x5强正相关，PC2被它主导，其余变量的影响稍弱；<br/>
+                  <img src="/Choose2PCsTip1.png" alt="">
+                  <strong>接着</strong><br/>
+                  下方右侧的散点图，以您选中的主成分为坐标轴。将聚类的结果以不同颜色的点展示在图上。您可以清晰地看出每一个类的样本具有什么特点。<br/>
+                  结合上图，并以下图为例：<br/>
+                  （1）第一个主成分把两类区分开了，所以x4和x6是区分两个类的关键变量；<br/>
+                  （2）第0类（蓝色）在PC1上取值偏大，参照该主成分和原始变量的相关性关系，这表示原始变量中x4取值大而x6取值小的样本，被聚集在了这一类中；第1类（绿色）恰好相反。<br/>
+                  <img src="/Choose2PCsTip2.png" alt="">
+                `,
   PCSTitle:'原始变量和主成分的相关性：',
   ScatterPlotOfPCs:'主成分散点图：',
   FeatureCreationSelection:'新建特征与特征选择',
-
+  PCAIntro:"PCA（主成分分析）是一种传统的降维方法，可以提取出少数几个具有代表性的主成分作为高维数据的代表。",
 };
 
 export default ZH_LAN;

@@ -1,5 +1,7 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
+import config from 'config'
+const {isEN} = config;
 
 export default class TSEN extends PureComponent{
 	constructor(props){
@@ -44,8 +46,10 @@ export default class TSEN extends PureComponent{
 			title: {
 				text: title,
 				textStyle:{
-					fontSize:11
-				}
+					fontSize:isEN?11:15,
+				},
+				// padding:[5,5,5,40],
+				left:40,
 			},
 			grid: {
 				left: '6%',

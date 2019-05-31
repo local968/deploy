@@ -1,6 +1,9 @@
 import React,{PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import 'echarts-gl'
+import EN from "../../constant/en";
+import config from 'config'
+const {isEN} = config;
 
 export default class PCS extends PureComponent{
 	constructor(props){
@@ -46,10 +49,11 @@ export default class PCS extends PureComponent{
 			// 	x:10,
 			// },
 			title: {
-				text: 'The Correlation between PCs and original variables:',
+				text: EN.PCSTitle,
 				textStyle:{
-					fontSize:11
-				}
+					fontSize:isEN?11:15,
+				},
+				left:10,
 			},
 			polar: {},
 			tooltip: {
