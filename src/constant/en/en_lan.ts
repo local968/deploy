@@ -1128,13 +1128,33 @@ const EN_LAN = {
   DataQualityFixing:'Data Quality Fixing',
   none:'None',
   VarianceExplained:'Variance Explained',
+  VarianceExplainedTip:`The table is arranged in descending order of eigenvalues. A larger eigenvalue indicates that the principal component (PC) has more explanatory power. In general, we choose PCs with a accumulated proportion  greater than or equal to 0.8 to represent the entire data.
+                        For example: in the following table, we think that the first three PCs are representative enough.<br/>
+                         <img src="/VarianceExplainedTip-en.png" alt=""/>
+                        `,
   PC:'#PC',
   Eigenvalue:'Eigenvalue',
   ComulatedProportion:'Comulated Proportion',
   Choose2PCs:'Choose 2 PCs',
+  Choose2PCsTip:`<strong>How to use this feature?</strong><br/>
+                  Please select any two PCs. By default, the two most important PCs display.<br/>
+                  <strong>At first</strong><br/>
+                  The diagram on the left below shows the correlation between the PC and the original variable, which makes it easier to understand the PC.<br/>
+                  The following figure is an example:<br/>
+                  (1) It can be seen along the x-axis that PC1 and variable x4 are strongly positively correlated, and x6 is strongly negatively correlated. PC1 is dominated by these two variables, and the influence of the remaining variables is slightly weaker.<br/>
+                  (2) It can be seen along the y-axis that PC2 is strongly positively correlated with variable x5, PC2 is dominated by it, and the influence of the remaining variables is slightly weaker.<br/>
+                   <img src="/Choose2PCsTip1.png" alt="">
+                  <strong>Then</strong><br/>
+                  The scatter plot on the bottom right, with the PC you selected as the axis. The results of the clustering are displayed on the graph as points of different colors. You can clearly see what the characteristics of each cluster's sample are.<br/>
+                  Combine the above figure, and the following figure is an example:<br/>
+                  (1) The first principal component separates the two clusters, so x4 and x6 are the key variables that distinguish the two clusters.<br/>
+                  (2) Cluster0 (blue) takes a larger value on PC1, referring to the correlation between the PC and the original variable, which means that the samples with large x4 value and small value of x6 in the original variable is gathered in In this cluster and cluster1(green) is just the opposite.<br/>
+                   <img src="/Choose2PCsTip2.png" alt="">
+                `,
   PCSTitle:'The Correlation between PCs and original variables:',
   ScatterPlotOfPCs:'ScatterPlot of PCs:',
   FeatureCreationSelection:'Feature Creation & Selection',
+  PCAIntro:"PCA (Principal Component Analysis) is a traditional dimensionality reduction method that extracts a few representative principal components (PCs) as representative of high-dimensional data.",
   watchtheinstructionalvideos:'Do you watch the instructional videos?',
   Dontpromptforthismessage:"Don't prompt for this message ",
   YES:'Yes',

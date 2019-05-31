@@ -127,8 +127,14 @@ export default class AdvancedView extends Component {
 }
 
 const questMarks = {
-  'CVNN': EN.CVNNHint, 'RSquared': EN.squaredHint, 'RMSSTD': EN.RMSSTDHint, 'CH': "", 'silhouette_cosine': "", 'silhouette_euclidean': ""
-}
+  'CVNN': EN.CVNNHint,
+  'RSquared': EN.squaredHint,
+  'RMSSTD': EN.RMSSTDHint,
+   'CH': "",
+  'silhouette_cosine': "",
+  'silhouette_euclidean': "",
+  PCA:EN.PCAIntro,
+};
 
 @observer
 class AdvancedModelTable extends Component {
@@ -140,15 +146,22 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: { selectModel }, sort, handleSort } = this.props;
-    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
+    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean','Parallel Plot','PCA'];
     const arr = [];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
+      if(['PCA','Parallel Plot'].includes(curr)){
+        return { ...prev, [curr]: <div>{getHint(curr)} {label}</div> }
+      }
       if (curr === sort.key) {
-        if (sort.value === 1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
-        if (sort.value === -1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+        if (sort.value === 1){
+          return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
+        }
+        if (sort.value === -1) {
+          return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+        }
       } else {
         if (arr.includes(curr)) {
           return { ...prev, [curr]: curr };
@@ -157,11 +170,11 @@ class AdvancedModelTable extends Component {
       }
       return prev
     }, {});
+    console.log('headerData',headerData)
     const header = <div className={styles.tableHeader}>
       <Row>
         {texts.map(t => <RowCell data={headerData[t]} key={t} />)}
-        <RowCell data='Parallel Plot' key='para' />
-        <RowCell data='PCA' key='pca' />
+        {/*<RowCell data='Parallel Plot' key='para' />*/}
       </Row>
     </div>;
     const dataSource = models.map(m => {
