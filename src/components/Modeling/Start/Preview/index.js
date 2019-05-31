@@ -44,7 +44,7 @@ export default class Preview extends Component {
     const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
     // const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
     const targetIndex = headerList.indexOf(target)
-    const data = cleanData.map((row, index) => row.concat(newVariable.map(n => newVariableData[index][n])).filter((k, i) => showIndex.includes(i)))
+    const data = cleanData.map((row, index) => showIndex.map(ind => row.concat(newVariable.map(n => newVariableData[index][n]))[ind]))
 
     const types = { ...colType, ...newType }
 
