@@ -527,9 +527,10 @@ function Computed(props: ComputedProps) {
         // if (!arrayResult.isPass) return arrayResult
         type = 'Array'
       } else {
-        const isNum = item.every(it => (it as any).type === Type.Number)
+        const numItem = expToString(item as Coordinate[])
+        const isNum = !isNaN(parseFloat(numItem))
         //判断是否是数字
-        if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${expToString(item as Coordinate[])}` }
+        if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${numItem}` }
       }
 
       typeArray.push(type)
@@ -621,7 +622,7 @@ function Computed(props: ComputedProps) {
       isVariable1 = true
       num += seniorResult.num - 1
       fnType = seniorResult.type
-      skipParams = SeniorFn.value === 'Concat'
+      skipParams = ['Concat', 'Groupby', 'Substring'].includes(SeniorFn.value)
     }
     if (BaseFn) {
       // 校验一般函数参数
@@ -800,7 +801,7 @@ function Computed(props: ComputedProps) {
           isPass: false,
           message: `error params ${numList.map(n => expToString(n.exp)).join(',')}`
         }
-        num = numOfParam * (numOfParam - 1)
+        num = (numOfParam * (numOfParam - 1)) >> 1
         break;
       case "Box_cox":
         type = 'Numerical'
@@ -959,7 +960,7 @@ function Computed(props: ComputedProps) {
   const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
   if (func) {
     const { name } = func;
-    if (!includes(['Concat', 'Eq', '(', ')', ','], name)) {
+    if (!includes(['Groupby', 'Substring', 'Concat', 'Eq', '(', ')', ','], name)) {
       variables = filter(variables, ({ varType }) => varType === 'Numerical')
     }
   }
