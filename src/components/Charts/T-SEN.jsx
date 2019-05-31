@@ -5,17 +5,24 @@ export default class TSEN extends PureComponent{
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
+		this.state = {
+			loading:true,
+		}
 	}
 	
 	componentDidMount() {
 		const chart = this.chart.getEchartsInstance();
 		chart.showLoading();
+		this.setState({
+			loading:false,
+		})
 	}
 	
 	getOption() {
 		const {x_name,y_name,data=[],title=''} = this.props;
+		const {loading} = this.state;
 		
-		if(data.length){
+		if(data.length&&!loading){
 			const chart = this.chart.getEchartsInstance();
 			chart.hideLoading();
 		}else{
