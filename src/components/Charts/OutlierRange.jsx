@@ -218,7 +218,7 @@ export default class OutlierRange extends PureComponent{
 		const _high = (parseInt(Math.min(max,end)*10*10)/100).toFixed(2);
 		return [
 			<div key="div" className={styles.outlierTop}>
-				<div>最小值:<InputNum
+				<div>{EN.Min}:<InputNum
 					min={min}
 					max={max}
 					step={0.01}
@@ -244,7 +244,7 @@ export default class OutlierRange extends PureComponent{
 						},this.setBrush);
 					}}
 				/></div>
-			<Button onClick={this.reset.bind(this)}>重置</Button>
+			<Button onClick={this.reset.bind(this)}>{EN.Resettodefault}</Button>
 			</div>,
 			<ReactEcharts
 			ref = {chart=>this.chart=chart}

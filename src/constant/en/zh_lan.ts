@@ -1002,6 +1002,33 @@ const ZH_LAN: any = {
   PCSTitle:'原始变量和主成分的相关性：',
   ScatterPlotOfPCs:'主成分散点图：',
   FeatureCreationSelection:'新建特征与特征选择',
+  watchtheinstructionalvideos:'是否观看教学视频？',
+  Dontpromptforthismessage:'不再提示该信息 ',
+  YES:'是',
+  NO:'否',
+  Logconversionofthe2:'以2为底数，对所选变量进行Log转换。',
+  VarContinuousvariablestartingwiththesymbol:'var- 连续变量，以@符号开头。',
+  Description:'说明：',
+  Negativenumbersinvariableswill0:'量中存在负数将被自动替换成0',
+  Logconversionofthe10:'以10为底数，对所选变量进行Log转换。',
+  Logconversionofthee:'以e为底数，对所选变量进行Log转换。',
+  Calculatethenthpoweroftheselectedvariable:'计算所选变量的n次方。',
+  Npositiveornegativeintegerordecimal:'n- 正负整数或小数。',
+  Whenthereturnvalueexceedsthememory:'返回数值超出内存后将用系统默认最大最小值替代。',
+  Comparestwovariablesforequality:'比较两个变量是否相等，相等返回1，不相等返回0。',
+  Var1Adiscretevariable:'var1- 离散变量或连续变量，以@符号开头。',
+  Var2Adiscretevariable:'var2- 离散变量或连续变量，以@符号开头。',
+  Return01result:'返回0/1结果',
+  Whenasinglevariableisentered:'输入单个变量时，返回该变量的总和；输入多个变量时，返回行的总和。',
+  Var1var2var3continuousvariables:'var1, var2, var3, ….- 连续变量，以@符号开头。',
+  Whenasinglevariableisenteredtheminimumvalue:'输入单个变量时，返回该变量的最小值；输入多个变量时，返回行的最小值。',
+  Whenasinglevariableisenteredtheminimumvaluemax:'输入单个变量时，返回该变量的最小值；输入多个变量时，返回行的最大值。',
+  Whenasinglevariableisenteredtheminimumvaluemaxmean:'输入单个变量时，返回该变量的均值；输入多个变量时，返回行的均值。',
+
+
+
+
+
 
 };
 
