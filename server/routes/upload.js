@@ -185,10 +185,13 @@ function saveSample() {
 
 router.get('/download/model', async (req, res) => {
   const { filename, projectId, mid, etlIndex } = req.query
+
+  const { data: { header: esHeader } } = await axios.get(`${esServicePath}/etls/${etlIndex}/headerArray`)
+
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  const { featureImportance, deployData } = model
-  const header = Object.keys(JSON.parse(featureImportance))
+  const { featureLabel, deployData } = model
+  const header = JSON.parse(featureLabel).filter(h => esHeader.includes(h))
   const url = JSON.parse(deployData)
 
   downloadCsv(decodeURIComponent(url), decodeURIComponent(filename), etlIndex, header, res)
@@ -247,9 +250,11 @@ router.get('/download/outlier', async (req, res) => {
   // const { userId } = req.session
   // const requestId = uuid.v4()
 
+  const { data: { header: esHeader } } = await axios.get(`${esServicePath}/etls/${etlIndex}/headerArray`)
+
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  const { featureImportance, deployData } = model
-  const header = Object.keys(JSON.parse(featureImportance))
+  const { featureLabel, deployData } = model
+  const header = JSON.parse(featureLabel).filter(h => esHeader.includes(h))
   const url = JSON.parse(deployData)
 
   // let _rate = rate
@@ -269,7 +274,7 @@ router.get('/download/outlier', async (req, res) => {
       step: async (results, parser) => {
         const row = results.data[0]
         if (!resultHeader) {
-          resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no' && key !== 'decision_index')
+          resultHeader = [...header.filter(), ...Object.keys(row)].filter(key => key !== '__no' && key !== 'decision_index')
           res.write(Papa.unparse([[...resultHeader, 'predict_label'], []], { header: false }))
         }
         const nos = Object.keys(temp)
