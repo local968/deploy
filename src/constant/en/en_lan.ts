@@ -1157,7 +1157,8 @@ const EN_LAN = {
   Whenasinglevariableisenteredtheminimumvalue:'When a single variable is entered, the minimum value of the variable is returned; when multiple variables are entered, the minimum value of the row is returned.',
   Whenasinglevariableisenteredtheminimumvaluemax:'When a single variable is entered, the minimum value of the variable is returned; when multiple variables are entered, the maximum value of the row is returned.',
   Whenasinglevariableisenteredtheminimumvaluemaxmean:'When a single variable is entered, the mean of the variable is returned; when multiple variables are entered, the mean of the row is returned.',
-
+  senior:'R2 custom function',
+  base:'Basic function',
 };
 
 
