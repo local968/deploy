@@ -58,6 +58,8 @@ class TargetIssue extends Component {
 
   saveTargetFixes = () => {
     this.props.project.fixTarget()
+
+    message.destroy();
     message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
     this.closeTarget();
   }
@@ -260,7 +262,10 @@ class VariableIssue extends Component {
   }
 
   onConfirm = () => {
-    this.props.project.endQuality().then(() => this.summary = true).catch(() => { message.error("error!!") })
+    this.props.project.endQuality().then(() => this.summary = true).catch(() => {
+
+      message.destroy();
+      message.error("error!!") })
     this.onClose()
   }
 

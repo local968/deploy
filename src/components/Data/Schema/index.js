@@ -51,6 +51,8 @@ export default class DataSchema extends Component {
     try {
       this.props.projectStore.project.endSchema()
     } catch (e) {
+
+      message.destroy();
       message.error(e)
     }
     this.onClose()

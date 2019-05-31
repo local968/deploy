@@ -117,6 +117,8 @@ export default class DataConnect extends Component {
     this.file = null
     this.process = 0
     this.uploading = false
+
+    message.destroy();
     message.error(error.toString())
     console.log(error, times)
   })
@@ -192,6 +194,8 @@ export default class DataConnect extends Component {
         });
       }),
       () => {
+
+        message.destroy();
         message.error(EN.Samplefileerror);
       }
     );
@@ -393,6 +397,8 @@ export default class DataConnect extends Component {
             if (resp.status !== 200) {
               this.process = 0
               this.uploading = false
+
+              message.destroy();
               return message.error(resp.message)
             }
             this.process = 50
