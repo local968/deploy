@@ -1,10 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react'
+import {inject, observer} from 'mobx-react'
 import Next from './Next.svg'
 import { Popover, Button, Icon } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+
+@inject('projectStore')
 @observer
 export default class ModelProcessFlow extends Component {
 
@@ -60,12 +62,90 @@ export default class ModelProcessFlow extends Component {
 			<Button>{text}<Icon type="down" /></Button>
 		</Popover>
 	}
+	
+	DQF(){
+		const {nullFillMethod,mismatchFillMethod,outlierFillMethod} = this.props.projectStore.project;
+		
+		const mv = this.DQFData(nullFillMethod,EN.MissingValue);
+		const mi = this.DQFData(mismatchFillMethod,EN.mismatch);
+		const out = this.DQFData(outlierFillMethod,EN.Outlier);
+		
+		if(!mv&&!mi&&!out){
+			return <dl>
+				<dd>{EN.none}</dd>
+			</dl>
+		}
+		
+		return <dl>
+			{mv}
+			{mi}
+			{out}
+		</dl>
+	}
+	DQFData(data,title){
+		const values = Object.entries(data);
+		const mismatchArray = [{
+			value: 'mode',
+			label: EN.Replacewithmostfrequentvalue
+		}, {
+			value: 'drop',
+			label: EN.Deletetherows
+		}, {
+			value: 'ignore',
+			label: EN.Replacewithauniquevalue
+		},{
+			value: 'mean',
+			label: EN.Replacewithmeanvalue
+		}, {
+			value: 'drop',
+			label: EN.Deletetherows
+		}, {
+			value: 'min',
+			label: EN.Replacewithminvalue
+		}, {
+			value: 'max',
+			label: EN.Replacewithmaxvalue
+		}, {
+			value: 'median',
+			label: EN.Replacewithmedianvalue
+		}, {
+			value: 'zero',
+			label: EN.ReplaceWith0
+		}, {
+			value: 'others',
+			label: EN.Replacewithothers
+		}];
+		
+		const result = mismatchArray.map(itm=>({
+			type:itm.value,
+			key:itm.label,
+			data:[],
+		}));
+		
+		values.forEach(itm=>{
+			result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+		});
+		
+		const resu = result.filter(itm=>itm.data&&itm.data.length);
+		
+		if(!resu.length){
+			return null;
+		}
+		return <React.Fragment>
+			<dt>{title}</dt>
+			{
+				resu.map(itm=><dd key={itm.key}>{itm.key}:{itm.data.join(',')}</dd>)
+			}
+		</React.Fragment>
+	}
 
 	render() {
 		const { dataFlow, standardType } = this.props.model;
 		// if (dataFlow.length === 1) {
 		return <section className={styles.process}>
 			<label>{EN.RawData}</label>
+			<img src={Next} alt='' />
+			{this.popOver(this.DQF(),EN.DataQualityFixing)}
 			<img src={Next} alt='' />
 			{this.popOver(this.FP(), EN.DataPreprocessing)}
 			<img src={Next} alt='' />

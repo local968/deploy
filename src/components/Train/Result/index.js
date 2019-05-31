@@ -174,10 +174,10 @@ function ModelResult(props) {
         <span>导出模型结果</span>
       </button>} */}
       {problemType === 'Clustering' && <a href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
-        <span>{'导出模型结果'}</span>
+        <span>{EN.Exportmodelresults}</span>
       </button></a>}
       {problemType === 'Outlier' && <a href={`/upload/download/outlier?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&rate=${formatNumber(selectModel.rate)}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
-        <span>{'导出模型结果'}</span>
+        <span>{EN.Exportmodelresults}</span>
       </button></a>}
     </div>
     {downloading && <ProcessLoading style={{ position: 'fixed' }} />}
@@ -471,10 +471,10 @@ const MappingDict = observer((props) => {
     const data = Object.entries(mapping)
       .filter(r1 => r1[0].toString().includes(state.origin))
       .filter(r2 => r2[1].toString().includes(state.encode))
-      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.ccell })))
+      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.mapCell })))
     const header = [
-      { content: <span>{EN.Origin}<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
-      { content: <span>{EN.Encoding} <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
+      { content: <span>{EN.Origin}<input style={{ width: 160,marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.mapCell },
+      { content: <span>{EN.Encoding} <input style={{ width: 160,marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.mapCell }
     ]
     return [header, ...data]
   })
@@ -490,7 +490,7 @@ const MappingDict = observer((props) => {
     </div>
     <div className={classes.dictTable}>
       <Table
-        columnWidth={300}
+        columnWidth={290}
         rowHeight={({ index }) => { return index === 0 ? 68 : 34 }}
         columnCount={2}
         rowCount={tableData.length}
@@ -498,7 +498,7 @@ const MappingDict = observer((props) => {
         fixedRowCount={1}
         checked={null}
         select={null}
-        style={{ border: "1px solid #ccc" }}
+        // style={{ border: "1px solid #ccc" }}
         data={tableData}
       />
     </div>

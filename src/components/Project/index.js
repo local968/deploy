@@ -16,7 +16,7 @@ export default class Project extends Component {
   componentWillUnmount() {
     const { deploymentStore, projectStore } = this.props
     const { project } = projectStore;
-    const name = this.name || EN.Project + new Date().toLocaleString()
+    const name = this.name || EN.Project + new Date().toLocaleString('chinese', { hour12: false })
     project.updateProject({
       name: name,
       // description: project.description,

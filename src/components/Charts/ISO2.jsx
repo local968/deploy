@@ -171,7 +171,7 @@ export default class Iso extends PureComponent{
             color:color[2],
             visualMap:false,
             symbolSize:5,
-            name:'正常',
+            name:EN.normal,
             animation:true,
             silent:true,
             zlevel:3,
@@ -181,7 +181,7 @@ export default class Iso extends PureComponent{
             color:color[3],
             visualMap:false,
             symbolSize:5,
-            name:'异常',
+            name:EN.abnormal,
             animation:true,
             silent:true,
             zlevel:2,
@@ -198,7 +198,7 @@ export default class Iso extends PureComponent{
                 legend: {
                     top: 5,
                     right:0,
-                    data: ['正常','异常'],
+                    data: [EN.normal,EN.abnormal],
                     align: 'left',
                     orient:'vertical',
                 },
@@ -366,7 +366,7 @@ export default class Iso extends PureComponent{
                     <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
             </div>,
             <div key = 'adjust' className={classes.adjust}>
-                <label data-tip="该比例将决定模型部署结果">{EN.Youcanadjustthecontaminationrate}:</label>
+                <label data-tip={EN.Thisratiowilldetermine}>{EN.Youcanadjustthecontaminationrate}:</label>
                <InputNum
               min={0}
               max={0.5}

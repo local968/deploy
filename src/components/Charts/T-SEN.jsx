@@ -1,14 +1,38 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
+import config from 'config'
+const {isEN} = config;
 
 export default class TSEN extends PureComponent{
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
+		this.state = {
+			loading:true,
+		}
+	}
+	
+	componentDidMount() {
+		const chart = this.chart.getEchartsInstance();
+		chart.showLoading();
+		this.setState({
+			loading:false,
+		})
 	}
 	
 	getOption() {
-		const {x_name,y_name,data,title=''} = this.props;
+		const {x_name,y_name,data=[],title=''} = this.props;
+		const {loading} = this.state;
+		
+		if(data.length&&!loading){
+			const chart = this.chart.getEchartsInstance();
+			chart.hideLoading();
+		}else{
+			return {
+				xAxis:{},
+				yAxis:{},
+			}
+		}
 		
 		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
 			return {
@@ -22,13 +46,15 @@ export default class TSEN extends PureComponent{
 			title: {
 				text: title,
 				textStyle:{
-					fontSize:11
-				}
+					fontSize:isEN?11:15,
+				},
+				// padding:[5,5,5,40],
+				left:40,
 			},
 			grid: {
 				left: '6%',
 				right: '20%',
-				bottom: '4%',
+				bottom: '4.5%',
 				containLabel: true
 			},
 			dataZoom:[{
@@ -94,7 +120,7 @@ export default class TSEN extends PureComponent{
 						show: true
 					},
 					nameLocation:'middle',
-					nameGap:25,
+					nameGap:23,
 				}
 			],
 			series,
@@ -118,6 +144,7 @@ export default class TSEN extends PureComponent{
 		const {width=550,height=400} = this.props;
 		return <ReactEcharts
 			option={this.getOption()}
+			ref = {chart=>this.chart=chart}
 			style={{height, width}}
 			notMerge={true}
 			lazyUpdate={true}

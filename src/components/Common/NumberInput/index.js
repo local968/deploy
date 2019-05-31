@@ -31,6 +31,7 @@ export default class NumberInput extends Component {
       onBlur(num)
       this.isFocus = false
     } catch (err) {
+      message.destroy();
       message.error(err.message)
       this.temp = value
       this.isFocus = false

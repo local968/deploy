@@ -990,7 +990,7 @@ export default class Project {
     if (status !== 200) {
       // 出现错误弹出提示框,需要用户确认
       Modal.error({
-        title: message || result['process error'],
+        title: message || result['processError'],
       });
       this.etling = false
       this.etlProgress = 0
@@ -1051,7 +1051,7 @@ export default class Project {
           const { status, result } = returnValue
           if (status < 0) {
             // this.setProperty({ dataViews: null })
-            return antdMessage.error(result['process error'])
+            return antdMessage.error(result['processError'])
           }
           // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
         })
@@ -1296,13 +1296,15 @@ export default class Project {
       id,
       problemType,
       target,
-      dataHeader
+      dataHeader,
+      colType
     } = this;
 
     let command = '';
     let trainData = {}
 
-    const featureLabel = dataHeader.filter(d => d !== target);
+    const featureLabel = dataHeader.filter(d => d !== target).filter(h => colType[h] !== 'Raw');
+    if(!featureLabel.length) return antdMessage.error("no feature label");
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -1495,13 +1497,15 @@ export default class Project {
       dataHeader,
       weights,
       newVariable,
-      trainHeader
+      trainHeader,
+      colType
     } = this;
 
     let command = '';
     let trainData = {}
 
-    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d));
+    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d)).filter(h => colType[h] !== 'Raw');
+    if(!featureLabel.length) return antdMessage.error("no feature label")
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -1890,7 +1894,7 @@ export default class Project {
         .then(returnValue => {
           const { status, result } = returnValue
           if (status < 0) {
-            return antdMessage.error(result['process error'])
+            return antdMessage.error(result['processError'])
           }
           // this.setProperty({
           //   preImportance: result.preImportance,
@@ -1914,7 +1918,7 @@ export default class Project {
       return api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
         this.correlationMatrixLoading = false
-        if (status < 0) return antdMessage.error(result['process error'])
+        if (status < 0) return antdMessage.error(result['processError'])
         this.correlationMatrixHeader = result.header;
         this.correlationMatrixData = result.data;
       })
@@ -1988,7 +1992,7 @@ export default class Project {
 
   handleError = returnValue => {
     const { result, status, command } = returnValue
-    if (status < 0) antdMessage.error(`command:${command}, error:${result['process error']}`)
+    if (status < 0) antdMessage.error(`command:${command}, error:${result['processError']}`)
   }
 
   getSample = () => {
@@ -2152,13 +2156,13 @@ export default class Project {
     html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsChunkTag}${jsTag}${cssChunkTag}${cssTag}</${body}>`
     return html
   }
-  
-  histogram(field){
-    const {colType,dataViews,etlIndex} = this;
-    if(!dataViews[field]){
+
+  histogram(field) {
+    const { colType, dataViews, etlIndex } = this;
+    if (!dataViews[field]) {
       return;
     }
-    if(colType[field] === 'Numerical'){
+    if (colType[field] === 'Numerical') {
       const { min, max } = dataViews[field];
       return {
         "name": "histogram-numerical",
@@ -2184,8 +2188,8 @@ export default class Project {
   univariant(value) {
     const { target, problemType, etlIndex, colType, dataViews } = this;
     const type = colType[value];
-  
-    if(!dataViews[value]){
+
+    if (!dataViews[value]) {
       return;
     }
 
@@ -2269,7 +2273,7 @@ export default class Project {
           url: model.pointToShowData,
         },
       });
-      
+
       list.push({
         name: 'fit-plot',
         data: {
@@ -2277,12 +2281,12 @@ export default class Project {
         },
       });
     }
-  
-    
-    
+
+
+
     return request.post({
       url: '/graphics/list',
-      data: list.filter(itm=>itm),
+      data: list.filter(itm => itm),
     })
   };
 

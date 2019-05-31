@@ -75,6 +75,7 @@ const redis =
 
 const config = {
   host: HOST,
+  isEN:IS_EN,
   port: BACKEND_PORT,
   redis,
   requestQueue: REQUEST_QUEUE,

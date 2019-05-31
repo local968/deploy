@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import styles from './styles.module.css';
-import { observer } from 'mobx-react'
+import {inject, observer} from 'mobx-react'
 import Next from './Next.svg'
 import { Popover, Button, Icon, Tag } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 
+@inject('projectStore')
 @observer
 export default class ModelProcessFlow extends Component {
 
@@ -35,34 +36,51 @@ export default class ModelProcessFlow extends Component {
 	}
 
 	DP(data) {
+		const rescaling = {
+			minmax:'MinMaxScaler',
+			normalize:'Normalizer',
+			quantile_transformer:'QuantileTransformer',
+			robust_scaler:'RobustScaler',
+			standardize:'StandardScaler',
+			none:'No Scaling',
+		}[data['rescaling:__choice__']];
+		
+		const { featureLabel } = this.props.model;
+		const { colType } = this.props.projectStore.project;
+		
+		const variables = featureLabel.filter(itm=>colType[itm] === "Categorical");
+		
 		return <dl>
-			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'One hot encoding')}
-			{this.list(data, 'rescaling:', 'Rescaling')}
-			{this.list(data, 'imputation:', 'Imputation')}
-			{this.list(data, 'balancing:', 'Banlance')}
+			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
+			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd title={variables.join(',')}>variables:<label>{variables.join(',')}</label></dd>}
+			
+			{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}
+			<dt>Banlance:{data['balancing:strategy']}</dt>
+			{this.list(data, `rescaling:${data['rescaling:__choice__']}:`, `Rescaling:${rescaling}`)}
 		</dl>
 	}
 
 	FP(data) {
 		const name = data['preprocessor:__choice__'];
 		const types = {
-			'extra_trees_preproc_for_classification': 'extreml.rand.trees.prepr.',
-			'extra_trees_preproc_for_regression': 'extreml.rand.trees.prepr.',
-			'fast_ica': 'ICA',
-			'feature_agglomeration': 'Feature Agglomeration',
-			'kernel_pca': 'kernel PCA',
-			'kitchen_sinks': 'Kitchen Sinks',
+			'extra_trees_preproc_for_classification': 'SelectFeature_ExtraTreesClassifier',
+			'extra_trees_preproc_for_regression': 'SelectFeature_ExtraTreesRegressor',
+			'fast_ica': 'FastICA',
+			'feature_agglomeration': 'FeatureAgglomeration',
+			'kernel_pca': 'KernelPCA',
+			'kitchen_sinks': 'kernel_approximation_RBFSampler',
 			'linear_svc_preprocessor': 'Linear SVM prepr.',
 			'no_preprocessor': 'No Preprocessing',
-			'no_preprocessing': 'No Preprocessing',
-			'nystroem_sampler': 'Nystroem Sampler',
+			'no_preprocessing': 'No Feature Preprocessing',
+			'nystroem_sampler': 'kernel_approximation_Nystroem',
 			'pca': 'PCA',
-			'polynomial': 'Polynomial',
-			'random_trees_embedding': 'Random Trees embed.',
-			'select_percentile_classification': 'Select Percentile',
-			'select_percentile_regression': 'Select Percentile',
-			'select_rates': 'Select Rates',
-			'liblinear_svc_preprocessor':'Liblinear Svc Preprocessor'
+			'polynomial': 'PolynomialFeatures',
+			'random_trees_embedding': 'RandomTreesEmbedding',
+			'select_percentile_classification': 'SelectPercentile',
+			'select_percentile_regression': 'SelectPercentile',
+			'select_rates': 'GenericUnivariateSelect',
+			'liblinear_svc_preprocessor':'SelectFeature_liblinear_svc',
+			'truncatedSVD':'TruncatedSVD',
 		};
 
 		return <dl>
@@ -82,6 +100,130 @@ export default class ModelProcessFlow extends Component {
 			{this.list(data, type, '')}
 		</dl>;
 	}
+	
+	DQF(){
+		const {nullFillMethod,mismatchFillMethod,outlierFillMethod} = this.props.projectStore.project;
+		
+		const mv = this.DQFData(nullFillMethod,EN.MissingValue);
+		const mi = this.DQFData(mismatchFillMethod,EN.mismatch);
+		const out = this.DQFData(outlierFillMethod,EN.Outlier);
+		
+		if(!mv&&!mi&&!out){
+			return <dl>
+				<dd>{EN.none}</dd>
+			</dl>
+		}
+		
+		return <dl>
+			{mv}
+			{mi}
+			{out}
+		</dl>
+	}
+	DQFData(data,title){
+		const { colType } = this.props.projectStore.project;
+		const values = Object.entries(data);
+		const mismatchArray =  [{
+			value: 'mode',
+			label: EN.Replacewithmostfrequentvalue
+		}, {
+			value: 'drop',
+			label: EN.Deletetherows
+		}, {
+			value: 'ignore',//Categorical
+			label: EN.Replacewithauniquevalue
+		}, {
+			value: 'ignore',
+			label: EN.DoNothing
+		},{
+			value: 'mean',
+			label: EN.Replacewithmeanvalue
+		},{
+			value: 'min',
+			label: EN.Replacewithminvalue
+		}, {
+			value: 'max',
+			label: EN.Replacewithmaxvalue
+		}, {
+			value: 'median',
+			label: EN.Replacewithmedianvalue
+		}, {
+			value: 'zero',
+			label: EN.ReplaceWith0
+		}, {
+			value: 'others',
+			label: EN.Replacewithothers
+		},{
+			value: 'low',
+			label: EN.Replacewithlower
+		}, {
+			value: 'high',
+			label: EN.Replacewithupper
+		}];
+		
+		const result = mismatchArray.map(itm=>({
+			type:itm.value,
+			key:itm.label,
+			data:[],
+		}));
+
+		values.forEach(itm=>{
+			if(itm[1]!=='ignore'){
+				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			}else{
+				if(itm,colType[itm[0]] === 'Categorical'){
+					result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+				}else{
+					result.filter(it=>it.type === itm[1])[1].data.push(itm[0]);
+				}
+			}
+		});
+		
+		const resu = result.filter(itm=>itm.data&&itm.data.length);
+		
+		if(!resu.length){
+			return null;
+		}
+		return <React.Fragment>
+			<dt>{title}</dt>
+			{
+				resu.map(itm=><dd key={itm.key}>{itm.key}:{itm.data.join(',')}</dd>)
+			}
+		</React.Fragment>
+	}
+	
+	FS(){
+		const { featureLabel } = this.props.model;
+		const {rawHeader,expression } = this.props.projectStore.project;
+		
+		const drop = _.pull(rawHeader,...featureLabel);
+		
+		const create = Object.values(expression).map(itm=>{
+			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
+		});
+		
+		if(!drop.length&&!create.length){
+			return null;
+		}
+		
+		const pop = <dl>
+			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
+				Drop these Variables:<label>{drop.join(',')}</label>
+			</dt>
+			<dt style={{display:(create.length?'':'none')}}>
+				Create these Variables:
+			</dt>
+			{
+				create.map((itm,index)=><dd key={index}>{itm}</dd>)
+			}
+		</dl>;
+		
+		return <React.Fragment>
+			<img src={Next} alt='' />
+			{this.popOver(pop,EN.FeatureCreationSelection)}
+		</React.Fragment>
+		
+	}
 
 	popOver(content, text) {
 		return <Popover
@@ -99,6 +241,9 @@ export default class ModelProcessFlow extends Component {
 			return <section className={styles.process}>
 				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
+				{this.popOver(this.DQF(),EN.DataQualityFixing)}
+				{this.FS()}
+				<img src={Next} alt='' />
 				{this.popOver(this.DP(dataFlow[0]),  EN.DataPreprocessing)}
 				<img src={Next} alt='' />
 				{this.popOver(this.FP(dataFlow[0]), EN.FeaturePreprocessing)}
@@ -110,6 +255,9 @@ export default class ModelProcessFlow extends Component {
 		} else if (dataFlow.length > 1) {
 			return <section className={`${styles.process} ${styles.many}`}>
 				<label>{EN.RawData}</label>
+				<img src={Next} alt='' />
+				{this.popOver(this.DQF(),EN.DataQualityFixing)}
+				{this.FS()}
 				<img src={Next} alt='' />
 				<dl>
 					{
@@ -128,17 +276,20 @@ export default class ModelProcessFlow extends Component {
 				<img src={Next} alt='' />
 				<label>Ensembled Model</label>
 				<img src={Next} alt='' />
-				 <label>{EN.Prediction}</label>
+				<label>{EN.Prediction}</label>
 			</section>
 		} else {
 			let str = modelName.split('.')[0];
 			str = str.substring(0, str.length - 1);
 			return <section className={styles.process}>
 				<label>{EN.RawData}</label>
-        <img src={Next} alt='' />
-        <label>{str}</label>
-        <img src={Next} alt='' />
-        <label>{EN.Prediction}</label>
+				<img src={Next} alt='' />
+				{this.popOver(this.DQF(),EN.DataQualityFixing)}
+				{this.FS()}
+				<img src={Next} alt='' />
+		        <label>{str}</label>
+		        <img src={Next} alt='' />
+		        <label>{EN.Prediction}</label>
 			</section>
 		}
 	}

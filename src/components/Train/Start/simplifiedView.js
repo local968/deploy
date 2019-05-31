@@ -163,17 +163,17 @@ export default class SimplifiedView extends Component {
         <div className={styles.chooseBox}>
           <input type='radio' name='scan' value='minMax' id='minMax' checked={standardType === 'minMax'}
                  onChange={this.handleType}/>
-          <label htmlFor='minMax'>{EN.minmaxscale}</label>
+          <label htmlFor='minMax'>{EN.minmaxscale}<Hint content={EN.Scaleseachfeaturetothegivenrange} /></label>
         </div>
         <div className={styles.chooseBox}>
           <input type='radio' name='scan' value='standard' id='standard' checked={standardType === 'standard'}
                  onChange={this.handleType}/>
-          <label htmlFor='standard'>{EN.standardscale}</label>
+          <label htmlFor='standard'>{EN.standardscale}<Hint content={EN.Centereachfeaturetothemean} /></label>
         </div>
         <div className={styles.chooseBox}>
           <input type='radio' name='scan' value='robust' id='robust' checked={standardType === 'robust'}
                  onChange={this.handleType}/>
-          <label htmlFor='robust'>{EN.robustscale}</label>
+          <label htmlFor='robust'>{EN.robustscale}<Hint content={EN.Centereachfeaturetothemedian} /></label>
         </div>
       </div>
       <div className={styles.simplifiedText}><span>{EN.CreateVariableListTip}</span></div>
@@ -212,7 +212,7 @@ export default class SimplifiedView extends Component {
         <div className={styles.tableHeader}>
           <div className={classnames(styles.tableTh, styles.tableCheck)}/>
           <div className={styles.tableTh}><span>{EN.Name}</span></div>
-          <div className={styles.tableTh}><span>{EN.Weight}</span></div>
+          <div className={styles.tableTh}><span>{EN.Weight}<Hint content={EN.Youcangivehigherweightstofeatures} /></span></div>
           <div className={styles.tableTh}><span>{EN.Histogram}</span></div>
           <div className={styles.tableTh}><span>{EN.DataType}</span></div>
           <div className={styles.tableTh}><span>{EN.UniqueValue}</span></div>

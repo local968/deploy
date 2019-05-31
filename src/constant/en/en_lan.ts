@@ -160,7 +160,7 @@ const EN_LAN = {
   Unselectpredictorsthatleadtolesswantedmodeling: 'Unselect predictors that lead to less wanted modeling results, they could be:',
   VariableIDs: '1. Variable IDs',
   Variablesthatarederivedfromthetarget: '2. Variables that are derived from the target',
-  Anyothervariablesyou: '3. Any other variables you don\'t need',
+  Anyothervariablesyou: "3. Any other variables you don't need",
   DuplicatedHeader: 'Duplicated NormalHeader',
   AutoHeaderRepair: 'Auto NormalHeader Repair',
   SkipDataQualityCheck: 'Skip Data Quality Check',
@@ -178,7 +178,7 @@ const EN_LAN = {
   /**
    * /app-bff/src/components/Deploy
    */
-  CreatedDate: 'Created Date-',
+  CreatedDate: 'Created Date',
   DeploymentStatus: 'Deployment Status',
   Home: 'Home',
   SortBy: 'Sorted by',
@@ -224,8 +224,8 @@ const EN_LAN = {
   InApp: 'In App',
   DeployFrequency: 'Deploy Frequency:',
   OneTime: 'One Time',
-  Time: 'time:',
-  Times: 'time:',
+  Time: 'time',
+  Times: 'time',
   Redeployevery: 'Redeploy every',
   AutoRepeat: 'Auto Repeat',
   Autodisableifanyissueoccurs: 'Auto disable if any issue occurs',
@@ -283,7 +283,7 @@ const EN_LAN = {
   /**
    * /app-bff/src/components/Home
    */
-  CreateProject: 'Create a New Project-',
+  CreateProject: 'Create a New Project',
   DeleteDialogTitle: 'Delete project confirmation',
   ConfirmOfDeletManyProject: 'Are you sure to delete the following projects',
   Areyousuretodeleteproject: 'Are you sure to delete project',
@@ -321,7 +321,7 @@ const EN_LAN = {
 
 
   Dataset: 'Dataset',
-  Sorrybutyoudonthavetheauthority: 'Sorry but you don\'t have the authority for entering this project.',
+  Sorrybutyoudonthavetheauthority: "Sorry but you don't have the authority for entering this project.",
   Youhavebeenkickedout: 'You have been kicked out',
   GoBacktotheProject: 'Go Back to the Project',
   GotoHomePage: 'Go to Home Page',
@@ -342,7 +342,7 @@ const EN_LAN = {
   Itrepresentsthecompleteness: 'Recall=TP/(TP+FN). It measures the % of positives the classifier labeled as positive. It represents the completeness of the classifier. The higher the recall is the more positives the classifier captures.',
   Manyclassifiersareabletoproduce: 'Cutoff Threshold is a critical probability which divides the prediction results into an event group and non-event group. A prediction result that is larger than the threshold goes into the event group, and a prediction result that is smaller than the threshold goes into the non-event group.',
   TheF1scoreistheharmonicmean: 'The F1-score is the harmonic mean of Precision and Recall, where an F1-score reaches its best value at 1 (perfect precision and recall) and worst at 0.',
-  PrecisionRecall: 'It\'s 2*Precision*Recall / (Precision+Recall).',
+  PrecisionRecall: "It's 2*Precision*Recall / (Precision+Recall).",
   Itmeasureshowmanytruepositivesamong: 'It measures how many true positives among all predicted (including true and false)  positives. It\'s TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.',
   Efficientwaytodetermine: 'KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It\'s calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other.',
   RootMeanSquareError: 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
@@ -491,7 +491,7 @@ const EN_LAN = {
   AdvancedModeling: 'Advanced Modeling',
   Youneedtoselectatleast: 'You need to select at least one algorithm!',
   Setting: 'Setting',
-  PrepareToModel: 'Data looks good now. It\'s time to train your model!',
+  PrepareToModel: "Data looks good now. It's time to train your model!",
   AdvancedVariable: 'Advanced Variable',
 
 
@@ -852,7 +852,7 @@ const EN_LAN = {
   Replacewithothers: 'Replace with others',
   MissingReason: 'Missing Reason',
   QuantityofMissingValue: 'Quantityof Missing Value',
-  Idonknow: "I don`t kno",
+  Idonknow: "I don`t know",
   Leftblankonpurpose: 'Left blank on purpose',
   FailedtoCollectorDataError: 'Failed to Collect or Data Error',
   ValidRange: 'Valid Range',
@@ -863,7 +863,8 @@ const EN_LAN = {
   YourtargetvariableHas: 'Your target variable has',
   Less: 'less',
   More: 'more',
-  Thantwouniquealues: 'than two unique values',
+  Thantwouniquealues: 'has some noises',
+  onlyOnevalue: 'has only one unique value',
   Targetvariablequalityisgood: 'Target variable quality is good!',
   Optional: 'optional',
   After: 'After',
@@ -1006,11 +1007,12 @@ const EN_LAN = {
   age2freb4: 'age2_fre_b4',
   agecusb3: 'age_cus_b3',
   agecusb4: 'age_cus_b4',
-  ChooseaVariableScalingMethod: 'Choose a Variable Scaling Method:',
+  ChooseaVariableScalingMethod: 'Choose a Variable Scaling Method',
   minmaxscale: 'min_max_scale',
   robustscale: 'robust_scale',
   FromSQL: 'From SQL',
   ProjectReport: 'Project Report',
+  standardscale: 'Standard Scale',
   Hostname: 'Hostname',
   Port: 'Port',
   DatabaseType: 'Database Type',
@@ -1088,11 +1090,11 @@ const EN_LAN = {
   Choose2or3Variables: 'Choose 2 or 3 Variables',
   Result: 'Result',
   Ss: 's',
-  ScoreHint: 'It evaluates the performance of the model. In general, a larger value indicates better model performance.',
+  ScoreHint: 'It evaluates the performance of the model. It ranges from 0 and 1. In general, a larger value indicates better model performance.',
   ContaminationRateHint: 'The proportion of anomaly to all data.',
   CVNNHint: 'It evaluates intercluster separation and the intracluster compactness. It ranges from 0 and 2. In general, a smaller value indicates better model performance.',
   TheNumberofClustersHint: 'TheNumberofClustersHint',
-  squaredHint: 'It measures the degree of difference between clusters. It ranges from 0 and 1. In the models with the same number of clusters, a larger value indicates that the model is better.',
+  squaredHint: 'It measures that how much (in percentage) the sample can be separated. It ranges from 0 and 1. In the models with the same number of clusters, a larger value indicates that the model is better.',
   SihouetteScoreHint: 'It validates the clustering performance based on the pairwise difference of between- and within-cluster distances. It ranges from -1 and 1. In general, a larger value indicates better model performance.',
   CHIndexHint: 'It evaluates the cluster validity based on the average between- and within-cluster sum of squares. In general, a larger value indicates better model performance.',
   clustersHint: 'clustersHint',
@@ -1115,8 +1117,78 @@ const EN_LAN = {
   ClusterReason: 'Since all your data predicted by this model belongs to one cluster, the metrics can not be computed.',
   Replacewithlower: 'Replace with lower',
   Replacewithupper: 'Replace with upper',
-  Pleaseinputsomecontentsforthesubmissio: 'Please input some contents for the submission.',
-  ClusterInfReason: 'the value of this metric is overflow'
+
+  Pleaseinputsomecontentsforthesubmissio:'Please input some contents for the submission.',
+  Variablename:'variable name',
+  formula:'formula',
+  Exportmodelresults:'Export model results',
+
+
+  ClusterInfReason: 'the value of this metric is overflow',
+  DataQualityFixing:'Data Quality Fixing',
+  none:'None',
+  VarianceExplained:'Variance Explained',
+  VarianceExplainedTip:`The table is arranged in descending order of eigenvalues. A larger eigenvalue indicates that the principal component (PC) has more explanatory power. In general, we choose PCs with a accumulated proportion  greater than or equal to 0.8 to represent the entire data.
+                        For example: in the following table, we think that the first three PCs are representative enough.<br/>
+                         <img src="/VarianceExplainedTip-en.png" alt=""/>
+                        `,
+  PC:'#PC',
+  Eigenvalue:'Eigenvalue',
+  ComulatedProportion:'Comulated Proportion',
+  Choose2PCs:'Choose 2 PCs',
+  Choose2PCsTip:`<strong>How to use this feature?</strong><br/>
+                  Please select any two PCs. By default, the two most important PCs display.<br/>
+                  <strong>At first</strong><br/>
+                  The diagram on the left below shows the correlation between the PC and the original variable, which makes it easier to understand the PC.<br/>
+                  The following figure is an example:<br/>
+                  (1) It can be seen along the x-axis that PC1 and variable x4 are strongly positively correlated, and x6 is strongly negatively correlated. PC1 is dominated by these two variables, and the influence of the remaining variables is slightly weaker.<br/>
+                  (2) It can be seen along the y-axis that PC2 is strongly positively correlated with variable x5, PC2 is dominated by it, and the influence of the remaining variables is slightly weaker.<br/>
+                   <img src="/Choose2PCsTip1.png" alt="">
+                  <strong>Then</strong><br/>
+                  The scatter plot on the bottom right, with the PC you selected as the axis. The results of the clustering are displayed on the graph as points of different colors. You can clearly see what the characteristics of each cluster's sample are.<br/>
+                  Combine the above figure, and the following figure is an example:<br/>
+                  (1) The first principal component separates the two clusters, so x4 and x6 are the key variables that distinguish the two clusters.<br/>
+                  (2) Cluster0 (blue) takes a larger value on PC1, referring to the correlation between the PC and the original variable, which means that the samples with large x4 value and small value of x6 in the original variable is gathered in In this cluster and cluster1(green) is just the opposite.<br/>
+                   <img src="/Choose2PCsTip2.png" alt="">
+                `,
+  PCSTitle:'The Correlation between PCs and original variables:',
+  ScatterPlotOfPCs:'ScatterPlot of PCs:',
+  FeatureCreationSelection:'Feature Creation & Selection',
+  PCAIntro:"PCA (Principal Component Analysis) is a traditional dimensionality reduction method that extracts a few representative principal components (PCs) as representative of high-dimensional data.",
+  watchtheinstructionalvideos:'Do you watch the instructional videos?',
+  Dontpromptforthismessage:"Don't prompt for this message ",
+  YES:'Yes',
+  NO:'No',
+  Logconversionofthe2:'Log conversion of the selected variable with a base of 2.',
+  VarContinuousvariablestartingwiththesymbol:'Var- Continuous variable, starting with the @ symbol.',
+  Description:'Description:',
+  Negativenumbersinvariableswill0:'Negative numbers in variables will be automatically replaced with 0',
+  Logconversionofthe10:'Log conversion of the selected variable with a base of 10.',
+  Logconversionofthee:'Log conversion of the selected variable with a base of e.',
+  Calculatethenthpoweroftheselectedvariable:'Calculate the nth power of the selected variable.',
+  Npositiveornegativeintegerordecimal:'N- positive or negative integer or decimal.',
+  Whenthereturnvalueexceedsthememory:'When the return value exceeds the memory, it will be replaced with the system default maximum and minimum values.',
+  Comparestwovariablesforequality:'Compares two variables for equality, equals 1 for equality, and returns 0 for unequal.',
+  Var1Adiscretevariable:'Var1- A discrete variable or continuous variable that begins with the @ symbol.',
+  Var2Adiscretevariable:'Var2- A discrete variable or continuous variable that begins with the @ symbol.',
+  Return01result:'Return 0/1 result',
+  Whenasinglevariableisentered:'When a single variable is entered, the sum of the variables is returned; when multiple variables are entered, the sum of the rows is returned.',
+  Var1var2var3continuousvariables:'Var1, var2, var3, ....- continuous variables, starting with the @ symbol.',
+  Whenasinglevariableisenteredtheminimumvalue:'When a single variable is entered, the minimum value of the variable is returned; when multiple variables are entered, the minimum value of the row is returned.',
+  Whenasinglevariableisenteredtheminimumvaluemax:'When a single variable is entered, the minimum value of the variable is returned; when multiple variables are entered, the maximum value of the row is returned.',
+  Whenasinglevariableisenteredtheminimumvaluemaxmean:'When a single variable is entered, the mean of the variable is returned; when multiple variables are entered, the mean of the row is returned.',
+  senior:'R2 custom function',
+  base:'Basic function',
+  lidationDataDefinition:'Required variable name',
+  DeploymentOptionText:'Option',
+  Thisratiowilldetermine:'This ratio will determine the model deployment results',
+  normal:'normal',
+  abnormal:'abnormal',
+  Scaleseachfeaturetothegivenrange:'Scales each feature to the given range - between zero and one. The Formula is (x - min) / (max - min).',
+  Centereachfeaturetothemean:'Center each feature to the mean and scale to unit variance. The Formula is (x - mean) / std.',
+  Centereachfeaturetothemedian:'Center each feature to the median and  scale according to the interquartile range. The Formula is (x - median) / (75th quantile - 25th quantile).  This method is robust to outliers.',
+  Youcangivehigherweightstofeatures:'You can give higher weights to features that you think are important. The value ranges from 0.1 to 99.9 and the adjustment step is 0.1.',
+
 };
 
 

@@ -26,6 +26,24 @@
     white-space: nowrap;
 }
 
+.process dt{
+    font-size:14px;
+    font-weight: bold;
+    text-transform: none;
+    display: flex;
+    align-items: center;
+}
+.process label{
+    font-weight: normal;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: inline-block;
+}
+.process dt:not(:first-child){
+    margin-top: 10px;
+}
+
 .process label {
     font-size: 0.2em;
 }

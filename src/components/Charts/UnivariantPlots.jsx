@@ -20,8 +20,8 @@ export default class UnivariantPlots extends PureComponent{
 				stack: 'sum',
 				markPoint : {
 					data : [
-						{type : 'max', name: '最大值'},
-						{type : 'min', name: '最小值'},
+						{type : 'max', name: EN.Max},
+						{type : 'min', name: EN.Min},
 					],
 				},
 			}

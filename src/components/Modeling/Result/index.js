@@ -78,6 +78,7 @@ export default class ModelResult extends Component {
     try {
       this.cancel = this.props.projectStore.project.generateReport(modelId)
     } catch (e) {
+      message.destroy();
       message.error('导出报告错误。')
       this.props.projectStore.project.reportProgress = 0
       this.props.projectStore.project.reportProgressText = 'init'

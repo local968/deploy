@@ -114,7 +114,10 @@ class AdvancedModel extends Component {
     if (hasNewOne) project.customHeader.push(checkedVariables)
     const sortFn = (a, b) => a - b
     if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
-    if (!project.version.length) return message.error(EN.Youneedtoselectatleast)
+    if (!project.version.length){
+      message.destroy();
+      return message.error(EN.Youneedtoselectatleast)
+    }
     closeAdvanced()
     advancedModeling()
   }

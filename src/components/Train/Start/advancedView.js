@@ -3,7 +3,7 @@ import styles from "./styles.module.css";
 import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
-import { NumberInput, Range } from "components/Common";
+import { NumberInput, Range,Hint } from "components/Common";
 import { Select, message, Tooltip } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
@@ -135,11 +135,11 @@ export default class AdvancedView extends Component {
     const measurementList =
       project.problemType === "Outlier"
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-        [{ value: "score", label: EN.Accuracy }]
+        [{ value: "score", label: EN.Accuracy ,hint:EN.ScoreHint}]
         : [
-          { value: "CVNN", label: "CVNN" },
-          { value: "CH", label: "CH Index" },
-          { value: "silhouette_euclidean", label: "Silhouette Score" },
+          { value: "CVNN", label: "CVNN" ,hint:EN.CVNNHint},
+          { value: "CH", label: "CH Index" ,hint:EN.CHIndexHint},
+          { value: "silhouette_euclidean", label: "Silhouette Score" ,hint:EN.SihouetteScoreHint},
 
           // { value: "CVNN", label: "CVNN" },
           // { value: "RSquared", label: "RSquared" },
@@ -295,6 +295,7 @@ export default class AdvancedView extends Component {
                 {measurementList.map((i, k) => (
                   <Option value={i.value} key={k}>
                     {i.label}
+                    <Hint content={i.hint} />
                   </Option>
                 ))}
               </Select>

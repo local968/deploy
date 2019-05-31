@@ -33,6 +33,7 @@ export default class Model {
   @observable featureList = []
   @observable rate = 0
   @observable pcaPlotData = ''
+  @observable featureLabel = []
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {

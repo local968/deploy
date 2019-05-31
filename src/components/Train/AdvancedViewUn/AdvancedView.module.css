@@ -305,6 +305,7 @@
   flex:2;
   padding-left: 12px;
   margin-left: 12px;
+  white-space: nowrap;
 }
 .table li:first-child{
   flex:2;
@@ -312,12 +313,15 @@
 .table li:last-child{
   flex:7;
   margin-right: 5px;
-  white-space: nowrap;
+  /*white-space: nowrap;*/
 }
 .chart{
   flex:2;
   text-align: left;
   padding-left: 40px;
+}
+.chart >div{
+  margin-bottom: 10px;
 }
 .chart >div >div{
   margin-left: 15px;
