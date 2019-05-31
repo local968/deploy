@@ -939,16 +939,18 @@ class PredictTable extends Component {
 
 class ModelComp extends Component {
   state = {
-    modelCompVisible: false
-  }
+    modelCompVisible: false,
+    select:true,
+  };
   handleClick = () => {
     this.setState({ modelCompVisible: true });
-  }
+  };
   handleCancel = () => {
     this.setState({ modelCompVisible: false });
-  }
+  };
   render() {
     const { models } = this.props;
+    const {select} = this.state;
     return (
       <div className={styles.modelComp}>
         <a onClick={this.handleClick} className={styles.comparison}>{EN.ModelComparisonCharts}</a>
@@ -965,9 +967,9 @@ class ModelComp extends Component {
             <h4>{EN.ModelComparisonCharts}</h4>
             <Tabs defaultActiveKey="1">
               <TabPane tab={EN.SpeedvsAccuracy} key="1">
-                {/*<SpeedAndAcc models={models} width={600} height={400} className="speedComp" />*/}
                 <SpeedvsAccuracys
                   // width={600}
+                  selectAll={select}
                   height={400}
                   x_name={EN.Speedms1000rows}
                   y_name={EN.Accuracy}
@@ -975,8 +977,8 @@ class ModelComp extends Component {
                 />
               </TabPane>
               <TabPane tab={EN.LiftsCharts} key="3">
-                {/*<LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
                 <LiftChart2
+                  selectAll={select}
                   models={models}
                   x_name={EN.percentage}
                   y_name={EN.lift}
@@ -987,9 +989,9 @@ class ModelComp extends Component {
                 />
               </TabPane>
               <TabPane tab={EN.ROCCurves} key="4">
-                {/*<RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
                 <RocChart2
                   models={models}
+                  selectAll={select}
                   x_name={EN.FalsePositiveDate}
                   y_name={EN.TruePositiveRate}
                   mom='roc'
@@ -1001,6 +1003,16 @@ class ModelComp extends Component {
                 <Learning width={600} height={400} className="learningComp" models={models} model={models[0]} />
               </TabPane> */}
             </Tabs>
+            <div className={styles.mccb}>
+              <Button key="cancel" type="primary" onClick={async ()=>{
+                await this.setState({select:false});
+                this.setState({select:true});
+              }}>{EN.SelectAll}</Button>
+              <Button key="cancel" type="primary" onClick={async ()=>{
+                await this.setState({select:true});
+                this.setState({select:false});
+              }}>{EN.DeselectAll}</Button>
+            </div>
           </div>
         </Modal>
       </div>
