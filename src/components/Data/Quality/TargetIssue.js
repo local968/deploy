@@ -45,7 +45,11 @@ export class ClassificationTarget extends Component {
         return null
       }).filter(n => !!n)
       const values = [...Object.keys(targetCounts), ...Object.values(temp).filter(v => !deleteKeys.includes(v)), ...renameValues]
-      if (values.length !== [...new Set(values)].length) return message.error("Cannot be modified to the same name")
+      if (values.length !== [...new Set(values)].length){
+
+        message.destroy();
+        return message.error("Cannot be modified to the same name")
+      }
       const { targetArrayTemp, targetMapTemp } = this.props.project
       if (!!targetArrayTemp.length) {
         targetArrayTemp.forEach((v, k) => {

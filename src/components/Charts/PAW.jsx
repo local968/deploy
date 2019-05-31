@@ -4,7 +4,9 @@ import {Select} from "antd";
 import PCS from "./PCS";
 import request from "../Request";
 import TSEN from "./T-SEN";
+import EN from "../../constant/en";
 const {Option} = Select;
+import { Hint } from 'components/Common';
 
 export default function PAW(props){
 	const {url}  = props;
@@ -70,13 +72,14 @@ export default function PAW(props){
 	
 	return <section className={styles.pca}>
 		<div className={styles.table}>
-			Variance Explained
+			{EN.VarianceExplained}
+			<Hint content={<div dangerouslySetInnerHTML={{__html:EN.VarianceExplainedTip}}/>} />
 			<dl>
 				<dt>
 					<ul>
-						<li>#PC</li>
-						<li>Eigenvalue</li>
-						<li>Comulated Proportion</li>
+						<li>{EN.PC}</li>
+						<li>{EN.Eigenvalue}</li>
+						<li>{EN.ComulatedProportion}</li>
 					</ul>
 				</dt>
 				{
@@ -91,7 +94,8 @@ export default function PAW(props){
 		</div>
 		<div className={styles.chart}>
 			<div>
-				Choose 2 PCs
+				{EN.Choose2PCs}
+				<Hint content={<div dangerouslySetInnerHTML={{__html:EN.Choose2PCsTip}}/>} />
 				<Select
 					style={{ width: 120 }}
 					value = {pcs[0]}
@@ -115,6 +119,7 @@ export default function PAW(props){
 			</div>
 			<dl>
 				<dt>
+					{/*<span>{EN.PCSTitle}</span>*/}
 					<PCS
 						 data={pcsD}
 					     x_name = {'PC'+(pcs[0]+1)}
@@ -123,13 +128,14 @@ export default function PAW(props){
 					/>
 				</dt>
 				<dd>
+					{/*<span>{EN.ScatterPlotOfPCs}</span>*/}
 					<TSEN
 						x_name = {'PC'+(pcs[0]+1)}
 						y_name = {'PC'+(pcs[1]+1)}
 						width = {380}
 						height={340}
 						data={tsenD}
-						title={'ScatterPlot of PCs:'}
+						title={EN.ScatterPlotOfPCs}
 					/>
 				</dd>
 			</dl>
