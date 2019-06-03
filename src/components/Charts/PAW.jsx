@@ -97,18 +97,22 @@ export default function PAW(props){
 				{EN.Choose2PCs}
 				<Hint content={<div dangerouslySetInnerHTML={{__html:EN.Choose2PCsTip}}/>} />
 				<Select
+					id='select_1'
 					style={{ width: 120 }}
 					value = {pcs[0]}
-				        onChange={value=>{
-					        setPcs([value,pcs[1]]);
+					getPopupContainer={() => document.getElementById('select_1')}
+			        onChange={value=>{
+				        setPcs([value,pcs[1]]);
 				}}>
 					{
 						corrData.map((itm,index)=><Option key={index} value={index} disabled={index === pcs[1]}>PC{index+1}</Option>)
 					}
 				</Select>
 				<Select
+					id='select_2'
 					style={{ width: 120 }}
 					value = {pcs[1]}
+					getPopupContainer={() => document.getElementById('select_2')}
 					onChange={value=>{
 						setPcs([pcs[0],value]);
 					}}>

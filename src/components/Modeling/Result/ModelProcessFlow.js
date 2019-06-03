@@ -54,7 +54,8 @@ export default class ModelProcessFlow extends Component {
 			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
 			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd title={variables.join(',')}>variables:<label>{variables.join(',')}</label></dd>}
 			
-			{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}
+			{/*{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}*/}
+			{data['categorical_encoding:__choice__'] === "no_encoding"&&<dt>Encoding:No Encoding</dt>}
 			<dt>Banlance:{data['balancing:strategy']}</dt>
 			{this.list(data, `rescaling:${data['rescaling:__choice__']}:`, `Rescaling:${rescaling}`)}
 		</dl>
