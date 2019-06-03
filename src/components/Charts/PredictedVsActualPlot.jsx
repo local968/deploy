@@ -81,13 +81,13 @@ export default class PredictedVsActualPlot extends PureComponent{
 				trigger: 'axis',
 				formatter: function (params) {
 					let result = `
-						组编号: ${params[0].axisValue}<br/>
+						{EN.PointNumber}: ${params[0].axisValue}<br/>
 						${params[0].seriesName}: ${params[0].value[1].toFixed(3)}<br/>
 					`;
 					
 					if(params[1]){
 						return `
-						组编号: ${params[0].axisValue}<br/>
+						{EN.PointNumber}: ${params[0].axisValue}<br/>
 						${params[0].seriesName}: ${params[0].value[1].toFixed(3)}<br/>
 						${params[1].seriesName}: ${params[1].value[1].toFixed(3)}
 					`;
