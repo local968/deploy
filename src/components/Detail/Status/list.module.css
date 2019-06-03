@@ -126,6 +126,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-right: 1rem;
+  word-wrap:break-word;
   line-height: 1.2;
 }
 .head .performance,
