@@ -248,15 +248,15 @@ class AdvancedModelTable extends Component {
             {
               detail && type === 'Parallel Plot'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
             }
-            Compute
+	          {EN.Compute}
           </a>} />
           <RowCell
               onClick={this.handleResult.bind(this,'PCA')}
               key='PCA' data={<a href='javascript:;' className={detail&&type === 'PCA'?styles.on:''}>
             {
-              detail && type === 'Pca'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
+              detail && type === 'PCA'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
             }
-            Compute
+	          {EN.Compute}
           </a>} />
         </Row>
         {detail && <RegressionDetailCurves
