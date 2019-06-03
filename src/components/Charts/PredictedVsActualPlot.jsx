@@ -31,8 +31,8 @@ export default class PredictedVsActualPlot extends PureComponent{
 			})).data;
 		}
 		
-		data[0].name = '真实值';
-		data[1].name = '预测值';
+		data[0].name = EN.ActualValues;
+		data[1].name = EN.PredictedValues;
 		this.setState({
 			data,
 			loading:false,
