@@ -16,7 +16,7 @@
   color: #4a4a4a;
   line-height: 1.4;
   max-width: 100%;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .modalBox {
