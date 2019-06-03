@@ -1055,6 +1055,8 @@ const ZH_LAN: any = {
   Youcangivehigherweightstofeatures:'您可以给您认为重要的变量设置更高的权重。取值范围为0.1~99.9，调节步长为0.1。',
   restore:'还原',
   Groupaverage:'的组内平均值',
+  DropTheseVariables:"删除下列特征",
+  CreateTheseVariables:"新增下列特征",
 };
 
 export default ZH_LAN;

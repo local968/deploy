@@ -59,6 +59,7 @@ export default class ThreeVariable extends PureComponent{
 				type: 'scroll',
 				zlevel:20,
 				animationDurationUpdate:100,
+				inactiveColor:'rgba(204,204,204,0.5)'
 			},
 			xAxis3D: {
 				name:x_name

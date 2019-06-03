@@ -1193,6 +1193,8 @@ const EN_LAN = {
   Youcangivehigherweightstofeatures:'You can give higher weights to features that you think are important. The value ranges from 0.1 to 99.9 and the adjustment step is 0.1.',
   restore:'restore',
   Groupaverage:'group average',
+  DropTheseVariables:"Drop these Variables",
+  CreateTheseVariables:"Create these Variables",
 };
 
 

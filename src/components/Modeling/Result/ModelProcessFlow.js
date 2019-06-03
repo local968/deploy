@@ -52,7 +52,9 @@ export default class ModelProcessFlow extends Component {
 		
 		return <dl>
 			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
-			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd title={variables.join(',')}>variables:<label>{variables.join(',')}</label></dd>}
+			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd title={variables.join(',')}>
+				<p style={{display:(variables.length?'':'none')}}>variables:<label>{variables.join(',')}</label></p>
+			</dd>}
 			
 			{/*{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}*/}
 			{data['categorical_encoding:__choice__'] === "no_encoding"&&<dt>Encoding:No Encoding</dt>}
@@ -209,10 +211,10 @@ export default class ModelProcessFlow extends Component {
 		
 		const pop = <dl>
 			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
-				Drop these Variables:<label>{drop.join(',')}</label>
+				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
 			</dt>
 			<dt style={{display:(create.length?'':'none')}}>
-				Create these Variables:
+				{EN.CreateTheseVariables}:
 			</dt>
 			{
 				create.map((itm,index)=><dd key={index}>{itm}</dd>)
