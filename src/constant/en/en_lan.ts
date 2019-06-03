@@ -1162,8 +1162,8 @@ const EN_LAN = {
   ScatterPlotOfPCs:'ScatterPlot of PCs:',
   FeatureCreationSelection:'Feature Creation & Selection',
   PCAIntro:"PCA (Principal Component Analysis) is a traditional dimensionality reduction method that extracts a few representative principal components (PCs) as representative of high-dimensional data.",
-  watchtheinstructionalvideos:'Do you want to watch the instructional videos?',
-  Dontpromptforthismessage:"Don't show this message again.",
+  watchtheinstructionalvideos:'Would you like to watch the tutorial video?',
+  Dontpromptforthismessage:"Do not display this message.",
   YES:'Yes',
   NO:'No',
   Logconversionofthe2:'Logarithmic tranformation with 2 as the base.',
@@ -1189,14 +1189,14 @@ const EN_LAN = {
   lidationDataDefinition:'Required variable name',
   DeploymentOptionText:'Option',
   Thisratiowilldetermine:'This ratio will determine the model deployment results',
-  normal:'normal',
-  abnormal:'outlier',
+  normal:'Normal',
+  abnormal:'Outlier',
   Scaleseachfeaturetothegivenrange:'Scales each feature to the given range - between zero and one. The Formula is (x - min) / (max - min).',
   Centereachfeaturetothemean:'Center each feature to the mean and scale to unit variance. The Formula is (x - mean) / std.',
   Centereachfeaturetothemedian:'Center each feature to the median and  scale according to the interquartile range. The Formula is (x - median) / (75th quantile - 25th quantile).  This method is robust to outliers.',
   Youcangivehigherweightstofeatures:'You can give higher weights to features that you think are important. The value ranges from 0.1 to 99.9 and the adjustment step is 0.1.',
   restore:'restore',
-  Groupaverage:'group average',
+  Groupaverage:'average of group x',
   DropTheseVariables:"Drop these Variables",
   CreateTheseVariables:"Create these Variables",
 
@@ -1243,6 +1243,8 @@ const EN_LAN = {
   Groupby_example: 'Groupby(@duration, [@job], [sum, median])',
   Groupby_example1: 'Groupby(@duration, [@job, @education], [mean, min])',
   Groupby_example2: 'Groupby(@job, [@education])',
+  Minimum:'Minimum',
+  Maximum:'Maximum',
 };
 
 

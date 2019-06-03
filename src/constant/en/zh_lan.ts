@@ -1108,6 +1108,8 @@ const ZH_LAN: any = {
   Groupby_example: 'Groupby(@duration, [@job], [sum, median])',
   Groupby_example1: 'Groupby(@duration, [@job, @education], [mean, min])',
   Groupby_example2: 'Groupby(@job, [@education])',
+  Minimum:'最小值',
+  Maximum:'最大值',
 };
 
 export default ZH_LAN;
