@@ -1191,6 +1191,7 @@ const EN_LAN = {
   Centereachfeaturetothemean:'Center each feature to the mean and scale to unit variance. The Formula is (x - mean) / std.',
   Centereachfeaturetothemedian:'Center each feature to the median and  scale according to the interquartile range. The Formula is (x - median) / (75th quantile - 25th quantile).  This method is robust to outliers.',
   Youcangivehigherweightstofeatures:'You can give higher weights to features that you think are important. The value ranges from 0.1 to 99.9 and the adjustment step is 0.1.',
+  restore:'restore',
   Groupaverage:'group average',
 };
 

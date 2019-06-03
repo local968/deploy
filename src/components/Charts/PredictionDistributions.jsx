@@ -1,6 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
+import config from 'config'
+
+const isEN = config.isEN;
 
 export default function PredictionDistributions(props){
 	const {x_name='',y_name='',width=500,height=400,model} = props;
@@ -25,7 +28,6 @@ export default function PredictionDistributions(props){
 		name:'True',
 		value:_.zip(_PERCENTAGE,_POSITIVE),
 	}];
-	// console.log('data',data)
 	const series = data.map(itm=>({
 		type: 'line',
 		areaStyle: {},
@@ -97,7 +99,10 @@ export default function PredictionDistributions(props){
 			yAxis: {
 				type: 'value',
 				name:y_name,
-				nameTextStyle,
+				nameTextStyle:{
+					...nameTextStyle,
+					padding:isEN?[0,0,0,10]:0,
+				},
 			},
 			grid:{
 				x2:140,

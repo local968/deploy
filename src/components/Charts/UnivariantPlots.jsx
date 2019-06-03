@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
+import EN from '../../constant/en';
 
 /**
  * Univariant Plot

@@ -15,12 +15,6 @@ export default class ROCCurves extends PureComponent{
 		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
 	}
 	
-	// componentWillReceiveProps(nextProps) {
-	// 	if(nextProps.model.fitIndex === this.state.startIndex){
-	// 		this.prePair(nextProps.model.fitIndex);
-	// 	}
-	// }
-	
 	prePair(fitIndex=this.props.model.fitIndex){
 		const {x_name='',y_name='',model} =this.props;
 		const {chartData} = model;
@@ -114,6 +108,7 @@ export default class ROCCurves extends PureComponent{
 			},
 			grid:{
 				y2:80,
+				x2:150,
 			},
 			tooltip:{
 				triggerOn: 'none',
@@ -178,7 +173,7 @@ export default class ROCCurves extends PureComponent{
 	}
 
 	render(){
-		const {width=600,height=300} = this.props;
+		const {width=650,height=300} = this.props;
 		return <ReactEcharts
 			ref = {chart=>this.chart = chart}
 			option={this.getOption()}
