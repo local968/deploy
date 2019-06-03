@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography } from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 
 const ZH_LAN: any = {
   Loading: '加载中…',
@@ -985,25 +985,25 @@ const ZH_LAN: any = {
   ClusterReason: '您的数据在该模型上的预测类别数为1类，故不显示度量指标。',
   Replacewithlower: '替换为下界',
   Replacewithupper: '替换为上界',
-  Pleaseinputsomecontentsforthesubmissio:'请输入提交的内容。',
+  Pleaseinputsomecontentsforthesubmissio: '请输入提交的内容。',
 
-  Variablename:'变量名称',
-  formula:'公式',
-  Exportmodelresults:'导出模型结果',
+  Variablename: '变量名称',
+  formula: '公式',
+  Exportmodelresults: '导出模型结果',
 
   ClusterInfReason: '该指标数值溢出',
-  DataQualityFixing:'数据质量修复',
-  none:'无',
-  VarianceExplained:'方差解释比例',
-  VarianceExplainedTip:`该表格按照特征根的大小降序排列。主成分的特征根越大，对整个数据的代表能力越强，因而也越重要。一般而言，我们选择累计解释百分比达到0.8及以上的全部主成分即可代表整个数据。<br/>
+  DataQualityFixing: '数据质量修复',
+  none: '无',
+  VarianceExplained: '方差解释比例',
+  VarianceExplainedTip: `该表格按照特征根的大小降序排列。主成分的特征根越大，对整个数据的代表能力越强，因而也越重要。一般而言，我们选择累计解释百分比达到0.8及以上的全部主成分即可代表整个数据。<br/>
                         比如：在以下例子中，我们认为选择前三个主成分就经具有足够代表性。<br/>
                         <img src="/VarianceExplainedTip.png" alt=""/>
                         `,
-  PC:'主成分',
-  Eigenvalue:'特征根',
-  ComulatedProportion:'累计解释百分比',
-  Choose2PCs:'请选择两个主成分',
-  Choose2PCsTip:`<section style="height:400px;overflow:auto;">
+  PC: '主成分',
+  Eigenvalue: '特征根',
+  ComulatedProportion: '累计解释百分比',
+  Choose2PCs: '请选择两个主成分',
+  Choose2PCsTip: `<section style="height:400px;overflow:auto;">
                 <strong>怎么使用这个功能？</strong><br/>
                   请选择任意两个主成分。默认显示最重要的两个主成分。<br/>
                   <strong>首先</strong><br/>
@@ -1057,6 +1057,57 @@ const ZH_LAN: any = {
   Groupaverage:'的组内平均值',
   DropTheseVariables:"删除下列特征",
   CreateTheseVariables:"新增下列特征",
+
+  Interactive: 'Interactive',
+  Interactive_descr: 'Interactive函数对选择的变量进行两两相乘操作，生成新变量',
+  Interactiverange_grammar: 'Interactive(@var1, @var2, @var3, …)',
+  Interactive_input: 'var1, var2, var3, ….-连续变量，以@符号开头，最多支持选择20个变量。',
+  Interactive_output: '连续变量',
+  Interactive_example: 'Interactive(@age, @income)',
+
+  func_note:'说明',
+
+  Box_cox: 'Box_cox',
+  Box_cox_descr: 'Box_cox函数对选择的变量进行以lambda为参数的Box-Cox转换。',
+  Box_cox_grammar: 'Box_cox(@var, lambda)',
+  Box_cox_input: 'var- 连续变量，以@符号开头。' ,
+  Box_cox_input1: 'lambda- 实数，不输入lambda时默认根据最大化似然函数选择最优lambda值。',
+  Box_cox_output: '连续变量',
+  Box_cox_example: 'Box_cox(@duration)',
+  Box_cox_example1: 'Box_cox(@duration,0.5)',
+  Box_cox_note: 'Box_cox(@duration)',
+  Box_cox_note_txt: '1. 变量中存在小于0的数时，变量将被平移处理成大于等于1的范围。',
+  Box_cox_note_txt1: '2. 不合理的lambda输入可能引起错误，建议范围-5.00~5.00，支持小数点后两位小数。',
+
+  Number_extraction: 'Number_extraction',
+  Number_extraction_descr: 'Number_extraction函数可以提取选择变量中的数字信息。',
+  Number_extraction_grammar: 'Number_extraction(@var)',
+  Number_extraction_input: 'var- 离散变量，以@符号开头。',
+  Number_extraction_output: '连续变量',
+  Number_extraction_note_txt: '当变量中含有多个间隔数字时，提取后数字将被合并。',
+  Number_extraction_example: 'Number_extraction(@percent)',
+
+  Substring: 'Substring',
+  Substring_descr: 'Substing函数可以通过指定位置提取变量信息。',
+  Substring_grammar: 'Substring(@var1, [position1, position2])',
+  Substring_input: 'var- 离散变量，以@符号开头。',
+  Substring_input1: 'position1, position2- 大于等于0的正整数，position1为提取变量的起始位置，position2为提取字段的结束位置。变量的起始位置从0开始， position2必须大于position1。',
+  Substring_output: '离散变量',
+  Substring_note_txt: 'position2如果超出变量长度将自动截取至变量结束位置。',
+  Substring_example: 'Substring(@month, [3, 5])',
+
+  Groupby: 'Groupby',
+  Groupby_descr: 'Groupby函数通过指定主键变量（key）对选择变量进行统计计算。',
+  Groupby_grammar: 'Groupby(@var, [@key1, @key2], [fun1,fun2,…])',
+  Groupby_input: 'var- 连续变量或离散变量，以@符号开头。',
+  Groupby_input1: 'key1， key2- 离散变量，用以对选择变量进行分组的主键变量。最多支持选择2个主键变量（2级统计），只选择一个主键变量时，“[]”可省略，所有变量以@符号开头。',
+  Groupby_input2: 'fun1, fun2,…- 对变量的统计函数，只选择一个fun时，“[]”可省略；',
+  Groupby_input3: 'var为连续变量时，支持 [sum, mean, min, max, std, median]；',
+  Groupby_input4: 'var为离散变量时，默认支持 mode（众数）统计。',
+  Groupby_output: '连续变量或离散变量',
+  Groupby_example: 'Groupby(@duration, [@job], [sum, median])',
+  Groupby_example1: 'Groupby(@duration, [@job, @education], [mean, min])',
+  Groupby_example2: 'Groupby(@job, [@education])',
 };
 
 export default ZH_LAN;

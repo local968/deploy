@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography } from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 
 const EN_LAN = {
   /**
@@ -574,9 +574,13 @@ const EN_LAN = {
   Custom_Quantile_bin: 'Custom_Quantile_bin()',
   Custom_Quantile_binfunction: 'Custom_Quantile_bin function allows you to easily construct new variables by dividing selected variables into certain groups depending on customized range.',
   Custom_Quantile_binrange_list1: 'Custom_Quantile_bin(@var, [range_list1], [range_list2]...)',
-  Variableneedstostartwith: 'var - 1 numerical variable to be divided; Variable needs to start with@. [range_list1], [range_list2]... - customized range to dividing the variable; its first number should be larger than the minimum value of the variable and the last number should be smaller than the maximum value of the variable; the length of the range_list decides the number of groups.',
   Custom_Quantile_binage: 'Custom_Quantile_bin(@age,[25|50],[20|40|60])',
-
+  Interactive: 'Interactive()',
+  Interactive_descr: 'Interactive function allows you to construct new variables by mutiplying two of them.',
+  Interactiverange_grammar: 'Interactive(@var1, @var2, @var3, …)',
+  Interactive_input: 'var1, var2, var3, ….- numerical variable, needs to start with @; maximum of 20 variables is supported.',
+  Interactive_output: 'numerical variable',
+  Interactive_example: 'Interactive(@age, @income)',
 
   // /app-bff/src/components/Modeling/Start
   Oneoftheclasseshasnumber: 'One of the classes has number of data points smaller than',
@@ -1118,25 +1122,25 @@ const EN_LAN = {
   Replacewithlower: 'Replace with lower',
   Replacewithupper: 'Replace with upper',
 
-  Pleaseinputsomecontentsforthesubmissio:'Please input some contents for the submission.',
-  Variablename:'variable name',
-  formula:'formula',
-  Exportmodelresults:'Export model results',
+  Pleaseinputsomecontentsforthesubmissio: 'Please input some contents for the submission.',
+  Variablename: 'variable name',
+  formula: 'formula',
+  Exportmodelresults: 'Export model results',
 
 
   ClusterInfReason: 'the value of this metric is overflow',
-  DataQualityFixing:'Data Quality Fixing',
-  none:'None',
-  VarianceExplained:'Variance Explained',
-  VarianceExplainedTip:`The table is arranged in descending order of eigenvalues. A larger eigenvalue indicates that the principal component (PC) has more explanatory power. In general, we choose PCs with a accumulated proportion  greater than or equal to 0.8 to represent the entire data.
+  DataQualityFixing: 'Data Quality Fixing',
+  none: 'None',
+  VarianceExplained: 'Variance Explained',
+  VarianceExplainedTip: `The table is arranged in descending order of eigenvalues. A larger eigenvalue indicates that the principal component (PC) has more explanatory power. In general, we choose PCs with a accumulated proportion  greater than or equal to 0.8 to represent the entire data.
                         For example: in the following table, we think that the first three PCs are representative enough.<br/>
                          <img src="/VarianceExplainedTip-en.png" alt=""/>
                         `,
-  PC:'#PC',
-  Eigenvalue:'Eigenvalue',
-  ComulatedProportion:'Comulated Proportion',
-  Choose2PCs:'Choose 2 PCs',
-  Choose2PCsTip:`
+  PC: '#PC',
+  Eigenvalue: 'Eigenvalue',
+  ComulatedProportion: 'Comulated Proportion',
+  Choose2PCs: 'Choose 2 PCs',
+  Choose2PCsTip: `
                   <section style="height:400px;overflow:auto;">
                    <strong>How to use this feature?</strong><br/>
                   Please select any two PCs. By default, the two most important PCs display.<br/>
@@ -1195,6 +1199,50 @@ const EN_LAN = {
   Groupaverage:'group average',
   DropTheseVariables:"Drop these Variables",
   CreateTheseVariables:"Create these Variables",
+
+  func_note:'Note',
+
+  Box_cox: 'Box_cox',
+  Box_cox_descr: 'Box_cox function allows you to construct a new variable by Box-Cox transformation with parameter lambda.',
+  Box_cox_grammar: 'Box_cox(@var, lambda)',
+  Box_cox_input: 'var- numerical variable, needs to start with @.',
+  Box_cox_input1: 'lambda- real number; when no lambda is input, the optimal lambda value is defined by maximizing likelihood function as default.',
+  Box_cox_output: 'numerical variable',
+  Box_cox_example: 'Box_cox(@duration)',
+  Box_cox_example1: 'Box_cox(@duration,0.5)',
+  Box_cox_note: 'Box_cox(@duration)',
+  Box_cox_note_txt: '1. When there are values of the variable less than 0, all values of this variable will be translated into a range greater than or equal to 1.',
+  Box_cox_note_txt1: 'Unreasonable lambda can cause errors. The recommended range of it is -5.00~5.00, which supports two decimal places max.',
+
+  Number_extraction: 'Number_extraction',
+  Number_extraction_descr: 'Number_extraction function allows you to extract the digital information.',
+  Number_extraction_grammar: 'Number_extraction(@var)',
+  Number_extraction_input: 'var- categorical variable, needs to start with @.',
+  Number_extraction_output: 'numerical variable',
+  Number_extraction_note_txt: 'When the variable contains multiple interval numbers, the extracted numbers will be ',
+  Number_extraction_example: 'Number_extraction(@percent)',
+
+  Substring: 'Substring',
+  Substring_descr: 'Substing function allows you to extract the information of the variable by specifying the position.',
+  Substring_grammar: 'Substring(@var1, [position1, position2])',
+  Substring_input: 'var- categorical variable, needs to start with @.',
+  Substring_input1: 'position1, position2- positive integer, greater than or equal to 0; position1 is the starting position of the extracted variable, and position2 is the ending position; the starting position starts at 0; position2 must be greater than position1.',
+  Substring_output: 'categorical variable',
+  Substring_note_txt: 'if position2 exceeds the variable length, it will be automatically replaced with the end of the variable.',
+  Substring_example: 'Substring(@month, [3, 5])',
+
+  Groupby: 'Groupby',
+  Groupby_descr: 'Groupby function allows you perform statistical calculation of selected variable by specifying primary key variables (key).',
+  Groupby_grammar: 'Groupby(@var, [@key1, @key2], [fun1,fun2,…])',
+  Groupby_input: 'var- numerical or categorical variable, needs to start with @.',
+  Groupby_input1: 'key1, key2- categorical variable, primary key variable for grouping the selected variable; maximum of 2 key variables is supported; when only one primary key variable is selected, "[]" can be omitted; all variables input need to start with @.',
+  Groupby_input2: 'fun1, fun2,…- statistical function; when only one function is selected, "[]" can be omitted;',
+  Groupby_input3: 'when var is a numerical variable, functions [sum, mean, min, max, std, median] are supported;',
+  Groupby_input4: 'when var is a categorical variable, function [mode] is supported by default.',
+  Groupby_output: 'numerical or categorical variable',
+  Groupby_example: 'Groupby(@duration, [@job], [sum, median])',
+  Groupby_example1: 'Groupby(@duration, [@job, @education], [mean, min])',
+  Groupby_example2: 'Groupby(@job, [@education])',
 };
 
 
