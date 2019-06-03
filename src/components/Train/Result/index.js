@@ -464,17 +464,21 @@ const MappingDict = observer((props) => {
 
   const handleSelect = value => {
     project.updateProject({ mappingKey: value })
+    setState({
+      origin: '',
+      encode: ''
+    })
   }
   const tableData = React.useMemo(() => {
     const key = mappingKey || list[0]
     const mapping = colMap[key]
     const data = Object.entries(mapping)
-      .filter(r1 => r1[0].toString().includes(state.origin))
-      .filter(r2 => r2[1].toString().includes(state.encode))
+      .filter(r1 => r1[0].toString().toLowerCase().includes(state.origin.toLowerCase()))
+      .filter(r2 => r2[1].toString().toLowerCase().includes(state.encode.toLowerCase()))
       .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.mapCell })))
     const header = [
-      { content: <span>{EN.Origin}<input style={{ width: 160,marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.mapCell },
-      { content: <span>{EN.Encoding} <input style={{ width: 160,marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.mapCell }
+      { content: <span>{EN.Origin}<input style={{ width: 160, marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.mapCell },
+      { content: <span>{EN.Encoding} <input style={{ width: 160, marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.mapCell }
     ]
     return [header, ...data]
   })
@@ -485,7 +489,7 @@ const MappingDict = observer((props) => {
     <div className={classes.dictSelect}>
       <span>{EN.PleaseSelectaCategoricalVariable}</span>
       <Select value={mappingKey || list[0]} style={{ width: 120, marginLeft: 20 }} onChange={handleSelect}>
-        {list.map(l => <Option value={l}>{l}</Option>)}
+        {list.map((l, k) => <Option value={l} key={k}>{l}</Option>)}
       </Select>
     </div>
     <div className={classes.dictTable}>
