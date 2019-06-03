@@ -1124,7 +1124,7 @@ class PredictTable extends Component {
     }];
 
 
-    console.log(data, '--------------------------')
+    console.log(data, '--------------------------' ,project.criteria , '123')
 
     return (
       <div className={styles.costbase}>
@@ -1138,66 +1138,69 @@ class PredictTable extends Component {
           dataSource={data}
           pagination={false} />
 
-        <div className={styles.costBlock}>
-          <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
-          <section className={styles.newTitle}>
-            <label>{EN.Input}</label>
-            <dl>
-              <dt>
-                <span>{EN.Basedonyourbizscenario}</span>
-                <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>
-                <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>
-              </dt>
-            </dl>
-            <dl style={{ margin: '0.1em 0' }}>
-              <dt>
-                <div className={styles.eventInput}>
-                  <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
-                  <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} onBlur={this.handleChangeEvent} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
-                  <span style={{ marginLeft: '0.5em' }}>%</span>
-                  {/*<span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>*/}
+        {
+          project.criteria === 'cost' ? <div className={styles.costBlock}>
+            <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
+            <section className={styles.newTitle}>
+              <label>{EN.Input}</label>
+              <dl>
+                <dt>
+                  <span>{EN.Basedonyourbizscenario}</span>
+                  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>
+                  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>
+                </dt>
+              </dl>
+              <dl style={{ margin: '0.1em 0' }}>
+                <dt>
+                  <div className={styles.eventInput}>
+                    <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
+                    <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} onBlur={this.handleChangeEvent} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
+                    <span style={{ marginLeft: '0.5em' }}>%</span>
+                    {/*<span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>*/}
+                  </div>
+                </dt>
+                <div className={styles.eventButton}>
+                  {/*<a*/}
+                  {/*  className={styles.myButton}*/}
+                  {/*  href="javascript:;" onClick={() => {*/}
+                  {/*  this.showTip = true;*/}
+                  {/*}*/}
+                  {/*}>{EN.Tips}</a>*/}
                 </div>
-              </dt>
-              <div className={styles.eventButton}>
-                {/*<a*/}
-                {/*  className={styles.myButton}*/}
-                {/*  href="javascript:;" onClick={() => {*/}
-                {/*  this.showTip = true;*/}
-                {/*}*/}
-                {/*}>{EN.Tips}</a>*/}
-              </div>
-            </dl>
-          </section>
-          <div className={styles.costBox}>
-            <div className={styles.costTable}>
-              <div className={styles.costRow}>
-                <div className={styles.costName}>
-                  <div className={classnames(styles.costColor, styles.cost1)} />
-                  <span>{EN.Benefit}</span>
+              </dl>
+            </section>
+            <div className={styles.costBox}>
+              <div className={styles.costTable}>
+                <div className={styles.costRow}>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost1)} />
+                    <span>{EN.Benefit}</span>
+                  </div>
+                  <div className={styles.costCell}>{this.costInput(1, 1)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 0)}</div>
                 </div>
-                <div className={styles.costCell}>{this.costInput(1, 1)}</div>
-                <div className={styles.costCell}>{this.costInput(0, 0)}</div>
-              </div>
-              <div className={styles.costRow}>
-                <div className={styles.costName}>
-                  <div className={classnames(styles.costColor, styles.cost2)} />
-                  <span>{EN.Cost}</span>
+                <div className={styles.costRow}>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost2)} />
+                    <span>{EN.Cost}</span>
+                  </div>
+                  <div className={styles.costCell}>{this.costInput(1, 0)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 1)}</div>
                 </div>
-                <div className={styles.costCell}>{this.costInput(1, 0)}</div>
-                <div className={styles.costCell}>{this.costInput(0, 1)}</div>
               </div>
             </div>
-          </div>
-          {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
-            <div><span className={styles.newStext}><b>{EN.Resultbasedonthedataset}{`<${typeof distribution === 'number' ? distribution : (event / 100)}%>`}{EN.Events}</b></span></div>
-            <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoptimalthreshold}{`<${formatNumber(Threshold, 3)}>`}</span></div>
-            <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoverallbenefit}{`<${curBenefit.benefit > Math.pow(10, 7) ? curBenefit.benefit.toPrecision(3) : formatNumber(curBenefit.benefit, 2)}>`}</span></div>
-            {/* <div className={styles.costText}><span>{curBenefit.text}</span></div> */}
-          </div>}
-          {/*<div className={styles.costButton}>*/}
-          {/*  <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>*/}
-          {/*</div>*/}
-        </div>
+            {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
+              <div><span className={styles.newStext}><b>{EN.Resultbasedonthedataset}{`<${typeof distribution === 'number' ? distribution : (event / 100)}%>`}{EN.Events}</b></span></div>
+              <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoptimalthreshold}{`<${formatNumber(Threshold, 3)}>`}</span></div>
+              <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoverallbenefit}{`<${curBenefit.benefit > Math.pow(10, 7) ? curBenefit.benefit.toPrecision(3) : formatNumber(curBenefit.benefit, 2)}>`}</span></div>
+              {/* <div className={styles.costText}><span>{curBenefit.text}</span></div> */}
+            </div>}
+            {/*<div className={styles.costButton}>*/}
+            {/*  <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>*/}
+            {/*</div>*/}
+          </div>:null
+        }
+
 
 
 
