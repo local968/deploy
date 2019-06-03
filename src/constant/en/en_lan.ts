@@ -871,7 +871,7 @@ const EN_LAN = {
   DeploymentpagewillprovidedeploymentIdandtokenparameter: 'Deployment page will provide deploymentId and token parameter',
   Response: 'Response',
   predictresult: 'result:predict result',
-  errorcodeifsuccess: 'code:error code, 10000 if succes',
+  errorcodeifsuccess: 'code:error code, 10000 if success',
   humenreadableinformation: 'message:humen readable information',
   originalerrorinformation: 'error:original error information, this field only exist if some error appear',
   dataisnotavalidJSONstring: 'data is not a valid JSON strin',
