@@ -1190,7 +1190,7 @@ const EN_LAN = {
   DeploymentOptionText:'Option',
   Thisratiowilldetermine:'This ratio will determine the model deployment results',
   normal:'normal',
-  abnormal:'abnormal',
+  abnormal:'outlier',
   Scaleseachfeaturetothegivenrange:'Scales each feature to the given range - between zero and one. The Formula is (x - min) / (max - min).',
   Centereachfeaturetothemean:'Center each feature to the mean and scale to unit variance. The Formula is (x - mean) / std.',
   Centereachfeaturetothemedian:'Center each feature to the median and  scale according to the interquartile range. The Formula is (x - median) / (75th quantile - 25th quantile).  This method is robust to outliers.',
