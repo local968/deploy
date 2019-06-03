@@ -208,14 +208,17 @@ const OutlierTable = observer((props) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
-          <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`} onClick={() => handleSort('name')}>
+          <span>{EN.ModelName}</span>
+          <span>{sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('score')}>{EN.Score} {sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('score')}>
+          <span className={classes.ccellHeaderSpan}>{EN.Score} </span>
+          <span>{sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('rate')}>{EN.ContaminationRate}{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rate')}>
+          <span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>
+          <span>{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>
@@ -329,23 +332,29 @@ const ClusteringTable = observer((props) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
-          <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`} onClick={() => handleSort('name')}>
+          <span>{EN.ModelName}</span>
+          <span>{sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cvnn')}>CVNN {sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cvnn')}>
+          <span className={classes.ccellHeaderSpan}>CVNN</span>
+          <span>{sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
         </div>
-        <div style={{ width: 100 }} className={`${classes.ccell}  ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('sihouette')}>{EN.SihouetteScore} {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
+        <div style={{ width: 100 }} className={`${classes.ccell}  ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
+          <span className={classes.ccellHeaderSpan}>{EN.SihouetteScore} </span>
+          <span>{sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('ch')}>CH Index {sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CHIndexHint} /></span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
+          <span className={classes.ccellHeaderSpan}>CH Index </span>
+          <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CHIndexHint} /></span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('rsquared')}>R squared {sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rsquared')}>
+          <span className={classes.ccellHeaderSpan}>R squared</span>
+          <span>{sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cluster')}>{EN.clusters} {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cluster')}>
+          <span className={classes.ccellHeaderSpan}>{EN.clusters} </span>
+          <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <span>{EN.VariableImpact}</span>

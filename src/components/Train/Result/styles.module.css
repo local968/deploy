@@ -204,6 +204,7 @@
   white-space: nowrap;
   height: 16px;
   display: inline-block;
+  max-width: 100%;
 }
 
 .ccell .progress span {
@@ -660,4 +661,8 @@ button.disable {
   text-decoration: none;
   text-overflow: ellipsis;
   width: 100%;
+}
+
+span.ccellHeaderSpan{
+  max-width: 60%;
 }
