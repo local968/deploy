@@ -18,15 +18,6 @@ export default function PAW(props){
 	function setPcsData(data){
 		const xs = data[pcs[0]];
 		const ys = data[pcs[1]];
-		// return data.map(itm=>{
-		// 	const re = [];
-		// 	itm.forEach((it,index)=>{
-		// 		if(pcs.includes(index)){
-		// 			re.push(it)
-		// 		}
-		// 	});
-		// 	return re;
-		// })
 		return _.zip(xs,ys);
 	}
 	
