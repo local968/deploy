@@ -86,6 +86,11 @@
     margin-bottom: 0;
 }
 
+.process p{
+    display: flex;
+    align-items: center;
+}
+
 .process dd {
     display: flex;
     margin-bottom: 0.1em;

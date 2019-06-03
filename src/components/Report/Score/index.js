@@ -483,7 +483,7 @@ class AdvancedModelTable extends Component {
         const graphicList = toJS(models[0].graphicList);
         graphicList.pop();
         return <Chart
-            y_name={target + '的组内平均值'}
+            y_name={target + EN.Groupaverage}
             data={graphicList.pop()}
         />
       }

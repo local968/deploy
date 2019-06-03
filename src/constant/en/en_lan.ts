@@ -871,7 +871,7 @@ const EN_LAN = {
   DeploymentpagewillprovidedeploymentIdandtokenparameter: 'Deployment page will provide deploymentId and token parameter',
   Response: 'Response',
   predictresult: 'result:predict result',
-  errorcodeifsuccess: 'code:error code, 10000 if succes',
+  errorcodeifsuccess: 'code:error code, 10000 if success',
   humenreadableinformation: 'message:humen readable information',
   originalerrorinformation: 'error:original error information, this field only exist if some error appear',
   dataisnotavalidJSONstring: 'data is not a valid JSON strin',
@@ -1191,7 +1191,10 @@ const EN_LAN = {
   Centereachfeaturetothemean:'Center each feature to the mean and scale to unit variance. The Formula is (x - mean) / std.',
   Centereachfeaturetothemedian:'Center each feature to the median and  scale according to the interquartile range. The Formula is (x - median) / (75th quantile - 25th quantile).  This method is robust to outliers.',
   Youcangivehigherweightstofeatures:'You can give higher weights to features that you think are important. The value ranges from 0.1 to 99.9 and the adjustment step is 0.1.',
+  restore:'restore',
   Groupaverage:'group average',
+  DropTheseVariables:"Drop these Variables",
+  CreateTheseVariables:"Create these Variables",
 };
 
 

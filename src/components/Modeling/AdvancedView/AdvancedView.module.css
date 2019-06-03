@@ -131,7 +131,11 @@
 .thumbnail img{
   width: 52px;
   height: 52px;
-    margin-right: 3px;
+  margin-right: 3px;
+  flex:0 0 52px;
+}
+.thumbnail div{
+  text-align: left;
 }
   .detailCurves .leftPanel button {
     margin-right: 0.2em;

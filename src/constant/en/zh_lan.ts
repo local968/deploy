@@ -1053,7 +1053,10 @@ const ZH_LAN: any = {
   Centereachfeaturetothemean:'将每一个特征标准化到均值为0，标准差为1，即服从标准正态分布。公式为: (x - 平均值) / 标准差。',
   Centereachfeaturetothemedian:'将每一个特征进行如下变换，公式为: (x - 中位数) / (上四分位数 - 下四分位数)。该变换对异常值更为稳健。',
   Youcangivehigherweightstofeatures:'您可以给您认为重要的变量设置更高的权重。取值范围为0.1~99.9，调节步长为0.1。',
+  restore:'还原',
   Groupaverage:'的组内平均值',
+  DropTheseVariables:"删除下列特征",
+  CreateTheseVariables:"新增下列特征",
 };
 
 export default ZH_LAN;

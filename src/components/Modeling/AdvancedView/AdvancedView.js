@@ -710,7 +710,6 @@ class DetailCurves extends Component {
     let hasReset = true;
     switch (curve) {
       case EN.ROCCurve:
-        // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = show && <ROCCurves
           height={300}
           width={500}
@@ -720,7 +719,6 @@ class DetailCurves extends Component {
         />;
         break;
       case EN.PredictionDistribution:
-        // curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = show && <PredictionDistributions
           height={300}
           width={500}
@@ -730,7 +728,6 @@ class DetailCurves extends Component {
         />;
         break;
       case EN.PrecisionRecallTradeoff:
-        // curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
         curComponent = show && <PRCharts
           height={300} width={500}
           x_name={EN.Recall}
@@ -739,7 +736,6 @@ class DetailCurves extends Component {
         />
         break;
       case EN.LiftChart:
-        // curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
         curComponent = <SingleLiftCharts
           height={300} width={500}
           x_name={EN.percentage}
@@ -799,11 +795,8 @@ class DetailCurves extends Component {
             {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} yes={yes} no={no} />
-          {/* <div className={styles.thumbnails}>
-            {thumbnails.slice(4, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
-          </div> */}
         </div>
-        <div className={styles.rightPanel} >
+        <div className={styles.rightPanel} style={{marginLeft:10}}>
           {curComponent}
           {hasReset && <button onClick={this.reset} className={styles.button + ' ' + styles.buttonr} >{EN.Reset}</button>}
         </div>
@@ -830,12 +823,12 @@ class Thumbnail extends Component {
     this.setState({ clickActive: true });
     this.props.onClick(this.props.value);
   }
-  handleMouseEnter = () => {
-    this.setState({ hoverActive: true });
-  }
-  handleMouseLeave = () => {
-    this.setState({ hoverActive: false });
-  }
+  // handleMouseEnter = () => {
+  //   this.setState({ hoverActive: true });
+  // }
+  // handleMouseLeave = () => {
+  //   this.setState({ hoverActive: false });
+  // };
   render() {
     const { selectedIcon, hoverIcon, normalIcon, text } = this.props.thumbnail;
     const { clickActive, hoverActive } = this.state;
@@ -847,7 +840,7 @@ class Thumbnail extends Component {
         // onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
-        <img src={icon} alt="icon" />
+        <img src={icon} alt="icon"/>
         <div>{text}</div>
       </div>
     )
@@ -1004,11 +997,11 @@ class ModelComp extends Component {
               </TabPane> */}
             </Tabs>
             <div className={styles.mccb}>
-              <Button key="cancel" type="primary" onClick={async ()=>{
+              <Button type="primary" onClick={async ()=>{
                 await this.setState({select:false});
                 this.setState({select:true});
               }}>{EN.SelectAll}</Button>
-              <Button key="cancel" type="primary" onClick={async ()=>{
+              <Button type="primary" onClick={async ()=>{
                 await this.setState({select:true});
                 this.setState({select:false});
               }}>{EN.DeselectAll}</Button>
