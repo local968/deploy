@@ -1244,9 +1244,10 @@ const EN_LAN = {
   Groupby_example: 'Groupby(@duration, [@job], [sum, median])',
   Groupby_example1: 'Groupby(@duration, [@job, @education], [mean, min])',
   Groupby_example2: 'Groupby(@job, [@education])',
-  Minimum: 'Minimum',
-  Maximum: 'Maximum',
-  TargetMore2Unique: "Target has more than 2 unique values",
+  Minimum:'Minimum',
+  Maximum:'Maximum',
+  TargetMore2Unique:"Target has more than 2 unique values",
+  Areyousuretodeletethismodeldeployment:'Are you sure to delete this model deployment? This action cannot be recovered.',
 };
 
 

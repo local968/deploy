@@ -217,14 +217,17 @@ const OutlierTable = observer((props) => {
           <span>{sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rate')}>
-          <span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>
+          <Tooltip title={EN.ContaminationRate}>{EN.ContaminationRate}</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>*/}
           <span>{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.VariableImpact}</span>
+          <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
+          {/*<span>{EN.VariableImpact}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.ModelProcessFlow}</span>
+          <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
+          {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
       </div>
     </div>
@@ -281,7 +284,8 @@ const OutlierRow = observer((props) => {
           />
         </div>
         <div className={`${classes.ccell} ${classes.modelName}`}>
-          <span>{model.modelName}</span>
+          <Tooltip title={model.modelName}>{model.modelName}</Tooltip>
+          {/*<span>{model.modelName}</span>*/}
         </div>
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.score)}</span>
@@ -341,29 +345,36 @@ const ClusteringTable = observer((props) => {
           <span>{sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
         </div>
         <div style={{ width: 100 }} className={`${classes.ccell}  ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
-          <span className={classes.ccellHeaderSpan}>{EN.SihouetteScore} </span>
+          <Tooltip title={EN.SihouetteScore}>{EN.SihouetteScore}</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.SihouetteScore} </span>*/}
           <span>{sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
-          <span className={classes.ccellHeaderSpan}>CH Index </span>
+          <Tooltip title={'CH Index '}>CH Index</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>CH Index </span>*/}
           <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CHIndexHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rsquared')}>
-          <span className={classes.ccellHeaderSpan}>R squared</span>
+          <Tooltip title={'R square'}>R square</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>R squared</span>*/}
           <span>{sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cluster')}>
-          <span className={classes.ccellHeaderSpan}>{EN.clusters} </span>
+          <Tooltip title={EN.clusters} >{EN.clusters} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
           <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.VariableImpact}</span>
+          <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
+          {/*<span>{EN.VariableImpact}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
           <span>{EN.ModelProcessFlow}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.Explaination}<Hint content={EN.ExplainationHint} /></span>
+          <Tooltip title={EN.Explaination}>{EN.Explaination}<Hint content={EN.ExplainationHint} /></Tooltip>
+          {/*<span>{EN.Explaination}<Hint content={EN.ExplainationHint} /></span>*/}
 
         </div>
       </div>
@@ -421,7 +432,8 @@ const ClusteringRow = observer((props) => {
           />
         </div>
         <div className={`${classes.ccell} ${classes.modelName}`}>
-          <span>{formatNumber(model.modelName)}</span>
+          <Tooltip title={model.modelName}>{formatNumber(model.modelName)}</Tooltip>
+          {/*<span>{formatNumber(model.modelName)}</span>*/}
         </div>
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.CVNN)}</span>
