@@ -480,10 +480,22 @@ function Computed(props: ComputedProps) {
       let type = 'Numerical'
       // item = item.trim()
       // 判断是否含有转化的()表达式
+      const isArray = (item[0] as any).type === Type.Lc && (item[item.length - 1] as any).type === Type.RC
       const fnIndex = item.findIndex(it => !!(it as any).index)
       const idIndex = item.findIndex(it => (it as any).type === Type.ID)
-      const isArray = (item[0] as any).type === Type.Lc && (item[item.length - 1] as any).type === Type.RC
-      if (fnIndex > -1) {
+      const paramFnIndex = item.findIndex(it => (it as any).type === Type.Func)
+      if (isArray) {
+        if (!inFunction) return {
+          isPass: false,
+          message: `${EN.Unexpectedidentifier} ${expToString(item as Coordinate[])}`
+        }
+        //暂时只判断是否为空数组
+        item = item.slice(1, -1)
+        if (!item.length) return { isPass: false, message: `${EN.Unknownvariable} []` }
+        // const arrayResult = checkParams(item, null, 0, false)
+        // if (!arrayResult.isPass) return arrayResult
+        type = 'Array'
+      } else if (fnIndex > -1) {
         // 截取函数名称
         const functionName = item.slice(0, fnIndex) as Coordinate[]
         let bracketNum = item[fnIndex] as Bracket
@@ -515,24 +527,17 @@ function Computed(props: ComputedProps) {
         const cur: Coordinate = item[0] as Coordinate
         isVariable = true
         type = colType[cur.value || ''] === 'Numerical' ? 'Numerical' : 'Categorical'
-      } else if (isArray) {
-        if (!inFunction) return {
+      } else if (paramFnIndex > -1) {
+        if (item.length > 1) return {
           isPass: false,
           message: `${EN.Unexpectedidentifier} ${expToString(item as Coordinate[])}`
         }
-        //暂时只判断是否为空数组
-        item = item.slice(1, -1)
-        if (!item.length) return { isPass: false, message: `${EN.Unknownvariable} []` }
-        // const arrayResult = checkParams(item, null, 0, false)
-        // if (!arrayResult.isPass) return arrayResult
-        type = 'Array'
       } else {
         const numItem = expToString(item as Coordinate[])
         const isNum = !isNaN(parseFloat(numItem))
         //判断是否是数字
         if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${numItem}` }
       }
-
       typeArray.push(type)
     }
     if (typeArray.length > 1) {
@@ -765,35 +770,91 @@ function Computed(props: ComputedProps) {
         break;
       case "Groupby":
         type = 'Categorical'
-        if (numOfParam !== 1) return {
-          isPass: false,
-          message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')}`
+        console.log(numOfParam, numList.length, 'Groupby')
+        let nList
+        if (numOfParam === 1) {
+          if (numList.length !== 2) return {
+            isPass: false,
+            message: `error params ${numList.map(n => expToString(n.exp)).join(',')}`
+          }
+          const vList = numList[0]
+          nList = numList[1]
+          const vExp = expToString(vList.exp)
+          if (vList.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${vExp}` }
+          const vListchecked = checkArrayParams(vList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+            if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+            if (!isVariable) return { isPass: false, message: `must use variable` }
+            return { isPass: true, message: 'ok' }
+          })
+          if (!vListchecked.isPass) return vListchecked
+          if (vListchecked.params > 2) return { isPass: false, message: `cannot > 2` }
+        } else if (numOfParam === 2) {
+          if (numList.length !== 1) return {
+            isPass: false,
+            message: `error params ${numList.map(n => expToString(n.exp)).join(',')}`
+          }
+          nList = numList[0]
+        } else {
+          return {
+            isPass: false,
+            message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')}`
+          }
         }
-        if (numList.length !== 2) return {
-          isPass: false,
-          message: `error params ${numList.map(n => expToString(n.exp)).join(',')}`
-        }
-        const [vList, nList] = numList
-        const vExp = expToString(vList.exp)
-        if (vList.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${vExp}` }
-        const vListchecked = checkArrayParams(vList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
-          if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
-          if (!isVariable) return { isPass: false, message: `must use variable` }
-          return { isPass: true, message: 'ok' }
-        })
-        if (!vListchecked.isPass) return vListchecked
-        if (vListchecked.params > 2) return { isPass: false, message: `cannot > 2` }
+
         const nExp = expToString(nList.exp)
-        if (nList.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp}` }
         const nListValues = paramList[0].type === 'Numerical' ? ['sum', 'mean', 'min', 'max', 'std', 'median'] : ['mode']
-        const nListchecked = checkArrayParams(nList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
-          if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
-          if (isVariable) return { isPass: false, message: `cannot use variable` }
-          if (!nListValues.includes(item)) return { isPass: false, message: `${EN.Unexpectedidentifier} ${item}` }
-          return { isPass: true, message: 'ok' }
-        })
-        if (!nListchecked.isPass) return nListchecked
-        num = nListchecked.params
+        console.log(nExp, nList, 'nExp')
+        if (nList.type === 'Array') {
+          const nListchecked = checkArrayParams(nList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+            console.log(item, isVariable, 'checkArrayParams')
+            if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+            if (isVariable) return { isPass: false, message: `cannot use variable` }
+            if (!nListValues.includes(item.toLowerCase())) return { isPass: false, message: `${EN.Unexpectedidentifier} ${item}` }
+            return { isPass: true, message: 'ok' }
+          })
+          if (!nListchecked.isPass) return nListchecked
+          num = nListchecked.params
+        } else {
+          if (nList.exp.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp}` }
+          const nParamExp = expToString(nList.exp[0])
+          if (!nListValues.includes(nParamExp.toLowerCase())) return { isPass: false, message: `${EN.Unexpectedidentifier} ${nParamExp}` }
+          // if (nList.exp[0].type !== Type.Func) return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp}` }
+          num = 1
+        }
+
+        // // const [vList, nList] = numList
+        // const vExp = expToString(vList.exp)
+        // console.log(vExp, 'vExp')
+        // if (vList.type === 'Array') {
+        //   const vListchecked = checkArrayParams(vList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+        //     if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+        //     if (!isVariable) return { isPass: false, message: `must use variable` }
+        //     return { isPass: true, message: 'ok' }
+        //   })
+        //   if (!vListchecked.isPass) return vListchecked
+        //   if (vListchecked.params > 2) return { isPass: false, message: `cannot > 2` }
+        // } else {
+        //   if (!vList.isVariable) return { isPass: false, message: `${EN.Unexpectedidentifier} ${vExp}` }
+        // }
+
+        // const nExp = expToString(nList.exp)
+        // console.log(nExp, 'nExp')
+        // if (nList.type === 'Array') {
+        //   const nListValues = paramList[0].type === 'Numerical' ? ['sum', 'mean', 'min', 'max', 'std', 'median'] : ['mode']
+        //   const nListchecked = checkArrayParams(nList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+        //     console.log(item, isVariable, 'checkArrayParams')
+        //     if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression}` }
+        //     if (isVariable) return { isPass: false, message: `cannot use variable` }
+        //     if (!nListValues.includes(item.toLowerCase())) return { isPass: false, message: `${EN.Unexpectedidentifier} ${item}` }
+        //     return { isPass: true, message: 'ok' }
+        //   })
+        //   if (!nListchecked.isPass) return nListchecked
+        //   num = nListchecked.params
+        // } else {
+        //   if (nList.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp}` }
+        //   if (nList[0].type !== Type.ID) return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp}` }
+        //   num = 1
+        // }
         break;
       case "Interactive":
         type = 'Numerical'
