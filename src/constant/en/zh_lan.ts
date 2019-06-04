@@ -1111,6 +1111,7 @@ const ZH_LAN: any = {
   Minimum:'最小值',
   Maximum:'最大值',
   TargetMore2Unique:"目标变量类别数量超过2个",
+  Areyousuretodeletethismodeldeployment:'您确定要删除此模型部署吗？ 此操作无法恢复。',
 };
 
 export default ZH_LAN;
