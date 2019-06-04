@@ -379,6 +379,7 @@ const EN_LAN = {
   PrecisionRecallTradeoff: 'Precision Recall Tradeoff',
   LiftChart: 'Lift Chart',
   ModelProcessFlow: 'Model Process Flow',
+  Report:'Report',
   Reset: 'Reset',
   ModelComparisonCharts: 'Model Comparison Charts',
   Close: 'Close',
