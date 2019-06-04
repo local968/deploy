@@ -35,15 +35,21 @@ export default class PCS extends PureComponent{
 				max:1,
 				min:-1,
 				name:x_name,
-				nameGap:25,
-				nameLocation:'center',
+				nameGap:5,
+				nameLocation:'end',
+				axisLine:{
+					onZero:false
+				},
 			},
 			yAxis: {
 				max:1,
 				min:-1,
 				name:y_name,
-				nameLocation:'center',
+				nameLocation:'end',
 				nameGap:16,
+				axisLine:{
+					onZero:false
+				},
 			},
 			// grid:{
 			// 	x:10,
