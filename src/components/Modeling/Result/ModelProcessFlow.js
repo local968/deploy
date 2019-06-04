@@ -205,9 +205,9 @@ export default class ModelProcessFlow extends Component {
 	
 	FS(){
 		const { featureLabel } = this.props.model;
-		const {rawHeader,expression } = this.props.projectStore.project;
+		const {rawHeader,expression,target } = this.props.projectStore.project;
 		
-		const drop = _.pull(rawHeader,...featureLabel);
+		const drop = _.pull(rawHeader,...featureLabel,target);
 		
 		const create = Object.values(expression).map(itm=>{
 			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
