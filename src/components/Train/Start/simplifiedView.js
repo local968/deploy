@@ -1,16 +1,16 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import {observer} from 'mobx-react';
+import { observer } from 'mobx-react';
 // import CorrelationMatrix from './CorrelationMatrix';
-import {Hint, ProcessLoading} from 'components/Common';
-import {observable, toJS} from 'mobx';
-import {Spin, Popover, message as antdMessage, Icon, Table, InputNumber, Modal} from 'antd';
+import { Hint, ProcessLoading } from 'components/Common';
+import { observable, toJS } from 'mobx';
+import { Spin, Popover, message as antdMessage, Icon, Table, InputNumber, Modal } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
 import config from 'config'
-import {formatNumber} from 'util'
+import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import HistogramNumerical from "../../Charts/HistogramNumerical";
 import HistogramCategorical from "../../Charts/HistogramCategorical";
@@ -57,7 +57,7 @@ export default class SimplifiedView extends Component {
   // }
 
   showCorrelationMatrix = () => {
-    const {project} = this.props;
+    const { project } = this.props;
 
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);
@@ -84,7 +84,7 @@ export default class SimplifiedView extends Component {
   }
 
   handleCheck = (key, e) => {
-    const {trainHeader} = this.props.project
+    const { trainHeader } = this.props.project
     const isChecked = e.target.checked
     if (isChecked) {
       this.props.project.trainHeader = trainHeader.filter(v => v !== key)
@@ -108,8 +108,8 @@ export default class SimplifiedView extends Component {
 
   handleChange = e => {
     const value = e.target.value
-    const {project} = this.props
-    const {dataHeader, customHeader, newVariable, target} = project
+    const { project } = this.props
+    const { dataHeader, customHeader, newVariable, target } = project
     let filterList = []
     if (!value) return
     if (value === 'all') {
@@ -125,7 +125,7 @@ export default class SimplifiedView extends Component {
   }
 
   handleWeight = key => value => {
-    const {project} = this.props
+    const { project } = this.props
     project.setProperty({
       weights: {
         ...project.weights,
@@ -141,7 +141,7 @@ export default class SimplifiedView extends Component {
   }
 
   handleType = (e) => {
-    const {project} = this.props
+    const { project } = this.props
     const value = e.target.value;
     project.setProperty({
       standardType: value
@@ -149,30 +149,30 @@ export default class SimplifiedView extends Component {
   }
 
   render() {
-    const {project} = this.props;
-    const {standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress} = project;
+    const { project } = this.props;
+    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
-    const variableType = {...newType, ...colType}
+    const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
-    return <div className={styles.simplified} style={{zIndex: this.visible ? 3 : 1}}>
+    return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.chooseScan}>
         <div className={styles.chooseLabel}><span>{EN.ChooseaVariableScalingMethod}:</span></div>
         <div className={styles.chooseBox}>
           <input type='radio' name='scan' value='minMax' id='minMax' checked={standardType === 'minMax'}
-                 onChange={this.handleType}/>
+            onChange={this.handleType} />
           <label htmlFor='minMax'>{EN.minmaxscale}<Hint content={EN.Scaleseachfeaturetothegivenrange} /></label>
         </div>
         <div className={styles.chooseBox}>
           <input type='radio' name='scan' value='standard' id='standard' checked={standardType === 'standard'}
-                 onChange={this.handleType}/>
+            onChange={this.handleType} />
           <label htmlFor='standard'>{EN.standardscale}<Hint content={EN.Centereachfeaturetothemean} /></label>
         </div>
         <div className={styles.chooseBox}>
           <input type='radio' name='scan' value='robust' id='robust' checked={standardType === 'robust'}
-                 onChange={this.handleType}/>
+            onChange={this.handleType} />
           <label htmlFor='robust'>{EN.robustscale}<Hint content={EN.Centereachfeaturetothemedian} /></label>
         </div>
       </div>
@@ -194,23 +194,23 @@ export default class SimplifiedView extends Component {
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable}
-                               addNewVariable={addNewVariable2} colType={{...colType, ...newType}} expression={expression}/>
+              addNewVariable={addNewVariable2} colType={{ ...colType, ...newType }} expression={expression} />
           </Modal>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
-                                            visible={this.showCorrelation}
-                                            onVisibleChange={this.hideCorrelationMatrix}
-                                            trigger="click"
-                                            content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
-                                                                      CorrelationMatrixData={this.CorrelationMatrixData}
-                                            />}/>}
+            visible={this.showCorrelation}
+            onVisibleChange={this.hideCorrelationMatrix}
+            trigger="click"
+            content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
+              CorrelationMatrixData={this.CorrelationMatrixData}
+            />} />}
           <span>{EN.CheckCorrelationMatrix}</span>
         </div>
       </div>
       <div className={styles.table}>
         <div className={styles.tableHeader}>
-          <div className={classnames(styles.tableTh, styles.tableCheck)}/>
+          <div className={classnames(styles.tableTh, styles.tableCheck)} />
           <div className={styles.tableTh}><span>{EN.Name}</span></div>
           <div className={styles.tableTh}><span>{EN.Weight}<Hint content={EN.Youcangivehigherweightstofeatures} /></span></div>
           <div className={styles.tableTh}><span>{EN.Histogram}</span></div>
@@ -224,23 +224,24 @@ export default class SimplifiedView extends Component {
         </div>
         {(dataViewsLoading) ?
           <div className={styles.tableLoading}>
-            <Icon type="loading"/>
+            <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
             {allVariables.map((h, i) => {
-              const data = {...dataViews, ...newVariableViews}[h] || {}
+              const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
+              const isNew = newVariable.includes(h)
               return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]}
-                                        handleWeight={this.handleWeight(h)} colType={variableType} project={project}
-                                        isChecked={checkedVariables.includes(h)}
-                                        handleCheck={this.handleCheck.bind(null, h)}
-                                        lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id}/>
+                handleWeight={this.handleWeight(h)} colType={variableType} project={project}
+                isChecked={checkedVariables.includes(h)}
+                handleCheck={this.handleCheck.bind(null, h)}
+                lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} isNew={isNew}/>
             })}
           </div>}
       </div>
       {(dataViewsLoading) &&
-      <ProcessLoading progress={dataViewsLoading ? (dataViewProgress / 2) : (importanceProgress / 2 + 50)}
-                      style={{bottom: '0.25em'}}/>}
+        <ProcessLoading progress={dataViewsLoading ? (dataViewProgress / 2) : (importanceProgress / 2 + 50)}
+          style={{ bottom: '0.25em' }} />}
     </div>
   }
 }
@@ -252,41 +253,46 @@ class SimplifiedViewRow extends Component {
   @observable chartData = {};
 
 
-  showHistograms = value => {
+  showHistograms = () => {
+    const { value, project, isNew } = this.props;
+    const {histgramPlots} = project;
+    if (isNew) {
+      // const newUrl = histgramPlots[value]
+      this.histograms = true
+      // newUrl do something
+      return ;
+    }
     // this.histograms = true
-    const {project = {},data,colType} = this.props;
-    const {etlIndex} = project;
-    const _data = {
-      field: value,
-      id: etlIndex,
-    };
-
     if (!this.chartData[value]) {
-      if (colType[value] === "Numerical") {
-        const {min, max} = data;
+      const data = {
+        field: value,
+        id: project.etlIndex,
+      };
+      if (project.colType[value] === "Numerical") {
+        const { min, max } = project.dataViews[value];
         data.interval = (max - min) / 100;
         request.post({
           url: '/graphics/histogram-numerical',
-          data:_data,
-        }).then((result) => this.showback(value, result.data));
+          data,
+        }).then((result) => this.showback(result.data, value));
       } else {
-        const {uniqueValues} = data;
+        // console.log(project.dataViews[value])
+        const { uniqueValues } = project.dataViews[value];
         data.size = uniqueValues > 8 ? 8 : uniqueValues;
         request.post({
           url: '/graphics/histogram-categorical',
-          data:_data,
-        }).then((result) => this.showback(value, result.data));
+          data,
+        }).then((result) => this.showback(result.data, value));
       }
-      return
+    } else {
+      this.histograms = true;
     }
 
-    this.histograms = true;
   };
-
-  showback = (target, result) => {
+  showback = (result, value) => {
     this.chartData = {
       ...this.chartData,
-      [target]: result,
+      [value]: result,
     };
     this.histograms = true;
   }
@@ -303,29 +309,32 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const {data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight} = this.props;
+    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew } = this.props;
+    const { histgramPlots, histgramPlot } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
-                                                                            onChange={handleCheck}/></div>
+        onChange={handleCheck} /></div>
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
-      <div className={styles.tableTd} style={{borderColor: 'transparent'}}>
-        <InputNumber value={weight || 1} max={99.9} min={0.1} step={0.1} precision={1} onChange={handleWeight}/>
+      <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
+        <InputNumber value={weight || 1} max={99.9} min={0.1} step={0.1} precision={1} onChange={handleWeight} />
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })} onClick={this.showHistograms.bind(this, value)}>
-        <img src={histogramIcon} className={styles.tableImage} alt='histogram'/>
+        <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {(!isRaw && this.histograms) ? <Popover placement='topLeft'
-                                                visible={!isRaw && this.histograms}
-                                                onVisibleChange={this.hideHistograms}
-                                                trigger="click"
-                                                content={<SimplifiedViewPlot onClose={this.hide}
-                                                                             type={colType[value]}
-                                                                             value={value}
-                                                                             data={this.chartData[value]}/>}/> : null}
+          visible={!isRaw && this.histograms}
+          onVisibleChange={this.hideHistograms}
+          trigger="click"
+          content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
+            <SimplifiedViewPlot onClose={this.hide}
+              type={colType[value]}
+              value={value}
+              data={this.chartData[value]} />
+          </SimplePlot>} /> : null}
       </div>
       <div className={styles.tableTd} title={valueType}>
         <span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
@@ -361,6 +370,41 @@ class SimplifiedViewRow extends Component {
   }
 }
 
+@observer
+class SimplePlot extends Component {
+  @observable visible = false;
+  @observable result = {};
+  constructor(props) {
+    super(props);
+    const { getPath, path, isNew } = props;
+    if (isNew && !path) getPath();
+    if (!isNew) {
+      return this.visible = true;
+    }
+    if (isNew && path) {
+      request.post({
+        url: '/graphics/new',
+        data: {
+          url: path,
+        }
+      }).then((res) => {
+        this.result = res;
+        this.visible = true;
+      })
+    }
+  }
+
+  render() {
+    const { children, path, isNew } = this.props;
+    if (!this.visible) return null;
+    if (!isNew) {
+      return children
+    }
+    const cloneEl = el => React.cloneElement(el, { ...this.result });
+    return Array.isArray(children) ? children.map(cloneEl) : cloneEl(children)
+  }
+}
+
 // @observer
 // class CorrelationPlot extends Component {
 //   constructor(props) {
@@ -381,13 +425,13 @@ class SimplifiedViewRow extends Component {
 @observer
 class CorrelationPlot extends Component {
   render() {
-    const {onClose, CorrelationMatrixData} = this.props;
-    const {type, value} = CorrelationMatrixData;
+    const { onClose, CorrelationMatrixData } = this.props;
+    const { type, value } = CorrelationMatrixData;
     return (
       <div className={styles.correlationPlot}>
         <div
           onClick={onClose}
-          style={{zIndex: 5}}
+          style={{ zIndex: 5 }}
           className={styles.plotClose}><span>X</span></div>
         <CorrelationMatrixs
           value={value}
@@ -402,7 +446,7 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
 
   render() {
-    const {type, style, data, value} = this.props;
+    const { type, style, data, value } = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
@@ -469,7 +513,7 @@ class CreateNewVariable extends Component {
     const hasConcat = functionList.filter(v => functionStr.includes(v.value.slice(0, -1))).find(v => v.value === "Concat()")
     this.myFunction = [...FUNCTIONS.senior].reverse().find(v => functionStr.includes(v.value.slice(0, -1))) || {}
     let exp = this.exp.slice(startIndex, this.inputPosition).trim()
-    const {dataHeader, colType} = this.props
+    const { dataHeader, colType } = this.props
     let valueList = [...dataHeader]
     if (!hasConcat) valueList = valueList.filter(v => colType[v] === "Numerical")
     let filterFunctions = []
@@ -575,7 +619,7 @@ class CreateNewVariable extends Component {
 
   //点击确认按钮
   handleAdd = () => {
-    let {name, exp, props: {expression}} = this
+    let { name, exp, props: { expression } } = this
     name = name.trim()
     if (!name) return antdMessage.error(EN.Nameisempty)
     if (expression.hasOwnProperty(name)) return antdMessage.error(`${EN.Newvariable} ${name} ${EN.Isexist}`)
@@ -583,7 +627,7 @@ class CreateNewVariable extends Component {
     const checked = this.checkExp(exp)
     if (!checked.isPass) return antdMessage.error(checked.message)
     if (!checked.num) return antdMessage.error(EN.Expressionisempty)
-    const {num, type} = checked
+    const { num, type } = checked
     const nameArray = []
     if (num === 1) {
       nameArray.push("r2_" + name)
@@ -614,10 +658,10 @@ class CreateNewVariable extends Component {
       // 查询第一个)
       const end = expression.indexOf(")") + 1
       if (end === 0) break;
-      if (num > 9) return {isPass: false, message: EN.Toomanyfunctions}
+      if (num > 9) return { isPass: false, message: EN.Toomanyfunctions }
       // 查询截取表达式最后一个(
       const start = expression.lastIndexOf("(", end)
-      if (start === -1) return {isPass: false, message: EN.Unexpectedtoken}
+      if (start === -1) return { isPass: false, message: EN.Unexpectedtoken }
       const exp = expression.slice(start + 1, end - 1)
       bracketExps.push(exp)
       //转化(...)为$?
@@ -633,7 +677,7 @@ class CreateNewVariable extends Component {
 
   // 校验基本表达式
   checkSimpleExp = (expression, bracketExps) => {
-    if (!expression) return {isPass: false, message: EN.Emptyexpression}
+    if (!expression) return { isPass: false, message: EN.Emptyexpression }
     const baseOptReg = new RegExp(/[+\-*/]/)
     // 根据+-*/切割表达式
     const array = expression.split(baseOptReg)
@@ -645,7 +689,7 @@ class CreateNewVariable extends Component {
       //Categorical
       let type = 'Numerical'
       item = item.trim()
-      if (!item) return {isPass: false, message: EN.Errorexpression}
+      if (!item) return { isPass: false, message: EN.Errorexpression }
       //判断是否是数字
       if (isNaN(item)) {
         // 判断是否含有转化的()表达式
@@ -654,14 +698,14 @@ class CreateNewVariable extends Component {
           // 截取函数名称
           const functionName = item.slice(0, index).trim()
           let bracketNum = item.slice(index + 1, index + 2).trim()
-          if (!bracketNum || isNaN(bracketNum)) return {isPass: false, message: EN.Errorexpression}
+          if (!bracketNum || isNaN(bracketNum)) return { isPass: false, message: EN.Errorexpression }
           try {
             bracketNum = parseInt(bracketNum, 10)
           } catch (e) {
-            return {isPass: false, message: EN.Errorexpression}
+            return { isPass: false, message: EN.Errorexpression }
           }
           const other = item.slice(index + 2).trim()
-          if (other) return {isPass: false, message: `${EN.Unexpectedidentifier} ${other}`}
+          if (other) return { isPass: false, message: `${EN.Unexpectedidentifier} ${other}` }
           // 校验参数
           const fnResult = this.checkParams(functionName, bracketExps, bracketNum)
           if (!fnResult.isPass) return fnResult
@@ -672,8 +716,8 @@ class CreateNewVariable extends Component {
         // 判断是否为选择的参数
         if (item.startsWith("@")) {
           item = item.slice(1)
-          const {dataHeader, colType} = this.props
-          if (!item || !dataHeader.includes(item)) return {isPass: false, message: `${EN.Unknownvariable} ${item}`}
+          const { dataHeader, colType } = this.props
+          if (!item || !dataHeader.includes(item)) return { isPass: false, message: `${EN.Unknownvariable} ${item}` }
           isVariable = true
           type = colType[item] === 'Numerical' ? 'Numerical' : 'Categorical'
         }
@@ -682,22 +726,22 @@ class CreateNewVariable extends Component {
     }
     if (typeArray.length > 1) {
       const index = typeArray.indexOf('Categorical')
-      if (index !== -1) return {isPass: false, message: `${EN.Errorexpression}: ${array[index]}`}
+      if (index !== -1) return { isPass: false, message: `${EN.Errorexpression}: ${array[index]}` }
       expType = 'Numerical'
     } else {
       expType = typeArray[0]
     }
-    return {isPass: true, message: EN.OK, num, isVariable, type: expType}
+    return { isPass: true, message: EN.OK, num, isVariable, type: expType }
   }
 
   // 校验表达式参数
   checkParams = (functionName, bracketExps, bracketNum) => {
     const exps = bracketExps[bracketNum]
-    if (!exps) return {isPass: false, message: EN.Emptyparameter}
+    if (!exps) return { isPass: false, message: EN.Emptyparameter }
     // 根据, 分割参数
     const expArray = exps.split(",")
     // 不是函数, 则参数只能为1个
-    if (!functionName && expArray.length > 1) return {isPass: false, message: `${EN.Unexpectedidentifier} ${exps}`}
+    if (!functionName && expArray.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${exps}` }
     const isBaseFn = FUNCTIONS.base.find(fn => fn.value === functionName + "()")
     const isSeniorFn = FUNCTIONS.senior.find(fn => fn.value === functionName + "()")
     const currentFn = isBaseFn || isSeniorFn
@@ -716,7 +760,7 @@ class CreateNewVariable extends Component {
       // 校验表达式
       const expChecked = this.checkSimpleExp(exp.trim(), bracketExps)
       if (!expChecked.isPass) return expChecked
-      const {isVariable, num, type} = expChecked
+      const { isVariable, num, type } = expChecked
       if (isVariable) numOfParam++
       // 报存参数类型
       params.push({
@@ -744,7 +788,7 @@ class CreateNewVariable extends Component {
     } else {
       // 校验非函数参数
       for (let param of params) {
-        if (param.type !== 'Numerical') return {isPass: false, message: EN.ParametersmustbeNumerical}
+        if (param.type !== 'Numerical') return { isPass: false, message: EN.ParametersmustbeNumerical }
       }
       fnType = 'Numerical'
     }
@@ -752,7 +796,7 @@ class CreateNewVariable extends Component {
       num += param.num - 1
       isVariable1 = isVariable1 || param.isVariable
     }
-    return {isPass: true, message: `ok`, num, isVariable: isVariable1, type: fnType}
+    return { isPass: true, message: `ok`, num, isVariable: isVariable1, type: fnType }
   }
 
   // 校验高级表达式参数
@@ -781,14 +825,14 @@ class CreateNewVariable extends Component {
         }
         const concatResults = numList.map(num => {
           let n = num.exp
-          if (isNaN(n) || n.includes(".")) return {isPass: false, message: `${n} ${EN.Mustbeinteger}`}
+          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           try {
             n = parseInt(n, 10)
           } catch (e) {
-            return {isPass: false, message: `${n} ${EN.Mustbeinteger}`}
+            return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           }
-          if (n < 2) return {isPass: false, message: `${n} ${EN.Mustgreaterthan}`}
-          if (n > numOfParam) return {isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}`}
+          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan}` }
+          if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}` }
           return {
             isPass: true,
             message: EN.OK,
@@ -804,13 +848,13 @@ class CreateNewVariable extends Component {
         type = 'Numerical'
         const diffResults = numList.map(num => {
           let n = num.exp
-          if (isNaN(n) || n.includes(".")) return {isPass: false, message: `${n} ${EN.Mustbeinteger}`}
+          if (isNaN(n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           try {
             n = parseInt(n, 10)
           } catch (e) {
-            return {isPass: false, message: `${n} ${EN.Mustbeinteger}`}
+            return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           }
-          return {isPass: true, message: EN.OK, num: numOfParam}
+          return { isPass: true, message: EN.OK, num: numOfParam }
         })
         for (let numResult of diffResults) {
           if (!numResult.isPass) return numResult
@@ -825,7 +869,7 @@ class CreateNewVariable extends Component {
         type = 'Categorical'
         const quantileBinArray = ["0", "1"]
         const [b, type1, type2] = numList
-        if (isNaN(b.exp) || b.exp.includes(".")) return {isPass: false, message: `${b.exp} ${EN.Mustbeinteger}`}
+        if (isNaN(b.exp) || b.exp.includes(".")) return { isPass: false, message: `${b.exp} ${EN.Mustbeinteger}` }
         if (!quantileBinArray.includes(type1.exp.trim())) return {
           isPass: false,
           message: `${type1.exp} ${EN.Isnotsupported}`
@@ -843,12 +887,12 @@ class CreateNewVariable extends Component {
           const str = n.trim()
           const first = str.slice(0, 1)
           const last = str.slice(-1)
-          if (first !== "[" || last !== "]") return {isPass: false, message: `${EN.Unexpectedidentifier} ${n}`}
+          if (first !== "[" || last !== "]") return { isPass: false, message: `${EN.Unexpectedidentifier} ${n}` }
           const array = str.slice(1, -1).split("|")
           for (let item of array) {
-            if (!item || isNaN(item.trim())) return {isPass: false, message: `${item} ${EN.Mustbenumbe}`}
+            if (!item || isNaN(item.trim())) return { isPass: false, message: `${item} ${EN.Mustbenumbe}` }
           }
-          return {isPass: true, message: EN.OK, num: 1}
+          return { isPass: true, message: EN.OK, num: 1 }
         })
         for (let numResult of numResults) {
           if (!numResult.isPass) return numResult
@@ -858,18 +902,18 @@ class CreateNewVariable extends Component {
       default:
         break;
     }
-    if (num < 1) return {isPass: false, message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}`}
-    return {isPass: true, message: EN.OK, num, type}
+    if (num < 1) return { isPass: false, message: `${EN.Function}: ${senior.value.slice(0, -2)} ${EN.Parameterserror}` }
+    return { isPass: true, message: EN.OK, num, type }
   }
 
   // 校验总表达式
   checkExp = _expression => {
-    if (!_expression) return {isPass: true, message: EN.OK, num: 0}
-    if (_expression.includes("$")) return {isPass: false, message: EN.Unexpectedtoken$}
+    if (!_expression) return { isPass: true, message: EN.OK, num: 0 }
+    if (_expression.includes("$")) return { isPass: false, message: EN.Unexpectedtoken$ }
 
-    const {bracketExps, expression} = this.formatBracket(_expression)
-    const {isPass, message, num, type} = this.checkSimpleExp(expression, bracketExps)
-    return {isPass, message, num, type}
+    const { bracketExps, expression } = this.formatBracket(_expression)
+    const { isPass, message, num, type } = this.checkSimpleExp(expression, bracketExps)
+    return { isPass, message, num, type }
   }
 
   // 计算阶乘
@@ -894,7 +938,7 @@ class CreateNewVariable extends Component {
   }
 
   render() {
-    const {onClose} = this.props
+    const { onClose } = this.props
     const functionList = [...FUNCTIONS.base, ...FUNCTIONS.senior]
     const functionSyntax = functionList.find(v => v.syntax === this.myFunction.syntax)
     const hintFunctionSyntax = functionList.find(v => v.syntax === this.showFunction.syntax)
@@ -904,31 +948,31 @@ class CreateNewVariable extends Component {
       <div className={styles.newVariableRow}>
         <div className={styles.newVariableName}>
           <input className={styles.newVariableInput} placeholder={EN.NAME} value={this.name}
-                 onChange={this.handleNameChange}/>
+            onChange={this.handleNameChange} />
         </div>
         <span>=</span>
         <div className={styles.newVariableFx}>
           <input className={styles.newVariableInput} placeholder={EN.FX} ref={this.fxRef} value={this.exp}
-                 onChange={this.handleChange} onKeyDown={this.onKeyDown} onSelect={this.onSelect}/>
+            onChange={this.handleChange} onKeyDown={this.onKeyDown} onSelect={this.onSelect} />
           {this.isIn && <div className={styles.newVariableEmpty} onClick={this.deleteFx}><span>X</span></div>}
           {this.hintStatus && <div className={styles.newVariableHintList}>
             {this.hints.map((v, k) => {
               return <div key={k} className={classnames(styles.newVariableHint, {
                 [styles.activeHint]: this.active === k
               })} onClick={this.handleSelect.bind(null, v.value, !!v.syntax)}
-                          onMouseOver={this.showSyntax.bind(null, k)}>
+                onMouseOver={this.showSyntax.bind(null, k)}>
                 <span>{v.label}</span>
               </div>
             })}
           </div>}
           {!!hintFunctionSyntax && (this.showTips ?
-            <FunctionTips value={hintFunctionSyntax.value}/> :
+            <FunctionTips value={hintFunctionSyntax.value} /> :
             <div className={styles.newVariableHintSyntax}>
               <span>{hintFunctionSyntax.syntax}</span>
               {hintIsSenior && <button onClick={this.showAll}><span>{EN.Tips}</span></button>}
             </div>)}
           {!!functionSyntax && <div className={styles.newVariableSyntax}
-                                    style={(this.hintStatus && !!this.hints.length) ? {right: '100%'} : null}>
+            style={(this.hintStatus && !!this.hints.length) ? { right: '100%' } : null}>
             <span>{functionSyntax.syntax}</span></div>}
         </div>
       </div>
@@ -936,7 +980,7 @@ class CreateNewVariable extends Component {
         <button className={classnames(styles.newVariableButton, styles.newVariableAdd, {
           [styles.disable]: this.loading
         })} onClick={this.loading ? null : this.handleAdd}>
-          <span>{this.loading ? <Icon type="loading" theme="outlined"/> : EN.ADD}</span>
+          <span>{this.loading ? <Icon type="loading" theme="outlined" /> : EN.ADD}</span>
         </button>
         <button className={classnames(styles.newVariableButton, styles.newVariableCancel)} onClick={onClose}>
           <span>{EN.Cancel}</span>
@@ -954,7 +998,7 @@ class FunctionTips extends Component {
       <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Concatvar1}</span></div>
       <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
-      <div className={styles.funcTipsContent}><span>{EN.Var1var2var3}<br/>
+      <div className={styles.funcTipsContent}><span>{EN.Var1var2var3}<br />
         {EN.Numberofvariables}</span></div>
       <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Categoricalvariables}</span></div>
@@ -968,8 +1012,8 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: 'red_nature', 2: 'red_small', 3: 'nature_small'},
-            {key: '2', 1: 'blue_sports', 2: 'blue_medium', 3: 'sports_medium'}
+            { key: '1', 1: 'red_nature', 2: 'red_small', 3: 'nature_small' },
+            { key: '2', 1: 'blue_sports', 2: 'blue_medium', 3: 'sports_medium' }
           ]}
           columns={[{
             title: 'color_theme',
@@ -986,7 +1030,7 @@ class FunctionTips extends Component {
             dataIndex: 3,
             key: 3,
             className: styles.funcTipsCol
-          }]}/>
+          }]} />
       </div>
       <div className={styles.funcTipsContent}><span>{EN.Concatolor3}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
@@ -997,15 +1041,15 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: 'red_nature_small'},
-            {key: '2', 1: 'blue_sports_medium'}
+            { key: '1', 1: 'red_nature_small' },
+            { key: '2', 1: 'blue_sports_medium' }
           ]}
           columns={[{
             title: 'color_theme_size',
             dataIndex: 1,
             key: 1,
             className: styles.funcTipsCol
-          }]}/>
+          }]} />
       </div>
       <div className={styles.funcTipsContent}><span>{EN.Concat23}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
@@ -1016,8 +1060,8 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: 'red_nature', 2: 'red_small', 3: 'nature_small', 4: 'red_nature_small'},
-            {key: '2', 1: 'blue_sports', 2: 'blue_medium', 3: 'sports_medium', 4: 'blue_sports_medium'}
+            { key: '1', 1: 'red_nature', 2: 'red_small', 3: 'nature_small', 4: 'red_nature_small' },
+            { key: '2', 1: 'blue_sports', 2: 'blue_medium', 3: 'sports_medium', 4: 'blue_sports_medium' }
           ]}
           columns={[{
             title: 'color_theme',
@@ -1035,12 +1079,12 @@ class FunctionTips extends Component {
             key: 3,
             className: styles.funcTipsCol
           },
-            {
-              title: 'color_theme_size',
-              dataIndex: 4,
-              key: 4,
-              className: styles.funcTipsCol
-            }]}/>
+          {
+            title: 'color_theme_size',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }]} />
       </div>
       <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
@@ -1054,7 +1098,7 @@ class FunctionTips extends Component {
       <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.DIffrow1}</span></div>
       <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
-      <div className={styles.funcTipsContent}><span>{EN.Ormorenumericalvariables}<br/>
+      <div className={styles.funcTipsContent}><span>{EN.Ormorenumericalvariables}<br />
         {EN.Distancetobecalculated}</span></div>
       <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Numericalvariable}</span></div>
@@ -1068,10 +1112,10 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: '200', 2: 'nan', 3: 'nan'},
-            {key: '2', 1: '230', 2: '30', 3: 'nan'},
-            {key: '3', 1: '280', 2: '50', 3: '80'},
-            {key: '4', 1: '250', 2: '-30', 3: '20'}
+            { key: '1', 1: '200', 2: 'nan', 3: 'nan' },
+            { key: '2', 1: '230', 2: '30', 3: 'nan' },
+            { key: '3', 1: '280', 2: '50', 3: '80' },
+            { key: '4', 1: '250', 2: '-30', 3: '20' }
           ]}
           columns={[{
             title: 'tax',
@@ -1088,7 +1132,7 @@ class FunctionTips extends Component {
             dataIndex: 3,
             key: 3,
             className: styles.funcTipsCol
-          }]}/>
+          }]} />
       </div>
       <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
@@ -1115,9 +1159,9 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: '1000', 2: '1000', 3: '200', 4: '200'},
-            {key: '2', 1: '1500', 2: '2500', 3: '300', 4: '500'},
-            {key: '3', 1: '1800', 2: '4300', 3: '350', 4: '850'}
+            { key: '1', 1: '1000', 2: '1000', 3: '200', 4: '200' },
+            { key: '2', 1: '1500', 2: '2500', 3: '300', 4: '500' },
+            { key: '3', 1: '1800', 2: '4300', 3: '350', 4: '850' }
           ]}
           columns={[{
             title: 'daily_sales',
@@ -1135,12 +1179,12 @@ class FunctionTips extends Component {
             key: 3,
             className: styles.funcTipsCol
           },
-            {
-              title: 'daily_cost_accum',
-              dataIndex: 4,
-              key: 4,
-              className: styles.funcTipsCol
-            }]}/>
+          {
+            title: 'daily_cost_accum',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }]} />
       </div>
       <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreatedcsystem}</span></div>
@@ -1154,10 +1198,10 @@ class FunctionTips extends Component {
       <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Quantile_binvar1var2}</span></div>
       <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
-      <div className={styles.funcTipsContent}><span>{EN.Allvariablesneedtostartwith}<br/>
-        {EN.Numberofgroupstobedivided}<br/>
-        {EN.Type1type2}<br/>
-        {EN.Variableisdividedbyitspercentile}<br/>
+      <div className={styles.funcTipsContent}><span>{EN.Allvariablesneedtostartwith}<br />
+        {EN.Numberofgroupstobedivided}<br />
+        {EN.Type1type2}<br />
+        {EN.Variableisdividedbyitspercentile}<br />
         {EN.Eachgroupiswiththesamevaluerange}</span></div>
       <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Categoricalvariables}</span></div>
@@ -1171,9 +1215,9 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: '19', 2: '0-25'},
-            {key: '2', 1: '45', 2: '25-50'},
-            {key: '3', 1: '60', 2: '50-75'}
+            { key: '1', 1: '19', 2: '0-25' },
+            { key: '2', 1: '45', 2: '25-50' },
+            { key: '3', 1: '60', 2: '50-75' }
           ]}
           columns={[{
             title: 'age',
@@ -1185,7 +1229,7 @@ class FunctionTips extends Component {
             dataIndex: 2,
             key: 2,
             className: styles.funcTipsCol
-          }]}/>
+          }]} />
       </div>
       <div className={styles.funcTipsContent}><span>{EN.Quantile_binage1}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
@@ -1196,9 +1240,9 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: '0-24', 2: '0-25', 3: '0-3', 4: '0-5'},
-            {key: '2', 1: '24-50', 2: '25-40', 3: '3-9', 4: '5-8'},
-            {key: '3', 1: '50-75', 2: '40-60', 3: '9-15', 4: '8-15'}
+            { key: '1', 1: '0-24', 2: '0-25', 3: '0-3', 4: '0-5' },
+            { key: '2', 1: '24-50', 2: '25-40', 3: '3-9', 4: '5-8' },
+            { key: '3', 1: '50-75', 2: '40-60', 3: '9-15', 4: '8-15' }
           ]}
           columns={[{
             title: 'age1_val_b4',
@@ -1216,12 +1260,12 @@ class FunctionTips extends Component {
             key: 3,
             className: styles.funcTipsCol
           },
-            {
-              title: 'age2_fre_b4',
-              dataIndex: 4,
-              key: 4,
-              className: styles.funcTipsCol
-            }]}/>
+          {
+            title: 'age2_fre_b4',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }]} />
       </div>
       <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
@@ -1248,9 +1292,9 @@ class FunctionTips extends Component {
           pagination={false}
           size="small"
           dataSource={[
-            {key: '1', 1: '15', 2: '(<=25)', 3: '(<=20)'},
-            {key: '2', 1: '40', 2: '(25-50)', 3: '(20-40)'},
-            {key: '3', 1: '55', 2: '(>=50)', 3: '(40-60)'}
+            { key: '1', 1: '15', 2: '(<=25)', 3: '(<=20)' },
+            { key: '2', 1: '40', 2: '(25-50)', 3: '(20-40)' },
+            { key: '3', 1: '55', 2: '(>=50)', 3: '(40-60)' }
           ]}
           columns={[{
             title: 'age',
@@ -1267,7 +1311,7 @@ class FunctionTips extends Component {
             dataIndex: 3,
             key: 3,
             className: styles.funcTipsCol
-          }]}/>
+          }]} />
       </div>
       <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
       <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
@@ -1275,7 +1319,7 @@ class FunctionTips extends Component {
   }
 
   render() {
-    const {value} = this.props
+    const { value } = this.props
     const key = value.slice(0, -2)
     if (!key || !this[key] || typeof this[key] !== 'function') return null
     return this[key]()
