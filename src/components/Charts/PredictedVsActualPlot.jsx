@@ -61,18 +61,23 @@ export default class PredictedVsActualPlot extends PureComponent{
 
 		// 指定图表的配置项和数据
 		return {
-			// title: {
-			// 	text: 'Within Group Sum of Squares'
-			// },
+			title: {
+				subtext: y_name,
+				subtextStyle:{
+					fontSize:12,
+					color:'#080808',
+				},
+				left:40,
+			},
 			xAxis: {
 				name:x_name,
 				type: 'value',
 				nameTextStyle,
 			},
 			yAxis: {
-				name: y_name,
+				// name: y_name+y_name,
 				type: 'value',
-				nameTextStyle,
+				// nameTextStyle,
 			},
 			legend: {
 				data: data.map(itm=>itm.name),
