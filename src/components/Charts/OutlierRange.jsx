@@ -257,7 +257,7 @@ export default class OutlierRange extends PureComponent{
 			/>,
 			<div key='bottom' className={styles.fixesBottom}>
 				<button className={styles.save} onClick={()=>saveEdit([_low,_high])}><span style={{color:'#fff'}}>{EN.Apply}</span></button>
-				<button className={styles.cancel} onClick={closeEdit}><span>{EN.CANCEL}</span></button>
+				<button className={styles.cancel} onClick={closeEdit}><span>{EN.Cancel}</span></button>
 			</div>,
 		]
 	}
