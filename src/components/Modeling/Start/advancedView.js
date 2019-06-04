@@ -108,7 +108,7 @@ export default class AdvancedView extends Component {
       return
     }
     this.props.project.algorithms = Algorithms[problemType].map(v => v.value)
-    this.props.project.version = [1, 2]
+    this.props.project.version = [1, 2, 4]
     // if (problemType === "Classification") {
     //   this.props.project.algorithms = Classification
     //   return
@@ -180,7 +180,7 @@ export default class AdvancedView extends Component {
     const { targetCounts, problemType } = this.props.project
     const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
     const defaultSetting = {
-      version: [1, 2],
+      version: [1, 2, 4],
       validationRate: 20,
       holdoutRate: 20,
       randSeed: 0,
@@ -287,6 +287,11 @@ export default class AdvancedView extends Component {
                   <label htmlFor={"algorithm" + k}>{v.label}</label>
                 </div>
               })}
+              <div className={styles.advancedAlgorithm} key={'solution-d'}>
+                {/* <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} /> */}
+                <input id={'R2-solution-d'} type='checkbox' checked={version.includes(4)} onChange={this.handleSolution.bind(null, 4)} />
+                <label htmlFor={'R2-solution-d'}>DNN</label>
+              </div>
             </div>
           </div>
           {problemType === "Classification" && < div className={styles.advancedBlock}>

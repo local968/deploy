@@ -154,7 +154,7 @@ export default class Project {
   @observable customRange = [];
   @observable algorithms = [];
   @observable selectId = '';
-  @observable version = [1, 2, 3];
+  @observable version = [1, 2, 4];
   @observable dataViews = null;
   @observable dataViewsLoading = false;
   @observable dataViewProgress = 0;
@@ -343,7 +343,7 @@ export default class Project {
       algorithms: algorithms,
       measurement,
       selectId: '',
-      version: [1, 2],
+      version: [1, 2, 4],
       trainHeader: [],
       customHeader: [],
       newVariable: [],
@@ -1376,7 +1376,7 @@ export default class Project {
           featureLabel,
           targetLabel: target,
           projectId: id,
-          version: '1,2,3',
+          version: '1,2,3,4',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,
@@ -1418,7 +1418,7 @@ export default class Project {
           featureLabel,
           targetLabel: target,
           projectId: id,
-          version: '1,2,3',
+          version: '1,2,3,4',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,
@@ -1669,7 +1669,7 @@ export default class Project {
         break;
       default:
         setting = type === 'auto' ? {
-          version: [1, 2, 3],
+          version: [1, 2, 4],
           validationRate: 20,
           holdoutRate: 20,
           randSeed: 0,
