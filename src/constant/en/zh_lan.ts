@@ -996,7 +996,7 @@ const ZH_LAN: any = {
   none: '无',
   VarianceExplained: '方差解释比例',
   VarianceExplainedTip: `该表格按照特征根的大小降序排列。主成分的特征根越大，对整个数据的代表能力越强，因而也越重要。一般而言，我们选择累计解释百分比达到0.8及以上的全部主成分即可代表整个数据。<br/>
-                        比如：在以下例子中，我们认为选择前三个主成分就经具有足够代表性。<br/>
+                        比如：在以下例子中，我们认为选择前三个主成分就已经具有足够代表性。<br/>
                         <img src="/VarianceExplainedTip.png" alt=""/>
                         `,
   PC: '主成分',
