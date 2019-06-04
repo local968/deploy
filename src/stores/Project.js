@@ -1304,7 +1304,7 @@ export default class Project {
     let trainData = {}
 
     const featureLabel = dataHeader.filter(d => d !== target).filter(h => colType[h] !== 'Raw');
-    if(!featureLabel.length) return antdMessage.error("no feature label");
+    if (!featureLabel.length) return antdMessage.error("no feature label");
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -1505,7 +1505,7 @@ export default class Project {
     let trainData = {}
 
     const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d)).filter(h => colType[h] !== 'Raw');
-    if(!featureLabel.length) return antdMessage.error("no feature label")
+    if (!featureLabel.length) return antdMessage.error("no feature label")
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -1928,12 +1928,13 @@ export default class Project {
   univariatePlot = field => {
     if (!field) return
     if (field === this.target) return
+    if (!this.newVariable.includes(field)) return
     if (this.univariatePlots.hasOwnProperty(field)) return
     this.univariatePlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'univariatePlot',
+        command: 'clfreg.univariatePlot',
         feature_label: [field]
       };
       // if (field) {
@@ -1945,10 +1946,10 @@ export default class Project {
       // }
       api.univariatePlot(command, progressResult => {
         const { result } = progressResult
-        const { field: plotKey, imageSavePath, progress } = result;
+        const { field: plotKey, Data, progress } = result;
         if (progress && progress === "start") return
         const univariatePlots = Object.assign({}, this.univariatePlots);
-        univariatePlots[plotKey] = imageSavePath
+        univariatePlots[plotKey] = Data
         this.setProperty({ univariatePlots })
       }).then(this.handleError)
     })
@@ -1956,12 +1957,13 @@ export default class Project {
 
   histgramPlot = field => {
     if (!field) return
+    if (!this.newVariable.includes(field)) return
     if (this.histgramPlots.hasOwnProperty(field)) return
     this.histgramPlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'histgramPlot',
+        command: 'top.histgramPlot',
         feature_label: [field]
       };
       if (field === this.target) {
@@ -1981,10 +1983,10 @@ export default class Project {
       // }
       api.histgramPlot(command, progressResult => {
         const { result } = progressResult
-        const { field: plotKey, imageSavePath, progress } = result;
+        const { field: plotKey, Data, progress } = result;
         if (progress && progress === "start") return
         const histgramPlots = Object.assign({}, this.histgramPlots);
-        histgramPlots[plotKey] = imageSavePath
+        histgramPlots[plotKey] = Data
         this.setProperty({ histgramPlots })
       }).then(this.handleError)
     })
