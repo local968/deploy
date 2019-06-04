@@ -98,13 +98,16 @@ export default class TSEN extends PureComponent{
 					name: x_name,
 					type: 'value',
 					scale: true,
+					axisLine:{
+						onZero:false
+					},
 					axisLabel: {
 						formatter: '{value}'
 					},
 					splitLine: {
 						show: true
 					},
-					nameLocation:'middle',
+					nameLocation:'end',
 					nameGap:25,
 				}
 			],
@@ -113,13 +116,16 @@ export default class TSEN extends PureComponent{
 					name: y_name,
 					type: 'value',
 					scale: true,
+					axisLine:{
+						onZero:false
+					},
 					axisLabel: {
 						formatter: '{value}'
 					},
 					splitLine: {
 						show: true
 					},
-					nameLocation:'middle',
+					nameLocation:'end',
 					nameGap:23,
 				}
 			],

@@ -108,7 +108,8 @@ const EN_LAN = {
   Pleasechooseadata: 'Please choose a data source to connect.',
   Resume: 'Resume',
   DataSourceDatabase: 'Data Source - Database',
-  Thisactionmaywipeoutallofyourprevious: 'This action may wipe out all of your previous work (e.g. models). Please proceed with caution.',
+  Thisactionmaywipeoutallofyourprevious: `This action may wipe out all of your previous work (e.g. models).
+  Please proceed with caution.`,
   Name: 'Name',
   LoadSampleData: 'Load Sample Data',
 
@@ -378,6 +379,7 @@ const EN_LAN = {
   PrecisionRecallTradeoff: 'Precision Recall Tradeoff',
   LiftChart: 'Lift Chart',
   ModelProcessFlow: 'Model Process Flow',
+  Report:'Report',
   Reset: 'Reset',
   ModelComparisonCharts: 'Model Comparison Charts',
   Close: 'Close',

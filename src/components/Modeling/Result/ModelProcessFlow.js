@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from 'react';
+import React, {Component, Fragment} from 'react';
 import styles from './styles.module.css';
 import {inject, observer} from 'mobx-react'
 import Next from './Next.svg'
-import { Popover, Button, Icon, Tag } from 'antd'
-import { formatNumber } from 'util'
+import {Button, Icon, Popover, Tag} from 'antd'
+import {formatNumber} from 'util'
 import EN from '../../../constant/en';
 
 @inject('projectStore')
@@ -105,11 +105,15 @@ export default class ModelProcessFlow extends Component {
 	}
 	
 	DQF(){
-		const {nullFillMethod,mismatchFillMethod,outlierFillMethod} = this.props.projectStore.project;
+		const {
+			nullFillMethod,nullLineCounts,
+			mismatchFillMethod,mismatchLineCounts,
+			outlierFillMethod,outlierLineCounts,
+		} = this.props.projectStore.project;
 		
-		const mv = this.DQFData(nullFillMethod,EN.MissingValue);
-		const mi = this.DQFData(mismatchFillMethod,EN.mismatch);
-		const out = this.DQFData(outlierFillMethod,EN.Outlier);
+		const mv = this.DQFData(nullFillMethod,nullLineCounts,EN.MissingValue);
+		const mi = this.DQFData(mismatchFillMethod,mismatchLineCounts,EN.mismatch);
+		const out = this.DQFData(outlierFillMethod,outlierLineCounts,EN.Outlier);
 		
 		if(!mv&&!mi&&!out){
 			return <dl>
@@ -123,9 +127,13 @@ export default class ModelProcessFlow extends Component {
 			{out}
 		</dl>
 	}
-	DQFData(data,title){
+	DQFData(data,lineCounts,title){
 		const { colType } = this.props.projectStore.project;
+		Object.entries(lineCounts).filter(itm=>itm[1]&&!data[itm[0]]).map(itm=>{
+			data[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
+		});
 		const values = Object.entries(data);
+		
 		const mismatchArray =  [{
 			value: 'mode',
 			label: EN.Replacewithmostfrequentvalue
@@ -174,7 +182,7 @@ export default class ModelProcessFlow extends Component {
 			if(itm[1]!=='ignore'){
 				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
 			}else{
-				if(itm,colType[itm[0]] === 'Categorical'){
+				if(colType[itm[0]] === 'Categorical'){
 					result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
 				}else{
 					result.filter(it=>it.type === itm[1])[1].data.push(itm[0]);
@@ -182,24 +190,24 @@ export default class ModelProcessFlow extends Component {
 			}
 		});
 		
-		const resu = result.filter(itm=>itm.data&&itm.data.length);
+		const res = result.filter(itm=>itm.data&&itm.data.length);
 		
-		if(!resu.length){
+		if(!res.length){
 			return null;
 		}
 		return <React.Fragment>
 			<dt>{title}</dt>
 			{
-				resu.map(itm=><dd key={itm.key}>{itm.key}:{itm.data.join(',')}</dd>)
+				res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}:{itm.data.join(',')}</dd>)
 			}
 		</React.Fragment>
 	}
 	
 	FS(){
 		const { featureLabel } = this.props.model;
-		const {rawHeader,expression } = this.props.projectStore.project;
+		const {rawHeader,expression,target } = this.props.projectStore.project;
 		
-		const drop = _.pull(rawHeader,...featureLabel);
+		const drop = _.pull(rawHeader,...featureLabel,target);
 		
 		const create = Object.values(expression).map(itm=>{
 			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
