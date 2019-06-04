@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
-import { Hint, ProcessLoading } from 'components/Common';
-import { observable, toJS } from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon, Table, Tooltip, Modal } from 'antd';
+import {observer} from 'mobx-react';
+import {Hint, ProcessLoading} from 'components/Common';
+import {observable, toJS} from 'mobx';
+import {Icon, message as antdMessage, Modal, Popover, Table} from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
-import config from 'config'
-import { formatNumber } from 'util'
+import {formatNumber} from 'util'
 import request from 'components/Request'
 import EN from '../../../constant/en';
 import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
@@ -314,10 +313,11 @@ class SimplifiedViewRow extends Component {
   @observable scatterData = {};
 
   showHistograms = () => {
-    const { value, project, isNew, histgramPlots } = this.props;
+    const { value, project, isNew } = this.props;
+    const {histgramPlots} = project;
     if (isNew) {
-      const newUrl = histgramPlots[value]
-      if(!newUrl) this.univariant = true
+      // const newUrl = histgramPlots[value]
+      this.histograms = true
       // newUrl do something
       return ;
     }
@@ -359,26 +359,49 @@ class SimplifiedViewRow extends Component {
   // showUnivariant = () => {
   //   this.univariant = true
   // }
-  showUnivariant = () => {
-    const { value, project, isNew, univariatePlots } = this.props;
+  
+  newGraphics(url){
+    return request.post({
+      url: '/graphics/new',
+      data: {
+        url,
+      }
+    })
+  }
+  
+  showUnivariant = async () => {
+    const { value, project, isNew, data:_data,colType } = this.props;
     if (isNew) {
-      const newUrl = univariatePlots[value]
-      if(!newUrl) this.univariant = true
-      // newUrl do something
-      return ;
+      // this.scatterData = {
+      //   ...this.scatterData,
+      //   // [value]: {
+      //   //   ...result,
+      //   // },
+      //   [`${value}-msg`]: {
+      //     type,
+      //   }
+      // };
+  
+      const type = colType[value];
+  
+      this.scatterData = {
+        ...this.scatterData,
+        // [value]: {
+        //   ...result,
+        // },
+        [`${value}-msg`]: {
+          y: project.target,
+          x: value,
+          type,
+        }
+      };
+      return this.univariant = true;
     }
-    if (isNew) return this.univariant = true;
     // const { name, categoricalMap } = project.dataViews[value];
 
     if (!this.scatterData[value]) {
-      const { target, problemType, etlIndex, colType } = project;
+      const { target, problemType, etlIndex } = project;
       const type = colType[value];
-
-      // const data = {
-      //   field: value,
-      //   id: etlIndex,
-      // };
-
       if (problemType === "Regression") {
         if (type === 'Numerical') {//散点图
           request.post({
@@ -399,8 +422,9 @@ class SimplifiedViewRow extends Component {
             }
           }).then((result) => this.showbackUnivariant(result, value, target, 'Categorical'));
         }
+        // _result
       } else {//Univariant
-        const { min, max } = project.dataViews[value];
+        const { min, max } = _data;
         const data = {
           target,
           value,
@@ -446,20 +470,6 @@ class SimplifiedViewRow extends Component {
     }
     this.univariant = true;
   };
-
-  // showUnivariantData(result,type){
-  //   const {value} = this.props;
-  //   this.scatterData = {
-  //      ...this.scatterData,
-  //      [value]: {
-  //        ...result,
-  //      },
-  //      [`${value}-msg`]: {
-  //        type,
-  //      }
-  //    };
-  //    this.univariant = true;
-  //   };
 
   showbackUnivariant = (result, x, y, type) => {
     const { value } = this.props;
@@ -526,10 +536,13 @@ class SimplifiedViewRow extends Component {
           visible={!isRaw && this.univariant}
           onVisibleChange={this.hideUnivariant}
           trigger="click"
-          content={<SimplePlot isNew={isNew} path={univariatePlots[value]} getPath={univariatePlot.bind(null, value)}><ScatterPlot onClose={this.hideUnivariant}
+          content={<SimplePlot isNew={isNew} path={univariatePlots[value]} getPath={univariatePlot.bind(null, value)}>
+            <ScatterPlot onClose={this.hideUnivariant}
             type={project.problemType}
             data={this.scatterData[value]}
             message={this.scatterData[`${value}-msg`]}
+              colType = {colType[value]}
+            // message={colType[value]}
           /></SimplePlot>} /> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
@@ -573,19 +586,38 @@ class SimplifiedViewRow extends Component {
 
 @observer
 class SimplePlot extends Component {
+  @observable visible = false;
+  @observable result = {};
   constructor(props) {
-    super(props)
-    const { getPath, path, isNew } = props
-    if (isNew && !path) getPath()
+    super(props);
+    const { getPath, path, isNew } = props;
+    console.log(234,path,isNew)
+    if (isNew && !path) getPath();
+    if(!isNew){
+      return this.visible = true;
+    }
+    if (isNew && path){
+       request.post({
+        url: '/graphics/new',
+        data: {
+          url:path,
+        }
+      }).then((res)=>{
+        this.result = res;
+        this.visible = true;
+       })
+    }
   }
 
   render() {
-    const { children, path, isNew } = this.props
-    console.log(isNew, path, "SimplePlot")
-    if (isNew && !path) return null
-    const cloneEl = el => React.cloneElement(el, { url: path })
-    const els = Array.isArray(children) ? children.map(cloneEl) : cloneEl(children)
-    return els
+    const { children, path, isNew } = this.props;
+    console.log(isNew, path, "SimplePlot");
+    if (!this.visible) return null;
+    if(!isNew){
+      return children
+    }
+    const cloneEl = el => React.cloneElement(el, { ...this.result });
+    return Array.isArray(children) ? children.map(cloneEl) : cloneEl(children)
   }
 }
 
@@ -647,7 +679,8 @@ class SimplifiedViewPlot extends Component {
 
   render() {
     const { type, style, data, target } = this.props;
-    if (type === 'Raw') return null
+    console.log(11,data)
+    if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
@@ -1531,10 +1564,14 @@ class FunctionTips extends Component {
 
 class ScatterPlot extends Component {
   render() {
-    const { type, style, data, message } = this.props;
+    const { type, style, data, message,colType } = this.props;
+    console.log(12312312312,type,message)
+  
     if (type === 'Regression') {
       //散点图
-      if (message.type === 'Numerical') {
+      if (colType === 'Numerical') {
+        console.log(111,data)
+  
         return <div className={styles.plot} style={style}>
           {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
           <TSENOne

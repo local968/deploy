@@ -254,27 +254,27 @@ class SimplifiedViewRow extends Component {
 
   showHistograms = value => {
     // this.histograms = true
-    const {project = {}} = this.props;
-    const {colType, etlIndex} = project;
-    const data = {
+    const {project = {},data,colType} = this.props;
+    const {etlIndex} = project;
+    const _data = {
       field: value,
       id: etlIndex,
     };
 
     if (!this.chartData[value]) {
       if (colType[value] === "Numerical") {
-        const {min, max} = project.dataViews[value];
+        const {min, max} = data;
         data.interval = (max - min) / 100;
         request.post({
           url: '/graphics/histogram-numerical',
-          data,
+          data:_data,
         }).then((result) => this.showback(value, result.data));
       } else {
-        const {uniqueValues} = project.dataViews[value];
+        const {uniqueValues} = data;
         data.size = uniqueValues > 8 ? 8 : uniqueValues;
         request.post({
           url: '/graphics/histogram-categorical',
-          data,
+          data:_data,
         }).then((result) => this.showback(value, result.data));
       }
       return

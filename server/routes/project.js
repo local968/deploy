@@ -809,9 +809,9 @@ wss.register('histgramPlot', (message, socket, progress) => {
         return progressResult
       }
       const { result } = progressResult
-      const { field, imageSavePath, progress: status } = result;
+      const { field, Data, progress: status } = result;
       if (status && status === "start") return
-      if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
+      if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = Data
       return progress(progressResult)
     }, true))
 })
@@ -851,9 +851,9 @@ wss.register('univariatePlot', (message, socket, progress) => {
         return progressResult
       }
       const { result } = progressResult
-      const { field, imageSavePath, progress: status = '' } = result;
+      const { field, Data, progress: status = '' } = result;
       if (status === "start") return
-      if (univariatePlots.hasOwnProperty(field)) univariatePlots[field] = imageSavePath
+      if (univariatePlots.hasOwnProperty(field)) univariatePlots[field] = Data
       return progress(progressResult)
     }, true))
 })

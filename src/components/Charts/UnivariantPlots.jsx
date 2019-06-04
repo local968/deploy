@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
 import EN from '../../constant/en';
+import {toJS} from "mobx";
 
 /**
  * Univariant Plot
@@ -10,8 +11,7 @@ export default class UnivariantPlots extends PureComponent{
 	getOption() {
 		const {title='',x_name='',y_name='',result={}} = this.props;
 
-		let {data=[],item=[]} = result;
-
+		let {data=[],item=[]} = toJS(result);
 
 		const series = data.map((itm)=>{
 			return {

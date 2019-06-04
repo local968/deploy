@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
+import {toJS} from "mobx";
 
 export default function TSENOne(props){
 	const {x_name='',y_name='',data={},width=400,height=400} = props;
@@ -68,10 +69,13 @@ export default function TSENOne(props){
 				},
 				nameLocation:'end',
 				nameGap:25,
+				axisLine:{
+					onZero:false
+				},
 			},
 		],
 		series:{
-			data:Object.values(data),
+			data:Object.values(toJS(data)),
 			type:'scatter',
 			symbolSize:5,
 		},
