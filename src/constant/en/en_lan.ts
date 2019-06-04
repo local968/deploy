@@ -1245,6 +1245,7 @@ const EN_LAN = {
   Groupby_example2: 'Groupby(@job, [@education])',
   Minimum:'Minimum',
   Maximum:'Maximum',
+  TargetMore2Unique:"Target has more than 2 unique values",
 };
 
 

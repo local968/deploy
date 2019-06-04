@@ -1110,6 +1110,7 @@ const ZH_LAN: any = {
   Groupby_example2: 'Groupby(@job, [@education])',
   Minimum:'最小值',
   Maximum:'最大值',
+  TargetMore2Unique:"目标变量类别数量超过2个",
 };
 
 export default ZH_LAN;
