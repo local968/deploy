@@ -1196,12 +1196,10 @@ const EN_LAN = {
   Centereachfeaturetothemedian:'Center each feature to the median and  scale according to the interquartile range. The Formula is (x - median) / (75th quantile - 25th quantile).  This method is robust to outliers.',
   Youcangivehigherweightstofeatures:'You can give higher weights to features that you think are important. The value ranges from 0.1 to 99.9 and the adjustment step is 0.1.',
   restore:'restore',
-  Groupaverage:'average of group x',
+  Groupaverage:'average of group',
   DropTheseVariables:"Drop these Variables",
   CreateTheseVariables:"Create these Variables",
-
   func_note:'Note',
-
   Box_cox: 'Box_cox',
   Box_cox_descr: 'Box_cox function allows you to construct a new variable by Box-Cox transformation with parameter lambda.',
   Box_cox_grammar: 'Box_cox(@var, lambda)',
