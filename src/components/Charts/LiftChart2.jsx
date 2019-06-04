@@ -3,7 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 
 export default function LiftChart2(props){
-	const {models,x_name,y_name,height=400,width=950,mom,x,y,formatter=false,selectAll} = props;
+	const {models,x_name,y_name,height=400,width=950,mom,x,y,formatter=false,selectAll=true} = props;
 	
 	const selected = {};
 	

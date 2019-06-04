@@ -9,7 +9,7 @@ export default function SpeedvsAccuracys(props){
 		y_name='',
 		height = 400,
 		width = 950,
-		selectAll
+		selectAll = true
 	} = props;
 	
 	const selected = {};
