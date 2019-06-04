@@ -281,7 +281,8 @@ const OutlierRow = observer((props) => {
           />
         </div>
         <div className={`${classes.ccell} ${classes.modelName}`}>
-          <span>{model.modelName}</span>
+          <Tooltip title={model.modelName}>{model.modelName}</Tooltip>
+          {/*<span>{model.modelName}</span>*/}
         </div>
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.score)}</span>
@@ -421,7 +422,8 @@ const ClusteringRow = observer((props) => {
           />
         </div>
         <div className={`${classes.ccell} ${classes.modelName}`}>
-          <span>{formatNumber(model.modelName)}</span>
+          <Tooltip title={model.modelName}>{formatNumber(model.modelName)}</Tooltip>
+          {/*<span>{formatNumber(model.modelName)}</span>*/}
         </div>
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.CVNN)}</span>
