@@ -94,12 +94,12 @@ export default {
       "type": Type.Func,
       "grammar": `${EN.Syntax}Quantile_bin(@var, b, type)`
     },
-    // {
-    //   "name": "Groupby",
-    //   "value": "Groupby",
-    //   "type": Type.Func,
-    //   "grammar": `${EN.Syntax}Groupby(@var1, [key list]，function_list)`
-    // },
+    {
+      "name": "Groupby",
+      "value": "Groupby",
+      "type": Type.Func,
+      "grammar": `${EN.Syntax}Groupby(@var1, [key list]，function_list)`
+    },
     {
       "name": "Interactive",
       "value": "Interactive",
