@@ -314,8 +314,13 @@ class SimplifiedViewRow extends Component {
   @observable scatterData = {};
 
   showHistograms = () => {
-    const { value, project, isNew } = this.props;
-    if (isNew) return this.univariant = true;
+    const { value, project, isNew, histgramPlots } = this.props;
+    if (isNew) {
+      const newUrl = histgramPlots[value]
+      if(!newUrl) this.univariant = true
+      // newUrl do something
+      return ;
+    }
     // this.histograms = true
     if (!this.chartData[value]) {
       const data = {
@@ -355,7 +360,13 @@ class SimplifiedViewRow extends Component {
   //   this.univariant = true
   // }
   showUnivariant = () => {
-    const { value, project, isNew } = this.props;
+    const { value, project, isNew, univariatePlots } = this.props;
+    if (isNew) {
+      const newUrl = univariatePlots[value]
+      if(!newUrl) this.univariant = true
+      // newUrl do something
+      return ;
+    }
     if (isNew) return this.univariant = true;
     // const { name, categoricalMap } = project.dataViews[value];
 
