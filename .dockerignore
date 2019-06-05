@@ -32,3 +32,4 @@ uploads
 config.lua
 /data
 # yarn.lock
+src

@@ -223,7 +223,7 @@ const EN_LAN = {
   LocalFile: 'Local File',
   ResultLocation: 'Result Location:',
   InApp: 'In App',
-  DeployFrequency: 'Deploy Frequency:',
+  DeployFrequency: 'Deploy Frequency',
   OneTime: 'One Time',
   Time: 'time',
   Times: 'time',
@@ -1248,6 +1248,9 @@ const EN_LAN = {
   Maximum:'Maximum',
   TargetMore2Unique:"Target has more than 2 unique values",
   Areyousuretodeletethismodeldeployment:'Are you sure to delete this model deployment? This action cannot be recovered.',
+  DropTheRows:'Drop the rows',
+  Mapping:"Mapping",
+  value:'value',
 };
 
 

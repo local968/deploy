@@ -109,6 +109,7 @@ export default class ParallelPlot extends PureComponent{
 				itemGap: 20,
 				itemWidth: 50,
 				itemHeight: 3,
+				inactiveColor:'rgba(204,204,204,0.5)'
 			},
 			silent:true,
 			progressiveChunkMode:'mod',

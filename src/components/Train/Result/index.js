@@ -372,7 +372,7 @@ const ClusteringTable = observer((props) => {
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
-          <span>{EN.ModelProcessFlow}</span>
+          {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <Tooltip title={EN.Explaination}>{EN.Explaination}<Hint content={EN.ExplainationHint} /></Tooltip>
