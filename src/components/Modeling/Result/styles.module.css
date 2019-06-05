@@ -94,11 +94,11 @@
 .process dd {
     margin-bottom: 0.1em;
     align-items: center;
-    max-width: 270px;
+    /*max-width: 270px;*/
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: block;
+    display: flex;
 }
 
 .process dd div {
