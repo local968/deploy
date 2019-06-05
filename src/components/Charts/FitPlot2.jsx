@@ -5,7 +5,7 @@ import './echarts.config'
 
 export default function FitPlot2(props){
 	const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props;
-	const {data} = chartDate;
+	const data = chartDate.data.map(itm=>[itm[0],itm[1]]);
 	// @ts-ignore
 	const num = concat(...data);
 

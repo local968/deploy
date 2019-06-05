@@ -591,7 +591,6 @@ class SimplePlot extends Component {
   constructor(props) {
     super(props);
     const { getPath, path, isNew } = props;
-    console.log(234,path,isNew)
     if (isNew && !path) getPath();
     if(!isNew){
       return this.visible = true;
@@ -611,7 +610,6 @@ class SimplePlot extends Component {
 
   render() {
     const { children, path, isNew } = this.props;
-    console.log(isNew, path, "SimplePlot");
     if (!this.visible) return null;
     if(!isNew){
       return children
@@ -679,7 +677,6 @@ class SimplifiedViewPlot extends Component {
 
   render() {
     const { type, style, data, target } = this.props;
-    console.log(11,data)
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
