@@ -1250,6 +1250,7 @@ const EN_LAN = {
   Areyousuretodeletethismodeldeployment:'Are you sure to delete this model deployment? This action cannot be recovered.',
   DropTheRows:'Drop the rows',
   Mapping:"Mapping",
+  value:'value',
 };
 
 
