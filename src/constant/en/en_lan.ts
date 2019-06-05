@@ -1248,6 +1248,8 @@ const EN_LAN = {
   Maximum:'Maximum',
   TargetMore2Unique:"Target has more than 2 unique values",
   Areyousuretodeletethismodeldeployment:'Are you sure to delete this model deployment? This action cannot be recovered.',
+  DropTheRows:'Drop the rows',
+  Mapping:"Mapping",
 };
 
 

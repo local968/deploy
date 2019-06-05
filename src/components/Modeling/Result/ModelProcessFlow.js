@@ -122,11 +122,48 @@ export default class ModelProcessFlow extends Component {
 		}
 		
 		return <dl>
+			{this.DQFT()}
 			{mv}
 			{mi}
 			{out}
 		</dl>
 	}
+	
+	
+	DQFT(){
+		const {
+			otherMap,
+			targetArray,
+			colValueCounts,
+			target,
+		} = this.props.projectStore.project;
+		
+		const drop = [],mapping=[];
+		
+		const df = _.pull(Object.keys(colValueCounts[target]),...targetArray);
+		df.forEach(itm=>{
+			if(otherMap[itm]){
+				mapping.push([itm,otherMap[itm]])
+			}else{
+				drop.push(itm);
+			}
+		});
+		
+		if(!drop.length&&!mapping.length){
+			return null;
+		}
+		
+		return <React.Fragment>
+			<dt>{EN.TargetMore2Unique}</dt>
+			{
+				<dd style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
+			}
+			{
+				<dd style={{display:(mapping.length?'':'none')}}>{EN.Mapping}:{mapping.map(itm=>`${itm[0]}->${itm[1]} `)}</dd>
+			}
+		</React.Fragment>
+	}
+	
 	DQFData(data,lineCounts,title){
 		const { colType } = this.props.projectStore.project;
 		Object.entries(lineCounts).filter(itm=>itm[1]&&!data[itm[0]]).map(itm=>{
