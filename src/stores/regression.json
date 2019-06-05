@@ -504,10 +504,12 @@
       }
     ],
     "trainModel": {
-      "name": "progress",
-      "model": "New Model Being Trained",
-      "modelName": "automl",
-      "value": 95
+      "asdashdgjhasgdjagkdjgj": {
+        "name": "progress",
+        "model": "New Model Being Trained",
+        "modelName": "automl",
+        "value": 95
+      }
     },
     "autorun": [
       null,

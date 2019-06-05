@@ -573,13 +573,15 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && <div className={styles.rowData}>
-            {trainModel ? <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
-            {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-            <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
-              {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+          {!train2Finished && Object.values(trainModel).map((tm, k) => {
+            return <div className={styles.rowData} key={k}>
+              <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+              <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, tm.requestId) : null}>
+                {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+              </div>
             </div>
-          </div>}
+          })}
         </div>
       </div>
     );
@@ -674,8 +676,8 @@ class ModelDetail extends Component {
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
-        {this.visible && this.type === 'process' &&!model.id.includes('Logistic')&& <ModelProcessFlow model={model} />}
-        {this.visible && this.type === 'process' &&model.id.includes('Logistic')&& <ModelProcessFlow2 model={model} />}
+        {this.visible && this.type === 'process' && !model.id.includes('Logistic') && <ModelProcessFlow model={model} />}
+        {this.visible && this.type === 'process' && model.id.includes('Logistic') && <ModelProcessFlow2 model={model} />}
       </div >
     );
   }

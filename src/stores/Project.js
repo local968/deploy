@@ -13,7 +13,7 @@ import request from "../components/Request";
 
 export default class Project {
   @observable models = []
-  @observable trainModel = null
+  @observable trainModel = {}
   @observable autorun = []
 
   @observable id = "";
@@ -364,7 +364,8 @@ export default class Project {
       standardType: 'standard',
       searchTime: 5,
       kValue: 5,
-      kType: 'auto'
+      kType: 'auto',
+      trainModel: {}
     }
   }
 
@@ -537,12 +538,12 @@ export default class Project {
       if (key === 'noCompute') {
         data.noComputeTemp = data[key]
       }
-      if (key === 'trainModel') {
-        if (data[key]) {
-          const { value } = data[key] || {}
-          data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
-        }
-      }
+      // if (key === 'trainModel') {
+      //   if (data[key]) {
+      //     const { value } = data[key] || {}
+      //     data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
+      //   }
+      // }
     }
     // data.updateTime = +new Date()
     Object.assign(this, data)
@@ -1774,14 +1775,16 @@ export default class Project {
     })
   }
 
-  abortTrain = (isLoading = false) => {
+  abortTrain = (stopId, isLoading = false) => {
+    if (!stopId) return
     if (this.stopModel) return
     this.stopModel = true
     const command = {
       command: 'stop',
       action: 'train',
       projectId: this.id,
-      isLoading
+      isLoading,
+      stopId
     }
     this.isAbort = true
     return socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
@@ -1801,7 +1804,7 @@ export default class Project {
   setModel = data => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
-    if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
+    // if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
     const model = new Model(this.id, { ...data, measurement: this.measurement })
     if (!!this.models.length) {
       const { problemType } = model

@@ -46,8 +46,8 @@ function ModelResult(props) {
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
   // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
 
-  const abortTrain = () => {
-    project.abortTrain()
+  const abortTrain = stopId => {
+    project.abortTrain(stopId)
   }
 
   const showDict = () => {
@@ -235,13 +235,15 @@ const OutlierTable = observer((props) => {
       {sortModels.map(m => {
         return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} />
       })}
-      {!train2Finished && <div className={classes.rowData}>
-        {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
-        {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-        <div className={classes.abortButton} onClick={!isAbort ? abortTrain : null}>
-          {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+        return <div className={styles.rowData} key={k}>
+          <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+          <div className={styles.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+            {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+          </div>
         </div>
-      </div>}
+      })}
     </div>
   </div >
 })
@@ -383,13 +385,15 @@ const ClusteringTable = observer((props) => {
       {sortModels.map(m => {
         return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
-      {!train2Finished && <div className={classes.rowData}>
-        {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
-        {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-        <div className={classes.abortButton} onClick={!isAbort ? abortTrain : null}>
-          {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+        return <div className={styles.rowData} key={k}>
+          <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+          <div className={styles.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+            {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+          </div>
         </div>
-      </div>}
+      })}
     </div>
   </div >
 })
