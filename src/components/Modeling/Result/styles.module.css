@@ -109,6 +109,13 @@
     display: flex;
 }
 
+.over dd{
+    max-width: 270px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
 .result {
     display: flex;
     flex: none;

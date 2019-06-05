@@ -247,10 +247,11 @@ export default class SimplifiedView extends Component {
         </div>
         <div
             className={classnames(styles.toolButton, styles.toolCheck)}
-            // id={'Correlation' + target}
+            id={'Correlation' + target}
              onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
-            // getPopupContainer={() => document.getElementById('Correlation' + target)}
+                                            visible={this.showCorrelation}
+            getPopupContainer={() => document.getElementById('Correlation' + target)}
             onVisibleChange={this.hideCorrelationMatrix}
             trigger="click"
             content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
@@ -524,7 +525,7 @@ class SimplifiedViewRow extends Component {
           visible={!isRaw && this.histograms}
            autoAdjustOverflow
           onVisibleChange={this.hideHistograms}
-           getPopupContainer = {()=>document.getElementById('Histograms'+value)}
+           // getPopupContainer = {()=>document.getElementById('Histograms'+value)}
           trigger="click"
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
                                getPath={histgramPlot.bind(null, value)}>
@@ -542,7 +543,7 @@ class SimplifiedViewRow extends Component {
         <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
         {(!isRaw && this.univariant) ? <Popover placement='topLeft'
                                                 arrowPointAtCenter
-                                                getPopupContainer = {()=>document.getElementById('Univariant' + value)}
+                                                // getPopupContainer = {()=>document.getElementById('Univariant' + value)}
                                                 visible={!isRaw && this.univariant}
                                                 autoAdjustOverflow
                                                 onVisibleChange={this.hideUnivariant}

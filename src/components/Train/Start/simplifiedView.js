@@ -323,18 +323,21 @@ class SimplifiedViewRow extends Component {
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
-      })} onClick={this.showHistograms.bind(this, value)}>
+      })}
+           id={'Histograms' + value}
+           onClick={this.showHistograms.bind(this, value)}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {(!isRaw && this.histograms) ? <Popover placement='topLeft'
-          visible={!isRaw && this.histograms}
-          onVisibleChange={this.hideHistograms}
-          trigger="click"
-          content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
-            <SimplifiedViewPlot onClose={this.hide}
-              type={colType[value]}
-              value={value}
-              data={this.chartData[value]} />
-          </SimplePlot>} /> : null}
+                                                visible={!isRaw && this.histograms}
+                                                // getPopupContainer = {()=>document.getElementsByClassName(styles.tableBody)[0]}
+                                                onVisibleChange={this.hideHistograms}
+                                                trigger="click"
+                                                content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
+                                                  <SimplifiedViewPlot onClose={this.hide}
+                                                                      type={colType[value]}
+                                                                      value={value}
+                                                                      data={this.chartData[value]} />
+                                                </SimplePlot>} /> : null}
       </div>
       <div className={styles.tableTd} title={valueType}>
         <span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
@@ -376,18 +379,31 @@ class SimplePlot extends Component {
   @observable result = {};
   constructor(props) {
     super(props);
-    const { getPath, path, isNew } = props;
+  }
+  
+  componentDidMount() {
+    this.getData()
+  }
+  
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.path!==this.props.path){
+      this.getData(nextProps)
+    }
+  }
+  
+  getData(props=this.props){
+    const { getPath, path, isNew } =props;
     if (isNew && !path) getPath();
-    if (!isNew) {
+    if(!isNew){
       return this.visible = true;
     }
-    if (isNew && path) {
+    if (isNew && path){
       request.post({
         url: '/graphics/new',
         data: {
-          url: path,
+          url:path,
         }
-      }).then((res) => {
+      }).then((res)=>{
         this.result = res;
         this.visible = true;
       })

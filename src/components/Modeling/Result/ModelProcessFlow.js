@@ -50,7 +50,7 @@ export default class ModelProcessFlow extends Component {
 		
 		const variables = featureLabel.filter(itm=>colType[itm] === "Categorical");
 		
-		return <dl>
+		return <dl className={styles.over}>
 			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
 			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd title={variables.join(',')}>
 				<p style={{display:(variables.length?'':'none')}}>variables:<label>{variables.join(',')}</label></p>
@@ -86,7 +86,7 @@ export default class ModelProcessFlow extends Component {
 			'truncatedSVD':'TruncatedSVD',
 		};
 
-		return <dl>
+		return <dl className={styles.over}>
 			{this.list(data, `preprocessor:${name}:`, types[name], true)}
 		</dl>
 	}
@@ -99,7 +99,7 @@ export default class ModelProcessFlow extends Component {
 			type = `regressor:${name}:`;
 		}
 
-		return <dl>
+		return <dl className={styles.over}>
 			{this.list(data, type, '')}
 		</dl>;
 	}
@@ -108,8 +108,10 @@ export default class ModelProcessFlow extends Component {
 		const {
 			nullFillMethod,nullLineCounts,
 			mismatchFillMethod,mismatchLineCounts,
-			outlierFillMethod,
+			outlierFillMethod,outlierLineCounts,
 			colType,
+			target,
+			problemType,
 		} = this.props.projectStore.project;
 		
 		Object.entries(nullLineCounts).filter(itm=>itm[1]&&!nullFillMethod[itm[0]]).map(itm=>{
@@ -120,9 +122,9 @@ export default class ModelProcessFlow extends Component {
 			mismatchFillMethod[itm[0]] = 'mean';
 		});
 		
-		const mv = this.DQFData(nullFillMethod,EN.MissingValue);
-		const mi = this.DQFData(mismatchFillMethod,EN.mismatch);
-		const out = this.DQFData(outlierFillMethod,EN.Outlier);
+		const mv = this.DQFData(nullFillMethod,EN.MissingValue,nullLineCounts[target]);
+		const mi = this.DQFData(mismatchFillMethod,EN.mismatch,mismatchLineCounts[target]);
+		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
 		
 		if(!mv&&!mi&&!out){
 			return <dl>
@@ -130,8 +132,8 @@ export default class ModelProcessFlow extends Component {
 			</dl>
 		}
 		
-		return <dl>
-			{this.DQFT()}
+		return <dl className={styles.over}>
+			{problemType==='Classification'&&this.DQFT()}
 			{mv}
 			{mi}
 			{out}
@@ -173,8 +175,11 @@ export default class ModelProcessFlow extends Component {
 		</React.Fragment>
 	}
 	
-	DQFData(data,title){
-		const { colType } = this.props.projectStore.project;
+	DQFData(data,title,showTarget,outlier=false){
+		const { colType,target,rawDataView,outlierDictTemp} = this.props.projectStore.project;
+		if(!showTarget){
+			Reflect.deleteProperty(data,target)
+		}
 		const values = Object.entries(data);
 		
 		const mismatchArray =  [{
@@ -238,6 +243,24 @@ export default class ModelProcessFlow extends Component {
 		if(!res.length){
 			return null;
 		}
+		if(outlier){
+			let {low,high} = rawDataView[target];
+			if(outlierDictTemp[target]){
+				const lh = [...outlierDictTemp[target]];
+				low = lh[0];
+				high = lh[1];
+			}else{
+				low = +low.toFixed(2);
+				high = +high.toFixed(2);
+			}
+			return <React.Fragment>
+				<dt>{title}</dt>
+				<dd>{EN.ValidRange}:[{low},{high}]</dd>
+				{
+					res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}</dd>)
+				}
+			</React.Fragment>
+		}
 		return <React.Fragment>
 			<dt>{title}</dt>
 			{
@@ -260,7 +283,7 @@ export default class ModelProcessFlow extends Component {
 			return null;
 		}
 		
-		const pop = <dl>
+		const pop = <dl className={styles.over}>
 			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
 				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
 			</dt>
