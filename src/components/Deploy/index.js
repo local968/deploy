@@ -46,7 +46,7 @@ export default class Home extends Component {
       this.props.deploymentStore.changeSort('sortBy', targetType);
     }
   };
-  
+
   render() {
     const {deploymentStore, routing, scheduleStore, userStore} = this.props;
     return (
@@ -219,6 +219,7 @@ export default class Home extends Component {
                   <Icon type="delete"/>
                 </span>
                 <Modal
+                  mask={false}
                   visible={this.state.visible}
                   onOk={() => {
                     deploymentStore.delete(deployment.id);
