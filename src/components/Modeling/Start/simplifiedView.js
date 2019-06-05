@@ -191,9 +191,10 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.targetRow}>
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
-          <div className={styles.targetCell} onClick={this.show}>
+          <div className={styles.targetCell}  id={target}  onClick={this.show}>
             <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
             {<Popover placement='bottomLeft'
+               getPopupContainer={() => document.getElementById(target)}
               visible={this.showHistograms}
               onVisibleChange={this.hide}
               trigger="click"
@@ -244,9 +245,12 @@ export default class SimplifiedView extends Component {
             <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={{ ...colType, ...newType }} expression={expression} />
           </Modal>
         </div>
-        <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
+        <div
+            className={classnames(styles.toolButton, styles.toolCheck)}
+            // id={'Correlation' + target}
+             onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
-            visible={this.showCorrelation}
+            // getPopupContainer={() => document.getElementById('Correlation' + target)}
             onVisibleChange={this.hideCorrelationMatrix}
             trigger="click"
             content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
@@ -354,20 +358,16 @@ class SimplifiedViewRow extends Component {
       [value]: result,
     };
     this.histograms = true;
-  }
-
-  // showUnivariant = () => {
-  //   this.univariant = true
-  // }
+  };
   
-  newGraphics(url){
-    return request.post({
-      url: '/graphics/new',
-      data: {
-        url,
-      }
-    })
-  }
+  // newGraphics(url){
+  //   return request.post({
+  //     url: '/graphics/new',
+  //     data: {
+  //       url,
+  //     }
+  //   })
+  // }
   
   showUnivariant = async () => {
     const { value, project, isNew, data:_data,colType } = this.props;
@@ -516,13 +516,19 @@ class SimplifiedViewRow extends Component {
       <div className={styles.tableTd} title={value}><span>{value}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
-      })} onClick={this.showHistograms}>
+      })}
+           id={'Histograms' + value}
+           onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {(!isRaw && this.histograms) ? <Popover placement='topLeft'
           visible={!isRaw && this.histograms}
+           autoAdjustOverflow
           onVisibleChange={this.hideHistograms}
+           getPopupContainer = {()=>document.getElementById('Histograms'+value)}
           trigger="click"
-          content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}><SimplifiedViewPlot onClose={this.hideHistograms}
+          content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
+                               getPath={histgramPlot.bind(null, value)}>
+            <SimplifiedViewPlot onClose={this.hideHistograms}
             type={colType[value]}
             target={value}
             data={this.chartData[value]}
@@ -530,20 +536,25 @@ class SimplifiedViewRow extends Component {
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
-      })} onClick={this.showUnivariant}>
+      })}
+           id={'Univariant' + value}
+           onClick={this.showUnivariant}>
         <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
         {(!isRaw && this.univariant) ? <Popover placement='topLeft'
-          visible={!isRaw && this.univariant}
-          onVisibleChange={this.hideUnivariant}
-          trigger="click"
-          content={<SimplePlot isNew={isNew} path={univariatePlots[value]} getPath={univariatePlot.bind(null, value)}>
-            <ScatterPlot onClose={this.hideUnivariant}
-            type={project.problemType}
-            data={this.scatterData[value]}
-            message={this.scatterData[`${value}-msg`]}
-              colType = {colType[value]}
-            // message={colType[value]}
-          /></SimplePlot>} /> : null}
+                                                arrowPointAtCenter
+                                                getPopupContainer = {()=>document.getElementById('Univariant' + value)}
+                                                visible={!isRaw && this.univariant}
+                                                autoAdjustOverflow
+                                                onVisibleChange={this.hideUnivariant}
+                                                trigger="click"
+                                                content={<SimplePlot isNew={isNew} path={univariatePlots[value]} getPath={univariatePlot.bind(null, value)}>
+                                                  <ScatterPlot onClose={this.hideUnivariant}
+                                                  type={project.problemType}
+                                                  data={this.scatterData[value]}
+                                                  message={this.scatterData[`${value}-msg`]}
+                                                    colType = {colType[value]}
+                                                  // message={colType[value]}
+                                                /></SimplePlot>} /> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
         <div className={styles.preImpotance}>
@@ -590,13 +601,26 @@ class SimplePlot extends Component {
   @observable result = {};
   constructor(props) {
     super(props);
-    const { getPath, path, isNew } = props;
+  }
+  
+  componentDidMount() {
+    this.getData()
+  }
+  
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.path!==this.props.path){
+      this.getData(nextProps)
+    }
+  }
+  
+  getData(props=this.props){
+    const { getPath, path, isNew } =props;
     if (isNew && !path) getPath();
     if(!isNew){
       return this.visible = true;
     }
     if (isNew && path){
-       request.post({
+      request.post({
         url: '/graphics/new',
         data: {
           url:path,
@@ -604,12 +628,12 @@ class SimplePlot extends Component {
       }).then((res)=>{
         this.result = res;
         this.visible = true;
-       })
+      })
     }
   }
 
   render() {
-    const { children, path, isNew } = this.props;
+    const { children, isNew } = this.props;
     if (!this.visible) return null;
     if(!isNew){
       return children
@@ -680,7 +704,6 @@ class SimplifiedViewPlot extends Component {
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={style}>
-        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
         <HistogramNumerical
           x_name={target}
           y_name={'count'}
@@ -1562,13 +1585,9 @@ class FunctionTips extends Component {
 class ScatterPlot extends Component {
   render() {
     const { type, style, data, message,colType } = this.props;
-    console.log(12312312312,type,message)
-  
     if (type === 'Regression') {
       //散点图
       if (colType === 'Numerical') {
-        console.log(111,data)
-  
         return <div className={styles.plot} style={style}>
           {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
           <TSENOne

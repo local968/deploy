@@ -2162,7 +2162,7 @@ export default class Project {
   histogram(field) {
     const { colType, dataViews, etlIndex } = this;
     if (!dataViews[field]) {
-      return;
+      return {}
     }
     if (colType[field] === 'Numerical') {
       const { min, max } = dataViews[field];
@@ -2192,7 +2192,7 @@ export default class Project {
     const type = colType[value];
 
     if (!dataViews[value]) {
-      return;
+      return {}
     }
 
     if (problemType === "Regression") {
@@ -2258,7 +2258,7 @@ export default class Project {
     });
 
 
-    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
+    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable];
     allVariables.sort((a, b) => {
       return preImportance ? -1 * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
     });
