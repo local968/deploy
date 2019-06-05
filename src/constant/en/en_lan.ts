@@ -223,7 +223,7 @@ const EN_LAN = {
   LocalFile: 'Local File',
   ResultLocation: 'Result Location:',
   InApp: 'In App',
-  DeployFrequency: 'Deploy Frequency:',
+  DeployFrequency: 'Deploy Frequency',
   OneTime: 'One Time',
   Time: 'time',
   Times: 'time',
