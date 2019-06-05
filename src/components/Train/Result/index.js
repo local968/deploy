@@ -236,10 +236,10 @@ const OutlierTable = observer((props) => {
         return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
-        return <div className={styles.rowData} key={k}>
-          <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+        return <div className={classes.rowData} key={k}>
+          <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
           <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
-          <div className={styles.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
         </div>
@@ -386,10 +386,10 @@ const ClusteringTable = observer((props) => {
         return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
-        return <div className={styles.rowData} key={k}>
-          <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+        return <div className={classes.rowData} key={k}>
+          <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
           <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
-          <div className={styles.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
         </div>
