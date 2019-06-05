@@ -952,7 +952,7 @@ wss.register('train', async (message, socket, progress) => {
 
     const commandArr = []
     const _stopIds = []
-    
+
     if (!!version) {
       const versions = (version || '').split(',')
       versions.forEach(_v => {
@@ -1010,7 +1010,7 @@ wss.register('train', async (message, socket, progress) => {
         // const { requestId: trainId } = result;
         // delete result.requestId
         // Reflect.deleteProperty(result, 'requestId')
-        await updateProjectField(projectId, userId, 'trainModel', { [trainId]: result })
+        await updateProjectField(projectId, userId, 'trainModel', { [trainId]: { ...result, requestId: trainId } })
 
         // const trainModel = await getProjectField(projectId, 'trainModel')
         // await createOrUpdate(projectId, userId, { trainModel: result })
