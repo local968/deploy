@@ -1115,6 +1115,7 @@ const ZH_LAN: any = {
   Areyousuretodeletethismodeldeployment:'您确定要删除此模型部署吗？ 此操作无法恢复。',
   DropTheRows:'删除整行',
   Mapping:"映射",
+  value:'值',
 };
 
 export default ZH_LAN;

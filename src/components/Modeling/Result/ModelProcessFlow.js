@@ -108,12 +108,21 @@ export default class ModelProcessFlow extends Component {
 		const {
 			nullFillMethod,nullLineCounts,
 			mismatchFillMethod,mismatchLineCounts,
-			outlierFillMethod,outlierLineCounts,
+			outlierFillMethod,
+			colType,
 		} = this.props.projectStore.project;
 		
-		const mv = this.DQFData(nullFillMethod,nullLineCounts,EN.MissingValue);
-		const mi = this.DQFData(mismatchFillMethod,mismatchLineCounts,EN.mismatch);
-		const out = this.DQFData(outlierFillMethod,outlierLineCounts,EN.Outlier);
+		Object.entries(nullLineCounts).filter(itm=>itm[1]&&!nullFillMethod[itm[0]]).map(itm=>{
+			nullFillMethod[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
+		});
+		
+		Object.entries(mismatchLineCounts).filter(itm=>colType[itm[0]] === 'Numerical'&&itm[1]&&!mismatchFillMethod[itm[0]]).map(itm=>{
+			mismatchFillMethod[itm[0]] = 'mean';
+		});
+		
+		const mv = this.DQFData(nullFillMethod,EN.MissingValue);
+		const mi = this.DQFData(mismatchFillMethod,EN.mismatch);
+		const out = this.DQFData(outlierFillMethod,EN.Outlier);
 		
 		if(!mv&&!mi&&!out){
 			return <dl>
@@ -156,19 +165,16 @@ export default class ModelProcessFlow extends Component {
 		return <React.Fragment>
 			<dt>{EN.TargetMore2Unique}</dt>
 			{
-				<dd style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
+				<dd title={drop.join(',')} style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
 			}
 			{
-				<dd style={{display:(mapping.length?'':'none')}}>{EN.Mapping}:{mapping.map(itm=>`${itm[0]}->${itm[1]} `)}</dd>
+				<dd title={mapping.map(itm=>`${itm[0]}->${itm[1]}`)} style={{display:(mapping.length?'':'none')}}>{EN.Mapping}:{mapping.map((itm,index)=>`${index?',':''}${itm[0]}->${itm[1]}`)}</dd>
 			}
 		</React.Fragment>
 	}
 	
-	DQFData(data,lineCounts,title){
+	DQFData(data,title){
 		const { colType } = this.props.projectStore.project;
-		Object.entries(lineCounts).filter(itm=>itm[1]&&!data[itm[0]]).map(itm=>{
-			data[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
-		});
 		const values = Object.entries(data);
 		
 		const mismatchArray =  [{

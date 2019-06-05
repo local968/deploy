@@ -92,10 +92,9 @@
 }
 
 .process dd {
-    /*display: flex;*/
     margin-bottom: 0.1em;
     align-items: center;
-    max-width: 200px;
+    max-width: 270px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
