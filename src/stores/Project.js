@@ -169,6 +169,7 @@ export default class Project {
   @observable stopModel = false
   @observable stopEtl = false
   @observable isAbort = false
+  @observable stopIds = []
 
   @observable reportProgress = 0
   @observable reportProgressText = 'init'
@@ -365,7 +366,8 @@ export default class Project {
       searchTime: 5,
       kValue: 5,
       kType: 'auto',
-      trainModel: {}
+      trainModel: {},
+      stopIds: []
     }
   }
 
@@ -665,6 +667,7 @@ export default class Project {
 
   @action
   endSchema = async () => {
+    this.etling = true
     await this.abortTrainByEtl()
     const data = {
       target: this.target,
@@ -677,7 +680,6 @@ export default class Project {
       outlierFillMethodTemp: this.outlierFillMethodTemp,
     }
     if (this.noComputeTemp) {
-      this.etling = true
       if (this.problemType === 'Classification') {
         const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
         if (min < 3) {
@@ -1081,7 +1083,6 @@ export default class Project {
 
   @action
   addNewVariable = (variableName, variables, exp, type) => {
-    console.log(variableName, variables, exp, type, 666)
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     const oldExp = Object.values(this.expression).join(";")
     const allExp = `${oldExp};${fullExp}`
@@ -1122,10 +1123,6 @@ export default class Project {
 
   @action
   addNewVariable2 = (variables, type) => {
-    // console.log(variableName, variables, exp, type, 666)
-    // const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
-    // const oldExp = Object.values(this.expression).join(";")
-    // const allExp = `${oldExp};${fullExp}`
     const scripts = [...Object.values(this.expression), ...variables].map(v => ({
       name: v.nameArray.map(n => ({
         value: n,
@@ -1278,12 +1275,13 @@ export default class Project {
           validate = score[currentMeasurement]
           holdout = score[currentMeasurement]
         }
-        if (!validate || !holdout) return
+        if (isNaN(parseFloat(validate)) || isNaN(parseFloat(holdout))) return
         return { id: m.id, value: validate + holdout }
         // const value = validate + holdout
         // if (!recommend) return recommend = { id: m.id, value }
         // if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
       })
+      .filter(_m => !_m)
       .sort((a, b) => (b.value - a.value) * sort)
       .map(_m => models.find(m => m.id === _m.id))
     // if (!!recommend) return models.find(m => m.id === recommend.id)
@@ -1776,8 +1774,8 @@ export default class Project {
   }
 
   abortTrain = (stopId, isLoading = false) => {
-    if (!stopId) return
-    if (this.stopModel) return
+    if (!stopId) return Promise.resolve()
+    if (this.stopModel) return Promise.resolve()
     this.stopModel = true
     const command = {
       command: 'stop',
@@ -1795,10 +1793,13 @@ export default class Project {
     }))
   }
 
-  abortTrainByEtl = async () => {
+  abortTrainByEtl = () => {
     this.models = []
-    if (this.train2ing) return await this.abortTrain()
-    return
+    if (this.train2ing && !!this.stopIds.length) {
+      const arr = this.stopIds.map(si => this.abortTrain(si))
+      return Promise.all(arr)
+    }
+    return Promise.resolve()
   }
 
   setModel = data => {

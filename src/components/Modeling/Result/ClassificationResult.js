@@ -461,8 +461,8 @@ class Performance extends Component {
 
 @observer
 class ModelTable extends Component {
-  abortTrain = () => {
-    this.props.abortTrain()
+  abortTrain = stopId => {
+    this.props.abortTrain(stopId)
   }
 
   // handleSort = key => {

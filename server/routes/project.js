@@ -953,46 +953,54 @@ wss.register('train', async (message, socket, progress) => {
     const commandArr = []
     const _stopIds = []
 
-    if (!!version) {
-      const versions = (version || '').split(',')
-      versions.forEach(_v => {
-        if (_v === '3') {
-          algorithms.forEach(al => {
+    const splitCommand = config.splitCommand
+
+    if (splitCommand) {
+      if (!!version) {
+        const versions = (version || '').split(',')
+        versions.forEach(_v => {
+          if (_v === '3') {
+            algorithms.forEach(al => {
+              const stopId = uuid.v4()
+              _stopIds.push(stopId)
+              commandArr.push({
+                ...message,
+                version: _v,
+                algorithms: [al],
+                userId,
+                stopId,
+                requestId: stopId
+              })
+            })
+          } else {
             const stopId = uuid.v4()
             _stopIds.push(stopId)
             commandArr.push({
               ...message,
               version: _v,
-              algorithms: [al],
               userId,
               stopId,
               requestId: stopId
             })
-          })
-        } else {
+          }
+        })
+      } else {
+        algorithms.forEach(al => {
           const stopId = uuid.v4()
           _stopIds.push(stopId)
           commandArr.push({
             ...message,
-            version: _v,
+            algorithms: [al],
             userId,
             stopId,
             requestId: stopId
           })
-        }
-      })
-    } else {
-      algorithms.forEach(al => {
-        const stopId = uuid.v4()
-        _stopIds.push(stopId)
-        commandArr.push({
-          ...message,
-          algorithms: [al],
-          userId,
-          stopId,
-          requestId: stopId
         })
-      })
+      }
+    } else {
+      const stopId = uuid.v4()
+      commandArr.push({ ...message, userId, requestId: stopId, stopId })
+      _stopIds.push(stopId)
     }
 
     if (!commandArr.length) return { status: 200, msg: 'ok' }

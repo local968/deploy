@@ -106,8 +106,8 @@ class ModelTable extends Component {
   // @observable sortKey = 'name'
   // @observable sort = 1
 
-  abortTrain = () => {
-    this.props.abortTrain()
+  abortTrain = stopId => {
+    this.props.abortTrain(stopId)
   }
 
   // handleSort = key => {
