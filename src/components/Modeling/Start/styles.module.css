@@ -1158,3 +1158,26 @@ span.crossWarning {
 .notAllow, .notAllow img {
   cursor: not-allowed;
 }
+
+.advancedLine{
+  display: flex;
+  flex: auto;
+  margin: 0.15em 0;
+}
+
+.advancedFlex {
+  display: flex;
+  flex: auto;
+}
+
+.advancedSpeed {
+  display: flex;
+  flex: auto;
+  align-items: flex-end;
+  margin: 0.15em 0;
+}
+
+.featureNotAllow, .featureNotAllow label, .featureNotAllow input {
+  color: #ccc;
+  cursor: not-allowed;
+}

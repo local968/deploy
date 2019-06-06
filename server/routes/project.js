@@ -999,7 +999,7 @@ wss.register('train', async (message, socket, progress) => {
       }
     } else {
       const stopId = uuid.v4()
-      commandArr.push({ ...message, userId, requestId: stopId, stopId })
+      commandArr.push({ ...message, userId, requestId: stopId, stopId, version, algorithms })
       _stopIds.push(stopId)
     }
 
