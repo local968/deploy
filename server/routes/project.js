@@ -960,18 +960,26 @@ wss.register('train', async (message, socket, progress) => {
         const versions = (version || '').split(',')
         versions.forEach(_v => {
           if (_v === '3') {
-            algorithms.forEach(al => {
-              const stopId = uuid.v4()
-              _stopIds.push(stopId)
-              commandArr.push({
-                ...message,
-                version: _v,
-                algorithms: [al],
-                userId,
-                stopId,
-                requestId: stopId
-              })
+            commandArr.push({
+              ...message,
+              version: _v,
+              algorithms: algorithms,
+              userId,
+              stopId,
+              requestId: stopId
             })
+            // algorithms.forEach(al => {
+            //   const stopId = uuid.v4()
+            //   _stopIds.push(stopId)
+            //   commandArr.push({
+            //     ...message,
+            //     version: _v,
+            //     algorithms: [al],
+            //     userId,
+            //     stopId,
+            //     requestId: stopId
+            //   })
+            // })
           } else {
             const stopId = uuid.v4()
             _stopIds.push(stopId)
