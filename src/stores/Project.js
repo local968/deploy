@@ -155,6 +155,7 @@ export default class Project {
   @observable algorithms = [];
   @observable selectId = '';
   @observable version = [1, 2, 4];
+  @observable features = ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
   @observable dataViews = null;
   @observable dataViewsLoading = false;
   @observable dataViewProgress = 0;
@@ -367,7 +368,8 @@ export default class Project {
       kValue: 5,
       kType: 'auto',
       trainModel: {},
-      stopIds: []
+      stopIds: [],
+      features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
     }
   }
 
@@ -696,7 +698,7 @@ export default class Project {
         subStepActive: 1,
         lastSubStep: 1
       })
-      this.etling = false
+      // this.etling = false
     } else {
       const step = {
         curStep: 2,
@@ -704,6 +706,7 @@ export default class Project {
         subStepActive: 3,
         lastSubStep: 3
       }
+      this.etling = false
       await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data, step))
     }
     // const step = this.noComputeTemp ? {
@@ -1402,7 +1405,8 @@ export default class Project {
             'sgd',
             'xgradient_boosting',
             'r2-logistics',
-          ]
+          ],
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => formatFeature(problemType)[fe])
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1440,7 +1444,8 @@ export default class Project {
             'ridge_regression',
             'sgd',
             'xgradient_boosting',
-          ]
+          ],
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => formatFeature(problemType)[fe])
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1497,7 +1502,8 @@ export default class Project {
       weights,
       newVariable,
       trainHeader,
-      colType
+      colType,
+      features,
     } = this;
 
     let command = '';
@@ -1546,6 +1552,35 @@ export default class Project {
         break;
       default:
         command = 'clfreg.train';
+        let featureList = []
+        if (problemType === "Classification") {
+          if (this.algorithms.some(al => [
+            'adaboost',
+            'decision_tree',
+            'extra_trees',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'liblinear_svc',
+            'random_forest',
+            'gaussian_nb',
+            'xgradient_boosting',
+          ].includes(al))) featureList = featureList.concat(['Extra Trees', 'Random Trees', 'fast ICA', 'PCA', 'Polynomial', 'feature agglomeration', 'linear SVM', 'Select Percentile', 'Select Rates'])
+          if (this.algorithms.includes('multinomial_nb')) featureList = featureList.concat(['Extra Trees', 'Random Trees', 'Polynomial', 'Feature Agglomeration', 'linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'])
+          if (this.algorithms.some(al => ["bernoulli_nb", "lda", "libsvm_svc", "passive_aggressive", "qda", "sgd"].includes(al))) featureList = featureList.concat(["Fast ICA", "Kernel PCA", "Kitchen Sinks", "Linear SVM"])
+        } else {
+          if (this.algorithms.some(al => [
+            'adaboost',
+            'decision_tree',
+            'extra_trees',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'random_forest',
+            'gaussian_process',
+            'xgradient_boosting',
+          ].includes(al))) featureList = featureList.concat(['Extra Trees', 'Random Trees', 'fast ICA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'])
+          if (this.algorithms.some(al => ["ard_regression", "liblinear_svr", "libsvm_svr", "ridge_regression", "sgd"].includes(al))) featureList = featureList.concat(["Fast ICA", "Kernel PCA", "Kitchen Sinks", "Linear SVM"])
+        }
+        const featuresPreprocessor = features.filter(fe => featureList.includes(fe)).map(fe => formatFeature(problemType)[fe])
         trainData = {
           problemType,
           featureLabel,
@@ -1561,6 +1596,7 @@ export default class Project {
           settingName: setting.name,
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
+          featuresPreprocessor
         };
         if (this.runWith === 'holdout') {
           trainData.validationRate = this.validationRate / 100
@@ -1606,7 +1642,7 @@ export default class Project {
   }
 
   newSetting = (type = 'auto') => {
-    const { problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+    const { features, problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
 
     let setting
@@ -1679,6 +1715,7 @@ export default class Project {
           dataRange: 'all',
           customField: '',
           customRange: [],
+          features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
           algorithms: problemType === "Classification" ? [
             'adaboost',
             'bernoulli_nb',
@@ -1730,7 +1767,8 @@ export default class Project {
             algorithms,
             speedVSaccuracy,
             ensembleSize,
-            featureLabel
+            featureLabel,
+            features
           }
     }
 
@@ -2448,4 +2486,38 @@ function loadFile(fileName, content) {
   aLink.href = URL.createObjectURL(blob);
   aLink.click();
   URL.revokeObjectURL(blob);
+}
+
+function formatFeature(pt) {
+  const obj = {
+    Classification: {
+      'Extra Trees': 'extra_trees_preproc_for_classification',
+      'Random Trees': 'random_trees_embedding',
+      'Fast ICA': 'fast_ica',
+      'Kernel PCA': 'kernel_pca',
+      'PCA': 'pca',
+      'Polynomial': 'polynomial',
+      'Feature Agglomeration': 'feature_agglomeration',
+      'Kitchen Sinks': 'kitchen_sinks',
+      'Linear SVM': 'linear_svc_preprocessor',
+      'Nystroem Sampler': 'nystroem_sampler',
+      'Select Percentile': 'select_percentile_classification',
+      'Select Rates': 'select_rates',
+    },
+    Regression: {
+      'Extra Trees': 'extra_trees_preproc_for_regression',
+      'Random Trees': 'random_trees_embedding',
+      'Fast ICA': 'fast_ica',
+      'Kernel PCA': 'kernel_pca',
+      'PCA': 'pca',
+      'Polynomial': 'polynomial',
+      'Feature Agglomeration': 'feature_agglomeration',
+      'Kitchen Sinks': 'kitchen_sinks',
+      'Linear SVM': 'linear_svc_preprocessor',
+      'Nystroem Sampler': 'nystroem_sampler',
+      'Select Percentile': 'select_percentile_regression',
+      'Select Rates': 'select_rates',
+    }
+  }
+  return obj[pt]
 }
