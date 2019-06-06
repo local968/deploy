@@ -960,6 +960,8 @@ wss.register('train', async (message, socket, progress) => {
         const versions = (version || '').split(',')
         versions.forEach(_v => {
           if (_v === '3') {
+            const stopId = uuid.v4()
+            _stopIds.push(stopId)
             commandArr.push({
               ...message,
               version: _v,
