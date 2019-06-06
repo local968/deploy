@@ -121,7 +121,7 @@ const api = {
     return redis.smembers(`project:${projectId}:models`).then(ids => {
       const pipeline = redis.pipeline();
       ids.forEach(mid => {
-        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex', 'chartData')
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "modelName", 'fitIndex', 'chartData')
       })
       return pipeline.exec().then(list => {
         const models = list.map(row => {
