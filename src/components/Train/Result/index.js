@@ -375,8 +375,8 @@ const ClusteringTable = observer((props) => {
           {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <Tooltip title={EN.Explaination}>{EN.Explaination}<Hint content={EN.ExplainationHint} /></Tooltip>
-          {/*<span>{EN.Explaination}<Hint content={EN.ExplainationHint} /></span>*/}
+          {/*<Tooltip title={EN.Explaination}>{EN.Explaination}<Hint content={EN.ExplainationHint} /></Tooltip>*/}
+          <span>{EN.Explaination}<Hint content={EN.ExplainationHint} /></span>
 
         </div>
       </div>
