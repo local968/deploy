@@ -193,8 +193,8 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
           <div className={styles.targetCell}  id={target}  onClick={this.show}>
             <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-            {<Popover placement='bottomLeft'
-               getPopupContainer={() => document.getElementById(target)}
+            {<Popover placement='left'
+               // getPopupContainer={() => document.getElementById(target)}
               visible={this.showHistograms}
               onVisibleChange={this.hide}
               trigger="click"
@@ -251,7 +251,7 @@ export default class SimplifiedView extends Component {
              onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
                                             visible={this.showCorrelation}
-            getPopupContainer={() => document.getElementById('Correlation' + target)}
+            // getPopupContainer={() => document.getElementById('Correlation' + target)}
             onVisibleChange={this.hideCorrelationMatrix}
             trigger="click"
             content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
@@ -521,10 +521,11 @@ class SimplifiedViewRow extends Component {
            id={'Histograms' + value}
            onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-        {(!isRaw && this.histograms) ? <Popover placement='topLeft'
+        {(!isRaw && this.histograms) ? <Popover placement='left'
           visible={!isRaw && this.histograms}
            autoAdjustOverflow
           onVisibleChange={this.hideHistograms}
+           overlayClassName='popovers'
            // getPopupContainer = {()=>document.getElementById('Histograms'+value)}
           trigger="click"
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
@@ -541,8 +542,9 @@ class SimplifiedViewRow extends Component {
            id={'Univariant' + value}
            onClick={this.showUnivariant}>
         <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
-        {(!isRaw && this.univariant) ? <Popover placement='topLeft'
+        {(!isRaw && this.univariant) ? <Popover placement='left'
                                                 arrowPointAtCenter
+                                                overlayClassName='popovers'
                                                 // getPopupContainer = {()=>document.getElementById('Univariant' + value)}
                                                 visible={!isRaw && this.univariant}
                                                 autoAdjustOverflow
