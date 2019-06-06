@@ -948,7 +948,7 @@ wss.register('train', async (message, socket, progress) => {
   // let hasModel = false;
   try {
     await checkTraningRestriction(user)
-    await checkEtl(projectId, userId)
+    
 
     const commandArr = []
     const _stopIds = []
@@ -1015,6 +1015,7 @@ wss.register('train', async (message, socket, progress) => {
 
     if (!commandArr.length) return { status: 200, msg: 'ok' }
     await createOrUpdate(projectId, userId, { ...updateData, stopIds: _stopIds })
+    await checkEtl(projectId, userId)
     console.log('finish etl')
 
     const processFn = async queueValue => {

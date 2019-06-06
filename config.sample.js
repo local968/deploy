@@ -56,7 +56,7 @@ const IS_EN = process.env.IS_EN || false;
 const YOUR_AGE = process.env.YOUR_AGE || '部署行数已达到出当前权限最大限制。';
 const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前权限最大限制。';
 const YOUR_USAGE = process.env.YOUR_USAGE  || '您的并发项目数量已达到当前许可证的最大限制。。';
-const SPLIT_COMMAND = rocess.env.SPLIT_COMMAND || false;
+const SPLIT_COMMAND = process.env.SPLIT_COMMAND || false;
 const redis =
   REDIS_TYPE === "2"
     ? {
