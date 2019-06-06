@@ -27,14 +27,18 @@ export default class OutlierRange extends PureComponent{
 		const {title='',field,id,project} = this.props;
 		const {rawDataView={}} = project;
 		let {min,max,low,high} = rawDataView[field]||{};
+		console.log('rawDataView',rawDataView,field,min,max)
+		
+		low = low.toFixed(2);
+		high = high.toFixed(2);
 
 		if(toJS(project.outlierDictTemp)[field]){
 			const data = project.outlierDictTemp[field];
-			low = (parseInt(data[0]*10*10)/100).toFixed(2);
-			high = (parseInt(data[1]*10*10)/100).toFixed(2);
+			low = data[0].toFixed(2);
+			high = data[1].toFixed(2);
 		}else{
-			low = (parseInt(low*10*10)/100).toFixed(2);
-			high = (parseInt(high*10*10)/100).toFixed(2);
+			// low = (parseInt(low*10*10)/100).toFixed(2);
+			// high = (parseInt(high*10*10)/100).toFixed(2);
 		}
 		let selectArea = [+low,+high];
 		const zoom=0.1*(max-min);
@@ -53,8 +57,8 @@ export default class OutlierRange extends PureComponent{
 		}).then((result) => {
 			this.setState({
 				title,
-				min:+(min-zoom).toFixed(3),
-				max:+(max+zoom).toFixed(3),
+				min:(Math.min(+(min-zoom),low)).toFixed(3),
+				max:(Math.max(+(min+zoom),high)).toFixed(3),
 				selectArea,
 				data:result.data,
 				chart,
@@ -214,33 +218,35 @@ export default class OutlierRange extends PureComponent{
 		const {max,min,selectArea} = this.state;
 		const [start,end] = selectArea;
 		const {closeEdit,saveEdit} = this.props;
-		const _low = (parseInt(Math.max(min,start)*10*10)/100).toFixed(2);
-		const _high = (parseInt(Math.min(max,end)*10*10)/100).toFixed(2);
+		// const _low = (parseInt(Math.max(min,start)*10*10)/100).toFixed(2);
+		// const _high = (parseInt(Math.min(max,end)*10*10)/100).toFixed(2);
+		const _low = Math.max(min,start).toFixed(2);
+		const _high = Math.min(max,end).toFixed(2);
 		return [
 			<div key="div" className={styles.outlierTop}>
 				<div>{EN.Minimum}:<InputNum
-					min={min}
-					max={max}
+					min={+min}
+					max={+max}
 					step={0.01}
 					precision={2}
-					value={_low}
+					value={+_low||0}
 					style={{ minWidth: 100 }}
 					onChange={(start)=>{
 						this.setState({
-							selectArea:[start,end],
+							selectArea:[+start,+end],
 						},this.setBrush);
 					}}
 				/></div>
 				<div>{EN.Maximum}:<InputNum
-					min={min}
-					max={max}
+					min={+min}
+					max={+max}
 					step={0.01}
 					precision={2}
-					value={_high}
+					value={+_high||0}
 					style={{ minWidth: 100 }}
 					onChange={(end)=>{
 						this.setState({
-							selectArea:[start,end],
+							selectArea:[+start,+end],
 						},this.setBrush);
 					}}
 				/></div>

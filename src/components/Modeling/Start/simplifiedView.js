@@ -191,9 +191,9 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.targetRow}>
           <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
-          <div className={styles.targetCell}  id={target}  onClick={this.show}>
+          <div className={styles.targetCell} onClick={this.show}>
             <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-            {<Popover placement='left'
+            {<Popover placement='bottomLeft'
                // getPopupContainer={() => document.getElementById(target)}
               visible={this.showHistograms}
               onVisibleChange={this.hide}

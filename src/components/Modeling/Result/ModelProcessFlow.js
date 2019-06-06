@@ -149,7 +149,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 		} = this.props.projectStore.project;
 		
-		const drop = [],mapping=[];
+		let drop = [],mapping=[];
 		
 		const df = _.pull(Object.keys(colValueCounts[target]),...targetArray);
 		df.forEach(itm=>{
@@ -159,6 +159,10 @@ export default class ModelProcessFlow extends Component {
 				drop.push(itm);
 			}
 		});
+		
+		if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
+			drop = [];
+		}
 		
 		if(!drop.length&&!mapping.length){
 			return null;

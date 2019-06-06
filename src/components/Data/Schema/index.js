@@ -177,13 +177,11 @@ export default class DataSchema extends Component {
         if (!header) {
           headerData.cn = classnames(headerData.cn, styles.missed);
         }
-        if (header && temp[header].length > 1) {
+        if (header && temp[header]&&temp[header].length > 1) {
           headerData.cn = classnames(headerData.cn, styles.duplicated);
         }
       }
       headerArr.push(headerData)
-
-
 
       const selectData = {
         content: '',
