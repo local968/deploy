@@ -27,22 +27,18 @@ export default class OutlierRange extends PureComponent{
 		const {title='',field,id,project} = this.props;
 		const {rawDataView={}} = project;
 		let {min,max,low,high} = rawDataView[field]||{};
-		console.log('rawDataView',rawDataView,field,min,max)
 		
 		low = low.toFixed(2);
 		high = high.toFixed(2);
 
 		if(toJS(project.outlierDictTemp)[field]){
 			const data = project.outlierDictTemp[field];
-			low = data[0].toFixed(2);
-			high = data[1].toFixed(2);
-		}else{
-			// low = (parseInt(low*10*10)/100).toFixed(2);
-			// high = (parseInt(high*10*10)/100).toFixed(2);
+			low = (+data[0]).toFixed(2);
+			high =(+data[1]).toFixed(2);
 		}
+		
 		let selectArea = [+low,+high];
 		const zoom=0.1*(max-min);
-		// const zoom = 0;
 		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
 		const interval = ((max-min)/bin).toFixed(2);
 		const chart = this.chart.getEchartsInstance();

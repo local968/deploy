@@ -64,11 +64,26 @@ export default class ModelProcessFlow extends Component {
 	}
 	
 	DQF(){
-		const {nullFillMethod,mismatchFillMethod,outlierFillMethod} = this.props.projectStore.project;
+		const {
+			nullFillMethod,nullLineCounts,
+			mismatchFillMethod,mismatchLineCounts,
+			outlierFillMethod,outlierLineCounts,
+			colType,
+			target,
+			problemType,
+		} = this.props.projectStore.project;
 		
-		const mv = this.DQFData(nullFillMethod,EN.MissingValue);
-		const mi = this.DQFData(mismatchFillMethod,EN.mismatch);
-		const out = this.DQFData(outlierFillMethod,EN.Outlier);
+		Object.entries(nullLineCounts).filter(itm=>itm[1]&&!nullFillMethod[itm[0]]).map(itm=>{
+			nullFillMethod[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
+		});
+		
+		Object.entries(mismatchLineCounts).filter(itm=>colType[itm[0]] === 'Numerical'&&itm[1]&&!mismatchFillMethod[itm[0]]).map(itm=>{
+			mismatchFillMethod[itm[0]] = 'mean';
+		});
+		
+		const mv = this.DQFData(nullFillMethod,EN.MissingValue,nullLineCounts[target]);
+		const mi = this.DQFData(mismatchFillMethod,EN.mismatch,mismatchLineCounts[target]);
+		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
 		
 		if(!mv&&!mi&&!out){
 			return <dl>
@@ -76,30 +91,76 @@ export default class ModelProcessFlow extends Component {
 			</dl>
 		}
 		
-		return <dl>
+		return <dl className={styles.over}>
+			{problemType==='Classification'&&this.DQFT()}
 			{mv}
 			{mi}
 			{out}
 		</dl>
 	}
-	DQFData(data,title){
+	
+	
+	DQFT(){
+		const {
+			otherMap,
+			targetArray,
+			colValueCounts,
+			target,
+		} = this.props.projectStore.project;
+		
+		let drop = [],mapping=[];
+		
+		const df = _.pull(Object.keys(colValueCounts[target]),...targetArray);
+		df.forEach(itm=>{
+			if(otherMap[itm]){
+				mapping.push([itm,otherMap[itm]])
+			}else{
+				drop.push(itm);
+			}
+		});
+		
+		if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
+			drop = [];
+		}
+		
+		if(!drop.length&&!mapping.length){
+			return null;
+		}
+		
+		return <React.Fragment>
+			<dt>{EN.TargetMore2Unique}</dt>
+			{
+				<dd title={drop.join(',')} style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
+			}
+			{
+				<dd title={mapping.map(itm=>`${itm[0]}->${itm[1]}`)} style={{display:(mapping.length?'':'none')}}>{EN.Mapping}:{mapping.map((itm,index)=>`${index?',':''}${itm[0]}->${itm[1]}`)}</dd>
+			}
+		</React.Fragment>
+	}
+	
+	DQFData(data,title,showTarget,outlier=false){
+		const { colType,target,rawDataView,outlierDictTemp} = this.props.projectStore.project;
+		if(!showTarget){
+			Reflect.deleteProperty(data,target)
+		}
 		const values = Object.entries(data);
-		const mismatchArray = [{
+		
+		const mismatchArray =  [{
 			value: 'mode',
 			label: EN.Replacewithmostfrequentvalue
 		}, {
 			value: 'drop',
 			label: EN.Deletetherows
 		}, {
-			value: 'ignore',
+			value: 'ignore',//Categorical
 			label: EN.Replacewithauniquevalue
+		}, {
+			value: 'ignore',
+			label: EN.DoNothing
 		},{
 			value: 'mean',
 			label: EN.Replacewithmeanvalue
-		}, {
-			value: 'drop',
-			label: EN.Deletetherows
-		}, {
+		},{
 			value: 'min',
 			label: EN.Replacewithminvalue
 		}, {
@@ -114,6 +175,12 @@ export default class ModelProcessFlow extends Component {
 		}, {
 			value: 'others',
 			label: EN.Replacewithothers
+		},{
+			value: 'low',
+			label: EN.Replacewithlower
+		}, {
+			value: 'high',
+			label: EN.Replacewithupper
 		}];
 		
 		const result = mismatchArray.map(itm=>({
@@ -123,18 +190,44 @@ export default class ModelProcessFlow extends Component {
 		}));
 		
 		values.forEach(itm=>{
-			result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			if(itm[1]!=='ignore'){
+				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			}else{
+				if(colType[itm[0]] === 'Categorical'){
+					result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+				}else{
+					result.filter(it=>it.type === itm[1])[1].data.push(itm[0]);
+				}
+			}
 		});
 		
-		const resu = result.filter(itm=>itm.data&&itm.data.length);
+		const res = result.filter(itm=>itm.data&&itm.data.length);
 		
-		if(!resu.length){
+		if(!res.length){
 			return null;
+		}
+		if(outlier){
+			let {low,high} = rawDataView[target];
+			if(outlierDictTemp[target]){
+				const lh = [...outlierDictTemp[target]];
+				low = lh[0];
+				high = lh[1];
+			}else{
+				low = +low.toFixed(2);
+				high = +high.toFixed(2);
+			}
+			return <React.Fragment>
+				<dt>{title}</dt>
+				<dd>{EN.ValidRange}:[{low},{high}]</dd>
+				{
+					res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}</dd>)
+				}
+			</React.Fragment>
 		}
 		return <React.Fragment>
 			<dt>{title}</dt>
 			{
-				resu.map(itm=><dd key={itm.key}>{itm.key}:{itm.data.join(',')}</dd>)
+				res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}:{itm.data.join(',')}</dd>)
 			}
 		</React.Fragment>
 	}

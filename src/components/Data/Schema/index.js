@@ -195,7 +195,7 @@ export default class DataSchema extends Component {
         if (!header) {
           key = `Unnamed: ${realColumn}`
         }
-        if (header && temp[header].length > 1) {
+        if (header && temp[header]&&temp[header].length > 1) {
           const tempIndex = temp[header].findIndex(c => c === realColumn);
           const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
           key = header + suffix

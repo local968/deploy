@@ -247,11 +247,9 @@ export default class SimplifiedView extends Component {
         </div>
         <div
             className={classnames(styles.toolButton, styles.toolCheck)}
-            id={'Correlation' + target}
              onClick={this.showCorrelationMatrix}>
           {this.showCorrelation && <Popover placement='left'
                                             visible={this.showCorrelation}
-            // getPopupContainer={() => document.getElementById('Correlation' + target)}
             onVisibleChange={this.hideCorrelationMatrix}
             trigger="click"
             content={<CorrelationPlot onClose={this.hideCorrelationMatrix}
@@ -521,9 +519,9 @@ class SimplifiedViewRow extends Component {
            id={'Histograms' + value}
            onClick={this.showHistograms}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-        {(!isRaw && this.histograms) ? <Popover placement='left'
+        {(!isRaw && this.histograms) ? <Popover placement='rightTop'
           visible={!isRaw && this.histograms}
-           autoAdjustOverflow
+           // autoAdjustOverflow
           onVisibleChange={this.hideHistograms}
            overlayClassName='popovers'
            // getPopupContainer = {()=>document.getElementById('Histograms'+value)}
@@ -542,12 +540,12 @@ class SimplifiedViewRow extends Component {
            id={'Univariant' + value}
            onClick={this.showUnivariant}>
         <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
-        {(!isRaw && this.univariant) ? <Popover placement='left'
-                                                arrowPointAtCenter
+        {(!isRaw && this.univariant) ? <Popover placement='rightTop'
+                                                // arrowPointAtCenter
                                                 overlayClassName='popovers'
                                                 // getPopupContainer = {()=>document.getElementById('Univariant' + value)}
                                                 visible={!isRaw && this.univariant}
-                                                autoAdjustOverflow
+                                                // autoAdjustOverflow
                                                 onVisibleChange={this.hideUnivariant}
                                                 trigger="click"
                                                 content={<SimplePlot isNew={isNew} path={univariatePlots[value]} getPath={univariatePlot.bind(null, value)}>

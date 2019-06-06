@@ -327,11 +327,11 @@ class SimplifiedViewRow extends Component {
            id={'Histograms' + value}
            onClick={this.showHistograms.bind(this, value)}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
-        {(!isRaw && this.histograms) ? <Popover placement='left'
+        {(!isRaw && this.histograms) ? <Popover placement='rightTop'
                                                 visible={!isRaw && this.histograms}
                                                 overlayClassName='popovers'
                                                 // getPopupContainer = {()=>document.getElementsByClassName(styles.advancedModel)[0]}
-                                                autoAdjustOverflow = {true}
+                                                // autoAdjustOverflow = {true}
                                                 onVisibleChange={this.hideHistograms}
                                                 trigger="click"
                                                 content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
