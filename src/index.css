@@ -99,3 +99,6 @@ body {
 .ant-radio-inner::after{
   background-color: #4EC078 !important;
 }
+.popovers .ant-popover-content{
+  margin-top: -30% !important;
+}
