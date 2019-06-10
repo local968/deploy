@@ -706,7 +706,7 @@ const ZH_LAN: any = {
   FailedtoCollectorDataError: '数据收集错误',
   ValidRange: '有效范围',
   QuantityofOutlier: '异常值数量',
-  DoNothing: '删除整行',
+  DoNothing: '不处理忽略',
   Apply: '应用',
   Found: '发现问题',
   YourtargetvariableHas: '您的目标变量的类别个数',

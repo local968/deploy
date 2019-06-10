@@ -113,11 +113,18 @@ export default class ModelProcessFlow extends Component {
 			targetArray,
 			colValueCounts,
 			target,
+			targetCounts,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
 		
-		const df = _.without(Object.keys(colValueCounts[target]),...targetArray);
+		let ta = _.cloneDeep(targetArray);
+		
+		if(!targetArray.length){
+			ta = Object.keys(targetCounts).splice(0,2)
+		}
+		
+		const df = _.without(Object.keys(colValueCounts[target]),...ta);
 		df.forEach(itm=>{
 			if(otherMap[itm]){
 				mapping.push([itm,otherMap[itm]])
