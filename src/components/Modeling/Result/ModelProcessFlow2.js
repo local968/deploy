@@ -110,7 +110,7 @@ export default class ModelProcessFlow extends Component {
 		
 		let drop = [],mapping=[];
 		
-		const df = _.pull(Object.keys(colValueCounts[target]),...targetArray);
+		const df = _.without(Object.keys(colValueCounts[target]),...targetArray);
 		df.forEach(itm=>{
 			if(otherMap[itm]){
 				mapping.push([itm,otherMap[itm]])
@@ -248,39 +248,5 @@ export default class ModelProcessFlow extends Component {
 			<img src={Next} alt='' />
 			<label>{EN.Prediction}</label>
 		</section>
-		// } else if (dataFlow.length > 1) {
-		// 	return <section className={`${styles.process} ${styles.many}`}>
-		// 		<label>{EN.RawData}</label>
-		// 		<img src={Next} alt='' />
-		// 		<dl>
-		// 			{
-		// 				dataFlow.filter(itm => itm.weight).map((itm, index) => {
-		// 					return <dd key={index}>
-		// 						{this.popOver(this.DP(itm), EN.DataPreprocessing)}
-		// 						<img src={Next} alt='' />
-		// 						{this.popOver(this.FP(itm), EN.FeaturePreprocessing)}
-		// 						<img src={Next} alt='' />
-		// 						{this.popOver(this.Third(itm), itm.model_name)}
-		// 						<Tag>{formatNumber(+itm.weight || 0)}</Tag>
-		// 					</dd>
-		// 				})
-		// 			}
-		// 		</dl>
-		// 		<img src={Next} alt='' />
-		// 		<label>{EN.EnsembledModel}</label>
-		// 		<img src={Next} alt='' />
-		// 		<label>{EN.Prediction}</label>
-		// 	</section>
-		// } else {
-		// 	let str = name.split('.')[0];
-		// 	str = str.substring(0, str.length - 1);
-		// 	return <section className={styles.process}>
-		// 		<label>{EN.RawData}</label>
-		// 		<img src={Next} alt='' />
-		// 		<label>{str}</label>
-		// 		<img src={Next} alt='' />
-		// 		<label>{EN.Prediction}</label>
-		// 	</section>
-		// }
 	}
 }
