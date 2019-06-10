@@ -2282,7 +2282,7 @@ export default class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = (model) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance } = this;
+    const { target, colType, etlIndex, dataHeader, newVariable, preImportance,trainHeader} = this;
 
     const list = [];
     list.push(this.histogram(target));
@@ -2301,6 +2301,8 @@ export default class Project {
 
 
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable];
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v));
+    [allVariables].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString());
     allVariables.sort((a, b) => {
       return preImportance ? -1 * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
     });
