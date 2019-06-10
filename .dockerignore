@@ -33,3 +33,4 @@ config.lua
 /data
 # yarn.lock
 src
+docker-compose.yaml

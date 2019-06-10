@@ -112,18 +112,26 @@ export default class ModelProcessFlow extends Component {
 			colType,
 			target,
 			problemType,
+			otherMap,
 		} = this.props.projectStore.project;
 		
+		const nfm = _.cloneDeep(nullFillMethod);
+		const mfm = _.cloneDeep(mismatchFillMethod);
+		
 		Object.entries(nullLineCounts).filter(itm=>itm[1]&&!nullFillMethod[itm[0]]).map(itm=>{
-			nullFillMethod[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
+			nfm[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
 		});
+		
+		if(otherMap.hasOwnProperty('')){
+			Reflect.deleteProperty(nfm,target);
+		}
 		
 		Object.entries(mismatchLineCounts).filter(itm=>colType[itm[0]] === 'Numerical'&&itm[1]&&!mismatchFillMethod[itm[0]]).map(itm=>{
-			mismatchFillMethod[itm[0]] = 'mean';
+			mfm[itm[0]] = 'mean';
 		});
 		
-		const mv = this.DQFData(nullFillMethod,EN.MissingValue,nullLineCounts[target]);
-		const mi = this.DQFData(mismatchFillMethod,EN.mismatch,mismatchLineCounts[target]);
+		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);
+		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
 		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
 		
 		if(!mv&&!mi&&!out){
