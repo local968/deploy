@@ -239,7 +239,16 @@ export default class ModelProcessFlow extends Component {
 		}));
 
 		values.forEach(itm=>{
-			if(itm[1]!=='ignore'){
+			if(!isNaN(+itm[1])){
+				if(!result.find(itm=>itm.type === itm[1])){
+					result.push({
+						type:itm[1],
+						key:EN.Replacewith + itm[1],
+						data:[],
+					})
+				}
+				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			}else if(itm[1]!=='ignore'){
 				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
 			}else{
 				if(colType[itm[0]] === 'Categorical'){
