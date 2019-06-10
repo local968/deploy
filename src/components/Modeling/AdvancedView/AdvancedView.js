@@ -272,31 +272,39 @@ export default class AdvancedView extends Component {
   get metricOptions() {
     const { project } = this.props
     if (project && project.problemType) {
-      return project.problemType === 'Classification' ? [{
-        display: 'Accuracy',
-        key: 'acc'
-      }, {
-        display: 'AUC',
-        key: 'auc'
-      }, {
-        display: 'F1',
-        key: 'f1'
-      }, {
-        display: 'Precision',
-        key: 'precision'
-      }, {
-        display: 'Recall',
-        key: 'recall'
-      }] : [{
-        display: 'MSE',
-        key: 'mse'
-      }, {
-        display: 'RMSE',
-        key: 'rmse'
-      }, {
-        display: <div>R<sup>2</sup></div>,
-        key: 'r2'
-      }]
+      return project.problemType === 'Classification' ?
+        // [{
+        //   display: 'Accuracy',
+        //   key: 'acc'
+        // }, {
+        //   display: 'AUC',
+        //   key: 'auc'
+        // }, {
+        //   display: 'F1',
+        //   key: 'f1'
+        // }, {
+        //   display: 'Precision',
+        //   key: 'precision'
+        // }, {
+        //   display: 'Recall',
+        //   key: 'recall'
+        // }]
+        [{
+          display: 'AUC',
+          key: 'auc'
+        }, {
+          display: 'F1',
+          key: 'f1'
+        }] : [{
+          display: 'MSE',
+          key: 'mse'
+        }, {
+          display: 'RMSE',
+          key: 'rmse'
+        }, {
+          display: <div>R<sup>2</sup></div>,
+          key: 'r2'
+        }]
     }
     return []
   }
@@ -796,7 +804,7 @@ class DetailCurves extends Component {
           </div>
           <PredictTable model={model} yes={yes} no={no} />
         </div>
-        <div className={styles.rightPanel} style={{marginLeft:10}}>
+        <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
           {curComponent}
           {hasReset && <button onClick={this.reset} className={styles.button + ' ' + styles.buttonr} >{EN.Reset}</button>}
         </div>
@@ -840,7 +848,7 @@ class Thumbnail extends Component {
         // onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
-        <img src={icon} alt="icon"/>
+        <img src={icon} alt="icon" />
         <div>{text}</div>
       </div>
     )
@@ -933,7 +941,7 @@ class PredictTable extends Component {
 class ModelComp extends Component {
   state = {
     modelCompVisible: false,
-    select:true,
+    select: true,
   };
   handleClick = () => {
     this.setState({ modelCompVisible: true });
@@ -943,7 +951,7 @@ class ModelComp extends Component {
   };
   render() {
     const { models } = this.props;
-    const {select} = this.state;
+    const { select } = this.state;
     return (
       <div className={styles.modelComp}>
         <a onClick={this.handleClick} className={styles.comparison}>{EN.ModelComparisonCharts}</a>
@@ -997,13 +1005,13 @@ class ModelComp extends Component {
               </TabPane> */}
             </Tabs>
             <div className={styles.mccb}>
-              <Button type="primary" onClick={async ()=>{
-                await this.setState({select:false});
-                this.setState({select:true});
+              <Button type="primary" onClick={async () => {
+                await this.setState({ select: false });
+                this.setState({ select: true });
               }}>{EN.SelectAll}</Button>
-              <Button type="primary" onClick={async ()=>{
-                await this.setState({select:true});
-                this.setState({select:false});
+              <Button type="primary" onClick={async () => {
+                await this.setState({ select: true });
+                this.setState({ select: false });
               }}>{EN.DeselectAll}</Button>
             </div>
           </div>
