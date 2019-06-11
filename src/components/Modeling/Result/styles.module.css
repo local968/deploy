@@ -71,6 +71,7 @@
 
 .process dt label {
     text-transform: none;
+    font-size: 14px;
 }
 
 .process button span {
