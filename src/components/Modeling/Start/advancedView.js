@@ -409,7 +409,7 @@ export default class AdvancedView extends Component {
               </div>
             </div>
           </div>
-          <div className={styles.advancedLine}>
+          {problemType === "Classification" && <div className={styles.advancedLine}>
             {/* <div className={styles.advancedResampling}> */}
             <div className={classnames(styles.advancedTitle, styles.otherLabel)}>
               <span>{EN.ResamplingSetting}</span>
@@ -426,7 +426,7 @@ export default class AdvancedView extends Component {
               <input id="resampling3" type='radio' name="resampling" checked={resampling === "no"} onChange={this.handleResampling.bind(null, 'no')} />
               <label htmlFor="resampling3">{EN.Noresampling}</label>
             </div>
-          </div>
+          </div>}
         </div>
         {/* </div> */}
       </div>
