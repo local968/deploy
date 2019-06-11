@@ -475,14 +475,14 @@ function Computed(props: ComputedProps) {
     let warning = false
     const typeArray: string[] = []
     for (let item of array) {
-      if(!item.length) {
+      if (!item.length) {
         if (warning) return { isPass: false, message: EN.Errorexpression }
         warning = true
         continue
-      }else{
+      } else {
         warning = false
       }
-      console.log(item,'adasd')
+      console.log(item, 'adasd')
       //Categorical
       let type = 'Numerical'
       // item = item.trim()
@@ -929,14 +929,19 @@ function Computed(props: ComputedProps) {
         // const last = subExp.slice(-1)
         // if (first !== "[" || last !== "]") return { isPass: false, message: `${ EN.Unexpectedidentifier } ${ subExp } ` }
         // const subArray = subItem.exp.slice(1, -1)
-
+        let prev: any
         const subchecked = checkArrayParams(subItem.exp.slice(1, -1), bracketExps, ({ item, type, isVariable }) => {
-          if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} ` }
+          if (!item) return { isPass: false, message: `${expToString(subItem.exp)} contain ${EN.Emptyexpression} ` }
           if (isVariable) return { isPass: false, message: `cannot use variable` }
           if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumbe} ` }
           if (isNaN(parseFloat(item)) || item.includes('.')) return {
             isPass: false,
             message: `${item} ${EN.Mustbeinteger} `
+          }
+          if (isNaN(parseFloat(prev))) prev = item
+          else {
+            if (prev > item) return { isPass: false, message: `${item} must larger than ${prev} ` }
+            prev = item
           }
           return { isPass: true, message: 'ok' }
         })
