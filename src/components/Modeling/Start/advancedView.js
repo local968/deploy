@@ -348,7 +348,7 @@ export default class AdvancedView extends Component {
         <div className={styles.advancedRight} style={{ flex: '4 4' }}>
           <div className={styles.advancedBlock}>
             <div className={classnames(styles.advancedTitle, styles.limit)}>
-              <span>{EN.SelectAlgorithm}:</span>
+              <span>{EN.SelectFeature}:</span>
             </div>
             <div className={styles.advancedOption}>
               <div className={styles.advancedOptionBox}>
