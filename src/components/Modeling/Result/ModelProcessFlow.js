@@ -160,7 +160,7 @@ export default class ModelProcessFlow extends Component {
 		
 		let drop = [],mapping=[];
 		
-		let ta = _.cloneDeep(targetArray);
+		let ta =[...targetArray];
 		
 		if(!targetArray.length){
 			ta = Object.keys(targetCounts).splice(0,2)
@@ -246,7 +246,6 @@ export default class ModelProcessFlow extends Component {
 		}));
 
 		values.forEach(itm=>{
-			console.log(1,itm[0],itm[1])
 			if(!isNaN(+itm[1])){
 				if(!result.find(itm=>itm.type === itm[1])){
 					result.push({
@@ -260,10 +259,8 @@ export default class ModelProcessFlow extends Component {
 				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
 			}else{
 				if(colType[itm[0]] === 'Categorical'){
-					console.log(1111,itm[0])
 					result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
 				}else{
-					console.log(2222,itm[0])
 					result.filter(it=>it.type === itm[1])[1].data.push(itm[0]);
 				}
 			}
@@ -302,7 +299,7 @@ export default class ModelProcessFlow extends Component {
 	
 	FS(){
 		const { featureLabel } = this.props.model;
-		const {rawHeader,expression,target } = this.props.projectStore.project;
+		const {rawHeader,expression,target,colType} = this.props.projectStore.project;
 		
 		let drop = _.without(rawHeader,...featureLabel,target);
 		
@@ -314,9 +311,15 @@ export default class ModelProcessFlow extends Component {
 			return null;
 		}
 		
+		const raw = drop.filter(itm=>colType[itm] === "Raw");
+		drop = _.without(drop,...raw);
+		
 		const pop = <dl className={styles.over}>
 			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
 				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
+			</dt>
+			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
+				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
 			</dt>
 			<dt style={{display:(create.length?'':'none')}}>
 				{EN.CreateTheseVariables}:
@@ -326,11 +329,10 @@ export default class ModelProcessFlow extends Component {
 			}
 		</dl>;
 		
-		return <React.Fragment>
+		return <Fragment>
 			<img src={Next} alt='' />
 			{this.popOver(pop,EN.FeatureCreationSelection)}
-		</React.Fragment>
-		
+		</Fragment>
 	}
 
 	popOver(content, text) {

@@ -39,13 +39,10 @@
     text-overflow: ellipsis;
     overflow: hidden;
     display: inline-block;
+    font-size: 0.2em;
 }
 .process dt:not(:first-child){
     margin-top: 10px;
-}
-
-.process label {
-    font-size: 0.2em;
 }
 
 .process img {
@@ -64,6 +61,7 @@
 
 .process label {
     text-transform: capitalize;
+    font-size: 0.15em;
 }
 
 .many img {
@@ -71,8 +69,8 @@
     margin: 0 5px;
 }
 
-.process label {
-    font-size: 0.15em;
+.process dt label {
+    text-transform: none;
 }
 
 .process button span {
