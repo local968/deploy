@@ -458,11 +458,20 @@ function Computed(props: ComputedProps) {
     // const baseOptReg = new RegExp(/[+\-*/]/)
     const length = expression.length
     let start = 0
+    let skipNum = 0
     let array: (Coordinate | Bracket)[][] = []
-    // 根据+-*/切割表达式
+    // 根据+-*/切割表达式 忽略[]
     for (let i = 0; i < length; i++) {
       if (i < start) continue
-      if ((expression[i] as any).type === Type.Op) {
+      if ((expression[i] as any).type === Type.Lc) {
+        skipNum++
+        continue
+      }
+      if ((expression[i] as any).type === Type.RC) {
+        if (skipNum > 0) skipNum--
+        continue
+      }
+      if (skipNum === 0 && (expression[i] as any).type === Type.Op) {
         array.push(expression.slice(start, i))
         start = i + 1
       }
@@ -482,7 +491,6 @@ function Computed(props: ComputedProps) {
       } else {
         warning = false
       }
-      console.log(item, 'adasd')
       //Categorical
       let type = 'Numerical'
       // item = item.trim()
@@ -586,7 +594,6 @@ function Computed(props: ComputedProps) {
       }
     }
     if (start < length) expArray.push(exps.slice(start, length))
-
     let numOfParam = 0
     let isVariable1 = false
     let num = 1
@@ -938,6 +945,7 @@ function Computed(props: ComputedProps) {
             isPass: false,
             message: `${item} ${EN.Mustbeinteger} `
           }
+          if (item < 0) return { isPass: false, message: `${item} must larger than 0` }
           if (isNaN(parseFloat(prev))) prev = item
           else {
             if (prev > item) return { isPass: false, message: `${item} must larger than ${prev} ` }
