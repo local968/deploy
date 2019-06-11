@@ -920,7 +920,7 @@ function Computed(props: ComputedProps) {
           message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         const subItem = numList[0]
-        if (subItem.type !== 'Array') return {
+        if (!subItem || subItem.type !== 'Array') return {
           isPass: false,
           message: `${EN.Unexpectedidentifier} ${expToString(subItem.exp)} `
         }
