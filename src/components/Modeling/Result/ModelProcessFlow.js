@@ -160,7 +160,7 @@ export default class ModelProcessFlow extends Component {
 		
 		let drop = [],mapping=[];
 		
-		let ta = _.cloneDeep(targetArray);
+		let ta =[...targetArray];
 		
 		if(!targetArray.length){
 			ta = Object.keys(targetCounts).splice(0,2)
@@ -246,7 +246,6 @@ export default class ModelProcessFlow extends Component {
 		}));
 
 		values.forEach(itm=>{
-			console.log(1,itm[0],itm[1])
 			if(!isNaN(+itm[1])){
 				if(!result.find(itm=>itm.type === itm[1])){
 					result.push({
@@ -260,10 +259,8 @@ export default class ModelProcessFlow extends Component {
 				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
 			}else{
 				if(colType[itm[0]] === 'Categorical'){
-					console.log(1111,itm[0])
 					result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
 				}else{
-					console.log(2222,itm[0])
 					result.filter(it=>it.type === itm[1])[1].data.push(itm[0]);
 				}
 			}
