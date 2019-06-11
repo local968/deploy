@@ -1252,7 +1252,8 @@ const EN_LAN = {
   DropTheRows:'Drop the rows',
   Mapping:"Mapping",
   value:'value',
-  SelectFeature: 'Select Feature Preprocessor'
+  SelectFeature: 'Select Feature Preprocessor',
+  errorparams:'error params',
 };
 
 

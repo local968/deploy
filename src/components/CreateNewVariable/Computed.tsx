@@ -779,7 +779,7 @@ function Computed(props: ComputedProps) {
         if (numOfParam === 1) {
           if (numList.length !== 2) return {
             isPass: false,
-            message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+            message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
           }
           const vList = numList[0]
           nList = numList[1]
@@ -795,13 +795,13 @@ function Computed(props: ComputedProps) {
         } else if (numOfParam === 2) {
           if (numList.length !== 1) return {
             isPass: false,
-            message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+            message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
           }
           nList = numList[0]
         } else {
           return {
             isPass: false,
-            message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+            message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
           }
         }
 
@@ -870,7 +870,7 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         if (numList.length > 0) return {
           isPass: false,
-          message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
         }
         num = (numOfParam * (numOfParam - 1)) >> 1
         break;
@@ -878,11 +878,11 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         if (numList.length > 1) return {
           isPass: false,
-          message: `error params ${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams} ${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         if (numOfParam > 1) return {
           isPass: false,
-          message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         if (numList[0] && expToString(numList[0].exp) && isNaN(parseFloat(expToString(numList[0].exp)))) return {
           isPass: false,
@@ -894,11 +894,11 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         if (numList.length > 0) return {
           isPass: false,
-          message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
         }
         if (numOfParam > 1) return {
           isPass: false,
-          message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         num = 1
         break;
@@ -906,11 +906,11 @@ function Computed(props: ComputedProps) {
         type = 'Categorical'
         if (numList.length > 1) return {
           isPass: false,
-          message: `error params ${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         if (numOfParam > 1) return {
           isPass: false,
-          message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         const subItem = numList[0]
         if (subItem.type !== 'Array') return {
@@ -934,8 +934,8 @@ function Computed(props: ComputedProps) {
           return {isPass: true, message: 'ok'}
         })
         if (!subchecked.isPass) return subchecked
-        if (subchecked.params !== 2) return {isPass: false, message: `error params ${expToString(subItem.exp)} `}
-        // if (subArray.length !== 2) return { isPass: false, message: `error params ${ subExp } ` }
+        if (subchecked.params !== 2) return {isPass: false, message: `${EN.errorparams}${expToString(subItem.exp)} `}
+        // if (subArray.length !== 2) return { isPass: false, message: `${EN.errorparams}${ subExp } ` }
         // for (let item of subArray) {
         //   if (!item) return { isPass: false, message: `${ subItem.exp } contain ${ EN.Emptyexpression } ` }
         //   if (isNaN(parseFloat(item)) || item.includes('.')) return { isPass: false, message: `${ item } ${ EN.Mustbeinteger } ` }
