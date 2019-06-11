@@ -1031,6 +1031,7 @@ function Computed(props: ComputedProps) {
   const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
   if (func) {
     const {name} = func;
+    variables = filter(variables, ({varType}) => varType !== 'Raw')
     if (!includes(['Number_extraction', 'Substring', 'Groupby', 'Substring', 'Concat', 'Eq', '(', ')', ','], name)) {
       variables = filter(variables, ({varType}) => varType === 'Numerical')
     }
