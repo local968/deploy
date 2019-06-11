@@ -579,7 +579,7 @@ class RegressionDetailCurves extends Component {
     }]
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{ minWidth: 0 }} >
+        <div className={styles.leftPanel} style={{ minWidth: 210 }} >
           {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
         </div>
         <div className={styles.rightPanel} >

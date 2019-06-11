@@ -13,7 +13,7 @@ import request from "../components/Request";
 
 export default class Project {
   @observable models = []
-  @observable trainModel = null
+  @observable trainModel = {}
   @observable autorun = []
 
   @observable id = "";
@@ -154,7 +154,8 @@ export default class Project {
   @observable customRange = [];
   @observable algorithms = [];
   @observable selectId = '';
-  @observable version = [1, 2, 3];
+  @observable version = [1, 2, 4];
+  @observable features = ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
   @observable dataViews = null;
   @observable dataViewsLoading = false;
   @observable dataViewProgress = 0;
@@ -169,6 +170,7 @@ export default class Project {
   @observable stopModel = false
   @observable stopEtl = false
   @observable isAbort = false
+  @observable stopIds = []
 
   @observable reportProgress = 0
   @observable reportProgressText = 'init'
@@ -343,7 +345,7 @@ export default class Project {
       algorithms: algorithms,
       measurement,
       selectId: '',
-      version: [1, 2],
+      version: [1, 2, 4],
       trainHeader: [],
       customHeader: [],
       newVariable: [],
@@ -364,7 +366,10 @@ export default class Project {
       standardType: 'standard',
       searchTime: 5,
       kValue: 5,
-      kType: 'auto'
+      kType: 'auto',
+      trainModel: {},
+      stopIds: [],
+      features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
     }
   }
 
@@ -537,12 +542,12 @@ export default class Project {
       if (key === 'noCompute') {
         data.noComputeTemp = data[key]
       }
-      if (key === 'trainModel') {
-        if (data[key]) {
-          const { value } = data[key] || {}
-          data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
-        }
-      }
+      // if (key === 'trainModel') {
+      //   if (data[key]) {
+      //     const { value } = data[key] || {}
+      //     data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
+      //   }
+      // }
     }
     // data.updateTime = +new Date()
     Object.assign(this, data)
@@ -664,6 +669,7 @@ export default class Project {
 
   @action
   endSchema = async () => {
+    this.etling = true
     await this.abortTrainByEtl()
     const data = {
       target: this.target,
@@ -676,7 +682,6 @@ export default class Project {
       outlierFillMethodTemp: this.outlierFillMethodTemp,
     }
     if (this.noComputeTemp) {
-      this.etling = true
       if (this.problemType === 'Classification') {
         const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
         if (min < 3) {
@@ -693,7 +698,7 @@ export default class Project {
         subStepActive: 1,
         lastSubStep: 1
       })
-      this.etling = false
+      // this.etling = false
     } else {
       const step = {
         curStep: 2,
@@ -701,6 +706,7 @@ export default class Project {
         subStepActive: 3,
         lastSubStep: 3
       }
+      this.etling = false
       await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data, step))
     }
     // const step = this.noComputeTemp ? {
@@ -990,7 +996,7 @@ export default class Project {
     if (status !== 200) {
       // 出现错误弹出提示框,需要用户确认
       Modal.error({
-        title: message || result['process error'],
+        title: message || result['processError'],
       });
       this.etling = false
       this.etlProgress = 0
@@ -1051,7 +1057,7 @@ export default class Project {
           const { status, result } = returnValue
           if (status < 0) {
             // this.setProperty({ dataViews: null })
-            return antdMessage.error(result['process error'])
+            return antdMessage.error(result['processError'])
           }
           // this.setProperty({ newVariableViews: result.data, dataViewsLoading: false })
         })
@@ -1080,7 +1086,6 @@ export default class Project {
 
   @action
   addNewVariable = (variableName, variables, exp, type) => {
-    console.log(variableName, variables, exp, type, 666)
     const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
     const oldExp = Object.values(this.expression).join(";")
     const allExp = `${oldExp};${fullExp}`
@@ -1121,10 +1126,6 @@ export default class Project {
 
   @action
   addNewVariable2 = (variables, type) => {
-    // console.log(variableName, variables, exp, type, 666)
-    // const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
-    // const oldExp = Object.values(this.expression).join(";")
-    // const allExp = `${oldExp};${fullExp}`
     const scripts = [...Object.values(this.expression), ...variables].map(v => ({
       name: v.nameArray.map(n => ({
         value: n,
@@ -1277,12 +1278,13 @@ export default class Project {
           validate = score[currentMeasurement]
           holdout = score[currentMeasurement]
         }
-        if (!validate || !holdout) return
+        if (isNaN(parseFloat(validate)) || isNaN(parseFloat(holdout))) return
         return { id: m.id, value: validate + holdout }
         // const value = validate + holdout
         // if (!recommend) return recommend = { id: m.id, value }
         // if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
       })
+      .filter(_m => !_m)
       .sort((a, b) => (b.value - a.value) * sort)
       .map(_m => models.find(m => m.id === _m.id))
     // if (!!recommend) return models.find(m => m.id === recommend.id)
@@ -1296,13 +1298,15 @@ export default class Project {
       id,
       problemType,
       target,
-      dataHeader
+      dataHeader,
+      colType
     } = this;
 
     let command = '';
     let trainData = {}
 
-    const featureLabel = dataHeader.filter(d => d !== target);
+    const featureLabel = dataHeader.filter(d => d !== target).filter(h => colType[h] !== 'Raw');
+    if (!featureLabel.length) return antdMessage.error("no feature label");
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -1374,7 +1378,7 @@ export default class Project {
           featureLabel,
           targetLabel: target,
           projectId: id,
-          version: '1,2,3',
+          version: '1,2,3,4',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,
@@ -1401,7 +1405,8 @@ export default class Project {
             'sgd',
             'xgradient_boosting',
             'r2-logistics',
-          ]
+          ],
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => formatFeature(problemType)[fe])
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1416,7 +1421,7 @@ export default class Project {
           featureLabel,
           targetLabel: target,
           projectId: id,
-          version: '1,2,3',
+          version: '1,2,3,4',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,
@@ -1439,7 +1444,8 @@ export default class Project {
             'ridge_regression',
             'sgd',
             'xgradient_boosting',
-          ]
+          ],
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => formatFeature(problemType)[fe])
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1495,13 +1501,16 @@ export default class Project {
       dataHeader,
       weights,
       newVariable,
-      trainHeader
+      trainHeader,
+      colType,
+      features,
     } = this;
 
     let command = '';
     let trainData = {}
 
-    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d));
+    const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d)).filter(h => colType[h] !== 'Raw');
+    if (!featureLabel.length) return antdMessage.error("no feature label")
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
 
@@ -1543,6 +1552,35 @@ export default class Project {
         break;
       default:
         command = 'clfreg.train';
+        let featureList = []
+        if (problemType === "Classification") {
+          if (this.algorithms.some(al => [
+            'adaboost',
+            'decision_tree',
+            'extra_trees',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'liblinear_svc',
+            'random_forest',
+            'gaussian_nb',
+            'xgradient_boosting',
+          ].includes(al))) featureList = featureList.concat(['Extra Trees', 'Random Trees', 'fast ICA', 'PCA', 'Polynomial', 'feature agglomeration', 'linear SVM', 'Select Percentile', 'Select Rates'])
+          if (this.algorithms.includes('multinomial_nb')) featureList = featureList.concat(['Extra Trees', 'Random Trees', 'Polynomial', 'Feature Agglomeration', 'linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'])
+          if (this.algorithms.some(al => ["bernoulli_nb", "lda", "libsvm_svc", "passive_aggressive", "qda", "sgd"].includes(al))) featureList = featureList.concat(["Fast ICA", "Kernel PCA", "Kitchen Sinks", "Linear SVM"])
+        } else {
+          if (this.algorithms.some(al => [
+            'adaboost',
+            'decision_tree',
+            'extra_trees',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'random_forest',
+            'gaussian_process',
+            'xgradient_boosting',
+          ].includes(al))) featureList = featureList.concat(['Extra Trees', 'Random Trees', 'fast ICA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'])
+          if (this.algorithms.some(al => ["ard_regression", "liblinear_svr", "libsvm_svr", "ridge_regression", "sgd"].includes(al))) featureList = featureList.concat(["Fast ICA", "Kernel PCA", "Kitchen Sinks", "Linear SVM"])
+        }
+        const featuresPreprocessor = features.filter(fe => featureList.includes(fe)).map(fe => formatFeature(problemType)[fe])
         trainData = {
           problemType,
           featureLabel,
@@ -1558,6 +1596,7 @@ export default class Project {
           settingName: setting.name,
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
+          featuresPreprocessor
         };
         if (this.runWith === 'holdout') {
           trainData.validationRate = this.validationRate / 100
@@ -1603,7 +1642,7 @@ export default class Project {
   }
 
   newSetting = (type = 'auto') => {
-    const { problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+    const { features, problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
 
     let setting
@@ -1665,7 +1704,7 @@ export default class Project {
         break;
       default:
         setting = type === 'auto' ? {
-          version: [1, 2, 3],
+          version: [1, 2, 4],
           validationRate: 20,
           holdoutRate: 20,
           randSeed: 0,
@@ -1676,6 +1715,7 @@ export default class Project {
           dataRange: 'all',
           customField: '',
           customRange: [],
+          features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
           algorithms: problemType === "Classification" ? [
             'adaboost',
             'bernoulli_nb',
@@ -1727,7 +1767,8 @@ export default class Project {
             algorithms,
             speedVSaccuracy,
             ensembleSize,
-            featureLabel
+            featureLabel,
+            features
           }
     }
 
@@ -1770,14 +1811,16 @@ export default class Project {
     })
   }
 
-  abortTrain = (isLoading = false) => {
-    if (this.stopModel) return
+  abortTrain = (stopId, isLoading = false) => {
+    if (!stopId) return Promise.resolve()
+    if (this.stopModel) return Promise.resolve()
     this.stopModel = true
     const command = {
       command: 'stop',
       action: 'train',
       projectId: this.id,
-      isLoading
+      isLoading,
+      stopId
     }
     this.isAbort = true
     return socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
@@ -1788,16 +1831,19 @@ export default class Project {
     }))
   }
 
-  abortTrainByEtl = async () => {
+  abortTrainByEtl = () => {
     this.models = []
-    if (this.train2ing) return await this.abortTrain()
-    return
+    if (this.train2ing && !!this.stopIds.length) {
+      const arr = this.stopIds.map(si => this.abortTrain(si))
+      return Promise.all(arr)
+    }
+    return Promise.resolve()
   }
 
   setModel = data => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
-    if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
+    // if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
     const model = new Model(this.id, { ...data, measurement: this.measurement })
     if (!!this.models.length) {
       const { problemType } = model
@@ -1890,7 +1936,7 @@ export default class Project {
         .then(returnValue => {
           const { status, result } = returnValue
           if (status < 0) {
-            return antdMessage.error(result['process error'])
+            return antdMessage.error(result['processError'])
           }
           // this.setProperty({
           //   preImportance: result.preImportance,
@@ -1914,7 +1960,7 @@ export default class Project {
       return api.correlationMatrix(command).then(returnValue => {
         const { status, result } = returnValue
         this.correlationMatrixLoading = false
-        if (status < 0) return antdMessage.error(result['process error'])
+        if (status < 0) return antdMessage.error(result['processError'])
         this.correlationMatrixHeader = result.header;
         this.correlationMatrixData = result.data;
       })
@@ -1924,12 +1970,13 @@ export default class Project {
   univariatePlot = field => {
     if (!field) return
     if (field === this.target) return
+    if (!this.newVariable.includes(field)) return
     if (this.univariatePlots.hasOwnProperty(field)) return
     this.univariatePlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'univariatePlot',
+        command: 'clfreg.univariatePlot',
         feature_label: [field]
       };
       // if (field) {
@@ -1941,10 +1988,10 @@ export default class Project {
       // }
       api.univariatePlot(command, progressResult => {
         const { result } = progressResult
-        const { field: plotKey, imageSavePath, progress } = result;
+        const { field: plotKey, Data, progress } = result;
         if (progress && progress === "start") return
         const univariatePlots = Object.assign({}, this.univariatePlots);
-        univariatePlots[plotKey] = imageSavePath
+        univariatePlots[plotKey] = Data
         this.setProperty({ univariatePlots })
       }).then(this.handleError)
     })
@@ -1952,12 +1999,13 @@ export default class Project {
 
   histgramPlot = field => {
     if (!field) return
+    if (!this.newVariable.includes(field)) return
     if (this.histgramPlots.hasOwnProperty(field)) return
     this.histgramPlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'histgramPlot',
+        command: 'top.histgramPlot',
         feature_label: [field]
       };
       if (field === this.target) {
@@ -1977,10 +2025,10 @@ export default class Project {
       // }
       api.histgramPlot(command, progressResult => {
         const { result } = progressResult
-        const { field: plotKey, imageSavePath, progress } = result;
+        const { field: plotKey, Data, progress } = result;
         if (progress && progress === "start") return
         const histgramPlots = Object.assign({}, this.histgramPlots);
-        histgramPlots[plotKey] = imageSavePath
+        histgramPlots[plotKey] = Data
         this.setProperty({ histgramPlots })
       }).then(this.handleError)
     })
@@ -1988,7 +2036,7 @@ export default class Project {
 
   handleError = returnValue => {
     const { result, status, command } = returnValue
-    if (status < 0) antdMessage.error(`command:${command}, error:${result['process error']}`)
+    if (status < 0) antdMessage.error(`command:${command}, error:${result['processError']}`)
   }
 
   getSample = () => {
@@ -2152,13 +2200,13 @@ export default class Project {
     html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsChunkTag}${jsTag}${cssChunkTag}${cssTag}</${body}>`
     return html
   }
-  
-  histogram(field){
-    const {colType,dataViews,etlIndex} = this;
-    if(!dataViews[field]){
-      return;
+
+  histogram(field) {
+    const { colType, dataViews, etlIndex } = this;
+    if (!dataViews[field]) {
+      return {}
     }
-    if(colType[field] === 'Numerical'){
+    if (colType[field] === 'Numerical') {
       const { min, max } = dataViews[field];
       return {
         "name": "histogram-numerical",
@@ -2184,9 +2232,9 @@ export default class Project {
   univariant(value) {
     const { target, problemType, etlIndex, colType, dataViews } = this;
     const type = colType[value];
-  
-    if(!dataViews[value]){
-      return;
+
+    if (!dataViews[value]) {
+      return {}
     }
 
     if (problemType === "Regression") {
@@ -2234,7 +2282,7 @@ export default class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = (model) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance } = this;
+    const { target, colType, etlIndex, dataHeader, newVariable, preImportance,trainHeader} = this;
 
     const list = [];
     list.push(this.histogram(target));
@@ -2252,7 +2300,9 @@ export default class Project {
     });
 
 
-    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
+    const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable];
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v));
+    [allVariables].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString());
     allVariables.sort((a, b) => {
       return preImportance ? -1 * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
     });
@@ -2269,7 +2319,7 @@ export default class Project {
           url: model.pointToShowData,
         },
       });
-      
+
       list.push({
         name: 'fit-plot',
         data: {
@@ -2277,12 +2327,12 @@ export default class Project {
         },
       });
     }
-  
-    
-    
+
+
+
     return request.post({
       url: '/graphics/list',
-      data: list.filter(itm=>itm),
+      data: list.filter(itm => itm),
     })
   };
 
@@ -2438,4 +2488,38 @@ function loadFile(fileName, content) {
   aLink.href = URL.createObjectURL(blob);
   aLink.click();
   URL.revokeObjectURL(blob);
+}
+
+function formatFeature(pt) {
+  const obj = {
+    Classification: {
+      'Extra Trees': 'extra_trees_preproc_for_classification',
+      'Random Trees': 'random_trees_embedding',
+      'Fast ICA': 'fast_ica',
+      'Kernel PCA': 'kernel_pca',
+      'PCA': 'pca',
+      'Polynomial': 'polynomial',
+      'Feature Agglomeration': 'feature_agglomeration',
+      'Kitchen Sinks': 'kitchen_sinks',
+      'Linear SVM': 'linear_svc_preprocessor',
+      'Nystroem Sampler': 'nystroem_sampler',
+      'Select Percentile': 'select_percentile_classification',
+      'Select Rates': 'select_rates',
+    },
+    Regression: {
+      'Extra Trees': 'extra_trees_preproc_for_regression',
+      'Random Trees': 'random_trees_embedding',
+      'Fast ICA': 'fast_ica',
+      'Kernel PCA': 'kernel_pca',
+      'PCA': 'pca',
+      'Polynomial': 'polynomial',
+      'Feature Agglomeration': 'feature_agglomeration',
+      'Kitchen Sinks': 'kitchen_sinks',
+      'Linear SVM': 'linear_svc_preprocessor',
+      'Nystroem Sampler': 'nystroem_sampler',
+      'Select Percentile': 'select_percentile_regression',
+      'Select Rates': 'select_rates',
+    }
+  }
+  return obj[pt]
 }

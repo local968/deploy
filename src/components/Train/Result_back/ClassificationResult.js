@@ -282,8 +282,8 @@ class Performance extends Component {
 
 @observer
 class ModelTable extends Component {
-  abortTrain = () => {
-    this.props.abortTrain()
+  abortTrain = stopId => {
+    this.props.abortTrain(stopId)
   }
 
   // handleSort = key => {
@@ -394,13 +394,15 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && <div className={styles.rowData}>
-            {trainModel ? <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
-            {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-            <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
-              {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+          {!train2Finished && Object.values(trainModel).map((tm, k) => {
+            return <div className={styles.rowData}>
+              <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+              <ProgressBar progress={((tm || {}).value || 0)} />
+              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, tm.requestId) : null}>
+                {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+              </div>
             </div>
-          </div>}
+          })}
         </div>
       </div>
     );

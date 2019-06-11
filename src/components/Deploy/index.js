@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import styles from './styles.module.css';
-import { inject, observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import moment from 'moment';
-import { Bread, Select, Pagination, Switch, Search } from 'components/Common';
-import { Icon } from 'antd';
+import {Bread, Select, Pagination, Switch, Search} from 'components/Common';
+import {Icon, Modal} from 'antd';
 import issueIcon from './fail.svg';
 import runningIcon from './running.svg';
 import normalIcon from './success.svg';
@@ -12,17 +12,17 @@ import EN from '../../constant/en';
 const deploymentStatus = {
   normal: (
     <span className={styles.normal}>
-      <img className={styles.statusIcon} src={normalIcon} alt="normal" />{EN.Normal}
+      <img className={styles.statusIcon} src={normalIcon} alt="normal"/>{EN.Normal}
     </span>
   ),
   issue: (
     <span className={styles.issue}>
-      <img className={styles.statusIcon} src={issueIcon} alt="issue" />{EN.Issue}
+      <img className={styles.statusIcon} src={issueIcon} alt="issue"/>{EN.Issue}
     </span>
   ),
   processing: (
     <span className={styles.running}>
-      <img className={styles.statusIcon} src={runningIcon} alt="running" />{EN.Running}
+      <img className={styles.statusIcon} src={runningIcon} alt="running"/>{EN.Running}
     </span>
   ),
   na: <span className={styles.na}>{EN.NA}</span>
@@ -31,6 +31,9 @@ const deploymentStatus = {
 @inject('deploymentStore', 'scheduleStore', 'userStore', 'routing')
 @observer
 export default class Home extends Component {
+  state = {
+    visible: false,
+  }
   toggle = (currentType, targetType) => () => {
     if (currentType === targetType) {
       this.props.deploymentStore.changeSort(
@@ -43,11 +46,12 @@ export default class Home extends Component {
       this.props.deploymentStore.changeSort('sortBy', targetType);
     }
   };
+
   render() {
-    const { deploymentStore, routing, scheduleStore, userStore } = this.props;
+    const {deploymentStore, routing, scheduleStore, userStore} = this.props;
     return (
       <div className={styles.home}>
-        <Bread list={[EN.Home]} />
+        <Bread list={[EN.Home]}/>
         <div className={styles.filter}>
           <Search
             value={deploymentStore.sortOptions.keywords}
@@ -109,7 +113,7 @@ export default class Home extends Component {
               {EN.CreatedDate}
             </span>
             <span className={styles.owner}>{EN.Owner}</span>
-            <span className={styles.delete} />
+            <span className={styles.delete}/>
           </div>
           <div className={styles.list}>
             {deploymentStore.sortedDeployments.map(deployment => (
@@ -153,10 +157,10 @@ export default class Home extends Component {
                   }
                 >
                   {deploymentStatus[
-                    scheduleStore.schedules &&
-                    scheduleStore.getLastSchedule(deployment.id, 'deployment')
-                      .status
-                  ] || deploymentStatus['normal']}
+                  scheduleStore.schedules &&
+                  scheduleStore.getLastSchedule(deployment.id, 'deployment')
+                    .status
+                    ] || deploymentStatus['normal']}
                 </span>
                 <span
                   className={styles.performanceStatus}
@@ -167,12 +171,12 @@ export default class Home extends Component {
                   }
                 >
                   {deploymentStatus[
-                    scheduleStore.schedules &&
-                    scheduleStore.getLastSchedule(
-                      deployment.id,
-                      'performance'
-                    ).status
-                  ] || deploymentStatus['normal']}
+                  scheduleStore.schedules &&
+                  scheduleStore.getLastSchedule(
+                    deployment.id,
+                    'performance'
+                  ).status
+                    ] || deploymentStatus['normal']}
                 </span>
                 {/* <span
                   className={styles.operationAlert}
@@ -207,11 +211,24 @@ export default class Home extends Component {
                 <span
                   className={styles.delete}
                   onClick={() => {
-                    deploymentStore.delete(deployment.id);
+                    // if (message.info(EN.Areyousuretodeletethismodeldeployment))
+                    //   deploymentStore.delete(deployment.id);
+                    this.setState({ visible: true })
                   }}
                 >
-                  <Icon type="delete" />
+                  <Icon type="delete"/>
                 </span>
+                <Modal
+                  mask={false}
+                  visible={this.state.visible}
+                  onOk={() => {
+                    deploymentStore.delete(deployment.id);
+                    this.setState({ visible: false })
+                  }}
+                  onCancel={() => this.setState({ visible: false })}
+                >
+                  {EN.Areyousuretodeletethismodeldeployment}
+                </Modal>
               </div>
             ))}
           </div>

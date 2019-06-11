@@ -16,6 +16,9 @@ export default function HistogramCategorical(props){
     width = 500,
   } = props;
   
+  const max = Math.max(...data.map(itm=>itm[1]));
+  
+  
   const nameTextStyle = {
     color:'#000',
   };
@@ -41,6 +44,9 @@ export default function HistogramCategorical(props){
       name:y_name,
       nameTextStyle,
       type: 'value',
+    },
+    grid:{
+      x:`${Math.floor(max+1)}`.length * 10 +20,
     },
     series: [{
       data: data.map((itm)=>itm.value),

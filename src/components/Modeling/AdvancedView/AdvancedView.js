@@ -250,7 +250,7 @@ export default class AdvancedView extends Component {
     const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
     if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
       return _filtedModels.filter(model => currentSetting.models.find(id => model.id === id))
-    return _filtedModels
+    return []
   }
 
   @computed
@@ -272,31 +272,39 @@ export default class AdvancedView extends Component {
   get metricOptions() {
     const { project } = this.props
     if (project && project.problemType) {
-      return project.problemType === 'Classification' ? [{
-        display: 'Accuracy',
-        key: 'acc'
-      }, {
-        display: 'AUC',
-        key: 'auc'
-      }, {
-        display: 'F1',
-        key: 'f1'
-      }, {
-        display: 'Precision',
-        key: 'precision'
-      }, {
-        display: 'Recall',
-        key: 'recall'
-      }] : [{
-        display: 'MSE',
-        key: 'mse'
-      }, {
-        display: 'RMSE',
-        key: 'rmse'
-      }, {
-        display: <div>R<sup>2</sup></div>,
-        key: 'r2'
-      }]
+      return project.problemType === 'Classification' ?
+        // [{
+        //   display: 'Accuracy',
+        //   key: 'acc'
+        // }, {
+        //   display: 'AUC',
+        //   key: 'auc'
+        // }, {
+        //   display: 'F1',
+        //   key: 'f1'
+        // }, {
+        //   display: 'Precision',
+        //   key: 'precision'
+        // }, {
+        //   display: 'Recall',
+        //   key: 'recall'
+        // }]
+        [{
+          display: 'AUC',
+          key: 'auc'
+        }, {
+          display: 'F1',
+          key: 'f1'
+        }] : [{
+          display: 'MSE',
+          key: 'mse'
+        }, {
+          display: 'RMSE',
+          key: 'rmse'
+        }, {
+          display: <div>R<sup>2</sup></div>,
+          key: 'r2'
+        }]
     }
     return []
   }
@@ -616,7 +624,7 @@ class RegressionDetailCurves extends Component {
     }]
     return (
       <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{ minWidth: 0 }} >
+        <div className={styles.leftPanel} style={{ minWidth: 210 }} >
           {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
         </div>
         <div className={styles.rightPanel} >
@@ -710,7 +718,6 @@ class DetailCurves extends Component {
     let hasReset = true;
     switch (curve) {
       case EN.ROCCurve:
-        // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = show && <ROCCurves
           height={300}
           width={500}
@@ -720,7 +727,6 @@ class DetailCurves extends Component {
         />;
         break;
       case EN.PredictionDistribution:
-        // curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = show && <PredictionDistributions
           height={300}
           width={500}
@@ -730,7 +736,6 @@ class DetailCurves extends Component {
         />;
         break;
       case EN.PrecisionRecallTradeoff:
-        // curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
         curComponent = show && <PRCharts
           height={300} width={500}
           x_name={EN.Recall}
@@ -739,7 +744,6 @@ class DetailCurves extends Component {
         />
         break;
       case EN.LiftChart:
-        // curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
         curComponent = <SingleLiftCharts
           height={300} width={500}
           x_name={EN.percentage}
@@ -799,11 +803,8 @@ class DetailCurves extends Component {
             {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable model={model} yes={yes} no={no} />
-          {/* <div className={styles.thumbnails}>
-            {thumbnails.slice(4, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
-          </div> */}
         </div>
-        <div className={styles.rightPanel} >
+        <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
           {curComponent}
           {hasReset && <button onClick={this.reset} className={styles.button + ' ' + styles.buttonr} >{EN.Reset}</button>}
         </div>
@@ -830,12 +831,12 @@ class Thumbnail extends Component {
     this.setState({ clickActive: true });
     this.props.onClick(this.props.value);
   }
-  handleMouseEnter = () => {
-    this.setState({ hoverActive: true });
-  }
-  handleMouseLeave = () => {
-    this.setState({ hoverActive: false });
-  }
+  // handleMouseEnter = () => {
+  //   this.setState({ hoverActive: true });
+  // }
+  // handleMouseLeave = () => {
+  //   this.setState({ hoverActive: false });
+  // };
   render() {
     const { selectedIcon, hoverIcon, normalIcon, text } = this.props.thumbnail;
     const { clickActive, hoverActive } = this.state;
@@ -939,16 +940,18 @@ class PredictTable extends Component {
 
 class ModelComp extends Component {
   state = {
-    modelCompVisible: false
-  }
+    modelCompVisible: false,
+    select: true,
+  };
   handleClick = () => {
     this.setState({ modelCompVisible: true });
-  }
+  };
   handleCancel = () => {
     this.setState({ modelCompVisible: false });
-  }
+  };
   render() {
     const { models } = this.props;
+    const { select } = this.state;
     return (
       <div className={styles.modelComp}>
         <a onClick={this.handleClick} className={styles.comparison}>{EN.ModelComparisonCharts}</a>
@@ -965,9 +968,9 @@ class ModelComp extends Component {
             <h4>{EN.ModelComparisonCharts}</h4>
             <Tabs defaultActiveKey="1">
               <TabPane tab={EN.SpeedvsAccuracy} key="1">
-                {/*<SpeedAndAcc models={models} width={600} height={400} className="speedComp" />*/}
                 <SpeedvsAccuracys
                   // width={600}
+                  selectAll={select}
                   height={400}
                   x_name={EN.Speedms1000rows}
                   y_name={EN.Accuracy}
@@ -975,8 +978,8 @@ class ModelComp extends Component {
                 />
               </TabPane>
               <TabPane tab={EN.LiftsCharts} key="3">
-                {/*<LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
                 <LiftChart2
+                  selectAll={select}
                   models={models}
                   x_name={EN.percentage}
                   y_name={EN.lift}
@@ -987,9 +990,9 @@ class ModelComp extends Component {
                 />
               </TabPane>
               <TabPane tab={EN.ROCCurves} key="4">
-                {/*<RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
                 <RocChart2
                   models={models}
+                  selectAll={select}
                   x_name={EN.FalsePositiveDate}
                   y_name={EN.TruePositiveRate}
                   mom='roc'
@@ -1001,6 +1004,16 @@ class ModelComp extends Component {
                 <Learning width={600} height={400} className="learningComp" models={models} model={models[0]} />
               </TabPane> */}
             </Tabs>
+            <div className={styles.mccb}>
+              <Button type="primary" onClick={async () => {
+                await this.setState({ select: false });
+                this.setState({ select: true });
+              }}>{EN.SelectAll}</Button>
+              <Button type="primary" onClick={async () => {
+                await this.setState({ select: true });
+                this.setState({ select: false });
+              }}>{EN.DeselectAll}</Button>
+            </div>
           </div>
         </Modal>
       </div>

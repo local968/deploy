@@ -127,8 +127,14 @@ export default class AdvancedView extends Component {
 }
 
 const questMarks = {
-  'CVNN': EN.CVNNHint, 'RSquared': EN.squaredHint, 'RMSSTD': EN.RMSSTDHint, 'CH': "", 'silhouette_cosine': "", 'silhouette_euclidean': ""
-}
+  'CVNN': EN.CVNNHint,
+  'RSquared': EN.squaredHint,
+  'RMSSTD': EN.RMSSTDHint,
+   'CH': "",
+  'silhouette_cosine': "",
+  'silhouette_euclidean': "",
+  PCA:EN.PCAIntro,
+};
 
 @observer
 class AdvancedModelTable extends Component {
@@ -140,15 +146,22 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: { selectModel }, sort, handleSort } = this.props;
-    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean'];
+    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean','Parallel Plot','PCA'];
     const arr = [];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
+      if(['PCA','Parallel Plot'].includes(curr)){
+        return { ...prev, [curr]: <div>{getHint(curr)} {label}</div> }
+      }
       if (curr === sort.key) {
-        if (sort.value === 1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
-        if (sort.value === -1) return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+        if (sort.value === 1){
+          return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
+        }
+        if (sort.value === -1) {
+          return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' style={{ transform: 'rotateZ(180deg)' }} /></div> }
+        }
       } else {
         if (arr.includes(curr)) {
           return { ...prev, [curr]: curr };
@@ -157,11 +170,11 @@ class AdvancedModelTable extends Component {
       }
       return prev
     }, {});
+    console.log('headerData',headerData)
     const header = <div className={styles.tableHeader}>
       <Row>
         {texts.map(t => <RowCell data={headerData[t]} key={t} />)}
-        <RowCell data='Parallel Plot' key='para' />
-        <RowCell data='PCA' key='pca' />
+        {/*<RowCell data='Parallel Plot' key='para' />*/}
       </Row>
     </div>;
     const dataSource = models.map(m => {
@@ -218,11 +231,11 @@ class AdvancedModelTable extends Component {
               case 'RMSSTD':
                 return <RowCell key={11} data={score.RMSSTD} />;
               case 'CH Index':
-                return <RowCell key={9} data={score.CH} title={score.CH === 'null' ? EN.ClusterReason : score.CH} />;
+                return <RowCell key={9} data={score.CH} title={score.CH === 'inf' ? EN.ClusterInfReason : score.CH === 'null' ? EN.ClusterReason : score.CH} />;
               case 'Silhouette Cosine':
-                return <RowCell key={3} data={score.silhouette_cosine} title={score.silhouette_cosine === 'null' ? EN.ClusterReason : score.silhouette_cosine} />;
+                return <RowCell key={3} data={score.silhouette_cosine} title={score.silhouette_cosine === 'inf' ? EN.ClusterInfReason : score.silhouette_cosine === 'null' ? EN.ClusterReason : score.silhouette_cosine} />;
               case 'Silhouette Euclidean':
-                return <RowCell key={4} data={score.silhouette_euclidean} title={score.silhouette_euclidean === 'null' ? EN.ClusterReason : score.silhouette_euclidean} />;
+                return <RowCell key={4} data={score.silhouette_euclidean} title={score.silhouette_euclidean === 'inf' ? EN.ClusterInfReason : score.silhouette_euclidean === 'null' ? EN.ClusterReason : score.silhouette_euclidean} />;
               case EN.Time:
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
               default:
@@ -235,15 +248,15 @@ class AdvancedModelTable extends Component {
             {
               detail && type === 'Parallel Plot'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
             }
-            Compute
+	          {EN.Compute}
           </a>} />
           <RowCell
-              onClick={this.handleResult.bind(this,'Pca')}
-              key='Pca' data={<a href='javascript:;' className={detail&&type === 'Pca'?styles.on:''}>
+              onClick={this.handleResult.bind(this,'PCA')}
+              key='PCA' data={<a href='javascript:;' className={detail&&type === 'PCA'?styles.on:''}>
             {
-              detail && type === 'Pca'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
+              detail && type === 'PCA'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
             }
-            Compute
+	          {EN.Compute}
           </a>} />
         </Row>
         {detail && <RegressionDetailCurves
@@ -284,7 +297,7 @@ class RegressionDetailCurves extends Component {
       return <ParallelPlots url={model.parallelPlotData} />
     }
     
-    if(['Pca'].includes(curve)){
+    if(['PCA'].includes(curve)){
       return <PAW url={model.pcaPlotData}/>
     }
   }
@@ -306,11 +319,11 @@ class RegressionDetailCurves extends Component {
       selectedIcon: ParallelPlotOn,
       type: "Parallel Plot"
     },{
-      text: 'Pca',
+      text: 'PCA',
       hoverIcon: PcaIcon,
       normalIcon: PcaIcon,
       selectedIcon: PcaIconOn,
-      type: 'Pca'
+      type: 'PCA'
     }];
     return (
       <div className={styles.detailCurves} >

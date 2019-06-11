@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { observable, computed } from 'mobx';
 import moment from 'moment';
 import VariableImpact from "./VariableImpact"
-import PredictVActual from './PredictVActual';
 import { Tooltip, Icon } from 'antd'
 import ModelProcessFlow from "./ModelProcessFlow";
 import Process from "./Process.svg";
@@ -14,6 +13,8 @@ import { ProgressBar, Hint } from 'components/Common';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import PredictedVsActualPlot from "../../Charts/PredictedVsActualPlot";
+import config from 'config'
+const isEN = config.isEN;
 
 @observer
 export default class RegressionView extends Component {
@@ -50,7 +51,7 @@ export default class RegressionView extends Component {
         {/*<PredictVActual model={current} project={project} />*/}
         <PredictedVsActualPlot
             x_name = {EN.PointNumber}
-            y_name = {project.target + '的组内平均值'}
+            y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}
             url={project.selectModel.pointToShowData}
         />
       </div>
@@ -115,8 +116,8 @@ class ModelTable extends Component {
   // @observable sortKey = 'name'
   // @observable sort = 1
 
-  abortTrain = () => {
-    this.props.abortTrain()
+  abortTrain = stopId => {
+    this.props.abortTrain(stopId)
   }
 
   // handleSort = key => {
@@ -223,13 +224,15 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && <div className={styles.rowData}>
-            {trainModel ? <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
-            {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-            <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain : null}>
-              {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+          {!train2Finished && Object.values(trainModel).map((tm, k) => {
+            return <div className={styles.rowData} key={k}>
+              <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+              <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, tm.requestId) : null}>
+                {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+              </div>
             </div>
-          </div>}
+          })}
         </div>
       </div>
     );

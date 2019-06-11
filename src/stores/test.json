@@ -4,10 +4,12 @@
       null
     ],
     "trainModel": {
-      "name": "progress",
-      "model": "New Model Being Trained",
-      "modelName": "r2-solution-b2.auto.02.21.2019_16:56:51",
-      "value": 82.5
+      "asdashdgjhasgdjagkdjgj": {
+        "name": "progress",
+        "model": "New Model Being Trained",
+        "modelName": "r2-solution-b2.auto.02.21.2019_16:56:51",
+        "value": 82.5
+      }
     },
     "autorun": [
       null,

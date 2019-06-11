@@ -62,7 +62,7 @@
     padding: 0.2em;
     border: 0.5px solid #d8d8d8;
     height: 3em;
-    flex: 1 0 150px;
+    flex: 1 0 240px;
     padding: 0 0.5em;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -131,7 +131,11 @@
 .thumbnail img{
   width: 52px;
   height: 52px;
-    margin-right: 3px;
+  margin-right: 3px;
+  flex:0 0 52px;
+}
+.thumbnail div{
+  text-align: left;
 }
   .detailCurves .leftPanel button {
     margin-right: 0.2em;
@@ -262,3 +266,10 @@
     display: inline-block;
     vertical-align: bottom;
   }
+.mccb{
+  display: flex;
+  justify-content: flex-end;
+}
+.mccb button{
+  margin-left: 20px;
+}

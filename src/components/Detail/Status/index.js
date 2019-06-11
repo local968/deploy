@@ -206,9 +206,9 @@ export default class List extends Component {
                       <span>
                         {s.schedule.threshold &&
                           `${transferR2(s.schedule.threshold.type)}:`}
-                      </span>
-                      <br />
-                      <span>
+                      {/*</span>*/}
+                      {/*<br />*/}
+                      {/*<span>*/}
                         {s.schedule.threshold &&
                           `${
                           s.schedule.threshold.value

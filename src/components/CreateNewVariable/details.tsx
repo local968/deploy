@@ -1,141 +1,142 @@
+import EN from "../../constant/en";
 export default [
   {
     "name": "Exp",
-    "value": "语法: exp(@var)",
+    "value": `${EN.Syntax}exp(@var)`,
   },
   {
     "name": "Log2",
     "value": `
       Log2<br/>
-      以2为底数，对所选变量进行Log转换。<br/>
-      语法：<br/>
+      ${EN.Logconversionofthe2}<br/>
+      ${EN.Syntax}<br/>
       Log2(@var)<br/>
-      输入：<br/>
-      var- 连续变量，以@符号开头。<br/>
-      输出：<br/>
-      连续变量<br/>
-      说明：<br/>
-      变量中存在负数将被自动替换成0
+      ${EN.Input}<br/>
+     ${EN.VarContinuousvariablestartingwiththesymbol}<br/>
+     ${EN.Output}<br/>
+      ${EN.Numerical}<br/>
+      ${EN.Description}<br/>
+      ${EN.Negativenumbersinvariableswill0}
     `
   },
   {
     "name": "Log10",
     "value": `
       Log10<br/>
-      以10为底数，对所选变量进行Log转换。<br/>
-      语法：<br/>
+      ${EN.Logconversionofthe10}<br/>
+      ${EN.Syntax}<br/>
       Log10(@var)<br/>
-      输入：<br/>
-      var- 连续变量，以@符号开头。 <br/>
-      输出：<br/>
-      连续变量<br/>
-      说明：<br/>
-      变量中存在负数将被自动替换成0
+      ${EN.Input}<br/>
+      ${EN.VarContinuousvariablestartingwiththesymbol}<br/>
+      ${EN.Output}<br/>
+     ${EN.Numerical}<br/>
+      ${EN.Description}<br/>
+      ${EN.Negativenumbersinvariableswill0}
     `
   },
   {
     "name": "Ln",
     "value": `
       Ln <br/>
-      以e为底数，对所选变量进行Ln转换。<br/>
-      语法：<br/>
+      ${EN.Logconversionofthee}<br/>
+    ${EN.Syntax}<br/>
       Ln(@var)<br/>
-      输入：<br/>
-      var- 连续变量，以@符号开头。  <br/>
-      输出：<br/>
-      连续变量<br/>
-      说明：<br/>
-      变量中存在负数将被自动替换成0
+        ${EN.Input}<br/>
+      ${EN.VarContinuousvariablestartingwiththesymbol}<br/>
+      ${EN.Output}<br/>
+     ${EN.Numerical}<br/>
+      ${EN.Description}<br/>
+      ${EN.Negativenumbersinvariableswill0}
     `
   },
   {
     "name": "Pow",
     "value": `
       Pow<br/>
-      计算所选变量的n次方。<br/>
-      语法：<br/>
+      ${EN.Calculatethenthpoweroftheselectedvariable}<br/>
+      ${EN.Syntax}<br/>
       Pow(@var, n)<br/>
-      输入：<br/>
-      var- 连续变量，以@符号开头。<br/>
-      n- 正负整数或小数。<br/>
-      输出：<br/>
-      连续变量<br/>
-      说明：<br/>
-      返回数值超出内存后将用系统默认最大最小值替代。
+      ${EN.Input}<br/>
+     ${EN.VarContinuousvariablestartingwiththesymbol}<br/>
+     ${EN.Npositiveornegativeintegerordecimal}<br/>
+       ${EN.Output}<br/>
+     ${EN.Numerical}<br/>
+       ${EN.Description}<br/>
+      ${EN.Whenthereturnvalueexceedsthememory}
      `
   },
   {
     "name": "Log",
-    "value": "语法: log(@var, base)",
+    "value": `${EN.Syntax}log(@var, base)`,
   },
   {
     "name": "Eq",
     "value": `
       Eq<br/>
-      比较两个变量是否相等，相等返回1，不相等返回0。<br/>
-      语法：<br/>
+     ${EN.Comparestwovariablesforequality}<br/>
+      ${EN.Syntax}<br/>
       Eq(@var1, @var2)<br/>
-      输入：<br/>
-      var1- 离散变量或连续变量，以@符号开头。<br/>
-      var2- 离散变量或连续变量，以@符号开头。<br/>
-      输出：<br/>
-      返回0/1结果
+     ${EN.Input}<br/>
+     ${EN.Var1Adiscretevariable}<br/>
+      ${EN.Var2Adiscretevariable}。<br/>
+        ${EN.Output}<br/>
+     ${EN.Return01result}
     `
   },
   {
     "name": "Sum",
     "value": `
       Sum<br/>
-      输入单个变量时，返回该变量的总和；输入多个变量时，返回行的总和。<br/>
-      语法：<br/>
+      ${EN.Whenasinglevariableisentered}<br/>
+      ${EN.Syntax}<br/>
       Sum(@var)<br/>
       Sum(@var1, @var2, @var3, …)<br/>
-      输入：<br/>
-      var1, var2, var3, ….- 连续变量，以@符号开头。<br/>
-      输出：<br/>
-      连续变量
+    ${EN.Input}<br/>
+     ${EN.Var1var2var3continuousvariables}<br/>
+      ${EN.Output}<br/>
+        ${EN.Numerical}
     `
   },
   {
     "name": "Min",
     "value": `
       Min<br/>
-      输入单个变量时，返回该变量的最小值；输入多个变量时，返回行的最小值。<br/>
-      语法：<br/>
+     ${EN.Whenasinglevariableisenteredtheminimumvalue}<br/>
+        ${EN.Syntax}<br/>
       Min(@var)<br/>
       Min(@var1, @var2, @var3, …)<br/>
-      输入：<br/>
-      var1, var2, var3, ….- 连续变量，以@符号开头。<br/>
-      输出：<br/>
-      连续变量
+       ${EN.Input}<br/>
+       ${EN.Var1var2var3continuousvariables}<br/>
+        ${EN.Output}<br/>
+        ${EN.Numerical}
     `
   },
   {
     "name": "Max",
     "value": `
       Max<br/>
-      输入单个变量时，返回该变量的最大值；输入多个变量时，返回行的最大值。<br/>
-      语法：<br/>
+     ${EN.Whenasinglevariableisenteredtheminimumvaluemax}<br/>
+       ${EN.Syntax}<br/>
       Max(@var)<br/>
       Max(@var1, @var2, @var3, …)<br/>
-      输入：<br/>
-      var1, var2, var3, ….- 连续变量，以@符号开头。<br/>
-      输出：<br/>
-      连续变量
+      ${EN.Input}<br/>
+       ${EN.Var1var2var3continuousvariables}<br/>
+        ${EN.Output}<br/>
+        ${EN.Numerical}
     `
   },
   {
     "name": "Mean",
     "value": `
         Mean<br/>
-        输入单个变量时，返回该变量的均值；输入多个变量时，返回行的均值。<br/>
-        语法：<br/>
+        ${EN.Whenasinglevariableisenteredtheminimumvaluemaxmean}<br/>
+        ${EN.Syntax}<br/>
         Mean(@var)<br/>
         Mean(@var1, @var2, @var3, …)<br/>
-        输入：<br/>
-        var1, var2, var3, ….- 连续变量，以@符号开头。<br/>
-        输出：<br/>
-        连续变量
+        ${EN.Input}<br/>
+       ${EN.Var1var2var3continuousvariables}<br/>
+        ${EN.Output}<br/>
+        ${EN.Numerical}
     `
   }
 ]

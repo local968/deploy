@@ -11,6 +11,10 @@ export default function HistogramNumerical(props){
 		height = 330,
 		width = 500,
 	} = props;
+	
+	const max = Math.max(...data.map(itm=>itm[1]));
+	
+	
 	const nameTextStyle = {
 		color:'#000',
 	};
@@ -34,6 +38,9 @@ export default function HistogramNumerical(props){
 			type: 'value',
 			name:y_name,
 			nameTextStyle,
+		},
+		grid:{
+			x:`${Math.floor(max+1)}`.length * 10 +20,
 		},
 		series: [{
 			data,

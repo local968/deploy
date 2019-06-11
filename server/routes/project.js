@@ -216,6 +216,10 @@ function updateModel(userId, id, mid, params) {
   })
 }
 
+function getModelCount(id) {
+  return redis.scard(`project:${id}:models`)
+}
+
 function moveModels(id) {
   return redis.smembers(`project:${id}:models`).then(ids => {
     const pipeline = redis.pipeline();
@@ -809,9 +813,9 @@ wss.register('histgramPlot', (message, socket, progress) => {
         return progressResult
       }
       const { result } = progressResult
-      const { field, imageSavePath, progress: status } = result;
+      const { field, Data, progress: status } = result;
       if (status && status === "start") return
-      if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = imageSavePath
+      if (histgramPlots.hasOwnProperty(field)) histgramPlots[field] = Data
       return progress(progressResult)
     }, true))
 })
@@ -851,9 +855,9 @@ wss.register('univariatePlot', (message, socket, progress) => {
         return progressResult
       }
       const { result } = progressResult
-      const { field, imageSavePath, progress: status = '' } = result;
+      const { field, Data, progress: status = '' } = result;
       if (status === "start") return
-      if (univariatePlots.hasOwnProperty(field)) univariatePlots[field] = imageSavePath
+      if (univariatePlots.hasOwnProperty(field)) univariatePlots[field] = Data
       return progress(progressResult)
     }, true))
 })
@@ -899,28 +903,29 @@ wss.register('etlCleanData', (message, socket, progress) => {
 })
 
 wss.register('abortTrain', (message, socket) => {
-  const { projectId, isLoading, _id: requestId } = message
+  const { projectId, isLoading, _id: requestId, stopId } = message
   const { userId } = socket.session
-  return redis.hget("project:" + projectId, 'stopId').then(stopId => {
-    try {
-      stopId = JSON.parse(stopId)
-    } catch (e) {
-    }
-    if (!stopId) return { status: 200, message: 'ok' }
-    return axios.get(`${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([{ ...message, userId, requestId, stopId }])}`).then(() => {
+  return getProjectField(projectId, 'stopIds').then(stopIds => {
+    if (!stopIds.length) return { status: 200, message: 'ok' }
+    if (!stopIds.includes(stopId)) return { status: 200, message: 'ok' }
+    return axios.get(`${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([{ ...message, userId, requestId, stopId }])}`).then(async () => {
       command.clearListener(stopId)
+      const trainModel = await getProjectField(projectId, 'trainModel')
+      Reflect.deleteProperty(trainModel, stopId);
       const statusData = {
         train2Finished: true,
         train2ing: false,
         train2Error: false,
-        trainModel: null,
-        stopId: ''
+        trainModel,
+        stopIds: stopIds.filter(si => si === stopId)
       }
       if (isLoading) {
         statusData.mainStep = 3
         statusData.curStep = 3
         statusData.lastSubStep = 1
         statusData.subStepActive = 1
+        statusData.trainModel = {}
+        statusData.stopIds = []
       }
       return createOrUpdate(projectId, userId, statusData)
     })
@@ -932,42 +937,116 @@ wss.register('abortTrain', (message, socket) => {
 
 wss.register('train', async (message, socket, progress) => {
   const { userId, user } = socket.session;
-  const { projectId, data: updateData, _id: requestId } = message;
+  const { projectId, data: updateData, version, algorithms } = message;
   // delete message.data
   Reflect.deleteProperty(message, 'data');
+  // 拆分algorithms
+  Reflect.deleteProperty(message, 'version');
+  Reflect.deleteProperty(message, 'algorithms');
   // const stopId = uuid.v4()
-  const data = { ...message, userId, requestId, stopId: requestId };
-  let hasModel = false;
+  // const data = { ...message, userId, requestId, stopId: requestId };
+  // let hasModel = false;
   try {
     await checkTraningRestriction(user)
-    await createOrUpdate(projectId, userId, { ...updateData, stopId: requestId })
+    
+
+    const commandArr = []
+    const _stopIds = []
+
+    const splitCommand = config.splitCommand
+
+    if (splitCommand) {
+      if (!!version) {
+        const versions = (version || '').split(',')
+        versions.forEach(_v => {
+          if (_v === '3') {
+            const stopId = uuid.v4()
+            _stopIds.push(stopId)
+            commandArr.push({
+              ...message,
+              version: _v,
+              algorithms: algorithms,
+              userId,
+              stopId,
+              requestId: stopId
+            })
+            // algorithms.forEach(al => {
+            //   const stopId = uuid.v4()
+            //   _stopIds.push(stopId)
+            //   commandArr.push({
+            //     ...message,
+            //     version: _v,
+            //     algorithms: [al],
+            //     userId,
+            //     stopId,
+            //     requestId: stopId
+            //   })
+            // })
+          } else {
+            const stopId = uuid.v4()
+            _stopIds.push(stopId)
+            commandArr.push({
+              ...message,
+              version: _v,
+              userId,
+              stopId,
+              requestId: stopId
+            })
+          }
+        })
+      } else {
+        algorithms.forEach(al => {
+          const stopId = uuid.v4()
+          _stopIds.push(stopId)
+          commandArr.push({
+            ...message,
+            algorithms: [al],
+            userId,
+            stopId,
+            requestId: stopId
+          })
+        })
+      }
+    } else {
+      const stopId = uuid.v4()
+      commandArr.push({ ...message, userId, requestId: stopId, stopId, version, algorithms })
+      _stopIds.push(stopId)
+    }
+
+    if (!commandArr.length) return { status: 200, msg: 'ok' }
+    await createOrUpdate(projectId, userId, { ...updateData, stopIds: _stopIds })
     await checkEtl(projectId, userId)
     console.log('finish etl')
-    const isAbort = await command({ ...data, stopId: requestId }, async queueValue => {
-      const stopId = await getProjectField(projectId, 'stopId')
+
+    const processFn = async queueValue => {
+      const stopIds = await getProjectField(projectId, 'stopIds')
       const { status, result, requestId: trainId } = queueValue;
-      if (status < 0 || status === 100) return 1;
-      if (stopId !== trainId) return 2
+      if (status < 0 || status === 100) return { ...queueValue, isAbort: false };
+      if (!stopIds.includes(trainId)) return { isAbort: true }
       if (!result) return
       let processValue
       if (result.name === "progress") {
         // const { requestId: trainId } = result;
         // delete result.requestId
-        Reflect.deleteProperty(result, 'requestId')
-        await createOrUpdate(projectId, userId, { trainModel: result })
+        // Reflect.deleteProperty(result, 'requestId')
+        await updateProjectField(projectId, userId, 'trainModel', { [trainId]: { ...result, requestId: trainId } })
+
+        // const trainModel = await getProjectField(projectId, 'trainModel')
+        // await createOrUpdate(projectId, userId, { trainModel: result })
         processValue = { ...result }
       } else if (result.score) {
-        hasModel = true;
-        const { chartData: chartDataUrl } = result
+        const { chartData: chartDataUrl, modelName } = result
+        const trainModel = await getProjectField(projectId, 'trainModel')
+        Reflect.deleteProperty(trainModel, trainId)
+        await createOrUpdate(projectId, userId, { trainModel })
         let chartData = { chartData: chartDataUrl }
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl)
         const stats = await getProjectField(projectId, 'stats')
-        await createOrUpdate(projectId, userId, { trainModel: null })
-        const modelData = { ...result, ...chartData, stats }
+        const modelData = { ...result, ...chartData, stats, featureLabel: message.featureLabel }
         if (message.problemType) modelData.problemType = message.problemType
         if (message.standardType) modelData.standardType = message.standardType
         if (modelData.rate) modelData.initRate = modelData.rate
-        const modelResult = await createModel(userId, projectId, result.modelName, modelData)
+        const modelResult = await createModel(userId, projectId, modelName, modelData)
         processValue = await addSettingModel(userId, projectId)(modelResult)
         // return progress(model)
       } else if (result.data) {
@@ -988,20 +1067,42 @@ wss.register('train', async (message, socket, progress) => {
         // return progress(model)
       }
       return progress(processValue)
-    }, true)
-    if (isAbort === 2) return { status: 200, msg: 'ok' }
+    }
+
+    await Promise.all(commandArr.map(_ca => command(_ca, processFn, true)))
+
     const statusData = {
       train2Finished: true,
       train2ing: false,
       train2Error: false,
+      trainModel: {},
       selectId: '',
-      stopId: ''
+      stopIds: []
     }
-    if (!hasModel) {
-      console.log('failed')
+    const modelCounts = await getModelCount(projectId)
+
+    if (modelCounts < 1) {
       statusData.train2Error = true
     }
+
     return await createOrUpdate(projectId, userId, statusData)
+
+    // return
+    // const isAbort = await command({ ...data, stopId: requestId }, , true)
+    // if (isAbort === 2) return { status: 200, msg: 'ok' }
+    // const statusData = {
+    //   train2Finished: true,
+    //   train2ing: false,
+    //   train2Error: false,
+    //   trainModel: [],
+    //   selectId: '',
+    //   stopId: ''
+    // }
+    // if (!hasModel) {
+    //   console.log('failed')
+    //   statusData.train2Error = true
+    // }
+    // return await createOrUpdate(projectId, userId, statusData)
   } catch (err) {
     const statusData = {
       train2Finished: false,

@@ -26,8 +26,23 @@
     white-space: nowrap;
 }
 
-.process label {
+.process dt{
+    font-size:14px;
+    font-weight: bold;
+    text-transform: none;
+    display: flex;
+    align-items: center;
+}
+.process label{
+    font-weight: normal;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: inline-block;
     font-size: 0.2em;
+}
+.process dt:not(:first-child){
+    margin-top: 10px;
 }
 
 .process img {
@@ -46,6 +61,7 @@
 
 .process label {
     text-transform: capitalize;
+    font-size: 0.15em;
 }
 
 .many img {
@@ -53,8 +69,9 @@
     margin: 0 5px;
 }
 
-.process label {
-    font-size: 0.15em;
+.process dt label {
+    text-transform: none;
+    font-size: 14px;
 }
 
 .process button span {
@@ -68,10 +85,19 @@
     margin-bottom: 0;
 }
 
-.process dd {
+.process p{
     display: flex;
+    align-items: center;
+}
+
+.process dd {
     margin-bottom: 0.1em;
     align-items: center;
+    /*max-width: 270px;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
 }
 
 .process dd div {
@@ -80,6 +106,13 @@
 
 .process dd button {
     display: flex;
+}
+
+.over dd{
+    max-width: 270px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .result {

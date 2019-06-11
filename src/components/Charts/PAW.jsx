@@ -4,7 +4,9 @@ import {Select} from "antd";
 import PCS from "./PCS";
 import request from "../Request";
 import TSEN from "./T-SEN";
+import EN from "../../constant/en";
 const {Option} = Select;
+import { Hint } from 'components/Common';
 
 export default function PAW(props){
 	const {url}  = props;
@@ -16,15 +18,6 @@ export default function PAW(props){
 	function setPcsData(data){
 		const xs = data[pcs[0]];
 		const ys = data[pcs[1]];
-		// return data.map(itm=>{
-		// 	const re = [];
-		// 	itm.forEach((it,index)=>{
-		// 		if(pcs.includes(index)){
-		// 			re.push(it)
-		// 		}
-		// 	});
-		// 	return re;
-		// })
 		return _.zip(xs,ys);
 	}
 	
@@ -61,7 +54,7 @@ export default function PAW(props){
 		fetchData();
 	}, []);
 	
-	const {corrData=[],ve=[],pcaData=[],predicts} = data;
+	const {corrData=[],ve=[],pcaData=[],predicts,fields} = data;
 	
 	useEffect(() => {
 		setPcsD(setPcsData(corrData));
@@ -70,13 +63,14 @@ export default function PAW(props){
 	
 	return <section className={styles.pca}>
 		<div className={styles.table}>
-			Variance Explained
+			{EN.VarianceExplained}
+			<Hint content={<div dangerouslySetInnerHTML={{__html:EN.VarianceExplainedTip}}/>} />
 			<dl>
 				<dt>
 					<ul>
-						<li>#PC</li>
-						<li>Eigenvalue</li>
-						<li>Comulated Proportion</li>
+						<li>{EN.PC}</li>
+						<li>{EN.Eigenvalue}</li>
+						<li>{EN.ComulatedProportion}</li>
 					</ul>
 				</dt>
 				{
@@ -91,20 +85,25 @@ export default function PAW(props){
 		</div>
 		<div className={styles.chart}>
 			<div>
-				Choose 2 PCs
+				{EN.Choose2PCs}
+				<Hint content={<div dangerouslySetInnerHTML={{__html:EN.Choose2PCsTip}}/>} />
 				<Select
+					id='select_1'
 					style={{ width: 120 }}
 					value = {pcs[0]}
-				        onChange={value=>{
-					        setPcs([value,pcs[1]]);
+					getPopupContainer={() => document.getElementById('select_1')}
+			        onChange={value=>{
+				        setPcs([value,pcs[1]]);
 				}}>
 					{
 						corrData.map((itm,index)=><Option key={index} value={index} disabled={index === pcs[1]}>PC{index+1}</Option>)
 					}
 				</Select>
 				<Select
+					id='select_2'
 					style={{ width: 120 }}
 					value = {pcs[1]}
+					getPopupContainer={() => document.getElementById('select_2')}
 					onChange={value=>{
 						setPcs([pcs[0],value]);
 					}}>
@@ -115,11 +114,11 @@ export default function PAW(props){
 			</div>
 			<dl>
 				<dt>
-					{/*The Correlation between PCs and original variables:*/}
 					<PCS
 						 data={pcsD}
 					     x_name = {'PC'+(pcs[0]+1)}
 					     y_name = {'PC'+(pcs[1]+1)}
+						 fields = {fields}
 					/>
 				</dt>
 				<dd>
@@ -129,7 +128,7 @@ export default function PAW(props){
 						width = {380}
 						height={340}
 						data={tsenD}
-						title={'ScatterPlot of PCs:'}
+						title={EN.ScatterPlotOfPCs}
 					/>
 				</dd>
 			</dl>

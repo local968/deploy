@@ -86,7 +86,7 @@
 
 .blood {
   font-size: 48px;
-  color: rgb(236, 212, 214);
+  color: #D0021B;
 }
 
 .orange {
@@ -204,6 +204,7 @@
   white-space: nowrap;
   height: 16px;
   display: inline-block;
+  max-width: 100%;
 }
 
 .ccell .progress span {
@@ -638,4 +639,30 @@ button.disable {
   color: #aaaaaa;
   background-image: none;
   border-color: transparent;
+}
+
+.mapCell {
+  display: flex;
+  padding: 0.1em;
+  border: solid 1px #d8d8d8;
+  /* border-right: 1px solid #d8d8d8; */
+  flex: 0 0 0.4em;
+  align-items: center;
+  height: 30px;
+  padding: 0 30px;
+}
+
+.mapCell span {
+  display: inline-block;
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+span.ccellHeaderSpan{
+  max-width: 60%;
 }

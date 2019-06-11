@@ -121,7 +121,7 @@ const api = {
     return redis.smembers(`project:${projectId}:models`).then(ids => {
       const pipeline = redis.pipeline();
       ids.forEach(mid => {
-        pipeline.hmget(`project:${projectId}:model:${mid}`, "name", 'fitIndex', 'chartData')
+        pipeline.hmget(`project:${projectId}:model:${mid}`, "modelName", 'fitIndex', 'chartData')
       })
       return pipeline.exec().then(list => {
         const models = list.map(row => {
@@ -241,6 +241,11 @@ const api = {
 }
 
 const etl = async (schedule, index, stats) => {
+  if (schedule.type === 'deployment') {
+    Object.keys(stats).forEach(key => {
+      if (stats[key].isTarget) delete stats[key]
+    })
+  }
   const response = await axios.post(`${esServicePath}/etls/${index}/etl`, stats)
   const { etlIndex, opaqueId } = response.data
   return await new Promise((resolve, reject) => {

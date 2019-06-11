@@ -92,7 +92,37 @@ export default {
       "name": "Quantile_bin",
       "value": "Quantile_bin",
       "type": Type.Func,
-      "grammar": `${EN.Syntax}Custom_Quantile_bin(@var, [range_list1], [range_list2]...)`
-    }
+      "grammar": `${EN.Syntax}Quantile_bin(@var, b, type)`
+    },
+    {
+      "name": "Groupby",
+      "value": "Groupby",
+      "type": Type.Func,
+      "grammar": `${EN.Syntax}Groupby(@var1, [key list]，function_list)`
+    },
+    {
+      "name": "Interactive",
+      "value": "Interactive",
+      "type": Type.Func,
+      "grammar": `${EN.Syntax}Interactive(@var1, @var2, @var3，...)`
+    },
+    {
+      "name": "Box_cox",
+      "value": "Box_cox",
+      "type": Type.Func,
+      "grammar": `${EN.Syntax}Box_cox(@var, lambda)`
+    },
+    {
+      "name": "Number_extraction",
+      "value": "Number_extraction",
+      "type": Type.Func,
+      "grammar": `${EN.Syntax}Number_ectraction(@var)`
+    },
+    {
+      "name": "Substring",
+      "value": "Substring",
+      "type": Type.Func,
+      "grammar": `${EN.Syntax}Substring(@var, [position1, position2])`
+    },
   ]
 }

@@ -31,8 +31,8 @@ export default class PredictedVsActualPlot extends PureComponent{
 			})).data;
 		}
 		
-		data[0].name = '真实值';
-		data[1].name = '预测值';
+		data[0].name = EN.ActualValues;
+		data[1].name = EN.PredictedValues;
 		this.setState({
 			data,
 			loading:false,
@@ -61,18 +61,23 @@ export default class PredictedVsActualPlot extends PureComponent{
 
 		// 指定图表的配置项和数据
 		return {
-			// title: {
-			// 	text: 'Within Group Sum of Squares'
-			// },
+			title: {
+				subtext: y_name,
+				subtextStyle:{
+					fontSize:12,
+					color:'#080808',
+				},
+				left:40,
+			},
 			xAxis: {
 				name:x_name,
 				type: 'value',
 				nameTextStyle,
 			},
 			yAxis: {
-				name: y_name,
+				// name: y_name+y_name,
 				type: 'value',
-				nameTextStyle,
+				// nameTextStyle,
 			},
 			legend: {
 				data: data.map(itm=>itm.name),
@@ -81,13 +86,13 @@ export default class PredictedVsActualPlot extends PureComponent{
 				trigger: 'axis',
 				formatter: function (params) {
 					let result = `
-						组编号: ${params[0].axisValue}<br/>
+						${EN.PointNumber}: ${params[0].axisValue}<br/>
 						${params[0].seriesName}: ${params[0].value[1].toFixed(3)}<br/>
 					`;
 					
 					if(params[1]){
 						return `
-						组编号: ${params[0].axisValue}<br/>
+						${EN.PointNumber}: ${params[0].axisValue}<br/>
 						${params[0].seriesName}: ${params[0].value[1].toFixed(3)}<br/>
 						${params[1].seriesName}: ${params[1].value[1].toFixed(3)}
 					`;

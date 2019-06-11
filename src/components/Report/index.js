@@ -13,6 +13,7 @@ import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
 import { formatNumber } from 'util'
 import EN from '../../constant/en';
+import ClassificationResult from "../Modeling/Result/ClassificationResult";
 
 const addComma = number => {
   if (Number.isNaN(number)) return number
@@ -287,9 +288,11 @@ class Report extends Component {
               </div>
               <div className={styles.titles}>
                 <div className={styles.metricsTitle}>{EN.ConfusionMatrix}</div>
-                <div className={styles.metricsTitle}>{EN.CostBased}</div>
+                {
+                  list[0].criteria === 'cost' ? <div className={styles.metricsTitle}>{EN.CostBased}</div>: null
+                }
               </div>
-              <PredictTable model={model} yes={yes} no={no} project={list[0]} />
+              <PredictTable  models={model}  model={model} yes={yes} no={no} project={list[0]} />
             </div>}
           </div>}
 

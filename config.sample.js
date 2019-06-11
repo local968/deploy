@@ -21,7 +21,7 @@ const AUTH_SERVICE = process.env.AUTH_SERVICE || "http://192.168.0.88:4002";
 const DEPLOYMENT_SERVICE =
   process.env.DEPLOYMENT_SERVICE || "http://192.168.0.88:4003";
 const DSL_SERVICE = process.env.DSL_SERVICE || "http://192.168.0.88:4004";
-const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:8000";// http://127.0.0.1:9201  http://192.168.0.23:9200
+const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:4005";// http://127.0.0.1:9201  http://192.168.0.23:9200
 const GRAPHIC_SERVICE =
   process.env.GRAPHIC_SERVICE || "http://192.168.0.88:4006";
 const JOB_SERVICE = process.env.JOB_SERVICE || "http://192.168.0.88:4007";
@@ -56,6 +56,7 @@ const IS_EN = process.env.IS_EN || false;
 const YOUR_AGE = process.env.YOUR_AGE || '部署行数已达到出当前权限最大限制。';
 const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前权限最大限制。';
 const YOUR_USAGE = process.env.YOUR_USAGE  || '您的并发项目数量已达到当前许可证的最大限制。。';
+const SPLIT_COMMAND = process.env.SPLIT_COMMAND || false;
 const redis =
   REDIS_TYPE === "2"
     ? {
@@ -75,6 +76,7 @@ const redis =
 
 const config = {
   host: HOST,
+  isEN:IS_EN,
   port: BACKEND_PORT,
   redis,
   requestQueue: REQUEST_QUEUE,
@@ -129,7 +131,8 @@ const config = {
     AMQPLIB_HEARTBEAT,
     AMQPLIB_VHOST,
     QUEUE_RESULT
-  }
+  },
+  splitCommand: SPLIT_COMMAND
 };
 
 module.exports = config;

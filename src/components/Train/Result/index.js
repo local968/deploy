@@ -46,8 +46,8 @@ function ModelResult(props) {
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
   // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
 
-  const abortTrain = () => {
-    project.abortTrain()
+  const abortTrain = stopId => {
+    project.abortTrain(stopId)
   }
 
   const showDict = () => {
@@ -174,10 +174,10 @@ function ModelResult(props) {
         <span>导出模型结果</span>
       </button>} */}
       {problemType === 'Clustering' && <a href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
-        <span>{'导出模型结果'}</span>
+        <span>{EN.Exportmodelresults}</span>
       </button></a>}
       {problemType === 'Outlier' && <a href={`/upload/download/outlier?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&rate=${formatNumber(selectModel.rate)}&etlIndex=${etlIndex}`} target='_black'><button className={`${classes.button}`} style={{ marginLeft: '.1em' }}>
-        <span>{'导出模型结果'}</span>
+        <span>{EN.Exportmodelresults}</span>
       </button></a>}
     </div>
     {downloading && <ProcessLoading style={{ position: 'fixed' }} />}
@@ -208,20 +208,26 @@ const OutlierTable = observer((props) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
-          <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`} onClick={() => handleSort('name')}>
+          <span>{EN.ModelName}</span>
+          <span>{sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('score')}>
+          <span className={classes.ccellHeaderSpan}>{EN.Score} </span>
+          <span>{sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rate')}>
+          <Tooltip title={EN.ContaminationRate}>{EN.ContaminationRate}</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>*/}
+          <span>{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('score')}>{EN.Score} {sort.key === 'score' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+          <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
+          {/*<span>{EN.VariableImpact}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('rate')}>{EN.ContaminationRate}{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.VariableImpact}</span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.ModelProcessFlow}</span>
+          <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
+          {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
       </div>
     </div>
@@ -229,13 +235,15 @@ const OutlierTable = observer((props) => {
       {sortModels.map(m => {
         return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} />
       })}
-      {!train2Finished && <div className={classes.rowData}>
-        {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
-        {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-        <div className={classes.abortButton} onClick={!isAbort ? abortTrain : null}>
-          {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+        return <div className={classes.rowData} key={k}>
+          <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+            {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+          </div>
         </div>
-      </div>}
+      })}
     </div>
   </div >
 })
@@ -278,7 +286,8 @@ const OutlierRow = observer((props) => {
           />
         </div>
         <div className={`${classes.ccell} ${classes.modelName}`}>
-          <span>{model.modelName}</span>
+          <Tooltip title={model.modelName}>{model.modelName}</Tooltip>
+          {/*<span>{model.modelName}</span>*/}
         </div>
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.score)}</span>
@@ -329,31 +338,44 @@ const ClusteringTable = observer((props) => {
   return <div className={classes.table}>
     <div className={classes.rowHeader}>
       <div className={classes.rowData}>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`}>
-          <span onClick={() => handleSort('name')}>{EN.ModelName} {sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader} ${classes.modelName}`} onClick={() => handleSort('name')}>
+          <span>{EN.ModelName}</span>
+          <span>{sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cvnn')}>
+          <span className={classes.ccellHeaderSpan}>CVNN</span>
+          <span>{sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
+        </div>
+        <div style={{ width: 100 }} className={`${classes.ccell}  ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
+          <Tooltip title={EN.SihouetteScore}>{EN.SihouetteScore}</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.SihouetteScore} </span>*/}
+          <span>{sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
+          <Tooltip title={'CH Index '}>CH Index</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>CH Index </span>*/}
+          <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CHIndexHint} /></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rsquared')}>
+          <Tooltip title={'R square'}>R square</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>R squared</span>*/}
+          <span>{sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cluster')}>
+          <Tooltip title={EN.clusters} >{EN.clusters} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
+          <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cvnn')}>CVNN {sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
-        </div>
-        <div style={{ width: 100 }} className={`${classes.ccell}  ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('sihouette')}>{EN.SihouetteScore} {sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
+          <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
+          {/*<span>{EN.VariableImpact}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('ch')}>CH Index {sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CHIndexHint} /></span>
+          <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
+          {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('rsquared')}>R squared {sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span onClick={() => handleSort('cluster')}>{EN.clusters} {sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.VariableImpact}</span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
-          <span>{EN.ModelProcessFlow}</span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          {/*<Tooltip title={EN.Explaination}>{EN.Explaination}<Hint content={EN.ExplainationHint} /></Tooltip>*/}
           <span>{EN.Explaination}<Hint content={EN.ExplainationHint} /></span>
 
         </div>
@@ -363,13 +385,15 @@ const ClusteringTable = observer((props) => {
       {sortModels.map(m => {
         return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
       })}
-      {!train2Finished && <div className={classes.rowData}>
-        {trainModel ? <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div> : null}
-        {trainModel ? <ProgressBar progress={((trainModel || {}).value || 0)} /> : null}
-        <div className={classes.abortButton} onClick={!isAbort ? abortTrain : null}>
-          {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+        return <div className={classes.rowData} key={k}>
+          <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
+          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+            {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
+          </div>
         </div>
-      </div>}
+      })}
     </div>
   </div >
 })
@@ -412,7 +436,8 @@ const ClusteringRow = observer((props) => {
           />
         </div>
         <div className={`${classes.ccell} ${classes.modelName}`}>
-          <span>{formatNumber(model.modelName)}</span>
+          <Tooltip title={model.modelName}>{formatNumber(model.modelName)}</Tooltip>
+          {/*<span>{formatNumber(model.modelName)}</span>*/}
         </div>
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.CVNN)}</span>
@@ -464,17 +489,21 @@ const MappingDict = observer((props) => {
 
   const handleSelect = value => {
     project.updateProject({ mappingKey: value })
+    setState({
+      origin: '',
+      encode: ''
+    })
   }
   const tableData = React.useMemo(() => {
     const key = mappingKey || list[0]
     const mapping = colMap[key]
     const data = Object.entries(mapping)
-      .filter(r1 => r1[0].toString().includes(state.origin))
-      .filter(r2 => r2[1].toString().includes(state.encode))
-      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.ccell })))
+      .filter(r1 => r1[0].toString().toLowerCase().includes(state.origin.toLowerCase()))
+      .filter(r2 => r2[1].toString().toLowerCase().includes(state.encode.toLowerCase()))
+      .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.mapCell })))
     const header = [
-      { content: <span>{EN.Origin}<input style={{ marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.titleCell },
-      { content: <span>{EN.Encoding} <input style={{ marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.titleCell }
+      { content: <span>{EN.Origin}<input style={{ width: 160, marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.mapCell },
+      { content: <span>{EN.Encoding} <input style={{ width: 160, marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.mapCell }
     ]
     return [header, ...data]
   })
@@ -485,12 +514,12 @@ const MappingDict = observer((props) => {
     <div className={classes.dictSelect}>
       <span>{EN.PleaseSelectaCategoricalVariable}</span>
       <Select value={mappingKey || list[0]} style={{ width: 120, marginLeft: 20 }} onChange={handleSelect}>
-        {list.map(l => <Option value={l}>{l}</Option>)}
+        {list.map((l, k) => <Option value={l} key={k}>{l}</Option>)}
       </Select>
     </div>
     <div className={classes.dictTable}>
       <Table
-        columnWidth={300}
+        columnWidth={290}
         rowHeight={({ index }) => { return index === 0 ? 68 : 34 }}
         columnCount={2}
         rowCount={tableData.length}
@@ -498,7 +527,7 @@ const MappingDict = observer((props) => {
         fixedRowCount={1}
         checked={null}
         select={null}
-        style={{ border: "1px solid #ccc" }}
+        // style={{ border: "1px solid #ccc" }}
         data={tableData}
       />
     </div>

@@ -332,6 +332,313 @@ export default class FunctionTips extends Component {
     </div>
   }
 
+  Interactive() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsContent}><span>{EN.Interactive}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Interactive_descr}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Allvariablesneedtostartwith}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Interactive_output}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Interactive_example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            {key: '1', 1: '25', 2: '20000', 3: '500000'},
+            {key: '2', 1: '40', 2: '15000', 3: '600000'},
+            {key: '3', 1: '35', 2: '25000', 3: '875000'}
+          ]}
+          columns={[{
+            title: 'age',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'income',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'age_income_inter',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }]}/>
+      </div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
+    </div>
+  }
+
+  Box_cox() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_grammar}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_input1}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_output}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.func_note}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_note_txt}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_note_txt1}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Box_cox_example1}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            {key: '1', 1: '79', 2: '6.22', 3: '15.78'},
+            {key: '2', 1: '199', 2: '8.15', 3: '26.21'},
+            {key: '3', 1: '226', 2: '8.44', 3: '28.07'}
+          ]}
+          columns={[{
+            title: 'duration',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'duration_boxcox',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'duration_boxcox_lambda',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }]}/>
+      </div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
+    </div>
+  }
+
+  Number_extraction() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsContent}><span>{EN.Number_extraction}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Number_extraction_grammar}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Number_extraction_input}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Number_extraction_output}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.func_note}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Number_extraction_note_txt}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Number_extraction_example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            {key: '1', 1: '23.319%', 2: '23.319'},
+            {key: '2', 1: '23.311%', 2: '23.311'},
+            {key: '3', 1: '23.35%', 2: '23.350'}
+          ]}
+          columns={[{
+            title: 'percent',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'percent_ext',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }]}/>
+      </div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
+    </div>
+  }
+
+  Substring() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsContent}><span>{EN.Substring}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Substring_grammar}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Substring_input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Substring_input1}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Substring_output}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.func_note}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Substring_note_txt}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Substring_example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            {key: '1', 1: 'no.oct month', 2: 'oct'},
+            {key: '2', 1: 'no.jun month', 2: 'jun'},
+            {key: '3', 1: 'no.may month', 2: 'may'}
+          ]}
+          columns={[{
+            title: 'month',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'month_sub',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }]}/>
+      </div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
+    </div>
+  }
+
+  Groupby() {
+    return <div className={styles.funcTips}>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Syntax}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_grammar}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_input}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_input1}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_input2}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_input3}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_input4}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_output}</span></div>
+      <div className={styles.funcTipsTitle}><span>{EN.Example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            {key: '1', 1: '79', 2: '8', 3: '38562', 4: '210.0'},
+            {key: '2', 1: '199', 2: '0', 3: '252275', 4: '176.0'},
+            {key: '3', 1: '266', 2: '1', 3: '263141', 4: '204.0'},
+            {key: '41', 1: '141', 2: '0', 3: '252275', 4: '176.0'},
+          ]}
+          columns={[{
+            title: 'duration',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'job',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'duration_sum',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }, {
+            title: 'duration_median',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }]}/>
+      </div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            {key: '1', 1: '79', 2: '8', 3: '2', 4: '392.08', 5: '25'},
+            {key: '2', 1: '199', 2: '0', 3: '1', 4: '261.25', 5: '4'},
+            {key: '3', 1: '226', 2: '1', 3: '0', 4: '301.20', 5: '5'},
+            {key: '4', 1: '141', 2: '0', 3: '1', 4: '261.25', 5: '4'},
+          ]}
+          columns={[{
+            title: 'duration',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'job',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'education',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }, {
+            title: 'duration_mean',
+            dataIndex: 4,
+            key: 4,
+            className: styles.funcTipsCol
+          }, {
+            title: 'duration_min',
+            dataIndex: 5,
+            key: 5,
+            className: styles.funcTipsCol
+          }]}/>
+      </div>
+      <div className={styles.funcTipsContent}><span>{EN.Groupby_example}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Output}</span></div>
+      <div className={styles.funcTipsContent}>
+        <Table
+          bordered={true}
+          defaultExpandAllRows={true}
+          pagination={false}
+          size="small"
+          dataSource={[
+            {key: '1', 1: '8', 2: '2', 3: '1'},
+            {key: '2', 1: '0', 2: '1', 3: '0'},
+            {key: '3', 1: '1', 2: '0', 3: '1'},
+            {key: '4', 1: '0', 2: '1', 3: '0'},
+          ]}
+          columns={[{
+            title: 'duration',
+            dataIndex: 1,
+            key: 1,
+            className: styles.funcTipsCol
+          }, {
+            title: 'job',
+            dataIndex: 2,
+            key: 2,
+            className: styles.funcTipsCol
+          }, {
+            title: 'job_mode',
+            dataIndex: 3,
+            key: 3,
+            className: styles.funcTipsCol
+          }]}/>
+      </div>
+      <div className={styles.funcTipsTitle}><span>{EN.Notice}</span></div>
+      <div className={styles.funcTipsContent}><span>{EN.Iftoomanynewvariablesarecreated}</span></div>
+    </div>
+  }
+
   render() {
     const {value} = this.props
     const key = value

@@ -3,32 +3,45 @@ import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
 
 export default function SpeedvsAccuracys(props){
-		const {
-			models,
-			x_name='',
-			y_name='',
-			height = 400,
-			width = 950
-		} = props;
+	const {
+		models,
+		x_name='',
+		y_name='',
+		height = 400,
+		width = 950,
+		selectAll = true
+	} = props;
+	
+	const selected = {};
 
-		const data = models.map(itm=>({
+	const data = models.map(itm=>{
+		selected[itm.modelName] = selectAll;
+		return {
 			name:itm.modelName,
 			value:[itm.executeSpeed,itm.accValidation],
-		}));
+		}
+	});
 	const lineStyle = {
 		normal: {
 			type: 'dashed',
 		},
 	};
-
+	
 	const series = data.map((itm)=>{
 		return {
 			name:itm.name,
-			symbolSize: 20,
+			symbolSize: 14,
 			data:[itm.value],
 			type: 'scatter',
+			hoverAnimation:true,
+			// markPoint:{
+			// 	symbol:'rect'
+			// },
 			markLine : {
 				lineStyle,
+				label:{
+					show:false
+				},
 				symbol:false,
 				data:[
 					{
@@ -63,6 +76,8 @@ export default function SpeedvsAccuracys(props){
 			top:'5%',
 			width:'auto',
 			bottom:'30%',
+			selected,
+			inactiveColor:'rgba(204,204,204,0.5)'
 		},
 		grid:{
 			x2:300,

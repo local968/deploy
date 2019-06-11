@@ -58,6 +58,8 @@ class TargetIssue extends Component {
 
   saveTargetFixes = () => {
     this.props.project.fixTarget()
+
+    message.destroy();
     message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
     this.closeTarget();
   }
@@ -70,7 +72,7 @@ class TargetIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin } = project;
+    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
     const isNum = colType[target] === 'Numerical'
@@ -83,7 +85,7 @@ class TargetIssue extends Component {
       outlier: outlierCount === 0 ? 0 : (outlierCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(outlierCount * 100 / (totalRawLines || 1), 2)
     }
     const warnings = []
-    const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 0
+    const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
     if (problemType === 'Classification') {
       if (unique < 2) warnings.push(EN.Yourtargetvariablehaslessthantwouniquevalues)
       if (unique === 2) {
@@ -260,7 +262,10 @@ class VariableIssue extends Component {
   }
 
   onConfirm = () => {
-    this.props.project.endQuality().then(() => this.summary = true).catch(() => { message.error("error!!") })
+    this.props.project.endQuality().then(() => this.summary = true).catch(() => {
+
+      message.destroy();
+      message.error("error!!") })
     this.onClose()
   }
 
@@ -500,7 +505,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, targetIssues, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
     const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
     const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
@@ -524,15 +529,15 @@ class Summary extends Component {
             <div className={styles.summaryCube} style={{ backgroundColor: '#00c855' }} />
             <span>{EN.CleanData}</span>
           </div>
-          {(!!targetIssues.mismatchRow || !!mismatchCount) && <div className={styles.summaryType}>
+          {(!!targetIssuesCountsOrigin.mismatchRow || !!mismatchCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }} />
             <span>{EN.DataTypeMismatch}</span>
           </div>}
-          {(!!targetIssues.nullRow || !!nullCount) && <div className={styles.summaryType}>
+          {(!!targetIssuesCountsOrigin.nullRow || !!nullCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
           </div>}
-          {(problemType !== 'Classification' && (!!targetIssues.outlierRow || !!outlierCount)) && <div className={styles.summaryType}>
+          {(problemType !== 'Classification' && (!!targetIssuesCountsOrigin.outlierRow || !!outlierCount)) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
             <span>{EN.Outlier}</span>
           </div>}

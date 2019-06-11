@@ -3,7 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 
 export default function SingleLiftCharts(props){
-	const {x_name='',y_name='',width=500,height=400,model} = props;
+	const {x_name='',y_name='',width=600,height=400,model} = props;
 	const {lift} = model.chartData;
 	const {LIFT,PERCENTAGE} = lift;
 	const _LIFT = Object.values(LIFT);
@@ -27,6 +27,9 @@ export default function SingleLiftCharts(props){
 			data,
 			smooth: true,
 		},
+		grid:{
+			x2:150
+		}
 	};
 
 	return <ReactEcharts

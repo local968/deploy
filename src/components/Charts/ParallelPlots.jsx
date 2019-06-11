@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import request from '../Request';
+import EN from "../../constant/en";
 
 export default class ParallelPlot extends PureComponent{
 	constructor(props){
@@ -108,6 +109,7 @@ export default class ParallelPlot extends PureComponent{
 				itemGap: 20,
 				itemWidth: 50,
 				itemHeight: 3,
+				inactiveColor:'rgba(204,204,204,0.5)'
 			},
 			silent:true,
 			progressiveChunkMode:'mod',
@@ -129,9 +131,11 @@ export default class ParallelPlot extends PureComponent{
 			},
 			series,
 			toolbox: {
-				left: 'right',
+				right:40,
 				feature: {
-					restore:{},
+					restore:{
+						title:EN.restore,
+					},
 				},
 				z: 202
 			},

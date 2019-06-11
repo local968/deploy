@@ -18,9 +18,9 @@ const header = (props) => {
       </div>
       <div className={styles.content_icon}>
         <img src={copyIcon}/>
-        <p>是否观看教学视频？</p>
+        <p>{EN.watchtheinstructionalvideos}</p>
       </div>
-      <Checkbox onChange={(e) => props.userStore.change('isCheck')(e.target.checked)}>不再提示该信息 </Checkbox>
+      <Checkbox onChange={(e) => props.userStore.change('isCheck')(e.target.checked)}>{EN.Dontpromptforthismessage}</Checkbox>
     </div>
   )
 }
@@ -30,8 +30,8 @@ function showConfirm(props ,email , password) {
     width: 400,
     icon:'',
     content: header(props),
-    okText: '是',
-    cancelText: '否',
+    okText: EN.YES,
+    cancelText: EN.NO,
     onOk() {
       props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
       props.userStore.change('isWatchVideo')(true);

@@ -26,6 +26,8 @@ import LiftChart2 from "../../Charts/LiftChart2";
 import RocChart2 from "../../Charts/RocChart2";
 import { Hint } from 'components/Common';
 import Chart from "../../Charts/Chart";
+import config from 'config'
+const isEN = config.isEN;
 // import ROCCurve from "../../Modeling/AdvancedView/icon-roc-curve-normal.svg";
 const ROCCurve = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgd2lkdGg9IjUwcHgiIGhlaWdodD0iNTBweCIgdmlld0JveD0iMCAwIDUwIDUwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTQgKDc2NDgwKSAtIGh0dHBzOi8vc2tldGNoYXBwLmNvbSAtLT4NCiAgICA8dGl0bGU+UGFnZSAxPC90aXRsZT4NCiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4NCiAgICA8ZGVmcz4NCiAgICAgICAgPHBvbHlnb24gaWQ9InBhdGgtMSIgcG9pbnRzPSIwLjAwMDQgMC43MjQgNDkuMjc2IDAuNzI0IDQ5LjI3NiA1MCAwLjAwMDQgNTAiPjwvcG9seWdvbj4NCiAgICA8L2RlZnM+DQogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+DQogICAgICAgIDxnIGlkPSI1LTQtMi1Nb2RlbC1TZWxlY3Rpb25fQWR2YW5jZWQtVmlld19Nb2RlbC1FeHBhbmRfUk9DLUN1cmUtQ29weS0yIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjk2LjAwMDAwMCwgLTUyOS4wMDAwMDApIj4NCiAgICAgICAgICAgIDxnIGlkPSJQYWdlLTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI5Ni4wMDAwMDAsIDUyOC4wMDAwMDApIj4NCiAgICAgICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDAuMjc2NDAwKSI+DQogICAgICAgICAgICAgICAgICAgIDxtYXNrIGlkPSJtYXNrLTIiIGZpbGw9IndoaXRlIj4NCiAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+DQogICAgICAgICAgICAgICAgICAgIDwvbWFzaz4NCiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9IkNsaXAtMiI+PC9nPg0KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNDcuMjc2NCw0NSBDNDcuMjc2NCw0Ni42NTQgNDUuOTMwNCw0OCA0NC4yNzY0LDQ4IEw1LjAwMDQsNDggQzMuMzQ1NCw0OCAyLjAwMDQsNDYuNjU0IDIuMDAwNCw0NSBMMi4wMDA0LDUuNzI0IEMyLjAwMDQsNC4wNjkgMy4zNDU0LDIuNzI0IDUuMDAwNCwyLjcyNCBMNDQuMjc2NCwyLjcyNCBDNDUuOTMwNCwyLjcyNCA0Ny4yNzY0LDQuMDY5IDQ3LjI3NjQsNS43MjQgTDQ3LjI3NjQsNDUgWiBNNDQuMjc2NCwwLjcyNCBMNS4wMDA0LDAuNzI0IEMyLjI0MzQsMC43MjQgMC4wMDA0LDIuOTY3IDAuMDAwNCw1LjcyNCBMMC4wMDA0LDQ1IEMwLjAwMDQsNDcuNzU3IDIuMjQzNCw1MCA1LjAwMDQsNTAgTDQ0LjI3NjQsNTAgQzQ3LjAzMzQsNTAgNDkuMjc2NCw0Ny43NTcgNDkuMjc2NCw0NSBMNDkuMjc2NCw1LjcyNCBDNDkuMjc2NCwyLjk2NyA0Ny4wMzM0LDAuNzI0IDQ0LjI3NjQsMC43MjQgTDQ0LjI3NjQsMC43MjQgWiIgaWQ9IkZpbGwtMSIgZmlsbD0iIzFEMkIzQyIgbWFzaz0idXJsKCNtYXNrLTIpIj48L3BhdGg+DQogICAgICAgICAgICAgICAgPC9nPg0KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMC4xMzU3LDIzLjcwMjcgTDI0LjM0ODcsMjcuOTE0NyBMMjIuODcyNywyOC45ODg3IEwxOC44MzM3LDI0Ljk0ODcgQzE5LjI0MTcsMjQuNTIwNyAxOS42Nzc3LDI0LjEwNTcgMjAuMTM1NywyMy43MDI3IE0zNy4wMDA3LDE4LjcwNjcgTDM1LjczOTcsMTkuNjIzNyBMMzQuNzM3NywxOC42MjA3IEMzNS40NjY3LDE4LjYyMDcgMzYuMjIzNywxOC42NTE3IDM3LjAwMDcsMTguNzA2NyBNMzMuMzU3NywxOC42NTU3IEwzNC45MjE3LDIwLjIxOTcgTDMzLjc4MTcsMjEuMDQ5NyBDMzMuNzU3NywyMC45OTQ3IDMzLjcyNTcsMjAuOTQyNyAzMy42ODA3LDIwLjg5NzcgTDMxLjU4MDcsMTguNzk3NyBDMzIuMTU2NywxOC43MzE3IDMyLjc0NzcsMTguNjg0NyAzMy4zNTc3LDE4LjY1NTcgTTMwLjMzMzcsMTguOTY0NyBMMzIuOTczNywyMS42MDQ3IEMzMi45ODA3LDIxLjYxMTcgMzIuOTg5NywyMS42MTM3IDMyLjk5NjcsMjEuNjE5NyBMMzEuODUxNywyMi40NTM3IEwyOC42OTU3LDE5LjI5NzcgQzI5LjIyNDcsMTkuMTY5NyAyOS43NzA3LDE5LjA1ODcgMzAuMzMzNywxOC45NjQ3IE0yNy41ODU3LDE5LjYwMTcgTDMxLjAzMjcsMjMuMDQ5NyBMMjkuNjU5NywyNC4wNDk3IEwyNS44MTg3LDIwLjIwNzcgQzI2LjM4MTcsMTkuOTgyNyAyNi45NzU3LDE5Ljc4NDcgMjcuNTg1NywxOS42MDE3IE0yNC44Mzc3LDIwLjY0MTcgTDI4Ljg0MTcsMjQuNjQ0NyBMMjcuNDExNywyNS42ODU3IEwyMy4yMDY3LDIxLjQ4MDcgQzIzLjcyMzcsMjEuMTc5NyAyNC4yNzM3LDIwLjkwNDcgMjQuODM3NywyMC42NDE3IE0yNS4wOTA3LDI3LjI0MjcgTDIwLjkwMTcsMjMuMDU0NyBDMjEuMzU0NywyMi42OTQ3IDIxLjgzOTcsMjIuMzU1NyAyMi4zMzk3LDIyLjAyNzcgTDI2LjU5MjcsMjYuMjgxNyBMMjUuMTUwNywyNy4zMzE3IEMyNS4xMzA3LDI3LjMwMTcgMjUuMTE2NywyNy4yNjg3IDI1LjA5MDcsMjcuMjQyNyBNMTguMTU3NywyNS42ODc3IEwyMi4wNTQ3LDI5LjU4MzcgTDIwLjYzOTcsMzAuNjE0NyBMMTcuMDczNywyNy4wNDg3IEMxNy40MTM3LDI2LjU4ODcgMTcuNzcxNywyNi4xMzM3IDE4LjE1NzcsMjUuNjg3NyBNMTYuNDg2NywyNy44NzQ3IEwxOS44MjE3LDMxLjIwOTcgTDE4LjY4NTcsMzIuMDM1NyBMMTUuNzI3NywyOS4wNzc3IEMxNS45NjU3LDI4LjY3NjcgMTYuMjE2NywyOC4yNzU3IDE2LjQ4NjcsMjcuODc0NyBNMTUuMjE1NywyOS45ODA3IEwxNy44NjY3LDMyLjYzMTcgTDE2LjY5NzcsMzMuNDgzNyBMMTQuNTM4NywzMS4zMjQ3IEMxNC43NDU3LDMwLjg4MTcgMTQuOTcxNywzMC40MzI3IDE1LjIxNTcsMjkuOTgwNyBNMTQuMTAxNywzMi4zMDI3IEwxNS44Nzg3LDM0LjA3ODcgTDE0Ljk0NDcsMzQuNzU4NyBMMTMuNjM5NywzMy40NTQ3IEMxMy43Nzk3LDMzLjA3OTcgMTMuOTM1NywzMi42OTM3IDE0LjEwMTcsMzIuMzAyNyBNMTMuMjcxNywzNC40OTk3IEwxNC4xMjQ3LDM1LjM1NDcgTDEyLjcxNTcsMzYuMzgwNyBDMTIuODYzNywzNS44MTI3IDEzLjA0NDcsMzUuMTgyNyAxMy4yNzE3LDM0LjQ5OTcgTTM4LjM0NTcsMzguMDE1NyBMMTIuMzQxNywzOC4wMTU3IEMxMi4zNTE3LDM3Ljk2NTcgMTIuMzU5NywzNy45MjE3IDEyLjM3MDcsMzcuODY4NyBMMzguNjE5NywxOC43NjQ3IEMzOS4wMDE3LDE4LjY1NTcgMzkuMjk0NywxOC4zMzA3IDM5LjMzOTcsMTcuOTEzNyBDMzkuMzk4NywxNy4zNjQ3IDM5LjAwMDcsMTYuODcxNyAzOC40NTE3LDE2LjgxMjcgQzIzLjM2NjcsMTUuMTkyNyAxNS41NDQ3LDIzLjY4MzcgMTIuMTYyNywzMS42Mzg3IEwxMi4xNjI3LDEyLjA3ODcgQzEyLjE2MjcsMTEuNTI2NyAxMS43MTU3LDExLjA3ODcgMTEuMTYyNywxMS4wNzg3IEMxMC42MTA3LDExLjA3ODcgMTAuMTYyNywxMS41MjY3IDEwLjE2MjcsMTIuMDc4NyBMMTAuMTYyNywzOS4wMTU3IEMxMC4xNjI3LDM5LjA2MzcgMTAuMTgzNywzOS4xMDQ3IDEwLjE5MDcsMzkuMTUxNyBDMTAuMTk5NywzOS4yMTg3IDEwLjIwNjcsMzkuMjg0NyAxMC4yMzA3LDM5LjM0NzcgQzEwLjI1MTcsMzkuNDA5NyAxMC4yODM3LDM5LjQ2MTcgMTAuMzE2NywzOS41MTY3IEMxMC4zNDk3LDM5LjU3MTcgMTAuMzc4NywzOS42MjQ3IDEwLjQyMDcsMzkuNjcxNyBDMTAuNDY0NywzOS43MjE3IDEwLjUxNTcsMzkuNzU5NyAxMC41Njg3LDM5Ljc5OTcgQzEwLjYxNjcsMzkuODM2NyAxMC42NjM3LDM5Ljg3MzcgMTAuNzIwNywzOS45MDE3IEMxMC43ODE3LDM5LjkzMjcgMTAuODQ3NywzOS45NDg3IDEwLjkxNTcsMzkuOTY2NyBDMTAuOTU4NywzOS45Nzc3IDEwLjk5NTcsNDAuMDAyNyAxMS4wNDI3LDQwLjAwODcgQzExLjA4MTcsNDAuMDEzNyAxMS4xMjA3LDQwLjAxNDcgMTEuMTU4Nyw0MC4wMTQ3IEMxMS4xNTk3LDQwLjAxNDcgMTEuMTYxNyw0MC4wMTU3IDExLjE2MjcsNDAuMDE1NyBMMzguMzQ1Nyw0MC4wMTU3IEMzOC44OTg3LDQwLjAxNTcgMzkuMzQ1NywzOS41Njg3IDM5LjM0NTcsMzkuMDE1NyBDMzkuMzQ1NywzOC40NjM3IDM4Ljg5ODcsMzguMDE1NyAzOC4zNDU3LDM4LjAxNTciIGlkPSJGaWxsLTQiIGZpbGw9IiMxRDJCM0MiPjwvcGF0aD4NCiAgICAgICAgICAgIDwvZz4NCiAgICAgICAgPC9nPg0KICAgIDwvZz4NCjwvc3ZnPg=='
 // import rocHover from "../../Modeling/AdvancedView/icon-roc-curve-hover.svg";
@@ -483,7 +485,7 @@ class AdvancedModelTable extends Component {
         const graphicList = toJS(models[0].graphicList);
         graphicList.pop();
         return <Chart
-            y_name={target + '的组内平均值'}
+            y_name={isEN?`${EN.Groupaverage} ${target}`:`${target} ${EN.Groupaverage}`}
             data={graphicList.pop()}
         />
       }
@@ -1012,7 +1014,7 @@ class PredictTable extends Component {
     const {  project } = this.props;
     const { models } = project
     const { targetCounts } = project
-    const { TP, FN, FP, TN } = this.costOption;
+    // const { TP, FN, FP, TN } = this.costOption;
     const [v0, v1] = Object.values(targetCounts)
     const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
     const percentNew = typeof this.distribution === 'number' ? this.distribution / 100 : percent0
@@ -1052,13 +1054,18 @@ class PredictTable extends Component {
 
 
 
-    const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution } = project;
+    const {  project = {}, model, yes, no } = this.props;
+    const { fitIndex, chartData } = model;
+    let TN = chartData.roc.TN[fitIndex];
+    let FP = chartData.roc.FP[fitIndex];
+    let TP = chartData.roc.TP[fitIndex];
+    let FN = chartData.roc.FN[fitIndex];
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution } = project;
     if (!current) return null;
 
     const { selectModel = {}, targetCounts = {} } = project;
 
-    const { fitIndex = 1, chartData = {} } = selectModel;
+    // const { fitIndex = 1, chartData = {} } = selectModel;
     const { roc = {} } = chartData;
 
     const Threshold = roc.Threshold && roc.Threshold[fitIndex] || -1;
@@ -1077,9 +1084,13 @@ class PredictTable extends Component {
 
     const currentPerformance = current ? (current.score.validateScore.auc > 0.8 && EN.GOOD) || (current.score.validateScore.auc > 0.6 && EN.OK) || EN.NotSatisfied : '';
     const [v0, v1] = !targetArrayTemp.length ? Object.keys(targetColMap) : targetArrayTemp;
-    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+    // const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
     const curBenefit = current.getBenefit(TP, FN, FP, TN, typeof distribution === 'number' ? (distribution / 100) : (event / 10000), event / 10000)
+
+
+
+
 
     const column = [{
       title: '',
@@ -1096,13 +1107,14 @@ class PredictTable extends Component {
       dataIndex: 'sum'
     }];
 
+    // set default value
     const data = [{
-      rowName: `Actual: ${no}`,
+      rowName: `${EN.Actual}: ${no}`,
       col1: `${Math.round(TN)}(TN)`,
       col2: `${Math.round(FP)}(FP)`,
       sum: +TN + +FP,
     }, {
-      rowName: `Actual: ${yes}`,
+      rowName: `${EN.Actual}: ${yes}`,
       col1: `${Math.round(FN)}(FN)`,
       col2: `${Math.round(TP)}(TP)`,
       sum: Number(FN) + +TP
@@ -1113,6 +1125,8 @@ class PredictTable extends Component {
       sum: +TN + +FN + +FP + +TP
     }];
 
+
+    console.log(data, '--------------------------' ,project.criteria , '123')
 
     return (
       <div className={styles.costbase}>
@@ -1126,66 +1140,69 @@ class PredictTable extends Component {
           dataSource={data}
           pagination={false} />
 
-        <div className={styles.costBlock}>
-          <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
-          <section className={styles.newTitle}>
-            <label>{EN.Input}</label>
-            <dl>
-              <dt>
-                <span>{EN.Basedonyourbizscenario}</span>
-                <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>
-                <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>
-              </dt>
-            </dl>
-            <dl style={{ margin: '0.1em 0' }}>
-              <dt>
-                <div className={styles.eventInput}>
-                  <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
-                  <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} onBlur={this.handleChangeEvent} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
-                  <span style={{ marginLeft: '0.5em' }}>%</span>
-                  {/*<span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>*/}
+        {
+          project.criteria === 'cost' ? <div className={styles.costBlock}>
+            <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
+            <section className={styles.newTitle}>
+              <label>{EN.Input}</label>
+              <dl>
+                <dt>
+                  <span>{EN.Basedonyourbizscenario}</span>
+                  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>
+                  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>
+                </dt>
+              </dl>
+              <dl style={{ margin: '0.1em 0' }}>
+                <dt>
+                  <div className={styles.eventInput}>
+                    <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
+                    <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} onBlur={this.handleChangeEvent} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
+                    <span style={{ marginLeft: '0.5em' }}>%</span>
+                    {/*<span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>*/}
+                  </div>
+                </dt>
+                <div className={styles.eventButton}>
+                  {/*<a*/}
+                  {/*  className={styles.myButton}*/}
+                  {/*  href="javascript:;" onClick={() => {*/}
+                  {/*  this.showTip = true;*/}
+                  {/*}*/}
+                  {/*}>{EN.Tips}</a>*/}
                 </div>
-              </dt>
-              <div className={styles.eventButton}>
-                {/*<a*/}
-                {/*  className={styles.myButton}*/}
-                {/*  href="javascript:;" onClick={() => {*/}
-                {/*  this.showTip = true;*/}
-                {/*}*/}
-                {/*}>{EN.Tips}</a>*/}
-              </div>
-            </dl>
-          </section>
-          <div className={styles.costBox}>
-            <div className={styles.costTable}>
-              <div className={styles.costRow}>
-                <div className={styles.costName}>
-                  <div className={classnames(styles.costColor, styles.cost1)} />
-                  <span>{EN.Benefit}</span>
+              </dl>
+            </section>
+            <div className={styles.costBox}>
+              <div className={styles.costTable}>
+                <div className={styles.costRow}>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost1)} />
+                    <span>{EN.Benefit}</span>
+                  </div>
+                  <div className={styles.costCell}>{this.costInput(1, 1)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 0)}</div>
                 </div>
-                <div className={styles.costCell}>{this.costInput(1, 1)}</div>
-                <div className={styles.costCell}>{this.costInput(0, 0)}</div>
-              </div>
-              <div className={styles.costRow}>
-                <div className={styles.costName}>
-                  <div className={classnames(styles.costColor, styles.cost2)} />
-                  <span>{EN.Cost}</span>
+                <div className={styles.costRow}>
+                  <div className={styles.costName}>
+                    <div className={classnames(styles.costColor, styles.cost2)} />
+                    <span>{EN.Cost}</span>
+                  </div>
+                  <div className={styles.costCell}>{this.costInput(1, 0)}</div>
+                  <div className={styles.costCell}>{this.costInput(0, 1)}</div>
                 </div>
-                <div className={styles.costCell}>{this.costInput(1, 0)}</div>
-                <div className={styles.costCell}>{this.costInput(0, 1)}</div>
               </div>
             </div>
-          </div>
-          {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
-            <div><span className={styles.newStext}><b>{EN.Resultbasedonthedataset}{`<${typeof distribution === 'number' ? distribution : (event / 100)}%>`}{EN.Events}</b></span></div>
-            <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoptimalthreshold}{`<${formatNumber(Threshold, 3)}>`}</span></div>
-            <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoverallbenefit}{`<${curBenefit.benefit > Math.pow(10, 7) ? curBenefit.benefit.toPrecision(3) : formatNumber(curBenefit.benefit, 2)}>`}</span></div>
-            {/* <div className={styles.costText}><span>{curBenefit.text}</span></div> */}
-          </div>}
-          {/*<div className={styles.costButton}>*/}
-          {/*  <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>*/}
-          {/*</div>*/}
-        </div>
+            {!!(TP || FN || FP || TN) && <div className={styles.costTextBox}>
+              <div><span className={styles.newStext}><b>{EN.Resultbasedonthedataset}{`<${typeof distribution === 'number' ? distribution : (event / 100)}%>`}{EN.Events}</b></span></div>
+              <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoptimalthreshold}{`<${formatNumber(Threshold, 3)}>`}</span></div>
+              <div style={{ display: (Threshold !== -1 ? '' : 'none') }}><span className={styles.newStext}>{EN.Theoverallbenefit}{`<${curBenefit.benefit > Math.pow(10, 7) ? curBenefit.benefit.toPrecision(3) : formatNumber(curBenefit.benefit, 2)}>`}</span></div>
+              {/* <div className={styles.costText}><span>{curBenefit.text}</span></div> */}
+            </div>}
+            {/*<div className={styles.costButton}>*/}
+            {/*  <button onClick={this.handleSubmit}><span>{EN.Submit}</span></button>*/}
+            {/*</div>*/}
+          </div>:null
+        }
+
 
 
 

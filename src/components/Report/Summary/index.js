@@ -126,6 +126,31 @@ class Summary extends Component {
         <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
+            </div>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span>{target}</span></div>
+              <div className={styles.summaryCell}><span>{formatNumber(percentList[0].clean, 2)}%</span></div>
+            </div>
+          </div>
+          <div className={styles.summaryTableRight}>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
+            </div>
+            <div className={styles.summaryTableRow}>
+              <div className={styles.summaryProgressBlock}>
+                <div className={styles.summaryProgress} style={{ width: percentList[0].clean + '%', backgroundColor: '#00c855' }} />
+                <div className={styles.summaryProgress} style={{ width: percentList[0].mismatch + '%', backgroundColor: '#819ffc' }} />
+                <div className={styles.summaryProgress} style={{ width: percentList[0].missing + '%', backgroundColor: '#ff97a7' }} />
+                {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percentList[0].outlier + '%', backgroundColor: '#f9cf37' }} />}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.summaryTable}>
+          <div className={styles.summaryTableLeft}>
+            <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
