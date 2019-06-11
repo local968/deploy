@@ -299,7 +299,7 @@ export default class ModelProcessFlow extends Component {
 	
 	FS(){
 		const { featureLabel } = this.props.model;
-		const {rawHeader,expression,target } = this.props.projectStore.project;
+		const {rawHeader,expression,target,colType} = this.props.projectStore.project;
 		
 		let drop = _.without(rawHeader,...featureLabel,target);
 		
@@ -311,9 +311,15 @@ export default class ModelProcessFlow extends Component {
 			return null;
 		}
 		
+		const raw = drop.filter(itm=>colType[itm] === "Raw");
+		drop = _.without(drop,...raw);
+		
 		const pop = <dl className={styles.over}>
 			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
 				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
+			</dt>
+			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
+				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
 			</dt>
 			<dt style={{display:(create.length?'':'none')}}>
 				{EN.CreateTheseVariables}:
@@ -323,11 +329,10 @@ export default class ModelProcessFlow extends Component {
 			}
 		</dl>;
 		
-		return <React.Fragment>
+		return <Fragment>
 			<img src={Next} alt='' />
 			{this.popOver(pop,EN.FeatureCreationSelection)}
-		</React.Fragment>
-		
+		</Fragment>
 	}
 
 	popOver(content, text) {
