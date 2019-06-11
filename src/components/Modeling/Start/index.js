@@ -113,8 +113,12 @@ class AdvancedModel extends Component {
     const hasNewOne = key === -1
     if (hasNewOne) project.customHeader.push(checkedVariables)
     const sortFn = (a, b) => a - b
-    if (!!algorithms.length) project.version = [...new Set([...version, 3])].sort(sortFn)
-    if (!project.version.length){
+    if (!!algorithms.length) {
+      project.version = [...new Set([...version, 3])].sort(sortFn)
+    } else {
+      project.version = version.filter(_v => _v !== 3)
+    }
+    if (!project.version.length) {
       message.destroy();
       return message.error(EN.Youneedtoselectatleast)
     }
@@ -133,7 +137,7 @@ class AdvancedModel extends Component {
   render() {
     const { project, closeAdvanced } = this.props
     const { dataHeader, newVariable, trainHeader, target } = project
-    console.log(project,9999)
+    console.log(project, 9999)
     const allVariables = [...dataHeader, ...newVariable]
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     return <div className={styles.advancedModel}>
@@ -147,7 +151,7 @@ class AdvancedModel extends Component {
           })} onClick={this.switchTab.bind(null, 2)}><span>{EN.AdvancellcedModeling} {EN.Setting}</span></div>
         </div>
         <div className={styles.viewBox}>
-          <Preview project={project} visiable={this.visiable} showTable={this.showTable} hideTable={this.hideTable}/>
+          <Preview project={project} visiable={this.visiable} showTable={this.showTable} hideTable={this.hideTable} />
           {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} hidden={this.visiable || this.tab === 1} />}
           <div className={styles.bottom}>
             <button className={classnames(styles.save, {
