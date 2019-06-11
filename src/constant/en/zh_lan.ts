@@ -1117,7 +1117,8 @@ const ZH_LAN: any = {
   DropTheRows:'删除整行',
   Mapping:"映射",
   value:'值',
-  SelectFeature: '选择特征预处理'
+  SelectFeature: '选择特征预处理',
+  errorparams:'错误参数',
 };
 
 export default ZH_LAN;
