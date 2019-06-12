@@ -295,6 +295,9 @@ export default class AdvancedView extends Component {
         }, {
           display: 'F1',
           key: 'f1'
+        }, {
+          key: "log_loss",
+          display: 'LogLoss'
         }] : [{
           display: 'MSE',
           key: 'mse'
