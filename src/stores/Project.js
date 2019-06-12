@@ -1284,7 +1284,7 @@ export default class Project {
         // if (!recommend) return recommend = { id: m.id, value }
         // if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
       })
-      .filter(_m => !_m)
+      .filter(_m => !!_m)
       .sort((a, b) => (b.value - a.value) * sort)
       .map(_m => models.find(m => m.id === _m.id))
     // if (!!recommend) return models.find(m => m.id === recommend.id)

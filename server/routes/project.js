@@ -948,7 +948,7 @@ wss.register('train', async (message, socket, progress) => {
   // let hasModel = false;
   try {
     await checkTraningRestriction(user)
-    
+
 
     const commandArr = []
     const _stopIds = []
@@ -1069,7 +1069,8 @@ wss.register('train', async (message, socket, progress) => {
       return progress(processValue)
     }
 
-    await Promise.all(commandArr.map(_ca => command(_ca, processFn, true)))
+    const commandRes = await Promise.all(commandArr.map(_ca => command(_ca, processFn, true)))
+    const count = commandRes.filter(cr => !cr.isAbort && cr.status === 100)
 
     const statusData = {
       train2Finished: true,
@@ -1081,7 +1082,7 @@ wss.register('train', async (message, socket, progress) => {
     }
     const modelCounts = await getModelCount(projectId)
 
-    if (modelCounts < 1) {
+    if (modelCounts < 1 && count < 1) {
       statusData.train2Error = true
     }
 
