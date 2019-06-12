@@ -654,7 +654,7 @@ class ClassificationModelRow extends Component {
   render() {
     const { model, texts, metric, checked, yes, no } = this.props;
     if (!model.chartData) return null;
-    const { modelName, fitIndex, chartData: { roc }, score } = model;
+    const { modelName, fitIndex, chartData: { roc, rocHoldout }, score } = model;
     const { detail } = this.state;
     return (
       <div >
@@ -684,9 +684,9 @@ class ClassificationModelRow extends Component {
               case 'KS':
                 return <RowCell key={7} data={roc.KS[fitIndex]} />;
               case EN.Validation:
-                return <RowCell key={8} data={metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
+                return <RowCell key={8} data={metric === 'log_loss' ? roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
               case EN.Holdout:
-                return <RowCell key={9} data={metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
+                return <RowCell key={9} data={metric === 'log_loss' ? rocHoldout.LOGLOSS[fitIndex] : metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
               case EN.Time:
                 return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
               default:
