@@ -384,7 +384,7 @@ export default class AdvancedView extends Component {
                 <span>{EN.SetMeasurement}:</span>
               </div>
               <div className={styles.advancedOption}>
-                <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} >
+                <Select className={styles.antdAdvancedSize} value={measurement} onChange={this.handleMeasurement} style={{ minWidth: 100 }}>
                   {measurementList.map((i, k) => <Option value={i.value} key={k}>{i.label}</Option>)}
                 </Select>
               </div>
