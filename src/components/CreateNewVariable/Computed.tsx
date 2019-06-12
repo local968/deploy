@@ -458,11 +458,20 @@ function Computed(props: ComputedProps) {
     // const baseOptReg = new RegExp(/[+\-*/]/)
     const length = expression.length
     let start = 0
+    let skipNum = 0
     let array: (Coordinate | Bracket)[][] = []
-    // 根据+-*/切割表达式
+    // 根据+-*/切割表达式 忽略[]
     for (let i = 0; i < length; i++) {
       if (i < start) continue
-      if ((expression[i] as any).type === Type.Op) {
+      if ((expression[i] as any).type === Type.Lc) {
+        skipNum++
+        continue
+      }
+      if ((expression[i] as any).type === Type.RC) {
+        if (skipNum > 0) skipNum--
+        continue
+      }
+      if (skipNum === 0 && (expression[i] as any).type === Type.Op) {
         array.push(expression.slice(start, i))
         start = i + 1
       }
@@ -475,14 +484,13 @@ function Computed(props: ComputedProps) {
     let warning = false
     const typeArray: string[] = []
     for (let item of array) {
-      if(!item.length) {
+      if (!item.length) {
         if (warning) return { isPass: false, message: EN.Errorexpression }
         warning = true
         continue
-      }else{
+      } else {
         warning = false
       }
-      console.log(item,'adasd')
       //Categorical
       let type = 'Numerical'
       // item = item.trim()
@@ -586,7 +594,6 @@ function Computed(props: ComputedProps) {
       }
     }
     if (start < length) expArray.push(exps.slice(start, length))
-
     let numOfParam = 0
     let isVariable1 = false
     let num = 1
@@ -929,14 +936,20 @@ function Computed(props: ComputedProps) {
         // const last = subExp.slice(-1)
         // if (first !== "[" || last !== "]") return { isPass: false, message: `${ EN.Unexpectedidentifier } ${ subExp } ` }
         // const subArray = subItem.exp.slice(1, -1)
-
+        let prev: any
         const subchecked = checkArrayParams(subItem.exp.slice(1, -1), bracketExps, ({ item, type, isVariable }) => {
-          if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} ` }
+          if (!item) return { isPass: false, message: `${expToString(subItem.exp)} contain ${EN.Emptyexpression} ` }
           if (isVariable) return { isPass: false, message: `cannot use variable` }
           if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumbe} ` }
           if (isNaN(parseFloat(item)) || item.includes('.')) return {
             isPass: false,
             message: `${item} ${EN.Mustbeinteger} `
+          }
+          if (item < 0) return { isPass: false, message: `${item} must larger than 0` }
+          if (isNaN(parseFloat(prev))) prev = item
+          else {
+            if (prev > item) return { isPass: false, message: `${item} must larger than ${prev} ` }
+            prev = item
           }
           return { isPass: true, message: 'ok' }
         })
