@@ -77,8 +77,8 @@ function Function(props: FunctionProps) {
                         button
                         key={'functions' + i}
                         className={classes.nested}
-                        onClick={() => onClick(coor, null)}
-                        onMouseOver={() => onMouseOver(coor.value)}
+                        onDoubleClick={() => onClick(coor, null)}
+                        onClick={() => onMouseOver(coor.value)}
                       >
                         <ListItemText primary={coor.name}/>
                       </ListItem>
