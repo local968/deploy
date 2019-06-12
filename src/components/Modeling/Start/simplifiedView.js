@@ -175,6 +175,8 @@ export default class SimplifiedView extends Component {
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
     const variableType = { ...newType, ...colType }
     Reflect.deleteProperty(variableType, target)
+    const newVariableType = { ...colType }
+    Reflect.deleteProperty(newVariableType, target)
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
@@ -243,7 +245,7 @@ export default class SimplifiedView extends Component {
             <span>{EN.CreateANewVariable}</span>
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
-            <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={variableType} expression={expression} />
+            <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={newVariableType} expression={expression} />
           </Modal>
         </div>
         <div
