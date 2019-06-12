@@ -273,32 +273,33 @@ export default class AdvancedView extends Component {
     const { project } = this.props
     if (project && project.problemType) {
       return project.problemType === 'Classification' ?
-        // [{
-        //   display: 'Accuracy',
-        //   key: 'acc'
-        // }, {
-        //   display: 'AUC',
-        //   key: 'auc'
-        // }, {
-        //   display: 'F1',
-        //   key: 'f1'
-        // }, {
-        //   display: 'Precision',
-        //   key: 'precision'
-        // }, {
-        //   display: 'Recall',
-        //   key: 'recall'
-        // }]
         [{
+          display: 'Accuracy',
+          key: 'acc'
+        }, {
           display: 'AUC',
           key: 'auc'
         }, {
           display: 'F1',
           key: 'f1'
         }, {
-          key: "log_loss",
-          display: 'LogLoss'
-        }] : [{
+          display: 'Precision',
+          key: 'precision'
+        }, {
+          display: 'Recall',
+          key: 'recall'
+        }]
+        // [{
+        //   display: 'AUC',
+        //   key: 'auc'
+        // }, {
+        //   display: 'F1',
+        //   key: 'f1'
+        // }, {
+        //   key: "log_loss",
+        //   display: 'LogLoss'
+        // }] 
+        : [{
           display: 'MSE',
           key: 'mse'
         }, {
