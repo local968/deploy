@@ -28,8 +28,9 @@ export default class StartTrain extends Component {
     this.visible = true
   }
 
-  closeAdvanced = () => {
+  closeAdvanced = (isCLose = true) => {
     this.visible = false
+    if(isCLose) this.props.projectStore.project.removeCurSetting()
   }
 
   render() {
@@ -122,7 +123,7 @@ class AdvancedModel extends Component {
       message.destroy();
       return message.error(EN.Youneedtoselectatleast)
     }
-    closeAdvanced()
+    closeAdvanced(false)
     advancedModeling()
   }
 

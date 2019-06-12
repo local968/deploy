@@ -125,6 +125,7 @@ export default class AdvancedView extends Component {
             return (aModelData - bModelData) * sort.value
           }
         case 'LogLoss':
+        case 'log_loss':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
@@ -288,6 +289,9 @@ export default class AdvancedView extends Component {
         }, {
           display: 'Recall',
           key: 'recall'
+        }, {
+          key: "log_loss",
+          display: 'LogLoss'
         }]
         // [{
         //   display: 'AUC',

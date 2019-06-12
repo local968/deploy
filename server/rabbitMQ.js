@@ -36,6 +36,8 @@ module.exports = function RabbitMQ(){
         });
       } catch (e) {
         console.error(e);
+        this.amqplib = undefined;
+        return this.getAmqplib();
       }
       return this.amqplib;
     }

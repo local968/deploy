@@ -703,7 +703,7 @@ function Computed(props: ComputedProps) {
           } catch (e) {
             return { isPass: false, message: `${_n} ${EN.Mustbeinteger} ` }
           }
-          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan} ` }
+          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan} 1` }
           if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1} ` }
           return {
             isPass: true,
@@ -927,7 +927,11 @@ function Computed(props: ComputedProps) {
           message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         const subItem = numList[0]
-        if (!subItem || subItem.type !== 'Array') return {
+        if (!subItem) return {
+          isPass: false,
+          message: `${EN.Function}: ${senior.value} ${EN.Parameterserror}`
+        }
+        if (subItem.type !== 'Array') return {
           isPass: false,
           message: `${EN.Unexpectedidentifier} ${expToString(subItem.exp)} `
         }
@@ -945,10 +949,10 @@ function Computed(props: ComputedProps) {
             isPass: false,
             message: `${item} ${EN.Mustbeinteger} `
           }
-          if (item < 0) return { isPass: false, message: `${item} must larger than 0` }
+          if (item < 0) return { isPass: false, message: `${item} ${EN.Thenumbermustbegreaterthanorequalto} 0` }
           if (isNaN(parseFloat(prev))) prev = item
           else {
-            if (prev > item) return { isPass: false, message: `${item} must larger than ${prev} ` }
+            if (prev > item) return { isPass: false, message: `${item} ${EN.Mustgreaterthan} ${prev} ` }
             prev = item
           }
           return { isPass: true, message: 'ok' }

@@ -1257,10 +1257,10 @@ export default class Project {
   //temp
   @computed
   get defualtRecommendModel() {
-    const { models, measurement, problemType } = this
+    const { currentSetting, models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
-    return models
+    return models.filter(_m => currentSetting.models.includes(_m.id))
       .map(m => {
         const { score } = m
         const { validateScore, holdoutScore } = score || {}
@@ -1278,13 +1278,15 @@ export default class Project {
           validate = score[currentMeasurement]
           holdout = score[currentMeasurement]
         }
-        if (isNaN(parseFloat(validate)) || isNaN(parseFloat(holdout))) return
+        if (isNaN(parseFloat(validate)) || isNaN(parseFloat(holdout))) return null
         return { id: m.id, value: validate + holdout }
         // const value = validate + holdout
         // if (!recommend) return recommend = { id: m.id, value }
         // if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
       })
-      .filter(_m => !!_m)
+      .filter(_m => {
+        return !!_m
+      })
       .sort((a, b) => (b.value - a.value) * sort)
       .map(_m => models.find(m => m.id === _m.id))
     // if (!!recommend) return models.find(m => m.id === recommend.id)
@@ -1781,6 +1783,11 @@ export default class Project {
       setting,
       models: []
     })
+  }
+
+  removeCurSetting = () => {
+    this.settings = this.settings.filter(st => st.id !== this.settingId)
+    this.settingId = ''
   }
 
   modeling = (trainData, updateData) => {
@@ -2282,7 +2289,7 @@ export default class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = (model) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance,trainHeader} = this;
+    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader } = this;
 
     const list = [];
     list.push(this.histogram(target));

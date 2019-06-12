@@ -532,7 +532,7 @@ const EN_LAN = {
   Mustbeinteger: 'must be integer',
   Function: 'function',
   Parameterserror: 'parameters error',
-  Mustgreaterthan: 'must greater than 1',
+  Mustgreaterthan: 'must greater than',
   Mustlessthan: 'must less than',
   Isnotsupported: 'is not supported',
   Mustbenumber: 'must be number',
