@@ -1087,7 +1087,7 @@ class CreateNewVariable extends Component {
           } catch (e) {
             return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           }
-          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan}` }
+          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan} 1` }
           if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}` }
           return {
             isPass: true,

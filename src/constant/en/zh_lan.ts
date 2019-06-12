@@ -404,7 +404,7 @@ const ZH_LAN: any = {
   Mustbeinteger: '必须为整数',
   Function: '函数',
   Parameterserror: '参数错误',
-  Mustgreaterthan: '必须大于１',
+  Mustgreaterthan: '必须大于',
   Mustlessthan: '必须小于',
   Isnotsupported: '不支持',
   Mustbenumber: '必须为数字',
