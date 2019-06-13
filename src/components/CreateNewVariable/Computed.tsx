@@ -19,7 +19,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { string } from "prop-types";
 import EN from '../../constant/en';
 import FUNCTIONS from './functions';
-import { message } from 'antd';
+import { message, Icon } from 'antd';
 
 // const FUNCTIONS = {
 //   base: [] as any[],
@@ -82,6 +82,8 @@ function Computed(props: ComputedProps) {
     detailKey: '',
     index: 0
   } as ComputedState)
+
+  const [loading, setLoading] = React.useState(false)
 
   const handleFunction = (func: Coordinate, startIndex: number | null) => {
     const { exps, index } = state;
@@ -371,6 +373,7 @@ function Computed(props: ComputedProps) {
   };
 
   const processAndSave = () => {
+    if (loading) return
     const { exps } = state;
     const checkd = exps.map(exp => checkExp(exp.value))
     const error = checkd.find(c => !c.isPass)
@@ -401,7 +404,9 @@ function Computed(props: ComputedProps) {
         exps: exps[i].value
       })
     }
+    setLoading(true)
     addNewVariable(newExps, newType).then(isok => {
+      setLoading(false)
       if (isok) onClose()
     })
   }
@@ -784,12 +789,11 @@ function Computed(props: ComputedProps) {
         })
         for (let numResult of numResults) {
           if (!numResult.isPass) return numResult
-          num += numResult.num || 0
+          num += (numResult as any).num || 0
         }
         break;
       case "Groupby":
         type = 'Categorical'
-        console.log(numOfParam, numList.length, 'Groupby')
         let nList
         if (numOfParam === 1) {
           if (numList.length !== 2) return {
@@ -801,12 +805,13 @@ function Computed(props: ComputedProps) {
           const vExp = expToString(vList.exp)
           if (vList.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${vExp} ` }
           const vListchecked = checkArrayParams(vList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+            console.log(item, isVariable, 'vListchecked')
             if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} ` }
             if (!isVariable) return { isPass: false, message: `must use variable` }
             return { isPass: true, message: 'ok' }
           })
           if (!vListchecked.isPass) return vListchecked
-          if (vListchecked.params > 2) return { isPass: false, message: `cannot > 2` }
+          if ((vListchecked.params || 0) > 2) return { isPass: false, message: `cannot > 2` }
         } else if (numOfParam === 2) {
           if (numList.length !== 1) return {
             isPass: false,
@@ -825,7 +830,7 @@ function Computed(props: ComputedProps) {
         console.log(nExp, nList, 'nExp')
         if (nList.type === 'Array') {
           const nListchecked = checkArrayParams(nList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
-            console.log(item, isVariable, 'checkArrayParams')
+            console.log(item, isVariable, 'nListchecked')
             if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} ` }
             if (isVariable) return { isPass: false, message: `cannot use variable` }
             if (!nListValues.includes(item.toLowerCase())) return {
@@ -833,9 +838,9 @@ function Computed(props: ComputedProps) {
               message: `${EN.Unexpectedidentifier} ${item} `
             }
             return { isPass: true, message: 'ok' }
-          })
+          }, true)
           if (!nListchecked.isPass) return nListchecked
-          num = nListchecked.params
+          num = nListchecked.params || 0
         } else {
           if (nList.exp.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp} ` }
           const nParamExp = expToString(nList.exp[0])
@@ -974,7 +979,7 @@ function Computed(props: ComputedProps) {
     return { isPass: true, message: EN.OK, num, type }
   }
 
-  const checkArrayParams = (exps: any[], bracketExps: any, callback: ({ }: any) => { isPass: boolean, message: string }) => {
+  const checkArrayParams = (exps: any[], bracketExps: any, callback: ({ }: any) => { isPass: boolean, message: string }, unCheck?: boolean): { isPass: boolean, message: string, params?: number } => {
     if (!exps.length) return { isPass: false, message: EN.Emptyparameter }
     const length = exps.length
     let start = 0
@@ -999,10 +1004,15 @@ function Computed(props: ComputedProps) {
     if (start < length) expArray.push(exps.slice(start, length))
 
     for (const exp of expArray) {
-      // 校验表达式
-      const expChecked = checkSimpleExp(exp, bracketExps, true)
-      if (!expChecked.isPass) return expChecked
-      const { isVariable, type } = expChecked
+      let isVariable = false
+      let type = ''
+      if (!unCheck) {
+        // 校验表达式
+        const expChecked = checkSimpleExp(exp, bracketExps, true)
+        if (!expChecked.isPass) return expChecked
+        isVariable = expChecked.isVariable
+        type = expChecked.type
+      }
       const checked = callback({ item: expToString(exp as Coordinate[]), type, isVariable })
       if (!checked.isPass) return checked
     }
@@ -1117,7 +1127,7 @@ function Computed(props: ComputedProps) {
       </CardContent>
       <CardActions disableActionSpacing className={classes.actions}>
         <Button variant="contained" onClick={processAndSave} className={classes.save}>
-          {EN.Yes}
+          {!loading ? EN.Yes : <Icon type="loading" style={{ fontSize: '24px' }} />}
         </Button>
         <Button
           variant="contained"
