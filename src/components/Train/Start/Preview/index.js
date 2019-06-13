@@ -90,8 +90,8 @@ export default class Preview extends Component {
     const tableData = data.map((row, index) => row.map(v => {
       v = v === 'NEW_VARIABLE_TYPE' ? '' : v
       return {
-        content: <span>{v}</span>,
-        title: v,
+        content: <span>{v || 'NULL'}</span>,
+        title: v || 'NULL',
         cn: classnames(styles.cell, {
           [styles.drop]: (will_be_drop_500_lines || []).includes(index)
         })

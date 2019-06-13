@@ -45,7 +45,7 @@ export class ClassificationTarget extends Component {
         return null
       }).filter(n => !!n)
       const values = [...Object.keys(targetCounts), ...Object.values(temp).filter(v => !deleteKeys.includes(v)), ...renameValues]
-      if (values.length !== [...new Set(values)].length){
+      if (values.length !== [...new Set(values)].length) {
 
         message.destroy();
         return message.error("Cannot be modified to the same name")
@@ -105,7 +105,7 @@ export class ClassificationTarget extends Component {
               const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
                 <div className={styles.targetPercentLabel}>
-                  {!this.rename ? <span title={value}>{value}</span> : <input value={value} onChange={this.handleRename.bind(null, v)} />}
+                  {!this.rename ? <span title={value || 'NULL'}>{value || 'NULL'}</span> : <input value={value} onChange={this.handleRename.bind(null, v)} />}
                 </div>
                 <div className={styles.targetPercentValue}>
                   <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
@@ -118,7 +118,7 @@ export class ClassificationTarget extends Component {
           {hasNull && <div className={styles.targetPercentBox}>
             <div className={styles.targetPercentRow} key={"targetPercentRowmissing"}>
               <div className={styles.targetPercentLabel}>
-                <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || '')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || '')}</span>
+                <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}</span>
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}></div>
@@ -411,7 +411,7 @@ export class SelectTarget extends Component {
               <input type='checkbox' onChange={this.check} value={''} checked={checked.includes('')} />
             </div>
             <div className={styles.targetPercentLabel}>
-              <span>{EN.Null}</span>
+              <span>{'NULL'}</span>
             </div>
             <div className={styles.targetPercentValue}>
               <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: 'ff97a7' }}></div>
@@ -425,15 +425,15 @@ export class SelectTarget extends Component {
         <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{v0}{EN.Or}{v1}{EN.MATAHC} </span></div>
         <div className={styles.targetPercentBox}>
           {this.checked.map((t, i) => {
-            const percent = (colValueCounts[target][t] || 0) / (totalRawLines || 1) * 85
+            const percent = ((t === '' ? nullLineCounts[target] : colValueCounts[target][t]) || 0) / (totalRawLines || 1) * 85
             const backgroundColor = (v0 === t && '#9be44b') || (v1 === t && '#adaafc') || '#c4cbd7'
             return <div className={styles.targetPercentRow} key={i}>
               <div className={styles.targetPercentLabel}>
-                <span>{t}</span>
+                <span>{t || 'NULL'}</span>
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                <span>{colValueCounts[target][t] || 0}</span>
+                <span>{(t === '' ? nullLineCounts[target] :colValueCounts[target][t]) || 0}</span>
               </div>
             </div>
           })}
@@ -455,7 +455,7 @@ export class SelectTarget extends Component {
                 <input type='checkbox' value={''} id={`belong`} checked={currentBelong.includes('')} disabled={disabledArray.includes('')} onChange={disabledArray.includes('') ? null : this.handleCheck} />
               </div>
               <div className={styles.targetPercentLabel}>
-                <span>{''}</span>
+                <span>{'NULL'}</span>
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: 'ff97a7' }}></div>
