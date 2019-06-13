@@ -1256,6 +1256,8 @@ const EN_LAN = {
   errorparams:'error params',
   ResidualRate:'Residual Rate',
   ResidualPercent:'Residual Percent',
+  InputRanges:'Input Ranges',
+  ZoomRegion:'Zoom Region',
 };
 
 

@@ -23,7 +23,7 @@ export default class PVA extends Component{
 		this.state = {
 			sliderValue : [0,100],
 			ready:false,
-			data:[{},{}],
+			data:[],
 		}
 	}
 	
@@ -46,7 +46,6 @@ export default class PVA extends Component{
 		
 		data[0].name = EN.ActualValues;
 		data[1].name = EN.PredictedValues;
-		// data[2].name = EN.ResidualRate;
 		this.setState({
 			data,
 			ready:true,
@@ -91,14 +90,8 @@ export default class PVA extends Component{
 		}
 		
 		const sliderValue = _.cloneDeep(this.state.sliderValue);
-		// let _bars = _.cloneDeep(bars);
-		// let _lines1 = _.cloneDeep(lines1);
-		// let _lines2 = _.cloneDeep(lines2);
 		const {x_name='',y_name=''} = this.props;
 		const [start,end] = sliderValue;
-		
-		// _bars = _.drop(_.drop(_bars,_bars.length*start/100).reverse(),_bars.length*(100-end)/100).reverse();
-		// let _data = _.chunk(_bars,_bars.length/100).map((itm,index)=>[index,_.sum(itm)/(_bars.length/100)]);
 		
 		let sum = 100/(end-start)*100;
 		const ResidualRate = _data.pop();
@@ -107,25 +100,21 @@ export default class PVA extends Component{
 		
 		sum = _.min([sum,_.size(_.chunk(ResidualRate.value,barLength))]);
 		
-		
 		const series = _data.map(itm=>({
 			type: 'line',
 			name:itm.name,
 			symbolSize: 3,
 			yAxisIndex: 0,
 			smooth: false,
-			data:_.map(_.chunk(itm.value,barLength),(itm,index)=>[index*100/sum,_.sum(itm)/barLength]),
+			data:_.map(_.chunk(itm.value,barLength),(itm,index)=>[index*100/sum,_.sum(itm)/_.size(itm)]),
 		}));
 
 		series.push({
 			name:EN.ResidualRate,
 			yAxisIndex: 1,
 			type: 'bar',
-			data:_.map(_.chunk(ResidualRate.value,barLength),(itm,index)=>[index*100/sum,_.sum(itm)/barLength]),
+			data:_.map(_.chunk(ResidualRate.value,barLength),(itm,index)=>[index*100/sum,_.sum(itm)/_.size(itm)]),
 		});
-		// console.log(series)
-		
-		// console.log(111,series)
 		return {
 			dataZoom: [{
 				type: 'slider',
@@ -167,16 +156,23 @@ export default class PVA extends Component{
 			legend: {},
 			tooltip: {
 				trigger: 'axis',
-				// formatter: function (params) {
-				// 	return `
-				// 		真实值：${params[1].data[1].toFixed(3)}
-				// 		<br/>
-				// 		预测值：${params[2].data[1].toFixed(3)}
-				// 		<br/>
-				// 		绝对误差比:${params[0].data[1].toFixed(3)}%
-				// 	`
-				// },
-				extraCssText:'background-color:#6a6aea;color:#fff;'
+				formatter: function (params) {
+					const result = [{
+						name:EN.ActualValues,
+						percent:'',
+					},{
+						name:EN.PredictedValues,
+						percent:'',
+					},{
+						name:EN.ResidualRate,
+						percent:'%',
+					}];
+					params.forEach(itm=>(result.filter(it=>it.name === itm.seriesName && !it.value)[0]||{}).value = itm.data[1].toFixed(3));
+					
+					let res = '';
+					result.filter(itm=>itm.value).forEach(itm=>res+=(`${itm.name}:${itm.value}${itm.percent}<br/>`));
+					return res;
+				},
 			},
 			series,
 			grid:{
@@ -185,10 +181,13 @@ export default class PVA extends Component{
 			},
 			toolbox:{
 				show : true,
-				right:100,
+				right:200,
 				itemSize:20,
 				feature : {
 					dataZoom: {
+						title:{
+							zoom:EN.ZoomRegion,
+						},
 						icon:{
 							back:'image://'
 						}
@@ -201,6 +200,9 @@ export default class PVA extends Component{
 	
 	render(){
 		const {data} = this.state;
+		if(!data[0]){
+			return null;
+		}
 		const act = _.cloneDeep(data[0].value)||[];
 		const pre = _.cloneDeep(data[1].value)||[];
 		
@@ -223,18 +225,20 @@ export default class PVA extends Component{
 					key='echart'
 					option={this.getOption()}
 					ref = {chart=>this.chart=chart}
-					style={{height: 400, width: 1000}}
+					style={{height: 400, width: 800}}
 					notMerge={true}
 					lazyUpdate={true}
 					theme='customed'
 				/>
 				<div className={styles.pva} id='pva'>
-					输入范围:
+					{EN.InputRanges}:
 					<Range
 						min={yMin}
 						max={yMax}
-						defaultValue={[x, y]}
-						onAfterChange = {(data)=>{
+						// defaultValue={[x, y]}
+						value={[x, y]}
+						step={0.0001}
+						onChange = {(data)=>{
 							const [min,max] = data;
 							let start = _.min([_.indexOf(act,_.find(act,itm=>itm>min)),_.indexOf(pre,_.find(pre,itm=>itm>min))]);
 							let end = _.max([_.indexOf(act,_.find(_.reverse(act),itm=>itm<max)),_.lastIndexOf(pre,_.find(_.reverse(pre),itm=>itm<max))]);
@@ -250,8 +254,8 @@ export default class PVA extends Component{
 					<InputNum
 						min={yMin}
 						max={y}
-						step={0.0001}
-						// precision={4}
+						// step={0.0001}
+						precision={4}
 						value={x}
 						style={{ width: 100 }}
 						onChange={min=>{
@@ -269,8 +273,8 @@ export default class PVA extends Component{
 					<InputNum
 						min={x}
 						max={yMax}
-						step={0.0001}
-						// precision={4}
+						// step={0.0001}
+						precision={4}
 						value={y}
 						style={{ width: 100 }}
 						onChange={max=>{
@@ -286,7 +290,7 @@ export default class PVA extends Component{
 							y_end++
 						}
 						return this.setSlider([y_start/act.length*100,y_end/act.length*100])
-					}}>确定</button>
+					}}>{EN.Yes}</button>
 				</div>
 			</div>
 		]

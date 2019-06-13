@@ -1121,6 +1121,9 @@ const ZH_LAN: any = {
   errorparams:'错误参数',
   ResidualRate:'残差率',
   ResidualPercent:'误差百分比',
+  InputRanges:'输入范围',
+  ZoomRegion:'区域缩放',
+
 };
 
 export default ZH_LAN;

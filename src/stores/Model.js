@@ -26,8 +26,9 @@ export default class Model {
   @observable labelWithImportance = {}
   @observable multiVarPlotData = ''
   @observable parallelPlotData = ''
-  @observable outlierPlotData = ''
-  @observable pointToShowData = ''
+  @observable outlierPlotData = '';
+  @observable pointToShowData = '';
+  @observable predictData = '';
   @observable fitAndResidualPlotData = ''
   @observable outlierPlotLoading = false
   @observable featureList = []
