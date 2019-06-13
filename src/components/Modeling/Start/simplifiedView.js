@@ -135,6 +135,7 @@ export default class SimplifiedView extends Component {
 
   hideNewVariable = () => {
     this.visible = false
+    this.reloadTable()
   }
 
   reloadTable = () => {

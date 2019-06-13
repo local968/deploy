@@ -16,7 +16,6 @@ import Summary from './Summary';
 import Expressions from './Expressions';
 import { Exp, Type, Coordinate } from './model/Coordinate';
 import { withStyles } from '@material-ui/core/styles';
-import { string } from "prop-types";
 import EN from '../../constant/en';
 import FUNCTIONS from './functions';
 import { message, Icon } from 'antd';

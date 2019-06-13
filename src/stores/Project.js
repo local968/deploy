@@ -1155,7 +1155,7 @@ export default class Project {
           return prev
         }, {})
         const expression = Object.assign({}, this.expression, variableExp)
-        this.updateProject({
+        return this.updateProject({
           newVariable,
           trainHeader,
           expression,
@@ -1163,8 +1163,8 @@ export default class Project {
           correlationMatrixData: null,
           correlationMatrixHeader: null,
           cleanPath: ''
-        })
-        return true
+        }).then(() => true)
+
       })
     })
   }
