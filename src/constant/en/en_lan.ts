@@ -1254,6 +1254,10 @@ const EN_LAN = {
   value:'value',
   SelectFeature: 'Select Feature Preprocessor',
   errorparams:'error params',
+  ResidualRate:'Residual Rate',
+  ResidualPercent:'Residual Percent',
+  InputRanges:'Input Ranges',
+  ZoomRegion:'Zoom Region',
 };
 
 
