@@ -16,6 +16,9 @@ body {
   }
 }
 
+.ant-popover{
+  z-index: 99999;
+}
 @font-face {
   font-family: ShareTech-Regular;
   src: url('./ShareTech-Regular.ttf');

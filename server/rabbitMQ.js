@@ -18,35 +18,51 @@ const {
 } = config.mq;
 
 module.exports = function RabbitMQ(){
+
+  this.connect =  () => {
+    amqp.connect({
+      protocol: AMQPLIB_PROTOCOL,
+      hostname: AMQPLIB_HOSTNAME,
+      port: AMQPLIB_PORT,
+      username: AMQPLIB_USERNAME,
+      password: AMQPLIB_PASSWORD,
+      locale: AMQPLIB_LOCALE,
+      frameMax: AMQPLIB_FRAMEMAX,
+      heartbeat: AMQPLIB_HEARTBEAT,
+      vhost: AMQPLIB_VHOST
+    }).then((conn)=> {
+      this.amqplib = conn;
+      conn.on('error',()=>{
+        this.amqplib = undefined;
+      });
+    }).catch(()=> {
+      this.amqplib = undefined;
+      setTimeout(()=>{
+        this.connect();
+      },2000)
+    });
+  };
+
   this.getAmqplib = async () => {
     if (this.amqplib) {
       return this.amqplib;
     } else {
-      try {
-        this.amqplib = await amqp.connect({
-          protocol: AMQPLIB_PROTOCOL,
-          hostname: AMQPLIB_HOSTNAME,
-          port: AMQPLIB_PORT,
-          username: AMQPLIB_USERNAME,
-          password: AMQPLIB_PASSWORD,
-          locale: AMQPLIB_LOCALE,
-          frameMax: AMQPLIB_FRAMEMAX,
-          heartbeat: AMQPLIB_HEARTBEAT,
-          vhost: AMQPLIB_VHOST
-        });
-      } catch (e) {
-        console.error(e);
-        this.amqplib = undefined;
-        return this.getAmqplib();
-      }
-      return this.amqplib;
+      this.connect();
+      return new Promise((resolve, reject)=>{
+        const timmer = setInterval(()=>{
+          if (this.amqplib){
+            resolve(this.amqplib);
+            clearInterval(timmer);
+          }
+        },500)
+      });
     }
   };
 
   this.publisher = async (task) => {
     const queueName = _.includes(task.command, `${config.requestQueue}.`)
-      ? task.command
-      : `${config.requestQueue}.${task.command}`;
+        ? task.command
+        : `${config.requestQueue}.${task.command}`;
     console.log(queueName)
     const mq = await this.getAmqplib();
     const ch = await mq.createChannel();
@@ -85,21 +101,21 @@ module.exports = function RabbitMQ(){
     const q = await ch.assertQueue(queue, { exclusive: false });
 
     await new Promise(resolve =>
-      ch.consume(
-        q.queue,
-        msg => {
-          resolve(msg);
+        ch.consume(
+            q.queue,
+            msg => {
+              resolve(msg);
 
-          const content = msg && msg.content.toString();
-          console.log("收到消息: ", `queue: ${queue}`, content);
-          ch.ack(msg);
+              const content = msg && msg.content.toString();
+              console.log("收到消息: ", `queue: ${queue}`, content);
+              ch.ack(msg);
 
-          if (content && callBack) {
-            callBack(content);
-          }
-        },
-        { noAck: false }
-      )
+              if (content && callBack) {
+                callBack(content);
+              }
+            },
+            { noAck: false }
+        )
     ).catch(err => {
       throw err;
     });
