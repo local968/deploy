@@ -163,7 +163,7 @@ wss.register('newEtl', async (message, socket, process) => {
     if (project.problemType === 'Classification') {
       let deletedValues = []
       if (project.targetArray && project.targetArray.length > 1) {
-        if (project.targetArray.includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
+        if (project.targetArray.includes('')) stats[project.target].missingValueFillMethod = { type: 'replace', value: 'NULL' }
         deletedValues = Object.keys(project.colValueCounts[project.target]).filter(k => !project.targetArray.includes(k))
       } else {
         deletedValues = Object.entries(project.colValueCounts[project.target]).sort((a, b) => b[1] - a[1]).slice(2).map(([k]) => k)
@@ -181,7 +181,7 @@ wss.register('newEtl', async (message, socket, process) => {
           if (key === '') return prev
           prev[key] = {
             type: 'replace',
-            value: value === '' ? 'NEW_VARIABLE_TYPE' : value
+            value: value === '' ? 'NULL' : value
           }
           return prev
         }, {}),
