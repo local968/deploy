@@ -14,6 +14,7 @@ import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import PredictedVsActualPlot from "../../Charts/PredictedVsActualPlot";
 import config from 'config'
+import PVA from "../../Charts/PVA";
 const isEN = config.isEN;
 
 @observer
@@ -48,8 +49,12 @@ export default class RegressionView extends Component {
           <Performance current={current} />
         </div>
         
-        {/*<PredictVActual model={current} project={project} />*/}
-        <PredictedVsActualPlot
+        {/*<PredictedVsActualPlot*/}
+        {/*    x_name = {EN.PointNumber}*/}
+        {/*    y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}*/}
+        {/*    url={project.selectModel.pointToShowData}*/}
+        {/*/>*/}
+        <PVA
             x_name = {EN.PointNumber}
             y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}
             url={project.selectModel.pointToShowData}

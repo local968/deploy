@@ -1119,6 +1119,8 @@ const ZH_LAN: any = {
   value:'值',
   SelectFeature: '选择特征预处理',
   errorparams:'错误参数',
+  ResidualRate:'残差率',
+  ResidualPercent:'误差百分比',
 };
 
 export default ZH_LAN;
