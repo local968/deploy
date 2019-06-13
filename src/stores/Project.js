@@ -1786,7 +1786,7 @@ export default class Project {
 
   removeCurSetting = () => {
     this.settings = this.settings.filter(st => st.id !== this.settingId)
-    this.settingId = this.settings[this.settings.length - 1].id || ''
+    this.settingId = (this.settings[this.settings.length - 1] || {}).id || ''
   }
 
   modeling = (trainData, updateData) => {
