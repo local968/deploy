@@ -512,7 +512,7 @@ class AdvancedModelTable extends Component {
               case EN.Holdout:
                 return <RowCell key={7} data={score.holdoutScore[metric]} title={score.holdoutScore[metric] === 'null' ? (holdout || {})[metric] : ""} />;
               case EN.Time:
-                return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
+                return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
                 return null
             }
@@ -688,7 +688,7 @@ class ClassificationModelRow extends Component {
               case EN.Holdout:
                 return <RowCell key={9} data={metric === 'log_loss' ? rocHoldout.LOGLOSS[fitIndex] : metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
               case EN.Time:
-                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
+                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
                 return null
             }
@@ -876,15 +876,15 @@ class Row extends Component {
 
 class RowCell extends Component {
   render() {
-    const { data, cellStyle, cellClassName, title, notFormat, ...rest } = this.props;
+    const { data, cellStyle, cellClassName, title, ...rest } = this.props;
     return (
       <div
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={title ? title : typeof data === 'object' ? '' : data}
+        title={title ? title : typeof data === 'object' ? '' : formatNumber(data)}
       >
-        {notFormat ? data : formatNumber(data)}
+        {formatNumber(data)}
       </div>
     );
   }

@@ -1155,7 +1155,7 @@ export default class Project {
           return prev
         }, {})
         const expression = Object.assign({}, this.expression, variableExp)
-        this.updateProject({
+        return this.updateProject({
           newVariable,
           trainHeader,
           expression,
@@ -1163,8 +1163,8 @@ export default class Project {
           correlationMatrixData: null,
           correlationMatrixHeader: null,
           cleanPath: ''
-        })
-        return true
+        }).then(() => true)
+
       })
     })
   }
@@ -1277,7 +1277,7 @@ export default class Project {
           validate = score[currentMeasurement]
           holdout = score[currentMeasurement]
         }
-        if (isNaN(parseFloat(validate)) || isNaN(parseFloat(holdout))) return null
+        if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
         // const value = validate + holdout
         // if (!recommend) return recommend = { id: m.id, value }
@@ -1786,7 +1786,7 @@ export default class Project {
 
   removeCurSetting = () => {
     this.settings = this.settings.filter(st => st.id !== this.settingId)
-    this.settingId = this.settings[this.settings.length - 1].id || ''
+    this.settingId = (this.settings[this.settings.length - 1] || {}).id || ''
   }
 
   modeling = (trainData, updateData) => {

@@ -1,8 +1,8 @@
 const formatNumber = (str, n = 3, f = false, m = 'round') => {
-  if (isNaN(parseFloat(str))) return str
+  if (isNaN(+str)) return str
   n = n > 0 ? n : 0
   const p = Math.pow(10, n)
-  const num = parseInt(Math[m](parseFloat(str) * p, 10)) / p
+  const num = parseInt(Math[m](+str * p, 10)) / p
   const ltz = num < 0
   str = Math.abs(num).toString()
   let i, d

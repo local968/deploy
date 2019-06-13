@@ -88,7 +88,7 @@ export default class Preview extends Component {
     }
 
     const tableData = data.map((row, index) => row.map(v => {
-      v = v === 'NEW_VARIABLE_TYPE' ? '' : v
+      v = v === 'NEW_VARIABLE_TYPE' ? 'other' : v
       return {
         content: <span>{v}</span>,
         title: v,
