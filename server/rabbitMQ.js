@@ -34,7 +34,6 @@ module.exports = function RabbitMQ(){
       this.amqplib = conn;
       conn.on('error',()=>{
         this.amqplib = undefined;
-        this.connect();
       });
     }).catch(()=> {
       this.amqplib = undefined;
