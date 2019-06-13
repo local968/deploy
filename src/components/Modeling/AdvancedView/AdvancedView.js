@@ -882,7 +882,7 @@ class RowCell extends Component {
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={title ? title : typeof data === 'object' ? '' : data}
+        title={title ? title : typeof data === 'object' ? '' : formatNumber(data)}
       >
         {notFormat ? data : formatNumber(data)}
       </div>

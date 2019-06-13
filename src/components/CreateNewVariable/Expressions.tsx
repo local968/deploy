@@ -136,7 +136,7 @@ function Expressions(props: ExpressionsProps) {
     for (let i: number = end - 1; i >= (start === end ? 0 : start); i--) {
       const v: Coordinate = value[i]
       if (Type.Char !== v.type) break
-      if (!isNaN(parseFloat(v.value || ''))) break
+      if (!isNaN(+(v.value || ''))) break
       obj.value = v.value + obj.value
       obj.start = i
     }

@@ -113,8 +113,8 @@ wss.register('newEtl', async (message, socket, process) => {
   for (let key in stats) {
     const mismatch = project.mismatchFillMethod[key]
     const value = project.colType[key] === 'Numerical' ? project.rawDataView[key].mean : project.rawDataView[key].mode
-    if (!isNaN(parseFloat(mismatch))) {
-      stats[key].mismatchFillMethod = { type: 'replace', value: parseFloat(mismatch) }
+    if (!isNaN(+mismatch)) {
+      stats[key].mismatchFillMethod = { type: 'replace', value: +mismatch }
     } else {
       if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
       else if (mismatch === 'zero') stats[key].mismatchFillMethod = { type: 'replace', value: 0 }
@@ -126,8 +126,8 @@ wss.register('newEtl', async (message, socket, process) => {
     // else stats[key].mismatchFillMethod = { type: 'replace', value }
 
     const missingValue = project.nullFillMethod[key]
-    if (!isNaN(parseFloat(missingValue))) {
-      stats[key].missingValueFillMethod = { type: 'replace', value: parseFloat(missingValue) }
+    if (!isNaN(+missingValue)) {
+      stats[key].missingValueFillMethod = { type: 'replace', value: +missingValue }
     } else {
       if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
       else if (missingValue === 'zero') stats[key].missingValueFillMethod = { type: 'replace', value: 0 }
@@ -141,8 +141,8 @@ wss.register('newEtl', async (message, socket, process) => {
     // else stats[key].missingValueFillMethod = { type: 'replace', value }
 
     const outlier = project.outlierFillMethod[key]
-    if (!isNaN(parseFloat(outlier))) {
-      stats[key].outlierFillMethod = { type: 'replace', value: parseFloat(outlier) }
+    if (!isNaN(+outlier)) {
+      stats[key].outlierFillMethod = { type: 'replace', value: +outlier }
     } else {
       if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' }
       else if (outlier === 'zero') stats[key].outlierFillMethod = { type: 'replace', value: 0 }

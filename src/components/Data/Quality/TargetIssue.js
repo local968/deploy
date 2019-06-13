@@ -544,7 +544,7 @@ export class FixIssue extends Component {
 
   nullSelect = (key, e) => {
     let value = e.target.value
-    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
+    value = isNaN(+(value)) ? value : parseFloat(value)
     const { missing } = this.fillMethod
     missing[key] = value === 'others' ? '' : value
     this.fillMethod.missing = { ...missing }
@@ -555,7 +555,7 @@ export class FixIssue extends Component {
 
   mismatchSelect = (key, e) => {
     let value = e.target.value
-    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
+    value = isNaN(+(value)) ? value : parseFloat(value)
     const { mismatch } = this.fillMethod
     mismatch[key] = value === 'others' ? '' : value
     this.fillMethod.mismatch = { ...mismatch }
@@ -566,7 +566,7 @@ export class FixIssue extends Component {
 
   outlierSelect = (key, e) => {
     let value = e.target.value
-    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
+    value = isNaN(+(value)) ? value : parseFloat(value)
     const { outlier } = this.fillMethod
     outlier[key] = value === 'others' ? '' : value
     this.fillMethod.outlier = { ...outlier }

@@ -1277,7 +1277,7 @@ export default class Project {
           validate = score[currentMeasurement]
           holdout = score[currentMeasurement]
         }
-        if (isNaN(parseFloat(validate)) || isNaN(parseFloat(holdout))) return null
+        if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
         // const value = validate + holdout
         // if (!recommend) return recommend = { id: m.id, value }

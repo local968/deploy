@@ -253,7 +253,7 @@ function Computed(props: ComputedProps) {
     const { exps, index } = state;
     const exp = exps[index]
     let { range: [start, end] } = exp
-    const isNumber: boolean = !isNaN(parseFloat(v))
+    const isNumber: boolean = !isNaN(+v)
     const isOp: boolean = OPARRAY.includes(v)
     const isLParen: boolean = v === '('
     const isRParen: boolean = v === ')'
@@ -554,7 +554,7 @@ function Computed(props: ComputedProps) {
         }
       } else {
         const numItem = expToString(item as Coordinate[])
-        const isNum = !isNaN(parseFloat(numItem))
+        const isNum = !isNaN(+numItem)
         //判断是否是数字
         if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${numItem}` }
       }
@@ -701,7 +701,7 @@ function Computed(props: ComputedProps) {
         }
         const concatResults = numList.map(num => {
           let _n: string = expToString(num.exp)
-          if (isNaN(parseFloat(_n)) || _n.includes(".")) return { isPass: false, message: `${_n} ${EN.Mustbeinteger} ` }
+          if (isNaN(+_n) || _n.includes(".")) return { isPass: false, message: `${_n} ${EN.Mustbeinteger} ` }
           let n: number
           try {
             n = parseInt(_n, 10)
@@ -725,7 +725,7 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         const diffResults = numList.map(num => {
           let n = expToString(num.exp)
-          if (isNaN(parseFloat(n)) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger} ` }
+          if (isNaN(+n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger} ` }
           try {
             parseInt(n, 10)
           } catch (e) {
@@ -750,7 +750,7 @@ function Computed(props: ComputedProps) {
           message: `${EN.Function}: ${senior.value} ${EN.Parameterserror} `
         }
         const [b, type1, type2] = numList
-        if (isNaN(parseFloat(expToString(b.exp))) || expToString(b.exp).includes(".")) return {
+        if (isNaN(+expToString(b.exp)) || expToString(b.exp).includes(".")) return {
           isPass: false,
           message: `${expToString(b.exp)} ${EN.Mustbeinteger} `
         }
@@ -903,7 +903,7 @@ function Computed(props: ComputedProps) {
           isPass: false,
           message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
-        if (numList[0] && expToString(numList[0].exp) && isNaN(parseFloat(expToString(numList[0].exp)))) return {
+        if (numList[0] && expToString(numList[0].exp) && isNaN(+expToString(numList[0].exp))) return {
           isPass: false,
           message: `${expToString(numList[0].exp)} ${EN.Mustbenumbe} `
         }
@@ -950,12 +950,12 @@ function Computed(props: ComputedProps) {
           if (!item) return { isPass: false, message: `${expToString(subItem.exp)} contain ${EN.Emptyexpression} ` }
           if (isVariable) return { isPass: false, message: `cannot use variable` }
           if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumbe} ` }
-          if (isNaN(parseFloat(item)) || item.includes('.')) return {
+          if (isNaN(+item) || item.includes('.')) return {
             isPass: false,
             message: `${item} ${EN.Mustbeinteger} `
           }
           if (item < 0) return { isPass: false, message: `${item} ${EN.Thenumbermustbegreaterthanorequalto} 0` }
-          if (isNaN(parseFloat(prev))) prev = item
+          if (isNaN(+prev)) prev = item
           else {
             if (prev > item) return { isPass: false, message: `${item} ${EN.Mustgreaterthan} ${prev} ` }
             prev = item
