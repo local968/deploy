@@ -35,7 +35,11 @@ module.exports = function RabbitMQ(){
           vhost: AMQPLIB_VHOST
         });
       } catch (e) {
-        console.error(e);
+        await new Promise((resolve)=>{
+          setTimeout(()=>{
+            resolve(true)
+          },5000)
+        })
         this.amqplib = undefined;
         return this.getAmqplib();
       }
