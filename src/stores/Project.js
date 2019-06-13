@@ -1140,11 +1140,10 @@ export default class Project {
         command: 'top.createNewVariable',
         csvScript: scripts
       };
-      return api.createNewVariable(command, progressResult => {
-      }).then(returnValue => {
+      return api.createNewVariable(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          antdMessage.error(result.msg)
+          antdMessage.error(result.processError)
           return false
         }
         const variablenames = variables.reduce((prev, _v) => [...prev, ..._v.nameArray], [])

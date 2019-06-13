@@ -60,7 +60,7 @@ const useStyles = withStyles({
 interface ComputedProps {
   classes: any,
   onClose: () => void,
-  addNewVariable: (newVariables: any[], type: any) => void,
+  addNewVariable: (newVariables: any[], type: any) => Promise<boolean>,
   colType: any,
   expression: any
 }
@@ -401,8 +401,9 @@ function Computed(props: ComputedProps) {
         exps: exps[i].value
       })
     }
-    addNewVariable(newExps, newType)
-    onClose()
+    addNewVariable(newExps, newType).then(isok => {
+      if (isok) onClose()
+    })
   }
 
   const Elevation: number = 1;
