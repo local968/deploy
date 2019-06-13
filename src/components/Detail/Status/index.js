@@ -25,7 +25,7 @@ export default class List extends Component {
   showScore = (score, type) => {
     let s
     if (score && score[type]) s = formatNumber(score[type], 2)
-    return s || ''
+    return s || 0
   }
 
   render() {
