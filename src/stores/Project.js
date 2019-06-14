@@ -1840,7 +1840,7 @@ export default class Project {
   abortTrainByEtl = async () => {
     this.models = []
     if (this.train2ing && !!this.stopIds.length) {
-      for(let si of stopIds) {
+      for(let si of this.stopIds) {
         await this.abortTrain(si)
       }
       return 
