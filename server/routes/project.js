@@ -912,7 +912,7 @@ wss.register('abortTrain', (message, socket) => {
       command.clearListener(stopId)
       const trainModel = await getProjectField(projectId, 'trainModel')
       Reflect.deleteProperty(trainModel, stopId);
-      const curStopIds = stopIds.filter(si => si === stopId)
+      const curStopIds = stopIds.filter(si => si !== stopId)
       const statusData = {
         train2Finished: true,
         train2Error: false,
