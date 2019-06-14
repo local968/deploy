@@ -871,7 +871,7 @@ const EN_LAN = {
   YourtargetvariableHas: 'Your target variable has',
   Less: 'less',
   More: 'more',
-  Thantwouniquealues: 'some noises',
+  Thantwouniquealues: ' some noises',
   onlyOnevalue: 'only one unique value',
   Targetvariablequalityisgood: 'Target variable quality is good!',
   Optional: 'optional',
@@ -1267,6 +1267,7 @@ const EN_LAN = {
   ChartZoneB:"  b. input the range of the target variable and click \"ok\"",
   ChartZoneC:"  c. rolling the mouse wheel to zoom in",
   ChartReset:"5.Click \"reset\" to to whole value range",
+  custom: "custom function"
 };
 
 

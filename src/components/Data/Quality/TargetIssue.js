@@ -87,7 +87,7 @@ export class ClassificationTarget extends Component {
     const hasNull = !isGood && Object.keys(targetCounts).includes('')
     const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas} ${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error?EN.onlyOnevalue:EN.Thantwouniquealues}`
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}

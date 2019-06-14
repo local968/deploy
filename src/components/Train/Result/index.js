@@ -238,7 +238,7 @@ const OutlierTable = observer((props) => {
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
           <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
           <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
@@ -388,7 +388,7 @@ const ClusteringTable = observer((props) => {
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
           <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
           <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
@@ -502,8 +502,8 @@ const MappingDict = observer((props) => {
       .filter(r2 => r2[1].toString().toLowerCase().includes(state.encode.toLowerCase()))
       .map(r => r.map(c => ({ content: <span>{c}</span>, cn: classes.mapCell })))
     const header = [
-      { content: <span>{EN.Origin}<input style={{ width: 160, marginLeft: 10 }} value={state.origin} onChange={handleChange('origin')} /></span>, cn: classes.mapCell },
-      { content: <span>{EN.Encoding} <input style={{ width: 160, marginLeft: 10 }} value={state.encode} onChange={handleChange('encode')} /></span>, cn: classes.mapCell }
+      { content: <div className={classes.inputBox}><span>{EN.Origin}</span> <input style={{ width: 160 }} value={state.origin} onChange={handleChange('origin')} /></div>, cn: classes.mapCell },
+      { content: <div className={classes.inputBox}><span>{EN.Encoding}</span> <input style={{ width: 160 }} value={state.encode} onChange={handleChange('encode')} /></div>, cn: classes.mapCell }
     ]
     return [header, ...data]
   })

@@ -666,3 +666,9 @@ button.disable {
 span.ccellHeaderSpan{
   max-width: 60%;
 }
+
+.inputBox {
+  display: flex;
+  flex: auto;
+  justify-content: space-around;
+}

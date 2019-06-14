@@ -32,6 +32,7 @@ interface ExpressionProps {
   addExp: (s: string) => void,
   toogleTooltip: () => void,
   onFocus: (e: MouseEvent<HTMLInputElement>) => void
+  setIndex: () => void
 }
 
 // interface ExpressionState {
@@ -39,7 +40,7 @@ interface ExpressionProps {
 // }
 
 function Expression(props: ExpressionProps) {
-  const {exp, deleteExp, left, right, addExp, setRange, onFocus, sign,toogleTooltip} = props //setRange
+  const {exp, deleteExp, left, right, addExp, setRange, onFocus, sign, toogleTooltip, setIndex} = props //setRange
   // const [state, setState] = React.useState({
   //   isDelete: false
   // } as ExpressionState)
@@ -94,27 +95,20 @@ function Expression(props: ExpressionProps) {
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // console.log(state.isDelete, "valuevaluevaluevaluevaluevaluevalue" )
-    // if (state.isDelete) return setDelete(false)
     toogleTooltip();
     const value: string = e.target.value.trim()
     if (!value) return
     addExp(value)
   }
 
-  if (onSelect) {
-  }
-
-  // const setDelete = (b: boolean) => {
-  //   setState({
-  //     ...state,
-  //     isDelete: b
-  //   })
-  // }
-
-  const onClick = (k: number) => () => {
+  const onClick = (k: number) => (e) => {
+    const input = e.currentTarget.parentElement.getElementsByTagName('input')[0];
     setRange(k + 1, k + 1)
+    setIndex()
+    input.focus()
+    e.stopPropagation();
   }
+
   return <Fragment>
     <FormControl className={classes.exp}>
       <Input
@@ -150,7 +144,7 @@ interface BlockProps {
   index: number;
   data: Coordinate;
   inRange: boolean,
-  onClick: () => void
+  onClick: (e: MouseEvent<HTMLDivElement>) => void
 }
 
 const blockStyle = makeStyles({
