@@ -903,7 +903,7 @@ wss.register('etlCleanData', (message, socket, progress) => {
 })
 
 wss.register('abortTrain', (message, socket) => {
-  const { projectId, isLoading, _id: requestId, stopId } = message
+  const { projectId, _id: requestId, stopId } = message
   const { userId } = socket.session
   return getProjectField(projectId, 'stopIds').then(stopIds => {
     if (!stopIds.length) return { status: 200, message: 'ok' }
@@ -912,14 +912,15 @@ wss.register('abortTrain', (message, socket) => {
       command.clearListener(stopId)
       const trainModel = await getProjectField(projectId, 'trainModel')
       Reflect.deleteProperty(trainModel, stopId);
+      const curStopIds = stopIds.filter(si => si === stopId)
       const statusData = {
         train2Finished: true,
         train2ing: false,
         train2Error: false,
         trainModel,
-        stopIds: stopIds.filter(si => si === stopId)
+        stopIds: curStopIds
       }
-      if (isLoading) {
+      if (!curStopIds.length) {
         statusData.mainStep = 3
         statusData.curStep = 3
         statusData.lastSubStep = 1

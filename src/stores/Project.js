@@ -1837,13 +1837,17 @@ export default class Project {
     }))
   }
 
-  abortTrainByEtl = () => {
+  abortTrainByEtl = async () => {
     this.models = []
     if (this.train2ing && !!this.stopIds.length) {
-      const arr = this.stopIds.map(si => this.abortTrain(si))
-      return Promise.all(arr)
+      for(let si of stopIds) {
+        await this.abortTrain(si)
+      }
+      return 
+      // const arr = this.stopIds.map(si => this.abortTrain(si))
+      // return Promise.all(arr)
     }
-    return Promise.resolve()
+    return
   }
 
   setModel = data => {
