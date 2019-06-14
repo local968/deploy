@@ -285,7 +285,7 @@
 }
 
 .tab {
-  color: black;
+  color: #979797 !important;
   font-size: 18px;
   width: 250px;
   padding: 10px 0;
@@ -295,8 +295,9 @@
 }
 
 .active {
-  font-weight: bold;
-  border-bottom: 5px black solid
+  /*font-weight: bold;*/
+  color: #1d2b3c !important;
+  border-bottom: 4px #1d2b3c solid
 }
 
 .trainingModel {
