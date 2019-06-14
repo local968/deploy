@@ -1258,6 +1258,15 @@ const EN_LAN = {
   ResidualPercent:'Residual Percent',
   InputRanges:'Input Ranges',
   ZoomRegion:'Zoom Region',
+  ChartDescription:"Chart Description",
+  ChartOrder:"Target variables are sorted from small to large according to real values",
+  ChartSplit:"The sorted data are divided into 100 in the current visual range.",
+  ChartSHowWhat:"The real value, the predicted value and the percentage of errors are shown as the intra-group mean value.",
+  ChartZone:"Zone enlargement mode:",
+  ChartZoneA:"A. Click on the Zoom button to select the viewing area directly on the graph.",
+  ChartZoneB:"B. Enter the viewing range directly after \"input range\" and press \"to determine\"",
+  ChartZoneC:"C. Sliding mouse pulley, directly enlarging the current range",
+  ChartReset:"Click the Reset button to return to the default maximum range",
 };
 
 

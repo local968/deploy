@@ -2322,7 +2322,7 @@ export default class Project {
       list.push({
         name: 'predicted-vs-actual-plot',
         data: {
-          url: model.pointToShowData,
+          url: model.predictData,
         },
       });
 

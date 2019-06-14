@@ -329,11 +329,11 @@ export default class ModelProcessFlow extends Component {
 			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
 				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
 			</dt>
-			<dt style={{display:(create.length?'':'none')}}>
+			<dt style={{display:(create.length?'':'none')}} title = {create.join(',')}>
 				{EN.CreateTheseVariables}:
 			</dt>
 			{
-				create.map((itm,index)=><dd key={index}>{itm}</dd>)
+				create.map((itm,index)=><dd key={index} title={itm}>{itm}</dd>)
 			}
 		</dl>;
 		
