@@ -165,7 +165,10 @@ function Expressions(props: ExpressionsProps) {
       isOpen: true,
       el: input ? input.id : ''
     })
+    const len = exps[k]['value'].length;
+    setRange(len, len)
     setIndex(k)
+    input.focus()
     e.stopPropagation()
   }
 
@@ -188,10 +191,6 @@ function Expressions(props: ExpressionsProps) {
     return !label || !_.size(value) || k + 1 != expSize;
   }
 
-  const estimateDelete = (k, expSize) => {
-    return k + 1 != expSize || !k;
-  }
-
   const selectItem = (v: Coordinate) => () => {
     switch (v.type) {
       case Type.Func:
@@ -207,9 +206,6 @@ function Expressions(props: ExpressionsProps) {
 
   const input: HTMLElement | null = state.el ? document.getElementById(state.el) : null
   const expSize = _.size(exps)
-  if (input) {
-    input.focus()
-  }
   return <List
     className={classes.list}
     subheader={<ListSubheader>
@@ -225,10 +221,10 @@ function Expressions(props: ExpressionsProps) {
                inputProps={{style: {backgroundColor: '#fff'}}}/>
         <ListItemText primary='=' className={classes.text}/>
         <Expression exp={exp} setRange={setRange} deleteExp={deleteExp} left={left} right={right}
-                    addExp={addExp} onFocus={onFocus(k)} sign={k}
+                    addExp={addExp} onFocus={onFocus(k)} sign={k} setIndex={() => setIndex(k)}
                     toogleTooltip={() => setState({...state, isTipOpen: true})}/>
         <div className={classes.tools}>
-          <IconButton onClick={deleteOne(k)} disabled={!!estimateDelete(k, expSize)}>
+          <IconButton onClick={deleteOne(k)} disabled={expSize === 1}>
             <DeleteIcon/>
           </IconButton>
           <IconButton onClick={addLine} disabled={!!estimateAdd(exp, k, expSize)}>
