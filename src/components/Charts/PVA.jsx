@@ -91,7 +91,7 @@ export default class PVA extends Component{
 		}
 		
 		const sliderValue = _.cloneDeep(this.state.sliderValue);
-		const {x_name='',y_name=''} = this.props;
+		const {y_name=''} = this.props;
 		const [start,end] = sliderValue;
 		
 		let sum = 100/(end-start)*100;
@@ -109,11 +109,10 @@ export default class PVA extends Component{
 			data:_.map(_.chunk(itm.value,barLength),(itm,index)=>[index*100/sum,_.sum(itm)/_.size(itm)]),
 		}));
 		
-		
 		const ResidualRate = series[0].data.map((itm,index)=>{
 			const act = itm[1];
 			const pre = series[1].data[index][1];
-			return [index,Math.abs((act-pre)*100/act)];
+			return [index*100/sum,Math.abs((act-pre)*100/act)];
 		});
 		
 		series.push({
@@ -122,6 +121,8 @@ export default class PVA extends Component{
 			type: 'bar',
 			data:ResidualRate,
 		});
+		
+		const minValueSpan = 100/_.size(_data[0].value) * 3;//最少显示3个点
 		
 		return {
 			title:{
@@ -148,6 +149,7 @@ export default class PVA extends Component{
 				},
 				start,
 				end,
+				minValueSpan,
 			},{
 				type: 'inside',
 				start,
@@ -155,6 +157,7 @@ export default class PVA extends Component{
 				xAxisIndex: [0],
 				rangeMode:['percent','percent'],
 				labelPrecision:2,
+				minValueSpan,
 			}],
 			xAxis: {
 				// name:x_name,

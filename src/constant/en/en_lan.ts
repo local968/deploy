@@ -871,7 +871,7 @@ const EN_LAN = {
   YourtargetvariableHas: 'Your target variable has',
   Less: 'less',
   More: 'more',
-  Thantwouniquealues: 'some noises',
+  Thantwouniquealues: ' some noises',
   onlyOnevalue: 'only one unique value',
   Targetvariablequalityisgood: 'Target variable quality is good!',
   Optional: 'optional',
