@@ -1132,6 +1132,7 @@ const ZH_LAN: any = {
   ChartZoneB:"  b. 在”输入范围“后直接输入查看范围后按”确定“，最多支持4位小数",
   ChartZoneC:"  c. 滑动鼠标滑轮，直接放大当前范围",
   ChartReset:"5.点击”重置“按钮可返回默认最大范围",
+  custom: "自定义函数"
 };
 
 export default ZH_LAN;
