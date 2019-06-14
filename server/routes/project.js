@@ -915,7 +915,6 @@ wss.register('abortTrain', (message, socket) => {
       const curStopIds = stopIds.filter(si => si === stopId)
       const statusData = {
         train2Finished: true,
-        train2ing: false,
         train2Error: false,
         trainModel,
         stopIds: curStopIds
@@ -927,6 +926,7 @@ wss.register('abortTrain', (message, socket) => {
         statusData.subStepActive = 1
         statusData.trainModel = {}
         statusData.stopIds = []
+        statusData.train2ing = false
       }
       return createOrUpdate(projectId, userId, statusData)
     })
