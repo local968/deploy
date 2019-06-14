@@ -709,7 +709,7 @@ const ZH_LAN: any = {
   DoNothing: '不处理忽略',
   Apply: '应用',
   Found: '发现问题',
-  YourtargetvariableHas: '您的目标变量的类别个数',
+  YourtargetvariableHas: '您的目标变量中',
   Less: '少于',
   More: '多于',
   Thantwouniquealues: '包含噪音',
