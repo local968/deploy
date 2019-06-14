@@ -1124,14 +1124,14 @@ const ZH_LAN: any = {
   InputRanges:'输入范围',
   ZoomRegion:'缩放区域',
   ChartDescription:"图表说明",
-  ChartOrder:"目标变量根据真实值从小到大排序",
-  ChartSplit:"排序后数据在当前可视范围内均分为100",
-  ChartSHowWhat:"显示真实值、预测值、误差百分比为组内均值",
-  ChartZone:"区域放大方式：",
-  ChartZoneA:"a. 点击”区域缩放“按钮，直接在图形上划选查看范围",
-  ChartZoneB:"b. 在”输入范围“后直接输入查看范围后按”确定“",
-  ChartZoneC:"c. 滑动鼠标滑轮，直接放大当前范围",
-  ChartReset:"点击”重置“按钮可返回默认最大范围",
+  ChartOrder:"1.目标变量根据真实值从小到大排序",
+  ChartSplit:"2.排序后数据在当前可视范围内均分为100",
+  ChartSHowWhat:"3.显示真实值、预测值、残差率为组内均值\n",
+  ChartZone:"4.区域放大方式：",
+  ChartZoneA:"  a. 点击”区域缩放“按钮，直接在图形上划选查看范围",
+  ChartZoneB:"  b. 在”输入范围“后直接输入查看范围后按”确定“，最多支持4位小数",
+  ChartZoneC:"  c. 滑动鼠标滑轮，直接放大当前范围",
+  ChartReset:"5.点击”重置“按钮可返回默认最大范围",
 };
 
 export default ZH_LAN;

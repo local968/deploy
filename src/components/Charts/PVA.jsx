@@ -233,14 +233,16 @@ export default class PVA extends Component{
 			<div className={styles.predictActual}>
 				<div className={styles.title}>
 					{EN.PredictedVSActualPlotSorted}
-					<Hint content={<p>{EN.ChartDescription}<br/>
+					<Hint content={<p><strong>{EN.ChartDescription}</strong><br/>
 						{EN.ChartOrder}<br/>
 						{EN.ChartSplit}<br/>
 						{EN.ChartSHowWhat}<br/>
 						{EN.ChartZone}<br/>
-						{EN.ChartZoneA}<br/>
-						{EN.ChartZoneB}<br/>
-						{EN.ChartZoneC}<br/>
+						<div style={{paddingLeft:20}}>
+							{EN.ChartZoneA}<br/>
+							{EN.ChartZoneB}<br/>
+							{EN.ChartZoneC}<br/>
+						</div>
 						{EN.ChartReset}</p>}
 						/>
 				</div>
@@ -255,24 +257,6 @@ export default class PVA extends Component{
 					/>
 				<div className={styles.pva} id='pva'>
 					{EN.InputRanges}:
-					{/*<Range*/}
-					{/*	min={yMin}*/}
-					{/*	max={yMax}*/}
-					{/*	// defaultValue={[x, y]}*/}
-					{/*	value={[x, y]}*/}
-					{/*	step={0.0001}*/}
-					{/*	onChange = {(data)=>{*/}
-					{/*		const [min,max] = data;*/}
-					{/*		let start = _.min([_.indexOf(act,_.find(act,itm=>itm>min)),_.indexOf(pre,_.find(pre,itm=>itm>min))]);*/}
-					{/*		let end = _.max([_.indexOf(act,_.find(_.reverse(act),itm=>itm<max)),_.lastIndexOf(pre,_.find(_.reverse(pre),itm=>itm<max))]);*/}
-					{/*		*/}
-					{/*		this.setState({*/}
-					{/*			yRange:[start,end+1],*/}
-					{/*			range:[min,max]*/}
-					{/*		});*/}
-					{/*	}}*/}
-					{/*	// tipFormatter={value => `${value}%`}*/}
-					{/*/>*/}
 					<InputNum
 						min={yMin}
 						max={y}
