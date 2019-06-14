@@ -8,6 +8,7 @@ import BoxPlots from "./BoxPlots";
 import PredictedVsActualPlot from "./PredictedVsActualPlot";
 import EN from "../../constant/en";
 import Pie2 from "./Pie2";
+import PVA from "./PVA";
 
 export default function Chart(props){
 	const {x_name='',y_name='',title=''} = props;
@@ -64,7 +65,7 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'predicted-vs-actual-plot':
-			chart = <PredictedVsActualPlot
+			chart = <PVA
 				x_name = {EN.PointNumber}
 				y_name = {y_name}
 				data={data}

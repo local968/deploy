@@ -91,7 +91,7 @@ export default class ModelProcessFlow extends Component {
 				{EN.CreateTheseVariables}:
 			</dt>
 			{
-				create.map((itm,index)=><dd key={index}>{itm}</dd>)
+				create.map((itm,index)=><dd key={index} title={itm}>{itm}</dd>)
 			}
 		</dl>;
 		

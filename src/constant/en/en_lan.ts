@@ -1258,6 +1258,15 @@ const EN_LAN = {
   ResidualPercent:'Residual Percent',
   InputRanges:'Input Ranges',
   ZoomRegion:'Zoom Region',
+  ChartDescription:"Plot Explanation",
+  ChartOrder:"1.Target variable is sorted by ascending according to the true value",
+  ChartSplit:"2.Sorted date is divided into 100 groups in the selected range",
+  ChartSHowWhat:"3.True value, predict value and absolute percentage error are the mean values within each group.",
+  ChartZone:"4.Zoom in methods:",
+  ChartZoneA:"  a. click ”zoom in“ and hold on to directly choosing the area of the plot",
+  ChartZoneB:"  b. input the range of the target variable and click \"ok\"",
+  ChartZoneC:"  c. rolling the mouse wheel to zoom in",
+  ChartReset:"5.Click \"reset\" to to whole value range",
 };
 
 
