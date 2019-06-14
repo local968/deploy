@@ -87,7 +87,7 @@ export class ClassificationTarget extends Component {
     const hasNull = !isGood && Object.keys(targetCounts).includes('')
     const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error?EN.onlyOnevalue:EN.Thantwouniquealues}`
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -422,7 +422,7 @@ export class SelectTarget extends Component {
         <div className={styles.fixesTips}><span></span></div>
       </div>}
       {this.step === 2 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{v0}{EN.Or}{v1}{EN.MATAHC} </span></div>
+        <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{v0 || 'NULL'}{EN.Or}{v1 || 'NULL'}{EN.MATAHC} </span></div>
         <div className={styles.targetPercentBox}>
           {this.checked.map((t, i) => {
             const percent = ((t === '' ? nullLineCounts[target] : colValueCounts[target][t]) || 0) / (totalRawLines || 1) * 85
@@ -433,7 +433,7 @@ export class SelectTarget extends Component {
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                <span>{(t === '' ? nullLineCounts[target] :colValueCounts[target][t]) || 0}</span>
+                <span>{(t === '' ? nullLineCounts[target] : colValueCounts[target][t]) || 0}</span>
               </div>
             </div>
           })}
@@ -464,8 +464,8 @@ export class SelectTarget extends Component {
             </div>
           </div>}
           <div className={styles.cleanTargetButton} style={{ margin: '.1em 0' }}>
-            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>{EN.Matchas}{v0 === '' ? EN.Null : v0}</span></button>
-            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>{EN.Matchas}{v1 === '' ? EN.Null : v1}</span></button>
+            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>{EN.Matchas}{v0 || 'NULL'}</span></button>
+            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>{EN.Matchas}{v1 || 'NULL'}</span></button>
           </div>
         </div>
 
