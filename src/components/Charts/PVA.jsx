@@ -99,21 +99,26 @@ export default class PVA extends Component{
 		
 		const barLength = _.max([_.size(_data[0].value)/sum,1]);
 		
-		sum = _.min([sum,_.size(_.chunk(_data[0].value,barLength))]);
+		// sum = _.min([sum,_.size(_.chunk(_data[0].value,barLength))]);
 		
-		const series = _data.map(itm=>({
-			type: 'line',
-			name:EN[itm.name],
-			symbolSize: 3,
-			yAxisIndex: 0,
-			smooth: false,
-			data:_.map(_.chunk(itm.value,barLength),(itm,index)=>[index*100/sum,_.sum(itm)/_.size(itm)]),
-		}));
+		let chunk;
+		
+		const series = _data.map(itm=>{
+			chunk = _.chunk(itm.value,barLength);
+			return {
+				type: 'line',
+				name:EN[itm.name],
+				symbolSize: 3,
+				yAxisIndex: 0,
+				smooth: false,
+				data:_.map(chunk,(itm,index)=>[index*100/chunk.length,_.sum(itm)/_.size(itm)]),
+			}
+		});
 		
 		const ResidualRate = series[0].data.map((itm,index)=>{
 			const act = itm[1];
 			const pre = series[1].data[index][1];
-			return [index*100/sum,Math.abs((act-pre)*100/act)];
+			return [index*100/chunk.length,Math.abs((act-pre)*100/act)];
 		});
 		
 		series.push({
@@ -226,7 +231,7 @@ export default class PVA extends Component{
 			return null;
 		}
 		const act = _.cloneDeep(data[0].value)||[];
-		const pre = _.cloneDeep(data[1].value)||[];
+		// const pre = _.cloneDeep(data[1].value)||[];
 		
 		const yMin = _.min(act);
 		const yMax = _.max(act);
@@ -269,9 +274,7 @@ export default class PVA extends Component{
 						value={x}
 						style={{ width: 100,marginLeft:20 }}
 						onChange={min=>{
-							// let start = _.min([lines1.indexOf(lines1.find(itm=>itm>min)),lines2.indexOf(lines2.find(itm=>itm>min))]);
-							let start = _.min([_.indexOf(act,_.find(act,itm=>itm>min)),_.indexOf(pre,_.find(pre,itm=>itm>min))]);
-							
+							let start = _.indexOf(act,_.find(act,itm=>itm>min));
 							start = start > 0 ? start-1:start;
 							this.setState({
 								yRange:[start,y_end],
@@ -288,22 +291,13 @@ export default class PVA extends Component{
 						value={y}
 						style={{ width: 100 }}
 						onChange={max=>{
-							let end = _.max([_.indexOf(act,_.find(_.reverse(act),itm=>itm<max)),_.lastIndexOf(pre,_.find(_.reverse(pre),itm=>itm<max))]);
+							let end = _.indexOf(act,_.find(_.reverse(act),itm=>itm<max));
 							this.setState({
 								yRange:[y_start,end+1],
 								range:[x,max]
 							});
 						}}
 					/>
-					{/*<button className={classNames(styles.button,styles.small)} onClick={()=>{*/}
-					{/*	if(y_start === y_end){*/}
-					{/*		y_end++*/}
-					{/*	}*/}
-					{/*	this.setState({*/}
-					{/*		loading:'change'*/}
-					{/*	});*/}
-					{/*	return this.setSlider([y_start/act.length*100,y_end/act.length*100],true)*/}
-					{/*}}>{EN.Yes}</button>*/}
 					<Button
 						type="primary"
 						loading={loading === 'change'}
@@ -315,9 +309,6 @@ export default class PVA extends Component{
 							return this.setSlider([y_start/act.length*100,y_end/act.length*100],'change')
 						}}
 					>{EN.Yes}</Button>
-					{/*<button className={classNames(styles.button,styles.small,styles.white)} onClick={()=>{*/}
-					{/*	return this.setSlider([0,100],true)*/}
-					{/*}}>{EN.Reset}</button>*/}
 					<Button
 						loading={loading === 'reset'}
 						disabled={loading === 'change'}
