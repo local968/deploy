@@ -10,6 +10,7 @@ import axios from 'axios'
 import { formatNumber } from 'util'
 import c1 from './classification'
 import request from "../components/Request";
+import EN from '../../src/constant/en'
 
 export default class Project {
   @observable models = []
@@ -20,6 +21,7 @@ export default class Project {
   @observable exist = true;
   @observable loading = false;
   @observable host = '';
+  @observable loadModel = false;
 
   //step
   @observable mainStep = 0;
@@ -1840,10 +1842,10 @@ export default class Project {
   abortTrainByEtl = async () => {
     this.models = []
     if (this.train2ing && !!this.stopIds.length) {
-      for(let si of this.stopIds) {
+      for (let si of this.stopIds) {
         await this.abortTrain(si)
       }
-      return 
+      return
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)
     }
@@ -1902,10 +1904,20 @@ export default class Project {
   }
 
   initModels = () => {
+    this.loadModel = true
+    let show = true
+    const so = setTimeout(() => {
+      show = false
+      antdMessage.error(EN.timeoutRetry, 3)
+      this.initModels()
+    }, 60000)
     socketStore.ready().then(api => api.queryModelList({ id: this.id })).then(result => {
+      if (!show) return
+      clearTimeout(so)
       const { status, message, list } = result
       if (status !== 200) return alert(message)
       this.models = []
+      this.loadModel = false
       list.forEach(m => {
         this.setModel(m)
       });

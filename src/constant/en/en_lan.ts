@@ -1267,7 +1267,8 @@ const EN_LAN = {
   ChartZoneB:"  b. input the range of the target variable and click \"ok\"",
   ChartZoneC:"  c. rolling the mouse wheel to zoom in",
   ChartReset:"5.Click \"reset\" to to whole value range",
-  custom: "custom function"
+  custom: "custom function",
+  timeoutRetry: "Connection timeout. Reconnecting now."
 };
 
 
