@@ -44,7 +44,7 @@ function parseChartData(result) {
   if (!result) return { chart: null, fitIndex: null, initialFitIndex: null };
   let fitIndex = -1;
   let initialFitIndex = -1;
-  const charts = ['density', 'lift', 'roc', 'rocHoldout'];
+  const charts = ['density', 'lift', 'roc'];
   charts.forEach(chart => {
     try {
       result[chart] = JSON.parse(result[chart])
@@ -1037,14 +1037,16 @@ wss.register('train', async (message, socket, progress) => {
         // await createOrUpdate(projectId, userId, { trainModel: result })
         processValue = { ...result }
       } else if (result.score) {
-        const { chartData: chartDataUrl, modelName } = result
+        const { chartData: chartDataUrl, holdoutChartData: holdoutChartDataUrl, modelName } = result
         const trainModel = await getProjectField(projectId, 'trainModel')
         Reflect.deleteProperty(trainModel, trainId)
         await createOrUpdate(projectId, userId, { trainModel })
         let chartData = { chartData: chartDataUrl }
+        let holdoutChartData = { chartData: holdoutChartDataUrl }
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl)
+        if (holdoutChartDataUrl) holdoutChartData = await parseNewChartData(holdoutChartDataUrl)
         const stats = await getProjectField(projectId, 'stats')
-        const modelData = { ...result, ...chartData, stats, featureLabel: message.featureLabel }
+        const modelData = { ...result, ...chartData, ...{ holdoutChartData: holdoutChartData.chartData }, stats, featureLabel: message.featureLabel }
         if (message.problemType) modelData.problemType = message.problemType
         if (message.standardType) modelData.standardType = message.standardType
         if (modelData.rate) modelData.initRate = modelData.rate

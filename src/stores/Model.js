@@ -35,6 +35,7 @@ export default class Model {
   @observable rate = 0
   @observable pcaPlotData = ''
   @observable featureLabel = []
+  @observable holdoutChartData = {};
   // @observable featureImportanceDetail = {}
 
   constructor(projectId, model, modelName) {
@@ -150,8 +151,8 @@ export default class Model {
   }
   @computed
   get accHoldout() {
-    const data = this.chartData || {}
-    const roc = data.rocHoldout || {}
+    const data = this.holdoutChartData || {}
+    const roc = data.roc || {}
     const { TP, FN, FP, TN } = roc
     if (!TP || !FN || !FP || !TN) return this.score.holdoutScore.acc
     return (TP[this.fitIndex] + TN[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
@@ -166,8 +167,8 @@ export default class Model {
   }
   @computed
   get precisionHoldout() {
-    const data = this.chartData || {}
-    const roc = data.rocHoldout || {}
+    const data = this.holdoutChartData || {}
+    const roc = data.roc || {}
     const { TP, FP } = roc
     if (!TP || !FP) return this.score.holdoutScore.precision
     return TP[this.fitIndex] / (TP[this.fitIndex] + FP[this.fitIndex])
@@ -182,8 +183,8 @@ export default class Model {
   }
   @computed
   get recallHoldout() {
-    const data = this.chartData || {}
-    const roc = data.rocHoldout || {}
+    const data = this.holdoutChartData || {}
+    const roc = data.roc || {}
     const { TP, FN } = roc
     if (!TP || !FN) return this.score.holdoutScore.precision
     return TP[this.fitIndex] / (TP[this.fitIndex] + FN[this.fitIndex])

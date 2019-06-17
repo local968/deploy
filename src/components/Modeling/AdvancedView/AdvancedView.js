@@ -104,27 +104,27 @@ export default class AdvancedView extends Component {
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
-            const dataKey = isHoldout ? 'rocHoldout' : 'roc'
-            const aModelData = (aModel.chartData[dataKey].F1[aFitIndex]);
-            const bModelData = (bModel.chartData[dataKey].F1[bFitIndex]);
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.F1[aFitIndex]);
+            const bModelData = (bModel[dataKey].roc.F1[bFitIndex]);
             return (aModelData - bModelData) * sort.value
           }
         case 'Precision':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const dataKey = isHoldout ? 'rocHoldout' : 'roc'
-            const aModelData = (aModel.chartData[dataKey].Precision[aFitIndex])
-            const bModelData = (bModel.chartData[dataKey].Precision[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.Precision[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.Precision[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'Recall':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const dataKey = isHoldout ? 'rocHoldout' : 'roc'
-            const aModelData = (aModel.chartData[dataKey].Recall[aFitIndex])
-            const bModelData = (bModel.chartData[dataKey].Recall[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.Recall[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.Recall[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'LogLoss':
@@ -132,18 +132,18 @@ export default class AdvancedView extends Component {
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const dataKey = isHoldout ? 'rocHoldout' : 'roc'
-            const aModelData = (aModel.chartData[dataKey].LOGLOSS[aFitIndex])
-            const bModelData = (bModel.chartData[dataKey].LOGLOSS[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.LOGLOSS[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.LOGLOSS[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'Cutoff Threshold':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const dataKey = isHoldout ? 'rocHoldout' : 'roc'
-            const aModelData = (aModel.chartData[dataKey].Threshold[aFitIndex])
-            const bModelData = (bModel.chartData[dataKey].Threshold[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.Threshold[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.Threshold[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'Normalized RMSE':
@@ -224,9 +224,9 @@ export default class AdvancedView extends Component {
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
-            const dataKey = isHoldout ? 'rocHoldout' : 'roc'
-            const aModelData = (aModel.chartData[dataKey].KS[aFitIndex]);
-            const bModelData = (bModel.chartData[dataKey].KS[bFitIndex]);
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.KS[aFitIndex]);
+            const bModelData = (bModel[dataKey].roc.KS[bFitIndex]);
             return (aModelData - bModelData) * sort.value
           }
         case EN.Time:
@@ -665,7 +665,7 @@ class ClassificationModelRow extends Component {
   render() {
     const { model, texts, metric, checked, yes, no, isHoldout } = this.props;
     if (!model.chartData) return null;
-    const { modelName, fitIndex, chartData: { roc, rocHoldout }, score } = model;
+    const { modelName, fitIndex, holdoutChartData, chartData, score } = model;
     const { detail } = this.state;
     return (
       <div >
@@ -689,15 +689,15 @@ class ClassificationModelRow extends Component {
               case 'Recall':
                 return <RowCell key={4} data={model[`recall${isHoldout ? 'Holdout' : 'Validation'}`]} />;
               case 'LogLoss':
-                return <RowCell key={5} data={(isHoldout ? rocHoldout : roc).LOGLOSS[fitIndex]} />;
+                return <RowCell key={5} data={(isHoldout ? holdoutChartData : chartData).roc.LOGLOSS[fitIndex]} />;
               case 'Cutoff Threshold':
-                return <RowCell key={6} data={(isHoldout ? rocHoldout : roc).Threshold[fitIndex]} />;
+                return <RowCell key={6} data={(isHoldout ? holdoutChartData : chartData).roc.Threshold[fitIndex]} />;
               case 'KS':
-                return <RowCell key={7} data={(isHoldout ? rocHoldout : roc).KS[fitIndex]} />;
+                return <RowCell key={7} data={(isHoldout ? holdoutChartData : chartData).roc.KS[fitIndex]} />;
               case EN.Validation:
-                return <RowCell key={8} data={metric === 'log_loss' ? roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
+                return <RowCell key={8} data={metric === 'log_loss' ? chartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
               case EN.Holdout:
-                return <RowCell key={9} data={metric === 'log_loss' ? rocHoldout.LOGLOSS[fitIndex] : metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
+                return <RowCell key={9} data={metric === 'log_loss' ? holdoutChartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
               case EN.Time:
                 return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
@@ -731,11 +731,11 @@ class DetailCurves extends Component {
     }, 0)
   };
   render() {
-    const { model, model: { mid }, yes, no, project,isHoldout } = this.props;
+    const { model, model: { mid }, yes, no, project, isHoldout } = this.props;
     const { curve, show } = this.state;
     let curComponent;
     let hasReset = true;
-  
+
     switch (curve) {
       case EN.ROCCurve:
         curComponent = show && <ROCCurves
