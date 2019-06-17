@@ -101,7 +101,7 @@
 .small{
     transform: scale(0.8);
     margin-left: 10px !important;
-    border: 1px solid#485469;
+    border: 1px solid #485469;
 }
 .white{
     color: #485469;
@@ -110,7 +110,7 @@
 
 .button span{
     font-size: 1rem;
-    color: #fff;
+    color: #fff !important;
     font-weight: normal;
 }
 
@@ -121,6 +121,16 @@
     align-items: center;
     margin: auto;
     white-space: nowrap;
+}
+.pva span{
+    font-size: 14px;
+}
+.pva div + button span{
+    color:#fff;
+
+}
+.pva button {
+    display: inline-flex;
 }
 .predictActual {
     display: flex;

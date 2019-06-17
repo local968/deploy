@@ -131,7 +131,7 @@ export default class ModelProcessFlow extends Component {
 			mfm[itm[0]] = 'mean';
 		});
 		
-		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);
+		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);//缺失值
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
 		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
 		
@@ -157,6 +157,7 @@ export default class ModelProcessFlow extends Component {
 			colValueCounts,
 			target,
 			targetCounts,
+			nullFillMethod,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
@@ -174,7 +175,6 @@ export default class ModelProcessFlow extends Component {
 			om[itm[0]] = (itm[1]||'NULL')
 		});
 		
-		console.log(otherMap,om)
 		df.forEach(itm=>{
 			if(om[itm]){
 				mapping.push([itm,om[itm]])
@@ -183,9 +183,19 @@ export default class ModelProcessFlow extends Component {
 			}
 		});
 		
-		if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
-			drop = [];
+		const NFMT = nullFillMethod[target];
+		
+		if(NFMT){
+			if(NFMT === 'drop'){
+				drop.push(target)
+			}else{
+				mapping.push([target,NFMT])
+			}
 		}
+		
+		// if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
+		// 	drop = [];
+		// }
 		
 		if(!drop.length&&!mapping.length){
 			return null;
