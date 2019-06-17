@@ -5,6 +5,7 @@ import Next from './Next.svg'
 import { Popover, Button, Icon } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import {toJS} from "mobx";
 
 @inject('projectStore')
 @observer
@@ -152,6 +153,7 @@ export default class ModelProcessFlow extends Component {
 			colValueCounts,
 			target,
 			targetCounts,
+			nullFillMethod,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
@@ -163,17 +165,33 @@ export default class ModelProcessFlow extends Component {
 		}
 		
 		const df = _.without(Object.keys(colValueCounts[target]),...ta);
+		
+		const om = {};
+		Object.entries(toJS(otherMap)).forEach(itm=>{
+			om[itm[0]] = (itm[1]||'NULL')
+		});
+		
 		df.forEach(itm=>{
-			if(otherMap[itm]){
-				mapping.push([itm,otherMap[itm]])
+			if(om[itm]){
+				mapping.push([itm,om[itm]])
 			}else{
 				drop.push(itm);
 			}
 		});
 		
-		if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
-			drop = [];
+		const NFMT = nullFillMethod[target];
+		
+		if(NFMT){
+			if(NFMT === 'drop'){
+				drop.push(target)
+			}else{
+				mapping.push([target,NFMT])
+			}
 		}
+		
+		// if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
+		// 	drop = [];
+		// }
 		
 		if(!drop.length&&!mapping.length){
 			return null;
