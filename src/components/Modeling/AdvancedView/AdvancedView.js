@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
-import { Hint } from 'components/Common';
+import { Hint, Switch } from 'components/Common';
 import ModelProcess from './ModelProcess';
 import modelProcess from './icon-model-process-flow-normal.svg';
 import processHover from './icon-model-process-flow-hover.svg';
@@ -365,7 +365,7 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort, handleChange, metric } = this.props;
+    const { project, sort, handleSort, handleChange, metric, isHoldout, handleHoldout } = this.props;
     const { problemType } = project
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
@@ -385,6 +385,11 @@ export default class AdvancedView extends Component {
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
         <div className={styles.metricSelection} >
+          <div className={styles.metricSwitch}>
+            <span>{EN.Validation}</span>
+            <Switch checked={isHoldout} onChange={handleHoldout} style={{ backgroundColor: '#1D2B3C' }} />
+            <span>{EN.Holdout}</span>
+          </div>
           <span className={styles.text} >{EN.MeasurementMetric}</span>
           <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
