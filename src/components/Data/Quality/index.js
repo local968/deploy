@@ -157,8 +157,8 @@ class TargetIssue extends Component {
               {!!sortData.length && sortData.map((r, k) => {
                 const v = r[targetIndex]
                 const { low = NaN, high = NaN } = rawDataView[target]
-                const isMissing = isNaN(parseFloat(v)) ? !v : false
-                const isMismatch = isNum ? isNaN(parseFloat(v)) : false
+                const isMissing = isNaN(+v) ? !v : false
+                const isMismatch = isNum ? isNaN(+v) : false
                 const isOutlier = isNum ? (v < low || v > high) : false
                 return <div key={k} className={classnames(styles.cell, {
                   [styles.mismatch]: isMismatch,
@@ -342,8 +342,8 @@ class VariableIssue extends Component {
 
       const isNum = colType[header] === 'Numerical'
       const { low = NaN, high = NaN } = rawDataView[header]
-      const isMissing = isNaN(parseFloat(v)) ? !v : false
-      const isMismatch = isNum ? isNaN(parseFloat(v)) : false
+      const isMissing = isNaN(+v) ? !v : false
+      const isMismatch = isNum ? isNaN(+v) : false
       const isOutlier = (header === target && isNum) ? (v < low || v > high) : false
       if (isMissing) {
         itemData.cn = classnames(itemData.cn, styles.missing);

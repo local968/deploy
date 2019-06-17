@@ -82,23 +82,18 @@ export default class ParallelPlot extends PureComponent{
 			name:itm.name,
 			type: 'parallel',
 			lineStyle,
-			data:itm.value,
-			// data:itm.value.map(itm=>{
-			// 	itm.unshift(undefined);
-			// 	return itm
-			// }),
+			// data:itm.value,
+			data:itm.value.map(itm=>{
+				itm.unshift(undefined);
+				return itm
+			}),
 		}));
 
-		// 使用刚指定的配置项和数据显示图表。
-		// myChart.setOption(option);
 		return {
 			title: {
 				text: title,
 			},
-			grid:{
-				// x2:100,
-				// y:150,
-			},
+			grid:{},
 			legend: {
 				orient: 'vertical',
 				type:'scroll',
@@ -121,7 +116,7 @@ export default class ParallelPlot extends PureComponent{
 				top: '20%',
 				parallelAxisDefault: {
 					type: 'value',
-					name: 'Parallel Plot',
+					// name: 'Parallel Plot',
 					nameLocation: 'end',
 					nameGap: 20,
 					nameTextStyle: {

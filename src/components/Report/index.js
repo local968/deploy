@@ -31,13 +31,13 @@ const addComma = number => {
 }
 
 const listdisplayProp = {}
-function displayProp(obj){
-  var Categorical = 0 ;
-  var Numerical = 0 ;
-  for(var name in obj){
-    if(obj[name] === 'Categorical'||obj[name] === 'Raw' ){
+function displayProp(obj) {
+  var Categorical = 0;
+  var Numerical = 0;
+  for (var name in obj) {
+    if (obj[name] === 'Categorical' || obj[name] === 'Raw') {
       Categorical += 1;
-    }else if(obj[name] === 'Numerical') {
+    } else if (obj[name] === 'Numerical') {
       Numerical += 1;
     }
   }
@@ -70,7 +70,7 @@ class Report extends Component {
 
 
   constructor(props) {
-    console.log(props , 'dsadasdasdasdas ' )
+    console.log(props, 'dsadasdasdasdas ')
     super(props)
     props.projectStore.currentId = props.projectStore.list.id
     // if (window.localStorage && window.localStorage.getItem(`reportConfig:${props.projectStore.project.selectModel.id}`)) {
@@ -78,7 +78,7 @@ class Report extends Component {
     //   if (config) this.config = JSON.parse(config)
     // }
     window.rr = this
-    console.log(this , 'this')
+    console.log(this, 'this')
   }
 
 
@@ -122,8 +122,8 @@ class Report extends Component {
   }
 
   toggleEdit = action(() => {
-   // this.isEdit = !this.isEdit
-  //  if (window.localStorage) window.localStorage.setItem(`reportConfig:${this.props.projectStore.project.selectModel.id}`, JSON.stringify(this.config))
+    // this.isEdit = !this.isEdit
+    //  if (window.localStorage) window.localStorage.setItem(`reportConfig:${this.props.projectStore.project.selectModel.id}`, JSON.stringify(this.config))
   })
 
   isShow = (name) => {
@@ -156,22 +156,23 @@ class Report extends Component {
   render() {
     const { projectStore: { list } } = this.props
     const { selectModel: model } = list[0]
-    const { score: { validateScore: vs, holdoutScore: hs }, fitIndex, chartData } = model
-    const { roc, rocHoldout: roch } = chartData || {}
+    const { score: { validateScore: vs, holdoutScore: hs }, fitIndex, chartData, holdoutChartData } = model
+    const { roc } = chartData || {}
+    const { roc: roch } = holdoutChartData || {}
     const { targetArray, targetColMap, renameVariable } = list[0]
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
 
-    console.log(list[0] , 'listlistlistlistlistlist' ,list[0].name)
+    console.log(list[0], 'listlistlistlistlistlist', list[0].name)
 
-    console.log(Object.keys(list[0].colType).values() , 'Object.keys(list[0].colType)' ,Object.keys(list[0].colType).filter(([k, v]) => {console.log(v, 'ccccccccc',k)}))
+    console.log(Object.keys(list[0].colType).values(), 'Object.keys(list[0].colType)', Object.keys(list[0].colType).filter(([k, v]) => { console.log(v, 'ccccccccc', k) }))
 
     displayProp(list[0].colType)
     return (
 
       <div className={styles.report}>
         <h1 className={styles.totalTitle}>{EN.ProjectReport}: {list[0].name}
-        {/*<small onClick={this.toggleEdit}>{this.isEdit ? EN.Save : EN.Edit}</small>*/}
+          {/*<small onClick={this.toggleEdit}>{this.isEdit ? EN.Save : EN.Edit}</small>*/}
         </h1>
         {this.isShow('profile') && <div className={classnames(styles.block, styles.profile)}>
           {this.checkBox('profile')}
@@ -289,10 +290,10 @@ class Report extends Component {
               <div className={styles.titles}>
                 <div className={styles.metricsTitle}>{EN.ConfusionMatrix}</div>
                 {
-                  list[0].criteria === 'cost' ? <div className={styles.metricsTitle}>{EN.CostBased}</div>: null
+                  list[0].criteria === 'cost' ? <div className={styles.metricsTitle}>{EN.CostBased}</div> : null
                 }
               </div>
-              <PredictTable  models={model}  model={model} yes={yes} no={no} project={list[0]} />
+              <PredictTable models={model} model={model} yes={yes} no={no} project={list[0]} />
             </div>}
           </div>}
 
@@ -309,17 +310,17 @@ class Report extends Component {
             {/*<h3 className={styles.blockTitle}>{EN.Charts} {list[0].problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>*/}
             <div className={styles.blockRow}>
               {/*<Score models={[list[0].selectModel]} project={list[0]} />*/}
-              <AdvancedView models={list[0].models} project={list[0]}  sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} />
+              <AdvancedView models={list[0].models} project={list[0]} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} />
             </div>
           </div>}
 
-          {this.isShow('processFlow')&&!model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
+          {this.isShow('processFlow') && !model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
             {this.checkBox('processFlow')}
             <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>
             <div className={styles.blockRow}><ModelProcessFlow model={list[0].selectModel} /></div>
           </div>}
 
-          {this.isShow('processFlow')&&model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
+          {this.isShow('processFlow') && model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
             {this.checkBox('processFlow')}
             <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>
             <div className={styles.blockRow}><ModelProcessFlow2 model={list[0].selectModel} /></div>

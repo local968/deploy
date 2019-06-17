@@ -63,14 +63,18 @@ export default class D3D2 extends PureComponent {
 		
 		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{itm}</Option>);
 		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
-		return <Select value={show_name[order]} style={{ width: 120 }} onChange={name=>{
-			this.setState({
-				show_name:{
-					...show_name,
-					[order]:name,
-				},
-			})
-		}}>
+		return <Select
+			value={show_name[order]}
+			style={{ width: 120 }}
+			getPopupContainer={() => document.getElementById(order)}
+			onChange={name=>{
+				this.setState({
+					show_name:{
+						...show_name,
+						[order]:name,
+					},
+				})
+			}}>
 			{
 				options
 			}
@@ -130,9 +134,9 @@ export default class D3D2 extends PureComponent {
 		return <section className={styles.d3d2}>
 			<dl>
 				<dt>{EN.Choose2or3Variables}</dt>
-				<dd>Var1:{this.selection('x_name')}</dd>
-				<dd>Var2:{this.selection('y_name')}</dd>
-				<dd>Var3:{this.selection('z_name')}</dd>
+				<dd id='x_name'>Var1:{this.selection('x_name')}</dd>
+				<dd id='y_name'>Var2:{this.selection('y_name')}</dd>
+				<dd id='z_name'>Var3:{this.selection('z_name')}</dd>
 				<dd>
 					<button className={styles.button} onClick={this.save.bind(this)}>
 						<span>{EN.Save}</span>

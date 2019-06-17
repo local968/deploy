@@ -14,12 +14,11 @@ import Funcions from './Funcions';
 import Variables from './Variables';
 import Summary from './Summary';
 import Expressions from './Expressions';
-import {Exp, Type, Coordinate} from './model/Coordinate';
-import {withStyles} from '@material-ui/core/styles';
-import {string} from "prop-types";
+import { Exp, Type, Coordinate } from './model/Coordinate';
+import { withStyles } from '@material-ui/core/styles';
 import EN from '../../constant/en';
 import FUNCTIONS from './functions';
-import {message} from 'antd';
+import { message, Icon } from 'antd';
 
 // const FUNCTIONS = {
 //   base: [] as any[],
@@ -60,7 +59,7 @@ const useStyles = withStyles({
 interface ComputedProps {
   classes: any,
   onClose: () => void,
-  addNewVariable: (newVariables: any[], type: any) => void,
+  addNewVariable: (newVariables: any[], type: any) => Promise<boolean>,
   colType: any,
   expression: any
 }
@@ -82,6 +81,8 @@ function Computed(props: ComputedProps) {
     detailKey: '',
     index: 0
   } as ComputedState)
+
+  const [loading, setLoading] = React.useState(false)
 
   const handleFunction = (func: Coordinate, startIndex: number | null) => {
     const {exps, index} = state;
@@ -197,7 +198,6 @@ function Computed(props: ComputedProps) {
   }
 
   const deleteIndex = (k: number) => {
-    if (k === 0) return
     const {exps, index} = state
     exps.splice(k, 1)
     setState({
@@ -251,8 +251,8 @@ function Computed(props: ComputedProps) {
   const addExp = (v: string) => {
     const {exps, index} = state;
     const exp = exps[index]
-    let {range: [start, end]} = exp
-    const isNumber: boolean = !isNaN(parseFloat(v))
+    let { range: [start, end] } = exp
+    const isNumber: boolean = !isNaN(+v)
     const isOp: boolean = OPARRAY.includes(v)
     const isLParen: boolean = v === '('
     const isRParen: boolean = v === ')'
@@ -371,7 +371,8 @@ function Computed(props: ComputedProps) {
   };
 
   const processAndSave = () => {
-    const {exps} = state;
+    if (loading) return
+    const { exps } = state;
     const checkd = exps.map(exp => checkExp(exp.value))
     const error = checkd.find(c => !c.isPass)
     if (error) {
@@ -401,8 +402,11 @@ function Computed(props: ComputedProps) {
         exps: exps[i].value
       })
     }
-    addNewVariable(newExps, newType)
-    onClose()
+    setLoading(true)
+    addNewVariable(newExps, newType).then(isok => {
+      setLoading(false)
+      if (isok) onClose()
+    })
   }
 
   const Elevation: number = 1;
@@ -458,24 +462,39 @@ function Computed(props: ComputedProps) {
     // const baseOptReg = new RegExp(/[+\-*/]/)
     const length = expression.length
     let start = 0
+    let skipNum = 0
     let array: (Coordinate | Bracket)[][] = []
-    // 根据+-*/切割表达式
+    // 根据+-*/切割表达式 忽略[]
     for (let i = 0; i < length; i++) {
-      if (i <= start) continue
-      if ((expression[i] as any).type === Type.Op) {
+      if (i < start) continue
+      if ((expression[i] as any).type === Type.Lc) {
+        skipNum++
+        continue
+      }
+      if ((expression[i] as any).type === Type.RC) {
+        if (skipNum > 0) skipNum--
+        continue
+      }
+      if (skipNum === 0 && (expression[i] as any).type === Type.Op) {
         array.push(expression.slice(start, i))
         start = i + 1
       }
     }
     if (start < length) array.push(expression.slice(start, length))
-
     // const array = expression.split(baseOptReg)
     let num = 1
     let isVariable = false
     let expType = ''
+    let warning = false
     const typeArray: string[] = []
     for (let item of array) {
-      if (!item.length) return {isPass: false, message: EN.Errorexpression}
+      if (!item.length) {
+        if (warning) return {isPass: false, message: EN.Errorexpression}
+        warning = true
+        continue
+      } else {
+        warning = false
+      }
       //Categorical
       let type = 'Numerical'
       // item = item.trim()
@@ -534,7 +553,7 @@ function Computed(props: ComputedProps) {
         }
       } else {
         const numItem = expToString(item as Coordinate[])
-        const isNum = !isNaN(parseFloat(numItem))
+        const isNum = !isNaN(+numItem)
         //判断是否是数字
         if (!isNum) return {isPass: false, message: `${EN.Unexpectedidentifier} ${numItem}`}
       }
@@ -579,7 +598,6 @@ function Computed(props: ComputedProps) {
       }
     }
     if (start < length) expArray.push(exps.slice(start, length))
-
     let numOfParam = 0
     let isVariable1 = false
     let num = 1
@@ -682,14 +700,14 @@ function Computed(props: ComputedProps) {
         }
         const concatResults = numList.map(num => {
           let _n: string = expToString(num.exp)
-          if (isNaN(parseFloat(_n)) || _n.includes(".")) return {isPass: false, message: `${_n} ${EN.Mustbeinteger} `}
+          if (isNaN(+_n) || _n.includes(".")) return { isPass: false, message: `${_n} ${EN.Mustbeinteger} ` }
           let n: number
           try {
             n = parseInt(_n, 10)
           } catch (e) {
             return {isPass: false, message: `${_n} ${EN.Mustbeinteger} `}
           }
-          if (n < 2) return {isPass: false, message: `${n} ${EN.Mustgreaterthan} `}
+          if (n < 2) return {isPass: false, message: `${n} ${EN.Mustgreaterthan} 1`}
           if (n > numOfParam) return {isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1} `}
           return {
             isPass: true,
@@ -706,7 +724,7 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         const diffResults = numList.map(num => {
           let n = expToString(num.exp)
-          if (isNaN(parseFloat(n)) || n.includes(".")) return {isPass: false, message: `${n} ${EN.Mustbeinteger} `}
+          if (isNaN(+n) || n.includes(".")) return { isPass: false, message: `${n} ${EN.Mustbeinteger} ` }
           try {
             parseInt(n, 10)
           } catch (e) {
@@ -731,7 +749,7 @@ function Computed(props: ComputedProps) {
           message: `${EN.Function}: ${senior.value} ${EN.Parameterserror} `
         }
         const [b, type1, type2] = numList
-        if (isNaN(parseFloat(expToString(b.exp))) || expToString(b.exp).includes(".")) return {
+        if (isNaN(+expToString(b.exp)) || expToString(b.exp).includes(".")) return {
           isPass: false,
           message: `${expToString(b.exp)} ${EN.Mustbeinteger} `
         }
@@ -769,39 +787,39 @@ function Computed(props: ComputedProps) {
         })
         for (let numResult of numResults) {
           if (!numResult.isPass) return numResult
-          num += numResult.num || 0
+          num += (numResult as any).num || 0
         }
         break;
       case "Groupby":
         type = 'Categorical'
-        console.log(numOfParam, numList.length, 'Groupby')
         let nList
         if (numOfParam === 1) {
           if (numList.length !== 2) return {
             isPass: false,
-            message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+            message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
           }
           const vList = numList[0]
           nList = numList[1]
           const vExp = expToString(vList.exp)
-          if (vList.type !== 'Array') return {isPass: false, message: `${EN.Unexpectedidentifier} ${vExp} `}
-          const vListchecked = checkArrayParams(vList.exp.slice(1, -1), bracketExps, ({item, isVariable}) => {
-            if (!item) return {isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} `}
-            if (!isVariable) return {isPass: false, message: `must use variable`}
-            return {isPass: true, message: 'ok'}
+          if (vList.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${vExp} ` }
+          const vListchecked = checkArrayParams(vList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+            console.log(item, isVariable, 'vListchecked')
+            if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} ` }
+            if (!isVariable) return { isPass: false, message: `must use variable` }
+            return { isPass: true, message: 'ok' }
           })
           if (!vListchecked.isPass) return vListchecked
-          if (vListchecked.params > 2) return {isPass: false, message: `cannot > 2`}
+          if ((vListchecked.params || 0) > 2) return { isPass: false, message: `cannot > 2` }
         } else if (numOfParam === 2) {
           if (numList.length !== 1) return {
             isPass: false,
-            message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+            message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
           }
           nList = numList[0]
         } else {
           return {
             isPass: false,
-            message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+            message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
           }
         }
 
@@ -809,18 +827,18 @@ function Computed(props: ComputedProps) {
         const nListValues = paramList[0].type === 'Numerical' ? ['sum', 'mean', 'min', 'max', 'std', 'median'] : ['mode']
         console.log(nExp, nList, 'nExp')
         if (nList.type === 'Array') {
-          const nListchecked = checkArrayParams(nList.exp.slice(1, -1), bracketExps, ({item, isVariable}) => {
-            console.log(item, isVariable, 'checkArrayParams')
-            if (!item) return {isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} `}
-            if (isVariable) return {isPass: false, message: `cannot use variable`}
+          const nListchecked = checkArrayParams(nList.exp.slice(1, -1), bracketExps, ({ item, isVariable }) => {
+            console.log(item, isVariable, 'nListchecked')
+            if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} ` }
+            if (isVariable) return { isPass: false, message: `cannot use variable` }
             if (!nListValues.includes(item.toLowerCase())) return {
               isPass: false,
               message: `${EN.Unexpectedidentifier} ${item} `
             }
-            return {isPass: true, message: 'ok'}
-          })
+            return { isPass: true, message: 'ok' }
+          }, true)
           if (!nListchecked.isPass) return nListchecked
-          num = nListchecked.params
+          num = nListchecked.params || 0
         } else {
           if (nList.exp.length > 1) return {isPass: false, message: `${EN.Unexpectedidentifier} ${nExp} `}
           const nParamExp = expToString(nList.exp[0])
@@ -870,7 +888,7 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         if (numList.length > 0) return {
           isPass: false,
-          message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
         }
         num = (numOfParam * (numOfParam - 1)) >> 1
         break;
@@ -878,13 +896,13 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         if (numList.length > 1) return {
           isPass: false,
-          message: `error params ${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams} ${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         if (numOfParam > 1) return {
           isPass: false,
-          message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
-        if (numList[0] && expToString(numList[0].exp) && isNaN(parseFloat(expToString(numList[0].exp)))) return {
+        if (numList[0] && expToString(numList[0].exp) && isNaN(+expToString(numList[0].exp))) return {
           isPass: false,
           message: `${expToString(numList[0].exp)} ${EN.Mustbenumbe} `
         }
@@ -894,11 +912,11 @@ function Computed(props: ComputedProps) {
         type = 'Numerical'
         if (numList.length > 0) return {
           isPass: false,
-          message: `error params ${numList.map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${numList.map(n => expToString(n.exp)).join(',')} `
         }
         if (numOfParam > 1) return {
           isPass: false,
-          message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         num = 1
         break;
@@ -906,13 +924,17 @@ function Computed(props: ComputedProps) {
         type = 'Categorical'
         if (numList.length > 1) return {
           isPass: false,
-          message: `error params ${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${numList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         if (numOfParam > 1) return {
           isPass: false,
-          message: `error params ${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
+          message: `${EN.errorparams}${paramList.slice(1).map(n => expToString(n.exp)).join(',')} `
         }
         const subItem = numList[0]
+        if (!subItem) return {
+          isPass: false,
+          message: `${EN.Function}: ${senior.value} ${EN.Parameterserror}`
+        }
         if (subItem.type !== 'Array') return {
           isPass: false,
           message: `${EN.Unexpectedidentifier} ${expToString(subItem.exp)} `
@@ -922,20 +944,26 @@ function Computed(props: ComputedProps) {
         // const last = subExp.slice(-1)
         // if (first !== "[" || last !== "]") return { isPass: false, message: `${ EN.Unexpectedidentifier } ${ subExp } ` }
         // const subArray = subItem.exp.slice(1, -1)
-
-        const subchecked = checkArrayParams(subItem.exp.slice(1, -1), bracketExps, ({item, type, isVariable}) => {
-          if (!item) return {isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} `}
-          if (isVariable) return {isPass: false, message: `cannot use variable`}
-          if (type !== 'Numerical') return {isPass: false, message: `${item} ${EN.Mustbenumbe} `}
-          if (isNaN(parseFloat(item)) || item.includes('.')) return {
+        let prev: any
+        const subchecked = checkArrayParams(subItem.exp.slice(1, -1), bracketExps, ({ item, type, isVariable }) => {
+          if (!item) return { isPass: false, message: `${expToString(subItem.exp)} contain ${EN.Emptyexpression} ` }
+          if (isVariable) return { isPass: false, message: `cannot use variable` }
+          if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumbe} ` }
+          if (isNaN(+item) || item.includes('.')) return {
             isPass: false,
             message: `${item} ${EN.Mustbeinteger} `
+          }
+          if (item < 0) return { isPass: false, message: `${item} ${EN.Thenumbermustbegreaterthanorequalto} 0` }
+          if (isNaN(+prev)) prev = item
+          else {
+            if (prev > item) return {isPass: false, message: `${item} ${EN.Mustgreaterthan} ${prev} `}
+            prev = item
           }
           return {isPass: true, message: 'ok'}
         })
         if (!subchecked.isPass) return subchecked
-        if (subchecked.params !== 2) return {isPass: false, message: `error params ${expToString(subItem.exp)} `}
-        // if (subArray.length !== 2) return { isPass: false, message: `error params ${ subExp } ` }
+        if (subchecked.params !== 2) return {isPass: false, message: `${EN.errorparams}${expToString(subItem.exp)} `}
+        // if (subArray.length !== 2) return { isPass: false, message: `${EN.errorparams}${ subExp } ` }
         // for (let item of subArray) {
         //   if (!item) return { isPass: false, message: `${ subItem.exp } contain ${ EN.Emptyexpression } ` }
         //   if (isNaN(parseFloat(item)) || item.includes('.')) return { isPass: false, message: `${ item } ${ EN.Mustbeinteger } ` }
@@ -949,8 +977,8 @@ function Computed(props: ComputedProps) {
     return {isPass: true, message: EN.OK, num, type}
   }
 
-  const checkArrayParams = (exps: any[], bracketExps: any, callback: ({}: any) => { isPass: boolean, message: string }) => {
-    if (!exps.length) return {isPass: false, message: EN.Emptyparameter}
+  const checkArrayParams = (exps: any[], bracketExps: any, callback: ({ }: any) => { isPass: boolean, message: string }, unCheck?: boolean): { isPass: boolean, message: string, params?: number } => {
+    if (!exps.length) return { isPass: false, message: EN.Emptyparameter }
     const length = exps.length
     let start = 0
     let skipNum = 0
@@ -974,11 +1002,16 @@ function Computed(props: ComputedProps) {
     if (start < length) expArray.push(exps.slice(start, length))
 
     for (const exp of expArray) {
-      // 校验表达式
-      const expChecked = checkSimpleExp(exp, bracketExps, true)
-      if (!expChecked.isPass) return expChecked
-      const {isVariable, type} = expChecked
-      const checked = callback({item: expToString(exp as Coordinate[]), type, isVariable})
+      let isVariable = false
+      let type = ''
+      if (!unCheck) {
+        // 校验表达式
+        const expChecked = checkSimpleExp(exp, bracketExps, true)
+        if (!expChecked.isPass) return expChecked
+        isVariable = expChecked.isVariable
+        type = expChecked.type
+      }
+      const checked = callback({ item: expToString(exp as Coordinate[]), type, isVariable })
       if (!checked.isPass) return checked
     }
     return {isPass: true, message: 'ok', params: expArray.length}
@@ -1031,6 +1064,7 @@ function Computed(props: ComputedProps) {
   const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
   if (func) {
     const {name} = func;
+    variables = filter(variables, ({varType}) => varType !== 'Raw')
     if (!includes(['Number_extraction', 'Substring', 'Groupby', 'Substring', 'Concat', 'Eq', '(', ')', ','], name)) {
       variables = filter(variables, ({varType}) => varType === 'Numerical')
     }
@@ -1091,7 +1125,7 @@ function Computed(props: ComputedProps) {
       </CardContent>
       <CardActions disableActionSpacing className={classes.actions}>
         <Button variant="contained" onClick={processAndSave} className={classes.save}>
-          {EN.Yes}
+          {!loading ? EN.Yes : <Icon type="loading" style={{ fontSize: '24px' }} />}
         </Button>
         <Button
           variant="contained"

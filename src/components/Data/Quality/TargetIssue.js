@@ -45,7 +45,7 @@ export class ClassificationTarget extends Component {
         return null
       }).filter(n => !!n)
       const values = [...Object.keys(targetCounts), ...Object.values(temp).filter(v => !deleteKeys.includes(v)), ...renameValues]
-      if (values.length !== [...new Set(values)].length){
+      if (values.length !== [...new Set(values)].length) {
 
         message.destroy();
         return message.error("Cannot be modified to the same name")
@@ -87,7 +87,7 @@ export class ClassificationTarget extends Component {
     const hasNull = !isGood && Object.keys(targetCounts).includes('')
     const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas} ${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error?EN.onlyOnevalue:EN.Thantwouniquealues}`
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -105,7 +105,7 @@ export class ClassificationTarget extends Component {
               const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
               return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
                 <div className={styles.targetPercentLabel}>
-                  {!this.rename ? <span title={value}>{value}</span> : <input value={value} onChange={this.handleRename.bind(null, v)} />}
+                  {!this.rename ? <span title={value || 'NULL'}>{value || 'NULL'}</span> : <input value={value} onChange={this.handleRename.bind(null, v)} />}
                 </div>
                 <div className={styles.targetPercentValue}>
                   <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
@@ -118,7 +118,7 @@ export class ClassificationTarget extends Component {
           {hasNull && <div className={styles.targetPercentBox}>
             <div className={styles.targetPercentRow} key={"targetPercentRowmissing"}>
               <div className={styles.targetPercentLabel}>
-                <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || '')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || '')}</span>
+                <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}</span>
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}></div>
@@ -411,7 +411,7 @@ export class SelectTarget extends Component {
               <input type='checkbox' onChange={this.check} value={''} checked={checked.includes('')} />
             </div>
             <div className={styles.targetPercentLabel}>
-              <span>{EN.Null}</span>
+              <span>{'NULL'}</span>
             </div>
             <div className={styles.targetPercentValue}>
               <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: 'ff97a7' }}></div>
@@ -422,18 +422,18 @@ export class SelectTarget extends Component {
         <div className={styles.fixesTips}><span></span></div>
       </div>}
       {this.step === 2 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{v0}{EN.Or}{v1}{EN.MATAHC} </span></div>
+        <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{v0 || 'NULL'}{EN.Or}{v1 || 'NULL'}{EN.MATAHC} </span></div>
         <div className={styles.targetPercentBox}>
           {this.checked.map((t, i) => {
-            const percent = (colValueCounts[target][t] || 0) / (totalRawLines || 1) * 85
+            const percent = ((t === '' ? nullLineCounts[target] : colValueCounts[target][t]) || 0) / (totalRawLines || 1) * 85
             const backgroundColor = (v0 === t && '#9be44b') || (v1 === t && '#adaafc') || '#c4cbd7'
             return <div className={styles.targetPercentRow} key={i}>
               <div className={styles.targetPercentLabel}>
-                <span>{t}</span>
+                <span>{t || 'NULL'}</span>
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                <span>{colValueCounts[target][t] || 0}</span>
+                <span>{(t === '' ? nullLineCounts[target] : colValueCounts[target][t]) || 0}</span>
               </div>
             </div>
           })}
@@ -455,7 +455,7 @@ export class SelectTarget extends Component {
                 <input type='checkbox' value={''} id={`belong`} checked={currentBelong.includes('')} disabled={disabledArray.includes('')} onChange={disabledArray.includes('') ? null : this.handleCheck} />
               </div>
               <div className={styles.targetPercentLabel}>
-                <span>{''}</span>
+                <span>{'NULL'}</span>
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: 'ff97a7' }}></div>
@@ -464,8 +464,8 @@ export class SelectTarget extends Component {
             </div>
           </div>}
           <div className={styles.cleanTargetButton} style={{ margin: '.1em 0' }}>
-            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>{EN.Matchas}{v0 === '' ? EN.Null : v0}</span></button>
-            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>{EN.Matchas}{v1 === '' ? EN.Null : v1}</span></button>
+            <button onClick={this.handleBelong.bind(null, 0)} className={this.belong === 0 ? styles.activeButton : null}><span>{EN.Matchas}{v0 || 'NULL'}</span></button>
+            <button onClick={this.handleBelong.bind(null, 1)} className={this.belong === 1 ? styles.activeButton : null}><span>{EN.Matchas}{v1 || 'NULL'}</span></button>
           </div>
         </div>
 
@@ -544,7 +544,7 @@ export class FixIssue extends Component {
 
   nullSelect = (key, e) => {
     let value = e.target.value
-    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
+    value = isNaN(+(value)) ? value : parseFloat(value)
     const { missing } = this.fillMethod
     missing[key] = value === 'others' ? '' : value
     this.fillMethod.missing = { ...missing }
@@ -555,7 +555,7 @@ export class FixIssue extends Component {
 
   mismatchSelect = (key, e) => {
     let value = e.target.value
-    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
+    value = isNaN(+(value)) ? value : parseFloat(value)
     const { mismatch } = this.fillMethod
     mismatch[key] = value === 'others' ? '' : value
     this.fillMethod.mismatch = { ...mismatch }
@@ -566,7 +566,7 @@ export class FixIssue extends Component {
 
   outlierSelect = (key, e) => {
     let value = e.target.value
-    value = isNaN(parseFloat(value)) ? value : parseFloat(value)
+    value = isNaN(+(value)) ? value : parseFloat(value)
     const { outlier } = this.fillMethod
     outlier[key] = value === 'others' ? '' : value
     this.fillMethod.outlier = { ...outlier }

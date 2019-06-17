@@ -17,9 +17,9 @@ import BButton from 'components/Common/BlackButton';
 import Hint from 'components/Common/Hint';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import config from 'config';
 
-const Option = Select.Option;
-
+const { Option, OptGroup } = Select;
 const ordinalNumberPostFix = number => {
   if ((number > 3 && number < 21) || number % 10 > 3) return 'th';
   return { 0: 'th', 1: 'st', 2: 'nd', 3: 'rd' }[number % 10];
@@ -49,6 +49,8 @@ export default class Performance extends Component {
   @observable uploadStatus = false;
   @observable uploadPercentage = 0;
   @observable uploadSpeed = '0 Kb/s';
+    @observable modelEditing = false;
+    @observable tempModelName = false;
 
   @action
   selectionOption = (key, value) => () => {
@@ -57,6 +59,21 @@ export default class Performance extends Component {
   };
   show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
+
+    modelChange = action(value => {
+        this.tempModelName = value
+    })
+
+    onSaveModel = action(() => {
+        const cd = this.props.deploymentStore.currentDeployment
+        if (this.modelEditing && this.tempModelName) {
+            cd.modelName = this.tempModelName;
+            cd.save();
+            this.tempModelName = false;
+        }
+        this.modelEditing = !this.modelEditing
+    })
+
   pause = action(() => {
     if (!this.uploadOperator) return
     if (this.uploadStatus === 'uploading') {
@@ -68,9 +85,42 @@ export default class Performance extends Component {
     this.uploadStatus = 'uploading'
   })
 
-  render() {
+    //
+    // isDisable (modelId) {
+    //     if(modelId.indexOf('Agg') != -1 || modelId.indexOf('DBSCAN1') != -1 || modelId.indexOf('SpectralClustering') != -1 ){
+    //         return true
+    //     }else {
+    //         return false
+    //     }
+    // }
+
+
+
+
+    render() {
     const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
+    let clusteringList =  [];
+
+    if(cd.modelType === 'Clustering') {
+        cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>{
+            clusteringList =  [];
+            {models.map(model =>{
+                const Agg = model.modelId.indexOf('Agg');
+                const DBSCAN1 = model.modelId.indexOf('DBSCAN1');
+                const SpectralClustering = model.modelId.indexOf('SpectralClustering');
+                if(Agg !== -1 ){
+                    clusteringList.push({})
+                }else if(DBSCAN1 !== -1 ) {
+                    clusteringList.push({})
+                }else if(SpectralClustering !== -1 ) {
+                    clusteringList.push({})
+                }else{
+                    clusteringList.push(model)
+                }
+            })}
+        })
+    }
     const cdpo = cd.performanceOptions;
     const uploader = {
       onError: action((error, times) => {
@@ -103,6 +153,10 @@ export default class Performance extends Component {
       },
       params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' }
     }
+
+
+    console.log(cd.modelType , 'cd.modelTypecd.modelType' , cd.modelList)
+
     return (
       <div className={styles.performance}>
         {/* {cdpo.enable && (
@@ -110,15 +164,57 @@ export default class Performance extends Component {
         )} */}
         {/* {!cdpo.enable && (
           <React.Fragment> */}
-        <div className={styles.block}>
-          <span className={styles.label}>
-            <span className={styles.text}>{EN.Model}</span>
-          </span>
-          <div className={styles.selections}>
-            <span className={styles.modelName}>{cd.modelName}</span>
-            {/* <img alt="model" src={infoIcon} className={styles.infoIcon} /> */}
-          </div>
-        </div>
+          {
+              cd.modelType !== 'Outlier' && cd.modelType !== 'Clustering' &&(
+                  <div className={styles.block}>
+                      <span className={styles.label}>
+                        <span className={styles.text}>{EN.Model}</span>
+                      </span>
+                      <div className={styles.selections}>
+                          <span className={styles.modelName}>{cd.modelName}</span>
+                          {/* <img alt="model" src={infoIcon} className={styles.infoIcon} /> */}
+                      </div>
+                  </div>
+              )
+          }
+
+          {
+              cd.modelType === 'Outlier' &&(
+                  <div className={styles.blocks}>
+                  <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
+                      <Select  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+                          {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
+                              <OptGroup key={settingName} label={settingName}>
+                                  {models.map(model =>  <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
+                                  )}
+                              </OptGroup>)}
+              </Select> : cd.modelName}</span>
+                      <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
+                      <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
+                  </div>
+              )}
+
+          {
+              cd.modelType === 'Clustering' &&(
+                  <div className={styles.blocks}>
+                  <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
+                      <Select  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+                          {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
+                              <OptGroup key={settingName} label={settingName}>
+                                  {clusteringList.map(model =>
+                                      JSON.stringify(model) !== "{}" && (
+                                          <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>)
+                                  )}
+                              </OptGroup>)}
+                      </Select> : cd.modelName}</span>
+                      <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
+                      <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
+                      {/*<span className={styles.data}>{EN.DeploymentDataDefinition}</span>*/}
+                      {/*<Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />*/}
+                      {/*<a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>*/}
+                  </div>
+              )}
+
         <div className={styles.block}>
           <span className={styles.label}>
             <span className={styles.text}>{EN.lidationDataDefinition}</span>
@@ -326,11 +422,11 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           value={cdpo.measurementMetric}
           onChange={value => selectionOption('measurementMetric', value)()}
         >
-          <Option value="Accuracy">{EN.Accuracy}</Option>
+          {/* <Option value="Accuracy">{EN.Accuracy}</Option> */}
           <Option value="AUC">{EN.AUC}</Option>
           <Option value="F1">F1</Option>
-          <Option value="Precision">{EN.Precision}</Option>
-          <Option value="Recall">{EN.Recall}</Option>
+          {/* <Option value="Precision">{EN.Precision}</Option> */}
+          {/* <Option value="Recall">{EN.Recall}</Option> */}
         </Select>
       )}
       {type === 'Regression' && (

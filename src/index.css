@@ -16,6 +16,9 @@ body {
   }
 }
 
+.ant-popover{
+  z-index: 99999;
+}
 @font-face {
   font-family: ShareTech-Regular;
   src: url('./ShareTech-Regular.ttf');
@@ -101,4 +104,17 @@ body {
 }
 .popovers .ant-popover-content{
   margin-top: -30% !important;
+}
+
+
+#pva .rc-input-number-handler-wrap{
+  display: none;
+}
+
+#pva .rc-slider{
+  margin: 0 50px 0 20px;
+}
+
+#pva button{
+  margin-left: 20px;
 }

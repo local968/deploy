@@ -171,7 +171,7 @@ export default class SimplifiedView extends Component {
 
   renderCell = (value, isNA) => {
     if (isNA) return 'N/A'
-    if (isNaN(parseFloat(value))) return value || 'N/A'
+    if (isNaN(+(value))) return value || 'N/A'
     return formatNumber(value, 2)
   };
   
@@ -512,7 +512,7 @@ class SimplifiedViewRow extends Component {
 
   renderCell = (value, isNA) => {
     if (isNA) return 'N/A'
-    if (isNaN(parseFloat(value))) return value || 'N/A'
+    if (isNaN(+(value))) return value || 'N/A'
     return formatNumber(value, 2)
   }
 
@@ -1035,7 +1035,7 @@ class CreateNewVariable extends Component {
           } catch (e) {
             return {isPass: false, message: `${n} ${EN.Mustbeinteger}`}
           }
-          if (n < 2) return {isPass: false, message: `${n} ${EN.Mustgreaterthan}`}
+          if (n < 2) return {isPass: false, message: `${n} ${EN.Mustgreaterthan} 1`}
           if (n > numOfParam) return {isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}`}
           return {
             isPass: true,

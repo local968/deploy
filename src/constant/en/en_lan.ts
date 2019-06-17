@@ -1,5 +1,5 @@
-import React from "react";
-import { Typography } from "@material-ui/core";
+// import React from "react";
+// import { Typography } from "@material-ui/core";
 
 const EN_LAN = {
   /**
@@ -532,7 +532,7 @@ const EN_LAN = {
   Mustbeinteger: 'must be integer',
   Function: 'function',
   Parameterserror: 'parameters error',
-  Mustgreaterthan: 'must greater than 1',
+  Mustgreaterthan: 'must greater than',
   Mustlessthan: 'must less than',
   Isnotsupported: 'is not supported',
   Mustbenumber: 'must be number',
@@ -871,7 +871,7 @@ const EN_LAN = {
   YourtargetvariableHas: 'Your target variable has',
   Less: 'less',
   More: 'more',
-  Thantwouniquealues: 'some noises',
+  Thantwouniquealues: ' some noises',
   onlyOnevalue: 'only one unique value',
   Targetvariablequalityisgood: 'Target variable quality is good!',
   Optional: 'optional',
@@ -1252,6 +1252,25 @@ const EN_LAN = {
   DropTheRows:'Drop the rows',
   Mapping:"Mapping",
   value:'value',
+  SelectFeature: 'Select Feature Preprocessor',
+  errorparams:'error params',
+  ResidualRate:'Residual Rate',
+  ResidualPercent:'Residual Percent',
+  InputRanges:'Input Ranges',
+  ZoomRegion:'Zoom Region',
+  ChartDescription:"Plot Explanation",
+  ChartOrder:"1.Target variable is sorted by ascending according to the true value",
+  ChartSplit:"2.Sorted date is divided into 100 groups in the selected range",
+  ChartSHowWhat:"3.True value, predict value and absolute percentage error are the mean values within each group.",
+  ChartZone:"4.Zoom in methods:",
+  ChartZoneA:"  a. click ”zoom in“ and hold on to directly choosing the area of the plot",
+  ChartZoneB:"  b. input the range of the target variable and click \"ok\"",
+  ChartZoneC:"  c. rolling the mouse wheel to zoom in",
+  ChartReset:"5.Click \"reset\" to to whole value range",
+  custom: "custom function",
+  timeoutRetry: "Connection timeout. Reconnecting now.",
+  Deployment:'Deployment',
+  PerformanceMonitors:'Performance Monitor',
 };
 
 

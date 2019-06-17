@@ -100,6 +100,7 @@ export default class SimplifiedView extends Component {
 
   hideNewVariable = () => {
     this.visible = false
+    this.reloadTable()
   }
 
   reloadTable = () => {
@@ -136,7 +137,7 @@ export default class SimplifiedView extends Component {
 
   renderCell = (value, isNA) => {
     if (isNA) return 'N/A'
-    if (isNaN(parseFloat(value))) return value || 'N/A'
+    if (isNaN(+(value))) return value || 'N/A'
     return formatNumber(value, 2)
   }
 
@@ -194,7 +195,7 @@ export default class SimplifiedView extends Component {
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable}
-              addNewVariable={addNewVariable2} colType={{ ...colType, ...newType }} expression={expression} />
+              addNewVariable={addNewVariable2} colType={colType} expression={expression} />
           </Modal>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
@@ -304,7 +305,7 @@ class SimplifiedViewRow extends Component {
 
   renderCell = (value, isNA) => {
     if (isNA) return 'N/A'
-    if (isNaN(parseFloat(value))) return value || 'N/A'
+    if (isNaN(+(value))) return value || 'N/A'
     return formatNumber(value, 2)
   }
 
@@ -849,7 +850,7 @@ class CreateNewVariable extends Component {
           } catch (e) {
             return { isPass: false, message: `${n} ${EN.Mustbeinteger}` }
           }
-          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan}` }
+          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan} 1` }
           if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1}` }
           return {
             isPass: true,

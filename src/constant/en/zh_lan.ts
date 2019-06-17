@@ -1,5 +1,5 @@
-import React from "react";
-import { Typography } from "@material-ui/core";
+// import React from "react";
+// import { Typography } from "@material-ui/core";
 
 const ZH_LAN: any = {
   Loading: '加载中…',
@@ -404,7 +404,7 @@ const ZH_LAN: any = {
   Mustbeinteger: '必须为整数',
   Function: '函数',
   Parameterserror: '参数错误',
-  Mustgreaterthan: '必须大于１',
+  Mustgreaterthan: '必须大于',
   Mustlessthan: '必须小于',
   Isnotsupported: '不支持',
   Mustbenumber: '必须为数字',
@@ -706,10 +706,10 @@ const ZH_LAN: any = {
   FailedtoCollectorDataError: '数据收集错误',
   ValidRange: '有效范围',
   QuantityofOutlier: '异常值数量',
-  DoNothing: '删除整行',
+  DoNothing: '不处理忽略',
   Apply: '应用',
   Found: '发现问题',
-  YourtargetvariableHas: '您的目标变量的类别个数',
+  YourtargetvariableHas: '您的目标变量中',
   Less: '少于',
   More: '多于',
   Thantwouniquealues: '包含噪音',
@@ -1117,6 +1117,25 @@ const ZH_LAN: any = {
   DropTheRows:'删除整行',
   Mapping:"映射",
   value:'值',
+  SelectFeature: '选择特征预处理',
+  errorparams:'错误参数',
+  ResidualRate:'残差率',
+  ResidualPercent:'残差率',
+  InputRanges:'输入范围',
+  ZoomRegion:'缩放区域',
+  ChartDescription:"图表说明",
+  ChartOrder:"1.目标变量根据真实值从小到大排序",
+  ChartSplit:"2.排序后数据在当前可视范围内均分为100",
+  ChartSHowWhat:"3.显示真实值、预测值、残差率为组内均值\n",
+  ChartZone:"4.区域放大方式：",
+  ChartZoneA:"  a. 点击”区域缩放“按钮，直接在图形上划选查看范围",
+  ChartZoneB:"  b. 在”输入范围“后直接输入查看范围后按”确定“，最多支持4位小数",
+  ChartZoneC:"  c. 滑动鼠标滑轮，直接放大当前范围",
+  ChartReset:"5.点击”重置“按钮可返回默认最大范围",
+  custom: "自定义函数",
+  timeoutRetry: "网络超时,正在重试.",
+  Deployment:'模型部署',
+  PerformanceMonitors:'部署性能',
 };
 
 export default ZH_LAN;

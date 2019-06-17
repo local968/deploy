@@ -273,3 +273,12 @@
 .mccb button{
   margin-left: 20px;
 }
+.metricSwitch {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin-right: 15px;
+}
+.metricSwitch span {
+  margin: 0 10px;
+}

@@ -44,7 +44,7 @@ function parseChartData(result) {
   if (!result) return { chart: null, fitIndex: null, initialFitIndex: null };
   let fitIndex = -1;
   let initialFitIndex = -1;
-  const charts = ['density', 'lift', 'roc', 'rocHoldout'];
+  const charts = ['density', 'lift', 'roc'];
   charts.forEach(chart => {
     try {
       result[chart] = JSON.parse(result[chart])
@@ -903,7 +903,7 @@ wss.register('etlCleanData', (message, socket, progress) => {
 })
 
 wss.register('abortTrain', (message, socket) => {
-  const { projectId, isLoading, _id: requestId, stopId } = message
+  const { projectId, _id: requestId, stopId } = message
   const { userId } = socket.session
   return getProjectField(projectId, 'stopIds').then(stopIds => {
     if (!stopIds.length) return { status: 200, message: 'ok' }
@@ -912,20 +912,22 @@ wss.register('abortTrain', (message, socket) => {
       command.clearListener(stopId)
       const trainModel = await getProjectField(projectId, 'trainModel')
       Reflect.deleteProperty(trainModel, stopId);
+      const curStopIds = stopIds.filter(si => si !== stopId)
       const statusData = {
         train2Finished: true,
-        train2ing: false,
         train2Error: false,
         trainModel,
-        stopIds: stopIds.filter(si => si === stopId)
+        stopIds: curStopIds
       }
-      if (isLoading) {
+      const modelCounts = await getModelCount(projectId)
+      if (!modelCounts && !curStopIds.length) {
         statusData.mainStep = 3
         statusData.curStep = 3
         statusData.lastSubStep = 1
         statusData.subStepActive = 1
         statusData.trainModel = {}
         statusData.stopIds = []
+        statusData.train2ing = false
       }
       return createOrUpdate(projectId, userId, statusData)
     })
@@ -948,7 +950,7 @@ wss.register('train', async (message, socket, progress) => {
   // let hasModel = false;
   try {
     await checkTraningRestriction(user)
-    
+
 
     const commandArr = []
     const _stopIds = []
@@ -1035,14 +1037,16 @@ wss.register('train', async (message, socket, progress) => {
         // await createOrUpdate(projectId, userId, { trainModel: result })
         processValue = { ...result }
       } else if (result.score) {
-        const { chartData: chartDataUrl, modelName } = result
+        const { chartData: chartDataUrl, holdoutChartData: holdoutChartDataUrl, modelName } = result
         const trainModel = await getProjectField(projectId, 'trainModel')
         Reflect.deleteProperty(trainModel, trainId)
         await createOrUpdate(projectId, userId, { trainModel })
         let chartData = { chartData: chartDataUrl }
+        let holdoutChartData = { chartData: holdoutChartDataUrl }
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl)
+        if (holdoutChartDataUrl) holdoutChartData = await parseNewChartData(holdoutChartDataUrl)
         const stats = await getProjectField(projectId, 'stats')
-        const modelData = { ...result, ...chartData, stats, featureLabel: message.featureLabel }
+        const modelData = { ...result, ...chartData, ...{ holdoutChartData: holdoutChartData.chartData }, stats, featureLabel: message.featureLabel }
         if (message.problemType) modelData.problemType = message.problemType
         if (message.standardType) modelData.standardType = message.standardType
         if (modelData.rate) modelData.initRate = modelData.rate
@@ -1069,7 +1073,8 @@ wss.register('train', async (message, socket, progress) => {
       return progress(processValue)
     }
 
-    await Promise.all(commandArr.map(_ca => command(_ca, processFn, true)))
+    const commandRes = await Promise.all(commandArr.map(_ca => command(_ca, processFn, true)))
+    const count = commandRes.filter(cr => !cr.isAbort && cr.status === 100)
 
     const statusData = {
       train2Finished: true,
@@ -1081,7 +1086,7 @@ wss.register('train', async (message, socket, progress) => {
     }
     const modelCounts = await getModelCount(projectId)
 
-    if (modelCounts < 1) {
+    if (modelCounts < 1 && count < 1) {
       statusData.train2Error = true
     }
 

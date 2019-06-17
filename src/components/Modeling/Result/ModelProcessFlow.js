@@ -5,6 +5,7 @@ import Next from './Next.svg'
 import {Button, Icon, Popover, Tag} from 'antd'
 import {formatNumber} from 'util'
 import EN from '../../../constant/en';
+import {toJS} from "mobx";
 
 @inject('projectStore')
 @observer
@@ -130,7 +131,7 @@ export default class ModelProcessFlow extends Component {
 			mfm[itm[0]] = 'mean';
 		});
 		
-		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);
+		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);//缺失值
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
 		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
 		
@@ -155,22 +156,46 @@ export default class ModelProcessFlow extends Component {
 			targetArray,
 			colValueCounts,
 			target,
+			targetCounts,
+			nullFillMethod,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
 		
-		const df = _.without(Object.keys(colValueCounts[target]),...targetArray);
+		let ta =[...targetArray];
+		
+		if(!targetArray.length){
+			ta = Object.keys(targetCounts).splice(0,2)
+		}
+		
+		const df = _.without(Object.keys(colValueCounts[target]),...ta);
+		
+		const om = {};
+		Object.entries(toJS(otherMap)).forEach(itm=>{
+			om[itm[0]] = (itm[1]||'NULL')
+		});
+		
 		df.forEach(itm=>{
-			if(otherMap[itm]){
-				mapping.push([itm,otherMap[itm]])
+			if(om[itm]){
+				mapping.push([itm,om[itm]])
 			}else{
 				drop.push(itm);
 			}
 		});
 		
-		if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
-			drop = [];
+		const NFMT = nullFillMethod[target];
+		
+		if(NFMT){
+			if(NFMT === 'drop'){
+				drop.push(target)
+			}else{
+				mapping.push([target,NFMT])
+			}
 		}
+		
+		// if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
+		// 	drop = [];
+		// }
 		
 		if(!drop.length&&!mapping.length){
 			return null;
@@ -292,7 +317,7 @@ export default class ModelProcessFlow extends Component {
 	
 	FS(){
 		const { featureLabel } = this.props.model;
-		const {rawHeader,expression,target } = this.props.projectStore.project;
+		const {rawHeader,expression,target,colType} = this.props.projectStore.project;
 		
 		let drop = _.without(rawHeader,...featureLabel,target);
 		
@@ -304,23 +329,28 @@ export default class ModelProcessFlow extends Component {
 			return null;
 		}
 		
+		const raw = drop.filter(itm=>colType[itm] === "Raw");
+		drop = _.without(drop,...raw);
+		
 		const pop = <dl className={styles.over}>
 			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
 				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
 			</dt>
-			<dt style={{display:(create.length?'':'none')}}>
+			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
+				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
+			</dt>
+			<dt style={{display:(create.length?'':'none')}} title = {create.join(',')}>
 				{EN.CreateTheseVariables}:
 			</dt>
 			{
-				create.map((itm,index)=><dd key={index}>{itm}</dd>)
+				create.map((itm,index)=><dd key={index} title={itm}>{itm}</dd>)
 			}
 		</dl>;
 		
-		return <React.Fragment>
+		return <Fragment>
 			<img src={Next} alt='' />
 			{this.popOver(pop,EN.FeatureCreationSelection)}
-		</React.Fragment>
-		
+		</Fragment>
 	}
 
 	popOver(content, text) {

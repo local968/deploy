@@ -10,6 +10,7 @@ import axios from 'axios'
 import { formatNumber } from 'util'
 import c1 from './classification'
 import request from "../components/Request";
+import EN from '../../src/constant/en'
 
 export default class Project {
   @observable models = []
@@ -20,6 +21,7 @@ export default class Project {
   @observable exist = true;
   @observable loading = false;
   @observable host = '';
+  @observable loadModel = false;
 
   //step
   @observable mainStep = 0;
@@ -1148,11 +1150,10 @@ export default class Project {
         command: 'top.createNewVariable',
         csvScript: scripts
       };
-      return api.createNewVariable(command, progressResult => {
-      }).then(returnValue => {
+      return api.createNewVariable(command).then(returnValue => {
         const { status, result } = returnValue
         if (status < 0) {
-          antdMessage.error(result.msg)
+          antdMessage.error(result.processError)
           return false
         }
         const variablenames = variables.reduce((prev, _v) => [...prev, ..._v.nameArray], [])
@@ -1164,7 +1165,7 @@ export default class Project {
           return prev
         }, {})
         const expression = Object.assign({}, this.expression, variableExp)
-        this.updateProject({
+        return this.updateProject({
           newVariable,
           trainHeader,
           expression,
@@ -1172,8 +1173,8 @@ export default class Project {
           correlationMatrixData: null,
           correlationMatrixHeader: null,
           cleanPath: ''
-        })
-        return true
+        }).then(() => true)
+
       })
     })
   }
@@ -1265,10 +1266,10 @@ export default class Project {
   //temp
   @computed
   get defualtRecommendModel() {
-    const { models, measurement, problemType } = this
+    const { currentSetting, models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
-    return models
+    return models.filter(_m => currentSetting.models.includes(_m.id))
       .map(m => {
         const { score } = m
         const { validateScore, holdoutScore } = score || {}
@@ -1286,13 +1287,15 @@ export default class Project {
           validate = score[currentMeasurement]
           holdout = score[currentMeasurement]
         }
-        if (isNaN(parseFloat(validate)) || isNaN(parseFloat(holdout))) return
+        if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
         // const value = validate + holdout
         // if (!recommend) return recommend = { id: m.id, value }
         // if ((recommend.value - value) * sort < 0) recommend = { id: m.id, value }
       })
-      .filter(_m => !_m)
+      .filter(_m => {
+        return !!_m
+      })
       .sort((a, b) => (b.value - a.value) * sort)
       .map(_m => models.find(m => m.id === _m.id))
     // if (!!recommend) return models.find(m => m.id === recommend.id)
@@ -1791,6 +1794,11 @@ export default class Project {
     })
   }
 
+  removeCurSetting = () => {
+    this.settings = this.settings.filter(st => st.id !== this.settingId)
+    this.settingId = (this.settings[this.settings.length - 1] || {}).id || ''
+  }
+
   modeling = (trainData, updateData) => {
     if (this.etling) return antdMessage.error('modeling error')
     this.train2ing = true
@@ -1839,13 +1847,17 @@ export default class Project {
     }))
   }
 
-  abortTrainByEtl = () => {
+  abortTrainByEtl = async () => {
     this.models = []
     if (this.train2ing && !!this.stopIds.length) {
-      const arr = this.stopIds.map(si => this.abortTrain(si))
-      return Promise.all(arr)
+      for (let si of this.stopIds) {
+        await this.abortTrain(si)
+      }
+      return
+      // const arr = this.stopIds.map(si => this.abortTrain(si))
+      // return Promise.all(arr)
     }
-    return Promise.resolve()
+    return
   }
 
   setModel = data => {
@@ -1900,10 +1912,20 @@ export default class Project {
   }
 
   initModels = () => {
+    this.loadModel = true
+    let show = true
+    const so = setTimeout(() => {
+      show = false
+      antdMessage.error(EN.timeoutRetry, 3)
+      this.initModels()
+    }, 60000)
     socketStore.ready().then(api => api.queryModelList({ id: this.id })).then(result => {
+      if (!show) return
+      clearTimeout(so)
       const { status, message, list } = result
       if (status !== 200) return alert(message)
       this.models = []
+      this.loadModel = false
       list.forEach(m => {
         this.setModel(m)
       });
@@ -2290,7 +2312,7 @@ export default class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = (model) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance } = this;
+    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader } = this;
 
     const list = [];
     list.push(this.histogram(target));
@@ -2309,6 +2331,8 @@ export default class Project {
 
 
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable];
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v));
+    [allVariables].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString());
     allVariables.sort((a, b) => {
       return preImportance ? -1 * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
     });
@@ -2322,7 +2346,7 @@ export default class Project {
       list.push({
         name: 'predicted-vs-actual-plot',
         data: {
-          url: model.pointToShowData,
+          url: model.predictData,
         },
       });
 

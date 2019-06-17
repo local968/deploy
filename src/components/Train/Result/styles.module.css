@@ -86,7 +86,7 @@
 
 .blood {
   font-size: 48px;
-  color: rgb(236, 212, 214);
+  color: #D0021B;
 }
 
 .orange {
@@ -280,12 +280,12 @@
 .tabs {
   border-bottom: 1px #1D2B3C solid;
   display: flex;
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
   margin-bottom: 40px
 }
 
 .tab {
-  color: black;
+  color: #979797 !important;
   font-size: 18px;
   width: 250px;
   padding: 10px 0;
@@ -295,8 +295,9 @@
 }
 
 .active {
-  font-weight: bold;
-  border-bottom: 5px black solid
+  /*font-weight: bold;*/
+  color: #1d2b3c !important;
+  border-bottom: 4px #1d2b3c solid
 }
 
 .trainingModel {
@@ -665,4 +666,10 @@ button.disable {
 
 span.ccellHeaderSpan{
   max-width: 60%;
+}
+
+.inputBox {
+  display: flex;
+  flex: auto;
+  justify-content: space-around;
 }

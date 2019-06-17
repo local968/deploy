@@ -28,8 +28,9 @@ export default class StartTrain extends Component {
     this.visible = true
   }
 
-  closeAdvanced = () => {
+  closeAdvanced = (isCLose = true) => {
     this.visible = false
+    if(isCLose) this.props.projectStore.project.removeCurSetting()
   }
 
   render() {
@@ -117,7 +118,7 @@ class AdvancedModel extends Component {
     const disableItems = problemType === 'Clustering' ? [...(totalLines > 20000 ? ['Agg', 'DBSCAN', 'SpectralClustering'] : []), ...(kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : [])] : []
     const trainAlgorithms = algorithms.filter(al => !disableItems.includes(al))
     if (!trainAlgorithms.length) return message.error(EN.Youneedtoselectatleast)
-    closeAdvanced()
+    closeAdvanced(false)
     advancedModeling()
   }
 

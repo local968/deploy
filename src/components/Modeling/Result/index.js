@@ -7,7 +7,7 @@ import { observable, action } from 'mobx';
 import AdvancedView from '../AdvancedView/AdvancedView';
 import ClassificationResult from './ClassificationResult';
 import RegressionResult from './RegressionResult';
-import { ProgressBar } from 'components/Common';
+import { ProgressBar, ProcessLoading } from 'components/Common';
 import { Modal, message, Button } from 'antd'
 import EN from '../../../constant/en';
 const Classification = 'Classification';
@@ -27,6 +27,7 @@ export default class ModelResult extends Component {
     }
   }
   @observable metric = this.props.projectStore.project.measurement
+  @observable isHoldout = false
 
   handleSort = (view, key) => {
     const sort = this.sort[view]
@@ -44,6 +45,10 @@ export default class ModelResult extends Component {
     // if (window.localStorage)
     //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
   });
+
+  handleHoldout = value => {
+    this.isHoldout = value
+  }
 
   deploy = () => {
     const { project } = this.props.projectStore;
@@ -89,8 +94,13 @@ export default class ModelResult extends Component {
     const { view, changeView } = this.props
     const { project } = this.props.projectStore;
     const { models } = project
+    const { id, etlIndex, fileName, selectModel, target, loadModel } = project
+    if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
     if (!models.length) return null;
     // const { view } = this;
+
+    const type = this.isHoldout ? 'holdout' : 'validate'
+    const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
     return (
       <div className={styles.modelResult}>
         <div className={styles.tabBox}>
@@ -111,7 +121,7 @@ export default class ModelResult extends Component {
         </div> */}
         {view === 'simple' ?
           <SimpleView models={models} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} /> :
-          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} />}
+          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} isHoldout={this.isHoldout} handleHoldout={this.handleHoldout} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
@@ -122,6 +132,9 @@ export default class ModelResult extends Component {
           <button className={styles.button} onClick={this.deploy}>
             <span>{EN.DeployTheModel}</span>
           </button>
+          {view === 'advanced' && <a href={`/upload/download/result?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-${type}.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&type=${type}&target=${target}`} target='_blank'><button className={styles.button}>
+            <span>{`${EN.Exportmodelresults}(${this.isHoldout ? EN.Holdout : EN.Validation})`}</span>
+          </button></a>}
         </div>
         {/* <Modal title='Model Insights'
           visible={current && this.show}

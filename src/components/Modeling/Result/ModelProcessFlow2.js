@@ -5,6 +5,7 @@ import Next from './Next.svg'
 import { Popover, Button, Icon } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
+import {toJS} from "mobx";
 
 @inject('projectStore')
 @observer
@@ -63,6 +64,44 @@ export default class ModelProcessFlow extends Component {
 		</Popover>
 	}
 	
+	FS(){
+		const { featureLabel } = this.props.model;
+		const {rawHeader,expression,target,colType} = this.props.projectStore.project;
+		
+		let drop = _.without(rawHeader,...featureLabel,target);
+		
+		const create = Object.values(expression).map(itm=>{
+			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
+		});
+		
+		if(!drop.length&&!create.length){
+			return null;
+		}
+		
+		const raw = drop.filter(itm=>colType[itm] === "Raw");
+		drop = _.without(drop,...raw);
+		
+		const pop = <dl className={styles.over}>
+			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
+				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
+			</dt>
+			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
+				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
+			</dt>
+			<dt style={{display:(create.length?'':'none')}}>
+				{EN.CreateTheseVariables}:
+			</dt>
+			{
+				create.map((itm,index)=><dd key={index} title={itm}>{itm}</dd>)
+			}
+		</dl>;
+		
+		return <Fragment>
+			<img src={Next} alt='' />
+			{this.popOver(pop,EN.FeatureCreationSelection)}
+		</Fragment>
+	}
+	
 	DQF(){
 		const {
 			nullFillMethod,nullLineCounts,
@@ -113,22 +152,46 @@ export default class ModelProcessFlow extends Component {
 			targetArray,
 			colValueCounts,
 			target,
+			targetCounts,
+			nullFillMethod,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
 		
-		const df = _.without(Object.keys(colValueCounts[target]),...targetArray);
+		let ta =[...targetArray];
+		
+		if(!targetArray.length){
+			ta = Object.keys(targetCounts).splice(0,2)
+		}
+		
+		const df = _.without(Object.keys(colValueCounts[target]),...ta);
+		
+		const om = {};
+		Object.entries(toJS(otherMap)).forEach(itm=>{
+			om[itm[0]] = (itm[1]||'NULL')
+		});
+		
 		df.forEach(itm=>{
-			if(otherMap[itm]){
-				mapping.push([itm,otherMap[itm]])
+			if(om[itm]){
+				mapping.push([itm,om[itm]])
 			}else{
 				drop.push(itm);
 			}
 		});
 		
-		if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
-			drop = [];
+		const NFMT = nullFillMethod[target];
+		
+		if(NFMT){
+			if(NFMT === 'drop'){
+				drop.push(target)
+			}else{
+				mapping.push([target,NFMT])
+			}
 		}
+		
+		// if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
+		// 	drop = [];
+		// }
 		
 		if(!drop.length&&!mapping.length){
 			return null;
@@ -249,12 +312,12 @@ export default class ModelProcessFlow extends Component {
 	}
 
 	render() {
-		const { dataFlow, standardType } = this.props.model;
-		// if (dataFlow.length === 1) {
+		const { dataFlow } = this.props.model;
 		return <section className={styles.process}>
 			<label>{EN.RawData}</label>
 			<img src={Next} alt='' />
 			{this.popOver(this.DQF(),EN.DataQualityFixing)}
+			{this.FS()}
 			<img src={Next} alt='' />
 			{this.popOver(this.FP(), EN.DataPreprocessing)}
 			<img src={Next} alt='' />

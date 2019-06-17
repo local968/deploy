@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
-import { Hint } from 'components/Common';
+import { Hint, Switch } from 'components/Common';
 import ModelProcess from './ModelProcess';
 import modelProcess from './icon-model-process-flow-normal.svg';
 import processHover from './icon-model-process-flow-hover.svg';
@@ -91,7 +91,7 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort, metric } = this.props;
+    const { models, project, projectStore, sort, metric, isHoldout } = this.props;
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
@@ -104,88 +104,94 @@ export default class AdvancedView extends Component {
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
-            const aModelData = (aModel.chartData.roc.F1[aFitIndex]);
-            const bModelData = (bModel.chartData.roc.F1[bFitIndex]);
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.F1[aFitIndex]);
+            const bModelData = (bModel[dataKey].roc.F1[bFitIndex]);
             return (aModelData - bModelData) * sort.value
           }
         case 'Precision':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = (aModel.chartData.roc.Precision[aFitIndex])
-            const bModelData = (bModel.chartData.roc.Precision[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.Precision[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.Precision[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'Recall':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = (aModel.chartData.roc.Recall[aFitIndex])
-            const bModelData = (bModel.chartData.roc.Recall[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.Recall[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.Recall[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'LogLoss':
+        case 'log_loss':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = (aModel.chartData.roc.LOGLOSS[aFitIndex])
-            const bModelData = (bModel.chartData.roc.LOGLOSS[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.LOGLOSS[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.LOGLOSS[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'Cutoff Threshold':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
-            const aModelData = (aModel.chartData.roc.Threshold[aFitIndex])
-            const bModelData = (bModel.chartData.roc.Threshold[bFitIndex])
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.Threshold[aFitIndex])
+            const bModelData = (bModel[dataKey].roc.Threshold[bFitIndex])
             return (aModelData - bModelData) * sort.value
           }
         case 'Normalized RMSE':
           {
-            const aModelData = (aModel.score.validateScore.nrmse)
-            const bModelData = (bModel.score.validateScore.nrmse)
+            const aModelData = isHoldout ? aModel.score.holdoutScore.nrmse : aModel.score.validateScore.nrmse
+            const bModelData = isHoldout ? bModel.score.holdoutScore.nrmse : bModel.score.validateScore.nrmse
             return (aModelData - bModelData) * sort.value
           }
         case 'RMSE':
           {
-            const aModelData = (aModel.score.validateScore.rmse)
-            const bModelData = (bModel.score.validateScore.rmse)
+            const aModelData = isHoldout ? (aModel.score.holdoutScore.rmse) : (aModel.score.validateScore.rmse)
+            const bModelData = isHoldout ? (bModel.score.holdoutScore.rmse) : (bModel.score.validateScore.rmse)
             return (aModelData - bModelData) * sort.value
           }
         case 'MSLE':
           {
-            const aModelData = (aModel.score.validateScore.msle)
-            const bModelData = (bModel.score.validateScore.msle)
+            const aModelData = isHoldout ? (aModel.score.holdoutScore.msle) : (aModel.score.validateScore.msle)
+            const bModelData = isHoldout ? (bModel.score.holdoutScore.msle) : (bModel.score.validateScore.msle)
             return (aModelData - bModelData) * sort.value
           }
         case 'RMSLE':
           {
-            const aModelData = (aModel.score.validateScore.rmsle)
-            const bModelData = (bModel.score.validateScore.rmsle)
+            const aModelData = isHoldout ? (aModel.score.holdoutScore.rmsle) : (aModel.score.validateScore.rmsle)
+            const bModelData = isHoldout ? (bModel.score.holdoutScore.rmsle) : (bModel.score.validateScore.rmsle)
             return (aModelData - bModelData) * sort.value
           }
         case 'MSE':
           {
-            const aModelData = (aModel.score.validateScore.mse)
-            const bModelData = (bModel.score.validateScore.mse)
+            const aModelData = isHoldout ? (aModel.score.holdoutScore.mse) : (aModel.score.validateScore.mse)
+            const bModelData = isHoldout ? (bModel.score.holdoutScore.mse) : (bModel.score.validateScore.mse)
             return (aModelData - bModelData) * sort.value
           }
         case 'MAE':
           {
-            const aModelData = (aModel.score.validateScore.mae)
-            const bModelData = (bModel.score.validateScore.mae)
+            const aModelData = isHoldout ? (aModel.score.holdoutScore.mae) : (aModel.score.validateScore.mae)
+            const bModelData = isHoldout ? (bModel.score.holdoutScore.mae) : (bModel.score.validateScore.mae)
             return (aModelData - bModelData) * sort.value
           }
         case 'R2':
           {
-            const aModelData = (aModel.score.validateScore.r2)
-            const bModelData = (bModel.score.validateScore.r2)
+            const aModelData = isHoldout ? (aModel.score.holdoutScore.r2) : (aModel.score.validateScore.r2)
+            const bModelData = isHoldout ? (bModel.score.holdoutScore.r2) : (bModel.score.validateScore.r2)
             return (aModelData - bModelData) * sort.value
           }
         case 'AdjustR2':
           {
-            const aModelData = (aModel.score.validateScore.adjustR2)
-            const bModelData = (bModel.score.validateScore.adjustR2)
+            const aModelData = isHoldout ? (aModel.score.holdoutScore.adjustR2) : (aModel.score.validateScore.adjustR2)
+            const bModelData = isHoldout ? (bModel.score.holdoutScore.adjustR2) : (bModel.score.validateScore.adjustR2)
             return (aModelData - bModelData) * sort.value
           }
         case EN.Validation:
@@ -218,8 +224,9 @@ export default class AdvancedView extends Component {
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
-            const aModelData = (aModel.chartData.roc.KS[aFitIndex]);
-            const bModelData = (bModel.chartData.roc.KS[bFitIndex]);
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+            const aModelData = (aModel[dataKey].roc.KS[aFitIndex]);
+            const bModelData = (bModel[dataKey].roc.KS[bFitIndex]);
             return (aModelData - bModelData) * sort.value
           }
         case EN.Time:
@@ -272,31 +279,46 @@ export default class AdvancedView extends Component {
   get metricOptions() {
     const { project } = this.props
     if (project && project.problemType) {
-      return project.problemType === 'Classification' ? [{
-        display: 'Accuracy',
-        key: 'acc'
-      }, {
-        display: 'AUC',
-        key: 'auc'
-      }, {
-        display: 'F1',
-        key: 'f1'
-      }, {
-        display: 'Precision',
-        key: 'precision'
-      }, {
-        display: 'Recall',
-        key: 'recall'
-      }] : [{
-        display: 'MSE',
-        key: 'mse'
-      }, {
-        display: 'RMSE',
-        key: 'rmse'
-      }, {
-        display: <div>R<sup>2</sup></div>,
-        key: 'r2'
-      }]
+      return project.problemType === 'Classification' ?
+        [{
+          display: 'Accuracy',
+          key: 'acc'
+        }, {
+          display: 'AUC',
+          key: 'auc'
+        }, {
+          display: 'F1',
+          key: 'f1'
+        }, {
+          display: 'Precision',
+          key: 'precision'
+        }, {
+          display: 'Recall',
+          key: 'recall'
+        }, {
+          key: "log_loss",
+          display: 'LogLoss'
+        }]
+        // [{
+        //   display: 'AUC',
+        //   key: 'auc'
+        // }, {
+        //   display: 'F1',
+        //   key: 'f1'
+        // }, {
+        //   key: "log_loss",
+        //   display: 'LogLoss'
+        // }]
+        : [{
+          display: 'MSE',
+          key: 'mse'
+        }, {
+          display: 'RMSE',
+          key: 'rmse'
+        }, {
+          display: <div>R<sup>2</sup></div>,
+          key: 'r2'
+        }]
     }
     return []
   }
@@ -349,8 +371,8 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort, handleChange, metric } = this.props;
-    const { problemType } = project
+    const { project, sort, handleSort, handleChange, metric, isHoldout, handleHoldout } = this.props;
+    const { problemType } = project;
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
       <div className={styles.advancedModelResult}>
@@ -369,12 +391,17 @@ export default class AdvancedView extends Component {
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
         <div className={styles.metricSelection} >
+          <div className={styles.metricSwitch}>
+            <span>{EN.Validation}</span>
+            <Switch checked={isHoldout} onChange={handleHoldout} style={{ backgroundColor: '#1D2B3C' }} />
+            <span>{EN.Holdout}</span>
+          </div>
           <span className={styles.text} >{EN.MeasurementMetric}</span>
           <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>
             {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
           </Select>
         </div>
-        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} metric={currMetric} />
+        <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} metric={currMetric} isHoldout={isHoldout} />
       </div>
     )
   }
@@ -406,7 +433,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sort, handleSort, metric } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sort, handleSort, metric, isHoldout } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
@@ -431,9 +458,9 @@ class AdvancedModelTable extends Component {
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
-        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} />
       } else {
-        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} />
+        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} />
       }
     });
     return (
@@ -456,8 +483,8 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked } = this.props;
-    const { score, modelName, reason } = model;
+    const { model, texts, metric, checked, isHoldout } = this.props;
+    const { score: { validateScore, holdoutScore }, modelName, reason } = model;
     const { detail } = this.state;
     const { validate, holdout } = reason || {}
     return (
@@ -476,27 +503,27 @@ class AdvancedModelTable extends Component {
                   />
                 )
               case 'Normalized RMSE':
-                return <RowCell key={10} data={score.validateScore.nrmse} title={score.validateScore.nrmse === 'null' ? (validate || {}).nrmse : ""} />;
+                return <RowCell key={10} data={(isHoldout ? holdoutScore : validateScore).nrmse} title={(isHoldout ? holdoutScore : validateScore).nrmse === 'null' ? (validate || {}).nrmse : ""} />;
               case 'RMSE':
-                return <RowCell key={2} data={score.validateScore.rmse} title={score.validateScore.rmse === 'null' ? (validate || {}).rmse : ""} />;
+                return <RowCell key={2} data={(isHoldout ? holdoutScore : validateScore).rmse} title={(isHoldout ? holdoutScore : validateScore).rmse === 'null' ? (validate || {}).rmse : ""} />;
               case 'MSLE':
-                return <RowCell key={11} data={score.validateScore.msle} title={score.validateScore.msle === 'null' ? (validate || {}).msle : ""} />;
+                return <RowCell key={11} data={(isHoldout ? holdoutScore : validateScore).msle} title={(isHoldout ? holdoutScore : validateScore).msle === 'null' ? (validate || {}).msle : ""} />;
               case 'RMSLE':
-                return <RowCell key={9} data={score.validateScore.rmsle} title={score.validateScore.rmsle === 'null' ? (validate || {}).rmsle : ""} />;
+                return <RowCell key={9} data={(isHoldout ? holdoutScore : validateScore).rmsle} title={(isHoldout ? holdoutScore : validateScore).rmsle === 'null' ? (validate || {}).rmsle : ""} />;
               case 'MSE':
-                return <RowCell key={3} data={score.validateScore.mse} title={score.validateScore.mse === 'null' ? (validate || {}).mse : ""} />;
+                return <RowCell key={3} data={(isHoldout ? holdoutScore : validateScore).mse} title={(isHoldout ? holdoutScore : validateScore).mse === 'null' ? (validate || {}).mse : ""} />;
               case 'MAE':
-                return <RowCell key={4} data={score.validateScore.mae} title={score.validateScore.mae === 'null' ? (validate || {}).mae : ""} />;
+                return <RowCell key={4} data={(isHoldout ? holdoutScore : validateScore).mae} title={(isHoldout ? holdoutScore : validateScore).mae === 'null' ? (validate || {}).mae : ""} />;
               case 'R2':
-                return <RowCell key={5} data={score.validateScore.r2} title={score.validateScore.r2 === 'null' ? (validate || {}).r2 : ""} />;
+                return <RowCell key={5} data={(isHoldout ? holdoutScore : validateScore).r2} title={(isHoldout ? holdoutScore : validateScore).r2 === 'null' ? (validate || {}).r2 : ""} />;
               case 'AdjustR2':
-                return <RowCell key={8} data={score.validateScore.adjustR2} title={score.validateScore.adjustR2 === 'null' ? (validate || {}).adjustR2 : ""} />;
+                return <RowCell key={8} data={(isHoldout ? holdoutScore : validateScore).adjustR2} title={(isHoldout ? holdoutScore : validateScore).adjustR2 === 'null' ? (validate || {}).adjustR2 : ""} />;
               case EN.Validation:
-                return <RowCell key={6} data={score.validateScore[metric]} title={score.validateScore[metric] === 'null' ? (validate || {})[metric] : ""} />;
+                return <RowCell key={6} data={validateScore[metric]} title={validateScore[metric] === 'null' ? (validate || {})[metric] : ""} />;
               case EN.Holdout:
-                return <RowCell key={7} data={score.holdoutScore[metric]} title={score.holdoutScore[metric] === 'null' ? (holdout || {})[metric] : ""} />;
+                return <RowCell key={7} data={holdoutScore[metric]} title={holdoutScore[metric] === 'null' ? (holdout || {})[metric] : ""} />;
               case EN.Time:
-                return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
+                return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
                 return null
             }
@@ -636,9 +663,9 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   };
   render() {
-    const { model, texts, metric, checked, yes, no } = this.props;
+    const { model, texts, metric, checked, yes, no, isHoldout } = this.props;
     if (!model.chartData) return null;
-    const { modelName, fitIndex, chartData: { roc }, score } = model;
+    const { modelName, fitIndex, holdoutChartData, chartData, score } = model;
     const { detail } = this.state;
     return (
       <div >
@@ -656,29 +683,29 @@ class ClassificationModelRow extends Component {
                   />
                 );
               case 'F1-Score':
-                return <RowCell key={2} data={model.f1Validation} />;
+                return <RowCell key={2} data={model[`f1${isHoldout ? 'Holdout' : 'Validation'}`]} />;
               case 'Precision':
-                return <RowCell key={3} data={model.precisionValidation} />;
+                return <RowCell key={3} data={model[`precision${isHoldout ? 'Holdout' : 'Validation'}`]} />;
               case 'Recall':
-                return <RowCell key={4} data={model.recallValidation} />;
+                return <RowCell key={4} data={model[`recall${isHoldout ? 'Holdout' : 'Validation'}`]} />;
               case 'LogLoss':
-                return <RowCell key={5} data={roc.LOGLOSS[fitIndex]} />;
+                return <RowCell key={5} data={(isHoldout ? holdoutChartData : chartData).roc.LOGLOSS[fitIndex]} />;
               case 'Cutoff Threshold':
-                return <RowCell key={6} data={roc.Threshold[fitIndex]} />;
+                return <RowCell key={6} data={(isHoldout ? holdoutChartData : chartData).roc.Threshold[fitIndex]} />;
               case 'KS':
-                return <RowCell key={7} data={roc.KS[fitIndex]} />;
+                return <RowCell key={7} data={(isHoldout ? holdoutChartData : chartData).roc.KS[fitIndex]} />;
               case EN.Validation:
-                return <RowCell key={8} data={metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
+                return <RowCell key={8} data={metric === 'log_loss' ? chartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
               case EN.Holdout:
-                return <RowCell key={9} data={metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
+                return <RowCell key={9} data={metric === 'log_loss' ? holdoutChartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
               case EN.Time:
-                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
+                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
                 return null
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} yes={yes} no={no} />}
+        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} />}
       </div>
     )
   }
@@ -704,10 +731,11 @@ class DetailCurves extends Component {
     }, 0)
   };
   render() {
-    const { model, model: { mid }, yes, no, project } = this.props;
+    const { model, model: { mid }, yes, no, project, isHoldout } = this.props;
     const { curve, show } = this.state;
     let curComponent;
     let hasReset = true;
+
     switch (curve) {
       case EN.ROCCurve:
         curComponent = show && <ROCCurves
@@ -716,6 +744,7 @@ class DetailCurves extends Component {
           x_name={EN.FalsePositiveDate}
           y_name={EN.TruePositiveRate}
           model={model}
+          isHoldout={isHoldout}
         />;
         break;
       case EN.PredictionDistribution:
@@ -725,6 +754,7 @@ class DetailCurves extends Component {
           x_name={EN.ProbabilityThreshold}
           y_name={EN.ProbabilityDensity}
           model={model}
+          isHoldout={isHoldout}
         />;
         break;
       case EN.PrecisionRecallTradeoff:
@@ -733,7 +763,8 @@ class DetailCurves extends Component {
           x_name={EN.Recall}
           y_name={EN.Precision}
           model={model}
-        />
+          isHoldout={isHoldout}
+        />;
         break;
       case EN.LiftChart:
         curComponent = <SingleLiftCharts
@@ -741,7 +772,7 @@ class DetailCurves extends Component {
           x_name={EN.percentage}
           y_name={EN.lift}
           model={model}
-        />
+        />;
         hasReset = false;
         break;
       case EN.VariableImpact:
@@ -796,7 +827,7 @@ class DetailCurves extends Component {
           </div>
           <PredictTable model={model} yes={yes} no={no} />
         </div>
-        <div className={styles.rightPanel} style={{marginLeft:10}}>
+        <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
           {curComponent}
           {hasReset && <button onClick={this.reset} className={styles.button + ' ' + styles.buttonr} >{EN.Reset}</button>}
         </div>
@@ -840,7 +871,7 @@ class Thumbnail extends Component {
         // onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
-        <img src={icon} alt="icon"/>
+        <img src={icon} alt="icon" />
         <div>{text}</div>
       </div>
     )
@@ -860,15 +891,15 @@ class Row extends Component {
 
 class RowCell extends Component {
   render() {
-    const { data, cellStyle, cellClassName, title, notFormat, ...rest } = this.props;
+    const { data, cellStyle, cellClassName, title, ...rest } = this.props;
     return (
       <div
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={title ? title : typeof data === 'object' ? '' : data}
+        title={title ? title : typeof data === 'object' ? '' : formatNumber(data)}
       >
-        {notFormat ? data : formatNumber(data)}
+        {formatNumber(data)}
       </div>
     );
   }
@@ -933,7 +964,7 @@ class PredictTable extends Component {
 class ModelComp extends Component {
   state = {
     modelCompVisible: false,
-    select:true,
+    select: true,
   };
   handleClick = () => {
     this.setState({ modelCompVisible: true });
@@ -943,7 +974,7 @@ class ModelComp extends Component {
   };
   render() {
     const { models } = this.props;
-    const {select} = this.state;
+    const { select } = this.state;
     return (
       <div className={styles.modelComp}>
         <a onClick={this.handleClick} className={styles.comparison}>{EN.ModelComparisonCharts}</a>
@@ -997,13 +1028,13 @@ class ModelComp extends Component {
               </TabPane> */}
             </Tabs>
             <div className={styles.mccb}>
-              <Button type="primary" onClick={async ()=>{
-                await this.setState({select:false});
-                this.setState({select:true});
+              <Button type="primary" onClick={async () => {
+                await this.setState({ select: false });
+                this.setState({ select: true });
               }}>{EN.SelectAll}</Button>
-              <Button type="primary" onClick={async ()=>{
-                await this.setState({select:true});
-                this.setState({select:false});
+              <Button type="primary" onClick={async () => {
+                await this.setState({ select: true });
+                this.setState({ select: false });
               }}>{EN.DeselectAll}</Button>
             </div>
           </div>

@@ -27,7 +27,7 @@ export default class ErrorBoundary extends Component {
       return (
         <div className={styles.errorBoundary}>
           <h2>{EN.SomethingwentwrongPlease}<a onClick={this.refresh}>{EN.Refresh}</a> or <a onClick={this.goback}>{EN.Goback}</a></h2>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <details style={{ whiteSpace: 'pre-wrap', maxHeight: '80%', overflow: 'auto' }}>
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.errorInfo.componentStack}
