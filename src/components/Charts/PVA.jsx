@@ -4,17 +4,12 @@ import * as _ from "lodash";
 import {debounce} from "lodash";
 import InputNum from'rc-input-number';
 import classNames from 'classnames';
-// import Slider from "rc-slider";
 import 'rc-input-number/assets/index.css';
-// import 'rc-slider/assets/index.css';
 import request from "../Request";
 import EN from "../../constant/en";
 import styles from './charts.module.css';
 import Hint from "../Common/Hint";
-
-
-// const createSliderWithTooltip = Slider.createSliderWithTooltip;
-// const Range = createSliderWithTooltip(Slider.Range);
+import { Button } from 'antd';
 
 export default class PVA extends Component{
 	constructor(props){
@@ -25,6 +20,7 @@ export default class PVA extends Component{
 			sliderValue : [0,100],
 			ready:false,
 			data:[],
+			loading:'',
 		}
 	}
 	
@@ -45,25 +41,30 @@ export default class PVA extends Component{
 			})).data;
 		}
 		
-		// data[0].name = EN.ActualValues;
-		// data[1].name = EN.PredictedValues;
 		this.setState({
 			data,
 			ready:true,
 		})
 	}
 	
-	async setSlider(sliderValue){
+	async setSlider(sliderValue,loading=''){
 		const [start,end] = this.state.sliderValue;
 		const [_start,_end] = sliderValue;
+		
+		if(loading!==this.state.loading){
+			this.setState({
+				loading,
+			});
+		}
+		
 		if(!this.chart){
 			return;
 		}
 		const chart = this.chart.getEchartsInstance();
 		chart.hideLoading();
-		if(start!==_start||end!==_end){
+		if(start!==_start||end!==_end||loading){
 			const rebuild = start === _start||end===_end||Math.abs(start-end-_start+_end)>0.1;
-			if(!rebuild){
+			if(!rebuild&&!loading){
 				return this.setState({
 					sliderValue,
 				})
@@ -220,7 +221,7 @@ export default class PVA extends Component{
 	}
 	
 	render(){
-		const {data} = this.state;
+		const {data,loading} = this.state;
 		if(!data[0]){
 			return null;
 		}
@@ -294,15 +295,36 @@ export default class PVA extends Component{
 							});
 						}}
 					/>
-					<button className={classNames(styles.button,styles.small)} onClick={()=>{
-						if(y_start === y_end){
-							y_end++
-						}
-						return this.setSlider([y_start/act.length*100,y_end/act.length*100])
-					}}>{EN.Yes}</button>
-					<button className={classNames(styles.button,styles.small,styles.white)} onClick={()=>{
-						return this.setSlider([0,100])
-					}}>{EN.Reset}</button>
+					{/*<button className={classNames(styles.button,styles.small)} onClick={()=>{*/}
+					{/*	if(y_start === y_end){*/}
+					{/*		y_end++*/}
+					{/*	}*/}
+					{/*	this.setState({*/}
+					{/*		loading:'change'*/}
+					{/*	});*/}
+					{/*	return this.setSlider([y_start/act.length*100,y_end/act.length*100],true)*/}
+					{/*}}>{EN.Yes}</button>*/}
+					<Button
+						type="primary"
+						loading={loading === 'change'}
+						disabled={loading === 'reset'}
+						onClick={()=>{
+							if(y_start === y_end){
+								y_end++
+							}
+							return this.setSlider([y_start/act.length*100,y_end/act.length*100],'change')
+						}}
+					>{EN.Yes}</Button>
+					{/*<button className={classNames(styles.button,styles.small,styles.white)} onClick={()=>{*/}
+					{/*	return this.setSlider([0,100],true)*/}
+					{/*}}>{EN.Reset}</button>*/}
+					<Button
+						loading={loading === 'reset'}
+						disabled={loading === 'change'}
+						onClick={()=>{
+							return this.setSlider([0,100],'reset')
+						}}
+					>{EN.Reset}</Button>
 				</div>
 			</div>
 		]
