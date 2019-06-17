@@ -513,7 +513,9 @@ const MappingDict = observer((props) => {
     </div>
     <div className={classes.dictSelect}>
       <span>{EN.PleaseSelectaCategoricalVariable}</span>
-      <Select value={mappingKey || list[0]} style={{ width: 120, marginLeft: 20 }} onChange={handleSelect}>
+      <Select
+          getPopupContainer={() => document.getElementsByClassName(classes.dictSelect)[0]}
+          value={mappingKey || list[0]} style={{ minWidth: 120, marginLeft: 20 }} onChange={handleSelect}>
         {list.map((l, k) => <Option value={l} key={k}>{l}</Option>)}
       </Select>
     </div>

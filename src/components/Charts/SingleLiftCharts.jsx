@@ -3,8 +3,9 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 
 export default function SingleLiftCharts(props){
-	const {x_name='',y_name='',width=600,height=400,model} = props;
-	const {lift} = model.chartData;
+	const {x_name='',y_name='',width=600,height=400,model,isHoldout} = props;
+	const {holdoutChartData,chartData} = model;
+	const {lift} = isHoldout?holdoutChartData:chartData;
 	const {LIFT,PERCENTAGE} = lift;
 	const _LIFT = Object.values(LIFT);
 	const _PERCENTAGE = Object.values(PERCENTAGE);

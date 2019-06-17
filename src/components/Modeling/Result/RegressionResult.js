@@ -58,7 +58,7 @@ export default class RegressionView extends Component {
             key='pva'
             x_name = {EN.PointNumber}
             y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}
-            url={project.selectModel.predictData}
+            url={project.selectModel.validatePlotData}
         />
       </div>
       <div className={styles.line} />

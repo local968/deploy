@@ -22,9 +22,9 @@ export default class PRCharts extends PureComponent{
 	
 	prePair(isHoldout=this.props.isHoldout){
 		const {x_name='',y_name='',model} = this.props;
-		const {chartData,fitIndex=0} = model;
-		const {roc,rocHoldout} = chartData;
-		const {Recall:x,Precision:y} = isHoldout?rocHoldout:roc;
+		const {chartData,fitIndex=0,holdoutChartData} = model;
+		const {roc} = isHoldout?holdoutChartData:chartData;
+		const {Recall:x,Precision:y} = roc;
 		
 		const _x = Object.values(x).map((itm,index)=>itm+index*10**-6);
 		const _y = Object.values(y);
