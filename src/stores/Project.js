@@ -585,15 +585,23 @@ export default class Project {
 
     await this.abortTrainByEtl()
 
-    if (!data.cleanHeader || !data.rawHeader || !data.dataHeader) {
-      const api = await socketStore.ready()
-      const { header } = await api.getHeader({ index: data.originalIndex })
-      data.cleanHeader = header
-      data.rawHeader = header
-      data.dataHeader = header
-    }
+    const api = await socketStore.ready()
+    const { header } = await api.getHeader({ index: data.originalIndex })
+    data.header = header
 
-    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, data, {
+    const totalRawLines = data.totalRawLines
+    const fileName = data.fileName
+    const originalIndex = data.originalIndex
+    const mapHeader = data.rawHeader
+    const rawHeader = data.header
+    const dataHeader = data.header
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
+      rawHeader,
+      dataHeader,
+      mapHeader,
+      totalRawLines,
+      originalIndex,
+      fileName,
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
