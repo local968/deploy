@@ -1133,7 +1133,9 @@ const ZH_LAN: any = {
   ChartZoneC:"  c. 滑动鼠标滑轮，直接放大当前范围",
   ChartReset:"5.点击”重置“按钮可返回默认最大范围",
   custom: "自定义函数",
-  timeoutRetry: "网络超时,正在重试."
+  timeoutRetry: "网络超时,正在重试.",
+  Deployment:'模型部署',
+  PerformanceMonitors:'部署性能',
 };
 
 export default ZH_LAN;

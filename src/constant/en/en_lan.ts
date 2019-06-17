@@ -1268,7 +1268,9 @@ const EN_LAN = {
   ChartZoneC:"  c. rolling the mouse wheel to zoom in",
   ChartReset:"5.Click \"reset\" to to whole value range",
   custom: "custom function",
-  timeoutRetry: "Connection timeout. Reconnecting now."
+  timeoutRetry: "Connection timeout. Reconnecting now.",
+  Deployment:'Deployment',
+  PerformanceMonitors:'Performance Monitor',
 };
 
 

@@ -12,6 +12,13 @@
   flex: 0 0 .5em;
 }
 
+.blocks {
+  margin-top: 0.37em;
+  display: flex;
+  flex: 0 0 .5em;
+  align-items: center;
+}
+
 .row {
   flex: 0 0 .4em;
 }
@@ -23,7 +30,8 @@
   text-align: right;
   justify-content: flex-end;
   line-height: 0.48em;
-  flex: 0 0 3em;
+  /*flex: 0 0 3em;*/
+  margin-left: -5rem;
   align-items: center;
 }
 
@@ -32,6 +40,23 @@
   margin-left: 0.3em;
   flex: 3 1 0;
   align-items: center;
+}
+
+.labels {
+  display: flex;
+  font-size: 1rem;
+  color: #4a4a4a;
+  text-align: right;
+  justify-content: flex-end;
+  line-height: 0.48em;
+  /*flex: 0 0 3em;*/
+  margin-left: 15rem;
+  align-items: center;
+}
+
+.selectionss{
+  display: inline-block;
+  margin-left: 0.3em;
 }
 
 .selection {
