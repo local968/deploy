@@ -308,7 +308,7 @@ export default class AdvancedView extends Component {
         // }, {
         //   key: "log_loss",
         //   display: 'LogLoss'
-        // }] 
+        // }]
         : [{
           display: 'MSE',
           key: 'mse'
@@ -372,7 +372,7 @@ export default class AdvancedView extends Component {
 
   render() {
     const { project, sort, handleSort, handleChange, metric, isHoldout, handleHoldout } = this.props;
-    const { problemType } = project
+    const { problemType } = project;
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
       <div className={styles.advancedModelResult}>
@@ -705,7 +705,7 @@ class ClassificationModelRow extends Component {
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} yes={yes} no={no} />}
+        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} />}
       </div>
     )
   }
@@ -731,10 +731,11 @@ class DetailCurves extends Component {
     }, 0)
   };
   render() {
-    const { model, model: { mid }, yes, no, project } = this.props;
+    const { model, model: { mid }, yes, no, project,isHoldout } = this.props;
     const { curve, show } = this.state;
     let curComponent;
     let hasReset = true;
+  
     switch (curve) {
       case EN.ROCCurve:
         curComponent = show && <ROCCurves
@@ -743,6 +744,7 @@ class DetailCurves extends Component {
           x_name={EN.FalsePositiveDate}
           y_name={EN.TruePositiveRate}
           model={model}
+          isHoldout={isHoldout}
         />;
         break;
       case EN.PredictionDistribution:
@@ -752,6 +754,7 @@ class DetailCurves extends Component {
           x_name={EN.ProbabilityThreshold}
           y_name={EN.ProbabilityDensity}
           model={model}
+          isHoldout={isHoldout}
         />;
         break;
       case EN.PrecisionRecallTradeoff:
@@ -760,7 +763,8 @@ class DetailCurves extends Component {
           x_name={EN.Recall}
           y_name={EN.Precision}
           model={model}
-        />
+          isHoldout={isHoldout}
+        />;
         break;
       case EN.LiftChart:
         curComponent = <SingleLiftCharts
@@ -768,7 +772,7 @@ class DetailCurves extends Component {
           x_name={EN.percentage}
           y_name={EN.lift}
           model={model}
-        />
+        />;
         hasReset = false;
         break;
       case EN.VariableImpact:

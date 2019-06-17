@@ -6,11 +6,11 @@ import config from 'config'
 const isEN = config.isEN;
 
 export default function PredictionDistributions(props){
-	const {x_name='',y_name='',width=500,height=400,model} = props;
+	const {x_name='',y_name='',width=500,height=400,model,isHoldout} = props;
 	const {initialFitIndex,fitIndex,chartData} = model;
-	const {density,roc} = chartData;
+	const {density,roc,rocHoldout} = chartData;
 	const {POSITIVE,NEGATIVE,PERCENTAGE} = density;
-	const {Threshold} = roc;
+	const {Threshold} = isHoldout?rocHoldout:roc;
 	const _POSITIVE = Object.values(POSITIVE);
 	const _NEGATIVE = Object.values(NEGATIVE);
 	const _PERCENTAGE = Object.values(PERCENTAGE);
