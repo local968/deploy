@@ -15,11 +15,17 @@ export default class ROCCurves extends PureComponent{
 		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
 	}
 	
-	prePair(fitIndex=this.props.model.fitIndex){
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.isHoldout!==this.props.isHoldout){
+			this.prePair(undefined,nextProps.isHoldout)
+		}
+	}
+	
+	prePair(fitIndex=this.props.model.fitIndex,isHoldout=this.props.isHoldout){
 		const {x_name='',y_name='',model} =this.props;
 		const {chartData} = model;
-		const {roc} = chartData;
-		const {FPR:x,TPR:y} = roc;
+		const {roc,rocHoldout} = chartData;
+		const {FPR:x,TPR:y} = isHoldout?rocHoldout:roc;
 		const _x = Object.values(x).map((itm,index)=>itm+index*10**-6);
 		const _y = Object.values(y);
 		const data = _.zip(_x,_y);
@@ -124,6 +130,10 @@ export default class ROCCurves extends PureComponent{
 
 		const _data = data.filter(itm=>itm[0] === point)||data[0];
 		_data[0] = myChart.convertFromPixel('grid', this.position);
+		
+		if(!_data[0]){
+			return
+		}
 		
 		const _x = _data[0][0];
 		const next_point = data.filter(itm=>itm[0]>point)[0];

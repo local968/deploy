@@ -1,5 +1,5 @@
-import React from "react";
-import { Typography } from "@material-ui/core";
+// import React from "react";
+// import { Typography } from "@material-ui/core";
 
 const ZH_LAN: any = {
   Loading: '加载中…',
