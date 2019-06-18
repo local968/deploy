@@ -121,7 +121,7 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader, newVariable } = project;
     if (!current) return null;
 
     const { selectModel = {}, targetCounts = {} } = project;
@@ -148,6 +148,7 @@ export default class ClassificationView extends Component {
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
     const curBenefit = current.getBenefit(TP, FN, FP, TN, typeof distribution === 'number' ? (distribution / 100) : (event / 10000), event / 10000)
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -345,7 +346,7 @@ export default class ClassificationView extends Component {
         text={text}
         sort={sort}
         handleSort={handleSort}
-        mapHeader={mapHeader}
+        mapHeader={newMapHeader}
       />
     </div>
   }

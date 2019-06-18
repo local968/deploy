@@ -31,9 +31,9 @@ function ModelResult(props) {
   })
   const { resetSide, view, changeView, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
-
+  const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   React.useEffect(() => {
     resetSide()
   })
@@ -147,7 +147,7 @@ function ModelResult(props) {
               placement='bottomLeft'
               visible={visible}
               onVisibleChange={hideDict}
-              content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
+              content={<MappingDict project={project} list={list} hideDict={hideDict} mapHeader={newMapHeader} />} />
           </div>}
         </div>
         <div className={classes.right} style={{ flex: 1, width: 200 }}>
@@ -158,8 +158,8 @@ function ModelResult(props) {
           }
         </div>
       </div>
-      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
-      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
+      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
+      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
     </div>}
     {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
     <div className={classes.buttonBlock}>
@@ -187,7 +187,7 @@ function ModelResult(props) {
 export default inject('projectStore', 'deploymentStore', 'routing')(observer(ModelResult))
 
 const OutlierTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
   const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -233,7 +233,7 @@ const OutlierTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} />
+        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} mapHeader={mapHeader} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -251,7 +251,7 @@ const OutlierTable = observer((props) => {
 const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
-  const { model, isRecommend, isSelect, onSelect } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader } = props
 
   const toggleImpact = (_type) => {
     if (!visible) {//本来是关着的
@@ -304,14 +304,14 @@ const OutlierRow = observer((props) => {
       </div>
     </Tooltip>
     <div className={classes.rowData}>
-      {visible && type === 'impact' && <VariableImpact model={model} />}
+      {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
     </div>
   </div>
 })
 
 const ClusteringTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
   const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -383,7 +383,7 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
+        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} mapHeader={mapHeader} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -399,7 +399,7 @@ const ClusteringTable = observer((props) => {
 })
 
 const ClusteringRow = observer((props) => {
-  const { model, isRecommend, isSelect, onSelect } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader } = props
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const toggleImpact = (_type) => {
@@ -466,7 +466,7 @@ const ClusteringRow = observer((props) => {
       </div>
     </Tooltip>
     <div className={classes.rowData}>
-      {visible && type === 'impact' && <VariableImpact model={model} />}
+      {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
       {visible && type === 'explanation' && <Explanation model={model} />}
     </div>
@@ -474,7 +474,7 @@ const ClusteringRow = observer((props) => {
 })
 
 const MappingDict = observer((props) => {
-  const { project, list, hideDict } = props
+  const { project, list, hideDict, mapHeader } = props
   const { colMap, mappingKey } = project
   const [state, setState] = React.useState({
     origin: '',
@@ -514,9 +514,9 @@ const MappingDict = observer((props) => {
     <div className={classes.dictSelect}>
       <span>{EN.PleaseSelectaCategoricalVariable}</span>
       <Select
-          getPopupContainer={() => document.getElementsByClassName(classes.dictSelect)[0]}
-          value={mappingKey || list[0]} style={{ minWidth: 120, marginLeft: 20 }} onChange={handleSelect}>
-        {list.map((l, k) => <Option value={l} key={k}>{l}</Option>)}
+        getPopupContainer={() => document.getElementsByClassName(classes.dictSelect)[0]}
+        value={mappingKey || list[0]} style={{ minWidth: 120, marginLeft: 20 }} onChange={handleSelect}>
+        {list.map((l, k) => <Option value={l} key={k}>{mapHeader[l]}</Option>)}
       </Select>
     </div>
     <div className={classes.dictTable}>

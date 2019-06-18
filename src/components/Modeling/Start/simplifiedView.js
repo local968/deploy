@@ -501,15 +501,16 @@ class SimplifiedViewRow extends Component {
 
   render() {
     const { data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines, isNew } = this.props;
-    const { univariatePlots, histgramPlots, univariatePlot, histgramPlot, mapHeader } = project
+    const { univariatePlots, histgramPlots, univariatePlot, histgramPlot, mapHeader, newVariable } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
 
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
         onChange={handleCheck} /></div>
-      <div className={styles.tableTd} title={mapHeader[value]}><span>{mapHeader[value]}</span></div>
+      <div className={styles.tableTd} title={newMapHeader[value]}><span>{newMapHeader[value]}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })}
@@ -528,7 +529,7 @@ class SimplifiedViewRow extends Component {
                                                                      getPath={histgramPlot.bind(null, value)}>
                                                   <SimplifiedViewPlot onClose={this.hideHistograms}
                                                                       type={colType[value]}
-                                                                      target={mapHeader[value]}
+                                                                      target={newMapHeader[value]}
                                                                       data={this.chartData[value]}
                                                   /></SimplePlot>} /> : null}
       </div>

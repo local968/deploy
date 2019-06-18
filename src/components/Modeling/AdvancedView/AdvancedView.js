@@ -433,9 +433,10 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader }, sort, handleSort, metric, isHoldout } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     const texts = problemType === 'Classification' ?
       [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
       [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
@@ -458,9 +459,9 @@ class AdvancedModelTable extends Component {
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
-        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={mapHeader} />
+        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
       } else {
-        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} />
+        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader}/>
       }
     });
     return (
@@ -483,7 +484,7 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked, isHoldout } = this.props;
+    const { model, texts, metric, checked, isHoldout, mapHeader } = this.props;
     const { score: { validateScore, holdoutScore }, modelName, reason } = model;
     const { detail } = this.state;
     const { validate, holdout } = reason || {}
@@ -529,7 +530,7 @@ class AdvancedModelTable extends Component {
             }
           })}
         </Row>
-        {detail && <RegressionDetailCurves isHoldout={isHoldout} project={this.props.project} model={model} />}
+        {detail && <RegressionDetailCurves isHoldout={isHoldout} project={this.props.project} model={model} mapHeader={mapHeader} />}
       </div>
     )
   }
@@ -612,7 +613,7 @@ class RegressionDetailCurves extends Component {
   }
 
   render() {
-    const { model, isHoldout, project: { mapHeader } } = this.props;
+    const { model, isHoldout, mapHeader } = this.props;
     const { curve, diagnoseType, chartDate, show, holdOutChartDate } = this.state;
     let curComponent;
     switch (curve) {

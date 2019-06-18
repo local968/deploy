@@ -310,14 +310,15 @@ class SimplifiedViewRow extends Component {
 
   render() {
     const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew } = this.props;
-    const { histgramPlots, histgramPlot,mapHeader } = project
+    const { histgramPlots, histgramPlot,mapHeader, newVariable } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
         onChange={handleCheck} /></div>
-      <div className={styles.tableTd} title={mapHeader[value]}><span>{mapHeader[value]}</span></div>
+      <div className={styles.tableTd} title={newMapHeader[value]}><span>{newMapHeader[value]}</span></div>
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.9} min={0.1} step={0.1} precision={1} onChange={handleWeight} />
       </div>
@@ -335,7 +336,7 @@ class SimplifiedViewRow extends Component {
                                                 content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
                                                   <SimplifiedViewPlot onClose={this.hide}
                                                                       type={colType[value]}
-                                                                      value={mapHeader[value]}
+                                                                      value={newMapHeader[value]}
                                                                       data={this.chartData[value]} />
                                                 </SimplePlot>} /> : null}
       </div>
