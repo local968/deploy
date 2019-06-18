@@ -184,6 +184,7 @@ export default class SimplifiedView extends Component {
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -248,7 +249,7 @@ export default class SimplifiedView extends Component {
             <span>{EN.CreateANewVariable}</span>
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
-            <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={newVariableType} expression={expression} />
+            <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={newVariableType} expression={expression} mapHeader={newMapHeader} />
           </Modal>
         </div>
         <div
@@ -299,7 +300,7 @@ export default class SimplifiedView extends Component {
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
               const isNew = newVariable.includes(h)
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance}
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} importance={importance} mapHeader={newMapHeader}
                 colType={variableType} project={project}
                 isChecked={checkedVariables.includes(h)}
                 handleCheck={this.handleCheck.bind(null, h)}
@@ -500,17 +501,16 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines, isNew } = this.props;
-    const { univariatePlots, histgramPlots, univariatePlot, histgramPlot, mapHeader, newVariable } = project
+    const { data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines, isNew, mapHeader } = this.props;
+    const { univariatePlots, histgramPlots, univariatePlot, histgramPlot } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
-    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
 
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
         onChange={handleCheck} /></div>
-      <div className={styles.tableTd} title={newMapHeader[value]}><span>{newMapHeader[value]}</span></div>
+      <div className={styles.tableTd} title={mapHeader[value]}><span>{mapHeader[value]}</span></div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })}
@@ -529,7 +529,7 @@ class SimplifiedViewRow extends Component {
                                                                      getPath={histgramPlot.bind(null, value)}>
                                                   <SimplifiedViewPlot onClose={this.hideHistograms}
                                                                       type={colType[value]}
-                                                                      target={newMapHeader[value]}
+                                                                      target={mapHeader[value]}
                                                                       data={this.chartData[value]}
                                                   /></SimplePlot>} /> : null}
       </div>

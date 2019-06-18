@@ -157,6 +157,7 @@ export default class SimplifiedView extends Component {
     const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.chooseScan}>
         <div className={styles.chooseLabel}><span>{EN.ChooseaVariableScalingMethod}:</span></div>
@@ -194,7 +195,7 @@ export default class SimplifiedView extends Component {
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable}
-              addNewVariable={addNewVariable2} colType={colType} expression={expression} />
+              addNewVariable={addNewVariable2} colType={colType} expression={expression} mapHeader={newMapHeader}/>
           </Modal>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
@@ -231,7 +232,7 @@ export default class SimplifiedView extends Component {
               const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
               const isNew = newVariable.includes(h)
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]}
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} mapHeader={newMapHeader}
                 handleWeight={this.handleWeight(h)} colType={variableType} project={project}
                 isChecked={checkedVariables.includes(h)}
                 handleCheck={this.handleCheck.bind(null, h)}
@@ -309,16 +310,15 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew } = this.props;
-    const { histgramPlots, histgramPlot,mapHeader, newVariable } = project
+    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew, mapHeader } = this.props;
+    const { histgramPlots, histgramPlot } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
-    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
         onChange={handleCheck} /></div>
-      <div className={styles.tableTd} title={newMapHeader[value]}><span>{newMapHeader[value]}</span></div>
+      <div className={styles.tableTd} title={mapHeader[value]}><span>{mapHeader[value]}</span></div>
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.9} min={0.1} step={0.1} precision={1} onChange={handleWeight} />
       </div>
@@ -336,7 +336,7 @@ class SimplifiedViewRow extends Component {
                                                 content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
                                                   <SimplifiedViewPlot onClose={this.hide}
                                                                       type={colType[value]}
-                                                                      value={newMapHeader[value]}
+                                                                      value={mapHeader[value]}
                                                                       data={this.chartData[value]} />
                                                 </SimplePlot>} /> : null}
       </div>
