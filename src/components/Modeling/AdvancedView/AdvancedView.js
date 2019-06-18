@@ -878,7 +878,11 @@ class DetailCurves extends Component {
           <div className={styles.thumbnails}>
             {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
-          <PredictTable model={model} yes={yes} no={no} />
+          <PredictTable
+              isHoldout={isHoldout}
+              model={model}
+              yes={yes}
+              no={no} />
         </div>
         <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
           {curComponent}
@@ -962,12 +966,13 @@ class RowCell extends Component {
 @observer
 class PredictTable extends Component {
   render() {
-    const { model, yes, no } = this.props;
-    const { fitIndex, chartData } = model;
-    let TN = chartData.roc.TN[fitIndex];
-    let FP = chartData.roc.FP[fitIndex];
-    let TP = chartData.roc.TP[fitIndex];
-    let FN = chartData.roc.FN[fitIndex];
+    const { model, yes, no ,isHoldout} = this.props;
+    const { fitIndex, chartData,holdoutChartData } = model;
+    const {roc} = isHoldout?holdoutChartData:chartData;
+    let TN = roc.TN[fitIndex];
+    let FP = roc.FP[fitIndex];
+    let TP = roc.TP[fitIndex];
+    let FN = roc.FN[fitIndex];
     const column = [{
       title: '',
       dataIndex: 'rowName',
