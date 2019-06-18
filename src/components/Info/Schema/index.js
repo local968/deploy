@@ -76,7 +76,7 @@ export default class DataSchema extends Component {
   }
 
   formatTable = () => {
-    const { headerTemp: { temp }, uploadData, rawHeader, renameVariable, etling } = this.props.projectStore.project;
+    const { uploadData, rawHeader, mapHeader, etling, headerTemp: {temp} } = this.props.projectStore.project;
     if (etling) return []
     const { showSelect, checkList } = this
     if (!uploadData.length) return []
@@ -138,15 +138,16 @@ export default class DataSchema extends Component {
         headerData.content = <HeaderInfo row='Header' col='Row' style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
         headerData.title = '';
       } else {
-        headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
-        headerData.title = header;
+        const headerText = mapHeader[header]
+        headerData.content = <EditHeader value={headerText} key={i - index.columnHeader} />
+        headerData.title = headerText;
         if (checkList.includes(header)) {
           headerData.cn = classnames(headerData.cn, styles.checked);
         }
-        if (!header) {
+        if (!headerText) {
           headerData.cn = classnames(headerData.cn, styles.missed);
         }
-        if (header && temp[header].length > 1) {
+        if (headerText && temp[headerText].length > 1) {
           headerData.cn = classnames(headerData.cn, styles.duplicated);
         }
       }
@@ -161,14 +162,14 @@ export default class DataSchema extends Component {
         selectData.content = "";
       } else {
         let key = header;
-        if (!header) {
-          key = `Unnamed: ${realColumn}`
-        }
-        if (header && temp[header].length > 1) {
-          const tempIndex = temp[header].findIndex(c => c === realColumn);
-          const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
-          key = header + suffix
-        }
+        // if (!header) {
+        //   key = `Unnamed: ${realColumn}`
+        // }
+        // if (header && temp[header].length > 1) {
+        //   const tempIndex = temp[header].findIndex(c => c === realColumn);
+        //   const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
+        //   key = header + suffix
+        // }
         const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
         const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>

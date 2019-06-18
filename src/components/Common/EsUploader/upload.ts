@@ -28,13 +28,13 @@ export default function EsUploader(file, option:any = {}) {
     step: async (result, parser) => {
       currentCursor = result.meta.cursor
       if(!header) {
-        header = result.data
+        header = result.data[0]
         uploader = parser
         return
       }
 
-      result.data.unshift(no++)
-      chunk.push(result.data)
+      result.data[0].unshift(no++)
+      chunk.push(result.data[0])
       if(currentCursor >= chunkSize) {
         parser.pause()
         chunkPromiseResolve()
@@ -77,11 +77,11 @@ export default function EsUploader(file, option:any = {}) {
       processors.splice(promise.no, 1)
       processors.forEach((p, i) => p.no = i )
     }
-    const _header = header.map( (k, i) => i.toString() )
+    // const _header = header.map( (k, i) => i.toString() )
     onFinished({
       originalIndex: index,
       totalRawLines: no,
-      rawHeader: _header,
+      rawHeader: header,
       fileName: file.name
     }, file)
   }
