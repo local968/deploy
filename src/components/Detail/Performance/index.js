@@ -41,6 +41,8 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
+let clusteringList = []
+
 @inject('deploymentStore', 'userStore', 'routing')
 @observer
 export default class Performance extends Component {
@@ -86,13 +88,13 @@ export default class Performance extends Component {
   })
 
 
-    isDisable (modelId) {
-        if(modelId.indexOf('Agg') != -1 || modelId.indexOf('DBSCAN1') != -1 || modelId.indexOf('SpectralClustering') != -1 ){
-            return true
-        }else {
-            return false
-        }
-    }
+    // isDisable (modelId) {
+    //     if(modelId.indexOf('Agg') != -1 || modelId.indexOf('DBSCAN1') != -1 || modelId.indexOf('SpectralClustering') != -1 ){
+    //         return true
+    //     }else {
+    //         return false
+    //     }
+    // }
 
 
 
@@ -100,27 +102,17 @@ export default class Performance extends Component {
     render() {
     const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
-    let clusteringList =  [];
 
-    // if(cd.modelType === 'Clustering') {
-    //     cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>{
-    //         clusteringList =  [];
-    //         {models.map(model =>{
-    //             const Agg = model.modelId.indexOf('Agg');
-    //             const DBSCAN1 = model.modelId.indexOf('DBSCAN1');
-    //             const SpectralClustering = model.modelId.indexOf('SpectralClustering');
-    //             if(Agg !== -1 ){
-    //                 clusteringList.push({})
-    //             }else if(DBSCAN1 !== -1 ) {
-    //                 clusteringList.push({})
-    //             }else if(SpectralClustering !== -1 ) {
-    //                 clusteringList.push({})
-    //             }else{
-    //                 clusteringList.push(model)
-    //             }
-    //         })}
-    //     })
-    // }
+    if(cd.modelType === 'Clustering') {
+        cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>{
+            clusteringList = models.filter(model =>{
+                return (model.modelId.indexOf('Agg') == -1 && model.modelId.indexOf('DBSCAN1') == -1  && model.modelId.indexOf('SpectralClustering') == -1)
+            })
+        })
+
+    }
+
+        console.log('123',clusteringList)
     const cdpo = cd.performanceOptions;
     const uploader = {
       onError: action((error, times) => {
@@ -201,17 +193,12 @@ export default class Performance extends Component {
                       <Select  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
                           {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
                               <OptGroup key={settingName} label={settingName}>
-                                  {models.map(model =>
-                                      JSON.stringify(model) !== "{}" && (
-                                          <Option disabled={this.isDisable(model.modelId)} key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>)
+                                  {clusteringList.map(model =>  <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
                                   )}
                               </OptGroup>)}
                       </Select> : cd.modelName}</span>
                       <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
                       <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
-                      {/*<span className={styles.data}>{EN.DeploymentDataDefinition}</span>*/}
-                      {/*<Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />*/}
-                      {/*<a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>*/}
                   </div>
               )}
 
