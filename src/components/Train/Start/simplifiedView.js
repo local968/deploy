@@ -2,14 +2,11 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-// import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon, Table, InputNumber, Modal } from 'antd';
+import { Popover, message as antdMessage, Icon, Table, InputNumber, Modal } from 'antd';
 import histogramIcon from './histogramIcon.svg';
-import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
-import config from 'config'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import HistogramNumerical from "../../Charts/HistogramNumerical";
@@ -74,6 +71,8 @@ export default class SimplifiedView extends Component {
       },
     }).then((CorrelationMatrixData) => {
       this.showCorrelation = true;
+      let {type} = CorrelationMatrixData;
+      CorrelationMatrixData.type = type.map(itm=>project.mapHeader[itm]);
       this.CorrelationMatrixData = CorrelationMatrixData;
     });
   };
@@ -311,14 +310,14 @@ class SimplifiedViewRow extends Component {
 
   render() {
     const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew } = this.props;
-    const { histgramPlots, histgramPlot } = project
+    const { histgramPlots, histgramPlot,mapHeader } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
         onChange={handleCheck} /></div>
-      <div className={styles.tableTd} title={value}><span>{value}</span></div>
+      <div className={styles.tableTd} title={mapHeader[value]}><span>{mapHeader[value]}</span></div>
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.9} min={0.1} step={0.1} precision={1} onChange={handleWeight} />
       </div>
@@ -331,14 +330,12 @@ class SimplifiedViewRow extends Component {
         {(!isRaw && this.histograms) ? <Popover placement='rightTop'
                                                 visible={!isRaw && this.histograms}
                                                 overlayClassName='popovers'
-                                                // getPopupContainer = {()=>document.getElementsByClassName(styles.advancedModel)[0]}
-                                                // autoAdjustOverflow = {true}
                                                 onVisibleChange={this.hideHistograms}
                                                 trigger="click"
                                                 content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
                                                   <SimplifiedViewPlot onClose={this.hide}
                                                                       type={colType[value]}
-                                                                      value={value}
+                                                                      value={mapHeader[value]}
                                                                       data={this.chartData[value]} />
                                                 </SimplePlot>} /> : null}
       </div>
