@@ -26,7 +26,7 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
   
@@ -44,7 +44,7 @@ export default class RegressionView extends Component {
             <span>{EN.SelectedModel} :<a className={styles.nohover}>&nbsp;{current.modelName}</a></span>
           </div>
           <div className={styles.row}>
-            <span>{EN.Target} :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
+            <span>{EN.Target} :<a className={styles.nohover}>&nbsp;{mapHeader[target]}</a></span>
           </div>
           <Performance current={current} />
         </div>
@@ -84,6 +84,7 @@ export default class RegressionView extends Component {
         recommendId={recommendModel.id}
         sort={sort}
         handleSort={handleSort}
+        mapHeader={mapHeader}
       />
     </div>
   }
@@ -168,7 +169,7 @@ class ModelTable extends Component {
 
   render() {
     // const { sortKey, sort } = this
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, exportReport, sort, handleSort } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, exportReport, sort, handleSort, mapHeader } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -227,6 +228,7 @@ class ModelTable extends Component {
                 onSelect={onSelect}
                 exportReport={exportReport(model.id)}
                 isRecommend={model.id === recommendId}
+                mapHeader={mapHeader}
               />
             );
           })}
@@ -264,7 +266,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isRecommend, exportReport, isSelect } = this.props;
+    const { model, onSelect, isRecommend, exportReport, isSelect, mapHeader } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -318,7 +320,7 @@ class ModelDetail extends Component {
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {/*{this.visible && <VariableImpact model={model} />}*/}
-        {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
+        {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
         {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
       </div >
     );

@@ -433,9 +433,9 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sort, handleSort, metric, isHoldout } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader }, sort, handleSort, metric, isHoldout } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
-    const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+    const [no, yes] = [renameVariable[v0] || mapHeader[v0], renameVariable[v1] || mapHeader[v1]];
     const texts = problemType === 'Classification' ?
       [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
       [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
@@ -558,9 +558,9 @@ class RegressionDetailCurves extends Component {
   componentDidMount() {
     this.setChartDate()
   }
-  
+
   componentWillReceiveProps(nextProps) {
-    if(nextProps.isHoldout!==this.props.isHoldout){
+    if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
       });
@@ -571,34 +571,34 @@ class RegressionDetailCurves extends Component {
       }, 0)
     }
   }
-  
-  setChartDate(isHoldout=this.props.isHoldout) {
+
+  setChartDate(isHoldout = this.props.isHoldout) {
     // isHoldout={isHoldout}
-    const {validatePlotData,holdoutPlotData} = this.props.model;
+    const { validatePlotData, holdoutPlotData } = this.props.model;
     // const url = isHoldout?holdoutPlotData:validatePlotData;
-  
+
     request.post({
       url: '/graphics/list',
       data: [{
-        name:'fit-plot',
-        data:{
-          url:validatePlotData,
+        name: 'fit-plot',
+        data: {
+          url: validatePlotData,
         }
-      },{
-        name:'fit-plot',
-        data:{
-          url:holdoutPlotData,
+      }, {
+        name: 'fit-plot',
+        data: {
+          url: holdoutPlotData,
         }
       }]
-    }).then(data=>{
-      const [chartDate,holdOutChartDate] = data;
+    }).then(data => {
+      const [chartDate, holdOutChartDate] = data;
       this.setState({
         chartDate,
         holdOutChartDate,
-        show:true,
+        show: true,
       })
     });
-    
+
     // request.post({
     //   url: '/graphics/fit-plot',
     //   data: {
@@ -612,29 +612,29 @@ class RegressionDetailCurves extends Component {
   }
 
   render() {
-    const { model,isHoldout } = this.props;
-    const { curve, diagnoseType, chartDate,show,holdOutChartDate } = this.state;
+    const { model, isHoldout, project: { mapHeader } } = this.props;
+    const { curve, diagnoseType, chartDate, show, holdOutChartDate } = this.state;
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
-        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
+        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} mapHeader={mapHeader}/></div>
         break;
       case EN.FitPlot:
-        curComponent = <div className={styles.plot} style={{height:300,width:500}}>
+        curComponent = <div className={styles.plot} style={{ height: 300, width: 500 }}>
           {show && <FitPlot2
             title={EN.FitPlot}
             x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
-            chartDate={isHoldout?holdOutChartDate:chartDate}
+            chartDate={isHoldout ? holdOutChartDate : chartDate}
           />}
         </div>;
         break;
       case EN.ResidualPlot:
-        const Plot =show && <ResidualPlot
+        const Plot = show && <ResidualPlot
           title={EN.ResidualPlot}
           x_name={EN.Truevalue}
           y_name={EN.Predictvalue}
-          chartDate={isHoldout?holdOutChartDate:chartDate}
+          chartDate={isHoldout ? holdOutChartDate : chartDate}
         />;
         curComponent = (
           <div className={styles.plot} >
@@ -768,9 +768,9 @@ class DetailCurves extends Component {
       })
     }, 0)
   };
-  
+
   componentWillReceiveProps(nextProps) {
-    if(nextProps.isHoldout!==this.props.isHoldout){
+    if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
       });
@@ -781,7 +781,7 @@ class DetailCurves extends Component {
       }, 0)
     }
   }
-  
+
   render() {
     const { model, model: { mid }, yes, no, project, isHoldout } = this.props;
     const { curve, show } = this.state;
