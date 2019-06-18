@@ -561,51 +561,80 @@ class RegressionDetailCurves extends Component {
   
   componentWillReceiveProps(nextProps) {
     if(nextProps.isHoldout!==this.props.isHoldout){
-      this.setChartDate(nextProps.isHoldout)
+      this.setState({
+        show: false
+      });
+      setTimeout(() => {
+        this.setState({
+          show: true
+        })
+      }, 0)
     }
   }
   
   setChartDate(isHoldout=this.props.isHoldout) {
     // isHoldout={isHoldout}
-    console.log(111, this.props.model)
     const {validatePlotData,holdoutPlotData} = this.props.model;
-    const url = isHoldout?holdoutPlotData:validatePlotData;
+    // const url = isHoldout?holdoutPlotData:validatePlotData;
+  
     request.post({
-      url: '/graphics/fit-plot',
-      data: {
-        url,
-      },
-    }).then(chartDate => {
+      url: '/graphics/list',
+      data: [{
+        name:'fit-plot',
+        data:{
+          url:validatePlotData,
+        }
+      },{
+        name:'fit-plot',
+        data:{
+          url:holdoutPlotData,
+        }
+      }]
+    }).then(data=>{
+      const [chartDate,holdOutChartDate] = data;
       this.setState({
-        chartDate
+        chartDate,
+        holdOutChartDate,
+        show:true,
       })
     });
+    
+    // request.post({
+    //   url: '/graphics/fit-plot',
+    //   data: {
+    //     url,
+    //   },
+    // }).then(chartDate => {
+    //   this.setState({
+    //     chartDate
+    //   })
+    // });
   }
 
   render() {
-    const { model } = this.props;
-    const { curve, diagnoseType, chartDate } = this.state;
+    const { model,isHoldout } = this.props;
+    const { curve, diagnoseType, chartDate,show,holdOutChartDate } = this.state;
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
         break;
       case EN.FitPlot:
-        curComponent = <div className={styles.plot}>
-          {chartDate && <FitPlot2
+        curComponent = <div className={styles.plot} style={{height:300,width:500}}>
+          {show && <FitPlot2
             title={EN.FitPlot}
             x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
-            chartDate={chartDate}
+            chartDate={isHoldout?holdOutChartDate:chartDate}
           />}
         </div>;
         break;
       case EN.ResidualPlot:
-        const Plot = <ResidualPlot
+        const Plot =show && <ResidualPlot
           title={EN.ResidualPlot}
           x_name={EN.Truevalue}
           y_name={EN.Predictvalue}
-          chartDate={chartDate}
+          chartDate={isHoldout?holdOutChartDate:chartDate}
         />;
         curComponent = (
           <div className={styles.plot} >
@@ -732,13 +761,27 @@ class DetailCurves extends Component {
     this.props.model.resetFitIndex();
     this.setState({
       show: false
-    })
+    });
     setTimeout(() => {
       this.setState({
         show: true
       })
     }, 0)
   };
+  
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.isHoldout!==this.props.isHoldout){
+      this.setState({
+        show: false
+      });
+      setTimeout(() => {
+        this.setState({
+          show: true
+        })
+      }, 0)
+    }
+  }
+  
   render() {
     const { model, model: { mid }, yes, no, project, isHoldout } = this.props;
     const { curve, show } = this.state;
@@ -749,7 +792,7 @@ class DetailCurves extends Component {
       case EN.ROCCurve:
         curComponent = show && <ROCCurves
           height={300}
-          width={500}
+          width={600}
           x_name={EN.FalsePositiveDate}
           y_name={EN.TruePositiveRate}
           model={model}

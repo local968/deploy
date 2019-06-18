@@ -77,27 +77,29 @@ export default class ROCCurves extends PureComponent{
 
 		const t = this;
 		setTimeout( ()=> {
-			myChart.setOption({
-				graphic: echarts.util.map(_data, function (item) {
-					return {
-						type: 'circle',
-						position: myChart.convertToPixel('grid', item),
-						shape: {
-							cx: 0,
-							cy: 0,
-							r: 10,
-						},
-						invisible: true,
-						draggable: true,
-						result,
-						myChart,
-						point,
-						ondrag: echarts.util.curry(t.onPointDragging),
-						updatePoint:t.updatePoint,
-						z: 100
-					};
-				})
-			});
+			try {
+				myChart.setOption({
+					graphic: echarts.util.map(_data, function (item) {
+						return {
+							type: 'circle',
+							position: myChart.convertToPixel('grid', item),
+							shape: {
+								cx: 0,
+								cy: 0,
+								r: 10,
+							},
+							invisible: true,
+							draggable: true,
+							result,
+							myChart,
+							point,
+							ondrag: echarts.util.curry(t.onPointDragging),
+							updatePoint:t.updatePoint,
+							z: 100
+						};
+					})
+				});
+			}catch{}
 		}, 0);
 
 		return  {
