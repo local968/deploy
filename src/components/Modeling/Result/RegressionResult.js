@@ -26,9 +26,10 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target, newVariable } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   
     return <div>
       <div className={styles.result}>
@@ -84,7 +85,7 @@ export default class RegressionView extends Component {
         recommendId={recommendModel.id}
         sort={sort}
         handleSort={handleSort}
-        mapHeader={mapHeader}
+        mapHeader={newMapHeader}
       />
     </div>
   }

@@ -42,6 +42,8 @@ export default class Preview extends Component {
     if (!!newVariable.length && !newVariableData.length) return []
     const headerList = [target, ...rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target), ...newVariable].filter(h => !trainHeader.includes(h))
     const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
+    
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     // const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
     const targetIndex = headerList.indexOf(target)
     const data = cleanData.map((row, index) => showIndex.map(ind => row.concat(newVariable.map(n => newVariableData[index][n]))[ind]))
@@ -64,7 +66,7 @@ export default class Preview extends Component {
     const selectArr = []
     for (let i = 0; i < realColumn; i++) {
       const header = headerList[i] ? headerList[i].trim() : '';
-      const headerText = mapHeader[header]
+      const headerText = newMapHeader[header]
       indexArr.push({
         content: <span>{i + 1}</span>,
         title: i + 1,
@@ -102,7 +104,7 @@ export default class Preview extends Component {
 
   render() {
     const { project, visiable, hideTable, showTable } = this.props
-    const { sortHeader, target, trainHeader, newVariable } = project
+    const { sortHeader, target, trainHeader, newVariable, mapHeader } = project
     const header = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
     const tableData = this.formatTable()
     // console.log(tableData.length, "tableData", cleanPath)
@@ -117,7 +119,7 @@ export default class Preview extends Component {
       </div>
       <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
-        <div className={styles.text}><span>{EN.TargetVariable}:</span><span className={styles.value} title={target}>{target}</span></div>
+        <div className={styles.text}><span>{EN.TargetVariable}:</span><span className={styles.value} title={mapHeader[target]}>{mapHeader[target]}</span></div>
         <div className={styles.text}><span>{EN.TotalVariables}:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
       </div>
       <div className={styles.table}>
