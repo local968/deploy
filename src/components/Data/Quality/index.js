@@ -72,7 +72,7 @@ class TargetIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
+    const { issues, sortData, mapHeader, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
     const isNum = colType[target] === 'Numerical'
@@ -146,7 +146,7 @@ class TargetIssue extends Component {
         <div className={styles.list}>
           <div className={styles.table}>
             <div className={classnames(styles.cell, styles.target)}><span>{EN.TargetVariable}</span></div>
-            <div className={classnames(styles.cell, styles.label)}><span>{target}</span></div>
+            <div className={classnames(styles.cell, styles.label)}><span>{mapHeader[target]}</span></div>
             <div className={classnames(styles.cell, styles.select)}><span>{isNum ? EN.Numerical : EN.Categorical}</span></div>
             <div className={classnames(styles.cell, styles.error)}>
               {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch}%</span></div>}
@@ -265,12 +265,13 @@ class VariableIssue extends Component {
     this.props.project.endQuality().then(() => this.summary = true).catch(() => {
 
       message.destroy();
-      message.error("error!!") })
+      message.error("error!!")
+    })
     this.onClose()
   }
 
   formatTable = () => {
-    const { target, colType, sortData, sortHeader, dataHeader, variableIssues, etling, rawDataView } = this.props.project;
+    const { target, colType, sortData, sortHeader, dataHeader, variableIssues, etling, rawDataView, mapHeader } = this.props.project;
     if (etling) return []
     if (!sortData.length) return []
     const headerList = [...dataHeader.filter(v => v !== target)]
@@ -293,6 +294,7 @@ class VariableIssue extends Component {
     const issueArr = []
     for (let i = 0; i < realColumn; i++) {
       const header = headerList[i] ? headerList[i].trim() : '';
+      const headerText = mapHeader[header]
 
       indexArr.push({
         content: <span>{i + 1}</span>,
@@ -301,8 +303,8 @@ class VariableIssue extends Component {
       })
 
       headerArr.push({
-        content: <span>{header}</span>,
-        title: header,
+        content: <span>{headerText}</span>,
+        title: headerText,
         cn: styles.titleCell
       })
 
@@ -505,7 +507,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { mapHeader, target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
     const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
     const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
@@ -549,7 +551,7 @@ class Summary extends Component {
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
             <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span>{target}</span></div>
+              <div className={styles.summaryCell}><span>{mapHeader[target]}</span></div>
               <div className={styles.summaryCell}><span>{formatNumber(percentList[0].clean, 2)}%</span></div>
             </div>
           </div>
@@ -585,7 +587,7 @@ class Summary extends Component {
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]
               return <div className={styles.summaryTableRow} key={k}>
-                <div className={styles.summaryCell}><span>{v}</span></div>
+                <div className={styles.summaryCell}><span>{mapHeader[v]}</span></div>
                 <div className={styles.summaryCell}><span>{formatNumber(percent.clean, 2)}%</span></div>
               </div>
             })}
