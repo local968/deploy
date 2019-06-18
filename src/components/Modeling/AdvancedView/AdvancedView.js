@@ -97,7 +97,6 @@ export default class AdvancedView extends Component {
     // const metricKey = this.metric.key;
 
     let { stopFilter, oldfiltedModels } = projectStore;
-
     const sortMethods = (aModel, bModel) => {
       switch (sort.key) {
         case 'F1-Score':
@@ -128,7 +127,6 @@ export default class AdvancedView extends Component {
             return (aModelData - bModelData) * sort.value
           }
         case 'LogLoss':
-        case 'log_loss':
           {
             const aFitIndex = aModel.fitIndex
             const bFitIndex = bModel.fitIndex
@@ -202,8 +200,8 @@ export default class AdvancedView extends Component {
               aModelData = (aModel.score.validateScore[metric || 'r2'])
               bModelData = (bModel.score.validateScore[metric || 'r2'])
             } else {
-              aModelData = metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
-              bModelData = metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
+              aModelData = metric === 'log_loss' ? aModel.chartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
+              bModelData = metric === 'log_loss' ? bModel.chartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
             }
             return (aModelData - bModelData) * sort.value
           }
@@ -215,8 +213,8 @@ export default class AdvancedView extends Component {
               aModelData = (aModel.score.holdoutScore[metric || 'r2'])
               bModelData = (bModel.score.holdoutScore[metric || 'r2'])
             } else {
-              aModelData = metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
-              bModelData = metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
+              aModelData = metric === 'log_loss' ? aModel.holdoutChartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
+              bModelData = metric === 'log_loss' ? bModel.holdoutChartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
             }
             return (aModelData - bModelData) * sort.value
           }
@@ -558,9 +556,9 @@ class RegressionDetailCurves extends Component {
   componentDidMount() {
     this.setChartDate()
   }
-  
+
   componentWillReceiveProps(nextProps) {
-    if(nextProps.isHoldout!==this.props.isHoldout){
+    if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
       });
@@ -571,34 +569,34 @@ class RegressionDetailCurves extends Component {
       }, 0)
     }
   }
-  
-  setChartDate(isHoldout=this.props.isHoldout) {
+
+  setChartDate(isHoldout = this.props.isHoldout) {
     // isHoldout={isHoldout}
-    const {validatePlotData,holdoutPlotData} = this.props.model;
+    const { validatePlotData, holdoutPlotData } = this.props.model;
     // const url = isHoldout?holdoutPlotData:validatePlotData;
-  
+
     request.post({
       url: '/graphics/list',
       data: [{
-        name:'fit-plot',
-        data:{
-          url:validatePlotData,
+        name: 'fit-plot',
+        data: {
+          url: validatePlotData,
         }
-      },{
-        name:'fit-plot',
-        data:{
-          url:holdoutPlotData,
+      }, {
+        name: 'fit-plot',
+        data: {
+          url: holdoutPlotData,
         }
       }]
-    }).then(data=>{
-      const [chartDate,holdOutChartDate] = data;
+    }).then(data => {
+      const [chartDate, holdOutChartDate] = data;
       this.setState({
         chartDate,
         holdOutChartDate,
-        show:true,
+        show: true,
       })
     });
-    
+
     // request.post({
     //   url: '/graphics/fit-plot',
     //   data: {
@@ -612,29 +610,29 @@ class RegressionDetailCurves extends Component {
   }
 
   render() {
-    const { model,isHoldout } = this.props;
-    const { curve, diagnoseType, chartDate,show,holdOutChartDate } = this.state;
+    const { model, isHoldout } = this.props;
+    const { curve, diagnoseType, chartDate, show, holdOutChartDate } = this.state;
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
         break;
       case EN.FitPlot:
-        curComponent = <div className={styles.plot} style={{height:300,width:500}}>
+        curComponent = <div className={styles.plot} style={{ height: 300, width: 500 }}>
           {show && <FitPlot2
             title={EN.FitPlot}
             x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
-            chartDate={isHoldout?holdOutChartDate:chartDate}
+            chartDate={isHoldout ? holdOutChartDate : chartDate}
           />}
         </div>;
         break;
       case EN.ResidualPlot:
-        const Plot =show && <ResidualPlot
+        const Plot = show && <ResidualPlot
           title={EN.ResidualPlot}
           x_name={EN.Truevalue}
           y_name={EN.Predictvalue}
-          chartDate={isHoldout?holdOutChartDate:chartDate}
+          chartDate={isHoldout ? holdOutChartDate : chartDate}
         />;
         curComponent = (
           <div className={styles.plot} >
@@ -768,9 +766,9 @@ class DetailCurves extends Component {
       })
     }, 0)
   };
-  
+
   componentWillReceiveProps(nextProps) {
-    if(nextProps.isHoldout!==this.props.isHoldout){
+    if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
       });
@@ -781,7 +779,7 @@ class DetailCurves extends Component {
       }, 0)
     }
   }
-  
+
   render() {
     const { model, model: { mid }, yes, no, project, isHoldout } = this.props;
     const { curve, show } = this.state;
@@ -879,10 +877,10 @@ class DetailCurves extends Component {
             {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable
-              isHoldout={isHoldout}
-              model={model}
-              yes={yes}
-              no={no} />
+            isHoldout={isHoldout}
+            model={model}
+            yes={yes}
+            no={no} />
         </div>
         <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
           {curComponent}
@@ -966,9 +964,9 @@ class RowCell extends Component {
 @observer
 class PredictTable extends Component {
   render() {
-    const { model, yes, no ,isHoldout} = this.props;
-    const { fitIndex, chartData,holdoutChartData } = model;
-    const {roc} = isHoldout?holdoutChartData:chartData;
+    const { model, yes, no, isHoldout } = this.props;
+    const { fitIndex, chartData, holdoutChartData } = model;
+    const { roc } = isHoldout ? holdoutChartData : chartData;
     let TN = roc.TN[fitIndex];
     let FP = roc.FP[fitIndex];
     let TP = roc.TP[fitIndex];
