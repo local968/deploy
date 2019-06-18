@@ -1,7 +1,24 @@
 import axios from 'axios';
 import papa from 'papaparse';
 
-const chunkSize = 1 * 1024 * 1024
+const chunkSize = 1 * 1024 * 1024;
+
+const autoFixHeader = (rawHeader) => {
+  const temp = {};
+  return rawHeader.map((_h, i) => {
+    let h = _h.trim();
+    if (/^$/.test(h)) {
+      h = `Unnamed_${i}`;
+    }
+    if (!temp[h]) {
+      temp[h] = 1;
+    } else {
+      h = h + '.' + temp[h];
+      temp[h]++;
+    }
+    return h;
+  });
+}
 
 export default function EsUploader(file, option = {}) {
   let isPause = false
@@ -12,23 +29,6 @@ export default function EsUploader(file, option = {}) {
   let rawHeader = []
   // let cleanHeader = []
   const { onProgress, onError, onFinished } = option;
-
-  const autoFixHeader = (rawHeader) => {
-    const temp = {};
-    return rawHeader.map((h, i) => {
-      h = h.trim();
-      if (/^$/.test(h)) {
-        h = `Unnamed_${i}`;
-      }
-      if (!temp[h]) {
-        temp[h] = 1;
-      } else {
-        h = h + '.' + temp[h];
-        temp[h]++;
-      }
-      return h;
-    });
-  }
 
   const upload = async () => {
     const { data } = await axios.get('/etls/createIndex');
