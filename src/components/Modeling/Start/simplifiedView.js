@@ -109,6 +109,8 @@ export default class SimplifiedView extends Component {
       },
     }).then((CorrelationMatrixData) => {
       this.showCorrelation = true;
+      let {type} = CorrelationMatrixData;
+      CorrelationMatrixData.type = type.map(itm=>project.mapHeader[itm]);
       this.CorrelationMatrixData = CorrelationMatrixData;
     });
   };
@@ -116,37 +118,37 @@ export default class SimplifiedView extends Component {
   hideCorrelationMatrix = e => {
     e && e.stopPropagation();
     this.showCorrelation = false
-  }
+  };
 
   handleCheck = (key, e) => {
-    const { trainHeader } = this.props.project
-    const isChecked = e.target.checked
+    const { trainHeader } = this.props.project;
+    const isChecked = e.target.checked;
     if (isChecked) {
       this.props.project.trainHeader = trainHeader.filter(v => v !== key)
     } else {
       if (trainHeader.includes(key)) return
       this.props.project.trainHeader = [...trainHeader, key]
     }
-  }
+  };
 
   showNewVariable = () => {
     this.visible = true
-  }
+  };
 
   hideNewVariable = () => {
-    this.visible = false
+    this.visible = false;
     this.reloadTable()
-  }
+  };
 
   reloadTable = () => {
     this.props.project.dataView().then(() => {
       this.props.project.preTrainImportance()
     })
-  }
+  };
 
   handleChange = e => {
-    const value = e.target.value
-    const { project } = this.props
+    const value = e.target.value;
+    const { project } = this.props;
     const { informativesLabel, dataHeader, customHeader, newVariable, target } = project
     let filterList = []
     if (!value) return
@@ -163,10 +165,10 @@ export default class SimplifiedView extends Component {
   }
 
   renderCell = (value, isNA) => {
-    if (isNA) return 'N/A'
-    if (isNaN(+(value))) return value || 'N/A'
+    if (isNA) return 'N/A';
+    if (isNaN(+(value))) return value || 'N/A';
     return formatNumber(value, 2)
-  }
+  };
 
   render() {
     const { project } = this.props;
@@ -204,7 +206,7 @@ export default class SimplifiedView extends Component {
               trigger="click"
               content={<SimplifiedViewPlot onClose={this.hide}
                 type={colType[target]}
-                target={target}
+                target={mapHeader[target]}
                 data={this.chartData[target]} />} />}
           </div>
           <div className={styles.targetCell}>
@@ -362,16 +364,7 @@ class SimplifiedViewRow extends Component {
     };
     this.histograms = true;
   };
-
-  // newGraphics(url){
-  //   return request.post({
-  //     url: '/graphics/new',
-  //     data: {
-  //       url,
-  //     }
-  //   })
-  // }
-
+  
   showUnivariant = async () => {
     const { value, project, isNew, data: _data, colType } = this.props;
     if (isNew) {
@@ -520,23 +513,24 @@ class SimplifiedViewRow extends Component {
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })}
-        id={'Histograms' + value}
-        onClick={this.showHistograms}>
-        <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
+           id={'Histograms' + value}
+           onClick={this.showHistograms}>
+        <img
+            src={histogramIcon}
+            className={styles.tableImage}
+            alt='histogram' />
         {(!isRaw && this.histograms) ? <Popover placement='rightTop'
-          visible={!isRaw && this.histograms}
-          // autoAdjustOverflow
-          onVisibleChange={this.hideHistograms}
-          overlayClassName='popovers'
-          // getPopupContainer = {()=>document.getElementById('Histograms'+value)}
-          trigger="click"
-          content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
-            getPath={histgramPlot.bind(null, value)}>
-            <SimplifiedViewPlot onClose={this.hideHistograms}
-              type={colType[value]}
-              target={value}
-              data={this.chartData[value]}
-            /></SimplePlot>} /> : null}
+                                                visible={!isRaw && this.histograms}
+                                                onVisibleChange={this.hideHistograms}
+                                                overlayClassName='popovers'
+                                                trigger="click"
+                                                content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
+                                                                     getPath={histgramPlot.bind(null, value)}>
+                                                  <SimplifiedViewPlot onClose={this.hideHistograms}
+                                                                      type={colType[value]}
+                                                                      target={mapHeader[value]}
+                                                                      data={this.chartData[value]}
+                                                  /></SimplePlot>} /> : null}
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
