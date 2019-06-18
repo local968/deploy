@@ -50,6 +50,8 @@ export default class Project {
   @observable dataHeader = [];
   @observable uploadData = [];
   @observable rawHeader = [];
+  // add header map
+  @observable mapHeader = []
   @observable colType = [];
   // @observable totalLines = 0;
   @observable totalRawLines = 0;
@@ -627,27 +629,27 @@ export default class Project {
 
   @action
   autoFixHeader = () => {
-    //   /**
-    //  * 自动修改header
-    //  */
-    //   const temp = {};
-    //   const header = this.rawHeader.map((h, i) => {
-    //     h = h.trim();
-    //     if (/^$/.test(h)) {
-    //       h = `Unnamed: ${i}`;
-    //     }
-    //     if (!temp[h]) {
-    //       temp[h] = 1;
-    //     } else {
-    //       h = h + '.' + temp[h];
-    //       temp[h]++;
-    //     }
-    //     return h;
-    //   });
+    /**
+   * 自动修改header
+   */
+    const temp = {};
+    const header = this.mapHeader.map((h, i) => {
+      h = h.trim();
+      if (/^$/.test(h)) {
+        h = `Unnamed: ${i}`;
+      }
+      if (!temp[h]) {
+        temp[h] = 1;
+      } else {
+        h = h + '.' + temp[h];
+        temp[h]++;
+      }
+      return h;
+    });
 
     // 上传文件，target为空
     return this.updateProject({
-      rawHeader: this.cleanHeader,
+      mapHeader: header,
     });
   }
 

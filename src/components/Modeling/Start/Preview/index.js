@@ -35,7 +35,7 @@ export default class Preview extends Component {
   formatTable = () => {
     const { cleanData, newVariableData } = this
     const { visiable, project } = this.props
-    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader, target } = project;
+    const { colType, will_be_drop_500_lines, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader, target, mapHeader } = project;
     if (!visiable) return []
     if (this.loading) return []
     if (!cleanData.length) return []
@@ -64,7 +64,7 @@ export default class Preview extends Component {
     const selectArr = []
     for (let i = 0; i < realColumn; i++) {
       const header = headerList[i] ? headerList[i].trim() : '';
-
+      const headerText = mapHeader[header]
       indexArr.push({
         content: <span>{i + 1}</span>,
         title: i + 1,
@@ -72,8 +72,8 @@ export default class Preview extends Component {
       })
 
       headerArr.push({
-        content: <span>{header}</span>,
-        title: header,
+        content: <span>{headerText}</span>,
+        title: headerText,
         cn: styles.titleCell
       })
 
