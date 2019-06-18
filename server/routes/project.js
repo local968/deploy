@@ -920,14 +920,16 @@ wss.register('abortTrain', (message, socket) => {
         stopIds: curStopIds
       }
       const modelCounts = await getModelCount(projectId)
-      if (!modelCounts && !curStopIds.length) {
-        statusData.mainStep = 3
-        statusData.curStep = 3
-        statusData.lastSubStep = 1
-        statusData.subStepActive = 1
+      if (!curStopIds.length) {
         statusData.trainModel = {}
         statusData.stopIds = []
         statusData.train2ing = false
+        if (!modelCounts) {
+          statusData.mainStep = 3
+          statusData.curStep = 3
+          statusData.lastSubStep = 1
+          statusData.subStepActive = 1
+        }
       }
       return createOrUpdate(projectId, userId, statusData)
     })
