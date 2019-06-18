@@ -28,13 +28,13 @@ export default function EsUploader(file, option:any = {}) {
     step: async (result, parser) => {
       currentCursor = result.meta.cursor
       if(!header) {
-        header = result.data[0]
+        header = result.data
         uploader = parser
         return
       }
 
-      result.data[0].unshift(no++)
-      chunk.push(result.data[0])
+      result.data.unshift(no++)
+      chunk.push(result.data)
       if(currentCursor >= chunkSize) {
         parser.pause()
         chunkPromiseResolve()
