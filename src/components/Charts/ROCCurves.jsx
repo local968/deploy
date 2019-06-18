@@ -23,9 +23,9 @@ export default class ROCCurves extends PureComponent{
 	
 	prePair(fitIndex=this.props.model.fitIndex,isHoldout=this.props.isHoldout){
 		const {x_name='',y_name='',model} =this.props;
-		const {chartData} = model;
-		const {roc,rocHoldout} = chartData;
-		const {FPR:x,TPR:y} = isHoldout?rocHoldout:roc;
+		const {chartData,holdoutChartData} = model;
+		const {roc,rocHoldout} = isHoldout?holdoutChartData:chartData;
+		const {FPR:x,TPR:y} = roc;
 		const _x = Object.values(x).map((itm,index)=>itm+index*10**-6);
 		const _y = Object.values(y);
 		const data = _.zip(_x,_y);

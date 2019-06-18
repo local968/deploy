@@ -85,14 +85,14 @@ export default class Performance extends Component {
     this.uploadStatus = 'uploading'
   })
 
-    //
-    // isDisable (modelId) {
-    //     if(modelId.indexOf('Agg') != -1 || modelId.indexOf('DBSCAN1') != -1 || modelId.indexOf('SpectralClustering') != -1 ){
-    //         return true
-    //     }else {
-    //         return false
-    //     }
-    // }
+
+    isDisable (modelId) {
+        if(modelId.indexOf('Agg') != -1 || modelId.indexOf('DBSCAN1') != -1 || modelId.indexOf('SpectralClustering') != -1 ){
+            return true
+        }else {
+            return false
+        }
+    }
 
 
 
@@ -102,25 +102,25 @@ export default class Performance extends Component {
     const cd = deploymentStore.currentDeployment;
     let clusteringList =  [];
 
-    if(cd.modelType === 'Clustering') {
-        cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>{
-            clusteringList =  [];
-            {models.map(model =>{
-                const Agg = model.modelId.indexOf('Agg');
-                const DBSCAN1 = model.modelId.indexOf('DBSCAN1');
-                const SpectralClustering = model.modelId.indexOf('SpectralClustering');
-                if(Agg !== -1 ){
-                    clusteringList.push({})
-                }else if(DBSCAN1 !== -1 ) {
-                    clusteringList.push({})
-                }else if(SpectralClustering !== -1 ) {
-                    clusteringList.push({})
-                }else{
-                    clusteringList.push(model)
-                }
-            })}
-        })
-    }
+    // if(cd.modelType === 'Clustering') {
+    //     cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>{
+    //         clusteringList =  [];
+    //         {models.map(model =>{
+    //             const Agg = model.modelId.indexOf('Agg');
+    //             const DBSCAN1 = model.modelId.indexOf('DBSCAN1');
+    //             const SpectralClustering = model.modelId.indexOf('SpectralClustering');
+    //             if(Agg !== -1 ){
+    //                 clusteringList.push({})
+    //             }else if(DBSCAN1 !== -1 ) {
+    //                 clusteringList.push({})
+    //             }else if(SpectralClustering !== -1 ) {
+    //                 clusteringList.push({})
+    //             }else{
+    //                 clusteringList.push(model)
+    //             }
+    //         })}
+    //     })
+    // }
     const cdpo = cd.performanceOptions;
     const uploader = {
       onError: action((error, times) => {
@@ -201,9 +201,9 @@ export default class Performance extends Component {
                       <Select  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
                           {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
                               <OptGroup key={settingName} label={settingName}>
-                                  {clusteringList.map(model =>
+                                  {models.map(model =>
                                       JSON.stringify(model) !== "{}" && (
-                                          <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>)
+                                          <Option disabled={this.isDisable(model.modelId)} key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>)
                                   )}
                               </OptGroup>)}
                       </Select> : cd.modelName}</span>

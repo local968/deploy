@@ -529,7 +529,7 @@ class AdvancedModelTable extends Component {
             }
           })}
         </Row>
-        {detail && <RegressionDetailCurves project={this.props.project} model={model} />}
+        {detail && <RegressionDetailCurves isHoldout={isHoldout} project={this.props.project} model={model} />}
       </div>
     )
   }
@@ -558,9 +558,18 @@ class RegressionDetailCurves extends Component {
   componentDidMount() {
     this.setChartDate()
   }
-
-  setChartDate() {
-    const url = this.props.model.fitAndResidualPlotData;
+  
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.isHoldout!==this.props.isHoldout){
+      this.setChartDate(nextProps.isHoldout)
+    }
+  }
+  
+  setChartDate(isHoldout=this.props.isHoldout) {
+    // isHoldout={isHoldout}
+    console.log(111, this.props.model)
+    const {validatePlotData,holdoutPlotData} = this.props.model;
+    const url = isHoldout?holdoutPlotData:validatePlotData;
     request.post({
       url: '/graphics/fit-plot',
       data: {
@@ -772,6 +781,7 @@ class DetailCurves extends Component {
           x_name={EN.percentage}
           y_name={EN.lift}
           model={model}
+          isHoldout={isHoldout}
         />;
         hasReset = false;
         break;
