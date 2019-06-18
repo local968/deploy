@@ -38,7 +38,7 @@ export default function EsUploader(file, option = {}) {
     papa.parse(file, {
       step: (result, parser) => {
         uploader = parser
-        const _row = result.data
+        const _row = _.chain(result.data).get(0).defaultTo([]).value()
         loaded += _row.toString().length
         if (!header) {
           rawHeader = autoFixHeader(_row).map(v => encodeURIComponent(v))
