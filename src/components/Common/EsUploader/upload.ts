@@ -26,6 +26,7 @@ export default function EsUploader(file, option:any = {}) {
 
   papa.parse(file, {
     step: async (result, parser) => {
+      if(result.data.length === 1 && result.data[0] === '') return
       currentCursor = result.meta.cursor
       if(!header) {
         header = result.data
