@@ -7,6 +7,7 @@ const crypto = require('crypto')
 const config = require('config')
 const nodemailer = require('nodemailer')
 const api = require('../scheduleApi')
+const userService = require('../apis/userService');
 
 const checkPassword = password => !!/[a-zA-Z0-9]{6,16}$/.test(password)
 const sha256 = password => crypto.createHmac('sha256', config.secret).update(password).digest('hex');
@@ -30,24 +31,58 @@ const sendCodeMail = (code, to) => {
 
 const router = new Router()
 
-router.post('/login', (req, res) => {
-  const { email, password } = req.body
-  redis
-    .get(`userEmail:${email}`)
-    .then(id => id
-      ? redis.hmget(`user:${id}`, 'id', 'email', 'password', 'level', 'createdTime')
-      : Promise.reject({ status: 404, message: 'user not exists.' }))
-    .then(info => {
-      if (sha256(password) === info[2]) {
-        if (info[3] === 0 || !info[3]) return Promise.reject({ status: 302, message: 'Your account is not available' })
-        req.session.userId = info[0]
-        req.session.user = { id: info[0], email: info[1], level: info[3], createdTime: info[4] }
-        res.send({ status: 200, message: 'ok', info: { id: info[0], email: info[1] } })
-      } else {
-        return Promise.reject({ status: 400, message: 'incorrect password.' })
-      }
-    })
-    .catch(error => res.send(error))
+router.post('/login', async(req, res) => {
+  const { email, password } = req.body;
+  
+  const had = await userService.exist(email);
+  
+  if(!had){
+    return res.send({ status: 404, message: 'user not exists.' })
+  }
+  const result = await userService.login(email,sha256(password));
+  
+  if(!result[0]){
+    return res.send({ status: 400, message: 'incorrect password.'})
+  }
+  const {level,id,create_time} = result[0];
+  
+  if(!level){
+    return res.send({ status:302, message: 'Your account is not available'})
+  }
+  
+  req.session.userId = id;
+  req.session.user = {
+    id,
+    email,
+    level,
+    createdTime: create_time,
+  };
+  res.send({
+    status: 200,
+    message: 'ok',
+    info: {
+      id,
+      email
+    }});
+  
+  
+  
+  // redis
+  //   .get(`userEmail:${email}`)
+  //   .then(id => id
+  //     ? redis.hmget(`user:${id}`, 'id', 'email', 'password', 'level', 'createdTime')
+  //     : Promise.reject({ status: 404, message: 'user not exists.' }))
+  //   .then(info => {
+  //     if (sha256(password) === info[2]) {
+  //       if (info[3] === 0 || !info[3]) return Promise.reject({ status: 302, message: 'Your account is not available' })
+  //       req.session.userId = info[0]
+  //       req.session.user = { id: info[0], email: info[1], level: info[3], createdTime: info[4] }
+  //       res.send({ status: 200, message: 'ok', info: { id: info[0], email: info[1] } })
+  //     } else {
+  //       return Promise.reject({ status: 400, message: 'incorrect password.' })
+  //     }
+  //   })
+  //   .catch(error => res.send(error))
 });
 
 router.delete('/logout', (req, res) => {
@@ -56,75 +91,132 @@ router.delete('/logout', (req, res) => {
   res.send({ status: 200, message: 'ok' });
 });
 
-router.get('/status', (req, res) => {
-  if (!req.session || !req.session.userId) return res.send({ status: 401, message: 'not login' })
-  redis.hmget('user:' + req.session.userId, 'id', 'email', 'createdTime').then(info =>
-    res.send({
+router.get('/status', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.send({ status: 401, message: 'not login' });
+  const {userId} = req.session;
+  
+  const result = await userService.status(userId);
+  
+  if(result.id){
+    const {id,email,create_time} = result;
+    return res.send({
       status: 200,
       message: 'ok',
-      info: { id: info[0], email: info[1], createdTime: info[2] }
-    })
-  ).catch(error => res.send({ status: 500, message: 'get status failed', error }))
-})
+      info: {
+        id,
+        email,
+        createdTime:create_time,
+      }
+    });
+  }
+  
+  res.send({ status: 500, message: 'get status failed', error:result.error });
+  
+  //
+  // redis.hmget('user:' + req.session.userId, 'id', 'email', 'createdTime').then(info =>
+  //   res.send({
+  //     status: 200,
+  //     message: 'ok',
+  //     info: { id: info[0], email: info[1], createdTime: info[2] }
+  //   })
+  // ).catch(error => res.send({ status: 500, message: 'get status failed', error }))
+});
 
 register('status', (data) => {
   return data
-})
+});
 
-router.post('/register', (req, res) => {
-  const { email, level } = req.body
-  const password = sha256(req.body.password)
-  const id = uuid.v4()
-  const createdTime = moment().unix()
+router.post('/register', async (req, res) => {
+  const { email, level } = req.body;
+  const password = sha256(req.body.password);
+  // const id = uuid.v4()
+  // const createdTime = moment().unix();
+  const createdTime = Date.now();
   // todo verify user info
+  
+  const result = await userService.register(res,email,level,password,createdTime);
+  
+  const {id} = result;
+  
+  req.session.userId = id;
+  
+  req.session.user = { id, email, level, createdTime };
+  
+  res.send({
+    status: 200,
+    message: 'ok',
+    info: { id, email }
+  })
+  
 
-  redis
-    .setnx(`userEmail:${email}`, id)
-    .then(success => success
-      ? redis.hmset(`user:${id}`, 'id', id, 'email', email, 'password', password, 'level', level || 1, 'createdTime', createdTime)
-      : Promise.reject({ status: 400, message: 'email exists.' })
-    ).then(ok => {
-      req.session.userId = id
-      req.session.user = { id, email, level, createdTime }
-      if (ok) res.send({
-        status: 200,
-        message: 'ok',
-        info: { id, email }
-      })
-    }, error => res.send(error))
-})
+  // redis
+  //   .setnx(`userEmail:${email}`, id)
+  //   .then(success => success
+  //     ? redis.hmset(`user:${id}`, 'id', id, 'email', email, 'password', password, 'level', level || 1, 'createdTime', createdTime)
+  //     : Promise.reject({ status: 400, message: 'email exists.' })
+  //   ).then(ok => {
+  //     req.session.userId = id
+  //     req.session.user = { id, email, level, createdTime }
+  //     if (ok) res.send({
+  //       status: 200,
+  //       message: 'ok',
+  //       info: { id, email }
+  //     })
+  //   }, error => res.send(error))
+});
 
 router.put('/changepassword', async (req, res) => {
-  const userId = req.session.userId
-  const { current, newPassword } = req.body
+  const {userId} = req.session;
+  const { current, newPassword } = req.body;
 
-  if (!checkPassword(newPassword)) return res.json({ status: 102, message: passwordError, error: passwordError })
-  const currentPassword = await redis.hget(`user:${userId}`, 'password')
-  if (sha256(current) !== currentPassword) return res.json({ status: 101, message: 'current password incorrect.', error: 'current password incorrect.' })
-  redis.hset(`user:${userId}`, 'password', sha256(newPassword))
+  if (!checkPassword(newPassword)) return res.json({ status: 102, message: passwordError, error: passwordError });
+  // const currentPassword = await redis.hget(`user:${userId}`, 'password');
+  
+  const result = await userService.status(userId);
+  const {password:currentPassword} = result;
+  
+  if (sha256(current) !== currentPassword) return res.json({ status: 101, message: 'current password incorrect.', error: 'current password incorrect.' });
+  
+ await userService.update(userId,{
+    password:sha256(newPassword)
+   // level:10,
+  });
+  
+  
+  // redis.hset(`user:${userId}`, 'password', sha256(newPassword))
   req.session.destroy();
   return res.json({ status: 200, message: 'ok' })
-})
+});
 
 router.post('/forgetpassword', async (req, res) => {
-  const { email } = req.body
-  const userId = await redis.get(`userEmail:${email}`)
-  if (!userId) return res.json({ status: 400, message: 'email not exists.', error: 'email not exists.' })
-  const code = new Array(6).fill(0).map(() => Math.floor(Math.random() * 10).toString()).join('')
-  redis.set(`forgetPassword:${code}`, userId, 'EX', 3600)
-  sendCodeMail(code, email)
+  const { email } = req.body;
+  // const userId = await redis.get(`userEmail:${email}`);
+  const had = await userService.exist(email);
+  
+  if (!had) return res.json({ status: 400, message: 'email not exists.', error: 'email not exists.' })
+  const code = new Array(6).fill(0).map(() => Math.floor(Math.random() * 10).toString()).join('');
+  redis.set(`forgetPassword:${code}`, userId, 'EX', 3600);
+  sendCodeMail(code, email);
   return res.json({ status: 200, message: 'ok' })
-})
+});
 
 router.put('/resetpassword', async (req, res) => {
   const { code, password } = req.body
   const userId = await redis.get(`forgetPassword:${code}`)
   if (!userId) return res.json({ status: 101, message: 'Your reset password request is invalid or expired.' })
   if (!checkPassword(password)) return res.json({ status: 102, message: passwordError, error: passwordError })
-  redis.hset(`user:${userId}`, 'password', sha256(password))
-  redis.del(`forgetPassword:${code}`)
-  return res.json({ status: 200, message: 'ok' })
-})
+  // redis.hset(`user:${userId}`, 'password', sha256(password))
+  
+  const result = await userService.update(id,{
+    password:sha256(password),
+  });
+  
+  if(result.id){
+    redis.del(`forgetPassword:${code}`)
+    return res.json({ status: 200, message: 'ok' })
+  }
+  return res.json({ status: 200, message: result.error })
+});
 
 router.get('/schedules', (req, res) => {
   api.getAllSchedule(req.session.userId).then(res.json.bind(res))
