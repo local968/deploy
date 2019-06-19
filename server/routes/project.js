@@ -1363,5 +1363,6 @@ wss.register('preDownload', async (message, socket) => {
 
 module.exports = {
   createOrUpdate,
-  deleteModels
+  deleteModels,
+  getProjectField
 }
