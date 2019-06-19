@@ -119,10 +119,11 @@ router.get('/dataDefinition', async (req, res) => {
   if (rank === null) return res.json({ status: 404, message: 'project not found.', error: 'project not found.' })
   const data = JSON.parse(await redis.hget(`project:${projectId}`, 'dataHeader'))
   const target = JSON.parse(await redis.hget(`project:${projectId}`, 'target'))
+  const map = JSON.parse(await redis.hget(`project:${projectId}`, 'mapHeader'))
   res.attachment('definition.csv');
   res.type('csv')
-  if (type && type === 'performance') res.send(data.join(','))
-  else res.send(data.filter(h => h !== target).join(','))
+  if (type && type === 'performance') res.send(data.map(i => map[i]).join(','))
+  else res.send(data.filter(h => h !== target).map(i => map[i]).join(','))
 })
 
 router.get('/test', async (req, res) => {
