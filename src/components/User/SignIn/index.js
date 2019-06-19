@@ -95,11 +95,11 @@ export default class SignIn extends Component {
   
   onKeyUp = (event) => {
     if (event.keyCode === 13) this.login()
-  }
+  };
   
   register = () => {
     this.props.history.push("/signup")
-  }
+  };
 
 
   render() {

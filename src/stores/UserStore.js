@@ -8,19 +8,20 @@ import socketStore from './SocketStore';
 
 class UserStore {
 
-  @observable status = 'init' // unlogin login
+  @observable status = 'init'; // unlogin login
   @observable info = {
     id: '',
     email: ''
-  }
+  };
   @observable tabKey = '1';
   @observable videoKey = '1';
   @observable isWatchVideo = true;
   @observable isCheck = false;
+  @observable planList = [];
 
   @action change = (name) => (val) => {
     this[name] = val;
-  }
+  };
 
   constructor(props) {
     // window.r2Report = testData
@@ -59,6 +60,16 @@ class UserStore {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
+      } else {
+        alert(res.data.message)
+      }
+    }))
+  }
+  
+  getPlanList() {
+    axios.get(`http://${config.host}:${config.port}/user/plans`).then(action(res => {
+      if (res.data.status === 200) {
+        this.planList = res.data.info;
       } else {
         alert(res.data.message)
       }

@@ -10,36 +10,40 @@ import EN from '../../../constant/en';
 @inject('userStore')
 @observer
 export default class SignUp extends Component {
-  @observable email = ''
-  @observable password = ''
-  @observable confirmPassword = ''
-  @observable level = 1
+  @observable email = '';
+  @observable password = '';
+  @observable confirmPassword = '';
+  @observable plan_id = '';
   @observable warning = {
     email: '',
     password: '',
     confirmPassword: '',
     level: ''
-  }
-  @observable showLicense = false
+  };
+  @observable showLicense = false;
 
   onChangeEmail = action(e => {
     this.email = e.target.value.toLowerCase()
-  })
+  });
 
   onChangePassword = action(e => {
     this.password = e.target.value
-  })
+  });
 
   onChangeConfirmPassword = action(e => {
     this.confirmPassword = e.target.value
-  })
+  });
 
   onChangeLevel = action(e => {
-    this.level = e.target.value
-  })
-
-  register = () => {
-    const { email, password, confirmPassword, warning, level } = this;
+    this.plan_id = e.target.value
+  });
+  
+  componentWillMount() {
+      this.props.userStore.getPlanList()
+  };
+    
+    register = () => {
+    const { email, password, confirmPassword, warning, plan_id } = this;
     if (!email) {
       warning.email = EN.Enteryouremail;
     } else if (!new RegExp(/^[a-zA-Z0-9_-]+(\.([a-zA-Z0-9_-])+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/).test(email)) {
@@ -65,8 +69,8 @@ export default class SignUp extends Component {
       return
     }
 
-    this.props.userStore.register({ email, password, level })
-  }
+    this.props.userStore.register({ email, password, plan_id })
+  };
 
   login = () => {
     this.props.history.push("/")
@@ -76,6 +80,7 @@ export default class SignUp extends Component {
   hide = action(() => (this.showLicense = false))
 
   render() {
+      console.log(this.props.userStore.planList)
     return (this.showLicense ?
       <License back={this.hide} /> :
       <div className={styles.signup}>
@@ -95,11 +100,11 @@ export default class SignUp extends Component {
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.level && <span><img src={warnIcon} alt='warning' />{this.warning.level}</span>}</div>
           <select value={this.level} onChange={this.onChangeLevel}>
-            <option value='0'>{EN.Unavailable}</option>
-            <option value='1'>{EN.FreeTrial}</option>
-            <option value='2'>{EN.Basic}</option>
-            <option value='3'>{EN.Essential}</option>
-            <option value='4'>{EN.Enterprise}</option>
+              {
+                  this.props.userStore.planList.map(itm=><option
+                      key={itm.id}
+                      value={itm.id}>{EN[itm.name]}</option>)
+              }
           </select>
         </div>
         <div className={styles.text}><span>{EN.ByclickingSign}&nbsp;<span className={styles.bold} onClick={this.show}>{EN.EndUserLicense}</span></span></div>

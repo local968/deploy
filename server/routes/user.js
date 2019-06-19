@@ -7,7 +7,8 @@ const crypto = require('crypto')
 const config = require('config')
 const nodemailer = require('nodemailer')
 const api = require('../scheduleApi')
-const userService = require('../apis/userService');
+const userService = require('../apis/service/userService');
+const planService = require('../apis/service/planService');
 
 const checkPassword = password => !!/[a-zA-Z0-9]{6,16}$/.test(password)
 const sha256 = password => crypto.createHmac('sha256', config.secret).update(password).digest('hex');
@@ -126,15 +127,28 @@ register('status', (data) => {
   return data
 });
 
+
+router.get('/plans',async (req,res)=>{
+   const list = await planService.list();
+  const result = list.map(itm=>({
+    id:itm.id,
+    name:itm.name,
+    // level:itm.level,
+  }));
+  res.send({
+    status: 200,
+    message: 'ok',
+    info: result,
+  })
+});
+
 router.post('/register', async (req, res) => {
-  const { email, level } = req.body;
+  const { email, level,plan_id } = req.body;
+ 
   const password = sha256(req.body.password);
-  // const id = uuid.v4()
-  // const createdTime = moment().unix();
   const createdTime = Date.now();
-  // todo verify user info
   
-  const result = await userService.register(res,email,level,password,createdTime);
+  const result = await userService.register(res,email,level,plan_id,password,createdTime);
   
   const {id} = result;
   
