@@ -1,6 +1,7 @@
 const formatNumber = (str, n = 3, f = false, m = 'round') => {
   if (isNaN(+str)) return str
   n = n > 0 ? n : 0
+  if(Math.abs(+str) > 1e7) return (+str).toExponential(n)
   const p = Math.pow(10, n)
   const num = parseInt(Math[m](+str * p, 10)) / p
   const ltz = num < 0
