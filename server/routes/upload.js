@@ -198,7 +198,7 @@ router.get('/download/result', async (req, res) => {
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
   const { featureLabel } = model
   const deployData = model[type + 'DeployData']
-  const header = JSON.parse(featureLabel).filter(h => esHeader.includes(h) && h !== target)
+  const header = [...JSON.parse(featureLabel).filter(h => esHeader.includes(h) && h !== target), target]
   const url = JSON.parse(deployData)
 
   let temp = {}

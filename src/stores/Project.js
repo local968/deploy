@@ -1650,7 +1650,23 @@ export default class Project {
       train2Error: false,
       selectId: '',
       settings: this.settings,
-      settingId: this.settingId
+      settingId: this.settingId,
+      kType: this.kType,
+      kValue: this.kValue,
+      algorithms: this.algorithms,
+      standardType: this.standardType,
+      searchTime: this.searchTime,
+      measurement: this.measurement,
+      randSeed: this.randSeed,
+      weights,
+      features,
+      version: this.version,
+      resampling: this.resampling,
+      speedVSaccuracy: this.speedVSaccuracy,
+      ensembleSize: this.ensembleSize,
+      holdoutRate: this.holdoutRate,
+      validationRate: this.validationRate,
+      crossCount: this.crossCount
     }, this.nextSubStep(2, 3)))
   }
 

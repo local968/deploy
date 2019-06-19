@@ -100,7 +100,7 @@ export default class ModelResult extends Component {
     // const { view } = this;
 
     const modelName = selectModel.modelName
-    const cannotDownload = !this.isHoldout && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
+    const cannotDownload = !this.isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
 
     const type = this.isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName

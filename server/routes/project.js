@@ -7,6 +7,8 @@ const command = require('../command')
 const _ = require('lodash');
 const config = require('config')
 const qs = require('querystring')
+const userLogger = require('log4js').getLogger('user')
+const errorLogger = require('log4js').getLogger('error')
 // const mq = require('../amqp')
 
 const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
@@ -169,7 +171,7 @@ function createOrUpdate(id, userId, data, isCreate = false) {
         const returnValue = err ? {
           status: 411,
           message: (isCreate ? "create" : "update") + " project error"
-        } : { status: 200, message: "ok", result: data, id }
+        } : { status: 200, message: (isCreate ? "create" : "update") + " success", result: data, id }
         wss.publish(`user:${userId}:projects`, returnValue)
         return returnValue
       })
