@@ -9,7 +9,8 @@ const config = require('config')
 const qs = require('querystring')
 // const mq = require('../amqp')
 
-const { userProjectRestriction, userConcurrentRestriction } = require('restriction')
+const {restriction} = require("../apis/service/planService");
+
 
 async function parseNewChartData(url) {
   try {
@@ -295,7 +296,7 @@ function checkProject(userId, id) {
 }
 
 const checkTraningRestriction = (user) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     // let level
     // try {
     //   level = parseInt(user.level, 10)
@@ -303,7 +304,9 @@ const checkTraningRestriction = (user) => {
     //   return reject({ message: "modeling error", status: -2 })
     // }
     const duration = moment.duration(moment().unix() - user.createdTime)
-    const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`
+    const restrictQuery = `user:${user.id}:duration:${duration.years()}-${duration.months()}:training`;
+    const {userProjectRestriction} = await restriction();
+  
     return redis.get(restrictQuery).then(count => {
       if (count >= userProjectRestriction[user.level]) return reject({
         status: -4,
@@ -456,8 +459,10 @@ wss.register("addProject", async (message, socket) => {
   // const startTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() })
   // const endTime = moment.unix(createdTime).add({ years: duration.years(), months: duration.months() + 1 })
   // const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
-  const { userId } = socket.session
+  const { userId } = socket.session;
   const counts = await redis.zcard(`user:${userId}:projects:createTime`)
+  const {userConcurrentRestriction} = await restriction();
+  
   if (counts >= userConcurrentRestriction[socket.session.user.level]) return {
     status: 408,
     message: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',

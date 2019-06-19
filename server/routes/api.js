@@ -7,7 +7,7 @@ const crypto = require('crypto')
 const config = require('config')
 const command = require('../command')
 const api = require('../scheduleApi')
-const { userDeployRestriction } = require('restriction')
+const {restriction} = require("../apis/service/planService");
 const wss = require('../webSocket')
 const Papa = require('papaparse')
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
@@ -96,8 +96,9 @@ router.post('/deploy', async (req, res) => {
   const [level, createdTime] = await redis.hmget(`user:${userId}`, 'level', 'createdTime')
   const duration = moment.duration(moment().unix() - createdTime)
   const restrictQuery = `user:${userId}:duration:${duration.years()}-${duration.months()}:deploy`
-  const count = await redis.get(restrictQuery)
-  const left = userDeployRestriction[level] - parseInt(count)
+  const count = await redis.get(restrictQuery);
+  const {userDeployRestriction} = await restriction();
+  const left = userDeployRestriction[level] - parseInt(count);
   if (parseInt(lineCount) >= left)
     return errorRes(10011, `Your remaining number of predictions this month: ${left} \nNumber of predictions you are attempting: ${lineCount} \nSorry but your attempt is refused.`)
   await redis.incrby(restrictQuery, lineCount)

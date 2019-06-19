@@ -10,10 +10,10 @@ const moment = require('moment')
 const axios = require('axios')
 const Papa = require('papaparse')
 const command = require('../command')
-const { userModelingRestriction, userStorageRestriction } = require('restriction')
-const http = require('http')
+const http = require('http');
+const {restriction} = require("../apis/service/planService");
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
-const router = new Router()
+const router = new Router();
 
 
 router.post('/check', async (req, res) => {
@@ -24,7 +24,8 @@ router.post('/check', async (req, res) => {
     status: 404,
     message: 'missing params',
     error: 'missing params'
-  })
+  });
+  const {userModelingRestriction,userStorageRestriction} = await restriction();
   if (type === 'modeling' && +fileSize >= userModelingRestriction[req.session.user.level]) return res.json({
     status: 416,
     message: 'Your usage of modeling data size has reached the max restricted by your current license.',

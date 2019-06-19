@@ -7,8 +7,9 @@ const crypto = require('crypto')
 const config = require('config')
 const nodemailer = require('nodemailer')
 const api = require('../scheduleApi')
-const userService = require('../apis/service/userService');
-const planService = require('../apis/service/planService');
+const {userService,planService} = require('../apis/service');
+
+// const { userModelingRestriction, userStorageRestriction } = require('restriction')
 
 const checkPassword = password => !!/[a-zA-Z0-9]{6,16}$/.test(password)
 const sha256 = password => crypto.createHmac('sha256', config.secret).update(password).digest('hex');
@@ -148,7 +149,9 @@ router.post('/register', async (req, res) => {
   const password = sha256(req.body.password);
   const createdTime = Date.now();
   
-  const result = await userService.register(res,email,level,plan_id,password,createdTime);
+  const plan =  await planService.detail(plan_id);
+  
+  const result = await userService.register(res,email,plan,password,createdTime);
   
   const {id} = result;
   

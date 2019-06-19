@@ -5,7 +5,7 @@ const command = require('./command')
 const moment = require('moment')
 const axios = require('axios')
 const config = require('config')
-const { userDeployRestriction, userStorageRestriction } = require('restriction')
+const {restriction} = require("./apis/service/planService");
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
 const setSchedule = (schedule) => {
@@ -109,7 +109,8 @@ const api = {
       await redis.set(`deployment:${deploymentId}`, JSON.stringify(deployment))
     }
     if (!fileId) return restrictQuery
-    const count = await redis.get(restrictQuery)
+    const count = await redis.get(restrictQuery);
+    const {userDeployRestriction} = await restriction();
     if (parseInt(count) + parseInt(lineCount) >= userDeployRestriction[level]) return false
     await redis.incrby(restrictQuery, lineCount)
     return restrictQuery

@@ -5,7 +5,6 @@ const { redis } = require('redis')
 const moment = require('moment')
 const axios = require('axios')
 const config = require('config')
-const { userModelingRestriction, userStorageRestriction } = require('restriction')
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 
 // wss.register('checkDatabase', (message, socket, progress) => command({
