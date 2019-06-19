@@ -7,6 +7,7 @@ import EN from '../../../constant/en';
 import { Modal, Checkbox } from 'antd';
 import copyIcon from './icon-test copy.svg'
 import deleteIcon from './delete.png'
+import config from 'config'
 
 const confirm = Modal.confirm;
 
@@ -14,10 +15,10 @@ const header = (props) => {
   return (
     <div>
       <div className={styles.content_head}>
-        <img onClick={() => {Modal.destroyAll();props.userStore.change('isCheck')(false)}} src={deleteIcon}/>
+        <img onClick={() => { Modal.destroyAll(); props.userStore.change('isCheck')(false) }} src={deleteIcon} />
       </div>
       <div className={styles.content_icon}>
-        <img src={copyIcon}/>
+        <img src={copyIcon} />
         <p>{EN.watchtheinstructionalvideos}</p>
       </div>
       <Checkbox onChange={(e) => props.userStore.change('isCheck')(e.target.checked)}>{EN.Dontpromptforthismessage}</Checkbox>
@@ -25,23 +26,23 @@ const header = (props) => {
   )
 }
 
-function showConfirm(props ,email , password) {
+function showConfirm(props, email, password) {
   confirm({
     width: 400,
-    icon:'',
+    icon: '',
     content: header(props),
     okText: EN.YES,
     cancelText: EN.NO,
     onOk() {
-      props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
+      props.userStore.isCheck ? localStorage.setItem('checked', true) : null;
       props.userStore.change('isWatchVideo')(true);
-      props.userStore.login({ email, password } , props)
+      props.userStore.login({ email, password }, props)
       props.userStore.change('tabKey')('2');
     },
     onCancel() {
-      props.userStore.isCheck ? localStorage.setItem('checked' , true) : null;
+      props.userStore.isCheck ? localStorage.setItem('checked', true) : null;
       props.userStore.change('isWatchVideo')(false);
-      props.userStore.login({ email, password } );
+      props.userStore.login({ email, password });
     },
   });
 }
@@ -55,15 +56,15 @@ export default class SignIn extends Component {
     email: '',
     password: ''
   }
-  
+
   onChangeEmail = action((e) => {
     this.email = e.target.value.toLowerCase()
   })
-  
+
   onChangePassword = action((e) => {
     this.password = e.target.value
   })
-  
+
   login = () => {
     const { email, password, warning } = this
     if (!email) {
@@ -73,31 +74,32 @@ export default class SignIn extends Component {
     } else {
       warning.email = '';
     }
-    
+
     if (!password) {
       warning.password = EN.EnterNewPassword;
     } else {
       warning.password = '';
     }
-    
+
     if (warning.email || warning.password) {
       return runInAction(() => {
         this.warning = warning
       })
     }
     const isShowModal = localStorage.getItem('checked');
-    if(!isShowModal){
-      showConfirm(this.props , email ,password)
-    }else{
+    if (!isShowModal) {
+      showConfirm(this.props, email, password)
+    } else {
       this.props.userStore.login({ email, password })
     }
   }
-  
+
   onKeyUp = (event) => {
     if (event.keyCode === 13) this.login()
   }
-  
+
   register = () => {
+    if(!config.register) return
     this.props.history.push("/signup")
   }
 
@@ -118,7 +120,7 @@ export default class SignIn extends Component {
         <button className={styles.button} onClick={this.login}>
           <span>{EN.SignIn}</span>
         </button>
-        <div className={styles.signup} onClick={this.register}><span>{EN.SignUp}</span></div>
+        {config.register && <div className={styles.signup} onClick={this.register}><span>{EN.SignUp}</span></div>}
       </div>
     </div>
   }
