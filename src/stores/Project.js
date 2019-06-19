@@ -2334,11 +2334,11 @@ export default class Project {
       list.push(this.univariant(itm));
     }
 
-    if (model.fitAndResidualPlotData) {
+    if (model.validatePlotData) {
       list.push({
         name: 'predicted-vs-actual-plot',
         data: {
-          url: model.predictData,
+          url: model.validatePlotData,
         },
       });
 
