@@ -561,12 +561,11 @@ class RegressionDetailCurves extends Component {
     if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
-      });
-      setTimeout(() => {
+      },()=>{
         this.setState({
           show: true
         })
-      }, 0)
+      });
     }
   }
 
@@ -771,12 +770,11 @@ class DetailCurves extends Component {
     if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
-      });
-      setTimeout(() => {
+      },()=>{
         this.setState({
           show: true
         })
-      }, 0)
+      });
     }
   }
 
@@ -800,7 +798,7 @@ class DetailCurves extends Component {
       case EN.PredictionDistribution:
         curComponent = show && <PredictionDistributions
           height={300}
-          width={500}
+          width={600}
           x_name={EN.ProbabilityThreshold}
           y_name={EN.ProbabilityDensity}
           model={model}
@@ -818,7 +816,7 @@ class DetailCurves extends Component {
         break;
       case EN.LiftChart:
         curComponent = <SingleLiftCharts
-          height={300} width={500}
+          height={300} width={600}
           x_name={EN.percentage}
           y_name={EN.lift}
           model={model}
