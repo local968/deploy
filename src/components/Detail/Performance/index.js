@@ -181,13 +181,14 @@ export default class Performance extends Component {
                       <Select style={{width:400}}  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
                           {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
                               {
-                                  const clusteringLists = models.filter(model =>{
-                                          return (model.modelId.indexOf('Agg') == -1 && model.modelId.indexOf('DBSCAN1') == -1  && model.modelId.indexOf('SpectralClustering') == -1)
+                                  let clusteringLists = [];
+                                  clusteringLists = models.filter(model =>{
+                                          return (model !== null && model.modelId.indexOf('Agg') == -1 && model.modelId.indexOf('DBSCAN1') == -1  && model.modelId.indexOf('SpectralClustering') == -1)
                                       })
                                   console.log(clusteringLists, 'clusteringListsclusteringLists')
                                  return (
                                      <OptGroup key={settingName} label={settingName}>
-                                         {clusteringLists.map(model =>  <Option  key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
+                                         {clusteringLists.map(model =>  model !== null && <Option  key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
                                          )}
                                      </OptGroup>
                                  )
