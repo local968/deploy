@@ -2345,7 +2345,7 @@ export default class Project {
       list.push({
         name: 'fit-plot',
         data: {
-          url: model.fitAndResidualPlotData,
+          url: model.validatePlotData,
         },
       });
     }
