@@ -11,6 +11,7 @@ const axios = require('axios')
 const Papa = require('papaparse')
 const command = require('../command')
 const { userModelingRestriction, userStorageRestriction } = require('restriction')
+const scheduleApi = require('../scheduleApi')
 const http = require('http')
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 const router = new Router()
@@ -403,11 +404,10 @@ router.get('/download/:scheduleId', async (req, res) => {
   const { filename } = req.query
   // http://192.168.0.83:8081/blockData?uid=1c40be8a70c711e9b6b391f028d6e331
   const schedule = JSON.parse(await redis.get(`schedule:${scheduleId}`))
-
   const { data: { header } } = await axios.get(`${esServicePath}/etls/${schedule.etlIndex}/headerArray`)
-
-  const mapHeader = []
-
+  const deployment = await scheduleApi.getDeployment(schedule.deploymentId)
+  const mapHeader = JSON.parse(await redis.hget(`project:${deployment.projectId}`, 'mapHeader'))
+  // console.log(schedule.result.deployData)
   downloadCsv(schedule.result.deployData, filename, schedule.etlIndex, header, mapHeader, res)
 
   // let temp = {}
@@ -474,7 +474,7 @@ function downloadCsv(url, filename, index, header, mapHeader, res) {
         const row = results.data
         if (!resultHeader) {
           resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no')
-          const headerTexts = [...header.map(h => mapHeader[h]), ...Object.keys(row)].filter(key => key !== '__no')
+          const headerTexts = [...header.filter(key => key !== '__no').map(h => mapHeader[h]), ...Object.keys(row)].filter(key => key !== '__no')
           res.write(Papa.unparse([headerTexts, []], { header: false }))
         }
         const nos = Object.keys(temp)
