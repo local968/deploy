@@ -41,8 +41,6 @@ const dateFormat = {
   month: number => `${number}${ordinalNumberPostFix(number)}`
 };
 
-let clusteringList = []
-
 @inject('deploymentStore', 'userStore', 'routing')
 @observer
 export default class Performance extends Component {
@@ -103,16 +101,6 @@ export default class Performance extends Component {
     const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
 
-    if(cd.modelType === 'Clustering') {
-        cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>{
-            clusteringList = models.filter(model =>{
-                return (model.modelId.indexOf('Agg') == -1 && model.modelId.indexOf('DBSCAN1') == -1  && model.modelId.indexOf('SpectralClustering') == -1)
-            })
-        })
-
-    }
-
-        console.log('123',clusteringList)
     const cdpo = cd.performanceOptions;
     const uploader = {
       onError: action((error, times) => {
@@ -174,7 +162,7 @@ export default class Performance extends Component {
               cd.modelType === 'Outlier' &&(
                   <div className={styles.blocks}>
                   <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
-                      <Select  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+                      <Select style={{width:400}}  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
                           {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
                               <OptGroup key={settingName} label={settingName}>
                                   {models.map(model =>  <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
@@ -190,12 +178,22 @@ export default class Performance extends Component {
               cd.modelType === 'Clustering' &&(
                   <div className={styles.blocks}>
                   <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
-                      <Select  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+                      <Select style={{width:400}}  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
                           {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
-                              <OptGroup key={settingName} label={settingName}>
-                                  {clusteringList.map(model =>  <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
-                                  )}
-                              </OptGroup>)}
+                              {
+                                  let clusteringLists = [];
+                                  clusteringLists = models.filter(model =>{
+                                          return (model !== null && model.modelId.indexOf('Agg') == -1 && model.modelId.indexOf('DBSCAN1') == -1  && model.modelId.indexOf('SpectralClustering') == -1)
+                                      })
+                                  console.log(clusteringLists, 'clusteringListsclusteringLists')
+                                 return (
+                                     <OptGroup key={settingName} label={settingName}>
+                                         {clusteringLists.map(model =>  model !== null && <Option  key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
+                                         )}
+                                     </OptGroup>
+                                 )
+                              }
+                          )}
                       </Select> : cd.modelName}</span>
                       <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
                       <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
