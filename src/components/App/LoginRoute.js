@@ -9,6 +9,7 @@ import ResetPassword from 'components/User/ResetPassword';
 import ForgetPassword from 'components/User/ForgetPassword';
 // import Community from 'components/Community';
 import Support from 'components/Support';
+import config from 'config'
 
 export default class LoginRouter extends Component {
   render() {
@@ -18,7 +19,7 @@ export default class LoginRouter extends Component {
         <div className={styles.content}>
           <Switch>
             <Route exact path="/" component={(props) => <SignIn {...props} />} />
-            <Route exact path="/signup" component={(props) => <SignUp {...props} />} />
+            {config.register && <Route exact path="/signup" component={(props) => <SignUp {...props} />} />}
             <Route exact path="/active" component={(props) => <SignActive {...props} />} />
             <Route exact path="/resetpassword" component={(props) => <ResetPassword {...props} />} />
             <Route exact path="/forgetpassword" component={(props) => <ForgetPassword {...props} />} />
