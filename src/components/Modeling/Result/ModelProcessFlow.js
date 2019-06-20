@@ -135,14 +135,16 @@ export default class ModelProcessFlow extends Component {
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
 		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
 		
-		if(!mv&&!mi&&!out){
+		const dqft = problemType==='Classification'&&this.DQFT();
+		
+		if(!mv&&!mi&&!out&&!dqft){
 			return <dl>
 				<dd>{EN.none}</dd>
 			</dl>
 		}
 		
 		return <dl className={styles.over}>
-			{problemType==='Classification'&&this.DQFT()}
+			{dqft}
 			{mv}
 			{mi}
 			{out}
@@ -201,7 +203,7 @@ export default class ModelProcessFlow extends Component {
 			return null;
 		}
 		
-		return <React.Fragment>
+		return <Fragment>
 			<dt>{EN.TargetMore2Unique}</dt>
 			{
 				<dd title={drop.join(',')} style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
@@ -209,7 +211,7 @@ export default class ModelProcessFlow extends Component {
 			{
 				<dd title={mapping.map(itm=>`${itm[0]}->${itm[1]}`)} style={{display:(mapping.length?'':'none')}}>{EN.Mapping}:{mapping.map((itm,index)=>`${index?',':''}${itm[0]}->${itm[1]}`)}</dd>
 			}
-		</React.Fragment>
+		</Fragment>
 	}
 	
 	DQFData(data,title,showTarget,outlier=false){
