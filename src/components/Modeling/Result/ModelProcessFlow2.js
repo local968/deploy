@@ -73,6 +73,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			problemType,
 			otherMap,
+			mapHeader,
 		} = this.props.projectStore.project;
 		
 		const nfm = _.cloneDeep(nullFillMethod);
@@ -92,8 +93,7 @@ export default class ModelProcessFlow extends Component {
 		
 		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
-		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
-		
+		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${mapHeader[target]})`,outlierLineCounts[target],true);
 		if(!mv&&!mi&&!out){
 			return <dl>
 				<dd>{EN.none}</dd>
