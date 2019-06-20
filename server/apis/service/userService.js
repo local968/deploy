@@ -8,7 +8,7 @@ const exist = async email=>{
 	return !!had.length;
 };
 
-const register = async (res,id,email,plan,password,create_time)=>{
+const register = async (res,email,plan,password,create_time)=>{
 	const had = await exist(email);
 	
 	if(had){
@@ -18,12 +18,22 @@ const register = async (res,id,email,plan,password,create_time)=>{
 		});
 	}
 	
+	console.log({
+		url,
+		data:{
+			email,
+			// level:plan.level,
+			password,
+			create_time,
+			plan_id:plan.id,
+		},
+	});
+	
 	return request.post({
 		url,
 		data:{
-			id,
 			email,
-			level:plan.level,
+			// level:plan.level,
 			password,
 			create_time,
 			plan_id:plan.id,

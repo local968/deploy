@@ -99,7 +99,7 @@ router.get('/status', async (req, res) => {
   
   const result = await userService.status(userId);
   
-  if(result.id){
+  if(result&&result.id){
     const {id,email,create_time} = result;
     return res.send({
       status: 200,
@@ -151,11 +151,10 @@ router.post('/register', async (req, res) => {
   const created_time = new Date();
   const plan =  await planService.detail(plan_id);
   
-  const id = uuid.v4();
   
-  const result = await userService.register(res,id,email,plan,password,created_time);
+  const result = await userService.register(res,email,plan,password,created_time);
   
-  // const {id} = result;
+  const {id} = result;
   
   req.session.userId = id;
   
