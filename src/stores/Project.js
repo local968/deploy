@@ -598,7 +598,7 @@ export default class Project {
     const totalRawLines = data.totalRawLines
     const fileName = data.fileName
     const originalIndex = data.originalIndex
-    const mapHeader = data.rawHeader
+    const mapHeader = data.rawHeader.map(_h => _h.trim())
     const rawHeader = data.header
     const dataHeader = data.header
     const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
