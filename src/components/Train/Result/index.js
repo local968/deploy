@@ -90,14 +90,6 @@ function ModelResult(props) {
       .then(id => props.routing.push('/deploy/project/' + id));
   };
 
-  // const download = async () => {
-  //   setDownloading(true)
-  //   const deplotData = problemType === 'Outlier' ? await project.preDownload() : selectModel.deployData
-  //   if (!deplotData) return message.error('download error!')
-  //   window.open(`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&url=${encodeURIComponent(deplotData)}`)
-  //   setDownloading(false)
-  // }
-
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
     {problemType === "Clustering" && <div className={classes.tabs}>
