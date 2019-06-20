@@ -203,7 +203,7 @@ wss.register('newEtl', async (message, socket, process) => {
       }
       else {
         //删除模型
-        await deleteModels(project.id)
+        await deleteModels(userId, project.id)
         clearInterval(interval)
         process({ progress: 90, status: 1 })
         const { data: { totalFixedCount, deletedCount } } = await axios.post(`${esServicePath}/etls/${project.originalIndex}/fixedLines`, stats)
