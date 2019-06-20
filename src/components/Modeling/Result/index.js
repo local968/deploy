@@ -18,7 +18,7 @@ export default class ModelResult extends Component {
   @observable show = false
   @observable sort = {
     simple: {
-      key: 'name',
+      key: 'time',
       value: 1
     },
     advanced: {

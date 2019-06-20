@@ -150,7 +150,7 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { mapHeader = [], standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
@@ -381,17 +381,17 @@ class SimplePlot extends Component {
   constructor(props) {
     super(props);
   }
-  
+
   componentDidMount() {
     this.getData()
   }
-  
+
   componentWillReceiveProps(nextProps) {
     if(nextProps.path!==this.props.path){
       this.getData(nextProps)
     }
   }
-  
+
   getData(props=this.props){
     const { getPath, path, isNew } =props;
     if (isNew && !path) getPath();

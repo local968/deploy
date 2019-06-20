@@ -43,7 +43,8 @@ log4js.configure({
     }
   },
   categories: {
-    default: { appenders: ['user', 'app'], level: 'ALL' },
-    error: { appenders: ['error'], level: 'ERROR' }
+    default: { appenders: ['app'], level: 'ALL' },
+    error: { appenders: ['error'], level: 'ERROR' },
+    user: { appenders: ['user'], level: 'ALL' }
   }
 });

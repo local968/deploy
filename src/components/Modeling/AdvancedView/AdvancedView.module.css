@@ -1,6 +1,7 @@
 .advancedModelResult {
   margin-top: 40px;
     font-size: 1rem;
+    min-width: 1600px;
   }
   .advancedModelResult .modelResult {
     display: inline-block;
@@ -20,8 +21,8 @@
     /* border: 0.5px solid #d8d8d8; */
     position: relative;
     max-height: 50vh;
-    /*overflow-y: scroll;*/
-    /*overflow-x: hidden;*/
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
   .advancedModelTable::-webkit-scrollbar{
     width: 17px;
@@ -51,18 +52,18 @@
     text-align: center;
   }
 
-  /* .tableHeader { */
-    /* margin-right: 17px; */
-  /* } */
+  .tableHeader {
+    margin-right: 17px;
+  }
 .advancedModelTableDiv {
-  width: 100%;
-  overflow-x: scroll;
+  /* width: 100%; */
+  /* overflow-x: scroll; */
 }
   .adrow .adcell {
     padding: 0.2em;
     border: 0.5px solid #d8d8d8;
     height: 3em;
-    flex: 1 0 240px;
+    flex: 1 0 100px;
     padding: 0 0.5em;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -70,7 +71,7 @@
     line-height: 3em;
   }
   .adrow .adcell:first-child {
-    flex: 0 0 400px;
+    flex: 0 0 260px;
   }
   .button {
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);

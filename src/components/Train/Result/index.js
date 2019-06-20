@@ -11,17 +11,17 @@ import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
 import EN from '../../../constant/en';
 import ISO2 from "../../Charts/ISO2";
-import axios from 'axios'
+import moment from 'moment'
 
 const Option = Select.Option;
 
 function ModelResult(props) {
   // const type = 'clustering'
   const [showTips, setShowTips] = React.useState(false)
-  const [downloading, setDownloading] = React.useState(false)
+  // const [downloading, setDownloading] = React.useState(false)
   const [sort, setSort] = React.useState({
     simple: {
-      key: 'name',
+      key: 'time',
       value: 1
     },
     advanced: {
@@ -89,14 +89,6 @@ function ModelResult(props) {
       .addDeployment(project.id, project.name, current.modelName, project.problemType)
       .then(id => props.routing.push('/deploy/project/' + id));
   };
-
-  // const download = async () => {
-  //   setDownloading(true)
-  //   const deplotData = problemType === 'Outlier' ? await project.preDownload() : selectModel.deployData
-  //   if (!deplotData) return message.error('download error!')
-  //   window.open(`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&url=${encodeURIComponent(deplotData)}`)
-  //   setDownloading(false)
-  // }
 
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
@@ -180,7 +172,7 @@ function ModelResult(props) {
         <span>{EN.Exportmodelresults}</span>
       </button></a>}
     </div>
-    {downloading && <ProcessLoading style={{ position: 'fixed' }} />}
+    {/* {downloading && <ProcessLoading style={{ position: 'fixed' }} />} */}
   </div>;
 }
 
@@ -197,6 +189,8 @@ const OutlierTable = observer((props) => {
           return (a.score.score - b.score.score) * value
         case 'rate':
           return (a.rate - b.rate) * value
+        case 'time':
+          return ((a.createTime || 0) - (b.createTime || 0)) * value
         case "name":
         default:
           return a.modelName > b.modelName ? value : -value
@@ -220,6 +214,11 @@ const OutlierTable = observer((props) => {
           <Tooltip title={EN.ContaminationRate}>{EN.ContaminationRate}</Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>*/}
           <span>{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('time')}>
+          <Tooltip title={EN.Time} >{EN.Time} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
+          <span>{sort.key === 'time' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
@@ -295,6 +294,9 @@ const OutlierRow = observer((props) => {
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.rate || 0)}</span>
         </div>
+        <div className={`${classes.ccell}`}>
+          <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
+        </div>
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
         </div>
@@ -303,10 +305,10 @@ const OutlierRow = observer((props) => {
         </div>
       </div>
     </Tooltip>
-    <div className={classes.rowData}>
-      {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-      {visible && type === 'process' && <ModelProcessFlow model={model} />}
-    </div>
+    {/* <div className={classes.rowData}> */}
+    {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
+    {visible && type === 'process' && <ModelProcessFlow model={model} />}
+    {/* </div> */}
   </div>
 })
 
@@ -327,6 +329,8 @@ const ClusteringTable = observer((props) => {
           return (a.score.silhouette_euclidean - b.score.silhouette_euclidean) * value
         case "cluster":
           return (Object.keys(a.labelWithImportance).length - Object.keys(b.labelWithImportance).length) * value
+        case 'time':
+          return ((a.createTime || 0) - (b.createTime || 0)) * value
         case "name":
         default:
           return a.modelName > b.modelName ? value : -value
@@ -365,6 +369,11 @@ const ClusteringTable = observer((props) => {
           <Tooltip title={EN.clusters} >{EN.clusters} </Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
           <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('time')}>
+          <Tooltip title={EN.Time} >{EN.Time} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
+          <span>{sort.key === 'time' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
@@ -454,6 +463,9 @@ const ClusteringRow = observer((props) => {
         <div className={`${classes.ccell}`}>
           <span>{clusters}</span>
         </div>
+        <div className={`${classes.ccell}`}>
+          <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
+        </div>
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
         </div>
@@ -465,11 +477,11 @@ const ClusteringRow = observer((props) => {
         </div>
       </div>
     </Tooltip>
-    <div className={classes.rowData}>
-      {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-      {visible && type === 'process' && <ModelProcessFlow model={model} />}
-      {visible && type === 'explanation' && <Explanation model={model} />}
-    </div>
+    {/* <div className={classes.rowData}> */}
+    {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
+    {visible && type === 'process' && <ModelProcessFlow model={model} />}
+    {visible && type === 'explanation' && <Explanation model={model} />}
+    {/* </div> */}
   </div>
 })
 

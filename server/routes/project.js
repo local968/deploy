@@ -1323,44 +1323,24 @@ wss.register("fetchData", async (message, socket) => {
   return await axios.get(path)
 })
 
-wss.register('preDownload', async (message, socket) => {
-  const { mid, rate, etlIndex, projectId, _id: requestId } = message
+wss.register('ssPlot', async (message, socket, progress) => {
+
   const { userId } = socket.session
-  // const requestId = uuid.v4()
 
-  // const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  // const { featureImportance } = model
-  // const header = Object.keys(JSON.parse(featureImportance))
-
-  let _rate = rate
-  try {
-    _rate = parseFloat(rate)
-  } catch (e) { }
-
-  try {
-    const deployResult = await command({
-      command: 'outlier.deploy',
-      requestId,
-      projectId,
-      userId,
-      csvLocation: [etlIndex],
-      ext: ['csv'],
-      solution: mid,
-      actionType: 'deployment',
-      frameFormat: 'csv',
-      rate: _rate
-    }, processData => {
-      const { status, result } = processData
-      if (status === 1) return
-      if (status === 100) return result
-      throw new Error(result[processError])
-    })
-
-    return { status: 100, message: 'ok', data: deployResult }
-    // downloadCsv(deployResult.deployData, decodeURIComponent(filename), etlIndex, header, res)
-  } catch (e) {
-    return { status: 500, message: 'error', error: e }
-  }
+  await checkEtl(message.projectId, userId)
+  return command({
+    ...message,
+    userId,
+    requestId: message._id
+  }, progressValue => {
+    const { status } = progressValue
+    if (status < 0 || status === 100) return progressValue
+    return progress(progressValue)
+  }, true).then(async returnValue => {
+    const { status, result } = returnValue
+    if (status === 100) await createOrUpdate(message.projectId, userId, { ssPlot: result })
+    return returnValue
+  })
 })
 
 module.exports = {

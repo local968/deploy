@@ -134,6 +134,7 @@ export default class Project {
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
   @observable mappingKey = ''
   @observable distribution = 0
+  @observable ssPlot = null
 
   // Advanced Modeling Setting
   @observable settingId = '';
@@ -373,7 +374,8 @@ export default class Project {
       kType: 'auto',
       trainModel: {},
       stopIds: [],
-      features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
+      features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
+      ssPlot: null
     }
   }
 
@@ -1995,6 +1997,51 @@ export default class Project {
     })
   }
 
+  clusterPreTrainImportance = () => {
+    return socketStore.ready().then(api => {
+      const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
+      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = [...data_label, ...new_label]
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
+      let cmd = 'clustering.preTrainImportance'
+      // switch (this.problemType) {
+      //   case 'Clustering':
+      //     cmd = 'clustering.train';
+      //     break;
+      //   case 'Outlier':
+      //     cmd = 'outlier.train';
+      //     break;
+      //   default:
+      //     cmd = 'clfreg.train';
+      // }
+
+      const command = {
+        projectId: this.id,
+        command: cmd,
+        feature_label
+      };
+      // if (new_label.length) {
+      //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+      //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      // }
+      this.preImportanceLoading = true
+      return api.preTrainImportance(command)
+        .then(returnValue => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            return antdMessage.error(result['processError'])
+          }
+          // this.setProperty({
+          //   preImportance: result.preImportance,
+          //   informativesLabel: result.informativesLabel,
+          //   preImportanceLoading: false
+          // })
+        })
+    })
+  }
+
   /**------------------------------------------------chart---------------------------------------------------------*/
   correlationMatrix = () => {
     if (this.correlationMatrixLoading) return Promise.resolve()
@@ -2079,6 +2126,21 @@ export default class Project {
         histgramPlots[plotKey] = Data
         this.setProperty({ histgramPlots })
       }).then(this.handleError)
+    })
+  }
+
+  getSsPlot = () => {
+    return socketStore.ready().then(api => {
+      return api.ssPlot({
+        command: 'clustering.ssPlot',
+        projectId: this.id
+      }, prosss => {
+        console.log(prosss, 'clustering.ssPlot  prosss')
+      }).then(returnValue => {
+        console.log(returnValue, "clustering.ssPlot returnValue")
+        const { status, result } = returnValue
+        if (status < 0) antdMessage.error(`${result['processError']}`)
+      })
     })
   }
 
@@ -2512,17 +2574,6 @@ export default class Project {
         this.reportProgressText = 'init'
       }), 10)
       this.reportProgress = 0
-    })
-  }
-
-  preDownload = () => {
-    const { selectModel, problemType, etlIndex, id } = this
-    if (problemType !== 'Outlier') return
-    return socketStore.ready().then(api => {
-      return api.preDownload({ mid: selectModel.id, rate: selectModel.rate, etlIndex, projectId: id }).then(result => {
-        if (result.status === 100) return result.data.deployData
-        return ''
-      })
     })
   }
 }
