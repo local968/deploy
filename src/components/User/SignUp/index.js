@@ -80,7 +80,6 @@ export default class SignUp extends Component {
   hide = action(() => (this.showLicense = false))
 
   render() {
-      console.log(this.props.userStore.planList)
     return (this.showLicense ?
       <License back={this.hide} /> :
       <div className={styles.signup}>
