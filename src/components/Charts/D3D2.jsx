@@ -6,7 +6,9 @@ const {Option} = Select;
 import styles from './charts.module.css';
 import THREE from './3Variable';
 import EN from "../../constant/en";
+import {inject} from "mobx-react";
 
+@inject('projectStore')
 export default class D3D2 extends PureComponent {
 	constructor(props) {
 		super(props);
@@ -38,6 +40,10 @@ export default class D3D2 extends PureComponent {
 			},
 		});
 		const {featuresLabel} = result;
+		// const {mapHeader} = this.props.projectStore.project;
+		
+		// const featuresLabel = result.featuresLabel.map(itm=>mapHeader[itm]);
+		
 		
 		const [x_name,y_name,z_name=''] = featuresLabel;
 		
@@ -59,9 +65,11 @@ export default class D3D2 extends PureComponent {
 		const {result,show_name} = this.state;
 		const {featuresLabel} = result;
 		
+		const {mapHeader} = this.props.projectStore.project;
+		
 		const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 		
-		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{itm}</Option>);
+		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{mapHeader[itm]}</Option>);
 		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
 		return <Select
 			value={show_name[order]}
@@ -84,6 +92,8 @@ export default class D3D2 extends PureComponent {
 	chart(){
 		const {x_name,y_name,z_name,result} = this.state;
 		const { featuresLabel, featureData, labels } = result;
+		const {mapHeader} = this.props.projectStore.project;
+		
 		
 		const data = [...new Set(labels)].map(itm => {
 			return {
@@ -102,16 +112,16 @@ export default class D3D2 extends PureComponent {
 		const names = [x_name, y_name, z_name].filter(itm=>itm);
 		if (names.length === 3) {
 			return <THREE
-				x_name={x_name}
-				y_name={y_name}
-				z_name={z_name}
+				x_name={mapHeader[x_name]}
+				y_name={mapHeader[y_name]}
+				z_name={mapHeader[z_name]}
 				data={data}
 			/>
 		}
 		
 		return <TSEN
-			x_name={names[0]}
-			y_name={names[1]}
+			x_name={mapHeader[names[0]]}
+			y_name={mapHeader[names[1]]}
 			data={data}/>
 	}
 	
