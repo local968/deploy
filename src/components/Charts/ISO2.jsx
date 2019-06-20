@@ -264,10 +264,11 @@ export default class Iso extends PureComponent{
 
     selection(order){
         const {show_name,list} = this.state;
+	    const {mapHeader} = this.props.projectStore.project;
+	    
+	    const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
-        const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
-
-        const options = list.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{itm}</Option>);
+        const options = list.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{mapHeader[itm]}</Option>);
 
         return <Select
           value={show_name[order]} style={{ width: 120 }} onChange={name=>{
