@@ -38,10 +38,12 @@ export default function EsUploader(file, option = {}) {
     papa.parse(file, {
       step: (result, parser) => {
         uploader = parser
-        const _row = result.data[0]
+        const _row = result.data
         loaded += _row.toString().length
         if (!header) {
-          rawHeader = autoFixHeader(_row)
+          // rawHeader = autoFixHeader(_row)
+          console.log(result)
+          rawHeader = _row
           // cleanHeader = rawHeader
           return header = '__no,' + rawHeader.map((h, i) => i).toString()
         }
@@ -82,17 +84,25 @@ export default function EsUploader(file, option = {}) {
           data: header + '\n' + chunk,
         }).then(async () => {
           chunk = ''
-          const { data } = await axios.get(`/etls/${dataIndex}/header`)
-          let header = data.split(',').filter(k => k !== '__no')
+          // const { data } = await axios.get(`/etls/${dataIndex}/header`)
+          // let header = data.split(',').filter(k => k !== '__no')
           // header = rawHeader.map(decodeURIComponent).filter(h => header.indexOf(h) !== -1)
+          // onFinished({
+          //   originalIndex: dataIndex,
+          //   totalRawLines: no,
+          //   cleanHeader: header,
+          //   rawHeader: header,
+          //   dataHeader: header,
+          //   fileName: file.name
+          // }, file)
+          // console.log(header)
           onFinished({
             originalIndex: dataIndex,
             totalRawLines: no,
-            cleanHeader: header,
-            rawHeader: header,
-            dataHeader: header,
+            rawHeader,
             fileName: file.name
           }, file)
+
         })
         // setUploadStatus('finished, total uploaded: ' + no + ' lines')
 

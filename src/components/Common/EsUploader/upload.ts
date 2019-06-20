@@ -5,7 +5,11 @@ const chunkSize = 1 * 1024 * 1024
 // const chunkSize = 100 * 1024
 const concurrent = 4
 
+const test = true
+
 export default function EsUploader(file, option:any = {}) {
+  console.log(file)
+  // return
   let index = false
   let hasNextChunk = true
   let isPause = false
@@ -24,10 +28,18 @@ export default function EsUploader(file, option:any = {}) {
 
   chunkPromise = new Promise((resolve, reject) => chunkPromiseResolve = resolve)
 
+
+  let prevCursor = 0
+  let count = 0
+
   papa.parse(file, {
     step: async (result, parser) => {
       if(result.data.length === 1 && result.data[0] === '') return
-      currentCursor = result.meta.cursor
+      const cursor = result.meta.cursor
+      const deltaCursor = cursor > prevCursor ? cursor - prevCursor : cursor
+      if(count >= 10)console.log(cursor, prevCursor, deltaCursor, currentCursor)
+      prevCursor = cursor
+      currentCursor += deltaCursor
       if(!header) {
         header = result.data
         uploader = parser
@@ -37,11 +49,14 @@ export default function EsUploader(file, option:any = {}) {
       result.data.unshift(no++)
       chunk.push(result.data)
       if(currentCursor >= chunkSize) {
+        console.log(result)
         parser.pause()
         chunkPromiseResolve()
+        count++
       }
     },
     complete: async () => {
+      console.log('complete')
       chunkPromiseResolve()
       hasNextChunk = false
     }
@@ -89,17 +104,26 @@ export default function EsUploader(file, option:any = {}) {
 
   const uploadChunk = async () => {
     const chunk = await getNextChunk()
-    const requestPromise: any = axios.request({
-      url: `/etls/${index}/upload`,
-      headers: {
-        'Content-Type': "text/plain",
-      },
-      method: "POST",
-      data: chunk.data
-    }).then((response) => ({promise: requestPromise, response}))
-    requestPromise.no = processors.length
-    requestPromise.bytes = chunk.bytes
-    processors.push(requestPromise)
+    if(test) {
+      const requestPromise = new Promise((resolve, reject) => {
+        setTimeout(resolve, 100)
+      }).then((response) => ({promise: requestPromise, response}))
+      requestPromise.no = processors.length
+      requestPromise.bytes = chunk.bytes
+      processors.push(requestPromise)
+    } else {
+      const requestPromise: any = axios.request({
+        url: `/etls/${index}/upload`,
+        headers: {
+          'Content-Type': "text/plain",
+        },
+        method: "POST",
+        data: chunk.data
+      }).then((response) => ({promise: requestPromise, response}))
+      requestPromise.no = processors.length
+      requestPromise.bytes = chunk.bytes
+      processors.push(requestPromise)
+    }
   }
 
   const getNextChunk = async () => {
@@ -112,7 +136,8 @@ export default function EsUploader(file, option:any = {}) {
     chunkPromise = new Promise((resolve, reject) => chunkPromiseResolve =
       resolve)
     const bytes = currentCursor
-    uploader.resume()
+    currentCursor = 0
+    if(count < 20)uploader.resume()
     await chunkPromise
     return {bytes, data: csvChunk}
   }
