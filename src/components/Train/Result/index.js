@@ -303,10 +303,10 @@ const OutlierRow = observer((props) => {
         </div>
       </div>
     </Tooltip>
-    <div className={classes.rowData}>
+    {/* <div className={classes.rowData}> */}
       {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
-    </div>
+    {/* </div> */}
   </div>
 })
 
@@ -465,11 +465,11 @@ const ClusteringRow = observer((props) => {
         </div>
       </div>
     </Tooltip>
-    <div className={classes.rowData}>
+    {/* <div className={classes.rowData}> */}
       {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
       {visible && type === 'process' && <ModelProcessFlow model={model} />}
       {visible && type === 'explanation' && <Explanation model={model} />}
-    </div>
+    {/* </div> */}
   </div>
 })
 
