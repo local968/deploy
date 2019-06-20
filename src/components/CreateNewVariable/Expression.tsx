@@ -1,8 +1,8 @@
-import React, {ChangeEvent, KeyboardEvent, Fragment, MouseEvent} from 'react';//Fragment
-import {makeStyles} from '@material-ui/styles';  //Coordinate
-import {FormControl, Input} from '@material-ui/core';//Input, InputAdornment,
+import React, { ChangeEvent, KeyboardEvent, Fragment, MouseEvent } from 'react';//Fragment
+import { makeStyles } from '@material-ui/styles';  //Coordinate
+import { FormControl, Input } from '@material-ui/core';//Input, InputAdornment,
 // import Fade from '@material-ui/core/Fade';
-import {Exp, Coordinate, Type} from './model/Coordinate';
+import { Exp, Coordinate, Type } from './model/Coordinate';
 import _ from 'lodash'
 // import Suggestion from './Suggestion';
 
@@ -40,11 +40,11 @@ interface ExpressionProps {
 // }
 
 function Expression(props: ExpressionProps) {
-  const {exp, deleteExp, left, right, addExp, setRange, onFocus, sign, toogleTooltip, setIndex} = props //setRange
+  const { exp, deleteExp, left, right, addExp, setRange, onFocus, sign, toogleTooltip, setIndex } = props //setRange
   // const [state, setState] = React.useState({
   //   isDelete: false
   // } as ExpressionState)
-  const {value, range: [start, end]} = exp
+  const { value, range: [start, end] } = exp
   const startValue: Array<Coordinate> = value.slice(0, start)
   const rangeValue: Array<Coordinate> = value.slice(start, end)
   const endValue: Array<Coordinate> = value.slice(end)
@@ -128,14 +128,14 @@ function Expression(props: ExpressionProps) {
         }}
         startAdornment={<Fragment>
           {startValue.map((v: Coordinate, k: number) => <Block key={k} index={k} data={v} inRange={false}
-                                                               onClick={onClick(k)}/>)}
+            onClick={onClick(k)} />)}
           {rangeValue.map((v: Coordinate, k: number) => <Block key={k} index={k + start} data={v}
-                                                               inRange={true} onClick={onClick(k + start)}/>)}
+            inRange={true} onClick={onClick(k + start)} />)}
         </Fragment>}
         endAdornment={<Fragment>
           {endValue.map((v: Coordinate, k: number) => <Block key={k} index={k + end} data={v} inRange={false}
-                                                             onClick={onClick(k + end)}/>)}
-        </Fragment>}/>
+            onClick={onClick(k + end)} />)}
+        </Fragment>} />
     </FormControl>
   </Fragment>
 }
@@ -175,8 +175,8 @@ const blockStyle = makeStyles({
 })
 
 function Block(props: BlockProps) {
-  const {index, data, inRange, onClick} = props
-  const {value, type} = data
+  const { index, data, inRange, onClick } = props
+  const { name, type } = data
   const classes = blockStyle()
 
   const getRenderClass = () => {
@@ -191,7 +191,7 @@ function Block(props: BlockProps) {
     }
   }
 
-  return <span className={getRenderClass()} data-i={index} onClick={onClick}>{value}</span>
+  return <span className={getRenderClass()} data-i={index} onClick={onClick}>{name}</span>
   // <Input
   // disableUnderline
   // fullWidth
