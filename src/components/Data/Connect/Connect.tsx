@@ -8,7 +8,7 @@ import sqlIcon from './sql.svg';
 // import defileIcon from './define.svg';
 import axios from 'axios';
 import { message as antdMessage } from 'antd';
-import { Uploader, ProgressBar, ProcessLoading, Confirm } from 'components/Common';
+import { Uploader, ProgressBar, Confirm } from 'components/Common';
 import config from 'config';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
@@ -88,7 +88,7 @@ function DataConnect(props: DataConnectProps) {
     });
   }
 
-  const onError = (error: { toString: () => React.ReactNode; }, times: any) => {
+  const onError = (error: Error, times: any) => {
     setState({
       ...state,
       file: null,
