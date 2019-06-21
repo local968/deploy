@@ -22,7 +22,7 @@ export default class ModelResult extends Component {
       value: 1
     },
     advanced: {
-      key: 'Model Name',
+      key: EN.Time,
       value: 1
     }
   }
