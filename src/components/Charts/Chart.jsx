@@ -5,7 +5,6 @@ import UnivariantPlots from "./UnivariantPlots";
 import CorrelationMatrixs from "./CorrelationMatrixs";
 import TSENOne from "./TSENOne";
 import BoxPlots from "./BoxPlots";
-import PredictedVsActualPlot from "./PredictedVsActualPlot";
 import EN from "../../constant/en";
 import Pie2 from "./Pie2";
 import PVA from "./PVA";

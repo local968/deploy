@@ -26,7 +26,7 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target, newVariable } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target, newVariable,selectModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
@@ -58,8 +58,8 @@ export default class RegressionView extends Component {
         <PVA
             key='pva'
             x_name = {EN.PointNumber}
-            y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}
-            url={project.selectModel.validatePlotData}
+            y_name = {isEN?`${EN.Groupaverage} ${mapHeader[target]}`:`${mapHeader[target]} ${EN.Groupaverage}`}
+            model={selectModel}
         />
       </div>
       <div className={styles.line} />

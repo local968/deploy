@@ -571,9 +571,7 @@ class RegressionDetailCurves extends Component {
   }
 
   setChartDate(isHoldout = this.props.isHoldout) {
-    // isHoldout={isHoldout}
     const { validatePlotData, holdoutPlotData } = this.props.model;
-    // const url = isHoldout?holdoutPlotData:validatePlotData;
 
     request.post({
       url: '/graphics/list',
