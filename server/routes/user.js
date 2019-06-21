@@ -149,10 +149,10 @@ router.post('/register', async (req, res) => {
   const password = sha256(req.body.password);
   const createdTime = moment().unix();
   const created_time = new Date();
-  const plan =  await planService.detail(plan_id);
+  // const plan =  await planService.detail(plan_id);
   
   
-  const result = await userService.register(res,email,plan,password,created_time);
+  const result = await userService.register(res,email,plan_id,password,created_time);
   
   const {id} = result;
   

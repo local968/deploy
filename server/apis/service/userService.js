@@ -5,7 +5,7 @@ const url = `${config.STRAPI}/dusers`;
 
 const exist = async email=>{
 	const had = await request.get(`${url}?email=${email}`);
-	return !!had.length;
+	return !!(had||[]).length;
 };
 
 const register = async (res,email,plan,password,create_time)=>{
@@ -17,18 +17,6 @@ const register = async (res,email,plan,password,create_time)=>{
 			status: 400
 		});
 	}
-	
-	console.log({
-		url,
-		data:{
-			email,
-			// level:plan.level,
-			password,
-			create_time,
-			plan_id:plan.id,
-		},
-	});
-	
 	return request.post({
 		url,
 		data:{
@@ -36,7 +24,7 @@ const register = async (res,email,plan,password,create_time)=>{
 			// level:plan.level,
 			password,
 			create_time,
-			plan_id:plan.id,
+			plan,
 		},
 	})
 };
