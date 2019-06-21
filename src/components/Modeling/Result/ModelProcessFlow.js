@@ -124,6 +124,10 @@ export default class ModelProcessFlow extends Component {
 			nfm[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
 		});
 		
+		if(problemType==='Classification'){
+			Reflect.deleteProperty(nfm,target)
+		}
+		
 		if(otherMap.hasOwnProperty('')){
 			Reflect.deleteProperty(nfm,target);
 		}
