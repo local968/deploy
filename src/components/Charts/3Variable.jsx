@@ -1,6 +1,7 @@
 import React,{PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import 'echarts-gl'
+import EN from "../../constant/en";
 
 export default class ThreeVariable extends PureComponent{
 	constructor(props){
@@ -26,6 +27,22 @@ export default class ThreeVariable extends PureComponent{
 			}
 		});
 		
+		series.forEach(({data,name})=>{
+			const mean = _.unzip(data).map(itm=>_.mean(itm));
+			series.push({
+				name:name + EN.NewAverage,
+				symbolSize:1.5*symbolSize,
+				type: 'scatter3D',
+				data:[mean],
+				symbol:'triangle',
+				emphasis:{
+					label:{
+						show:false
+					}
+				}
+			})
+		})
+		
 		return {
 			tooltip: {
 				formatter: function (params, ticket, callback) {
@@ -43,9 +60,7 @@ export default class ThreeVariable extends PureComponent{
 				// 	}
 				// }
 			},
-			grid3D: {
-				// right:200
-			},
+			grid3D: {},
 			temporalSuperSampling:{
 				enable:true,
 			},

@@ -40,10 +40,6 @@ export default class D3D2 extends PureComponent {
 			},
 		});
 		const {featuresLabel} = result;
-		// const {mapHeader} = this.props.projectStore.project;
-		
-		// const featuresLabel = result.featuresLabel.map(itm=>mapHeader[itm]);
-		
 		
 		const [x_name,y_name,z_name=''] = featuresLabel;
 		
