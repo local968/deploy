@@ -19,16 +19,24 @@ const errorTip = message.error;
 @inject('userStore', 'deploymentStore', 'routing')
 @observer
 export default class Sider extends Component {
-  state = {labUrl: ''}
+  state = {
+    labUrl: '',
+    logoUrl:'',
+  };
 
-  componentDidMount() {
+   componentDidMount() {
     axios.get('/jupyterLabUrl')
       .then(({data}) => this.setState({labUrl: data}))
-      .catch(({response: {data}}) => errorTip(data))
+      .catch(({response: {data}}) => errorTip(data));
+  
+    axios.get('/image/logo')
+        .then(({data}) => this.setState({logoUrl:data}))
+        // .catch(({response: {data}}) => errorTip(data))
+    
   }
 
   render() {
-    const {labUrl} = this.state;
+    const {labUrl,logoUrl} = this.state;
     const {userStore, routing} = this.props;
     const isLogin = userStore.status === 'login';
     const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/lab';
@@ -37,7 +45,8 @@ export default class Sider extends Component {
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
-          <img className={styles.logoImg} src={logo} alt="logo"/>
+          <img className={styles.logoImg} src={logoUrl} alt="logo"/>
+          {/*<img className={styles.logoImg} src={logo} alt="logo"/>*/}
           {/* <h2 className={styles.mrone}>R2 Learn</h2> */}
         </div>
         <div className={styles.menus}>

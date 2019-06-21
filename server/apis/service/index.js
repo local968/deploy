@@ -1,8 +1,5 @@
-const userService = require('./userService');
-const planService = require('./planService');
-
-
 module.exports = {
-	userService,
-	planService,
+	userService:require('./userService'),
+	planService:require('./planService'),
+	imgService:require('./imgService'),
 };
