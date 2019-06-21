@@ -98,6 +98,7 @@ function DataConnect(props: DataConnectProps) {
     try {
       const process: number = (parseFloat(loaded) / parseFloat(size)) * 50
       setProcess(process)
+      console.log(process, 'onProgress process')
     } catch (e) { }
   }
 
@@ -282,6 +283,8 @@ function DataConnect(props: DataConnectProps) {
     setProcess(0)
   }
 
+  console.log(process, 'render process')
+
   return (
     <div className={styles.connect} onDrop={handleDrop} onDragOver={handleDragOver}>
       <div className={styles.title}>
@@ -335,7 +338,6 @@ function DataConnect(props: DataConnectProps) {
         visible={state.sample}
       />}
       <DataUploading
-        etling={project.etling}
         closeUpload={closeUpload}
         etlProgress={project.etlProgress}
         pause={state.pause}
