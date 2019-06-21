@@ -4,7 +4,14 @@ import { observer } from 'mobx-react';
 import { ProcessLoading } from 'components/Common';
 import EN from '../../../constant/en';
 
-function DataSample(props: any) {
+interface DataSampleProps {
+  onClose: () => void,
+  visible: boolean,
+  project: any,
+  selectSample: (name: string) => void
+};
+
+function DataSample(props: DataSampleProps) {
   const { onClose, visible, project, selectSample } = props;
   const [files, setFiles] = useState([] as any[])
   const [select, setSelect] = useState(-1)
@@ -31,19 +38,25 @@ function DataSample(props: any) {
     selectSample(file.name);
   };
 
-  const formatSize = size => {
+  const formatSize = (size: number) => {
     let { size: s, n } = getSize(size)
     if (n < 0) n = 1
     const unit = (n === 1 && 'b') || (n === 2 && 'Kb') || (n === 3 && 'Mb') || (n === 4 && 'Gb') || 'Tb'
     return (parseInt((s * 100).toString(), 10) / 100) + ' ' + unit
   }
 
-  const getSize = (size, n = 1) => {
+  type fileSize = {
+    size: number;
+    n: number;
+  };
+
+  const getSize = (size: number, n: number = 1): fileSize => {
     if (n >= 5) return { size, n }
     const s = size / 1024
     if (s > 1) return getSize(s, ++n)
     return { size, n }
   }
+
   if (!visible) return null
 
   return loading ?
@@ -80,7 +93,7 @@ function DataSample(props: any) {
               <span>{EN.DataSize}</span>
             </div>
           </div>
-          {files.map((row, index) => {
+          {files.map((row: any, index: number) => {
             return (
               <div
                 className={styles.sampleRow}

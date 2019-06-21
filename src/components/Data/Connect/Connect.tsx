@@ -101,11 +101,11 @@ function DataConnect(props: DataConnectProps) {
     console.log(error, times)
   }
 
-  const onProgress = (progress: { split: (arg0: string) => [any, any]; }, speed: any) => {
+  const onProgress = (progress: string, speed: string) => {
     if (!state.uploading) return
     const [loaded, size] = progress.split("/")
     try {
-      const process = (parseFloat(loaded) / parseFloat(size)) * 50
+      const process: number = (parseFloat(loaded) / parseFloat(size)) * 50
       setState({
         ...state,
         process,
@@ -136,13 +136,6 @@ function DataConnect(props: DataConnectProps) {
     }
   }
 
-  const showSample = () => {
-    setState({
-      ...state,
-      sample: true,
-    })
-  }
-
   const hideSample = () => {
     setState({
       ...state,
@@ -150,7 +143,7 @@ function DataConnect(props: DataConnectProps) {
     })
   }
 
-  const selectSample = (filename: any) => {
+  const selectSample = (filename: string) => {
     if (!!state.process) return false;
 
     setState({
@@ -181,13 +174,6 @@ function DataConnect(props: DataConnectProps) {
     hideSample();
   };
 
-  const showSql = () => {
-    setState({
-      ...state,
-      sql: true,
-    })
-  }
-
   const hideSql = () => {
     setState({
       ...state,
@@ -195,7 +181,7 @@ function DataConnect(props: DataConnectProps) {
     })
   }
 
-  const onClick = (key: any) => () => {
+  const onClick = (key: string) => () => {
     if (state.uploading || project.etling) return
     if (project.train2ing || !!project.models.length) return setState({
       ...state,
@@ -226,7 +212,7 @@ function DataConnect(props: DataConnectProps) {
     })
   }
 
-  const block = (label: React.ReactNode, img: string | undefined, key: string) => {
+  const block = (label: React.ReactNode, img: string, key: string) => {
     return (
       <div className={styles.uploadBlock} onClick={onClick(key)}>
         <div className={styles.blockImg}>
@@ -282,7 +268,7 @@ function DataConnect(props: DataConnectProps) {
     })
   }
 
-  const databaseSubmit = async (options: { sqlTable: any; }) => {
+  const databaseSubmit = async (options: any) => {
     hideSql();
     setState({
       ...state,
