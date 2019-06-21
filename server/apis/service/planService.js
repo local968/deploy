@@ -5,7 +5,7 @@ const url = `${config.STRAPI}/plans`;
 
 const list = async ()=>{
 	const _list = await request.get(`${url}`);
-	return _list.sort((a,b)=>a.level-b.level)
+	return (_list||[]).sort((a,b)=>a.level-b.level)
 };
 
 const detail = async id =>{

@@ -45,12 +45,12 @@ const update = async (id,data)=>{
 };
 
 const addUse = async (user_id,type,multi)=>{
-	const {plan} = await status(user_id);
+	const {plan_used} = await status(user_id);
 	
-	plan[type] = plan[type] || 0 + multi;
+	plan_used[type] = plan_used[type] || 0 + multi;
 	
 	return update(user_id,{
-		plan,
+		plan_used,
 	})
 };
 
@@ -59,5 +59,6 @@ module.exports = {
 	status,
 	login,
 	exist,
-	update
+	update,
+	addUse,
 };

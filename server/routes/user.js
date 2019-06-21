@@ -144,12 +144,15 @@ router.get('/plans',async (req,res)=>{
 });
 
 router.post('/register', async (req, res) => {
-  const { email, level,plan_id } = req.body;
+  let { email, level,plan_id } = req.body;
  
   const password = sha256(req.body.password);
   const createdTime = moment().unix();
   const created_time = new Date();
-  // const plan =  await planService.detail(plan_id);
+  if(!plan_id){
+    const plan = await planService.detail(plan_id);
+    plan_id = plan.id;
+  }
   
   
   const result = await userService.register(res,email,plan_id,password,created_time);
