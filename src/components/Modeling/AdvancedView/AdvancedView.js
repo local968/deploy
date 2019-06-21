@@ -459,7 +459,7 @@ class AdvancedModelTable extends Component {
       if (problemType === 'Classification') {
         return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
       } else {
-        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader}/>
+        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
       }
     });
     return (
@@ -498,6 +498,7 @@ class AdvancedModelTable extends Component {
                     <Tooltip title={modelName}>
                       <span className={styles.modelName} alt={modelName}>{modelName}</span>
                     </Tooltip>
+                    <Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} />
                   </div>}
                   />
                 )
@@ -562,7 +563,7 @@ class RegressionDetailCurves extends Component {
     if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
-      },()=>{
+      }, () => {
         this.setState({
           show: true
         })
@@ -713,6 +714,7 @@ class ClassificationModelRow extends Component {
                     <Tooltip title={modelName}>
                       <span className={styles.modelName} alt={modelName} >{modelName}</span>
                     </Tooltip>
+                    <Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} />
                   </div>}
                   />
                 );
@@ -739,7 +741,7 @@ class ClassificationModelRow extends Component {
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} mapHeader={mapHeader}/>}
+        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} mapHeader={mapHeader} />}
       </div>
     )
   }
@@ -769,7 +771,7 @@ class DetailCurves extends Component {
     if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
-      },()=>{
+      }, () => {
         this.setState({
           show: true
         })
