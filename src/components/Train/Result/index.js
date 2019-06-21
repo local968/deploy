@@ -25,7 +25,7 @@ function ModelResult(props) {
       value: 1
     },
     advanced: {
-      key: 'Model Name',
+      key: EN.Time,
       value: 1
     }
   })
