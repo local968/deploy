@@ -2429,6 +2429,12 @@ export default class Project {
           url: model.validatePlotData,
         },
       });
+      // list.push({
+      //   name: 'predicted-vs-actual-plot',
+      //   data: {
+      //     url: model.holdoutPlotData,
+      //   },
+      // });
 
       list.push({
         name: 'fit-plot',
