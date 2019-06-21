@@ -61,7 +61,7 @@ export default class List extends Component {
               </div>
               <div className={styles.item}>
                 <span className={styles.label}>{EN.ValidationDataDefinition}</span>
-                <a href={`/upload/dataDefinition?projectId=${cd.projectId}`} className={classnames(styles.text, styles.download)}>
+                <a href={`/upload/dataDefinition?projectId=${cd.projectId}&type=performance`} className={classnames(styles.text, styles.download)}>
                   {EN.Download}
                 </a>
               </div>
