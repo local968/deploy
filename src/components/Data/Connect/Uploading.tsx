@@ -5,7 +5,6 @@ import r2LoadGif from './R2Loading.gif';
 import EN from '../../../constant/en';
 
 interface DataUploadingProps {
-  etling: boolean,
   closeUpload: () => void,
   etlProgress: number,
   pause?: () => void,
@@ -17,7 +16,7 @@ interface DataUploadingProps {
 };
 
 function DataUploading(props: DataUploadingProps) {
-  const { etling, closeUpload, etlProgress, pause, resume, visiable, isSql, process, sqlProgress } = props
+  const { closeUpload, etlProgress, pause, resume, visiable, isSql, process, sqlProgress } = props
   const [isPause, setPause] = React.useState(false);
 
   const handleParse = () => {
@@ -39,7 +38,7 @@ function DataUploading(props: DataUploadingProps) {
     if (process >= 50) return EN.ExtractTransformLoadinprogress;
     if (isSql && process === 0) return EN.Perparingfordatabaseconnection;
     if (isSql && process > 0 && process < 50) return `${EN.DownloadedData} ${sqlProgress}${EN.Rows}`;
-  }, [isPause, process, isSql, sqlProgress, etling])
+  }, [isPause, process, isSql, sqlProgress])
 
   return visiable ? <div className={styles.sample}>
     <div className={styles.cover} />
