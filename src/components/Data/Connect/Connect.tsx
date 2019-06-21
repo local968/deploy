@@ -14,6 +14,7 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 import EN from '../../../constant/en';
 import DataSample from './Sample'
+import DataUploading from './Uploading'
 
 interface DataConnectProps {
   userStore: any,
@@ -26,7 +27,6 @@ interface DataConnectState {
   sql: boolean,
   file: File | null,
   uploading: boolean,
-  process: number,
   isPause: boolean,
   isSql: boolean,
   sqlProgress: number,
@@ -44,7 +44,6 @@ function DataConnect(props: DataConnectProps) {
     sql: false,
     file: null,
     uploading: false,
-    process: project.etling ? 50 : 0,
     isPause: false,
     isSql: false,
     sqlProgress: 0,
@@ -52,15 +51,7 @@ function DataConnect(props: DataConnectProps) {
     key: '',
   } as DataConnectState
   const [state, setState] = useState(initState)
-
-  const message = useMemo(() => {
-    if (state.isPause) return EN.Paused;
-    if (!state.isSql && state.process === 0) return EN.Preparingforupload;
-    if (!state.isSql && state.process > 0 && state.process < 50) return EN.Uploadingdata;
-    if (state.process >= 50) return EN.ExtractTransformLoadinprogress;
-    if (state.isSql && state.process === 0) return EN.Perparingfordatabaseconnection;
-    if (state.isSql && state.process > 0 && state.process < 50) return `${EN.DownloadedData} ${state.sqlProgress}${EN.Rows}`;
-  }, [state.isPause, state.process, state.isSql, state.sqlProgress, project.etling])
+  const [process, setProcess] = useState(project.etling ? 50 : 0)
 
   const onUpload = ({ pause, resume }) => {
     setState({
@@ -75,16 +66,16 @@ function DataConnect(props: DataConnectProps) {
   const upload = (data: any) => {
     setState({
       ...state,
-      process: 50,
       file: null,
     })
+    setProcess(50)
 
     project.fastTrackInit(data).then(() => {
       setState({
         ...state,
-        process: 0,
         uploading: false,
       })
+      setProcess(0)
     });
   }
 
@@ -92,9 +83,9 @@ function DataConnect(props: DataConnectProps) {
     setState({
       ...state,
       file: null,
-      process: 0,
       uploading: false,
     })
+    setProcess(0)
 
     antdMessage.destroy();
     antdMessage.error(error.toString())
@@ -106,10 +97,7 @@ function DataConnect(props: DataConnectProps) {
     const [loaded, size] = progress.split("/")
     try {
       const process: number = (parseFloat(loaded) / parseFloat(size)) * 50
-      setState({
-        ...state,
-        process,
-      })
+      setProcess(process)
     } catch (e) { }
   }
 
@@ -144,7 +132,7 @@ function DataConnect(props: DataConnectProps) {
   }
 
   const selectSample = (filename: string) => {
-    if (!!state.process) return false;
+    if (!!process) return false;
 
     setState({
       ...state,
@@ -154,16 +142,13 @@ function DataConnect(props: DataConnectProps) {
     axios.post(`http://${config.host}:${config.port}/upload/sample`, { filename }).then(
       data => {
         const { fileId } = data.data
-        setState({
-          ...state,
-          process: 50,
-        })
+        setProcess(50)
         project.fastTrackInit(fileId).then(() => {
           setState({
             ...state,
-            process: 0,
             uploading: false
           })
+          setProcess(50)
         });
       },
       () => {
@@ -192,16 +177,17 @@ function DataConnect(props: DataConnectProps) {
       ...state,
       key
     })
-    onConfirm()
+    onConfirm(key)
   }
 
-  const onConfirm = () => {
-    if (!state.key) return
+  const onConfirm = (key: string = '') => {
+    const _key = key || state.key
+    if (!_key) return
     onClose()
-    if (state.key === 'upload') return uploadRef.current && uploadRef.current.show()
+    if (_key === 'upload') return uploadRef.current && uploadRef.current.show()
     setState({
       ...state,
-      [state.key]: true
+      [_key]: true
     })
   }
 
@@ -227,7 +213,7 @@ function DataConnect(props: DataConnectProps) {
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    if (!!state.process) return false;
+    if (!!process) return false;
     let file = e.dataTransfer && e.dataTransfer.files[0];
     setState({
       ...state,
@@ -239,33 +225,15 @@ function DataConnect(props: DataConnectProps) {
     e.preventDefault();
   }
 
-  const handleParse = () => {
-    if (state.isPause) return
-    state.pause && state.pause()
-    setState({
-      ...state,
-      isPause: true
-    })
-  }
-
-  const handleResume = () => {
-    if (!state.isPause) return
-    state.resume && state.resume()
-    setState({
-      ...state,
-      isPause: false
-    })
-  }
-
   const closeUpload = () => {
-    if (state.process >= 50) project.abortEtl()
+    if (process >= 50) project.abortEtl()
     state.pause && state.pause()
     setState({
       ...state,
       uploading: false,
-      process: 0,
       file: null
     })
+    setProcess(0)
   }
 
   const databaseSubmit = async (options: any) => {
@@ -274,18 +242,15 @@ function DataConnect(props: DataConnectProps) {
       ...state,
       isSql: true,
       uploading: true,
-      process: 0
     })
+    setProcess(0)
     // let processInterval: NodeJS.Timeout;
     const api = await socketStore.ready();
     const resp = await api.downloadFromDatabase({ ...options, type: 'modeling', projectId: project.id }, (res: {
       count: any;
     }) => {
-      if (state.process < 49.9)
-        setState({
-          ...state,
-          process: state.process + 0.1
-        })
+      if (process < 49.9)
+        setProcess(process + 0.1)
       if (res.count)
         setState({
           ...state,
@@ -296,17 +261,14 @@ function DataConnect(props: DataConnectProps) {
     if (resp.status !== 200) {
       setState({
         ...state,
-        process: 0,
         uploading: false
       })
+      setProcess(0)
       antdMessage.destroy();
       antdMessage.error(resp.message);
       return
     }
-    setState({
-      ...state,
-      process: 50,
-    })
+    setProcess(50)
     await project.fastTrackInit({
       originalIndex: resp.originalIndex,
       totalRawLines: state.sqlProgress,
@@ -315,9 +277,9 @@ function DataConnect(props: DataConnectProps) {
     })
     setState({
       ...state,
-      process: 0,
       uploading: false
     })
+    setProcess(0)
   }
 
   return (
@@ -372,7 +334,17 @@ function DataConnect(props: DataConnectProps) {
         selectSample={selectSample}
         visible={state.sample}
       />}
-      {!!(state.uploading || project.etling) && (
+      <DataUploading
+        etling={project.etling}
+        closeUpload={closeUpload}
+        etlProgress={project.etlProgress}
+        pause={state.pause}
+        resume={state.resume}
+        visiable={state.uploading || project.etling}
+        isSql={state.isSql}
+        process={process}
+        sqlProgress={state.sqlProgress} />
+      {/* {!!(state.uploading || project.etling) && (
         <div className={styles.sample}>
           <div className={styles.cover} />
           <div className={styles.progressBlock}>
@@ -386,12 +358,12 @@ function DataConnect(props: DataConnectProps) {
               </div>
               <div className={styles.progressing}>
                 <ProgressBar
-                  progress={state.process + (project.etlProgress || 0) / 2}
+                  progress={process + (project.etlProgress || 0) / 2}
                 />
               </div>
               <div className={styles.progressText}>
                 <span>{message}</span>
-                {(state.process < 50 && state.process > 0 && !state.isSql) &&
+                {(process < 50 && process > 0 && !state.isSql) &&
                   <div className={styles.progressButton}>{!state.isPause ?
                     <span onClick={handleParse}>{EN.Paused}</span> :
                     <span onClick={handleResume}>{EN.Resume}</span>}</div>}
@@ -399,7 +371,7 @@ function DataConnect(props: DataConnectProps) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       <DatabaseConfig
         options={{}}
         visible={state.sql}
