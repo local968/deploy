@@ -2,14 +2,12 @@ import axios, { AxiosResponse } from 'axios'
 import papa from 'papaparse'
 
 const chunkSize = 1 * 1024 * 1024
-// const chunkSize = 100 * 1024
+// const chunkSize = 1 * 1024
 const concurrent = 4
 
-const test = true
+const test = false
 
 export default function EsUploader(file, option:any = {}) {
-  console.log(file)
-  // return
   let index = false
   let hasNextChunk = true
   let isPause = false
@@ -28,32 +26,20 @@ export default function EsUploader(file, option:any = {}) {
 
   chunkPromise = new Promise((resolve, reject) => chunkPromiseResolve = resolve)
 
-
-  let prevCursor = 0
-  let count = 0
-
   papa.parse(file, {
-    step: async (result, parser) => {
-      if(result.data.length === 1 && result.data[0] === '') return
-      const cursor = result.meta.cursor
-      const deltaCursor = cursor > prevCursor ? cursor - prevCursor : cursor
-      if(count >= 10)console.log(cursor, prevCursor, deltaCursor, currentCursor)
-      prevCursor = cursor
-      currentCursor += deltaCursor
+    chunkSize,
+    skipEmptyLines: true,
+    chunk: async (result, parser) => {
       if(!header) {
-        header = result.data
+        header = result.data[0]
+        header.unshift('__no')
+        result.data = result.data.slice(1)
         uploader = parser
-        return
       }
+      chunk = result.data.map(row => [no++, ...row])
 
-      result.data.unshift(no++)
-      chunk.push(result.data)
-      if(currentCursor >= chunkSize) {
-        console.log(result)
-        parser.pause()
-        chunkPromiseResolve()
-        count++
-      }
+      parser.pause()
+      chunkPromiseResolve()
     },
     complete: async () => {
       console.log('complete')
@@ -63,9 +49,13 @@ export default function EsUploader(file, option:any = {}) {
   })
 
   const createIndex = async () => {
-    const { data } = await axios.get('/etls/createIndex')
-    const { index: dataIndex } = data
-    index = dataIndex
+    if(!test) {
+      const { data } = await axios.get('/etls/createIndex')
+      const { index: dataIndex } = data
+      index = dataIndex
+    } else {
+      index = test
+    }
   }
 
   const start = async () => {
@@ -97,7 +87,7 @@ export default function EsUploader(file, option:any = {}) {
     onFinished({
       originalIndex: index,
       totalRawLines: no,
-      rawHeader: header,
+      rawHeader: header.filter(h => h !== '__no'),
       fileName: file.name
     }, file)
   }
@@ -131,13 +121,12 @@ export default function EsUploader(file, option:any = {}) {
     _header.unshift('__no')
     chunk.unshift(_header)
     const csvChunk = papa.unparse(chunk)
+    const bytes = csvChunk.length
     chunk = []
-    if(!hasNextChunk) return {bytes: currentCursor, data: csvChunk}
+    if(!hasNextChunk) return {bytes, data: csvChunk}
     chunkPromise = new Promise((resolve, reject) => chunkPromiseResolve =
       resolve)
-    const bytes = currentCursor
-    currentCursor = 0
-    if(count < 20)uploader.resume()
+    uploader.resume()
     await chunkPromise
     return {bytes, data: csvChunk}
   }
