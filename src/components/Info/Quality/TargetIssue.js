@@ -140,8 +140,7 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, nullCount, mismatchCount, outlierCount } = this.props;
-    const { dataHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
-    console.log(project)
+    const { mapHeader, dataHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -214,7 +213,7 @@ export class FixIssue extends Component {
                     (showType === 'Categorical' ? 'mode' : 'mean')
                 const isOthers = !mismatchArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span title={k}>{k}</span></div>
+                  <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span title={mapHeader[k]}>{mapHeader[k]}</span></div>
                   <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
                   <div className={styles.fixesCell}><span title={this.formatCell(mean)}>{this.formatCell(mean)}</span></div>
@@ -347,7 +346,7 @@ export class FixIssue extends Component {
                     (showType === 'Categorical' ? 'mode' : 'mean')
                 const isOthers = !nullArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={styles.fixesCell}><span title={k}>{k}</span></div>
+                  <div className={styles.fixesCell}><span title={mapHeader[k]}>{mapHeader[k]}</span></div>
                   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
                     <option value='none' key="none">{EN.Idonknow}</option>
                     <option value="blank" key="blank">{EN.Leftblankonpurpose}</option>
@@ -484,7 +483,7 @@ export class FixIssue extends Component {
                     outlierFillMethodTemp[k] : 'ignore'
                 const isOthers = !outlierArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
-                  <div className={styles.fixesCell}><span title={k}>{k}</span></div>
+                  <div className={styles.fixesCell}><span title={mapHeader[k]}>{mapHeader[k]}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
                       {formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}
@@ -502,7 +501,7 @@ export class FixIssue extends Component {
                     </select>
                     {isOthers && <NumberInput value={method} onBlur={this.handleInput.bind(null, 'outlier', k)} />}
                   </div>
-                </div> 
+                </div>
 
                 // const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 // const median = !rawDataView ? 'N/A' : rawDataView[k].median

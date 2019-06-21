@@ -71,6 +71,7 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
 
   const uploadResponse = await axios.post(`${esServicePath}/etls/database/${index}/upload`, databaseConfig)
   if (uploadResponse.data.status !== 200) return uploadResponse.data
+  const rawHeader = uploadResponse.data.rawHeader
   const opaqueId = uploadResponse.data.opaqueId
 
   return await new Promise((resolve, reject) => {
@@ -89,7 +90,8 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
           resolve({
             status: 200,
             message: 'ok',
-            index
+            originalIndex: index,
+            rawHeader
           })
         }
       }

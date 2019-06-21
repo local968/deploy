@@ -121,7 +121,7 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader, newVariable } = project;
     if (!current) return null;
 
     const { selectModel = {}, targetCounts = {} } = project;
@@ -148,6 +148,7 @@ export default class ClassificationView extends Component {
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const text = (criteria === 'cost' && (TP | FN || FP || TN)) ? EN.BenefitCost : EN.Recommended;
     const curBenefit = current.getBenefit(TP, FN, FP, TN, typeof distribution === 'number' ? (distribution / 100) : (event / 10000), event / 10000)
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -162,7 +163,7 @@ export default class ClassificationView extends Component {
             <span>{EN.SelectedModel} :<a className={styles.nohover}>&nbsp;{current.modelName}</a></span>
           </div>
           <div className={styles.row}>
-            <span>{EN.Target} :<a className={styles.nohover}>&nbsp;{project.target}</a></span>
+            <span>{EN.Target} :<a className={styles.nohover}>&nbsp;{mapHeader[project.target]}</a></span>
           </div>
         </div>
         <Performance current={current} yes={yes} no={no} />
@@ -345,6 +346,7 @@ export default class ClassificationView extends Component {
         text={text}
         sort={sort}
         handleSort={handleSort}
+        mapHeader={newMapHeader}
       />
     </div>
   }
@@ -506,7 +508,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort, mapHeader } = this.props;
     // const { sortKey, sort } = this
     return (
       <div className={styles.table}>
@@ -570,13 +572,14 @@ class ModelTable extends Component {
                 exportReport={exportReport(model.id)}
                 isRecommend={model.id === recommendId}
                 text={text}
+                mapHeader={mapHeader}
               />
             );
           })}
           {!train2Finished && Object.values(trainModel).map((tm, k) => {
             return <div className={styles.rowData} key={k}>
               <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-              <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
+              <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
               <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, tm.requestId) : null}>
                 {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
               </div>
@@ -607,7 +610,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect, isRecommend, text, exportReport } = this.props;
+    const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -675,7 +678,7 @@ class ModelDetail extends Component {
           </div>
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-        {this.visible && this.type === 'impact' && <VariableImpact model={model} />}
+        {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader}/>}
         {this.visible && this.type === 'process' && !model.id.includes('Logistic') && <ModelProcessFlow model={model} />}
         {this.visible && this.type === 'process' && model.id.includes('Logistic') && <ModelProcessFlow2 model={model} />}
       </div >

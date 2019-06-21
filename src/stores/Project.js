@@ -50,6 +50,8 @@ export default class Project {
   @observable dataHeader = [];
   @observable uploadData = [];
   @observable rawHeader = [];
+  // add header map
+  @observable mapHeader = []
   @observable colType = [];
   // @observable totalLines = 0;
   @observable totalRawLines = 0;
@@ -132,6 +134,7 @@ export default class Project {
   @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
   @observable mappingKey = ''
   @observable distribution = 0
+  @observable ssPlot = null
 
   // Advanced Modeling Setting
   @observable settingId = '';
@@ -371,7 +374,8 @@ export default class Project {
       kType: 'auto',
       trainModel: {},
       stopIds: [],
-      features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
+      features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
+      ssPlot: null
     }
   }
 
@@ -587,15 +591,23 @@ export default class Project {
 
     await this.abortTrainByEtl()
 
-    if (!data.cleanHeader || !data.rawHeader || !data.dataHeader) {
-      const api = await socketStore.ready()
-      const { header } = await api.getHeader({ index: data.originalIndex })
-      data.cleanHeader = header
-      data.rawHeader = header
-      data.dataHeader = header
-    }
+    const api = await socketStore.ready()
+    const { header } = await api.getHeader({ index: data.originalIndex })
+    data.header = header
 
-    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, data, {
+    const totalRawLines = data.totalRawLines
+    const fileName = data.fileName
+    const originalIndex = data.originalIndex
+    const mapHeader = data.rawHeader.map(_h => _h.trim())
+    const rawHeader = data.header
+    const dataHeader = data.header
+    const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
+      rawHeader,
+      dataHeader,
+      mapHeader,
+      totalRawLines,
+      originalIndex,
+      fileName,
       mainStep: 2,
       curStep: 2,
       lastSubStep: 1,
@@ -619,27 +631,27 @@ export default class Project {
 
   @action
   autoFixHeader = () => {
-    //   /**
-    //  * 自动修改header
-    //  */
-    //   const temp = {};
-    //   const header = this.rawHeader.map((h, i) => {
-    //     h = h.trim();
-    //     if (/^$/.test(h)) {
-    //       h = `Unnamed: ${i}`;
-    //     }
-    //     if (!temp[h]) {
-    //       temp[h] = 1;
-    //     } else {
-    //       h = h + '.' + temp[h];
-    //       temp[h]++;
-    //     }
-    //     return h;
-    //   });
+    /**
+   * 自动修改header
+   */
+    const temp = {};
+    const header = this.mapHeader.map((h, i) => {
+      h = h.trim();
+      if (/^$/.test(h)) {
+        h = `Unnamed: ${i}`;
+      }
+      if (!temp[h]) {
+        temp[h] = 1;
+      } else {
+        h = h + '.' + temp[h];
+        temp[h]++;
+      }
+      return h;
+    });
 
     // 上传文件，target为空
     return this.updateProject({
-      rawHeader: this.cleanHeader,
+      mapHeader: header,
     });
   }
 
@@ -649,7 +661,7 @@ export default class Project {
     let temp = {};
     let isMissed = false;
     let isDuplicated = false;
-    this.rawHeader.forEach((h, i) => {
+    this.mapHeader.forEach((h, i) => {
       h = h.trim();
       if (!h) {
         isMissed = true;
@@ -1640,7 +1652,23 @@ export default class Project {
       train2Error: false,
       selectId: '',
       settings: this.settings,
-      settingId: this.settingId
+      settingId: this.settingId,
+      kType: this.kType,
+      kValue: this.kValue,
+      algorithms: this.algorithms,
+      standardType: this.standardType,
+      searchTime: this.searchTime,
+      measurement: this.measurement,
+      randSeed: this.randSeed,
+      weights,
+      features,
+      version: this.version,
+      resampling: this.resampling,
+      speedVSaccuracy: this.speedVSaccuracy,
+      ensembleSize: this.ensembleSize,
+      holdoutRate: this.holdoutRate,
+      validationRate: this.validationRate,
+      crossCount: this.crossCount
     }, this.nextSubStep(2, 3)))
   }
 
@@ -1969,6 +1997,51 @@ export default class Project {
     })
   }
 
+  clusterPreTrainImportance = () => {
+    return socketStore.ready().then(api => {
+      const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
+      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = [...data_label, ...new_label]
+      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
+
+      let cmd = 'clustering.preTrainImportance'
+      // switch (this.problemType) {
+      //   case 'Clustering':
+      //     cmd = 'clustering.train';
+      //     break;
+      //   case 'Outlier':
+      //     cmd = 'outlier.train';
+      //     break;
+      //   default:
+      //     cmd = 'clfreg.train';
+      // }
+
+      const command = {
+        projectId: this.id,
+        command: cmd,
+        feature_label
+      };
+      // if (new_label.length) {
+      //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
+      //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
+      // }
+      this.preImportanceLoading = true
+      return api.preTrainImportance(command)
+        .then(returnValue => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            return antdMessage.error(result['processError'])
+          }
+          // this.setProperty({
+          //   preImportance: result.preImportance,
+          //   informativesLabel: result.informativesLabel,
+          //   preImportanceLoading: false
+          // })
+        })
+    })
+  }
+
   /**------------------------------------------------chart---------------------------------------------------------*/
   correlationMatrix = () => {
     if (this.correlationMatrixLoading) return Promise.resolve()
@@ -2053,6 +2126,21 @@ export default class Project {
         histgramPlots[plotKey] = Data
         this.setProperty({ histgramPlots })
       }).then(this.handleError)
+    })
+  }
+
+  getSsPlot = () => {
+    return socketStore.ready().then(api => {
+      return api.ssPlot({
+        command: 'clustering.ssPlot',
+        projectId: this.id
+      }, prosss => {
+        console.log(prosss, 'clustering.ssPlot  prosss')
+      }).then(returnValue => {
+        console.log(returnValue, "clustering.ssPlot returnValue")
+        const { status, result } = returnValue
+        if (status < 0) antdMessage.error(`${result['processError']}`)
+      })
     })
   }
 
@@ -2486,17 +2574,6 @@ export default class Project {
         this.reportProgressText = 'init'
       }), 10)
       this.reportProgress = 0
-    })
-  }
-
-  preDownload = () => {
-    const { selectModel, problemType, etlIndex, id } = this
-    if (problemType !== 'Outlier') return
-    return socketStore.ready().then(api => {
-      return api.preDownload({ mid: selectModel.id, rate: selectModel.rate, etlIndex, projectId: id }).then(result => {
-        if (result.status === 100) return result.data.deployData
-        return ''
-      })
     })
   }
 }

@@ -5,6 +5,7 @@ import Detail from 'components/Detail';
 import Deploy from 'components/Deploy';
 import Main from 'components/Main/index.tsx';
 import Home from 'components/Home';
+import Test from 'components/Test';
 import ChangePassword from 'components/User/ChangePassword';
 import Support from 'components/Support';
 
@@ -15,7 +16,7 @@ class defaultRouter extends Component {
       <Switch>
         <Route exact path="/" component={(props) => <Home {...props} />} />
         <Route exact path="/deploy" component={(props) => <Deploy {...props} />} />
-        <Route exact path="/test" component={(props) => 'test/test'} />
+        <Route exact path="/test" component={(props) => <Test {...props} />} />
         <Route path="/project/:pid" component={(props) => <Main {...props} />} />
         <Route path="/deploy/project/:id" component={(props) => <Detail {...props} />} />
         <Route exact path="/changepassword" component={(props) => <ChangePassword {...props} />} />

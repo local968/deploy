@@ -114,6 +114,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			problemType,
 			otherMap,
+			mapHeader,
 		} = this.props.projectStore.project;
 		
 		const nfm = _.cloneDeep(nullFillMethod);
@@ -133,7 +134,7 @@ export default class ModelProcessFlow extends Component {
 		
 		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);//缺失值
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
-		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
+		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${mapHeader[target]})`,outlierLineCounts[target],true);
 		
 		const dqft = problemType==='Classification'&&this.DQFT();
 		
@@ -160,6 +161,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			targetCounts,
 			nullFillMethod,
+			// mapHeader,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
@@ -185,19 +187,18 @@ export default class ModelProcessFlow extends Component {
 			}
 		});
 		
-		const NFMT = nullFillMethod[target];
 		
-		if(NFMT){
-			if(NFMT === 'drop'){
-				drop.push(target)
-			}else{
-				mapping.push([target,NFMT])
+		if(ta.find(itm=>itm === '') === undefined){
+			const NFMT = nullFillMethod[target];
+			
+			if(NFMT){
+				if(NFMT === 'drop'){
+					drop.push('NULL')
+				}else{
+					mapping.push(['NULL',NFMT])
+				}
 			}
 		}
-		
-		// if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
-		// 	drop = [];
-		// }
 		
 		if(!drop.length&&!mapping.length){
 			return null;
@@ -215,7 +216,7 @@ export default class ModelProcessFlow extends Component {
 	}
 	
 	DQFData(data,title,showTarget,outlier=false){
-		const { colType,target,rawDataView,outlierDictTemp} = this.props.projectStore.project;
+		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.projectStore.project;
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
@@ -301,25 +302,28 @@ export default class ModelProcessFlow extends Component {
 				low = +low.toFixed(2);
 				high = +high.toFixed(2);
 			}
-			return <React.Fragment>
+			return <Fragment>
 				<dt>{title}</dt>
 				<dd>{EN.ValidRange}:[{low},{high}]</dd>
 				{
-					res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}</dd>)
+					res.map(itm=><dd key={itm.key} title={itm.data.map(itm=>mapHeader[itm]).join(',')}>{itm.key}</dd>)
 				}
-			</React.Fragment>
+			</Fragment>
 		}
-		return <React.Fragment>
+		return <Fragment>
 			<dt>{title}</dt>
 			{
-				res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}:{itm.data.join(',')}</dd>)
+				res.map(itm=>{
+					const _data = itm.data.map(itm=>mapHeader[itm]).join(',');
+					return <dd key={itm.key} title={_data}>{itm.key}:{_data}</dd>
+				})
 			}
-		</React.Fragment>
+		</Fragment>
 	}
 	
 	FS(){
 		const { featureLabel } = this.props.model;
-		const {rawHeader,expression,target,colType} = this.props.projectStore.project;
+		const {rawHeader,expression,target,colType,mapHeader} = this.props.projectStore.project;
 		
 		let drop = _.without(rawHeader,...featureLabel,target);
 		
@@ -331,8 +335,9 @@ export default class ModelProcessFlow extends Component {
 			return null;
 		}
 		
-		const raw = drop.filter(itm=>colType[itm] === "Raw");
-		drop = _.without(drop,...raw);
+		let raw = drop.filter(itm=>colType[itm] === "Raw");
+		drop = _.without(drop,...raw).map(itm=>mapHeader[itm]);
+		raw = raw.map(itm=>mapHeader[itm]);
 		
 		const pop = <dl className={styles.over}>
 			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
@@ -345,7 +350,7 @@ export default class ModelProcessFlow extends Component {
 				{EN.CreateTheseVariables}:
 			</dt>
 			{
-				create.map((itm,index)=><dd key={index} title={itm}>{itm}</dd>)
+				create.map((itm,index)=><dd key={index} title={mapHeader[itm]}>{mapHeader[itm]}</dd>)
 			}
 		</dl>;
 		

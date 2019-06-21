@@ -18,7 +18,7 @@ export default class ModelResult extends Component {
   @observable show = false
   @observable sort = {
     simple: {
-      key: 'name',
+      key: 'time',
       value: 1
     },
     advanced: {
@@ -100,7 +100,7 @@ export default class ModelResult extends Component {
     // const { view } = this;
 
     const modelName = selectModel.modelName
-    const cannotDownload = !this.isHoldout && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
+    const cannotDownload = !this.isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
 
     const type = this.isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
@@ -135,13 +135,13 @@ export default class ModelResult extends Component {
           <button className={styles.button} onClick={this.deploy}>
             <span>{EN.DeployTheModel}</span>
           </button>
-          {view === 'advanced' && cannotDownload ? <button className={classnames(styles.button, styles.disabled)}>
+          {view === 'advanced' && (cannotDownload ? <button className={classnames(styles.button, styles.disabled)}>
             <span>{`${EN.Exportmodelresults}(${this.isHoldout ? EN.Holdout : EN.Validation})`}</span>
           </button> : <a href={`/upload/download/result?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-${type}.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&type=${type}&target=${target}`} target='_blank'>
               <button className={styles.button}>
                 <span>{`${EN.Exportmodelresults}(${this.isHoldout ? EN.Holdout : EN.Validation})`}</span>
               </button>
-            </a>}
+            </a>)}
         </div>
         {/* <Modal title='Model Insights'
           visible={current && this.show}

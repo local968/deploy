@@ -61,7 +61,8 @@ interface ComputedProps {
   onClose: () => void,
   addNewVariable: (newVariables: any[], type: any) => Promise<boolean>,
   colType: any,
-  expression: any
+  expression: any,
+  mapHeader: any
 }
 
 export interface ComputedState {
@@ -75,7 +76,7 @@ function initExp(): Exp {
 }
 
 function Computed(props: ComputedProps) {
-  const {classes, onClose, addNewVariable, colType, expression} = props
+  const {classes, onClose, addNewVariable, colType, expression, mapHeader} = props
   const [state, setState] = React.useState({
     exps: [initExp()],
     detailKey: '',
@@ -1041,7 +1042,7 @@ function Computed(props: ComputedProps) {
 
   let variables: Coordinate[] = map(colType, function (value, name) {
     return {
-      name,
+      name: mapHeader[name],
       type: Type.ID,
       value: name,
       varType: value

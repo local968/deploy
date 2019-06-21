@@ -11,17 +11,17 @@ import { formatNumber } from 'util'
 import D3D2 from "../../Charts/D3D2";
 import EN from '../../../constant/en';
 import ISO2 from "../../Charts/ISO2";
-import axios from 'axios'
+import moment from 'moment'
 
 const Option = Select.Option;
 
 function ModelResult(props) {
   // const type = 'clustering'
   const [showTips, setShowTips] = React.useState(false)
-  const [downloading, setDownloading] = React.useState(false)
+  // const [downloading, setDownloading] = React.useState(false)
   const [sort, setSort] = React.useState({
     simple: {
-      key: 'name',
+      key: 'time',
       value: 1
     },
     advanced: {
@@ -31,9 +31,9 @@ function ModelResult(props) {
   })
   const { resetSide, view, changeView, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
-
+  const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   React.useEffect(() => {
     resetSide()
   })
@@ -90,14 +90,6 @@ function ModelResult(props) {
       .then(id => props.routing.push('/deploy/project/' + id));
   };
 
-  // const download = async () => {
-  //   setDownloading(true)
-  //   const deplotData = problemType === 'Outlier' ? await project.preDownload() : selectModel.deployData
-  //   if (!deplotData) return message.error('download error!')
-  //   window.open(`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-predict.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&url=${encodeURIComponent(deplotData)}`)
-  //   setDownloading(false)
-  // }
-
   return <div className={classes.root}>
     {problemType === 'Outlier' && <h3 className={classes.header}>{EN.ModelingResult}</h3>}
     {problemType === "Clustering" && <div className={classes.tabs}>
@@ -147,7 +139,7 @@ function ModelResult(props) {
               placement='bottomLeft'
               visible={visible}
               onVisibleChange={hideDict}
-              content={<MappingDict project={project} list={list} hideDict={hideDict} />} />
+              content={<MappingDict project={project} list={list} hideDict={hideDict} mapHeader={newMapHeader} />} />
           </div>}
         </div>
         <div className={classes.right} style={{ flex: 1, width: 200 }}>
@@ -158,8 +150,8 @@ function ModelResult(props) {
           }
         </div>
       </div>
-      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
-      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} />}
+      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
+      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
     </div>}
     {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
     <div className={classes.buttonBlock}>
@@ -180,14 +172,14 @@ function ModelResult(props) {
         <span>{EN.Exportmodelresults}</span>
       </button></a>}
     </div>
-    {downloading && <ProcessLoading style={{ position: 'fixed' }} />}
+    {/* {downloading && <ProcessLoading style={{ position: 'fixed' }} />} */}
   </div>;
 }
 
 export default inject('projectStore', 'deploymentStore', 'routing')(observer(ModelResult))
 
 const OutlierTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
   const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -197,6 +189,8 @@ const OutlierTable = observer((props) => {
           return (a.score.score - b.score.score) * value
         case 'rate':
           return (a.rate - b.rate) * value
+        case 'time':
+          return ((a.createTime || 0) - (b.createTime || 0)) * value
         case "name":
         default:
           return a.modelName > b.modelName ? value : -value
@@ -221,6 +215,11 @@ const OutlierTable = observer((props) => {
           {/*<span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>*/}
           <span>{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('time')}>
+          <Tooltip title={EN.Time} >{EN.Time} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
+          <span>{sort.key === 'time' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
           {/*<span>{EN.VariableImpact}</span>*/}
@@ -233,7 +232,7 @@ const OutlierTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} />
+        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} mapHeader={mapHeader} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -251,7 +250,7 @@ const OutlierTable = observer((props) => {
 const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
-  const { model, isRecommend, isSelect, onSelect } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader } = props
 
   const toggleImpact = (_type) => {
     if (!visible) {//本来是关着的
@@ -295,6 +294,9 @@ const OutlierRow = observer((props) => {
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.rate || 0)}</span>
         </div>
+        <div className={`${classes.ccell}`}>
+          <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
+        </div>
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
         </div>
@@ -303,15 +305,15 @@ const OutlierRow = observer((props) => {
         </div>
       </div>
     </Tooltip>
-    <div className={classes.rowData}>
-      {visible && type === 'impact' && <VariableImpact model={model} />}
-      {visible && type === 'process' && <ModelProcessFlow model={model} />}
-    </div>
+    {/* <div className={classes.rowData}> */}
+    {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
+    {visible && type === 'process' && <ModelProcessFlow model={model} />}
+    {/* </div> */}
   </div>
 })
 
 const ClusteringTable = observer((props) => {
-  const { models, sort, handleSort, project, abortTrain, onSelect } = props
+  const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
   const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -327,6 +329,8 @@ const ClusteringTable = observer((props) => {
           return (a.score.silhouette_euclidean - b.score.silhouette_euclidean) * value
         case "cluster":
           return (Object.keys(a.labelWithImportance).length - Object.keys(b.labelWithImportance).length) * value
+        case 'time':
+          return ((a.createTime || 0) - (b.createTime || 0)) * value
         case "name":
         default:
           return a.modelName > b.modelName ? value : -value
@@ -366,6 +370,11 @@ const ClusteringTable = observer((props) => {
           {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
           <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('time')}>
+          <Tooltip title={EN.Time} >{EN.Time} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
+          <span>{sort.key === 'time' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <Tooltip title={EN.VariableImpact}>{EN.VariableImpact}</Tooltip>
           {/*<span>{EN.VariableImpact}</span>*/}
@@ -383,7 +392,7 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} />
+        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} mapHeader={mapHeader} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -399,7 +408,7 @@ const ClusteringTable = observer((props) => {
 })
 
 const ClusteringRow = observer((props) => {
-  const { model, isRecommend, isSelect, onSelect } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader } = props
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const toggleImpact = (_type) => {
@@ -454,6 +463,9 @@ const ClusteringRow = observer((props) => {
         <div className={`${classes.ccell}`}>
           <span>{clusters}</span>
         </div>
+        <div className={`${classes.ccell}`}>
+          <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
+        </div>
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('impact')}><img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}</span>
         </div>
@@ -465,16 +477,16 @@ const ClusteringRow = observer((props) => {
         </div>
       </div>
     </Tooltip>
-    <div className={classes.rowData}>
-      {visible && type === 'impact' && <VariableImpact model={model} />}
-      {visible && type === 'process' && <ModelProcessFlow model={model} />}
-      {visible && type === 'explanation' && <Explanation model={model} />}
-    </div>
+    {/* <div className={classes.rowData}> */}
+    {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
+    {visible && type === 'process' && <ModelProcessFlow model={model} />}
+    {visible && type === 'explanation' && <Explanation model={model} />}
+    {/* </div> */}
   </div>
 })
 
 const MappingDict = observer((props) => {
-  const { project, list, hideDict } = props
+  const { project, list, hideDict, mapHeader } = props
   const { colMap, mappingKey } = project
   const [state, setState] = React.useState({
     origin: '',
@@ -514,9 +526,9 @@ const MappingDict = observer((props) => {
     <div className={classes.dictSelect}>
       <span>{EN.PleaseSelectaCategoricalVariable}</span>
       <Select
-          getPopupContainer={() => document.getElementsByClassName(classes.dictSelect)[0]}
-          value={mappingKey || list[0]} style={{ minWidth: 120, marginLeft: 20 }} onChange={handleSelect}>
-        {list.map((l, k) => <Option value={l} key={k}>{l}</Option>)}
+        getPopupContainer={() => document.getElementsByClassName(classes.dictSelect)[0]}
+        value={mappingKey || list[0]} style={{ minWidth: 120, marginLeft: 20 }} onChange={handleSelect}>
+        {list.map((l, k) => <Option value={l} key={k}>{mapHeader[l]}</Option>)}
       </Select>
     </div>
     <div className={classes.dictTable}>

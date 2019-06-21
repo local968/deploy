@@ -64,44 +64,6 @@ export default class ModelProcessFlow extends Component {
 		</Popover>
 	}
 	
-	FS(){
-		const { featureLabel } = this.props.model;
-		const {rawHeader,expression,target,colType} = this.props.projectStore.project;
-		
-		let drop = _.without(rawHeader,...featureLabel,target);
-		
-		const create = Object.values(expression).map(itm=>{
-			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
-		});
-		
-		if(!drop.length&&!create.length){
-			return null;
-		}
-		
-		const raw = drop.filter(itm=>colType[itm] === "Raw");
-		drop = _.without(drop,...raw);
-		
-		const pop = <dl className={styles.over}>
-			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
-				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
-			</dt>
-			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
-				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
-			</dt>
-			<dt style={{display:(create.length?'':'none')}}>
-				{EN.CreateTheseVariables}:
-			</dt>
-			{
-				create.map((itm,index)=><dd key={index} title={itm}>{itm}</dd>)
-			}
-		</dl>;
-		
-		return <Fragment>
-			<img src={Next} alt='' />
-			{this.popOver(pop,EN.FeatureCreationSelection)}
-		</Fragment>
-	}
-	
 	DQF(){
 		const {
 			nullFillMethod,nullLineCounts,
@@ -111,6 +73,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			problemType,
 			otherMap,
+			mapHeader,
 		} = this.props.projectStore.project;
 		
 		const nfm = _.cloneDeep(nullFillMethod);
@@ -156,6 +119,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			targetCounts,
 			nullFillMethod,
+			// mapHeader,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
@@ -181,23 +145,24 @@ export default class ModelProcessFlow extends Component {
 			}
 		});
 		
-		const NFMT = nullFillMethod[target];
 		
-		if(NFMT){
-			if(NFMT === 'drop'){
-				drop.push(target)
-			}else{
-				mapping.push([target,NFMT])
+		if(ta.find(itm=>itm === '') === undefined){
+			const NFMT = nullFillMethod[target];
+			
+			if(NFMT){
+				if(NFMT === 'drop'){
+					drop.push('NULL')
+				}else{
+					mapping.push(['NULL',NFMT])
+				}
 			}
 		}
-		
-		// if(drop.length&&Object.keys(colValueCounts[target]).length === 2){
-		// 	drop = [];
-		// }
 		
 		if(!drop.length&&!mapping.length){
 			return null;
 		}
+		
+		// drop = drop.map(itm=>mapHeader[itm]);
 		
 		return <React.Fragment>
 			<dt>{EN.TargetMore2Unique}</dt>
@@ -211,7 +176,7 @@ export default class ModelProcessFlow extends Component {
 	}
 	
 	DQFData(data,title,showTarget,outlier=false){
-		const { colType,target,rawDataView,outlierDictTemp} = this.props.projectStore.project;
+		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.projectStore.project;
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
@@ -297,20 +262,62 @@ export default class ModelProcessFlow extends Component {
 				low = +low.toFixed(2);
 				high = +high.toFixed(2);
 			}
-			return <React.Fragment>
+			return <Fragment>
 				<dt>{title}</dt>
 				<dd>{EN.ValidRange}:[{low},{high}]</dd>
 				{
-					res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}</dd>)
+					res.map(itm=><dd key={itm.key} title={itm.data.map(itm=>mapHeader[itm]).join(',')}>{itm.key}</dd>)
 				}
-			</React.Fragment>
+			</Fragment>
 		}
-		return <React.Fragment>
+		return <Fragment>
 			<dt>{title}</dt>
 			{
-				res.map(itm=><dd key={itm.key} title={itm.data.join(',')}>{itm.key}:{itm.data.join(',')}</dd>)
+				res.map(itm=>{
+					const _data = itm.data.map(itm=>mapHeader[itm]).join(',');
+					return <dd key={itm.key} title={_data}>{itm.key}:{_data}</dd>
+				})
 			}
-		</React.Fragment>
+		</Fragment>
+	}
+	
+	FS(){
+		const { featureLabel } = this.props.model;
+		const {rawHeader,expression,target,colType,mapHeader} = this.props.projectStore.project;
+		
+		let drop = _.without(rawHeader,...featureLabel,target);
+		
+		const create = Object.values(expression).map(itm=>{
+			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
+		});
+		
+		if(!drop.length&&!create.length){
+			return null;
+		}
+		
+		let raw = drop.filter(itm=>colType[itm] === "Raw");
+		drop = _.without(drop,...raw).map(itm=>mapHeader[itm]);
+		raw = raw.map(itm=>mapHeader[itm]);
+		
+		const pop = <dl className={styles.over}>
+			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
+				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
+			</dt>
+			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
+				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
+			</dt>
+			<dt style={{display:(create.length?'':'none')}} title = {create.join(',')}>
+				{EN.CreateTheseVariables}:
+			</dt>
+			{
+				create.map((itm,index)=><dd key={index} title={mapHeader[itm]}>{mapHeader[itm]}</dd>)
+			}
+		</dl>;
+		
+		return <Fragment>
+			<img src={Next} alt='' />
+			{this.popOver(pop,EN.FeatureCreationSelection)}
+		</Fragment>
 	}
 
 	render() {

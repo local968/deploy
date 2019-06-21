@@ -96,7 +96,7 @@ export default class DataSchema extends Component {
   }
 
   formatTable = () => {
-    const { target, headerTemp: { temp }, uploadData, rawHeader, renameVariable, etling } = this.props.projectStore.project;
+    const { target, uploadData, rawHeader, renameVariable, etling, mapHeader, headerTemp: {temp} } = this.props.projectStore.project;
     if (etling) return []
     const { showSelect, checkList } = this
     if (!uploadData.length) return []
@@ -166,18 +166,19 @@ export default class DataSchema extends Component {
         headerData.content = <HeaderInfo row={EN.Header} col={EN.Row} style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
         headerData.title = '';
       } else {
-        headerData.content = <EditHeader value={header} key={i - index.columnHeader} />
-        headerData.title = header;
+        const headerText = mapHeader[header]
+        headerData.content = <EditHeader value={headerText} key={i - index.columnHeader} />
+        headerData.title = headerText;
         if (target && target === header) {
           headerData.cn = classnames(headerData.cn, styles.target);
         }
         if (checkList.includes(header)) {
           headerData.cn = classnames(headerData.cn, styles.checked);
         }
-        if (!header) {
+        if (!headerText) {
           headerData.cn = classnames(headerData.cn, styles.missed);
         }
-        if (header && temp[header]&&temp[header].length > 1) {
+        if (headerText && temp[headerText]&&temp[headerText].length > 1) {
           headerData.cn = classnames(headerData.cn, styles.duplicated);
         }
       }
@@ -192,14 +193,14 @@ export default class DataSchema extends Component {
         selectData.content = "";
       } else {
         let key = header;
-        if (!header) {
-          key = `Unnamed: ${realColumn}`
-        }
-        if (header && temp[header]&&temp[header].length > 1) {
-          const tempIndex = temp[header].findIndex(c => c === realColumn);
-          const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
-          key = header + suffix
-        }
+        // if (!headerText) {
+        //   key = `Unnamed: ${realColumn}`
+        // }
+        // if (header && temp[header] && temp[header].length > 1) {
+        //   const tempIndex = temp[header].findIndex(c => c === realColumn);
+        //   const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
+        //   key = header + suffix
+        // }
         const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
         const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
@@ -251,7 +252,7 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { etling, etlProgress, rawHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated } } = project;
+    const { etling, etlProgress, rawHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated }, mapHeader } = project;
     const targetOption = {};
     const tableData = this.formatTable()
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
@@ -259,8 +260,8 @@ export default class DataSchema extends Component {
     //target选择列表
     rawHeader.forEach(h => {
       h = h.trim()
-      if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = h
-      if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = h
+      if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = mapHeader[h]
+      if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = mapHeader[h]
     });
 
     return project && <div className={styles.schema}>

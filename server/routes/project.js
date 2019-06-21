@@ -7,6 +7,8 @@ const command = require('../command')
 const _ = require('lodash');
 const config = require('config')
 const qs = require('querystring')
+const userLogger = require('log4js').getLogger('user')
+const errorLogger = require('log4js').getLogger('error')
 // const mq = require('../amqp')
 
 const {restriction} = require("../apis/service/planService");
@@ -170,8 +172,17 @@ function createOrUpdate(id, userId, data, isCreate = false) {
         const returnValue = err ? {
           status: 411,
           message: (isCreate ? "create" : "update") + " project error"
-        } : { status: 200, message: "ok", result: data, id }
+        } : { status: 200, message: (isCreate ? "create" : "update") + " success", result: data, id }
         wss.publish(`user:${userId}:projects`, returnValue)
+        const logData = {
+          userId,
+          pid: id,
+          params: JSON.stringify(data),
+          message: `${returnValue.message}: ${id}`,
+          time: moment().unix()
+        }
+        if (err) errorLogger.error(logData)
+        userLogger[err ? 'error' : 'info'](logData)
         return returnValue
       })
   })
@@ -205,6 +216,12 @@ function createModel(userId, id, modelId, params) {
     const data = err ? { status: 412, message: "create model error" } : { status: 200, message: "ok" }
     const result = { ...data, model: saveData, id }
     wss.publish(`user:${userId}:projects`, result)
+    userLogger.info({
+      userId,
+      message: `create model: ${id}`,
+      mid: id,
+      time: moment().unix()
+    })
     return result
   })
 }
@@ -213,6 +230,13 @@ function updateModel(userId, id, mid, params) {
   return redis.hmset(`project:${id}:model:${mid}`, mapObjectToArray(params)).then(() => {
     const result = { status: 200, message: "ok", modelResult: { ...params, id: mid }, id }
     wss.publish(`user:${userId}:projects`, result)
+    userLogger.info({
+      userId,
+      params: JSON.stringify(params),
+      message: `update model: ${id}`,
+      mid: id,
+      time: moment().unix()
+    })
     return result
   })
 }
@@ -239,7 +263,7 @@ function moveModels(id) {
   })
 }
 
-function deleteModels(id) {
+function deleteModels(userId, id) {
   const selPipeline = redis.pipeline();
   selPipeline.smembers(`project:${id}:models`)
   selPipeline.smembers(`project:${id}:models:previous`)
@@ -254,7 +278,27 @@ function deleteModels(id) {
     pipeline.del(`project:${id}:models:previous`)
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
-      if (error) return { status: 414, message: "delete models error", error }
+      if (error) {
+        errorLogger.error({
+          userId,
+          message: "delete models error",
+          pid: id,
+          time: moment().unix()
+        })
+        userLogger.error({
+          userId,
+          message: "delete models error",
+          pid: id,
+          time: moment().unix()
+        })
+        return { status: 414, message: "delete models error", error }
+      }
+      userLogger.warn({
+        userId,
+        message: "delete models success",
+        pid: id,
+        time: moment().unix()
+      })
       return {
         status: 200,
         message: 'ok'
@@ -272,8 +316,28 @@ function deleteProject(userId, id) {
     pipeline.zrem(`user:${userId}:projects:createTime`, id)
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0])
-      if (error) return { status: 415, message: "delete project error", error }
-      return deleteModels(id)
+      if (error) {
+        errorLogger.error({
+          userId,
+          message: "delete project error",
+          pid: id,
+          time: moment().unix()
+        })
+        userLogger.error({
+          userId,
+          message: "delete project error",
+          pid: id,
+          time: moment().unix()
+        })
+        return { status: 415, message: "delete project error", error }
+      }
+      userLogger.warn({
+        userId,
+        message: "delete project success",
+        pid: id,
+        time: moment().unix()
+      })
+      return deleteModels(userId, id)
     })
   })
 }
@@ -287,6 +351,18 @@ function checkProject(userId, id) {
       }
     }
     if (result.userId !== userId) {
+      errorLogger.error({
+        userId,
+        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        pid: id,
+        time: moment().unix()
+      })
+      userLogger.error({
+        userId,
+        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        pid: id,
+        time: moment().unix()
+      })
       console.error(`user:${userId}, project:${id} ${!result.userId ? 'delete' : 'error'}`)
       return { status: 421, message: "project error" }
       // return {}
@@ -308,11 +384,23 @@ const checkTraningRestriction = (user) => {
     const {userProjectRestriction} = await restriction();
   
     return redis.get(restrictQuery).then(count => {
-      if (count >= userProjectRestriction[user.level]) return reject({
-        status: -4,
-        message: 'Your usage of "Number of Training" has reached the max restricted by your current license.',
-        error: 'project number exceed'
-      })
+      if (count >= userProjectRestriction[user.level]) {
+        errorLogger.error({
+          userId: user.id,
+          message: `Your usage of "Number of Training" has reached the max restricted by your current license.`,
+          time: moment().unix()
+        })
+        userLogger.error({
+          userId: user.id,
+          message: `Your usage of "Number of Training" has reached the max restricted by your current license.`,
+          time: moment().unix()
+        })
+        return reject({
+          status: -4,
+          message: 'Your usage of "Number of Training" has reached the max restricted by your current license.',
+          error: 'project number exceed'
+        })
+      }
       redis.incr(restrictQuery)
       resolve()
     })
@@ -383,6 +471,13 @@ function updateProjectField(id, userId, field, data) {
         id,
         result: { [field]: data }
       }
+      userLogger.info({
+        userId,
+        pid: id,
+        message: 'update project field success',
+        params: JSON.stringify({ [field]: data }),
+        time: moment().unix()
+      })
       wss.publish(`user:${userId}:projects`, returnValue)
       return returnValue
     })
@@ -447,6 +542,12 @@ async function checkEtl(projectId, userId) {
         requestId: uuid.v4()
       }
     }).then(() => {
+      userLogger.info({
+        userId,
+        pid: projectId,
+        message: 'command etl success',
+        time: moment().unix()
+      })
       return createOrUpdate(projectId, userId, { hasSendEtl: true })
     })
   }
@@ -461,12 +562,17 @@ wss.register("addProject", async (message, socket) => {
   // const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
   const { userId } = socket.session;
   const counts = await redis.zcard(`user:${userId}:projects:createTime`)
-  const {userConcurrentRestriction} = await restriction();
-  
-  if (counts >= userConcurrentRestriction[socket.session.user.level]) return {
-    status: 408,
-    message: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
-    error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
+  if (counts >= userConcurrentRestriction[socket.session.user.level]) {
+    errorLogger.error({
+      userId,
+      message: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
+      time: moment().unix()
+    })
+    return {
+      status: 408,
+      message: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
+      error: 'Your usage of number of concurrent project has reached the max restricted by your current lisense.',
+    }
   }
   const id = await redis.incr("node:project:count")
   // const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
@@ -677,7 +783,7 @@ wss.register('etl', (message, socket, progress) => {
             }
           }
           //重新做ETL后删除所有模型
-          deleteModels(id)
+          deleteModels(userId, id)
 
           return createOrUpdate(id, userId, { ...result, ...steps }).then(updateResult => {
             if (updateResult.status !== 200) return updateResult
@@ -915,6 +1021,13 @@ wss.register('abortTrain', (message, socket) => {
     if (!stopIds.includes(stopId)) return { status: 200, message: 'ok' }
     return axios.get(`${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([{ ...message, userId, requestId, stopId }])}`).then(async () => {
       command.clearListener(stopId)
+      userLogger.warn({
+        userId,
+        pid: projectId,
+        params: JSON.stringify({ stopId }),
+        message: `abort train: ${stopId}`,
+        time: moment().unix()
+      })
       const trainModel = await getProjectField(projectId, 'trainModel')
       Reflect.deleteProperty(trainModel, stopId);
       const curStopIds = stopIds.filter(si => si !== stopId)
@@ -957,7 +1070,6 @@ wss.register('train', async (message, socket, progress) => {
   // let hasModel = false;
   try {
     await checkTraningRestriction(user)
-
 
     const commandArr = []
     const _stopIds = []
@@ -1022,6 +1134,17 @@ wss.register('train', async (message, socket, progress) => {
       _stopIds.push(stopId)
     }
 
+    commandArr.forEach(___co => {
+      userLogger.info({
+        userId,
+        pid: projectId,
+        command: JSON.stringify(___co),
+        stopId: ___co.stopId,
+        message: `start train: ${___co.stopId}`,
+        time: moment().unix()
+      })
+    })
+
     if (!commandArr.length) return { status: 200, msg: 'ok' }
     await createOrUpdate(projectId, userId, { ...updateData, stopIds: _stopIds })
     await checkEtl(projectId, userId)
@@ -1030,8 +1153,26 @@ wss.register('train', async (message, socket, progress) => {
     const processFn = async queueValue => {
       const stopIds = await getProjectField(projectId, 'stopIds')
       const { status, result, requestId: trainId } = queueValue;
-      if (status < 0 || status === 100) return { ...queueValue, isAbort: false };
-      if (!stopIds.includes(trainId)) return { isAbort: true }
+      if (status < 0 || status === 100) {
+        userLogger.info({
+          userId,
+          pid: projectId,
+          stopId: trainId,
+          message: `train finished: ${trainId}`,
+          time: moment().unix()
+        })
+        return { ...queueValue, isAbort: false };
+      }
+      if (!stopIds.includes(trainId)) {
+        userLogger.warn({
+          userId,
+          pid: projectId,
+          stopId: trainId,
+          message: `train aborted: ${trainId}`,
+          time: moment().unix()
+        })
+        return { isAbort: true }
+      }
       if (!result) return
       let processValue
       if (result.name === "progress") {
@@ -1326,47 +1467,28 @@ wss.register("fetchData", async (message, socket) => {
   return await axios.get(path)
 })
 
-wss.register('preDownload', async (message, socket) => {
-  const { mid, rate, etlIndex, projectId, _id: requestId } = message
+wss.register('ssPlot', async (message, socket, progress) => {
+
   const { userId } = socket.session
-  // const requestId = uuid.v4()
 
-  // const model = await redis.hgetall(`project:${projectId}:model:${mid}`)
-  // const { featureImportance } = model
-  // const header = Object.keys(JSON.parse(featureImportance))
-
-  let _rate = rate
-  try {
-    _rate = parseFloat(rate)
-  } catch (e) { }
-
-  try {
-    const deployResult = await command({
-      command: 'outlier.deploy',
-      requestId,
-      projectId,
-      userId,
-      csvLocation: [etlIndex],
-      ext: ['csv'],
-      solution: mid,
-      actionType: 'deployment',
-      frameFormat: 'csv',
-      rate: _rate
-    }, processData => {
-      const { status, result } = processData
-      if (status === 1) return
-      if (status === 100) return result
-      throw new Error(result[processError])
-    })
-
-    return { status: 100, message: 'ok', data: deployResult }
-    // downloadCsv(deployResult.deployData, decodeURIComponent(filename), etlIndex, header, res)
-  } catch (e) {
-    return { status: 500, message: 'error', error: e }
-  }
+  await checkEtl(message.projectId, userId)
+  return command({
+    ...message,
+    userId,
+    requestId: message._id
+  }, progressValue => {
+    const { status } = progressValue
+    if (status < 0 || status === 100) return progressValue
+    return progress(progressValue)
+  }, true).then(async returnValue => {
+    const { status, result } = returnValue
+    if (status === 100) await createOrUpdate(message.projectId, userId, { ssPlot: result })
+    return returnValue
+  })
 })
 
 module.exports = {
   createOrUpdate,
-  deleteModels
+  deleteModels,
+  getProjectField
 }

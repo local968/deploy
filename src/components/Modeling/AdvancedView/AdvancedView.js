@@ -431,9 +431,10 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable }, sort, handleSort, metric, isHoldout } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     const texts = problemType === 'Classification' ?
       [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
       [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
@@ -456,9 +457,9 @@ class AdvancedModelTable extends Component {
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
-        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} />
+        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
       } else {
-        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} />
+        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader}/>
       }
     });
     return (
@@ -481,7 +482,7 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked, isHoldout } = this.props;
+    const { model, texts, metric, checked, isHoldout, mapHeader } = this.props;
     const { score: { validateScore, holdoutScore }, modelName, reason } = model;
     const { detail } = this.state;
     const { validate, holdout } = reason || {}
@@ -527,7 +528,7 @@ class AdvancedModelTable extends Component {
             }
           })}
         </Row>
-        {detail && <RegressionDetailCurves isHoldout={isHoldout} project={this.props.project} model={model} />}
+        {detail && <RegressionDetailCurves isHoldout={isHoldout} project={this.props.project} model={model} mapHeader={mapHeader} />}
       </div>
     )
   }
@@ -609,12 +610,12 @@ class RegressionDetailCurves extends Component {
   }
 
   render() {
-    const { model, isHoldout } = this.props;
+    const { model, isHoldout, mapHeader } = this.props;
     const { curve, diagnoseType, chartDate, show, holdOutChartDate } = this.state;
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
-        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
+        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} mapHeader={mapHeader} /></div>
         break;
       case EN.FitPlot:
         curComponent = <div className={styles.plot} style={{ height: 300, width: 500 }}>
@@ -698,7 +699,7 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   };
   render() {
-    const { model, texts, metric, checked, yes, no, isHoldout } = this.props;
+    const { model, texts, metric, checked, yes, no, isHoldout, mapHeader } = this.props;
     if (!model.chartData) return null;
     const { modelName, fitIndex, holdoutChartData, chartData, score } = model;
     const { detail } = this.state;
@@ -740,7 +741,7 @@ class ClassificationModelRow extends Component {
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} />}
+        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} mapHeader={mapHeader}/>}
       </div>
     )
   }
@@ -779,7 +780,7 @@ class DetailCurves extends Component {
   }
 
   render() {
-    const { model, model: { mid }, yes, no, project, isHoldout } = this.props;
+    const { model, model: { mid }, yes, no, project, isHoldout, mapHeader } = this.props;
     const { curve, show } = this.state;
     let curComponent;
     let hasReset = true;
@@ -825,7 +826,7 @@ class DetailCurves extends Component {
         hasReset = false;
         break;
       case EN.VariableImpact:
-        curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
+        curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} mapHeader={mapHeader} /></div>
         hasReset = false;
         break;
       case EN.ModelProcessFlow:

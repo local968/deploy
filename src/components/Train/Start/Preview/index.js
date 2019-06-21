@@ -37,7 +37,7 @@ export default class Preview extends Component {
   formatTable = () => {
     const { cleanData, newVariableData } = this
     const { visiable, project } = this.props
-    const { colType, will_be_drop_500_lines, trainHeader, newVariable, newType, rawHeader, dataHeader } = project;
+    const { colType, will_be_drop_500_lines, trainHeader, newVariable, newType, rawHeader, dataHeader, mapHeader } = project;
     if (!visiable) return []
     if (this.loading) return []
     if (!cleanData.length) return []
@@ -45,6 +45,7 @@ export default class Preview extends Component {
     const headerList = [...rawHeader.filter(_h => dataHeader.includes(_h)), ...newVariable].filter(h => !trainHeader.includes(h))
     const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
     const data = cleanData.map((row, index) => showIndex.map(ind => row.concat(newVariable.map(n => newVariableData[index][n]))[ind]))
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
 
     // const headerList = [...sortHeader,].filter(v => !trainHeader.includes(v))
     // const indexs = headerList.map(h => header.indexOf(h))
@@ -66,7 +67,7 @@ export default class Preview extends Component {
     const selectArr = []
     for (let i = 0; i < realColumn; i++) {
       const header = headerList[i] ? headerList[i].trim() : '';
-
+      const headerText = newMapHeader[header]
       indexArr.push({
         content: <span>{i + 1}</span>,
         title: i + 1,
@@ -74,8 +75,8 @@ export default class Preview extends Component {
       })
 
       headerArr.push({
-        content: <span>{header}</span>,
-        title: header,
+        content: <span>{headerText}</span>,
+        title: headerText,
         cn: styles.titleCell
       })
 

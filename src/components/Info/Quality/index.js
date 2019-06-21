@@ -67,7 +67,7 @@ class VariableIssue extends Component {
   }
 
   formatTable = () => {
-    const { colType, uploadData, rawHeader, dataHeader, totalRawLines, etling, rawDataView, variableIssues, problemType } = this.props.project;
+    const { colType, uploadData, rawHeader, dataHeader, totalRawLines, etling, rawDataView, variableIssues, problemType, mapHeader } = this.props.project;
     if (etling) return []
     if (!uploadData.length) return []
     const headerList = [...dataHeader]
@@ -90,7 +90,7 @@ class VariableIssue extends Component {
     const issueArr = []
     for (let i = 0; i < realColumn; i++) {
       const header = headerList[i] ? headerList[i].trim() : '';
-
+      const headerText = mapHeader[header]
       indexArr.push({
         content: <span>{i + 1}</span>,
         title: i + 1,
@@ -98,8 +98,8 @@ class VariableIssue extends Component {
       })
 
       headerArr.push({
-        content: <span>{header}</span>,
-        title: header,
+        content: <span>{headerText}</span>,
+        title: headerText,
         cn: styles.titleCell
       })
 
@@ -303,7 +303,7 @@ class Summary extends Component {
 
   render() {
     const { project, editFixes } = this.props;
-    const { dataHeader, totalRawLines, colType, deletedCount, totalLines, problemType, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, issues } = project
+    const { mapHeader, dataHeader, totalRawLines, colType, deletedCount, totalLines, problemType, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, issues } = project
     const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
     const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
     const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
@@ -357,7 +357,7 @@ class Summary extends Component {
             {variableList.map((v, k) => {
               const percent = percentList[k]
               return <div className={styles.summaryTableRow} key={k}>
-                <div className={styles.summaryCell}><span>{v}</span></div>
+                <div className={styles.summaryCell}><span>{mapHeader[v]}</span></div>
                 <div className={styles.summaryCell}><span>{formatNumber(percent.clean, 2)}%</span></div>
               </div>
             })}

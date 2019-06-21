@@ -14,7 +14,7 @@ export default class VariableImpact extends Component {
   }
 
   render() {
-    const { model } = this.props;
+    const { model, mapHeader } = this.props;
     const { featureImportance } = model;
     const arr = Object.entries(featureImportance).sort(
       (a, b) => b[1] - a[1]
@@ -27,7 +27,7 @@ export default class VariableImpact extends Component {
           return (
             <div key={index} className={styles.detailRow}>
               <div className={styles.detailName}>
-                <span title={row[0]}>{row[0]}</span>
+                <span title={mapHeader[row[0]]}>{mapHeader[row[0]]}</span>
               </div>
               <div
                 className={styles.detailProcess}

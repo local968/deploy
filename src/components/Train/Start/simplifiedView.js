@@ -2,14 +2,11 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-// import CorrelationMatrix from './CorrelationMatrix';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
-import { Spin, Popover, message as antdMessage, Icon, Table, InputNumber, Modal } from 'antd';
+import { Popover, message as antdMessage, Icon, Table, InputNumber, Modal } from 'antd';
 import histogramIcon from './histogramIcon.svg';
-import univariantIcon from './univariantIcon.svg';
 import FUNCTIONS from './functions';
-import config from 'config'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import HistogramNumerical from "../../Charts/HistogramNumerical";
@@ -74,6 +71,8 @@ export default class SimplifiedView extends Component {
       },
     }).then((CorrelationMatrixData) => {
       this.showCorrelation = true;
+      let {type} = CorrelationMatrixData;
+      CorrelationMatrixData.type = type.map(itm=>project.mapHeader[itm]);
       this.CorrelationMatrixData = CorrelationMatrixData;
     });
   };
@@ -151,13 +150,14 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { mapHeader = [], standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
+    const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.chooseScan}>
         <div className={styles.chooseLabel}><span>{EN.ChooseaVariableScalingMethod}:</span></div>
@@ -195,7 +195,7 @@ export default class SimplifiedView extends Component {
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable}
-              addNewVariable={addNewVariable2} colType={colType} expression={expression} />
+              addNewVariable={addNewVariable2} colType={colType} expression={expression} mapHeader={newMapHeader}/>
           </Modal>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
@@ -232,7 +232,7 @@ export default class SimplifiedView extends Component {
               const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
               const isNew = newVariable.includes(h)
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]}
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} mapHeader={newMapHeader}
                 handleWeight={this.handleWeight(h)} colType={variableType} project={project}
                 isChecked={checkedVariables.includes(h)}
                 handleCheck={this.handleCheck.bind(null, h)}
@@ -310,7 +310,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew } = this.props;
+    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew, mapHeader } = this.props;
     const { histgramPlots, histgramPlot } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
@@ -318,7 +318,7 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
         onChange={handleCheck} /></div>
-      <div className={styles.tableTd} title={value}><span>{value}</span></div>
+      <div className={styles.tableTd} title={mapHeader[value]}><span>{mapHeader[value]}</span></div>
       <div className={styles.tableTd} style={{ borderColor: 'transparent' }}>
         <InputNumber value={weight || 1} max={99.9} min={0.1} step={0.1} precision={1} onChange={handleWeight} />
       </div>
@@ -331,14 +331,12 @@ class SimplifiedViewRow extends Component {
         {(!isRaw && this.histograms) ? <Popover placement='rightTop'
                                                 visible={!isRaw && this.histograms}
                                                 overlayClassName='popovers'
-                                                // getPopupContainer = {()=>document.getElementsByClassName(styles.advancedModel)[0]}
-                                                // autoAdjustOverflow = {true}
                                                 onVisibleChange={this.hideHistograms}
                                                 trigger="click"
                                                 content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
                                                   <SimplifiedViewPlot onClose={this.hide}
                                                                       type={colType[value]}
-                                                                      value={value}
+                                                                      value={mapHeader[value]}
                                                                       data={this.chartData[value]} />
                                                 </SimplePlot>} /> : null}
       </div>
@@ -383,17 +381,17 @@ class SimplePlot extends Component {
   constructor(props) {
     super(props);
   }
-  
+
   componentDidMount() {
     this.getData()
   }
-  
+
   componentWillReceiveProps(nextProps) {
     if(nextProps.path!==this.props.path){
       this.getData(nextProps)
     }
   }
-  
+
   getData(props=this.props){
     const { getPath, path, isNew } =props;
     if (isNew && !path) getPath();
