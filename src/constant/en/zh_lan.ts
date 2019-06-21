@@ -780,7 +780,7 @@ const ZH_LAN: any = {
   Problemstatement: '',
   Businessvalue: '',
   SpeedvsAccuracy: '建模速度vs准确率',
-  LiftsCharts: 'Lift图',
+  LiftsCharts: '提升图',
   ROCCurves: 'ROC曲线',
   Speedms1000rows: '建模速度(行/秒)',
   Percentage: '百分比',

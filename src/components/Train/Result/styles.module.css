@@ -160,7 +160,7 @@
 
 .cell {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid #979797;
@@ -186,7 +186,7 @@
 
 .ccell {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid #979797;

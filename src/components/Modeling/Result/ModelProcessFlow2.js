@@ -91,17 +91,20 @@ export default class ModelProcessFlow extends Component {
 			mfm[itm[0]] = 'mean';
 		});
 		
-		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);
+		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);//缺失值
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
-		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${mapHeader[target]})`,outlierLineCounts[target],true);
-		if(!mv&&!mi&&!out){
+		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${target})`,outlierLineCounts[target],true);
+		
+		const dqft = problemType==='Classification'&&this.DQFT();
+		
+		if(!mv&&!mi&&!out&&!dqft){
 			return <dl>
 				<dd>{EN.none}</dd>
 			</dl>
 		}
 		
 		return <dl className={styles.over}>
-			{problemType==='Classification'&&this.DQFT()}
+			{dqft}
 			{mv}
 			{mi}
 			{out}
