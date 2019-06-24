@@ -275,8 +275,8 @@ router.get('/download/model', async (req, res) => {
       step: async (results, parser) => {
         const row = results.data
         if (!resultHeader) {
-          resultHeader = [...header, ...Object.keys(row)]
-          const headerTexts = [...header.filter(key => key !== '__no').map(h => mapHeader[h]), ...Object.keys(row)]
+          resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no')
+          const headerTexts = [...header.filter(key => key !== '__no').map(h => mapHeader[h]), ...Object.keys(row)].filter(key => key !== '__no')
           res.write(Papa.unparse([headerTexts, []], { header: false }))
         }
         const nos = Object.keys(temp)
