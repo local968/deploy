@@ -33,6 +33,7 @@ export default class Project {
   @observable name;
   @observable createTime
   @observable updateTime
+  @observable charset = 'utf-8';
   // @observable description;
 
   //problem

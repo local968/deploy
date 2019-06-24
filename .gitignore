@@ -39,3 +39,5 @@ start.sh
 
 config.js
 logs
+
+nohup.log
