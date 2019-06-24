@@ -140,6 +140,7 @@
     font-size: 1rem;
     flex: none;
     flex-direction: column;
+    position: relative;
 }
 .predictActual .title {
     font-weight: bold;
@@ -177,6 +178,7 @@
     align-items: center;
     position: absolute;
     right: 120px;
+    /*top: -20px;*/
 }
 .metricSwitch span {
     margin: 0 10px;

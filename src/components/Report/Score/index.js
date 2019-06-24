@@ -748,20 +748,19 @@ class DetailCurves extends Component {
   state = {
     curve: EN.ROCCurve,
     show: true,
-  }
+  };
   handleClick = val => {
     this.setState({ curve: val });
-  }
+  };
   reset = () => {
     this.props.model.resetFitIndex();
     this.setState({
       show: false
-    })
-    setTimeout(() => {
+    },()=>{
       this.setState({
         show: true
       })
-    }, 0)
+    });
   };
   render() {
     const { model, model: { mid }, yes, no, project } = this.props;
@@ -770,7 +769,6 @@ class DetailCurves extends Component {
     let hasReset = true;
     switch (curve) {
       case EN.ROCCurve:
-        // curComponent = <RocChart height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = show && <ROCCurves
           height={300}
           width={500}
@@ -780,7 +778,6 @@ class DetailCurves extends Component {
         />;
         break;
       case EN.PredictionDistribution:
-        // curComponent = <PredictionDistribution height={190} width={500} className={`roc${mid}`} model={model} />
         curComponent = show && <PredictionDistributions
           height={300}
           width={500}
@@ -790,32 +787,30 @@ class DetailCurves extends Component {
         />;
         break;
       case EN.PrecisionRecallTradeoff:
-        // curComponent = <PRChart height={190} width={500} className={`precisionrecall${mid}`} model={model} />
         curComponent = show && <PRCharts
           height={300} width={500}
           x_name={EN.Recall}
           y_name={EN.Precision}
           model={model}
-        />
+        />;
         break;
       case EN.LiftChart:
-        // curComponent = <LiftChart height={190} width={500} className={`lift${mid}`} model={model} />;
         curComponent = <SingleLiftCharts
           height={300} width={500}
           x_name={EN.percentage}
           y_name={EN.lift}
           model={model}
-        />
+        />;
         hasReset = false;
         break;
       case EN.VariableImpact:
-        curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>
+        curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} /></div>;
         hasReset = false;
         break;
       case EN.ModelProcessFlow:
         curComponent = <div style={{ maxWidth: document.body.clientWidth / 2 }} >
           <ModelProcess model={model} className={`modelprocess${mid}`} />
-        </div>
+        </div>;
         hasReset = false;
         break;
       default:

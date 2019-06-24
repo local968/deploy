@@ -119,7 +119,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			targetCounts,
 			nullFillMethod,
-			// mapHeader,
+			nullLineCounts,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
@@ -149,7 +149,7 @@ export default class ModelProcessFlow extends Component {
 		if(ta.find(itm=>itm === '') === undefined){
 			const NFMT = nullFillMethod[target];
 			
-			if(NFMT){
+			if(NFMT&&nullLineCounts[target]){
 				if(NFMT === 'drop'){
 					drop.push('NULL')
 				}else{

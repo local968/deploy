@@ -9,6 +9,10 @@ import EN from "../../constant/en";
 import styles from './charts.module.css';
 import { Button } from 'antd';
 import { Hint, Switch } from 'components/Common';
+import config from 'config'
+const isEN = config.isEN;
+
+
 
 export default class PVA extends Component{
 	constructor(props){
@@ -33,8 +37,6 @@ export default class PVA extends Component{
 	
 	async componentDidMount(model=this.props.model) {
 		const { validatePlotData, holdoutPlotData } = model||{};
-		
-		console.log(111,this.props.data)
 		
 		if(!this.props.data){
 			request.post({
@@ -126,15 +128,19 @@ export default class PVA extends Component{
 		
 		let chunk;
 		
+		let max = 0;
+		
 		const series = _data.map(itm=>{
 			chunk = _.chunk(itm.value,barLength);
+			const data = _.map(chunk,(itm,index)=>[index*100/chunk.length,_.sum(itm)/_.size(itm)]);
+			max = _.max([max,...data.map(itm=>itm[1])]);
 			return {
 				type: 'line',
 				name:EN[itm.name],
 				symbolSize: 3,
 				yAxisIndex: 0,
 				smooth: false,
-				data:_.map(chunk,(itm,index)=>[index*100/chunk.length,_.sum(itm)/_.size(itm)]),
+				data,
 			}
 		});
 		
@@ -224,7 +230,7 @@ export default class PVA extends Component{
 			},
 			series,
 			grid:{
-				// x2:130,
+				x:`${max}`.length * 20,
 				y2:80,
 			},
 			toolbox:{
@@ -268,7 +274,7 @@ export default class PVA extends Component{
 		const [x,y] = range;
 		let [y_start,y_end] = yRange;
 		return [
-			<div className={styles.predictActual}>
+			<div className={styles.predictActual} key='predictActual'>
 				<div className={styles.title}>
 					{EN.PredictedVSActualPlotSorted}
 					<Hint content={<p><strong>{EN.ChartDescription}</strong><br/>
@@ -284,7 +290,7 @@ export default class PVA extends Component{
 						{EN.ChartReset}</p>}
 						/>
 				</div>
-				<div className={styles.metricSwitch}>
+				<div className={styles.metricSwitch} style={{top:(isEN?-25:0)}}>
 					<span>{EN.Validation}</span>
 					<Switch checked={isHoldout} onChange={this.handleHoldout.bind(this)} style={{ backgroundColor: '#1D2B3C' }} />
 					<span>{EN.Holdout}</span>
