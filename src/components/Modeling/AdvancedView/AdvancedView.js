@@ -418,7 +418,7 @@ const questMarks = {
   'F1-Score': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
   Precision: <p>{EN.Itmeasureshowmanytruepositivesamong}</p>,
   KS: EN.Efficientwaytodetermine,
-  'Normalized RMSE': EN.RootMeanSquareError,
+  'Normalized RMSE': EN.RootMeanSquareErrorRMSEmeasures,
   R2: EN.R2isastatisticalmeasure,
   RMSE: EN.RootMeanSquareErrorprediction,
   RMSLE: EN.RMSLEissimilarwithRMSE,

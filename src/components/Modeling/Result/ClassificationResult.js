@@ -123,7 +123,6 @@ export default class ClassificationView extends Component {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
     const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader, newVariable } = project;
     if (!current) return null;
-
     const { selectModel = {}, targetCounts = {} } = project;
 
     const { fitIndex = 1, chartData = {} } = selectModel;
@@ -265,7 +264,7 @@ export default class ClassificationView extends Component {
               <dl>
                 <dt>
                   <span>{EN.Benefitcostiscalculated}</span>
-                  <span><span style={{ display: 'block' }}>(r<sub>modified</sub>/r<sub>0</sub>)*({EN.Benefits}*TP–{EN.Costs}*FN)+(1-r<sub>modified</sub> /1-r<sub>0</sub>)*({EN.Benefits}*TN–{EN.Costs}*FP);</span></span>
+                  <span><span style={{ display: 'block' }}>(r<sub>modified</sub>/r<sub>0</sub>)*({EN.Benefits}*TP–{EN.Costs}*FN)+(1-r<sub>modified</sub>) /(1-r<sub>0</sub>)*({EN.Benefits}*TN–{EN.Costs}*FP);</span></span>
                   <span>{EN.TPTruePositiveTNTrueNegative}</span>
                 </dt>
               </dl>
