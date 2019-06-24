@@ -83,7 +83,7 @@ export default class ModelProcessFlow extends Component {
 			'select_percentile_classification': 'SelectPercentile',
 			'select_percentile_regression': 'SelectPercentile',
 			'select_rates': 'GenericUnivariateSelect',
-			'liblinear_svc_preprocessor':'SelectFeature_liblinear_svc',
+			'liblinear_svc_preprocessor':'SelectFeature_LinearSVC',
 			'truncatedSVD':'TruncatedSVD',
 		};
 
