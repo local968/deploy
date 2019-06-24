@@ -9,6 +9,10 @@ import EN from "../../constant/en";
 import styles from './charts.module.css';
 import { Button } from 'antd';
 import { Hint, Switch } from 'components/Common';
+import config from 'config'
+const isEN = config.isEN;
+
+
 
 export default class PVA extends Component{
 	constructor(props){
@@ -286,7 +290,7 @@ export default class PVA extends Component{
 						{EN.ChartReset}</p>}
 						/>
 				</div>
-				<div className={styles.metricSwitch}>
+				<div className={styles.metricSwitch} style={{top:(isEN?-25:0)}}>
 					<span>{EN.Validation}</span>
 					<Switch checked={isHoldout} onChange={this.handleHoldout.bind(this)} style={{ backgroundColor: '#1D2B3C' }} />
 					<span>{EN.Holdout}</span>
