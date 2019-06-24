@@ -480,7 +480,7 @@ const ClusteringRow = observer((props) => {
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
     {visible && type === 'process' && <ModelProcessFlow model={model} />}
-    {visible && type === 'explanation' && <Explanation model={model} />}
+    {visible && type === 'explanation' && <Explanation model={model} mapHeader={mapHeader}/>}
     {/* </div> */}
   </div>
 })
