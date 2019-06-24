@@ -110,6 +110,20 @@ export default function PredictionDistributions(props){
 			},
 			tooltip:{
 				triggerOn: 'none',
+				formatter: function (params) {
+					const [data] = params;
+					let res = data.dataIndex;
+					
+					params.forEach(itm=>{
+						if(itm.axisValue  === itm.data[0]){
+							res += `
+							<br/>
+							${itm.marker}${itm.seriesName}:${itm.value[1]}
+						`
+						}
+					});
+					return res;
+				},
 			},
 			legend: {
 				orient: 'vertical',
@@ -119,8 +133,6 @@ export default function PredictionDistributions(props){
 			series,
 		};
 	}
-	
-	
 
 	return <ReactEcharts
 		option={option}

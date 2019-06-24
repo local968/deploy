@@ -24,7 +24,7 @@ export default class ROCCurves extends PureComponent{
 	prePair(fitIndex=this.props.model.fitIndex,isHoldout=this.props.isHoldout){
 		const {x_name='',y_name='',model} =this.props;
 		const {chartData,holdoutChartData} = model;
-		const {roc,rocHoldout} = isHoldout?holdoutChartData:chartData;
+		const {roc} = isHoldout?holdoutChartData:chartData;
 		const {FPR:x,TPR:y} = roc;
 		const _x = Object.values(x).map((itm,index)=>itm+index*10**-6);
 		const _y = Object.values(y);
@@ -113,6 +113,7 @@ export default class ROCCurves extends PureComponent{
 			yAxis: {
 				type: 'value',
 				name:y_name,
+				// min:-0.001,
 			},
 			grid:{
 				y2:80,
@@ -141,14 +142,21 @@ export default class ROCCurves extends PureComponent{
 		const next_point = data.filter(itm=>itm[0]>point)[0];
 
 		const prev_point = data.filter(itm=>itm[0]<point).reverse()[0];
+		
+		// console.log('_x-point',_x,point);
+		// console.log('prev_point',prev_point,_x<point,!prev_point&&_x<point);
 
-		if((!next_point&&_x>point)||(!prev_point&&_x<point)){
+		if((!next_point&&_x>point)||(!prev_point&&_x<=point)){
 			this.position = myChart.convertToPixel('grid', data.filter(itm=>itm[0] === point)[0]);
 			return
 		}else if(next_point&&_x>next_point[0]){
+			console.log(2)
+			
 			point = next_point[0];
 			this.position = myChart.convertToPixel('grid', next_point)
 		}else if(prev_point&&_x<prev_point[0]){
+			console.log(3)
+			
 			point = prev_point[0];
 			this.position =  myChart.convertToPixel('grid', prev_point)
 		}
