@@ -320,7 +320,7 @@ const ZH_LAN: any = {
   R2LearnsDefaultSelection: 'R2 Learn 的默认推荐',
   Input: '输入:',
   Pleaseenterbenefitandcostin: '请在0.00到1000,000,000.00范围内输入收益和损失。输入的数字最多支持两位小数，必须是正值。',
-  Noteifacorrectpredictionbringsyouprofit: '注意：如果正确的预测为您带来利润，那么这是一种效收益。如果不正确的预测为您带来损失，那就是成本。所有输入都应以相同的单位进行测量。',
+  Noteifacorrectpredictionbringsyouprofit: '注意：如果正确的预测为您带来利润，那么这是一种有效收益。如果不正确的预测为您带来损失，那就是成本。所有输入都应以相同的单位进行测量。',
   Tips: '提示',
   Benefit: '收益:',
   Benefits: '收益',
