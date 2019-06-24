@@ -9,14 +9,18 @@ import modelProcess from './icon-model-process-flow-normal.svg';
 import processHover from './icon-model-process-flow-hover.svg';
 import processSelectd from './icon-model-process-flow-selected.svg';
 import ROCCurve from './icon-roc-curve-normal.svg';
-import liftChart from './icon-lift-chart-normal.svg';
+import liftChart from './icon-lift-chart-normal.png';
+import gainChart from './icon-gain-chart-normal.png';
+import ksCurve from './icon-ks-curve-normal.png';
 import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
 import predictDist from './icon-prediction-distribution-normal.svg';
 import liftchartHover from './icon-lift-chart-hover.svg';
 import rocHover from './icon-roc-curve-hover.svg';
 import precisionRecallHover from './icon-precision-recall-tradeoff-hover.svg';
 import predictionDistribution from './icon-prediction-distribution-hover.svg';
-import liftchartSelected from './icon-lift-chart-selected.svg';
+import liftchartSelected from './icon-lift-chart-selected.png';
+import gainchartSelected from './icon-gain-chart-selected.png';
+import ksCurveSelected from './icon-ks-curve-selected.png';
 import FitPlotHover from './iconMR-FitPlot-Hover.svg';
 import FitPlotNormal from './iconMR-FitPlot-Normal.svg';
 import FitPlotSelected from './iconMR-FitPlot-Selected.svg';
@@ -54,6 +58,8 @@ import LiftChart2 from "../../Charts/LiftChart2";
 import RocChart2 from "../../Charts/RocChart2";
 import FitPlot2 from "../../Charts/FitPlot2";
 import request from '../../Request'
+import GainChart from "../../Charts/GainChart";
+import KsChart from "../../Charts/KsChart";
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -412,7 +418,7 @@ const questMarks = {
   'F1-Score': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
   Precision: <p>{EN.Itmeasureshowmanytruepositivesamong}</p>,
   KS: EN.Efficientwaytodetermine,
-  'Normalized RMSE': EN.RootMeanSquareError,
+  'Normalized RMSE': EN.RootMeanSquareErrorRMSEmeasures,
   R2: EN.R2isastatisticalmeasure,
   RMSE: EN.RootMeanSquareErrorprediction,
   RMSLE: EN.RMSLEissimilarwithRMSE,
@@ -459,7 +465,7 @@ class AdvancedModelTable extends Component {
       if (problemType === 'Classification') {
         return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
       } else {
-        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader}/>
+        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
       }
     });
     return (
@@ -498,6 +504,7 @@ class AdvancedModelTable extends Component {
                     <Tooltip title={modelName}>
                       <span className={styles.modelName} alt={modelName}>{modelName}</span>
                     </Tooltip>
+                    <Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} />
                   </div>}
                   />
                 )
@@ -562,7 +569,7 @@ class RegressionDetailCurves extends Component {
     if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
-      },()=>{
+      }, () => {
         this.setState({
           show: true
         })
@@ -571,9 +578,7 @@ class RegressionDetailCurves extends Component {
   }
 
   setChartDate(isHoldout = this.props.isHoldout) {
-    // isHoldout={isHoldout}
     const { validatePlotData, holdoutPlotData } = this.props.model;
-    // const url = isHoldout?holdoutPlotData:validatePlotData;
 
     request.post({
       url: '/graphics/list',
@@ -715,6 +720,7 @@ class ClassificationModelRow extends Component {
                     <Tooltip title={modelName}>
                       <span className={styles.modelName} alt={modelName} >{modelName}</span>
                     </Tooltip>
+                    <Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} />
                   </div>}
                   />
                 );
@@ -741,7 +747,7 @@ class ClassificationModelRow extends Component {
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} mapHeader={mapHeader}/>}
+        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} mapHeader={mapHeader} />}
       </div>
     )
   }
@@ -771,7 +777,7 @@ class DetailCurves extends Component {
     if (nextProps.isHoldout !== this.props.isHoldout) {
       this.setState({
         show: false
-      },()=>{
+      }, () => {
         this.setState({
           show: true
         })
@@ -825,6 +831,26 @@ class DetailCurves extends Component {
         />;
         hasReset = false;
         break;
+      case EN.GainChart:
+        curComponent = <GainChart
+            height={300} width={600}
+            x_name={EN.percentage}
+            y_name={EN.Gain}
+            model={model}
+            isHoldout={isHoldout}
+        />;
+        hasReset = false;
+        break;
+      case EN.KSCurve:
+        curComponent = <KsChart
+            height={300} width={600}
+            x_name={EN.percentage}
+            y_name='KS'
+            model={model}
+            isHoldout={isHoldout}
+        />;
+        hasReset = false;
+        break;
       case EN.VariableImpact:
         curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} mapHeader={mapHeader} /></div>
         hasReset = false;
@@ -859,6 +885,16 @@ class DetailCurves extends Component {
       selectedIcon: liftchartSelected,
       text: EN.LiftChart
     }, {
+      normalIcon: gainChart,
+      hoverIcon: gainChart,
+      selectedIcon: gainchartSelected,
+      text: EN.GainChart
+    },{
+      normalIcon: ksCurve,
+      hoverIcon: ksCurve,
+      selectedIcon: ksCurveSelected,
+      text: EN.KSCurve
+    }, {
       normalIcon: varImpactNormal,
       hoverIcon: varImpactHover,
       selectedIcon: varImpactSelected,
@@ -873,7 +909,7 @@ class DetailCurves extends Component {
       <div className={styles.detailCurves} >
         <div className={styles.leftPanel} style={{ flex: 1 }}>
           <div className={styles.thumbnails}>
-            {thumbnails.slice(0, 5).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+            {thumbnails.slice(0, 7).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
           </div>
           <PredictTable
             isHoldout={isHoldout}

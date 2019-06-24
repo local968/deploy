@@ -40,7 +40,7 @@ class App extends Component {
                       <ErrorBoundary>
                         <Layout/>
                       </ErrorBoundary>
-                      <Test/>
+                      {/*<Test/>*/}
                     </div>
                   </div>
                 </Router>}

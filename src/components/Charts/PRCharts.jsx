@@ -114,6 +114,7 @@ export default class PRCharts extends PureComponent{
 			yAxis: {
 				type: 'value',
 				name:y_name,
+				min:-0.001,
 			},
 			grid:{
 				y2:80,
@@ -140,7 +141,7 @@ export default class PRCharts extends PureComponent{
 
 		const prev_point = data.filter(itm=>itm[0]<point).reverse()[0];
 
-		if((!next_point&&_x>point)||(!prev_point&&_x<point)){
+		if((!next_point&&_x>point)||(!prev_point&&_x<=point)){
 			this.position = myChart.convertToPixel('grid', data.filter(itm=>itm[0] === point)[0]);
 			return
 		}else if(next_point&&_x>next_point[0]){

@@ -1,3 +1,3 @@
-import EsUploader from './old'
+import EsUploader from './upload'
 
 export default EsUploader

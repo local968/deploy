@@ -83,7 +83,7 @@ export default class ModelProcessFlow extends Component {
 			'select_percentile_classification': 'SelectPercentile',
 			'select_percentile_regression': 'SelectPercentile',
 			'select_rates': 'GenericUnivariateSelect',
-			'liblinear_svc_preprocessor':'SelectFeature_liblinear_svc',
+			'liblinear_svc_preprocessor':'SelectFeature_LinearSVC',
 			'truncatedSVD':'TruncatedSVD',
 		};
 
@@ -124,6 +124,10 @@ export default class ModelProcessFlow extends Component {
 			nfm[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
 		});
 		
+		if(problemType==='Classification'){
+			Reflect.deleteProperty(nfm,target)
+		}
+		
 		if(otherMap.hasOwnProperty('')){
 			Reflect.deleteProperty(nfm,target);
 		}
@@ -161,7 +165,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			targetCounts,
 			nullFillMethod,
-			// mapHeader,
+			nullLineCounts,
 		} = this.props.projectStore.project;
 		
 		let drop = [],mapping=[];
@@ -191,7 +195,7 @@ export default class ModelProcessFlow extends Component {
 		if(ta.find(itm=>itm === '') === undefined){
 			const NFMT = nullFillMethod[target];
 			
-			if(NFMT){
+			if(NFMT&&nullLineCounts[target]){
 				if(NFMT === 'drop'){
 					drop.push('NULL')
 				}else{

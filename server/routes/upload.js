@@ -206,9 +206,9 @@ router.get('/download/result', async (req, res) => {
   let temp = {}
   let counter = 0
   let resultHeader
-  res.attachment(decodeURIComponent(filename));
+  res.attachment(filename);
   res.type('csv')
-  http.get(decodeURIComponent(url), (response) => {
+  http.get(url, (response) => {
     Papa.parse(response, {
       download: true,
       header: true,
@@ -266,7 +266,7 @@ router.get('/download/model', async (req, res) => {
   const header = JSON.parse(featureLabel).filter(h => esHeader.includes(h))
   const url = JSON.parse(deployData)
 
-  downloadCsv(decodeURIComponent(url), decodeURIComponent(filename), etlIndex, header, mapHeader, res)
+  downloadCsv(url, filename, etlIndex, header, mapHeader, res)
 
   // let temp = {}
   // let counter = 0

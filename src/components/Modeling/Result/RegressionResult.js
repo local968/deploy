@@ -22,15 +22,15 @@ export default class RegressionView extends Component {
   onSelect = model => {
     this.props.project.setSelectModel(model.id)
   };
-  
+
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target, newVariable } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target, newVariable,selectModel } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
-  
+
     return <div>
       <div className={styles.result}>
         <div className={styles.box}>
@@ -49,7 +49,7 @@ export default class RegressionView extends Component {
           </div>
           <Performance current={current} />
         </div>
-        
+
         {/*<PredictedVsActualPlot*/}
         {/*    x_name = {EN.PointNumber}*/}
         {/*    y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}*/}
@@ -58,8 +58,8 @@ export default class RegressionView extends Component {
         <PVA
             key='pva'
             x_name = {EN.PointNumber}
-            y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}
-            url={project.selectModel.validatePlotData}
+            y_name = {isEN?`${EN.Groupaverage} ${mapHeader[target]}`:`${mapHeader[target]} ${EN.Groupaverage}`}
+            model={selectModel}
         />
       </div>
       <div className={styles.line} />
@@ -101,7 +101,7 @@ class Performance extends Component {
           <span>{formatNumber(current.score.validateScore.nrmse)}</span>
         </div>
         <div className={styles.performanceText}>
-          <span><Hint content={EN.RootMeanSquareError} /> {EN.NormalizedRMSE}</span>
+          <span><Hint content={EN.RootMeanSquareErrorRMSEmeasures} /> {EN.NormalizedRMSE}</span>
         </div>
       </div>
       <div className={styles.space} />
@@ -188,7 +188,7 @@ class ModelTable extends Component {
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'rmse')}>
-              <span><Hint content={EN.RootMeanSquareErrorRMSEmeasures} /><i style={{ width: 4 }} />RMSE
+              <span><Hint content={EN.RootMeanSquareErrorprediction} /><i style={{ width: 4 }} />RMSE
               {sort.key !== 'rmse' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>

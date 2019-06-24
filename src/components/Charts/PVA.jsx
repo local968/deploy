@@ -3,13 +3,16 @@ import ReactEcharts from 'echarts-for-react';
 import * as _ from "lodash";
 import {debounce} from "lodash";
 import InputNum from'rc-input-number';
-import classNames from 'classnames';
 import 'rc-input-number/assets/index.css';
 import request from "../Request";
 import EN from "../../constant/en";
 import styles from './charts.module.css';
-import Hint from "../Common/Hint";
 import { Button } from 'antd';
+import { Hint, Switch } from 'components/Common';
+import config from 'config'
+const isEN = config.isEN;
+
+
 
 export default class PVA extends Component{
 	constructor(props){
@@ -19,32 +22,53 @@ export default class PVA extends Component{
 		this.state = {
 			sliderValue : [0,100],
 			ready:false,
-			data:[],
+			chartDate:[],
+			holdOutChartDate:[],
 			loading:'',
+			isHoldout:false,
 		}
 	}
 	
 	componentWillReceiveProps(nextProps) {
-		if(nextProps.url !== this.props.url){
-			return this.componentDidMount(nextProps.url);
+		if(nextProps.model.validatePlotData !== this.props.model.validatePlotData){
+			return this.componentDidMount(nextProps.model);
 		}
 	}
 	
-	async componentDidMount(url=this.props.url) {
-		let data = this.props.data;
-		if(!data){
-			data = (await request.post({
-				url:'/graphics/predicted-vs-actual-plot',
-				data:{
-					url,
-				},
-			})).data;
-		}
+	async componentDidMount(model=this.props.model) {
+		const { validatePlotData, holdoutPlotData } = model||{};
 		
-		this.setState({
-			data,
-			ready:true,
-		})
+		if(!this.props.data){
+			request.post({
+				url: '/graphics/list',
+				data: [{
+					name: 'predicted-vs-actual-plot',
+					data: {
+						url: validatePlotData,
+					}
+				}, {
+					name: 'predicted-vs-actual-plot',
+					data: {
+						url: holdoutPlotData,
+					}
+				}]
+			}).then(data => {
+				const [chartDate, holdOutChartDate] = data;
+				this.setState({
+					chartDate:chartDate.data,
+					holdOutChartDate:holdOutChartDate.data,
+					ready:true,
+					isHoldout:false,
+				})
+			});
+		}else{
+			const [holdOutChartDate,chartDate] = this.props.data;
+			this.setState({
+				chartDate:chartDate.data,
+				holdOutChartDate:holdOutChartDate.data,
+				ready:true,
+			})
+		}
 	}
 	
 	async setSlider(sliderValue,loading=''){
@@ -82,7 +106,8 @@ export default class PVA extends Component{
 	}
 	
 	getOption() {
-		const {ready,data} = this.state;
+		const {ready,chartDate,holdOutChartDate,isHoldout} = this.state;
+		const data = isHoldout?holdOutChartDate:chartDate;
 		const _data = _.cloneDeep(data);
 		if(!ready){
 			return {
@@ -103,15 +128,19 @@ export default class PVA extends Component{
 		
 		let chunk;
 		
+		let max = 0;
+		
 		const series = _data.map(itm=>{
 			chunk = _.chunk(itm.value,barLength);
+			const data = _.map(chunk,(itm,index)=>[index*100/chunk.length,_.sum(itm)/_.size(itm)]);
+			max = _.max([max,...data.map(itm=>itm[1])]);
 			return {
 				type: 'line',
 				name:EN[itm.name],
 				symbolSize: 3,
 				yAxisIndex: 0,
 				smooth: false,
-				data:_.map(chunk,(itm,index)=>[index*100/chunk.length,_.sum(itm)/_.size(itm)]),
+				data,
 			}
 		});
 		
@@ -201,7 +230,7 @@ export default class PVA extends Component{
 			},
 			series,
 			grid:{
-				// x2:130,
+				x:`${max}`.length * 20,
 				y2:80,
 			},
 			toolbox:{
@@ -224,14 +253,20 @@ export default class PVA extends Component{
 		};
 		
 	}
+	handleHoldout(){
+		this.setState(prevState=>({
+			isHoldout:!prevState.isHoldout
+		}));
+	}
 	
 	render(){
-		const {data,loading} = this.state;
+		const {loading,isHoldout,chartDate,holdOutChartDate} = this.state;
+		const data = isHoldout?holdOutChartDate:chartDate;
+		
 		if(!data[0]){
 			return null;
 		}
 		const act = _.cloneDeep(data[0].value)||[];
-		// const pre = _.cloneDeep(data[1].value)||[];
 		
 		const yMin = _.min(act);
 		const yMax = _.max(act);
@@ -239,7 +274,7 @@ export default class PVA extends Component{
 		const [x,y] = range;
 		let [y_start,y_end] = yRange;
 		return [
-			<div className={styles.predictActual}>
+			<div className={styles.predictActual} key='predictActual'>
 				<div className={styles.title}>
 					{EN.PredictedVSActualPlotSorted}
 					<Hint content={<p><strong>{EN.ChartDescription}</strong><br/>
@@ -254,6 +289,11 @@ export default class PVA extends Component{
 						</div>
 						{EN.ChartReset}</p>}
 						/>
+				</div>
+				<div className={styles.metricSwitch} style={{top:(isEN?-25:0)}}>
+					<span>{EN.Validation}</span>
+					<Switch checked={isHoldout} onChange={this.handleHoldout.bind(this)} style={{ backgroundColor: '#1D2B3C' }} />
+					<span>{EN.Holdout}</span>
 				</div>
 				<ReactEcharts
 					key='echart'
@@ -316,6 +356,7 @@ export default class PVA extends Component{
 							return this.setSlider([0,100],'reset')
 						}}
 					>{EN.Reset}</Button>
+					
 				</div>
 			</div>
 		]
