@@ -231,7 +231,6 @@ router.get('/download/result', async (req, res) => {
           res.write(Papa.unparse(result, { header: false }))
           temp = { [row['__no']]: row }
           parser.resume()
-          flag = true
         } else {
           temp[row['__no']] = row
           counter++
@@ -264,55 +263,53 @@ router.get('/download/model', async (req, res) => {
   const header = JSON.parse(featureLabel).filter(h => esHeader.includes(h))
   const url = JSON.parse(deployData)
 
-  downloadCsv(url, filename, etlIndex, header, mapHeader, res)
-
-  // let temp = {}
-  // let counter = 0
-  // let resultHeader
-  // // let start = Math.min(...nos, row['__on'])
-  // // let end = Math.max(...nos, row['__on'])
-  // res.attachment(filename);
-  // res.type('csv')
-  // http.get(url, (response) => {
-  //   Papa.parse(response, {
-  //     download: true,
-  //     header: true,
-  //     step: async (results, parser) => {
-  //       const row = results.data[0]
-  //       if (!resultHeader) {
-  //         resultHeader = [...header, ...Object.keys(row).filter(key => key !== '__no')]
-  //         res.write(Papa.unparse([resultHeader, []], { header: false }))
-  //       }
-  //       const nos = Object.keys(temp)
-  //       const _start = Math.min(...nos, row['__no'])
-  //       const _end = Math.max(...nos, row['__no'])
-  //       if (counter >= 500 || _end - _start >= 10000) {
-  //         const start = Math.min(...nos)
-  //         const end = Math.max(...nos)
-  //         parser.pause()
-  //         counter = 0
-  //         const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
-  //         const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
-  //         result.push([])
-  //         res.write(Papa.unparse(result, { header: false }))
-  //         temp = {}
-  //         parser.resume()
-  //       }
-  //       temp[row['__no']] = row
-  //       counter++
-  //     },
-  //     complete: async (results, file) => {
-  //       counter = 0
-  //       const nos = Object.keys(temp)
-  //       const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
-  //       const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
-  //       result.push([])
-  //       res.write(Papa.unparse(result, { header: false }))
-  //       temp = {}
-  //       res.end()
-  //     }
-  //   })
-  // })
+  let temp = {}
+  let counter = 0
+  let resultHeader
+  res.attachment(filename);
+  res.type('csv')
+  http.get(url, (response) => {
+    Papa.parse(response, {
+      download: true,
+      header: true,
+      step: async (results, parser) => {
+        const row = results.data
+        if (!resultHeader) {
+          resultHeader = [...header, ...Object.keys(row)]
+          const headerTexts = [...header.filter(key => key !== '__no').map(h => mapHeader[h]), ...Object.keys(row)]
+          res.write(Papa.unparse([headerTexts, []], { header: false }))
+        }
+        const nos = Object.keys(temp)
+        const _start = Math.min(...nos, row['__no'])
+        const _end = Math.max(...nos, row['__no'])
+        if (counter >= 500 || _end - _start >= 5000) {
+          const start = Math.min(...nos)
+          const end = Math.max(...nos)
+          parser.pause()
+          counter = 1
+          const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
+          const result = response.data.result.filter(_row => !!temp[_row['__no']]).map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+          result.push([])
+          res.write(Papa.unparse(result, { header: false }))
+          temp = { [row['__no']]: row }
+          parser.resume()
+        } else {
+          temp[row['__no']] = row
+          counter++
+        }
+      },
+      complete: async (results, file) => {
+        counter = 0
+        const nos = Object.keys(temp)
+        const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
+        const result = response.data.result.filter(_row => !!temp[_row['__no']]).map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
+        result.push([])
+        res.write(Papa.unparse(result, { header: false }))
+        temp = {}
+        res.end()
+      }
+    })
+  })
 })
 
 router.get('/download/outlier', async (req, res) => {
@@ -358,7 +355,7 @@ router.get('/download/outlier', async (req, res) => {
           parser.pause()
           counter = 1
           const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`)
-          const result = response.data.result.map(esRow => {
+          const result = response.data.result.filter(_row => !!temp[_row['__no']]).map(esRow => {
             const rowData = { ...esRow, ...temp[esRow['__no']] }
             const row = resultHeader.map(h => rowData[h])
             const label = rowData.decision_index <= rate ? -1 : 1
@@ -369,7 +366,6 @@ router.get('/download/outlier', async (req, res) => {
           res.write(Papa.unparse(result, { header: false }))
           temp = { [row['__no']]: row }
           parser.resume()
-          flag = true
         } else {
           temp[row['__no']] = row
           counter++
@@ -379,7 +375,7 @@ router.get('/download/outlier', async (req, res) => {
         counter = 0
         const nos = Object.keys(temp)
         const response = await axios.get(`${esServicePath}/etls/${etlIndex}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
-        const result = response.data.result.map(esRow => {
+        const result = response.data.result.filter(_row => !!temp[_row['__no']]).map(esRow => {
           const rowData = { ...esRow, ...temp[esRow['__no']] }
           const row = resultHeader.map(h => rowData[h])
           const label = rowData.decision_index <= rate ? -1 : 1
@@ -445,7 +441,6 @@ function scheduleDownloadCsv(url, filename, index, header, mapHeader, res,
           res.write(Papa.unparse(result, { header: false }))
           temp = { [row['__no']]: row }
           parser.resume()
-          flag = true
         } else {
           temp[row['__no']] = row
           counter++
@@ -465,57 +460,6 @@ function scheduleDownloadCsv(url, filename, index, header, mapHeader, res,
   })
 }
 
-
-function downloadCsv(url, filename, index, header, mapHeader, res) {
-  let temp = {}
-  let counter = 0
-  let resultHeader
-  res.attachment(filename);
-  res.type('csv')
-  http.get(url, (response) => {
-    Papa.parse(response, {
-      download: true,
-      header: true,
-      step: async (results, parser) => {
-        const row = results.data
-        if (!resultHeader) {
-          resultHeader = [...header, ...Object.keys(row)].filter(key => key !== '__no')
-          const headerTexts = [...header.filter(key => key !== '__no').map(h => mapHeader[h]), ...Object.keys(row)].filter(key => key !== '__no')
-          res.write(Papa.unparse([headerTexts, []], { header: false }))
-        }
-        const nos = Object.keys(temp)
-        const _start = Math.min(...nos, row['__no'])
-        const _end = Math.max(...nos, row['__no'])
-        if (counter >= 500 || _end - _start >= 5000) {
-          const start = Math.min(...nos)
-          const end = Math.max(...nos)
-          parser.pause()
-          counter = 1
-          const response = await axios.get(`${esServicePath}/etls/${index}/preview?start=${start}&end=${end}`)
-          const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
-          result.push([])
-          res.write(Papa.unparse(result, { header: false }))
-          temp = { [row['__no']]: row }
-          parser.resume()
-          flag = true
-        } else {
-          temp[row['__no']] = row
-          counter++
-        }
-      },
-      complete: async (results, file) => {
-        counter = 0
-        const nos = Object.keys(temp)
-        const response = await axios.get(`${esServicePath}/etls/${index}/preview?start=${Math.min(...nos)}&end=${Math.max(...nos)}`)
-        const result = response.data.result.map(esRow => resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])))
-        result.push([])
-        res.write(Papa.unparse(result, { header: false }))
-        temp = {}
-        res.end()
-      }
-    })
-  })
-}
 
 // saveSample()
 
