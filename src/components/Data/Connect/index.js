@@ -14,6 +14,9 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 import EN from '../../../constant/en';
 import { observable, action, computed } from 'mobx';
+import {Select} from 'antd'
+
+const Option = Select.Option
 
 // const files = {
 //   RegressionSample: [
@@ -277,13 +280,24 @@ export default class DataConnect extends Component {
 
   render() {
     const { projectStore: { project }, userStore, socketStore } = this.props;
-    const { etlProgress, etling } = project
+    const { etlProgress, etling, charset } = project
     const process = etling ? 50 : this.process
+    const charsetChange = action((charset) => {
+      project.updateProject({charset})
+    })
     window.cn = this
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
           <span>{EN.Pleasechooseadata}</span>
+          <label className={styles.chooseCharset}>{EN.choosecharset}</label>
+          <Select style={{width: '8rem'}} value={charset} onChange={charsetChange}>
+            <Option value='utf-8'>{EN.UTF_8}</Option>
+            <Option value='utf-16'>{EN.UTF_16}</Option>
+            <Option value='gbk'>{EN.GBK}</Option>
+            <Option value='gb-2312'>{EN.GB_2312}</Option>
+            <Option value='big5'>{EN.BIG5}</Option>
+          </Select>
         </div>
         {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
@@ -308,6 +322,7 @@ export default class DataConnect extends Component {
             onCheck={this.onChecks}
             file={this.file}
             ref={this.uploadRef}
+            charset={charset}
           />
           {/* {this.block('From R2 Learn', sampleIcon, this.showSample)}
           {!!(this.uploading || etling) ? (

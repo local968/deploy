@@ -21,7 +21,8 @@ export default function EsUploader(file, option:any = {}) {
   let currentCursor = 0
   let no = 0
 
-  const { onProgress = () => {}, onError = () => {}, onFinished = () => {} } =
+  const { onProgress = () => {}, onError = () => {}, onFinished = () => {},
+    charset = 'utf-8' } =
     option
 
   chunkPromise = new Promise((resolve, reject) => chunkPromiseResolve = resolve)
@@ -29,6 +30,7 @@ export default function EsUploader(file, option:any = {}) {
   papa.parse(file, {
     chunkSize,
     skipEmptyLines: true,
+    encoding: charset,
     chunk: async (result, parser) => {
       if(!header) {
         header = result.data[0]
