@@ -46,7 +46,7 @@ router.post('/login', async(req, res) => {
   if(!result[0]){
     return res.send({ status: 400, message: 'incorrect password.'})
   }
-  const {level,id,create_time} = result[0];
+  const {plan:{level},id,create_time,drole:role={}} = result[0];
   
   if(!level){
     return res.send({ status:302, message: 'Your account is not available'})
@@ -64,7 +64,8 @@ router.post('/login', async(req, res) => {
     message: 'ok',
     info: {
       id,
-      email
+      email,
+      role,
     }});
   
   
@@ -100,7 +101,8 @@ router.get('/status', async (req, res) => {
   const result = await userService.status(userId);
   
   if(result&&result.id){
-    const {id,email,create_time} = result;
+    const {id,email,create_time,drole={}} = result;
+    console.log(drole)
     return res.send({
       status: 200,
       message: 'ok',
@@ -108,11 +110,12 @@ router.get('/status', async (req, res) => {
         id,
         email,
         createdTime:create_time,
+        role:drole,
       }
     });
   }
   
-  res.send({ status: 500, message: 'get status failed', error:result.error });
+  res.send({ status: 500, message: 'get status failed', error:(result||{}).error });
   
   //
   // redis.hmget('user:' + req.session.userId, 'id', 'email', 'createdTime').then(info =>

@@ -42,6 +42,9 @@ export default class Sider extends Component {
     const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/lab';
     const isDeploy = routing.location.pathname.includes('deploy');
     const isSupport = routing.location.pathname.includes('support');
+    
+    const {support=true,JupyterLab=true,project=true} = userStore.info.role;
+  
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
@@ -52,6 +55,7 @@ export default class Sider extends Component {
         <div className={styles.menus}>
           <a
             className={styles.home}
+            style={{display:(project?'':'none')}}
             onClick={() =>
               isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')
             }
@@ -62,6 +66,7 @@ export default class Sider extends Component {
             })}>{EN.Home}</h4>
           </a>
           <a className={styles.support}
+             style={{display:(support?'':'none')}}
              onClick={() => {
                routing.push('/support')
              }}>
@@ -69,8 +74,10 @@ export default class Sider extends Component {
             <h4 className={classnames(styles.nav, {
               [styles.active]: isSupport
             })}>{EN.Support}</h4>
-          </a>
-          <a className={styles.support} onClick={() => labUrl && window.open(labUrl, '_blank')}>
+        </a>
+          <a className={styles.support}
+             style={{display:(JupyterLab?'':'none')}}
+             onClick={() => labUrl && window.open(labUrl, '_blank')}>
             <img alt="support" src={community} className={styles.community}/>
             <h4 className={styles.nav}>JupyterLab</h4>
           </a>

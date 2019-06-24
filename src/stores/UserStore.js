@@ -11,7 +11,8 @@ class UserStore {
   @observable status = 'init'; // unlogin login
   @observable info = {
     id: '',
-    email: ''
+    email: '',
+    role:{},
   };
   @observable tabKey = '1';
   @observable videoKey = '1';
@@ -27,18 +28,22 @@ class UserStore {
     // window.r2Report = testData
 
     if (window.r2Report) {
-      this.status = 'unlogin'
+      this.status = 'unlogin';
       return
     }
 
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
-        this.info = res.data.info
+        this.info = res.data.info;
+        if(res.data.info.role.project === false){
+          console.log(12)
+        }
+        console.log(res.data.info.role.project);
         this.status = 'login'
       } else {
         this.status = 'unlogin'
       }
-    }))
+    }));
     when(() => this.status === 'login', socketStore.connect.bind(socketStore))
   }
 
