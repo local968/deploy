@@ -1998,6 +1998,7 @@ export default class Project {
   }
 
   clusterPreTrainImportance = () => {
+    if (this.problemType !== 'Clustering') return Promise.resolve()
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
