@@ -6,6 +6,16 @@
     flex: auto;
 }
 
+.chooseCharset {
+  font-size: 1.25rem;
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.charsets {
+  width: 10rem;
+}
+
 .uploadRow {
     display: flex;
     flex: none;
@@ -339,7 +349,7 @@
     justify-content: center;
     align-items: center;
     margin-left: auto;
-    
+
 }
 
 .progressButton span {
