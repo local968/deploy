@@ -145,18 +145,18 @@ export default class ROCCurves extends PureComponent{
 		
 		// console.log('_x-point',_x,point);
 		// console.log('prev_point',prev_point,_x<point,!prev_point&&_x<point);
+		// console.log(prev_point,point,data)
 
 		if((!next_point&&_x>point)||(!prev_point&&_x<=point)){
 			this.position = myChart.convertToPixel('grid', data.filter(itm=>itm[0] === point)[0]);
+			// console.log(1, myChart.convertToPixel('grid', data.filter(itm=>itm[0] === point)[0]))
 			return
 		}else if(next_point&&_x>next_point[0]){
-			console.log(2)
-			
+			// console.log(2)
 			point = next_point[0];
 			this.position = myChart.convertToPixel('grid', next_point)
 		}else if(prev_point&&_x<prev_point[0]){
-			console.log(3)
-			
+			// console.log(3)
 			point = prev_point[0];
 			this.position =  myChart.convertToPixel('grid', prev_point)
 		}

@@ -281,7 +281,7 @@ export default class ModelProcessFlow extends Component {
 		</Fragment>
 	}
 	
-	FS(){
+	FS(){//新建特性与特征选择
 		const { featureLabel } = this.props.model;
 		const {rawHeader,expression,target,colType,mapHeader} = this.props.projectStore.project;
 		
@@ -289,15 +289,16 @@ export default class ModelProcessFlow extends Component {
 		
 		const create = Object.values(expression).map(itm=>{
 			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
-		});
+		}).filter(itm=>itm);
 		
 		if(!drop.length&&!create.length){
 			return null;
 		}
 		
 		let raw = drop.filter(itm=>colType[itm] === "Raw");
-		drop = _.without(drop,...raw).map(itm=>mapHeader[itm]);
-		raw = raw.map(itm=>mapHeader[itm]);
+		drop = _.without(drop,...raw).map(itm=>mapHeader[itm]||itm);
+		
+		raw = raw.map(itm=>mapHeader[itm]||itm);
 		
 		const pop = <dl className={styles.over}>
 			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
