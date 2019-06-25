@@ -1025,7 +1025,7 @@ function Computed(props: ComputedProps) {
     return n * factorial(n - 1)
   }
 
-  const expToString = (exps: Coordinate[]) => exps.map(_e => ((_e as any).value || '')).join('')
+  const expToString = (exps: Coordinate[]) => exps.map(_e => (!_e.value ? '' : _e.type === Type.ID ? mapHeader[_e .value] : (_e as any).value)).join('')
 
   // 校验总表达式
   const checkExp = (_expression: Coordinate[]) => {
