@@ -1,21 +1,17 @@
-// const uuid = require('uuid/v4')
-const { redis } = require('redis')
-const { Router } = require('express')
-const config = require('../config');
-const router = new Router()
-const crypto = require('crypto')
-const command = require('./command')
+import { redis } from './redis';
+import { Router } from 'express';
+import config from '../config';
 
-// const nodeId = uuid()
-const nodeId = 1
+const router = Router();
+const nodeId = 1;
 
 // fake socket
 const fakeSocket = {
-  send: () => { },
-  session: { userId: 1 }
-}
+  send: () => {},
+  session: { userId: 1 },
+};
 
-const saveMessage = async (message, user) => {
+export const saveMessage = async (message, user) => {
   // message.user = user
   // message = JSON.stringify(message)
   // const id = crypto.createHash('md5').update(message).digest('hex')
@@ -26,9 +22,9 @@ const saveMessage = async (message, user) => {
   // pipeline.set(key, message)
   // pipeline.sadd(`node:${nodeId}:messages`, key)
   // return pipeline.exec()
-}
+};
 
-const removeMessage = async (message, user) => {
+export const removeMessage = async (message, user) => {
   // message.user = user
   // message = JSON.stringify(message)
   // const id = crypto.createHash('md5').update(message).digest('hex')
@@ -37,9 +33,9 @@ const removeMessage = async (message, user) => {
   // pipeline.del(key)
   // pipeline.srem(`node:${nodeId}:messages`, key)
   // return pipeline.exec()
-}
+};
 
-const init = async (wss) => {
+const init = async wss => {
   // try {
   //   await command({
   //     command: 'clearWaitingQueue',
@@ -50,7 +46,6 @@ const init = async (wss) => {
   // } catch (e) {
   //   console.log(e.message)
   // }
-
   // const emits = []
   // let left = await redis.scard(`node:${nodeId}:messages`)
   // if (left === 0) return
@@ -70,27 +65,28 @@ const init = async (wss) => {
   //   console.log('left:', left)
   // }
   // emits.forEach(args => wss.emit(...args))
-}
+};
 
 router.get('/status', async (req, res) => {
-  if (req.query.password !== config.PASSWORD) return res.status(404).end()
-  const left = await redis.scard(`node:${nodeId}:messages`)
-  res.json({ left })
-})
+  if (req.query.password !== config.PASSWORD) return res.status(404).end();
+  const left = await redis.scard(`node:${nodeId}:messages`);
+  res.json({ left });
+});
 
 router.get('/clear', async (req, res) => {
-  if (req.query.password !== config.PASSWORD) return res.status(404).end()
-  const keys = await redis.smembers(`node:${nodeId}:messages`)
-  const result = await redis.del(...keys, `node:${nodeId}:messages`)
-  const left = await redis.scard(`node:${nodeId}:messages`)
-  res.json({ result, left, keys })
-})
+  if (req.query.password !== config.PASSWORD) return res.status(404).end();
+  const keys = await redis.smembers(`node:${nodeId}:messages`);
+  const result = await redis.del(...keys, `node:${nodeId}:messages`);
+  const left = await redis.scard(`node:${nodeId}:messages`);
+  res.json({ result, left, keys });
+});
 
 router.get('/clearProjectModels', async (req, res) => {
-  if (req.query.password !== config.PASSWORD) return res.status(404).end()
-  const keys = await redis.smembers(`project:${req.query.id}:models`)
-  const result = await redis.del(...keys, `project:${req.query.id}:models`)
-  res.json({ status: 'ok' })
-})
+  if (req.query.password !== config.PASSWORD) return res.status(404).end();
+  const keys = await redis.smembers(`project:${req.query.id}:models`);
+  const result = await redis.del(...keys, `project:${req.query.id}:models`);
+  res.json({ status: 'ok' });
+});
 
-module.exports = { saveMessage, removeMessage, recover: init, messageRouter: router }
+export const messageRouter = router;
+export const recover = init;
