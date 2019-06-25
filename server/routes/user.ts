@@ -1,6 +1,6 @@
 import express from 'express';
 import uuid from 'uuid';
-import { redis } from 'redis';
+import { redis } from '../redis';
 import moment from 'moment';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';

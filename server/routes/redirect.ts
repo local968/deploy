@@ -1,5 +1,5 @@
 import express from 'express';
-import { redis } from 'redis';
+import { redis } from '../redis';
 import proxy from 'http-proxy-middleware';
 
 const router = express.Router();

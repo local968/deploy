@@ -1,4 +1,4 @@
-import Redis from 'redis';
+import { redis } from '../redis';
 import uuid from 'uuid';
 import moment from 'moment';
 import command from '../command';
@@ -10,7 +10,6 @@ import config from '../../config';
 import { Metric, StatusData, Steps } from '../types';
 import restriction from '../restriction';
 
-const { redis } = Redis;
 const { userProjectRestriction, userConcurrentRestriction } = restriction;
 const userLogger = log4js.getLogger('user');
 const errorLogger = log4js.getLogger('error');

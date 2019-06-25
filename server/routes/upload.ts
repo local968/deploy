@@ -1,6 +1,6 @@
 import express from 'express';
 import formidable from 'formidable';
-import { redis } from 'redis';
+import { redis } from '../redis';
 import uuid from 'uuid';
 import crypto from 'crypto';
 import fs from 'fs';

@@ -1,4 +1,4 @@
-import Redis from 'redis';
+import { redis } from '../redis';
 import moment from 'moment';
 import express from 'express';
 import uuid from 'uuid';
@@ -13,7 +13,6 @@ import axios from 'axios';
 import _ from 'lodash';
 
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
-const { redis } = Redis;
 const router = express.Router();
 const { userDeployRestriction } = restriction;
 
