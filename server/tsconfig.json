@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2018",
+    "checkJs": false,
+    "strict": false,
+    "allowJs": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true
+  }
+}

@@ -1,49 +1,56 @@
-const moment = require('moment');
-const config = require('../config');
-const api = require('./scheduleApi');
-const command = require('./command')
+import moment from 'moment';
+import config from '../config';
+import api from './scheduleApi';
+import command from './command';
+import _ from 'lodash';
+import { GenerateNextScheduleTimeOptions } from './types';
 // schedule handle
 const scheduleInterval = setInterval(
   scheduleHandler,
-  config.schedulePeriod * 100
+  _.toInteger(config.schedulePeriod) * 100,
 );
-scheduleHandler()
+scheduleHandler();
 // queue handle
 // const queueInterval = setInterval(scheduleQueue, config.queuePeriod * 1000);
 
 async function scheduleHandler() {
   const now = moment().unix();
   const schedules = await api.getTimeUpSchedules(now);
-  schedules.map(async schedule => {
+  _.forEach(schedules, async schedule => {
     schedule.updatedDate = now;
     schedule.status = 'progressing';
     await api.upsertSchedule(schedule);
 
     let deployment = await api.getDeployment(schedule.deploymentId);
-    if (!deployment) return
+    if (!deployment) return;
 
-    let restrictQuery
+    let restrictQuery;
     try {
-      restrictQuery = await api.checkUserFileRestriction(schedule)
+      restrictQuery = await api.checkUserFileRestriction(schedule);
     } catch (e) {
-      schedule.status = 'issue'
-      schedule.updatedDate = moment().unix()
-      schedule.result = { ['processError']: e.message }
+      schedule.status = 'issue';
+      schedule.updatedDate = moment().unix();
+      schedule.result = { ['processError']: e.message };
       await api.upsertSchedule(schedule);
-      return
+      return;
     }
     deployment = await api.getDeployment(schedule.deploymentId);
     if (restrictQuery === false) {
-      schedule.status = 'issue'
-      schedule.updatedDate = moment().unix()
+      schedule.status = 'issue';
+      schedule.updatedDate = moment().unix();
       schedule.result = { ['processError']: config.yourAge };
       await api.upsertSchedule(schedule);
     } else {
       // send command to python
-      const fileId = await api.getCleanIndex(schedule, deployment[`${schedule.type}Options`].fileId, deployment.projectId, deployment.modelName)
-      const fileName = deployment[`${schedule.type}Options`].file
-      const ext = '.' + fileName.split('.')[fileName.split('.').length - 1]
-      const newFeatureLabel = await api.getFeatureLabel(deployment.projectId)
+      const fileId = await api.getCleanIndex(
+        schedule,
+        deployment[`${schedule.type}Options`].fileId,
+        deployment.projectId,
+        deployment.modelName,
+      );
+      const fileName = deployment[`${schedule.type}Options`].file;
+      const ext = '.' + fileName.split('.')[fileName.split('.').length - 1];
+      const newFeatureLabel = await api.getFeatureLabel(deployment.projectId);
       let cmd = '';
       switch (deployment.modelType) {
         case 'Clustering':
@@ -64,43 +71,70 @@ async function scheduleHandler() {
         command: cmd,
         solution: deployment.modelName,
         actionType: schedule.type,
-        frameFormat: 'csv'
-      }
-      if (!!Object.keys(newFeatureLabel || {}).length) request.newFeatureLabel = newFeatureLabel
-      if (deployment.modelType === "Classification") {
+        frameFormat: 'csv',
+        newFeatureLabel: undefined,
+        cutoff: undefined,
+        rate: undefined,
+        csvScript: undefined,
+      };
+      if (!!_.keys(newFeatureLabel || {}).length)
+        request.newFeatureLabel = newFeatureLabel;
+      if (deployment.modelType === 'Classification') {
         try {
-          request.cutoff = await api.getCutOff(deployment.projectId, deployment.modelName)
-        } catch (e) { console.info(`get cute off failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`) }
+          request.cutoff = await api.getCutOff(
+            deployment.projectId,
+            deployment.modelName,
+          );
+        } catch (e) {
+          console.info(
+            `get cute off failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`,
+          );
+        }
       }
-      if (deployment.modelType === "Outlier") {
+      if (deployment.modelType === 'Outlier') {
         try {
-          request.rate = await api.getRate(deployment.projectId, deployment.modelName)
-        } catch (e) { console.info(`get rate failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`) }
+          request.rate = await api.getRate(
+            deployment.projectId,
+            deployment.modelName,
+          );
+        } catch (e) {
+          console.info(
+            `get rate failed, projectId:${deployment.projectId} scheduleId:${schedule.id} deploymentId:${deployment.id}`,
+          );
+        }
       }
-      if (deployment.csvScript && deployment.csvScript !== '') request.csvScript = deployment.csvScript
-      let result = {}
+      if (deployment.csvScript && deployment.csvScript !== '')
+        request.csvScript = deployment.csvScript;
+      let result = {};
       await command(request, data => {
-        result = { ...result, ...data.result }
-        return data.status === 100 || data.status < 0
-      })
-      if (result['processError']) api.decreaseLines(restrictQuery, await api.getLineCount(deployment[`${schedule.type}Options`].fileId))
-      schedule.result = result
-      schedule.status = result['processError'] ? 'issue' : 'finished'
-      schedule.updatedDate = moment().unix()
-      api.upsertSchedule(schedule)
+        result = { ...result, ...data.result };
+        return data.status === 100 || data.status < 0;
+      });
+      if (result['processError'])
+        api.decreaseLines(
+          restrictQuery,
+          await api.getLineCount(deployment[`${schedule.type}Options`].fileId),
+        );
+      schedule.result = result;
+      schedule.status = result['processError'] ? 'issue' : 'finished';
+      schedule.updatedDate = moment().unix();
+      api.upsertSchedule(schedule);
     }
 
-    if (deployment[`${schedule.type}Options`].autoDisable && schedule.status === 'issue') {
-      deployment.enable = false
-      api.updateDeployment(deployment)
-      return
+    if (
+      deployment[`${schedule.type}Options`].autoDisable &&
+      schedule.status === 'issue'
+    ) {
+      deployment.enable = false;
+      api.updateDeployment(deployment);
+      return;
     }
 
     const cdo = deployment[`${schedule.type}Options`];
     const nextTime = generateNextScheduleTime(
       cdo.frequency,
       cdo.frequencyOptions,
-      now - 1
+      now - 1,
     );
     if (!nextTime) return;
 
@@ -108,7 +142,7 @@ async function scheduleHandler() {
       schedule.deploymentId,
       schedule.ends,
       nextTime,
-      schedule.type
+      schedule.type,
     );
 
     if (has) {
@@ -119,7 +153,7 @@ async function scheduleHandler() {
         cdo ? nextTime : null,
         schedule.ends,
         schedule.threshold,
-        schedule.id
+        schedule.id,
       );
       await api.upsertSchedule(nextSchedule);
     }
@@ -147,7 +181,9 @@ const hasNext = (deploymentId, ends, nextTime, type) =>
     if (ends === 'never') return resolve(true);
     if (ends === 'completed') return resolve(false);
     if (ends > 10000) return nextTime >= ends ? resolve(false) : resolve(true);
-    const count = api.getScheduleCount(deploymentId, type).then(count => (ends >= count ? resolve(false) : resolve(true)));
+    const count = api
+      .getScheduleCount(deploymentId, type)
+      .then(count => (ends >= count ? resolve(false) : resolve(true)));
   });
 
 const catchError = console.error;
@@ -167,11 +203,16 @@ const compare = (a, b) => {
 };
 
 const deploy = (deployment, threshold = null) => {
-  if (!deployment) throw new Error('no deployment')
+  if (!deployment) throw new Error('no deployment');
   const cddo = deployment.deploymentOptions;
   const cdpo = deployment.performanceOptions;
-  threshold === null && cddo && api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
-    const nextScheduleTime = generateNextScheduleTime(cddo.frequency, cddo.frequencyOptions);
+  threshold === null &&
+  cddo &&
+  api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
+    const nextScheduleTime = generateNextScheduleTime(
+      cddo.frequency,
+      cddo.frequencyOptions,
+    );
     if (!schedule && !nextScheduleTime) return;
     if (schedule) {
       // update estimated time
@@ -179,25 +220,33 @@ const deploy = (deployment, threshold = null) => {
       schedule.updatedDate = moment().unix();
       schedule.ends =
         cddo.frequency === 'once' ? 1 : cddo.frequencyOptions.ends;
-      if (threshold) schedule.threshold = threshold
+      if (threshold) schedule.threshold = threshold;
       api.upsertSchedule(schedule).catch(catchError);
     } else {
-      api.upsertSchedule(
-        generateSchedule(
-          deployment.id,
-          deployment.modelName,
-          'deployment',
-          nextScheduleTime,
-          cddo.frequency === 'once'
-            ? cddo.frequencyOptions.time
-            : cddo.frequencyOptions.ends,
-          threshold)
-      ).catch(catchError);
+      api
+        .upsertSchedule(
+          generateSchedule(
+            deployment.id,
+            deployment.modelName,
+            'deployment',
+            nextScheduleTime,
+            cddo.frequency === 'once'
+              ? cddo.frequencyOptions.time
+              : cddo.frequencyOptions.ends,
+            threshold,
+          ),
+        )
+        .catch(catchError);
     }
-  })
+  });
 
-  threshold && cdpo && api.getLastWaitingSchedule(deployment.id, 'performance').then(schedule => {
-    const nextScheduleTime = generateNextScheduleTime(cdpo.frequency, cdpo.frequencyOptions);
+  threshold &&
+  cdpo &&
+  api.getLastWaitingSchedule(deployment.id, 'performance').then(schedule => {
+    const nextScheduleTime = generateNextScheduleTime(
+      cdpo.frequency,
+      cdpo.frequencyOptions,
+    );
     if (!schedule && !nextScheduleTime) return;
     if (schedule) {
       // update estimated time
@@ -205,23 +254,26 @@ const deploy = (deployment, threshold = null) => {
       schedule.updatedDate = moment().unix();
       schedule.ends =
         cdpo.frequency === 'once' ? 1 : cdpo.frequencyOptions.ends;
-      if (threshold) schedule.threshold = threshold
+      if (threshold) schedule.threshold = threshold;
       api.upsertSchedule(schedule).catch(catchError);
     } else {
-      api.upsertSchedule(
-        generateSchedule(
-          deployment.id,
-          deployment.modelName,
-          'performance',
-          nextScheduleTime,
-          cdpo.frequency === 'once'
-            ? cdpo.frequencyOptions.time
-            : cdpo.frequencyOptions.ends,
-          threshold)
-      ).catch(catchError);
+      api
+        .upsertSchedule(
+          generateSchedule(
+            deployment.id,
+            deployment.modelName,
+            'performance',
+            nextScheduleTime,
+            cdpo.frequency === 'once'
+              ? cdpo.frequencyOptions.time
+              : cdpo.frequencyOptions.ends,
+            threshold,
+          ),
+        )
+        .catch(catchError);
     }
-  })
-}
+  });
+};
 
 const generateSchedule = (
   deploymentId,
@@ -234,7 +286,7 @@ const generateSchedule = (
   status = 'waiting',
   actualTime = null,
   updatedDate = moment().unix(),
-  createdDate = moment().unix()
+  createdDate = moment().unix(),
 ) => ({
   deploymentId,
   modelName,
@@ -246,10 +298,14 @@ const generateSchedule = (
   status,
   actualTime,
   updatedDate,
-  createdDate
+  createdDate,
 });
 
-const generateNextScheduleTime = (frequency, options, lastTime) => {
+const generateNextScheduleTime = (
+  frequency,
+  options?: GenerateNextScheduleTimeOptions,
+  lastTime?,
+) => {
   if (!options) return;
   if (!frequency) return;
   const now = moment().unix();
@@ -262,11 +318,13 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
     return;
   if (frequency === 'once' && lastTime) return;
 
+  const repeatOn = _.toInteger(options.repeatOn);
+
   const startTimeStrategies = {
     day: () => {
       let startTime = moment.unix(options.starts);
       startTime = moment(
-        `${moment().format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+        `${moment().format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`,
       );
       if (startTime.unix() < now) startTime.add(1, 'days');
       return startTime.unix();
@@ -274,29 +332,31 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
     week: () => {
       let startTime = moment.unix(options.starts);
       startTime = moment(
-        `${moment().format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+        `${moment().format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`,
       );
-      startTime.day(options.repeatOn - 1);
+      startTime.day(repeatOn - 1);
       if (startTime.unix() < now) startTime.add(1, 'weeks');
       return startTime.unix();
     },
     month: () => {
       let startTime = moment.unix(options.starts);
       startTime = moment(
-        `${moment().format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+        `${moment().format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`,
       );
-      if (startTime.format('D') > options.repeatOn) {
-        const difference = startTime.format('D') - options.repeatOn;
+      if (_.toInteger(startTime.format('D')) > repeatOn) {
+        const difference =
+          _.toInteger(startTime.format('D')) - _.toInteger(repeatOn);
         startTime.subtract(difference, 'days');
         startTime.add(1, 'months');
-      } else if (startTime.format('D') < options.repeatOn) {
-        const difference = options.repeatOn - startTime.format('D');
+      } else if (_.toInteger(startTime.format('D')) < repeatOn) {
+        const difference =
+          _.toInteger(repeatOn) - _.toInteger(startTime.format('D'));
         startTime.add(difference, 'days');
       } else {
         if (startTime.unix() < now) startTime.add(1, 'months');
       }
       return startTime.unix();
-    }
+    },
   };
 
   // 1. after restart server, it will immidiatly execute all time up schedules(put into a queue),
@@ -312,7 +372,7 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
         _time = _time.add(options.repeatFrequency, 'days');
       // fix start time
       const rightTime = moment(
-        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`,
       );
       if (rightTime.unix() < now) rightTime.add(1, 'days');
       return rightTime.unix();
@@ -322,17 +382,17 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
       let _time = moment.unix(lastTime);
       while (_time.unix() < now)
         _time = _time.add(options.repeatFrequency, 'weeks');
-      if (_time.day() !== options.repeatOn - 1) {
+      if (_time.day() !== repeatOn - 1) {
         // fix day to the right day of week
         const __time = moment(_time);
-        if (__time.day(options.repeatOn - 1).unix() < now) {
-          _time.day(7 + options.repeatOn - 1);
+        if (__time.day(repeatOn - 1).unix() < now) {
+          _time.day(7 + repeatOn - 1);
         } else {
-          _time.day(options.repeatOn - 1);
+          _time.day(repeatOn - 1);
         }
       }
       const rightTime = moment(
-        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`,
       );
       if (rightTime.unix() < now) rightTime.add(1, 'weeks');
       return rightTime.unix();
@@ -342,22 +402,23 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
       let _time = moment.unix(lastTime);
       while (_time.unix() < now)
         _time = _time.add(options.repeatFrequency, 'months');
-      if (_time.format('D') !== options.repeatOn) {
-        if (_time.format('D') > options.repeatOn) {
-          const difference = _time.format('D') - options.repeatOn;
+      const d = _.toInteger(_time.format('D'));
+      if (d !== repeatOn) {
+        if (d > repeatOn) {
+          const difference = d - repeatOn;
           _time.subtract(difference, 'days');
           _time.add(1, 'months');
-        } else if (_time.format('D') < options.repeatOn) {
-          const difference = options.repeatOn - _time.format('D');
+        } else if (d < repeatOn) {
+          const difference = repeatOn - d;
           _time.add(difference, 'days');
         }
       }
       const rightTime = moment(
-        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`
+        `${_time.format('YYYY-MM-DD')} ${startTime.format('HH:mm:ss')}`,
       );
       if (rightTime.unix() < now) rightTime.add(1, 'months');
       return rightTime.unix();
-    }
+    },
   };
 
   // lastTime = now - 1;
@@ -365,13 +426,13 @@ const generateNextScheduleTime = (frequency, options, lastTime) => {
   const nextTime =
     frequency === 'once'
       ? options.time === 'completed'
-        ? now
-        : options.time
+      ? now
+      : options.time
       : lastTime
-        ? nextTimeStrategies[options.repeatPeriod]()
-        : startTimeStrategies[options.repeatPeriod]();
+      ? nextTimeStrategies[options.repeatPeriod]()
+      : startTimeStrategies[options.repeatPeriod]();
 
   return nextTime;
 };
 
-module.exports = deploy
+export default deploy;
