@@ -67,8 +67,6 @@ const Option = Select.Option;
 @observer
 export default class AdvancedView extends Component {
 
-  @observable currentSettingId = 'all';
-
   // undefined = can not sort, false = no sort ,1 = asc, -1 = desc
   // @observable sortState = {
   //   'Model Name': 1,
@@ -97,7 +95,7 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort, metric, isHoldout } = this.props;
+    const { models, project, projectStore, sort, metric, isHoldout,currentSettingId } = this.props;
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
@@ -257,8 +255,8 @@ export default class AdvancedView extends Component {
       _filtedModels = _filtedModels.sort(sortMethods);
     }
 
-    if (this.currentSettingId === 'all') return _filtedModels;
-    const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
+    if (currentSettingId === 'all') return _filtedModels;
+    const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
     if (currentSetting && currentSetting.models)
       return _filtedModels.filter(model => currentSetting.models.find(id => model.id === id))
     return []
@@ -340,10 +338,6 @@ export default class AdvancedView extends Component {
 
   // });
 
-  changeSetting = action((settingId) => {
-    this.currentSettingId = settingId
-  });
-
   // handleChange = action(value => {
   //   this.metric = this.metricOptions.find(m => m.key === value);
   //   // if (window.localStorage)
@@ -380,7 +374,7 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort, handleChange, metric, handleHoldout } = this.props;
+    const { project, sort, handleSort, handleChange, metric, handleHoldout, currentSettingId, changeSetting } = this.props;
     const {isHoldout} = this.props.projectStore.project;
     const { problemType } = project;
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
@@ -393,7 +387,7 @@ export default class AdvancedView extends Component {
         <div className={styles.middle}>
           <div className={styles.settings}>
             <span className={styles.label}>{EN.ModelNameContains}:</span>
-            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
+            <Select className={styles.settingsSelect} value={currentSettingId} onChange={changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
               <Option value={'all'}>{EN.All}</Option>
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>

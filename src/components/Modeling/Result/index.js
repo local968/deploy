@@ -15,6 +15,7 @@ const Classification = 'Classification';
 @inject('deploymentStore', 'routing', 'projectStore')
 @observer
 export default class ModelResult extends Component {
+  @observable view = 'simple'
   @observable show = false
   @observable sort = {
     simple: {
@@ -28,6 +29,11 @@ export default class ModelResult extends Component {
   }
   @observable metric = this.props.projectStore.project.measurement
   @observable isHoldout = false
+  @observable currentSettingId = 'all';
+
+  changeView = view => {
+    this.view = view
+  }
 
   handleSort = (view, key) => {
     const sort = this.sort[view]
@@ -90,11 +96,14 @@ export default class ModelResult extends Component {
     }
   }
 
+  changeSetting = action((settingId) => {
+    this.currentSettingId = settingId
+  });
+
   render() {
-    const { view, changeView } = this.props
     const { project } = this.props.projectStore;
     const { models } = project
-    const { id, etlIndex, fileName, selectModel, target, loadModel } = project
+    const { id, etlIndex, fileName, selectModel, target, loadModel, settings } = project
     if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
     if (!models.length) return null;
     // const { view } = this;
@@ -104,15 +113,20 @@ export default class ModelResult extends Component {
 
     const type = this.isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
+    console.log(this.currentSettingId, 'this.currentSettingId')
+    let filterModels = [...models]
+    const currentSetting = this.currentSettingId === 'all' ? null : settings.find(setting => setting.id === this.currentSettingId)
+    if (currentSetting && currentSetting.models)
+      filterModels = filterModels.filter(model => currentSetting.models.find(id => model.id === id))
     return (
       <div className={styles.modelResult}>
         <div className={styles.tabBox}>
           <div className={classnames(styles.tab, {
-            [styles.active]: view === 'simple'
-          })} onClick={changeView.bind(null, 'simple')}><span>{EN.SimplifiedView}</span></div>
+            [styles.active]: this.view === 'simple'
+          })} onClick={this.changeView.bind(null, 'simple')}><span>{EN.SimplifiedView}</span></div>
           <div className={classnames(styles.tab, {
-            [styles.active]: view === 'advanced'
-          })} onClick={changeView.bind(null, 'advanced')}><span>{EN.AdvancedView}</span></div>
+            [styles.active]: this.view === 'advanced'
+          })} onClick={this.changeView.bind(null, 'advanced')}><span>{EN.AdvancedView}</span></div>
         </div>
         {/* <div className={styles.buttonBlock} >
           <button className={styles.button} onClick={this.changeView.bind(this, 'simple')}>
@@ -122,9 +136,9 @@ export default class ModelResult extends Component {
             <span>Advanced View</span>
           </button>
         </div> */}
-        {view === 'simple' ?
-          <SimpleView models={models} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} /> :
-          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} isHoldout={this.isHoldout} handleHoldout={this.handleHoldout} />}
+        {this.view === 'simple' ?
+          <SimpleView models={filterModels} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} currentSettingId={this.currentSettingId} /> :
+          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} isHoldout={this.isHoldout} handleHoldout={this.handleHoldout} currentSettingId={this.currentSettingId} changeSetting={this.changeSetting} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
@@ -135,7 +149,7 @@ export default class ModelResult extends Component {
           <button className={styles.button} onClick={this.deploy}>
             <span>{EN.DeployTheModel}</span>
           </button>
-          {view === 'advanced' && (cannotDownload ? <button className={classnames(styles.button, styles.disabled)}>
+          {this.view === 'advanced' && (cannotDownload ? <button className={classnames(styles.button, styles.disabled)}>
             <span>{`${EN.Exportmodelresults}(${this.isHoldout ? EN.Holdout : EN.Validation})`}</span>
           </button> : <a href={`/upload/download/result?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-${type}.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&type=${type}&target=${target}`} target='_blank'>
               <button className={styles.button}>
