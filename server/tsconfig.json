@@ -1,12 +1,29 @@
 {
-  "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "target": "esnext",
     "module": "commonjs",
-    "target": "es2018",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "pretty": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "alwaysStrict": true,
+    "noImplicitThis": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "noEmitHelpers": true,
     "checkJs": false,
     "strict": false,
     "allowJs": true,
     "noImplicitAny": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "."
   }
 }
