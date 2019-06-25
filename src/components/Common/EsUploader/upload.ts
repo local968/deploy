@@ -28,6 +28,7 @@ export default function EsUploader(file, option:any = {}) {
   chunkPromise = new Promise((resolve, reject) => chunkPromiseResolve = resolve)
 
   papa.parse(file, {
+    // @ts-ignore
     chunkSize,
     skipEmptyLines: true,
     encoding: charset,

@@ -14,6 +14,7 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 import EN from '../../../constant/en';
 import { observable, action, computed } from 'mobx';
+import { formatNumber } from 'util';
 import {Select} from 'antd'
 
 const Option = Select.Option
@@ -503,8 +504,11 @@ class DataSample extends Component {
               <div className={styles.sampleCell}>
                 <span>{EN.FileName}</span>
               </div>
-              <div className={styles.sampleCell}>
+              {/* <div className={styles.sampleCell}>
                 <span>{EN.TargetVariable}</span>
+              </div> */}
+              <div className={styles.sampleCell}>
+                <span>{EN.DataLines}</span>
               </div>
               <div className={styles.sampleCell}>
                 <span>{EN.DataSize}</span>
@@ -537,8 +541,11 @@ class DataSample extends Component {
                   <div className={styles.sampleCell} title={row.filename}>
                     <span>{row.name}</span>
                   </div>
-                  <div className={styles.sampleCell} title={row.target}>
+                  {/* <div className={styles.sampleCell} title={row.target}>
                     <span>{row.target}</span>
+                  </div> */}
+                  <div className={styles.sampleCell}>
+                    <span>{formatNumber(row.lines)}</span>
                   </div>
                   <div className={styles.sampleCell} title={row.size}>
                     <span>{this.formatSize(row.size)}</span>

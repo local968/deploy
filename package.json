@@ -29,9 +29,9 @@
   },
   "proxy": "http://localhost:8080",
   "scripts": {
-    "start": "node ./server/index.js",
+    "start": "node server/index.ts",
     "dev": "react-app-rewired start & pm2 start deploy2-dev.json",
-    "fdev": "react-app-rewired start & node ./server/index.js",
+    "fdev": "react-app-rewired start & node server/index.ts",
     "frontend": "react-app-rewired start",
     "server": "node server",
     "ts-node": "ts-node --project server/tsconfig.json server",

@@ -47,6 +47,7 @@ const ZH_LAN: any = {
   Warning: '警告',
   Continue: '继续',
   DataSize: '数据大小',
+  DataLines: '文件行数',
   FileName: '文件名',
   FromComp: '本地上传',
   NoAuthority: '无权限',
