@@ -147,7 +147,7 @@ export default class ModelProcessFlow extends Component {
 		
 		
 		if(ta.find(itm=>itm === '') === undefined){
-			const NFMT = nullFillMethod[target];
+			const NFMT = om['']||nullFillMethod[target];
 			
 			if(NFMT&&nullLineCounts[target]){
 				if(NFMT === 'drop'){
@@ -288,8 +288,8 @@ export default class ModelProcessFlow extends Component {
 		let drop = _.without(rawHeader,...featureLabel,target);
 		
 		const create = Object.values(expression).map(itm=>{
-			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.value).join('')}`
-		}).filter(itm=>itm);
+			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.type=== 'ID'?mapHeader[it.value]:it.value).join('')}`
+		});
 		
 		if(!drop.length&&!create.length){
 			return null;
@@ -308,7 +308,7 @@ export default class ModelProcessFlow extends Component {
 				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
 			</dt>
 			<dt style={{display:(create.length?'':'none')}} title = {create.join(',')}>
-				{EN.CreateTheseVariables}:
+				{EN.CreateTheseVariables}:<label>{create.join(',')}</label>
 			</dt>
 			{
 				create.map((itm,index)=><dd key={index} title={mapHeader[itm]}>{mapHeader[itm]}</dd>)
