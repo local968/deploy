@@ -1,9 +1,10 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import * as papa from 'papaparse';
-const config = require('config');
+import config from '../../config';
+
 const { ETL_SERVICE } = config.services;
 
-const chunkSize = 1 * 1024 * 1024;
+const chunkSize = 1024 * 1024;
 // const chunkSize = 1 * 1024
 const concurrent = 4;
 
@@ -149,6 +150,7 @@ function EsUploader(file, option: any = {}) {
 
   start();
 }
+
 export default file => {
   return new Promise((resolve, reject) => {
     EsUploader(file, {
