@@ -1517,7 +1517,7 @@ wss.register('train', async (message, socket, progress) => {
   //   return err
   // })
 });
-
+console.log(wss)
 wss.register('watchProjectList', (message, socket) => {
   const { userId } = socket.session;
   const key = `user:${userId}:projects`;

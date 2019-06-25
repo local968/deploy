@@ -150,7 +150,11 @@ const init: any = (server, sessionParser) => {
   return wss;
 };
 
-init.register = (...args) => _apis.push(args);
+init.register = (...args) => {
+  if(args){
+    _apis.push(args)
+  }
+};
 init.subscribe = (...args) => _subscribes.push(args);
 init.publish = (...args) => _publishes.push(args);
 
