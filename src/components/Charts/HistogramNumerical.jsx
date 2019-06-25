@@ -3,7 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
 
 export default function HistogramNumerical(props){
-	const {
+	let {
 		data=[],
 		x_name='',
 		y_name='',
@@ -14,14 +14,19 @@ export default function HistogramNumerical(props){
 	
 	const max = Math.max(...data.map(itm=>itm[1]));
 	
-	
 	const nameTextStyle = {
 		color:'#000',
 	};
+	const fontSize = 15;
+	
+	title = _.chunk([...title],35).map(itm=>itm.join('')).join('\n');
 	const option = {
 		title: {
 			text: title,
 			x: 'center',
+			textStyle:{
+				fontSize
+			}
 		},
 		xAxis: {
 			type: 'category',
