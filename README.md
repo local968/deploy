@@ -9,7 +9,7 @@ server  //服务端源码
 src     //客户端源码
 static  //公开目录
 config-overrides.js //react-app-rewired配置文件
-config.js //项目配置文件
+config.ts //项目配置文件
 deploy2-dev.json  //dev模式后端pm2启动文件
 deploy2.json  //production模式后端pm2启动文件
 Dockerfile
