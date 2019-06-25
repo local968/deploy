@@ -1660,8 +1660,9 @@ wss.register('getFiles', (message, socket) => {
 });
 
 wss.register('getSample', (message, socket) => {
-  const type = (message.problemType || '')[0];
-  if (!type || (type !== 'C' && type !== 'R')) return [];
+  const { problemType } = message
+  const type = (problemType === 'Classification' && 'C') || (problemType === 'Regression' && 'R') || (problemType === 'Clustering' && 'U') || (problemType === 'Outlier' && 'O')
+  if (!type || (type !== 'C' && type !== 'R' && type !== 'U' && type !== 'O')) return [];
   return redis.smembers(`file:${type}:samples`).then(result => {
     const list = result.map(r => {
       try {
