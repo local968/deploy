@@ -95,7 +95,11 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort, metric, isHoldout,currentSettingId } = this.props;
+    const { models, project, projectStore, sort, metric,currentSettingId } = this.props;
+    // const {problemType} = project;
+    // problemType === "Classification"&&this.props.projectStore.project.upIsHoldout(false);
+    const {isHoldout} = this.props.projectStore.project;
+  
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
@@ -141,11 +145,11 @@ export default class AdvancedView extends Component {
           }
         case 'Cutoff Threshold':
           {
-            const aFitIndex = aModel.fitIndex
-            const bFitIndex = bModel.fitIndex
-            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
-            const aModelData = (aModel[dataKey].roc.Threshold[aFitIndex])
-            const bModelData = (bModel[dataKey].roc.Threshold[bFitIndex])
+            const aFitIndex = aModel.fitIndex;
+            const bFitIndex = bModel.fitIndex;
+            const dataKey = isHoldout ? 'holdoutChartData' : 'chartData';
+            const aModelData = (aModel[dataKey].roc.Threshold[aFitIndex]);
+            const bModelData = (bModel[dataKey].roc.Threshold[bFitIndex]);
             return (aModelData - bModelData) * sort.value
           }
         case 'Normalized RMSE':
@@ -346,6 +350,7 @@ export default class AdvancedView extends Component {
 
   constructor(props) {
     super(props);
+    props.project.problemType === "Classification"&&props.projectStore.project.upIsHoldout(false);
     // const currentSetting = props.projectStore.project.currentSetting
     // this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
     // autorun(() => {
