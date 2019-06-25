@@ -36,7 +36,6 @@ export default class PVA extends Component{
 	
 	async componentDidMount(model=this.props.model) {
 		const { validatePlotData, holdoutPlotData } = model||{};
-		// this.props.projectStore.project.upIsHoldout(false);
 		
 		if(!this.props.data){
 			request.post({
