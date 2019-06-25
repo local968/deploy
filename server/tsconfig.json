@@ -24,6 +24,7 @@
     "allowJs": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "outDir": "../release"
   }
 }
