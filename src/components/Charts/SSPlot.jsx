@@ -1,6 +1,7 @@
 import React,{useState} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import EN from "../../constant/en";
+import { Spin } from 'antd';
 
 export default function GainChart(props){
 	const {width=600,height=400,project} = props;
@@ -52,11 +53,13 @@ export default function GainChart(props){
 		};
 	}
 	
-	return <ReactEcharts
-		option={option}
-		style={{height, width}}
-		notMerge={true}
-		lazyUpdate={true}
-		theme='customed'
-	/>
+	return <Spin spinning={!ssPlot}>
+		<ReactEcharts
+			option={option}
+			style={{height, width}}
+			notMerge={true}
+			lazyUpdate={true}
+			theme='customed'
+		/>
+	</Spin>
 }

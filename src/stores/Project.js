@@ -181,6 +181,7 @@ export default class Project {
   @observable reportProgress = 0
   @observable reportProgressText = 'init'
   @observable reportCancel = false
+  @observable isHoldout = false;
 
   constructor(id, args) {
     this.id = id
@@ -473,7 +474,13 @@ export default class Project {
       };
     }
     return obj
-  }
+  };
+  
+  @action
+  upIsHoldout(isHoldout) {
+    console.log(3,isHoldout)
+    this.isHoldout = isHoldout;
+  };
 
   @action
   updateProject = data => {
