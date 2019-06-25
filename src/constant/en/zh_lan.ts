@@ -241,9 +241,9 @@ const ZH_LAN: any = {
   PrecisionRecall: 'F1 = 2*Precision*Recall / (Precision+Recall)',
   Itmeasureshowmanytruepositivesamong: '它衡量所有预测（包括真假）阳类中有多少实际阳类,方程为真阳(tp) / (真阳(tp) + 假阳(fp))。从计算中可以看出，当值越大，分类器的误报越少。它有点代表分类器的准确性。',
   Efficientwaytodetermine: 'KS = TPR - FPR。KS用来判断两个类别之间是否存在显著差异。为所有阈值上真阳性率与假阳性率之差的最大值。k值越高，两个类别的的区分度就越大。',
-  RootMeanSquareError: '均方根误差（RMSE）测量模型的预测误差。标准化RMSE将帮助您比较模型性能：越小越好。',
+  RootMeanSquareError: '均方根误差（RMSE）测量模型的预测误差。RMSE将帮助您比较模型性能：越小越好。',
   R2isastatisticalmeasure: 'R^2 在统计学中用于度量应变量的变异中可由自变量解释部分所占的比例，以此来判断统计模型的解释力。 R^2=模型能解释的方差/目标变量总方差',
-  RootMeanSquareErrorprediction: '均方根误差（RMSE）测量模型的预测误差。标准化RMSE将帮助您比较模型性能：越小越好。',
+  RootMeanSquareErrorprediction: '均方根误差（RMSE）测量模型的预测误差。RMSE将帮助您比较模型性能：越小越好。',
   RMSLEissimilarwithRMSE: 'RMSLE与RMSE相似，差别在于RMSLE对y和y的预测值做了对数变换。',
   MeanSquaredErro: '均方误差',
   MeanAbsoluteError: 'Mean Absolute Error',
@@ -946,6 +946,7 @@ const ZH_LAN: any = {
   Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation: '您还可以告诉我们您的业务需求，以获得更精确的建议',
   ContaminationRate: '异常值比例',
   TheNumberofClusters: '聚类个数',
+  NumberofClusters: '聚类个数',
   Score: '评分',
   SihouetteScore: 'Sihouette Score',
   exportreporterror: '导出报告异常。',
@@ -1146,6 +1147,9 @@ const ZH_LAN: any = {
   timeoutRetry: "网络超时,正在重试.",
   Deployment:'模型部署',
   PerformanceMonitors:'部署性能',
+  WithinGroupSsSquares:"组内离差平方和",
+  WithinGroupSsPlot:"组内离差平方和",
+  WithinGroupsSs:"组内离差平方和",
 };
 
 export default ZH_LAN;

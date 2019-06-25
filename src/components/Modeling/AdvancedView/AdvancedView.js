@@ -373,9 +373,15 @@ export default class AdvancedView extends Component {
     // props.projectStore.changeStopFilter(true)
     props.projectStore.changeOldfiltedModels(undefined)
   }
+  
+  handleHoldout(){
+    const {isHoldout} = this.props.projectStore.project;
+    this.props.projectStore.project.upIsHoldout(!isHoldout);
+  }
 
   render() {
-    const { project, sort, handleSort, handleChange, metric, isHoldout, handleHoldout } = this.props;
+    const { project, sort, handleSort, handleChange, metric, handleHoldout } = this.props;
+    const {isHoldout} = this.props.projectStore.project;
     const { problemType } = project;
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
@@ -397,7 +403,7 @@ export default class AdvancedView extends Component {
         <div className={styles.metricSelection} >
           <div className={styles.metricSwitch}>
             <span>{EN.Validation}</span>
-            <Switch checked={isHoldout} onChange={handleHoldout} style={{ backgroundColor: '#1D2B3C' }} />
+            <Switch checked={isHoldout} onChange={this.handleHoldout.bind(this)} style={{ backgroundColor: '#1D2B3C' }} />
             <span>{EN.Holdout}</span>
           </div>
           <span className={styles.text} >{EN.MeasurementMetric}</span>

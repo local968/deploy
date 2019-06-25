@@ -9,11 +9,10 @@ import EN from "../../constant/en";
 import styles from './charts.module.css';
 import { Button } from 'antd';
 import { Hint, Switch } from 'components/Common';
-import config from 'config'
-const isEN = config.isEN;
+import {inject, observer} from "mobx-react";
 
-
-
+@inject('projectStore')
+@observer
 export default class PVA extends Component{
 	constructor(props){
 		super(props);
@@ -37,6 +36,7 @@ export default class PVA extends Component{
 	
 	async componentDidMount(model=this.props.model) {
 		const { validatePlotData, holdoutPlotData } = model||{};
+		// this.props.projectStore.project.upIsHoldout(false);
 		
 		if(!this.props.data){
 			request.post({
@@ -230,7 +230,7 @@ export default class PVA extends Component{
 			},
 			series,
 			grid:{
-				x:`${max}`.length * 20,
+				x:`${parseInt(max)}`.length * 18,
 				y2:80,
 			},
 			toolbox:{
@@ -254,13 +254,13 @@ export default class PVA extends Component{
 		
 	}
 	handleHoldout(){
-		this.setState(prevState=>({
-			isHoldout:!prevState.isHoldout
-		}));
+		const {isHoldout} = this.props.projectStore.project;
+		this.props.projectStore.project.upIsHoldout(!isHoldout);
 	}
 	
 	render(){
-		const {loading,isHoldout,chartDate,holdOutChartDate} = this.state;
+		const {loading,chartDate,holdOutChartDate} = this.state;
+		const {isHoldout} = this.props.projectStore.project;
 		const data = isHoldout?holdOutChartDate:chartDate;
 		
 		if(!data[0]){
@@ -290,7 +290,7 @@ export default class PVA extends Component{
 						{EN.ChartReset}</p>}
 						/>
 				</div>
-				<div className={styles.metricSwitch} style={{top:(isEN?-25:0)}}>
+				<div className={styles.metricSwitch} style={{top:-25}}>
 					<span>{EN.Validation}</span>
 					<Switch checked={isHoldout} onChange={this.handleHoldout.bind(this)} style={{ backgroundColor: '#1D2B3C' }} />
 					<span>{EN.Holdout}</span>
