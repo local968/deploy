@@ -1,6 +1,9 @@
 // import React from "react";
 // import { Typography } from "@material-ui/core";
 
+import Button from "@material-ui/core/Button";
+import React from "react";
+
 const EN_LAN = {
   /**
    *  './src/components/App'
@@ -1080,6 +1083,7 @@ const EN_LAN = {
   Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation: 'You can also tell us your business needs to get a more precise recommendation',
   ContaminationRate: 'Contamination Rate',
   TheNumberofClusters: 'The Number of Clusters',
+  NumberofClusters: 'Number of Clusters',
   Score: 'Score',
   SihouetteScore: 'Sihouette Score',
   exportreporterror: 'export report error.',
@@ -1274,6 +1278,9 @@ const EN_LAN = {
   timeoutRetry: "Connection timeout. Reconnecting now.",
   Deployment:'Deployment',
   PerformanceMonitors:'Performance Monitor',
+  WithinGroupSsSquares:"Within Group SS Squares",
+  WithinGroupSsPlot:"Within Group SS Plot",
+  WithinGroupsSs:"Within Groups SS",
 };
 
 

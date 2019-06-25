@@ -9,8 +9,6 @@ export default function GainChart(props){
 	const data =  Object.values(lift.GAIN||{})
 		.map((itm,index)=>[(index+1)/10,itm]);
 	
-	// data.unshift([0,0]);
-
 	const option = {
 		xAxis: {
 			name:x_name,
@@ -22,7 +20,7 @@ export default function GainChart(props){
 			type: 'line',
 			symbolSize: 0,
 			data,
-			smooth: true,
+			smooth: false,
 		},
 		grid:{
 			x2:150

@@ -189,6 +189,7 @@ export default class ROCCurves extends PureComponent{
 	}
 
 	updatePoint(point){
+		// console.log(point,this.state._x.indexOf(point))
 		this.props.model.setFitIndex(this.state._x.indexOf(point));
 	}
 

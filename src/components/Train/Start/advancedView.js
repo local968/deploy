@@ -4,11 +4,13 @@ import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
 import { NumberInput, Range,Hint } from "components/Common";
-import { Select, message, Tooltip } from "antd";
+import { Select, message, Tooltip ,Popover} from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
 import InputNumber from "antd/es/input-number";
 import EN from '../../../constant/en';
+import SSPlot from "../../Charts/SSPlot";
+import Button from "@material-ui/core/Button";
 const Option = Select.Option;
 
 @observer
@@ -192,6 +194,15 @@ export default class AdvancedView extends Component {
               <div className={`${styles.advancedTitle}`}>
                 <span>{EN.SpecifytheNumberofClusterstoForm}</span>
               </div>
+              <Popover
+                  placement="bottomLeft"
+                  content={<SSPlot
+                    height={300} width={600}
+                    project={project}
+                />} title={null}>
+                <Button className={styles.button}>{EN.WithinGroupSsPlot}</Button>
+              </Popover>
+              
             </div>
             <div className={styles.advancedBlock}>
               {(
