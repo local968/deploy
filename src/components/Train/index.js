@@ -19,7 +19,7 @@ import { ProjectSide } from 'components/Common';
 @observer
 export default class Modeling extends Component {
   @observable right = 0
-  @observable view = 'simple'
+
 
   constructor(props) {
     super(props);
@@ -54,10 +54,6 @@ export default class Modeling extends Component {
     if (this.sideRef.current) this.sideRef.current.reset()
   }
 
-  changeView = view => {
-    this.view = view
-  }
-
   enter = step => {
     const { lastSubStep, subStepActive, updateProject, nextSubStep } = this.props.projectStore.project;
     if (step === subStepActive) return false;
@@ -67,7 +63,6 @@ export default class Modeling extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { view } = this
 
     return (
       <div className={styles.modeling}>
@@ -76,9 +71,7 @@ export default class Modeling extends Component {
           <Route exact path="/project/:id/train/result" component={() => {
             return <TrainResult
               resetSide={this.resetSide}
-              project={project}
-              view={view}
-              changeView={this.changeView} />
+              project={project} />
           }} />
         </Switch>}
         {project && <ProjectSide
@@ -95,13 +88,11 @@ export default class Modeling extends Component {
 @observer
 class TrainResult extends Component {
   render() {
-    const { project, view, changeView, resetSide } = this.props;
+    const { project, resetSide } = this.props;
     const { models, train2Error, train2ing } = project;
     if (train2Error) return <ModelError />;
     if (!models.length && train2ing) return <Loading />;
     return <ModelResult
-      view={view}
-      changeView={changeView}
       resetSide={resetSide}
     />
   }

@@ -20,7 +20,8 @@ const isEN = config.isEN;
 @observer
 export default class RegressionView extends Component {
   onSelect = model => {
-    this.props.project.setSelectModel(model.id)
+    this.props.project.setSelectModel(model.id);
+    this.props.project.upIsHoldout(false);
   };
 
 
@@ -49,12 +50,6 @@ export default class RegressionView extends Component {
           </div>
           <Performance current={current} />
         </div>
-
-        {/*<PredictedVsActualPlot*/}
-        {/*    x_name = {EN.PointNumber}*/}
-        {/*    y_name = {isEN?`${EN.Groupaverage} ${project.target}`:`${project.target} ${EN.Groupaverage}`}*/}
-        {/*    url={project.selectModel.pointToShowData}*/}
-        {/*/>*/}
         <PVA
             key='pva'
             x_name = {EN.PointNumber}

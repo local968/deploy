@@ -47,6 +47,7 @@ const ZH_LAN: any = {
   Warning: '警告',
   Continue: '继续',
   DataSize: '数据大小',
+  DataLines: '文件行数',
   FileName: '文件名',
   FromComp: '本地上传',
   NoAuthority: '无权限',
@@ -945,6 +946,7 @@ const ZH_LAN: any = {
   Youcanalsotellusyourbusinessneedstogetamorepreciserecommendation: '您还可以告诉我们您的业务需求，以获得更精确的建议',
   ContaminationRate: '异常值比例',
   TheNumberofClusters: '聚类个数',
+  NumberofClusters: '聚类个数',
   Score: '评分',
   SihouetteScore: 'Sihouette Score',
   exportreporterror: '导出报告异常。',
@@ -1145,6 +1147,9 @@ const ZH_LAN: any = {
   timeoutRetry: "网络超时,正在重试.",
   Deployment:'模型部署',
   PerformanceMonitors:'部署性能',
+  WithinGroupSsSquares:"组内离差平方和",
+  WithinGroupSsPlot:"组内离差平方和",
+  WithinGroupsSs:"组内离差平方和",
 };
 
 export default ZH_LAN;

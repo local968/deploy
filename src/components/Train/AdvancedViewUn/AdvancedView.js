@@ -16,17 +16,15 @@ import PcaIconOn from './pca-on.png'
 import IconParallel from './icon-parallel.svg'
 import IconParallel2 from './icon-parallel2.svg'
 import PAW from "../../Charts/PAW";
-const {Option} = Select;
+const { Option } = Select;
 
 @inject('projectStore')
 @observer
 export default class AdvancedView extends Component {
 
-  @observable currentSettingId = 'all';
-
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort } = this.props;
+    const { models, project, projectStore, sort, currentSettingId } = this.props;
     let _filtedModels = [...models];
 
     let { stopFilter, oldfiltedModels } = projectStore;
@@ -89,17 +87,12 @@ export default class AdvancedView extends Component {
       _filtedModels = _filtedModels.sort(sortMethods);
     }
 
-    if (this.currentSettingId === 'all') return _filtedModels;
-    const currentSetting = project.settings.find(setting => setting.id === this.currentSettingId)
-    if (currentSetting && currentSetting.models && currentSetting.models.length > 0)
+    if (currentSettingId === 'all') return _filtedModels;
+    const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
+    if (currentSetting && currentSetting.models)
       return _filtedModels.filter(model => currentSetting.models.find(id => model.id === id))
     return _filtedModels
   }
-
-  changeSetting = action((settingId) => {
-    this.currentSettingId = settingId
-  });
-
 
   constructor(props) {
     super(props);
@@ -108,13 +101,13 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort } = this.props;
+    const { project, sort, handleSort, currentSettingId, changeSetting } = this.props;
     return (
       <div className={styles.advancedModelResult}>
         <div className={styles.middle}>
           <div className={styles.settings}>
             <span className={styles.label}>{EN.ModelNameContains}:</span>
-            <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
+            <Select className={styles.settingsSelect} value={currentSettingId} onChange={changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
               <Option value={'all'}>{EN.All}</Option>
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
@@ -130,10 +123,10 @@ const questMarks = {
   'CVNN': EN.CVNNHint,
   'RSquared': EN.squaredHint,
   'RMSSTD': EN.RMSSTDHint,
-   'CH': "",
+  'CH': "",
   'silhouette_cosine': "",
   'silhouette_euclidean': "",
-  PCA:EN.PCAIntro,
+  PCA: EN.PCAIntro,
 };
 
 @observer
@@ -146,17 +139,17 @@ class AdvancedModelTable extends Component {
 
   render() {
     const { models, project: { selectModel }, sort, handleSort } = this.props;
-    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean','Parallel Plot','PCA'];
+    const texts = [EN.ModelName, EN.Time, 'CVNN', 'RSquared', 'RMSSTD', 'CH Index', 'Silhouette Cosine', 'Silhouette Euclidean', 'Parallel Plot', 'PCA'];
     const arr = [];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
       const label = <div className={styles.headerLabel} title={replaceR2(curr)}>{replaceR2(curr)}</div>;
-      if(['PCA','Parallel Plot'].includes(curr)){
+      if (['PCA', 'Parallel Plot'].includes(curr)) {
         return { ...prev, [curr]: <div>{getHint(curr)} {label}</div> }
       }
       if (curr === sort.key) {
-        if (sort.value === 1){
+        if (sort.value === 1) {
           return { ...prev, [curr]: <div onClick={handleSort.bind(null, curr)}>{getHint(curr)} {label}<Icon type='up' /></div> }
         }
         if (sort.value === -1) {
@@ -170,7 +163,7 @@ class AdvancedModelTable extends Component {
       }
       return prev
     }, {});
-    console.log('headerData',headerData)
+    console.log('headerData', headerData)
     const header = <div className={styles.tableHeader}>
       <Row>
         {texts.map(t => <RowCell data={headerData[t]} key={t} />)}
@@ -196,19 +189,19 @@ class AdvancedModelTable extends Component {
 @observer class RegressionModleRow extends Component {
   state = {
     detail: false,
-    type:'',
+    type: '',
   };
   handleResult = _type => {
-    const {type,detail} = this.state;
+    const { type, detail } = this.state;
     this.setState({
-      detail: type === _type ? !detail:true,
-      type:_type,
+      detail: type === _type ? !detail : true,
+      type: _type,
     });
   };
   render() {
     const { model, texts, checked } = this.props;
     const { score, modelName } = model;
-    const { detail,type } = this.state;
+    const { detail, type } = this.state;
     return (
       <div className={styles.tb}>
         <Row>
@@ -243,26 +236,26 @@ class AdvancedModelTable extends Component {
             }
           })}
           <RowCell
-              onClick={this.handleResult.bind(this,'Parallel Plot')}
-              key='Parallel Plot' data={<a href='javascript:;' className={detail&&type === 'Parallel Plot'?styles.on:''}>
-            {
-              detail && type === 'Parallel Plot'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
-            }
-	          {EN.Compute}
-          </a>} />
+            onClick={this.handleResult.bind(this, 'Parallel Plot')}
+            key='Parallel Plot' data={<a href='javascript:;' className={detail && type === 'Parallel Plot' ? styles.on : ''}>
+              {
+                detail && type === 'Parallel Plot' ? <img src={IconParallel2} alt='' /> : <img src={IconParallel} alt='' />
+              }
+              {EN.Compute}
+            </a>} />
           <RowCell
-              onClick={this.handleResult.bind(this,'PCA')}
-              key='PCA' data={<a href='javascript:;' className={detail&&type === 'PCA'?styles.on:''}>
-            {
-              detail && type === 'PCA'?<img src={IconParallel2} alt=''/>:<img src={IconParallel} alt=''/>
-            }
-	          {EN.Compute}
-          </a>} />
+            onClick={this.handleResult.bind(this, 'PCA')}
+            key='PCA' data={<a href='javascript:;' className={detail && type === 'PCA' ? styles.on : ''}>
+              {
+                detail && type === 'PCA' ? <img src={IconParallel2} alt='' /> : <img src={IconParallel} alt='' />
+              }
+              {EN.Compute}
+            </a>} />
         </Row>
         {detail && <RegressionDetailCurves
-            project={this.props.project}
-            model={model}
-            type={type}
+          project={this.props.project}
+          model={model}
+          type={type}
         />}
       </div>
     )
@@ -271,7 +264,7 @@ class AdvancedModelTable extends Component {
 
 @observer
 class RegressionDetailCurves extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       curve: props.type,
@@ -279,26 +272,26 @@ class RegressionDetailCurves extends Component {
       diagnoseType: null
     }
   }
-  
+
   componentWillReceiveProps(nextProps) {
-    if(nextProps.type!==this.state.curve){
+    if (nextProps.type !== this.state.curve) {
       this.handleClick(nextProps.type)
     }
   }
-  
+
   handleClick = val => {
     this.setState({ curve: val });
   };
-  
-  curComponent(){
-    const { type,model} = this.props;
-    const {curve} = this.state;
-    if(curve === 'Parallel Plot'){
+
+  curComponent() {
+    const { type, model } = this.props;
+    const { curve } = this.state;
+    if (curve === 'Parallel Plot') {
       return <ParallelPlots url={model.parallelPlotData} />
     }
-    
-    if(['PCA'].includes(curve)){
-      return <PAW url={model.pcaPlotData}/>
+
+    if (['PCA'].includes(curve)) {
+      return <PAW url={model.pcaPlotData} />
     }
   }
 
@@ -318,7 +311,7 @@ class RegressionDetailCurves extends Component {
       normalIcon: ParallelPlot,
       selectedIcon: ParallelPlotOn,
       type: "Parallel Plot"
-    },{
+    }, {
       text: 'PCA',
       hoverIcon: PcaIcon,
       normalIcon: PcaIcon,
@@ -378,7 +371,7 @@ class Thumbnail extends Component {
         // onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
       >
-        <img style={{width:50,height:50,margin:5}} src={icon} alt="icon" />
+        <img style={{ width: 50, height: 50, margin: 5 }} src={icon} alt="icon" />
         <div>{text}</div>
       </div>
     )

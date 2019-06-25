@@ -15,6 +15,7 @@ import r2LoadGif from './R2Loading.gif';
 import EN from '../../../constant/en';
 import { observable, action, computed } from 'mobx';
 import {Select} from 'antd'
+import { formatNumber } from 'util';
 
 const Option = Select.Option
 
@@ -514,6 +515,9 @@ class DataSample extends Component {
                 <span>{EN.TargetVariable}</span>
               </div>
               <div className={styles.sampleCell}>
+                <span>{EN.DataLines}</span>
+              </div>
+              <div className={styles.sampleCell}>
                 <span>{EN.DataSize}</span>
               </div>
             </div>
@@ -546,6 +550,9 @@ class DataSample extends Component {
                   </div>
                   <div className={styles.sampleCell} title={row.target}>
                     <span>{row.target}</span>
+                  </div>
+                  <div className={styles.sampleCell}>
+                    <span>{formatNumber(row.lines)}</span>
                   </div>
                   <div className={styles.sampleCell} title={row.size}>
                     <span>{this.formatSize(row.size)}</span>

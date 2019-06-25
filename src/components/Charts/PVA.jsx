@@ -9,7 +9,10 @@ import EN from "../../constant/en";
 import styles from './charts.module.css';
 import { Button } from 'antd';
 import { Hint, Switch } from 'components/Common';
+import {inject, observer} from "mobx-react";
 
+@inject('projectStore')
+@observer
 export default class PVA extends Component{
 	constructor(props){
 		super(props);
@@ -250,13 +253,13 @@ export default class PVA extends Component{
 		
 	}
 	handleHoldout(){
-		this.setState(prevState=>({
-			isHoldout:!prevState.isHoldout
-		}));
+		const {isHoldout} = this.props.projectStore.project;
+		this.props.projectStore.project.upIsHoldout(!isHoldout);
 	}
 	
 	render(){
-		const {loading,isHoldout,chartDate,holdOutChartDate} = this.state;
+		const {loading,chartDate,holdOutChartDate} = this.state;
+		const {isHoldout} = this.props.projectStore.project;
 		const data = isHoldout?holdOutChartDate:chartDate;
 		
 		if(!data[0]){

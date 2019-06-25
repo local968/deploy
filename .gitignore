@@ -24,7 +24,7 @@ yarn-error.log*
 # vscode
 .vscode
 
-package-lock.json
+#package-lock.json
 
 local_config.js
 
@@ -41,3 +41,5 @@ config.js
 logs
 
 nohup.out
+release
+build
