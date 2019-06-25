@@ -33,8 +33,10 @@ export default class RabbitMQ {
       })
       .then(conn => {
         this.amqplib = conn;
-        conn.on('error', () => {
+        conn.on('close', () => {
           this.amqplib = undefined;
+          console.error('************** mq 连接失败，开始重连');
+          this.connect();
         });
       })
       .catch(() => {
@@ -70,7 +72,7 @@ export default class RabbitMQ {
     await ch.assertQueue(queueName);
 
     !_.isEmpty(task) &&
-      (await ch.sendToQueue(queueName, Buffer.from(JSON.stringify(task))));
+    (await ch.sendToQueue(queueName, Buffer.from(JSON.stringify(task))));
 
     await ch.close();
   };

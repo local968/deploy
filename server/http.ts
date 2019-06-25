@@ -58,7 +58,9 @@ app.use(express.static('static'));
 // CRA routing
 app.get('*', function(req, res) {
   const index = path.join(process.cwd(), 'static', 'index.html');
-  if (fs.existsSync(index)) return res.sendFile(index);
+  if (fs.existsSync(index)){
+    return res.sendFile(index)
+  }
   axios.get('http://localhost:3000').then(resp => res.send(resp.data));
 });
 

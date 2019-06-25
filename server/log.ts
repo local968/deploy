@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
 import { configure } from 'log4js';
 
 try {
@@ -12,6 +12,7 @@ try {
 try {
   // const fs = require('fs')
   const logPath = path.join(__dirname, '..', 'logs');
+  fs.ensureDirSync(logPath);
   const logs = fs.readdirSync(logPath);
   logs.forEach(log => {
     fs.unlinkSync(path.join(logPath, log));
