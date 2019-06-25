@@ -41,6 +41,7 @@ router.post('/deploy', async (req, res) => {
   if (token !== validToken) return errorRes(10010)
 
   // data format
+  const mapHeader = JSON.parse(await redis.hmget(`project:${projectId}`, 'mapHeader'))
   if (!req.body.data) return errorRes(10002)
   let data
   let rawData
@@ -53,9 +54,12 @@ router.post('/deploy', async (req, res) => {
   if (!rawData || !Array.isArray(rawData) || rawData.length === 0) return errorRes(10005)
   data = rawData.map((r, i) => {
     const row = {}
-    for (let key in Object.keys(r)) row[encodeURIComponent(key)] = encodeURIComponent(r[key])
-    r[encodeURIComponent('__no')] = i;
-    return r
+    Object.keys(r).forEach(key => {
+      row[mapHeader.indexOf(key)] = r[key]
+    })
+    row['__no'] = i
+    r['__no'] = i
+    return row
   })
   data = Papa.unparse(data)
   if (lineCount > 10000 || data.length > 1024 * 1024 * 100) return errorRes(10012)
@@ -82,10 +86,15 @@ router.post('/deploy', async (req, res) => {
 
   // etl
   let etlIndex
+  let target = 'target'
+  let targetIndex = 0
   try {
     const result = await redis.hmget(`project:${projectId}:model:${deployment.modelName}`, "stats")
     let [stats] = result
     stats = JSON.parse(stats)
+    targetIndex = Object.keys(stats).find(key => stats[key].isTarget)
+    target = mapHeader[Object.keys(stats).find(key => stats[key].isTarget)]
+    delete stats[targetIndex]
     etlIndex = await etl(index, stats)
   } catch (e) {
     console.error(e)
@@ -147,17 +156,25 @@ router.post('/deploy', async (req, res) => {
   }
 
   res.json({
-    result: combineResult(rawData, resultData),
+    result: combineResult(rawData, resultData, target, targetIndex),
     code: 10000,
     message: 'ok'
   })
 })
 
-const combineResult = (source, result) => {
+const combineResult = (source, result, target, targetIndex) => {
   return source.map(s => {
     s = Object.assign({}, s, result.find(r => r.__no === s.__no))
-    delete s.__no
-    return s
+    const row = {}
+    Object.keys(s).forEach(key => {
+      if (key === '__no') return
+      if (key.startsWith(targetIndex)) {
+        row[key.replace(targetIndex, target)] = s[key]
+        return
+      }
+      row[key] = s[key]
+    })
+    return row
   })
 }
 
