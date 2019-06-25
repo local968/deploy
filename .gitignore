@@ -41,3 +41,5 @@ config.js
 logs
 
 nohup.out
+release
+build
