@@ -33,7 +33,7 @@ const init: any = (server, sessionParser) => {
       this.isAlive = true;
     });
     socket.on('message', wss.emit.bind(wss, 'message', socket));
-    socket.on('close', (socket, code, reason) => {
+    socket.on('close', (code, reason) => {
       socket.isAlive = false;
       const log = `${ip} - ${
         req.session.userId
@@ -44,7 +44,7 @@ const init: any = (server, sessionParser) => {
       // console.warn('socket closed, reason:' + reason + ' code:' + code)
     });
 
-    socket.on('error', (socket, error) => {
+    socket.on('error', (code, error) => {
       const log = `${ip} - ${
         req.session.userId
       } - [${moment().format()}] - ${moment().valueOf()} - error - ${req

@@ -98,7 +98,7 @@ function query(key, params) {
           Object.keys(item).forEach(key => {
             try {
               item[key] = JSON.parse(item[key]);
-            } catch (e) {}
+            } catch (e) { }
           });
           if (item.uploadFileName) {
             return getFileInfo(item.uploadFileName).then(files => {
@@ -159,15 +159,15 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
       const err = result.find(([error]) => !!error);
       const returnValue = err
         ? {
-            status: 411,
-            message: (isCreate ? 'create' : 'update') + ' project error',
-          }
+          status: 411,
+          message: (isCreate ? 'create' : 'update') + ' project error',
+        }
         : {
-            status: 200,
-            message: (isCreate ? 'create' : 'update') + ' success',
-            result: data,
-            id,
-          };
+          status: 200,
+          message: (isCreate ? 'create' : 'update') + ' success',
+          result: data,
+          id,
+        };
       wss.publish(`user:${userId}:projects`, returnValue);
       const logData = {
         userId,
@@ -184,7 +184,7 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
 }
 
 function addSettingModel(userId, projectId) {
-  return function(result) {
+  return function (result) {
     const { modelName } = result.model;
     redis
       .hmget(`project:${projectId}`, 'settingId', 'settings')
@@ -356,7 +356,7 @@ function checkProject(userId, id) {
     for (let key in result) {
       try {
         result[key] = JSON.parse(result[key]);
-      } catch (e) {}
+      } catch (e) { }
     }
     if (result.userId !== userId) {
       errorLogger.error({
@@ -392,7 +392,7 @@ const checkTraningRestriction = user => {
     const duration = moment.duration(moment().unix() - user.createdTime);
     const restrictQuery = `user:${
       user.id
-    }:duration:${duration.years()}-${duration.months()}:training`;
+      }:duration:${duration.years()}-${duration.months()}:training`;
     return redis.get(restrictQuery).then(count => {
       if (count >= userProjectRestriction[user.level]) {
         errorLogger.error({
@@ -447,7 +447,7 @@ function getFileInfo(files) {
       if (!file) continue;
       try {
         file = JSON.parse(file);
-      } catch (e) {}
+      } catch (e) { }
       if (!file.path || !file.name) continue;
       fileNames.push(file.name);
       csvLocation.push(file.path);
@@ -470,7 +470,7 @@ function updateProjectField(id, userId, field, data) {
   return redis.hget(key, field).then(result => {
     try {
       result = JSON.parse(result);
-    } catch (e) {}
+    } catch (e) { }
     if (Array.isArray(data) || Array.isArray(result)) {
       data = [...new Set([...(result || []), ...(data || [])])];
     } else if (typeof data === 'object' || typeof result === 'object') {
@@ -501,7 +501,7 @@ export function getProjectField(id, field) {
   return redis.hget(key, field).then(result => {
     try {
       result = JSON.parse(result);
-    } catch (e) {}
+    } catch (e) { }
     return result;
   });
 }
@@ -530,7 +530,10 @@ async function getBaseEtl(id) {
   ]);
   const { etlIndex, target, problemType, dataHeader, colType, stats } = data;
   const colMap = _.chain(stats)
-    .filter(([, metric]: [string, Metric]) => metric.type === 'Categorical')
+    .entries()
+    .filter(([, metric]: [string, Metric]) =>
+      metric.type === 'Categorical'
+    )
     .reduce((prev, [key, metric]: [string, Metric]) => {
       prev[key] = _.reduce(
         metric.categoricalMap,
@@ -650,7 +653,7 @@ wss.register('queryProjectList', (message, socket) => {
 
   const key = `user:${userId}:projects:${
     sort === 'createTime' ? 'createTime' : 'updateTime'
-  }`;
+    }`;
 
   const params = ['+inf', '-inf'];
 
@@ -674,7 +677,7 @@ wss.register('queryProject', (message, socket) => {
     for (let key in result) {
       try {
         result[key] = JSON.parse(result[key]);
-      } catch (e) {}
+      } catch (e) { }
     }
     if (result.userId !== userId) return { status: 420, message: 'error' };
     return {
@@ -702,7 +705,7 @@ wss.register('queryModelList', message => {
         for (let key in data) {
           try {
             data[key] = JSON.parse(data[key]);
-          } catch (e) {}
+          } catch (e) { }
         }
         return data;
       });
@@ -851,7 +854,7 @@ wss.register('abortEtl', (message, socket) => {
   return redis.hget('project:' + projectId, 'stopId').then(stopId => {
     try {
       stopId = JSON.parse(stopId);
-    } catch (e) {}
+    } catch (e) { }
     if (!stopId) return { status: 200, message: 'ok' };
     return command(
       { ...message, userId, requestId: message._id, stopId },
@@ -928,10 +931,10 @@ wss.register('correlationMatrix', (message, socket, progress) =>
       const data =
         status === 100
           ? {
-              correlationMatrixHeader: result.header,
-              correlationMatrixData: result.data,
-              correlationMatrixLoading: false,
-            }
+            correlationMatrixHeader: result.header,
+            correlationMatrixData: result.data,
+            correlationMatrixLoading: false,
+          }
           : { correlationMatrixLoading: false };
       createOrUpdate(message.projectId, socket.session.userId, data);
       return returnValue;
@@ -986,21 +989,21 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
           promise.push(
             status === 100
               ? updateProjectField(
-                  message.projectId,
-                  socket.session.userId,
-                  'preImportance',
-                  result.data,
-                )
+                message.projectId,
+                socket.session.userId,
+                'preImportance',
+                result.data,
+              )
               : Promise.resolve({}),
           );
           promise.push(
             status === 100
               ? updateProjectField(
-                  message.projectId,
-                  socket.session.userId,
-                  'informativesLabel',
-                  result.informativesLabel,
-                )
+                message.projectId,
+                socket.session.userId,
+                'informativesLabel',
+                result.informativesLabel,
+              )
               : Promise.resolve({}),
           );
           promise.push(
@@ -1523,7 +1526,7 @@ wss.register('watchProjectList', (message, socket) => {
     data => {
       try {
         data = JSON.parse(data);
-      } catch (e) {}
+      } catch (e) { }
       return data;
     },
     socket,
@@ -1663,7 +1666,7 @@ wss.register('getSample', (message, socket) => {
     const list = result.map(r => {
       try {
         r = JSON.parse(r);
-      } catch (e) {}
+      } catch (e) { }
       return r;
     });
     return { list };

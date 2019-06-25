@@ -69,7 +69,7 @@ wss.register('originalStats', async (message, socket) => {
         nullLineCounts[key] = issue.missingValue || 0;
         mismatchLineCounts[key] = issue.mismatch || 0;
         outlierLineCounts[key] = issue.outlierCount || 0;
-      });
+      }).value();
     const result: Project = {
       colType,
       colMap,
@@ -127,7 +127,7 @@ wss.register('newEtl', async (message, socket, process) => {
     .entries()
     .forEach(([key, value]) => {
       stats[key].type = value;
-    });
+    }).value();
 
   for (let key in stats) {
     const mismatch = project.mismatchFillMethod[key];
