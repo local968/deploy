@@ -13,7 +13,7 @@ export default ({
   dropdownClassName,
   disabled,
   selectOption,
-   getPopupContainer = () => document.body
+  getPopupContainer = () => document.body
 }) => {
   if (options) {
     return (

@@ -14,6 +14,7 @@ export default class DataSchema extends Component {
   @observable showSelect = false
   @observable dataType = { ...this.props.projectStore.project.colType }
   @observable visiable = false
+  @observable target = this.props.projectStore.project.target
 
   constructor(props) {
     super(props)
@@ -22,21 +23,22 @@ export default class DataSchema extends Component {
 
   doEtl = () => {
     const { project } = this.props.projectStore
-    const { rawHeader, target } = project;
+    const { rawHeader } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
     const data = {
+      target: this.target,
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
     }
     // 回归默认设置为drop
-    if (target && this.dataType[target] === 'Numerical') {
-      data.outlierFillMethod = { [target]: 'drop' }
-      data.outlierFillMethodTemp = { [target]: 'drop' }
-      data.nullFillMethod = { [target]: 'drop' }
-      data.nullFillMethodTemp = { [target]: 'drop' }
+    if (this.target && this.dataType[this.target] === 'Numerical') {
+      data.outlierFillMethod = { [this.target]: 'drop' }
+      data.outlierFillMethodTemp = { [this.target]: 'drop' }
+      data.nullFillMethod = { [this.target]: 'drop' }
+      data.nullFillMethodTemp = { [this.target]: 'drop' }
     } else {
-      data.nullFillMethod = { [target]: 'drop' }
-      data.nullFillMethodTemp = { [target]: 'drop' }
+      data.nullFillMethod = { [this.target]: 'drop' }
+      data.nullFillMethodTemp = { [this.target]: 'drop' }
     }
     project.setProperty(data)
     if (project.train2ing || !!project.models.length) return this.visiable = true
@@ -60,7 +62,8 @@ export default class DataSchema extends Component {
 
   targetSelect = (value) => {
     // const { colType } = this.props.projectStore.project
-    this.props.projectStore.project.setProperty({ target: value })
+    // this.props.projectStore.project.setProperty({ target: value })
+    this.target = value
     this.tableRef.current.updateGrids()
     // this.props.projectStore.project.updateProject(data).then(() => this.tableRef.current.updateGrids())
     this.checkList = [...this.checkList.filter(v => v !== value)]
@@ -96,7 +99,8 @@ export default class DataSchema extends Component {
   }
 
   formatTable = () => {
-    const { target, uploadData, rawHeader, renameVariable, etling, mapHeader, headerTemp: {temp} } = this.props.projectStore.project;
+    const { target } = this
+    const { uploadData, rawHeader, renameVariable, etling, mapHeader, headerTemp: { temp } } = this.props.projectStore.project;
     if (etling) return []
     const { showSelect, checkList } = this
     if (!uploadData.length) return []
@@ -178,7 +182,7 @@ export default class DataSchema extends Component {
         if (!headerText) {
           headerData.cn = classnames(headerData.cn, styles.missed);
         }
-        if (headerText && temp[headerText]&&temp[headerText].length > 1) {
+        if (headerText && temp[headerText] && temp[headerText].length > 1) {
           headerData.cn = classnames(headerData.cn, styles.duplicated);
         }
       }
@@ -252,7 +256,7 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { etling, etlProgress, rawHeader, problemType, noComputeTemp, target, headerTemp: { isMissed, isDuplicated }, mapHeader } = project;
+    const { etling, etlProgress, rawHeader, problemType, noComputeTemp, headerTemp: { isMissed, isDuplicated }, mapHeader } = project;
     const targetOption = {};
     const tableData = this.formatTable()
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
@@ -280,7 +284,7 @@ export default class DataSchema extends Component {
             autoWidth={"1.6em"}
             options={targetOption}
             onChange={this.targetSelect}
-            value={target}
+            value={this.target}
             disabled={isMissed || isDuplicated}
             selectOption={{ showSearch: true }}
             getPopupContainer={() => document.getElementById('schemaContent')}
@@ -323,7 +327,7 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || !target || (newDataHeader.length <= 1 && newDataHeader.indexOf(target) > -1)} text={EN.Continue} />
+        <ContinueButton onClick={this.doEtl} disabled={etling || !this.target || (newDataHeader.length <= 1 && newDataHeader.indexOf(this.target) > -1)} text={EN.Continue} />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />

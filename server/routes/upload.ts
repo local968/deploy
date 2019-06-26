@@ -219,7 +219,7 @@ async function saveSample() {
       const filePath = path.join(samplePath, f);
       const id = uuid.v4();
       try {
-        console.log('start file:' + f);
+        console.log('file:' + f + ' start');
         const {
           originalIndex,
           totalRawLines,
@@ -237,11 +237,11 @@ async function saveSample() {
           lines: totalRawLines,
           header: rawHeader,
         };
-        console.log(f, data, 'ddddddd');
         pipeline.sadd(`file:${type}:samples`, JSON.stringify(data));
         pipeline.set(`file:sample:${name}`, id);
         pipeline.set(`file:${id}`, JSON.stringify(data));
         await pipeline.exec();
+        console.log('file:' + f + ' end');
       } catch (e) {
         console.error(e, `sample: ${f} error`);
       }

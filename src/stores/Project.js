@@ -21,7 +21,6 @@ export default class Project {
   @observable exist = true;
   @observable loading = false;
   @observable host = '';
-  @observable loadModel = false;
 
   //step
   @observable mainStep = 0;
@@ -283,55 +282,72 @@ export default class Project {
   }
 
   @computed
+  get defaultAlgorithms() {
+    let algorithms = []
+    let disableList = []
+    if (this.problemType === "Clustering") {
+      algorithms = [
+        'KMeans',
+        'GMM',
+        'Birch',
+        'Agg',
+        'SpectralClustering',
+        'DBSCAN',
+        'MeanShift',
+      ]
+      disableList = (this.totalLines > 100000 && ['Birch', 'MeanShift']) || (this.totalLines > 50000 && ['MeanShift']) || (this.totalLines > 20000 && ['DBSCAN', 'MeanShift']) || []
+    } else if (this.problemType === "Outlier") {
+      algorithms = [
+        'HBOS',
+        'PCA',
+        'IsolationForest',
+        'MCD',
+        'EllipticEnvelope',
+      ]
+      disableList = (this.totalLines > 300000 && ['IsolationForest', 'MCD', 'EllipticEnvelope']) || []
+    } else if (this.problemType === "Classification") {
+      algorithms = [
+        'adaboost',
+        'bernoulli_nb',
+        'decision_tree',
+        'extra_trees',
+        'gaussian_nb',
+        'gradient_boosting',
+        'k_nearest_neighbors',
+        'lda',
+        'liblinear_svc',
+        'libsvm_svc',
+        'multinomial_nb',
+        'passive_aggressive',
+        'qda',
+        'random_forest',
+        'sgd',
+        'xgradient_boosting',
+        'r2-logistics',
+      ]
+    } else if (this.problemType === "Regression") {
+      algorithms = [
+        'adaboost',
+        'ard_regression',
+        'decision_tree',
+        'extra_trees',
+        'gaussian_process',
+        'gradient_boosting',
+        'k_nearest_neighbors',
+        'liblinear_svr',
+        'libsvm_svr',
+        'random_forest',
+        'ridge_regression',
+        'sgd',
+        'xgradient_boosting',
+      ]
+    }
+    return algorithms.filter(a => !disableList.includes(a))
+  }
+
+  @computed
   get defaultTrain() {
     const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score'
-    const algorithms = (this.problemType === "Clustering" && [
-      'KMeans',
-      'GMM',
-      'Birch',
-      'Agg',
-      'SpectralClustering',
-      'DBSCAN',
-      'MeanShift',
-    ]) || (this.problemType === "Outlier" && [
-      'HBOS',
-      'PCA',
-      'IsolationForest',
-      'MCD',
-      'EllipticEnvelope',
-    ]) || (this.problemType === "Classification" && [
-      'adaboost',
-      'bernoulli_nb',
-      'decision_tree',
-      'extra_trees',
-      'gaussian_nb',
-      'gradient_boosting',
-      'k_nearest_neighbors',
-      'lda',
-      'liblinear_svc',
-      'libsvm_svc',
-      'multinomial_nb',
-      'passive_aggressive',
-      'qda',
-      'random_forest',
-      'sgd',
-      'xgradient_boosting',
-      'r2-logistics',
-    ]) || (this.problemType === "Regression" && [
-      'adaboost',
-      'ard_regression',
-      'decision_tree',
-      'extra_trees',
-      'gaussian_process',
-      'gradient_boosting',
-      'k_nearest_neighbors',
-      'liblinear_svr',
-      'libsvm_svr',
-      'random_forest',
-      'ridge_regression',
-      'sgd',
-      'xgradient_boosting',
-    ])
 
     return {
       train2Finished: false,
@@ -349,7 +365,7 @@ export default class Project {
       dataRange: 'all',
       customField: '',
       customRange: [],
-      algorithms: algorithms,
+      algorithms: this.defaultAlgorithms,
       measurement,
       selectId: '',
       version: [1, 2, 4],
@@ -475,7 +491,7 @@ export default class Project {
     }
     return obj
   };
-  
+
   @action
   upIsHoldout(isHoldout) {
     // if(this.problemType === "Classification"){
@@ -1381,7 +1397,8 @@ export default class Project {
           command,
           settingName: setting.name,
           applyWeights: {},
-          problemType
+          problemType,
+          targetLabel: target ? [target] : []
         };
         break;
       case 'Outlier':
@@ -1402,7 +1419,8 @@ export default class Project {
           command,
           settingName: setting.name,
           applyWeights: {},
-          problemType
+          problemType,
+          targetLabel: target ? [target] : []
         };
         break;
       case 'Classification':
@@ -1566,7 +1584,8 @@ export default class Project {
           command,
           settingName: setting.name,
           applyWeights: weights,
-          problemType
+          problemType,
+          targetLabel: target ? [target] : []
         };
         break;
       case 'Outlier':
@@ -1581,7 +1600,8 @@ export default class Project {
           command,
           settingName: setting.name,
           applyWeights: weights,
-          problemType
+          problemType,
+          targetLabel: target ? [target] : []
         };
         break;
       default:
@@ -1951,23 +1971,28 @@ export default class Project {
   }
 
   initModels = () => {
-    this.loadModel = true
+    // this.loadModel = true
     // let show = true
     // const so = setTimeout(() => {
-    //   // show = false
+    //   show = false
     //   antdMessage.error(EN.timeoutRetry, 3)
     //   this.initModels()
     // }, 60000)
-    socketStore.ready().then(api => api.queryModelList({ id: this.id })).then(result => {
+    this.models = []
+    socketStore.ready().then(api => api.queryModelList({ id: this.id }, progressResult => {
+      const { status, message, model } = progressResult
+      if (status !== 200) return antdMessage.error(message)
+      this.setModel(model)
+    })).then(result => {
       // if (!show) return
       // clearTimeout(so)
       const { status, message, list } = result
       if (status !== 200) return alert(message)
-      this.models = []
-      this.loadModel = false
-      list.forEach(m => {
-        this.setModel(m)
-      });
+      // this.models = []
+      // this.loadModel = false
+      // list.forEach(m => {
+      //   this.setModel(m)
+      // });
     })
   }
 
@@ -2155,9 +2180,7 @@ export default class Project {
         command: 'clustering.ssPlot',
         projectId: this.id
       }, prosss => {
-        console.log(prosss, 'clustering.ssPlot  prosss')
       }).then(returnValue => {
-        console.log(returnValue, "clustering.ssPlot returnValue")
         const { status, result } = returnValue
         if (status < 0) antdMessage.error(`${result['processError']}`)
       })

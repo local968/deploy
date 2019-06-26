@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { ContinueButton, Modal, ProcessLoading, Table, Confirm } from 'components/Common';
 import { observable } from 'mobx';
-import { ClassificationTarget, RegressionTarget, RowIssue, DataIssue, FixIssue, SelectTarget } from './TargetIssue'
+import { ClassificationTarget, RegressionTarget, RowIssue, FixIssue, SelectTarget } from './TargetIssue'
 import { message } from 'antd'
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
@@ -13,10 +13,201 @@ import Pie2 from "../../Charts/Pie2";
 @inject('projectStore')
 @observer
 export default class DataQuality extends Component {
+  @observable step = 1
+
+  changeTab = value => {
+    const { problemType } = this.props.projectStore.project
+    if (problemType === 'Clustering') return
+    this.step = value
+  }
 
   render() {
     const { project } = this.props.projectStore;
-    return <VariableIssue project={project} />
+    const { problemType, target } = project
+    if (problemType === 'Clustering' || !target) return <VariableIssue project={project} />
+    return this.step === 1 ? <TargetIssue project={project} changeTab={this.changeTab.bind(null, 2)} /> : <VariableIssue project={project} changeTab={this.changeTab.bind(null, 1)} />
+  }
+}
+
+@observer
+class TargetIssue extends Component {
+  @observable visible = false
+  @observable edit = false
+
+  backToConnect = () => {
+    const { updateProject, nextSubStep } = this.props.project
+    updateProject(nextSubStep(1, 2))
+  }
+
+  backToSchema = () => {
+    const { updateProject, nextSubStep } = this.props.project
+    updateProject(nextSubStep(2, 2))
+  }
+
+  editFixes = () => {
+    this.visible = true
+  }
+
+  closeFixes = () => {
+    this.visible = false
+  }
+
+  editTarget = () => {
+    this.edit = true
+  }
+
+  closeTarget = () => {
+    this.edit = false
+  }
+
+  saveTargetFixes = () => {
+    this.props.project.fixTarget()
+
+    message.destroy();
+    message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
+    this.closeTarget();
+  }
+
+  saveDataFixes = () => {
+    this.props.project.fixFillMethod()
+    message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
+    this.closeFixes();
+  }
+
+  render() {
+    const { project, changeTab } = this.props;
+    const { issues, sortData, mapHeader, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
+    const targetIndex = sortHeader.findIndex(h => h === target);
+    const recomm = 2 //problemType === 'Outlier' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
+    const isNum = colType[target] === 'Numerical'
+    const nullCount = Number.isInteger(nullLineCounts[target]) ? nullLineCounts[target] : 0
+    const mismatchCount = (isNum && Number.isInteger(mismatchLineCounts[target])) ? mismatchLineCounts[target] : 0
+    const outlierCount = (isNum && Number.isInteger(outlierLineCounts[target])) ? outlierLineCounts[target] : 0
+    const targetPercent = {
+      missing: nullCount === 0 ? 0 : (nullCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(nullCount * 100 / (totalRawLines || 1), 2),
+      mismatch: mismatchCount === 0 ? 0 : (mismatchCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(mismatchCount * 100 / (totalRawLines || 1), 2),
+      outlier: outlierCount === 0 ? 0 : (outlierCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(outlierCount * 100 / (totalRawLines || 1), 2)
+    }
+    const warnings = []
+    const unique = targetArrayTemp.length || rawDataView[target].uniqueValues
+    const hasNull = !targetArrayTemp.length ? !!nullCount : false
+    // if (problemType === 'Classification') {
+    if (unique > 2 || hasNull) warnings.push(`${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`)
+    if (unique < 2 && !hasNull) warnings.push(`${EN.YourtargetvariableHas}${EN.onlyOnevalue}`)
+    if (unique === 2 && !hasNull) {
+      const min = Math.min(...Object.values(targetCounts))
+      if (min < 3) warnings.push(EN.Itisrecommendedthatyou)
+    }
+    // }
+    if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push(EN.Yourtargetvariableisempty)
+    const cannotContinue = !!warnings.length || issues.targetIssue
+    const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue
+    return <div className={styles.quality}>
+      <div className={styles.issue}>
+        {!!warnings.length && <div className={styles.issueTitle}><span>{EN.Warning}!</span></div>}
+        {!!warnings.length && <div className={styles.issueBox}>
+          {warnings.map((v, k) => <div className={styles.issueText} key={k}>
+            <div className={styles.point}></div>
+            <span>{v}</span>
+          </div>)}
+        </div>}
+        {(issues.targetIssue || issues.rowIssue) && <div className={styles.issueTitle}><span>{EN.IssueS}{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 1 && EN.SS} {EN.Found}!</span></div>}
+        {(issues.targetIssue || issues.rowIssue) && <div className={styles.issueBox}>
+          {issues.targetIssue && <div className={styles.issueText}>
+            <div className={styles.point}></div>
+            <span>{EN.Yourtargetvariablehasmorethantwouniquevalues}</span>
+            {/* {problemType === 'Classification' ?
+              <span>{EN.Yourtargetvariablehasmorethantwouniquevalues}</span> :
+              <span>{EN.Yourtargetvariablehaslessthan}{recomm}{EN.Uniquevalueswhichisnot}</span>} */}
+          </div>}
+          {issues.rowIssue && <div className={styles.issueText}>
+            <div className={styles.point}></div>
+            <span>{EN.Datasizeistoosmall}</span>
+          </div>}
+        </div>}
+        {isClean && <div className={styles.cleanTitle}><span>{EN.Targetvariablequalitylooksgood}</span></div>}
+      </div>
+      <div className={styles.typeBox}>
+        {!!mismatchCount && <div className={styles.type}>
+          <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
+          <span>{EN.DataTypeMismatch}</span>
+        </div>}
+        {!!nullCount && <div className={styles.type}>
+          <div className={classnames(styles.typeBlock, styles.missing)}></div>
+          <span>{EN.MissingValue}</span>
+        </div>}
+        {!!outlierCount && <div className={styles.type}>
+          <div className={classnames(styles.typeBlock, styles.outlier)}></div>
+          <span>{EN.Outlier}</span>
+        </div>}
+        <div className={styles.issueTabs}>
+          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
+          <div className={styles.issueTab} onClick={cannotContinue ? null : changeTab}><span>{EN.PredictorVariables}</span></div>
+        </div>
+      </div>
+      <div className={styles.contentBox}>
+        <div className={styles.list}>
+          <div className={styles.table}>
+            <div className={classnames(styles.cell, styles.target)}><span>{EN.TargetVariable}</span></div>
+            <div className={classnames(styles.cell, styles.label)}><span>{mapHeader[target]}</span></div>
+            <div className={classnames(styles.cell, styles.select)}><span>{isNum ? EN.Numerical : EN.Categorical}</span></div>
+            <div className={classnames(styles.cell, styles.error)}>
+              {!!targetPercent.mismatch && <div className={classnames(styles.errorBlock, styles.mismatch)}><span>{targetPercent.mismatch}%</span></div>}
+              {!!targetPercent.missing && <div className={classnames(styles.errorBlock, styles.missing)}><span>{targetPercent.missing}%</span></div>}
+              {!!targetPercent.outlier && <div className={classnames(styles.errorBlock, styles.outlier)}><span>{targetPercent.outlier}%</span></div>}
+            </div>
+            <div className={styles.tableBody}>
+              {!!sortData.length && sortData.map((r, k) => {
+                const v = r[targetIndex]
+                const { low = NaN, high = NaN } = rawDataView[target]
+                const isMissing = isNaN(+v) ? !v : false
+                const isMismatch = isNum ? isNaN(+v) : false
+                const isOutlier = isNum ? (v < low || v > high) : false
+                return <div key={k} className={classnames(styles.cell, {
+                  [styles.mismatch]: isMismatch,
+                  [styles.missing]: isMissing,
+                  [styles.outlier]: isOutlier
+                })}>
+                  <span title={renameVariable[v] || v}>{renameVariable[v] || v}</span>
+                </div>
+              })}
+            </div>
+          </div>
+          <ContinueButton disabled={cannotContinue} onClick={changeTab} text={EN.Continue} width="100%" />
+        </div>
+        <div className={styles.content}>
+          <ClassificationTarget project={project}
+            backToConnect={this.backToConnect}
+            backToSchema={this.backToSchema}
+            editTarget={this.editTarget} />
+          {issues.rowIssue && <RowIssue backToConnect={this.backToConnect}
+            totalRawLines={totalRawLines} />}
+        </div>
+        <Modal content={<FixIssue project={project}
+          nullCount={targetIssuesCountsOrigin.nullRow}
+          mismatchCount={targetIssuesCountsOrigin.mismatchRow}
+          outlierCount={targetIssuesCountsOrigin.outlierRow}
+          closeFixes={this.closeFixes}
+          saveDataFixes={this.saveDataFixes}
+          isTarget={true} />}
+          visible={this.visible}
+          width='12em'
+          title={EN.HowR2LearnWillFixtheIssues}
+          onClose={this.closeFixes}
+          closeByMask={true}
+          showClose={true}
+        />
+        <Modal content={<SelectTarget project={project} closeTarget={this.closeTarget} saveTargetFixes={this.saveTargetFixes} />}
+          visible={this.edit}
+          width='5.5em'
+          title={EN.HowR2LearnWillFixtheIssues}
+          onClose={this.closeTarget}
+          closeByMask={true}
+          showClose={true}
+        />
+      </div>
+      {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
+    </div>
   }
 }
 
@@ -159,7 +350,7 @@ class VariableIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount }, totalRawLines } = project;
+    const { dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount }, totalRawLines, problemType } = project;
     // const nullCount = Object.values(nullLineCounts).reduce((sum, n) => sum + n, 0)
     // const mismatchCount = Object.values(mismatchLineCounts).reduce((sum, n) => sum + n, 0)
     // const outlierCount = Object.values(outlierLineCounts).reduce((sum, n) => sum + n, 0)
@@ -200,6 +391,10 @@ class VariableIssue extends Component {
         {!!outlierCount && <div className={styles.type}>
           <div className={classnames(styles.typeBlock, styles.outlier)}></div>
           <span>{EN.Outlier}</span>
+        </div>}
+        {problemType === 'Outlier' && <div className={styles.issueTabs}>
+          <div className={styles.issueTab} onClick={changeTab}><span>{EN.TargetVariable}</span></div>
+          <div className={styles.issueTab} style={{ borderBottomColor: '#1d2b3c' }}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
         </div>}
       </div>
       <div className={styles.variableIssue}>
@@ -367,10 +562,10 @@ class Summary extends Component {
               const percent = percentList[k]
               return <div className={styles.summaryTableRow} key={k}>
                 <div className={styles.summaryProgressBlock}>
-                  <div className={styles.summaryProgress} style={{width: percent.clean + '%', backgroundColor: '#00c855'}}/>
-                  <div className={styles.summaryProgress} style={{width: percent.mismatch + '%', backgroundColor: '#819ffc'}}/>
-                  <div className={styles.summaryProgress} style={{width: percent.missing + '%', backgroundColor: '#ff97a7'}}/>
-                  <div className={styles.summaryProgress} style={{width: percent.outlier + '%', backgroundColor: '#f9cf37'}}/>
+                  <div className={styles.summaryProgress} style={{ width: percent.clean + '%', backgroundColor: '#00c855' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.mismatch + '%', backgroundColor: '#819ffc' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.missing + '%', backgroundColor: '#ff97a7' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }} />
                 </div>
               </div>
             })}
@@ -383,9 +578,9 @@ class Summary extends Component {
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
           <Pie2
-              RowsWillBeFixed={fixedPercent}
-              RowsWillBeDeleted={deletePercent}
-              CleanData={cleanPercent}
+            RowsWillBeFixed={fixedPercent}
+            RowsWillBeDeleted={deletePercent}
+            CleanData={cleanPercent}
           />
           <div className={styles.summaryParts}>
             <div className={styles.summaryPart}>

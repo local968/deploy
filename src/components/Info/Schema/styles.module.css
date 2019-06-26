@@ -69,7 +69,7 @@
     background-image: linear-gradient(to bottom, #5b657b, #243448);
     color: #fff;
     padding: 0 0.2em;
-    /* margin-left: 0.4em; */
+    margin-left: 0.4em;
     cursor: pointer;
     line-height: .3em;
 }

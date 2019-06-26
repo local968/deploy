@@ -602,6 +602,7 @@ const EN_LAN = {
   SelectAlgorithm: 'Select Algorithm',
   SelectAll: 'Select All',
   DeselectAll: 'Deselect all',
+  SelectDefault: 'Default',
   R2solutionModelling: 'R2-solution-a & b are mandatory modelling algorithms for Advanced Modelling.',
   R2solutiona: 'R2-solution-a',
   R2solutionb: 'R2-solution-b',
@@ -1277,11 +1278,16 @@ const EN_LAN = {
   ChartReset: "5.Click \"reset\" to to whole value range",
   custom: "custom function",
   timeoutRetry: "Connection timeout. Reconnecting now.",
-  Deployment:'Deployment',
-  PerformanceMonitors:'Performance Monitor',
-  WithinGroupSsSquares:"Within Group SS Squares",
-  WithinGroupSsPlot:"Within Group SS Plot",
-  WithinGroupsSs:"Within Groups SS",
+  Deployment: 'Deployment',
+  PerformanceMonitors: 'Performance Monitor',
+  WithinGroupSsSquares: "Within Group SS Squares",
+  WithinGroupSsPlot: "Within Group SS Plot",
+  WithinGroupsSs: "Within Groups SS",
+  ImportantValues: "Median Value of The Variable",
+  adjustMutualInfo: 'Adjust Mutual Info',
+  adjustRandScore: 'Adjust Rand Score',
+  ClusteringTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the clustering models. Otherwise, you can leave blank here.`,
+  OutlierTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the outlier detection models. Otherwise, you can leave blank here.`
 };
 
 

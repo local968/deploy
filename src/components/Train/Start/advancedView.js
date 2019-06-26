@@ -3,8 +3,8 @@ import styles from "./styles.module.css";
 import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
-import { NumberInput, Range,Hint } from "components/Common";
-import { Select, message, Tooltip ,Popover} from "antd";
+import { NumberInput, Range, Hint } from "components/Common";
+import { Select, message, Tooltip, Popover } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
 import InputNumber from "antd/es/input-number";
@@ -77,6 +77,13 @@ export default class AdvancedView extends Component {
     // });
   };
 
+  handleDefaultCheck = () => {
+    this.props.project.algorithms = this.props.project.defaultAlgorithms
+    // project.setProperty({
+    //   algorithms: _algorithms
+    // });
+  };
+
   changeSetting = e => {
     const { project } = this.props;
     if (e.target.value === "default") return this.resetSetting();
@@ -95,7 +102,7 @@ export default class AdvancedView extends Component {
     const { project } = this.props;
     const defaultSetting = {
       kType: "auto",
-      algorithms: ["KMeans"],
+      algorithms: project.defaultAlgorithms,
       standardType: "standard",
       searchTime: 5,
       measurement: "CVNN",
@@ -134,14 +141,17 @@ export default class AdvancedView extends Component {
 
   render() {
     const { project, hidden } = this.props;
+    const { algorithms, defaultAlgorithms } = project
+    const isAll = Algorithms[project.problemType].length === algorithms.length
+    const isDefault = algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
     const measurementList =
       project.problemType === "Outlier"
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-        [{ value: "score", label: EN.Accuracy ,hint:EN.ScoreHint}]
+        [{ value: "score", label: EN.Accuracy, hint: EN.ScoreHint }]
         : [
-          { value: "CVNN", label: "CVNN" ,hint:EN.CVNNHint},
-          { value: "CH", label: "CH Index" ,hint:EN.CHIndexHint},
-          { value: "silhouette_euclidean", label: "Silhouette Score" ,hint:EN.SihouetteScoreHint},
+          { value: "CVNN", label: "CVNN", hint: EN.CVNNHint },
+          { value: "CH", label: "CH Index", hint: EN.CHIndexHint },
+          { value: "silhouette_euclidean", label: "Silhouette Score", hint: EN.SihouetteScoreHint },
 
           // { value: "CVNN", label: "CVNN" },
           // { value: "RSquared", label: "RSquared" },
@@ -195,14 +205,14 @@ export default class AdvancedView extends Component {
                 <span>{EN.SpecifytheNumberofClusterstoForm}</span>
               </div>
               <Popover
-                  placement="bottomLeft"
-                  content={<SSPlot
-                    height={300} width={600}
-                    project={project}
+                placement="bottomLeft"
+                content={<SSPlot
+                  height={300} width={600}
+                  project={project}
                 />} title={null}>
                 <Button className={styles.button}>{EN.WithinGroupSsPlot}</Button>
               </Popover>
-              
+
             </div>
             <div className={styles.advancedBlock}>
               {(
@@ -212,7 +222,8 @@ export default class AdvancedView extends Component {
                       id="number_auto"
                       type="radio"
                       name="numberselect"
-                      defaultChecked={project.kType === "auto"}
+                      checked={project.kType === "auto"}
+                      readOnly
                       onClick={this.handleMode("auto")}
                     />
                     <label htmlFor="number_auto">{EN.Auto}</label>
@@ -222,7 +233,8 @@ export default class AdvancedView extends Component {
                       id="number_custom"
                       type="radio"
                       name="numberselect"
-                      defaultChecked={project.kType === "no_more_than"}
+                      checked={project.kType === "no_more_than"}
+                      readOnly
                       onClick={this.handleMode("no_more_than")}
                     />
                     <label htmlFor="number_custom">{EN.NoMoreThan}</label>
@@ -251,7 +263,8 @@ export default class AdvancedView extends Component {
                     id="algorithmSelect1"
                     type="radio"
                     name="algorithmSelect"
-                    defaultChecked={project.algorithms.length}
+                    checked={isAll}
+                    readOnly
                     onClick={this.handleSelectAll.bind(null, true)}
                   />
                   <label htmlFor="algorithmSelect1">{EN.SelectAll}</label>
@@ -261,10 +274,22 @@ export default class AdvancedView extends Component {
                     id="algorithmSelect2"
                     type="radio"
                     name="algorithmSelect"
-                    defaultChecked={!project.algorithms.length}
+                    checked={!project.algorithms.length}
+                    readOnly
                     onClick={this.handleSelectAll.bind(null, false)}
                   />
                   <label htmlFor="algorithmSelect2">{EN.DeselectAll}</label>
+                </div>
+                <div className={styles.advancedOptionBox}>
+                  <input
+                    id="algorithmSelect2"
+                    type="radio"
+                    name="algorithmSelect"
+                    checked={isDefault}
+                    readOnly
+                    onClick={this.handleDefaultCheck}
+                  />
+                  <label htmlFor="algorithmSelect3">{EN.SelectDefault}</label>
                 </div>
               </div>
             </div>

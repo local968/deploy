@@ -106,7 +106,6 @@ export default class ModelResult extends Component {
     const { project } = this.props.projectStore;
     const { models,isHoldout } = project
     const { id, etlIndex, fileName, selectModel, target, loadModel, settings } = project
-    if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
     if (!models.length) return null;
     // const { view } = this;
 
