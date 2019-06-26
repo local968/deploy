@@ -45,17 +45,29 @@ const router = express.Router();
 router.post('/login', async(req, res) => {
   const { email, password } = req.body;
 
-  const had = await userService.exist(email);
+  let user = await userService.findByEmail(email);
 
-  if(!had){
+  if(!user){
     return res.send({ status: 404, message: 'user not exists.' })
   }
-  const result = await userService.login(email,sha256(password));
+  if(user.update_password){
+    const result = await userService.firstLogin(email,password,sha256(password));
+    if(result&&!user.plan){
+      const plan = await planService.detail('');
+      await userService.update(user.id,{
+        plan:plan._id,
+      });
+    }
+    user = await userService.findByEmail(email);
+  }else{
+    const _result = await userService.login(email,sha256(password));
+    user = _result[0];
+  }
 
-  if(!result[0]){
+  if(!user){
     return res.send({ status: 400, message: 'incorrect password.'})
   }
-  const {plan:{level},id,create_time,drole:role={}} = result[0];
+  const {plan:{level},id,create_time,drole:role={}} = user;
 
   if(!level){
     return res.send({ status:302, message: 'Your account is not available'})
@@ -135,7 +147,6 @@ router.post('/register', async (req, res) => {
     const plan = await planService.detail(plan_id);
     plan_id = plan.id;
   }
-
 
   const result = await userService.register(res,email,plan_id,password,created_time);
 
