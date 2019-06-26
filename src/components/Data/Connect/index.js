@@ -295,7 +295,6 @@ export default class DataConnect extends Component {
           <Select style={{ width: '8rem' }} value={charset} onChange={charsetChange}>
             <Option value='utf-8'>{EN.UTF_8}</Option>
             <Option value='gbk'>{EN.GBK}</Option>
-            <Option value='gb-2312'>{EN.GB_2312}</Option>
             <Option value='big5'>{EN.BIG5}</Option>
           </Select>
         </div>

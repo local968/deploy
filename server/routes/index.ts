@@ -21,7 +21,7 @@ router.get('/jupyterLabUrl', (req, res) =>
 );
 
 router.get('/dashboardUrl', (req, res) =>
-  res.send(process.env.JUPYTER_LAB || 'https://192.168.0.23:16443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/'),
+  res.send(process.env.DASHBOARD_URL || 'https://192.168.0.23:16443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/'),
 );
 
 export default router;
