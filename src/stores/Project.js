@@ -478,18 +478,18 @@ export default class Project {
   
   @action
   upIsHoldout(isHoldout) {
-    if(this.problemType === "Classification"){
-      const {chartData,holdoutChartData,fitIndex} = this.selectModel;
-      const {roc:{Threshold:data}} = !isHoldout?holdoutChartData:chartData;
-      const {roc:{Threshold:nextData}} = isHoldout?holdoutChartData:chartData;
-      
-      const od = data[fitIndex];
-  
-      const nextValue = Object.values(nextData).sort((a,b)=>Math.abs(a-od)-Math.abs(b-od))[0];
-      
-      const newFitIndex = Object.entries(nextData).filter(itm=>itm[1] === nextValue)[0][0];
-      this.selectModel.fitIndex = +newFitIndex;
-    }
+    // if(this.problemType === "Classification"){
+    //   const {chartData,holdoutChartData,fitIndex} = this.selectModel;
+    //   const {roc:{Threshold:data}} = !isHoldout?holdoutChartData:chartData;
+    //   const {roc:{Threshold:nextData}} = isHoldout?holdoutChartData:chartData;
+    //
+    //   const od = data[fitIndex];
+    //
+    //   const nextValue = Object.values(nextData).sort((a,b)=>Math.abs(a-od)-Math.abs(b-od))[0];
+    //
+    //   const newFitIndex = Object.entries(nextData).filter(itm=>itm[1] === nextValue)[0][0];
+    //   this.selectModel.fitIndex = +newFitIndex;
+    // }
     this.isHoldout = isHoldout;
   };
 
@@ -1952,15 +1952,15 @@ export default class Project {
 
   initModels = () => {
     this.loadModel = true
-    let show = true
-    const so = setTimeout(() => {
-      show = false
-      antdMessage.error(EN.timeoutRetry, 3)
-      this.initModels()
-    }, 60000)
+    // let show = true
+    // const so = setTimeout(() => {
+    //   // show = false
+    //   antdMessage.error(EN.timeoutRetry, 3)
+    //   this.initModels()
+    // }, 60000)
     socketStore.ready().then(api => api.queryModelList({ id: this.id })).then(result => {
-      if (!show) return
-      clearTimeout(so)
+      // if (!show) return
+      // clearTimeout(so)
       const { status, message, list } = result
       if (status !== 200) return alert(message)
       this.models = []
