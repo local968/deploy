@@ -148,7 +148,7 @@ router.post('/register', async (req, res) => {
   res.send({
     status: 200,
     message: 'ok',
-    info: { id, email }
+    info: { id, email,role:{} }
   })
 });
 
