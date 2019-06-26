@@ -29,14 +29,20 @@ function ModelResult(props) {
       value: 1
     }
   })
-  const { resetSide, view, changeView, projectStore } = props
+  const [currentSettingId, setCurrentSettingId] = React.useState('all')
+  const [view, setView] = React.useState('simple')
+  const { resetSide, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   React.useEffect(() => {
     resetSide()
   })
+  let filterModels = [...models]
+  const currentSetting = currentSettingId === 'all' ? null : settings.find(setting => setting.id === currentSettingId)
+  if (currentSetting && currentSetting.models)
+    filterModels = filterModels.filter(model => currentSetting.models.find(id => model.id === id))
 
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
@@ -45,6 +51,11 @@ function ModelResult(props) {
   const cannotDeploy = problemType === 'Clustering' && !selectModel.supportDeploy
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
   // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
+
+  const changeView = view => {
+    setView(view)
+  }
+
 
   const abortTrain = stopId => {
     project.abortTrain(stopId)
@@ -63,6 +74,10 @@ function ModelResult(props) {
     project.updateProject({
       selectId: model.id
     })
+  }
+
+  const changeSetting = (settingId) => {
+    setCurrentSettingId(settingId)
   }
 
   const handleSort = (view, key) => {
@@ -150,10 +165,10 @@ function ModelResult(props) {
           }
         </div>
       </div>
-      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
-      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={models} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
+      {problemType === 'Clustering' && <ClusteringTable abortTrain={abortTrain} project={project} models={filterModels} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
+      {problemType === 'Outlier' && <OutlierTable abortTrain={abortTrain} project={project} models={filterModels} sort={sort.simple} handleSort={(key) => handleSort('simple', key)} onSelect={onSelect} mapHeader={newMapHeader} />}
     </div>}
-    {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} />}
+    {view === 'advanced' && <AdvancedViewUn project={project} models={models} sort={sort.advanced} handleSort={(key) => handleSort('advanced', key)} currentSettingId={currentSettingId} changeSetting={changeSetting} />}
     <div className={classes.buttonBlock}>
       {cannotDeploy ? <Tooltip title={EN.cannotDeploy} visible={showTips}>
         <button className={`${classes.button} ${classes.disable}`} onMouseOver={() => setShowTips(true)} onMouseOut={() => setShowTips(false)}>
@@ -480,7 +495,7 @@ const ClusteringRow = observer((props) => {
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
     {visible && type === 'process' && <ModelProcessFlow model={model} />}
-    {visible && type === 'explanation' && <Explanation model={model} />}
+    {visible && type === 'explanation' && <Explanation model={model} mapHeader={mapHeader} />}
     {/* </div> */}
   </div>
 })

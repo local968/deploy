@@ -220,9 +220,10 @@ class ProjectStore {
           return antdMessage.error(message)
           // return { error: message }
         }
-        this.list = this.list.filter(i => {
-          return !ids.includes(i.id)
-        })
+        return this.queryProjectList()
+        // this.list = this.list.filter(i => {
+        //   return !ids.includes(i.id)
+        // })
         // return this.queryProjectList()
       })
     })

@@ -33,6 +33,7 @@ export default class Project {
   @observable name;
   @observable createTime
   @observable updateTime
+  @observable charset = 'utf-8';
   // @observable description;
 
   //problem
@@ -180,6 +181,7 @@ export default class Project {
   @observable reportProgress = 0
   @observable reportProgressText = 'init'
   @observable reportCancel = false
+  @observable isHoldout = false;
 
   constructor(id, args) {
     this.id = id
@@ -472,7 +474,24 @@ export default class Project {
       };
     }
     return obj
-  }
+  };
+  
+  @action
+  upIsHoldout(isHoldout) {
+    if(this.problemType === "Classification"){
+      const {chartData,holdoutChartData,fitIndex} = this.selectModel;
+      const {roc:{Threshold:data}} = !isHoldout?holdoutChartData:chartData;
+      const {roc:{Threshold:nextData}} = isHoldout?holdoutChartData:chartData;
+      
+      const od = data[fitIndex];
+  
+      const nextValue = Object.values(nextData).sort((a,b)=>Math.abs(a-od)-Math.abs(b-od))[0];
+      
+      const newFitIndex = Object.entries(nextData).filter(itm=>itm[1] === nextValue)[0][0];
+      this.selectModel.fitIndex = +newFitIndex;
+    }
+    this.isHoldout = isHoldout;
+  };
 
   @action
   updateProject = data => {
@@ -1998,6 +2017,7 @@ export default class Project {
   }
 
   clusterPreTrainImportance = () => {
+    if (this.problemType !== 'Clustering') return Promise.resolve()
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)

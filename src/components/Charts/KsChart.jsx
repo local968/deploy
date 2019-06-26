@@ -8,29 +8,33 @@ export default function KsChart(props){
 	const {KS_FPR,KS_TPR} = lift;
 
 	
-	
-	
 	const FPR = Object.values(KS_FPR);
 	const TPR = Object.values(KS_TPR);
 	
 	const series = [TPR,FPR].map(itm=>{
-		const data =  itm.map((it,index)=>[(index+1)/10,it]);
+		const data =  itm.map((it,index)=>[(index+1)*10,it]);
 		data.unshift([0,0]);
 		
 		return {
 			type: 'line',
 			symbolSize: 0,
 			data,
-			smooth: true,
+			smooth: false,
 		}
 	});
 	
 	const option = {
 		xAxis: {
 			name:x_name,
+			axisLabel:{
+				formatter: '{value}%'
+			}
 		},
 		yAxis: {
 			name:y_name,
+			axisLabel:{
+				formatter: (value)=>`${value*100}%`
+			}
 		},
 		series,
 		grid:{

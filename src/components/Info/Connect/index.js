@@ -14,6 +14,10 @@ import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 import EN from '../../../constant/en';
 import { observable, action, computed } from 'mobx';
+import { formatNumber } from 'util';
+import { Select } from 'antd'
+
+const Option = Select.Option
 
 // const files = {
 //   RegressionSample: [
@@ -176,25 +180,25 @@ export default class DataConnect extends Component {
     this.sample = false
   })
 
-  selectSample = filename => {
+  selectSample = data => {
     const process = this.props.projectStore.project.etling ? 50 : this.process
     if (!!process) return false;
 
     this.uploading = true
 
-    axios.post(`http://${config.host}:${config.port}/upload/sample`, { filename }).then(
-      action(data => {
-        const { fileId } = data.data
-        this.process = 50
-        this.props.projectStore.project.fastTrackInit(fileId).then(() => {
-          this.process = 0
-          this.uploading = false
-        });
-      }),
-      () => {
-        message.error(EN.Samplefileerror);
-      }
-    );
+    // axios.post(`http://${config.host}:${config.port}/upload/sample`, { filename }).then(
+    //   action(data => {
+    //     const { fileId } = data.data
+    this.process = 50
+    this.props.projectStore.project.fastTrackInit(data).then(() => {
+      this.process = 0
+      this.uploading = false
+    });
+    //   }),
+    //   () => {
+    //     message.error(EN.Samplefileerror);
+    //   }
+    // );
     this.hideSample();
   };
 
@@ -273,13 +277,24 @@ export default class DataConnect extends Component {
 
   render() {
     const { projectStore: { project }, userStore, socketStore } = this.props;
-    const { etlProgress, etling } = project
+    const { etlProgress, etling, charset } = project
     const process = etling ? 50 : this.process
+    const charsetChange = action((charset) => {
+      project.updateProject({ charset })
+    })
     window.cn = this
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
           <span>{EN.Pleasechooseadata}</span>
+          <label className={styles.chooseCharset}>{EN.choosecharset}</label>
+          <Select style={{ width: '8rem' }} value={charset} onChange={charsetChange}>
+            <Option value='utf-8'>{EN.UTF_8}</Option>
+            <Option value='utf-16'>{EN.UTF_16}</Option>
+            <Option value='gbk'>{EN.GBK}</Option>
+            <Option value='gb-2312'>{EN.GB_2312}</Option>
+            <Option value='big5'>{EN.BIG5}</Option>
+          </Select>
         </div>
         {/* <div className={styles.maxRow}>
           <span>Maximum Data Size</span>
@@ -296,6 +311,7 @@ export default class DataConnect extends Component {
           {this.block(EN.FromComp, localFileIcon, 'upload')}
           {this.block(EN.FromSQL, sqlIcon, 'sql')}
           <Uploader
+            charset={charset}
             onStart={this.onUpload}
             onComplete={this.upload}
             onError={this.onError}
@@ -440,7 +456,12 @@ class DataSample extends Component {
     // const sample = this.files[project.problemType + 'Sample'];
     const file = (this.files || [])[this.select];
     if (!file) return;
-    selectSample(file.name);
+    selectSample({
+      rawHeader: file.header,
+      totalRawLines: file.lines,
+      originalIndex: file.index,
+      fileName: file.name
+    });
   };
 
   formatSize = size => {
@@ -488,8 +509,11 @@ class DataSample extends Component {
               <div className={styles.sampleCell}>
                 <span>{EN.FileName}</span>
               </div>
-              <div className={styles.sampleCell}>
+              {/* <div className={styles.sampleCell}>
                 <span>{EN.TargetVariable}</span>
+              </div> */}
+              <div className={styles.sampleCell}>
+                <span>{EN.DataLines}</span>
               </div>
               <div className={styles.sampleCell}>
                 <span>{EN.DataSize}</span>
@@ -522,8 +546,11 @@ class DataSample extends Component {
                   <div className={styles.sampleCell} title={row.filename}>
                     <span>{row.name}</span>
                   </div>
-                  <div className={styles.sampleCell} title={row.target}>
+                  {/* <div className={styles.sampleCell} title={row.target}>
                     <span>{row.target}</span>
+                  </div> */}
+                  <div className={styles.sampleCell}>
+                    <span>{formatNumber(row.lines)}</span>
                   </div>
                   <div className={styles.sampleCell} title={row.size}>
                     <span>{this.formatSize(row.size)}</span>

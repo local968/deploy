@@ -59,7 +59,7 @@ export default class Uploader extends Component {
   }
 
   upload = file => {
-    const { params, onProgress, onError, onComplete } = this.props;
+    const { params, onProgress, onError, onComplete, charset } = this.props;
     axios.post(`http://${config.host}:${config.port}/upload/check`, { fileSize: file.size, type: 'modeling', projectId: params.projectId }).then(response => {
       if (response.data.status !== 200) return onError(response.data.message)
       const token = response.data.token
@@ -69,6 +69,7 @@ export default class Uploader extends Component {
         onProgress: onProgress,
         onFinished: onComplete,
         onError: this.retry,
+        charset,
         params: {
           ...params,
           token,

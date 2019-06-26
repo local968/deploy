@@ -7,22 +7,28 @@ export default function GainChart(props){
 	const {lift={}} = isHoldout?holdoutChartData:chartData;
 
 	const data =  Object.values(lift.GAIN||{})
-		.map((itm,index)=>[(index+1)/10,itm]);
+		.map((itm,index)=>[(index+1)*10,itm]);
 	
-	// data.unshift([0,0]);
-
+	data.unshift([0,0]);
+	
 	const option = {
 		xAxis: {
 			name:x_name,
+			axisLabel:{
+				formatter: '{value}%'
+			}
 		},
 		yAxis: {
 			name:y_name,
+			axisLabel:{
+				formatter: '{value}%'
+			}
 		},
 		series:{
 			type: 'line',
 			symbolSize: 0,
 			data,
-			smooth: true,
+			smooth: false,
 		},
 		grid:{
 			x2:150
