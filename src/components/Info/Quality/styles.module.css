@@ -77,7 +77,7 @@
 	flex: none;
 	align-items: center;
 	z-index: 1;
-	height: .3em;
+	min-height: .3em;
 }
 
 .type {

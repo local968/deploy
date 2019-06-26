@@ -33,7 +33,7 @@ function ModelResult(props) {
   const [view, setView] = React.useState('simple')
   const { resetSide, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings, loadModel } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   React.useEffect(() => {
@@ -195,11 +195,15 @@ export default inject('projectStore', 'deploymentStore', 'routing')(observer(Mod
 
 const OutlierTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, target } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
       switch (key) {
+        case "auc":
+          if (!!target) return (a.score.auc - b.score.auc) * value
+        case "acc":
+          if (!!target) return (a.score.accuracy - b.score.accuracy) * value
         case "score":
           return (a.score.score - b.score.score) * value
         case 'rate':
@@ -230,6 +234,16 @@ const OutlierTable = observer((props) => {
           {/*<span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>*/}
           <span>{sort.key === 'rate' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
+        {!!target && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('auc')}>
+          <Tooltip title={EN.PerformanceAUC}>{EN.PerformanceAUC}</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>*/}
+          <span>{sort.key === 'auc' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>}
+        {!!target && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('acc')}>
+          <Tooltip title={EN.Accuracys}>{EN.Accuracys}</Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.ContaminationRate}</span>*/}
+          <span>{sort.key === 'acc' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>}
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('time')}>
           <Tooltip title={EN.Time} >{EN.Time} </Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
@@ -247,7 +261,7 @@ const OutlierTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} mapHeader={mapHeader} />
+        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} mapHeader={mapHeader} hasTarget={!!target} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -265,7 +279,7 @@ const OutlierTable = observer((props) => {
 const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
-  const { model, isRecommend, isSelect, onSelect, mapHeader } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader, hasTarget } = props
 
   const toggleImpact = (_type) => {
     if (!visible) {//本来是关着的
@@ -309,6 +323,12 @@ const OutlierRow = observer((props) => {
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.rate || 0)}</span>
         </div>
+        {hasTarget && <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.auc || 0)}</span>
+        </div>}
+        {hasTarget && <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score.accuracy || 0)}</span>
+        </div>}
         <div className={`${classes.ccell}`}>
           <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
         </div>
@@ -329,11 +349,19 @@ const OutlierRow = observer((props) => {
 
 const ClusteringTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, target } = project
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
       switch (key) {
+        case 'adjinfo':
+          if (!!target) {
+            return (a.realLabelScore.adjust_mutual_info - b.realLabelScore.adjust_mutual_info) * value
+          }
+        case 'adjScore':
+          if (!!target) {
+            return (a.realLabelScore.adjust_rand_score - b.realLabelScore.adjust_rand_score) * value
+          }
         case "cvnn":
           return (a.score.CVNN - b.score.CVNN) * value
         case "rsquared":
@@ -365,7 +393,7 @@ const ClusteringTable = observer((props) => {
           <span className={classes.ccellHeaderSpan}>CVNN</span>
           <span>{sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
         </div>
-        <div style={{ width: 100 }} className={`${classes.ccell}  ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
+        <div className={`${classes.ccell}  ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
           <Tooltip title={EN.SihouetteScore}>{EN.SihouetteScore}</Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>{EN.SihouetteScore} </span>*/}
           <span>{sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
@@ -385,6 +413,16 @@ const ClusteringTable = observer((props) => {
           {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
           <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
+        {!!target && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('adjinfo')}>
+          <Tooltip title={EN.adjustMutualInfo} >{EN.adjustMutualInfo} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
+          <span>{sort.key === 'adjinfo' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>}
+        {!!target && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('adjScore')}>
+          <Tooltip title={EN.adjustRandScore} >{EN.adjustRandScore} </Tooltip>
+          {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
+          <span>{sort.key === 'adjScore' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
+        </div>}
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('time')}>
           <Tooltip title={EN.Time} >{EN.Time} </Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>{EN.clusters} </span>*/}
@@ -407,7 +445,7 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} mapHeader={mapHeader} />
+        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} mapHeader={mapHeader} hasTarget={!!target} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -423,7 +461,9 @@ const ClusteringTable = observer((props) => {
 })
 
 const ClusteringRow = observer((props) => {
-  const { model, isRecommend, isSelect, onSelect, mapHeader } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader, hasTarget } = props
+  const { realLabelScore = {} } = model
+  const { adjust_mutual_info = '', adjust_rand_score = '' } = realLabelScore
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const toggleImpact = (_type) => {
@@ -478,6 +518,12 @@ const ClusteringRow = observer((props) => {
         <div className={`${classes.ccell}`}>
           <span>{clusters}</span>
         </div>
+        {hasTarget && <div className={`${classes.ccell}`}>
+          <span>{adjust_mutual_info}</span>
+        </div>}
+        {hasTarget && <div className={`${classes.ccell}`}>
+          <span>{adjust_rand_score}</span>
+        </div>}
         <div className={`${classes.ccell}`}>
           <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
         </div>

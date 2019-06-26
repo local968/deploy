@@ -186,6 +186,7 @@
 
 .ccell {
   display: flex;
+  width: 0;
   justify-content: flex-start;
   align-items: center;
   padding: 8px 0;
@@ -228,6 +229,7 @@
 .rowHeader {
   display: flex;
   flex: none;
+  padding-right: .2em;
 }
 
 .data {

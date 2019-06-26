@@ -25,11 +25,15 @@ export default class SimplifiedView extends Component {
 
 
   componentDidMount() {
-    this.props.project.dataView()
+    this.props.project.dataView().then(() => {
+      this.props.project.clusterPreTrainImportance()
+    })
   }
 
   componentDidMount() {
-    this.props.project.dataView()
+    this.props.project.dataView().then(() => {
+      this.props.project.clusterPreTrainImportance()
+    })
   }
 
   getCorrelationMatrix = () => {
@@ -71,8 +75,8 @@ export default class SimplifiedView extends Component {
       },
     }).then((CorrelationMatrixData) => {
       this.showCorrelation = true;
-      let {type} = CorrelationMatrixData;
-      CorrelationMatrixData.type = type.map(itm=>project.mapHeader[itm]);
+      let { type } = CorrelationMatrixData;
+      CorrelationMatrixData.type = type.map(itm => project.mapHeader[itm]);
       this.CorrelationMatrixData = CorrelationMatrixData;
     });
   };
@@ -103,21 +107,23 @@ export default class SimplifiedView extends Component {
   }
 
   reloadTable = () => {
-    this.props.project.dataView()
-  }
+    this.props.project.dataView().then(() => {
+      this.props.project.clusterPreTrainImportance()
+    })
+  };
 
   handleChange = e => {
     const value = e.target.value
     const { project } = this.props
-    const { dataHeader, customHeader, newVariable, target } = project
+    const { dataHeader, customHeader, newVariable, target, informativesLabel } = project
     let filterList = []
     if (!value) return
     if (value === 'all') {
       filterList = [...dataHeader, ...newVariable]
     }
-    // if (value === 'informatives') {
-    //   filterList = informativesLabel
-    // }
+    if (value === 'informatives') {
+      filterList = informativesLabel
+    }
     if (!isNaN(value) && value < customHeader.length) {
       filterList = customHeader[value]
     }
@@ -150,11 +156,11 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { mapHeader = [], standardType, colType, targetMap, dataViews, weights, dataViewsLoading, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { problemType, mapHeader = [], standardType, colType, targetMap, dataViews, weights, dataViewsLoading, informativesLabel, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
-    const key = [allVariables, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
+    const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
@@ -183,7 +189,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolLabel}><span>{EN.CurrentVariableList}</span></div>
           <select value={selectValue} onChange={this.handleChange}>
             <option value='all'>{EN.AllVariables} ({allVariables.length})</option>
-            {/* <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option> */}
+            <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option>
             {customHeader.map((v, k) => <option key={k} value={k}>{EN.Custom}{k + 1} ({v.length})</option>)}
             {hasNewOne && <option
               value={customHeader.length}>{EN.Custom}{customHeader.length + 1} ({checkedVariables.length})</option>}
@@ -195,7 +201,7 @@ export default class SimplifiedView extends Component {
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable}
-              addNewVariable={addNewVariable2} colType={colType} expression={expression} mapHeader={newMapHeader}/>
+              addNewVariable={addNewVariable2} colType={colType} expression={expression} mapHeader={newMapHeader} />
           </Modal>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>
@@ -215,6 +221,13 @@ export default class SimplifiedView extends Component {
           <div className={styles.tableTh}><span>{EN.Name}</span></div>
           <div className={styles.tableTh}><span>{EN.Weight}<Hint content={EN.Youcangivehigherweightstofeatures} /></span></div>
           <div className={styles.tableTh}><span>{EN.Histogram}</span></div>
+          {problemType === 'Clustering' && <div className={classnames(styles.tableTh, styles.tableImportance)}>
+            <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon
+              type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
+            <span>{EN.Importance}</span>
+            <div className={styles.tableReload} onClick={this.reloadTable}><span><Icon type="reload" /></span></div>
+            <Hint themeStyle={{ fontSize: '1rem' }} content={EN.AdvancedModelingImportanceTip} />
+          </div>}
           <div className={styles.tableTh}><span>{EN.DataType}</span></div>
           <div className={styles.tableTh}><span>{EN.UniqueValue}</span></div>
           <div className={styles.tableTh}><span>{EN.Mean}</span></div>
@@ -223,24 +236,27 @@ export default class SimplifiedView extends Component {
           <div className={styles.tableTh}><span>{EN.Min}</span></div>
           <div className={styles.tableTh}><span>{EN.Max}</span></div>
         </div>
-        {(dataViewsLoading) ?
+        {(dataViewsLoading || preImportanceLoading) ?
           <div className={styles.tableLoading}>
             <Icon type="loading" />
           </div> :
           <div className={styles.tableBody}>
-            {allVariables.map((h, i) => {
+            {allVariables.sort((a, b) => {
+              return preImportance ? this.sort * ((preImportance[a] || 0) - (preImportance[b] || 0)) : 0
+            }).map((h, i) => {
               const data = { ...dataViews, ...newVariableViews }[h] || {}
               const map = targetMap || {};
               const isNew = newVariable.includes(h)
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} mapHeader={newMapHeader}
+              const importance = preImportance ? (preImportance[h] || 0) : 0.01;
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} mapHeader={newMapHeader} importance={importance}
                 handleWeight={this.handleWeight(h)} colType={variableType} project={project}
                 isChecked={checkedVariables.includes(h)}
                 handleCheck={this.handleCheck.bind(null, h)}
-                lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} isNew={isNew}/>
+                lines={Math.min(Math.floor(totalLines * 0.95), 1000)} id={id} isNew={isNew} />
             })}
           </div>}
       </div>
-      {(dataViewsLoading) &&
+      {(dataViewsLoading || preImportanceLoading) &&
         <ProcessLoading progress={dataViewsLoading ? (dataViewProgress / 2) : (importanceProgress / 2 + 50)}
           style={{ bottom: '0.25em' }} />}
     </div>
@@ -256,12 +272,12 @@ class SimplifiedViewRow extends Component {
 
   showHistograms = () => {
     const { value, project, isNew } = this.props;
-    const {histgramPlots} = project;
+    const { histgramPlots } = project;
     if (isNew) {
       // const newUrl = histgramPlots[value]
       this.histograms = true
       // newUrl do something
-      return ;
+      return;
     }
     // this.histograms = true
     if (!this.chartData[value]) {
@@ -310,8 +326,8 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew, mapHeader } = this.props;
-    const { histgramPlots, histgramPlot } = project
+    const { data, colType, weight, value, project, isChecked, handleCheck, id, lines, handleWeight, isNew, mapHeader, importance } = this.props;
+    const { histgramPlots, histgramPlot, problemType } = project
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues
@@ -325,21 +341,26 @@ class SimplifiedViewRow extends Component {
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })}
-           id={'Histograms' + value}
-           onClick={this.showHistograms.bind(this, value)}>
+        id={'Histograms' + value}
+        onClick={this.showHistograms.bind(this, value)}>
         <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
         {(!isRaw && this.histograms) ? <Popover placement='rightTop'
-                                                visible={!isRaw && this.histograms}
-                                                overlayClassName='popovers'
-                                                onVisibleChange={this.hideHistograms}
-                                                trigger="click"
-                                                content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
-                                                  <SimplifiedViewPlot onClose={this.hide}
-                                                                      type={colType[value]}
-                                                                      value={mapHeader[value]}
-                                                                      data={this.chartData[value]} />
-                                                </SimplePlot>} /> : null}
+          visible={!isRaw && this.histograms}
+          overlayClassName='popovers'
+          onVisibleChange={this.hideHistograms}
+          trigger="click"
+          content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
+            <SimplifiedViewPlot onClose={this.hide}
+              type={colType[value]}
+              value={mapHeader[value]}
+              data={this.chartData[value]} />
+          </SimplePlot>} /> : null}
       </div>
+      {problemType === 'Clustering' && <div className={classnames(styles.tableTd, styles.tableImportance)}>
+        <div className={styles.preImpotance}>
+          <div className={styles.preImpotanceActive} style={{ width: (importance * 100) + '%' }} />
+        </div>
+      </div>}
       <div className={styles.tableTd} title={valueType}>
         <span>{valueType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
       <div className={classnames(styles.tableTd, {
@@ -387,24 +408,24 @@ class SimplePlot extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.path!==this.props.path){
+    if (nextProps.path !== this.props.path) {
       this.getData(nextProps)
     }
   }
 
-  getData(props=this.props){
-    const { getPath, path, isNew } =props;
+  getData(props = this.props) {
+    const { getPath, path, isNew } = props;
     if (isNew && !path) getPath();
-    if(!isNew){
+    if (!isNew) {
       return this.visible = true;
     }
-    if (isNew && path){
+    if (isNew && path) {
       request.post({
         url: '/graphics/new',
         data: {
-          url:path,
+          url: path,
         }
-      }).then((res)=>{
+      }).then((res) => {
         this.result = res;
         this.visible = true;
       })

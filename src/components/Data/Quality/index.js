@@ -85,10 +85,13 @@ class TargetIssue extends Component {
       outlier: outlierCount === 0 ? 0 : (outlierCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(outlierCount * 100 / (totalRawLines || 1), 2)
     }
     const warnings = []
-    const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
+    // const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
+    const unique = targetArrayTemp.length || rawDataView[target].uniqueValues
+    const hasNull = !targetArrayTemp.length ? !!nullCount : false
     if (problemType === 'Classification') {
-      if (unique < 2) warnings.push(EN.Yourtargetvariablehaslessthantwouniquevalues)
-      if (unique === 2) {
+      if (hasNull) warnings.push(`${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`)
+      if (unique < 2 && !hasNull) warnings.push(`${EN.YourtargetvariableHas}${EN.onlyOnevalue}`)
+      if (unique === 2 && !hasNull) {
         const min = Math.min(...Object.values(targetCounts))
         if (min < 3) warnings.push(EN.Itisrecommendedthatyou)
       }

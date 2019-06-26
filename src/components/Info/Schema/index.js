@@ -3,17 +3,18 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
-import { Checkbox } from 'antd'
+import { Checkbox, Icon } from 'antd'
 import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confirm } from 'components/Common';
 import EN from '../../../constant/en';
 
 @inject('projectStore')
 @observer
 export default class DataSchema extends Component {
-  @observable checkList = this.props.projectStore.project.rawHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
+  @observable checkList = this.props.projectStore.project.rawHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r) && r !== this.props.projectStore.project.target)
   @observable showSelect = false
   @observable dataType = { ...this.props.projectStore.project.colType }
   @observable visiable = false
+  @observable target = this.props.projectStore.project.target
 
   constructor(props) {
     super(props)
@@ -23,8 +24,9 @@ export default class DataSchema extends Component {
   doEtl = () => {
     const { project } = this.props.projectStore
     const { rawHeader } = project;
-    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
     const data = {
+      target: this.target,
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
     }
@@ -56,6 +58,15 @@ export default class DataSchema extends Component {
     this.tableRef.current.updateGrids()
   }
 
+  targetSelect = (value) => {
+    // const { colType } = this.props.projectStore.project
+    // this.props.projectStore.project.setProperty({ target: value })
+    this.target = value
+    this.tableRef.current.updateGrids()
+    // this.props.projectStore.project.updateProject(data).then(() => this.tableRef.current.updateGrids())
+    this.checkList = [...this.checkList.filter(v => v !== value)]
+  }
+
   select = (key, e) => {
     const v = e.target.value
     this.dataType[key] = v
@@ -76,16 +87,21 @@ export default class DataSchema extends Component {
   }
 
   formatTable = () => {
-    const { uploadData, rawHeader, mapHeader, etling, headerTemp: {temp} } = this.props.projectStore.project;
+    const { target } = this
+    const { uploadData, rawHeader, renameVariable, etling, mapHeader, headerTemp: { temp } } = this.props.projectStore.project;
     if (etling) return []
     const { showSelect, checkList } = this
     if (!uploadData.length) return []
     // return []
     // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
     // const { checkList, showSelect } = this.state;
-    const headerList = rawHeader
+    const headerList = target ? [target, ...rawHeader.filter(v => v !== target)] : rawHeader
+    const targetIndex = target ? rawHeader.indexOf(target) : -1
     // const notShowIndex = sortHeader.filter(v => !sortHeader.includes(v)).map(v => sortHeader.indexOf(v))
-    const data = uploadData
+    const data = targetIndex > -1 ? uploadData.map(row => {
+      const value = row[targetIndex]
+      return [value, ...row.slice(0, targetIndex), ...row.slice(targetIndex + 1)]
+    }) : uploadData
     // if(!sortData.length) return []
     /**
      * 根据showSelect, indexPosition变化
@@ -121,6 +137,10 @@ export default class DataSchema extends Component {
           checkData.content = "";
         } else {
           checkData.content = <Checkbox onChange={this.checked.bind(null, header)} checked={true}></Checkbox>
+          if (target && target === header) {
+            checkData.cn = classnames(styles.check, styles.target);
+            checkData.content = "";
+          }
           if (checkList.includes(header)) {
             checkData.cn = classnames(styles.check, styles.checked);
             checkData.content = <Checkbox onChange={this.checked.bind(null, header)} checked={false}></Checkbox>
@@ -135,19 +155,22 @@ export default class DataSchema extends Component {
         cn: styles.titleCell
       }
       if (i === index.columnHeader - 1) {
-        headerData.content = <HeaderInfo row='Header' col='Row' style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
+        headerData.content = <HeaderInfo row={EN.Header} col={EN.Row} style={{ margin: '-3px -.1em 0', height: '34px', width: '110px' }} rotate={15.739} />
         headerData.title = '';
       } else {
         const headerText = mapHeader[header]
         headerData.content = <EditHeader value={headerText} key={i - index.columnHeader} />
         headerData.title = headerText;
+        if (target && target === header) {
+          headerData.cn = classnames(headerData.cn, styles.target);
+        }
         if (checkList.includes(header)) {
           headerData.cn = classnames(headerData.cn, styles.checked);
         }
         if (!headerText) {
           headerData.cn = classnames(headerData.cn, styles.missed);
         }
-        if (headerText && temp[headerText].length > 1) {
+        if (headerText && temp[headerText] && temp[headerText].length > 1) {
           headerData.cn = classnames(headerData.cn, styles.duplicated);
         }
       }
@@ -162,10 +185,10 @@ export default class DataSchema extends Component {
         selectData.content = "";
       } else {
         let key = header;
-        // if (!header) {
+        // if (!headerText) {
         //   key = `Unnamed: ${realColumn}`
         // }
-        // if (header && temp[header].length > 1) {
+        // if (header && temp[header] && temp[header].length > 1) {
         //   const tempIndex = temp[header].findIndex(c => c === realColumn);
         //   const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
         //   key = header + suffix
@@ -178,6 +201,10 @@ export default class DataSchema extends Component {
           <option value="Numerical">{EN.Numerical}</option>
         </select>
         selectData.title = { Numerical: EN.Numerical, Categorical: EN.Categorical, Raw: EN.Categorical + '(Raw)' }[colValue]
+        if (target && target === key) {
+          selectData.cn = classnames(styles.cell, styles.target);
+          selectData.content = <span>{{ Numerical: EN.Numerical, Categorical: EN.Categorical, Raw: EN.Categorical + '(Raw)' }[colValue]}</span>
+        }
 
       }
       selectArr.push(selectData)
@@ -200,6 +227,11 @@ export default class DataSchema extends Component {
           cn: styles.cell
         }
         // const cellValue = data[rowIndex][realColumn]
+        if (target && target === header) {
+          itemData.cn = classnames(itemData.cn, styles.target);
+          itemData.content = <span>{renameVariable[v] || v}</span>;
+          itemData.title = renameVariable[v] || v;
+        }
         if (checkList.includes(header)) {
           itemData.cn = classnames(itemData.cn, styles.checked);
         }
@@ -212,9 +244,16 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { etling, etlProgress, rawHeader, noComputeTemp, headerTemp: { isMissed, isDuplicated } } = project;
+    const { mapHeader, etling, etlProgress, rawHeader, noComputeTemp, headerTemp: { isMissed, isDuplicated } } = project;
     const tableData = this.formatTable()
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
+
+    //target选择列表
+    const targetOption = rawHeader.reduce((prev, h) => {
+      h = h.trim()
+      if (this.dataType[h] === "Categorical") prev[h] = mapHeader[h]
+      return prev
+    }, {});
 
     return project && <div className={styles.schema}>
       <div className={styles.schemaInfo}>
@@ -226,6 +265,19 @@ export default class DataSchema extends Component {
       </div>
       <div className={styles.schemaContent} id='schemaContent'>
         <div className={styles.schemaTools}>
+          <Select
+            title={EN.TargetVariable}
+            dropdownClassName={"targetSelect"}
+            autoWidth={"1.6em"}
+            options={targetOption}
+            onChange={this.targetSelect}
+            value={this.target}
+            disabled={isMissed || isDuplicated}
+            selectOption={{ showSearch: true, allowClear: !!this.target, clearIcon: <Icon type='close' /> }}
+            getPopupContainer={() => document.getElementById('schemaContent')}
+          />
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
+          }</div>} />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
               <span>{EN.UnselectUndesirableVariables}</span>
