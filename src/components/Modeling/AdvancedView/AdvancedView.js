@@ -738,7 +738,7 @@ class ClassificationModelRow extends Component {
               case 'LogLoss':
                 return <RowCell key={5} data={(isHoldout ? holdoutChartData : chartData).roc.LOGLOSS[fitIndex]} />;
               case 'Cutoff Threshold':
-                return <RowCell key={6} data={(isHoldout ? holdoutChartData : chartData).roc.Threshold[fitIndex]} />;
+                return <RowCell key={6} data={chartData.roc.Threshold[fitIndex]} />;
               case 'KS':
                 return <RowCell key={7} data={(isHoldout ? holdoutChartData : chartData).roc.KS[fitIndex]} />;
               case EN.Validation:
