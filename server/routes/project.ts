@@ -688,34 +688,40 @@ wss.register('queryProject', (message, socket) => {
   });
 });
 
-wss.register('queryModelList', message => {
+wss.register('queryModelList', (message, socket, process) => {
   const { id } = message;
   const key = `project:${id}:models`;
 
   return redis.smembers(key).then(ids => {
-    const pipeline = redis.pipeline();
-    ids.forEach(modelId => {
-      pipeline.hgetall(`project:${id}:model:${modelId}`);
-    });
-    return pipeline.exec().then(list => {
-      const error = list.find(i => !!i[0]);
-      if (error) return { status: 413, message: 'query models error', error };
-      const result = list.map(item => {
-        let data = item[1];
-        for (let key in data) {
-          try {
-            data[key] = JSON.parse(data[key]);
-          } catch (e) { }
-        }
-        return data;
-      });
+    let promise: Promise<void> = Promise.resolve()
 
-      return {
-        status: 200,
-        message: 'ok',
-        list: result,
-      };
+    ids.forEach(modelId => {
+      const curPromise: Promise<void> = new Promise(async resolve => {
+        try {
+          const result = await redis.hgetall(`project:${id}:model:${modelId}`)
+          const model = Object.entries(result).reduce((prev: {}, [key, value]: [string, string]) => {
+            prev[key] = JSON.parse(value);
+            return prev
+          }, {})
+          process({
+            status: 200,
+            message: 'ok',
+            model,
+          })
+        } catch (e) {
+          process({
+            status: 417,
+            message: `init model ${modelId} failed`
+          })
+        }
+        resolve()
+      })
+      promise = promise.then(() => curPromise)
     });
+    return promise.then(() => ({
+      status: 200,
+      message: 'ok'
+    }))
   });
 });
 
