@@ -20,32 +20,33 @@ const errorTip = message.error;
 @observer
 export default class Sider extends Component {
   state = {
-    labUrl: '',
+    // labUrl: '',
     logoUrl:'',
-    dashUrl:''
+    // dashUrl:''
   };
 
    componentDidMount() {
-    axios.get('/jupyterLabUrl')
-      .then(({ data }) => this.setState({ labUrl: data }))
-      .catch(({ response: { data } }) => errorTip(data))
+    // axios.get('/jupyterLabUrl')
+    //   .then(({ data }) => this.setState({ labUrl: data }))
+    //   .catch(({ response: { data } }) => errorTip(data))
 
-    axios.get('/dashboardUrl')
-      .then(({ data }) => this.setState({ dashUrl: data }))
-      .catch(({ response: { data } }) => errorTip(data))
+    // axios.get('/dashboardUrl')
+    //   .then(({ data }) => this.setState({ dashUrl: data }))
+    //   .catch(({ response: { data } }) => errorTip(data))
     axios.get('/image/logo')
       .then(({data}) => this.setState({logoUrl:data}))
   }
 
   render() {
-    const { labUrl, dashUrl,logoUrl } = this.state;
+    const { logoUrl } = this.state;
     const { userStore={}, routing } = this.props;
+    const { labUrl, dashUrl,info={}} = userStore;
     const isLogin = userStore.status === 'login';
     // const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/lab';
     const isDeploy = routing.location.pathname.includes('deploy');
     const isSupport = routing.location.pathname.includes('support');
     
-    const {support=true,JupyterLab=true,project=true} = userStore.info.role||{};
+    const {support=true,JupyterLab=true,project=true,Dashboard=true} = info.role||{};
   
     return (
       <aside className={styles.sider}>
@@ -78,18 +79,20 @@ export default class Sider extends Component {
             })}>{EN.Support}</h4>
         </a>
           <a className={styles.support}
-             style={{display:(JupyterLab?'':'none')}}
+             style={{display:(labUrl&&JupyterLab?'':'none')}}
              onClick={() => labUrl && window.open(labUrl, '_blank')}>
             <img alt="support" src={community} className={styles.community}/>
             <h4 className={styles.nav}>JupyterLab</h4>
           </a>
-          <a className={styles.support} onClick={() => dashUrl && window.open(dashUrl, '_blank')}>
+          <a className={styles.support}
+             style={{display:(dashUrl&&Dashboard?'':'none')}}
+             onClick={() => dashUrl && window.open(dashUrl, '_blank')}>
             <Icon style={{ fontSize: '32px', color: '#2987a4', marginBottom: '5px' }} type="dashboard" />
             <h4 className={styles.nav}>Dashboard</h4>
           </a>
 
         </div>
-        <a className={styles.bottom} onClick={this.switchClick}>
+        <a className={styles.bottom} onClick={this.switchClick.bind(this,project)}>
           <img alt="switch" src={switchIcon} />
           {isDeploy || !isLogin ? (
             <h4 className={styles.nav}>
@@ -105,7 +108,10 @@ export default class Sider extends Component {
     );
   }
 
-  switchClick = () => {
+  switchClick = (project) => {
+     if(!project){
+       return;
+     }
     const { location, deploymentStore, userStore, routing } = this.props;
     const isDeploy = routing.location.pathname.includes('deploy');
     const userId = userStore.info.id;

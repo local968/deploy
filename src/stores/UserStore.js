@@ -19,6 +19,8 @@ class UserStore {
   @observable isWatchVideo = true;
   @observable isCheck = false;
   @observable planList = [];
+  @observable labUrl = '';
+  @observable dashUrl= '';
 
   @action change = (name) => (val) => {
     this[name] = val;
@@ -36,9 +38,16 @@ class UserStore {
       if (res.data.status === 200) {
         this.info = res.data.info;
         if(res.data.info.role.project === false){
-          console.log(12)
+         location.href = '/deploy'
         }
-        console.log(res.data.info.role.project);
+        if(res.data.info.role.JupyterLab !== false){
+          axios.get('/jupyterLabUrl')
+            .then(({ data }) => this.labUrl = data)
+        }
+        if(res.data.info.role.Dashboard !== false){
+          axios.get('/dashboardUrl')
+            .then(({ data }) => this.dashUrl = data)
+        }
         this.status = 'login'
       } else {
         this.status = 'unlogin'
