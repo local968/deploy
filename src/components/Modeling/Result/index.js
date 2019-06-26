@@ -28,7 +28,7 @@ export default class ModelResult extends Component {
     }
   }
   @observable metric = this.props.projectStore.project.measurement
-  @observable isHoldout = false
+  // @observable isHoldout = false
   @observable currentSettingId = 'all';
 
   changeView = view => {
@@ -53,8 +53,10 @@ export default class ModelResult extends Component {
   });
 
   handleHoldout = value => {
-    this.isHoldout = value
-  }
+    // this.isHoldout = value
+    // const {isHoldout} = this.props.projectStore.project;
+    this.props.projectStore.project.upIsHoldout(value);
+  };
 
   deploy = () => {
     const { project } = this.props.projectStore;
@@ -102,16 +104,16 @@ export default class ModelResult extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { models } = project
+    const { models,isHoldout } = project
     const { id, etlIndex, fileName, selectModel, target, loadModel, settings } = project
     if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
     if (!models.length) return null;
     // const { view } = this;
 
     const modelName = selectModel.modelName;
-    const cannotDownload = !this.isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
+    const cannotDownload = !isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
 
-    const type = this.isHoldout ? 'holdout' : 'validate'
+    const type = isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
     console.log(this.currentSettingId, 'this.currentSettingId')
     let filterModels = [...models]
@@ -143,7 +145,7 @@ export default class ModelResult extends Component {
                         exportReport={this.exportReport}
                         sort={this.sort.advanced}
                         handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange}
-                        isHoldout={this.isHoldout}
+                        isHoldout={isHoldout}
                         handleHoldout={this.handleHoldout}
                         currentSettingId={this.currentSettingId
                         } changeSetting={this.changeSetting} />}
@@ -158,10 +160,10 @@ export default class ModelResult extends Component {
             <span>{EN.DeployTheModel}</span>
           </button>
           {this.view === 'advanced' && (cannotDownload ? <button className={classnames(styles.button, styles.disabled)}>
-            <span>{`${EN.Exportmodelresults}(${this.isHoldout ? EN.Holdout : EN.Validation})`}</span>
+            <span>{`${EN.Exportmodelresults}(${isHoldout ? EN.Holdout : EN.Validation})`}</span>
           </button> : <a href={`/upload/download/result?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-${type}.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&type=${type}&target=${target}`} target='_blank'>
               <button className={styles.button}>
-                <span>{`${EN.Exportmodelresults}(${this.isHoldout ? EN.Holdout : EN.Validation})`}</span>
+                <span>{`${EN.Exportmodelresults}(${isHoldout ? EN.Holdout : EN.Validation})`}</span>
               </button>
             </a>)}
         </div>
