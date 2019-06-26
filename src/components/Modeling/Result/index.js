@@ -58,7 +58,7 @@ export default class ModelResult extends Component {
 
   deploy = () => {
     const { project } = this.props.projectStore;
-    const { selectModel: current } = project
+    const { selectModel: current } = project;
     // const { newVariable, trainHeader } = project
     // const newVariableLabel = newVariable.filter(v => !trainHeader.includes(v))
     // const variables = [...new Set(newVariableLabel.map(label => label.split("_")[1]))]
@@ -108,7 +108,7 @@ export default class ModelResult extends Component {
     if (!models.length) return null;
     // const { view } = this;
 
-    const modelName = selectModel.modelName
+    const modelName = selectModel.modelName;
     const cannotDownload = !this.isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
 
     const type = this.isHoldout ? 'holdout' : 'validate'
@@ -138,7 +138,15 @@ export default class ModelResult extends Component {
         </div> */}
         {this.view === 'simple' ?
           <SimpleView models={filterModels} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} currentSettingId={this.currentSettingId} /> :
-          <AdvancedView models={models} project={project} exportReport={this.exportReport} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} isHoldout={this.isHoldout} handleHoldout={this.handleHoldout} currentSettingId={this.currentSettingId} changeSetting={this.changeSetting} />}
+          <AdvancedView models={models}
+                        project={project}
+                        exportReport={this.exportReport}
+                        sort={this.sort.advanced}
+                        handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange}
+                        isHoldout={this.isHoldout}
+                        handleHoldout={this.handleHoldout}
+                        currentSettingId={this.currentSettingId
+                        } changeSetting={this.changeSetting} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
