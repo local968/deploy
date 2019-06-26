@@ -141,6 +141,9 @@ export default class AdvancedView extends Component {
 
   render() {
     const { project, hidden } = this.props;
+    const { algorithms, defaultAlgorithms } = project
+    const isAll = Algorithms[project.problemType].length === algorithms.length
+    const isDefault = algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
     const measurementList =
       project.problemType === "Outlier"
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
@@ -219,7 +222,8 @@ export default class AdvancedView extends Component {
                       id="number_auto"
                       type="radio"
                       name="numberselect"
-                      defaultChecked={project.kType === "auto"}
+                      checked={project.kType === "auto"}
+                      readOnly
                       onClick={this.handleMode("auto")}
                     />
                     <label htmlFor="number_auto">{EN.Auto}</label>
@@ -229,7 +233,8 @@ export default class AdvancedView extends Component {
                       id="number_custom"
                       type="radio"
                       name="numberselect"
-                      defaultChecked={project.kType === "no_more_than"}
+                      checked={project.kType === "no_more_than"}
+                      readOnly
                       onClick={this.handleMode("no_more_than")}
                     />
                     <label htmlFor="number_custom">{EN.NoMoreThan}</label>
@@ -258,7 +263,8 @@ export default class AdvancedView extends Component {
                     id="algorithmSelect1"
                     type="radio"
                     name="algorithmSelect"
-                    defaultChecked={project.algorithms.length}
+                    checked={isAll}
+                    readOnly
                     onClick={this.handleSelectAll.bind(null, true)}
                   />
                   <label htmlFor="algorithmSelect1">{EN.SelectAll}</label>
@@ -268,7 +274,8 @@ export default class AdvancedView extends Component {
                     id="algorithmSelect2"
                     type="radio"
                     name="algorithmSelect"
-                    defaultChecked={!project.algorithms.length}
+                    checked={!project.algorithms.length}
+                    readOnly
                     onClick={this.handleSelectAll.bind(null, false)}
                   />
                   <label htmlFor="algorithmSelect2">{EN.DeselectAll}</label>
@@ -278,7 +285,8 @@ export default class AdvancedView extends Component {
                     id="algorithmSelect2"
                     type="radio"
                     name="algorithmSelect"
-                    defaultChecked={!project.algorithms.length}
+                    checked={isDefault}
+                    readOnly
                     onClick={this.handleDefaultCheck}
                   />
                   <label htmlFor="algorithmSelect3">{EN.SelectDefault}</label>
