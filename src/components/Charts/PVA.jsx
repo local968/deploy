@@ -144,6 +144,8 @@ export default class PVA extends Component{
 			}
 		});
 		
+		max = Math.abs(max)>10e8?10e8:max;
+		
 		const ResidualRate = series[0].data.map((itm,index)=>{
 			const act = itm[1];
 			const pre = series[1].data[index][1];
@@ -203,6 +205,16 @@ export default class PVA extends Component{
 			yAxis: [{
 				name: y_name,
 				type: 'value',
+				axisLabel:{
+					formatter: (value)=>{
+						if(parseInt(value).length>10){
+							const p = Math.floor(Math.log(Math.abs(value)) / Math.LN10);
+							const n = value * Math.pow(10, -p);
+							return n.toFixed(3) + 'e' + p
+						}
+						return value;
+					}
+				}
 			},{
 				name: EN.ResidualPercent,
 				type: 'value'
