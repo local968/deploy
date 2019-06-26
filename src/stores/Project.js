@@ -1980,7 +1980,6 @@ export default class Project {
     // }, 60000)
     this.models = []
     socketStore.ready().then(api => api.queryModelList({ id: this.id }, progressResult => {
-      console.log(progressResult, "progressResult")
       const { status, message, model } = progressResult
       if (status !== 200) return antdMessage.error(message)
       this.setModel(model)
@@ -2181,9 +2180,7 @@ export default class Project {
         command: 'clustering.ssPlot',
         projectId: this.id
       }, prosss => {
-        console.log(prosss, 'clustering.ssPlot  prosss')
       }).then(returnValue => {
-        console.log(returnValue, "clustering.ssPlot returnValue")
         const { status, result } = returnValue
         if (status < 0) antdMessage.error(`${result['processError']}`)
       })
