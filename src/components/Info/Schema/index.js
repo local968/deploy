@@ -244,7 +244,7 @@ export default class DataSchema extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { mapHeader, etling, etlProgress, rawHeader, noComputeTemp, headerTemp: { isMissed, isDuplicated } } = project;
+    const { mapHeader, etling, etlProgress, rawHeader, noComputeTemp, headerTemp: { isMissed, isDuplicated }, problemType } = project;
     const tableData = this.formatTable()
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
 
@@ -276,8 +276,7 @@ export default class DataSchema extends Component {
             selectOption={{ showSearch: true, allowClear: !!this.target, clearIcon: <Icon type='close' /> }}
             getPopupContainer={() => document.getElementById('schemaContent')}
           />
-          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
-          }</div>} />
+          <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN[`${problemType}Target`]} />
           {(isMissed || isDuplicated) ?
             <div className={classnames(styles.schemaSelect, styles.disabled)}>
               <span>{EN.UnselectUndesirableVariables}</span>

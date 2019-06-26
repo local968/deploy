@@ -1286,6 +1286,8 @@ const EN_LAN = {
   ImportantValues: "Median Value of The Variable",
   adjustMutualInfo: 'Adjust Mutual Info',
   adjustRandScore: 'Adjust Rand Score',
+  ClusteringTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the clustering models. Otherwise, you can leave blank here.`,
+  OutlierTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the outlier detection models. Otherwise, you can leave blank here.`
 };
 
 
