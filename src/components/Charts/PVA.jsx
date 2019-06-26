@@ -105,7 +105,8 @@ export default class PVA extends Component{
 	}
 	
 	getOption() {
-		const {ready,chartDate,holdOutChartDate,isHoldout} = this.state;
+		const {ready,chartDate,holdOutChartDate} = this.state;
+		const {isHoldout} = this.props.projectStore.project;
 		const data = isHoldout?holdOutChartDate:chartDate;
 		const _data = _.cloneDeep(data);
 		if(!ready){
