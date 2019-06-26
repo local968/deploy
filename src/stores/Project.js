@@ -478,18 +478,18 @@ export default class Project {
   
   @action
   upIsHoldout(isHoldout) {
-    if(this.problemType === "Classification"){
-      const {chartData,holdoutChartData,fitIndex} = this.selectModel;
-      const {roc:{Threshold:data}} = !isHoldout?holdoutChartData:chartData;
-      const {roc:{Threshold:nextData}} = isHoldout?holdoutChartData:chartData;
-      
-      const od = data[fitIndex];
-  
-      const nextValue = Object.values(nextData).sort((a,b)=>Math.abs(a-od)-Math.abs(b-od))[0];
-      
-      const newFitIndex = Object.entries(nextData).filter(itm=>itm[1] === nextValue)[0][0];
-      this.selectModel.fitIndex = +newFitIndex;
-    }
+    // if(this.problemType === "Classification"){
+    //   const {chartData,holdoutChartData,fitIndex} = this.selectModel;
+    //   const {roc:{Threshold:data}} = !isHoldout?holdoutChartData:chartData;
+    //   const {roc:{Threshold:nextData}} = isHoldout?holdoutChartData:chartData;
+    //
+    //   const od = data[fitIndex];
+    //
+    //   const nextValue = Object.values(nextData).sort((a,b)=>Math.abs(a-od)-Math.abs(b-od))[0];
+    //
+    //   const newFitIndex = Object.entries(nextData).filter(itm=>itm[1] === nextValue)[0][0];
+    //   this.selectModel.fitIndex = +newFitIndex;
+    // }
     this.isHoldout = isHoldout;
   };
 

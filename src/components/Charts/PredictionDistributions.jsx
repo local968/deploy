@@ -10,7 +10,8 @@ export default function PredictionDistributions(props){
 	const {initialFitIndex,fitIndex,chartData,holdoutChartData} = model;
 	const {density,roc} = isHoldout?holdoutChartData:chartData;
 	const {POSITIVE,NEGATIVE,PERCENTAGE} = density;
-	const {Threshold} = roc;
+	// const {Threshold} = roc;
+	const {Threshold} = chartData.roc;
 	const _POSITIVE = Object.values(POSITIVE);
 	const _NEGATIVE = Object.values(NEGATIVE);
 	const _PERCENTAGE = Object.values(PERCENTAGE);
