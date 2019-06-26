@@ -247,7 +247,7 @@ function Expressions(props: ExpressionsProps) {
                   key={k}
                   onClick={selectItem(item)}
                 >
-                  {item.value}
+                  {item.name}
                 </MenuItem>
               })}
           </MenuList>
