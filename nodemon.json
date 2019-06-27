@@ -1,0 +1,6 @@
+{
+  "watch": ["server"],
+  "ext": "ts",
+  "ignore": ["src"],
+  "exec": "node --inspect=8081 ./server/index.js"
+}

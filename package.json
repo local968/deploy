@@ -47,6 +47,7 @@
     "build-local": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
+    "nodemon": "nodemon",
     "docker:build": "docker build -t harbor-dev.r2ai.com.cn/next-test/next-deploy2:latest . && docker push harbor-dev.r2ai.com.cn/next-test/next-deploy2:latest"
   },
   "devDependencies": {
@@ -81,6 +82,7 @@
     "mobx-react": "^6.0.0-rc.4",
     "mobx-react-devtools": "^5.0.1",
     "mobx-react-router": "^4.0.5",
+    "nodemon": "^1.19.1",
     "prettier": "^1.18.2",
     "rc-slider": "latest",
     "react": "^16.8.6",
