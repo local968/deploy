@@ -20,7 +20,7 @@ export interface SummaryProps {
 }
 
 function Summary(props: SummaryProps) {
-  const classes = useStyles();
+  const classes = useStyles({});
   const {detailKey} = props;
   const current: Detail | undefined =
     details.find(d => d.name === detailKey);

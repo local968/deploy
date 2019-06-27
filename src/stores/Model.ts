@@ -2,11 +2,16 @@ import { observable, action, computed } from 'mobx';
 import socketStore from "./SocketStore";
 import config from 'config'
 import { debounce } from 'lodash'
-import { formatNumber } from 'util'
+import { formatNumber } from '../../src/util'
 import EN from '../../src/constant/en'
-import Axios from 'axios';
 
-export default class Model {
+class Model {
+  projectId
+  _id
+  id
+  initialFitIndex
+  dataFlow
+  graphicList
   @observable score;
   @observable backend;
   @observable featureImportance;
@@ -35,10 +40,10 @@ export default class Model {
   @observable rate = 0
   @observable pcaPlotData = ''
   @observable featureLabel = []
-  @observable holdoutChartData = {};
+  @observable holdoutChartData;
   // @observable featureImportanceDetail = {}
 
-  constructor(projectId, model, modelName) {
+  constructor(projectId: string, model: unknown, modelName?: string) {
     this.projectId = projectId;
     this._id = modelName;
     Object.assign(this, model);
@@ -316,3 +321,5 @@ export default class Model {
     }));
   }
 }
+
+export default Model

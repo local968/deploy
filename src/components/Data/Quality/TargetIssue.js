@@ -243,28 +243,28 @@ export class RowIssue extends Component {
 @observer
 export class DataIssue extends Component {
   render() {
-    const { backToConnect, editFixes, targetIssues, totalLines, percent, totalRawLines } = this.props;
+    const { backToConnect, editFixes, targetIssuesCountsOrigin, totalLines, percent, totalRawLines } = this.props;
 
     return <div className={styles.block}>
       <div className={styles.name}><span>{EN.Dataissuesarefound}</span></div>
       <div className={styles.desc}>
         <div className={styles.info}>
           <div className={styles.progressBox}>
-            {!!targetIssues.nullRow && <div className={styles.issueBlock}>
+            {!!targetIssuesCountsOrigin.nullRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>{EN.MissingValueS}({targetIssues.nullRow} {EN.Rows}) {formatNumber(percent.missing, 2)}%</span></div>
+                <div className={styles.issueRow}><span>{EN.MissingValueS}({targetIssuesCountsOrigin.nullRow} {EN.Rows}) {formatNumber(percent.missing, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.missing)} style={{ width: ((typeof percent.missing === 'number') ? percent.missing : 1) + "%" }}></div>
               </div>
             </div>}
-            {!!targetIssues.mismatchRow && <div className={styles.issueBlock}>
+            {!!targetIssuesCountsOrigin.mismatchRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>{EN.mismatch}({targetIssues.mismatchRow} {EN.Rows}) {formatNumber(percent.mismatch, 2)}%</span></div>
+                <div className={styles.issueRow}><span>{EN.mismatch}({targetIssuesCountsOrigin.mismatchRow} {EN.Rows}) {formatNumber(percent.mismatch, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.mismatch)} style={{ width: ((typeof percent.mismatch === 'number') ? percent.mismatch : 1) + "%" }}></div>
               </div>
             </div>}
-            {!!targetIssues.outlierRow && <div className={styles.issueBlock}>
+            {!!targetIssuesCountsOrigin.outlierRow && <div className={styles.issueBlock}>
               <div className={styles.left}>
-                <div className={styles.issueRow}><span>{EN.outlierRow} ({targetIssues.outlierRow} {EN.Rows}) {formatNumber(percent.outlier, 2)}%</span></div>
+                <div className={styles.issueRow}><span>{EN.outlierRow} ({targetIssuesCountsOrigin.outlierRow} {EN.Rows}) {formatNumber(percent.outlier, 2)}%</span></div>
                 <div className={classnames(styles.progress, styles.outlier)} style={{ width: ((typeof percent.outlier === 'number') ? percent.outlier : 1) + "%" }}></div>
               </div>
             </div>}

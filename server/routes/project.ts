@@ -854,30 +854,6 @@ wss.register('etl', (message, socket, progress) => {
   });
 });
 
-wss.register('abortEtl', (message, socket) => {
-  const projectId = message.projectId;
-  const userId = socket.session.userId;
-  return redis.hget('project:' + projectId, 'stopId').then(stopId => {
-    try {
-      stopId = JSON.parse(stopId);
-    } catch (e) { }
-    if (!stopId) return { status: 200, message: 'ok' };
-    return command(
-      { ...message, userId, requestId: message._id, stopId },
-      null,
-      true,
-    ).then(() => {
-      command.clearListener(stopId);
-      const statusData = {
-        etling: false,
-        etlProgress: 0,
-        stopId: '',
-      };
-      return createOrUpdate(projectId, userId, statusData);
-    });
-  });
-});
-
 wss.register('dataView', (message, socket, progress) => {
   return createOrUpdate(message.projectId, socket.session.userId, {
     dataViewsLoading: true,

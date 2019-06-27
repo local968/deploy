@@ -29,7 +29,7 @@ interface VariablesState {
 
 function Variables(props: VariablesProps) {
   const {handleClick, variables} = props;
-  const classes = useStyles()
+  const classes = useStyles({})
   const [state, setState] = React.useState({filterStr: ''});
   const inputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setState({

@@ -37,7 +37,7 @@ export interface FunctionProps {
 
 
 function Function(props: FunctionProps) {
-  const classes = useStyles();
+  const classes = useStyles({});
   const { onClick, onMouseOver, functions } = props;
   const initState: any = { filterStr: '', base: true, senior: true };
   const [state, setState] = React.useState(initState as any);

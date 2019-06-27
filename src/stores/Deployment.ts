@@ -87,7 +87,7 @@ export default class Deploy {
 
   save = () => {
     return new Promise((resolve, reject) => {
-      socketStore.ready().then(api => {
+      socketStore.ready().then((api: any) => {
         api.updateDeployment({
           data: {
             id: this.id,
@@ -124,14 +124,14 @@ export default class Deploy {
     });
 
   getModelInfo = action(async () => {
-    const api = await socketStore.ready()
+    const api: any = await socketStore.ready()
     const { modelList } = await api.getAllModels({ projectId: this.projectId, modelType: this.modelType })
     this.modelList = modelList
   })
 
   findModel = (modelName) => {
     let result
-    this.modelList && Object.entries(this.modelList).forEach(([settingName, models]) => {
+    this.modelList && Object.entries(this.modelList).forEach(([settingName, models]: [any, any]) => {
       if (result) return
       models.forEach(model => {
         if (result || !model) return
@@ -148,7 +148,7 @@ export default class Deploy {
   }
 
   getDeploymentToken = async () => {
-    const api = await socketStore.ready()
+    const api: any = await socketStore.ready()
     const result = await api.getDeploymentToken({ deploymentId: this.id, projectId: this.projectId })
     return result.token
   }
