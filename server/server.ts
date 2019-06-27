@@ -1,3 +1,4 @@
+import 'bluebird';
 import events from 'events';
 import './log';
 import { server, sessionParser } from './http';
