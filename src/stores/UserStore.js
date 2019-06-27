@@ -33,12 +33,17 @@ class UserStore {
       this.status = 'unlogin';
       return
     }
-
+    this.getStatus();
+   
+    when(() => this.status === 'login', socketStore.connect.bind(socketStore))
+  }
+  
+  getStatus(){
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info;
         if(res.data.info.role.project === false&&location.pathname==='/'){
-         location.href = '/deploy'
+          location.href = '/deploy'
         }
         if(res.data.info.role.JupyterLab !== false){
           axios.get('/jupyterLabUrl')
@@ -53,16 +58,16 @@ class UserStore {
         this.status = 'unlogin'
       }
     }));
-    when(() => this.status === 'login', socketStore.connect.bind(socketStore))
   }
 
   login(params , props) {
     axios.post(`http://${config.host}:${config.port}/user/login`, params).then(action(res => {
       if (res.data.status === 200) {
-        this.info = res.data.info
-        this.status = 'login'
+        this.info = res.data.info;
+        this.status = 'login';
         props && props.history.push({pathname: '/support',state: { key
-              : 'loginTo' }})
+              : 'loginTo' }});
+        this.getStatus();
       } else {
         alert(res.data.message || 'Login failure')
       }
@@ -73,8 +78,8 @@ class UserStore {
     axios.post(`http://${config.host}:${config.port}/user/register`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info;
-        this.status = 'login'
-        this.constructor();
+        this.status = 'login';
+        this.getStatus();
       } else {
         alert(res.data.message)
       }
