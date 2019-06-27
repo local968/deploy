@@ -3,15 +3,17 @@ import styles from "./styles.module.css";
 import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
-import { NumberInput, Range, Hint } from "components/Common";
+import { NumberInput, Hint } from "components/Common";
 import { Select, message, Tooltip, Popover } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
 import InputNumber from "antd/es/input-number";
 import EN from '../../../constant/en';
-import SSPlot from "../../Charts/SSPlot";
 import Button from "@material-ui/core/Button";
-const Option = Select.Option;
+const {Option} = Select;
+import {
+  SSPlot
+} from "../../Charts"
 
 @observer
 export default class AdvancedView extends Component {

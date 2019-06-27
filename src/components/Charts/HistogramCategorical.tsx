@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
+import _ from 'lodash';
 
 /**
  * Histogram-Categorical
@@ -15,15 +16,15 @@ export default function HistogramCategorical(props){
     height = 330,
     width = 500,
   } = props;
-  
+
   const max = Math.max(...data.map(itm=>itm[1]));
-  
+
   const nameTextStyle = {
     color:'#000',
   };
-  
+
   const fontSize = 15;
-  
+
   title = _.chunk([...title],35).map(itm=>itm.join('')).join('\n');
   const option = {
     title: {

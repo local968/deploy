@@ -6,20 +6,21 @@ import config from 'config'
 const {isEN} = config;
 
 export default class PCS extends PureComponent{
+	private chart: any;
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
 	}
-	
+
 	componentDidMount() {
 		const chart = this.chart.getEchartsInstance();
 		chart.showLoading();
 	}
-	
+
 	getOption() {
-		
-		const {data=[],x_name='',y_name='',fields} = this.props;
-		
+
+		const {data=[],x_name='',y_name='',fields} = this.props as any;
+
 		if(data.length){
 			const chart = this.chart.getEchartsInstance();
 			chart.hideLoading();
@@ -29,7 +30,7 @@ export default class PCS extends PureComponent{
 				yAxis:{},
 			}
 		}
-		
+
 		return {
 			xAxis: {
 				max:1,
@@ -102,7 +103,7 @@ export default class PCS extends PureComponent{
 			}]
 		};
 	}
-	
+
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}

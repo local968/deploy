@@ -9,7 +9,7 @@ import {toJS} from "mobx";
  */
 export default class UnivariantPlots extends PureComponent{
 	getOption() {
-		const {title='',x_name='',y_name='',result={}} = this.props;
+		const {title='',x_name='',y_name='',result={}} = this.props as any;
 
 		let {data=[],item=[]} = toJS(result);
 
@@ -27,11 +27,11 @@ export default class UnivariantPlots extends PureComponent{
 				},
 			}
 		});
-		
+
 		const nameTextStyle = {
 			color:'#000',
 		};
-		
+
 		return {
 			title : {
 				text: title,
@@ -72,7 +72,7 @@ export default class UnivariantPlots extends PureComponent{
 		const {
 			height = 330,
 			width = 400,
-		} = this.props;
+		} = this.props as any;
 
 		return <ReactEcharts
 			option={this.getOption()}

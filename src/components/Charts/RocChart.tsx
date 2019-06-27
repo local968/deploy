@@ -5,11 +5,11 @@ import config from 'config'
 
 const isEN = config.isEN;
 
-export default function RocChart2(props){
+export default function RocChart(props){
 	const {models,x_name,y_name,height=400,width=950,mom,x,y,formatter=false,selectAll=true} = props;
-	
+
 	const selected = {};
-	
+
 	const data = models.map(itm=>{
 		const mother = itm.chartData[mom];
 		const _x = Object.values(mother[x]);
@@ -31,7 +31,7 @@ export default function RocChart2(props){
 			smooth:false,
 		}
 	});
-	
+
 	const nameTextStyle = {
 		color:'#000',
 	};

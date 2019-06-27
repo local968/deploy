@@ -19,11 +19,11 @@ import PRCharts from "../../Charts/PRCharts";
 import SingleLiftCharts from "../../Charts/SingleLiftCharts";
 import VariableImpact from "../../Modeling/Result/VariableImpact";
 import ModelProcess from "../../Modeling/AdvancedView/ModelProcess";
-import FitPlot2 from "../../Charts/FitPlot2";
+import FitPlot from "../../Charts/FitPlot";
 import ResidualPlot from "../../Charts/ResidualPlot";
 import SpeedvsAccuracys from "../../Charts/SpeedvsAccuracys";
-import LiftChart2 from "../../Charts/LiftChart2";
-import RocChart2 from "../../Charts/RocChart2";
+import LiftChart from "../../Charts/LiftChart";
+import RocChart from "../../Charts/RocChart";
 import { Hint } from 'components/Common';
 import Chart from "../../Charts/Chart";
 import config from 'config'
@@ -615,7 +615,7 @@ class RegressionDetailCurves extends Component {
         break;
       case EN.FitPlot:
         curComponent = <div className={styles.plot}>
-          {<FitPlot2
+          {<FitPlot
             title={EN.FitPlot}
             x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
@@ -1281,7 +1281,7 @@ class ModelComp extends Component {
               </TabPane>
               <TabPane tab={EN.LiftsCharts} key="3">
                 {/*<LiftChart className="liftComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
-                <LiftChart2
+                <LiftChart
                   models={models}
                   x_name={EN.percentage}
                   y_name={EN.lift}
@@ -1293,7 +1293,7 @@ class ModelComp extends Component {
               </TabPane>
               <TabPane tab={EN.ROCCurves} key="4">
                 {/*<RocChart className="rocComp" isFocus={false} compareChart={true} width={600} height={400} models={models} model={models[0]} />*/}
-                <RocChart2
+                <RocChart
                   models={models}
                   x_name={EN.FalsePositiveDate}
                   y_name={EN.TruePositiveRate}

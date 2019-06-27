@@ -13,12 +13,12 @@ export default function CorrelationMatrixs(props){
 	});
 
 	data = data.map((item)=> [item[1], item[0], item[2] || '-']);
-	
+
 	const len = Math.max(...type.map(itm=>itm.length),0);
 	const nameTextStyle = {
 		color:'#000',
 	};
-	
+
 	let series = {
 		type: 'heatmap',
 		data,
@@ -30,21 +30,17 @@ export default function CorrelationMatrixs(props){
 		},
 	};
 	if(!len){
+
 		series = {
 			type: 'tree',
-			
 			data: [{name:'N/A'}],
-			
-			left: '20%',
-			// right: '2%',
-			// top: '8%',
-			// bottom: '20%',
-			
+			// @ts-ignore
+			left: "20%",
 			symbol: 'emptyCircle',
 			symbolSize:1,
-			
+
 			orient: 'LR',
-			
+
 			label: {
 				normal: {
 					position: 'center',
@@ -54,7 +50,7 @@ export default function CorrelationMatrixs(props){
 					fontSize: 100
 				}
 			},
-			
+
 			leaves: {
 				label: {
 					normal: {

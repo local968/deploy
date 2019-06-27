@@ -11,6 +11,7 @@ import request from "../Request";
 import {toJS} from "mobx";
 
 export default class OutlierRange extends PureComponent{
+	private chart: any;
 	constructor(props){
 		super(props);
 		this.state = {
@@ -24,10 +25,10 @@ export default class OutlierRange extends PureComponent{
 	}
 
 	componentDidMount() {
-		const {title='',field,id,project} = this.props;
+		const {title='',field,id,project} = this.props as any;
 		const {rawDataView={}} = project;
-		let {min,max,low,high} = rawDataView[field]||{};
-		
+		let {min,max,low,high} = rawDataView[field] as any;
+
 		low = low.toFixed(2);
 		high = high.toFixed(2);
 
@@ -36,13 +37,13 @@ export default class OutlierRange extends PureComponent{
 			low = (+data[0]).toFixed(2);
 			high =(+data[1]).toFixed(2);
 		}
-		
+
 		let selectArea = [+low,+high];
 		const zoom=0.1*(max-min);
 		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
 		const interval = ((max-min)/bin).toFixed(2);
 		const chart = this.chart.getEchartsInstance();
-		
+
 		request.post({
 			url: '/graphics/outlier-range',
 			data: {
@@ -68,7 +69,7 @@ export default class OutlierRange extends PureComponent{
 					return
 				}
 				const area =  areas[0];
-				const {selectArea} = this.state;
+				const {selectArea} = this.state as any;
 				const [start,end] = selectArea;
 				const [_start,_end] = area.coordRange;
 				if(start!==_start||end!==_end){
@@ -86,8 +87,8 @@ export default class OutlierRange extends PureComponent{
 	}
 
 	setBrush(){
-		const {chart,selectArea} = this.state;
-		
+		const {chart,selectArea} = this.state as any;
+
 		chart.dispatchAction({
 			type: 'brush',
 			areas: [
@@ -101,21 +102,21 @@ export default class OutlierRange extends PureComponent{
 	}
 
 	getOption() {
-		const {ready,data,min,max} = this.state;
+		const {ready,data,min,max} = this.state as any;
 		if(!ready){
 			return {
 				xAxis:{},
 				yAxis:{},
 			}
 		}
-		
+
 		const _data = data.map(itm=>{
 			const _min = Math.max(itm[0],min);
 			const _max = Math.min(itm[1],max);
 			return [_min,_max,itm[2]]
 		});
-		
-		
+
+
 		function renderItem(params, api) {
 			const yValue = api.value(2);
 			const start = api.coord([api.value(0), yValue]);
@@ -204,18 +205,16 @@ export default class OutlierRange extends PureComponent{
 	}
 
 	reset(){
-		const {low,high} = this.state;
+		const {low,high} = this.state as any;
 		this.setState({
 			selectArea:[low,high],
 		},this.setBrush);
 	}
 
 	render(){
-		const {max,min,selectArea} = this.state;
+		const {max,min,selectArea} = this.state as any;
 		const [start,end] = selectArea;
-		const {closeEdit,saveEdit} = this.props;
-		// const _low = (parseInt(Math.max(min,start)*10*10)/100).toFixed(2);
-		// const _high = (parseInt(Math.min(max,end)*10*10)/100).toFixed(2);
+		const {closeEdit,saveEdit} = this.props as any;
 		const _low = Math.max(min,start).toFixed(2);
 		const _high = Math.min(max,end).toFixed(2);
 		return [
