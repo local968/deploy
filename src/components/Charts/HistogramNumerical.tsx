@@ -35,10 +35,10 @@ export default function HistogramNumerical(props){
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
-	        axisLabel:{
-	            interval:Math.floor((data.length/5)),
-	            formatter: (value)=>value.toFixed(2),
-	        },
+      axisLabel:{
+          interval:Math.floor((data.length/5)),
+          formatter: (value)=>value.toFixed(2),
+      },
 		},
 		yAxis: {
 			type: 'value',

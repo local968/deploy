@@ -19,15 +19,17 @@ import {
   TSENOne,
   BoxPlots,
   UnivariantPlots,
+  HS,
 } from "../../Charts"
 
 @observer
 export default class SimplifiedView extends Component {
-  @observable sort = -1
-  @observable showHistograms = false
-  @observable showCorrelation = false
-  @observable visible = false
+  @observable sort = -1;
+  @observable showHistograms = false;
+  @observable showCorrelation = false;
+  @observable visible = false;
   @observable chartData = {};
+  @observable result = {};
   @observable CorrelationMatrixData = {};
 
   componentDidMount() {
@@ -42,19 +44,20 @@ export default class SimplifiedView extends Component {
 
   show = () => {
     const { project = {} } = this.props;
-    const { target, colType, etlIndex } = project;
+    const { target, colType, etlIndex,stats } = project;
 
     if (!this.chartData[target]) {
       if (colType[target] === "Numerical") {
-        const { min, max } = project.dataViews[target];
+        const {max,min,std_deviation_bounds:{lower,upper}} = stats[target].originalStats;
+        const interval =( Math.max(upper,max)-Math.min(lower,min))/100;
         request.post({
           url: '/graphics/histogram-numerical',
           data: {
             field: target,
             id: etlIndex,
-            interval: (max - min) / 100
+            interval,
           },
-        }).then((result) => this.showback(target, result.data));
+        }).then((result) => this.showback(target, result.data,{min,max,interval}));
       } else {
         const { uniqueValues } = project.dataViews[target];
         request.post({
@@ -72,13 +75,17 @@ export default class SimplifiedView extends Component {
     this.showHistograms = true;
   };
 
-  showback = (target, result) => {
+  showback = (target, result,message) => {
     this.chartData = {
       ...this.chartData,
       [target]: result,
     };
+    this.result = {
+      ...this.result,
+      [target]: message,
+    };
     this.showHistograms = true;
-  }
+  };
 
   hide = e => {
     e && e.stopPropagation();
@@ -210,6 +217,7 @@ export default class SimplifiedView extends Component {
               content={<SimplifiedViewPlot onClose={this.hide}
                 type={colType[target]}
                 target={mapHeader[target]}
+                result={this.result[target]}
                 data={this.chartData[target]} />} />}
           </div>
           <div className={styles.targetCell}>
@@ -320,11 +328,12 @@ class SimplifiedViewRow extends Component {
   @observable histograms = false
   @observable univariant = false;
   @observable chartData = {};
+  @observable result = {};
   @observable scatterData = {};
 
   showHistograms = () => {
     const { value, project, isNew } = this.props;
-    const { histgramPlots } = project;
+    const { colType,etlIndex,stats } = project;
     if (isNew) {
       // const newUrl = histgramPlots[value]
       this.histograms = true
@@ -335,17 +344,17 @@ class SimplifiedViewRow extends Component {
     if (!this.chartData[value]) {
       const data = {
         field: value,
-        id: project.etlIndex,
+        id: etlIndex,
       };
-      if (project.colType[value] === "Numerical") {
-        const { min, max } = project.dataViews[value];
-        data.interval = (max - min) / 100;
+      if (colType[value] === "Numerical") {
+        const {max,min,std_deviation_bounds:{lower,upper}} = stats[value].originalStats;
+        data.interval =( Math.max(upper,max)-Math.min(lower,min))/100;
+  
         request.post({
           url: '/graphics/histogram-numerical',
           data,
-        }).then((result) => this.showback(result.data, value));
+        }).then((result) => this.showback(result.data, value,{min,max,interval:data.interval}));
       } else {
-        // console.log(project.dataViews[value])
         const { uniqueValues } = project.dataViews[value];
         data.size = uniqueValues > 8 ? 8 : uniqueValues;
         request.post({
@@ -358,10 +367,14 @@ class SimplifiedViewRow extends Component {
     }
 
   };
-  showback = (result, value) => {
+  showback = (result, value,message) => {
     this.chartData = {
       ...this.chartData,
       [value]: result,
+    };
+    this.result = {
+      ...this.result,
+      [value]: message,
     };
     this.histograms = true;
   };
@@ -528,9 +541,10 @@ class SimplifiedViewRow extends Component {
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
             getPath={histgramPlot.bind(null, value)}>
             <SimplifiedViewPlot onClose={this.hideHistograms}
-              type={colType[value]}
-              target={mapHeader[value]}
-              data={this.chartData[value]}
+                                type={colType[value]}
+                                target={mapHeader[value]}
+                                result={this.result[value]}
+                                data={this.chartData[value]}
             /></SimplePlot>} /> : null}
       </div>
       <div className={classnames(styles.tableTd, {
@@ -680,35 +694,29 @@ class CorrelationPlot extends Component {
   }
 }
 
-// @observer
-// class SimplifiedViewPlot extends Component {
-//   constructor(props) {
-//     super(props)
-//     if (!props.fetch) props.getPath()
-//   }
-//
-//   render() {
-//     const { onClose, path, type, id, style } = this.props;
-//     const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
-//     return <div className={styles.plot} style={style}>
-//       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-//       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
-//     </div>
-//   }
-// }
-
 class SimplifiedViewPlot extends Component {
 
   render() {
-    const { type, style, data, target } = this.props;
+    const { type, style, data, target,result } = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
-      return <div className={styles.plot} style={style}>
-        <HistogramNumerical
+      return <div className={styles.plot} style={{
+        width:600,
+        height:500,
+        flexDirection: 'column',
+      }}>
+        {/*<HistogramNumerical*/}
+        {/*  x_name={target}*/}
+        {/*  y_name={'count'}*/}
+        {/*  title={`Feature:${target}`}*/}
+        {/*  data={data}*/}
+        {/*/>*/}
+        <HS
           x_name={target}
           y_name={'count'}
           title={`Feature:${target}`}
           data={data}
+          result={result}
         />
       </div>
     }
@@ -719,6 +727,7 @@ class SimplifiedViewPlot extends Component {
         title={`Feature:${target}`}
         data={data}
       />
+     
     </div>
   }
 }
