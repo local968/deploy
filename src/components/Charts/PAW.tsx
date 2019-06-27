@@ -7,6 +7,7 @@ import TSEN from "./T-SEN";
 import EN from "../../constant/en";
 const {Option} = Select;
 import { Hint } from 'components/Common';
+import _ from 'lodash';
 
 export default function PAW(props){
 	const {url}  = props;
@@ -14,13 +15,13 @@ export default function PAW(props){
 	const [pcs,setPcs] = useState([0,1]);
 	const [pcsD,setPcsD] = useState([]);
 	const [tsenD,setTsenD] = useState([]);
-	
+
 	function setPcsData(data){
 		const xs = data[pcs[0]];
 		const ys = data[pcs[1]];
 		return _.zip(xs,ys);
 	}
-	
+
 	function setTsenData(pcaData=[],predicts=[]){
 		let data = [...new Set(predicts)].map(name=>({
 			name,
@@ -38,8 +39,9 @@ export default function PAW(props){
 		});
 		return data;
 	}
-	
-	useEffect(() => {
+
+	// @ts-ignore
+	useEffect( () => {
 		async function fetchData() {
 			const result = await request.post({
 				url: '/graphics/paw',
@@ -51,16 +53,17 @@ export default function PAW(props){
 			setPcsD(setPcsData(result.corrData));
 			setTsenD(setTsenData(result.pcaData,result.predicts))
 		}
-		fetchData();
+		return fetchData();
 	}, []);
-	
-	const {corrData=[],ve=[],pcaData=[],predicts,fields} = data;
-	
+
+	const {corrData=[],ve=[],pcaData=[],predicts,fields} = data as any;
+
 	useEffect(() => {
 		setPcsD(setPcsData(corrData));
 		setTsenD(setTsenData(pcaData,predicts));
 	}, pcs);
-	
+
+
 	return <section className={styles.pca}>
 		<div className={styles.table}>
 			{EN.VarianceExplained}
@@ -114,6 +117,8 @@ export default function PAW(props){
 			</div>
 			<dl>
 				<dt>
+					{/*
+					// @ts-ignore*/}
 					<PCS
 						 data={pcsD}
 					     x_name = {'PC'+(pcs[0]+1)}
@@ -122,6 +127,8 @@ export default function PAW(props){
 					/>
 				</dt>
 				<dd>
+					{/*
+					//@ts-ignore*/}
 					<TSEN
 						x_name = {'PC'+(pcs[0]+1)}
 						y_name = {'PC'+(pcs[1]+1)}

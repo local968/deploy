@@ -9,17 +9,17 @@ initEcharts(Echarts);
 export default class BoxPlots extends PureComponent{
 
 	getOption() {
-		const {value=[],title='',x_name='',y_name='',x_keys = []} = this.props;
+		const {value=[],title='',x_name='',y_name='',x_keys = []} = this.props as any;
 
 		const data = Echarts.dataTool.prepareBoxplotData(value);
 		const nameTextStyle = {
 			color:'#000',
 		};
-		
+
 		const {boxData,outliers} = data;
-		
+
 		const max = Math.max(Math.max(...boxData.map(itm=>Math.max(...itm))),Math.max(...outliers.map(itm=>Math.max(...itm))));
-		
+
 		return {
 			title: [
 				{
@@ -100,7 +100,7 @@ export default class BoxPlots extends PureComponent{
 		const {
 			height = 400,
 			width = 400,
-		} = this.props;
+		} = this.props as any;
 
 		return <ReactEcharts
 			option={this.getOption()}

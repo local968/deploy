@@ -7,21 +7,20 @@ const isEN = config.isEN;
 
 export default function PredictionDistributions(props){
 	const {x_name='',y_name='',width=500,height=400,model,isHoldout} = props;
-	const {initialFitIndex,fitIndex,chartData,holdoutChartData} = model;
-	const {density,roc} = isHoldout?holdoutChartData:chartData;
+	const {fitIndex,chartData,holdoutChartData} = model;
+	const {density} = isHoldout?holdoutChartData:chartData;
 	const {POSITIVE,NEGATIVE,PERCENTAGE} = density;
-	// const {Threshold} = roc;
 	const {Threshold} = chartData.roc;
 	const _POSITIVE = Object.values(POSITIVE);
 	const _NEGATIVE = Object.values(NEGATIVE);
 	const _PERCENTAGE = Object.values(PERCENTAGE);
 	const [point,setPoint] = useState(false);
-	
+
 	useEffect(()=>{
-		const s = +(Threshold[fitIndex].toFixed(3));
+		const s:any = +(Threshold[fitIndex].toFixed(3));
 		setPoint(s);
 	},[]);
-	
+
 	const data =  [{
 		name:'False',
 		value:_.zip(_PERCENTAGE,_NEGATIVE),
@@ -36,26 +35,26 @@ export default function PredictionDistributions(props){
 		data:itm.value,
 		symbol: 'circle',
 	}));
-	
+
 	const setf = _.debounce((value)=>{
 		if(point === value||!value){
 			return
 		}
-		
-		const t = Object.values(Threshold).sort((a,b)=>{
+
+		const t = Object.values(Threshold).sort((a:number,b:number)=>{
 			return Math.abs(a - value) - Math.abs(b - value)
 		})[0];
-		
+
 		setPoint(value);
-		
+
 		const ind = Object.values(Threshold).indexOf(t);
 			props.model.setFitIndex(ind)
 	},100);
-	
+
 	const nameTextStyle = {
 		color:'#000',
 	};
-	
+
 	let option;
 	if(point === false){
 		option = {
@@ -114,7 +113,7 @@ export default function PredictionDistributions(props){
 				formatter: function (params) {
 					const [data] = params;
 					let res = data.dataIndex;
-					
+
 					params.forEach(itm=>{
 						if(itm.axisValue  === itm.data[0]){
 							res += `

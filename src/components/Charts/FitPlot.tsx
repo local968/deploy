@@ -1,14 +1,19 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 import {concat} from 'lodash'
+import './echarts.config'
 
-export default function ResidualPlot(props){
+export default function FitPlot(props){
 	const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props;
-	const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
+	const data = chartDate.data.map(itm=>[itm[0],itm[1]]);
+	// @ts-ignore
 	const num = concat(...data);
 
 	const max = Math.max(...num);
 	const min = Math.min(...num);
+	const nameTextStyle = {
+		color:'#000',
+	};
 
 	const option =  {
 		title: {
@@ -16,21 +21,23 @@ export default function ResidualPlot(props){
 			x: 'center',
 			y: 0,
 		},
-		tooltip: {
-			formatter: '{c}',
-		},
 		grid:{
 			x:`${Math.floor(max+1)}`.length * 10 +20,
+		},
+		tooltip: {
+			formatter: '{c}',
 		},
 		xAxis: {
 			name:x_name,
 			axisLine:{show:false},
 			nameLocation:'middle',
 			nameGap:25,
+			nameTextStyle,
 		},
 		yAxis: {
 			name:y_name,
 			axisLine:{show:false},
+			nameTextStyle,
 		},
 		series: [
 			{
@@ -40,7 +47,7 @@ export default function ResidualPlot(props){
 			},
 			{
 				type:'line',
-				data:[[min-1,0],[max+1,0]],
+				data:[[min-1,min-1],[max+1,max+1]],
 				symbolSize: 0,
 			},
 		],

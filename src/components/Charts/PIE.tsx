@@ -2,7 +2,7 @@ import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 import EN from "../../constant/en";
 
-export default function Pie2(props){
+export default function PIE(props){
 		const {width=120,height=120,RowsWillBeFixed,RowsWillBeDeleted,CleanData} = props;
 		const option = {
 			tooltip : {

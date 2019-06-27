@@ -6,12 +6,13 @@ import CorrelationMatrixs from "./CorrelationMatrixs";
 import TSENOne from "./TSENOne";
 import BoxPlots from "./BoxPlots";
 import EN from "../../constant/en";
-import Pie2 from "./Pie2";
+import PIE from "./PIE";
 import PVA from "./PVA";
 
 export default function Chart(props){
 	const {x_name='',y_name='',title=''} = props;
-	const {name,data} = props.data||{};
+	const {data:_data={}} = props;
+	const {name,data} = _data as any;
 	let chart;
 	switch (name) {
 		case 'histogram-categorical':
@@ -31,6 +32,7 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'classification-numerical':
+			// @ts-ignore
 			chart = <UnivariantPlots
 				x_name={x_name}
 				y_name={y_name}
@@ -38,6 +40,7 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'classification-categorical':
+			// @ts-ignore
 			chart = <UnivariantPlots
 				x_name={x_name}
 				y_name={y_name}
@@ -58,12 +61,14 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'regression-categorical':
+			// @ts-ignore
 			chart = <BoxPlots
 				x_keys={data.x_keys}
 				value={data.value}
 			/>;
 			break;
 		case 'predicted-vs-actual-plot':
+			// @ts-ignore
 			chart = <PVA
 				x_name = {EN.PointNumber}
 				y_name = {y_name}
@@ -71,7 +76,7 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'pie':
-			chart = <Pie2
+			chart = <PIE
 				RowsWillBeFixed={data.fixedPercent}
 				RowsWillBeDeleted={data.deletePercent}
 				CleanData={data.cleanPercent}
@@ -79,7 +84,7 @@ export default function Chart(props){
 			break;
 		default:
 			chart = null;
-			
+
 	}
 	return chart;
 }

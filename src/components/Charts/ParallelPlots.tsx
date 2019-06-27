@@ -12,7 +12,7 @@ export default class ParallelPlot extends PureComponent{
 	}
 
 	async componentDidMount() {
-		const { url} = this.props;
+		const {url} = this.props as any;
 		const result = await request.post({
 			url: '/graphics/parallel-coordinate-map',
 			data: {
@@ -27,7 +27,7 @@ export default class ParallelPlot extends PureComponent{
 	}
 
 	getOption() {
-		const {result,ready} = this.state;
+		const {result,ready} = this.state as any;
 
 		if(!ready){
 			return {
@@ -58,7 +58,7 @@ export default class ParallelPlot extends PureComponent{
 		}
 
 		let parallelAxis = [];
-		
+
 		const nameTextStyle = {
 			color:'#000',
 		};

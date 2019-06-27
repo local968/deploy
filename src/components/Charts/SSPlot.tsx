@@ -2,6 +2,7 @@ import React,{useState} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import EN from "../../constant/en";
 import { Spin } from 'antd';
+import _ from 'lodash';
 
 export default function GainChart(props){
 	const {width=600,height=400,project} = props;
@@ -19,7 +20,8 @@ export default function GainChart(props){
 		const {x,y} = ssPlot;
 		const data = _.zip(x,y);
 		max = _.max(y);
-		
+
+
 		option = {
 			xAxis: {
 				name:EN.NumberofClusters,
@@ -27,6 +29,7 @@ export default function GainChart(props){
 			yAxis: {
 				name:EN.WithinGroupSsSquares,
 			},
+			// @ts-ignore
 			series:{
 				type: 'line',
 				symbolSize: 0,
@@ -34,7 +37,7 @@ export default function GainChart(props){
 				smooth: false,
 			},
 			grid:{
-				x:`${parseInt(max)}`.length * 10,
+				x:`${parseInt(String(max))}`.length * 10,
 				x2:150
 			},
 			tooltip: {
@@ -42,7 +45,7 @@ export default function GainChart(props){
 				formatter: function (params) {
 					if(params[0]&&params[0].value){
 						const [x,y] = params[0].value;
-						
+
 						return `
 							${EN.NumberofClusters}:${x}<br/>
 							${EN.WithinGroupsSs}:${y}<br/>
@@ -52,7 +55,7 @@ export default function GainChart(props){
 			},
 		};
 	}
-	
+
 	return <Spin spinning={!ssPlot}>
 		<ReactEcharts
 			option={option}
