@@ -35,7 +35,7 @@ wss.register('originalStats', async (message, socket) => {
   const chunkSize = _.chain(headersLn)
     .defaultTo(0)
     .divide(4)
-    .castArray()
+    .round()
     .concat([1])
     .max()
     .value();
