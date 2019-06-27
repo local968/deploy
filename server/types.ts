@@ -22,7 +22,6 @@ export interface BaseResponse {
 
 export class Project {
   colMap?: unknown = {};
-  will_be_drop_500_lines?: unknown[] = [];
   stats?: OriginalStats = {};
   userId?: string = '';
   models?: unknown[] = [];
@@ -87,11 +86,8 @@ export class Project {
 
   //data quality
   mismatchFillMethod?: unknown = {};
-  mismatchIndex?: unknown = {};
   nullFillMethod?: unknown = {};
-  nullIndex?: unknown = {};
   outlierFillMethod?: unknown = {};
-  outlierIndex?: unknown = {};
   outlierDict?: unknown = {};
   targetMap?: unknown = {};
   targetArray?: unknown[] = [];

@@ -37,7 +37,6 @@ wss.register('originalStats', async (message, socket) => {
     const nullLineCounts = {};
     const mismatchLineCounts = {};
     const outlierLineCounts = {};
-    const will_be_drop_500_lines = [];
     _.chain(data)
       .entries()
       .forEach(([key, metric = {}]: [string, Metric]) => {
@@ -76,16 +75,12 @@ wss.register('originalStats', async (message, socket) => {
       colValueCounts,
       rawDataView,
       nullFillMethod: {},
-      nullIndex: {},
       mismatchFillMethod: {},
-      mismatchIndex: {},
       outlierFillMethod: {},
-      outlierIndex: {},
       totalFixedLines: 0,
       nullLineCounts,
       mismatchLineCounts,
       outlierLineCounts,
-      will_be_drop_500_lines,
       stats: data,
       originalIndex: index,
       nullLineCountsOrigin: nullLineCounts,

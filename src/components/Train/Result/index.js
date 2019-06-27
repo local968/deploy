@@ -8,12 +8,14 @@ import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
 import { Tooltip, Icon, Popover, Select, message } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
-import D3D2 from "../../Charts/D3D2";
 import EN from '../../../constant/en';
-import ISO2 from "../../Charts/ISO2";
 import moment from 'moment'
+import {
+  ISO,
+  D3D2,
+} from  "../../Charts"
 
-const Option = Select.Option;
+const {Option} = Select;
 
 function ModelResult(props) {
   // const type = 'clustering'
@@ -160,7 +162,7 @@ function ModelResult(props) {
         <div className={classes.right} style={{ flex: 1, width: 200 }}>
           {
             project.problemType === "Outlier" ?
-              <ISO2 />
+              <ISO />
               : <D3D2 url={selectModel.multiVarPlotData} />
           }
         </div>

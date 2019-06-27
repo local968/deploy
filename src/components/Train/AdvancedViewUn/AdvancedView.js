@@ -4,19 +4,21 @@ import { Select, Radio, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import { Hint } from 'components/Common';
-import { observable, computed, action } from 'mobx';
+import { computed} from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import ParallelPlots from "../../Charts/ParallelPlots";
 import ParallelPlot from './parallel-plot.png'
 import ParallelPlotOn from './parallel-plot-on.png'
 import PcaIcon from './pca.png'
 import PcaIconOn from './pca-on.png'
 import IconParallel from './icon-parallel.svg'
 import IconParallel2 from './icon-parallel2.svg'
-import PAW from "../../Charts/PAW";
 const { Option } = Select;
+import {
+  PAW,
+  ParallelPlots,
+} from "../../Charts"
 
 @inject('projectStore')
 @observer

@@ -9,7 +9,9 @@ import { message } from 'antd'
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import Pie2 from "../../Charts/Pie2";
+import {
+  PIE
+} from "../../Charts"
 @inject('projectStore')
 @observer
 export default class DataQuality extends Component {
@@ -72,7 +74,7 @@ class TargetIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, mapHeader, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
+    const { issues, sortData, mapHeader, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = problemType === 'Classification' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
     const isNum = colType[target] === 'Numerical'
@@ -615,7 +617,7 @@ class Summary extends Component {
         <div className={styles.summaryPie}>
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
-          <Pie2
+          <PIE
             RowsWillBeFixed={fixedPercent}
             RowsWillBeDeleted={deletePercent}
             CleanData={cleanPercent}

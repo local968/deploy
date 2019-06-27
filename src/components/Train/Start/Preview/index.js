@@ -37,7 +37,7 @@ export default class Preview extends Component {
   formatTable = () => {
     const { cleanData, newVariableData } = this
     const { visiable, project } = this.props
-    const { colType, will_be_drop_500_lines, trainHeader, newVariable, newType, rawHeader, dataHeader, mapHeader } = project;
+    const { colType, trainHeader, newVariable, newType, rawHeader, dataHeader, mapHeader } = project;
     if (!visiable) return []
     if (this.loading) return []
     if (!cleanData.length) return []
@@ -93,9 +93,7 @@ export default class Preview extends Component {
       return {
         content: <span>{v}</span>,
         title: v,
-        cn: classnames(styles.cell, {
-          [styles.drop]: (will_be_drop_500_lines || []).includes(index)
-        })
+        cn: styles.cell
       }
     }))
 

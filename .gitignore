@@ -24,7 +24,8 @@ yarn-error.log*
 # vscode
 .vscode
 
-#package-lock.json
+package-lock.json
+yarn.lock
 
 local_config.js
 

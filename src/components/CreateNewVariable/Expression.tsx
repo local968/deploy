@@ -48,7 +48,7 @@ function Expression(props: ExpressionProps) {
   const startValue: Array<Coordinate> = value.slice(0, start)
   const rangeValue: Array<Coordinate> = value.slice(start, end)
   const endValue: Array<Coordinate> = value.slice(end)
-  const classes = useStyles()
+  const classes = useStyles({})
 
   const onSelect = () => {
     const selection: any = getSelection()
@@ -177,7 +177,7 @@ const blockStyle = makeStyles({
 function Block(props: BlockProps) {
   const { index, data, inRange, onClick } = props
   const { name, type } = data
-  const classes = blockStyle()
+  const classes = blockStyle({})
 
   const getRenderClass = () => {
     if (inRange) return classes.selected
