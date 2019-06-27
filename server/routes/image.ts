@@ -10,4 +10,4 @@ router.get('/:name', async (req, res) => {
 	return res.send(url);
 });
 
-module.exports = router;
+export default router;

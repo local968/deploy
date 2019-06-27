@@ -1,4 +1,4 @@
-import React, { useEffect, ChangeEvent } from 'react';
+import React, { ChangeEvent } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
 import ContinueButton from 'components/Common/ContinueButton';
@@ -10,6 +10,7 @@ const { TextArea } = Input;
 interface ProjectProps {
   projectStore: any,
   deploymentStore: any,
+  userStore:any,
 }
 
 function Project(props: ProjectProps) {
@@ -38,7 +39,12 @@ function Project(props: ProjectProps) {
 
   const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value)
-  }
+  };
+
+  // const {project_continue=true} = props.userStore.info.role;
+  console.log(props)
+
+  var project_continue = true
 
   return (
     <div className={styles.project}>
@@ -52,7 +58,7 @@ function Project(props: ProjectProps) {
           <label >Project Description</label>
           <TextArea rows={4} placeholder="project description" defaultValue={project ? project.description : ""} onChange={this.onChange.bind(this, "description")} className={styles.textarea}/>
         </div> */}
-      <div className={styles.sep}></div>
+      <div className={styles.sep}/>
       <div className={styles.textBox}>
         <label>{EN.ProblemStatement}</label>
         <TextArea
@@ -71,9 +77,14 @@ function Project(props: ProjectProps) {
           rows={4}
           placeholder={`${EN.Businessvalue}${EN.Thiswillhelpproactively}`} />
       </div>
-      <ContinueButton width={null} onClick={nextStep} disabled={false} text={EN.Continue} />
+      <ContinueButton
+        width={null}
+        onClick={nextStep}
+        disabled={false}
+        show={project_continue}
+        text={EN.Continue} />
     </div>
   )
 }
 
-export default inject('projectStore', 'deploymentStore')(observer(Project))
+export default inject('projectStore', 'deploymentStore','userStore')(observer(Project))
