@@ -11,13 +11,15 @@ import FUNCTIONS from './functions';
 import { formatNumber } from 'util'
 import request from 'components/Request'
 import EN from '../../../constant/en';
-import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
-import HistogramNumerical from "../../Charts/HistogramNumerical";
-import HistogramCategorical from "../../Charts/HistogramCategorical";
-import TSENOne from "../../Charts/TSENOne";
-import BoxPlots from "../../Charts/BoxPlots";
-import UnivariantPlots from "../../Charts/UnivariantPlots";
 import CreateNewVariables from '../../CreateNewVariable'
+import {
+  HistogramCategorical,
+  HistogramNumerical,
+  CorrelationMatrixs,
+  TSENOne,
+  BoxPlots,
+  UnivariantPlots,
+} from "../../Charts"
 
 @observer
 export default class SimplifiedView extends Component {

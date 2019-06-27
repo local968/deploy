@@ -1,4 +1,4 @@
-import {observable, action, when} from 'mobx';
+import { observable, action, when } from 'mobx';
 import axios from 'axios';
 import config from 'config';
 import socketStore from './SocketStore';
@@ -11,7 +11,8 @@ class UserStore {
   @observable status = 'init' // unlogin login
   @observable info = {
     id: '',
-    email: ''
+    email: '',
+    level: ''
   }
   @observable tabKey = '1';
   @observable videoKey = '1';
@@ -41,13 +42,17 @@ class UserStore {
     when(() => this.status === 'login', socketStore.connect.bind(socketStore))
   }
 
-  login(params , props) {
+  login(params, props) {
     axios.post(`http://${config.host}:${config.port}/user/login`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
-        props && props.history.push({pathname: '/support',state: { key
-              : 'loginTo' }})
+        props && props.history.push({
+          pathname: '/support', state: {
+            key
+              : 'loginTo'
+          }
+        })
       } else {
         alert(res.data.message || 'Login failure')
       }
@@ -77,16 +82,18 @@ class UserStore {
   }
 
   resetPassword(code, password) {
-    return axios.put(`http://${config.host}:${config.port}/user/resetpassword`, {code, password})
+    return axios.put(`http://${config.host}:${config.port}/user/resetpassword`, { code, password })
   }
 
   forgetPassword(email) {
-    return axios.post(`http://${config.host}:${config.port}/user/forgetpassword`, {email})
+    return axios.post(`http://${config.host}:${config.port}/user/forgetpassword`, { email })
   }
 
   changePassword(current, newPassword) {
-    return axios.put(`http://${config.host}:${config.port}/user/changepassword`, {current, newPassword})
+    return axios.put(`http://${config.host}:${config.port}/user/changepassword`, { current, newPassword })
   }
 }
+
+export { UserStore }
 
 export default new UserStore()

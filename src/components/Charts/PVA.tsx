@@ -14,6 +14,7 @@ import {inject, observer} from "mobx-react";
 @inject('projectStore')
 @observer
 export default class PVA extends Component{
+	private chart: any;
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
@@ -27,17 +28,20 @@ export default class PVA extends Component{
 			isHoldout:false,
 		}
 	}
-	
+
 	componentWillReceiveProps(nextProps) {
-		if(nextProps.model.validatePlotData !== this.props.model.validatePlotData){
+		const {model} = this.props as any;
+		if(nextProps.model.validatePlotData !== model.validatePlotData){
 			return this.componentDidMount(nextProps.model);
 		}
 	}
-	
-	async componentDidMount(model=this.props.model) {
-		const { validatePlotData, holdoutPlotData } = model||{};
-		
-		if(!this.props.data){
+
+	//@ts-ignore
+	async componentDidMount(model=this.props.model||{}) {
+		const { validatePlotData, holdoutPlotData } = model as any;
+		const {data} = this.props as any;
+
+		if(!data){
 			request.post({
 				url: '/graphics/list',
 				data: [{
@@ -61,7 +65,7 @@ export default class PVA extends Component{
 				})
 			});
 		}else{
-			const [holdOutChartDate,chartDate] = this.props.data;
+			const [holdOutChartDate,chartDate] = data;
 			this.setState({
 				chartDate:chartDate.data,
 				holdOutChartDate:holdOutChartDate.data,
@@ -69,17 +73,18 @@ export default class PVA extends Component{
 			})
 		}
 	}
-	
+
 	async setSlider(sliderValue,loading=''){
-		const [start,end] = this.state.sliderValue;
+		const {loading:_loading,sliderValue:_sliderValue} = this.state as any;
+		const [start,end] = _sliderValue;
 		const [_start,_end] = sliderValue;
-		
-		if(loading!==this.state.loading){
+
+		if(loading!==_loading){
 			this.setState({
 				loading,
 			});
 		}
-		
+
 		if(!this.chart){
 			return;
 		}
@@ -103,10 +108,11 @@ export default class PVA extends Component{
 			},100)
 		}
 	}
-	
+
 	getOption() {
-		const {ready,chartDate,holdOutChartDate} = this.state;
-		const {isHoldout} = this.props.projectStore.project;
+		const {ready,chartDate,holdOutChartDate,sliderValue:_sliderValue} = this.state as any;
+		const {projectStore,y_name} = this.props as any;
+		const {isHoldout} = projectStore.project;
 		const data = isHoldout?holdOutChartDate:chartDate;
 		const _data = _.cloneDeep(data);
 		if(!ready){
@@ -115,24 +121,21 @@ export default class PVA extends Component{
 				yAxis:{},
 			}
 		}
-		
-		const sliderValue = _.cloneDeep(this.state.sliderValue);
-		const {y_name=''} = this.props;
+
+		const sliderValue = _.cloneDeep(_sliderValue);
 		const [start,end] = sliderValue;
-		
+
 		let sum = 100/(end-start)*100;
-		
+
 		const barLength = _.max([_.size(_data[0].value)/sum,1]);
-		
-		// sum = _.min([sum,_.size(_.chunk(_data[0].value,barLength))]);
-		
+
 		let chunk;
-		
+
 		let max = 0;
-		
+
 		const series = _data.map(itm=>{
 			chunk = _.chunk(itm.value,barLength);
-			const data = _.map(chunk,(itm,index)=>[index*100/chunk.length,_.sum(itm)/_.size(itm)]);
+			const data = _.map(chunk,(itm,index:number)=>[index*100/chunk.length,_.sum(itm)/_.size(itm)]);
 			max = _.max([max,...data.map(itm=>itm[1])]);
 			return {
 				type: 'line',
@@ -143,24 +146,24 @@ export default class PVA extends Component{
 				data,
 			}
 		});
-		
+
 		max = Math.abs(max)>10e8?10e8:max;
-		
+
 		const ResidualRate = series[0].data.map((itm,index)=>{
 			const act = itm[1];
 			const pre = series[1].data[index][1];
 			return [index*100/chunk.length,Math.abs((act-pre)*100/act)];
 		});
-		
+
 		series.push({
 			name:EN.ResidualRate,
 			yAxisIndex: 1,
 			type: 'bar',
 			data:ResidualRate,
 		});
-		
+
 		const minValueSpan = 100/_.size(_data[0].value) * 3;//最少显示3个点
-		
+
 		return {
 			title:{
 				subtext:EN.ZoomRegion,
@@ -176,11 +179,11 @@ export default class PVA extends Component{
 				labelPrecision:2,
 				realtime:false,
 				xAxisIndex: [0],
-				labelFormatter: (value)=> {
-					if(!isNaN(`${value}`)){
+				labelFormatter: async(value)=> {
+					if(!isNaN(Number(`${value}`))){
 						sliderValue.shift();
 						sliderValue.push(value);
-						this.setSlider(sliderValue);
+						await this.setSlider(sliderValue);
 						return value.toFixed(3);
 					}
 				},
@@ -207,7 +210,7 @@ export default class PVA extends Component{
 				type: 'value',
 				axisLabel:{
 					formatter: (value)=>{
-						if(parseInt(value).length>10){
+						if(String(parseInt(value)).length>10){
 							const p = Math.floor(Math.log(Math.abs(value)) / Math.LN10);
 							const n = value * Math.pow(10, -p);
 							return n.toFixed(3) + 'e' + p
@@ -233,16 +236,17 @@ export default class PVA extends Component{
 						name:EN.ResidualRate,
 						percent:'%',
 					}];
-					params.forEach(itm=>(result.filter(it=>it.name === itm.seriesName && !it.value)[0]||{}).value = itm.data[1].toFixed(3));
-					
+					//@ts-ignore
+					params.forEach((itm)=>(result.filter((it:any)=>it.name === itm.seriesName && !it.value)[0]||{}).value = itm.data[1].toFixed(3));
+
 					let res = '';
-					result.filter(itm=>itm.value).forEach(itm=>res+=(`${itm.name}:${itm.value}${itm.percent}<br/>`));
+					result.filter((itm:any)=>itm.value).forEach((itm:any)=>res+=(`${itm.name}:${itm.value}${itm.percent}<br/>`));
 					return res;
 				},
 			},
 			series,
 			grid:{
-				x:`${parseInt(max)}`.length * 18,
+				x:`${parseInt(String(max))}`.length * 18,
 				y2:80,
 			},
 			toolbox:{
@@ -263,26 +267,28 @@ export default class PVA extends Component{
 				}
 			}
 		};
-		
+
 	}
 	handleHoldout(){
-		const {isHoldout} = this.props.projectStore.project;
-		this.props.projectStore.project.upIsHoldout(!isHoldout);
+		const {projectStore} = this.props as any;
+		const {isHoldout} = projectStore.project;
+		projectStore.project.upIsHoldout(!isHoldout);
 	}
-	
+
 	render(){
-		const {loading,chartDate,holdOutChartDate} = this.state;
-		const {isHoldout} = this.props.projectStore.project;
+		const {loading,chartDate,holdOutChartDate} = this.state as any;
+		const {projectStore} = this.props as any;
+		const {isHoldout} = projectStore.project;
 		const data = isHoldout?holdOutChartDate:chartDate;
-		
+
 		if(!data[0]){
 			return null;
 		}
 		const act = _.cloneDeep(data[0].value)||[];
-		
+
 		const yMin = _.min(act);
 		const yMax = _.max(act);
-		const {range= [yMin,yMax],yRange= [0,_.size(act)]} = this.state;
+		const {range= [yMin,yMax],yRange= [0,_.size(act)]} = this.state as any;
 		const [x,y] = range;
 		let [y_start,y_end] = yRange;
 		return [
@@ -368,7 +374,7 @@ export default class PVA extends Component{
 							return this.setSlider([0,100],'reset')
 						}}
 					>{EN.Reset}</Button>
-					
+
 				</div>
 			</div>
 		]

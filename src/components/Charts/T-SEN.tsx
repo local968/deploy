@@ -4,6 +4,7 @@ import config from 'config'
 const {isEN} = config;
 
 export default class TSEN extends PureComponent{
+	private chart: any;
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
@@ -11,7 +12,7 @@ export default class TSEN extends PureComponent{
 			loading:true,
 		}
 	}
-	
+
 	componentDidMount() {
 		const chart = this.chart.getEchartsInstance();
 		chart.showLoading();
@@ -19,11 +20,11 @@ export default class TSEN extends PureComponent{
 			loading:false,
 		})
 	}
-	
+
 	getOption() {
-		const {x_name,y_name,data=[],title=''} = this.props;
-		const {loading} = this.state;
-		
+		const {x_name,y_name,data=[],title=''} = this.props as any;
+		const {loading} = this.state as any;
+
 		if(data.length&&!loading){
 			const chart = this.chart.getEchartsInstance();
 			chart.hideLoading();
@@ -33,7 +34,7 @@ export default class TSEN extends PureComponent{
 				yAxis:{},
 			}
 		}
-		
+
 		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
 			return {
 				name:itm.name,
@@ -145,9 +146,9 @@ export default class TSEN extends PureComponent{
 			// }
 		}
 	}
-	
+
 	render(){
-		const {width=550,height=400} = this.props;
+		const {width=550,height=400} = this.props as any;
 		return <ReactEcharts
 			option={this.getOption()}
 			ref = {chart=>this.chart=chart}

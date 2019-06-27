@@ -4,12 +4,12 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Modal, NumberInput } from 'components/Common';
 import { observable } from 'mobx'
-// import * as d3 from 'd3';
 import { Icon, message } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import OutlierRange from "../../Charts/OutlierRange";
-import request from '../../Request'
+import {
+  OutlierRange
+} from "../../Charts"
 
 @observer
 export class ClassificationTarget extends Component {

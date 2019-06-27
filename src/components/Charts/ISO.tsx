@@ -15,11 +15,12 @@ const {Option} = Select;
 
 const classes = styles;
 
-const color = ['#b7cbf8','#ffffff','green','red'];//背景(开始)/背景(结束）/正常点/异常点
+const color:any = ['#b7cbf8','#ffffff','green','red'];//背景(开始)/背景(结束）/正常点/异常点
 
 @inject('projectStore')
 @observer
 export default class Iso extends PureComponent{
+    private chart:any;
     constructor(props){
         super(props);
         this.state = {
@@ -41,36 +42,38 @@ export default class Iso extends PureComponent{
         this.chart = React.createRef();
         this.updatePoint = debounce(this.updatePoint, 280)
     }
-    
+
     componentDidMount() {
         const chart = this.chart.getEchartsInstance();
         chart.showLoading();
-        
+
         return this.message();
     }
 
     async message() {
+
         const chart = this.chart.getEchartsInstance();
         chart.showLoading();
-        const { selectModel:models} = this.props.projectStore.project;
-        const {outlierPlotData:url,outlierPlotData:loading,rate,initRate} = models;
-    
-        // const point = (models.dataFlow[0].contamination||0).toFixed(3);
+        const {projectStore} = this.props as any;
+        const { selectModel:models} = projectStore.project;
+        const {outlierPlotData:url,rate,initRate} = models;
+
         const point = (rate).toFixed(3);
         let var1,var2,vars=[];
-        if(models.modelName === this.state.modelName){
-            vars=this.state.vars;
+        const {modelName,vars:_vars} = this.state as any;
+        if(models.modelName === modelName){
+            vars = _vars;
         }
         const {featureImportance} = models;
         if(vars.length){
             var1 = vars[0];
             var2 = vars[1];
         }else{
-            const list = Object.entries(featureImportance).sort((b,a)=>a[1]-b[1]);
+            const list = Object.entries(featureImportance).sort((b:any,a:any)=>a[1]-b[1]);
              var1 = list[0][0];
              var2 = list[1][0];
         }
-        
+
         const result = await request.post({
             url: '/graphics/outlier',
             data: {
@@ -100,16 +103,17 @@ export default class Iso extends PureComponent{
     }
 
     getOption() {
-        let {ready,xRange,yRange,value,dot,point,var1,var2,url} = this.state;
-        
+        let {ready,xRange,yRange,value,dot,point,var1,var2,url} = this.state as any;
+
         if(!ready){
             return {
                 xAxis: {},
                 yAxis: {},
             }
         }
-    
-        if(url !== this.props.projectStore.project.selectModel.outlierPlotData){
+        const {projectStore} = this.props as any;
+
+        if(url !== projectStore.project.selectModel.outlierPlotData){
             this.componentDidMount()
         }
 
@@ -161,13 +165,14 @@ export default class Iso extends PureComponent{
         }else{
             data1 = dot.map(itm=>[itm[0],itm[1]]);
         }
-        
+
         data1.unshift([-100,-1,0]);
         data2.unshift([-100,-1,0]);
 
         series.push({
             type:'scatter',
             data:data1,
+            // @ts-ignore
             color:color[2],
             visualMap:false,
             symbolSize:5,
@@ -186,7 +191,7 @@ export default class Iso extends PureComponent{
             silent:true,
             zlevel:2,
         });
-        
+
         const nameTextStyle = {
 	        color:'#000',
         };
@@ -258,15 +263,16 @@ export default class Iso extends PureComponent{
         this.setState({
             point,
         });
-        // console.log(this.props.projectStore.project.selectModel)
-        this.props.projectStore.project.selectModel.updateModel({rate: point})
+        const {projectStore} = this.props as any;
+        return projectStore.project.selectModel.updateModel({rate: point})
     }
 
     selection(order){
-        const {show_name,list} = this.state;
-	    const {mapHeader} = this.props.projectStore.project;
-	    
-	    const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
+        const {show_name,list} = this.state as any;
+        const {projectStore} = this.props as any;
+	      const {mapHeader} = projectStore.project;
+
+	      const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
         const options = list.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{mapHeader[itm]}</Option>);
 
@@ -286,10 +292,11 @@ export default class Iso extends PureComponent{
     }
 
     save(){
-        const {show_name} = this.state;
+        const {show_name} = this.state as any;
         const {var1,var2} = show_name;
-        const { modelName} = this.props.projectStore.project.selectModel;
-    
+        const {projectStore} = this.props as any;
+        const { modelName} = projectStore.project.selectModel;
+
         this.setState({
             modelName,
             vars:[var1,var2],
@@ -297,25 +304,25 @@ export default class Iso extends PureComponent{
             const chart = this.chart.getEchartsInstance();
             chart.showLoading();
         });
-        this.props.projectStore.project.selectModel.saveFeatureList([var1,var2]);
-        
+        return projectStore.project.selectModel.saveFeatureList([var1,var2]);
     }
 
     reset(){
-        const {default_point=0} = this.state;
+        const {default_point=0} = this.state as any;
         this.setState({
             slider_value:default_point,
         });
-        this.updatePoint(default_point)
+        return this.updatePoint(default_point)
     }
 
     render(){
-        const {slider_value} = this.state;
+        const {slider_value} = this.state as any;
         const {
             height = 500,
             width = 600,
-        } = this.props;
-        
+        } = this.props as any;
+
+        // @ts-ignore
         return [
             <section key='dl' className={classes.d3d2}>
                 <dl>
@@ -342,18 +349,19 @@ export default class Iso extends PureComponent{
                 <Slider
                     min={0}
                     max={0.5}
+                     // @ts-ignore
                     marks={{
-                        0:0,
-                        0.05:'',
-                        0.1:0.1,
-                        0.15:'',
-                        0.2:0.2,
-                        0.25:'',
-                        0.3:0.3,
-                        0.35:'',
-                        0.4:0.4,
-                        0.45:'',
-                        0.5:0.5,
+                        '0':0,
+                        '0.05':'',
+                        '0.1':0.1,
+                        '0.15':'',
+                        '0.2':0.2,
+                        '0.25':'',
+                        '0.3':0.3,
+                        '0.35':'',
+                        '0.4':0.4,
+                        '0.45':'',
+                        '0.5':0.5,
                     }}
                     included={false}
                     step={0.001}
@@ -361,7 +369,7 @@ export default class Iso extends PureComponent{
                         this.setState({
                             slider_value,
                         });
-                        this.updatePoint(slider_value)
+                        return this.updatePoint(slider_value)
                     }}
                     value={+slider_value} />
                     <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
@@ -379,7 +387,7 @@ export default class Iso extends PureComponent{
                   this.setState({
                       slider_value,
                   });
-                  this.updatePoint(slider_value)
+                  return this.updatePoint(slider_value)
               }}
             />
             </div>,

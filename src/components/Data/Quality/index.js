@@ -9,7 +9,9 @@ import { message } from 'antd'
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import Pie2 from "../../Charts/Pie2";
+import {
+  PIE
+} from "../../Charts"
 @inject('projectStore')
 @observer
 export default class DataQuality extends Component {
@@ -190,7 +192,7 @@ class TargetIssue extends Component {
             totalRawLines={totalRawLines} />}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
-            targetIssues={targetIssuesCountsOrigin}
+            targetIssuesCountsOrigin={targetIssuesCountsOrigin}
             totalRawLines={totalRawLines}
             totalLines={totalLines}
             percent={targetPercent} />}
@@ -615,7 +617,7 @@ class Summary extends Component {
         <div className={styles.summaryPie}>
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
-          <Pie2
+          <PIE
             RowsWillBeFixed={fixedPercent}
             RowsWillBeDeleted={deletePercent}
             CleanData={cleanPercent}

@@ -43,25 +43,27 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
-import { observable, computed, action } from 'mobx';
+import { computed} from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
-// import FitPlot from "../../Charts/FitPlot";
-import ResidualPlot from "../../Charts/ResidualPlot";
 import EN from '../../../constant/en';
-import ROCCurves from "../../Charts/ROCCurves";
-import PredictionDistributions from "../../Charts/PredictionDistributions";
-import PRCharts from "../../Charts/PRCharts";
-import SingleLiftCharts from '../../Charts/SingleLiftCharts'
-import SpeedvsAccuracys from "../../Charts/SpeedvsAccuracys";
-import LiftChart2 from "../../Charts/LiftChart2";
-import RocChart2 from "../../Charts/RocChart2";
-import FitPlot2 from "../../Charts/FitPlot2";
 import request from '../../Request'
-import GainChart from "../../Charts/GainChart";
-import KsChart from "../../Charts/KsChart";
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
+const {TabPane} = Tabs;
+const {Option} = Select;
+
+import {
+  KsChart,
+  GainChart,
+  FitPlot,
+  SingleLiftCharts,
+  SpeedvsAccuracys,
+  ResidualPlot,
+  PredictionDistributions,
+  ROCCurves,
+  PRCharts,
+  LiftChart,
+  RocChart,
+} from "../../Charts"
 
 @inject('projectStore')
 @observer
@@ -629,7 +631,7 @@ class RegressionDetailCurves extends Component {
         break;
       case EN.FitPlot:
         curComponent = <div className={styles.plot} style={{ height: 300, width: 500 }}>
-          {show && <FitPlot2
+          {show && <FitPlot
             title={EN.FitPlot}
             x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
@@ -1097,7 +1099,7 @@ class ModelComp extends Component {
                 />
               </TabPane>
               <TabPane tab={EN.LiftsCharts} key="3">
-                <LiftChart2
+                <LiftChart
                   selectAll={select}
                   models={models}
                   x_name={EN.percentage}
@@ -1109,7 +1111,7 @@ class ModelComp extends Component {
                 />
               </TabPane>
               <TabPane tab={EN.ROCCurves} key="4">
-                <RocChart2
+                <RocChart
                   models={models}
                   selectAll={select}
                   x_name={EN.FalsePositiveDate}

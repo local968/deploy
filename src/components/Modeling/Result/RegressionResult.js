@@ -12,10 +12,11 @@ import Variable from "./Variable.svg";
 import { ProgressBar, Hint } from 'components/Common';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import PredictedVsActualPlot from "../../Charts/PredictedVsActualPlot";
 import config from 'config'
-import PVA from "../../Charts/PVA";
 const isEN = config.isEN;
+import {
+  PVA
+} from "../../Charts"
 
 @observer
 export default class RegressionView extends Component {

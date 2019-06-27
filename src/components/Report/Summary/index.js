@@ -4,8 +4,9 @@ import { observer } from 'mobx-react';
 import * as d3 from 'd3';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import Pie2 from "../../Charts/Pie2";
-import classnames from "classnames";
+import {
+  PIE
+} from "../../Charts"
 @observer
 class Summary extends Component {
   componentDidMount() {
@@ -191,7 +192,7 @@ class Summary extends Component {
         <div className={styles.summaryPie}>
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
-          <Pie2
+          <PIE
               RowsWillBeFixed={fixedPercent}
               RowsWillBeDeleted={deletePercent}
               CleanData={cleanPercent}
