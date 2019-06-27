@@ -37,7 +37,7 @@ class UserStore {
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info;
-        if(res.data.info.role.project === false){
+        if(res.data.info.role.project === false&&location.pathname==='/'){
          location.href = '/deploy'
         }
         if(res.data.info.role.JupyterLab !== false){
@@ -72,8 +72,9 @@ class UserStore {
   register(params) {
     axios.post(`http://${config.host}:${config.port}/user/register`, params).then(action(res => {
       if (res.data.status === 200) {
-        this.info = res.data.info
+        this.info = res.data.info;
         this.status = 'login'
+        this.constructor();
       } else {
         alert(res.data.message)
       }
@@ -93,7 +94,9 @@ class UserStore {
   logout() {
     axios.delete(`http://${config.host}:${config.port}/user/logout`).then(action(res => {
       if (res.data.status === 200) {
-        this.status = 'unlogin'
+        this.status = 'unlogin';
+        this.labUrl = '';
+        this.dashUrl= '';
         window.location.reload()
       } else {
         alert(res.data.message)
