@@ -12,6 +12,7 @@ import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router';
 import EN from '../../../constant/en';
 import { message, Icon } from 'antd';
+import axios from 'axios';
 
 const errorTip = message.error;
 

@@ -227,7 +227,6 @@ function DataConnect(props: DataConnectProps) {
   }
 
   const closeUpload = () => {
-    if (process >= 50) project.abortEtl()
     state.pause && state.pause()
     setState({
       ...state,

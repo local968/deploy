@@ -5,28 +5,33 @@ import uuid from 'uuid';
 
 const debug = false;
 
-class Socket extends EventEmitter {
-  url = 'ws://' + config.host + ':' + config.port + '/ws';
-  reconnectLock = false;
-  connectionError = false;
-  errorTimes = 0;
-  ws = null;
-  timeout = 10000;
-  heartbeatTimeout = null;
-  serverTimeout = null;
-  messageList = [];
+interface SocketInterface {
+  reconnect: () => void,
+  send: (message: string) => void
+}
+
+class Socket extends EventEmitter implements SocketInterface {
+  private url = 'ws://' + config.host + ':' + config.port + '/ws';
+  private reconnectLock = false;
+  private connectionError = false;
+  private errorTimes = 0;
+  private ws: null | WebSocket = null;
+  private timeout = 10000;
+  private heartbeatTimeout: null | NodeJS.Timeout = null;
+  private serverTimeout: null | NodeJS.Timeout = null;
+  private messageList: string[] = [];
 
   constructor() {
     super();
     this.createWebSocket();
   }
 
-  createWebSocket() {
+  private createWebSocket() {
     try {
       if ('WebSocket' in window) {
-        this.ws = new window.WebSocket(this.url);
+        this.ws = new (window as any).WebSocket(this.url);
       } else if ('MozWebSocket' in window) {
-        this.ws = new window.MozWebSocket(this.url);
+        this.ws = new (window as any).MozWebSocket(this.url);
       } else {
         alert('Your browser does not support websocket.');
       }
@@ -37,7 +42,7 @@ class Socket extends EventEmitter {
     }
   }
 
-  reconnect() {
+  public reconnect() {
     if (this.reconnectLock) return;
     this.reconnectLock = true;
     this.emit('offline');
@@ -48,9 +53,10 @@ class Socket extends EventEmitter {
     }, 2000);
   }
 
-  start() {
-    clearTimeout(this.heartbeatTimeout);
-    clearTimeout(this.serverTimeout);
+  private start() {
+    if (this.heartbeatTimeout !== null) clearTimeout(this.heartbeatTimeout);
+    if (this.serverTimeout !== null) clearTimeout(this.serverTimeout);
+
     this.heartbeatTimeout = setTimeout(() => {
       // send a  ping, any message from server will reset this timeout.
       this.ws && this.ws.readyState === 1 && this.ws.send('ping');
@@ -61,19 +67,20 @@ class Socket extends EventEmitter {
     }, this.timeout);
   }
 
-  initEventHandle() {
+  private initEventHandle() {
+    if (!this.ws) return
     this.ws.addEventListener('message', this.onMessage);
     this.ws.addEventListener('error', this.onError);
     this.ws.addEventListener('close', this.onClose);
     this.ws.addEventListener('open', this.onOpen);
   }
 
-  onMessage = event => {
+  private onMessage = event => {
     this.start(); //any message represent current connection working.
     this.emit('message', event);
   };
 
-  onClose = event => {
+  private onClose = event => {
     this.errorTimes++;
     // if (this.errorTimes >= 10) {
     //   this.connectionError = event
@@ -83,12 +90,12 @@ class Socket extends EventEmitter {
     console.warn('websocket connection closed!', event);
   };
 
-  onError = event => {
+  private onError = event => {
     if (!this.connectionError) this.reconnect();
     console.error('websocket connection error!', event);
   };
 
-  onOpen = event => {
+  private onOpen = event => {
     this.errorTimes = 0;
     this.start(); //reset client heartbeat check
     this.emit('online');
@@ -103,7 +110,8 @@ class Socket extends EventEmitter {
     // }
   };
 
-  send(message) {
+  public send(message) {
+    if (!this.ws) return
     if (this.ws.readyState === 1) {
       this.ws.send(message);
     } else {
@@ -111,17 +119,23 @@ class Socket extends EventEmitter {
     }
   }
 
-  terminate() {
+  private terminate() {
     // this.ws && this.ws.terminate()
-    clearTimeout(this.heartbeatTimeout);
-    clearTimeout(this.serverTimeout);
+    if (this.heartbeatTimeout) clearTimeout(this.heartbeatTimeout);
+    if (this.serverTimeout) clearTimeout(this.serverTimeout);
   }
 }
 
-class SocketStore extends EventEmitter {
+interface SocketStoreInterface {
+  status: string,
+  api: { on: (str: string, callback: () => void) => void }
+  socket? : Socket
+}
+
+class SocketStore extends EventEmitter implements SocketStoreInterface {
   status = 'init';
   api = { on: this.on.bind(this) };
-  socket = null;
+  socket
 
   connect = () => {
     this.socket = new Socket();
@@ -149,12 +163,12 @@ class SocketStore extends EventEmitter {
     this.socket.on('online', () => {
       this.emit('online');
     });
-    if (debug) {
-      window.ss = this;
-      window.ws = this.ws;
-      window.api = this.api;
-      window.axios = axios;
-    }
+    // if (debug) {
+    //   window.ss = this;
+    //   window.ws = this.ws;
+    //   window.api = this.api;
+    //   window.axios = axios;
+    // }
   };
 
   // reconnect() {
@@ -162,7 +176,7 @@ class SocketStore extends EventEmitter {
   //   this.connect()
   // }
 
-  ready() {
+  ready(): Promise<any> {
     if (this.status === 'ready') return Promise.resolve(this.api);
     return new Promise((resolve, reject) => {
       this.once('apiReady', resolve.bind(null, this.api));

@@ -1,4 +1,4 @@
-import { observable, action, computed, toJS, autorun } from "mobx";
+import { observable, action, computed, toJS, autorun, IReactionDisposer } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
 import moment from 'moment';
@@ -7,180 +7,277 @@ import uuid from 'uuid';
 import Papa from 'papaparse';
 import { message as antdMessage, Modal } from 'antd';
 import axios from 'axios'
-import { formatNumber } from 'util'
-import c1 from './classification'
+import { formatNumber } from '../../src/util'
+import c1 from './classification.json'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 
-export default class Project {
-  @observable models = []
-  @observable trainModel = {}
-  @observable autorun = []
+export interface Numerical {
+  missingValue?: number;
+  mismatch?: number;
+  outlierCount?: number;
+}
 
-  @observable id = "";
-  @observable exist = true;
-  @observable loading = false;
-  @observable host = '';
+export interface OriginalStats {
+  std_deviation?: unknown;
+  numerical?: Numerical;
+}
+export interface Metric {
+  originalStats?: OriginalStats;
+  type?;
+  originalCategoricalMap?;
+  categoricalMap?;
+}
+
+export interface BaseResponse {
+  message: string;
+  status: number;
+}
+
+export interface CostOption {
+  TP: number;
+  FP: number;
+  FN: number;
+  TN: number;
+}
+
+export interface Settings {
+  id: string,
+  name: string,
+  setting: unknown,
+  models: string[]
+}
+
+export interface SsPlot {
+  x: number[],
+  y: number[]
+}
+
+export interface StringObject {
+  [key: string]: string
+}
+
+export interface NumberObject {
+  [key: string]: number
+}
+
+export interface TrainCommand {
+  kType?: string,
+  kValue?: number,
+  algorithms?: string[],
+  standardType?: string,
+  searchTime?: number,
+  metricsMethod?: string,
+  featureLabel?: string[],
+  randomSeed?: number,
+  projectId?: string,
+  command?: string,
+  settingName?: string,
+  applyWeights?: NumberObject,
+  problemType?: string,
+  targetLabel?: string[],
+  version?: string,
+  sampling?: string,
+  speedVSaccuracy?: number,
+  ensembleSize?: number,
+  randSeed?: number,
+  measurement?: string,
+  holdoutRate?: number,
+  featuresPreprocessor?: string[],
+  validationRate?: number,
+  nfold?: number
+}
+
+class Project {
+  visiable: boolean
+  init: boolean = false
+  univariatePlotsBase64: StringObject
+  histgramPlotsBase64: StringObject
+  rawHistgramPlotsBase64: StringObject
+
+  @observable colMap: StringObject = {};
+  @observable stats: OriginalStats = {};
+  @observable userId: string = '';
+  @observable models: Model[] = [];
+  @observable trainModel: unknown = {};
+  @observable autorun: IReactionDisposer[] = [];
+
+  @observable id: string = '';
+  @observable exist: boolean = true;
+  @observable loading: boolean = false;
+  @observable host: string = '';
+  @observable loadModel: boolean = false;
 
   //step
-  @observable mainStep = 0;
-  @observable curStep = 0;
-  @observable lastSubStep = 1;
-  @observable subStepActive = 1;
+  @observable mainStep: number = 0;
+  @observable curStep: number = 0;
+  @observable lastSubStep: number = 1;
+  @observable subStepActive: number = 1;
 
   //project
-  @observable name;
-  @observable createTime
-  @observable updateTime
-  @observable charset = 'utf-8';
-  // @observable description;
+  @observable name: string = '';
+  @observable createTime: number = 0;
+  @observable updateTime: number = 0;
+  @observable charset: string = 'utf-8';
+  // description;
 
   //problem
-  @observable problemType = '';
-  @observable statement = '';
-  @observable business = '';
-  @observable changeProjectType = '';
+  @observable problemType: string = '';
+  @observable statement: string = '';
+  @observable business: string = '';
+  @observable changeProjectType: string = '';
 
   //etl
-  @observable etling = false;
-  @observable etlProgress = 0
+  @observable etling: boolean = false;
+  @observable etlProgress: number = 0;
 
   // upload data
-  @observable cleanHeader = []
-  @observable dataHeader = [];
-  @observable uploadData = [];
-  @observable rawHeader = [];
+  @observable cleanHeader: string[] = [];
+  @observable dataHeader: string[] = [];
+  @observable uploadData: string[][] = [];
+  @observable rawHeader: string[] = [];
   // add header map
-  @observable mapHeader = []
-  @observable colType = [];
-  // @observable totalLines = 0;
-  @observable totalRawLines = 0;
-  @observable firstEtl = true;
-  @observable target = '';
-  @observable noCompute = false;
-  @observable validationRate = 20;
-  @observable holdoutRate = 20;
-  @observable uploadFileName = [];
-  @observable fileName = '';
-  // @observable cleanData = []
-  @observable originPath = '';
+  @observable mapHeader: string[] = [];
+  @observable colType: StringObject = {};
+  // totalLines: unknown =  0;
+  @observable totalRawLines: number = 0;
+  @observable firstEtl: boolean = true;
+  @observable target: string = '';
+  @observable noCompute: boolean = false;
+  @observable validationRate: number = 20;
+  @observable holdoutRate: number = 20;
+  @observable uploadFileName: string[] = [];
+  @observable fileName: string = '';
+  // cleanData: unknown =  []
+  @observable originPath: string = '';
 
-  @observable etlCleanDataLoading = false
-  @observable cleanPath = ''
+  etlCleanDataLoading: boolean = false;
+  @observable cleanPath: string = '';
 
-  @observable noComputeTemp = false;
-  @observable originalIndex = ''
-  @observable etlIndex = ''
+  @observable noComputeTemp: boolean = false;
+  @observable originalIndex: string = '';
+  @observable etlIndex: string = '';
 
   //data quality
-  @observable mismatchFillMethod = {}
-  @observable mismatchIndex = {}
-  @observable nullFillMethod = {}
-  @observable nullIndex = {}
-  @observable outlierFillMethod = {}
-  @observable outlierIndex = {}
-  @observable outlierDict = {}
-  @observable targetMap = {};
-  @observable targetArray = []
-  @observable rawDataView = null;
-  @observable preImportance = null;
-  @observable preImportanceLoading = false;
-  @observable importanceProgress = 0
-  @observable histgramPlots = {};
-  @observable univariatePlots = {};
-  @observable newVariable = [];
-  @observable expression = {}
-  @observable newType = {}
-  @observable informativesLabel = []
-  @observable colValueCounts = {}
-  @observable totalFixedLines = 0
-  @observable nullLineCounts = {}
-  @observable mismatchLineCounts = {}
-  @observable outlierLineCounts = {}
-  @observable renameVariable = {}
-  @observable missingReason = {}
-  @observable newVariablePath = ''
-  @observable newVariableViews = {}
-  @observable otherMap = {}
-
-  // @observable totalFixedCount = 0
-  @observable deletedCount = 0
-
+  @observable mismatchFillMethod: StringObject = {};
+  @observable nullFillMethod: StringObject = {};
+  @observable outlierFillMethod: StringObject = {};
+  @observable outlierDict: unknown = {};
+  @observable targetMap: NumberObject = {};
+  @observable targetArray: string[] = [];
+  @observable rawDataView: unknown | null = null;
+  @observable preImportance: NumberObject | null = null;
+  @observable preImportanceLoading: boolean = false;
+  @observable importanceProgress: number = 0;
+  @observable histgramPlots: unknown = {};
+  @observable univariatePlots: unknown = {};
+  @observable newVariable: string[] = [];
+  @observable expression: unknown = {};
+  @observable newType: StringObject = {};
+  @observable informativesLabel: string[] = [];
+  @observable colValueCounts: { [key: string]: NumberObject } = {};
+  @observable totalFixedLines: number = 0;
+  @observable nullLineCounts: NumberObject = {};
+  @observable mismatchLineCounts: NumberObject = {};
+  @observable outlierLineCounts: NumberObject = {};
+  @observable renameVariable: StringObject = {};
+  @observable missingReason: StringObject = {};
+  @observable newVariablePath: string = '';
+  @observable newVariableViews: unknown = {};
+  @observable otherMap: StringObject = {};
+  // totalFixedCount: unknown =  0
+  @observable deletedCount: number = 0;
   //原始issue
-  @observable nullLineCountsOrigin = {}
-  @observable mismatchLineCountsOrigin = {}
-  @observable outlierLineCountsOrigin = {}
-
-
-  @observable targetMapTemp = {};
-  @observable targetArrayTemp = [];
-  @observable missingReasonTemp = {}
-  @observable mismatchFillMethodTemp = {}
-  @observable nullFillMethodTemp = {}
-  @observable outlierFillMethodTemp = {}
-  @observable outlierDictTemp = {}
+  @observable nullLineCountsOrigin: NumberObject = {};
+  @observable mismatchLineCountsOrigin: NumberObject = {};
+  @observable outlierLineCountsOrigin: NumberObject = {};
+  @observable targetMapTemp: NumberObject = {};
+  @observable targetArrayTemp: string[] = [];
+  @observable missingReasonTemp: StringObject = {};
+  @observable mismatchFillMethodTemp: StringObject = {};
+  @observable nullFillMethodTemp: StringObject = {};
+  @observable outlierFillMethodTemp: StringObject = {};
+  @observable outlierDictTemp: unknown = {};
 
   // train
   // 训练状态
-  @observable train2Finished = false;
-  @observable train2ing = false;
-  @observable train2Error = false;
+  @observable train2Finished: boolean = false;
+  @observable train2ing: boolean = false;
+  @observable train2Error: boolean = false;
 
-  @observable trainingId = ''
+  @observable trainingId: string = '';
   // 不需要参加训练的label
-  @observable trainHeader = []
-  @observable customHeader = []
-  @observable criteria = 'defualt';
-  @observable costOption = { TP: 0, FP: 0, FN: 0, TN: 0 }
-  @observable mappingKey = ''
-  @observable distribution = 0
-  @observable ssPlot = null
+  @observable trainHeader: string[] = [];
+  @observable customHeader: string[] = [];
+  @observable criteria: string = 'defualt';
+  @observable costOption: CostOption = {
+    TP: 0,
+    FP: 0,
+    FN: 0,
+    TN: 0,
+  };
+  @observable mappingKey: string = '';
+  @observable distribution: number = 0;
+  @observable ssPlot: SsPlot | null = null;
 
   // Advanced Modeling Setting
-  @observable settingId = '';
-  @observable settings = [];
+  @observable settingId: string = '';
+  @observable settings: Settings[] = [];
 
   // correlation
-  @observable correlationMatrixHeader;
-  @observable correlationMatrixData;
-  @observable correlationMatrixLoading = false;
+  @observable correlationMatrixHeader: unknown;
+  @observable correlationMatrixData: unknown;
+  @observable correlationMatrixLoading: boolean = false;
 
   // 训练速度和过拟合
-  @observable speedVSaccuracy = 5;
+  @observable speedVSaccuracy: number = 5;
 
-  @observable ensembleSize = 20;
-  @observable randSeed = 0;
-  @observable measurement = 'CVNN';
-  @observable resampling = "no";
-  @observable runWith = 'holdout';
-  @observable crossCount = 5;
-  @observable dataRange = 'all';
-  @observable customField = '';
-  @observable customRange = [];
-  @observable algorithms = [];
-  @observable selectId = '';
-  @observable version = [1, 2, 4];
-  @observable features = ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
-  @observable dataViews = null;
-  @observable dataViewsLoading = false;
-  @observable dataViewProgress = 0;
+  @observable ensembleSize: number = 20;
+  @observable randSeed: number = 0;
+  @observable measurement: string = 'CVNN';
+  @observable resampling: string = 'no';
+  @observable runWith: string = 'holdout';
+  @observable crossCount: number = 5;
+  @observable dataRange: string = 'all';
+  @observable customField: string = '';
+  @observable customRange: unknown[] = [];
+  @observable algorithms: string[] = [];
+  @observable selectId: string = '';
+  @observable version: number[] = [1, 2, 4];
+  @observable features: string[] = [
+    'Extra Trees',
+    'Random Trees',
+    'Fast ICA',
+    'Kernel PCA',
+    'PCA',
+    'Polynomial',
+    'Feature Agglomeration',
+    'Kitchen Sinks',
+    'Linear SVM',
+    'Nystroem Sampler',
+    'Select Percentile',
+    'Select Rates',
+  ];
+  @observable dataViews: unknown | null = null;
+  @observable dataViewsLoading: boolean = false;
+  @observable dataViewProgress: number = 0;
 
   //un
-  @observable weights = {}
-  @observable standardType = 'standard'
-  @observable searchTime = 5
-  @observable kValue = 5
-  @observable kType = 'auto'
+  @observable weights: NumberObject = {};
+  @observable standardType: string = 'standard';
+  @observable searchTime: number = 5;
+  @observable kValue: number = 5;
+  @observable kType: string = 'auto';
 
-  @observable stopModel = false
-  @observable stopEtl = false
-  @observable isAbort = false
-  @observable stopIds = []
+  @observable stopModel: boolean = false;
+  @observable stopEtl: boolean = false;
+  @observable isAbort: boolean = false;
+  @observable stopIds: string[] = [];
 
-  @observable reportProgress = 0
-  @observable reportProgressText = 'init'
-  @observable reportCancel = false
-  @observable isHoldout = false;
+  @observable reportProgress: number = 0;
+  @observable reportProgressText: string = 'init';
+  @observable reportCancel: boolean = false;
+  @observable isHoldout: boolean = false;
 
   constructor(id, args) {
     this.id = id
@@ -215,7 +312,7 @@ export default class Project {
 
   readIndex = async (index) => {
     const url = `/etls/${index}/preview`
-    const { data = {} } = await axios.get(url)
+    const { data } = await axios.get(url)
     const result = (data.result || []).map(row => this.rawHeader.map(h => row[h]))
     return result
   }
@@ -255,11 +352,8 @@ export default class Project {
   get defaultDataQuality() {
     return {
       // mismatchFillMethod: {},
-      mismatchIndex: {},
       // nullFillMethod: {},
-      nullIndex: {},
       // outlierFillMethod: {},
-      outlierIndex: {},
 
       // outlierDict: {},
       targetMap: {},
@@ -283,8 +377,8 @@ export default class Project {
 
   @computed
   get defaultAlgorithms() {
-    let algorithms = []
-    let disableList = []
+    let algorithms: string[] = []
+    let disableList: string[] = []
     if (this.problemType === "Clustering") {
       algorithms = [
         'KMeans',
@@ -404,8 +498,8 @@ export default class Project {
   }
 
   @computed
-  get currentSetting() {
-    return this.settings.find(s => s.id === this.settingId)
+  get currentSetting(): Settings | undefined {
+    return this.settings.find((s: any) => s.id === this.settingId)
   }
 
   @computed
@@ -421,7 +515,7 @@ export default class Project {
     if (!uploadData.length) return []
     if (!target) return uploadData
     return uploadData.map(row => {
-      const newRow = []
+      const newRow: string[] = []
       sortHeader.forEach(v => {
         const index = rawHeader.indexOf(v)
         if (index > -1) newRow.push(row[index])
@@ -597,12 +691,17 @@ export default class Project {
   /**---------------------------------------------problem-------------------------------------------------*/
   @action
   saveProblem = async () => {
-    const updObj = {
+    const updObj: {
+      statement: string
+      business: string
+      problemType: string
+      measurement?: string
+    } = {
       statement: this.statement,
       business: this.business,
       problemType: this.changeProjectType
     };
-    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score'
+    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl()
       //全部恢复到problem步骤
@@ -720,7 +819,17 @@ export default class Project {
   endSchema = async () => {
     this.etling = true
     await this.abortTrainByEtl()
-    const data = {
+    const data: {
+      target: string,
+      colType: StringObject,
+      dataHeader: string[],
+      noCompute: boolean,
+      nullFillMethod: StringObject,
+      nullFillMethodTemp: StringObject,
+      outlierFillMethod: StringObject,
+      outlierFillMethodTemp: StringObject,
+      crossCount?: number
+    } = {
       target: this.target,
       colType: { ...this.colType },
       dataHeader: [...this.dataHeader],
@@ -949,19 +1058,6 @@ export default class Project {
   }
 
   @computed
-  get targetIssues() {
-    const { target, mismatchIndex, nullIndex, outlierIndex, colType } = this;
-    const arr = {
-      mismatchRow: colType[target] !== "Categorical" ? (mismatchIndex[target] || []) : [],
-      nullRow: nullIndex[target] || [],
-      outlierRow: colType[target] !== "Categorical" ? (outlierIndex[target] || []) : [],
-    }
-
-    arr.errorRow = Array.from(new Set([...arr.mismatchRow, ...arr.nullRow, ...arr.outlierRow]))
-    return arr
-  }
-
-  @computed
   get targetIssuesCountsOrigin() {
     const { target, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin, colType } = this;
     const arr = {
@@ -970,106 +1066,6 @@ export default class Project {
       outlierRow: colType[target] !== "Categorical" ? (outlierLineCountsOrigin[target] || 0) : 0,
     }
     return arr
-  }
-
-  etl = async (saveIssue = false) => {
-    const { id, problemType, dataHeader, uploadFileName } = this;
-
-    const command = 'etl';
-
-    const data = {
-      projectId: id,
-      time: moment().valueOf(),
-      saveIssue,
-      command
-    }
-
-    if (this.colType && Object.keys(this.colType).length) {
-      data.colType = { ...this.colType };
-    }
-
-    if (this.target) {
-      data.targetLabel = this.target;
-      data.problemType = problemType;
-    }
-
-    if (dataHeader.length) {
-      data.featureLabel = dataHeader.filter(v => v !== this.target)
-    }
-
-    if (this.mismatchFillMethod && Object.keys(this.mismatchFillMethod).length) {
-      data.mismatchFillMethod = toJS(this.mismatchFillMethod);
-    }
-
-    if (this.nullFillMethod && Object.keys(this.nullFillMethod).length) {
-      data.nullFillMethod = toJS(this.nullFillMethod);
-    }
-
-    if (this.outlierFillMethod && Object.keys(this.outlierFillMethod).length) {
-      data.outlierFillMethod = toJS(this.outlierFillMethod);
-    }
-
-    if (this.targetArray && this.targetArray.length) {
-      data.targetMap = { [this.target]: toJS(this.targetMap) };
-      data.showTargetMap = this.targetArray.map((v, k) => {
-        return { [v]: k }
-      })
-    }
-
-    if (this.outlierDict && Object.keys(this.outlierDict).length) {
-      data.outlierDict = toJS(this.outlierDict);
-    }
-
-    if (this.noCompute) {
-      data.noCompute = true;
-    }
-
-    if (this.firstEtl) {
-      data.firstEtl = true;
-    }
-
-    if (this.firstEtl) {
-      data.csvLocation = [...uploadFileName]
-    }
-
-    // id: request ID
-    // projectId: project ID
-    // csv_location: csv 文件相对路径
-    // problem_type: 预测类型 Classification , Regression
-    // feature_label: 特征列名
-    // fill_method:  无效值
-    // kwargs:
-    const api = await socketStore.ready()
-    const returnValue = await api.etl(data)
-    const { result, status, message } = returnValue;
-    if (status !== 200) {
-      // 出现错误弹出提示框,需要用户确认
-      Modal.error({
-        title: message || result['processError'],
-      });
-      this.etling = false
-      this.etlProgress = 0
-      return false
-    }
-    this.setProperty(result)
-    return true
-  }
-
-  abortEtl = () => {
-    if (this.stopEtl) return
-    this.stopEtl = true
-    const command = {
-      command: 'stop',
-      action: 'etl',
-      projectId: this.id
-    }
-    this.isAbort = true
-    socketStore.ready().then(api => api.abortEtl(command).then(returnValue => {
-      const { status, message, result, id } = returnValue
-      if (id !== this.id) return
-      if (status !== 200) return antdMessage.error(message)
-      this.setProperty({ ...result, stopEtl: false })
-    }))
   }
 
   @action
@@ -1229,7 +1225,7 @@ export default class Project {
   get recommendModel() {
     const { costOption, criteria, models, problemType, defualtRecommendModel, targetCounts, distribution } = this
     const [v0, v1] = Object.values(targetCounts)
-    const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+    const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4))
     const percentNew = distribution ? distribution / 100 : percent0
     let model
     if (problemType === 'Classification') {
@@ -1311,7 +1307,7 @@ export default class Project {
     return models.filter(_m => currentSetting.models.includes(_m.id))
       .map(m => {
         const { score } = m
-        const { validateScore, holdoutScore } = score || {}
+        const { validateScore, holdoutScore } = score
         let validate, holdout
         if (problemType === 'Classification') {
           validate = currentMeasurement === 'auc' ? (validateScore || {}).auc : m[currentMeasurement + 'Validation']
@@ -1353,7 +1349,7 @@ export default class Project {
     } = this;
 
     let command = '';
-    let trainData = {}
+    let trainData: TrainCommand = {}
 
     const featureLabel = dataHeader.filter(d => d !== target).filter(h => colType[h] !== 'Raw');
     if (!featureLabel.length) return antdMessage.error("no feature label");
@@ -1428,7 +1424,7 @@ export default class Project {
         trainData = {
           problemType,
           featureLabel,
-          targetLabel: target,
+          targetLabel: [target],
           projectId: id,
           version: '1,2,3,4',
           command,
@@ -1436,7 +1432,7 @@ export default class Project {
           speedVSaccuracy: 5,
           ensembleSize: 20,
           randSeed: 0,
-          measurement: problemType === "Classification" ? "auc" : "r2",
+          measurement: "auc",
           settingName: setting.name,
           holdoutRate: 0.2,
           algorithms: [
@@ -1471,7 +1467,7 @@ export default class Project {
         trainData = {
           problemType,
           featureLabel,
-          targetLabel: target,
+          targetLabel: [target],
           projectId: id,
           version: '1,2,3,4',
           command,
@@ -1479,7 +1475,7 @@ export default class Project {
           speedVSaccuracy: 5,
           ensembleSize: 20,
           randSeed: 0,
-          measurement: problemType === "Classification" ? "auc" : "r2",
+          measurement: "r2",
           settingName: setting.name,
           holdoutRate: 0.2,
           algorithms: [
@@ -1559,7 +1555,7 @@ export default class Project {
     } = this;
 
     let command = '';
-    let trainData = {}
+    let trainData: TrainCommand = {}
 
     const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d)).filter(h => colType[h] !== 'Raw');
     if (!featureLabel.length) return antdMessage.error("no feature label")
@@ -1855,7 +1851,8 @@ export default class Project {
 
   removeCurSetting = () => {
     this.settings = this.settings.filter(st => st.id !== this.settingId)
-    this.settingId = (this.settings[this.settings.length - 1] || {}).id || ''
+    const curSetting = this.settings[this.settings.length - 1]
+    this.settingId = curSetting ? curSetting.id : ''
   }
 
   modeling = (trainData, updateData) => {
@@ -1938,7 +1935,7 @@ export default class Project {
     if (data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
       const [v0, v1] = Object.values(this.targetCounts)
-      const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+      const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4))
       const percentNew = this.distribution ? this.distribution / 100 : percent0
       const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
       if (index === model.fitIndex) return
@@ -1958,7 +1955,7 @@ export default class Project {
     if (data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
       const [v0, v1] = Object.values(this.targetCounts)
-      const percent0 = parseFloat(formatNumber(v1 / (v0 + v1), 4))
+      const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4))
       const percentNew = this.distribution ? this.distribution / 100 : percent0
       const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
       if (index === model.fitIndex) return
@@ -2143,7 +2140,12 @@ export default class Project {
     if (this.histgramPlots.hasOwnProperty(field)) return
     this.histgramPlots[field] = ''
     socketStore.ready().then(api => {
-      const command = {
+      const command: {
+        projectId: string,
+        command: string,
+        feature_label: string[],
+        newFeatureLabel?: NumberObject
+      } = {
         projectId: this.id,
         command: 'top.histgramPlot',
         feature_label: [field]
@@ -2635,7 +2637,7 @@ function loadFile(fileName, content) {
   aLink.download = fileName;
   aLink.href = URL.createObjectURL(blob);
   aLink.click();
-  URL.revokeObjectURL(blob);
+  URL.revokeObjectURL(blob.toString());
 }
 
 function formatFeature(pt) {
@@ -2671,3 +2673,5 @@ function formatFeature(pt) {
   }
   return obj[pt]
 }
+
+export default Project

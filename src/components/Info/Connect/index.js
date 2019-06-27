@@ -267,8 +267,6 @@ export default class DataConnect extends Component {
   }
 
   closeUpload = () => {
-    const process = this.props.projectStore.project.etling ? 50 : this.process
-    if (process >= 50) this.props.projectStore.project.abortEtl()
     this.pause && this.pause()
     this.uploading = false
     this.process = 0

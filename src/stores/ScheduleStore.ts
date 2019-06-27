@@ -1,7 +1,7 @@
 import { observable, computed, when, action } from 'mobx';
 import socketStore from 'stores/SocketStore';
 import userStore from 'stores/UserStore';
-import deploymentStore from './DeploymentStore.js';
+import deploymentStore from './DeploymentStore';
 
 const sortStrategies = {
   createdDate: (a, b) =>
@@ -83,10 +83,10 @@ class ScheduleStore {
 
   initWatch = () => {
     when(
-      () => userStore.status === 'login' && userStore.info.id,
+      () => userStore.status === 'login' && !!userStore.info.id,
       () =>
         socketStore.ready().then(api => {
-          const callback = action(response => {
+          const callback = action((response: any) => {
             this.schedules = response.list;
             this.watchingList = true
           })
@@ -127,8 +127,8 @@ class ScheduleStore {
     // pagination
     const start =
       (this.sortOptions.currentPage - 1) *
-      parseInt(this.sortOptions.perPage, 10);
-    const end = start + parseInt(this.sortOptions.perPage, 10);
+      parseInt(this.sortOptions.perPage.toString(), 10);
+    const end = start + parseInt(this.sortOptions.perPage.toString(), 10);
     result = result.slice(start, end);
     result = result.map(schedule => ({
       schedule,

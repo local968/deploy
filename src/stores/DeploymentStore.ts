@@ -26,7 +26,7 @@ const sortStrategies = {
 
 const filter = (keywords, deployments) => {
   if (!keywords || keywords === '') return deployments;
-  const result = [];
+  const result: any[] = [];
   deployments.map((_d, index) => {
     const _results = keywords
       .split(' ')
@@ -46,10 +46,10 @@ const filter = (keywords, deployments) => {
 
 class DeploymentStore {
   sortByOptions = {
-    createdDate: EN.CreatedDate+ '∧',
-    rcreatedDate: EN.CreatedDate+ '∨',
-    projectName: EN.ProjectName+'∧',
-    rprojectName: EN.ProjectName+'∨',
+    createdDate: EN.CreatedDate + '∧',
+    rcreatedDate: EN.CreatedDate + '∨',
+    projectName: EN.ProjectName + '∧',
+    rprojectName: EN.ProjectName + '∨',
     modelName: EN.ModelName + ' ∧',
     rmodelName: EN.ModelName + ' ∨'
   };
@@ -92,8 +92,8 @@ class DeploymentStore {
     // pagination
     const start =
       (this.sortOptions.currentPage - 1) *
-      parseInt(this.sortOptions.perPage, 10);
-    const end = start + parseInt(this.sortOptions.perPage, 10);
+      parseInt(this.sortOptions.perPage.toString(), 10);
+    const end = start + parseInt(this.sortOptions.perPage.toString(), 10);
     result = result.slice(start, end);
 
     return result;
@@ -106,7 +106,7 @@ class DeploymentStore {
   }
 
   constructor() {
-    socketStore.ready().then(api => {
+    socketStore.ready().then((api: any) => {
       this.initWatch()
       api.on('online', this.initWatch)
       api.on('offline', this.onOffline)
@@ -117,8 +117,8 @@ class DeploymentStore {
     when(
       () => userStore.status === 'login',
       () =>
-        socketStore.ready().then(api => {
-          const callback = action(response => {
+        socketStore.ready().then((api: any) => {
+          const callback = action((response: any) => {
             this.deployments = response.list;
             this.watchingList = true;
           })
@@ -142,7 +142,7 @@ class DeploymentStore {
       csvScript,
       performanceOptions: {}
     };
-    const api = await socketStore.ready();
+    const api: any = await socketStore.ready();
     const checkResponse = await api.getProjectDeployment({ projectId })
     if (checkResponse.deploymentId) {
       api.updateDeploymentModel({ deploymentId: checkResponse.deploymentId, modelName })
@@ -158,25 +158,25 @@ class DeploymentStore {
   @action
   create(project) {
     return new Promise((resolve, reject) => {
-      socketStore.ready().then(api => api.addDeployment({ project }));
+      socketStore.ready().then((api: any) => api.addDeployment({ project }));
     });
   }
 
   @action
   change(id, key, value) {
-    const _d = new Deployment(this.deployments.find(_d => _d.id === id));
+    const _d = new Deployment(this.deployments.find((_d: any) => _d.id === id));
     _d[key] = value;
     return _d.save();
   }
 
   @action
   toggleEnable(id, value) {
-    const _d = new Deployment(this.deployments.find(_d => _d.id === id));
+    const _d = new Deployment(this.deployments.find((_d: any) => _d.id === id));
     if (value) {
       _d.enable = value;
     } else {
       _d.enable = !_d.enable;
-      socketStore.ready().then(api => {
+      socketStore.ready().then((api: any) => {
         if (_d.enable === false) {
           api.suspendDeployment({ id });
         } else if (_d.enable === true) {
@@ -196,7 +196,7 @@ class DeploymentStore {
 
   @action
   delete(id) {
-    socketStore.ready().then(api => api.removeDeployment({ id }));
+    socketStore.ready().then((api: any) => api.removeDeployment({ id }));
   }
 
   @action
@@ -204,7 +204,7 @@ class DeploymentStore {
     this.sortOptions[key] = value;
   };
 
-  deploySchedule = (deploymentId, threshold) => socketStore.ready().then(api => api.deploySchedule({ deploymentId, threshold }));
+  deploySchedule = (deploymentId, threshold) => socketStore.ready().then((api: any) => api.deploySchedule({ deploymentId, threshold }));
 }
 
 export default new DeploymentStore();

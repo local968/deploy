@@ -76,7 +76,7 @@ class TargetIssue extends Component {
 
   render() {
     const { project, changeTab } = this.props;
-    const { issues, sortData, mapHeader, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, targetIssues, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
+    const { issues, sortData, mapHeader, target, colType, sortHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, problemType, totalRawLines, totalLines, etling, etlProgress, renameVariable, targetCounts, rawDataView, targetIssuesCountsOrigin, targetArrayTemp } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
     const recomm = 2 //problemType === 'Outlier' ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
     const isNum = colType[target] === 'Numerical'

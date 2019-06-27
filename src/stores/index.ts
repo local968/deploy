@@ -5,8 +5,6 @@ import deploymentStore from './DeploymentStore'
 import scheduleStore from './ScheduleStore'
 import axios from 'axios'
 
-window.axios = axios
-
 export default {
   socketStore,
   userStore,
@@ -15,7 +13,7 @@ export default {
   scheduleStore
 };
 
-window.stores = {
+(window as any).stores = {
   socketStore,
   userStore,
   projectStore,
