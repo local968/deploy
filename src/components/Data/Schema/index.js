@@ -7,7 +7,7 @@ import { Checkbox, message } from 'antd'
 import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confirm } from 'components/Common';
 import EN from '../../../constant/en';
 
-@inject('projectStore')
+@inject('projectStore','userStore')
 @observer
 export default class DataSchema extends Component {
   @observable checkList = this.props.projectStore.project.rawHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
@@ -267,7 +267,9 @@ export default class DataSchema extends Component {
       if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = mapHeader[h]
       if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = mapHeader[h]
     });
-
+  
+    const {schema_continue=true} = this.props.userStore.info.role;
+  
     return project && <div className={styles.schema}>
       <div className={styles.schemaInfo}>
         <div className={styles.schemaI}><span>i</span></div>
@@ -300,11 +302,11 @@ export default class DataSchema extends Component {
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
           }</div>} />
           {isMissed && <div className={styles.schemaMissed} >
-            <div className={styles.errorBlock}></div>
+            <div className={styles.errorBlock}/>
             <span>{EN.Missing}</span>
           </div>}
           {isDuplicated && <div className={styles.schemaDuplicated} >
-            <div className={styles.errorBlock}></div>
+            <div className={styles.errorBlock}/>
             <span>{EN.DuplicatedHeader}</span>
           </div>}
           {(isMissed || isDuplicated) && <div className={styles.schemaSelect} onClick={this.autoFix}>
@@ -327,7 +329,11 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || !this.target || (newDataHeader.length <= 1 && newDataHeader.indexOf(this.target) > -1)} text={EN.Continue} />
+        <ContinueButton
+          onClick={this.doEtl}
+          show={schema_continue}
+          disabled={etling || !this.target || (newDataHeader.length <= 1 && newDataHeader.indexOf(this.target) > -1)}
+          text={EN.Continue} />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />

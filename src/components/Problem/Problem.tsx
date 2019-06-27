@@ -21,6 +21,7 @@ const Unsupervised = [
 
 interface ProblemProps {
   projectStore: any
+  userStore:any,
 }
 
 interface ProblemState {
@@ -28,7 +29,7 @@ interface ProblemState {
 }
 
 const initState: ProblemState = {
-  visiable: false
+  visiable: false,
 }
 
 function Problem(props: ProblemProps) {
@@ -64,7 +65,9 @@ function Problem(props: ProblemProps) {
   const onConfirm = () => {
     saveProblem()
     onClose()
-  }
+  };
+
+  const {problem_continue=true} = props.userStore.info.role;
 
   return <div className={styles.problem}>
     <div className={styles.title}><span>{EN.ChooseProblemType}</span></div>
@@ -90,9 +93,14 @@ function Problem(props: ProblemProps) {
         ))}
       </RadioGroup>
     </div>
-    <ContinueButton onClick={nextStep} disabled={!changeProjectType} text={EN.Continue} width={null} />
+    <ContinueButton
+      onClick={nextStep}
+      disabled={!changeProjectType}
+      text={EN.Continue}
+      show={problem_continue}
+      width={null} />
     {<Confirm width={'6em'} visible={state.visiable} title={EN.Warning} content={EN.Thisactionmaywipeoutallofyourprevious} onClose={onClose} onConfirm={onConfirm} confirmText={EN.Continue} closeText={EN.CANCEL} />}
   </div>
 }
 
-export default inject('projectStore')(observer(Problem))
+export default inject('projectStore','userStore')(observer(Problem))

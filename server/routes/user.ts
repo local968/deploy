@@ -104,6 +104,13 @@ router.get('/status', async (req, res) => {
 
   if(result&&result.id){
     const {id,email,create_time,drole={},plan={}} = result;
+    Reflect.deleteProperty(drole,'_id');
+    Reflect.deleteProperty(drole,'id');
+    Reflect.deleteProperty(drole,'name');
+    Reflect.deleteProperty(drole,'createdAt');
+    Reflect.deleteProperty(drole,'updatedAt');
+    Reflect.deleteProperty(drole,'__v');
+
     return res.send({
       status: 200,
       message: 'ok',
