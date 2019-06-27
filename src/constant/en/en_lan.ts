@@ -1287,7 +1287,13 @@ const EN_LAN = {
   adjustMutualInfo: 'Adjust Mutual Info',
   adjustRandScore: 'Adjust Rand Score',
   ClusteringTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the clustering models. Otherwise, you can leave blank here.`,
-  OutlierTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the outlier detection models. Otherwise, you can leave blank here.`
+  OutlierTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the outlier detection models. Otherwise, you can leave blank here.`,
+  choosecharset: 'choose charset:',
+  UTF_8: 'UTF-8(default)',
+  UTF_16: 'UTF-16',
+  GBK: 'GBK',
+  GB_2312: 'GB-2312',
+  BIG5: 'BIG5',
 };
 
 

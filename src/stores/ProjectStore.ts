@@ -309,4 +309,6 @@ class ProjectStore {
   }
 }
 
+export { ProjectStore }
+
 export default new ProjectStore()

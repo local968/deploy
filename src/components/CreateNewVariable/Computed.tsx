@@ -776,7 +776,7 @@ function Computed(props: ComputedProps) {
           const cuschecked = checkArrayParams(num.exp.slice(1, -1), bracketExps, ({item, type, isVariable}) => {
             if (!item) return {isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} `}
             if (isVariable) return {isPass: false, message: `cannot use variable`}
-            if (type !== 'Numerical') return {isPass: false, message: `${item} ${EN.Mustbenumbe} `}
+            if (type !== 'Numerical') return {isPass: false, message: `${item} ${EN.Mustbenumber} `}
             return {isPass: true, message: 'ok'}
           })
           if (!cuschecked.isPass) return cuschecked
@@ -905,7 +905,7 @@ function Computed(props: ComputedProps) {
         }
         if (numList[0] && expToString(numList[0].exp) && isNaN(+expToString(numList[0].exp))) return {
           isPass: false,
-          message: `${expToString(numList[0].exp)} ${EN.Mustbenumbe} `
+          message: `${expToString(numList[0].exp)} ${EN.Mustbenumber} `
         }
         num = 1
         break;
@@ -949,7 +949,7 @@ function Computed(props: ComputedProps) {
         const subchecked = checkArrayParams(subItem.exp.slice(1, -1), bracketExps, ({ item, type, isVariable }) => {
           if (!item) return { isPass: false, message: `${expToString(subItem.exp)} contain ${EN.Emptyexpression} ` }
           if (isVariable) return { isPass: false, message: `cannot use variable` }
-          if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumbe} ` }
+          if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumber} ` }
           if (isNaN(+item) || item.includes('.')) return {
             isPass: false,
             message: `${item} ${EN.Mustbeinteger} `

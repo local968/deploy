@@ -5,42 +5,86 @@ import { debounce } from 'lodash'
 import { formatNumber } from '../../src/util'
 import EN from '../../src/constant/en'
 
+export interface graphicListItem {
+  name: string,
+  data: {
+    fields: string[],
+    id: string,
+  }
+}
+
+export interface ChartDataRoc {
+  AUCPR: number[],
+  AUCROC: number[],
+  F1: number[],
+  FN: number[],
+  FP: number[],
+  FPR: number[],
+  F_BETA: number[],
+  KS: number[],
+  LOGLOSS: number[],
+  Precision: number[],
+  Recall: number[],
+  TN: number[],
+  TP: number[],
+  TPR: number[],
+  Threshold: number[],
+  Youden: number[],
+}
+
+export interface ChartData {
+  roc: ChartDataRoc,
+  lift: unknown,
+  density: unknown
+}
+
+export interface ClaregScore {
+  acc?: number
+  auc?: number
+  f1?: number
+  logLoss?: number
+  precision?: number
+  recall?: number
+}
+
+export interface Score {
+  score?: number,
+  auc?: number,
+  validateScore?: ClaregScore,
+  holdoutScore?: ClaregScore,
+  trainScore?: ClaregScore
+}
+
 class Model {
-  projectId
-  _id
-  id
-  initialFitIndex
-  dataFlow
-  graphicList
-  @observable score;
-  @observable backend;
-  @observable featureImportance;
-  @observable executeSpeed = 0;
-  @observable modelName = "";
-  @observable modelInsightsData = null;
-  @observable fitIndex = 0;
-  @observable chartData;
-  @observable fitPlot;
-  @observable residualPlot;
-  @observable qcut;
-  @observable confusionMatrix
-  @observable problemType
-  @observable fitIndexModified;
-  @observable filtedModels;
-  @observable importanceLoading = false
-  @observable labelWithImportance = {}
-  @observable multiVarPlotData = ''
-  @observable parallelPlotData = ''
-  @observable outlierPlotData = '';
-  @observable pointToShowData = '';
-  @observable predictData = '';
-  @observable fitAndResidualPlotData = ''
-  @observable outlierPlotLoading = false
-  @observable featureList = []
-  @observable rate = 0
-  @observable pcaPlotData = ''
-  @observable featureLabel = []
-  @observable holdoutChartData;
+  projectId: string
+  _id: string
+  id: string
+  initialFitIndex: number
+  dataFlow: StringObject
+  graphicList: graphicListItem[]
+  @observable score: Score;
+  @observable backend: string;
+  @observable featureImportance: NumberObject;
+  @observable executeSpeed: number = 0;
+  @observable modelName: string = "";
+  // @observable modelInsightsData = null;
+  @observable fitIndex: number = 0;
+  @observable chartData: ChartData;
+  @observable problemType: string
+  @observable importanceLoading: boolean = false
+  @observable labelWithImportance: NumberObject = {}
+  @observable multiVarPlotData: string = ''
+  @observable parallelPlotData: string = ''
+  @observable outlierPlotData: string = '';
+  @observable pointToShowData: string = '';
+  @observable predictData: string = '';
+  @observable fitAndResidualPlotData: string = ''
+  @observable outlierPlotLoading: boolean = false
+  @observable featureList: string[] = []
+  @observable rate: number = 0
+  @observable pcaPlotData: string = ''
+  @observable featureLabel: string[] = []
+  @observable holdoutChartData: ChartData;
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {
@@ -51,27 +95,8 @@ class Model {
     this.updateModel = debounce(this.updateModel, 1000)
   }
 
-  @computed
-  get fitPlotPath() {
-    return this.fitPlot ? this.urlPath(this.fitPlot) : ''
-  }
-
-  @computed
-  get residualPlotPath() {
-    return this.residualPlot ? this.urlPath(this.residualPlot) : ''
-  }
-
-  urlPath = path => {
-    return `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.projectId}`
-  }
-
   @action
-  setData(type, obj) {
-    this[type] = Object.assign({}, { ...this[type] }, obj)
-  }
-
-  @action
-  setProperty(data) {
+  setProperty(data: Object) {
     if (typeof data !== 'object') {
       return false;
     }
@@ -83,16 +108,17 @@ class Model {
     Reflect.deleteProperty(data, 'projectId')
 
     for (let key in data) {
-      if (typeof data[key] === 'function') {
-        delete data[key];
+      const value = Reflect.get(data, key)
+      // (data as Model)[(key as keyof Model)]
+      if (typeof value === 'function') {
+        Reflect.deleteProperty(data, key)
       }
     }
     Object.assign(this, data)
   }
   @action
-  setFitIndex(index) {
+  setFitIndex(index: number) {
     this.fitIndex = index;
-    this.fitIndexModified = true;
     this.updateModel({
       fitIndex: index,
     })
@@ -100,7 +126,6 @@ class Model {
 
   @action
   resetFitIndex() {
-    this.fitIndexModified = false;
     const { initialFitIndex: fitIndex } = this;
     this.fitIndex = fitIndex;
     this.updateModel({
@@ -108,9 +133,9 @@ class Model {
     })
   }
 
-  getBenefit = (ITP, IFN, IFP, ITN, IPN, IPO) => {
-    const data = this.chartData || {};
-    const roc = data.roc || {};
+  getBenefit = (ITP: number, IFN: number, IFP: number, ITN: number, IPN: number, IPO: number) => {
+    const data = this.chartData
+    const roc = data.roc
     const { TP, FN, FP, TN } = roc;
     if (!ITP && !IFN && !IFP && !ITN) return {
       benefit: 0,
@@ -138,58 +163,57 @@ class Model {
   }
   @computed
   get predicted() {
-    const { chartData, confusionMatrix, fitIndex, problemType } = this
+    const { chartData, fitIndex, problemType } = this
     if (problemType !== 'Classification') return [1, 1]
     if (chartData) {
       const { TP, FN, FP, TN } = chartData.roc
       return [TN[fitIndex] / (TN[fitIndex] + FP[fitIndex]), TP[fitIndex] / (TP[fitIndex] + FN[fitIndex])]
     }
-    return [confusionMatrix[0][0] / ((confusionMatrix[0][0] + confusionMatrix[0][1]) || 1), confusionMatrix[1][1] / ((confusionMatrix[1][0] + confusionMatrix[1][1]) || 1)];
   }
   @computed
   get accValidation() {
-    const data = this.chartData || {}
-    const roc = data.roc || {}
+    const data = this.chartData
+    const roc = data.roc
     const { TP, FN, FP, TN } = roc
     if (!TP || !FN || !FP || !TN) return this.score.validateScore.acc
     return (TP[this.fitIndex] + TN[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
   }
   @computed
   get accHoldout() {
-    const data = this.holdoutChartData || {}
-    const roc = data.roc || {}
+    const data = this.holdoutChartData
+    const roc = data.roc
     const { TP, FN, FP, TN } = roc
     if (!TP || !FN || !FP || !TN) return this.score.holdoutScore.acc
     return (TP[this.fitIndex] + TN[this.fitIndex]) / (TP[this.fitIndex] + FN[this.fitIndex] + FP[this.fitIndex] + TN[this.fitIndex])
   }
   @computed
   get precisionValidation() {
-    const data = this.chartData || {}
-    const roc = data.roc || {}
+    const data = this.chartData
+    const roc = data.roc
     const { TP, FP } = roc
     if (!TP || !FP) return this.score.validateScore.precision
     return TP[this.fitIndex] / (TP[this.fitIndex] + FP[this.fitIndex])
   }
   @computed
   get precisionHoldout() {
-    const data = this.holdoutChartData || {}
-    const roc = data.roc || {}
+    const data = this.holdoutChartData
+    const roc = data.roc
     const { TP, FP } = roc
     if (!TP || !FP) return this.score.holdoutScore.precision
     return TP[this.fitIndex] / (TP[this.fitIndex] + FP[this.fitIndex])
   }
   @computed
   get recallValidation() {
-    const data = this.chartData || {}
-    const roc = data.roc || {}
+    const data = this.chartData
+    const roc = data.roc
     const { TP, FN } = roc
     if (!TP || !FN) return this.score.validateScore.precision
     return TP[this.fitIndex] / (TP[this.fitIndex] + FN[this.fitIndex])
   }
   @computed
   get recallHoldout() {
-    const data = this.holdoutChartData || {}
-    const roc = data.roc || {}
+    const data = this.holdoutChartData
+    const roc = data.roc
     const { TP, FN } = roc
     if (!TP || !FN) return this.score.holdoutScore.precision
     return TP[this.fitIndex] / (TP[this.fitIndex] + FN[this.fitIndex])
@@ -204,9 +228,9 @@ class Model {
     const { precisionHoldout, recallHoldout } = this
     return 2 * precisionHoldout * recallHoldout / (precisionHoldout + recallHoldout)
   }
-  modelProcessFlow(dataFlow) {
+  modelProcessFlow(dataFlow: StringObject) {
     const rawPara = dataFlow || this.dataFlow;
-    const para = {};
+    const para: { [key: string]: StringObject } = {};
     const preprocessor = rawPara['preprocessor:__choice__'];
     if (!preprocessor) return { flow: null, flowPara: null };
 
@@ -242,7 +266,7 @@ class Model {
     };
     return { flow: chain, flowPara: para };
   }
-  extractParameters(rawPara, para, str, choice) {
+  extractParameters(rawPara: StringObject, para: { [key: string]: StringObject }, str: string, choice: string) {
     const keys = Object.keys(rawPara);
     para[choice] = {};
     keys.forEach(key => {
@@ -280,7 +304,7 @@ class Model {
       api.permutationImportance(command)
     })
   }
-  saveFeatureList = async (featureList) => {
+  saveFeatureList = async (featureList: [string, string]) => {
     // if (this.outlierPlotLoading) return
     if (!Array.isArray(featureList) || featureList.length !== 2) return console.log('error featureList')
     if (featureList[0] === this.featureList[0] && featureList[1] === this.featureList[1]) return console.log("same")
@@ -312,8 +336,8 @@ class Model {
   //     return api.outlierPlot(command)
   //   })
   // }
-  updateModel(data) {
-    Object.assign(this, data);
+  updateModel(data: Object) {
+    this.setProperty(data)
     return socketStore.ready().then(api => api.updateModel({
       data,
       id: this.id,

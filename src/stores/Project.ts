@@ -18,20 +18,71 @@ export interface Numerical {
   outlierCount?: number;
 }
 
-export interface OriginalStats {
-  std_deviation?: unknown;
-  numerical?: Numerical;
-}
 export interface Metric {
-  originalStats?: OriginalStats;
-  type?;
-  originalCategoricalMap?;
-  categoricalMap?;
+  name: string,
+  type: 'Categorical' | 'Numerical' | 'Raw',
+  isTarget?: boolean,
+  originalStats: Stats,
+  etlStats?: Stats,
+  mismatchFillMethod?: FillMethod,
+  missingValueFillMethod?: FillMethod,
+  outlierFillMethod?: FillMethod,
+  mapFillMethod?: { [value: string]: FillMethod },
+  categoricalMap?: { key: string, doc_count: number }[]
+  originalCategoricalMap?: { key: string, doc_count: number }[]
+}
+
+export interface FillMethod {
+  type: 'delete' | 'replace',
+  value?: string
+}
+
+export interface Stats {
+  took: number,
+  count?: number;
+  min?: number;
+  max?: number;
+  avg?: number;
+  sum?: number;
+  sum_of_squares?: number;
+  variance?: number;
+  std_deviation?: number;
+  std_deviation_bounds?: StdDeviationBounds;
+  median?: number;
+  uniqueValues: number;
+  doubleUniqueValue?: number;
+  doubleCount?: number;
+  keywordCount?: number;
+  mode: string;
+  modeCount: number;
+  mean?: number;
+  kurtosis?: number;
+  skewness?: number;
+  high?: number;
+  low?: number;
+  numerical?: Numerical;
+  categorical?: Categorical;
+}
+
+export interface Categorical {
+  missingValue?: number;
+}
+
+export interface Numerical {
+  mismatch?: number;
+  missingValue?: number;
+  outlierCount?: number;
+}
+
+export interface StdDeviationBounds {
+  upper: number;
+  lower: number;
 }
 
 export interface BaseResponse {
   message: string;
   status: number;
+  result?: any
 }
 
 export interface CostOption {
@@ -51,14 +102,6 @@ export interface Settings {
 export interface SsPlot {
   x: number[],
   y: number[]
-}
-
-export interface StringObject {
-  [key: string]: string
-}
-
-export interface NumberObject {
-  [key: string]: number
 }
 
 export interface TrainCommand {
@@ -88,6 +131,10 @@ export interface TrainCommand {
   nfold?: number
 }
 
+export interface DataView {
+  [key: string]: Stats
+}
+
 class Project {
   visiable: boolean
   init: boolean = false
@@ -96,7 +143,7 @@ class Project {
   rawHistgramPlotsBase64: StringObject
 
   @observable colMap: StringObject = {};
-  @observable stats: OriginalStats = {};
+  @observable stats: Stats;
   @observable userId: string = '';
   @observable models: Model[] = [];
   @observable trainModel: unknown = {};
@@ -165,7 +212,7 @@ class Project {
   @observable outlierDict: unknown = {};
   @observable targetMap: NumberObject = {};
   @observable targetArray: string[] = [];
-  @observable rawDataView: unknown | null = null;
+  @observable rawDataView: DataView | null = null;
   @observable preImportance: NumberObject | null = null;
   @observable preImportanceLoading: boolean = false;
   @observable importanceProgress: number = 0;
@@ -279,7 +326,7 @@ class Project {
   @observable reportCancel: boolean = false;
   @observable isHoldout: boolean = false;
 
-  constructor(id, args) {
+  constructor(id: string, args: Object) {
     this.id = id
     this.visiable = true
     this.setProperty(args)
@@ -291,7 +338,7 @@ class Project {
     // })
   }
 
-  readData = path => {
+  readData = (path: string) => {
     const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
     return new Promise((resolve, reject) => {
       Papa.parse(url, {
@@ -310,10 +357,10 @@ class Project {
     })
   }
 
-  readIndex = async (index) => {
+  readIndex = async (index: string) => {
     const url = `/etls/${index}/preview`
     const { data } = await axios.get(url)
-    const result = (data.result || []).map(row => this.rawHeader.map(h => row[h]))
+    const result = data.result.map((row: StringObject) => this.rawHeader.map(h => row[h]))
     return result
   }
 
@@ -322,7 +369,7 @@ class Project {
     return this.totalRawLines - this.deletedCount
   }
 
-  fetchData = async path => {
+  fetchData = async (path: string) => {
     const api = await socketStore.ready()
     const result = await api.fetchData({ path })
     return result.data
@@ -337,7 +384,7 @@ class Project {
       uploadFileName: [],
       dataHeader: [],
       rawHeader: [],
-      colType: [],
+      colType: {},
       totalLines: 0,
       totalRawLines: 0,
       firstEtl: true,
@@ -345,33 +392,46 @@ class Project {
       noCompute: false,
       rawDataView: null,
       originalIndex: ''
+    } as {
+      cleanHeader: string[],
+      uploadFileName: string[],
+      dataHeader: string[],
+      rawHeader: string[],
+      colType: StringObject,
+      totalLines: number,
+      totalRawLines: number,
+      firstEtl: boolean,
+      target: string,
+      noCompute: boolean,
+      rawDataView: null,
+      originalIndex: string
     }
   }
 
   @computed
   get defaultDataQuality() {
     return {
-      // mismatchFillMethod: {},
-      // nullFillMethod: {},
-      // outlierFillMethod: {},
-
-      // outlierDict: {},
       targetMap: {},
       targetArray: [],
       totalFixedLines: 0,
-      // nullLineCounts: {},
-      // mismatchLineCounts: {},
-      // outlierLineCounts: {},
       renameVariable: {},
       missingReason: {},
       targetMapTemp: {},
       targetArrayTemp: [],
-      // mismatchFillMethodTemp: {},
-      // nullFillMethodTemp: {},
-      // outlierFillMethodTemp: {},
       outlierDictTemp: {},
       otherMap: {},
       cleanPath: ''
+    } as {
+      targetMap: NumberObject,
+      targetArray: string[],
+      totalFixedLines: number,
+      renameVariable: StringObject,
+      missingReason: StringObject,
+      targetMapTemp: NumberObject,
+      targetArrayTemp: string[],
+      outlierDictTemp: unknown,
+      otherMap: StringObject,
+      cleanPath: string
     }
   }
 
@@ -488,11 +548,56 @@ class Project {
       stopIds: [],
       features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
       ssPlot: null
+    } as {
+      train2Finished: boolean,
+      train2ing: boolean,
+      train2Error: boolean,
+      criteria: string,
+      costOption: { TP: 0, FP: 0, FN: 0, TN: 0 },
+      speedVSaccuracy: number,
+      ensembleSize: number,
+      // maxTime: 10,
+      randSeed: number,
+      resampling: string,
+      runWith: string,
+      crossCount: number,
+      dataRange: string,
+      customField: string,
+      customRange: string[],
+      algorithms: string[],
+      measurement: string,
+      selectId: string,
+      version: number[],
+      trainHeader: string[],
+      customHeader: string[],
+      newVariable: string[],
+      newType: unknown,
+      expression: unknown,
+      validationRate: number,
+      holdoutRate: number,
+      hasSendEtl: boolean,
+      dataViews: null,
+      dataViewsLoading: boolean,
+      preImportanceLoading: boolean,
+      preImportance: NumberObject,
+      mappingKey: string,
+      newVariablePath: string,
+      newVariableViews: unknown,
+      distribution: number,
+      weights: NumberObject,
+      standardType: string,
+      searchTime: number,
+      kValue: number,
+      kType: string,
+      trainModel: unknown,
+      stopIds: string[],
+      features: string[],
+      ssPlot: null
     }
   }
 
   @computed
-  get settingName() {
+  get settingName(): string {
     if (this.currentSetting) return this.currentSetting.name
     return ''
   }
@@ -503,14 +608,14 @@ class Project {
   }
 
   @computed
-  get sortHeader() {
+  get sortHeader(): string[] {
     const { target, dataHeader } = this
     if (!target) return dataHeader
     return [target, ...dataHeader.filter(v => target !== v)]
   }
 
   @computed
-  get sortData() {
+  get sortData(): string[][] {
     const { target, sortHeader, uploadData, rawHeader } = this
     if (!uploadData.length) return []
     if (!target) return uploadData
@@ -544,10 +649,10 @@ class Project {
   }
 
   @action
-  jump = (routeIndex, subStepActive) => ({ subStepActive, curStep: routeIndex })
+  jump = (routeIndex: number, subStepActive: number) => ({ subStepActive, curStep: routeIndex })
 
   @action
-  nextMainStep = (routeIndex) => {
+  nextMainStep = (routeIndex: number) => {
     let obj;
     if (routeIndex <= this.mainStep) {
       obj = {
@@ -565,7 +670,7 @@ class Project {
   }
 
   @action
-  nextSubStep = (subStepIndex, routeIndex) => {
+  nextSubStep = (subStepIndex: number, routeIndex: number) => {
     let obj;
     if (routeIndex === this.mainStep) {
       if (subStepIndex > this.lastSubStep) {
@@ -587,7 +692,7 @@ class Project {
   };
 
   @action
-  upIsHoldout(isHoldout) {
+  upIsHoldout(isHoldout: boolean) {
     // if(this.problemType === "Classification"){
     //   const {chartData,holdoutChartData,fitIndex} = this.selectModel;
     //   const {roc:{Threshold:data}} = !isHoldout?holdoutChartData:chartData;
@@ -604,12 +709,11 @@ class Project {
   };
 
   @action
-  updateProject = data => {
+  updateProject = (data: Object) => {
     this.loading = true;
-    data.id = this.id
 
     return socketStore.ready().then(api => {
-      return api.updateProject(data)
+      return api.updateProject({ ...data, id: this.id })
     })
   }
 
@@ -656,33 +760,29 @@ class Project {
   }
 
   @action
-  setProperty = (data) => {
-    delete data.totalLines
+  setProperty = (data: Object) => {
     if (typeof data !== 'object') {
       return false;
     }
     if (Array.isArray(data)) {
       return false;
     }
-    delete data.userId;
-    delete data.id;
+    Reflect.deleteProperty(data, 'totalLines')
+    Reflect.deleteProperty(data, 'userId')
+    Reflect.deleteProperty(data, 'id')
     for (let key in data) {
-      if (typeof data[key] === 'function') {
-        delete data[key];
+      const value = Reflect.get(data, key)
+      // let value = (data as Project)[(key as keyof Project)]
+      if (typeof value === 'function') {
+        Reflect.deleteProperty(data, key)
         continue;
       }
       if (key === 'problemType') {
-        data.changeProjectType = data[key]
+        Reflect.defineProperty(data, 'changeProjectType', { value })
       }
       if (key === 'noCompute') {
-        data.noComputeTemp = data[key]
+        Reflect.defineProperty(data, 'noComputeTemp', { value })
       }
-      // if (key === 'trainModel') {
-      //   if (data[key]) {
-      //     const { value } = data[key] || {}
-      //     data[key].value = Math.max((value || 0), ((this[key] || {}).value || 0))
-      //   }
-      // }
     }
     // data.updateTime = +new Date()
     Object.assign(this, data)
@@ -721,20 +821,24 @@ class Project {
   /**---------------------------------------------data-------------------------------------------------*/
   //修改上传文件
   @action
-  fastTrackInit = async (data) => {
+  fastTrackInit = async (data: {
+    totalRawLines: number,
+    fileName: string,
+    originalIndex: string,
+    rawHeader: string[]
+  }) => {
 
     await this.abortTrainByEtl()
 
     const api = await socketStore.ready()
     const { header } = await api.getHeader({ index: data.originalIndex })
-    data.header = header
 
     const totalRawLines = data.totalRawLines
     const fileName = data.fileName
     const originalIndex = data.originalIndex
     const mapHeader = data.rawHeader.map(_h => _h.trim())
-    const rawHeader = data.header
-    const dataHeader = data.header
+    const rawHeader = header
+    const dataHeader = header
     const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, {
       rawHeader,
       dataHeader,
@@ -768,7 +872,7 @@ class Project {
     /**
    * 自动修改header
    */
-    const temp = {};
+    const temp: NumberObject = {};
     const header = this.mapHeader.map((h, i) => {
       h = h.trim();
       if (/^$/.test(h)) {
@@ -792,7 +896,7 @@ class Project {
   @computed
   get headerTemp() {
     //查看是否存在相同名称的header
-    let temp = {};
+    let temp: { [key: string]: number[] } = {};
     let isMissed = false;
     let isDuplicated = false;
     this.mapHeader.forEach((h, i) => {
@@ -867,43 +971,20 @@ class Project {
       this.etling = false
       await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data, step))
     }
-    // const step = this.noComputeTemp ? {
-    //   curStep: 3,
-    //   mainStep: 3,
-    //   subStepActive: 1,
-    //   lastSubStep: 1
-    // } : {
-    //     curStep: 2,
-    //     mainStep: 2,
-    //     subStepActive: 3,
-    //     lastSubStep: 3
-    //   }
-    // await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
-    //   target: this.target,
-    //   colType: { ...this.colType },
-    //   dataHeader: [...this.dataHeader],
-    //   noCompute: this.noComputeTemp,
-    //   nullFillMethod: this.nullFillMethod,
-    //   nullFillMethodTemp: this.nullFillMethodTemp,
-    //   outlierFillMethod: this.outlierFillMethod,
-    //   outlierFillMethodTemp: this.outlierFillMethodTemp,
-    //   ...step
-    // }))
-    // return await this.etl(true)
   }
 
   @computed
   get qualityHasChanged() {
     return true
-    let hasChange = false
-    const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
-    for (const item of list) {
-      const before = this[item]
-      const after = this[item + "Temp"]
-      hasChange = this.hasChanged(before, after)
-      if (hasChange) break
-    }
-    return hasChange
+    // let hasChange = false
+    // const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
+    // for (const item of list) {
+    //   const before = this[item]
+    //   const after = this[item + "Temp"]
+    //   hasChange = this.hasChanged(before, after)
+    //   if (hasChange) break
+    // }
+    // return hasChange
   }
 
   @action
@@ -941,21 +1022,25 @@ class Project {
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    await api.newEtl({ projectId: this.id }, ({ progress }) => {
+    await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
       this.etlProgress = progress
     })
     this.etlProgress = 0
     this.etling = false
   }
 
-  hasChanged = (before, after) => {
+  hasChanged = (before: Object, after: Object): boolean => {
     if (Object.keys(before).length === Object.keys(after).length) {
       for (const key in before) {
-        if (typeof before[key] === 'object') {
-          const changed = this.hasChanged(before[key], after[key])
-          if (changed) return changed
-        } else {
-          if (before[key] !== after[key]) return true
+        if (before.hasOwnProperty(key)) {
+          const bvalue = Reflect.get(before, key)
+          const avalue = Reflect.get(after, key)
+          if (typeof bvalue === 'object') {
+            const changed = this.hasChanged(bvalue as Object, avalue as Object)
+            if (changed) return changed
+          } else {
+            if (bvalue !== avalue) return true
+          }
         }
       }
       return false
@@ -992,7 +1077,8 @@ class Project {
     if (problemType === "Classification") {
       data.targetIssue = Object.keys(targetCounts).length > 2;
     } else if (problemType === "Regression") {
-      const unique = (rawDataView ? rawDataView[target] : {}).uniqueValues || 1000
+      const dataview = Reflect.get(rawDataView, target)
+      const unique = dataview.uniqueValues || 1000
       data.targetIssue = unique < Math.min((rawHeader.length - 1) * 6, 1000)
     }
 
@@ -1098,7 +1184,7 @@ class Project {
       // }
       this.dataViewsLoading = true
       return api.dataView(command)
-        .then(returnValue => {
+        .then((returnValue: BaseResponse) => {
           const { status, result } = returnValue
           if (status < 0) {
             // this.setProperty({ dataViews: null })
