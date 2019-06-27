@@ -393,23 +393,27 @@ const ClusteringTable = observer((props) => {
           <span>{sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cvnn')}>
+          <span style={{overflow: 'visible'}}><Hint content={EN.CVNNHint} /></span>
           <span className={classes.ccellHeaderSpan}>CVNN</span>
-          <span>{sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CVNNHint} /></span>
+          <span>{sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
         </div>
-        <div className={`${classes.ccell}  ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
+          <span style={{overflow: 'visible'}}><Hint content={EN.SihouetteScoreHint} /></span>
           <Tooltip title={EN.SihouetteScore}>{EN.SihouetteScore}</Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>{EN.SihouetteScore} </span>*/}
-          <span>{sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.SihouetteScoreHint} /></span>
+          <span>{sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
+          <span style={{overflow: 'visible'}}><Hint content={EN.CHIndexHint} /></span>
           <Tooltip title={'CH Index '}>CH Index</Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>CH Index </span>*/}
-          <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.CHIndexHint} /></span>
+          <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rsquared')}>
+          <span style={{overflow: 'visible'}}><Hint content={EN.squaredHint} /></span>
           <Tooltip title={'R square'}>R square</Tooltip>
           {/*<span className={classes.ccellHeaderSpan}>R squared</span>*/}
-          <span>{sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} <Hint content={EN.squaredHint} /></span>
+          <span>{sort.key === 'rsquared' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cluster')}>
           <Tooltip title={EN.clusters} >{EN.clusters} </Tooltip>
@@ -522,10 +526,10 @@ const ClusteringRow = observer((props) => {
           <span>{clusters}</span>
         </div>
         {hasTarget && <div className={`${classes.ccell}`}>
-          <span>{adjust_mutual_info}</span>
+          <span>{formatNumber(adjust_mutual_info)}</span>
         </div>}
         {hasTarget && <div className={`${classes.ccell}`}>
-          <span>{adjust_rand_score}</span>
+          <span>{formatNumber(adjust_rand_score)}</span>
         </div>}
         <div className={`${classes.ccell}`}>
           <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>

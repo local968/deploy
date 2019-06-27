@@ -189,7 +189,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolLabel}><span>{EN.CurrentVariableList}</span></div>
           <select value={selectValue} onChange={this.handleChange}>
             <option value='all'>{EN.AllVariables} ({allVariables.length})</option>
-            <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option>
+            {problemType === 'Clustering' && <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option>}
             {customHeader.map((v, k) => <option key={k} value={k}>{EN.Custom}{k + 1} ({v.length})</option>)}
             {hasNewOne && <option
               value={customHeader.length}>{EN.Custom}{customHeader.length + 1} ({checkedVariables.length})</option>}

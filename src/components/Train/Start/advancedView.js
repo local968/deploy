@@ -145,7 +145,7 @@ export default class AdvancedView extends Component {
     const { project, hidden } = this.props;
     const { algorithms, defaultAlgorithms } = project
     const isAll = Algorithms[project.problemType].length === algorithms.length
-    const isDefault = algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
+    const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
     const measurementList =
       project.problemType === "Outlier"
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
