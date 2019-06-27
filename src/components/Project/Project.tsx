@@ -17,7 +17,7 @@ function Project(props: ProjectProps) {
   const { deploymentStore = {}, projectStore = {} } = props
   const { project } = projectStore;
 
-  if (!project) return null
+  if (!project) return null;
 
   const [name, setName] = React.useState(project ? project.name : '')
 
@@ -41,10 +41,7 @@ function Project(props: ProjectProps) {
     setName(e.target.value)
   };
 
-  // const {project_continue=true} = props.userStore.info.role;
-  console.log(props)
-
-  var project_continue = true
+  const {project_continue=true} = props.userStore.info.role;
 
   return (
     <div className={styles.project}>

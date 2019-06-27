@@ -103,7 +103,7 @@ router.get('/status', async (req, res) => {
   const result = await userService.status(userId);
 
   if(result&&result.id){
-    const {id,email,create_time,drole={}} = result;
+    const {id,email,create_time,drole={},plan={}} = result;
     return res.send({
       status: 200,
       message: 'ok',
@@ -112,6 +112,7 @@ router.get('/status', async (req, res) => {
         email,
         createdTime:create_time,
         role:drole,
+        level:plan.level,
       }
     });
   }

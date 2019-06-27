@@ -13,9 +13,9 @@ import moment from 'moment'
 import {
   ISO,
   D3D2,
-} from  "../../Charts"
+} from "../../Charts"
 
-const {Option} = Select;
+const { Option } = Select;
 
 function ModelResult(props) {
   // const type = 'clustering'
@@ -49,6 +49,7 @@ function ModelResult(props) {
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
   if (!selectModel || !models.length) return null
+  if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
 
   const cannotDeploy = problemType === 'Clustering' && !selectModel.supportDeploy
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName

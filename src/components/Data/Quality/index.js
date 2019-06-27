@@ -192,7 +192,7 @@ class TargetIssue extends Component {
             totalRawLines={totalRawLines} />}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <DataIssue backToConnect={this.backToConnect}
             editFixes={this.editFixes}
-            targetIssues={targetIssuesCountsOrigin}
+            targetIssuesCountsOrigin={targetIssuesCountsOrigin}
             totalRawLines={totalRawLines}
             totalLines={totalLines}
             percent={targetPercent} />}

@@ -1,7 +1,7 @@
 // import React from "react";
 // import { Typography } from "@material-ui/core";
 
-const ZH_LAN: any = {
+const ZH_LAN = {
   Loading: '加载中…',
   Reconnecting: '重新连接...',
   OhISee: '我知道了',

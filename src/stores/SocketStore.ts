@@ -1,4 +1,3 @@
-import axios from 'axios';
 import config from '../config';
 import EventEmitter from 'events';
 import uuid from 'uuid';
@@ -129,7 +128,7 @@ class Socket extends EventEmitter implements SocketInterface {
 interface SocketStoreInterface {
   status: string,
   api: { on: (str: string, callback: () => void) => void }
-  socket? : Socket
+  socket?: Socket
 }
 
 class SocketStore extends EventEmitter implements SocketStoreInterface {
@@ -207,5 +206,7 @@ class SocketStore extends EventEmitter implements SocketStoreInterface {
     this.status = 'ready';
   }
 }
+
+export { SocketStore }
 
 export default new SocketStore();

@@ -104,9 +104,10 @@ export default class ModelResult extends Component {
 
   render() {
     const { project } = this.props.projectStore;
-    const { models,isHoldout } = project
+    const { models, isHoldout } = project
     const { id, etlIndex, fileName, selectModel, target, loadModel, settings } = project
     if (!models.length) return null;
+    if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
     // const { view } = this;
 
     const modelName = selectModel.modelName;
@@ -140,14 +141,14 @@ export default class ModelResult extends Component {
         {this.view === 'simple' ?
           <SimpleView models={filterModels} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} currentSettingId={this.currentSettingId} /> :
           <AdvancedView models={models}
-                        project={project}
-                        exportReport={this.exportReport}
-                        sort={this.sort.advanced}
-                        handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange}
-                        isHoldout={isHoldout}
-                        handleHoldout={this.handleHoldout}
-                        currentSettingId={this.currentSettingId
-                        } changeSetting={this.changeSetting} />}
+            project={project}
+            exportReport={this.exportReport}
+            sort={this.sort.advanced}
+            handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange}
+            isHoldout={isHoldout}
+            handleHoldout={this.handleHoldout}
+            currentSettingId={this.currentSettingId
+            } changeSetting={this.changeSetting} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>

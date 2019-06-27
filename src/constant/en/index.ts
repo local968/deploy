@@ -3,7 +3,5 @@ import ZH_LAN from './zh_lan'
 import config from 'config'
 
 const isEN = config.isEN;
-let EN;
-isEN ? EN = EN_LAN : EN = ZH_LAN;
 
-export default EN;
+export default isEN ? EN_LAN : ZH_LAN;
