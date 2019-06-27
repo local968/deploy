@@ -75,12 +75,12 @@ class Socket extends EventEmitter implements SocketInterface {
     this.ws.addEventListener('open', this.onOpen);
   }
 
-  private onMessage = event => {
+  private onMessage = (event: unknown) => {
     this.start(); //any message represent current connection working.
     this.emit('message', event);
   };
 
-  private onClose = event => {
+  private onClose = (event: unknown) => {
     this.errorTimes++;
     // if (this.errorTimes >= 10) {
     //   this.connectionError = event
@@ -90,12 +90,12 @@ class Socket extends EventEmitter implements SocketInterface {
     console.warn('websocket connection closed!', event);
   };
 
-  private onError = event => {
+  private onError = (event: unknown) => {
     if (!this.connectionError) this.reconnect();
     console.error('websocket connection error!', event);
   };
 
-  private onOpen = event => {
+  private onOpen = () => {
     this.errorTimes = 0;
     this.start(); //reset client heartbeat check
     this.emit('online');
@@ -110,7 +110,7 @@ class Socket extends EventEmitter implements SocketInterface {
     // }
   };
 
-  public send(message) {
+  public send(message: string) {
     if (!this.ws) return
     if (this.ws.readyState === 1) {
       this.ws.send(message);
@@ -135,27 +135,35 @@ interface SocketStoreInterface {
 class SocketStore extends EventEmitter implements SocketStoreInterface {
   status = 'init';
   api = { on: this.on.bind(this) };
-  socket
+  socket: Socket
 
   connect = () => {
     this.socket = new Socket();
-    this.socket.on('message', message => {
+    this.socket.on('message', (message: { data: string }) => {
       let data = message.data;
       if (data === 'pong') return;
       if (debug) console.log('receive message:', data);
+      let _data: {
+        type: string
+        request: {
+          _id: string,
+          progress: boolean
+        }
+        api?: string[]
+      }
       try {
-        data = JSON.parse(data);
+        _data = JSON.parse(data);
       } catch (e) {
         console.warn('unknown message:', message.data);
       }
-      if (data.type === 'api') {
-        return this.initApi(data);
+      if (_data.type === 'api') {
+        return this.initApi(_data.api);
       }
-      if (data.request && data.request._id && data.request.progress !== true)
-        return this.emit(data.request._id, data);
-      if (data.request && data.request._id && data.request.progress === true)
-        return this.emit('progress' + data.request._id, data);
-      if (data.type) return this.emit(data.type, data);
+      if (_data.request && _data.request._id && _data.request.progress !== true)
+        return this.emit(_data.request._id, _data);
+      if (_data.request && _data.request._id && _data.request.progress === true)
+        return this.emit('progress' + _data.request._id, _data);
+      if (_data.type) return this.emit(_data.type, _data);
     });
     this.socket.on('offline', () => {
       this.emit('offline');
@@ -183,25 +191,27 @@ class SocketStore extends EventEmitter implements SocketStoreInterface {
     });
   }
 
-  initApi(data) {
-    data.api.map(eventName => {
-      return (this.api[eventName] = (data = {}, callback) => {
-        if (typeof data === 'function') {
-          callback = data;
-          data = {};
-        }
-        const _id = uuid.v4();
-        data._id = _id;
-        data.type = eventName;
-        if (callback) this.on('progress' + _id, callback);
-        return new Promise((resolve, reject) => {
-          this.once(_id, (...args) => {
-            if (callback) this.removeListener('progress' + _id, callback);
-            resolve(...args);
+  initApi(api: string[]) {
+    api.map(eventName => {
+      return Reflect.defineProperty(this.api, eventName, {
+        value: (data: { _id?: string, type?: string } = {}, callback: () => void) => {
+          if (typeof data === 'function') {
+            callback = data;
+            data = {};
+          }
+          const _id = uuid.v4();
+          data._id = _id;
+          data.type = eventName;
+          if (callback) this.on('progress' + _id, callback);
+          return new Promise((resolve, reject) => {
+            this.once(_id, (...args) => {
+              if (callback) this.removeListener('progress' + _id, callback);
+              resolve(...args);
+            });
+            this.socket.send(JSON.stringify(data));
           });
-          this.socket.send(JSON.stringify(data));
-        });
-      });
+        }
+      })
     });
     this.emit('apiReady');
     this.status = 'ready';

@@ -17,6 +17,7 @@ import DataSample from './Sample'
 import { ProjectStore } from 'stores/ProjectStore';
 import { UserStore } from 'stores/UserStore';
 import { SocketStore } from 'stores/SocketStore';
+import { UploadProps } from 'stores/Project';
 
 const Option = Select.Option
 
@@ -29,23 +30,23 @@ interface DataConnectProps {
 @inject('userStore', 'socketStore', 'projectStore')
 @observer
 export default class DataConnect extends Component<DataConnectProps> {
-  constructor(props) {
+  constructor(props: DataConnectProps) {
     super(props)
     this.uploadRef = React.createRef()
   }
   uploadRef: React.RefObject<Uploader>
   pause: () => void
   resume: () => void
-  @observable sample = false
-  @observable sql = false
-  @observable file = null
-  @observable uploading = false
-  @observable process = 0
-  @observable isPause = false
-  @observable isSql = false
-  @observable sqlProgress = 0
-  @observable visiable = false
-  @observable key = ''
+  @observable sample: boolean = false
+  @observable sql: boolean = false
+  @observable file: File | null = null
+  @observable uploading: boolean = false
+  @observable process: number = 0
+  @observable isPause: boolean = false
+  @observable isSql: boolean = false
+  @observable sqlProgress: number = 0
+  @observable visiable: boolean = false
+  @observable key: string = ''
 
   @computed
   get message() {
@@ -58,14 +59,14 @@ export default class DataConnect extends Component<DataConnectProps> {
     if (this.isSql && process > 0 && process < 50) return `${EN.DownloadedData} ${this.sqlProgress}${EN.Rows}`;
   }
 
-  onUpload = ({ pause, resume }) => {
+  onUpload = ({ pause, resume }: { pause: () => void, resume: () => void }) => {
     this.uploading = true
     this.isPause = false
     this.pause = pause
     this.resume = resume
   }
 
-  upload = action(data => {
+  upload = action((data: UploadProps) => {
 
     this.process = 50
     this.file = null
@@ -76,7 +77,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     });
   })
 
-  onError = action((error, times) => {
+  onError = action((error: Error, times: number) => {
     this.file = null
     this.process = 0
     this.uploading = false
@@ -86,7 +87,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     console.log(error, times)
   })
 
-  onProgress = action((progress, speed) => {
+  onProgress = action((progress: string, speed: string) => {
     if (!this.uploading) return
     const [loaded, size] = progress.split("/")
     try {
@@ -141,7 +142,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.sample = false
   })
 
-  selectSample = data => {
+  selectSample = (data: UploadProps) => {
     const process = this.props.projectStore.project.etling ? 50 : this.process
     if (!!process) return false;
 
@@ -173,11 +174,11 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.sql = false;
   })
 
-  onClick = key => {
+  onClick = (key: string) => {
     const { project } = this.props.projectStore
     if (this.uploading || project.etling) return
     this.key = key
-    if ((project || {}).train2ing || !!((project || {}).models || []).length) return this.visiable = true
+    if (project.train2ing || !!project.models.length) return this.visiable = true
     this.onConfirm()
   }
 
@@ -185,14 +186,14 @@ export default class DataConnect extends Component<DataConnectProps> {
     if (!this.key) return
     this.onClose()
     if (this.key === 'upload') return this.uploadRef.current.show()
-    this[this.key] = true
+    Reflect.defineProperty(this, this.key, { value: true })
   }
 
   onClose = () => {
     this.visiable = false
   }
 
-  block = (label, img, key) => {
+  block = (label: string, img: string, key: string) => {
     return (
       <div className={styles.uploadBlock} onClick={this.onClick.bind(null, key)}>
         <div className={styles.blockImg}>
@@ -310,14 +311,14 @@ export default class DataConnect extends Component<DataConnectProps> {
           onClose={this.hideSql}
           title={EN.DataSourceDatabase}
           projectId={project.id}
-          onSubmit={action(async options => {
+          onSubmit={action(async (options: { sqlTable: string }) => {
             this.hideSql();
             this.isSql = true
             this.uploading = true
             let processInterval;
             const api = await socketStore.ready()
             this.process = 0
-            const resp = await api.downloadFromDatabase({ ...options, type: 'modeling', projectId: project.id }, action(res => {
+            const resp = await api.downloadFromDatabase({ ...options, type: 'modeling', projectId: project.id }, action((res: { count: number }) => {
               if (this.process < 49.9) this.process += 0.1
               if (res.count) this.sqlProgress = res.count
             }))

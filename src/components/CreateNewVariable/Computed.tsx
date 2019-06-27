@@ -8,7 +8,7 @@ import {
   Button,
   Typography
 } from '@material-ui/core';
-import {map, filter, includes, get, findIndex, findLastIndex, slice} from 'lodash';
+import { map, filter, includes, get, findIndex, findLastIndex, slice } from 'lodash';
 // import { useImmer } from 'use-immer';
 import Funcions from './Funcions';
 import Variables from './Variables';
@@ -19,6 +19,7 @@ import { withStyles } from '@material-ui/core/styles';
 import EN from '../../constant/en';
 import FUNCTIONS from './functions';
 import { message, Icon } from 'antd';
+import { NewVariable } from 'stores/Project';
 
 // const FUNCTIONS = {
 //   base: [] as any[],
@@ -72,11 +73,11 @@ export interface ComputedState {
 }
 
 function initExp(): Exp {
-  return {value: [], label: '', range: [0, 0]}
+  return { value: [], label: '', range: [0, 0] }
 }
 
 function Computed(props: ComputedProps) {
-  const {classes, onClose, addNewVariable, colType, expression, mapHeader} = props
+  const { classes, onClose, addNewVariable, colType, expression, mapHeader } = props
   const [state, setState] = React.useState({
     exps: [initExp()],
     detailKey: '',
@@ -86,7 +87,7 @@ function Computed(props: ComputedProps) {
   const [loading, setLoading] = React.useState(false)
 
   const handleFunction = (func: Coordinate, startIndex: number | null) => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const LPAREN: Coordinate = {
       value: '(',
       name: '(',
@@ -98,14 +99,14 @@ function Computed(props: ComputedProps) {
       type: Type.Rparen,
     };
     const newExp: Exp = exps[index]
-    const {range: [start, end], value} = newExp
+    const { range: [start, end], value } = newExp
     const curStart: number = typeof startIndex === 'number' ? startIndex : start
     const parenId = (func.value || '') + new Date().getTime();
     newExp.value = [
       ...value.slice(0, curStart),
       func,
-      {...LPAREN, id: parenId},
-      {...RPAREN, id: parenId},
+      { ...LPAREN, id: parenId },
+      { ...RPAREN, id: parenId },
       ...value.slice(end),
     ];
     newExp.range = [curStart + 2, curStart + 2];
@@ -122,9 +123,9 @@ function Computed(props: ComputedProps) {
   };
 
   const handleVariables = (v: Coordinate, startIndex: number | null) => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const newExp: Exp = exps[index]
-    const {range: [start, end], value} = newExp
+    const { range: [start, end], value } = newExp
     const curStart: number = typeof startIndex === 'number' ? startIndex : start
 
     const splitValue: Coordinate = {
@@ -186,7 +187,7 @@ function Computed(props: ComputedProps) {
   }
 
   const addLine = () => {
-    const {exps} = state
+    const { exps } = state
     exps.push(initExp())
     setState({
       ...state,
@@ -199,7 +200,7 @@ function Computed(props: ComputedProps) {
   }
 
   const deleteIndex = (k: number) => {
-    const {exps, index} = state
+    const { exps, index } = state
     exps.splice(k, 1)
     setState({
       ...state,
@@ -218,9 +219,9 @@ function Computed(props: ComputedProps) {
   }
 
   const deleteExp = () => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const exp: Exp = exps[index]
-    const {range: [start, end]} = exp
+    const { range: [start, end] } = exp
     if (end <= 0) return;
     const newExp: Array<Coordinate> = [...exp.value];
     const isEq: boolean = start === end
@@ -240,7 +241,7 @@ function Computed(props: ComputedProps) {
   };
 
   const changeExpLabel = (v: string) => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const exp = exps[index];
     exps[index].label = v;
     setState({
@@ -250,7 +251,7 @@ function Computed(props: ComputedProps) {
   };
 
   const addExp = (v: string) => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const exp = exps[index]
     let { range: [start, end] } = exp
     const isNumber: boolean = !isNaN(+v)
@@ -330,9 +331,9 @@ function Computed(props: ComputedProps) {
   };
 
   const left = () => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const exp: Exp = exps[index]
-    const {range: [start]} = exp;
+    const { range: [start] } = exp;
     if (start <= 0) {
       return;
     }
@@ -344,7 +345,7 @@ function Computed(props: ComputedProps) {
   };
 
   const right = () => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const exp: Exp = exps[index]
     const end: number = exp.range[1]
     if (end >= exp.value.length) {
@@ -358,7 +359,7 @@ function Computed(props: ComputedProps) {
   };
 
   const setRange = (start: number, end: number) => {
-    const {exps, index} = state;
+    const { exps, index } = state;
     const exp: Exp = exps[index]
     const l: number = exp.value.length;
     if (end > l || start < 0) {
@@ -379,11 +380,11 @@ function Computed(props: ComputedProps) {
     if (error) {
       return alert(error.message)
     }
-    const newType = {}
+    const newType: StringObject = {}
     // const variables: string[] = [...newVariable]
-    const newExps: any[] = []
+    const newExps: NewVariable[] = []
     for (let i = 0; i < checkd.length; i++) {
-      const {num, type} = checkd[i] as any
+      const { num, type } = checkd[i] as any
       const name = exps[i].label
       if (!name) return message.error(EN.Nameisempty)
       if (expression.hasOwnProperty(name)) return message.error(`${EN.Newvariable} ${name} ${EN.Isexist}`)
@@ -419,10 +420,25 @@ function Computed(props: ComputedProps) {
     index: number
   }
 
+  interface BracketExps {
+    [key: string]: (Coordinate | Bracket)[]
+  }
+
+  interface CheckReturns {
+    isPass: boolean, message: string, num?: number, isVariable?: boolean, type?: string
+  }
+
+  interface Params {
+    isVariable: boolean,
+    num: number,
+    exp: (Coordinate | Bracket)[],
+    type: string
+  }
+
   // 转化括号
   const formatBracket = (_expression: Coordinate[]) => {
     let expression: (Coordinate | Bracket)[] = _expression
-    const bracketExps: any = {}
+    const bracketExps: BracketExps = {}
     let num = 1
 
     while (true) {
@@ -441,11 +457,11 @@ function Computed(props: ComputedProps) {
           break
         }
       }
-      if (start === -1) return {isPass: false, message: EN.Unexpectedtoken}
+      if (start === -1) return { isPass: false, message: EN.Unexpectedtoken }
       const exp: (Coordinate | Bracket)[] = expression.slice(start + 1, end - 1)
       bracketExps[num] = exp
       //转化(...)为$?
-      expression = [...expression.slice(0, start), {index: num}, ...expression.slice(end)]
+      expression = [...expression.slice(0, start), { index: num }, ...expression.slice(end)]
       num++
     }
 
@@ -458,8 +474,8 @@ function Computed(props: ComputedProps) {
   }
 
   // 校验基本表达式
-  const checkSimpleExp = (expression: (Coordinate | Bracket)[], bracketExps: any, inFunction: boolean) => {
-    if (!expression.length) return {isPass: false, message: EN.Emptyexpression}
+  const checkSimpleExp = (expression: (Coordinate | Bracket)[], bracketExps: BracketExps, inFunction: boolean): CheckReturns => {
+    if (!expression.length) return { isPass: false, message: EN.Emptyexpression }
     // const baseOptReg = new RegExp(/[+\-*/]/)
     const length = expression.length
     let start = 0
@@ -490,7 +506,7 @@ function Computed(props: ComputedProps) {
     const typeArray: string[] = []
     for (let item of array) {
       if (!item.length) {
-        if (warning) return {isPass: false, message: EN.Errorexpression}
+        if (warning) return { isPass: false, message: EN.Errorexpression }
         warning = true
         continue
       } else {
@@ -511,7 +527,7 @@ function Computed(props: ComputedProps) {
         }
         //暂时只判断是否为空数组
         item = item.slice(1, -1)
-        if (!item.length) return {isPass: false, message: `${EN.Unknownvariable} []`}
+        if (!item.length) return { isPass: false, message: `${EN.Unknownvariable} []` }
         // const arrayResult = checkParams(item, null, 0, false)
         // if (!arrayResult.isPass) return arrayResult
         type = 'Array'
@@ -556,7 +572,7 @@ function Computed(props: ComputedProps) {
         const numItem = expToString(item as Coordinate[])
         const isNum = !isNaN(+numItem)
         //判断是否是数字
-        if (!isNum) return {isPass: false, message: `${EN.Unexpectedidentifier} ${numItem}`}
+        if (!isNum) return { isPass: false, message: `${EN.Unexpectedidentifier} ${numItem}` }
       }
       typeArray.push(type)
     }
@@ -570,14 +586,14 @@ function Computed(props: ComputedProps) {
     } else {
       expType = typeArray[0]
     }
-    return {isPass: true, message: EN.OK, num, isVariable, type: expType}
+    return { isPass: true, message: EN.OK, num, isVariable, type: expType }
   }
 
   // 校验表达式参数
-  const checkParams = (functionName: (Coordinate | Bracket)[], bracketExps: any, bracketNum: number) => {
+  const checkParams = (functionName: (Coordinate | Bracket)[], bracketExps: BracketExps, bracketNum: number): CheckReturns => {
     //默认校验函数 暂时 校验数组functionName为总表达式
     const exps = bracketExps[bracketNum]
-    if (!exps.length) return {isPass: false, message: EN.Emptyparameter}
+    if (!exps.length) return { isPass: false, message: EN.Emptyparameter }
     const length = exps.length
     let start = 0
     let skipNum = 0
@@ -585,15 +601,15 @@ function Computed(props: ComputedProps) {
     // 根据, 分割参数
     for (let i = 0; i < length; i++) {
       if (i < start) continue
-      if ((exps[i] as any).type === Type.Lc) {
+      if ((exps[i] as Coordinate).type === Type.Lc) {
         skipNum++
         continue
       }
-      if ((exps[i] as any).type === Type.RC) {
+      if ((exps[i] as Coordinate).type === Type.RC) {
         if (skipNum > 0) skipNum--
         continue
       }
-      if (skipNum === 0 && (exps[i] as any).type === Type.Split) {
+      if (skipNum === 0 && (exps[i] as Coordinate).type === Type.Split) {
         expArray.push(exps.slice(start, i))
         start = i + 1
       }
@@ -603,13 +619,13 @@ function Computed(props: ComputedProps) {
     let isVariable1 = false
     let num = 1
     let fnType = ''
-    const params: any[] = []
+    const params: Params[] = []
     let stillVariable = true
     for (const exp of expArray) {
       // 校验表达式
       const expChecked = checkSimpleExp(exp, bracketExps, !!functionName.length)
       if (!expChecked.isPass) return expChecked
-      const {isVariable, num, type} = expChecked
+      const { isVariable, num, type } = expChecked
       if (stillVariable) {
         if (isVariable) numOfParam++
         if (!isVariable) stillVariable = false
@@ -644,7 +660,7 @@ function Computed(props: ComputedProps) {
 
     if (SeniorFn) {
       // 校验高级函数参数
-      const seniorResult: any = checkSeniorParams(SeniorFn, params, numOfParam, bracketExps)
+      const seniorResult: CheckReturns = checkSeniorParams(SeniorFn, params, numOfParam, bracketExps)
       if (!seniorResult.isPass) return seniorResult
       isVariable1 = true
       num += seniorResult.num - 1
@@ -666,15 +682,15 @@ function Computed(props: ComputedProps) {
     if (!skipParams) {
       // 校验参数
       for (let param of params) {
-        if (param.type === 'Categorical') return {isPass: false, message: EN.ParametersmustbeNumerical}
+        if (param.type === 'Categorical') return { isPass: false, message: EN.ParametersmustbeNumerical }
       }
     }
 
-    return {isPass: true, message: `ok`, num, isVariable: isVariable1, type: fnType}
+    return { isPass: true, message: `ok`, num, isVariable: isVariable1, type: fnType }
   }
 
   // 校验高级表达式参数
-  const checkSeniorParams = (senior, params: any[], numOfParam: number, bracketExps: any) => {
+  const checkSeniorParams = (senior: Coordinate, params: Params[], numOfParam: number, bracketExps: BracketExps): CheckReturns => {
     let num = 0
     let type = ''
 
@@ -686,7 +702,7 @@ function Computed(props: ComputedProps) {
       for (let param of paramList) {
         if (param.type !== paramType) return {
           isPass: false,
-          message: `${EN.Function} ${senior.value} ${EN[`Parametersmustbe${paramType}`]}`
+          message: `${EN.Function} ${senior.value} ${Reflect.get(EN, `Parametersmustbe${paramType}`)}`
         }
       }
     }
@@ -706,10 +722,10 @@ function Computed(props: ComputedProps) {
           try {
             n = parseInt(_n, 10)
           } catch (e) {
-            return {isPass: false, message: `${_n} ${EN.Mustbeinteger} `}
+            return { isPass: false, message: `${_n} ${EN.Mustbeinteger} ` }
           }
-          if (n < 2) return {isPass: false, message: `${n} ${EN.Mustgreaterthan} 1`}
-          if (n > numOfParam) return {isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1} `}
+          if (n < 2) return { isPass: false, message: `${n} ${EN.Mustgreaterthan} 1` }
+          if (n > numOfParam) return { isPass: false, message: `${n} ${EN.Mustlessthan} ${numOfParam + 1} ` }
           return {
             isPass: true,
             message: EN.OK,
@@ -729,9 +745,9 @@ function Computed(props: ComputedProps) {
           try {
             parseInt(n, 10)
           } catch (e) {
-            return {isPass: false, message: `${n} ${EN.Mustbeinteger} `}
+            return { isPass: false, message: `${n} ${EN.Mustbeinteger} ` }
           }
-          return {isPass: true, message: EN.OK, num: numOfParam}
+          return { isPass: true, message: EN.OK, num: numOfParam }
         })
         for (let numResult of diffResults) {
           if (!numResult.isPass) return numResult
@@ -768,23 +784,23 @@ function Computed(props: ComputedProps) {
         type = 'Categorical'
         const numResults = numList.map(num => {
           let n = expToString(num.exp)
-          if (num.type !== 'Array') return {isPass: false, message: `${EN.Unexpectedidentifier} ${n} `}
+          if (num.type !== 'Array') return { isPass: false, message: `${EN.Unexpectedidentifier} ${n} ` }
           // const str = n.trim()
           // const first = num.exp.slice(0, 1)
           // const last = num.exp.slice(-1)
           // if (first.type !== "[" || last.value !== "]") return { isPass: false, message: `${ EN.Unexpectedidentifier } ${ n } ` }
-          const cuschecked = checkArrayParams(num.exp.slice(1, -1), bracketExps, ({item, type, isVariable}) => {
-            if (!item) return {isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} `}
-            if (isVariable) return {isPass: false, message: `cannot use variable`}
-            if (type !== 'Numerical') return {isPass: false, message: `${item} ${EN.Mustbenumber} `}
-            return {isPass: true, message: 'ok'}
+          const cuschecked = checkArrayParams(num.exp.slice(1, -1), bracketExps, ({ item, type, isVariable }) => {
+            if (!item) return { isPass: false, message: `${subItem.exp} contain ${EN.Emptyexpression} ` }
+            if (isVariable) return { isPass: false, message: `cannot use variable` }
+            if (type !== 'Numerical') return { isPass: false, message: `${item} ${EN.Mustbenumber} ` }
+            return { isPass: true, message: 'ok' }
           })
           if (!cuschecked.isPass) return cuschecked
           // const array = str.slice(1, -1).split(",")
           // for (let item of array) {
           //   if (!item || isNaN(parseFloat(item.trim()))) return { isPass: false, message: `${ item } ${ EN.Mustbenumbe } ` }
           // }
-          return {isPass: true, message: EN.OK, num: 1}
+          return { isPass: true, message: EN.OK, num: 1 }
         })
         for (let numResult of numResults) {
           if (!numResult.isPass) return numResult
@@ -841,8 +857,8 @@ function Computed(props: ComputedProps) {
           if (!nListchecked.isPass) return nListchecked
           num = nListchecked.params || 0
         } else {
-          if (nList.exp.length > 1) return {isPass: false, message: `${EN.Unexpectedidentifier} ${nExp} `}
-          const nParamExp = expToString(nList.exp[0])
+          if (nList.exp.length > 1) return { isPass: false, message: `${EN.Unexpectedidentifier} ${nExp} ` }
+          const nParamExp = expToString([nList.exp[0]])
           if (!nListValues.includes(nParamExp.toLowerCase())) return {
             isPass: false,
             message: `${EN.Unexpectedidentifier} ${nParamExp} `
@@ -957,13 +973,13 @@ function Computed(props: ComputedProps) {
           if (item < 0) return { isPass: false, message: `${item} ${EN.Thenumbermustbegreaterthanorequalto} 0` }
           if (isNaN(+prev)) prev = item
           else {
-            if (prev > item) return {isPass: false, message: `${item} ${EN.Mustgreaterthan} ${prev} `}
+            if (prev > item) return { isPass: false, message: `${item} ${EN.Mustgreaterthan} ${prev} ` }
             prev = item
           }
-          return {isPass: true, message: 'ok'}
+          return { isPass: true, message: 'ok' }
         })
         if (!subchecked.isPass) return subchecked
-        if (subchecked.params !== 2) return {isPass: false, message: `${EN.errorparams}${expToString(subItem.exp)} `}
+        if (subchecked.params !== 2) return { isPass: false, message: `${EN.errorparams}${expToString(subItem.exp)} ` }
         // if (subArray.length !== 2) return { isPass: false, message: `${EN.errorparams}${ subExp } ` }
         // for (let item of subArray) {
         //   if (!item) return { isPass: false, message: `${ subItem.exp } contain ${ EN.Emptyexpression } ` }
@@ -974,8 +990,8 @@ function Computed(props: ComputedProps) {
       default:
         break;
     }
-    if (num < 1) return {isPass: false, message: `${EN.Function}: ${senior.value} ${EN.Parameterserror} `}
-    return {isPass: true, message: EN.OK, num, type}
+    if (num < 1) return { isPass: false, message: `${EN.Function}: ${senior.value} ${EN.Parameterserror} ` }
+    return { isPass: true, message: EN.OK, num, type }
   }
 
   const checkArrayParams = (exps: any[], bracketExps: any, callback: ({ }: any) => { isPass: boolean, message: string }, unCheck?: boolean): { isPass: boolean, message: string, params?: number } => {
@@ -1015,28 +1031,28 @@ function Computed(props: ComputedProps) {
       const checked = callback({ item: expToString(exp as Coordinate[]), type, isVariable })
       if (!checked.isPass) return checked
     }
-    return {isPass: true, message: 'ok', params: expArray.length}
+    return { isPass: true, message: 'ok', params: expArray.length }
   }
 
 
   // 计算阶乘
-  const factorial = (n: number) => {
+  const factorial = (n: number): number => {
     if (n < 2) return 1
     return n * factorial(n - 1)
   }
 
-  const expToString = (exps: Coordinate[]) => exps.map(_e => (!_e.value ? '' : _e.type === Type.ID ? mapHeader[_e .value] : (_e as any).value)).join('')
+  const expToString = (exps: (Coordinate | Bracket)[]) => exps.map((_e: Coordinate) => (!_e.value ? '' : _e.type === Type.ID ? mapHeader[_e.value] : (_e as any).value)).join('')
 
   // 校验总表达式
   const checkExp = (_expression: Coordinate[]) => {
-    if (!_expression.length) return {isPass: true, message: EN.Emptyparameter, num: 0}
+    if (!_expression.length) return { isPass: true, message: EN.Emptyparameter, num: 0 }
     // if (_expression.includes("$")) return { isPass: false, message: EN.Unexpectedtoken$ }
 
-    const {bracketExps, expression, isPass: _isPass, message: _message} = formatBracket(_expression)
-    if (!_isPass) return {isPass: _isPass, message: _message}
+    const { bracketExps, expression, isPass: _isPass, message: _message } = formatBracket(_expression)
+    if (!_isPass) return { isPass: _isPass, message: _message }
     // console.log(bracketExps, expression, 666)
-    const {isPass, message, num, type} = checkSimpleExp(expression as (Coordinate | Bracket)[], bracketExps, false)
-    return {isPass, message, num, type}
+    const { isPass, message, num, type } = checkSimpleExp(expression as (Coordinate | Bracket)[], bracketExps, false)
+    return { isPass, message, num, type }
   }
   //------------------------------------------check end-----------------------------------------------------------------
 
@@ -1049,28 +1065,28 @@ function Computed(props: ComputedProps) {
     };
   });
   //参数类型： concat eq 任意类型  其他的方法都需要 Numerical类型的变量
-  const {exps, index} = state;
+  const { exps, index } = state;
   const currExp = exps[index];
-  const {range, value} = currExp;
+  const { range, value } = currExp;
   const inputIndex = range[1]
   const pre = slice(value, 0, inputIndex);
   const next = slice(value, inputIndex);
   const lParenIndex = findLastIndex(pre, v => {
     if (v.value === '(') {
-      return findIndex(next, ({value, id}) => (value === ')' && v.id === id)) > -1
+      return findIndex(next, ({ value, id }) => (value === ')' && v.id === id)) > -1
     }
     return false
   })
   const vari = pre.pop() || {};
   const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
   if (func) {
-    const {name} = func;
-    variables = filter(variables, ({varType}) => varType !== 'Raw')
+    const { name } = func;
+    variables = filter(variables, ({ varType }) => varType !== 'Raw')
     if (!includes(['Number_extraction', 'Substring', 'Groupby', 'Substring', 'Concat', 'Eq', '(', ')', ','], name)) {
-      variables = filter(variables, ({varType}) => varType === 'Numerical')
+      variables = filter(variables, ({ varType }) => varType === 'Numerical')
     }
     if (includes(['Number_extraction', 'Substring'], name)) {
-      variables = filter(variables, ({varType}) => varType === 'Categorical')
+      variables = filter(variables, ({ varType }) => varType === 'Categorical')
     }
   }
   return (
@@ -1107,19 +1123,19 @@ function Computed(props: ComputedProps) {
           <Grid item xs={3}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.Function}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} functions={FUNCTIONS}/>
+              <Funcions onClick={handleFunction} onMouseOver={onMouseOver} functions={FUNCTIONS} />
             </Paper>
           </Grid>
           <Grid item xs={3}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.FormField}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Variables handleClick={handleVariables} variables={variables}/>
+              <Variables handleClick={handleVariables} variables={variables} />
             </Paper>
           </Grid>
           <Grid item xs={6}>
             <Typography align='left' variant='h6' noWrap gutterBottom>{EN.ProjectDescription}</Typography>
             <Paper elevation={Elevation} className={classes.paper}>
-              <Summary detailKey={state.detailKey}/>
+              <Summary detailKey={state.detailKey} />
             </Paper>
           </Grid>
         </Grid>

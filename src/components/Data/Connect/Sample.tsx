@@ -17,7 +17,7 @@ interface DataSampleProps {
 
 @observer
 class DataSample extends Component<DataSampleProps> {
-  constructor(props) {
+  constructor(props: DataSampleProps) {
     super(props)
     this.init()
   }
@@ -49,14 +49,14 @@ class DataSample extends Component<DataSampleProps> {
     });
   };
 
-  formatSize = size => {
+  formatSize = (size: number) => {
     let { size: s, n } = this.getSize(size)
     if (n < 0) n = 1
     const unit = (n === 1 && 'b') || (n === 2 && 'Kb') || (n === 3 && 'Mb') || (n === 4 && 'Gb') || 'Tb'
     return (parseInt((s * 100).toString(), 10) / 100) + ' ' + unit
   }
 
-  getSize = (size, n = 1) => {
+  getSize = (size: number, n: number = 1): { size: number, n: number } => {
     if (n >= 5) return { size, n }
     const s = size / 1024
     if (s > 1) return this.getSize(s, ++n)

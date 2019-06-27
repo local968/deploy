@@ -11,6 +11,7 @@ import { formatNumber } from '../../src/util'
 import c1 from './classification.json'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
+import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
 
 export interface Numerical {
   missingValue?: number;
@@ -82,7 +83,10 @@ export interface StdDeviationBounds {
 export interface BaseResponse {
   message: string;
   status: number;
-  result?: any
+  result?: any;
+  id?: string
+  model?: Model
+  command?: string
 }
 
 export interface CostOption {
@@ -133,6 +137,19 @@ export interface TrainCommand {
 
 export interface DataView {
   [key: string]: Stats
+}
+
+export interface UploadProps {
+  totalRawLines: number;
+  fileName: string;
+  originalIndex: string;
+  rawHeader: string[];
+};
+
+export interface NewVariable {
+  name: string,
+  nameArray: string[],
+  exps: Coordinate[]
 }
 
 class Project {
@@ -216,10 +233,10 @@ class Project {
   @observable preImportance: NumberObject | null = null;
   @observable preImportanceLoading: boolean = false;
   @observable importanceProgress: number = 0;
-  @observable histgramPlots: unknown = {};
-  @observable univariatePlots: unknown = {};
+  @observable histgramPlots: StringObject = {};
+  @observable univariatePlots: StringObject = {};
   @observable newVariable: string[] = [];
-  @observable expression: unknown = {};
+  @observable expression: { [key: string]: NewVariable } = {};
   @observable newType: StringObject = {};
   @observable informativesLabel: string[] = [];
   @observable colValueCounts: { [key: string]: NumberObject } = {};
@@ -305,7 +322,7 @@ class Project {
     'Select Percentile',
     'Select Rates',
   ];
-  @observable dataViews: unknown | null = null;
+  @observable dataViews: DataView | null = null;
   @observable dataViewsLoading: boolean = false;
   @observable dataViewProgress: number = 0;
 
@@ -760,7 +777,7 @@ class Project {
   }
 
   @action
-  setProperty = (data: Object) => {
+  setProperty = (data: Partial<Project>) => {
     if (typeof data !== 'object') {
       return false;
     }
@@ -771,6 +788,7 @@ class Project {
     Reflect.deleteProperty(data, 'userId')
     Reflect.deleteProperty(data, 'id')
     for (let key in data) {
+      // const value = data[key]
       const value = Reflect.get(data, key)
       // let value = (data as Project)[(key as keyof Project)]
       if (typeof value === 'function') {
@@ -821,12 +839,7 @@ class Project {
   /**---------------------------------------------data-------------------------------------------------*/
   //修改上传文件
   @action
-  fastTrackInit = async (data: {
-    totalRawLines: number,
-    fileName: string,
-    originalIndex: string,
-    rawHeader: string[]
-  }) => {
+  fastTrackInit = async (data: UploadProps) => {
 
     await this.abortTrainByEtl()
 
@@ -1215,48 +1228,48 @@ class Project {
     })
   }
 
-  @action
-  addNewVariable = (variableName, variables, exp, type) => {
-    const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
-    const oldExp = Object.values(this.expression).join(";")
-    const allExp = `${oldExp};${fullExp}`
+  // @action
+  // addNewVariable = (variableName, variables, exp, type) => {
+  //   const fullExp = `${variables.map(v => "@" + v).join(",")}=${exp}`
+  //   const oldExp = Object.values(this.expression).join(";")
+  //   const allExp = `${oldExp};${fullExp}`
 
-    return socketStore.ready().then(api => {
-      const command = {
-        projectId: this.id,
-        command: 'top.createNewVariable',
-        csvScript: allExp.replace(/\|/g, ",")
-      };
-      return api.createNewVariable(command, progressResult => {
-      }).then(returnValue => {
-        const { status, result } = returnValue
-        if (status < 0) {
-          antdMessage.error(result.msg)
-          return false
-        }
-        const newVariable = [...this.newVariable, ...variables]
-        const trainHeader = [...this.trainHeader, ...variables]
-        const newType = Object.assign({}, this.newType, variables.reduce((start, v) => {
-          start[v] = type
-          return start
-        }, {}))
-        const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
-        this.updateProject({
-          newVariable,
-          trainHeader,
-          expression,
-          newType,
-          correlationMatrixData: null,
-          correlationMatrixHeader: null,
-          cleanPath: ''
-        })
-        return true
-      })
-    })
-  }
+  //   return socketStore.ready().then(api => {
+  //     const command = {
+  //       projectId: this.id,
+  //       command: 'top.createNewVariable',
+  //       csvScript: allExp.replace(/\|/g, ",")
+  //     };
+  //     return api.createNewVariable(command, progressResult => {
+  //     }).then(returnValue => {
+  //       const { status, result } = returnValue
+  //       if (status < 0) {
+  //         antdMessage.error(result.msg)
+  //         return false
+  //       }
+  //       const newVariable = [...this.newVariable, ...variables]
+  //       const trainHeader = [...this.trainHeader, ...variables]
+  //       const newType = Object.assign({}, this.newType, variables.reduce((start, v) => {
+  //         start[v] = type
+  //         return start
+  //       }, {}))
+  //       const expression = Object.assign({}, this.expression, { [variableName]: fullExp })
+  //       this.updateProject({
+  //         newVariable,
+  //         trainHeader,
+  //         expression,
+  //         newType,
+  //         correlationMatrixData: null,
+  //         correlationMatrixHeader: null,
+  //         cleanPath: ''
+  //       })
+  //       return true
+  //     })
+  //   })
+  // }
 
   @action
-  addNewVariable2 = (variables, type) => {
+  addNewVariable2 = (variables: NewVariable[], type: StringObject) => {
     const scripts = [...Object.values(this.expression), ...variables].map(v => ({
       name: v.nameArray.map(n => ({
         value: n,
@@ -1271,7 +1284,7 @@ class Project {
         command: 'top.createNewVariable',
         csvScript: scripts
       };
-      return api.createNewVariable(command).then(returnValue => {
+      return api.createNewVariable(command).then((returnValue: BaseResponse) => {
         const { status, result } = returnValue
         if (status < 0) {
           antdMessage.error(result.processError)
@@ -1284,7 +1297,7 @@ class Project {
         const variableExp = variables.reduce((prev, _v) => {
           prev[_v.name] = _v
           return prev
-        }, {})
+        }, {} as { [key: string]: NewVariable })
         const expression = Object.assign({}, this.expression, variableExp)
         return this.updateProject({
           newVariable,
@@ -1295,7 +1308,6 @@ class Project {
           correlationMatrixHeader: null,
           cleanPath: ''
         }).then(() => true)
-
       })
     })
   }
@@ -1396,17 +1408,14 @@ class Project {
         const { validateScore, holdoutScore } = score
         let validate, holdout
         if (problemType === 'Classification') {
-          validate = currentMeasurement === 'auc' ? (validateScore || {}).auc : m[currentMeasurement + 'Validation']
-          holdout = currentMeasurement === 'auc' ? (holdoutScore || {}).auc : m[currentMeasurement + 'Holdout']
+          validate = currentMeasurement === 'auc' ? validateScore.auc : Reflect.get(m, currentMeasurement + 'Validation')  //m[currentMeasurement + 'Validation']
+          holdout = currentMeasurement === 'auc' ? holdoutScore.auc : Reflect.get(m, currentMeasurement + 'Holdout') //m[currentMeasurement + 'Holdout']
         } else if (problemType === 'Regression') {
-          validate = (validateScore || {})[currentMeasurement]
-          holdout = (holdoutScore || {})[currentMeasurement]
-        } else if (problemType === 'Clustering') {
-          validate = score[currentMeasurement]
-          holdout = score[currentMeasurement]
-        } else if (problemType === 'Outlier') {
-          validate = score[currentMeasurement]
-          holdout = score[currentMeasurement]
+          validate = Reflect.get(validateScore, currentMeasurement) //validateScore[currentMeasurement]
+          holdout = Reflect.get(holdoutScore, currentMeasurement) //holdoutScore[currentMeasurement]
+        } else if (problemType === 'Clustering' || problemType === 'Outlier') {
+          validate = Reflect.get(score, currentMeasurement) //score[currentMeasurement]
+          holdout = Reflect.get(score, currentMeasurement) //score[currentMeasurement]
         }
         if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
@@ -1540,7 +1549,7 @@ class Project {
             'xgradient_boosting',
             'r2-logistics',
           ],
-          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => formatFeature(problemType)[fe])
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe))
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1579,7 +1588,7 @@ class Project {
             'sgd',
             'xgradient_boosting',
           ],
-          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => formatFeature(problemType)[fe])
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Regression'), fe))
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1688,7 +1697,7 @@ class Project {
         break;
       default:
         command = 'clfreg.train';
-        let featureList = []
+        let featureList: string[] = []
         if (problemType === "Classification") {
           if (this.algorithms.some(al => [
             'adaboost',
@@ -1716,7 +1725,10 @@ class Project {
           ].includes(al))) featureList = featureList.concat(['Extra Trees', 'Random Trees', 'fast ICA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'])
           if (this.algorithms.some(al => ["ard_regression", "liblinear_svr", "libsvm_svr", "ridge_regression", "sgd"].includes(al))) featureList = featureList.concat(["Fast ICA", "Kernel PCA", "Kitchen Sinks", "Linear SVM"])
         }
-        const featuresPreprocessor = features.filter(fe => featureList.includes(fe)).map(fe => formatFeature(problemType)[fe])
+        const featuresPreprocessor = features.filter(fe => featureList.includes(fe)).map(fe => {
+          const curFeature = formatFeature(problemType === "Classification" ? "Classification" : "Regression")
+          return Reflect.get(curFeature, fe)
+        })
         trainData = {
           problemType,
           featureLabel,
@@ -1941,26 +1953,12 @@ class Project {
     this.settingId = curSetting ? curSetting.id : ''
   }
 
-  modeling = (trainData, updateData) => {
+  modeling = (trainData: TrainCommand, updateData: Object) => {
     if (this.etling) return antdMessage.error('modeling error')
     this.train2ing = true
     this.isAbort = false
     // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
-    socketStore.ready().then(api => api.train({ ...trainData, data: updateData }, progressResult => {
-      // if (this.isAbort) return
-      // if (progressResult.name === "progress") {
-      //   if (progressResult.trainId) this.trainingId = progressResult.trainId
-      //   if (!progressResult.model) return
-      //   if (!progressResult.value) return
-      //   if(this.trainModel && this.trainModel.value && progressResult.value > this.trainModel.value)
-      //   this.trainModel = progressResult
-      //   return
-      // }
-      // if (progressResult.status !== 200) return
-      //暂时移除  保证命令只发一次
-      // let result = progressResult.model
-      // this.setModel(result)
-    })).then(returnValue => {
+    socketStore.ready().then(api => api.train({ ...trainData, data: updateData })).then(returnValue => {
       this.trainingId = ''
       const { status, message } = returnValue
       if (status !== 200) {
@@ -1969,7 +1967,7 @@ class Project {
     })
   }
 
-  abortTrain = (stopId, isLoading = false) => {
+  abortTrain = (stopId: string, isLoading: boolean = false) => {
     if (!stopId) return Promise.resolve()
     if (this.stopModel) return Promise.resolve()
     this.stopModel = true
@@ -1981,7 +1979,7 @@ class Project {
       stopId
     }
     this.isAbort = true
-    return socketStore.ready().then(api => api.abortTrain(command).then(returnValue => {
+    return socketStore.ready().then(api => api.abortTrain(command).then((returnValue: BaseResponse) => {
       const { status, message, result, id } = returnValue
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
@@ -2002,7 +2000,7 @@ class Project {
     return
   }
 
-  setModel = data => {
+  setModel = (data: Model) => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     // if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
@@ -2029,12 +2027,11 @@ class Project {
     }
   }
 
-  setModelField = data => {
-    const times = data.times || 0
+  setModelField = (data: Partial<Model>, times: number = 0) => {
     const model = this.models.find(m => data.id === m.id)
     if (!model) {
       if (times > 10) return
-      setTimeout(() => this.setModelField({ ...data, times: times + 1 }), 100)
+      setTimeout(() => this.setModelField(data, times + 1), 100)
       return
     }
     model.setProperty(data)
@@ -2049,7 +2046,7 @@ class Project {
     }
   }
 
-  setSelectModel = id => {
+  setSelectModel = (id: string) => {
     this.updateProject({ selectId: id })
   }
 
@@ -2065,7 +2062,7 @@ class Project {
       }
     }, 60000)
     this.models = []
-    socketStore.ready().then(api => api.queryModelList({ id: this.id }, progressResult => {
+    socketStore.ready().then(api => api.queryModelList({ id: this.id }, (progressResult: BaseResponse) => {
       const { status, message, model } = progressResult
       if (status !== 200) return antdMessage.error(message)
       count++
@@ -2114,7 +2111,7 @@ class Project {
       // }
       this.preImportanceLoading = true
       return api.preTrainImportance(command)
-        .then(returnValue => {
+        .then((returnValue: BaseResponse) => {
           const { status, result } = returnValue
           if (status < 0) {
             return antdMessage.error(result['processError'])
@@ -2160,7 +2157,7 @@ class Project {
       // }
       this.preImportanceLoading = true
       return api.preTrainImportance(command)
-        .then(returnValue => {
+        .then((returnValue: BaseResponse) => {
           const { status, result } = returnValue
           if (status < 0) {
             return antdMessage.error(result['processError'])
@@ -2184,7 +2181,7 @@ class Project {
         command: 'correlationMatrix',
         featureLabel: this.dataHeader.filter(n => n !== this.target)
       };
-      return api.correlationMatrix(command).then(returnValue => {
+      return api.correlationMatrix(command).then((returnValue: BaseResponse) => {
         const { status, result } = returnValue
         this.correlationMatrixLoading = false
         if (status < 0) return antdMessage.error(result['processError'])
@@ -2194,12 +2191,13 @@ class Project {
     })
   }
 
-  univariatePlot = field => {
+  univariatePlot = (field: string) => {
     if (!field) return
     if (field === this.target) return
     if (!this.newVariable.includes(field)) return
     if (this.univariatePlots.hasOwnProperty(field)) return
-    this.univariatePlots[field] = ''
+    Reflect.deleteProperty(this.univariatePlots, field)
+    // this.univariatePlots[field] = ''
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
@@ -2213,7 +2211,7 @@ class Project {
       //     command.feature_label = [field]
       //   }
       // }
-      api.univariatePlot(command, progressResult => {
+      api.univariatePlot(command, (progressResult: BaseResponse) => {
         const { result } = progressResult
         const { field: plotKey, Data, progress } = result;
         if (progress && progress === "start") return
@@ -2224,11 +2222,12 @@ class Project {
     })
   }
 
-  histgramPlot = field => {
+  histgramPlot = (field: string) => {
     if (!field) return
     if (!this.newVariable.includes(field)) return
     if (this.histgramPlots.hasOwnProperty(field)) return
-    this.histgramPlots[field] = ''
+    Reflect.deleteProperty(this.histgramPlots, field)
+    // this.histgramPlots[field] = ''
     socketStore.ready().then(api => {
       const command: {
         projectId: string,
@@ -2244,7 +2243,7 @@ class Project {
         const newFeatureLabel = {}
         Object.keys(this.targetColMap).slice(0, 2).forEach((k, index) => {
           const rename = this.renameVariable[k]
-          if (!!rename) newFeatureLabel[rename] = index
+          if (!!rename) Reflect.defineProperty(newFeatureLabel, rename, { value: index })
         })
         if (!!Object.keys(newFeatureLabel).length) command.newFeatureLabel = newFeatureLabel
       }
@@ -2255,7 +2254,7 @@ class Project {
       //     command.feature_label = [field]
       //   }
       // }
-      api.histgramPlot(command, progressResult => {
+      api.histgramPlot(command, (progressResult: BaseResponse) => {
         const { result } = progressResult
         const { field: plotKey, Data, progress } = result;
         if (progress && progress === "start") return
@@ -2271,15 +2270,15 @@ class Project {
       return api.ssPlot({
         command: 'clustering.ssPlot',
         projectId: this.id
-      }, prosss => {
-      }).then(returnValue => {
+      }, (prosss: BaseResponse) => {
+      }).then((returnValue: BaseResponse) => {
         const { status, result } = returnValue
         if (status < 0) antdMessage.error(`${result['processError']}`)
       })
     })
   }
 
-  handleError = returnValue => {
+  handleError = (returnValue: BaseResponse) => {
     const { result, status, command } = returnValue
     if (status < 0) antdMessage.error(`command:${command}, error:${result['processError']}`)
   }
@@ -2311,27 +2310,32 @@ class Project {
     })
   }
 
-  allPlots = async (changeReportProgress) => {
+  allPlots = async (changeReportProgress: (str: string, num: number) => boolean) => {
     const variableCount = this.dataHeader.length - 1
     const api = await socketStore.ready()
-    const univariateCommand = {
+    type plotCommand = {
+      projectId: string,
+      command: string,
+      feature_label: string[]
+    }
+    const univariateCommand: plotCommand = {
       projectId: this.id,
       command: 'univariatePlot',
       feature_label: []
     }
-    const histogramCommand = {
+    const histogramCommand: plotCommand = {
       projectId: this.id,
       command: 'histgramPlot',
       feature_label: []
     }
-    const rawHistogramCommand = {
+    const rawHistogramCommand: plotCommand = {
       projectId: this.id,
       command: 'rawHistgramPlot',
       feature_label: [this.target]
     }
     if (changeReportProgress('preparing univariate plot.', 75)) return
     let univariatePlotCount = 0
-    await api.univariatePlot(univariateCommand, progressResult => {
+    await api.univariatePlot(univariateCommand, (progressResult: BaseResponse) => {
       univariatePlotCount++
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -2342,7 +2346,7 @@ class Project {
     })
     if (changeReportProgress('preparing histogram plot.', 80)) return
     let histgramPlotCount = 0
-    await api.histgramPlot(histogramCommand, progressResult => {
+    await api.histgramPlot(histogramCommand, (progressResult: BaseResponse) => {
       histgramPlotCount++
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
@@ -2352,7 +2356,7 @@ class Project {
       changeReportProgress(`preparing histogram plot.(${histgramPlotCount}/${variableCount})`, 80 + 5 * histgramPlotCount / variableCount)
     })
     if (changeReportProgress('preparing target histogram plot.', 85)) return
-    await api.rawHistgramPlot(rawHistogramCommand, progressResult => {
+    await api.rawHistgramPlot(rawHistogramCommand, (progressResult: BaseResponse) => {
       const { result } = progressResult
       const { field: plotKey, imageSavePath, progress } = result;
       if (result.name === 'progress') return
@@ -2361,7 +2365,7 @@ class Project {
     })
   }
 
-  getBase64Image = (img) => {
+  getBase64Image = (img: HTMLImageElement) => {
     var canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
@@ -2371,7 +2375,7 @@ class Project {
     return dataURL // return dataURL.replace("data:image/png;base64,", "");
   }
 
-  translateToBase64 = (imagePath) => {
+  translateToBase64 = (imagePath: string) => {
     if (!imagePath) return Promise.resolve('')
     const url = `http://${config.host}:${config.port}/redirect/download/${imagePath}?projectId=${this.id}`
     return new Promise((resolve, reject) => {
@@ -2382,7 +2386,7 @@ class Project {
     })
   }
 
-  generateReportHtml = async (jsonData) => {
+  generateReportHtml = async (jsonData: string) => {
     const script = 'script'
     const body = 'body'
     const link = 'link'
@@ -2446,13 +2450,14 @@ class Project {
     return html
   }
 
-  histogram(field) {
+  histogram(field: string) {
     const { colType, dataViews, etlIndex } = this;
-    if (!dataViews[field]) {
+    const value: Stats = Reflect.get(dataViews, field)
+    if (!value) {
       return {}
     }
     if (colType[field] === 'Numerical') {
-      const { min, max } = dataViews[field];
+      const { min, max } = value;
       return {
         "name": "histogram-numerical",
         "data": {
@@ -2474,11 +2479,11 @@ class Project {
     }
   }
 
-  univariant(value) {
+  univariant(value: string) {
     const { target, problemType, etlIndex, colType, dataViews } = this;
     const type = colType[value];
-
-    if (!dataViews[value]) {
+    const dataUn: Stats = Reflect.get(dataViews, value)
+    if (!dataUn) {
       return {}
     }
 
@@ -2503,7 +2508,7 @@ class Project {
         };
       }
     } else {//Univariant
-      const { min, max } = dataViews[value];
+      const { min, max } = dataUn;
       const data = {
         target,
         value,
@@ -2526,7 +2531,7 @@ class Project {
   }
 
   //在这里获取所以直方图折线图数据
-  allVariableList = (model) => {
+  allVariableList = (validatePlotData: string) => {
     const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader } = this;
 
     const list = [];
@@ -2557,11 +2562,11 @@ class Project {
       list.push(this.univariant(itm));
     }
 
-    if (model.validatePlotData) {
+    if (validatePlotData) {
       list.push({
         name: 'predicted-vs-actual-plot',
         data: {
-          url: model.validatePlotData,
+          url: validatePlotData,
         },
       });
       // list.push({
@@ -2574,7 +2579,7 @@ class Project {
       list.push({
         name: 'fit-plot',
         data: {
-          url: model.validatePlotData,
+          url: validatePlotData,
         },
       });
     }
@@ -2589,7 +2594,7 @@ class Project {
 
 
   // 点击导出的按钮
-  generateReport = async (modelId, aaa) => {
+  generateReport = async (modelId: string, aaa?: Object) => {
     console.log(aaa)
     // aaa.routing.history.push('/report')
     console.log(this, 'ttttttttttttttttttttttt')
@@ -2622,10 +2627,10 @@ class Project {
     //   changeReportProgress('initializing report.', 0)
 
 
-    const model = this.models.find(m => m.id === modelId);
+    const model: Model = this.models.find(m => m.id === modelId);
     //在这里获取所以直方图折线图数据
     // changeReportProgress('preparing univariate plot.', 75)
-    model.graphicList = await this.allVariableList(model);
+    model.graphicList = await this.allVariableList(model.validatePlotData);
     // changeReportProgress('preparing univariate plot.', 100)
     const json = JSON.stringify([{ ...this, ...{ models: [model] } }]);
 
@@ -2719,7 +2724,7 @@ class Project {
   }
 }
 
-function loadFile(fileName, content) {
+function loadFile(fileName: string, content: string) {
   var aLink = document.createElement('a');
   var blob = new Blob([content], {
     type: 'text/plain'
@@ -2730,7 +2735,7 @@ function loadFile(fileName, content) {
   URL.revokeObjectURL(blob.toString());
 }
 
-function formatFeature(pt) {
+function formatFeature(pt: 'Classification' | 'Regression') {
   const obj = {
     Classification: {
       'Extra Trees': 'extra_trees_preproc_for_classification',
