@@ -2054,25 +2054,29 @@ class Project {
   }
 
   initModels = () => {
-    // this.loadModel = true
-    // let show = true
-    // const so = setTimeout(() => {
-    //   show = false
-    //   antdMessage.error(EN.timeoutRetry, 3)
-    //   this.initModels()
-    // }, 60000)
+    this.loadModel = true
+    let show = true
+    let count = 0
+    const so = setTimeout(() => {
+      if (!count) {
+        show = false
+        antdMessage.error(EN.timeoutRetry, 3)
+        this.initModels()
+      }
+    }, 60000)
     this.models = []
     socketStore.ready().then(api => api.queryModelList({ id: this.id }, progressResult => {
       const { status, message, model } = progressResult
       if (status !== 200) return antdMessage.error(message)
+      count++
       this.setModel(model)
     })).then(result => {
-      // if (!show) return
-      // clearTimeout(so)
-      const { status, message, list } = result
+      if (!show) return
+      clearTimeout(so)
+      const { status, message } = result
       if (status !== 200) return alert(message)
       // this.models = []
-      // this.loadModel = false
+      this.loadModel = false
       // list.forEach(m => {
       //   this.setModel(m)
       // });

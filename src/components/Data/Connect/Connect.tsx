@@ -33,7 +33,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     super(props)
     this.uploadRef = React.createRef()
   }
-    uploadRef: React.RefObject<Uploader>
+  uploadRef: React.RefObject<Uploader>
   pause: () => void
   resume: () => void
   @observable sample = false
