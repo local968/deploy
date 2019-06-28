@@ -1,10 +1,13 @@
 import 'bluebird';
 import events from 'events';
+import axios from 'axios';
 import './log';
 import { server, sessionParser } from './http';
 import wssInit from './webSocket';
 import { recover } from './reboot';
 import config from '../config';
+
+axios.defaults.maxContentLength = Infinity;
 
 (events.EventEmitter.prototype as any)._maxListeners = 1000;
 
