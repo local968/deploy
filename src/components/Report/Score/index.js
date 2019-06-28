@@ -491,7 +491,7 @@ class AdvancedModelTable extends Component {
       }
       return <React.Fragment/>
     };
-    
+
     return (
       <div className={styles.advancedModelTableDiv}>
         <RegressChart/>
@@ -517,7 +517,7 @@ class AdvancedModelTable extends Component {
     // const { detail } = this.state;
     const { validate, holdout } = reason || {};
 
-    
+
     return (
       <div>
         <Row onClick={this.handleResult} >
@@ -605,13 +605,14 @@ class RegressionDetailCurves extends Component {
   // }
 
   render() {
-    const { model } = this.props;
+    const { model,project} = this.props;
     const { curve, diagnoseType, chartDate } = this.state;
     const fitData = toJS(model.graphicList).pop();
+    console.log(model , 'mmmmmmmmmmmmmmmmmmmmm',project)
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
-        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} /></div>
+        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact mapHeader = {project.mapHeader} model={model} /></div>
         break;
       case EN.FitPlot:
         curComponent = <div className={styles.plot}>
