@@ -96,7 +96,6 @@ function query(key, params) {
     return Promise.all(promiseArray).then(array => {
       return Promise.all(
         array.map(item => {
-          console.log(item, 'item')
           // Object.keys(item).forEach(key => {
           //   try {
           //     item[key] = JSON.parse(item[key]);
