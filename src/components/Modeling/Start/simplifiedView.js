@@ -657,23 +657,6 @@ class SimplePlot extends Component {
   }
 }
 
-// @observer
-// class CorrelationPlot extends Component {
-//   constructor(props) {
-//     super(props)
-//     if (!props.fetch) props.getPath()
-//   }
-//   render() {
-//     const { data, header, onClose } = this.props;
-//     return (
-//       <div className={styles.correlationPlot} >
-//         <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-//         {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
-//       </div>
-//     )
-//   }
-// }
-
 @observer
 class CorrelationPlot extends Component {
   render() {
@@ -705,12 +688,6 @@ class SimplifiedViewPlot extends Component {
         height:500,
         flexDirection: 'column',
       }}>
-        {/*<HistogramNumerical*/}
-        {/*  x_name={target}*/}
-        {/*  y_name={'count'}*/}
-        {/*  title={`Feature:${target}`}*/}
-        {/*  data={data}*/}
-        {/*/>*/}
         <HS
           x_name={target}
           y_name={'count'}
