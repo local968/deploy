@@ -119,8 +119,9 @@
     font-size: 16px;
     display: flex;
     align-items: center;
-    margin: auto;
+    /*margin: auto;*/
     white-space: nowrap;
+    margin: 0 auto 10px;
 }
 .pva span{
     font-size: 14px;
@@ -136,11 +137,12 @@
     display: flex;
     overflow: visible;
     vertical-align: top;
-    width: 65%;
+    /*width: 65%;*/
     font-size: 1rem;
-    flex: none;
+    /*flex: none;*/
     flex-direction: column;
     position: relative;
+    flex:2;
 }
 .predictActual .title {
     font-weight: bold;

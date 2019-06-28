@@ -825,7 +825,7 @@ class DetailCurves extends Component {
           x_name={EN.Recall}
           y_name={EN.Precision}
           model={model}
-          isHoldout={isHoldout}
+          // isHoldout={isHoldout}
         />;
         break;
       case EN.LiftChart:

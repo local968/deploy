@@ -1,14 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import styles from './styles.module.css';
-import {inject, observer} from 'mobx-react'
-import Next from './Next.svg'
 import { Popover, Button, Icon } from 'antd'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import {toJS} from "mobx";
 
-@inject('projectStore')
-@observer
+const Next = 'data:image/svg+xml;base64,DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4NCiAgICAgICAgPGcgaWQ9IjUtNS00bW9kZWxpbmctQkNsYXNzaWZpY2F0aW9uLXNpbXBsZVZpZXc1IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkyLjAwMDAwMCwgLTQ1NC4wMDAwMDApIiBmaWxsPSIjNDQ4RUVEIj4NCiAgICAgICAgICAgIDxnIGlkPSJHcm91cC00MyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjIxLjQwMDAwMCwgNDQ3LjAwMDAwMCkiPg0KICAgICAgICAgICAgICAgIDxwb2x5Z29uIGlkPSJQYWdlLTEiIHBvaW50cz0iNzcuNDg2NzM3NyA3LjE5OTkxODAzIDc3LjQ4NjczNzcgMTAuMjcwNTk0NCA3MC44IDEwLjI3MDU5NDQgNzAuOCAxOS4xMjg5MTM4IDc3LjQ4NjczNzcgMTkuMTI4OTEzOCA3Ny40ODY3Mzc3IDIyLjIgODUuODAwNDA4OSAxNC42OTk5NTkiPjwvcG9seWdvbj4NCiAgICAgICAgICAgIDwvZz4NCiAgICAgICAgPC9nPg0KICAgIDwvZz4NCjwvc3ZnPg=='
+
 export default class ModelProcessFlow extends Component {
 
 	list(data) {
@@ -73,8 +71,7 @@ export default class ModelProcessFlow extends Component {
 			target,
 			problemType,
 			otherMap,
-			mapHeader,
-		} = this.props.projectStore.project;
+		} = this.props.project;
 		
 		const nfm = _.cloneDeep(nullFillMethod);
 		const mfm = _.cloneDeep(mismatchFillMethod);
@@ -120,7 +117,7 @@ export default class ModelProcessFlow extends Component {
 			targetCounts,
 			nullFillMethod,
 			nullLineCounts,
-		} = this.props.projectStore.project;
+		} = this.props.project;
 		
 		let drop = [],mapping=[];
 		
@@ -176,7 +173,7 @@ export default class ModelProcessFlow extends Component {
 	}
 	
 	DQFData(data,title,showTarget,outlier=false){
-		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.projectStore.project;
+		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.project;
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
@@ -283,7 +280,7 @@ export default class ModelProcessFlow extends Component {
 	
 	FS(){//新建特性与特征选择
 		const { featureLabel } = this.props.model;
-		const {rawHeader,expression,target,colType,mapHeader} = this.props.projectStore.project;
+		const {rawHeader,expression,target,colType,mapHeader} = this.props.project;
 		
 		let drop = _.without(rawHeader,...featureLabel,target);
 		

@@ -349,8 +349,8 @@ class Project {
   @observable isHoldout: boolean = false;
 
   constructor(id: string, args: Object) {
-    this.id = id
-    this.visiable = true
+    this.id = id;
+    this.visiable = true;
     this.setProperty(args)
     // autorun(() => {
     //   if (!this.cleanPath) return this.cleanData = []
@@ -361,7 +361,7 @@ class Project {
   }
 
   readData = (path: string) => {
-    const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
+    const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`;
     return new Promise((resolve, reject) => {
       Papa.parse(url, {
         download: true,
@@ -2073,12 +2073,12 @@ class Project {
     }
     model.setProperty(data)
     if (data.chartData && this.criteria === "cost") {
-      const { TP, FP, FN, TN } = this.costOption
-      const [v0, v1] = Object.values(this.targetCounts)
-      const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4))
-      const percentNew = this.distribution ? this.distribution / 100 : percent0
-      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
-      if (index === model.fitIndex) return
+      const { TP, FP, FN, TN } = this.costOption;
+      const [v0, v1] = Object.values(this.targetCounts);
+      const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4));
+      const percentNew = this.distribution ? this.distribution / 100 : percent0;
+      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0);
+      if (index === model.fitIndex) return;
       model.updateModel({ fitIndex: index })
     }
   }
@@ -2582,7 +2582,7 @@ class Project {
   }
 
   //在这里获取所以直方图折线图数据
-  allVariableList = (validatePlotData: string) => {
+  allVariableList = (model: any) => {
     const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader } = this;
 
     const list = [];
@@ -2613,6 +2613,7 @@ class Project {
       list.push(this.univariant(itm));
     }
 
+    const {validatePlotData,holdoutPlotData} = model;
     if (validatePlotData) {
       list.push({
         name: 'predicted-vs-actual-plot',
@@ -2620,17 +2621,22 @@ class Project {
           url: validatePlotData,
         },
       });
-      // list.push({
-      //   name: 'predicted-vs-actual-plot',
-      //   data: {
-      //     url: model.holdoutPlotData,
-      //   },
-      // });
-
+      list.push({
+        name: 'predicted-vs-actual-plot',
+        data: {
+          url: holdoutPlotData,
+        },
+      });
       list.push({
         name: 'fit-plot',
         data: {
           url: validatePlotData,
+        },
+      });
+      list.push({
+        name: 'fit-plot',
+        data: {
+          url: holdoutPlotData,
         },
       });
     }
@@ -2678,10 +2684,10 @@ class Project {
     //   changeReportProgress('initializing report.', 0)
 
 
-    const model: Model = this.models.find(m => m.id === modelId);
+    const model:any = this.models.find(m => m.id === modelId);
     //在这里获取所以直方图折线图数据
     // changeReportProgress('preparing univariate plot.', 75)
-    model.graphicList = await this.allVariableList(model.validatePlotData);
+    model.graphicList = await this.allVariableList(model);
     // changeReportProgress('preparing univariate plot.', 100)
     const json = JSON.stringify([{ ...this, ...{ models: [model] } }]);
 

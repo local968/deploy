@@ -4,7 +4,7 @@ import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
 import { NumberInput, Hint } from "components/Common";
-import { Select, message, Tooltip, Popover } from "antd";
+import { Select, message, Tooltip, Popover,Icon } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
 import InputNumber from "antd/es/input-number";
@@ -17,6 +17,12 @@ import {
 
 @observer
 export default class AdvancedView extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      showSsPlot:false,
+    }
+  }
   handleName = action(e => {
     const { project } = this.props;
     project.settings.find(s => s.id === project.settingId).name =
@@ -208,11 +214,24 @@ export default class AdvancedView extends Component {
               </div>
               <Popover
                 placement="bottomLeft"
+                trigger="click"
+                visible={this.state.showSsPlot}
+                onVisibleChange={()=>{
+                  this.setState(prevState=>({
+                    showSsPlot:!prevState.showSsPlot
+                  }))
+                }}
                 content={<SSPlot
                   height={300} width={600}
                   project={project}
-                />} title={null}>
-                <Button className={styles.button}>{EN.WithinGroupSsPlot}</Button>
+                />} title={<Icon onClick={()=>{
+                  this.setState({
+                    showSsPlot:false
+                  })
+                }
+              } className={styles.ssPlot} type="close" />}>
+                <Button
+                  className={styles.button}>{EN.WithinGroupSsPlot}</Button>
               </Popover>
 
             </div>

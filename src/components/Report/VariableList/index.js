@@ -160,6 +160,7 @@ export default class SimplifiedView extends Component {
 
     return <Chart
       data = {data}
+      project={project}
     />
   }
 
@@ -206,6 +207,7 @@ export default class SimplifiedView extends Component {
                           y_name={'count'}
                           title={`Feature:${target}`}
                           data={top1}
+                          project={project}
                       />}/>}
           </div>
           <div className={styles.targetCell}>
@@ -481,18 +483,20 @@ class SimplifiedViewRow extends Component {
                                                     y_name={'count'}
                                                     title={`Feature:${value}`}
                                                     data={chartDatas[0]}
+                                                    project={project}
                                                 />}/> : null}
       </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })} onClick={this.showUnivariant}>
-        <img src={univariantIcon} className={styles.tableImage} />
+        <img src={univariantIcon} className={styles.tableImage}  alt=''/>
         {(!isRaw && this.univariant) ? <Popover placement='topLeft'
                                                 visible={!isRaw && this.univariant}
                                                 onVisibleChange={this.hideUnivariant}
                                                 trigger="click"
                                                 content={<Chart
                                                     data={chartDatas[1]}
+                                                    project={project}
                                                 />}/> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>

@@ -9,9 +9,8 @@ import EN from "../../constant/en";
 import styles from './charts.module.css';
 import { Button } from 'antd';
 import { Hint, Switch } from 'components/Common';
-import {inject, observer} from "mobx-react";
+import {observer} from "mobx-react";
 
-@inject('projectStore')
 @observer
 export default class PVA extends Component{
 	private chart: any;
@@ -26,7 +25,7 @@ export default class PVA extends Component{
 			holdOutChartDate:[],
 			loading:'',
 			isHoldout:false,
-		}
+		};
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -111,8 +110,8 @@ export default class PVA extends Component{
 
 	getOption() {
 		const {ready,chartDate,holdOutChartDate,sliderValue:_sliderValue} = this.state as any;
-		const {projectStore,y_name} = this.props as any;
-		const {isHoldout} = projectStore.project;
+		const {project,y_name} = this.props as any;
+		const {isHoldout} = project;
 		const data = isHoldout?holdOutChartDate:chartDate;
 		const _data = _.cloneDeep(data);
 		if(!ready){
@@ -152,7 +151,7 @@ export default class PVA extends Component{
 		const ResidualRate = series[0].data.map((itm,index)=>{
 			const act = itm[1];
 			const pre = series[1].data[index][1];
-			return [index*100/chunk.length,Math.abs((act-pre)*100/act)];
+			return [index*100/chunk.length,act?Math.abs((act-pre)*100/act):0];
 		});
 
 		series.push({
@@ -163,6 +162,16 @@ export default class PVA extends Component{
 		});
 
 		const minValueSpan = 100/_.size(_data[0].value) * 3;//最少显示3个点
+
+		const grid:any = {
+			y2:80,
+		};
+
+		const maxL = (`${parseInt(String(max))}`.length);
+
+		if(maxL>5){
+			grid.x = (`${parseInt(String(max))}`.length) * 18 + 20;
+		}
 
 		return {
 			title:{
@@ -179,11 +188,11 @@ export default class PVA extends Component{
 				labelPrecision:2,
 				realtime:false,
 				xAxisIndex: [0],
-				labelFormatter: async(value)=> {
+				labelFormatter: (value)=> {
 					if(!isNaN(Number(`${value}`))){
 						sliderValue.shift();
 						sliderValue.push(value);
-						await this.setSlider(sliderValue);
+						 this.setSlider(sliderValue);
 						return value.toFixed(3);
 					}
 				},
@@ -245,10 +254,7 @@ export default class PVA extends Component{
 				},
 			},
 			series,
-			grid:{
-				x:`${parseInt(String(max))}`.length * 18,
-				y2:80,
-			},
+			grid,
 			toolbox:{
 				show : true,
 				top:20,
@@ -270,15 +276,15 @@ export default class PVA extends Component{
 
 	}
 	handleHoldout(){
-		const {projectStore} = this.props as any;
-		const {isHoldout} = projectStore.project;
-		projectStore.project.upIsHoldout(!isHoldout);
+		const {project} = this.props as any;
+		const {isHoldout} = project;
+		project.upIsHoldout(!isHoldout);
 	}
 
 	render(){
 		const {loading,chartDate,holdOutChartDate} = this.state as any;
-		const {projectStore} = this.props as any;
-		const {isHoldout} = projectStore.project;
+		const {project} = this.props as any;
+		const {isHoldout} = project;
 		const data = isHoldout?holdOutChartDate:chartDate;
 
 		if(!data[0]){
