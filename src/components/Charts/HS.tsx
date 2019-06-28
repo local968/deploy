@@ -121,8 +121,8 @@ export default class HS extends Component{
 			xAxis: {
 				name:x_name,
 				type: 'value',
-				min,
-				max,
+				// min,
+				// max,
 				nameLocation:'middle',
 				nameGap:25,
 				nameTextStyle,
