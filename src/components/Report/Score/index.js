@@ -397,21 +397,8 @@ export default class AdvancedView extends Component {
           <div className={styles.status}>&nbsp;&nbsp;{this.performance}</div>
         </div>
         <div className={styles.middle}>
-          {/*<div className={styles.settings}>*/}
-          {/*  <span className={styles.label}>{EN.ModelNameContains}:</span>*/}
-          {/*  <Select className={styles.settingsSelect} value={this.currentSettingId} onChange={this.changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>*/}
-          {/*    <Option value={'all'}>{EN.All}</Option>*/}
-          {/*    {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}*/}
-          {/*  </Select>*/}
-          {/*</div>*/}
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
-        {/*<div className={styles.metricSelection} >*/}
-        {/*  <span className={styles.text} >{EN.MeasurementMetric}</span>*/}
-        {/*  <Select size="large" value={currMetric.key} onChange={handleChange} style={{ width: '150px', fontSize: '1.125rem' }} getPopupContainer={() => document.getElementsByClassName(styles.metricSelection)[0]}>*/}
-        {/*    {this.metricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}*/}
-        {/*  </Select>*/}
-        {/*</div>*/}
         <AdvancedModelTable {...this.props} models={this.filtedModels} project={project} sort={sort} handleSort={handleSort} metric={currMetric} />
       </div>
     )
@@ -446,7 +433,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable,target },sort, handleSort, metric,project } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable,target,mapHeader },sort, handleSort, metric,project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
@@ -484,9 +471,11 @@ class AdvancedModelTable extends Component {
       if (problemType !== 'Classification') {
         const graphicList = toJS(models[0].graphicList);
         graphicList.pop();
+        graphicList.pop();
         return <Chart
-            y_name={isEN?`${EN.Groupaverage} ${target}`:`${target} ${EN.Groupaverage}`}
+            y_name={isEN?`${EN.Groupaverage} ${mapHeader[target]}`:`${mapHeader[target]} ${EN.Groupaverage}`}
             data={[graphicList.pop(),graphicList.pop()]}
+            name='predicted-vs-actual-plot'
             project={project}
         />
       }
@@ -587,28 +576,13 @@ class RegressionDetailCurves extends Component {
     this.setState({ diagnoseType: e.target.value });
   };
 
-  // componentDidMount() {
-  //   this.setChartDate()
-  // }
-  //
-  // setChartDate() {
-  //   // const url = this.props.model.fitAndResidualPlotData;
-  //   // request.post({
-  //   //   url: '/graphics/fit-plot',
-  //   //   data: {
-  //   //     url,
-  //   //   },
-  //   // }).then(chartDate => {
-  //   //   this.setState({
-  //   //     chartDate
-  //   //   })
-  //   // });
-  // }
-
   render() {
     const { model,project} = this.props;
-    const { curve, diagnoseType, chartDate } = this.state;
-    const fitData = toJS(model.graphicList).pop();
+    const { curve, diagnoseType } = this.state;
+    const {isHoldout} = project;
+    const graphicList = toJS(model.graphicList);
+    const holdOutChartDate = graphicList.pop();
+    const chartDate = graphicList.pop();
     console.log(model , 'mmmmmmmmmmmmmmmmmmmmm',project)
     let curComponent;
     switch (curve) {
@@ -621,7 +595,8 @@ class RegressionDetailCurves extends Component {
             title={EN.FitPlot}
             x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
-            chartDate={fitData}
+            // chartDate={fitData}
+            chartDate={isHoldout ? holdOutChartDate : chartDate}
           />}
         </div>;
         break;
@@ -630,7 +605,8 @@ class RegressionDetailCurves extends Component {
           title={EN.ResidualPlot}
           x_name={EN.Truevalue}
           y_name={EN.Predictvalue}
-          chartDate={fitData}
+          // chartDate={fitData}
+          chartDate={isHoldout ? holdOutChartDate : chartDate}
         />;
         curComponent = (
           <div className={styles.plot} >
@@ -946,23 +922,6 @@ class PredictTable extends Component {
   @observable distribution = this.props.project.distribution || ''
   totalLines = this.props.project.totalLines;
   onChange = e => {
-    // const criteria = e.target.value
-    // this.showCost = criteria === 'cost'
-    // const data = { criteria }
-    // if (!this.showCost) {
-    //   const { models } = this.props
-    //   data.selectId = ''
-    //   // this.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
-    //   // data.costOption = { TP: 0, FN: 0, FP: 0, TN: 0 }
-    //   models.forEach(m => {
-    //     if (!m.initialFitIndex) return
-    //     m.updateModel({ fitIndex: m.initialFitIndex })
-    //   })
-    // } else {
-    //   this.handleSubmit()
-    // }
-    // this.props.project.updateProject(data)
-
     const criteria = e.target.value;
     this.showCost = criteria === 'cost';
     this.showTip = false;
@@ -998,16 +957,6 @@ class PredictTable extends Component {
   }
 
   handleSubmit = () => {
-    // const { project } = this.props
-    // const { models } = project
-    // const { TP, FN, FP, TN } = project.costOption
-    // models.forEach(m => {
-    //   const benefit = m.getBenefit(TP, FN, FP, TN)
-    //   if (benefit.index !== m.fitIndex) m.updateModel({ fitIndex: benefit.index })
-    // })
-    // project.updateProject({ costOption: { ...this.costOption }, selectId: '' })
-
-
     const {  project } = this.props;
     const { models } = project
     const { targetCounts } = project

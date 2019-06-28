@@ -2563,8 +2563,13 @@ class Project {
     }
 
     const {validatePlotData,holdoutPlotData} = model;
-
     if (validatePlotData) {
+      list.push({
+        name: 'predicted-vs-actual-plot',
+        data: {
+          url: validatePlotData,
+        },
+      });
       list.push({
         name: 'predicted-vs-actual-plot',
         data: {
@@ -2572,16 +2577,15 @@ class Project {
         },
       });
       list.push({
-        name: 'predicted-vs-actual-plot',
+        name: 'fit-plot',
         data: {
           url: validatePlotData,
         },
       });
-
       list.push({
         name: 'fit-plot',
         data: {
-          url: validatePlotData,
+          url: holdoutPlotData,
         },
       });
     }

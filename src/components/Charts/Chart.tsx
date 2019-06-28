@@ -10,9 +10,16 @@ import PIE from "./PIE";
 import PVA from "./PVA";
 
 export default function Chart(props){
-	const {x_name='',y_name='',title='',project} = props;
+	let {x_name='',y_name='',title='',project,name} = props;
 	const {data:_data={}} = props;
-	const {name,data} = _data as any;
+	let data;
+	if(name){
+		data = props.data;
+	}else{
+		name = _data.name;
+		data = _data.data;
+	}
+
 	let chart;
 	switch (name) {
 		case 'histogram-categorical':

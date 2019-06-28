@@ -105,7 +105,6 @@ export default class ModelProcessFlow extends Component {
 	}
 	
 	DQF(){
-		console.log('this.props.project',this.props);
 		const {
 			nullFillMethod,nullLineCounts,
 			mismatchFillMethod,mismatchLineCounts,

@@ -1150,7 +1150,7 @@ const ZH_LAN = {
   Deployment: '模型部署',
   PerformanceMonitors: '部署性能',
   WithinGroupSsSquares: "组内离差平方和",
-  WithinGroupSsPlot: "组内离差平方和",
+  WithinGroupSsPlot: "组内离差平方和图",
   WithinGroupsSs: "组内离差平方和",
   ImportantValues: '变量中值',
   adjustMutualInfo: '调整互信息',
