@@ -13,13 +13,14 @@ export default class HS extends Component{
 		super(props);
 		this.chart = React.createRef();
 		this.setSlider = debounce(this.setSlider, 1000);
-		const {result={}} = props;
-		const {min,max,interval} =result;
+		const {result,data} = props;
+		const {min=0,max=0,interval=1} =result||data;
+		const _data = result?data:data.data;
 		this.state = {
 			sliderValue : [min,max],
 			ready:true,
 			step:1,
-			data:toJS(props.data),
+			data:toJS(_data),
 			min,
 			max,
 			interval,
