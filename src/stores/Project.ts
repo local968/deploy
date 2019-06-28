@@ -2198,9 +2198,10 @@ class Project {
         feature_label: allLabel,
         standardType: this.standardTypeTemp,
         weights: allLabel.reduce((prev, la) => {
-          prev[la] = this.weightsTemp[la] || 1
+          prev.push(this.weightsTemp[la] || 1)
+          // prev[la] = 
           return prev
-        }, {} as NumberObject),
+        }, [] as number[]),
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
@@ -2613,7 +2614,7 @@ class Project {
       list.push(this.univariant(itm));
     }
 
-    const {validatePlotData,holdoutPlotData} = model;
+    const { validatePlotData, holdoutPlotData } = model;
     if (validatePlotData) {
       list.push({
         name: 'predicted-vs-actual-plot',
@@ -2684,7 +2685,7 @@ class Project {
     //   changeReportProgress('initializing report.', 0)
 
 
-    const model:any = this.models.find(m => m.id === modelId);
+    const model: any = this.models.find(m => m.id === modelId);
     //在这里获取所以直方图折线图数据
     // changeReportProgress('preparing univariate plot.', 75)
     model.graphicList = await this.allVariableList(model);
