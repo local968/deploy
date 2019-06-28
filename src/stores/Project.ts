@@ -877,7 +877,7 @@ class Project {
   @action
   originalStats = async () => {
     const api = await socketStore.ready()
-    return await api.originalStats({ index: this.originalIndex, projectId: this.id })
+    return await api.originalStats({ index: this.originalIndex, projectId: this.id, headers: toJS(this.rawHeader) })
   }
 
   @action
