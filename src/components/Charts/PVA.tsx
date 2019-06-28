@@ -213,7 +213,7 @@ export default class PVA extends Component{
 						if(String(parseInt(value)).length>10){
 							const p = Math.floor(Math.log(Math.abs(value)) / Math.LN10);
 							const n = value * Math.pow(10, -p);
-							return n.toFixed(3) + 'e' + p
+							return n.toFixed(3) + 'e+' + p
 						}
 						return value;
 					}
