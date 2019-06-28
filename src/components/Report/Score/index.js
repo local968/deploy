@@ -594,9 +594,8 @@ class RegressionDetailCurves extends Component {
         curComponent = <div className={styles.plot}>
           {<FitPlot
             title={EN.FitPlot}
-            x_name={EN.Truevalue}
+            // x_name={EN.Truevalue}
             y_name={EN.Predictvalue}
-            // chartDate={fitData}
             chartDate={isHoldout ? holdOutChartDate : chartDate}
           />}
         </div>;

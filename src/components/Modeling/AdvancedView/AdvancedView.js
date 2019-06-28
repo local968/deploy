@@ -641,7 +641,7 @@ class RegressionDetailCurves extends Component {
       case EN.ResidualPlot:
         const Plot = show && <ResidualPlot
           title={EN.ResidualPlot}
-          x_name={EN.Truevalue}
+          // x_name={EN.Truevalue}
           y_name={EN.Predictvalue}
           chartDate={isHoldout ? holdOutChartDate : chartDate}
         />;
