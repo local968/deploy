@@ -244,55 +244,50 @@ wss.register('newEtl', async (message, socket, process) => {
     }
   }
 
-  if (
-    project.problemType &&
-    project.problemType !== 'Clustering' &&
-    project.problemType !== 'Outlier'
-  ) {
-    stats[project.target].isTarget = true;
-    if (project.problemType === 'Classification') {
-      let deletedValues = [];
-      if (project.targetArray && project.targetArray.length > 1) {
-        if (_.includes(project.targetArray, ''))
-          stats[project.target].missingValueFillMethod = {
-            type: 'replace',
-            value: 'NULL',
-          };
-        deletedValues = Object.keys(
-          project.colValueCounts[project.target],
-        ).filter(k => !project.targetArray.includes(k));
-      } else {
-        deletedValues = _.chain(project.colValueCounts[project.target])
-          .entries()
-          .sort((a, b) => b[1] - a[1])
-          .slice(2)
-          .map(([k]) => k)
-          .value();
-      }
-      if (Object.keys(project.otherMap).includes(''))
+  stats[project.target].isTarget = true;
+  if (project.problemType === 'Classification' || project.problemType === 'Outlier') {
+    let deletedValues = [];
+    if (project.targetArray && project.targetArray.length > 1) {
+      if (_.includes(project.targetArray, ''))
         stats[project.target].missingValueFillMethod = {
           type: 'replace',
-          value: project.otherMap[''],
+          value: 'NULL',
         };
-
-      stats[project.target].mapFillMethod = {
-        ...deletedValues.reduce((prev, key) => {
-          prev[key] = {
-            type: 'delete',
-          };
-          return prev;
-        }, {}),
-        ...Object.entries(project.otherMap).reduce((prev, [key, value]) => {
-          if (key === '') return prev;
-          prev[key] = {
-            type: 'replace',
-            value: value === '' ? 'NULL' : value,
-          };
-          return prev;
-        }, {}),
-      };
+      deletedValues = Object.keys(
+        project.colValueCounts[project.target],
+      ).filter(k => !project.targetArray.includes(k));
+    } else {
+      deletedValues = _.chain(project.colValueCounts[project.target])
+        .entries()
+        .sort((a, b) => b[1] - a[1])
+        .slice(2)
+        .map(([k]) => k)
+        .value();
     }
+    if (Object.keys(project.otherMap).includes(''))
+      stats[project.target].missingValueFillMethod = {
+        type: 'replace',
+        value: project.otherMap[''],
+      };
+
+    stats[project.target].mapFillMethod = {
+      ...deletedValues.reduce((prev, key) => {
+        prev[key] = {
+          type: 'delete',
+        };
+        return prev;
+      }, {}),
+      ...Object.entries(project.otherMap).reduce((prev, [key, value]) => {
+        if (key === '') return prev;
+        prev[key] = {
+          type: 'replace',
+          value: value === '' ? 'NULL' : value,
+        };
+        return prev;
+      }, {}),
+    };
   }
+
   const response = await axios.post(
     `${esServicePath}/etls/${project.originalIndex}/etl`,
     stats,
