@@ -68,25 +68,7 @@ export default class SimplifiedView extends Component {
   // }
 
   showCorrelationMatrix = () => {
-    // const {project} = this.props;
-    //
-    // const colType = toJS(project.colType);
-    // const trainHeader = toJS(project.trainHeader);
-    //
-    // const fields = Object.entries(colType)
-    //   .filter(itm => itm[1] === 'Numerical')
-    //   .map(itm => itm[0])
-    //   .filter(itm => !trainHeader.includes(itm));
-    // request.post({
-    //   url: '/graphics/correlation-matrix',
-    //   data: {
-    //     fields,
-    //     id: project.etlIndex,
-    //   },
-    // }).then((CorrelationMatrixData) => {
       this.showCorrelation = true;
-      // this.CorrelationMatrixData = CorrelationMatrixData;
-    // });
   };
 
   hideCorrelationMatrix = e => {

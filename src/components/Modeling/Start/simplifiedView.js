@@ -105,11 +105,12 @@ export default class SimplifiedView extends Component {
 
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);
+    const dataHeader = toJS(project.dataHeader);
 
     const fields = Object.entries(colType)
       .filter(itm => itm[1] === 'Numerical')
       .map(itm => itm[0])
-      .filter(itm => !trainHeader.includes(itm));
+      .filter(itm => !trainHeader.includes(itm)&&dataHeader.includes(itm));
     request.post({
       url: '/graphics/correlation-matrix',
       data: {
