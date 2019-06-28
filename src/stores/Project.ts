@@ -796,10 +796,10 @@ class Project {
         continue;
       }
       if (key === 'problemType') {
-        Reflect.defineProperty(data, 'changeProjectType', { value })
+        Reflect.set(data, 'changeProjectType', value)
       }
       if (key === 'noCompute') {
-        Reflect.defineProperty(data, 'noComputeTemp', { value })
+        Reflect.set(data, 'noComputeTemp', value)
       }
     }
     // data.updateTime = +new Date()
@@ -2243,7 +2243,7 @@ class Project {
         const newFeatureLabel = {}
         Object.keys(this.targetColMap).slice(0, 2).forEach((k, index) => {
           const rename = this.renameVariable[k]
-          if (!!rename) Reflect.defineProperty(newFeatureLabel, rename, { value: index })
+          if (!!rename) Reflect.set(newFeatureLabel, rename, index)
         })
         if (!!Object.keys(newFeatureLabel).length) command.newFeatureLabel = newFeatureLabel
       }

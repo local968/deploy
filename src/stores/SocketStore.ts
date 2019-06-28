@@ -193,24 +193,22 @@ class SocketStore extends EventEmitter implements SocketStoreInterface {
 
   initApi(api: string[]) {
     api.map(eventName => {
-      return Reflect.defineProperty(this.api, eventName, {
-        value: (data: { _id?: string, type?: string } = {}, callback: () => void) => {
-          if (typeof data === 'function') {
-            callback = data;
-            data = {};
-          }
-          const _id = uuid.v4();
-          data._id = _id;
-          data.type = eventName;
-          if (callback) this.on('progress' + _id, callback);
-          return new Promise((resolve, reject) => {
-            this.once(_id, (...args) => {
-              if (callback) this.removeListener('progress' + _id, callback);
-              resolve(...args);
-            });
-            this.socket.send(JSON.stringify(data));
-          });
+      return Reflect.set(this.api, eventName, (data: { _id?: string, type?: string } = {}, callback: () => void) => {
+        if (typeof data === 'function') {
+          callback = data;
+          data = {};
         }
+        const _id = uuid.v4();
+        data._id = _id;
+        data.type = eventName;
+        if (callback) this.on('progress' + _id, callback);
+        return new Promise((resolve, reject) => {
+          this.once(_id, (...args) => {
+            if (callback) this.removeListener('progress' + _id, callback);
+            resolve(...args);
+          });
+          this.socket.send(JSON.stringify(data));
+        });
       })
     });
     this.emit('apiReady');

@@ -8,7 +8,7 @@ import { Table } from 'components/Common';
 import EN from '../../../../constant/en';
 
 import dataIcon from './data.svg';
-import axios from 'axios';
+import { formatNumber } from 'util';
 
 @observer
 export default class Preview extends Component {
@@ -91,8 +91,8 @@ export default class Preview extends Component {
     const tableData = data.map((row, index) => row.map(v => {
       v = v === 'NEW_VARIABLE_TYPE' ? '(other)' : v
       return {
-        content: <span>{v}</span>,
-        title: v,
+        content: <span>{formatNumber(v, 2)}</span>,
+        title: formatNumber(v, 2),
         cn: styles.cell
       }
     }))

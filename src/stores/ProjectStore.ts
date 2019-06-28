@@ -132,7 +132,7 @@ class ProjectStore {
     if (!isNaN(+(v.toString()))) {
       v = parseInt(v.toString(), 10)
     }
-    Reflect.defineProperty(this.toolsOption, k, { value: v })
+    Reflect.set(this.toolsOption, k, v)
     // this.toolsOption[k] = v;
     this.queryProjectList()
   }
