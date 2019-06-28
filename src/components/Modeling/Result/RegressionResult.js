@@ -56,6 +56,7 @@ export default class RegressionView extends Component {
             x_name = {EN.PointNumber}
             y_name = {isEN?`${EN.Groupaverage} ${mapHeader[target]}`:`${mapHeader[target]} ${EN.Groupaverage}`}
             model={selectModel}
+            project={project}
         />
       </div>
       <div className={styles.line} />
@@ -166,7 +167,7 @@ class ModelTable extends Component {
 
   render() {
     // const { sortKey, sort } = this
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, exportReport, sort, handleSort, mapHeader } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, exportReport, sort, handleSort, mapHeader,project } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -226,6 +227,7 @@ class ModelTable extends Component {
                 exportReport={exportReport(model.id)}
                 isRecommend={model.id === recommendId}
                 mapHeader={mapHeader}
+                project={project}
               />
             );
           })}
@@ -263,7 +265,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isRecommend, exportReport, isSelect, mapHeader } = this.props;
+    const { model, onSelect, isRecommend, exportReport, isSelect, mapHeader,project } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -318,7 +320,7 @@ class ModelDetail extends Component {
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {/*{this.visible && <VariableImpact model={model} />}*/}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-        {this.visible && this.type === 'process' && <ModelProcessFlow model={model} />}
+        {this.visible && this.type === 'process' && <ModelProcessFlow project={project} model={model} />}
       </div >
     );
   }

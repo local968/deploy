@@ -10,7 +10,7 @@ import PIE from "./PIE";
 import PVA from "./PVA";
 
 export default function Chart(props){
-	const {x_name='',y_name='',title=''} = props;
+	const {x_name='',y_name='',title='',project} = props;
 	const {data:_data={}} = props;
 	const {name,data} = _data as any;
 	let chart;
@@ -68,11 +68,12 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'predicted-vs-actual-plot':
-			// @ts-ignore
+			//@ts-ignore
 			chart = <PVA
 				x_name = {EN.PointNumber}
 				y_name = {y_name}
 				data={data}
+				project={project}
 			/>;
 			break;
 		case 'pie':

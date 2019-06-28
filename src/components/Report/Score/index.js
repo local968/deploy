@@ -446,7 +446,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable,target },sort, handleSort, metric } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable,target },sort, handleSort, metric,project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
@@ -486,7 +486,8 @@ class AdvancedModelTable extends Component {
         graphicList.pop();
         return <Chart
             y_name={isEN?`${EN.Groupaverage} ${target}`:`${target} ${EN.Groupaverage}`}
-            data={graphicList.pop()}
+            data={[graphicList.pop(),graphicList.pop()]}
+            project={project}
         />
       }
       return <React.Fragment/>
