@@ -392,6 +392,7 @@ const ZH_LAN = {
   CreateANewVariable: '创建新变量',
   CheckCorrelationMatrix: '相关性矩阵',
   UnivariantPlot: '散点图',
+  UnivariantPlots: '马赛克图',
   Importance: '重要性',
   AdvancedModelingImportanceTip: '下列显示了预测因子相对于目标变量的重要性。',
   STD: '标准差',

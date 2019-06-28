@@ -280,7 +280,7 @@ export default class SimplifiedView extends Component {
           <div className={classnames(styles.tableTh, styles.tableCheck)} />
           <div className={styles.tableTh}><span>{EN.Name}</span></div>
           <div className={styles.tableTh}><span>{EN.Histogram}</span></div>
-          <div className={styles.tableTh}><span>{EN.UnivariantPlot}</span></div>
+          <div className={styles.tableTh}><span>{EN.UnivariantPlots}</span></div>
           <div className={classnames(styles.tableTh, styles.tableImportance)}>
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon
               type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
@@ -349,7 +349,7 @@ class SimplifiedViewRow extends Component {
       if (colType[value] === "Numerical") {
         const {max,min,std_deviation_bounds:{lower,upper}} = stats[value].originalStats;
         data.interval =( Math.max(upper,max)-Math.min(lower,min))/100;
-  
+
         request.post({
           url: '/graphics/histogram-numerical',
           data,
@@ -727,7 +727,7 @@ class SimplifiedViewPlot extends Component {
         title={`Feature:${target}`}
         data={data}
       />
-     
+
     </div>
   }
 }
