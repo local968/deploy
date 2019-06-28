@@ -98,10 +98,17 @@ export default class ModelProcessFlow extends Component {
 			name = data['regressor:__choice__'];
 			type = `regressor:${name}:`;
 		}
-
-		return <dl className={styles.over}>
-			{this.list(data, type, '')}
-		</dl>;
+		
+		const result = this.list(data, type, '');
+		
+		if(result){
+			return <dl className={styles.over}>
+				{this.list(data, type, '')}
+			</dl>;
+		}
+		return <dl>
+			<dd>{EN.none}</dd>
+		</dl>
 	}
 	
 	DQF(){
