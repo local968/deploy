@@ -43,38 +43,6 @@ export default class SimplifiedView extends Component {
   }
 
   show = () => {
-    // console.log(1)
-    // const {project = {}} = this.props;
-    // const {target, colType, etlIndex} = project;
-    //
-    // if (!this.chartData[target]) {
-    //   if (colType[target] === "Numerical") {
-    //     const { min, max } = project.dataViews[target];
-    //     console.log(target , 'target1')
-    //     // request.post({
-    //     //   url: '/graphics/histogram-numerical',
-    //     //   data: {
-    //     //     field: target,
-    //     //     id: etlIndex,
-    //     //     interval : (max - min) / 100
-    //     //   },
-    //     // }).then((result) => this.showback(target, result.data));
-    //   } else {
-    //     const {uniqueValues} = project.dataViews[target];
-    //     data.size = uniqueValues > 8 ? 8 : uniqueValues;
-    //     console.log(target , 'target2')
-    //     // request.post({
-    //     //   url: '/graphics/histogram-categorical',
-    //     //   data: {
-    //     //     field: target,
-    //     //     id: etlIndex,
-    //     //     size: uniqueValues > 8 ? 8 : uniqueValues,
-    //     //   },
-    //     // }).then((result) => this.showback(target, result.data));
-    //   }
-    //   return
-    // }
-
     this.showHistograms = true;
   };
 
@@ -350,33 +318,7 @@ class SimplifiedViewRow extends Component {
   @observable scatterData = {};
 
   showHistograms = () => {
-    // const {value, project} = this.props;
-    // // this.histograms = true
-    // if (!this.chartData[value]) {
-    //   const data = {
-    //     field: value,
-    //     id: project.etlIndex,
-    //   };
-    //   if (project.colType[value] === "Numerical") {
-    //     const {min, max} = project.dataViews[value];
-    //     data.interval = (max - min) / 100;
-    //     request.post({
-    //       url: '/graphics/histogram-numerical',
-    //       data,
-    //     }).then((result) => this.showback(result.data, value));
-    //   } else {
-    //     // console.log(project.dataViews[value])
-    //     const {uniqueValues} = project.dataViews[value];
-    //     data.size = uniqueValues > 8 ? 8 : uniqueValues;
-    //     request.post({
-    //       url: '/graphics/histogram-categorical',
-    //       data,
-    //     }).then((result) => this.showback(result.data, value));
-    //   }
-    // } else {
       this.histograms = true;
-    // }
-
   };
   showback = (result, value) => {
     this.chartData = {

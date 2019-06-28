@@ -518,6 +518,7 @@ const EN_LAN = {
   CreateANewVariable: 'Create a New Variable',
   CheckCorrelationMatrix: 'Check Correlation Matrix',
   UnivariantPlot: 'Univariant Plot',
+  UnivariantPlots: 'Mosaic Plot',
   Importance: 'Importance',
   AdvancedModelingImportanceTip: 'The following column reflects the importance of the predictor to the target variable.',
   STD: 'STD',
