@@ -135,8 +135,8 @@ export default class SimplifiedView extends Component {
   handleWeight = key => value => {
     const { project } = this.props
     project.setProperty({
-      weights: {
-        ...project.weights,
+      weightsTemp: {
+        ...project.weightsTemp,
         [key]: value
       }
     })
@@ -152,13 +152,13 @@ export default class SimplifiedView extends Component {
     const { project } = this.props
     const value = e.target.value;
     project.setProperty({
-      standardType: value
+      standardTypeTemp: value
     })
   }
 
   render() {
     const { project } = this.props;
-    const { problemType, mapHeader = [], standardType, colType, targetMap, dataViews, weights, dataViewsLoading, informativesLabel, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { problemType, mapHeader = [], standardTypeTemp, colType, targetMap, dataViews, weightsTemp, dataViewsLoading, informativesLabel, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
@@ -170,17 +170,17 @@ export default class SimplifiedView extends Component {
       <div className={styles.chooseScan}>
         <div className={styles.chooseLabel}><span>{EN.ChooseaVariableScalingMethod}:</span></div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='minMax' id='minMax' checked={standardType === 'minMax'}
+          <input type='radio' name='scan' value='minMax' id='minMax' checked={standardTypeTemp === 'minMax'}
             onChange={this.handleType} />
           <label htmlFor='minMax'>{EN.minmaxscale}<Hint content={EN.Scaleseachfeaturetothegivenrange} /></label>
         </div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='standard' id='standard' checked={standardType === 'standard'}
+          <input type='radio' name='scan' value='standard' id='standard' checked={standardTypeTemp === 'standard'}
             onChange={this.handleType} />
           <label htmlFor='standard'>{EN.standardscale}<Hint content={EN.Centereachfeaturetothemean} /></label>
         </div>
         <div className={styles.chooseBox}>
-          <input type='radio' name='scan' value='robust' id='robust' checked={standardType === 'robust'}
+          <input type='radio' name='scan' value='robust' id='robust' checked={standardTypeTemp === 'robust'}
             onChange={this.handleType} />
           <label htmlFor='robust'>{EN.robustscale}<Hint content={EN.Centereachfeaturetothemedian} /></label>
         </div>
@@ -250,7 +250,7 @@ export default class SimplifiedView extends Component {
               const map = targetMap || {};
               const isNew = newVariable.includes(h)
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
-              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weights || {})[h]} mapHeader={newMapHeader} importance={importance}
+              return <SimplifiedViewRow key={i} value={h} data={data} map={map} weight={(weightsTemp || {})[h]} mapHeader={newMapHeader} importance={importance}
                 handleWeight={this.handleWeight(h)} colType={variableType} project={project}
                 isChecked={checkedVariables.includes(h)}
                 handleCheck={this.handleCheck.bind(null, h)}
@@ -290,12 +290,12 @@ class SimplifiedViewRow extends Component {
       if (project.colType[value] === "Numerical") {
         // const { min, max } = project.dataViews[value];
         // data.interval = (max - min) / 100;
-        const {max,min,std_deviation_bounds:{lower,upper}} = stats[value].originalStats;
-        data.interval =( Math.max(upper,max)-Math.min(lower,min))/100;
+        const { max, min, std_deviation_bounds: { lower, upper } } = stats[value].originalStats;
+        data.interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
         request.post({
           url: '/graphics/histogram-numerical',
           data,
-        }).then((result) => this.showback(result.data, value,{min,max,interval:data.interval}));
+        }).then((result) => this.showback(result.data, value, { min, max, interval: data.interval }));
       } else {
         // console.log(project.dataViews[value])
         const { uniqueValues } = project.dataViews[value];
@@ -310,7 +310,7 @@ class SimplifiedViewRow extends Component {
     }
 
   };
-  showback = (result, value,message) => {
+  showback = (result, value, message) => {
     this.chartData = {
       ...this.chartData,
       [value]: result,
@@ -359,10 +359,10 @@ class SimplifiedViewRow extends Component {
           trigger="click"
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
             <SimplifiedViewPlot onClose={this.hide}
-                                type={colType[value]}
-                                value={mapHeader[value]}
-                                result={this.result[value]}
-                                data={this.chartData[value]} />
+              type={colType[value]}
+              value={mapHeader[value]}
+              result={this.result[value]}
+              data={this.chartData[value]} />
           </SimplePlot>} /> : null}
       </div>
       {problemType === 'Clustering' && <div className={classnames(styles.tableTd, styles.tableImportance)}>
@@ -493,12 +493,12 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
 
   render() {
-    const { type, style, data, value,result } = this.props;
+    const { type, style, data, value, result } = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={{
-        width:600,
-        height:500,
+        width: 600,
+        height: 500,
         flexDirection: 'column',
       }}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}

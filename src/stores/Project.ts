@@ -12,6 +12,7 @@ import c1 from './classification.json'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
+import _ from "lodash";
 
 export interface Numerical {
   missingValue?: number;
@@ -154,7 +155,7 @@ export interface NewVariable {
 
 class Project {
   visiable: boolean
-  init: boolean = false
+  @observable init: boolean = false
   univariatePlotsBase64: StringObject
   histgramPlotsBase64: StringObject
   rawHistgramPlotsBase64: StringObject
@@ -332,6 +333,10 @@ class Project {
   @observable searchTime: number = 5;
   @observable kValue: number = 5;
   @observable kType: string = 'auto';
+
+  //un temp
+  @observable weightsTemp: NumberObject = {};
+  @observable standardTypeTemp: string = 'standard';
 
   @observable stopModel: boolean = false;
   @observable stopEtl: boolean = false;
@@ -737,7 +742,27 @@ class Project {
   @action
   initProject = () => {
     if (this.init) return
-    this.init = true
+    socketStore.ready().then(api => {
+      api.initProject({ id: this.id }).then(result => {
+        const { status, message, project } = result
+        if (status !== 200) return antdMessage.error(message)
+        this.setProperty({ ...project, init: true })
+        // Object.assign(this, project, { init: true })
+
+
+        this.autorun.push(autorun(async () => {
+          if (!this.originalIndex) {
+            this.uploadData = []
+          } else {
+            // this.readData(this.originPath).then(data => {
+            //   this.uploadData = data.slice(1)
+            // })
+            this.uploadData = await this.readIndex(this.originalIndex)
+          }
+        }))
+      })
+    })
+
     // this.autorun.push(autorun(async () => {
     //   if (this.uploadFileName && this.uploadFileName.length > 0) {
     //     const api = await socketStore.ready()
@@ -747,16 +772,7 @@ class Project {
     //   }
     //   this.fileNames = []
     // }))
-    this.autorun.push(autorun(async () => {
-      if (!this.originalIndex) {
-        this.uploadData = []
-      } else {
-        // this.readData(this.originPath).then(data => {
-        //   this.uploadData = data.slice(1)
-        // })
-        this.uploadData = await this.readIndex(this.originalIndex)
-      }
-    }))
+
     // this.autorun.push(autorun(async () => {
     //   if (!this.cleanPath) {
     //     this.cleanData = []
@@ -778,12 +794,26 @@ class Project {
 
   @action
   setProperty = (data: Partial<Project>) => {
-    if (typeof data !== 'object') {
-      return false;
-    }
-    if (Array.isArray(data)) {
-      return false;
-    }
+    //   if (typeof data !== 'object') {
+    //     return false;
+    //   }
+    //   if (Array.isArray(data)) {
+    //     return false;
+    //   }
+
+    //  const result =  _.chain(data).omit(['totalLines','userId','id']).omitBy((value)=>{
+    //       return typeof value === 'function'
+    //   }).assign({
+    //     changeProjectType: _.isEmpty(data.problemType) ? data.changeProjectType : data.problemType,
+    //     noComputeTemp: _.isEmpty(data.noCompute) ? data.noComputeTemp : data.noCompute,
+    //   }).value();
+
+    //   for (const key in result){
+    //     if(result.hasOwnProperty(key)){
+    //       this[key] = result[key]
+    //     }
+    //   }
+
     Reflect.deleteProperty(data, 'totalLines')
     Reflect.deleteProperty(data, 'userId')
     Reflect.deleteProperty(data, 'id')
@@ -800,6 +830,12 @@ class Project {
       }
       if (key === 'noCompute') {
         Reflect.set(data, 'noComputeTemp', value)
+      }
+      if (key === 'weights') {
+        Reflect.set(data, 'weightsTemp', value)
+      }
+      if (key === 'standardType') {
+        Reflect.set(data, 'standardTypeTemp', value)
       }
     }
     // data.updateTime = +new Date()
@@ -1642,11 +1678,12 @@ class Project {
       problemType,
       target,
       dataHeader,
-      weights,
+      weightsTemp,
       newVariable,
       trainHeader,
       colType,
       features,
+      standardTypeTemp
     } = this;
 
     let command = '';
@@ -1666,7 +1703,7 @@ class Project {
           kType: this.kType,
           kValue: this.kValue,
           algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
-          standardType: this.standardType,
+          standardType: standardTypeTemp,
           searchTime: this.searchTime,
           metricsMethod: this.measurement,
           featureLabel: featureLabel,
@@ -1674,7 +1711,7 @@ class Project {
           projectId: id,
           command,
           settingName: setting.name,
-          applyWeights: weights,
+          applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : []
         };
@@ -1683,14 +1720,14 @@ class Project {
         command = 'outlier.train';
         trainData = {
           algorithms: this.algorithms,
-          standardType: this.standardType,
+          standardType: standardTypeTemp,
           searchTime: this.searchTime,
           featureLabel: featureLabel,
           randomSeed: this.randSeed,
           projectId: id,
           command,
           settingName: setting.name,
-          applyWeights: weights,
+          applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : []
         };
@@ -1789,11 +1826,11 @@ class Project {
       kType: this.kType,
       kValue: this.kValue,
       algorithms: this.algorithms,
-      standardType: this.standardType,
+      standardType: standardTypeTemp,
       searchTime: this.searchTime,
       measurement: this.measurement,
       randSeed: this.randSeed,
-      weights,
+      weights: weightsTemp,
       features,
       version: this.version,
       resampling: this.resampling,
@@ -2127,13 +2164,22 @@ class Project {
 
   clusterPreTrainImportance = () => {
     if (this.problemType !== 'Clustering') return Promise.resolve()
-    return socketStore.ready().then(api => {
-      const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
-      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const feature_label = [...data_label, ...new_label]
-      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
+    const allLabel = [...this.dataHeader, ...this.newVariable].filter(v => v !== this.target)
+    const before = allLabel.reduce((prev, la) => {
+      prev[la] = this.weights[la] || 1
+      return prev
+    }, {} as NumberObject)
+    const after = allLabel.reduce((prev, la) => {
+      prev[la] = this.weightsTemp[la] || 1
+      return prev
+    }, {} as NumberObject)
+
+    const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+
+    if (!isChange) return Promise.resolve()
+
+    return socketStore.ready().then(api => {
       let cmd = 'clustering.preTrainImportance'
       // switch (this.problemType) {
       //   case 'Clustering':
@@ -2149,7 +2195,12 @@ class Project {
       const command = {
         projectId: this.id,
         command: cmd,
-        feature_label
+        feature_label: allLabel,
+        standardType: this.standardTypeTemp,
+        weights: allLabel.reduce((prev, la) => {
+          prev[la] = this.weightsTemp[la] || 1
+          return prev
+        }, {} as NumberObject),
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
