@@ -46,7 +46,7 @@ export default class DataConnect extends Component<DataConnectProps> {
   @observable isSql: boolean = false
   @observable sqlProgress: number = 0
   @observable visiable: boolean = false
-  @observable key: string = ''
+  @observable key: 'sample' | 'upload' | 'sql' | '' = ''
 
   @computed
   get message() {
@@ -174,7 +174,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.sql = false;
   })
 
-  onClick = (key: string) => {
+  onClick = (key: 'sample' | 'upload' | 'sql') => {
     const { project } = this.props.projectStore
     if (this.uploading || project.etling) return
     this.key = key
@@ -186,7 +186,8 @@ export default class DataConnect extends Component<DataConnectProps> {
     if (!this.key) return
     this.onClose()
     if (this.key === 'upload') return this.uploadRef.current.show()
-    Reflect.defineProperty(this, this.key, { value: true })
+    this[this.key] = true
+    // Reflect.defineProperty(this, this.key, { value: true })
   }
 
   onClose = () => {
@@ -244,6 +245,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     const charsetChange = action((charset) => {
       project.updateProject({ charset })
     })
+    console.log(this.sample)
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
