@@ -1147,7 +1147,7 @@ wss.register('etlCleanData', (message, socket, progress) => {
 wss.register('abortTrain', (message, socket) => {
   const { projectId, _id: requestId, stopId } = message;
   const { userId } = socket.session;
-  return getProjectField(projectId, 'stopIds').then(stopIds => {
+  return getProjectField(projectId, 'stopIds').then((stopIds = []) => {
     if (!stopIds.length) return { status: 200, message: 'ok' };
     if (!stopIds.includes(stopId)) return { status: 200, message: 'ok' };
     return axios

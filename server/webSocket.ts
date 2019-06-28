@@ -77,7 +77,7 @@ const init: any = (server, sessionParser) => {
       const socket = args[1];
       const progress = result => {
         try {
-          socket.send(
+          socket.isAlive && socket.send(
             JSON.stringify({
               ...result,
               request: { ...message, progress: true },
