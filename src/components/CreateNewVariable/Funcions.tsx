@@ -65,7 +65,7 @@ function Function(props: FunctionProps) {
       {
         map(validFuncs, (v, k) => <div key={k + 'div'}>
           <ListItem onClick={() => onCosClick(k)} key={k} button>
-            <ListItemText primary={EN[k]} />
+            <ListItemText primary={Reflect.get(EN, k)} />
             {state[k] ? <ExpandMore /> : <ExpandLess />}
           </ListItem>
           <Collapse in={state[k]} unmountOnExit key={k + 'col'}>

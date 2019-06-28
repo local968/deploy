@@ -10,7 +10,7 @@ import moment from "moment";
 import InputNumber from "antd/es/input-number";
 import EN from '../../../constant/en';
 import Button from "@material-ui/core/Button";
-const {Option} = Select;
+const { Option } = Select;
 import {
   SSPlot
 } from "../../Charts"
@@ -145,7 +145,7 @@ export default class AdvancedView extends Component {
     const { project, hidden } = this.props;
     const { algorithms, defaultAlgorithms } = project
     const isAll = Algorithms[project.problemType].length === algorithms.length
-    const isDefault = algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
+    const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
     const measurementList =
       project.problemType === "Outlier"
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
@@ -284,7 +284,7 @@ export default class AdvancedView extends Component {
                 </div>
                 <div className={styles.advancedOptionBox}>
                   <input
-                    id="algorithmSelect2"
+                    id="algorithmSelect3"
                     type="radio"
                     name="algorithmSelect"
                     checked={isDefault}

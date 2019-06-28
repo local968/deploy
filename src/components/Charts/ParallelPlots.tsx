@@ -2,7 +2,9 @@ import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import request from '../Request';
 import EN from "../../constant/en";
+import { inject } from 'mobx-react';
 
+@inject('projectStore')
 export default class ParallelPlot extends PureComponent{
 	constructor(props){
 		super(props);
@@ -36,8 +38,6 @@ export default class ParallelPlot extends PureComponent{
 			}
 		}
 
-
-
 		let {title='',schema=[],data=[]} = result;
 		let len = 0;
 
@@ -63,11 +63,14 @@ export default class ParallelPlot extends PureComponent{
 			color:'#000',
 		};
 
+		const {projectStore} = this.props as any;
+
 		schema.forEach((itm,index)=>{
+			const name = projectStore.project.mapHeader[itm];
 			parallelAxis.push({
 				dim:index+1,
 				nameLocation:'start',
-				name:itm,
+				name,
 				nameTextStyle,
 			})
 		});

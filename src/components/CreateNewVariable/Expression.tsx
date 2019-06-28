@@ -101,7 +101,7 @@ function Expression(props: ExpressionProps) {
     addExp(value)
   }
 
-  const onClick = (k: number) => (e) => {
+  const onClick = (k: number) => (e: MouseEvent<HTMLSpanElement>) => {
     const input = e.currentTarget.parentElement.getElementsByTagName('input')[0];
     setRange(k + 1, k + 1)
     setIndex()

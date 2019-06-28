@@ -23,7 +23,7 @@ function Project(props: ProjectProps) {
 
   const nextStep = () => {
     const _name: string = name || EN.Project + new Date().toLocaleString('chinese', { hour12: false })
-    const deployment = deploymentStore.deployments.find(d => project.id === d.projectId)
+    const deployment = deploymentStore.deployments.find((d: any) => project.id === d.projectId)
     if (deployment) deploymentStore.change(deployment.id, 'projectName', _name)
     project.updateProject({
       name: _name,

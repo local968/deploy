@@ -186,7 +186,7 @@ function Expressions(props: ExpressionsProps) {
     return suggestions
   }
 
-  const estimateAdd = (exp, k, expSize) => {
+  const estimateAdd = (exp: Exp, k: number, expSize: number) => {
     const {label, value} = exp;
     return !label || !_.size(value) || k + 1 != expSize;
   }

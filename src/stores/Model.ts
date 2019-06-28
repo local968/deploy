@@ -45,6 +45,15 @@ export interface ClaregScore {
   logLoss?: number
   precision?: number
   recall?: number
+  adjustR2?: number
+  mae?: number
+  mse?: number
+  msle?: number
+  nmse?: number
+  nrmse?: number
+  r2?: number
+  rmse?: number
+  rmsle?: number
 }
 
 export interface Score {
@@ -62,6 +71,7 @@ class Model {
   initialFitIndex: number
   dataFlow: StringObject
   graphicList: graphicListItem[]
+  validatePlotData: string
   @observable score: Score;
   @observable backend: string;
   @observable featureImportance: NumberObject;
@@ -96,7 +106,7 @@ class Model {
   }
 
   @action
-  setProperty(data: Object) {
+  setProperty(data: Partial<Model>) {
     if (typeof data !== 'object') {
       return false;
     }
@@ -108,6 +118,7 @@ class Model {
     Reflect.deleteProperty(data, 'projectId')
 
     for (let key in data) {
+      // const value = data[key]
       const value = Reflect.get(data, key)
       // (data as Model)[(key as keyof Model)]
       if (typeof value === 'function') {

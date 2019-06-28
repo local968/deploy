@@ -1,34 +1,50 @@
 import { observable, action, when, computed, autorun } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
+import Model from './Model'
 import uuid from "uuid";
 import moment from 'moment'
 import { message as antdMessage } from 'antd'
 
-class ProjectStore {
-  @observable loading = true;
-  @observable init = false;
-  @observable isOnline = true;
-  @observable watchList = false;
-  @observable currentId = "";
+export interface ToolsOption {
+  current: number,
+  limit: number,
+  offset: number,
+  sort: string,
+}
 
-  @observable list = [];
-  @observable total = 0;
-  @observable keywords = '';
-  @observable toolsOption = {
+export interface WatchResult {
+  status: number,
+  id: string,
+  result: Partial<Project>,
+  model: Model,
+  modelResult: Partial<Model>
+}
+
+class ProjectStore {
+  @observable loading: boolean = true;
+  @observable init: boolean = false;
+  @observable isOnline: boolean = true;
+  @observable watchList: boolean = false;
+  @observable currentId: string = "";
+
+  @observable list: Project[] = [];
+  @observable total: number = 0;
+  @observable keywords: string = '';
+  @observable toolsOption: ToolsOption = {
     current: 1,
     limit: 10,
     offset: 0,
     sort: 'createTime',
   };
-  @observable broadcastId = "";
-  @observable conflict = false;
-  @observable stopFilter = false;
-  oldfiltedModels = null;
-  newfiltedModels = null;
+  @observable broadcastId: string = "";
+  @observable conflict: boolean = false;
+  @observable stopFilter: boolean = false;
+  oldfiltedModels: Model[] | null = null;
+  newfiltedModels: Model[] | null = null;
 
   @action
-  changeStopFilter = (stopFilter) => {
+  changeStopFilter = (stopFilter: boolean) => {
     this.stopFilter = stopFilter;
     if (!stopFilter) {
       this.oldfiltedModels = this.newfiltedModels
@@ -36,12 +52,12 @@ class ProjectStore {
   };
 
   @action
-  changeNewfiltedModels = (models) => {
+  changeNewfiltedModels = (models: Model[]) => {
     this.newfiltedModels = models
   };
 
   @action
-  changeOldfiltedModels = (models) => {
+  changeOldfiltedModels = (models: Model[]) => {
     this.oldfiltedModels = models
   };
 
@@ -49,7 +65,7 @@ class ProjectStore {
   constructor() {
     if ((window as any).r2Report) {
       const list = (window as any).r2Report
-      this.list = list.map(row => {
+      this.list = list.map((row: Project) => {
         const project = new Project(row.id + "", { ...row, ...{ isAbort: false } })
         project.models.forEach(m => project.setModel(m))
         return project
@@ -102,7 +118,7 @@ class ProjectStore {
   get sortList() {
     const sort = this.toolsOption.sort
     return this.list.filter(p => p.visiable).sort((a, b) => {
-      return b[sort] - a[sort]
+      return Reflect.get(b, sort) - Reflect.get(a, sort)
     }).slice(0, this.toolsOption.limit)
   }
 
@@ -112,16 +128,17 @@ class ProjectStore {
   }
 
   @action
-  changeOption = (k, v) => {
-    if (!isNaN(v)) {
-      v = parseInt(v, 10)
+  changeOption = (k: string, v: string | number) => {
+    if (!isNaN(+(v.toString()))) {
+      v = parseInt(v.toString(), 10)
     }
-    this.toolsOption[k] = v;
+    Reflect.defineProperty(this.toolsOption, k, { value: v })
+    // this.toolsOption[k] = v;
     this.queryProjectList()
   }
 
   @action
-  changePage = page => {
+  changePage = (page: number) => {
     const { current, limit } = this.toolsOption
     if (current === page) return;
     const offset = (page - 1) * limit
@@ -132,11 +149,11 @@ class ProjectStore {
   @action
   watchProjectList = () => {
     socketStore.ready().then(api => {
-      api.watchProjectList().then(watch => {
+      api.watchProjectList().then((watch: { status: number, id?: string }) => {
         if (watch.status === 200) {
           this.watchList = true
           this.init = true
-          api.on(watch.id, data => {
+          api.on(watch.id, (data: WatchResult) => {
             const { status, id, result, model, modelResult } = data
             if (status === 200) {
               const project = this.list.find(p => p.id === id)
@@ -151,7 +168,7 @@ class ProjectStore {
               }
             }
           })
-          api.on("inProject", data => {
+          api.on("inProject", (data: { id: string, broadcastId: string }) => {
             const { id, broadcastId } = data
             if (broadcastId === this.broadcastId) return
             if (id !== this.currentId) return
@@ -166,7 +183,7 @@ class ProjectStore {
   queryProjectList = () => {
     this.loading = true;
     return socketStore.ready().then(api => {
-      return api.queryProjectList(this.toolsOption).then(result => {
+      return api.queryProjectList(this.toolsOption).then((result: { status: number, message: string, list: Project[], count: number }) => {
         const { status, message, list, count } = result
         if (status !== 200) {
           this.loading = false;
@@ -195,7 +212,7 @@ class ProjectStore {
     if (this.loading) return
     this.loading = true;
     return socketStore.ready().then(api => {
-      return api.addProject().then(result => {
+      return api.addProject().then((result: { status: number, message: string, id: string }) => {
         const { status, message, id } = result
         if (status !== 200) {
           this.loading = false;
@@ -209,11 +226,11 @@ class ProjectStore {
   }
 
   @action
-  deleteProjects = ids => {
+  deleteProjects = (ids: string[]) => {
     if (this.loading) return
     this.loading = true;
     return socketStore.ready().then(api => {
-      return api.deleteProjects({ ids }).then(result => {
+      return api.deleteProjects({ ids }).then((result: { status: number, message: string }) => {
         const { status, message } = result
         this.loading = false;
         if (status !== 200) {
@@ -230,7 +247,7 @@ class ProjectStore {
   }
 
   @action
-  initProject = id => {
+  initProject = (id: string) => {
     return new Promise(resolve => {
       if (this.currentId === id) return resolve(true)
       if (this.list.length) {
@@ -245,7 +262,7 @@ class ProjectStore {
         }
       }
       socketStore.ready().then(api => {
-        api.checkProject({ id }).then(result => {
+        api.checkProject({ id }).then((result: { status: number, data: Project }) => {
           const { status, data } = result
           if (status !== 200) {
             return resolve(false)
@@ -278,7 +295,7 @@ class ProjectStore {
   }
 
   @action
-  inProject = id => {
+  inProject = (id: string) => {
     return socketStore.ready().then(api => {
       this.broadcastId = uuid.v4()
       return api.inProject({ id, broadcastId: this.broadcastId })

@@ -9,11 +9,13 @@ import histogramIcon from './histogramIcon.svg';
 import FUNCTIONS from './functions';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import HistogramNumerical from "../../Charts/HistogramNumerical";
-import HistogramCategorical from "../../Charts/HistogramCategorical";
 import request from 'components/Request'
-import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
 import CreateNewVariables from '../../CreateNewVariable'
+import {
+  HS,
+  HistogramCategorical,
+  CorrelationMatrixs,
+} from '../../Charts';
 
 @observer
 export default class SimplifiedView extends Component {
@@ -189,7 +191,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.toolLabel}><span>{EN.CurrentVariableList}</span></div>
           <select value={selectValue} onChange={this.handleChange}>
             <option value='all'>{EN.AllVariables} ({allVariables.length})</option>
-            <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option>
+            {problemType === 'Clustering' && <option value='informatives'>{EN.Informatives} ({informativesLabel.length})</option>}
             {customHeader.map((v, k) => <option key={k} value={k}>{EN.Custom}{k + 1} ({v.length})</option>)}
             {hasNewOne && <option
               value={customHeader.length}>{EN.Custom}{customHeader.length + 1} ({checkedVariables.length})</option>}
@@ -265,14 +267,14 @@ export default class SimplifiedView extends Component {
 
 @observer
 class SimplifiedViewRow extends Component {
-  @observable histograms = false
-  @observable univariant = false
+  @observable histograms = false;
+  @observable univariant = false;
   @observable chartData = {};
-
+  @observable result = {};
 
   showHistograms = () => {
     const { value, project, isNew } = this.props;
-    const { histgramPlots } = project;
+    const { stats } = project;
     if (isNew) {
       // const newUrl = histgramPlots[value]
       this.histograms = true
@@ -286,12 +288,14 @@ class SimplifiedViewRow extends Component {
         id: project.etlIndex,
       };
       if (project.colType[value] === "Numerical") {
-        const { min, max } = project.dataViews[value];
-        data.interval = (max - min) / 100;
+        // const { min, max } = project.dataViews[value];
+        // data.interval = (max - min) / 100;
+        const {max,min,std_deviation_bounds:{lower,upper}} = stats[value].originalStats;
+        data.interval =( Math.max(upper,max)-Math.min(lower,min))/100;
         request.post({
           url: '/graphics/histogram-numerical',
           data,
-        }).then((result) => this.showback(result.data, value));
+        }).then((result) => this.showback(result.data, value,{min,max,interval:data.interval}));
       } else {
         // console.log(project.dataViews[value])
         const { uniqueValues } = project.dataViews[value];
@@ -306,13 +310,17 @@ class SimplifiedViewRow extends Component {
     }
 
   };
-  showback = (result, value) => {
+  showback = (result, value,message) => {
     this.chartData = {
       ...this.chartData,
       [value]: result,
     };
+    this.result = {
+      ...this.result,
+      [value]: message,
+    };
     this.histograms = true;
-  }
+  };
 
   hideHistograms = e => {
     e && e.stopPropagation();
@@ -351,9 +359,10 @@ class SimplifiedViewRow extends Component {
           trigger="click"
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
             <SimplifiedViewPlot onClose={this.hide}
-              type={colType[value]}
-              value={mapHeader[value]}
-              data={this.chartData[value]} />
+                                type={colType[value]}
+                                value={mapHeader[value]}
+                                result={this.result[value]}
+                                data={this.chartData[value]} />
           </SimplePlot>} /> : null}
       </div>
       {problemType === 'Clustering' && <div className={classnames(styles.tableTd, styles.tableImportance)}>
@@ -484,16 +493,21 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
 
   render() {
-    const { type, style, data, value } = this.props;
+    const { type, style, data, value,result } = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
-      return <div className={styles.plot} style={style}>
+      return <div className={styles.plot} style={{
+        width:600,
+        height:500,
+        flexDirection: 'column',
+      }}>
         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-        <HistogramNumerical
+        <HS
           x_name={value}
           y_name={'count'}
           title={`Feature:${value}`}
           data={data}
+          result={result}
         />
       </div>
     }

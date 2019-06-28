@@ -588,7 +588,7 @@ function scheduleDownloadCsv(
   res,
   target,
 ) {
-  header = [...header.filter(h => h !== target), target];
+  if( target ) header = [...header.filter(h => h !== target), target];
   let temp = {};
   let counter = 0;
   let resultHeader;
@@ -607,9 +607,9 @@ function scheduleDownloadCsv(
           const headerTexts = [
             ...header.filter(key => key !== '__no').map(h => mapHeader[h]),
             ...Object.keys(row).map(v =>
-              v.startsWith(target) ? v.replace(target, mapHeader[target]) : v,
-            ),
-          ].filter(key => key !== '__no');
+              target && v.startsWith(target) ? v.replace(target, mapHeader[target]) : v
+            )
+          ].filter(key => key !== '__no')
           res.write(Papa.unparse([headerTexts, []], { header: false }));
         }
         const nos = _.chain(temp)

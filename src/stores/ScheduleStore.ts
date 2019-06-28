@@ -3,40 +3,56 @@ import socketStore from 'stores/SocketStore';
 import userStore from 'stores/UserStore';
 import deploymentStore from './DeploymentStore';
 
+export interface Schedule {
+  deploymentId: string;
+  modelName: string;
+  type: string;
+  estimatedTime: number;
+  ends?: number | string | unknown;
+  threshold?: unknown | null;
+  prevSchedule?: unknown | null;
+  status: string;
+  actualTime?: unknown | null;
+  updatedDate: number;
+  createdDate: number;
+  name?: string;
+  owner?: string;
+}
+
 const sortStrategies = {
-  createdDate: (a, b) =>
+  createdDate: (a: Schedule, b: Schedule) =>
     a.createdDate === b.createdDate
       ? 0
       : a.createdDate > b.createdDate
         ? -1
         : 1,
-  rcreatedDate: (a, b) =>
+  rcreatedDate: (a: Schedule, b: Schedule) =>
     a.createdDate === b.createdDate
       ? 0
       : a.createdDate < b.createdDate
         ? -1
         : 1,
-  updatedDate: (a, b) =>
+  updatedDate: (a: Schedule, b: Schedule) =>
     a.updatedDate === b.updatedDate
       ? 0
       : a.updatedDate > b.updatedDate
         ? -1
         : 1,
-  rupdatedDate: (a, b) =>
+  rupdatedDate: (a: Schedule, b: Schedule) =>
     a.updatedDate === b.updatedDate
       ? 0
       : a.updatedDate < b.updatedDate
         ? -1
         : 1,
-  projectName: (a, b) => a.name.localeCompare(b.name),
-  rprojectName: (a, b) => a.name.localeCompare(b.name) * -1,
-  modelName: (a, b) => a.modelName.localeCompare(b.modelName),
-  rmodelName: (a, b) => a.modelName.localeCompare(b.modelName) * -1
+  projectName: (a: Schedule, b: Schedule) => a.name.localeCompare(b.name),
+  rprojectName: (a: Schedule, b: Schedule) => a.name.localeCompare(b.name) * -1,
+  modelName: (a: Schedule, b: Schedule) => a.modelName.localeCompare(b.modelName),
+  rmodelName: (a: Schedule, b: Schedule) => a.modelName.localeCompare(b.modelName) * -1
 };
 
-const filter = (keywords, schedules) => {
+const filter = (keywords: string, schedules: Schedule[]) => {
   if (!keywords || keywords === '') return schedules;
-  const result = [];
+  const result: Schedule[] = [];
   schedules.map((_d, index) => {
     const _results = keywords
       .split(' ')
@@ -55,23 +71,27 @@ const filter = (keywords, schedules) => {
 };
 
 class ScheduleStore {
-  perPageOptions = {
+  perPageOptions: { 5: string, 10: string, 20: string } = {
     // 2: '2',
     5: '5',
     10: '10',
     20: '20'
   };
 
-  @observable schedules = [];
-  @observable watchingList = false
+  @observable schedules: Schedule[] = [];
+  @observable watchingList: boolean = false
 
-  @observable
-  sortOptions = {
-    keywords: '',
-    sortBy: 'createdDate',
-    perPage: 10,
-    currentPage: 1
-  };
+  @observable sortOptions: {
+    keywords: string
+    sortBy: string
+    perPage: number
+    currentPage: number
+  } = {
+      keywords: '',
+      sortBy: 'createdDate',
+      perPage: 10,
+      currentPage: 1
+    };
 
   constructor() {
     socketStore.ready().then(api => {
@@ -86,7 +106,7 @@ class ScheduleStore {
       () => userStore.status === 'login' && !!userStore.info.id,
       () =>
         socketStore.ready().then(api => {
-          const callback = action((response: any) => {
+          const callback = action((response: { list: Schedule[] }) => {
             this.schedules = response.list;
             this.watchingList = true
           })
@@ -110,7 +130,7 @@ class ScheduleStore {
     return this.sortSchedules('performance', this.schedules, deploymentStore.deployments);
   }
 
-  sortSchedules = (type, schedules, deployments) => {
+  sortSchedules = (type: string, schedules: Schedule[], deployments: { id: string }[]) => {
     if (deployments.length === 0) return []
     const _schedules = schedules.filter(
       s => s && s.type === type && parseInt(s.deploymentId, 10) === parseInt(deploymentStore.currentId, 10)
@@ -122,7 +142,7 @@ class ScheduleStore {
     result = filter(this.sortOptions.keywords, _schedules);
 
     // order
-    result = result.sort(sortStrategies[this.sortOptions.sortBy]);
+    result = result.sort(Reflect.get(sortStrategies, this.sortOptions.sortBy));
 
     // pagination
     const start =
@@ -140,15 +160,15 @@ class ScheduleStore {
     return result;
   };
 
-  getLastSchedule = (deploymentId, type = 'deployment') => this.schedules
+  getLastSchedule = (deploymentId: string, type: string = 'deployment') => this.schedules
     .filter(
       schedule =>
         schedule && schedule.deploymentId === deploymentId && schedule.type === type
     )
     .reduce(
-      (prev, curr, index) =>
+      (prev, curr) =>
         (prev.updatedDate || 0) < curr.updatedDate ? curr : prev,
-      {}
+      {} as Schedule
     );
 }
 

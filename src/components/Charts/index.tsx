@@ -25,6 +25,7 @@ import ParallelPlots from './ParallelPlots'
 import SSPlot from './SSPlot'
 import TSEN from './T-SEN'
 import PIE from './PIE'
+import HS from './HS'
 
 export {
   Bar,
@@ -54,4 +55,5 @@ export {
   SSPlot,
   TSEN,
   PIE,
+  HS,
 }
