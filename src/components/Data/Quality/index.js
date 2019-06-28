@@ -27,6 +27,8 @@ export default class DataQuality extends Component {
   }
 }
 
+
+@inject('userStore')
 @observer
 class TargetIssue extends Component {
   @observable visible = false
@@ -67,10 +69,10 @@ class TargetIssue extends Component {
   }
 
   saveDataFixes = () => {
-    this.props.project.fixFillMethod()
+    this.props.project.fixFillMethod();
     message.info(EN.Thechangeswillbeappliedintrainingsection, 5)
     this.closeFixes();
-  }
+  };
 
   render() {
     const { project, changeTab } = this.props;
@@ -86,7 +88,7 @@ class TargetIssue extends Component {
       mismatch: mismatchCount === 0 ? 0 : (mismatchCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(mismatchCount * 100 / (totalRawLines || 1), 2),
       outlier: outlierCount === 0 ? 0 : (outlierCount * 100 / (totalRawLines || 1)) < 0.01 ? "<0.01" : formatNumber(outlierCount * 100 / (totalRawLines || 1), 2)
     }
-    const warnings = []
+    const warnings = [];
     // const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
     const unique = targetArrayTemp.length || rawDataView[target].uniqueValues
     const hasNull = !targetArrayTemp.length ? !!nullCount : false
@@ -94,36 +96,37 @@ class TargetIssue extends Component {
       if (hasNull) warnings.push(`${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`)
       if (unique < 2 && !hasNull) warnings.push(`${EN.YourtargetvariableHas}${EN.onlyOnevalue}`)
       if (unique === 2 && !hasNull) {
-        const min = Math.min(...Object.values(targetCounts))
+        const min = Math.min(...Object.values(targetCounts));
         if (min < 3) warnings.push(EN.Itisrecommendedthatyou)
       }
     }
-    if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push(EN.Yourtargetvariableisempty)
-    const cannotContinue = !!warnings.length || (problemType === 'Classification' && issues.targetIssue)
-    const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue && !(problemType !== 'Classification' && issues.targetRowIssue)
+    if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push(EN.Yourtargetvariableisempty);
+    const cannotContinue = !!warnings.length || (problemType === 'Classification' && issues.targetIssue);
+    const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue && !(problemType !== 'Classification' && issues.targetRowIssue);
+    const {quality_continue=true} = this.props.userStore.info.role;
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {!!warnings.length && <div className={styles.issueTitle}><span>{EN.Warning}!</span></div>}
         {!!warnings.length && <div className={styles.issueBox}>
           {warnings.map((v, k) => <div className={styles.issueText} key={k}>
-            <div className={styles.point}></div>
+            <div className={styles.point}/>
             <span>{v}</span>
           </div>)}
         </div>}
         {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueTitle}><span>{EN.IssueS}{issues.targetIssue + issues.rowIssue + issues.targetRowIssue > 1 && EN.SS} {EN.Found}!</span></div>}
         {(issues.targetIssue || issues.rowIssue || (problemType !== 'Classification' && issues.targetRowIssue)) && <div className={styles.issueBox}>
           {issues.targetIssue && <div className={styles.issueText}>
-            <div className={styles.point}></div>
+            <div className={styles.point}/>
             {problemType === 'Classification' ?
               <span>{EN.Yourtargetvariablehasmorethantwouniquevalues}</span> :
               <span>{EN.Yourtargetvariablehaslessthan}{recomm}{EN.Uniquevalueswhichisnot}</span>}
           </div>}
           {issues.rowIssue && <div className={styles.issueText}>
-            <div className={styles.point}></div>
+            <div className={styles.point}/>
             <span>{EN.Datasizeistoosmall}</span>
           </div>}
           {(problemType !== 'Classification' && issues.targetRowIssue) && <div className={styles.issueText}>
-            <div className={styles.point}></div>
+            <div className={styles.point}/>
             <span>{EN.Somedataissueshighlightedincolor}</span>
           </div>}
         </div>}
@@ -131,15 +134,15 @@ class TargetIssue extends Component {
       </div>
       <div className={styles.typeBox}>
         {!!mismatchCount && <div className={styles.type}>
-          <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
+          <div className={classnames(styles.typeBlock, styles.mismatch)}/>
           <span>{EN.DataTypeMismatch}</span>
         </div>}
         {!!nullCount && <div className={styles.type}>
-          <div className={classnames(styles.typeBlock, styles.missing)}></div>
+          <div className={classnames(styles.typeBlock, styles.missing)}/>
           <span>{EN.MissingValue}</span>
         </div>}
         {!!outlierCount && <div className={styles.type}>
-          <div className={classnames(styles.typeBlock, styles.outlier)}></div>
+          <div className={classnames(styles.typeBlock, styles.outlier)}/>
           <span>{EN.Outlier}</span>
         </div>}
         <div className={styles.issueTabs}>
@@ -175,7 +178,12 @@ class TargetIssue extends Component {
               })}
             </div>
           </div>
-          <ContinueButton disabled={cannotContinue} onClick={changeTab} text={EN.Continue} width="100%" />
+          <ContinueButton
+            disabled={cannotContinue}
+            onClick={changeTab}
+            text={EN.Continue}
+            show={quality_continue}
+            width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?
@@ -225,6 +233,8 @@ class TargetIssue extends Component {
   }
 }
 
+
+@inject('userStore')
 @observer
 class VariableIssue extends Component {
   @observable visible = false
@@ -370,7 +380,9 @@ class VariableIssue extends Component {
   render() {
     const { project, changeTab } = this.props;
     const { issues, dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount } } = project;
-    const tableData = this.formatTable()
+    const tableData = this.formatTable();
+    // const {quality_EditTheFixes=true} = this.props.userStore.info.role;
+    // console.log('quality_EditTheFixes',quality_EditTheFixes)
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
@@ -378,16 +390,18 @@ class VariableIssue extends Component {
           <div className={styles.cleanTitle}><span>{EN.VariableQualitylooksgood}</span></div>}
         <div className={styles.issueBox}>
           {issues.rowIssue && <div className={styles.issueText}>
-            <div className={styles.point}></div>
+            <div className={styles.point}/>
             <span className={styles.limitText}>{EN.Foryourwholedataset}</span>
             <div className={styles.button} onClick={this.backToConnect}>
               <button><span>{EN.LoadaNewDataset}</span></button>
             </div>
           </div>}
           {issues.dataIssue && <div className={styles.issueText}>
-            <div className={styles.point}></div>
-            <span className={styles.limitText}>{EN.SomeissuesarefoundR2learnhasgenerated}</span>
-            <div className={styles.button} onClick={this.editFixes}>
+            <div className={styles.point}/>
+            <span className={styles.limitText}>{EN.SomeissuesarefoundR2learnhasgenerated}</span>12312
+            <div className={styles.button}
+                 // style={{display:(quality_EditTheFixes?"":"none")}}
+                 onClick={this.editFixes}>
               <button><span>{EN.EditTheFixes}</span></button>
             </div>
           </div>}
@@ -395,7 +409,7 @@ class VariableIssue extends Component {
       </div>
       <div className={styles.typeBox}>
         {!!mismatchCount && <div className={styles.type}>
-          <div className={classnames(styles.typeBlock, styles.mismatch)}></div>
+          <div className={classnames(styles.typeBlock, styles.mismatch)}/>
           <span>{EN.DataTypeMismatch}</span>
         </div>}
         {!!nullCount && <div className={styles.type}>

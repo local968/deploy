@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { Modal, NumberInput } from 'components/Common';
 import { observable } from 'mobx'
 // import * as d3 from 'd3';
@@ -11,6 +11,7 @@ import EN from '../../../constant/en';
 import OutlierRange from "../../Charts/OutlierRange";
 import request from '../../Request'
 
+@inject('userStore')
 @observer
 export class ClassificationTarget extends Component {
   @observable rename = false
@@ -87,7 +88,8 @@ export class ClassificationTarget extends Component {
     const hasNull = !isGood && Object.keys(targetCounts).includes('')
     const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`;
+    const {quality_Fixit=true} = this.props.userStore.info.role;
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -121,7 +123,7 @@ export class ClassificationTarget extends Component {
                 <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}</span>
               </div>
               <div className={styles.targetPercentValue}>
-                <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}></div>
+                <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}/>
                 <span>{targetCounts['']}</span>
               </div>
             </div>
@@ -160,7 +162,10 @@ export class ClassificationTarget extends Component {
             </div>
             {!error && <div className={styles.method}>
               <div className={styles.reason}><span>{EN.Thetargetvariablehassomenoise}</span></div>
-              <div className={styles.button} onClick={editTarget}>
+              <div
+                className={styles.button}
+                style={{display:(quality_Fixit?"":"none")}}
+                onClick={editTarget}>
                 <button><span>{EN.Fixit}</span></button>
               </div>
             </div>}
@@ -222,7 +227,7 @@ export class RowIssue extends Component {
         <div className={styles.info}>
           <div className={styles.progressBox}>
             <div className={styles.progressText}><span>{EN.AllDatatotalRawLinesrows} ({totalRawLines} {EN.Rows})</span><span>{EN.Rowsminimum}</span></div>
-            <div className={styles.progress} style={{ width: totalRawLines / 10 + "%" }}></div>
+            <div className={styles.progress} style={{ width: totalRawLines / 10 + '%' }}/>
           </div>
         </div>
         <div className={styles.methods}>
@@ -398,7 +403,7 @@ export class SelectTarget extends Component {
                 <span>{v}</span>
               </div>
               <div className={styles.targetPercentValue}>
-                <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
+                <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}/>
                 <span>{colValueCounts[target][v] || 0}</span>
               </div>
             </div>
