@@ -1792,3 +1792,14 @@ span.performanceScore {
   color: #445167;
   text-decoration: underline;
 }
+.metricSwitch {
+    flex: none;
+    align-items: center;
+    margin-right: 15px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: flex-end;
+}
+.metricSwitch span {
+    margin: 0 10px;
+}

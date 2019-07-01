@@ -105,11 +105,12 @@ export default class SimplifiedView extends Component {
 
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);
+    const dataHeader = toJS(project.dataHeader);
 
     const fields = Object.entries(colType)
       .filter(itm => itm[1] === 'Numerical')
       .map(itm => itm[0])
-      .filter(itm => !trainHeader.includes(itm));
+      .filter(itm => !trainHeader.includes(itm)&&dataHeader.includes(itm));
     request.post({
       url: '/graphics/correlation-matrix',
       data: {
@@ -381,36 +382,22 @@ class SimplifiedViewRow extends Component {
 
   showUnivariant = async () => {
     const { value, project, isNew, data: _data, colType } = this.props;
+    const {mapHeader,target,problemType,etlIndex} = project;
     if (isNew) {
-      // this.scatterData = {
-      //   ...this.scatterData,
-      //   // [value]: {
-      //   //   ...result,
-      //   // },
-      //   [`${value}-msg`]: {
-      //     type,
-      //   }
-      // };
-
       const type = colType[value];
 
       this.scatterData = {
         ...this.scatterData,
-        // [value]: {
-        //   ...result,
-        // },
         [`${value}-msg`]: {
-          y: project.target,
+          y: mapHeader[target],
           x: value,
           type,
         }
       };
       return this.univariant = true;
     }
-    // const { name, categoricalMap } = project.dataViews[value];
 
     if (!this.scatterData[value]) {
-      const { target, problemType, etlIndex } = project;
       const type = colType[value];
       if (problemType === "Regression") {
         if (type === 'Numerical') {//散点图
@@ -421,7 +408,7 @@ class SimplifiedViewRow extends Component {
               x: value,
               id: etlIndex,
             }
-          }).then((result) => this.showbackUnivariant(result, value, target, 'Numerical'));
+          }).then((result) => this.showbackUnivariant(result, mapHeader[value], mapHeader[target], 'Numerical'));
         } else {//回归-分类 箱线图
           request.post({
             url: '/graphics/regression-categorical',
@@ -430,7 +417,7 @@ class SimplifiedViewRow extends Component {
               value,
               id: etlIndex,
             }
-          }).then((result) => this.showbackUnivariant(result, value, target, 'Categorical'));
+          }).then((result) => this.showbackUnivariant(result, mapHeader[value], mapHeader[target], 'Categorical'));
         }
         // _result
       } else {//Univariant
@@ -453,6 +440,7 @@ class SimplifiedViewRow extends Component {
               },
               [`${value}-msg`]: {
                 type,
+                x:mapHeader[value],
               }
             };
             this.univariant = true;
@@ -470,6 +458,7 @@ class SimplifiedViewRow extends Component {
               },
               [`${value}-msg`]: {
                 type,
+                x:mapHeader[value],
               }
             };
             this.univariant = true;
@@ -519,6 +508,8 @@ class SimplifiedViewRow extends Component {
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
+    
+    console.log(this.scatterData)
 
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
@@ -567,11 +558,10 @@ class SimplifiedViewRow extends Component {
               data={this.scatterData[value]}
               message={this.scatterData[`${value}-msg`]}
               colType={colType[value]}
-            // message={colType[value]}
             /></SimplePlot>} /> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>
-        <div className={styles.preImpotance}>
+        <div className={styles.preImpotance} title={formatNumber(importance, 3)}>
           <div className={styles.preImpotanceActive} style={{ width: (importance * 100) + '%' }} />
         </div>
       </div>

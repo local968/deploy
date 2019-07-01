@@ -40,8 +40,7 @@ export default function PAW(props){
 		return data;
 	}
 
-	// @ts-ignore
-	useEffect( () => {
+	useEffect( function() {
 		async function fetchData() {
 			const result = await request.post({
 				url: '/graphics/paw',
@@ -53,7 +52,7 @@ export default function PAW(props){
 			setPcsD(setPcsData(result.corrData));
 			setTsenD(setTsenData(result.pcaData,result.predicts))
 		}
-		return fetchData();
+		fetchData();
 	}, []);
 
 	const {corrData=[],ve=[],pcaData=[],predicts,fields} = data as any;

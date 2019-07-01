@@ -4,7 +4,7 @@ import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
 import { NumberInput, Hint } from "components/Common";
-import { Select, message, Tooltip, Popover } from "antd";
+import { Select, message, Tooltip, Popover,Icon } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
 import InputNumber from "antd/es/input-number";
@@ -17,6 +17,9 @@ import {
 
 @observer
 export default class AdvancedView extends Component {
+  constructor(props){
+    super(props);
+  }
   handleName = action(e => {
     const { project } = this.props;
     project.settings.find(s => s.id === project.settingId).name =
@@ -143,27 +146,18 @@ export default class AdvancedView extends Component {
 
   render() {
     const { project, hidden } = this.props;
-    const { algorithms, defaultAlgorithms } = project
-    const isAll = Algorithms[project.problemType].length === algorithms.length
-    const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
+    const { algorithms, defaultAlgorithms,settingId,settings=[],problemType,settingName,showSsPlot} = project;
+    const isAll = Algorithms[problemType].length === algorithms.length;
+    const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al));
+    const defaultIsAll = Algorithms[project.problemType].length === defaultAlgorithms.length
     const measurementList =
-      project.problemType === "Outlier"
-        ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-        [{ value: "score", label: EN.Accuracy, hint: EN.ScoreHint }]
+     problemType === "Outlier"
+        ? [{ value: "score", label: EN.Accuracy, hint: EN.ScoreHint }]
         : [
           { value: "CVNN", label: "CVNN", hint: EN.CVNNHint },
           { value: "CH", label: "CH Index", hint: EN.CHIndexHint },
           { value: "silhouette_euclidean", label: "Silhouette Score", hint: EN.SihouetteScoreHint },
-
-          // { value: "CVNN", label: "CVNN" },
-          // { value: "RSquared", label: "RSquared" },
-          // { value: "RMSSTD", label: "RMSSTD" },
-          // { value: "CH", label: "CH" },
-          // { value: "silhouette_cosine", label: "silhouette_cosine" },
-          // { value: "silhouette_euclidean", label: "silhouette_euclidean" }
         ];
-    // const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
-    // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
     return (
       <div className={styles.advanced}>
         <div className={styles.advancedRow}>
@@ -173,10 +167,9 @@ export default class AdvancedView extends Component {
                 <span>{EN.SelectFromPreviousSettings}:</span>
               </div>
               <div className={styles.advancedOption}>
-                <select value={project.settingId} onChange={this.changeSetting}>
+                <select value={settingId} onChange={this.changeSetting}>
                   <option value={"default"}>{EN.Default}</option>
-                  {project.settings &&
-                    project.settings.map(setting => (
+                  {settings.map(setting => (
                       <option key={setting.id} value={setting.id}>
                         {setting.name}
                       </option>
@@ -193,14 +186,14 @@ export default class AdvancedView extends Component {
               <div className={styles.advancedOption}>
                 <input
                   type="text"
-                  value={project.settingName}
+                  value={settingName}
                   onChange={this.handleName}
                 />
               </div>
             </div>
           </div>
         </div>
-        {project.problemType === "Outlier" ? null : <div className={styles.advancedRow}>
+        {problemType === "Outlier" ? null : <div className={styles.advancedRow}>
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
               <div className={`${styles.advancedTitle}`}>
@@ -208,11 +201,20 @@ export default class AdvancedView extends Component {
               </div>
               <Popover
                 placement="bottomLeft"
+                trigger="click"
+                visible={showSsPlot}
+                onVisibleChange={()=>{
+                  project.showSsPlot = !showSsPlot
+                }}
                 content={<SSPlot
                   height={300} width={600}
                   project={project}
-                />} title={null}>
-                <Button className={styles.button}>{EN.WithinGroupSsPlot}</Button>
+                />} title={<Icon onClick={()=>{
+                project.showSsPlot = false
+                }
+              } className={styles.ssPlot} type="close" />}>
+                <Button
+                  className={styles.button}>{EN.WithinGroupSsPlot}</Button>
               </Popover>
 
             </div>
@@ -282,7 +284,7 @@ export default class AdvancedView extends Component {
                   />
                   <label htmlFor="algorithmSelect2">{EN.DeselectAll}</label>
                 </div>
-                <div className={styles.advancedOptionBox}>
+                {!defaultIsAll && <div className={styles.advancedOptionBox}>
                   <input
                     id="algorithmSelect3"
                     type="radio"
@@ -292,7 +294,7 @@ export default class AdvancedView extends Component {
                     onClick={this.handleDefaultCheck}
                   />
                   <label htmlFor="algorithmSelect3">{EN.SelectDefault}</label>
-                </div>
+                </div>}
               </div>
             </div>
             <div className={styles.advancedBlock}>

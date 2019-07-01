@@ -10,7 +10,6 @@ export default function EsUploader(file, option = {}) {
   let isStop = false
   let uploader = null
   let rawHeader = []
-  // let cleanHeader = []
   const { onProgress, onError, onFinished } = option;
 
   const autoFixHeader = (rawHeader) => {
@@ -44,7 +43,6 @@ export default function EsUploader(file, option = {}) {
           // rawHeader = autoFixHeader(_row)
           console.log(result)
           rawHeader = _row
-          // cleanHeader = rawHeader
           return header = '__no,' + rawHeader.map((h, i) => i).toString()
         }
         const row = _row
@@ -90,7 +88,6 @@ export default function EsUploader(file, option = {}) {
           // onFinished({
           //   originalIndex: dataIndex,
           //   totalRawLines: no,
-          //   cleanHeader: header,
           //   rawHeader: header,
           //   dataHeader: header,
           //   fileName: file.name

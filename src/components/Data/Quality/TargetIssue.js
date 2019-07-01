@@ -621,7 +621,7 @@ export class FixIssue extends Component {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, nullLineCountsOrigin, mismatchLineCountsOrigin, outlierLineCountsOrigin, dataHeader } = project
+    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, dataHeader } = project
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -642,11 +642,11 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(mismatchLineCountsOrigin).map((k, i) => {
+              {Object.keys(mismatchLineCounts).map((k, i) => {
                 if (!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const originNum = mismatchLineCountsOrigin[k]
+                const originNum = mismatchLineCounts[k]
                 if (!originNum) {
                   return null;
                 }
@@ -777,11 +777,11 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(nullLineCountsOrigin).map((k, i) => {
+              {Object.keys(nullLineCounts).map((k, i) => {
                 if (!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const originNum = nullLineCountsOrigin[k]
+                const originNum = nullLineCounts[k]
                 if (!originNum) {
                   return null;
                 }
@@ -921,11 +921,11 @@ export class FixIssue extends Component {
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(outlierLineCountsOrigin).map((k, i) => {
+              {Object.keys(outlierLineCounts).map((k, i) => {
                 if (!dataHeader.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
-                const originNum = outlierLineCountsOrigin[k]
+                const originNum = outlierLineCounts[k]
                 if (!originNum) {
                   return null;
                 }

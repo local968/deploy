@@ -507,7 +507,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort, mapHeader } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort, mapHeader,project } = this.props;
     // const { sortKey, sort } = this
     return (
       <div className={styles.table}>
@@ -572,6 +572,7 @@ class ModelTable extends Component {
                 isRecommend={model.id === recommendId}
                 text={text}
                 mapHeader={mapHeader}
+                project={project}
               />
             );
           })}
@@ -609,7 +610,8 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader } = this.props;
+    const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader,project } = this.props;
+    console.log(11,project)
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -678,8 +680,8 @@ class ModelDetail extends Component {
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader}/>}
-        {this.visible && this.type === 'process' && !model.id.includes('Logistic') && <ModelProcessFlow model={model} />}
-        {this.visible && this.type === 'process' && model.id.includes('Logistic') && <ModelProcessFlow2 model={model} />}
+        {this.visible && this.type === 'process' && !model.id.includes('Logistic') && <ModelProcessFlow project={project} model={model} />}
+        {this.visible && this.type === 'process' && model.id.includes('Logistic') && <ModelProcessFlow2 project={project} model={model} />}
       </div >
     );
   }

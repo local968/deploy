@@ -36,7 +36,6 @@ function Problem(props: ProblemProps) {
   const { projectStore } = props
   const { project } = projectStore;
   const { changeProjectType, fileName, problemType, saveProblem } = project
-  console.log(changeProjectType, problemType)
 
   // const { onChange, changeProjectType = '', models = [], uploadFileName = [], problemType = '', saveProblem } = props
 

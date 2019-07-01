@@ -127,9 +127,6 @@ wss.register('originalStats', async (message, socket) => {
       outlierLineCounts,
       stats: data,
       originalIndex: index,
-      nullLineCountsOrigin: nullLineCounts,
-      mismatchLineCountsOrigin: mismatchLineCounts,
-      outlierLineCountsOrigin: outlierLineCounts,
 
       mainStep: 2,
       curStep: 2,

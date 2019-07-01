@@ -65,7 +65,7 @@ router.post('/check', async (req, res) => {
 router.post('/', (req, res) => {
   // console.log('upload nginx callback')
   const form = new formidable.IncomingForm();
-  form.parse(req, function(error, fields, files) {
+  form.parse(req, function (error, fields, files) {
     const params = req.query;
     if (!params || !params.token || !params.userId || !params.type)
       return res.json({
@@ -312,17 +312,33 @@ router.get('/download/result', async (req, res) => {
           const response = await axios.get(
             `${esServicePath}/etls/${etlIndex}/preview?start=${start}&end=${end}`,
           );
-          const result = response.data.result
-            .filter(_r => !!temp[_r['__no']])
-            .map(esRow =>
-              resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])),
-            );
+
+          const result = Object.entries(temp).map(([key, esRows]: [string, any[]]) => {
+            return esRows.map(esRow => {
+              const originRow = response.data.result.find(r => r['__no'].toString() === key)
+              return resultHeader.map(h => ({ ...originRow, ...esRow }[h]))
+            })
+          }).reduce((prev: string[], arr: string[]) => {
+            return [...prev, ...arr]
+          }, [] as string[])
+
+
+          // const result = response.data.result
+          //   .filter(_r => !!temp[_r['__no']])
+          //   .map(esRow =>
+
+
+          //     resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])),
+          //   );
           result.push([]);
           res.write(Papa.unparse(result, { header: false }));
-          temp = { [row['__no']]: row };
+          temp = {[row['__no']]: [row]};
+          // temp[row['__no']] = temp[row['__no']] || [];
+          // temp[row['__no']].push(row)
           parser.resume();
         } else {
-          temp[row['__no']] = row;
+          temp[row['__no']] = temp[row['__no']] || [];
+          temp[row['__no']].push(row)
           counter++;
         }
       },
@@ -337,11 +353,21 @@ router.get('/download/result', async (req, res) => {
             ...nos,
           )}&end=${Math.max(...nos)}`,
         );
-        const result = response.data.result
-          .filter(_r => !!temp[_r['__no']])
-          .map(esRow =>
-            resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])),
-          );
+        const result = Object.entries(temp).map(([key, esRows]: [string, any[]]) => {
+          return esRows.map(esRow => {
+            const originRow = response.data.result.find(r => r['__no'].toString() === key)
+            return resultHeader.map(h => ({ ...originRow, ...esRow }[h]))
+          })
+        }).reduce((prev: string[], arr: string[]) => {
+          return [...prev, ...arr]
+        }, [] as string[])
+
+
+        // const result = response.data.result
+        //   .filter(_r => !!temp[_r['__no']])
+        //   .map(esRow =>
+        //     resultHeader.map(h => ({ ...esRow, ...temp[esRow['__no']] }[h])),
+        //   );
         result.push([]);
         res.write(Papa.unparse(result, { header: false }));
         temp = {};
@@ -562,30 +588,30 @@ router.get('/download/:scheduleId', async (req, res) => {
   const mapHeader = JSON.parse(
     await redis.hget(`project:${deployment.projectId}`, 'mapHeader'),
   );
-  const target = JSON.parse(
-    await redis.hget(`project:${deployment.projectId}`, 'target'),
-  );
-  // console.log(schedule.result.deployData)
-  scheduleDownloadCsv(
-    schedule.result.deployData,
+    const target = JSON.parse(
+      await redis.hget(`project:${deployment.projectId}`, 'target'),
+    );
+    // console.log(schedule.result.deployData)
+    scheduleDownloadCsv(
+      schedule.result.deployData,
+      filename,
+      schedule.etlIndex,
+      header,
+      mapHeader,
+      res,
+      target,
+    );
+  });
+
+  function scheduleDownloadCsv(
+    url,
     filename,
-    schedule.etlIndex,
+    index,
     header,
     mapHeader,
     res,
     target,
-  );
-});
-
-function scheduleDownloadCsv(
-  url,
-  filename,
-  index,
-  header,
-  mapHeader,
-  res,
-  target,
-) {
+  ) {
   if( target && header.indexOf(target) !== -1 ) header = [...header.filter(h => h !== target), target];
   let temp = {};
   let counter = 0;
