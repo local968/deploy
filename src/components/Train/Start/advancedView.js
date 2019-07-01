@@ -151,6 +151,7 @@ export default class AdvancedView extends Component {
     const { project, hidden } = this.props;
     const { algorithms, defaultAlgorithms } = project
     const isAll = Algorithms[project.problemType].length === algorithms.length
+    const defaultIsAll = Algorithms[project.problemType].length === defaultAlgorithms.length
     const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
     const measurementList =
       project.problemType === "Outlier"
@@ -301,7 +302,7 @@ export default class AdvancedView extends Component {
                   />
                   <label htmlFor="algorithmSelect2">{EN.DeselectAll}</label>
                 </div>
-                <div className={styles.advancedOptionBox}>
+                {!defaultIsAll && <div className={styles.advancedOptionBox}>
                   <input
                     id="algorithmSelect3"
                     type="radio"
@@ -311,7 +312,7 @@ export default class AdvancedView extends Component {
                     onClick={this.handleDefaultCheck}
                   />
                   <label htmlFor="algorithmSelect3">{EN.SelectDefault}</label>
-                </div>
+                </div>}
               </div>
             </div>
             <div className={styles.advancedBlock}>
