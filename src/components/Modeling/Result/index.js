@@ -67,7 +67,7 @@ export default class ModelResult extends Component {
     // const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
 
     this.props.deploymentStore
-      .addDeployment(project.id, project.name, current.modelName, current.problemType)
+      .addDeployment(project.id, project.name, current.modelName, current.problemType, project.mapHeader)
       .then(id => this.props.routing.push('/deploy/project/' + id));
   };
 

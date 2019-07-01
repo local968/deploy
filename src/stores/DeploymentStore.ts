@@ -132,13 +132,14 @@ class DeploymentStore {
     this.watchingList = false;
   })
 
-  async addDeployment(projectId, projectName, modelName, modelType, csvScript) {
+  async addDeployment(projectId, projectName, modelName, modelType, mapHeader, csvScript) {
     const data = {
       deploymentOptions: {},
       modelName,
       modelType,
       projectId,
       projectName,
+      mapHeader,
       csvScript,
       performanceOptions: {}
     };
