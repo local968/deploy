@@ -1295,6 +1295,7 @@ const EN_LAN = {
   GBK: 'GBK',
   GB_2312: 'GB-2312',
   BIG5: 'BIG5',
+  residual:"residual",
 };
 
 

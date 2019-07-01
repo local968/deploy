@@ -1229,9 +1229,15 @@ button.disable {
   justify-content: center;
   cursor: pointer;
   font-size: 16px;
-  margin-right: .25em;
+  /*margin-right: .25em;*/
   padding: 10px 20px;
+  margin-left: 50px !important;
 }
 .button span{
   color:#fff;
+}
+.ssPlot{
+  position: absolute;
+  right: 18px;
+  top: 18px;
 }

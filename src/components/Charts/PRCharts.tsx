@@ -2,7 +2,9 @@ import React, {PureComponent} from 'react'
 import echarts from 'echarts';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash'
+import { observer } from 'mobx-react';
 
+@observer
 export default class PRCharts extends PureComponent{
 	private chart: any;
 	constructor(props){
@@ -16,14 +18,15 @@ export default class PRCharts extends PureComponent{
 	}
 
 	componentWillReceiveProps(nextProps) {
-		const {isHoldout} = this.props as any;
-		if(nextProps.isHoldout!==isHoldout){
+		const {project} = this.props as any;
+		const {isHoldout} = project as any;
+		if(nextProps.project.isHoldout!==isHoldout){
 			this.prePair(nextProps.isHoldout)
 		}
 	}
 
 	//@ts-ignore
-	prePair(isHoldout=this.props.isHoldout){
+	prePair(isHoldout=this.props.project.isHoldout){
 		const {x_name='',y_name='',model} = this.props as any;
 		const {chartData,fitIndex=0,holdoutChartData} = model;
 		const {roc} = isHoldout?holdoutChartData:chartData;

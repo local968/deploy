@@ -23,14 +23,6 @@ export default class DataSchema extends Component {
 
   doEtl = () => {
     const { project } = this.props.projectStore
-    const { rawHeader } = project;
-    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
-    const data = {
-      target: this.target,
-      dataHeader: newDataHeader,
-      colType: { ...this.dataType }
-    }
-    project.setProperty(data)
     if (project.train2ing || !!project.models.length) return this.visiable = true
     this.onConfirm()
   }
@@ -40,6 +32,15 @@ export default class DataSchema extends Component {
   }
 
   onConfirm = () => {
+    const { project } = this.props.projectStore
+    const { rawHeader } = project;
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
+    const data = {
+      target: this.target || '',
+      dataHeader: newDataHeader,
+      colType: { ...this.dataType }
+    }
+    project.setProperty(data)
     try {
       this.props.projectStore.project.endSchema()
     } catch (e) {

@@ -264,7 +264,15 @@ const OutlierTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <OutlierRow model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} key={m.id} mapHeader={mapHeader} hasTarget={!!target} />
+        return <OutlierRow
+          model={m}
+          isRecommend={m.id === recommendModel.id}
+          isSelect={m.id === selectModel.id}
+          onSelect={onSelect}
+          key={m.id}
+          mapHeader={mapHeader}
+          project={project}
+          hasTarget={!!target} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -282,7 +290,7 @@ const OutlierTable = observer((props) => {
 const OutlierRow = observer((props) => {
   const [type, setType] = React.useState('')
   const [visible, setVisible] = React.useState(false)
-  const { model, isRecommend, isSelect, onSelect, mapHeader, hasTarget } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader, hasTarget,project } = props
 
   const toggleImpact = (_type) => {
     if (!visible) {//本来是关着的
@@ -345,7 +353,7 @@ const OutlierRow = observer((props) => {
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow model={model} />}
+    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
     {/* </div> */}
   </div>
 })
@@ -452,7 +460,15 @@ const ClusteringTable = observer((props) => {
     </div>
     <div className={classes.rowBox}>
       {sortModels.map(m => {
-        return <ClusteringRow key={m.id} model={m} isRecommend={m.id === recommendModel.id} isSelect={m.id === selectModel.id} onSelect={onSelect} mapHeader={mapHeader} hasTarget={!!target} />
+        return <ClusteringRow
+          key={m.id}
+          model={m}
+          isRecommend={m.id === recommendModel.id}
+          isSelect={m.id === selectModel.id}
+          onSelect={onSelect}
+          project={project}
+          mapHeader={mapHeader}
+          hasTarget={!!target} />
       })}
       {!train2Finished && Object.values(trainModel).map((tm, k) => {
         return <div className={classes.rowData} key={k}>
@@ -468,7 +484,7 @@ const ClusteringTable = observer((props) => {
 })
 
 const ClusteringRow = observer((props) => {
-  const { model, isRecommend, isSelect, onSelect, mapHeader, hasTarget } = props
+  const { model, isRecommend, isSelect, onSelect, mapHeader, hasTarget,project } = props
   const { realLabelScore = {} } = model
   const { adjust_mutual_info = '', adjust_rand_score = '' } = realLabelScore
   const [type, setType] = React.useState('')
@@ -547,7 +563,7 @@ const ClusteringRow = observer((props) => {
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow model={model} />}
+    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
     {visible && type === 'explanation' && <Explanation model={model} mapHeader={mapHeader} />}
     {/* </div> */}
   </div>

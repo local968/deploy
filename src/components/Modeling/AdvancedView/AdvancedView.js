@@ -4,32 +4,12 @@ import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import { Hint, Switch } from 'components/Common';
-import ModelProcess from './ModelProcess';
-import modelProcess from './icon-model-process-flow-normal.svg';
-import processHover from './icon-model-process-flow-hover.svg';
-import processSelectd from './icon-model-process-flow-selected.svg';
-import ROCCurve from './icon-roc-curve-normal.svg';
-import liftChart from './icon-lift-chart-normal.png';
-import gainChart from './icon-gain-chart-normal.png';
-import ksCurve from './icon-ks-curve-normal.png';
-import precisionRecall from './icon-precision-recall-tradeoff-normal.svg';
-import predictDist from './icon-prediction-distribution-normal.svg';
-import liftchartHover from './icon-lift-chart-hover.svg';
-import rocHover from './icon-roc-curve-hover.svg';
-import precisionRecallHover from './icon-precision-recall-tradeoff-hover.svg';
-import predictionDistribution from './icon-prediction-distribution-hover.svg';
-import liftchartSelected from './icon-lift-chart-selected.png';
-import gainchartSelected from './icon-gain-chart-selected.png';
-import ksCurveSelected from './icon-ks-curve-selected.png';
 import FitPlotHover from './iconMR-FitPlot-Hover.svg';
 import FitPlotNormal from './iconMR-FitPlot-Normal.svg';
 import FitPlotSelected from './iconMR-FitPlot-Selected.svg';
 import ResidualHover from './iconMR-Residual-Hover.svg';
 import ResidualNormal from './iconMR-Residual-Normal.svg';
 import ResidualSelected from './iconMR-ResidualPlot-Selected.svg';
-import rocSelected from './icon-roc-curve-selected.svg';
-import precisionRecallSelected from './icon-precision-recall-tradeoff-selected.svg';
-import predictionDistributionSelected from './icon-prediction-distribution-selected.svg';
 import varImpactHover from './icon-variable-impact-linear-hover.svg';
 import varImpactSelected from './icon-variable-impact-selected.svg';
 import varImpactNormal from './icon-variable-impact-linear-normal.svg';
@@ -52,18 +32,14 @@ const {TabPane} = Tabs;
 const {Option} = Select;
 
 import {
-  KsChart,
-  GainChart,
   FitPlot,
-  SingleLiftCharts,
   SpeedvsAccuracys,
   ResidualPlot,
-  PredictionDistributions,
-  ROCCurves,
-  PRCharts,
   LiftChart,
   RocChart,
 } from "../../Charts"
+import DetailCurves from './DetailCurves';
+import Thumbnail from './Thumbnail';
 
 @inject('projectStore')
 @observer
@@ -444,7 +420,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout,project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
@@ -470,9 +446,27 @@ class AdvancedModelTable extends Component {
     const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>
     const dataSource = models.map(m => {
       if (problemType === 'Classification') {
-        return <ClassificationModelRow no={no} yes={yes} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
+        return <ClassificationModelRow
+          no={no} yes={yes}
+          key={m.id} texts={texts}
+          onClickCheckbox={this.onClickCheckbox(m.id)}
+          checked={selectModel.id === m.id}
+          model={m}
+          metric={metric.key}
+          isHoldout={isHoldout}
+          project={project}
+          mapHeader={newMapHeader} />
       } else {
-        return <RegressionModleRow project={this.props.project} key={m.id} texts={texts} onClickCheckbox={this.onClickCheckbox(m.id)} checked={selectModel.id === m.id} model={m} metric={metric.key} isHoldout={isHoldout} mapHeader={newMapHeader} />
+        return <RegressionModleRow
+          project={this.props.project}
+          key={m.id}
+          texts={texts}
+          onClickCheckbox={this.onClickCheckbox(m.id)}
+          checked={selectModel.id === m.id}
+          model={m}
+          metric={metric.key}
+          isHoldout={isHoldout}
+          mapHeader={newMapHeader} />
       }
     });
     return (
@@ -495,7 +489,7 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked, isHoldout, mapHeader } = this.props;
+    const { model, texts, metric, checked, isHoldout, mapHeader,project } = this.props;
     const { score: { validateScore, holdoutScore }, modelName, reason } = model;
     const { detail } = this.state;
     const { validate, holdout } = reason || {}
@@ -542,7 +536,12 @@ class AdvancedModelTable extends Component {
             }
           })}
         </Row>
-        {detail && <RegressionDetailCurves isHoldout={isHoldout} project={this.props.project} model={model} mapHeader={mapHeader} />}
+        {detail && <RegressionDetailCurves
+          isHoldout={isHoldout}
+          project={project}
+          model={model}
+          mapHeader={mapHeader}
+        />}
       </div>
     )
   }
@@ -642,7 +641,7 @@ class RegressionDetailCurves extends Component {
       case EN.ResidualPlot:
         const Plot = show && <ResidualPlot
           title={EN.ResidualPlot}
-          x_name={EN.Truevalue}
+          // x_name={EN.Truevalue}
           y_name={EN.Predictvalue}
           chartDate={isHoldout ? holdOutChartDate : chartDate}
         />;
@@ -711,12 +710,12 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   };
   render() {
-    const { model, texts, metric, checked, yes, no, isHoldout, mapHeader } = this.props;
+    const { model, texts, metric, checked, yes, no, isHoldout,project } = this.props;
     if (!model.chartData) return null;
     const { modelName, fitIndex, holdoutChartData, chartData, score } = model;
     const { detail } = this.state;
     return (
-      <div >
+      <div>
         <Row onClick={this.handleResult} >
           {texts.map(t => {
             switch (t) {
@@ -754,222 +753,12 @@ class ClassificationModelRow extends Component {
             }
           })}
         </Row>
-        {detail && <DetailCurves model={model} yes={yes} no={no} isHoldout={isHoldout} mapHeader={mapHeader} />}
-      </div>
-    )
-  }
-}
-
-class DetailCurves extends Component {
-  state = {
-    curve: EN.ROCCurve,
-    show: true,
-  }
-  handleClick = val => {
-    this.setState({ curve: val });
-  }
-  reset = () => {
-    this.props.model.resetFitIndex();
-    this.setState({
-      show: false
-    });
-    setTimeout(() => {
-      this.setState({
-        show: true
-      })
-    }, 0)
-  };
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.isHoldout !== this.props.isHoldout) {
-      this.setState({
-        show: false
-      }, () => {
-        this.setState({
-          show: true
-        })
-      });
-    }
-  }
-
-  render() {
-    const { model, model: { mid }, yes, no, project, isHoldout, mapHeader } = this.props;
-    const { curve, show } = this.state;
-    let curComponent;
-    let hasReset = true;
-
-    switch (curve) {
-      case EN.ROCCurve:
-        curComponent = show && <ROCCurves
-          height={300}
-          width={600}
-          x_name={EN.FalsePositiveDate}
-          y_name={EN.TruePositiveRate}
+        {detail && <DetailCurves
           model={model}
-          isHoldout={isHoldout}
-        />;
-        break;
-      case EN.PredictionDistribution:
-        curComponent = show && <PredictionDistributions
-          height={300}
-          width={600}
-          x_name={EN.ProbabilityThreshold}
-          y_name={EN.ProbabilityDensity}
-          model={model}
-          isHoldout={isHoldout}
-        />;
-        break;
-      case EN.PrecisionRecallTradeoff:
-        curComponent = show && <PRCharts
-          height={300} width={500}
-          x_name={EN.Recall}
-          y_name={EN.Precision}
-          model={model}
-          isHoldout={isHoldout}
-        />;
-        break;
-      case EN.LiftChart:
-        curComponent = <SingleLiftCharts
-          height={300} width={600}
-          x_name={EN.percentage}
-          y_name={EN.lift}
-          model={model}
-          isHoldout={isHoldout}
-        />;
-        hasReset = false;
-        break;
-      case EN.GainChart:
-        curComponent = <GainChart
-            height={300} width={600}
-            x_name={EN.percentage}
-            y_name={EN.Gain}
-            model={model}
-            isHoldout={isHoldout}
-        />;
-        hasReset = false;
-        break;
-      case EN.KSCurve:
-        curComponent = <KsChart
-            height={300} width={600}
-            x_name={EN.percentage}
-            y_name='KS'
-            model={model}
-            isHoldout={isHoldout}
-        />;
-        hasReset = false;
-        break;
-      case EN.VariableImpact:
-        curComponent = <div style={{ fontSize: 50 }} ><VariableImpact model={model} mapHeader={mapHeader} /></div>
-        hasReset = false;
-        break;
-      case EN.ModelProcessFlow:
-        curComponent = <div style={{ maxWidth: document.body.clientWidth / 2 }} >
-          <ModelProcess model={model} className={`modelprocess${mid}`} />
-        </div>
-        hasReset = false;
-        break;
-      default:
-        break;
-    }
-    const thumbnails = [{
-      normalIcon: ROCCurve,
-      hoverIcon: rocHover,
-      selectedIcon: rocSelected,
-      text: EN.ROCCurve
-    }, {
-      normalIcon: predictDist,
-      hoverIcon: predictionDistribution,
-      selectedIcon: predictionDistributionSelected,
-      text: EN.PredictionDistribution
-    }, {
-      normalIcon: precisionRecall,
-      hoverIcon: precisionRecallHover,
-      selectedIcon: precisionRecallSelected,
-      text: EN.PrecisionRecallTradeoff
-    }, {
-      normalIcon: liftChart,
-      hoverIcon: liftchartHover,
-      selectedIcon: liftchartSelected,
-      text: EN.LiftChart
-    }, {
-      normalIcon: gainChart,
-      hoverIcon: gainChart,
-      selectedIcon: gainchartSelected,
-      text: EN.GainChart
-    },{
-      normalIcon: ksCurve,
-      hoverIcon: ksCurve,
-      selectedIcon: ksCurveSelected,
-      text: EN.KSCurve
-    }, {
-      normalIcon: varImpactNormal,
-      hoverIcon: varImpactHover,
-      selectedIcon: varImpactSelected,
-      text: EN.VariableImpact
-    }, {
-      normalIcon: modelProcess,
-      hoverIcon: processHover,
-      selectedIcon: processSelectd,
-      text: EN.ModelProcessFlow
-    }];
-    return (
-      <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{ flex: 1 }}>
-          <div className={styles.thumbnails}>
-            {thumbnails.slice(0, 7).map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
-          </div>
-          <PredictTable
-            isHoldout={isHoldout}
-            model={model}
-            yes={yes}
-            no={no} />
-        </div>
-        <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
-          {curComponent}
-          {hasReset && <button onClick={this.reset} className={styles.button + ' ' + styles.buttonr} >{EN.Reset}</button>}
-        </div>
-      </div>
-    )
-  }
-}
-
-class Thumbnail extends Component {
-  state = {
-    clickActive: false,
-    hoverActive: false
-  }
-  componentDidMount() {
-    const { curSelected, value } = this.props;
-    this.setState({ clickActive: curSelected === value });
-  }
-  componentWillReceiveProps(nextProps) {
-    const { curSelected, value } = nextProps;
-    this.setState({ clickActive: curSelected === value });
-  }
-  handleClick = e => {
-    e.stopPropagation();
-    this.setState({ clickActive: true });
-    this.props.onClick(this.props.value);
-  }
-  // handleMouseEnter = () => {
-  //   this.setState({ hoverActive: true });
-  // }
-  // handleMouseLeave = () => {
-  //   this.setState({ hoverActive: false });
-  // };
-  render() {
-    const { selectedIcon, hoverIcon, normalIcon, text } = this.props.thumbnail;
-    const { clickActive, hoverActive } = this.state;
-    const icon = clickActive ? selectedIcon : hoverActive ? hoverIcon : normalIcon;
-    return (
-      <div
-        className={styles.thumbnail}
-        // onMouseEnter={this.handleMouseEnter}
-        // onMouseLeave={this.handleMouseLeave}
-        onClick={this.handleClick}
-      >
-        <img src={icon} alt="icon" />
-        <div>{text}</div>
+          yes={yes}
+          no={no}
+          project={project}
+        />}
       </div>
     )
   }
@@ -998,63 +787,6 @@ class RowCell extends Component {
       >
         {formatNumber(data)}
       </div>
-    );
-  }
-}
-
-
-@observer
-class PredictTable extends Component {
-  render() {
-    const { model, yes, no, isHoldout } = this.props;
-    const { fitIndex, chartData, holdoutChartData } = model;
-    const { roc } = isHoldout ? holdoutChartData : chartData;
-    let TN = roc.TN[fitIndex];
-    let FP = roc.FP[fitIndex];
-    let TP = roc.TP[fitIndex];
-    let FN = roc.FN[fitIndex];
-    const column = [{
-      title: '',
-      dataIndex: 'rowName',
-      className: styles.actual
-    }, {
-      title: `${EN.Predict}: ${no}`,
-      dataIndex: 'col1',
-    }, {
-      title: `${EN.Predict}: ${yes}`,
-      dataIndex: 'col2'
-    }, {
-      title: '',
-      dataIndex: 'sum'
-    }];
-
-    // set default value
-    const data = [{
-      rowName: `${EN.Actual}: ${no}`,
-      col1: `${Math.round(TN)}(TN)`,
-      col2: `${Math.round(FP)}(FP)`,
-      sum: +TN + +FP,
-    }, {
-      rowName: `${EN.Actual}: ${yes}`,
-      col1: `${Math.round(FN)}(FN)`,
-      col2: `${Math.round(TP)}(TP)`,
-      sum: Number(FN) + +TP
-    }, {
-      rowName: '',
-      col1: +TN + +FN,
-      col2: +FP + +TP,
-      sum: +TN + +FN + +FP + +TP
-    }];
-    return (
-      <Table
-        className={styles.predictTable}
-        columns={column}
-        bordered
-        rowKey={re => {
-          return re.rowName;
-        }}
-        dataSource={data}
-        pagination={false} />
     );
   }
 }
@@ -1121,9 +853,6 @@ class ModelComp extends Component {
                   y='TPR'
                 />
               </TabPane>
-              {/* <TabPane tab="Learning Curves" key="2">
-                <Learning width={600} height={400} className="learningComp" models={models} model={models[0]} />
-              </TabPane> */}
             </Tabs>
             <div className={styles.mccb}>
               <Button type="primary" onClick={async () => {

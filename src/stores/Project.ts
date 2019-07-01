@@ -8,7 +8,6 @@ import Papa from 'papaparse';
 import { message as antdMessage, Modal } from 'antd';
 import axios from 'axios'
 import { formatNumber } from '../../src/util'
-import c1 from './classification.json'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
@@ -132,7 +131,8 @@ export interface TrainCommand {
   holdoutRate?: number,
   featuresPreprocessor?: string[],
   validationRate?: number,
-  nfold?: number
+  nfold?: number,
+  showSsPlot?:boolean
 }
 
 export interface DataView {
@@ -154,7 +154,7 @@ export interface NewVariable {
 
 class Project {
   visiable: boolean
-  init: boolean = false
+  @observable init: boolean = false
   univariatePlotsBase64: StringObject
   histgramPlotsBase64: StringObject
   rawHistgramPlotsBase64: StringObject
@@ -333,6 +333,10 @@ class Project {
   @observable kValue: number = 5;
   @observable kType: string = 'auto';
 
+  //un temp
+  @observable weightsTemp: NumberObject = {};
+  @observable standardTypeTemp: string = 'standard';
+
   @observable stopModel: boolean = false;
   @observable stopEtl: boolean = false;
   @observable isAbort: boolean = false;
@@ -342,10 +346,11 @@ class Project {
   @observable reportProgressText: string = 'init';
   @observable reportCancel: boolean = false;
   @observable isHoldout: boolean = false;
+  @observable showSsPlot: boolean = false;
 
   constructor(id: string, args: Object) {
-    this.id = id
-    this.visiable = true
+    this.id = id;
+    this.visiable = true;
     this.setProperty(args)
     // autorun(() => {
     //   if (!this.cleanPath) return this.cleanData = []
@@ -356,7 +361,7 @@ class Project {
   }
 
   readData = (path: string) => {
-    const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`
+    const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`;
     return new Promise((resolve, reject) => {
       Papa.parse(url, {
         download: true,
@@ -375,7 +380,9 @@ class Project {
   }
 
   readIndex = async (index: string) => {
-    const url = `/etls/${index}/preview`
+    const maxCell = 400000
+    const max = Math.min(parseInt((maxCell / (this.rawHeader.length || 1)).toString(), 10), 500)
+    const url = `/etls/${index}/preview?end=${max - 1}`
     const { data } = await axios.get(url)
     const result = data.result.map((row: StringObject) => this.rawHeader.map(h => row[h]))
     return result
@@ -737,7 +744,27 @@ class Project {
   @action
   initProject = () => {
     if (this.init) return
-    this.init = true
+    socketStore.ready().then(api => {
+      api.initProject({ id: this.id }).then(result => {
+        const { status, message, project } = result
+        if (status !== 200) return antdMessage.error(message)
+        this.setProperty({ ...project, init: true })
+        // Object.assign(this, project, { init: true })
+
+
+        this.autorun.push(autorun(async () => {
+          if (!this.originalIndex) {
+            this.uploadData = []
+          } else {
+            // this.readData(this.originPath).then(data => {
+            //   this.uploadData = data.slice(1)
+            // })
+            this.uploadData = await this.readIndex(this.originalIndex)
+          }
+        }))
+      })
+    })
+
     // this.autorun.push(autorun(async () => {
     //   if (this.uploadFileName && this.uploadFileName.length > 0) {
     //     const api = await socketStore.ready()
@@ -747,16 +774,7 @@ class Project {
     //   }
     //   this.fileNames = []
     // }))
-    this.autorun.push(autorun(async () => {
-      if (!this.originalIndex) {
-        this.uploadData = []
-      } else {
-        // this.readData(this.originPath).then(data => {
-        //   this.uploadData = data.slice(1)
-        // })
-        this.uploadData = await this.readIndex(this.originalIndex)
-      }
-    }))
+
     // this.autorun.push(autorun(async () => {
     //   if (!this.cleanPath) {
     //     this.cleanData = []
@@ -778,12 +796,26 @@ class Project {
 
   @action
   setProperty = (data: Partial<Project>) => {
-    if (typeof data !== 'object') {
-      return false;
-    }
-    if (Array.isArray(data)) {
-      return false;
-    }
+    //   if (typeof data !== 'object') {
+    //     return false;
+    //   }
+    //   if (Array.isArray(data)) {
+    //     return false;
+    //   }
+
+    //  const result =  _.chain(data).omit(['totalLines','userId','id']).omitBy((value)=>{
+    //       return typeof value === 'function'
+    //   }).assign({
+    //     changeProjectType: _.isEmpty(data.problemType) ? data.changeProjectType : data.problemType,
+    //     noComputeTemp: _.isEmpty(data.noCompute) ? data.noComputeTemp : data.noCompute,
+    //   }).value();
+
+    //   for (const key in result){
+    //     if(result.hasOwnProperty(key)){
+    //       this[key] = result[key]
+    //     }
+    //   }
+
     Reflect.deleteProperty(data, 'totalLines')
     Reflect.deleteProperty(data, 'userId')
     Reflect.deleteProperty(data, 'id')
@@ -796,10 +828,16 @@ class Project {
         continue;
       }
       if (key === 'problemType') {
-        Reflect.defineProperty(data, 'changeProjectType', { value })
+        Reflect.set(data, 'changeProjectType', value)
       }
       if (key === 'noCompute') {
-        Reflect.defineProperty(data, 'noComputeTemp', { value })
+        Reflect.set(data, 'noComputeTemp', value)
+      }
+      if (key === 'weights') {
+        Reflect.set(data, 'weightsTemp', value)
+      }
+      if (key === 'standardType') {
+        Reflect.set(data, 'standardTypeTemp', value)
       }
     }
     // data.updateTime = +new Date()
@@ -1402,7 +1440,7 @@ class Project {
     const { currentSetting, models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
-    return models.filter(_m => currentSetting.models.includes(_m.id))
+    return models.filter(_m => (currentSetting && currentSetting.models && currentSetting.models.length) ? currentSetting.models.includes(_m.id) : true)
       .map(m => {
         const { score } = m
         const { validateScore, holdoutScore } = score
@@ -1642,11 +1680,12 @@ class Project {
       problemType,
       target,
       dataHeader,
-      weights,
+      weightsTemp,
       newVariable,
       trainHeader,
       colType,
       features,
+      standardTypeTemp
     } = this;
 
     let command = '';
@@ -1666,7 +1705,7 @@ class Project {
           kType: this.kType,
           kValue: this.kValue,
           algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
-          standardType: this.standardType,
+          standardType: standardTypeTemp,
           searchTime: this.searchTime,
           metricsMethod: this.measurement,
           featureLabel: featureLabel,
@@ -1674,7 +1713,7 @@ class Project {
           projectId: id,
           command,
           settingName: setting.name,
-          applyWeights: weights,
+          applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : []
         };
@@ -1683,14 +1722,14 @@ class Project {
         command = 'outlier.train';
         trainData = {
           algorithms: this.algorithms,
-          standardType: this.standardType,
+          standardType: standardTypeTemp,
           searchTime: this.searchTime,
           featureLabel: featureLabel,
           randomSeed: this.randSeed,
           projectId: id,
           command,
           settingName: setting.name,
-          applyWeights: weights,
+          applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : []
         };
@@ -1789,11 +1828,11 @@ class Project {
       kType: this.kType,
       kValue: this.kValue,
       algorithms: this.algorithms,
-      standardType: this.standardType,
+      standardType: standardTypeTemp,
       searchTime: this.searchTime,
       measurement: this.measurement,
       randSeed: this.randSeed,
-      weights,
+      weights: weightsTemp,
       features,
       version: this.version,
       resampling: this.resampling,
@@ -2036,12 +2075,12 @@ class Project {
     }
     model.setProperty(data)
     if (data.chartData && this.criteria === "cost") {
-      const { TP, FP, FN, TN } = this.costOption
-      const [v0, v1] = Object.values(this.targetCounts)
-      const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4))
-      const percentNew = this.distribution ? this.distribution / 100 : percent0
-      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0)
-      if (index === model.fitIndex) return
+      const { TP, FP, FN, TN } = this.costOption;
+      const [v0, v1] = Object.values(this.targetCounts);
+      const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4));
+      const percentNew = this.distribution ? this.distribution / 100 : percent0;
+      const { index } = model.getBenefit(TP, FP, FN, TN, percentNew, percent0);
+      if (index === model.fitIndex) return;
       model.updateModel({ fitIndex: index })
     }
   }
@@ -2081,6 +2120,7 @@ class Project {
   }
 
   preTrainImportance = () => {
+    if (this.preImportanceLoading) return Promise.resolve()
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
@@ -2126,14 +2166,24 @@ class Project {
   }
 
   clusterPreTrainImportance = () => {
+    if (this.preImportanceLoading) return Promise.resolve()
     if (this.problemType !== 'Clustering') return Promise.resolve()
-    return socketStore.ready().then(api => {
-      const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
-      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const feature_label = [...data_label, ...new_label]
-      if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
+    const allLabel = [...this.dataHeader, ...this.newVariable].filter(v => v !== this.target)
+    const before = allLabel.reduce((prev, la) => {
+      prev[la] = this.weights[la] || 1
+      return prev
+    }, {} as NumberObject)
+    const after = allLabel.reduce((prev, la) => {
+      prev[la] = this.weightsTemp[la] || 1
+      return prev
+    }, {} as NumberObject)
+
+    const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+
+    if (!isChange) return Promise.resolve()
+
+    return socketStore.ready().then(api => {
       let cmd = 'clustering.preTrainImportance'
       // switch (this.problemType) {
       //   case 'Clustering':
@@ -2149,7 +2199,13 @@ class Project {
       const command = {
         projectId: this.id,
         command: cmd,
-        feature_label
+        feature_label: allLabel,
+        standardType: this.standardTypeTemp,
+        weights: allLabel.reduce((prev, la) => {
+          prev.push(this.weightsTemp[la] || 1)
+          // prev[la] =
+          return prev
+        }, [] as number[]),
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
@@ -2243,7 +2299,7 @@ class Project {
         const newFeatureLabel = {}
         Object.keys(this.targetColMap).slice(0, 2).forEach((k, index) => {
           const rename = this.renameVariable[k]
-          if (!!rename) Reflect.defineProperty(newFeatureLabel, rename, { value: index })
+          if (!!rename) Reflect.set(newFeatureLabel, rename, index)
         })
         if (!!Object.keys(newFeatureLabel).length) command.newFeatureLabel = newFeatureLabel
       }
@@ -2531,7 +2587,7 @@ class Project {
   }
 
   //在这里获取所以直方图折线图数据
-  allVariableList = (validatePlotData: string) => {
+  allVariableList = (model: any) => {
     const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader } = this;
 
     const list = [];
@@ -2562,6 +2618,7 @@ class Project {
       list.push(this.univariant(itm));
     }
 
+    const { validatePlotData, holdoutPlotData } = model;
     if (validatePlotData) {
       list.push({
         name: 'predicted-vs-actual-plot',
@@ -2569,17 +2626,22 @@ class Project {
           url: validatePlotData,
         },
       });
-      // list.push({
-      //   name: 'predicted-vs-actual-plot',
-      //   data: {
-      //     url: model.holdoutPlotData,
-      //   },
-      // });
-
+      list.push({
+        name: 'predicted-vs-actual-plot',
+        data: {
+          url: holdoutPlotData,
+        },
+      });
       list.push({
         name: 'fit-plot',
         data: {
           url: validatePlotData,
+        },
+      });
+      list.push({
+        name: 'fit-plot',
+        data: {
+          url: holdoutPlotData,
         },
       });
     }
@@ -2627,10 +2689,10 @@ class Project {
     //   changeReportProgress('initializing report.', 0)
 
 
-    const model: Model = this.models.find(m => m.id === modelId);
+    const model: any = this.models.find(m => m.id === modelId);
     //在这里获取所以直方图折线图数据
     // changeReportProgress('preparing univariate plot.', 75)
-    model.graphicList = await this.allVariableList(model.validatePlotData);
+    model.graphicList = await this.allVariableList(model);
     // changeReportProgress('preparing univariate plot.', 100)
     const json = JSON.stringify([{ ...this, ...{ models: [model] } }]);
 

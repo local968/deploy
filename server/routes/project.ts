@@ -89,51 +89,49 @@ function query(key, params) {
     if (!Array.isArray(data) || !data.length) {
       return result;
     }
+    const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName']
 
     const promiseArray = data.map(r => {
-      return redis.hgetall('project:' + r);
-      // return redis.hmget("project:" + r, Field)
+      // return redis.hgetall('project:' + r);
+      return redis.hmget("project:" + r, Field)
     });
     return Promise.all(promiseArray).then(array => {
       return Promise.all(
         array.map(item => {
-          Object.keys(item).forEach(key => {
-            try {
-              item[key] = JSON.parse(item[key]);
-            } catch (e) { }
-          });
-          if (item.uploadFileName) {
-            return getFileInfo(item.uploadFileName).then(files => {
-              item.fileNames = files.fileNames;
-              return item;
-            });
-          }
-          return Promise.resolve(item);
+          // Object.keys(item).forEach(key => {
+          //   try {
+          //     item[key] = JSON.parse(item[key]);
+          //   } catch (e) { }
+          // });
+          // if (item.uploadFileName) {
+          //   return getFileInfo(item.uploadFileName).then(files => {
+          //     item.fileNames = files.fileNames;
+          //     return item;
+          //   });
+          // }
+          // return Promise.resolve(item);
+
+
           // for (let key in item) {
           //   try {
           //     result[key] = JSON.parse(result[key])
           //   } catch (e) { }
-          //   if (result.uploadFileName) {
-          //     return getFileInfo(obj.uploadFileName).then(files => {
-          //       obj.fileNames = files.fileNames
-          //       return obj
-          //     })
-          //   }
           // }
-          // const obj = {}
-          // item.forEach((v, k) => {
-          //   try {
-          //     v = JSON.parse(v)
-          //   } catch (e) { }
-          //   obj[Field[k]] = v
-          // })
+          const obj = {}
+          item.forEach((v, k) => {
+            try {
+              v = JSON.parse(v)
+            } catch (e) { }
+            obj[Field[k]] = v
+          })
           // if (obj.uploadFileName) {
           //   return getFileInfo(obj.uploadFileName).then(files => {
           //     obj.fileNames = files.fileNames
           //     return obj
           //   })
           // }
-          // return Promise.resolve(obj)
+          return Promise.resolve(obj)
+          // return Promise.resolve({})
         }),
       ).then(list => {
         result.list = list;
@@ -549,15 +547,25 @@ async function getBaseEtl(id) {
       return prev;
     }, {})
     .value();
-  return {
+  const etlData: {
+    command: string,
+    csvLocation: string[],
+    problemType: string,
+    featureLabel: string[],
+    colType: { [key: string]: string },
+    colMap: { [key: string]: Metric },
+    targetLabel: string[]
+  } = {
     command: 'top.etlBase',
     csvLocation: [etlIndex],
-    targetLabel: [target],
     problemType,
     featureLabel: dataHeader,
     colType,
     colMap,
+    targetLabel: []
   };
+  if (target) etlData.targetLabel.push(target)
+  return etlData
 }
 
 async function checkEtl(projectId, userId) {
@@ -584,6 +592,26 @@ async function checkEtl(projectId, userId) {
     });
   }
 }
+
+function getProject(projectId) {
+  return redis.hgetall('project:' + projectId).then(p => {
+    Object.keys(p).forEach(key => {
+      try {
+        p[key] = JSON.parse(p[key]);
+      } catch (e) { }
+    });
+    return {
+      status: 200,
+      message: 'ok',
+      project: p
+    }
+  });
+}
+
+wss.register('initProject', async (message, socket) => {
+  const { id } = message
+  return getProject(id)
+})
 
 wss.register('addProject', async (message, socket) => {
   // const { userId, user } = socket.session

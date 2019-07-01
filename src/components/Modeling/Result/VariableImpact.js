@@ -7,7 +7,7 @@ import { Spin } from 'antd'
 @observer
 export default class VariableImpact extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     const { featureImportance, permutationImportance, importanceLoading } = props.model
     const keys = Object.keys(featureImportance)
     if(!keys.length && !importanceLoading) permutationImportance()
@@ -27,7 +27,7 @@ export default class VariableImpact extends Component {
           return (
             <div key={index} className={styles.detailRow}>
               <div className={styles.detailName}>
-                <span title={mapHeader[row[0]]}>{mapHeader[row[0]]}</span>
+                <span title={mapHeader[row[0]]||row[0]}>{mapHeader[row[0]]||row[0]}</span>
               </div>
               <div
                 className={styles.detailProcess}

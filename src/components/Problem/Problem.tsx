@@ -8,6 +8,7 @@ import Confirm from 'components/Common/Confirm';
 import { action } from 'mobx';
 import { RadioChangeEvent } from 'antd/lib/radio';
 import EN from '../../constant/en';
+import { ProjectStore } from 'stores/ProjectStore';
 const RadioGroup = Radio.Group;
 const selectable = [
   { value: 'Classification', type: EN.TrueorFalseBinaryClassification, detail: (<p>{EN.Topredictifaneventislikely}</p>) },
@@ -15,13 +16,13 @@ const selectable = [
 ];
 
 const Unsupervised = [
-  { value: 'Clustering', type:  EN.Clustering, detail: EN.ClusteringHint },
-  { value: 'Outlier', type:  EN.OutlierDetection, detail: EN.OutlierDetectionHint }
+  { value: 'Clustering', type: EN.Clustering, detail: EN.ClusteringHint },
+  { value: 'Outlier', type: EN.OutlierDetection, detail: EN.OutlierDetectionHint }
 ];
 
 interface ProblemProps {
-  projectStore: any
   userStore:any,
+  projectStore: ProjectStore
 }
 
 interface ProblemState {
@@ -34,8 +35,8 @@ const initState: ProblemState = {
 
 function Problem(props: ProblemProps) {
   const { projectStore } = props
-  const { project } = projectStore || {} as any;
-  const { changeProjectType = '', uploadFileName = [], problemType = '', saveProblem } = project || {} as any
+  const { project } = projectStore;
+  const { changeProjectType, fileName, problemType, saveProblem } = project
 
   // const { onChange, changeProjectType = '', models = [], uploadFileName = [], problemType = '', saveProblem } = props
 
@@ -48,7 +49,7 @@ function Problem(props: ProblemProps) {
   })
 
   const nextStep = () => {
-    if (!!uploadFileName.length && problemType && problemType !== changeProjectType) return setState({
+    if (!!fileName && problemType && problemType !== changeProjectType) return setState({
       ...state,
       visiable: true
     })

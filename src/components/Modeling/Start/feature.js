@@ -29,7 +29,7 @@ export default [
     },
     {
         value: 'Kitchen Sinks',
-        label: 'Kitchen Sinks'
+        label: 'RBFSampler'
     },
     {
         value: 'Linear SVM',
@@ -37,7 +37,7 @@ export default [
     },
     {
         value: 'Nystroem Sampler',
-        label: 'Nystroem Sampler'
+        label: 'Nystroem'
     },
     {
         value: 'Select Percentile',
@@ -45,6 +45,6 @@ export default [
     },
     {
         value: 'Select Rates',
-        label: 'Select Rates'
+        label: 'Generic Univariate Select'
     },
 ]

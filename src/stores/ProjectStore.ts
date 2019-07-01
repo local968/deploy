@@ -132,7 +132,7 @@ class ProjectStore {
     if (!isNaN(+(v.toString()))) {
       v = parseInt(v.toString(), 10)
     }
-    Reflect.defineProperty(this.toolsOption, k, { value: v })
+    Reflect.set(this.toolsOption, k, v)
     // this.toolsOption[k] = v;
     this.queryProjectList()
   }
@@ -321,7 +321,17 @@ class ProjectStore {
 
   @action
   clean = () => {
-    if (this.currentId) this.project.clean()
+    if (this.currentId) {
+      const projectIndex = this.list.findIndex(p => p.id === this.currentId)
+      //重新初始化 
+      this.list[projectIndex] = new Project(this.currentId, {
+        id: this.list[projectIndex].id,
+        fileName: this.list[projectIndex].fileName,
+        createTime: this.list[projectIndex].createTime,
+        updateTime: this.list[projectIndex].updateTime,
+        name: this.list[projectIndex].name,
+      })
+    }
     this.currentId = ''
   }
 }

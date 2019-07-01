@@ -2,6 +2,7 @@ import request from './request'
 import config from '../../../config'
 
 const url = `${config.STRAPI}/plans`;
+console.log(url)
 
 const list = async ()=>{
 	const _list:any = await request.get(`${url}`);

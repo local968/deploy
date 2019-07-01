@@ -34,7 +34,7 @@ wss.register('originalStats', async (message, socket) => {
 
   const chunkSize = _.chain(headersLn)
     .defaultTo(0)
-    .divide(16)
+    .divide(64)
     .round()
     .concat([1])
     .max()
@@ -51,10 +51,10 @@ wss.register('originalStats', async (message, socket) => {
   function getStats(index, hds?: string[]) {
     const options = Array.isArray(hds)
       ? {
-          params: {
-            headers: hds,
-          },
-        }
+        params: {
+          headers: hds,
+        },
+      }
       : undefined;
     return axios
       .get(`${esServicePath}/etls/${index}/stats`, options)
@@ -244,48 +244,50 @@ wss.register('newEtl', async (message, socket, process) => {
     }
   }
 
-  stats[project.target].isTarget = true;
-  if (project.problemType === 'Classification' || project.problemType === 'Outlier') {
-    let deletedValues = [];
-    if (project.targetArray && project.targetArray.length > 1) {
-      if (_.includes(project.targetArray, ''))
+  if (project.target) {
+    stats[project.target].isTarget = true;
+    if (project.problemType === 'Classification' || project.problemType === 'Outlier') {
+      let deletedValues = [];
+      if (project.targetArray && project.targetArray.length > 1) {
+        if (_.includes(project.targetArray, ''))
+          stats[project.target].missingValueFillMethod = {
+            type: 'replace',
+            value: 'NULL',
+          };
+        deletedValues = Object.keys(
+          project.colValueCounts[project.target],
+        ).filter(k => !project.targetArray.includes(k));
+      } else {
+        deletedValues = _.chain(project.colValueCounts[project.target])
+          .entries()
+          .sort((a, b) => b[1] - a[1])
+          .slice(2)
+          .map(([k]) => k)
+          .value();
+      }
+      if (Object.keys(project.otherMap).includes(''))
         stats[project.target].missingValueFillMethod = {
           type: 'replace',
-          value: 'NULL',
+          value: project.otherMap[''],
         };
-      deletedValues = Object.keys(
-        project.colValueCounts[project.target],
-      ).filter(k => !project.targetArray.includes(k));
-    } else {
-      deletedValues = _.chain(project.colValueCounts[project.target])
-        .entries()
-        .sort((a, b) => b[1] - a[1])
-        .slice(2)
-        .map(([k]) => k)
-        .value();
-    }
-    if (Object.keys(project.otherMap).includes(''))
-      stats[project.target].missingValueFillMethod = {
-        type: 'replace',
-        value: project.otherMap[''],
-      };
 
-    stats[project.target].mapFillMethod = {
-      ...deletedValues.reduce((prev, key) => {
-        prev[key] = {
-          type: 'delete',
-        };
-        return prev;
-      }, {}),
-      ...Object.entries(project.otherMap).reduce((prev, [key, value]) => {
-        if (key === '') return prev;
-        prev[key] = {
-          type: 'replace',
-          value: value === '' ? 'NULL' : value,
-        };
-        return prev;
-      }, {}),
-    };
+      stats[project.target].mapFillMethod = {
+        ...deletedValues.reduce((prev, key) => {
+          prev[key] = {
+            type: 'delete',
+          };
+          return prev;
+        }, {}),
+        ...Object.entries(project.otherMap).reduce((prev, [key, value]) => {
+          if (key === '') return prev;
+          prev[key] = {
+            type: 'replace',
+            value: value === '' ? 'NULL' : value,
+          };
+          return prev;
+        }, {}),
+      };
+    }
   }
 
   const response = await axios.post(

@@ -8,7 +8,7 @@ import { Table } from 'components/Common';
 import EN from '../../../../constant/en';
 
 import dataIcon from './data.svg';
-import axios from 'axios';
+import { formatNumber } from 'util';
 
 @observer
 export default class Preview extends Component {
@@ -42,7 +42,7 @@ export default class Preview extends Component {
     if (!!newVariable.length && !newVariableData.length) return []
     const headerList = [target, ...rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target), ...newVariable].filter(h => !trainHeader.includes(h))
     const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
-    
+
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     // const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
     const targetIndex = headerList.indexOf(target)
@@ -91,8 +91,8 @@ export default class Preview extends Component {
       if (i === targetIndex) v = renameVariable[v] || v
       v = v === 'NEW_VARIABLE_TYPE' ? '(other)' : v
       return {
-        content: <span>{v}</span>,
-        title: v,
+        content: <span>{formatNumber(v, 2)}</span>,
+        title: formatNumber(v, 2),
         cn: styles.cell
       }
     }))

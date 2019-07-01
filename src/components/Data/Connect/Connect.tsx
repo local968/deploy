@@ -242,7 +242,6 @@ export default class DataConnect extends Component<DataConnectProps> {
     const charsetChange = action((charset) => {
       project.updateProject({ charset })
     })
-    console.log(this.sample)
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>

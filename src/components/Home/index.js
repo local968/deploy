@@ -284,7 +284,7 @@ class Project extends Component {
         <div className={styles.description}>{project.description}</div>
       </div>
       <div className={styles.sub}>
-        <div className={styles.partner}>{project.id} {project.fileNames && project.fileNames.join(",")}</div>
+        <div className={styles.partner}>{project.id} {project.fileName}</div>
         <div className={styles.time}>{EN.CreatedDate}: {moment.unix(project.createTime).fromNow()}</div>
       </div>
       <div className={classnames(styles.cover, {
