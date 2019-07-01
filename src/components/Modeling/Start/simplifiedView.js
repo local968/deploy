@@ -408,7 +408,7 @@ class SimplifiedViewRow extends Component {
               x: value,
               id: etlIndex,
             }
-          }).then((result) => this.showbackUnivariant(result, value, target, 'Numerical'));
+          }).then((result) => this.showbackUnivariant(result, mapHeader[value], mapHeader[target], 'Numerical'));
         } else {//回归-分类 箱线图
           request.post({
             url: '/graphics/regression-categorical',
@@ -417,7 +417,7 @@ class SimplifiedViewRow extends Component {
               value,
               id: etlIndex,
             }
-          }).then((result) => this.showbackUnivariant(result, value, target, 'Categorical'));
+          }).then((result) => this.showbackUnivariant(result, mapHeader[value], mapHeader[target], 'Categorical'));
         }
         // _result
       } else {//Univariant
