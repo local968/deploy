@@ -171,7 +171,8 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.sql = false;
   })
 
-  onClick = (key: 'sample' | 'upload' | 'sql') => {
+  onClick = (key: 'sample' | 'upload' | 'sql',onUse) => {
+    if(!onUse)return;
     const { project } = this.props.projectStore
     if (this.uploading || project.etling) return
     this.key = key
@@ -185,19 +186,19 @@ export default class DataConnect extends Component<DataConnectProps> {
     if (this.key === 'upload') return this.uploadRef.current.show()
     this[this.key] = true
     // Reflect.defineProperty(this, this.key, { value: true })
-  }
+  };
 
   onClose = () => {
     this.visiable = false
-  }
+  };
 
-  block = (label: string, img: string, key: string) => {
+  block = (label: string, img: string, key: string,onUse=true) => {
     return (
-      <div className={styles.uploadBlock} onClick={this.onClick.bind(null, key)}>
+      <div className={styles.uploadBlock} onClick={this.onClick.bind(null, key,onUse)}>
         <div className={styles.blockImg}>
           <img src={img} alt={label} />
         </div>
-        <div className={styles.blockLabel}>
+        <div style={{display:(onUse?'':'none')}} className={styles.blockLabel}>
           <span>{label}</span>
         </div>
       </div>
@@ -241,7 +242,9 @@ export default class DataConnect extends Component<DataConnectProps> {
     const process = etling ? 50 : this.process
     const charsetChange = action((charset) => {
       project.updateProject({ charset })
-    })
+    });
+    const {role} =  userStore.info as any;
+    const {connect_FromR2L=true,connect_FromComp=true,connect_FromSQL=true} = role;
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
@@ -254,9 +257,9 @@ export default class DataConnect extends Component<DataConnectProps> {
           </Select>
         </div>
         <div className={styles.uploadRow}>
-          {this.block(EN.FromR2L, sampleIcon, 'sample')}
-          {this.block(EN.FromComp, localFileIcon, 'upload')}
-          {this.block(EN.FromSQL, sqlIcon, 'sql')}
+          {this.block(EN.FromR2L, sampleIcon, 'sample',connect_FromR2L)}
+          {this.block(EN.FromComp, localFileIcon, 'upload',connect_FromComp)}
+          {this.block(EN.FromSQL, sqlIcon, 'sql',connect_FromSQL)}
           <Uploader
             onStart={this.onUpload}
             onComplete={this.upload}

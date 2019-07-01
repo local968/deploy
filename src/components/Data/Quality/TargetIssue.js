@@ -217,10 +217,13 @@ export class RegressionTarget extends Component {
   }
 }
 
+@inject('userStore')
 @observer
 export class RowIssue extends Component {
   render() {
     const { backToConnect, totalRawLines } = this.props;
+    const {quality_LoadaNewDataset=true} = this.props.userStore.info.role;
+  
     return <div className={styles.block}>
       <div className={styles.name}><span>{EN.Datasizeistoosmall}</span></div>
       <div className={styles.desc}>
@@ -234,7 +237,7 @@ export class RowIssue extends Component {
           <div className={styles.methodBox}>
             <div className={styles.method}>
               <div className={styles.reason}><span>{EN.Datasize} > {EN.Rowsisrecommended}</span></div>
-              <div className={styles.button} onClick={backToConnect}>
+              <div style={{display:quality_LoadaNewDataset?'':'none'}} className={styles.button} onClick={backToConnect}>
                 <button><span>{EN.LoadaNewDataset}</span></button>
               </div>
             </div>
