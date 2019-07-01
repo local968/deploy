@@ -586,7 +586,7 @@ function scheduleDownloadCsv(
   res,
   target,
 ) {
-  if( target ) header = [...header.filter(h => h !== target), target];
+  if( target && header.indexOf(target) !== -1 ) header = [...header.filter(h => h !== target), target];
   let temp = {};
   let counter = 0;
   let resultHeader;

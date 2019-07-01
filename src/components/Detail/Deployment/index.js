@@ -145,7 +145,8 @@ export default class Deployment extends Component {
       operator: (opeartor) => {
         this.uploadOperator = opeartor
       },
-      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' }
+      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy'},
+      mapHeader: cd.mapHeader
     }
     return (
       <div className={styles.deployment} >

@@ -104,7 +104,7 @@ function ModelResult(props) {
     // const exps = variables.map(v => expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
 
     props.deploymentStore
-      .addDeployment(project.id, project.name, current.modelName, project.problemType)
+      .addDeployment(project.id, project.name, current.modelName, project.problemType, project.mapHeader)
       .then(id => props.routing.push('/deploy/project/' + id));
   };
 
