@@ -400,7 +400,7 @@ export default class ModelProcessFlow extends Component {
 				<label>{EN.Prediction}</label>
 			</section>
 		} else if (dataFlow.length > 1) {
-			return <section className={`${styles.process} ${styles.many}`}>
+			return <section className={`${styles.process} ${styles.many} many`}>
 				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
 				{this.popOver(this.DQF(),EN.DataQualityFixing)}

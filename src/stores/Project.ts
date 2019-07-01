@@ -8,11 +8,9 @@ import Papa from 'papaparse';
 import { message as antdMessage, Modal } from 'antd';
 import axios from 'axios'
 import { formatNumber } from '../../src/util'
-import c1 from './classification.json'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
-import _ from "lodash";
 
 export interface Numerical {
   missingValue?: number;
@@ -133,7 +131,8 @@ export interface TrainCommand {
   holdoutRate?: number,
   featuresPreprocessor?: string[],
   validationRate?: number,
-  nfold?: number
+  nfold?: number,
+  showSsPlot?:boolean
 }
 
 export interface DataView {
@@ -347,6 +346,7 @@ class Project {
   @observable reportProgressText: string = 'init';
   @observable reportCancel: boolean = false;
   @observable isHoldout: boolean = false;
+  @observable showSsPlot: boolean = false;
 
   constructor(id: string, args: Object) {
     this.id = id;
@@ -2203,7 +2203,7 @@ class Project {
         standardType: this.standardTypeTemp,
         weights: allLabel.reduce((prev, la) => {
           prev.push(this.weightsTemp[la] || 1)
-          // prev[la] = 
+          // prev[la] =
           return prev
         }, [] as number[]),
       };
