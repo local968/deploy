@@ -209,10 +209,9 @@ class Project {
   @observable noCompute: boolean = false;
   @observable validationRate: number = 20;
   @observable holdoutRate: number = 20;
-  @observable uploadFileName: string[] = [];
   @observable fileName: string = '';
   // cleanData: unknown =  []
-  @observable originPath: string = '';
+  // @observable originPath: string = '';
 
   etlCleanDataLoading: boolean = false;
   @observable cleanPath: string = '';
@@ -399,7 +398,6 @@ class Project {
     // this.noComputeTemp = false
 
     return {
-      uploadFileName: [],
       dataHeader: [],
       rawHeader: [],
       colType: {},
@@ -411,7 +409,6 @@ class Project {
       rawDataView: null,
       originalIndex: ''
     } as {
-      uploadFileName: string[],
       dataHeader: string[],
       rawHeader: string[],
       colType: StringObject,
@@ -757,26 +754,6 @@ class Project {
         }))
       })
     })
-
-    // this.autorun.push(autorun(async () => {
-    //   if (this.uploadFileName && this.uploadFileName.length > 0) {
-    //     const api = await socketStore.ready()
-    //     const fileNames = (await api.getFiles({ files: this.uploadFileName.toJS() })).fileNames
-    //     this.fileNames = fileNames || []
-    //     return
-    //   }
-    //   this.fileNames = []
-    // }))
-
-    // this.autorun.push(autorun(async () => {
-    //   if (!this.cleanPath) {
-    //     this.cleanData = []
-    //   } else {
-    //     this.readData(this.cleanPath).then(data => {
-    //       this.cleanData = data
-    //     })
-    //   }
-    // }))
   }
 
   @action
@@ -901,7 +878,7 @@ class Project {
     const result = await this.originalStats()
     if (result.status !== 200) {
       antdMessage.error(result.message)
-      this.updateProject({ fileName: '', uploadFileName: [], originalIndex: '', etling: false })
+      this.updateProject({ fileName: '', originalIndex: '', etling: false })
     }
   }
 
