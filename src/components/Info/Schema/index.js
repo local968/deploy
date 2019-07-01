@@ -32,6 +32,7 @@ export default class DataSchema extends Component {
   }
 
   onConfirm = () => {
+    const { project } = this.props.projectStore
     const { rawHeader } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
     const data = {
