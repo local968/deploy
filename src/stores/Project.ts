@@ -380,7 +380,9 @@ class Project {
   }
 
   readIndex = async (index: string) => {
-    const url = `/etls/${index}/preview`
+    const maxCell = 400000
+    const max = Math.min(parseInt((maxCell / (this.rawHeader.length || 1)).toString(), 10), 500)
+    const url = `/etls/${index}/preview?end=${max - 1}`
     const { data } = await axios.get(url)
     const result = data.result.map((row: StringObject) => this.rawHeader.map(h => row[h]))
     return result
@@ -1438,7 +1440,7 @@ class Project {
     const { currentSetting, models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
-    return models.filter(_m => currentSetting.models.includes(_m.id))
+    return models.filter(_m => (currentSetting && currentSetting.models && currentSetting.models.length) ? currentSetting.models.includes(_m.id) : true)
       .map(m => {
         const { score } = m
         const { validateScore, holdoutScore } = score
