@@ -37,8 +37,6 @@ function Problem(props: ProblemProps) {
   const { project } = projectStore;
   const { changeProjectType, fileName, problemType, saveProblem } = project
 
-  // const { onChange, changeProjectType = '', models = [], uploadFileName = [], problemType = '', saveProblem } = props
-
   const [state, setState] = React.useState(initState);
 
   const onChange = action((type: string) => (e: RadioChangeEvent) => {
