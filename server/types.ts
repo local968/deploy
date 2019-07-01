@@ -58,7 +58,6 @@ export class Project {
   etlProgress?: number = 0;
 
   // upload data
-  cleanHeader?: unknown[] = [];
   dataHeader?: unknown[] = [];
   uploadData?: unknown[] = [];
   rawHeader?: unknown[] = [];
@@ -114,11 +113,6 @@ export class Project {
 
   // totalFixedCount?: unknown =  0
   deletedCount?: number = 0;
-
-  //原始issue
-  nullLineCountsOrigin?: unknown = {};
-  mismatchLineCountsOrigin?: unknown = {};
-  outlierLineCountsOrigin?: unknown = {};
 
   targetMapTemp?: unknown = {};
   targetArrayTemp?: unknown = [];

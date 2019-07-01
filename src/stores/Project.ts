@@ -196,7 +196,6 @@ class Project {
   @observable etlProgress: number = 0;
 
   // upload data
-  @observable cleanHeader: string[] = [];
   @observable dataHeader: string[] = [];
   @observable uploadData: string[][] = [];
   @observable rawHeader: string[] = [];
@@ -251,10 +250,6 @@ class Project {
   @observable otherMap: StringObject = {};
   // totalFixedCount: unknown =  0
   @observable deletedCount: number = 0;
-  //原始issue
-  @observable nullLineCountsOrigin: NumberObject = {};
-  @observable mismatchLineCountsOrigin: NumberObject = {};
-  @observable outlierLineCountsOrigin: NumberObject = {};
   @observable targetMapTemp: NumberObject = {};
   @observable targetArrayTemp: string[] = [];
   @observable missingReasonTemp: StringObject = {};
@@ -404,7 +399,6 @@ class Project {
     // this.noComputeTemp = false
 
     return {
-      cleanHeader: [],
       uploadFileName: [],
       dataHeader: [],
       rawHeader: [],
@@ -417,7 +411,6 @@ class Project {
       rawDataView: null,
       originalIndex: ''
     } as {
-      cleanHeader: string[],
       uploadFileName: string[],
       dataHeader: string[],
       rawHeader: string[],
@@ -1123,7 +1116,7 @@ class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin } = this;
+    const { problemType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, outlierLineCounts, mismatchLineCounts, nullLineCounts } = this;
 
     if (problemType === "Classification") {
       data.targetIssue = Object.keys(targetCounts).length > 2;
@@ -1137,7 +1130,7 @@ class Project {
       data.rowIssue = true;
     }
 
-    if (target && (+outlierLineCountsOrigin[target] + +mismatchLineCountsOrigin[target] + +nullLineCountsOrigin[target]) > 0) {
+    if (target && (+outlierLineCounts[target] + +mismatchLineCounts[target] + +nullLineCounts[target]) > 0) {
       data.targetRowIssue = true
     }
 
@@ -1196,11 +1189,11 @@ class Project {
 
   @computed
   get targetIssuesCountsOrigin() {
-    const { target, outlierLineCountsOrigin, mismatchLineCountsOrigin, nullLineCountsOrigin, colType } = this;
+    const { target, outlierLineCounts, mismatchLineCounts, nullLineCounts, colType } = this;
     const arr = {
-      mismatchRow: colType[target] !== "Categorical" ? (mismatchLineCountsOrigin[target] || 0) : 0,
-      nullRow: nullLineCountsOrigin[target] || 0,
-      outlierRow: colType[target] !== "Categorical" ? (outlierLineCountsOrigin[target] || 0) : 0,
+      mismatchRow: colType[target] !== "Categorical" ? (mismatchLineCounts[target] || 0) : 0,
+      nullRow: nullLineCounts[target] || 0,
+      outlierRow: colType[target] !== "Categorical" ? (outlierLineCounts[target] || 0) : 0,
     }
     return arr
   }

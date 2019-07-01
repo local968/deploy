@@ -801,7 +801,6 @@ wss.register('etl', (message, socket, progress) => {
             return createOrUpdate(id, userId, {
               originPath: path,
               rawHeader: originHeader,
-              cleanHeader: fields,
               dataHeader: fields,
             });
           if (name === 'cleanCsvHeader')
@@ -830,9 +829,9 @@ wss.register('etl', (message, socket, progress) => {
 
           //保存原始错误
           if (saveIssue) {
-            result.nullLineCountsOrigin = result.nullLineCounts;
-            result.mismatchLineCountsOrigin = result.mismatchLineCounts;
-            result.outlierLineCountsOrigin = result.outlierLineCounts;
+            result.nullLineCounts = result.nullLineCounts;
+            result.mismatchLineCounts = result.mismatchLineCounts;
+            result.outlierLineCounts = result.outlierLineCounts;
           }
 
           result.etling = false;
