@@ -382,36 +382,22 @@ class SimplifiedViewRow extends Component {
 
   showUnivariant = async () => {
     const { value, project, isNew, data: _data, colType } = this.props;
+    const {mapHeader,target,problemType,etlIndex} = project;
     if (isNew) {
-      // this.scatterData = {
-      //   ...this.scatterData,
-      //   // [value]: {
-      //   //   ...result,
-      //   // },
-      //   [`${value}-msg`]: {
-      //     type,
-      //   }
-      // };
-
       const type = colType[value];
 
       this.scatterData = {
         ...this.scatterData,
-        // [value]: {
-        //   ...result,
-        // },
         [`${value}-msg`]: {
-          y: project.target,
+          y: mapHeader[target],
           x: value,
           type,
         }
       };
       return this.univariant = true;
     }
-    // const { name, categoricalMap } = project.dataViews[value];
 
     if (!this.scatterData[value]) {
-      const { target, problemType, etlIndex } = project;
       const type = colType[value];
       if (problemType === "Regression") {
         if (type === 'Numerical') {//散点图
@@ -454,6 +440,7 @@ class SimplifiedViewRow extends Component {
               },
               [`${value}-msg`]: {
                 type,
+                x:mapHeader[value],
               }
             };
             this.univariant = true;
@@ -471,6 +458,7 @@ class SimplifiedViewRow extends Component {
               },
               [`${value}-msg`]: {
                 type,
+                x:mapHeader[value],
               }
             };
             this.univariant = true;
@@ -520,6 +508,8 @@ class SimplifiedViewRow extends Component {
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
+    
+    console.log(this.scatterData)
 
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
@@ -568,7 +558,6 @@ class SimplifiedViewRow extends Component {
               data={this.scatterData[value]}
               message={this.scatterData[`${value}-msg`]}
               colType={colType[value]}
-            // message={colType[value]}
             /></SimplePlot>} /> : null}
       </div>
       <div className={classnames(styles.tableTd, styles.tableImportance)}>

@@ -710,12 +710,12 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   };
   render() {
-    const { model, texts, metric, checked, yes, no, isHoldout, mapHeader,project } = this.props;
+    const { model, texts, metric, checked, yes, no, isHoldout,project } = this.props;
     if (!model.chartData) return null;
     const { modelName, fitIndex, holdoutChartData, chartData, score } = model;
     const { detail } = this.state;
     return (
-      <div >
+      <div>
         <Row onClick={this.handleResult} >
           {texts.map(t => {
             switch (t) {
@@ -853,9 +853,6 @@ class ModelComp extends Component {
                   y='TPR'
                 />
               </TabPane>
-              {/* <TabPane tab="Learning Curves" key="2">
-                <Learning width={600} height={400} className="learningComp" models={models} model={models[0]} />
-              </TabPane> */}
             </Tabs>
             <div className={styles.mccb}>
               <Button type="primary" onClick={async () => {

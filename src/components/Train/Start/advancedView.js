@@ -19,9 +19,6 @@ import {
 export default class AdvancedView extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      showSsPlot:false,
-    }
   }
   handleName = action(e => {
     const { project } = this.props;
@@ -149,28 +146,18 @@ export default class AdvancedView extends Component {
 
   render() {
     const { project, hidden } = this.props;
-    const { algorithms, defaultAlgorithms } = project
-    const isAll = Algorithms[project.problemType].length === algorithms.length
+    const { algorithms, defaultAlgorithms,settingId,settings=[],problemType,settingName,showSsPlot} = project;
+    const isAll = Algorithms[problemType].length === algorithms.length;
+    const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al));
     const defaultIsAll = Algorithms[project.problemType].length === defaultAlgorithms.length
-    const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al))
     const measurementList =
-      project.problemType === "Outlier"
-        ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-        [{ value: "score", label: EN.Accuracy, hint: EN.ScoreHint }]
+     problemType === "Outlier"
+        ? [{ value: "score", label: EN.Accuracy, hint: EN.ScoreHint }]
         : [
           { value: "CVNN", label: "CVNN", hint: EN.CVNNHint },
           { value: "CH", label: "CH Index", hint: EN.CHIndexHint },
           { value: "silhouette_euclidean", label: "Silhouette Score", hint: EN.SihouetteScoreHint },
-
-          // { value: "CVNN", label: "CVNN" },
-          // { value: "RSquared", label: "RSquared" },
-          // { value: "RMSSTD", label: "RMSSTD" },
-          // { value: "CH", label: "CH" },
-          // { value: "silhouette_cosine", label: "silhouette_cosine" },
-          // { value: "silhouette_euclidean", label: "silhouette_euclidean" }
         ];
-    // const customFieldList = sortHeader.filter(v => colType[v] === "Numerical")
-    // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
     return (
       <div className={styles.advanced}>
         <div className={styles.advancedRow}>
@@ -180,10 +167,9 @@ export default class AdvancedView extends Component {
                 <span>{EN.SelectFromPreviousSettings}:</span>
               </div>
               <div className={styles.advancedOption}>
-                <select value={project.settingId} onChange={this.changeSetting}>
+                <select value={settingId} onChange={this.changeSetting}>
                   <option value={"default"}>{EN.Default}</option>
-                  {project.settings &&
-                    project.settings.map(setting => (
+                  {settings.map(setting => (
                       <option key={setting.id} value={setting.id}>
                         {setting.name}
                       </option>
@@ -200,14 +186,14 @@ export default class AdvancedView extends Component {
               <div className={styles.advancedOption}>
                 <input
                   type="text"
-                  value={project.settingName}
+                  value={settingName}
                   onChange={this.handleName}
                 />
               </div>
             </div>
           </div>
         </div>
-        {project.problemType === "Outlier" ? null : <div className={styles.advancedRow}>
+        {problemType === "Outlier" ? null : <div className={styles.advancedRow}>
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
               <div className={`${styles.advancedTitle}`}>
@@ -216,19 +202,15 @@ export default class AdvancedView extends Component {
               <Popover
                 placement="bottomLeft"
                 trigger="click"
-                visible={this.state.showSsPlot}
+                visible={showSsPlot}
                 onVisibleChange={()=>{
-                  this.setState(prevState=>({
-                    showSsPlot:!prevState.showSsPlot
-                  }))
+                  project.showSsPlot = !showSsPlot
                 }}
                 content={<SSPlot
                   height={300} width={600}
                   project={project}
                 />} title={<Icon onClick={()=>{
-                  this.setState({
-                    showSsPlot:false
-                  })
+                project.showSsPlot = false
                 }
               } className={styles.ssPlot} type="close" />}>
                 <Button
