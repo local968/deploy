@@ -23,6 +23,15 @@ export default class DataSchema extends Component {
 
   doEtl = () => {
     const { project } = this.props.projectStore
+    if (project.train2ing || !!project.models.length) return this.visiable = true
+    this.onConfirm()
+  }
+
+  onClose = () => {
+    this.visiable = false
+  }
+
+  onConfirm = () => {
     const { rawHeader } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
     const data = {
@@ -41,15 +50,6 @@ export default class DataSchema extends Component {
       data.nullFillMethodTemp = { [this.target]: 'drop' }
     }
     project.setProperty(data)
-    if (project.train2ing || !!project.models.length) return this.visiable = true
-    this.onConfirm()
-  }
-
-  onClose = () => {
-    this.visiable = false
-  }
-
-  onConfirm = () => {
     try {
       this.props.projectStore.project.endSchema()
     } catch (e) {

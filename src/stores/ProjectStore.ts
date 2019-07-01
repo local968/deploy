@@ -323,6 +323,7 @@ class ProjectStore {
   clean = () => {
     if (this.currentId) {
       const projectIndex = this.list.findIndex(p => p.id === this.currentId)
+      //重新初始化 
       this.list[projectIndex] = new Project(this.currentId, {
         id: this.list[projectIndex].id,
         fileName: this.list[projectIndex].fileName,
