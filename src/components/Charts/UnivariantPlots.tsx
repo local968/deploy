@@ -57,11 +57,13 @@ export default class UnivariantPlots extends PureComponent{
 				name:x_name,
 				data:item,
 				nameTextStyle,
+				nameLocation:'middle',
+				nameGap:25,
 			},
 			yAxis:  {
 				type: 'value',
 				nameTextStyle,
-				name:y_name,
+				// name:y_name,
 			},
 			series,
 		};

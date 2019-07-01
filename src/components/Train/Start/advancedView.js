@@ -19,9 +19,6 @@ import {
 export default class AdvancedView extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      showSsPlot:false,
-    }
   }
   handleName = action(e => {
     const { project } = this.props;
