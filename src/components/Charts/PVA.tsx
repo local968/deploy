@@ -25,6 +25,7 @@ export default class PVA extends Component{
 			holdOutChartDate:[],
 			loading:'',
 			isHoldout:false,
+			selected:{},
 		};
 	}
 
@@ -89,6 +90,11 @@ export default class PVA extends Component{
 		}
 		const chart = this.chart.getEchartsInstance();
 		chart.hideLoading();
+		chart.on('legendselectchanged', ({selected})=> {
+			this.setState({
+				selected
+			})
+		});
 		if(start!==_start||end!==_end||loading){
 			const rebuild = start === _start||end===_end||Math.abs(start-end-_start+_end)>0.1;
 			if(!rebuild&&!loading){
@@ -109,7 +115,7 @@ export default class PVA extends Component{
 	}
 
 	getOption() {
-		const {ready,chartDate,holdOutChartDate,sliderValue:_sliderValue} = this.state as any;
+		const {ready,chartDate,holdOutChartDate,sliderValue:_sliderValue,selected} = this.state as any;
 		const {project,y_name} = this.props as any;
 		const {isHoldout} = project;
 		const data = isHoldout?holdOutChartDate:chartDate;
@@ -231,7 +237,9 @@ export default class PVA extends Component{
 				name: EN.ResidualPercent,
 				type: 'value'
 			}],
-			legend: {},
+			legend: {
+				selected,
+			},
 			tooltip: {
 				trigger: 'axis',
 				formatter: function (params) {
