@@ -544,15 +544,25 @@ async function getBaseEtl(id) {
       return prev;
     }, {})
     .value();
-  return {
+  const etlData: {
+    command: string,
+    csvLocation: string[],
+    problemType: string,
+    featureLabel: string[],
+    colType: { [key: string]: string },
+    colMap: { [key: string]: Metric },
+    targetLabel: string[]
+  } = {
     command: 'top.etlBase',
     csvLocation: [etlIndex],
-    targetLabel: [target],
     problemType,
     featureLabel: dataHeader,
     colType,
     colMap,
+    targetLabel: []
   };
+  if (target) etlData.targetLabel.push(target)
+  return etlData
 }
 
 async function checkEtl(projectId, userId) {

@@ -36,7 +36,7 @@ export default class DataSchema extends Component {
     const { rawHeader } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
     const data = {
-      target: this.target,
+      target: this.target || '',
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
     }
