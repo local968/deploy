@@ -367,7 +367,7 @@ class SimplifiedViewRow extends Component {
           </SimplePlot>} /> : null}
       </div>
       {problemType === 'Clustering' && <div className={classnames(styles.tableTd, styles.tableImportance)}>
-        <div className={styles.preImpotance}>
+        <div className={styles.preImpotance} title={formatNumber(importance, 3)}>
           <div className={styles.preImpotanceActive} style={{ width: (importance * 100) + '%' }} />
         </div>
       </div>}
