@@ -6,14 +6,16 @@ import styles from "./styles.module.css";
 @observer
 export default class SignActive extends Component{
     componentDidMount() {
-        const {search} = this.props.location
+        const {location,routing,userStore} = this.props as any;
+        const {search} = location;
         const code = search.substr(1);
-        if(!code) return this.props.routing.push("/")
-        this.props.userStore.completeReg(code)
+        if(!code) return routing.push("/");
+        userStore.completeReg(code)
     }
 
     render() {
-        const {reg, regErr} = this.props.userStore
+        const {userStore} = this.props as any;
+        const {reg, regErr} = userStore;
         return <div className={styles.signActive}>
             <span>{reg?(regErr?'激活失败,请重新注册':'激活成功, 2秒后跳转'):'正在激活'}</span>
         </div>
