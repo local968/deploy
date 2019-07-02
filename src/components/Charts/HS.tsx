@@ -28,7 +28,10 @@ export default class HS extends Component{
 	}
 
 	componentDidMount() {
-		this.chart.getEchartsInstance().showLoading();
+		const {data} = this.state as any;
+		if(_.size(data)>1){
+			this.chart.getEchartsInstance().showLoading();
+		}
 	}
 
 	async setSlider(sliderValue){
@@ -59,10 +62,9 @@ export default class HS extends Component{
 			}
 		}
 
-
 		const sliderValue = _.cloneDeep(_sliderValue);
 		let _data = _.cloneDeep(data);
-		const [start,end] = sliderValue;
+		let [start,end] = sliderValue;
 
 		const series = [{
 			yAxisIndex: 0,
@@ -83,7 +85,56 @@ export default class HS extends Component{
 		const fontSize = 15;
 		title = _.chunk([...title],35).map(itm=>itm.join('')).join('\n');
 
-		const minValueSpan = (max-min)/_.size(data) * step;//最少显示3个点
+		const len = _.size(data);
+
+		const minValueSpan = (max-min)/len * step;//最少显示3个点
+
+		const xAxis:any = {
+			name:x_name,
+			type: 'value',
+			nameLocation:'middle',
+			nameGap:25,
+			nameTextStyle,
+			axisLabel:{
+				interval:Math.floor((data.length/5)),
+				formatter: (value)=>value.toFixed(2),
+			},
+		};
+
+		if(len<=1){
+			const val = data[0][0];
+			xAxis.min = val - 1;
+			xAxis.max = val + 1;
+			start = -1;
+			end = 1;
+		}
+
+		let dataZoom = [];
+
+		if(len>1){
+			dataZoom = [{
+				type: 'slider',
+				rangeMode:['value','value'],
+				labelPrecision:2,
+				labelFormatter: (value)=> {
+						if(!isNaN(Number(`${value}`))){
+							sliderValue.shift();
+							sliderValue.push(value);
+							this.setSlider(sliderValue);
+							return value.toFixed(3);
+						}
+				},
+				startValue:start,
+				endValue:end,
+				minValueSpan,
+			} ,{
+					type: 'inside',
+					rangeMode:['value','value'],
+					labelPrecision:2,
+					minValueSpan,
+				}
+			]
+		}
 
 		return {
 			title: {
@@ -93,44 +144,8 @@ export default class HS extends Component{
 					fontSize
 				}
 			},
-			dataZoom: [{
-				type: 'slider',
-				rangeMode:['value','value'],
-				labelPrecision:2,
-				// realtime:false,
-				labelFormatter: (value)=> {
-					if(!isNaN(Number(`${value}`))){
-						sliderValue.shift();
-						sliderValue.push(value);
-						this.setSlider(sliderValue);
-						return value.toFixed(3);
-					}
-				},
-				startValue:start,
-				endValue:end,
-				minValueSpan,
-			} ,{
-				type: 'inside',
-				// start,
-				// end,
-				rangeMode:['value','value'],
-				labelPrecision:2,
-				minValueSpan,
-			}
-			],
-			xAxis: {
-				name:x_name,
-				type: 'value',
-				// min,
-				// max,
-				nameLocation:'middle',
-				nameGap:25,
-				nameTextStyle,
-				axisLabel:{
-					interval:Math.floor((data.length/5)),
-					formatter: (value)=>value.toFixed(2),
-				},
-			},
+			dataZoom,
+			xAxis,
 			yAxis: {
 				name: y_name,
 				type: 'value',
@@ -158,6 +173,7 @@ export default class HS extends Component{
 
 	render(){
 		const {step,data,interval} = this.state as any;
+		const len = _.size(data);
 		return [
 			<ReactEcharts
 				key='echart'
@@ -172,14 +188,15 @@ export default class HS extends Component{
 			     style={{
 			     	 textAlign:'left',
 				     width:550,
+				     display:(len>1?"":"none")
 			     }}>
 				当前比例：{step * interval}
 			</div>,
 			<div key='y' id='pva'
 			     style={{
 						 width:550,
-				     display:'flex',
 				     whiteSpace:'nowrap',
+				     display:(len>1?"flex":"none")
 				}}>
 				比例:
 				<Slider
