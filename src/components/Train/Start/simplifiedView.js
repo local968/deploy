@@ -24,18 +24,15 @@ export default class SimplifiedView extends Component {
   @observable showCorrelation = false
   @observable visible = false;
   @observable CorrelationMatrixData = {};
-
+  @observable weights = {}
+  @observable standardType = ''
 
   componentDidMount() {
-    this.props.project.dataView().then(() => {
-      this.props.project.clusterPreTrainImportance()
-    })
+    this.reloadTable()
   }
 
   componentDidMount() {
-    this.props.project.dataView().then(() => {
-      this.props.project.clusterPreTrainImportance()
-    })
+    this.reloadTable()
   }
 
   getCorrelationMatrix = () => {
@@ -109,10 +106,13 @@ export default class SimplifiedView extends Component {
     this.reloadTable()
   }
 
-  reloadTable = () => {
-    this.props.project.dataView().then(() => {
-      this.props.project.clusterPreTrainImportance()
-    })
+  reloadTable = async () => {
+    try {
+      await this.props.project.dataView()
+      await this.props.project.clusterPreTrainImportance()
+      this.weights = { ...this.props.project.weightsTemp }
+      this.standardType = this.props.project.standardTypeTemp
+    } catch (e) { }
   };
 
   handleChange = e => {
@@ -169,6 +169,18 @@ export default class SimplifiedView extends Component {
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
+    const allLabel = [...dataHeader, ...newVariable].filter(v => v !== target)
+    const before = allLabel.reduce((prev, la) => {
+      prev[la] = this.weights[la] || 1
+      return prev
+    }, {})
+    const after = allLabel.reduce((prev, la) => {
+      prev[la] = weightsTemp[la] || 1
+      return prev
+    }, {})
+
+    const isChange = project.hasChanged(before, after) || standardTypeTemp !== this.standardType
+
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.chooseScan}>
         <div className={styles.chooseLabel}><span>{EN.ChooseaVariableScalingMethod}:</span></div>
@@ -230,7 +242,7 @@ export default class SimplifiedView extends Component {
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon
               type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>{EN.Importance}</span>
-            <div className={styles.tableReload} onClick={this.reloadTable}><span><Icon type="reload" /></span></div>
+            <div className={styles.tableReload} onClick={isChange ? this.reloadTable : () => { }}><span style={isChange ? { color: '#448eed' } : {}}><Icon type="reload" spin={isChange} /></span></div>
             <Hint themeStyle={{ fontSize: '1rem' }} content={EN.AdvancedModelingImportanceTip} />
           </div>}
           <div className={styles.tableTh}><span>{EN.DataType}</span></div>
