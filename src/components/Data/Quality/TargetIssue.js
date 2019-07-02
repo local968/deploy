@@ -89,7 +89,7 @@ export class ClassificationTarget extends Component {
     const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
     const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`;
-    const {quality_Fixit=true} = this.props.userStore.info.role;
+    const {quality_Fixit=true,quality_rename = true,quality_RemapTarget=true} = this.props.userStore.info.role;
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -129,12 +129,17 @@ export class ClassificationTarget extends Component {
             </div>
           </div>}
           {isGood && <div className={styles.cleanTargetBlock}>
-            {!this.rename ? <div className={styles.cleanTargetRename}>
-              <div className={styles.cleanTargetButton}>
+            {!this.rename ? <div
+              className={styles.cleanTargetRename}>
+              <div
+                style={{display:(quality_rename?'':'none')}}
+                className={styles.cleanTargetButton}>
                 <button onClick={this.showRename}><span>{EN.ChangeTargetVariableValue}</span></button>
               </div>
               <span>({EN.Optional})</span>
-              {!!targetArrayTemp.length && <div className={styles.remapTargetButton}>
+              {!!targetArrayTemp.length && <div
+                style={{display:(quality_RemapTarget?'':'none')}}
+                className={styles.remapTargetButton}>
                 <button onClick={editTarget}><span>{EN.RemapTarget}</span></button>
               </div>}
             </div> : <div className={styles.cleanTargetRename}>

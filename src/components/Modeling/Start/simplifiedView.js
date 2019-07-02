@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
 import { Icon, message as antdMessage, Modal, Popover, Table } from 'antd';
@@ -14,7 +14,6 @@ import EN from '../../../constant/en';
 import CreateNewVariables from '../../CreateNewVariable'
 import {
   HistogramCategorical,
-  HistogramNumerical,
   CorrelationMatrixs,
   TSENOne,
   BoxPlots,
@@ -22,6 +21,7 @@ import {
   HS,
 } from "../../Charts"
 
+@inject('userStore')
 @observer
 export default class SimplifiedView extends Component {
   @observable sort = -1;
@@ -195,6 +195,8 @@ export default class SimplifiedView extends Component {
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
+    const {schema_TargetVariable=true} = this.props.userStore.info.role;
+  
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -211,7 +213,6 @@ export default class SimplifiedView extends Component {
           <div className={styles.targetCell} onClick={this.show}>
             <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
             {<Popover placement='bottomLeft'
-              // getPopupContainer={() => document.getElementById(target)}
               visible={this.showHistograms}
               onVisibleChange={this.hide}
               trigger="click"
@@ -255,8 +256,9 @@ export default class SimplifiedView extends Component {
               <option value={customHeader.length}>custom_{customHeader.length + 1} ({checkedVariables.length})</option>}
           </select>
         </div>
-        <div className={styles.newVariable}>
-          <div className={styles.toolButton} onClick={this.showNewVariable}>
+        <div className={styles.newVariable} style={{display:(schema_TargetVariable?'':'none')}}>
+          <div className={styles.toolButton}
+               onClick={this.showNewVariable}>
             <span>{EN.CreateANewVariable}</span>
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
@@ -508,8 +510,6 @@ class SimplifiedViewRow extends Component {
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
-    
-    console.log(this.scatterData)
 
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
-// import autoIcon from './mr-one-logo-blue.svg';
 import { Modal } from 'components/Common';
 import { observable } from 'mobx';
 import { message, Icon } from 'antd';
@@ -13,19 +12,21 @@ import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
 import EN from '../../../constant/en';
 
-@inject('projectStore')
+@inject('projectStore','userStore')
 @observer
 export default class StartTrain extends Component {
-  @observable visible = false
+  @observable visible = false;
 
-  fastTrain = () => {
-    this.props.projectStore.project.newSetting('auto')
-    this.props.projectStore.project.fastTrain();
+  fastTrain(work){
+    if(work) {
+      this.props.projectStore.project.newSetting('auto');
+      this.props.projectStore.project.fastTrain();
+    }
   };
 
-  advanced = () => {
-    this.props.projectStore.project.newSetting('custom')
-    this.visible = true
+  advanced(){
+      this.props.projectStore.project.newSetting('custom')
+      this.visible = true
   }
 
   closeAdvanced = (isCLose = true) => {
@@ -34,6 +35,7 @@ export default class StartTrain extends Component {
   }
 
   render() {
+    const {modeling_start_AutomaticModeling=true} = this.props.userStore.info.role;
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
@@ -41,7 +43,7 @@ export default class StartTrain extends Component {
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock} onClick={this.fastTrain}>
+            <div className={styles.trainBlock} onClick={this.fastTrain.bind(this,modeling_start_AutomaticModeling)}>
               <div className={styles.trainRecommend}>
                 <span><Icon type="star" style={{ color: "#50647a" }} theme='filled' />{EN.Recommended}</span>
               </div>
@@ -57,13 +59,15 @@ export default class StartTrain extends Component {
                 </span>
               </div>
             </div>
-            <button className={styles.train} onClick={this.fastTrain}>
+            <button
+              style={{display:(modeling_start_AutomaticModeling?'':'none')}}
+              className={styles.train} onClick={this.fastTrain}>
               <span>{EN.AutomaticModeling}</span>
             </button>
           </div>
-          <div className={styles.trainSep}></div>
+          <div className={styles.trainSep}/>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock} onClick={this.advanced}>
+            <div className={styles.trainBlock} onClick={this.advanced.bind(this,modeling_start_AutomaticModeling)}>
               <div className={styles.trainImg}>
                 <img src={advancedIcon} alt="advanced" />
               </div>
@@ -95,6 +99,7 @@ export default class StartTrain extends Component {
   }
 }
 
+@inject('userStore')
 @observer
 class AdvancedModel extends Component {
   @observable tab = 1
@@ -136,11 +141,11 @@ class AdvancedModel extends Component {
   }
 
   render() {
-    const { project, closeAdvanced } = this.props
-    const { dataHeader, newVariable, trainHeader, target } = project
-    console.log(project, 9999)
-    const allVariables = [...dataHeader, ...newVariable]
-    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
+    const { project, closeAdvanced } = this.props;
+    const { dataHeader, newVariable, trainHeader, target } = project;
+    const allVariables = [...dataHeader, ...newVariable];
+    const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target);
+    const {quality_RemapTarget=true} = this.props.userStore.info.role;
     return <div className={styles.advancedModel}>
       <div className={styles.advancedContent}>
         <div className={styles.tabBox}>
@@ -155,13 +160,17 @@ class AdvancedModel extends Component {
           <Preview project={project} visiable={this.visiable} showTable={this.showTable} hideTable={this.hideTable} />
           {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} hidden={this.visiable || this.tab === 1} />}
           <div className={styles.bottom}>
-            <button className={classnames(styles.save, {
+            <button
+              style={{display:(quality_RemapTarget?'':'none')}}
+              className={classnames(styles.save, {
               [styles.disable]: !checkedVariables.length
-            })} onClick={!checkedVariables.length ? null : this.modeling} ><span>{EN.Modeling}</span></button>
+            })}
+              onClick={!checkedVariables.length ? null : this.modeling} >
+              <span>{EN.Modeling}</span>
+            </button>
             <button className={styles.cancel} onClick={closeAdvanced}><span>{EN.Cancel}</span></button>
           </div>
         </div>
-
       </div>
     </div>
   }

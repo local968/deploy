@@ -381,8 +381,8 @@ class VariableIssue extends Component {
     const { project, changeTab } = this.props;
     const { issues, dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount } } = project;
     const tableData = this.formatTable();
-    // const {quality_EditTheFixes=true} = this.props.userStore.info.role;
-    // console.log('quality_EditTheFixes',quality_EditTheFixes)
+    const {quality_Predict_LoadaNewDataset=true,quality_Predict_Continue=true} = this.props.userStore.info.role;
+  
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
@@ -392,7 +392,9 @@ class VariableIssue extends Component {
           {issues.rowIssue && <div className={styles.issueText}>
             <div className={styles.point}/>
             <span className={styles.limitText}>{EN.Foryourwholedataset}</span>
-            <div className={styles.button} onClick={this.backToConnect}>
+            <div className={styles.button}
+                 style={{display:(quality_Predict_LoadaNewDataset?'':'none')}}
+                 onClick={this.backToConnect}>
               <button><span>{EN.LoadaNewDataset}</span></button>
             </div>
           </div>}
@@ -413,11 +415,11 @@ class VariableIssue extends Component {
           <span>{EN.DataTypeMismatch}</span>
         </div>}
         {!!nullCount && <div className={styles.type}>
-          <div className={classnames(styles.typeBlock, styles.missing)}></div>
+          <div className={classnames(styles.typeBlock, styles.missing)}/>
           <span>{EN.MissingValue}</span>
         </div>}
         {!!outlierCount && <div className={styles.type}>
-          <div className={classnames(styles.typeBlock, styles.outlier)}></div>
+          <div className={classnames(styles.typeBlock, styles.outlier)}/>
           <span>{EN.Outlier}</span>
         </div>}
         <div className={styles.issueTabs}>
@@ -440,8 +442,11 @@ class VariableIssue extends Component {
             data={tableData}
           />
         </div>
-        <div className={styles.variableBottom}>
-          <ContinueButton onClick={this.showSummary} text={EN.Continue} width="15%" />
+        <div className={styles.variableBottom} style={{display:(quality_Predict_Continue?'':'none')}}>
+          <ContinueButton
+            onClick={this.showSummary}
+            text={EN.Continue}
+            width="15%" />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}
@@ -469,7 +474,14 @@ class VariableIssue extends Component {
         closeByMask={true}
         showClose={true}
       />
-      {<Confirm width={'6em'} visible={this.warning} title={EN.Warning} content={EN.Thisactionmaywipeoutallofyourprevious} onClose={this.onClose} onConfirm={this.onConfirm} confirmText={EN.Continue} closeText={EN.CANCEL} />}
+      {<Confirm width={'6em'}
+                visible={this.warning}
+                title={EN.Warning}
+                content={EN.Thisactionmaywipeoutallofyourprevious}
+                onClose={this.onClose}
+                onConfirm={this.onConfirm}
+                confirmText={EN.Continue}
+                closeText={EN.CANCEL} />}
     </div>
   }
 }

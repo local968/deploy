@@ -62,13 +62,13 @@ export default class DataSchema extends Component {
   }
 
   targetSelect = (value) => {
-    // const { colType } = this.props.projectStore.project
-    // this.props.projectStore.project.setProperty({ target: value })
-    this.target = value
-    this.tableRef.current.updateGrids()
-    // this.props.projectStore.project.updateProject(data).then(() => this.tableRef.current.updateGrids())
-    this.checkList = [...this.checkList.filter(v => v !== value)]
-  }
+    const {schema_TargetVariable=true} = this.props.userStore.info.role;
+    if(schema_TargetVariable){
+      this.target = value;
+      this.tableRef.current.updateGrids();
+      this.checkList = [...this.checkList.filter(v => v !== value)]
+    }
+  };
 
   checked = (key, e) => {
     const checked = e.target.checked

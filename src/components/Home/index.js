@@ -3,11 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import addProjectIcon from './combined-shape-copy.svg';
 import deleteIcon from './delete.svg';
-// import duplicateIcon from './duplicate.svg';
-// import shareIcon from './share.svg';
 import deleteDarkIcon from './delete-dark.svg';
-// import duplicateDarkIcon from './duplicate-dark.svg';
-// import shareDarkIcon from './share-dark.svg';
 import checkedIcon from './checked.svg';
 import { Search, Select, Pagination, ProcessLoading, Confirm } from 'components/Common';
 import { inject, observer } from 'mobx-react';
@@ -17,7 +13,7 @@ import EN from '../../constant/en';
 import config from 'config'
 
 const isEN = config.isEN;
-@inject('routing', 'projectStore')
+@inject('routing', 'projectStore','userStore')
 @observer
 export default class Home extends Component {
   @observable ids = []
@@ -226,12 +222,16 @@ export default class Home extends Component {
   render() {
     const { projectStore } = this.props;
     const { toolsOption, total, sortList: sortProjects, changeOption, changePage, keywords } = projectStore;
-    console.log(sortProjects , 'sortList')
+  
+    const {main_create=true} = this.props.userStore.info.role;
+  
     return <div className={classnames(styles.home)} >
       {this.loading && <ProcessLoading style={{ position: 'fixed' }} />}
       <Tools toolsOption={toolsOption} total={total} changeOption={changeOption} changePage={changePage} keywords={keywords} changeWords={this.changeWords} />
       <div className={classnames(styles.projects)}>
-        <div className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
+        <div
+          style={{display:(main_create?'':'none')}}
+          className={classnames(styles.project, styles.newProject)} onClick={this.handleAdd}>
           <img src={addProjectIcon} alt="New Project" />
           <span>{EN.CreateProject}</span>
         </div>
@@ -254,7 +254,7 @@ export default class Home extends Component {
   }
 }
 
-@inject('routing')
+@inject('routing','userStore')
 @observer
 class Project extends Component {
   @observable cover = false
@@ -278,6 +278,7 @@ class Project extends Component {
 
   render() {
     const { project, actions, selected } = this.props;
+    const {main_delete=true} = this.props.userStore.info.role;
     return <div className={styles.project} onMouseEnter={this.showCover} onMouseLeave={this.hideCover}>
       <div className={styles.info}>
         <div className={styles.name}>{project.name}</div>
@@ -290,17 +291,18 @@ class Project extends Component {
       <div className={classnames(styles.cover, {
         [styles.active]: this.cover || selected
       })}>
-        <div className={styles.actionBox}>
+        <div
+          style={{display:(main_delete?'':'none')}}
+          className={styles.actionBox}>
           <div className={styles.select}>
             {
               this.props.selected ?
                 <img className={styles.checked} onClick={this.toggleSelect} src={checkedIcon} alt="checked" /> :
-                <div className={styles.circle} onClick={this.toggleSelect}></div>
+                <div className={styles.circle} onClick={this.toggleSelect}/>
             }
           </div>
-          <div className={styles.action}>
-            {/* <img onClick={actions.bind(null, "share", project.id)} src={shareIcon} alt="share" />
-            <img onClick={actions.bind(null, "duplicate", project.id)} src={duplicateIcon} alt="duplicate" /> */}
+          <div
+            className={styles.action}>
             <img onClick={actions.bind(null, "delete", project.id)} src={deleteIcon} alt="delete" />
           </div>
         </div>
