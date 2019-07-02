@@ -97,11 +97,11 @@ export default class HS extends Component{
 				type: 'slider',
 				rangeMode:['value','value'],
 				labelPrecision:2,
-				// realtime:false,
 				labelFormatter: (value)=> {
 					if(!isNaN(Number(`${value}`))){
 						sliderValue.shift();
 						sliderValue.push(value);
+						//@ts-ignore
 						this.setSlider(sliderValue);
 						return value.toFixed(3);
 					}

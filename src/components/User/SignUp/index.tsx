@@ -22,27 +22,23 @@ export default class SignUp extends Component {
   };
   @observable showLicense = false;
 
-  onChangeEmail = action(e => {
-    this.email = e.target.value.toLowerCase()
+  onChangeEmail = action(({target}) => {
+    this.email = target.value.toLowerCase()
   });
 
-  onChangePassword = action(e => {
-    this.password = e.target.value
+  onChangePassword = action(({target}) => {
+    this.password = target.value
   });
 
-  onChangeConfirmPassword = action(e => {
-    this.confirmPassword = e.target.value
+  onChangeConfirmPassword = action(({target}) => {
+    this.confirmPassword = target.value
   });
 
-  onChangeLevel = action(e => {
-    this.plan_id = e.target.value
-  });
-  
   componentWillMount() {
-      this.props.userStore.getPlanList()
+    const {userStore} = this.props as any;
+    userStore.getPlanList()
   };
-    
-    register = () => {
+  register = () => {
     const { email, password, confirmPassword, warning, plan_id } = this;
     if (!email) {
       warning.email = EN.Enteryouremail;
@@ -65,42 +61,49 @@ export default class SignUp extends Component {
     }
 
     if (warning.email || warning.password || warning.confirmPassword) {
-      this.warning = warning
+      this.warning = warning;
       return
     }
+    const {userStore} = this.props as any;
 
-    this.props.userStore.register({ email, password, plan_id })
+    userStore.register({ email, password, plan_id })
   };
 
   login = () => {
-    this.props.history.push("/")
+    const {history} = this.props as any;
+    history.push("/")
+  };
+
+  show = action(() => (this.showLicense = true));
+  hide = action(() => (this.showLicense = false));
+
+  onChangePlan(value){
+    this.plan_id = value;
   }
 
-  show = action(() => (this.showLicense = true))
-  hide = action(() => (this.showLicense = false))
-
   render() {
-    return (this.showLicense ?
-      <License back={this.hide} /> :
+    const {userStore} = this.props as any;
+    // @ts-ignore
+    return (this.showLicense ? <License back={this.hide} /> :
       <div className={styles.signup}>
         <div className={styles.title}><span>{EN.SignUp}</span></div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.email && <span><img src={warnIcon} alt='warning' />{this.warning.email}</span>}</div>
-          <input type="text" placeholder={EN.EmailAddress} value={this.email} onChange={this.onChangeEmail} />
+          <input type="text" placeholder={EN.EmailAddress} value={this.email} onChange={this.onChangeEmail.bind(this)} />
         </div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.password && <span><img src={warnIcon} alt='warning' />{this.warning.password}</span>}</div>
-          <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword} />
+          <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword.bind(this)} />
         </div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.confirmPassword && <span><img src={warnIcon} alt='warning' />{this.warning.confirmPassword}</span>}</div>
-          <input type="password" placeholder={EN.ConfirmPassword} value={this.confirmPassword} onChange={this.onChangeConfirmPassword} />
+          <input type="password" placeholder={EN.ConfirmPassword} value={this.confirmPassword} onChange={this.onChangeConfirmPassword.bind(this)} />
         </div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.level && <span><img src={warnIcon} alt='warning' />{this.warning.level}</span>}</div>
-          <select value={this.level} onChange={this.onChangeLevel}>
+          <select value={this.plan_id} onChange={this.onChangePlan.bind(this)}>
               {
-                  this.props.userStore.planList.map(itm=><option
+                  userStore.planList.map(itm=><option
                       key={itm.id}
                       value={itm.id}>{EN[itm.name]}</option>)
               }
@@ -119,9 +122,9 @@ export default class SignUp extends Component {
 
 @observer
 class License extends Component {
-  @observable language = 'EN'
+  @observable language = 'EN';
 
-  onChange = action(e => this.language = e.target.checked ? 'CN' : 'EN')
+  onChange = action(({target}) => this.language = target.checked ? 'CN' : 'EN');
 
   getContent = () => {
     return this.language === 'EN' ?
@@ -279,12 +282,13 @@ class License extends Component {
         <p>[以下无正文]</p>
         <br />
       </div>
-  }
+  };
 
   render() {
+    const {back} = this.props as any;
     return <div className={styles.license}>
-      <div className={styles.back} onClick={this.props.back}><Icon className={styles.icon} type="arrow-left" /></div>
-      <div className={styles.checkbox}><Checkbox onChange={this.onChange} >查看中文</Checkbox></div>
+      <div className={styles.back} onClick={back}><Icon className={styles.icon} type="arrow-left" /></div>
+      <div className={styles.checkbox}><Checkbox onChange={this.onChange.bind(this)} >查看中文</Checkbox></div>
       <div className={styles.licenseTitle}><span>{this.language === 'EN' ? 'R2.ai End User License Agreement' : 'R2.ai'}</span></div>
       {this.getContent()}
     </div>

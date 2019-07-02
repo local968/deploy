@@ -1,4 +1,4 @@
-FROM node:12-stretch-slim
+FROM node:10-stretch-slim
 COPY . /app
 RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
 RUN cd /app && cnpm install --production

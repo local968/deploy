@@ -61,7 +61,7 @@ class UserStore {
     }));
   }
 
-  login(params, props) {
+  login(params, props=null) {
     axios.post(`http://${config.host}:${config.port}/user/login`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info;

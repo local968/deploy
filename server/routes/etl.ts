@@ -41,28 +41,39 @@ wss.register('originalStats', async (message, socket) => {
     .value();
 
   const headersChunked = _.chain(headers)
-    .chunk(chunkSize)
-    .reduce(
-      (result, hds: string[]) => _.concat(result, getStats(index, hds)),
-      _.gte(headersLn, 1) ? [] : [getStats(index)],
+    .chunk(
+      _.chain(_.divide(headersLn, chunkSize))
+        .round()
+        .concat([1])
+        .max()
+        .value(),
     )
-    .value();
+    .reduce(
+      (result, hds: string[]) => result.then(getStats(index, hds)),
+      _.gte(headersLn, 1) ? Bluebird.resolve({}) : getStats(index)(),
+    );
 
   function getStats(index, hds?: string[]) {
     const options = Array.isArray(hds)
       ? {
-        params: {
-          headers: hds,
-        },
-      }
+          params: {
+            headers: hds,
+          },
+        }
       : undefined;
-    return new Bluebird((resolve, reject) => {
-      axios
-        .get(`${esServicePath}/etls/${index}/stats`, options)
-        .then(getData)
-        .then(resolve)
-        .catch(reject);
-    });
+    return (data = {}) => {
+      return Bluebird.resolve(
+        axios
+          .get(`${esServicePath}/etls/${index}/stats`, options)
+          .then(getData)
+          .then((current = {}) => {
+            return {
+              ...data,
+              ...current,
+            };
+          }),
+      ).delay(500);
+    };
 
     function getData({ data }) {
       return data;
@@ -70,16 +81,7 @@ wss.register('originalStats', async (message, socket) => {
   }
 
   try {
-    const data = await Bluebird.reduce<any, any>(
-      headersChunked,
-      (total, current) => {
-        return {
-          ...total,
-          ...current
-        }
-      },
-      {});
-
+    const data = await headersChunked.value();
     // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
 
     const colType = {};
