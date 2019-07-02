@@ -95,7 +95,7 @@ class Model {
   @observable pcaPlotData: string = ''
   @observable featureLabel: string[] = []
   @observable holdoutChartData: ChartData;
-  @observable target: string[];
+  @observable target: string[] = [];
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {

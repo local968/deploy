@@ -180,6 +180,7 @@ function createModel(userId, id, modelId, params) {
   pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray(saveData));
   pipeline.sadd(`project:${id}:models`, modelId);
   return pipeline.exec().then(list => {
+    Reflect.deleteProperty(saveData, 'stats')
     const err = list.find(([error]) => !!error);
     const data = err
       ? { status: 412, message: 'create model error' }
@@ -223,42 +224,14 @@ function getModelCount(id) {
   return redis.scard(`project:${id}:models`);
 }
 
-function moveModels(id) {
+//change to move
+export function deleteModels(userId, id) {
   return redis.smembers(`project:${id}:models`).then(ids => {
     const pipeline = redis.pipeline();
     ids.forEach(mid => {
       pipeline.sadd(`project:${id}:models:previous`, mid);
     });
     pipeline.del(`project:${id}:models`);
-    return pipeline.exec().then(list => {
-      const error = list.find(i => !!i[0]);
-      if (error) return { status: 414, message: 'delete models error', error };
-      return {
-        status: 200,
-        message: 'ok',
-      };
-    });
-  });
-}
-
-export function deleteModels(userId, id) {
-  const selPipeline = redis.pipeline();
-  selPipeline.smembers(`project:${id}:models`);
-  selPipeline.smembers(`project:${id}:models:previous`);
-
-  return selPipeline.exec().then(([[nowError, nowIds], [oldError, oldIds]]) => {
-    if (nowError || oldError)
-      return {
-        status: 414,
-        message: 'delete models error',
-        error: nowError || oldError,
-      };
-    const pipeline = redis.pipeline();
-    [...nowIds, ...oldIds].forEach(mid => {
-      pipeline.del(`project:${id}:model:${mid}`);
-    });
-    pipeline.del(`project:${id}:models`);
-    pipeline.del(`project:${id}:models:previous`);
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0]);
       if (error) {
@@ -282,6 +255,7 @@ export function deleteModels(userId, id) {
         pid: id,
         time: moment().unix(),
       });
+      // if (error) return { status: 414, message: 'delete models error', error };
       return {
         status: 200,
         message: 'ok',
@@ -289,6 +263,56 @@ export function deleteModels(userId, id) {
     });
   });
 }
+
+// // real delete
+// export function deleteModels(userId, id) {
+//   const selPipeline = redis.pipeline();
+//   selPipeline.smembers(`project:${id}:models`);
+//   selPipeline.smembers(`project:${id}:models:previous`);
+
+//   return selPipeline.exec().then(([[nowError, nowIds], [oldError, oldIds]]) => {
+//     if (nowError || oldError)
+//       return {
+//         status: 414,
+//         message: 'delete models error',
+//         error: nowError || oldError,
+//       };
+//     const pipeline = redis.pipeline();
+//     [...nowIds, ...oldIds].forEach(mid => {
+//       pipeline.del(`project:${id}:model:${mid}`);
+//     });
+//     pipeline.del(`project:${id}:models`);
+//     pipeline.del(`project:${id}:models:previous`);
+//     return pipeline.exec().then(list => {
+//       const error = list.find(i => !!i[0]);
+//       if (error) {
+//         errorLogger.error({
+//           userId,
+//           message: 'delete models error',
+//           pid: id,
+//           time: moment().unix(),
+//         });
+//         userLogger.error({
+//           userId,
+//           message: 'delete models error',
+//           pid: id,
+//           time: moment().unix(),
+//         });
+//         return { status: 414, message: 'delete models error', error };
+//       }
+//       userLogger.warn({
+//         userId,
+//         message: 'delete models success',
+//         pid: id,
+//         time: moment().unix(),
+//       });
+//       return {
+//         status: 200,
+//         message: 'ok',
+//       };
+//     });
+//   });
+// }
 
 function deleteProject(userId, id) {
   return checkProject(userId, id).then(err => {

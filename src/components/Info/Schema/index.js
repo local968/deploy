@@ -33,12 +33,16 @@ export default class DataSchema extends Component {
 
   onConfirm = () => {
     const { project } = this.props.projectStore
-    const { rawHeader } = project;
+    const { rawHeader, problemType } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
     const data = {
       target: this.target || '',
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
+    }
+    if (problemType === 'Outlier' && this.target) {
+      data.nullFillMethod = { [this.target]: 'drop' }
+      data.nullFillMethodTemp = { [this.target]: 'drop' }
     }
     project.setProperty(data)
     try {
