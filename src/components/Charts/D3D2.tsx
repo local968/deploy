@@ -8,8 +8,12 @@ import THREE from './3Variable';
 import EN from "../../constant/en";
 import {inject} from "mobx-react";
 
+interface DataSampleProps {
+	url:string
+}
+
 @inject('projectStore')
-export default class D3D2 extends PureComponent {
+export default class D3D2 extends PureComponent<DataSampleProps>{
 	constructor(props) {
 		super(props);
 		this.state = {

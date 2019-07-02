@@ -4,8 +4,12 @@ import request from '../Request';
 import EN from "../../constant/en";
 import { inject } from 'mobx-react';
 
+interface DataSampleProps {
+	url:string
+}
+
 @inject('projectStore')
-export default class ParallelPlot extends PureComponent{
+export default class ParallelPlot extends PureComponent<DataSampleProps>{
 	constructor(props){
 		super(props);
 		this.state = {

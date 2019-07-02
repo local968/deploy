@@ -17,12 +17,12 @@ export default function Bar(){
 				value:50,
 			}]
 		};
-		
+
 		const {x_name,y_name,data,title} = result;
 		const nameTextStyle = {
 			color:'#000',
 		};
-		
+
 		const option = {
 			title: {
 				text: title,
@@ -46,8 +46,8 @@ export default function Bar(){
 					show:true,
 				},
 			}]
-		}
-	
+		};
+
 	return <ReactEcharts
 		option={option}
 		style={{height: 400, width: 1000}}

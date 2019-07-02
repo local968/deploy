@@ -6,7 +6,12 @@ import initEcharts from './echarts.config';
 
 initEcharts(Echarts);
 
-export default class BoxPlots extends PureComponent{
+interface DataSampleProps {
+	x_keys:Array<string>
+	value:Array<string>
+}
+
+export default class BoxPlots extends PureComponent<DataSampleProps>{
 
 	getOption() {
 		const {value=[],title='',x_name='',y_name='',x_keys = []} = this.props as any;

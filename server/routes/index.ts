@@ -21,11 +21,11 @@ router.use('/etls', redirectEs);
 router.use("/uploads", redirectUpload);
 router.use('/api', api);
 router.get('/jupyterLabUrl', (req, res) =>
-  res.send(process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/notebook/lab'),
+  res.send(process.env.JUPYTER_LAB || '/notebook/lab'),
 );
 
 router.get('/dashboardUrl', (req, res) =>
-  res.send(process.env.DASHBOARD_URL || 'https://192.168.0.23:16443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/'),
+  res.send(process.env.DASHBOARD_URL || '/kubernetes/dashboard'),
 );
 
 export default router;

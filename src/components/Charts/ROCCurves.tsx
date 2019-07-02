@@ -3,7 +3,16 @@ import echarts from 'echarts';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash'
 
-export default class ROCCurves extends PureComponent{
+interface DataSampleProps {
+	height:number
+	width:number
+	x_name:string
+	y_name:string
+	model:any
+	isHoldout:boolean
+}
+
+export default class ROCCurves extends PureComponent<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);
@@ -17,15 +26,14 @@ export default class ROCCurves extends PureComponent{
 	}
 
 	componentWillReceiveProps(nextProps) {
-		const {isHoldout} = this.props as any;
+		const {isHoldout} = this.props;
 		if(nextProps.isHoldout!==isHoldout){
 			this.prePair(undefined,nextProps.isHoldout)
 		}
 	}
 
-	//@ts-ignore
 	prePair(fitIndex=this.props.model.fitIndex,isHoldout=this.props.isHoldout){
-		const {x_name='',y_name='',model} =this.props as any;
+		const {x_name='',y_name='',model} =this.props;
 		const {chartData,holdoutChartData} = model;
 		const {roc} = isHoldout?holdoutChartData:chartData;
 		const {FPR:x,TPR:y} = roc;
@@ -197,13 +205,13 @@ export default class ROCCurves extends PureComponent{
 	}
 
 	updatePoint(point){
-		const {model} = this.props as any;
+		const {model} = this.props;
 		const {_x} = this.state as any;
 		model.setFitIndex(_x.indexOf(point));
 	}
 
 	render(){
-		const {width=650,height=300} = this.props as any;
+		const {width=650,height=300} = this.props;
 		return <ReactEcharts
 			ref = {chart=>this.chart = chart}
 			option={this.getOption()}

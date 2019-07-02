@@ -11,8 +11,15 @@ import { Button } from 'antd';
 import { Hint, Switch } from 'components/Common';
 import {observer} from "mobx-react";
 
+interface DataSampleProps {
+	x_name:string
+	y_name:string
+	model:any
+	project:any
+}
+
 @observer
-export default class PVA extends Component{
+export default class PVA extends Component<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);
@@ -26,6 +33,7 @@ export default class PVA extends Component{
 			loading:'',
 			isHoldout:false,
 			selected:{},
+			range:undefined,
 		};
 	}
 
@@ -36,7 +44,6 @@ export default class PVA extends Component{
 		}
 	}
 
-	//@ts-ignore
 	async componentDidMount(model=this.props.model||{}) {
 		const { validatePlotData, holdoutPlotData } = model as any;
 		const {data} = this.props as any;
@@ -102,9 +109,15 @@ export default class PVA extends Component{
 					sliderValue,
 				})
 			}
-			await this.setState({
-				ready:false,
-			},()=>chart.showLoading());
+			const sState:any = {
+				ready:false
+			};
+
+			if(loading === 'reset'){
+				sState.range = undefined;
+			}
+
+			await this.setState(sState,()=>chart.showLoading());
 			setTimeout(async()=>{
 				await this.setState({
 					sliderValue,
@@ -291,8 +304,7 @@ export default class PVA extends Component{
 
 	render(){
 		const {loading,chartDate,holdOutChartDate} = this.state as any;
-		const {project} = this.props as any;
-		const {isHoldout} = project;
+		const {isHoldout} = this.props.project;
 		const data = isHoldout?holdOutChartDate:chartDate;
 
 		if(!data[0]){
@@ -302,7 +314,7 @@ export default class PVA extends Component{
 
 		const yMin = _.min(act);
 		const yMax = _.max(act);
-		const {range= [yMin,yMax],yRange= [0,_.size(act)]} = this.state as any;
+		const {range = [yMin,yMax],yRange= [0,_.size(act)]} = this.state as any;
 		const [x,y] = range;
 		let [y_start,y_end] = yRange;
 		return [
@@ -363,7 +375,7 @@ export default class PVA extends Component{
 						value={y}
 						style={{ width: 100 }}
 						onChange={max=>{
-							let end = _.indexOf(act,_.find(_.reverse(act),itm=>itm<max));
+							let end = _.indexOf(act,_.max(_.filter(act,itm=>itm<max)));
 							this.setState({
 								yRange:[y_start,end+1],
 								range:[x,max]
@@ -384,9 +396,7 @@ export default class PVA extends Component{
 					<Button
 						loading={loading === 'reset'}
 						disabled={loading === 'change'}
-						onClick={()=>{
-							return this.setSlider([0,100],'reset')
-						}}
+						onClick={()=>this.setSlider([0,100],'reset')}
 					>{EN.Reset}</Button>
 
 				</div>
