@@ -5,7 +5,14 @@ import EN from "../../constant/en";
 import config from 'config'
 const {isEN} = config;
 
-export default class PCS extends PureComponent{
+interface DataSampleProps {
+	data:any
+	x_name:string
+	y_name:string
+	fields:any
+}
+
+export default class PCS extends PureComponent<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);

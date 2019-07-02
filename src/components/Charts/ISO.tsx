@@ -17,9 +17,13 @@ const classes = styles;
 
 const color:any = ['#b7cbf8','#ffffff','green','red'];//背景(开始)/背景(结束）/正常点/异常点
 
+interface DataSampleProps {
+    projectStore:any
+}
+
 @inject('projectStore')
 @observer
-export default class Iso extends PureComponent{
+export default class Iso extends PureComponent<DataSampleProps>{
     private chart:any;
     constructor(props){
         super(props);
@@ -51,11 +55,9 @@ export default class Iso extends PureComponent{
     }
 
     async message() {
-
         const chart = this.chart.getEchartsInstance();
         chart.showLoading();
-        const {projectStore} = this.props as any;
-        const { selectModel:models} = projectStore.project;
+        const { selectModel:models} = this.props.projectStore.project;
         const {outlierPlotData:url,rate,initRate} = models;
 
         const point = (rate).toFixed(3);
@@ -322,7 +324,6 @@ export default class Iso extends PureComponent{
             width = 600,
         } = this.props as any;
 
-        // @ts-ignore
         return [
             <section key='dl' className={classes.d3d2}>
                 <dl>
@@ -349,19 +350,18 @@ export default class Iso extends PureComponent{
                 <Slider
                     min={0}
                     max={0.5}
-                     // @ts-ignore
                     marks={{
-                        '0':0,
+                        '0':'0',
                         '0.05':'',
-                        '0.1':0.1,
+                        '0.1':'0.1',
                         '0.15':'',
-                        '0.2':0.2,
+                        '0.2':'0.2',
                         '0.25':'',
-                        '0.3':0.3,
+                        '0.3':'0.3',
                         '0.35':'',
-                        '0.4':0.4,
+                        '0.4':'0.4',
                         '0.45':'',
-                        '0.5':0.5,
+                        '0.5':'0.5',
                     }}
                     included={false}
                     step={0.001}
@@ -372,7 +372,7 @@ export default class Iso extends PureComponent{
                         return this.updatePoint(slider_value)
                     }}
                     value={+slider_value} />
-                    <a href='javascript:;' onClick={this.reset.bind(this)}>{EN.Reset}</a>
+                    <a href="javascript:" onClick={this.reset.bind(this)}>{EN.Reset}</a>
             </div>,
             <div key = 'adjust' className={classes.adjust}>
                 <label data-tip={EN.Thisratiowilldetermine}>{EN.Youcanadjustthecontaminationrate}:</label>

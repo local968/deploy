@@ -11,8 +11,15 @@ import { Button } from 'antd';
 import { Hint, Switch } from 'components/Common';
 import {observer} from "mobx-react";
 
+interface DataSampleProps {
+	x_name:string
+	y_name:string
+	model:any
+	project:any
+}
+
 @observer
-export default class PVA extends Component{
+export default class PVA extends Component<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);

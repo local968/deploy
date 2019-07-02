@@ -1,9 +1,19 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import config from 'config'
+import EN from '../../constant/en';
 const {isEN} = config;
 
-export default class TSEN extends PureComponent{
+interface DataSampleProps {
+	x_name : string
+	y_name : string
+	width : number
+	height :number
+	data : any
+	title : string
+}
+
+export default class TSEN extends PureComponent<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);
