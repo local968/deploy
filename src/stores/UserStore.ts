@@ -41,7 +41,7 @@ class UserStore {
 
   getStatus(){
     axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
-      if (res.data.status === 200) {
+      if (res.data.status === 200&&res.data.info.role) {
         this.info = res.data.info;
         if(res.data.info.role.project === false&&location.pathname==='/'){
           location.href = '/deploy'

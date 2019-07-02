@@ -6,15 +6,30 @@ import { observable } from 'mobx'
 import { Checkbox, message } from 'antd'
 import { Select, ContinueButton, ProcessLoading, Table, Hint, HeaderInfo, Confirm } from 'components/Common';
 import EN from '../../../constant/en';
+import EditHeader from './EditHeader'
+import { ProjectStore } from 'stores/ProjectStore';
+import { UserStore } from 'stores/UserStore';
+import { SocketStore } from 'stores/SocketStore';
 
-@inject('projectStore','userStore')
-@observer
-export default class DataSchema extends Component {
+type TableCell = {
+  content: string | React.ReactElement;
+  title: string;
+  cn: string;
+};
+
+interface DataSchemaProps {
+  projectStore: ProjectStore,
+  userStore: UserStore,
+  socketStore: SocketStore
+}
+
+class DataSchema extends Component<DataSchemaProps> {
   @observable checkList = this.props.projectStore.project.rawHeader.filter(r => !this.props.projectStore.project.dataHeader.includes(r))
   @observable showSelect = false
   @observable dataType = { ...this.props.projectStore.project.colType }
   @observable visiable = false
   @observable target = this.props.projectStore.project.target
+  tableRef: React.RefObject<Table>
 
   constructor(props) {
     super(props)
@@ -35,7 +50,15 @@ export default class DataSchema extends Component {
     const { project } = this.props.projectStore
     const { rawHeader } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
-    const data = {
+    const data: {
+      target: string,
+      dataHeader: string[],
+      colType: StringObject,
+      outlierFillMethod?: StringObject
+      outlierFillMethodTemp?: StringObject
+      nullFillMethod?: StringObject
+      nullFillMethodTemp?: StringObject
+    } = {
       target: this.target || '',
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
@@ -62,7 +85,8 @@ export default class DataSchema extends Component {
   }
 
   targetSelect = (value) => {
-    const {schema_TargetVariable=true} = this.props.userStore.info.role;
+    const {role} = this.props.userStore.info as any;
+    const {schema_TargetVariable=true} = role;
     if(schema_TargetVariable){
       this.target = value;
       this.tableRef.current.updateGrids();
@@ -141,7 +165,7 @@ export default class DataSchema extends Component {
     for (let i = 0; i < realColumn; i++) {
       const header = headerList[i - index.columnHeader] ? headerList[i - index.columnHeader].trim() : '';
       if (index.checkRow > -1) {
-        const checkData = {
+        const checkData: TableCell = {
           content: '',
           title: '',
           cn: styles.check
@@ -162,7 +186,7 @@ export default class DataSchema extends Component {
         checkArr.push(checkData)
       }
 
-      const headerData = {
+      const headerData: TableCell = {
         content: '',
         title: '',
         cn: styles.titleCell
@@ -189,7 +213,7 @@ export default class DataSchema extends Component {
       }
       headerArr.push(headerData)
 
-      const selectData = {
+      const selectData: TableCell = {
         content: '',
         title: '',
         cn: styles.check
@@ -206,7 +230,7 @@ export default class DataSchema extends Component {
         //   const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
         //   key = header + suffix
         // }
-        const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
+        const canTransforToCategorical = this.props.projectStore.project.rawDataView[key].doubleUniqueValue < Math.min(this.props.projectStore.project.rawDataView[key].count * 0.1, 1000)
         const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
           {!canTransforToCategorical && <option value="Raw">{EN.Categorical}(Raw)</option>}
@@ -224,11 +248,11 @@ export default class DataSchema extends Component {
     }
 
     const tableData = data.map((row, rowIndex) => {
-      const arr = []
+      const arr: TableCell[] = []
       if (index.columnHeader > 0) {
         arr.push({
           content: <span>{rowIndex + 1}</span>,
-          title: rowIndex + 1,
+          title: (rowIndex + 1).toString(),
           cn: styles.cell
         })
       }
@@ -268,9 +292,9 @@ export default class DataSchema extends Component {
       if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = mapHeader[h]
       if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = mapHeader[h]
     });
-  
-    const {schema_continue=true} = this.props.userStore.info.role;
-  
+    const {role} = this.props.userStore.info as any;
+    const {schema_continue=true} = role;
+
     return project && <div className={styles.schema}>
       <div className={styles.schemaInfo}>
         <div className={styles.schemaI}><span>i</span></div>
@@ -284,7 +308,7 @@ export default class DataSchema extends Component {
           <Select
             title={EN.TargetVariable}
             dropdownClassName={"targetSelect"}
-            autoWidth={"1.6em"}
+            width={"1.6em"}
             options={targetOption}
             onChange={this.targetSelect}
             value={this.target}
@@ -334,7 +358,9 @@ export default class DataSchema extends Component {
           onClick={this.doEtl}
           show={schema_continue}
           disabled={etling || !this.target || (newDataHeader.length <= 1 && newDataHeader.indexOf(this.target) > -1)}
-          text={EN.Continue} />
+          text={EN.Continue}
+          width={null}
+          />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />
@@ -346,10 +372,4 @@ export default class DataSchema extends Component {
   }
 }
 
-//修改表头
-class EditHeader extends Component {
-  render() {
-    const { value } = this.props
-    return <span>{value}</span>
-  }
-}
+export default inject('projectStore')(observer(DataSchema))

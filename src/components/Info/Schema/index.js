@@ -33,12 +33,16 @@ export default class DataSchema extends Component {
 
   onConfirm = () => {
     const { project } = this.props.projectStore
-    const { rawHeader } = project;
+    const { rawHeader, problemType } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
     const data = {
       target: this.target || '',
       dataHeader: newDataHeader,
       colType: { ...this.dataType }
+    }
+    if (problemType === 'Outlier' && this.target) {
+      data.nullFillMethod = { [this.target]: 'drop' }
+      data.nullFillMethodTemp = { [this.target]: 'drop' }
     }
     project.setProperty(data)
     try {
@@ -194,7 +198,7 @@ export default class DataSchema extends Component {
         //   const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
         //   key = header + suffix
         // }
-        const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
+        const canTransforToCategorical = this.props.projectStore.project.rawDataView[key].doubleUniqueValue < Math.min(this.props.projectStore.project.rawDataView[key].count * 0.1, 1000)
         const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
           {!canTransforToCategorical && <option value="Raw">{EN.Categorical}(Raw)</option>}
@@ -315,7 +319,7 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || (newDataHeader.length < 1)} text={EN.Continue} />
+        <ContinueButton onClick={this.doEtl} disabled={etling || (newDataHeader.length < 1) || isMissed || isDuplicated} text={EN.Continue} />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />

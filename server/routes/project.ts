@@ -120,6 +120,10 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
     ? Promise.resolve({ status: 200, message: 'ok' })
     : checkProject(userId, id);
   return promise.then(checked => {
+    if (checked.status === 444) return {
+      status: 200,
+      me4ssage: 'ok'
+    }
     if (checked.status !== 200) return checked;
     const time = moment().unix();
     data.updateTime = time;
@@ -130,6 +134,7 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
     pipeline.zadd(`user:${userId}:projects:updateTime`, time, id);
     if (isCreate) pipeline.zadd(`user:${userId}:projects:createTime`, time, id);
     return pipeline.exec().then(result => {
+      Reflect.deleteProperty(data, 'stats')
       const err = result.find(([error]) => !!error);
       const returnValue = err
         ? {
@@ -181,6 +186,7 @@ function createModel(userId, id, modelId, params) {
   pipeline.hmset(`project:${id}:model:${modelId}`, mapObjectToArray(saveData));
   pipeline.sadd(`project:${id}:models`, modelId);
   return pipeline.exec().then(list => {
+    Reflect.deleteProperty(saveData, 'stats')
     const err = list.find(([error]) => !!error);
     const data = err
       ? { status: 412, message: 'create model error' }
@@ -201,6 +207,7 @@ function updateModel(userId, id, mid, params) {
   return redis
     .hmset(`project:${id}:model:${mid}`, mapObjectToArray(params))
     .then(() => {
+      Reflect.deleteProperty(params, 'stats')
       const result = {
         status: 200,
         message: 'ok',
@@ -223,42 +230,14 @@ function getModelCount(id) {
   return redis.scard(`project:${id}:models`);
 }
 
-function moveModels(id) {
+//change to move
+export function deleteModels(userId, id) {
   return redis.smembers(`project:${id}:models`).then(ids => {
     const pipeline = redis.pipeline();
     ids.forEach(mid => {
       pipeline.sadd(`project:${id}:models:previous`, mid);
     });
     pipeline.del(`project:${id}:models`);
-    return pipeline.exec().then(list => {
-      const error = list.find(i => !!i[0]);
-      if (error) return { status: 414, message: 'delete models error', error };
-      return {
-        status: 200,
-        message: 'ok',
-      };
-    });
-  });
-}
-
-export function deleteModels(userId, id) {
-  const selPipeline = redis.pipeline();
-  selPipeline.smembers(`project:${id}:models`);
-  selPipeline.smembers(`project:${id}:models:previous`);
-
-  return selPipeline.exec().then(([[nowError, nowIds], [oldError, oldIds]]) => {
-    if (nowError || oldError)
-      return {
-        status: 414,
-        message: 'delete models error',
-        error: nowError || oldError,
-      };
-    const pipeline = redis.pipeline();
-    [...nowIds, ...oldIds].forEach(mid => {
-      pipeline.del(`project:${id}:model:${mid}`);
-    });
-    pipeline.del(`project:${id}:models`);
-    pipeline.del(`project:${id}:models:previous`);
     return pipeline.exec().then(list => {
       const error = list.find(i => !!i[0]);
       if (error) {
@@ -282,6 +261,7 @@ export function deleteModels(userId, id) {
         pid: id,
         time: moment().unix(),
       });
+      // if (error) return { status: 414, message: 'delete models error', error };
       return {
         status: 200,
         message: 'ok',
@@ -290,8 +270,62 @@ export function deleteModels(userId, id) {
   });
 }
 
+// // real delete
+// export function deleteModels(userId, id) {
+//   const selPipeline = redis.pipeline();
+//   selPipeline.smembers(`project:${id}:models`);
+//   selPipeline.smembers(`project:${id}:models:previous`);
+
+//   return selPipeline.exec().then(([[nowError, nowIds], [oldError, oldIds]]) => {
+//     if (nowError || oldError)
+//       return {
+//         status: 414,
+//         message: 'delete models error',
+//         error: nowError || oldError,
+//       };
+//     const pipeline = redis.pipeline();
+//     [...nowIds, ...oldIds].forEach(mid => {
+//       pipeline.del(`project:${id}:model:${mid}`);
+//     });
+//     pipeline.del(`project:${id}:models`);
+//     pipeline.del(`project:${id}:models:previous`);
+//     return pipeline.exec().then(list => {
+//       const error = list.find(i => !!i[0]);
+//       if (error) {
+//         errorLogger.error({
+//           userId,
+//           message: 'delete models error',
+//           pid: id,
+//           time: moment().unix(),
+//         });
+//         userLogger.error({
+//           userId,
+//           message: 'delete models error',
+//           pid: id,
+//           time: moment().unix(),
+//         });
+//         return { status: 414, message: 'delete models error', error };
+//       }
+//       userLogger.warn({
+//         userId,
+//         message: 'delete models success',
+//         pid: id,
+//         time: moment().unix(),
+//       });
+//       return {
+//         status: 200,
+//         message: 'ok',
+//       };
+//     });
+//   });
+// }
+
 function deleteProject(userId, id) {
   return checkProject(userId, id).then(err => {
+    if (err.status === 444) return {
+      status: 200,
+      me4ssage: 'ok'
+    }
     if (err.status !== 200) return err;
     const pipeline = redis.pipeline();
     pipeline.del(`project:${id}`);
@@ -327,6 +361,16 @@ function deleteProject(userId, id) {
 
 function checkProject(userId, id) {
   return redis.hgetall(`project:${id}`).then(result => {
+    if (!result) {
+      errorLogger.error({
+        userId,
+        message: `project:${id} has been deleted`,
+        pid: id,
+        time: moment().unix(),
+      });
+      return { status: 444, message: `project:${id} has been deleted` };
+    }
+    Reflect.deleteProperty(result, 'stats')
     for (let key in result) {
       try {
         result[key] = JSON.parse(result[key]);
@@ -569,7 +613,7 @@ async function checkEtl(projectId, userId) {
 
 function getProject(projectId) {
   return redis.hgetall('project:' + projectId).then(p => {
-
+    Reflect.deleteProperty(p, 'stats')
     Object.keys(p).forEach(key => {
       try {
         p[key] = JSON.parse(p[key]);
@@ -633,6 +677,10 @@ wss.register('updateProject', (message, socket) => {
   Reflect.deleteProperty(data, 'userId');
 
   return checkProject(userId, id).then(err => {
+    if (err.status === 444) return {
+      status: 200,
+      me4ssage: 'ok'
+    }
     if (err.status !== 200) return err;
     return createOrUpdate(id, userId, data);
   });
@@ -1362,6 +1410,7 @@ wss.register('train', async (message, socket, progress) => {
           ...{ holdoutChartData: holdoutChartData.chartData },
           stats,
           featureLabel: message.featureLabel,
+          target: message.targetLabel
         };
         if (message.problemType) modelData.problemType = message.problemType;
         if (message.standardType) modelData.standardType = message.standardType;

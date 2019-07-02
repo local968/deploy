@@ -186,14 +186,14 @@ router.get('/test', async (req, res) => {
 });
 
 router.get('/reload', (req, res) => {
-  saveSample();
+  saveSample(true);
   res.json({
     status: 100,
     msg: 'ok',
   });
 });
 
-async function saveSample() {
+async function saveSample(force: boolean = false) {
   const root = process.cwd();
   const samplePath = path.join(root, 'sample');
 
@@ -208,10 +208,14 @@ async function saveSample() {
   // }
   const files = fs.readdirSync(samplePath);
 
-  await redis.del(`file:C:samples`);
-  await redis.del(`file:R:samples`);
-  await redis.del(`file:U:samples`);
-  await redis.del(`file:O:samples`);
+  //手动刷新
+  if (force) {
+    await redis.del(`file:C:samples`);
+    await redis.del(`file:R:samples`);
+    await redis.del(`file:U:samples`);
+    await redis.del(`file:O:samples`);
+  }
+
   try {
     const promiseArr = files.map(async f => {
       const pipeline = redis.pipeline();
@@ -219,7 +223,15 @@ async function saveSample() {
       const filePath = path.join(samplePath, f);
       const id = uuid.v4();
       try {
-        console.log('file:' + f + ' start');
+        if (!force) {
+          try {
+            const exist = await checkSampleExist(name)
+            if (exist) return console.info(`sample:${f} already exist`)
+          } catch (e) {
+            return console.error(`sample:${f} check failed`, e)
+          }
+        }
+        console.info('file:' + f + ' start');
         const {
           originalIndex,
           totalRawLines,
@@ -241,18 +253,24 @@ async function saveSample() {
         pipeline.set(`file:sample:${name}`, id);
         pipeline.set(`file:${id}`, JSON.stringify(data));
         await pipeline.exec();
-        console.log('file:' + f + ' end');
+        console.info('file:' + f + ' end');
       } catch (e) {
         console.error(e, `sample: ${f} error`);
       }
     });
     await Promise.all(promiseArr);
-    console.log(`sample complete`);
+    console.info(`sample complete`);
   } catch (e) {
     console.error(e);
   }
 
   // pipeline.exec()
+}
+
+async function checkSampleExist(name: string) {
+  if (!name) throw new Error("filename required")
+  const id = await redis.get(`file:sample:${name}`)
+  return !!id
 }
 
 router.get('/download/result', async (req, res) => {
@@ -334,7 +352,7 @@ router.get('/download/result', async (req, res) => {
           //   );
           result.push([]);
           res.write(Papa.unparse(result, { header: false }));
-          temp = {[row['__no']]: [row]};
+          temp = { [row['__no']]: [row] };
           // temp[row['__no']] = temp[row['__no']] || [];
           // temp[row['__no']].push(row)
           parser.resume();
@@ -590,31 +608,31 @@ router.get('/download/:scheduleId', async (req, res) => {
   const mapHeader = JSON.parse(
     await redis.hget(`project:${deployment.projectId}`, 'mapHeader'),
   );
-    const target = JSON.parse(
-      await redis.hget(`project:${deployment.projectId}`, 'target'),
-    );
-    // console.log(schedule.result.deployData)
-    scheduleDownloadCsv(
-      schedule.result.deployData,
-      filename,
-      schedule.etlIndex,
-      header,
-      mapHeader,
-      res,
-      target,
-    );
-  });
-
-  function scheduleDownloadCsv(
-    url,
+  const target = JSON.parse(
+    await redis.hget(`project:${deployment.projectId}`, 'target'),
+  );
+  // console.log(schedule.result.deployData)
+  scheduleDownloadCsv(
+    schedule.result.deployData,
     filename,
-    index,
+    schedule.etlIndex,
     header,
     mapHeader,
     res,
     target,
-  ) {
-  if( target && header.indexOf(target) !== -1 ) header = [...header.filter(h => h !== target), target];
+  );
+});
+
+function scheduleDownloadCsv(
+  url,
+  filename,
+  index,
+  header,
+  mapHeader,
+  res,
+  target,
+) {
+  if (target && header.indexOf(target) !== -1) header = [...header.filter(h => h !== target), target];
   let temp = {};
   let counter = 0;
   let resultHeader;
@@ -687,6 +705,6 @@ router.get('/download/:scheduleId', async (req, res) => {
   });
 }
 
-// saveSample()
+saveSample()
 
 export default router;
