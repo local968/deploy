@@ -44,12 +44,12 @@ export default class SimplifiedView extends Component {
 
   show = () => {
     const { project = {} } = this.props;
-    const { target, colType, etlIndex,stats } = project;
+    const { target, colType, etlIndex, rawDataView } = project;
 
     if (!this.chartData[target]) {
       if (colType[target] === "Numerical") {
-        const {max,min,std_deviation_bounds:{lower,upper}} = stats[target].originalStats;
-        const interval =( Math.max(upper,max)-Math.min(lower,min))/100;
+        const { max, min, std_deviation_bounds: { lower, upper } } = rawDataView[target];
+        const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
         request.post({
           url: '/graphics/histogram-numerical',
           data: {
@@ -57,7 +57,7 @@ export default class SimplifiedView extends Component {
             id: etlIndex,
             interval,
           },
-        }).then((result) => this.showback(target, result.data,{min,max,interval}));
+        }).then((result) => this.showback(target, result.data, { min, max, interval }));
       } else {
         const { uniqueValues } = project.dataViews[target];
         request.post({
@@ -75,7 +75,7 @@ export default class SimplifiedView extends Component {
     this.showHistograms = true;
   };
 
-  showback = (target, result,message) => {
+  showback = (target, result, message) => {
     this.chartData = {
       ...this.chartData,
       [target]: result,
@@ -110,7 +110,7 @@ export default class SimplifiedView extends Component {
     const fields = Object.entries(colType)
       .filter(itm => itm[1] === 'Numerical')
       .map(itm => itm[0])
-      .filter(itm => !trainHeader.includes(itm)&&dataHeader.includes(itm));
+      .filter(itm => !trainHeader.includes(itm) && dataHeader.includes(itm));
     request.post({
       url: '/graphics/correlation-matrix',
       data: {
@@ -334,7 +334,7 @@ class SimplifiedViewRow extends Component {
 
   showHistograms = () => {
     const { value, project, isNew } = this.props;
-    const { colType,etlIndex,stats } = project;
+    const { colType, etlIndex, rawDataView } = project;
     if (isNew) {
       // const newUrl = histgramPlots[value]
       this.histograms = true
@@ -348,13 +348,13 @@ class SimplifiedViewRow extends Component {
         id: etlIndex,
       };
       if (colType[value] === "Numerical") {
-        const {max,min,std_deviation_bounds:{lower,upper}} = stats[value].originalStats;
-        data.interval =( Math.max(upper,max)-Math.min(lower,min))/100;
+        const { max, min, std_deviation_bounds: { lower, upper } } = rawDataView[value];
+        data.interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
 
         request.post({
           url: '/graphics/histogram-numerical',
           data,
-        }).then((result) => this.showback(result.data, value,{min,max,interval:data.interval}));
+        }).then((result) => this.showback(result.data, value, { min, max, interval: data.interval }));
       } else {
         const { uniqueValues } = project.dataViews[value];
         data.size = uniqueValues > 8 ? 8 : uniqueValues;
@@ -368,7 +368,7 @@ class SimplifiedViewRow extends Component {
     }
 
   };
-  showback = (result, value,message) => {
+  showback = (result, value, message) => {
     this.chartData = {
       ...this.chartData,
       [value]: result,
@@ -382,7 +382,7 @@ class SimplifiedViewRow extends Component {
 
   showUnivariant = async () => {
     const { value, project, isNew, data: _data, colType } = this.props;
-    const {mapHeader,target,problemType,etlIndex} = project;
+    const { mapHeader, target, problemType, etlIndex } = project;
     if (isNew) {
       const type = colType[value];
 
@@ -440,7 +440,7 @@ class SimplifiedViewRow extends Component {
               },
               [`${value}-msg`]: {
                 type,
-                x:mapHeader[value],
+                x: mapHeader[value],
               }
             };
             this.univariant = true;
@@ -458,7 +458,7 @@ class SimplifiedViewRow extends Component {
               },
               [`${value}-msg`]: {
                 type,
-                x:mapHeader[value],
+                x: mapHeader[value],
               }
             };
             this.univariant = true;
@@ -508,7 +508,7 @@ class SimplifiedViewRow extends Component {
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
-    
+
     console.log(this.scatterData)
 
     return <div className={styles.tableRow}>
@@ -532,10 +532,10 @@ class SimplifiedViewRow extends Component {
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
             getPath={histgramPlot.bind(null, value)}>
             <SimplifiedViewPlot onClose={this.hideHistograms}
-                                type={colType[value]}
-                                target={mapHeader[value]}
-                                result={this.result[value]}
-                                data={this.chartData[value]}
+              type={colType[value]}
+              target={mapHeader[value]}
+              result={this.result[value]}
+              data={this.chartData[value]}
             /></SimplePlot>} /> : null}
       </div>
       <div className={classnames(styles.tableTd, {
@@ -670,12 +670,12 @@ class CorrelationPlot extends Component {
 class SimplifiedViewPlot extends Component {
 
   render() {
-    const { type, style, data, target,result } = this.props;
+    const { type, style, data, target, result } = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={{
-        width:600,
-        height:500,
+        width: 600,
+        height: 500,
         flexDirection: 'column',
       }}>
         <HS
