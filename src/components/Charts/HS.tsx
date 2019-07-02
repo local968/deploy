@@ -7,7 +7,15 @@ import 'rc-input-number/assets/index.css';
 import 'rc-slider/assets/index.css';
 import { toJS } from 'mobx';
 
-export default class HS extends Component{
+interface DataSampleProps {
+	x_name:string
+	y_name:string
+	title:string
+	data:any
+	result:any
+}
+
+export default class HS extends Component<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);

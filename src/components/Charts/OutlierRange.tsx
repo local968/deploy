@@ -10,7 +10,15 @@ import styles from './styles.module.css';
 import request from "../Request";
 import {toJS} from "mobx";
 
-export default class OutlierRange extends PureComponent{
+interface DataSampleProps {
+	closeEdit:any
+	saveEdit:any
+	field:any
+	id:string
+	project:any
+}
+
+export default class OutlierRange extends PureComponent<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);
