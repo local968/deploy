@@ -86,7 +86,7 @@ function Main(props: MainProps) {
     routing.push("/")
     projectStore.outProject()
   }
-  if(!project || !project.init) return <ProcessLoading style={{ position: 'fixed' }} />
+  if(!project || !project.init || project.loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
 
   return <React.Fragment>
     <div className={styles.header}>

@@ -10,7 +10,15 @@ import styles from './styles.module.css';
 import request from "../Request";
 import {toJS} from "mobx";
 
-export default class OutlierRange extends PureComponent{
+interface DataSampleProps {
+	closeEdit:any
+	saveEdit:any
+	field:any
+	id:string
+	project:any
+}
+
+export default class OutlierRange extends PureComponent<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);
@@ -40,7 +48,7 @@ export default class OutlierRange extends PureComponent{
 
 		let selectArea = [+low,+high];
 		const zoom=0.1*(max-min);
-		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
+		const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 15);
 		const interval = ((max-min)/bin).toFixed(2);
 		const chart = this.chart.getEchartsInstance();
 

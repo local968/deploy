@@ -132,7 +132,7 @@ export interface TrainCommand {
   featuresPreprocessor?: string[],
   validationRate?: number,
   nfold?: number,
-  showSsPlot?:boolean
+  showSsPlot?: boolean
 }
 
 export interface DataView {
@@ -160,7 +160,7 @@ class Project {
   rawHistgramPlotsBase64: StringObject
 
   @observable colMap: StringObject = {};
-  @observable stats: Stats;
+  // @observable stats: Stats;
   @observable userId: string = '';
   @observable models: Model[] = [];
   @observable trainModel: unknown = {};
@@ -1143,10 +1143,10 @@ class Project {
 
   @computed
   get variableIssueCount() {
-    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType } = this
-    const nullCount = Object.values(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).reduce((sum, v) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
+    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType, dataHeader } = this
+    const nullCount = Object.entries(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
 
     return { nullCount, mismatchCount, outlierCount }
   }
