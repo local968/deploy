@@ -320,7 +320,7 @@ export default class DataSchema extends Component {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || (newDataHeader.length < 1)} text={EN.Continue} />
+        <ContinueButton onClick={this.doEtl} disabled={etling || (newDataHeader.length < 1) || isMissed || isDuplicated} text={EN.Continue} />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />
