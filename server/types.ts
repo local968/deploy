@@ -71,10 +71,9 @@ export class Project {
   noCompute?: boolean = false;
   validationRate?: number = 20;
   holdoutRate?: number = 20;
-  uploadFileName?: unknown[] = [];
   fileName?: string = '';
   // cleanData?: unknown =  []
-  originPath?: string = '';
+  // originPath?: string = '';
 
   etlCleanDataLoading?: boolean = false;
   cleanPath?: string = '';

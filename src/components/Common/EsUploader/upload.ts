@@ -45,7 +45,6 @@ export default function EsUploader(file, option:any = {}) {
       chunkPromiseResolve()
     },
     complete: async () => {
-      console.log('complete')
       chunkPromiseResolve()
       hasNextChunk = false
     }
@@ -120,7 +119,8 @@ export default function EsUploader(file, option:any = {}) {
   }
 
   const getNextChunk = async () => {
-    const _header = header.map( (k, i) => i )
+    const _header = header.filter(key => key !== '__no').map( (k, i) => option.mapHeader ? option.mapHeader.indexOf(k) : i)
+    console.log(_header, option.mapHeader, header)
     _header.unshift('__no')
     chunk.unshift(_header)
     const csvChunk = papa.unparse(chunk)

@@ -98,25 +98,6 @@ function query(key, params) {
     return Promise.all(promiseArray).then(array => {
       return Promise.all(
         array.map(item => {
-          // Object.keys(item).forEach(key => {
-          //   try {
-          //     item[key] = JSON.parse(item[key]);
-          //   } catch (e) { }
-          // });
-          // if (item.uploadFileName) {
-          //   return getFileInfo(item.uploadFileName).then(files => {
-          //     item.fileNames = files.fileNames;
-          //     return item;
-          //   });
-          // }
-          // return Promise.resolve(item);
-
-
-          // for (let key in item) {
-          //   try {
-          //     result[key] = JSON.parse(result[key])
-          //   } catch (e) { }
-          // }
           const obj = {}
           item.forEach((v, k) => {
             try {
@@ -124,14 +105,7 @@ function query(key, params) {
             } catch (e) { }
             obj[Field[k]] = v
           })
-          // if (obj.uploadFileName) {
-          //   return getFileInfo(obj.uploadFileName).then(files => {
-          //     obj.fileNames = files.fileNames
-          //     return obj
-          //   })
-          // }
           return Promise.resolve(obj)
-          // return Promise.resolve({})
         }),
       ).then(list => {
         result.list = list;
@@ -595,11 +569,13 @@ async function checkEtl(projectId, userId) {
 
 function getProject(projectId) {
   return redis.hgetall('project:' + projectId).then(p => {
+
     Object.keys(p).forEach(key => {
       try {
         p[key] = JSON.parse(p[key]);
       } catch (e) { }
     });
+
     return {
       status: 200,
       message: 'ok',
@@ -757,133 +733,133 @@ wss.register('queryModelList', (message, socket, process) => {
   });
 });
 
-wss.register('etl', (message, socket, progress) => {
-  const { userId } = socket.session;
-  const {
-    firstEtl,
-    noCompute,
-    saveIssue,
-    projectId: id,
-    csvLocation: files,
-    _id: requestId,
-  } = message;
+// wss.register('etl', (message, socket, progress) => {
+//   const { userId } = socket.session;
+//   const {
+//     firstEtl,
+//     noCompute,
+//     saveIssue,
+//     projectId: id,
+//     csvLocation: files,
+//     _id: requestId,
+//   } = message;
 
-  return setDefaultData(id, userId).then(setResult => {
-    if (setResult.status !== 200) return setResult;
-    return getFileInfo(files).then(fileInfo => {
-      if (fileInfo.status !== 200) return fileInfo;
-      const { csvLocation, ext } = fileInfo;
-      const data = {
-        ...message,
-        userId: userId,
-        requestId,
-        csvLocation,
-        ext,
-        noCompute: firstEtl || noCompute,
-        stopId: requestId,
-      };
-      // delete data.firstEtl
-      Reflect.deleteProperty(data, 'firstEtl');
-      Reflect.deleteProperty(data, 'saveIssue');
-      if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation');
-      if (!ext) Reflect.deleteProperty(data, 'ext');
-      return createOrUpdate(id, userId, {
-        etling: true,
-        stopId: requestId,
-      }).then(() =>
-        command(data, processData => {
-          let { result, status } = processData;
-          if (status < 0 || status === 100) return processData;
-          const { name, path, key, originHeader, value, fields } = result;
-          if (name === 'progress' && key === 'etl')
-            return createOrUpdate(id, userId, { etlProgress: value });
-          if (name === 'csvHeader')
-            return createOrUpdate(id, userId, {
-              originPath: path,
-              rawHeader: originHeader,
-              dataHeader: fields,
-            });
-          if (name === 'cleanCsvHeader')
-            return createOrUpdate(id, userId, { cleanPath: path });
-          return null;
-        }).then((returnValue: any) => {
-          let { result, status } = returnValue;
-          if (status < 0) {
-            return createOrUpdate(id, userId, {
-              etlProgress: 0,
-              etling: false,
-            }).then(() => {
-              return {
-                status: 418,
-                result,
-                message: returnValue.message,
-              };
-            });
-          }
+//   return setDefaultData(id, userId).then(setResult => {
+//     if (setResult.status !== 200) return setResult;
+//     return getFileInfo(files).then(fileInfo => {
+//       if (fileInfo.status !== 200) return fileInfo;
+//       const { csvLocation, ext } = fileInfo;
+//       const data = {
+//         ...message,
+//         userId: userId,
+//         requestId,
+//         csvLocation,
+//         ext,
+//         noCompute: firstEtl || noCompute,
+//         stopId: requestId,
+//       };
+//       // delete data.firstEtl
+//       Reflect.deleteProperty(data, 'firstEtl');
+//       Reflect.deleteProperty(data, 'saveIssue');
+//       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation');
+//       if (!ext) Reflect.deleteProperty(data, 'ext');
+//       return createOrUpdate(id, userId, {
+//         etling: true,
+//         stopId: requestId,
+//       }).then(() =>
+//         command(data, processData => {
+//           let { result, status } = processData;
+//           if (status < 0 || status === 100) return processData;
+//           const { name, path, key, originHeader, value, fields } = result;
+//           if (name === 'progress' && key === 'etl')
+//             return createOrUpdate(id, userId, { etlProgress: value });
+//           if (name === 'csvHeader')
+//             return createOrUpdate(id, userId, {
+//               originPath: path,
+//               rawHeader: originHeader,
+//               dataHeader: fields,
+//             });
+//           if (name === 'cleanCsvHeader')
+//             return createOrUpdate(id, userId, { cleanPath: path });
+//           return null;
+//         }).then((returnValue: any) => {
+//           let { result, status } = returnValue;
+//           if (status < 0) {
+//             return createOrUpdate(id, userId, {
+//               etlProgress: 0,
+//               etling: false,
+//             }).then(() => {
+//               return {
+//                 status: 418,
+//                 result,
+//                 message: returnValue.message,
+//               };
+//             });
+//           }
 
-          //赋值给temp
-          result.outlierDictTemp = result.outlierDict;
-          result.nullFillMethodTemp = result.nullFillMethod;
-          result.mismatchFillMethodTemp = result.mismatchFillMethod;
-          result.outlierFillMethodTemp = result.outlierFillMethod;
+//           //赋值给temp
+//           result.outlierDictTemp = result.outlierDict;
+//           result.nullFillMethodTemp = result.nullFillMethod;
+//           result.mismatchFillMethodTemp = result.mismatchFillMethod;
+//           result.outlierFillMethodTemp = result.outlierFillMethod;
 
-          //保存原始错误
-          if (saveIssue) {
-            result.nullLineCounts = result.nullLineCounts;
-            result.mismatchLineCounts = result.mismatchLineCounts;
-            result.outlierLineCounts = result.outlierLineCounts;
-          }
+//           //保存原始错误
+//           if (saveIssue) {
+//             result.nullLineCounts = result.nullLineCounts;
+//             result.mismatchLineCounts = result.mismatchLineCounts;
+//             result.outlierLineCounts = result.outlierLineCounts;
+//           }
 
-          result.etling = false;
-          result.etlProgress = 0;
-          result.firstEtl = false;
-          result.stopId = '';
-          // delete result.name
-          // delete result.id
-          // delete result.userId
-          Reflect.deleteProperty(result, 'name');
-          Reflect.deleteProperty(result, 'id');
-          Reflect.deleteProperty(result, 'userId');
-          if (!files) Reflect.deleteProperty(result, 'totalRawLines'); //delete result.totalRawLines
-          // 最终ETL 小于1W行  使用cross
-          if (result.totalLines < 10000) result.runWith = 'cross';
-          const steps: Steps = {};
-          if (firstEtl) {
-            steps.curStep = 2;
-            steps.mainStep = 2;
-            steps.subStepActive = 2;
-            steps.lastSubStep = 2;
-          } else {
-            if (noCompute) {
-              steps.curStep = 3;
-              steps.mainStep = 3;
-              steps.subStepActive = 1;
-              steps.lastSubStep = 1;
-            } else {
-              steps.curStep = 2;
-              steps.mainStep = 2;
-              steps.subStepActive = 3;
-              steps.lastSubStep = 3;
-            }
-          }
-          //重新做ETL后删除所有模型
-          deleteModels(userId, id);
+//           result.etling = false;
+//           result.etlProgress = 0;
+//           result.firstEtl = false;
+//           result.stopId = '';
+//           // delete result.name
+//           // delete result.id
+//           // delete result.userId
+//           Reflect.deleteProperty(result, 'name');
+//           Reflect.deleteProperty(result, 'id');
+//           Reflect.deleteProperty(result, 'userId');
+//           if (!files) Reflect.deleteProperty(result, 'totalRawLines'); //delete result.totalRawLines
+//           // 最终ETL 小于1W行  使用cross
+//           if (result.totalLines < 10000) result.runWith = 'cross';
+//           const steps: Steps = {};
+//           if (firstEtl) {
+//             steps.curStep = 2;
+//             steps.mainStep = 2;
+//             steps.subStepActive = 2;
+//             steps.lastSubStep = 2;
+//           } else {
+//             if (noCompute) {
+//               steps.curStep = 3;
+//               steps.mainStep = 3;
+//               steps.subStepActive = 1;
+//               steps.lastSubStep = 1;
+//             } else {
+//               steps.curStep = 2;
+//               steps.mainStep = 2;
+//               steps.subStepActive = 3;
+//               steps.lastSubStep = 3;
+//             }
+//           }
+//           //重新做ETL后删除所有模型
+//           deleteModels(userId, id);
 
-          return createOrUpdate(id, userId, { ...result, ...steps }).then(
-            updateResult => {
-              if (updateResult.status !== 200) return updateResult;
-              return {
-                status: 200,
-                message: 'ok',
-                result: result,
-              };
-            },
-          );
-        }),
-      );
-    });
-  });
-});
+//           return createOrUpdate(id, userId, { ...result, ...steps }).then(
+//             updateResult => {
+//               if (updateResult.status !== 200) return updateResult;
+//               return {
+//                 status: 200,
+//                 message: 'ok',
+//                 result: result,
+//               };
+//             },
+//           );
+//         }),
+//       );
+//     });
+//   });
+// });
 
 wss.register('dataView', (message, socket, progress) => {
   return createOrUpdate(message.projectId, socket.session.userId, {

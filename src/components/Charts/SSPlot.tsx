@@ -4,7 +4,7 @@ import EN from "../../constant/en";
 import { Spin } from 'antd';
 import _ from 'lodash';
 
-export default function GainChart(props){
+export default function SSPlot(props){
 	const {width=600,height=400,project} = props;
 	const [ssPlot,upSsPlot] = useState(project.ssPlot);
 	let max = 1;

@@ -196,12 +196,13 @@ export default class AdvancedView extends Component {
         {problemType === "Outlier" ? null : <div className={styles.advancedRow}>
           <div className={styles.advancedBox}>
             <div className={styles.advancedBlock}>
-              <div className={`${styles.advancedTitle}`}>
+              <div className={styles.advancedTitle} id='advancedTitle'>
                 <span>{EN.SpecifytheNumberofClusterstoForm}</span>
               </div>
               <Popover
                 placement="bottomLeft"
                 trigger="click"
+                getPopupContainer={()=>document.getElementById('advancedTitle')}
                 visible={showSsPlot}
                 onVisibleChange={()=>{
                   project.showSsPlot = !showSsPlot

@@ -56,9 +56,13 @@ wss.register('originalStats', async (message, socket) => {
         },
       }
       : undefined;
-    return axios
-      .get(`${esServicePath}/etls/${index}/stats`, options)
-      .then(getData);
+    return new Bluebird((resolve, reject) => {
+      axios
+        .get(`${esServicePath}/etls/${index}/stats`, options)
+        .then(getData)
+        .then(resolve)
+        .catch(reject);
+    });
 
     function getData({ data }) {
       return data;
@@ -66,9 +70,15 @@ wss.register('originalStats', async (message, socket) => {
   }
 
   try {
-    const data = await Bluebird.all(headersChunked).then((dataList = []) =>
-      _.assign({}, ...dataList),
-    );
+    const data = await Bluebird.reduce<any, any>(
+      headersChunked,
+      (total, current) => {
+        return {
+          ...total,
+          ...current
+        }
+      },
+      {});
 
     // fs.writeFile('response.json', JSON.stringify(data), { flag: 'a' }, () => { })
 
@@ -243,7 +253,10 @@ wss.register('newEtl', async (message, socket, process) => {
 
   if (project.target) {
     stats[project.target].isTarget = true;
-    if (project.problemType === 'Classification' || project.problemType === 'Outlier') {
+    if (
+      project.problemType === 'Classification' ||
+      project.problemType === 'Outlier'
+    ) {
       let deletedValues = [];
       if (project.targetArray && project.targetArray.length > 1) {
         if (_.includes(project.targetArray, ''))

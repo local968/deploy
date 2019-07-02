@@ -131,7 +131,8 @@ export default class Performance extends Component {
       operator: (opeartor) => {
         this.uploadOperator = opeartor
       },
-      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' }
+      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy'},
+      mapHeader: cd.mapHeader
     }
 
 

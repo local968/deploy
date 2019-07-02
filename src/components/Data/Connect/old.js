@@ -166,14 +166,6 @@ export default class DataConnect extends Component {
 
   })
 
-  // doEtl = () => {
-  //   const { project } = this.props.projectStore
-  //   project.etl().then(pass => {
-  //     console.log(pass,"pass")
-  //     if (!pass) project.updateProject({ uploadFileName: [] })
-  //   });
-  // };
-
   showSample = action(() => {
     this.sample = true
   })

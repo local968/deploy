@@ -590,31 +590,31 @@ router.get('/download/:scheduleId', async (req, res) => {
   const mapHeader = JSON.parse(
     await redis.hget(`project:${deployment.projectId}`, 'mapHeader'),
   );
-  const target = JSON.parse(
-    await redis.hget(`project:${deployment.projectId}`, 'target'),
-  );
-  // console.log(schedule.result.deployData)
-  scheduleDownloadCsv(
-    schedule.result.deployData,
+    const target = JSON.parse(
+      await redis.hget(`project:${deployment.projectId}`, 'target'),
+    );
+    // console.log(schedule.result.deployData)
+    scheduleDownloadCsv(
+      schedule.result.deployData,
+      filename,
+      schedule.etlIndex,
+      header,
+      mapHeader,
+      res,
+      target,
+    );
+  });
+
+  function scheduleDownloadCsv(
+    url,
     filename,
-    schedule.etlIndex,
+    index,
     header,
     mapHeader,
     res,
     target,
-  );
-});
-
-function scheduleDownloadCsv(
-  url,
-  filename,
-  index,
-  header,
-  mapHeader,
-  res,
-  target,
-) {
-  if (target) header = [...header.filter(h => h !== target), target];
+  ) {
+  if( target && header.indexOf(target) !== -1 ) header = [...header.filter(h => h !== target), target];
   let temp = {};
   let counter = 0;
   let resultHeader;

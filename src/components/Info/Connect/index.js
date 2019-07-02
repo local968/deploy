@@ -164,14 +164,6 @@ export default class DataConnect extends Component {
 
   })
 
-  // doEtl = () => {
-  //   const { project } = this.props.projectStore
-  //   project.etl().then(pass => {
-  //     console.log(pass,"pass")
-  //     if (!pass) project.updateProject({ uploadFileName: [] })
-  //   });
-  // };
-
   showSample = action(() => {
     this.sample = true
   })
@@ -409,9 +401,10 @@ export default class DataConnect extends Component {
             }
             this.process = 50
             project.fastTrackInit({
-              originalIndex: resp.index,
+              originalIndex: resp.originalIndex,
               totalRawLines: this.sqlProgress,
-              fileName: options.sqlTable
+              fileName: options.sqlTable,
+              rawHeader: resp.rawHeader
             }).then(() => {
               this.process = 0
               this.uploading = false
