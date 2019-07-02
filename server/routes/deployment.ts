@@ -86,7 +86,7 @@ wss.register('deploySchedule', message =>
     .then(() => ({ status: 200, message: 'ok' })),
 );
 
-wss.register('suspendDeployment', (message, socket) => {});
+wss.register('suspendDeployment', (message, socket) => { });
 
 wss.register('removeDeployment', (message, socket) => {
   const pipeline = redis.pipeline();
@@ -129,9 +129,11 @@ wss.register('updateDeployment', (message, socket) => {
 wss.register('getAllModels', async message => {
   const { projectId, modelType } = message;
   const currModelIds = await redis.smembers(`project:${projectId}:models`);
-  const prevModelIds = await redis.smembers(
-    `project:${projectId}:models:previous`,
-  );
+  // delete models
+  // const prevModelIds = await redis.smembers(
+  //   `project:${projectId}:models:previous`,
+  // );
+  const prevModelIds = []
   const modelIds = [...currModelIds, ...prevModelIds];
   const pipeline = redis.pipeline();
   let resultCount = 2;

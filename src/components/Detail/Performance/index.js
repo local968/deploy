@@ -166,7 +166,7 @@ export default class Performance extends Component {
                       <Select style={{width:400}}  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
                           {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
                               <OptGroup key={settingName} label={settingName}>
-                                  {models.map(model =>  <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
+                                  {models.map(model =>  !!model ? <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option> : null
                                   )}
                               </OptGroup>)}
               </Select> : cd.modelName}</span>

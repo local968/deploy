@@ -154,7 +154,7 @@ export default class Deployment extends Component {
           <span className={styles.model}>{EN.Model}: {this.modelEditing ? <Select value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
             {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
               <OptGroup key={settingName} label={settingName}>
-                {models.map(model => <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>)}
+                {models.map(model => !!model ? <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option> : null)}
               </OptGroup>)}
           </Select> : cd.modelName}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
