@@ -30,10 +30,9 @@ wss.register('originalStats', async (message, socket) => {
   const { userId } = socket.session;
   const { index, projectId, headers } = message;
 
-  const headersLn = _.get(headers, 'length');
+  const headersLn = _.get(headers, 'length') || 0;
 
   const chunkSize = _.chain(headersLn)
-    .defaultTo(0)
     .divide(64)
     .round()
     .concat([1])
@@ -41,7 +40,7 @@ wss.register('originalStats', async (message, socket) => {
     .value();
 
   const headersChunked = _.chain(headers)
-    .chunk(chunkSize)
+    .chunk((headersLn / chunkSize) || 1)
     .reduce(
       (result, hds: string[]) => result.then(getStats(index, hds)),
       _.gte(headersLn, 1) ? Bluebird.resolve({}) : getStats(index)(),
@@ -50,10 +49,10 @@ wss.register('originalStats', async (message, socket) => {
   function getStats(index, hds?: string[]) {
     const options = Array.isArray(hds)
       ? {
-        params: {
-          headers: hds,
-        },
-      }
+          params: {
+            headers: hds,
+          },
+        }
       : undefined;
     return (data = {}) => {
       return Bluebird.resolve(
