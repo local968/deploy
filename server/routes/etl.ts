@@ -40,7 +40,9 @@ wss.register('originalStats', async (message, socket) => {
     .value();
 
   const headersChunked = _.chain(headers)
-    .chunk((headersLn / chunkSize) || 1)
+    .chunk(_.chain((headersLn / chunkSize)).round()
+    .concat([1])
+    .max().value())
     .reduce(
       (result, hds: string[]) => result.then(getStats(index, hds)),
       _.gte(headersLn, 1) ? Bluebird.resolve({}) : getStats(index)(),
