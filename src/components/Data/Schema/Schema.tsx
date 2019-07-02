@@ -372,4 +372,4 @@ class DataSchema extends Component<DataSchemaProps> {
   }
 }
 
-export default inject('projectStore')(observer(DataSchema))
+export default inject('projectStore','userStore')(observer(DataSchema))
