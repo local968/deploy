@@ -65,11 +65,11 @@ export default class SimplifiedView extends Component {
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);
     const dataHeader = toJS(project.dataHeader);
-  
+
     const fields = Object.entries(colType)
       .filter(itm => itm[1] === 'Numerical')
       .map(itm => itm[0])
-      .filter(itm => !trainHeader.includes(itm)&&dataHeader.includes(itm));
+      .filter(itm => !trainHeader.includes(itm) && dataHeader.includes(itm));
     request.post({
       url: '/graphics/correlation-matrix',
       data: {
@@ -159,9 +159,11 @@ export default class SimplifiedView extends Component {
 
   render() {
     const { project } = this.props;
-    const { problemType, mapHeader = [], standardTypeTemp, colType, targetMap, dataViews, weightsTemp, dataViewsLoading, informativesLabel, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
+    const { target, problemType, mapHeader = [], standardTypeTemp, colType, targetMap, dataViews, weightsTemp, dataViewsLoading, informativesLabel, preImportance, preImportanceLoading, histgramPlots, dataHeader, addNewVariable2, newVariable, newType, newVariableViews, id, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress } = project;
     const allVariables = [...dataHeader, ...newVariable]
     const variableType = { ...newType, ...colType }
+    const newVariableType = { ...colType }
+    if (!!target) Reflect.deleteProperty(newVariableType, target)
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
@@ -204,7 +206,7 @@ export default class SimplifiedView extends Component {
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable}
-              addNewVariable={addNewVariable2} colType={colType} expression={expression} mapHeader={newMapHeader} />
+              addNewVariable={addNewVariable2} colType={newVariableType} expression={expression} mapHeader={newMapHeader} />
           </Modal>
         </div>
         <div className={classnames(styles.toolButton, styles.toolCheck)} onClick={this.showCorrelationMatrix}>

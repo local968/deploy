@@ -262,9 +262,10 @@ class ProjectStore {
         }
       }
       socketStore.ready().then(api => {
-        api.checkProject({ id }).then((result: { status: number, data: Project }) => {
-          const { status, data } = result
+        api.checkProject({ id }).then((result: { status: number, data: Project, message: string }) => {
+          const { status, data, message } = result
           if (status !== 200) {
+            antdMessage.error(message)
             return resolve(false)
           }
           const hiddenProject = new Project(id + '', { ...data, visiable: false })

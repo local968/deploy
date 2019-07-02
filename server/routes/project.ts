@@ -118,6 +118,10 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
     ? Promise.resolve({ status: 200, message: 'ok' })
     : checkProject(userId, id);
   return promise.then(checked => {
+    if (checked.status === 444) return {
+      status: 200,
+      me4ssage: 'ok'
+    }
     if (checked.status !== 200) return checked;
     const time = moment().unix();
     data.updateTime = time;
@@ -316,6 +320,10 @@ export function deleteModels(userId, id) {
 
 function deleteProject(userId, id) {
   return checkProject(userId, id).then(err => {
+    if (err.status === 444) return {
+      status: 200,
+      me4ssage: 'ok'
+    }
     if (err.status !== 200) return err;
     const pipeline = redis.pipeline();
     pipeline.del(`project:${id}`);
@@ -351,6 +359,15 @@ function deleteProject(userId, id) {
 
 function checkProject(userId, id) {
   return redis.hgetall(`project:${id}`).then(result => {
+    if (!result) {
+      errorLogger.error({
+        userId,
+        message: `project:${id} has been deleted`,
+        pid: id,
+        time: moment().unix(),
+      });
+      return { status: 444, message: `project:${id} has been deleted` };
+    }
     Reflect.deleteProperty(result, 'stats')
     for (let key in result) {
       try {
@@ -656,6 +673,10 @@ wss.register('updateProject', (message, socket) => {
   Reflect.deleteProperty(data, 'userId');
 
   return checkProject(userId, id).then(err => {
+    if (err.status === 444) return {
+      status: 200,
+      me4ssage: 'ok'
+    }
     if (err.status !== 200) return err;
     return createOrUpdate(id, userId, data);
   });
