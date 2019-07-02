@@ -40,7 +40,7 @@ export default class OutlierRange extends PureComponent{
 
 		let selectArea = [+low,+high];
 		const zoom=0.1*(max-min);
-		const bin = Math.min(project.stats[field].originalStats.doubleUniqueValue, 15);
+		const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 15);
 		const interval = ((max-min)/bin).toFixed(2);
 		const chart = this.chart.getEchartsInstance();
 

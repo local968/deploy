@@ -160,7 +160,7 @@ class Project {
   rawHistgramPlotsBase64: StringObject
 
   @observable colMap: StringObject = {};
-  @observable stats: Stats;
+  // @observable stats: Stats;
   @observable userId: string = '';
   @observable models: Model[] = [];
   @observable trainModel: unknown = {};

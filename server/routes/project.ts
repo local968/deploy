@@ -128,6 +128,7 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
     pipeline.zadd(`user:${userId}:projects:updateTime`, time, id);
     if (isCreate) pipeline.zadd(`user:${userId}:projects:createTime`, time, id);
     return pipeline.exec().then(result => {
+      Reflect.deleteProperty(data, 'stats')
       const err = result.find(([error]) => !!error);
       const returnValue = err
         ? {
@@ -199,6 +200,7 @@ function updateModel(userId, id, mid, params) {
   return redis
     .hmset(`project:${id}:model:${mid}`, mapObjectToArray(params))
     .then(() => {
+      Reflect.deleteProperty(params, 'stats')
       const result = {
         status: 200,
         message: 'ok',
@@ -325,6 +327,7 @@ function deleteProject(userId, id) {
 
 function checkProject(userId, id) {
   return redis.hgetall(`project:${id}`).then(result => {
+    Reflect.deleteProperty(result, 'stats')
     for (let key in result) {
       try {
         result[key] = JSON.parse(result[key]);
@@ -566,7 +569,7 @@ async function checkEtl(projectId, userId) {
 
 function getProject(projectId) {
   return redis.hgetall('project:' + projectId).then(p => {
-
+    Reflect.deleteProperty(p, 'stats')
     Object.keys(p).forEach(key => {
       try {
         p[key] = JSON.parse(p[key]);
@@ -1358,6 +1361,7 @@ wss.register('train', async (message, socket, progress) => {
           ...{ holdoutChartData: holdoutChartData.chartData },
           stats,
           featureLabel: message.featureLabel,
+          target: message.targetLabel
         };
         if (message.problemType) modelData.problemType = message.problemType;
         if (message.standardType) modelData.standardType = message.standardType;

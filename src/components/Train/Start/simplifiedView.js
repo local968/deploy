@@ -275,7 +275,7 @@ class SimplifiedViewRow extends Component {
 
   showHistograms = () => {
     const { value, project, isNew } = this.props;
-    const { stats } = project;
+    const { rawDataView } = project;
     if (isNew) {
       // const newUrl = histgramPlots[value]
       this.histograms = true
@@ -291,7 +291,7 @@ class SimplifiedViewRow extends Component {
       if (project.colType[value] === "Numerical") {
         // const { min, max } = project.dataViews[value];
         // data.interval = (max - min) / 100;
-        const { max, min, std_deviation_bounds: { lower, upper } } = stats[value].originalStats;
+        const { max, min, std_deviation_bounds: { lower, upper } } = rawDataView[value];
         data.interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
         request.post({
           url: '/graphics/histogram-numerical',

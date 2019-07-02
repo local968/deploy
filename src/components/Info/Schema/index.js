@@ -194,7 +194,7 @@ export default class DataSchema extends Component {
         //   const suffix = tempIndex === 0 ? "" : '.' + tempIndex;
         //   key = header + suffix
         // }
-        const canTransforToCategorical = this.props.projectStore.project.stats[key].originalStats.doubleUniqueValue < Math.min(this.props.projectStore.project.stats[key].originalStats.count * 0.1, 1000)
+        const canTransforToCategorical = this.props.projectStore.project.rawDataView[key].doubleUniqueValue < Math.min(this.props.projectStore.project.rawDataView[key].count * 0.1, 1000)
         const colValue = this.dataType[key]
         selectData.content = <select value={colValue} onChange={this.select.bind(null, key)}>
           {!canTransforToCategorical && <option value="Raw">{EN.Categorical}(Raw)</option>}
