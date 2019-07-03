@@ -27,9 +27,9 @@ export default class Sider extends Component {
       .then(({ data }) => this.setState({ labUrl: data }))
       .catch(({ response: { data } }) => errorTip(data))
 
-    axios.get('/dashboardUrl')
-      .then(({ data }) => this.setState({ dashUrl: data }))
-      .catch(({ response: { data } }) => errorTip(data))
+    // axios.get('/dashboardUrl')
+    //   .then(({ data }) => this.setState({ dashUrl: data }))
+    //   .catch(({ response: { data } }) => errorTip(data))
   }
 
   render() {

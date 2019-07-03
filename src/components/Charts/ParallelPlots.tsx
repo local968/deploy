@@ -76,6 +76,7 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 				nameLocation:'start',
 				name,
 				nameTextStyle,
+				nameRotate:15,
 			})
 		});
 
@@ -100,14 +101,14 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 			title: {
 				text: title,
 			},
-			grid:{},
+			grid:{
+			},
 			legend: {
 				orient: 'vertical',
 				type:'scroll',
 				top: 50,
 				bottom:50,
 				right: 0,
-				// data: legendName,
 				itemGap: 20,
 				itemWidth: 50,
 				itemHeight: 3,
@@ -117,13 +118,12 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 			progressiveChunkMode:'mod',
 			parallelAxis,
 			parallel: {
-				left: '5%',
-				right: '13%',
-				bottom: '10%',
-				top: '20%',
+				left: '15%',
+				right: '15%',
+				bottom: '20%',
+				top: '10%',
 				parallelAxisDefault: {
 					type: 'value',
-					// name: 'Parallel Plot',
 					nameLocation: 'end',
 					nameGap: 20,
 					nameTextStyle: {
