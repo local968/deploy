@@ -9,7 +9,7 @@ import './echarts.config'
 import request from '../Request'
 import styles from './charts.module.css';
 import EN from "../../constant/en";
-import { Select } from 'antd';
+import {Select, Tooltip} from 'antd';
 import {inject, observer} from "mobx-react";
 const {Option} = Select;
 
@@ -276,7 +276,10 @@ export default class Iso extends PureComponent<DataSampleProps>{
 
 	      const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
-        const options = list.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{mapHeader[itm]}</Option>);
+
+        const options = list.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>
+            <Tooltip title={mapHeader[itm]}>{mapHeader[itm]}</Tooltip>
+        </Option>);
 
         return <Select
           value={show_name[order]} style={{ width: 120 }} onChange={name=>{
