@@ -993,7 +993,7 @@ class Project {
 
   @action
   endQuality = async () => {
-    if (!this.qualityHasChanged) return await Promise.resolve()
+    if (!this.qualityHasChanged) return
     this.etling = true
     await this.abortTrainByEtl()
     const data = Object.assign(this.defaultTrain, {
@@ -1010,14 +1010,14 @@ class Project {
       const min = Math.min(...Object.values(this.targetCounts))
       if (min < 3) {
         console.error("数量太小");
-        return await Promise.reject()
+        return Promise.reject()
       }
       if (min < 5) data.crossCount = min - 1
     }
     await this.updateProject(data)
     // await this.etl()
     const pass = await this.newEtl()
-    if (!pass) return
+    if (!pass) return Promise.reject()
     const step = {
       curStep: 2,
       mainStep: 2,
@@ -1025,6 +1025,7 @@ class Project {
       lastSubStep: 3
     }
     await this.updateProject(step)
+    return true
   }
 
   newEtl = async () => {

@@ -57,11 +57,7 @@ class VariableIssue extends Component<VariableIssueProps> {
   }
 
   onConfirm = () => {
-    this.props.project.endQuality().then(() => this.summary = true).catch(() => {
-
-      message.destroy();
-      message.error("error!!")
-    })
+    this.props.project.endQuality().then(() => this.summary = true).catch(() => { })
     this.onClose()
   }
 
