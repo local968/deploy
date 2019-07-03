@@ -2140,18 +2140,19 @@ class Project {
     if (this.problemType !== 'Clustering') return Promise.resolve()
 
     const allLabel = [...this.dataHeader, ...this.newVariable].filter(v => v !== this.target)
-    const before = allLabel.reduce((prev, la) => {
-      prev[la] = this.weights[la] || 1
-      return prev
-    }, {} as NumberObject)
-    const after = allLabel.reduce((prev, la) => {
-      prev[la] = this.weightsTemp[la] || 1
-      return prev
-    }, {} as NumberObject)
+    //移除, 现由views判断
+    // const before = allLabel.reduce((prev, la) => {
+    //   prev[la] = this.weights[la] || 1
+    //   return prev
+    // }, {} as NumberObject)
+    // const after = allLabel.reduce((prev, la) => {
+    //   prev[la] = this.weightsTemp[la] || 1
+    //   return prev
+    // }, {} as NumberObject)
 
-    const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+    // const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
 
-    if (!isChange) return Promise.resolve()
+    // if (!isChange) return Promise.resolve()
 
     return socketStore.ready().then(api => {
       let cmd = 'clustering.preTrainImportance'
