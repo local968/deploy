@@ -213,9 +213,6 @@ class Project {
   // cleanData: unknown =  []
   // @observable originPath: string = '';
 
-  etlCleanDataLoading: boolean = false;
-  @observable cleanPath: string = '';
-
   @observable noComputeTemp: boolean = false;
   @observable originalIndex: string = '';
   @observable etlIndex: string = '';
@@ -262,8 +259,6 @@ class Project {
   @observable train2Finished: boolean = false;
   @observable train2ing: boolean = false;
   @observable train2Error: boolean = false;
-
-  @observable trainingId: string = '';
   // 不需要参加训练的label
   @observable trainHeader: string[] = [];
   @observable customHeader: string[] = [];
@@ -281,11 +276,6 @@ class Project {
   // Advanced Modeling Setting
   @observable settingId: string = '';
   @observable settings: Settings[] = [];
-
-  // correlation
-  @observable correlationMatrixHeader: unknown;
-  @observable correlationMatrixData: unknown;
-  @observable correlationMatrixLoading: boolean = false;
 
   // 训练速度和过拟合
   @observable speedVSaccuracy: number = 5;
@@ -346,12 +336,6 @@ class Project {
     this.id = id;
     this.visiable = true;
     this.setProperty(args)
-    // autorun(() => {
-    //   if (!this.cleanPath) return this.cleanData = []
-    //   this.readData(this.cleanPath).then(data => {
-    //     this.cleanData = data
-    //   })
-    // })
   }
 
   readData = (path: string) => {
@@ -434,7 +418,6 @@ class Project {
       targetArrayTemp: [],
       outlierDictTemp: {},
       otherMap: {},
-      cleanPath: ''
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -445,7 +428,6 @@ class Project {
       targetArrayTemp: string[],
       outlierDictTemp: unknown,
       otherMap: StringObject,
-      cleanPath: string
     }
   }
 
@@ -1267,9 +1249,6 @@ class Project {
   //         trainHeader,
   //         expression,
   //         newType,
-  //         correlationMatrixData: null,
-  //         correlationMatrixHeader: null,
-  //         cleanPath: ''
   //       })
   //       return true
   //     })
@@ -1312,9 +1291,6 @@ class Project {
           trainHeader,
           expression,
           newType,
-          correlationMatrixData: null,
-          correlationMatrixHeader: null,
-          cleanPath: ''
         }).then(() => true)
       })
     })
@@ -1968,7 +1944,6 @@ class Project {
     this.isAbort = false
     // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData })).then(returnValue => {
-      this.trainingId = ''
       const { status, message } = returnValue
       if (status !== 200) {
         antdMessage.error(message)
@@ -2198,26 +2173,6 @@ class Project {
     })
   }
 
-  /**------------------------------------------------chart---------------------------------------------------------*/
-  correlationMatrix = () => {
-    if (this.correlationMatrixLoading) return Promise.resolve()
-    this.correlationMatrixLoading = true
-    return socketStore.ready().then(api => {
-      const command = {
-        projectId: this.id,
-        command: 'correlationMatrix',
-        featureLabel: this.dataHeader.filter(n => n !== this.target)
-      };
-      return api.correlationMatrix(command).then((returnValue: BaseResponse) => {
-        const { status, result } = returnValue
-        this.correlationMatrixLoading = false
-        if (status < 0) return antdMessage.error(result['processError'])
-        this.correlationMatrixHeader = result.header;
-        this.correlationMatrixData = result.data;
-      })
-    })
-  }
-
   univariatePlot = (field: string) => {
     if (!field) return
     if (field === this.target) return
@@ -2321,20 +2276,6 @@ class Project {
         antdMessage.error("fetch sample error")
         return []
       })
-  }
-
-  etlCleanData = () => {
-    const { dataHeader, newVariable } = this
-    const fields = [...dataHeader, ...newVariable]
-    return socketStore.ready().then(api => {
-      const command = {
-        feature_label: fields,
-        command: 'etlCleanData',
-        projectId: this.id
-      }
-      this.etlCleanDataLoading = true
-      return api.etlCleanData(command)
-    })
   }
 
   allPlots = async (changeReportProgress: (str: string, num: number) => boolean) => {

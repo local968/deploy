@@ -75,9 +75,6 @@ export class Project {
   // cleanData?: unknown =  []
   // originPath?: string = '';
 
-  etlCleanDataLoading?: boolean = false;
-  cleanPath?: string = '';
-
   noComputeTemp?: boolean = false;
   originalIndex?: string = '';
   etlIndex?: string = '';
@@ -126,8 +123,6 @@ export class Project {
   train2Finished?: boolean = false;
   train2ing?: boolean = false;
   train2Error?: boolean = false;
-
-  trainingId?: string = '';
   // 不需要参加训练的label
   trainHeader?: unknown[] = [];
   customHeader?: unknown[] = [];
@@ -145,11 +140,6 @@ export class Project {
   // Advanced Modeling Setting
   settingId?: string = '';
   settings?: unknown[] = [];
-
-  // correlation
-  correlationMatrixHeader?: unknown;
-  correlationMatrixData?: unknown;
-  correlationMatrixLoading?: boolean = false;
 
   // 训练速度和过拟合
   speedVSaccuracy?: unknown = 5;

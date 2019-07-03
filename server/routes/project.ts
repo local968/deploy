@@ -60,21 +60,6 @@ function parseChartData(result) {
   return getChartData(result);
 }
 
-function setDefaultData(id, userId) {
-  const data = {
-    correlationMatrixHeader: null,
-    correlationMatrixData: null,
-    univariatePlots: {},
-    histgramPlots: {},
-    preImportance: null,
-    dataViews: null,
-    informativesLabel: [],
-    settings: [],
-    settingId: '',
-  };
-  return createOrUpdate(id, userId, data);
-}
-
 function query(key, params) {
   const pipeline = redis.pipeline();
   pipeline.zcard(key);
@@ -952,29 +937,6 @@ wss.register('dataView', (message, socket, progress) => {
   // sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
 });
 
-wss.register('correlationMatrix', (message, socket, progress) =>
-  createOrUpdate(message.projectId, socket.session.userId, {
-    correlationMatrixLoading: true,
-  }).then(() =>
-    sendToCommand(
-      { ...message, userId: socket.session.userId, requestId: message._id },
-      progress,
-    ).then((returnValue: any) => {
-      const { status, result } = returnValue;
-      const data =
-        status === 100
-          ? {
-            correlationMatrixHeader: result.header,
-            correlationMatrixData: result.data,
-            correlationMatrixLoading: false,
-          }
-          : { correlationMatrixLoading: false };
-      createOrUpdate(message.projectId, socket.session.userId, data);
-      return returnValue;
-    }),
-  ),
-);
-
 wss.register('preTrainImportance', async (message, socket, progress) => {
   const { userId } = socket.session;
   const { projectId } = message;
@@ -1169,30 +1131,6 @@ wss.register('createNewVariable', async (message, socket, progress) => {
     await createOrUpdate(projectId, userId, { newVariablePath: resultData });
   }
   return returnValue;
-});
-
-wss.register('etlCleanData', (message, socket, progress) => {
-  const { projectId } = message;
-  const { userId } = socket.session;
-  return createOrUpdate(projectId, userId, { etlCleanDataLoading: true }).then(
-    () => {
-      return sendToCommand(
-        { ...message, userId, requestId: message._id },
-        progress,
-      ).then((returnValue: any) => {
-        const { result, status } = returnValue;
-        const saveData = {
-          etlCleanDataLoading: false,
-          cleanPath: undefined,
-        };
-        if (status === 100) {
-          const cleanPath = ((result || {}).result || {}).path || '';
-          if (cleanPath) saveData.cleanPath = cleanPath;
-        }
-        return createOrUpdate(projectId, userId, saveData);
-      });
-    },
-  );
 });
 
 wss.register('abortTrain', (message, socket) => {
