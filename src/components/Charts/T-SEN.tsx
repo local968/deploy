@@ -7,10 +7,10 @@ const {isEN} = config;
 interface DataSampleProps {
 	x_name : string
 	y_name : string
-	width : number
-	height :number
+	width?: number
+	height?:number
 	data : any
-	title : string
+	title?: string
 }
 
 export default class TSEN extends PureComponent<DataSampleProps>{

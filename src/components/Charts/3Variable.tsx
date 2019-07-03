@@ -2,18 +2,49 @@ import React,{PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import 'echarts-gl'
 import EN from "../../constant/en";
+import _ from 'lodash';
 
-export default class ThreeVariable extends PureComponent{
+const color = [
+	"#80bdfd",
+	"#b0e39b",
+	"#fec571",
+	"#5bdcef",
+	"#ff9595",
+	"#a89fec",
+	"#52b4ee",
+	"#ddf07a",
+	"#ed85a5",
+	"#828de5",
+	"#afe39b",
+	"#fc8b89",
+	"#ffe169",
+	"#82ddc1",
+	"#ffb287",
+	"#de80b9"
+];
+
+interface Interface {
+	x_name:string
+	y_name:string
+	z_name:string
+	data:any
+}
+
+export default class ThreeVariable extends PureComponent<Interface>{
+	private chart: React.RefObject<any>;
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
 	}
-	
+
 	getOption() {
 		const symbolSize = 5;
 		const {x_name='',y_name='',z_name='',data=[]} = this.props;
-		
-		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
+
+		const series = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
+			if(!color[ind]){
+				color.push('#'+Math.random().toString(16).substring(2,8))
+			}
 			return {
 				name:itm.name,
 				type: 'scatter3D',
@@ -21,16 +52,30 @@ export default class ThreeVariable extends PureComponent{
 				data:itm.value,
 				emphasis:{
 					label:{
-						show:false
+						show:false,
 					}
-				}
+				},
+				itemStyle:{
+					color:color[ind]
+				},
 			}
 		});
-		
-		series.forEach(({data,name})=>{
-			const mean = _.unzip(data).map(itm=>_.mean(itm));
+
+		series.push({
+			name:EN._Average,
+			type: 'scatter3D',
+			symbol:'triangle',
+			itemStyle:{
+				borderWidth:1,
+				borderColor:'#000',
+				color:'#1c2b3b'
+			},
+		});
+
+		series.forEach((itm,ind)=>{
+			const mean = _.unzip(itm.data).map(itm=>_.mean(itm));
 			series.push({
-				name:name + EN.NewAverage,
+				name:EN._Average,
 				symbolSize:1.5*symbolSize,
 				type: 'scatter3D',
 				data:[mean],
@@ -39,13 +84,20 @@ export default class ThreeVariable extends PureComponent{
 					label:{
 						show:false
 					}
-				}
+				},
+				itemStyle:{
+					borderWidth:0.1,
+					borderColor:'#000',
+					color:color[ind]
+				},
 			})
-		})
-		
+		});
+
+
+
 		return {
 			tooltip: {
-				formatter: function (params, ticket, callback) {
+				formatter: function (params) {
 					const {seriesName,value,marker} = params;
 					return `
 						${marker}${seriesName}<br/>
@@ -88,7 +140,7 @@ export default class ThreeVariable extends PureComponent{
 			series,
 		};
 	}
-	
+
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}

@@ -1,6 +1,3 @@
-// import React from "react";
-// import { Typography } from "@material-ui/core";
-
 const ZH_LAN = {
   Loading: '加载中…',
   Reconnecting: '重新连接...',
@@ -781,6 +778,7 @@ const ZH_LAN = {
   Average: '',
   PointNumber: '组编号',
   NewAverage: '的平均值',
+  _Average: '平均值',
   RawData: '原始数据',
   GroupNumber: '组数：',
   PredictedAverage: '预测值（均值）：',

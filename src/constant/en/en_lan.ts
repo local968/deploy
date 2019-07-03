@@ -935,6 +935,7 @@ const EN_LAN = {
   Average: 'Average',
   PointNumber: 'Group ID',
   NewAverage: '',
+  _Average: 'Average',
   RawData: 'Raw Data',
   GroupNumber: 'Group Number:',
   PredictedAverage: 'Predicted Average:',
