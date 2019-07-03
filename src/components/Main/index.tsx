@@ -26,57 +26,58 @@ function Main(props: MainProps) {
   const { userStore, projectStore, routing, match } = props
   const { project, conflict, notExit } = projectStore;
 
-  React.useEffect(() => {
-    const { pid = null } = match.params || {};
-    let step = -1
-    let _autorun: any = null
-    when(
-      () => project,
-      () => projectStore.inProject(pid)
-    )
-    when(
-      () => userStore.status === "login",
-      () => projectStore.initProject(pid).then((init: boolean) => {
-        if (!init) {
-          message.error("Sorry but you don't have the authority for entering this project.")
+  const { pid = null } = match.params || {};
+  let step = -1
+  let _autorun: any = null
+  when(
+    () => userStore.status === "login",
+    () => projectStore.initProject(pid).then((init: boolean) => {
+      if (!init) {
+        message.error("Sorry but you don't have the authority for entering this project.")
+        routing.push("/")
+      }
+      _autorun = autorun(() => {
+        if (!project) return
+        const { curStep = 0, id = '', problemType = '' } = project || {};
+        if (curStep === step) return
+        step = curStep
+        const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType)
+        let url = ''
+        switch (curStep) {
+          case 1:
+            url = `/project/${id}/problem`
+            break
+          case 2:
+            url = `/project/${id}/${isUnsupervised ? 'info' : 'data'}`
+            break
+          case 3:
+            url = `/project/${id}/${isUnsupervised ? 'train' : 'modeling'}`
+            break
+          case 0:
+            url = `/project/${id}/project`
+            break
+          default:
+        }
+        if (!url) routing.push('/')
+        if (!routing.location.pathname.startsWith(`/project/${id}`)) return
+        if (routing.location.pathname.includes(url)) return
+        return routing.push(url)
+      })
+      when(
+        () => project,
+        () => projectStore.inProject(pid)
+      )
+      when(
+        () => project && !project.exist,
+        () => {
+          message.warn("project not exist")
           routing.push("/")
         }
-        _autorun = autorun(() => {
-          if (!project) return
-          const { curStep = 0, id = '', problemType = '' } = project || {};
-          if (curStep === step) return
-          step = curStep
-          const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType)
-          let url = ''
-          switch (curStep) {
-            case 1:
-              url = `/project/${id}/problem`
-              break
-            case 2:
-              url = `/project/${id}/${isUnsupervised ? 'info' : 'data'}`
-              break
-            case 3:
-              url = `/project/${id}/${isUnsupervised ? 'train' : 'modeling'}`
-              break
-            case 0:
-              url = `/project/${id}/project`
-              break
-            default:
-          }
-          if (!url) routing.push('/')
-          if (!routing.location.pathname.startsWith(`/project/${id}`)) return
-          if (routing.location.pathname.includes(url)) return
-          return routing.push(url)
-        })
-        when(
-          () => project && !project.exist,
-          () => {
-            message.warn("project not exist")
-            routing.push("/")
-          }
-        )
-      })
-    )
+      )
+    })
+  )
+
+  React.useEffect(() => {
     return () => {
       _autorun && _autorun()
     }
@@ -86,7 +87,7 @@ function Main(props: MainProps) {
     routing.push("/")
     projectStore.outProject()
   }
-  if(!project || !project.init || project.loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
+  if (!project || !project.init || project.loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
 
   return <React.Fragment>
     <div className={styles.header}>

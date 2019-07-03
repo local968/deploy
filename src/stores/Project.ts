@@ -956,7 +956,8 @@ class Project {
         if (min < 5) data.crossCount = min - 1
       }
       await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data))
-      await this.newEtl()
+      const pass = await this.newEtl()
+      if (!pass) return
       await this.updateProject({
         curStep: 3,
         mainStep: 3,
@@ -1003,10 +1004,6 @@ class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp),
-      curStep: 2,
-      mainStep: 2,
-      subStepActive: 3,
-      lastSubStep: 3
     })
 
     if (this.problemType === 'Classification') {
@@ -1019,17 +1016,26 @@ class Project {
     }
     await this.updateProject(data)
     // await this.etl()
-    await this.newEtl()
-    this.etling = false
+    const pass = await this.newEtl()
+    if (!pass) return
+    const step = {
+      curStep: 2,
+      mainStep: 2,
+      subStepActive: 3,
+      lastSubStep: 3
+    }
+    await this.updateProject(step)
   }
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
+    const { status, message } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
       this.etlProgress = progress
     })
     this.etlProgress = 0
     this.etling = false
+    if (status !== 200) antdMessage.error(message)
+    return status === 200
   }
 
   hasChanged = (before: Object, after: Object): boolean => {
@@ -2034,7 +2040,9 @@ class Project {
     this.updateProject({ selectId: id })
   }
 
-  initModels = () => {
+  initModels = (force = false) => {
+    if(this.loadModel) return
+    if(!force && !!this.models.length) return
     this.loadModel = true
     let show = true
     let count = 0
