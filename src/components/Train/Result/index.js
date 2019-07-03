@@ -363,8 +363,10 @@ const OutlierRow = observer((props) => {
 
 const ClusteringTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, measurement } = project
   const hasTarget = models.some(m => !!m.target.length)
+  const measurementLabel = (measurement === 'CH' && 'CH Index') || (measurement === 'silhouette_euclidean' && EN.SihouetteScore) || 'CVNN'
+  const measurementHint = (measurement === 'CH' && EN.CHIndexHint) || (measurement === 'silhouette_euclidean' && EN.SihouetteScoreHint) || EN.CVNNHint
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
     const fn = (a, b) => {
@@ -406,23 +408,26 @@ const ClusteringTable = observer((props) => {
           <span>{EN.ModelName}</span>
           <span>{sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cvnn')}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
+          <span style={{ overflow: 'visible' }}><Hint content={measurementHint} /></span>
+          <Tooltip title={measurementLabel}>{measurementLabel}</Tooltip>
+          <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
+        </div>
+        {/* <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cvnn')}>
           <span style={{ overflow: 'visible' }}><Hint content={EN.CVNNHint} /></span>
           <span className={classes.ccellHeaderSpan}>CVNN</span>
           <span>{sort.key === 'cvnn' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
+        </div> */}
+        {/* <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('sihouette')}>
           <span style={{ overflow: 'visible' }}><Hint content={EN.SihouetteScoreHint} /></span>
           <Tooltip title={EN.SihouetteScore}>{EN.SihouetteScore}</Tooltip>
-          {/*<span className={classes.ccellHeaderSpan}>{EN.SihouetteScore} </span>*/}
           <span>{sort.key === 'sihouette' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
-        </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
+        </div> */}
+        {/* <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
           <span style={{ overflow: 'visible' }}><Hint content={EN.CHIndexHint} /></span>
           <Tooltip title={'CH Index '}>CH Index</Tooltip>
-          {/*<span className={classes.ccellHeaderSpan}>CH Index </span>*/}
           <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
-        </div>
+        </div> */}
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('rsquared')}>
           <span style={{ overflow: 'visible' }}><Hint content={EN.squaredHint} /></span>
           <Tooltip title={'R square'}>R square</Tooltip>
@@ -533,14 +538,17 @@ const ClusteringRow = observer((props) => {
           {/*<span>{formatNumber(model.modelName)}</span>*/}
         </div>
         <div className={`${classes.ccell}`}>
+          <span>{formatNumber(model.score[project.measurement])}</span>
+        </div>
+        {/* <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.CVNN)}</span>
-        </div>
-        <div className={`${classes.ccell}`}>
+        </div> */}
+        {/* <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.silhouette_euclidean)}</span>
-        </div>
-        <div className={`${classes.ccell}`}>
+        </div> */}
+        {/* <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.CH)}</span>
-        </div>
+        </div> */}
         <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.RSquared)}</span>
         </div>
