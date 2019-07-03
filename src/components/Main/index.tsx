@@ -64,10 +64,6 @@ function Main(props: MainProps) {
         return routing.push(url)
       })
       when(
-        () => project,
-        () => projectStore.inProject(pid)
-      )
-      when(
         () => project && !project.exist,
         () => {
           message.warn("project not exist")

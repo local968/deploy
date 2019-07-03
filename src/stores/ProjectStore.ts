@@ -246,8 +246,7 @@ class ProjectStore {
 
   @action
   initProject = (id: string) => {
-    if(this.projectInit) return Promise.resolve(true)
-    console.log(this.projectInit, 'initProject')
+    if (this.projectInit) return Promise.resolve(true)
     this.projectInit = true
     return new Promise(resolve => {
       when(
@@ -262,6 +261,7 @@ class ProjectStore {
               project.initProject()
               project.initModels()
               this.currentId = id
+              this.inProject(id)
               // this.projectInit = false
               return resolve(true)
             }
@@ -278,6 +278,7 @@ class ProjectStore {
               hiddenProject.initProject()
               hiddenProject.initModels()
               this.currentId = id
+              this.inProject(id)
               // this.projectInit = false
               resolve(true)
             })
