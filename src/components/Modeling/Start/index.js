@@ -31,7 +31,7 @@ export default class StartTrain extends Component {
       id,
       models: []
     })
-    project.settingId = setting
+    project.settingId = id
     project.fastTrain();
   };
 
