@@ -381,13 +381,13 @@ const ClusteringTable = observer((props) => {
         // if (!!target) {
         //   return (a.realLabelScore.adjust_rand_score - b.realLabelScore.adjust_rand_score) * value
         // }
-        case "cvnn":
+        case "CVNN":
           return (a.score.CVNN - b.score.CVNN) * value
         case "rsquared":
           return (a.score.RSquared - b.score.RSquared) * value
-        case "ch":
+        case "CH":
           return (a.score.CH - b.score.CH) * value
-        case "sihouette":
+        case "silhouette_euclidean":
           return (a.score.silhouette_euclidean - b.score.silhouette_euclidean) * value
         case "cluster":
           return (Object.keys(a.labelWithImportance).length - Object.keys(b.labelWithImportance).length) * value
@@ -408,10 +408,10 @@ const ClusteringTable = observer((props) => {
           <span>{EN.ModelName}</span>
           <span>{sort.key === 'name' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
-        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('ch')}>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort(measurement)}>
           <span style={{ overflow: 'visible' }}><Hint content={measurementHint} /></span>
           <Tooltip title={measurementLabel}>{measurementLabel}</Tooltip>
-          <span>{sort.key === 'ch' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
+          <span>{sort.key === measurement ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />} </span>
         </div>
         {/* <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cvnn')}>
           <span style={{ overflow: 'visible' }}><Hint content={EN.CVNNHint} /></span>
