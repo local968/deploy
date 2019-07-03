@@ -23,7 +23,7 @@ export default class StartTrain extends Component {
   fastTrain = () => {
     const { project } = this.props.projectStore
     const setting = project.newSetting()
-    const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
+    const name = `auto.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
     const id = uuid.v4()
     project.settings.push({
       setting,
