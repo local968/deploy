@@ -1158,6 +1158,7 @@ const ZH_LAN = {
   ClusteringTarget: "若您的数据里包含“目标变量”列，请在这里进行选择，我们将对聚类分析的效果进行验证；若不包含，请留空。",
   OutlierTarget: "若您的数据里包含“目标变量”列，请在这里进行选择，我们将对异常值检测的效果进行验证；若不包含，请留空。",
   residual:"残差值",
+  settingNameRequired: '设置名称不能为空'
 };
 
 export default ZH_LAN;
