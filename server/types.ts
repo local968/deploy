@@ -1,18 +1,63 @@
-export interface Numerical {
+
+export interface Metric {
+  name: string,
+  type: 'Categorical' | 'Numerical' | 'Raw',
+  isTarget?: boolean,
+  originalStats: Stats,
+  etlStats?: Stats,
+  mismatchFillMethod?: FillMethod,
+  missingValueFillMethod?: FillMethod,
+  outlierFillMethod?: FillMethod,
+  mapFillMethod?: { [value: string]: FillMethod },
+  categoricalMap?: { key: string, doc_count: number }[]
+  originalCategoricalMap?: { key: string, doc_count: number }[]
+}
+
+export interface FillMethod {
+  type: 'delete' | 'replace',
+  value?: string
+}
+
+export interface Stats {
+  took: number,
+  count?: number;
+  min?: number;
+  max?: number;
+  avg?: number;
+  sum?: number;
+  sum_of_squares?: number;
+  variance?: number;
+  std_deviation?: number;
+  std_deviation_bounds?: StdDeviationBounds;
+  median?: number;
+  uniqueValues: number;
+  doubleUniqueValue?: number;
+  doubleCount?: number;
+  keywordCount?: number;
+  mode: string;
+  modeCount: number;
+  mean?: number;
+  kurtosis?: number;
+  skewness?: number;
+  high?: number;
+  low?: number;
+  numerical?: Numerical;
+  categorical?: Categorical;
+}
+
+export interface Categorical {
   missingValue?: number;
+}
+
+export interface Numerical {
   mismatch?: number;
+  missingValue?: number;
   outlierCount?: number;
 }
 
-export interface OriginalStats {
-  std_deviation?: unknown;
-  numerical?: Numerical;
-}
-export interface Metric {
-  originalStats?: OriginalStats;
-  type?;
-  originalCategoricalMap?;
-  categoricalMap?;
+export interface StdDeviationBounds {
+  upper: number;
+  lower: number;
 }
 
 export interface BaseResponse {
@@ -22,7 +67,7 @@ export interface BaseResponse {
 
 export class Project {
   colMap?: unknown = {};
-  stats?: OriginalStats = {};
+  stats?: Stats;
   userId?: string = '';
   models?: unknown[] = [];
   trainModel?: unknown = {};

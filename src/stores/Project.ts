@@ -12,31 +12,6 @@ import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
 
-export interface Numerical {
-  missingValue?: number;
-  mismatch?: number;
-  outlierCount?: number;
-}
-
-export interface Metric {
-  name: string,
-  type: 'Categorical' | 'Numerical' | 'Raw',
-  isTarget?: boolean,
-  originalStats: Stats,
-  etlStats?: Stats,
-  mismatchFillMethod?: FillMethod,
-  missingValueFillMethod?: FillMethod,
-  outlierFillMethod?: FillMethod,
-  mapFillMethod?: { [value: string]: FillMethod },
-  categoricalMap?: { key: string, doc_count: number }[]
-  originalCategoricalMap?: { key: string, doc_count: number }[]
-}
-
-export interface FillMethod {
-  type: 'delete' | 'replace',
-  value?: string
-}
-
 export interface Stats {
   took: number,
   count?: number;

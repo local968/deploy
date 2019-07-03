@@ -56,10 +56,10 @@ wss.register('originalStats', async (message, socket) => {
   function getStats(index, hds?: string[]) {
     const options = Array.isArray(hds)
       ? {
-          params: {
-            headers: hds,
-          },
-        }
+        params: {
+          headers: hds,
+        },
+      }
       : undefined;
     return (data = {}) => {
       return Bluebird.resolve(
@@ -94,11 +94,11 @@ wss.register('originalStats', async (message, socket) => {
 
     _.chain(data)
       .entries()
-      .forEach(([key, metric = {}]: [string, Metric]) => {
+      .forEach(([key, metric]: [string, Metric]) => {
         const {
-          originalStats = {},
+          originalStats,
           type,
-          originalCategoricalMap = {},
+          originalCategoricalMap,
         } = metric;
         const stats = originalStats;
         colType[key] = type;
@@ -339,7 +339,8 @@ wss.register('newEtl', async (message, socket, process) => {
         const dataViews = {};
         Object.entries(data).forEach(([key, metric]: [string, Metric]) => {
           const stats = metric.originalStats;
-          dataViews[key] = { ...stats, std: stats.std_deviation };
+          const etlStats = metric.etlStats
+          dataViews[key] = { ...stats, ...etlStats, std: (etlStats && etlStats.std_deviation) || stats.std_deviation };
         });
         process({ progress: 100, status: 1 });
         createOrUpdate(projectId, userId, {
