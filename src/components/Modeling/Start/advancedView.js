@@ -7,7 +7,6 @@ import { NumberInput, Range } from 'components/Common';
 import { Select, message, Tooltip } from 'antd';
 import Algorithms from './algorithms';
 import Feature from './feature';
-import moment from 'moment';
 import EN from '../../../constant/en';
 
 const Option = Select.Option;
@@ -15,13 +14,14 @@ const Option = Select.Option;
 @observer
 export default class AdvancedView extends Component {
 
-  handleName = action((e) => {
-    const { project } = this.props
-    project.settings.find(s => s.id === project.settingId).name = e.target.value || `custom.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
-  })
+  handleName = e => {
+    const { setSettingName } = this.props;
+    setSettingName(e.target.value)
+  }
 
   handleSize = value => {
     this.props.project.ensembleSize = value;
+    this.props.setSetting({ ensembleSize: value })
   }
 
   handleSlider = value => {
@@ -29,10 +29,12 @@ export default class AdvancedView extends Component {
     if (max === min) return
     this.props.project.holdoutRate = 100 - max;
     this.props.project.validationRate = max - min;
+    this.props.setSetting({ holdoutRate: 100 - max, validationRate: max - min })
   }
 
   handleDrag = value => {
     this.props.project.holdoutRate = 100 - value;
+    this.props.setSetting({ holdoutRate: 100 - value })
   }
 
   changeValidationRate = value => {
@@ -41,6 +43,7 @@ export default class AdvancedView extends Component {
     if (value + holdoutRate > 99) value = 99 - holdoutRate;
     if (validationRate === value) return;
     this.props.project.validationRate = value;
+    this.props.setSetting({ validationRate: value })
   }
 
   changeHoldoutRate = value => {
@@ -50,6 +53,7 @@ export default class AdvancedView extends Component {
     if (value + num > 99) value = 99 - num;
     if (holdoutRate === value) return;
     this.props.project.holdoutRate = value;
+    this.props.setSetting({ holdoutRate: value })
   }
 
   changeCrossCount = value => {
@@ -60,6 +64,7 @@ export default class AdvancedView extends Component {
       return message.error(`${EN.Oneoftheclasseshasnumber} ${crossCountMax} ${EN.Pleaseselectalowerfoldcv}`)
     }
     this.props.project.crossCount = value;
+    this.props.setSetting({ crossCount: value })
   }
 
   handleFeatures = (key, e) => {
@@ -68,9 +73,11 @@ export default class AdvancedView extends Component {
     if (isCheck) {
       if (features.includes(key)) return
       this.props.project.features = [...features, key]
+      this.props.setSetting({ features: [...features, key] })
     } else {
       if (!features.includes(key)) return
       this.props.project.features = features.filter(v => v !== key)
+      this.props.setSetting({ features: features.filter(v => v !== key) })
     }
   }
 
@@ -80,10 +87,12 @@ export default class AdvancedView extends Component {
 
   handleRandSeed = value => {
     this.props.project.randSeed = value;
+    this.props.setSetting({ randSeed: value })
   }
 
   handleMeasurement = value => {
     this.props.project.measurement = value
+    this.props.setSetting({ measurement: value })
   }
 
   handleRunWith = v => {
@@ -91,13 +100,16 @@ export default class AdvancedView extends Component {
       const { validationRate, holdoutRate } = this.props.project;
       if (validationRate + holdoutRate > 99) {
         this.props.project.holdoutRate = Math.min((99 - validationRate), 10);
+        this.props.setSetting({ holdoutRate: Math.min((99 - validationRate), 10) })
       }
     }
     this.props.project.runWith = v;
+    this.props.setSetting({ runWith: v })
   }
 
   handleResampling = v => {
     this.props.project.resampling = v;
+    this.props.setSetting({ resampling: v })
   }
 
   crossPercent = () => {
@@ -117,19 +129,23 @@ export default class AdvancedView extends Component {
   handleFeaturesAll = value => {
     if (!value) {
       this.props.project.features = []
+      this.props.setSetting({ features: [] })
       return
     }
     this.props.project.features = ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates']
+    this.props.setSetting({ features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'] })
   }
 
   handleSelectAll = value => {
     const { problemType } = this.props.project
     if (!value) {
       this.props.project.algorithms = []
+      this.props.setSetting({ algorithms: [] })
       return
     }
     this.props.project.algorithms = Algorithms[problemType].map(v => v.value)
     this.props.project.version = [1, 2, 4]
+    this.props.setSetting({ version: [1, 2, 4], algorithms: Algorithms[problemType].map(v => v.value) })
     // if (problemType === "Classification") {
     //   this.props.project.algorithms = Classification
     //   return
@@ -143,20 +159,24 @@ export default class AdvancedView extends Component {
     if (isCheck) {
       if (algorithms.includes(key)) return
       this.props.project.algorithms = [...algorithms, key]
+      this.props.setSetting({ algorithms: [...algorithms, key] })
     } else {
       if (!algorithms.includes(key)) return
       this.props.project.algorithms = algorithms.filter(v => v !== key)
+      this.props.setSetting({ algorithms: algorithms.filter(v => v !== key) })
     }
   }
 
   handleSpeed = value => {
     this.props.project.speedVSaccuracy = value
+    this.props.setSetting({ speedVSaccuracy: value })
   }
 
   changeSpeed = (isSpeed, value) => {
     if (!isSpeed) value = 10 - value
     if (value < 1 || value > 9) return
     this.props.project.speedVSaccuracy = value
+    this.props.setSetting({ speedVSaccuracy: value })
   }
 
   handleSolution = (num, e) => {
@@ -165,9 +185,11 @@ export default class AdvancedView extends Component {
     if (isCheck) {
       if (version.includes(num)) return
       this.props.project.version = [...version, num]
+      this.props.setSetting({ version: [...version, num] })
     } else {
       if (!version.includes(num)) return
       this.props.project.version = version.filter(n => n !== num)
+      this.props.setSetting({ version: version.filter(n => n !== num) })
     }
   }
 
@@ -177,54 +199,40 @@ export default class AdvancedView extends Component {
     this.props.project.holdoutRate = 20
     this.props.project.validationRate = 20
     this.props.project.crossCount = Math.min((min - 1), 5)
+    this.props.setSetting({ holdoutRate: 20, validationRate: 20, crossCount: Math.min((min - 1), 5) })
   })
 
   resetSpeed = action(() => {
     this.props.project.speedVSaccuracy = 5
+    this.props.setSetting({ speedVSaccuracy: 5 })
   })
 
   changeSetting = action((e) => {
-    const { project } = this.props
-    if (e.target.value === 'default') return this.resetSetting(project)
+    const { project, setSetting } = this.props
     const selectedSetting = project.settings.find(s => s.id === e.target.value)
     if (selectedSetting) {
-      project.settingId = e.target.value
       Object.entries(selectedSetting.setting).forEach(([key, value]) => {
         project[key] = value
       })
+      setSetting(selectedSetting.setting)
     } else {
-      project.settingId = 'default'
+      setSetting(this.resetSetting(project))
     }
   })
 
   resetSetting = action((project) => {
-    const { targetCounts, problemType } = this.props.project
-    const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
-    const defaultSetting = {
-      version: [1, 2, 4],
-      validationRate: 20,
-      holdoutRate: 20,
-      randSeed: 0,
-      measurement: project.changeProjectType === "Classification" ? "auc" : "r2",
-      runWith: project.totalLines > 10000 ? 'holdout' : 'cross',
-      resampling: 'no',
-      crossCount: Math.min((min - 1), 5),
-      dataRange: 'all',
-      customField: '',
-      customRange: [],
-      algorithms: [],
-      speedVSaccuracy: 5
-    }
-    Object.entries(defaultSetting).forEach(([key, value]) => {
+    const setting = this.props.project.newSetting()
+    Object.entries(setting).forEach(([key, value]) => {
       project[key] = value
     })
     message.destroy();
     message.info(EN.YourAdvancedModeling)
+    return setting
   })
 
   render() {
-    const { hidden, project } = this.props
-    const { features, settingId, settingName, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy, ensembleSize, totalLines } = project;
+    const { hidden, project, setting } = this.props
+    const { features, settings, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, problemType, dataRange, customField, customRange, sortHeader, colType, dataViews, algorithms, speedVSaccuracy, ensembleSize, totalLines } = project;
     const measurementList = problemType === "Classification" ?
       // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
       [{ value: "auc", label: 'AUC' }, { value: "log_loss", label: 'LogLoss' }] :
@@ -268,9 +276,10 @@ export default class AdvancedView extends Component {
               <span>{EN.SelectFromPreviousSettings}:</span>
             </div>
             <div className={styles.advancedOption}>
-              <select value={settingId} onChange={this.changeSetting}>
+              <select value={setting.id} onChange={this.changeSetting}>
                 <option value={'default'}>{EN.Default}</option>
                 {settings && settings.map(setting => <option key={setting.id} value={setting.id}>{setting.name}</option>)}
+                <option key={setting.id} value={setting.id}>{setting.name}</option>
               </select>
             </div>
           </div>
@@ -281,7 +290,7 @@ export default class AdvancedView extends Component {
               <span>{EN.NameYourModelSettings}:</span>
             </div>
             <div className={styles.advancedOption}>
-              <input type="text" value={settingName} onChange={this.handleName} />
+              <input type="text" value={setting.name} onChange={this.handleName} />
             </div>
           </div>
         </div>

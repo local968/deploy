@@ -1800,18 +1800,17 @@ class Project {
     }, this.nextSubStep(2, 3)))
   }
 
-  newSetting = (type = 'auto') => {
-    const { features, problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+  newSetting = () => {
+    const { problemType, dataHeader, newVariable, targetCounts, trainHeader } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
-
-    let setting
+    const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
 
     switch (problemType) {
       case 'Clustering':
-        setting = type === 'auto' ? {
-          kType,
-          kValue,
-          measurement,
+        return {
+          kType: 'auto',
+          kValue: 5,
+          measurement: 'CVNN',
           algorithms: [
             'KMeans',
             'GMM',
@@ -1826,20 +1825,9 @@ class Project {
           featureLabel,
           randSeed: 0,
           weights: {},
-        } : {
-            kType,
-            kValue,
-            measurement,
-            algorithms,
-            standardType,
-            searchTime,
-            featureLabel,
-            randSeed,
-            weights,
-          };
-        break;
+        }
       case 'Outlier':
-        setting = type === 'auto' ? {
+        return {
           algorithms: [
             'HBOS',
             'PCA',
@@ -1852,17 +1840,9 @@ class Project {
           featureLabel,
           randSeed: 0,
           weights: {},
-        } : {
-            algorithms,
-            standardType,
-            searchTime,
-            featureLabel,
-            randSeed,
-            weights,
-          };
-        break;
+        }
       default:
-        setting = type === 'auto' ? {
+        return {
           version: [1, 2, 4],
           validationRate: 20,
           holdoutRate: 20,
@@ -1870,7 +1850,7 @@ class Project {
           measurement: problemType === "Classification" ? "auc" : "r2",
           runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
           resampling: 'no',
-          crossCount: '5',
+          crossCount: Math.min((min - 1), 5),
           dataRange: 'all',
           customField: '',
           customRange: [],
@@ -1911,35 +1891,18 @@ class Project {
           speedVSaccuracy: 5,
           ensembleSize: 20,
           featureLabel
-        } : {
-            version,
-            validationRate,
-            holdoutRate,
-            randSeed,
-            measurement,
-            runWith,
-            resampling,
-            crossCount,
-            dataRange,
-            customField,
-            customRange,
-            algorithms,
-            speedVSaccuracy,
-            ensembleSize,
-            featureLabel,
-            features
-          }
+        }
     }
 
-    const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
-    const id = uuid.v4()
-    this.settingId = id
-    this.settings.push({
-      id,
-      name: name,
-      setting,
-      models: []
-    })
+    // const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
+    // const id = uuid.v4()
+    // this.settingId = id
+    // this.settings.push({
+    //   id,
+    //   name: name,
+    //   setting,
+    //   models: []
+    // })
   }
 
   removeCurSetting = () => {

@@ -1241,3 +1241,11 @@ button.disable {
   right: 18px;
   top: 18px;
 }
+
+.advancedSpeed {
+  display: flex;
+  flex: auto;
+  align-items: flex-end;
+  margin: 0.15em 0;
+  max-width: 50%;
+}
