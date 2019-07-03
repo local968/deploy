@@ -105,7 +105,6 @@ export default class Preview extends Component {
     const { dataHeader, trainHeader, newVariable } = project
     const header = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
     const tableData = this.formatTable()
-    // console.log(tableData.length, "tableData", cleanPath)
     return <div className={classnames(styles.content, {
       [styles.active]: visiable
     })}>

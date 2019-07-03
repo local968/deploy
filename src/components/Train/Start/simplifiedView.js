@@ -35,10 +35,6 @@ export default class SimplifiedView extends Component {
     this.reloadTable()
   }
 
-  getCorrelationMatrix = () => {
-    this.props.project.correlationMatrix()
-  }
-
   show = () => {
     this.showHistograms = true
   }

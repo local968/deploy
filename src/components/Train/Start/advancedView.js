@@ -4,7 +4,7 @@ import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
 import { NumberInput, Hint } from "components/Common";
-import { Select, message, Tooltip, Popover,Icon } from "antd";
+import { Select, message, Tooltip, Popover, Icon } from "antd";
 import Algorithms from "./algorithms";
 import moment from "moment";
 import InputNumber from "antd/es/input-number";
@@ -17,7 +17,7 @@ import {
 
 @observer
 export default class AdvancedView extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
   }
   handleName = action(e => {
@@ -53,11 +53,14 @@ export default class AdvancedView extends Component {
   handleSelectAll = value => {
     const { project } = this.props;
     let algorithms = [];
-    if (!value) {
+    if (value === 'none') {
       algorithms = [];
-    } else {
+    } else if (value === 'all') {
       algorithms = Algorithms[project.problemType].map(v => v.value);
+    } else if (value === 'default') {
+      algorithms = project.defaultAlgorithms
     }
+    this.props.project.algorithmRadio = value
     this.props.project.algorithms = algorithms
     // project.setProperty({
     //   algorithms
@@ -82,12 +85,12 @@ export default class AdvancedView extends Component {
     // });
   };
 
-  handleDefaultCheck = () => {
-    this.props.project.algorithms = this.props.project.defaultAlgorithms
-    // project.setProperty({
-    //   algorithms: _algorithms
-    // });
-  };
+  // handleDefaultCheck = () => {
+  //   this.props.project.algorithms = this.props.project.defaultAlgorithms
+  //   // project.setProperty({
+  //   //   algorithms: _algorithms
+  //   // });
+  // };
 
   changeSetting = e => {
     const { project } = this.props;
@@ -146,12 +149,11 @@ export default class AdvancedView extends Component {
 
   render() {
     const { project, hidden } = this.props;
-    const { algorithms, defaultAlgorithms,settingId,settings=[],problemType,settingName,showSsPlot} = project;
-    const isAll = Algorithms[problemType].length === algorithms.length;
-    const isDefault = !isAll && algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al));
-    const defaultIsAll = Algorithms[project.problemType].length === defaultAlgorithms.length
+    const { algorithms, defaultAlgorithms, settingId, settings = [], problemType, settingName, showSsPlot, algorithmRadio } = project;
+    // const isAll = Algorithms[problemType].length === algorithms.length;
+    // const isDefault = algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al));
     const measurementList =
-     problemType === "Outlier"
+      problemType === "Outlier"
         ? [{ value: "score", label: EN.Accuracy, hint: EN.ScoreHint }]
         : [
           { value: "CVNN", label: "CVNN", hint: EN.CVNNHint },
@@ -170,10 +172,10 @@ export default class AdvancedView extends Component {
                 <select value={settingId} onChange={this.changeSetting}>
                   <option value={"default"}>{EN.Default}</option>
                   {settings.map(setting => (
-                      <option key={setting.id} value={setting.id}>
-                        {setting.name}
-                      </option>
-                    ))}
+                    <option key={setting.id} value={setting.id}>
+                      {setting.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -202,18 +204,18 @@ export default class AdvancedView extends Component {
               <Popover
                 placement="bottomLeft"
                 trigger="click"
-                getPopupContainer={()=>document.getElementById('advancedTitle')}
+                getPopupContainer={() => document.getElementById('advancedTitle')}
                 visible={showSsPlot}
-                onVisibleChange={()=>{
+                onVisibleChange={() => {
                   project.showSsPlot = !showSsPlot
                 }}
                 content={<SSPlot
                   height={300} width={600}
                   project={project}
-                />} title={<Icon onClick={()=>{
-                project.showSsPlot = false
+                />} title={<Icon onClick={() => {
+                  project.showSsPlot = false
                 }
-              } className={styles.ssPlot} type="close" />}>
+                } className={styles.ssPlot} type="close" />}>
                 <Button
                   className={styles.button}>{EN.WithinGroupSsPlot}</Button>
               </Popover>
@@ -268,9 +270,9 @@ export default class AdvancedView extends Component {
                     id="algorithmSelect1"
                     type="radio"
                     name="algorithmSelect"
-                    checked={isAll}
+                    checked={algorithmRadio === 'all'}
                     readOnly
-                    onClick={this.handleSelectAll.bind(null, true)}
+                    onClick={this.handleSelectAll.bind(null, 'all')}
                   />
                   <label htmlFor="algorithmSelect1">{EN.SelectAll}</label>
                 </div>
@@ -279,23 +281,23 @@ export default class AdvancedView extends Component {
                     id="algorithmSelect2"
                     type="radio"
                     name="algorithmSelect"
-                    checked={!project.algorithms.length}
+                    checked={algorithmRadio === 'none'}
                     readOnly
-                    onClick={this.handleSelectAll.bind(null, false)}
+                    onClick={this.handleSelectAll.bind(null, 'none')}
                   />
                   <label htmlFor="algorithmSelect2">{EN.DeselectAll}</label>
                 </div>
-                {!defaultIsAll && <div className={styles.advancedOptionBox}>
+                <div className={styles.advancedOptionBox}>
                   <input
                     id="algorithmSelect3"
                     type="radio"
                     name="algorithmSelect"
-                    checked={isDefault}
+                    checked={algorithmRadio === 'default'}
                     readOnly
-                    onClick={this.handleDefaultCheck}
+                    onClick={this.handleSelectAll.bind(null, 'default')}
                   />
                   <label htmlFor="algorithmSelect3">{EN.SelectDefault}</label>
-                </div>}
+                </div>
               </div>
             </div>
             <div className={styles.advancedBlock}>

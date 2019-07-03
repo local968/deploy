@@ -1123,7 +1123,7 @@ const EN_LAN = {
   ClusteringHint: 'To group a set of objects in such a way that objects in the same cluster are more similar to each other than to those in other clusters. (e.g. customer segmentation)',
   OutlierDetectionHint: 'To identify rare events which raise suspicions by differing significantly from the majority of the data. (e.g. Credit Card Fraud Detection)',
   ExplainationHint: 'Important variables for each cluster.',
-  DoyouwanttotreatnullL: 'Do you want to treat null values as one class?',
+  Doyouwanttotreatnull: 'Do you want to treat null values as one class?',
   cannotDeploy: 'Tip: The model you choose only supports deployment of original training data.',
   TargetValues: 'Target Values',
   MissingValues: 'Missing Values',

@@ -38,10 +38,6 @@ export default class SimplifiedView extends Component {
     })
   }
 
-  getCorrelationMatrix = () => {
-    this.props.project.correlationMatrix()
-  }
-
   show = () => {
     const { project = {} } = this.props;
     const { target, colType, etlIndex, rawDataView } = project;

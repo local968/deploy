@@ -213,9 +213,6 @@ class Project {
   // cleanData: unknown =  []
   // @observable originPath: string = '';
 
-  etlCleanDataLoading: boolean = false;
-  @observable cleanPath: string = '';
-
   @observable noComputeTemp: boolean = false;
   @observable originalIndex: string = '';
   @observable etlIndex: string = '';
@@ -262,8 +259,6 @@ class Project {
   @observable train2Finished: boolean = false;
   @observable train2ing: boolean = false;
   @observable train2Error: boolean = false;
-
-  @observable trainingId: string = '';
   // 不需要参加训练的label
   @observable trainHeader: string[] = [];
   @observable customHeader: string[] = [];
@@ -281,11 +276,6 @@ class Project {
   // Advanced Modeling Setting
   @observable settingId: string = '';
   @observable settings: Settings[] = [];
-
-  // correlation
-  @observable correlationMatrixHeader: unknown;
-  @observable correlationMatrixData: unknown;
-  @observable correlationMatrixLoading: boolean = false;
 
   // 训练速度和过拟合
   @observable speedVSaccuracy: number = 5;
@@ -319,6 +309,7 @@ class Project {
   @observable dataViews: DataView | null = null;
   @observable dataViewsLoading: boolean = false;
   @observable dataViewProgress: number = 0;
+  @observable algorithmRadio: 'all' | 'none' | 'default' = 'all'
 
   //un
   @observable weights: NumberObject = {};
@@ -346,12 +337,6 @@ class Project {
     this.id = id;
     this.visiable = true;
     this.setProperty(args)
-    // autorun(() => {
-    //   if (!this.cleanPath) return this.cleanData = []
-    //   this.readData(this.cleanPath).then(data => {
-    //     this.cleanData = data
-    //   })
-    // })
   }
 
   readData = (path: string) => {
@@ -434,7 +419,6 @@ class Project {
       targetArrayTemp: [],
       outlierDictTemp: {},
       otherMap: {},
-      cleanPath: ''
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -445,7 +429,6 @@ class Project {
       targetArrayTemp: string[],
       outlierDictTemp: unknown,
       otherMap: StringObject,
-      cleanPath: string
     }
   }
 
@@ -561,7 +544,8 @@ class Project {
       trainModel: {},
       stopIds: [],
       features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
-      ssPlot: null
+      ssPlot: null,
+      algorithmRadio: 'all'
     } as {
       train2Finished: boolean,
       train2ing: boolean,
@@ -606,7 +590,8 @@ class Project {
       trainModel: unknown,
       stopIds: string[],
       features: string[],
-      ssPlot: null
+      ssPlot: null,
+      algorithmRadio: 'all' | 'none' | 'default'
     }
   }
 
@@ -974,7 +959,8 @@ class Project {
         if (min < 5) data.crossCount = min - 1
       }
       await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data))
-      await this.newEtl()
+      const pass = await this.newEtl()
+      if (!pass) return
       await this.updateProject({
         curStep: 3,
         mainStep: 3,
@@ -1010,7 +996,7 @@ class Project {
 
   @action
   endQuality = async () => {
-    if (!this.qualityHasChanged) return await Promise.resolve()
+    if (!this.qualityHasChanged) return
     this.etling = true
     await this.abortTrainByEtl()
     const data = Object.assign(this.defaultTrain, {
@@ -1021,33 +1007,39 @@ class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp),
-      curStep: 2,
-      mainStep: 2,
-      subStepActive: 3,
-      lastSubStep: 3
     })
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
       if (min < 3) {
         console.error("数量太小");
-        return await Promise.reject()
+        return Promise.reject()
       }
       if (min < 5) data.crossCount = min - 1
     }
     await this.updateProject(data)
     // await this.etl()
-    await this.newEtl()
-    this.etling = false
+    const pass = await this.newEtl()
+    if (!pass) return Promise.reject()
+    const step = {
+      curStep: 2,
+      mainStep: 2,
+      subStepActive: 3,
+      lastSubStep: 3
+    }
+    await this.updateProject(step)
+    return true
   }
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
+    const { status, message } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
       this.etlProgress = progress
     })
     this.etlProgress = 0
     this.etling = false
+    if (status !== 200) antdMessage.error(message)
+    return status === 200
   }
 
   hasChanged = (before: Object, after: Object): boolean => {
@@ -1267,9 +1259,6 @@ class Project {
   //         trainHeader,
   //         expression,
   //         newType,
-  //         correlationMatrixData: null,
-  //         correlationMatrixHeader: null,
-  //         cleanPath: ''
   //       })
   //       return true
   //     })
@@ -1312,9 +1301,6 @@ class Project {
           trainHeader,
           expression,
           newType,
-          correlationMatrixData: null,
-          correlationMatrixHeader: null,
-          cleanPath: ''
         }).then(() => true)
       })
     })
@@ -1968,7 +1954,6 @@ class Project {
     this.isAbort = false
     // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData })).then(returnValue => {
-      this.trainingId = ''
       const { status, message } = returnValue
       if (status !== 200) {
         antdMessage.error(message)
@@ -2059,7 +2044,9 @@ class Project {
     this.updateProject({ selectId: id })
   }
 
-  initModels = () => {
+  initModels = (force = false) => {
+    if (this.loadModel) return
+    if (!force && !!this.models.length) return
     this.loadModel = true
     let show = true
     let count = 0
@@ -2140,18 +2127,19 @@ class Project {
     if (this.problemType !== 'Clustering') return Promise.resolve()
 
     const allLabel = [...this.dataHeader, ...this.newVariable].filter(v => v !== this.target)
-    const before = allLabel.reduce((prev, la) => {
-      prev[la] = this.weights[la] || 1
-      return prev
-    }, {} as NumberObject)
-    const after = allLabel.reduce((prev, la) => {
-      prev[la] = this.weightsTemp[la] || 1
-      return prev
-    }, {} as NumberObject)
+    //移除, 现由views判断
+    // const before = allLabel.reduce((prev, la) => {
+    //   prev[la] = this.weights[la] || 1
+    //   return prev
+    // }, {} as NumberObject)
+    // const after = allLabel.reduce((prev, la) => {
+    //   prev[la] = this.weightsTemp[la] || 1
+    //   return prev
+    // }, {} as NumberObject)
 
-    const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+    // const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
 
-    if (!isChange) return Promise.resolve()
+    // if (!isChange) return Promise.resolve()
 
     return socketStore.ready().then(api => {
       let cmd = 'clustering.preTrainImportance'
@@ -2194,26 +2182,6 @@ class Project {
           //   preImportanceLoading: false
           // })
         })
-    })
-  }
-
-  /**------------------------------------------------chart---------------------------------------------------------*/
-  correlationMatrix = () => {
-    if (this.correlationMatrixLoading) return Promise.resolve()
-    this.correlationMatrixLoading = true
-    return socketStore.ready().then(api => {
-      const command = {
-        projectId: this.id,
-        command: 'correlationMatrix',
-        featureLabel: this.dataHeader.filter(n => n !== this.target)
-      };
-      return api.correlationMatrix(command).then((returnValue: BaseResponse) => {
-        const { status, result } = returnValue
-        this.correlationMatrixLoading = false
-        if (status < 0) return antdMessage.error(result['processError'])
-        this.correlationMatrixHeader = result.header;
-        this.correlationMatrixData = result.data;
-      })
     })
   }
 
@@ -2320,20 +2288,6 @@ class Project {
         antdMessage.error("fetch sample error")
         return []
       })
-  }
-
-  etlCleanData = () => {
-    const { dataHeader, newVariable } = this
-    const fields = [...dataHeader, ...newVariable]
-    return socketStore.ready().then(api => {
-      const command = {
-        feature_label: fields,
-        command: 'etlCleanData',
-        projectId: this.id
-      }
-      this.etlCleanDataLoading = true
-      return api.etlCleanData(command)
-    })
   }
 
   allPlots = async (changeReportProgress: (str: string, num: number) => boolean) => {

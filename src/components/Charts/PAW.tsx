@@ -116,18 +116,14 @@ export default function PAW(props){
 			</div>
 			<dl>
 				<dt>
-					{/*
-					// @ts-ignore*/}
 					<PCS
 						 data={pcsD}
-					     x_name = {'PC'+(pcs[0]+1)}
-					     y_name = {'PC'+(pcs[1]+1)}
+						 x_name = {'PC'+(pcs[0]+1)}
+						 y_name = {'PC'+(pcs[1]+1)}
 						 fields = {fields}
 					/>
 				</dt>
 				<dd>
-					{/*
-					//@ts-ignore*/}
 					<TSEN
 						x_name = {'PC'+(pcs[0]+1)}
 						y_name = {'PC'+(pcs[1]+1)}

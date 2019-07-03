@@ -4,8 +4,16 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash'
 import { observer } from 'mobx-react';
 
+interface DataSampleProps {
+	project:any
+	height:number
+	width:number
+	x_name:string
+	y_name:string
+	model:any
+}
 @observer
-export default class PRCharts extends PureComponent{
+export default class PRCharts extends PureComponent<DataSampleProps>{
 	private chart: any;
 	constructor(props){
 		super(props);
@@ -18,16 +26,14 @@ export default class PRCharts extends PureComponent{
 	}
 
 	componentWillReceiveProps(nextProps) {
-		const {project} = this.props as any;
-		const {isHoldout} = project as any;
+		const {isHoldout} = this.props.project;
 		if(nextProps.project.isHoldout!==isHoldout){
 			this.prePair(nextProps.isHoldout)
 		}
 	}
 
-	//@ts-ignore
 	prePair(isHoldout=this.props.project.isHoldout){
-		const {x_name='',y_name='',model} = this.props as any;
+		const {x_name='',y_name='',model} = this.props;
 		const {chartData,fitIndex=0,holdoutChartData} = model;
 		const {roc} = isHoldout?holdoutChartData:chartData;
 		const {Recall:x,Precision:y} = roc;
@@ -133,7 +139,6 @@ export default class PRCharts extends PureComponent{
 		};
 	}
 
-
 	onPointDragging(){
 		let {result,myChart,point} = this as any;
 		let {data} = result;
@@ -195,13 +200,12 @@ export default class PRCharts extends PureComponent{
 	}
 
 	updatePoint(point){
-		const {model} = this.props as any;
 		const {_x} = this.state as any;
-		model.setFitIndex(_x.indexOf(point));
+		this.props.model.setFitIndex(_x.indexOf(point));
 	}
 
 	render(){
-		const {width=600,height=300} = this.props as any;
+		const {width=600,height=300} = this.props;
 		return <ReactEcharts
 			ref = {chart=>this.chart = chart}
 			option={this.getOption()}

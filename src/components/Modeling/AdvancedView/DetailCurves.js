@@ -83,7 +83,8 @@ export default class DetailCurves extends Component {
         break;
       case EN.PrecisionRecallTradeoff:
         curComponent = show && <PRCharts
-          height={300} width={500}
+          height={300}
+          width={500}
           x_name={EN.Recall}
           y_name={EN.Precision}
           model={model}
@@ -102,7 +103,8 @@ export default class DetailCurves extends Component {
         break;
       case EN.GainChart:
         curComponent = <GainChart
-          height={300} width={600}
+          height={300}
+          width={600}
           x_name={EN.percentage}
           y_name={EN.Gain}
           model={model}

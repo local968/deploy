@@ -7,7 +7,7 @@ const concurrent = 4
 
 const test = false
 
-export default function EsUploader(file, option:any = {}) {
+export default function EsUploader(file, option: any = {}) {
   let index = false
   let hasNextChunk = true
   let isPause = false
@@ -21,7 +21,7 @@ export default function EsUploader(file, option:any = {}) {
   let currentCursor = 0
   let no = 0
 
-  const { onProgress = () => {}, onError = () => {}, onFinished = () => {},
+  const { onProgress = () => { }, onError = () => { }, onFinished = () => { },
     charset = 'utf-8' } =
     option
 
@@ -33,14 +33,14 @@ export default function EsUploader(file, option:any = {}) {
     skipEmptyLines: true,
     encoding: charset,
     chunk: async (result, parser) => {
-      if(!header) {
+      uploaded += papa.unparse(result.data).length
+      if (!header) {
         header = result.data[0]
         header.unshift('__no')
         result.data = result.data.slice(1)
         uploader = parser
       }
       chunk = result.data.map(row => [no++, ...row])
-
       parser.pause()
       chunkPromiseResolve()
     },
@@ -51,7 +51,7 @@ export default function EsUploader(file, option:any = {}) {
   })
 
   const createIndex = async () => {
-    if(!test) {
+    if (!test) {
       const { data } = await axios.get('/etls/createIndex')
       const { index: dataIndex } = data
       index = dataIndex
@@ -71,19 +71,19 @@ export default function EsUploader(file, option:any = {}) {
   const continuedUpload = async () => {
     while (hasNextChunk && !isPause) {
       const { promise, response } = await Promise.race(processors)
-      uploaded += promise.bytes
+      // uploaded += promise.bytes
       onProgress(`${uploaded}/${file.size}`)
       processors.splice(promise.no, 1)
-      processors.forEach((p, i) => p.no = i )
+      processors.forEach((p, i) => p.no = i)
       await uploadChunk()
     }
-    if(chunk.length > 0) await uploadChunk()
-    while ( processors.length > 0 ) {
+    if (chunk.length > 0) await uploadChunk()
+    while (processors.length > 0) {
       const { promise, response } = await Promise.race(processors)
-      uploaded += promise.bytes
+      // uploaded += promise.bytes
       onProgress(`${uploaded}/${file.size}`)
       processors.splice(promise.no, 1)
-      processors.forEach((p, i) => p.no = i )
+      processors.forEach((p, i) => p.no = i)
     }
     // const _header = header.map( (k, i) => i.toString() )
     onFinished({
@@ -96,12 +96,12 @@ export default function EsUploader(file, option:any = {}) {
 
   const uploadChunk = async () => {
     const chunk = await getNextChunk()
-    if(test) {
+    if (test) {
       const requestPromise = new Promise((resolve, reject) => {
         setTimeout(resolve, 100)
-      }).then((response) => ({promise: requestPromise, response}))
+      }).then((response) => ({ promise: requestPromise, response }))
       requestPromise.no = processors.length
-      requestPromise.bytes = chunk.bytes
+      // requestPromise.bytes = chunk.bytes
       processors.push(requestPromise)
     } else {
       const requestPromise: any = axios.request({
@@ -110,27 +110,27 @@ export default function EsUploader(file, option:any = {}) {
           'Content-Type': "text/plain",
         },
         method: "POST",
-        data: chunk.data
-      }).then((response) => ({promise: requestPromise, response}))
+        data: chunk
+      }).then((response) => ({ promise: requestPromise, response }))
       requestPromise.no = processors.length
-      requestPromise.bytes = chunk.bytes
+      // requestPromise.bytes = chunk.bytes
       processors.push(requestPromise)
     }
   }
 
   const getNextChunk = async () => {
-    const _header = header.filter(key => key !== '__no').map( (k, i) => option.mapHeader ? option.mapHeader.indexOf(k) : i)
+    const _header = header.filter(key => key !== '__no').map((k, i) => option.mapHeader ? option.mapHeader.indexOf(k) : i)
     _header.unshift('__no')
     chunk.unshift(_header)
     const csvChunk = papa.unparse(chunk)
-    const bytes = csvChunk.length
+    // const bytes = csvChunk.length
     chunk = []
-    if(!hasNextChunk) return {bytes, data: csvChunk}
+    if (!hasNextChunk) return csvChunk
     chunkPromise = new Promise((resolve, reject) => chunkPromiseResolve =
       resolve)
     uploader.resume()
     await chunkPromise
-    return {bytes, data: csvChunk}
+    return csvChunk
   }
 
   const resume = async () => {
