@@ -1,6 +1,5 @@
 import React, {Component, Fragment} from 'react';
 import styles from './styles.module.css';
-// import Next from './Next.svg'
 import {Button, Icon, Popover, Tag} from 'antd'
 import {formatNumber} from 'util'
 import EN from '../../../constant/en';
@@ -52,8 +51,15 @@ export default class ModelProcessFlow extends Component {
 		
 		return <dl className={styles.over}>
 			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
-			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd title={variables.join(',')}>
-				<p style={{display:(variables.length?'':'none')}}>variables:<label>{variables.join(',')}</label></p>
+			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd>
+				<p style={{display:(variables.length?'':'none')}}>
+					<label>variables:</label>
+					<ul>
+						{
+							variables.map(it=><li title={it}>{it}</li>)
+						}
+					</ul>
+				</p>
 			</dd>}
 			
 			{/*{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}*/}
@@ -325,8 +331,14 @@ export default class ModelProcessFlow extends Component {
 			<dt>{title}</dt>
 			{
 				res.map(itm=>{
-					const _data = itm.data.map(itm=>mapHeader[itm]).join(',');
-					return <dd key={itm.key} title={_data}>{itm.key}:{_data}</dd>
+					return <dd>
+						<label>{itm.key}:</label>
+						<ul>
+							{
+								itm.data.map(it=><li title={mapHeader[it]}>{mapHeader[it]}</li>)
+							}
+						</ul>
+					</dd>
 				})
 			}
 		</Fragment>
@@ -352,18 +364,40 @@ export default class ModelProcessFlow extends Component {
 		raw = raw.map(itm=>mapHeader[itm]||itm);
 		
 		const pop = <dl className={styles.over}>
-			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
-				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
-			</dt>
-			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
-				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
-			</dt>
-			<dt style={{display:(create.length?'':'none')}} title = {create.join(',')}>
-				{EN.CreateTheseVariables}:<label>{create.join(',')}</label>
-			</dt>
 			{
-				create.map((itm,index)=><dd key={index} title={mapHeader[itm]}>{mapHeader[itm]}</dd>)
+				drop.length?<dt>
+					<label>{EN.DropTheseVariables}:</label>
+					<ul>
+						{
+							drop.map(it=><li title={it}>{it}</li>)
+						}
+					</ul>
+				</dt>:null
 			}
+			
+			{
+				raw.length?<dt>
+					<label>{EN.DropTheseVariables}(raw):</label>
+					<ul>
+						{
+							raw.map(it=><li title={it}>{it}</li>)
+						}
+					</ul>
+				</dt>:null
+			}
+			{
+				create.length?<Fragment>
+					<dt title = {create.join(',')}>
+						<label>{EN.CreateTheseVariables}:</label>
+						<ul>
+							{
+								create.map(it=><li title={it}>{it}</li>)
+							}
+						</ul>
+					</dt>
+				</Fragment>:null
+			}
+			
 		</dl>;
 		
 		return <Fragment>
@@ -374,6 +408,7 @@ export default class ModelProcessFlow extends Component {
 
 	popOver(content, text) {
 		return <Popover
+			overlayClassName={styles.popover}
 			arrowPointAtCenter={true}
 			autoAdjustOverflow={false}
 			getPopupContainer={() => document.getElementsByClassName(styles.process)[0]}

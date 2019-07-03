@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import styles from './styles.module.css';
+// import styles from './styles.module.css';
+import styles from '../../Modeling/Result/styles.module.css';
 import { observer } from 'mobx-react'
 import Next from './Next.svg'
 import { Popover, Button, Icon } from 'antd'
@@ -77,9 +78,10 @@ export default class ModelProcessFlow extends Component {
 			{this.list(data)}
 		</dl>;
 	}
-
+	
 	popOver(content, text) {
 		return <Popover
+			overlayClassName={styles.popover}
 			arrowPointAtCenter={true}
 			autoAdjustOverflow={false}
 			getPopupContainer={() => document.getElementsByClassName(styles.process)[0]}
@@ -87,54 +89,247 @@ export default class ModelProcessFlow extends Component {
 			<Button>{text}<Icon type="down" /></Button>
 		</Popover>
 	}
-
+	
+	DQF(){
+		const {
+			nullFillMethod,nullLineCounts,
+			mismatchFillMethod,mismatchLineCounts,
+			outlierFillMethod,outlierLineCounts,
+			colType,
+			target,
+			problemType,
+			otherMap,
+			mapHeader,
+		} = this.props.project;
+		
+		const nfm = _.cloneDeep(nullFillMethod);
+		const mfm = _.cloneDeep(mismatchFillMethod);
+		
+		Object.entries(nullLineCounts).filter(itm=>itm[1]&&!nullFillMethod[itm[0]]).map(itm=>{
+			nfm[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
+		});
+		
+		if(problemType==='Classification'){
+			Reflect.deleteProperty(nfm,target)
+		}
+		
+		if(otherMap.hasOwnProperty('')){
+			Reflect.deleteProperty(nfm,target);
+		}
+		
+		Object.entries(mismatchLineCounts).filter(itm=>colType[itm[0]] === 'Numerical'&&itm[1]&&!mismatchFillMethod[itm[0]]).map(itm=>{
+			mfm[itm[0]] = 'mean';
+		});
+		
+		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);//缺失值
+		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
+		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${mapHeader[target]})`,outlierLineCounts[target],true);
+		
+		const dqft = problemType==='Classification'&&this.DQFT();
+		
+		if(!mv&&!mi&&!out&&!dqft){
+			return <dl>
+				<dd>{EN.none}</dd>
+			</dl>
+		}
+		
+		return <dl className={styles.over}>
+			{dqft}
+			{mv}
+			{mi}
+			{out}
+		</dl>
+	}
+	
+	DQFData(data,title,showTarget,outlier=false){
+		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.project;
+		if(!showTarget){
+			Reflect.deleteProperty(data,target)
+		}
+		const values = Object.entries(data);
+		
+		const mismatchArray =  [{
+			value: 'mode',
+			label: EN.Replacewithmostfrequentvalue
+		}, {
+			value: 'drop',
+			label: EN.Deletetherows
+		}, {
+			value: 'ignore',//Categorical
+			label: EN.Replacewithauniquevalue
+		}, {
+			value: 'ignore',
+			label: EN.DoNothing
+		},{
+			value: 'mean',
+			label: EN.Replacewithmeanvalue
+		},{
+			value: 'min',
+			label: EN.Replacewithminvalue
+		}, {
+			value: 'max',
+			label: EN.Replacewithmaxvalue
+		}, {
+			value: 'median',
+			label: EN.Replacewithmedianvalue
+		}, {
+			value: 'zero',
+			label: EN.ReplaceWith0
+		}, {
+			value: 'others',
+			label: EN.Replacewithothers
+		},{
+			value: 'low',
+			label: EN.Replacewithlower
+		}, {
+			value: 'high',
+			label: EN.Replacewithupper
+		}];
+		
+		const result = mismatchArray.map(itm=>({
+			type:itm.value,
+			key:itm.label,
+			data:[],
+		}));
+		
+		values.forEach(itm=>{
+			if(!isNaN(+itm[1])){
+				if(!result.find(itm=>itm.type === itm[1])){
+					result.push({
+						type:itm[1],
+						key:EN.Replacewith + itm[1],
+						data:[],
+					})
+				}
+				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			}else if(itm[1]!=='ignore'){
+				result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+			}else{
+				if(colType[itm[0]] === 'Categorical'){
+					result.filter(it=>it.type === itm[1])[0].data.push(itm[0]);
+				}else{
+					result.filter(it=>it.type === itm[1])[1].data.push(itm[0]);
+				}
+			}
+		});
+		
+		const res = result.filter(itm=>itm.data&&itm.data.length);
+		
+		if(!res.length){
+			return null;
+		}
+		if(outlier){
+			let {low,high} = rawDataView[target];
+			if(outlierDictTemp[target]){
+				const lh = [...outlierDictTemp[target]];
+				low = lh[0];
+				high = lh[1];
+			}else{
+				low = +low.toFixed(2);
+				high = +high.toFixed(2);
+			}
+			return <Fragment>
+				<dt>{title}</dt>
+				<dd>{EN.ValidRange}:[{low},{high}]</dd>
+				{
+					res.map(itm=><dd key={itm.key} title={itm.data.map(itm=>mapHeader[itm]).join(',')}>{itm.key}</dd>)
+				}
+			</Fragment>
+		}
+		return <Fragment>
+			<dt>{title}</dt>
+			{
+				res.map(itm=>{
+					return <dd>
+						<label>{itm.key}:</label>
+						<ul>
+							{
+								itm.data.map(it=><li title={mapHeader[it]}>{mapHeader[it]}</li>)
+							}
+						</ul>
+					</dd>
+				})
+			}
+		</Fragment>
+	}
+	
+	
+	FS(){//新建特性与特征选择
+		const { featureLabel } = this.props.model;
+		const {rawHeader,expression,target,colType,mapHeader} = this.props.project;
+		
+		let drop = _.without(rawHeader,...featureLabel,target);
+		
+		const create = Object.values(expression).map(itm=>{
+			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.type=== 'ID'?mapHeader[it.value]:it.value).join('')}`
+		});
+		
+		if(!drop.length&&!create.length){
+			return null;
+		}
+		
+		let raw = drop.filter(itm=>colType[itm] === "Raw");
+		drop = _.without(drop,...raw).map(itm=>mapHeader[itm]||itm);
+		
+		raw = raw.map(itm=>mapHeader[itm]||itm);
+		
+		const pop = <dl className={styles.over}>
+			{
+				drop.length?<dt>
+					<label>{EN.DropTheseVariables}:</label>
+					<ul>
+						{
+							drop.map(it=><li title={it}>{it}</li>)
+						}
+					</ul>
+				</dt>:null
+			}
+			
+			{
+				raw.length?<dt>
+					<label>{EN.DropTheseVariables}(raw):</label>
+					<ul>
+						{
+							raw.map(it=><li title={it}>{it}</li>)
+						}
+					</ul>
+				</dt>:null
+			}
+			{
+				create.length?<Fragment>
+					<dt title = {create.join(',')}>
+						<label>{EN.CreateTheseVariables}:</label>
+						<ul>
+							{
+								create.map(it=><li title={it}>{it}</li>)
+							}
+						</ul>
+					</dt>
+				</Fragment>:null
+			}
+		
+		</dl>;
+		
+		return <Fragment>
+			<img src={Next} alt='' />
+			{this.popOver(pop,EN.FeatureCreationSelection)}
+		</Fragment>
+	}
+	
+	
 	render() {
 		const { dataFlow, standardType } = this.props.model;
-		// if (dataFlow.length === 1) {
 		return <section className={styles.process}>
 			<label>{EN.RawData}</label>
 			<img src={Next} alt='' />
+			{this.popOver(this.DQF(),EN.DataQualityFixing)}
+			{this.FS()}
+			<img src={Next} alt='' />
 			{this.popOver(this.DP(standardType), EN.DataPreprocessing)}
-			{/* <img src={Next} alt='' />
-				{this.popOver(this.FP(dataFlow[0]), EN.FeaturePreprocessing)} */}
 			<img src={Next} alt='' />
 			{this.popOver(this.Third(dataFlow[0]), dataFlow[0].model_name)}
 			<img src={Next} alt='' />
 			<label>{EN.Prediction}</label>
 		</section>
-		// } else if (dataFlow.length > 1) {
-		// 	return <section className={`${styles.process} ${styles.many}`}>
-		// 		<label>{EN.RawData}</label>
-		// 		<img src={Next} alt='' />
-		// 		<dl>
-		// 			{
-		// 				dataFlow.filter(itm => itm.weight).map((itm, index) => {
-		// 					return <dd key={index}>
-		// 						{this.popOver(this.DP(itm), EN.DataPreprocessing)}
-		// 						<img src={Next} alt='' />
-		// 						{this.popOver(this.FP(itm), EN.FeaturePreprocessing)}
-		// 						<img src={Next} alt='' />
-		// 						{this.popOver(this.Third(itm), itm.model_name)}
-		// 						<Tag>{formatNumber(+itm.weight || 0)}</Tag>
-		// 					</dd>
-		// 				})
-		// 			}
-		// 		</dl>
-		// 		<img src={Next} alt='' />
-		// 		<label>{EN.EnsembledModel}</label>
-		// 		<img src={Next} alt='' />
-		// 		<label>{EN.Prediction}</label>
-		// 	</section>
-		// } else {
-		// 	let str = name.split('.')[0];
-		// 	str = str.substring(0, str.length - 1);
-		// 	return <section className={styles.process}>
-		// 		<label>{EN.RawData}</label>
-		// 		<img src={Next} alt='' />
-		// 		<label>{str}</label>
-		// 		<img src={Next} alt='' />
-		// 		<label>{EN.Prediction}</label>
-		// 	</section>
-		// }
 	}
 }

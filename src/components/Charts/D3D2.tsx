@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import TSEN from './T-SEN'
 import request from '../Request'
-import { Select } from 'antd';
+import {Select, Tooltip} from 'antd';
 const {Option} = Select;
 import styles from './charts.module.css';
 import THREE from './3Variable';
@@ -72,7 +72,9 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 
 		const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
-		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>{mapHeader[itm]}</Option>);
+		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>
+			<Tooltip title={mapHeader[itm]}>{mapHeader[itm]}</Tooltip>
+		</Option>);
 		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
 		return <Select
 			value={show_name[order]}

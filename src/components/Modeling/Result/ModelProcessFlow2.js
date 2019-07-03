@@ -51,9 +51,10 @@ export default class ModelProcessFlow extends Component {
 			{this.list(data)}
 		</dl>;
 	}
-
+	
 	popOver(content, text) {
 		return <Popover
+			overlayClassName={styles.popover}
 			arrowPointAtCenter={true}
 			autoAdjustOverflow={false}
 			getPopupContainer={() => document.getElementsByClassName(styles.process)[0]}
@@ -271,12 +272,19 @@ export default class ModelProcessFlow extends Component {
 			<dt>{title}</dt>
 			{
 				res.map(itm=>{
-					const _data = itm.data.map(itm=>mapHeader[itm]).join(',');
-					return <dd key={itm.key} title={_data}>{itm.key}:{_data}</dd>
+					return <dd>
+						<label>{itm.key}:</label>
+						<ul>
+							{
+								itm.data.map(it=><li title={mapHeader[it]}>{mapHeader[it]}</li>)
+							}
+						</ul>
+					</dd>
 				})
 			}
 		</Fragment>
 	}
+	
 	
 	FS(){//新建特性与特征选择
 		const { featureLabel } = this.props.model;
@@ -298,18 +306,40 @@ export default class ModelProcessFlow extends Component {
 		raw = raw.map(itm=>mapHeader[itm]||itm);
 		
 		const pop = <dl className={styles.over}>
-			<dt style={{display:(drop.length?'':'none')}} title = {drop.join(',')}>
-				{EN.DropTheseVariables}:<label>{drop.join(',')}</label>
-			</dt>
-			<dt style={{display:(raw.length?'':'none')}} title = {raw.join(',')}>
-				{EN.DropTheseVariables}(raw):<label>{raw.join(',')}</label>
-			</dt>
-			<dt style={{display:(create.length?'':'none')}} title = {create.join(',')}>
-				{EN.CreateTheseVariables}:<label>{create.join(',')}</label>
-			</dt>
 			{
-				create.map((itm,index)=><dd key={index} title={mapHeader[itm]}>{mapHeader[itm]}</dd>)
+				drop.length?<dt>
+					<label>{EN.DropTheseVariables}:</label>
+					<ul>
+						{
+							drop.map(it=><li title={it}>{it}</li>)
+						}
+					</ul>
+				</dt>:null
 			}
+			
+			{
+				raw.length?<dt>
+					<label>{EN.DropTheseVariables}(raw):</label>
+					<ul>
+						{
+							raw.map(it=><li title={it}>{it}</li>)
+						}
+					</ul>
+				</dt>:null
+			}
+			{
+				create.length?<Fragment>
+					<dt title = {create.join(',')}>
+						<label>{EN.CreateTheseVariables}:</label>
+						<ul>
+							{
+								create.map(it=><li title={it}>{it}</li>)
+							}
+						</ul>
+					</dt>
+				</Fragment>:null
+			}
+		
 		</dl>;
 		
 		return <Fragment>
@@ -317,6 +347,7 @@ export default class ModelProcessFlow extends Component {
 			{this.popOver(pop,EN.FeatureCreationSelection)}
 		</Fragment>
 	}
+
 
 	render() {
 		const { dataFlow } = this.props.model;
