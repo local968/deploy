@@ -177,7 +177,7 @@ export default class Iso extends PureComponent<DataSampleProps>{
             // @ts-ignore
             color:color[2],
             visualMap:false,
-            symbolSize:5,
+            symbolSize:3,
             name:EN.normal,
             animation:true,
             silent:true,
@@ -187,7 +187,7 @@ export default class Iso extends PureComponent<DataSampleProps>{
             data:data2,
             color:color[3],
             visualMap:false,
-            symbolSize:5,
+            symbolSize:3,
             name:EN.abnormal,
             animation:true,
             silent:true,
@@ -239,7 +239,7 @@ export default class Iso extends PureComponent<DataSampleProps>{
                     name:var2,
                     nameLocation:'middle',
                     nameGap:25,
-	                nameTextStyle,
+	                  nameTextStyle,
                 },
                 visualMap: {
                     min:0,
@@ -249,14 +249,9 @@ export default class Iso extends PureComponent<DataSampleProps>{
                     orient:'horizontal',
                     show:false,
                 },
-                // toolbox: {
-                //     feature: {
-                //         dataZoom: {},
-                //         // brush: {
-                //         //     type: ['rect'],
-                //         // },
-                //     },
-                // },
+                dataZoom:[{
+                    type: 'inside',
+                }],
                 series,
         };
     }
