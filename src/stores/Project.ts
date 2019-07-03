@@ -309,6 +309,7 @@ class Project {
   @observable dataViews: DataView | null = null;
   @observable dataViewsLoading: boolean = false;
   @observable dataViewProgress: number = 0;
+  @observable algorithmRadio: 'all' | 'none' | 'default' = 'all'
 
   //un
   @observable weights: NumberObject = {};
@@ -543,7 +544,8 @@ class Project {
       trainModel: {},
       stopIds: [],
       features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
-      ssPlot: null
+      ssPlot: null,
+      algorithmRadio: 'all'
     } as {
       train2Finished: boolean,
       train2ing: boolean,
@@ -588,7 +590,8 @@ class Project {
       trainModel: unknown,
       stopIds: string[],
       features: string[],
-      ssPlot: null
+      ssPlot: null,
+      algorithmRadio: 'all' | 'none' | 'default'
     }
   }
 
@@ -2042,8 +2045,8 @@ class Project {
   }
 
   initModels = (force = false) => {
-    if(this.loadModel) return
-    if(!force && !!this.models.length) return
+    if (this.loadModel) return
+    if (!force && !!this.models.length) return
     this.loadModel = true
     let show = true
     let count = 0
