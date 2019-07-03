@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import styles from './styles.module.css';
 import {inject, observer} from 'mobx-react';
 import moment from 'moment';
-import {Bread, Select, Pagination, Switch, Search} from 'components/Common';
+import {Bread, Select, Pagination, Switch, Search, Confirm} from 'components/Common';
 import {Icon, Modal} from 'antd';
 import issueIcon from './fail.svg';
 import runningIcon from './running.svg';
@@ -218,17 +218,12 @@ export default class Home extends Component {
                 >
                   <Icon type="delete"/>
                 </span>
-                <Modal
-                  mask={false}
-                  visible={this.state.visible}
-                  onOk={() => {
+                <Confirm width={'6em'} visible={this.state.visible} title={EN.Warning}
+                  content={EN.Areyousuretodeletethismodeldeployment} onClose={() => this.setState({ visible: false })} onConfirm={() => {
                     deploymentStore.delete(deployment.id);
                     this.setState({ visible: false })
                   }}
-                  onCancel={() => this.setState({ visible: false })}
-                >
-                  {EN.Areyousuretodeletethismodeldeployment}
-                </Modal>
+                  confirmText={EN.Continue} closeText={EN.CANCEL} />
               </div>
             ))}
           </div>
