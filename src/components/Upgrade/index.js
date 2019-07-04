@@ -33,7 +33,7 @@ const InfoContent = ({describe, img, onClick, data = []}) => {
 export default class Upgrade extends Component {
 
   open() {
-    const url = 'http://app17.newa-tech.com:27002/submitOrder';
+    const url = '//app17.newa-tech.com:27002/submitOrder';
     window.open(url)
   }
 

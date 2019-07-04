@@ -1,8 +1,28 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import config from 'config'
+import _ from 'lodash';
 import EN from '../../constant/en';
 const {isEN} = config;
+
+const color = [
+	"#80bdfd",
+	"#b0e39b",
+	"#fec571",
+	"#5bdcef",
+	"#ff9595",
+	"#a89fec",
+	"#52b4ee",
+	"#ddf07a",
+	"#ed85a5",
+	"#828de5",
+	"#afe39b",
+	"#fc8b89",
+	"#ffe169",
+	"#82ddc1",
+	"#ffb287",
+	"#de80b9"
+];
 
 interface DataSampleProps {
 	x_name : string
@@ -11,10 +31,14 @@ interface DataSampleProps {
 	height?:number
 	data : any
 	title?: string
+	average?:boolean
 }
 
 export default class TSEN extends PureComponent<DataSampleProps>{
 	private chart: any;
+	state:{
+		loading:boolean
+	};
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
@@ -32,8 +56,8 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 	}
 
 	getOption() {
-		const {x_name,y_name,data=[],title=''} = this.props as any;
-		const {loading} = this.state as any;
+		const {x_name,y_name,data=[],title='',average} = this.props;
+		const {loading} = this.state;
 
 		if(data.length&&!loading){
 			const chart = this.chart.getEchartsInstance();
@@ -45,7 +69,10 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 			}
 		}
 
-		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
+		const series = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
+			if(!color[ind]){
+				color.push('#'+Math.random().toString(16).substring(2,8))
+			}
 			return {
 				name:itm.name,
 				data:itm.value,
@@ -53,6 +80,40 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 				symbolSize:5,
 			}
 		});
+
+		if(average){
+			series.push({
+				name:EN._Average,
+				type: 'scatter',
+				symbol:'triangle',
+				itemStyle:{
+					borderWidth:1,
+					borderColor:'#000',
+					color:'#1c2b3b'
+				},
+			});
+			series.forEach((itm,ind)=>{
+				const mean = _.unzip(itm.data).map(itm=>_.mean(itm));
+				series.push({
+					name:EN._Average,
+					symbolSize:8,
+					type: 'scatter',
+					data:[mean],
+					symbol:'triangle',
+					emphasis:{
+						label:{
+							show:false
+						}
+					},
+					itemStyle:{
+						borderWidth:0.1,
+						borderColor:'#000',
+						color:color[ind]
+					},
+				})
+			});
+		}
+
 		return {
 			title: {
 				text: title,
@@ -158,7 +219,7 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 	}
 
 	render(){
-		const {width=550,height=400} = this.props as any;
+		const {width=550,height=400} = this.props;
 		return <ReactEcharts
 			option={this.getOption()}
 			ref = {chart=>this.chart=chart}

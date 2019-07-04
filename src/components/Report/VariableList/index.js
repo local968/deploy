@@ -562,7 +562,7 @@ class CorrelationPlot extends Component {
 //
 //   render() {
 //     const { onClose, path, type, id, style } = this.props;
-//     const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
+//     const imgPath = path ? `//${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
 //     return <div className={styles.plot} style={style}>
 //       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
 //       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}

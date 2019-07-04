@@ -14,8 +14,9 @@ import {observer} from "mobx-react";
 interface DataSampleProps {
 	x_name:string
 	y_name:string
-	model:any
 	project:any
+	data?:any
+	model?:any
 }
 
 @observer
