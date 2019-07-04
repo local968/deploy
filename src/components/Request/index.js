@@ -8,7 +8,6 @@ const get = (url)=>{
         if (err || !res.ok) {
           reject(err)
         } else {
-
           resolve(JSON.parse(res.text));
         }
       });

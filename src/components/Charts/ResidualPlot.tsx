@@ -1,16 +1,23 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
-import {concat} from 'lodash'
+// import {concat} from 'lodash'
 import EN from "../../constant/en";
+import _ from 'lodash';
 
 export default function ResidualPlot(props){
 	const {chartDate={},title='',y_name='',width=500,height=300} = props;
-	const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
+	// const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
+	const num:any = [];
+	const data = _.map(chartDate.data,itm=>{
+		const [x,y] = itm;
+		num.push(x,y);
+		return [x,y];
+	});
 	// @ts-ignore
-	const num = concat(...data);
+	// const num = concat(...data);
 
-	const max = Math.max(...num);
-	const min = Math.min(...num);
+	const max:number = _.max(num);
+	const min:number = _.min(num);
 
 	const nameTextStyle = {
 		color:'#000',
