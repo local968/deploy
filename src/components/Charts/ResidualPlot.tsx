@@ -9,7 +9,7 @@ export default function ResidualPlot(props){
 	// const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
 	const num:any = [];
 	const data = _.map(chartDate.data,itm=>{
-		const [x,y] = itm;
+		const [x,,y] = itm;
 		num.push(x,y);
 		return [x,y];
 	});
