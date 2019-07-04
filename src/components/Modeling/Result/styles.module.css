@@ -367,6 +367,14 @@ span.performanceScore {
 .predicted {
     background-color: #adaafc;
 }
+.fail{
+  background-color:  #49E4E1;
+
+}
+
+.failPredicted {
+  background-color: #f9cf37;
+}
 
 .different {
     background-color: #f9cf37;
