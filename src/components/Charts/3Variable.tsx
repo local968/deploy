@@ -78,7 +78,7 @@ export default class ThreeVariable extends PureComponent<Interface>{
 				name:EN._Average,
 				symbolSize:1.5*symbolSize,
 				type: 'scatter3D',
-				data:[mean],
+				data:[mean,mean,mean],
 				symbol:'triangle',
 				emphasis:{
 					label:{
