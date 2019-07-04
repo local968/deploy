@@ -124,7 +124,9 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		return <TSEN
 			x_name={mapHeader[names[0]]}
 			y_name={mapHeader[names[1]]}
-			data={data}/>
+			data={data}
+			average={true}
+		/>
 	}
 
 	save(){
