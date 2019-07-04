@@ -11,27 +11,35 @@ import Preview from './Preview'
 import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
 import EN from '../../../constant/en';
+import uuid from 'uuid'
+import moment from 'moment'
 
 @inject('projectStore','userStore')
 @observer
 export default class StartTrain extends Component {
   @observable visible = false;
 
-  fastTrain(work){
-    if(work) {
-      this.props.projectStore.project.newSetting('auto');
-      this.props.projectStore.project.fastTrain();
-    }
+  fastTrain = () => {
+    const { project } = this.props.projectStore
+    const setting = project.newSetting()
+    const name = `auto.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
+    const id = uuid.v4()
+    project.settings.push({
+      setting,
+      name,
+      id,
+      models: []
+    })
+    project.settingId = id
+    project.fastTrain();
   };
 
-  advanced(){
-      this.props.projectStore.project.newSetting('custom')
-      this.visible = true
+  advanced = () => {
+    this.visible = true
   }
 
-  closeAdvanced = (isCLose = true) => {
+  closeAdvanced = () => {
     this.visible = false
-    if(isCLose) this.props.projectStore.project.removeCurSetting()
   }
 
   render() {
@@ -104,6 +112,12 @@ export default class StartTrain extends Component {
 class AdvancedModel extends Component {
   @observable tab = 1
   @observable visiable = false
+  @observable setting = {
+    name: `custom.${moment().format('MM.DD.YYYY_HH:mm:ss')}`,
+    id: uuid.v4(),
+    setting: this.props.project.newSetting(),
+    models: []
+  }
 
   switchTab = (num) => {
     if (num !== 1 && num !== 2) return false;
@@ -117,6 +131,10 @@ class AdvancedModel extends Component {
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v) && v !== target)
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
+    if (!this.setting.name) {
+      message.destroy();
+      return message.error(EN.settingNameRequired)
+    }
     if (hasNewOne) project.customHeader.push(checkedVariables)
     const sortFn = (a, b) => a - b
     if (!!algorithms.length) {
@@ -128,7 +146,9 @@ class AdvancedModel extends Component {
       message.destroy();
       return message.error(EN.Youneedtoselectatleast)
     }
-    closeAdvanced(false)
+    project.settings.push({ ...this.setting })
+    project.settingId = this.setting.id
+    closeAdvanced()
     advancedModeling()
   }
 
@@ -138,6 +158,16 @@ class AdvancedModel extends Component {
 
   hideTable = () => {
     this.visiable = false
+  }
+
+  setSetting = (setting) => {
+    Object.entries(setting).forEach(([key, value]) => {
+      this.setting.setting[key] = value
+    })
+  }
+
+  setSettingName = (name) => {
+    this.setting.name = name
   }
 
   render() {
@@ -158,7 +188,7 @@ class AdvancedModel extends Component {
         </div>
         <div className={styles.viewBox}>
           <Preview project={project} visiable={this.visiable} showTable={this.showTable} hideTable={this.hideTable} />
-          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} hidden={this.visiable || this.tab === 1} />}
+          {this.tab === 1 ? <SimplifiedView project={project} /> : <AdvancedView project={project} hidden={this.visiable || this.tab === 1} setting={this.setting} setSetting={this.setSetting} setSettingName={this.setSettingName} />}
           <div className={styles.bottom}>
             <button
               style={{display:(quality_RemapTarget?'':'none')}}

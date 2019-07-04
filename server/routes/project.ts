@@ -62,21 +62,6 @@ function parseChartData(result) {
   return getChartData(result);
 }
 
-function setDefaultData(id, userId) {
-  const data = {
-    correlationMatrixHeader: null,
-    correlationMatrixData: null,
-    univariatePlots: {},
-    histgramPlots: {},
-    preImportance: null,
-    dataViews: null,
-    informativesLabel: [],
-    settings: [],
-    settingId: '',
-  };
-  return createOrUpdate(id, userId, data);
-}
-
 function query(key, params) {
   const pipeline = redis.pipeline();
   pipeline.zcard(key);
@@ -360,8 +345,21 @@ function deleteProject(userId, id) {
 }
 
 function checkProject(userId, id) {
-  return redis.hgetall(`project:${id}`).then(result => {
-    if (!result) {
+  const Field = ['id', 'userId', 'name', 'createTime', 'updateTime', 'description', 'fileName']
+  return redis.hmget(`project:${id}`, Field).then(result => {
+    const data = Field.reduce((prev, value, key) => {
+      prev[value] = JSON.parse(result[key])
+      return prev
+    }, {} as {
+      id: string | null,
+      userId: string | null,
+      name: string | null,
+      createTime: string | null,
+      updateTime: string | null,
+      description: string | null,
+      fileName: string | null
+    })
+    if (!data.id) {
       errorLogger.error({
         userId,
         message: `project:${id} has been deleted`,
@@ -370,32 +368,27 @@ function checkProject(userId, id) {
       });
       return { status: 444, message: `project:${id} has been deleted` };
     }
-    Reflect.deleteProperty(result, 'stats')
-    for (let key in result) {
-      try {
-        result[key] = JSON.parse(result[key]);
-      } catch (e) { }
-    }
-    if (result.userId !== userId) {
+
+    if (data.userId !== userId) {
       errorLogger.error({
         userId,
-        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
         pid: id,
         time: moment().unix(),
       });
       userLogger.error({
         userId,
-        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
         pid: id,
         time: moment().unix(),
       });
       console.error(
-        `user:${userId}, project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        `user:${userId}, project:${id} ${!data.userId ? 'delete' : 'error'}`,
       );
       return { status: 421, message: 'project error' };
       // return {}
     }
-    return { status: 200, message: 'ok', data: result };
+    return { status: 200, message: 'ok', data };
   });
 }
 
@@ -956,29 +949,6 @@ wss.register('dataView', (message, socket, progress) => {
   // sendToCommand({ ...message, userId: socket.session.userId, requestId: message._id }, progress)
 });
 
-wss.register('correlationMatrix', (message, socket, progress) =>
-  createOrUpdate(message.projectId, socket.session.userId, {
-    correlationMatrixLoading: true,
-  }).then(() =>
-    sendToCommand(
-      { ...message, userId: socket.session.userId, requestId: message._id },
-      progress,
-    ).then((returnValue: any) => {
-      const { status, result } = returnValue;
-      const data =
-        status === 100
-          ? {
-            correlationMatrixHeader: result.header,
-            correlationMatrixData: result.data,
-            correlationMatrixLoading: false,
-          }
-          : { correlationMatrixLoading: false };
-      createOrUpdate(message.projectId, socket.session.userId, data);
-      return returnValue;
-    }),
-  ),
-);
-
 wss.register('preTrainImportance', async (message, socket, progress) => {
   const { userId } = socket.session;
   const { projectId } = message;
@@ -1173,30 +1143,6 @@ wss.register('createNewVariable', async (message, socket, progress) => {
     await createOrUpdate(projectId, userId, { newVariablePath: resultData });
   }
   return returnValue;
-});
-
-wss.register('etlCleanData', (message, socket, progress) => {
-  const { projectId } = message;
-  const { userId } = socket.session;
-  return createOrUpdate(projectId, userId, { etlCleanDataLoading: true }).then(
-    () => {
-      return sendToCommand(
-        { ...message, userId, requestId: message._id },
-        progress,
-      ).then((returnValue: any) => {
-        const { result, status } = returnValue;
-        const saveData = {
-          etlCleanDataLoading: false,
-          cleanPath: undefined,
-        };
-        if (status === 100) {
-          const cleanPath = ((result || {}).result || {}).path || '';
-          if (cleanPath) saveData.cleanPath = cleanPath;
-        }
-        return createOrUpdate(projectId, userId, saveData);
-      });
-    },
-  );
 });
 
 wss.register('abortTrain', (message, socket) => {

@@ -12,7 +12,7 @@ interface DataSampleProps {
 	y_name:string
 	title:string
 	data:any
-	result:any
+	result?:any
 }
 
 export default class HS extends Component<DataSampleProps>{
@@ -110,7 +110,7 @@ export default class HS extends Component<DataSampleProps>{
 		};
 
 		if(len<=1){
-			const val = data[0][0];
+			const val = data[0]&&data[0][0];
 			xAxis.min = val - 1;
 			xAxis.max = val + 1;
 			start = -1;

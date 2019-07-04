@@ -13,7 +13,7 @@ import config from '../../config';
 import axios from 'axios';
 import _ from 'lodash';
 
-const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
+const esServicePath = config.services.ETL_SERVICE;
 const router = express.Router();
 // const { userDeployRestriction } = restriction;
 

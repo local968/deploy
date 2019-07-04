@@ -1,7 +1,7 @@
 import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
-const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
+const esServicePath = config.services.ETL_SERVICE; 
 
 wss.register('checkDatabase', async (message = {}) => {
   const databaseConfig = {

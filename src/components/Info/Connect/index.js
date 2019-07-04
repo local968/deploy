@@ -178,7 +178,7 @@ export default class DataConnect extends Component {
 
     this.uploading = true
 
-    // axios.post(`http://${config.host}:${config.port}/upload/sample`, { filename }).then(
+    // axios.post(`//${config.host}:${config.port}/upload/sample`, { filename }).then(
     //   action(data => {
     //     const { fileId } = data.data
     this.process = 50

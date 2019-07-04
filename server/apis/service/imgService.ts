@@ -16,8 +16,3 @@ const detail = async name =>{
 module.exports = {
 	detail,
 };
-
-
-// export default {
-// 	detail,
-// }

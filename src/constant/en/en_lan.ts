@@ -935,6 +935,7 @@ const EN_LAN = {
   Average: 'Average',
   PointNumber: 'Group ID',
   NewAverage: '',
+  _Average: 'Average',
   RawData: 'Raw Data',
   GroupNumber: 'Group Number:',
   PredictedAverage: 'Predicted Average:',
@@ -1295,7 +1296,8 @@ const EN_LAN = {
   GBK: 'GBK',
   GB_2312: 'GB-2312',
   BIG5: 'BIG5',
-  residual:"residual",
+  residual: "residual",
+  settingNameRequired: 'setting name required'
 };
 
 

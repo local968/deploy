@@ -27,6 +27,7 @@ class ProjectStore {
   @observable isOnline: boolean = true;
   @observable watchList: boolean = false;
   @observable currentId: string = "";
+  @observable projectInit: boolean = false
 
   @observable list: Project[] = [];
   @observable total: number = 0;
@@ -97,12 +98,8 @@ class ProjectStore {
     when(
       () => this.watchList,
       () => {
-        this.queryProjectList().then(() => {
-          if (this.project) {
-            this.project.initProject()
-            this.project.initModels()
-          }
-        })
+        this.queryProjectList()
+        if (this.currentId) this.initProject(this.currentId)
       }
     )
   }
@@ -111,6 +108,7 @@ class ProjectStore {
     this.watchList = false;
     this.init = false
     this.isOnline = false
+    this.projectInit = false
     if (this.project) this.project.clean();
   }
 
@@ -248,34 +246,52 @@ class ProjectStore {
 
   @action
   initProject = (id: string) => {
+    if (this.projectInit) return Promise.resolve(true)
+    this.projectInit = true
     return new Promise(resolve => {
-      if (this.currentId === id) return resolve(true)
-      if (this.list.length) {
-        const project = this.list.find(row => {
-          return row.id === id
-        })
-        if (project) {
-          project.initProject()
-          project.initModels()
-          this.currentId = id
-          return resolve(true)
-        }
-      }
-      socketStore.ready().then(api => {
-        api.checkProject({ id }).then((result: { status: number, data: Project, message: string }) => {
-          const { status, data, message } = result
-          if (status !== 200) {
-            antdMessage.error(message)
-            return resolve(false)
+      when(
+        () => this.watchList,
+        () => {
+          if (this.currentId === id) return resolve(true)
+          if (this.list.length) {
+            const project = this.list.find(row => {
+              return row.id === id
+            })
+            if (project) {
+              project.initProject()
+              project.initModels()
+              this.currentId = id
+              this.inProject(id)
+              // this.projectInit = false
+              return resolve(true)
+            }
           }
-          const hiddenProject = new Project(id + '', { ...data, visiable: false })
-          this.list.push(hiddenProject)
-          hiddenProject.initProject()
-          hiddenProject.initModels()
-          this.currentId = id
-          resolve(true)
-        })
-      })
+          socketStore.ready().then(api => {
+            api.checkProject({ id }).then((result: { status: number, data: Project, message: string }) => {
+              const { status, data, message } = result
+              if (status !== 200) {
+                antdMessage.error(message)
+                return resolve(false)
+              }
+              const hiddenProject = new Project(id + '', {
+                id: data.id,
+                fileName: data.fileName,
+                createTime: data.createTime,
+                updateTime: data.updateTime,
+                name: data.name,
+                visiable: false
+              })
+              this.list.push(hiddenProject)
+              hiddenProject.initProject()
+              hiddenProject.initModels()
+              this.currentId = id
+              this.inProject(id)
+              // this.projectInit = false
+              resolve(true)
+            })
+          })
+        }
+      )
       //   when(
       //     () => !this.loading && !this.isInit,
       //     () => {
@@ -334,6 +350,7 @@ class ProjectStore {
       })
     }
     this.currentId = ''
+    this.projectInit = false
   }
 }
 

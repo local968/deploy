@@ -43,7 +43,7 @@ export default class Sider extends Component {
     const { userStore={}, routing } = this.props;
     const { labUrl, dashUrl,info={}} = userStore;
     const isLogin = userStore.status === 'login';
-    // const jupyterLabUrl = process.env.JUPYTER_LAB || 'http://192.168.0.23:18888/lab';
+    // const jupyterLabUrl = process.env.JUPYTER_LAB || '//192.168.0.23:18888/lab';
     const isDeploy = routing.location.pathname.includes('deploy');
     const isSupport = routing.location.pathname.includes('support');
     

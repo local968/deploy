@@ -19,7 +19,7 @@ export default function CorrelationMatrixs(props){
 		color:'#000',
 	};
 
-	let series = {
+	let series:any = {
 		type: 'heatmap',
 		data,
 		itemStyle: {
@@ -28,13 +28,17 @@ export default function CorrelationMatrixs(props){
 				shadowColor: 'rgba(0, 0, 0, 0.5)',
 			},
 		},
+		tooltip:{
+			formatter:data=>{
+				const {marker,value} = data;
+				return `${marker}:${value[2].toFixed(3)}`
+			}
+		}
 	};
 	if(!len){
-
 		series = {
 			type: 'tree',
 			data: [{name:'N/A'}],
-			// @ts-ignore
 			left: "20%",
 			symbol: 'emptyCircle',
 			symbolSize:1,

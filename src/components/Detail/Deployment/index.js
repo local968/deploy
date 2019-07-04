@@ -161,7 +161,7 @@ export default class Deployment extends Component {
           <a className={styles.change} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
           <span className={styles.data}>{EN.DeploymentDataDefinition}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />
-          <a className={styles.download} target="_blank" href={`http://${config.host}:${config.port}/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>
+          <a className={styles.download} target="_blank" href={`/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>
           {/* <span className={styles.email}>
             Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (

@@ -8,7 +8,7 @@ export default function SSPlot(props){
 	const {width=600,height=400,project} = props;
 	const [ssPlot,upSsPlot] = useState(project.ssPlot);
 	let max = 1;
-	let option = {
+	let option:any = {
 		xAxis:{},
 		yAxis:{},
 	};
@@ -29,7 +29,6 @@ export default function SSPlot(props){
 			yAxis: {
 				name:EN.WithinGroupSsSquares,
 			},
-			// @ts-ignore
 			series:{
 				type: 'line',
 				symbolSize: 0,
@@ -48,7 +47,7 @@ export default function SSPlot(props){
 
 						return `
 							${EN.NumberofClusters}:${x}<br/>
-							${EN.WithinGroupsSs}:${y}<br/>
+							${EN.WithinGroupsSs}:${y.toFixed(3)}<br/>
 						`
 					}
 				},
