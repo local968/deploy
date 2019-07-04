@@ -18,7 +18,7 @@ import uploader from './uploader';
 
 import { getProjectField } from './project';
 
-const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
+const esServicePath = config.services.ETL_SERVICE; 
 const router = express.Router();
 const { userModelingRestriction, userStorageRestriction } = Restriction;
 

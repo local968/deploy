@@ -315,7 +315,7 @@ class Project {
   }
 
   readData = (path: string) => {
-    const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`;
+    const url = `/redirect/download/${path}?projectId=${this.id}`;
     return new Promise((resolve, reject) => {
       Papa.parse(url, {
         download: true,
@@ -2295,7 +2295,7 @@ class Project {
 
   translateToBase64 = (imagePath: string) => {
     if (!imagePath) return Promise.resolve('')
-    const url = `http://${config.host}:${config.port}/redirect/download/${imagePath}?projectId=${this.id}`
+    const url = `/redirect/download/${imagePath}?projectId=${this.id}`
     return new Promise((resolve, reject) => {
       var img = document.createElement('img');
       img.src = url

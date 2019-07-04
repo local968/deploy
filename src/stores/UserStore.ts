@@ -31,7 +31,7 @@ class UserStore {
       return
     }
 
-    axios.get(`http://${config.host}:${config.port}/user/status`).then(action(res => {
+    axios.get(`/user/status`).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
@@ -43,7 +43,7 @@ class UserStore {
   }
 
   login(params, props=null) {
-    axios.post(`http://${config.host}:${config.port}/user/login`, params).then(action(res => {
+    axios.post(`/user/login`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
@@ -60,7 +60,7 @@ class UserStore {
   }
 
   register(params) {
-    axios.post(`http://${config.host}:${config.port}/user/register`, params).then(action(res => {
+    axios.post(`/user/register`, params).then(action(res => {
       if (res.data.status === 200) {
         this.info = res.data.info
         this.status = 'login'
@@ -71,7 +71,7 @@ class UserStore {
   }
 
   logout() {
-    axios.delete(`http://${config.host}:${config.port}/user/logout`).then(action(res => {
+    axios.delete(`/user/logout`).then(action(res => {
       if (res.data.status === 200) {
         this.status = 'unlogin'
         window.location.reload()
@@ -82,15 +82,15 @@ class UserStore {
   }
 
   resetPassword(code, password) {
-    return axios.put(`http://${config.host}:${config.port}/user/resetpassword`, { code, password })
+    return axios.put(`/user/resetpassword`, { code, password })
   }
 
   forgetPassword(email) {
-    return axios.post(`http://${config.host}:${config.port}/user/forgetpassword`, { email })
+    return axios.post(`/user/forgetpassword`, { email })
   }
 
   changePassword(current, newPassword) {
-    return axios.put(`http://${config.host}:${config.port}/user/changepassword`, { current, newPassword })
+    return axios.put(`/user/changepassword`, { current, newPassword })
   }
 }
 
