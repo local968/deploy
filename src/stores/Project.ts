@@ -970,16 +970,16 @@ class Project {
 
   @computed
   get qualityHasChanged() {
-    return true
-    // let hasChange = false
-    // const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
-    // for (const item of list) {
-    //   const before = this[item]
-    //   const after = this[item + "Temp"]
-    //   hasChange = this.hasChanged(before, after)
-    //   if (hasChange) break
-    // }
-    // return hasChange
+    if(!this.etlIndex) return true
+    let hasChange = false
+    const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
+    for (const item of list) {
+      const before = this[item]
+      const after = this[item + "Temp"]
+      hasChange = this.hasChanged(before, after)
+      if (hasChange) break
+    }
+    return hasChange
   }
 
   @action
