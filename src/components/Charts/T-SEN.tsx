@@ -34,7 +34,7 @@ interface DataSampleProps {
 	average?:boolean
 }
 
-export default class TSEN extends PureComponent<DataSampleProps>{
+export default class T_SEN extends PureComponent<DataSampleProps>{
 	private chart: any;
 	state:{
 		loading:boolean
@@ -106,7 +106,7 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 						}
 					},
 					itemStyle:{
-						borderWidth:0.1,
+						borderWidth:1,
 						borderColor:'#000',
 						color:color[ind]
 					},
