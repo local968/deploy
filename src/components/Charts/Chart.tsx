@@ -32,7 +32,7 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'histogram-numerical':
-			chart = <HistogramNumerical
+			chart = <HS
 				x_name={x_name}
 				y_name={y_name}
 				title={title}

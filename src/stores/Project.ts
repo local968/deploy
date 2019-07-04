@@ -2369,19 +2369,22 @@ class Project {
   }
 
   histogram(field: string) {
-    const { colType, dataViews, etlIndex } = this;
-    const value: Stats = Reflect.get(dataViews, field)
+    const { colType, dataViews, etlIndex,rawDataView } = this;
+    const value: Stats = Reflect.get(dataViews, field);
     if (!value) {
       return {}
     }
     if (colType[field] === 'Numerical') {
-      const { min, max } = value;
+      const { max, min, std_deviation_bounds: { lower, upper } } = rawDataView[field];
+      const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
       return {
         "name": "histogram-numerical",
         "data": {
           field,
           id: etlIndex,
-          interval: (max - min) / 100
+          interval,
+          max,
+          min,
         }
       }
     } else {
