@@ -429,8 +429,21 @@ class Project {
         'IsolationForest',
         'MCD',
         'EllipticEnvelope',
+        'OneClassSVM',
+        'LocalOutlierFactor',
+        'ABOD',
+        'FB',
       ]
-      disableList = (this.totalLines > 300000 && ['IsolationForest', 'MCD', 'EllipticEnvelope']) || []
+      disableList = (this.totalLines > 30000 && ['OneClassSVM',
+        'LocalOutlierFactor',
+        'ABOD',
+        'FB']) || (this.totalLines > 300000 && ['OneClassSVM',
+          'LocalOutlierFactor',
+          'ABOD',
+          'FB',
+          'IsolationForest',
+          'MCD',
+          'EllipticEnvelope']) || []
     } else if (this.problemType === "Classification") {
       algorithms = [
         'adaboost',
@@ -1776,7 +1789,7 @@ class Project {
   }
 
   newSetting = () => {
-    const { problemType, dataHeader, newVariable, targetCounts, trainHeader } = this;
+    const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
     const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
 
@@ -1786,15 +1799,7 @@ class Project {
           kType: 'auto',
           kValue: 5,
           measurement: 'CVNN',
-          algorithms: [
-            'KMeans',
-            'GMM',
-            'Birch',
-            'Agg',
-            'SpectralClustering',
-            'DBSCAN',
-            'MeanShift',
-          ],
+          algorithms: defaultAlgorithms,
           standardType: 'standard',
           searchTime: 5,
           featureLabel,
@@ -1803,13 +1808,7 @@ class Project {
         }
       case 'Outlier':
         return {
-          algorithms: [
-            'HBOS',
-            'PCA',
-            'IsolationForest',
-            'MCD',
-            'EllipticEnvelope',
-          ],
+          algorithms: defaultAlgorithms,
           standardType: 'standard',
           searchTime: 5,
           featureLabel,
@@ -1830,39 +1829,7 @@ class Project {
           customField: '',
           customRange: [],
           features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
-          algorithms: problemType === "Classification" ? [
-            'adaboost',
-            'bernoulli_nb',
-            'decision_tree',
-            'extra_trees',
-            'gaussian_nb',
-            'gradient_boosting',
-            'k_nearest_neighbors',
-            'lda',
-            'liblinear_svc',
-            'libsvm_svc',
-            'multinomial_nb',
-            'passive_aggressive',
-            'qda',
-            'random_forest',
-            'sgd',
-            'xgradient_boosting',
-            'r2-logistics',
-          ] : [
-              'adaboost',
-              'ard_regression',
-              'decision_tree',
-              'extra_trees',
-              'gaussian_process',
-              'gradient_boosting',
-              'k_nearest_neighbors',
-              'liblinear_svr',
-              'libsvm_svr',
-              'random_forest',
-              'ridge_regression',
-              'sgd',
-              'xgradient_boosting',
-            ],
+          algorithms: defaultAlgorithms,
           speedVSaccuracy: 5,
           ensembleSize: 20,
           featureLabel

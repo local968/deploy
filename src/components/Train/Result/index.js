@@ -35,7 +35,7 @@ function ModelResult(props) {
   const [view, setView] = React.useState('simple')
   const { resetSide, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings, loadModel } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings, loadModel, measurement } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   React.useEffect(() => {
@@ -43,6 +43,8 @@ function ModelResult(props) {
   })
   let filterModels = [...models]
   const currentSetting = currentSettingId === 'all' ? null : settings.find(setting => setting.id === currentSettingId)
+  const measurementLabel = (measurement === 'CH' && 'CH Index') || (measurement === 'silhouette_euclidean' && EN.SihouetteScore) || 'CVNN'
+  const measurementHint = (measurement === 'CH' && EN.CHIndexHint) || (measurement === 'silhouette_euclidean' && EN.SihouetteScoreHint) || EN.CVNNHint
   if (currentSetting && currentSetting.models)
     filterModels = filterModels.filter(model => currentSetting.models.find(id => model.id === id))
 
@@ -135,8 +137,8 @@ function ModelResult(props) {
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
             <div className={classes.cvnn}>
-              <div className={classes.orange}>{formatNumber(selectModel.score.CVNN)}</div>
-              <span className={classes.label}>CVNN <Hint content={EN.CVNNHint} /></span>
+              <div className={classes.orange}>{formatNumber(selectModel.score[measurement])}</div>
+              <span className={classes.label}>{measurementLabel} <Hint content={measurementHint} /></span>
             </div>
             <div className={classes.cluster}>
               <div className={classes.blood}>{Object.keys(selectModel.labelWithImportance).length}</div>
