@@ -343,8 +343,21 @@ function deleteProject(userId, id) {
 }
 
 function checkProject(userId, id) {
-  return redis.hgetall(`project:${id}`).then(result => {
-    if (!result) {
+  const Field = ['id', 'userId', 'name', 'createTime', 'updateTime', 'description', 'fileName']
+  return redis.hmget(`project:${id}`, Field).then(result => {
+    const data = Field.reduce((prev, value, key) => {
+      prev[value] = JSON.parse(result[key])
+      return prev
+    }, {} as {
+      id: string | null,
+      userId: string | null,
+      name: string | null,
+      createTime: string | null,
+      updateTime: string | null,
+      description: string | null,
+      fileName: string | null
+    })
+    if (!data.id) {
       errorLogger.error({
         userId,
         message: `project:${id} has been deleted`,
@@ -353,32 +366,27 @@ function checkProject(userId, id) {
       });
       return { status: 444, message: `project:${id} has been deleted` };
     }
-    Reflect.deleteProperty(result, 'stats')
-    for (let key in result) {
-      try {
-        result[key] = JSON.parse(result[key]);
-      } catch (e) { }
-    }
-    if (result.userId !== userId) {
+
+    if (data.userId !== userId) {
       errorLogger.error({
         userId,
-        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
         pid: id,
         time: moment().unix(),
       });
       userLogger.error({
         userId,
-        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
         pid: id,
         time: moment().unix(),
       });
       console.error(
-        `user:${userId}, project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        `user:${userId}, project:${id} ${!data.userId ? 'delete' : 'error'}`,
       );
       return { status: 421, message: 'project error' };
       // return {}
     }
-    return { status: 200, message: 'ok', data: result };
+    return { status: 200, message: 'ok', data };
   });
 }
 

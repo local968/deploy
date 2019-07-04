@@ -273,7 +273,14 @@ class ProjectStore {
                 antdMessage.error(message)
                 return resolve(false)
               }
-              const hiddenProject = new Project(id + '', { ...data, visiable: false })
+              const hiddenProject = new Project(id + '', {
+                id: data.id,
+                fileName: data.fileName,
+                createTime: data.createTime,
+                updateTime: data.updateTime,
+                name: data.name,
+                visiable: false
+              })
               this.list.push(hiddenProject)
               hiddenProject.initProject()
               hiddenProject.initModels()
