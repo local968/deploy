@@ -81,8 +81,8 @@ export default class OrderManage extends Component {
         </div>
         <div className={styles.operate}>
           <a download="selectedOrder.csv"
-             href={'http://localhost:54000/order/downloadOrder?orderIds=' + this.selectedIds.join(',')}>下载已选订单</a>
-          <a href={'http://localhost:54000/order/downloadOrder?all=true'} download="orders.csv">下载所有订单</a>
+             href={'//localhost:54000/order/downloadOrder?orderIds=' + this.selectedIds.join(',')}>下载已选订单</a>
+          <a href={'//localhost:54000/order/downloadOrder?all=true'} download="orders.csv">下载所有订单</a>
         </div>
       </div>
     )
