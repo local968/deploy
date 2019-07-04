@@ -707,11 +707,15 @@ class Project {
   @action
   initProject = () => {
     if (this.init) return
+    this.init = true
     socketStore.ready().then(api => {
       api.initProject({ id: this.id }).then(result => {
         const { status, message, project } = result
-        if (status !== 200) return antdMessage.error(message)
-        this.setProperty({ ...project, init: true })
+        if (status !== 200) {
+          this.init = false
+          return antdMessage.error(message)
+        }
+        this.setProperty(project)
         // Object.assign(this, project, { init: true })
 
 
@@ -2336,7 +2340,7 @@ class Project {
   }
 
   histogram(field: string) {
-    const { colType, dataViews, etlIndex,rawDataView } = this;
+    const { colType, dataViews, etlIndex, rawDataView } = this;
     const value: Stats = Reflect.get(dataViews, field);
     if (!value) {
       return {}
