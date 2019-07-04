@@ -8,6 +8,7 @@ import BoxPlots from "./BoxPlots";
 import EN from "../../constant/en";
 import PIE from "./PIE";
 import PVA from "./PVA";
+import HS from "./HS";
 
 export default function Chart(props){
 	let {x_name='',y_name='',title='',project,name} = props;
@@ -39,7 +40,6 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'classification-numerical':
-			// @ts-ignore
 			chart = <UnivariantPlots
 				x_name={x_name}
 				y_name={y_name}
@@ -47,7 +47,6 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'classification-categorical':
-			// @ts-ignore
 			chart = <UnivariantPlots
 				x_name={x_name}
 				y_name={y_name}
@@ -68,14 +67,12 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'regression-categorical':
-			// @ts-ignore
 			chart = <BoxPlots
 				x_keys={data.x_keys}
 				value={data.value}
 			/>;
 			break;
 		case 'predicted-vs-actual-plot':
-			//@ts-ignore
 			chart = <PVA
 				x_name = {EN.PointNumber}
 				y_name = {y_name}
