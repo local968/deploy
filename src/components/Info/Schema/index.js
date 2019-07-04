@@ -33,12 +33,24 @@ export default class DataSchema extends Component {
 
   onConfirm = () => {
     const { project } = this.props.projectStore
-    const { rawHeader, problemType } = project;
+    const { rawHeader, problemType, outlierLineCounts } = project;
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && d !== this.target);
     const data = {
       target: this.target || '',
       dataHeader: newDataHeader,
-      colType: { ...this.dataType }
+      colType: { ...this.dataType },
+      outlierFillMethod: {},
+      outlierFillMethodTemp: {},
+      nullFillMethod: {},
+      nullFillMethodTemp: {}
+    }
+    if (problemType === 'Clustering') {
+      const outlierFillMethod = newDataHeader.reduce((prev, h) => {
+        if (this.dataType[h] === 'Numerical' && !!outlierLineCounts[h]) prev[h] = 'drop'
+        return prev
+      }, {})
+      data.outlierFillMethod = outlierFillMethod
+      data.outlierFillMethodTemp = outlierFillMethod
     }
     if (problemType === 'Outlier' && this.target) {
       data.nullFillMethod = { [this.target]: 'drop' }
