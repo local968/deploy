@@ -210,7 +210,7 @@ const OutlierTable = observer((props) => {
           if (hasTarget) return ((a.score.auc || 0) - (b.score.auc || 0)) * value
         // if (!!target) return (a.score.auc - b.score.auc) * value
         case "acc":
-          if (hasTarget) return ((a.score.auc || 0) - (b.score.auc || 0)) * value
+          if (hasTarget) return ((a.score.accuracy[formatNumber(a.rate, 2)] || 0) - (b.score.accuracy[formatNumber(b.rate, 2)] || 0)) * value
         // if (!!target) return (a.score.accuracy - b.score.accuracy) * value
         case "score":
           return (a.score.score - b.score.score) * value
@@ -343,7 +343,7 @@ const OutlierRow = observer((props) => {
           <span>{!model.target.length ? 'null' : formatNumber(model.score.auc || 0)}</span>
         </div>}
         {hasTarget && <div className={`${classes.ccell}`}>
-          <span>{!model.target.length ? 'null' : formatNumber(model.score.accuracy || 0)}</span>
+          <span>{!model.target.length ? 'null' : formatNumber(model.score.accuracy[formatNumber(model.rate, 2)] || 0)}</span>
         </div>}
         <div className={`${classes.ccell}`}>
           <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
