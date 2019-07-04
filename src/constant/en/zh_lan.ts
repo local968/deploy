@@ -779,6 +779,7 @@ const ZH_LAN = {
   PointNumber: '组编号',
   NewAverage: '的平均值',
   _Average: '平均值',
+  _NewAverage: '的平均值',
   RawData: '原始数据',
   GroupNumber: '组数：',
   PredictedAverage: '预测值（均值）：',

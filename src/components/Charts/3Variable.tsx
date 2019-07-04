@@ -41,10 +41,13 @@ export default class ThreeVariable extends PureComponent<Interface>{
 		const symbolSize = 5;
 		const {x_name='',y_name='',z_name='',data=[]} = this.props;
 
+		let xmin:any = Infinity;
+
 		const series = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
 			if(!color[ind]){
 				color.push('#'+Math.random().toString(16).substring(2,8))
 			}
+			xmin = _.min([xmin,..._.map(itm.value,it=>it[0])]);
 			return {
 				name:itm.name,
 				type: 'scatter3D',
@@ -78,7 +81,7 @@ export default class ThreeVariable extends PureComponent<Interface>{
 				name:EN._Average,
 				symbolSize:1.5*symbolSize,
 				type: 'scatter3D',
-				data:[mean,mean,mean],
+				data:[mean,[xmin-10000,0,0]],
 				symbol:'triangle',
 				emphasis:{
 					label:{
@@ -93,12 +96,15 @@ export default class ThreeVariable extends PureComponent<Interface>{
 			})
 		});
 
-
-
 		return {
 			tooltip: {
+				show:true,
 				formatter: function (params) {
-					const {seriesName,value,marker} = params;
+					let {seriesName,value,marker,color} = params;
+					if(seriesName === EN._Average){
+						const list= series.filter(itm=>itm.itemStyle.color === color);
+						seriesName = list[0].name + EN._NewAverage
+					}
 					return `
 						${marker}${seriesName}<br/>
 						${x_name}:${value[0].toFixed(3)}<br/>
@@ -129,7 +135,8 @@ export default class ThreeVariable extends PureComponent<Interface>{
 				inactiveColor:'rgba(204,204,204,0.5)'
 			},
 			xAxis3D: {
-				name:x_name
+				name:x_name,
+				min:Math.floor(xmin)
 			},
 			yAxis3D: {
 				name:y_name
