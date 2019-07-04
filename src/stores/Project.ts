@@ -11,6 +11,7 @@ import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
+import { when } from "q";
 
 export interface Stats {
   took: number,
@@ -970,7 +971,7 @@ class Project {
 
   @computed
   get qualityHasChanged() {
-    if(!this.etlIndex) return true
+    if (!this.etlIndex) return true
     let hasChange = false
     const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
     for (const item of list) {
@@ -1963,11 +1964,19 @@ class Project {
       }
     }, 60000)
     this.models = []
+    const readyModels = []
+    when(
+      () => this.init,
+      () => readyModels.forEach(m => {
+        this.setModel(m)
+      })
+    )
     socketStore.ready().then(api => api.queryModelList({ id: this.id }, (progressResult: BaseResponse) => {
       const { status, message, model } = progressResult
       if (status !== 200) return antdMessage.error(message)
       count++
-      this.setModel(model)
+      if (this.init) return this.setModel(model)
+      readyModels.push(model)
     })).then(result => {
       if (!show) return
       clearTimeout(so)
