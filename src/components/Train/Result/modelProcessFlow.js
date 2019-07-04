@@ -239,12 +239,12 @@ export default class ModelProcessFlow extends Component {
 		return <Fragment>
 			<dt>{title}</dt>
 			{
-				res.map(itm=>{
-					return <dd>
+				res.map((itm,ind)=>{
+					return <dd key={ind}>
 						<label>{itm.key}:</label>
 						<ul>
 							{
-								itm.data.map(it=><li title={mapHeader[it]}>{mapHeader[it]}</li>)
+								itm.data.map((it,ind)=><li key={ind} title={mapHeader[it]}>{mapHeader[it]}</li>)
 							}
 						</ul>
 					</dd>
@@ -279,7 +279,7 @@ export default class ModelProcessFlow extends Component {
 					<label>{EN.DropTheseVariables}:</label>
 					<ul>
 						{
-							drop.map(it=><li title={it}>{it}</li>)
+							drop.map(it=><li key={it} title={it}>{it}</li>)
 						}
 					</ul>
 				</dt>:null
@@ -290,7 +290,7 @@ export default class ModelProcessFlow extends Component {
 					<label>{EN.DropTheseVariables}(raw):</label>
 					<ul>
 						{
-							raw.map(it=><li title={it}>{it}</li>)
+							raw.map(it=><li key={it} title={it}>{it}</li>)
 						}
 					</ul>
 				</dt>:null
@@ -301,7 +301,7 @@ export default class ModelProcessFlow extends Component {
 						<label>{EN.CreateTheseVariables}:</label>
 						<ul>
 							{
-								create.map(it=><li title={it}>{it}</li>)
+								create.map(it=><li key={it} title={it}>{it}</li>)
 							}
 						</ul>
 					</dt>

@@ -5,14 +5,13 @@ import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
 import moment from 'moment';
-import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
+import { Hint, NumberInput, ProgressBar} from 'components/Common';
 import VariableImpact from "./VariableImpact"
-import ModelProcessFlow from "./ModelProcessFlow"
 import Variable from './Variable.svg'
 import Process from './Process.svg'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import ModelProcessFlow2 from "./ModelProcessFlow2";
+import MPF from './MPF';
 const AccuracyHint = EN.Givenaparticularpopulation
 
 @observer
@@ -699,8 +698,7 @@ class ModelDetail extends Component {
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader}/>}
-        {this.visible && this.type === 'process' && !model.id.includes('Logistic') && <ModelProcessFlow project={project} model={model} />}
-        {this.visible && this.type === 'process' && model.id.includes('Logistic') && <ModelProcessFlow2 project={project} model={model} />}
+        {this.visible && this.type === 'process'&& <MPF modelId ={model.id}  project={project} model={model} />}
       </div >
     );
   }
