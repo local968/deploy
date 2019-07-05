@@ -1,15 +1,13 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
-// import {concat} from 'lodash'
 import EN from "../../constant/en";
 import _ from 'lodash';
 
 export default function ResidualPlot(props){
 	const {chartDate={},title='',width=500,height=300} = props;
-	// const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
 	const num:any = [];
 	const data = _.map(chartDate.data,itm=>{
-		const [y,,x] = itm;
+		const [,x,y] = itm;
 		num.push(x);
 		return [x,y];
 	});
@@ -42,15 +40,15 @@ export default function ResidualPlot(props){
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
-			// max:_max,
-			// min:_min,
+			boundaryGap:[0,0],
+			max:_max,
+			min:_min,
 		},
 		yAxis: {
 			name:EN.residual,
 			axisLine:{show:false},
 			nameTextStyle,
-			// max:_max,
-			// min:_min,
+			boundaryGap:[0,0],
 		},
 		series: [
 			{

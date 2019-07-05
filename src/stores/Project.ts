@@ -534,7 +534,9 @@ class Project {
       stopIds: [],
       features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
       ssPlot: null,
-      algorithmRadio: 'all'
+      algorithmRadio: 'all',
+      settingId: '',
+      settings: []
     } as {
       train2Finished: boolean,
       train2ing: boolean,
@@ -580,7 +582,9 @@ class Project {
       stopIds: string[],
       features: string[],
       ssPlot: null,
-      algorithmRadio: 'all' | 'none' | 'default'
+      algorithmRadio: 'all' | 'none' | 'default',
+      settingId: string,
+      settings: Settings[]
     }
   }
 
