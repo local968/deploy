@@ -71,8 +71,8 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 
 		const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
-		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>
-			<Tooltip title={mapHeader[itm]}>{mapHeader[itm]}</Tooltip>
+		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} title={mapHeader[itm]} value={itm}>
+			{mapHeader[itm]}
 		</Option>);
 		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
 		return <Select

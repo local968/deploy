@@ -45,10 +45,9 @@
     "ts-node": "ts-node --project server/tsconfig.json server/server.ts",
     "nodemon": "nodemon server",
     "build": "yarn build-server && react-app-rewired build && rm -rf static && mv build static && yarn docker:build",
-    "build-local": "react-app-rewired build",
+    "build-local": "yarn build-server && react-app-rewired build && rm -rf static && mv build static",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
-    "nodemon": "nodemon",
     "docker:build": "docker build -t harbor-dev.r2ai.com.cn/next-test/next-deploy2:latest . && docker push harbor-dev.r2ai.com.cn/next-test/next-deploy2:latest"
   },
   "devDependencies": {

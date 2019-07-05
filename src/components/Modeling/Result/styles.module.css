@@ -27,13 +27,21 @@
     overflow: visible;
     font-weight: bold;
 }
+.over dt {
+    align-items: flex-start !important
+}
 
-.modelResult dd ul,.modelResult dt ul{
+.over ul{
     list-style: none;
     margin-block-start:0;
     margin-block-end:0;
     padding-inline-start:0;
     overflow:hidden;
+    color:#333;
+}
+
+.modelResult dd ul,.modelResult dt ul{
+
 }
 
 
@@ -91,6 +99,7 @@
 .process label {
     text-transform: capitalize;
     font-size: 0.15em;
+    font-weight: bold;
 }
 
 .many img {
@@ -334,6 +343,7 @@ span.performanceScore {
 
 .progressLine {
     display: flex;
+    align-items: center;
 }
 
 .progress {
@@ -366,6 +376,14 @@ span.performanceScore {
 
 .predicted {
     background-color: #adaafc;
+}
+.fail{
+  background-color:  #49E4E1;
+
+}
+
+.failPredicted {
+  background-color: #f9cf37;
 }
 
 .different {

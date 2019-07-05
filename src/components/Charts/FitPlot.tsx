@@ -1,19 +1,27 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
-import {concat} from 'lodash'
+import _ from 'lodash'
 import './echarts.config'
 
 export default function FitPlot(props){
 	const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props;
-	const data = chartDate.data.map(itm=>[itm[0],itm[1]]);
+	const num:any = [];
+	const data = _.map(chartDate.data,itm=>{
+		const [x,y] = itm;
+		num.push(x,y);
+		return [x,y];
+	});
 	// @ts-ignore
-	const num = concat(...data);
+	// const num = _.concat(...data);
 
-	const max = Math.max(...num);
-	const min = Math.min(...num);
+	const max:number = _.max(num);
+	const min:number = _.min(num);
 	const nameTextStyle = {
 		color:'#000',
 	};
+
+  const _max = (max + Math.abs(max-min)/3).toFixed(1);
+  const _min = (min - Math.abs(max-min)/3).toFixed(1);
 
 	const option =  {
 		title: {
@@ -22,7 +30,7 @@ export default function FitPlot(props){
 			y: 0,
 		},
 		grid:{
-			x:`${Math.floor(max+1)}`.length * 10 +20,
+			x:`${Math.floor((max)+1)}`.length * 10 +20,
 		},
 		tooltip: {
 			formatter: '{c}',
@@ -33,11 +41,15 @@ export default function FitPlot(props){
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
+      max:_max,
+      min:_min,
 		},
 		yAxis: {
 			name:y_name,
 			axisLine:{show:false},
 			nameTextStyle,
+      max:_max,
+      min:_min,
 		},
 		series: [
 			{
@@ -47,7 +59,7 @@ export default function FitPlot(props){
 			},
 			{
 				type:'line',
-				data:[[min-1,min-1],[max+1,max+1]],
+				data:[[_min,_min],[_max,_max]],
 				symbolSize: 0,
 			},
 		],

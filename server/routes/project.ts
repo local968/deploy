@@ -339,6 +339,12 @@ function deleteProject(userId, id) {
         pid: id,
         time: moment().unix(),
       });
+      wss.publish(`user:${userId}:projects`, {
+        status: 200,
+        message: `delete project success`,
+        result: { exist: false },
+        id,
+      });
       return deleteModels(userId, id);
     });
   });

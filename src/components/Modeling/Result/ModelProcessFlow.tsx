@@ -173,7 +173,6 @@ export default class ModelProcessFlow extends Component<Interface> {
 		</dl>
 	}
 
-
 	DQFT(){
 		const {
 			otherMap,
@@ -239,6 +238,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 			}
 		</Fragment>
 	}
+
 
 	DQFData(data,title,showTarget,outlier=false){
 		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.project;

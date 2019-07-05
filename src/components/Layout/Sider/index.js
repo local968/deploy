@@ -27,15 +27,8 @@ export default class Sider extends Component {
   };
 
    componentDidMount() {
-    // axios.get('/jupyterLabUrl')
-    //   .then(({ data }) => this.setState({ labUrl: data }))
-    //   .catch(({ response: { data } }) => errorTip(data))
-
-    // axios.get('/dashboardUrl')
-    //   .then(({ data }) => this.setState({ dashUrl: data }))
-    //   .catch(({ response: { data } }) => errorTip(data))
-    axios.get('/image/logo')
-      .then(({data}) => this.setState({logoUrl:data}))
+     axios.get('/image/logo')
+       .then(({data}) => this.setState({logoUrl:data}))
   }
 
   render() {

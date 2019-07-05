@@ -1,4 +1,4 @@
-import { observable, action, when, computed, autorun } from "mobx";
+import { observable, action, when, computed } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
 import Model from './Model'
@@ -75,13 +75,13 @@ class ProjectStore {
     }
     this.initWatch()
     this.initReload()
-    autorun(() => {
-      if (this.project) {
-        this.project.clean();
-        this.queryProjectList();
-        this.project.initProject()
-      }
-    })
+    // autorun(() => {
+    //   if (this.project) {
+    //     this.project.clean();
+    //     this.queryProjectList();
+    //     this.project.initProject()
+    //   }
+    // })
   }
 
   initReload = () => {

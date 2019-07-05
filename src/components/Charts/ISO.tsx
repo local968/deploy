@@ -272,8 +272,8 @@ export default class Iso extends PureComponent<DataSampleProps>{
 	      const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
 
-        const options = list.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>
-            <Tooltip title={mapHeader[itm]}>{mapHeader[itm]}</Tooltip>
+        const options = list.map(itm=><Option key={itm} title={mapHeader[itm]} disabled={disable.includes(itm)} value={itm}>
+            {mapHeader[itm]}
         </Option>);
 
         return <Select

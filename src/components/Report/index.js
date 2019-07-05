@@ -4,13 +4,12 @@ import { observer, inject } from 'mobx-react';
 import classnames from 'classnames';
 import Summary from './Summary'
 import VariableList from './VariableList'
-import ModelProcessFlow from '../Modeling/Result/ModelProcessFlow'
-import ModelProcessFlow2 from '../Modeling/Result/ModelProcessFlow2'
 import AdvancedView, { PredictTable } from './Score'
 import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
 import { formatNumber } from 'util'
 import EN from '../../constant/en';
+import MPF from '../Modeling/Result/MPF';
 
 const addComma = number => {
   if (Number.isNaN(number)) return number
@@ -312,17 +311,11 @@ class Report extends Component {
             </div>
           </div>}
 
-          {this.isShow('processFlow') && !model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
+          <div className={classnames(styles.block, styles.processFlow)}>
             {this.checkBox('processFlow')}
             <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>
-            <div className={styles.blockRow}><ModelProcessFlow project={list[0]} model={list[0].selectModel} /></div>
-          </div>}
-
-          {this.isShow('processFlow') && model.id.includes('Logistic') && <div className={classnames(styles.block, styles.processFlow)}>
-            {this.checkBox('processFlow')}
-            <h3 className={styles.blockTitle}>{EN.ModelProcessFlow}</h3>
-            <div className={styles.blockRow}><ModelProcessFlow2 project={project} model={list[0].selectModel} /></div>
-          </div>}
+            <div className={styles.blockRow}><MPF modelId={model.id} project={list[0]} model={list[0].selectModel} /></div>
+          </div>
         </div>
       </div>
     )

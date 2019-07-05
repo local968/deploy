@@ -5,14 +5,13 @@ import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
 import moment from 'moment';
-import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
+import { Hint, NumberInput, ProgressBar} from 'components/Common';
 import VariableImpact from "./VariableImpact"
-import ModelProcessFlow from "./ModelProcessFlow"
 import Variable from './Variable.svg'
 import Process from './Process.svg'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import ModelProcessFlow2 from "./ModelProcessFlow2";
+import MPF from './MPF';
 const AccuracyHint = EN.Givenaparticularpopulation
 
 @observer
@@ -363,6 +362,7 @@ class Predicted extends Component {
             width={3.5}
             label={no}
             type={'success'}
+            failType={'fail'}
           />
         </div>
         <div className={styles.progressBlock}>
@@ -371,6 +371,7 @@ class Predicted extends Component {
             width={3.5}
             label={yes}
             type={'predicted'}
+            failType={'failPredicted'}
           />
         </div>
         <div className={styles.progressMeans}>
@@ -382,10 +383,24 @@ class Predicted extends Component {
             <div className={classnames(styles.progressSquare, styles.predicted)} />
             <div className={styles.progressMeanText} title={`${EN.Actual}: ${yes} ${EN.Predicted}: ${yes}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {yes}</span></div>
           </div>
+
           <div className={styles.progressMean}>
-            <div className={classnames(styles.progressSquare, styles.different)} />
-            <div className={styles.progressMeanText} title={`${EN.Actual} & ${EN.Predicted} ${EN.Different}`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>
+            <div className={classnames(styles.progressSquare, styles.fail)} />
+            <div className={styles.progressMeanText} title={`${EN.Actual}: ${no} ${EN.Predicted}: ${yes}`}><span>{EN.Actual}: {no}</span><span>{EN.Predicted}: {yes}</span></div>
           </div>
+
+
+          <div className={styles.progressMean}>
+            <div className={classnames(styles.progressSquare, styles.failPredicted)} />
+            <div className={styles.progressMeanText} title={`${EN.Actual}: ${yes} ${EN.Predicted}: ${no}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {no}</span></div>
+          </div>
+
+
+
+          {/*<div className={styles.progressMean}>*/}
+          {/*  <div className={classnames(styles.progressSquare, styles.different)} />*/}
+          {/*  <div className={styles.progressMeanText} title={`${EN.Actual} & ${EN.Predicted} ${EN.Different}`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>*/}
+          {/*</div>*/}
         </div>
       </div>
     );
@@ -395,7 +410,7 @@ class Predicted extends Component {
 @observer
 class PredictedProgress extends Component {
   render() {
-    const { predicted, width, label, type, height } = this.props;
+    const { predicted, width, label, type,failType, height } = this.props;
     const title = label === undefined ? (
       ''
     ) : (
@@ -406,6 +421,7 @@ class PredictedProgress extends Component {
     const predictedPercent = Math.round(predicted * 100);
     const failedPercent = 100 - predictedPercent
     const isSmaller = (!!predictedPercent && predictedPercent < 10) || (!!failedPercent && failedPercent < 10)
+
     return (
       <div className={styles.progressLine}>
         {title}
@@ -422,7 +438,7 @@ class PredictedProgress extends Component {
           <span>{predictedPercent + '%'}</span>
         </div>}
         {!!failedPercent && <div
-          className={classnames(styles.progress, styles.different, {
+          className={classnames(styles.progress, styles[failType], {
             [styles.progressLarge]: !predictedPercent,
             [styles.progressSmall]: isSmaller
           })}
@@ -639,6 +655,7 @@ class ModelDetail extends Component {
                 width={1.5}
                 height={0.2}
                 type={'success'}
+                failType={'fail'}
               />
               <div className={styles.space} />
               <PredictedProgress
@@ -646,6 +663,7 @@ class ModelDetail extends Component {
                 width={1.5}
                 height={0.2}
                 type={'predicted'}
+                failType={'failPredicted'}
               />
             </div>
             <div className={styles.cell}>
@@ -679,8 +697,7 @@ class ModelDetail extends Component {
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader}/>}
-        {this.visible && this.type === 'process' && !model.id.includes('Logistic') && <ModelProcessFlow project={project} model={model} />}
-        {this.visible && this.type === 'process' && model.id.includes('Logistic') && <ModelProcessFlow2 project={project} model={model} />}
+        {this.visible && this.type === 'process'&& <MPF modelId ={model.id}  project={project} model={model} />}
       </div >
     );
   }

@@ -41,10 +41,13 @@ export default class ThreeVariable extends PureComponent<Interface>{
 		const symbolSize = 5;
 		const {x_name='',y_name='',z_name='',data=[]} = this.props;
 
+		let xmin:any = Infinity;
+
 		const series = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
 			if(!color[ind]){
 				color.push('#'+Math.random().toString(16).substring(2,8))
 			}
+			xmin = _.min([xmin,..._.map(itm.value,it=>it[0])]);
 			return {
 				name:itm.name,
 				type: 'scatter3D',
@@ -63,11 +66,11 @@ export default class ThreeVariable extends PureComponent<Interface>{
 
 		series.push({
 			name:EN._Average,
+			symbolSize:2,
 			type: 'scatter3D',
-			symbol:'triangle',
+			// symbol:'triangle',
+			symbol:'path://M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z',
 			itemStyle:{
-				borderWidth:1,
-				borderColor:'#000',
 				color:'#1c2b3b'
 			},
 		});
@@ -78,7 +81,7 @@ export default class ThreeVariable extends PureComponent<Interface>{
 				name:EN._Average,
 				symbolSize:1.5*symbolSize,
 				type: 'scatter3D',
-				data:[mean],
+				data:[mean,[xmin-10000,0,0]],
 				symbol:'triangle',
 				emphasis:{
 					label:{
@@ -93,12 +96,15 @@ export default class ThreeVariable extends PureComponent<Interface>{
 			})
 		});
 
-
-
 		return {
 			tooltip: {
+				show:true,
 				formatter: function (params) {
-					const {seriesName,value,marker} = params;
+					let {seriesName,value,marker,color} = params;
+					if(seriesName === EN._Average){
+						const list= series.filter(itm=>itm.itemStyle.color === color);
+						seriesName = list[0].name + EN._NewAverage
+					}
 					return `
 						${marker}${seriesName}<br/>
 						${x_name}:${value[0].toFixed(3)}<br/>
@@ -106,17 +112,12 @@ export default class ThreeVariable extends PureComponent<Interface>{
 						${z_name}:${value[2].toFixed(3)}
 					`
 				},
-				// axisPointer:{
-				// 	label:{
-				// 		precision:3
-				// 	}
-				// }
 			},
 			grid3D: {},
 			temporalSuperSampling:{
 				enable:true,
 			},
-			animation:false,
+			animation:true,
 			legend: {
 				orient: 'vertical',
 				top: 40,
@@ -129,7 +130,8 @@ export default class ThreeVariable extends PureComponent<Interface>{
 				inactiveColor:'rgba(204,204,204,0.5)'
 			},
 			xAxis3D: {
-				name:x_name
+				name:x_name,
+				min:Math.floor(xmin)
 			},
 			yAxis3D: {
 				name:y_name

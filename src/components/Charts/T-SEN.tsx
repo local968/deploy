@@ -34,7 +34,7 @@ interface DataSampleProps {
 	average?:boolean
 }
 
-export default class TSEN extends PureComponent<DataSampleProps>{
+export default class T_SEN extends PureComponent<DataSampleProps>{
 	private chart: any;
 	state:{
 		loading:boolean
@@ -78,6 +78,9 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 				data:itm.value,
 				type:'scatter',
 				symbolSize:5,
+				itemStyle:{
+					color:color[ind]
+				},
 			}
 		});
 
@@ -106,7 +109,7 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 						}
 					},
 					itemStyle:{
-						borderWidth:0.1,
+						borderWidth:1,
 						borderColor:'#000',
 						color:color[ind]
 					},
@@ -120,7 +123,6 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 				textStyle:{
 					fontSize:isEN?11:15,
 				},
-				// padding:[5,5,5,40],
 				left:40,
 			},
 			grid: {
@@ -135,14 +137,19 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 			tooltip: {
 				showDelay: 0,
 				formatter: function (params) {
+					let {seriesName,value,name,color,marker} = params;
+					if(seriesName === EN._Average){
+						const list= series.filter(itm=>itm.itemStyle.color === color);
+						seriesName = list[0].name + EN._NewAverage
+					}
 					if (params.value.length > 1) {
-						return params.seriesName + '<br/>'
+						return marker+seriesName + '<br/>'
 							+ x_name +':'+ params.value[0].toFixed(3) + '<br/>'
 							+ y_name +':'+ params.value[1].toFixed(3);
 					} else {
-						return params.seriesName + ' :<br/>'
-							+ params.name + ' : '
-							+ params.value;
+						return marker+seriesName + ' :<br/>'
+							+ name + ' : '
+							+ value;
 					}
 				},
 				axisPointer:{
@@ -154,7 +161,7 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 					},
 					label:{
 						precision:3
-					}
+					},
 				}
 			},
 			legend: {
@@ -181,6 +188,9 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 					},
 					nameLocation:'end',
 					nameGap:25,
+					axisPointer:{
+						snap:true
+					}
 				}
 			],
 			yAxis: [
@@ -199,6 +209,9 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 					},
 					nameLocation:'end',
 					nameGap:23,
+					axisPointer:{
+						snap:true
+					}
 				}
 			],
 			series,

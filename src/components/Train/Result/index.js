@@ -1,11 +1,10 @@
 import React from 'react';
-import { ContinueButton, Hint, ProgressBar, Table, ProcessLoading } from 'components/Common'
+import { Hint, ProgressBar, Table, ProcessLoading } from 'components/Common'
 import classes from './styles.module.css';
 import VariableImpact from './VariableImpact'
-import ModelProcessFlow from './modelProcessFlow'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-import { Tooltip, Icon, Popover, Select, message } from 'antd'
+import { Tooltip, Icon, Popover, Select} from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
@@ -14,6 +13,7 @@ import {
   ISO,
   D3D2,
 } from "../../Charts"
+import MPF from '../../Modeling/Result/MPF';
 
 const { Option } = Select;
 
@@ -35,7 +35,7 @@ function ModelResult(props) {
   const [view, setView] = React.useState('simple')
   const { resetSide, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings, loadModel } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings, loadModel, measurement } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   React.useEffect(() => {
@@ -43,6 +43,8 @@ function ModelResult(props) {
   })
   let filterModels = [...models]
   const currentSetting = currentSettingId === 'all' ? null : settings.find(setting => setting.id === currentSettingId)
+  const measurementLabel = (measurement === 'CH' && 'CH Index') || (measurement === 'silhouette_euclidean' && EN.SihouetteScore) || 'CVNN'
+  const measurementHint = (measurement === 'CH' && EN.CHIndexHint) || (measurement === 'silhouette_euclidean' && EN.SihouetteScoreHint) || EN.CVNNHint
   if (currentSetting && currentSetting.models)
     filterModels = filterModels.filter(model => currentSetting.models.find(id => model.id === id))
 
@@ -135,8 +137,8 @@ function ModelResult(props) {
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
             <div className={classes.cvnn}>
-              <div className={classes.orange}>{formatNumber(selectModel.score.CVNN)}</div>
-              <span className={classes.label}>CVNN <Hint content={EN.CVNNHint} /></span>
+              <div className={classes.orange}>{formatNumber(selectModel.score[measurement])}</div>
+              <span className={classes.label}>{measurementLabel} <Hint content={measurementHint} /></span>
             </div>
             <div className={classes.cluster}>
               <div className={classes.blood}>{Object.keys(selectModel.labelWithImportance).length}</div>
@@ -208,7 +210,7 @@ const OutlierTable = observer((props) => {
           if (hasTarget) return ((a.score.auc || 0) - (b.score.auc || 0)) * value
         // if (!!target) return (a.score.auc - b.score.auc) * value
         case "acc":
-          if (hasTarget) return ((a.score.auc || 0) - (b.score.auc || 0)) * value
+          if (hasTarget) return ((a.score.accuracy[formatNumber(a.rate, 2)] || 0) - (b.score.accuracy[formatNumber(b.rate, 2)] || 0)) * value
         // if (!!target) return (a.score.accuracy - b.score.accuracy) * value
         case "score":
           return (a.score.score - b.score.score) * value
@@ -341,7 +343,7 @@ const OutlierRow = observer((props) => {
           <span>{!model.target.length ? 'null' : formatNumber(model.score.auc || 0)}</span>
         </div>}
         {hasTarget && <div className={`${classes.ccell}`}>
-          <span>{!model.target.length ? 'null' : formatNumber(model.score.accuracy || 0)}</span>
+          <span>{!model.target.length ? 'null' : formatNumber(model.score.accuracy[formatNumber(model.rate, 2)] || 0)}</span>
         </div>}
         <div className={`${classes.ccell}`}>
           <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
@@ -356,7 +358,7 @@ const OutlierRow = observer((props) => {
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
+    {visible && type === 'process' && <MPF project={project} model={model} />}
     {/* </div> */}
   </div>
 })
@@ -568,7 +570,7 @@ const ClusteringRow = observer((props) => {
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
+    {visible && type === 'process' && <MPF project={project} model={model} />}
     {visible && type === 'explanation' && <Explanation model={model} mapHeader={mapHeader} />}
     {/* </div> */}
   </div>

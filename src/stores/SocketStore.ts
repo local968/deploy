@@ -10,7 +10,7 @@ interface SocketInterface {
 }
 
 class Socket extends EventEmitter implements SocketInterface {
-  private url = 'ws://' + config.host + ':' + config.port + '/ws';
+  private url = `${window.location.protocol.startsWith('https') ? 'wss' : 'ws'}://${window.location.hostname}:${window.location.port}/ws`;
   private reconnectLock = false;
   private connectionError = false;
   private errorTimes = 0;

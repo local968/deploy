@@ -85,13 +85,14 @@ export default function EsUploader(file, option: any = {}) {
       processors.splice(promise.no, 1)
       processors.forEach((p, i) => p.no = i)
     }
-    // const _header = header.map( (k, i) => i.toString() )
-    onFinished({
-      originalIndex: index,
-      totalRawLines: no,
-      rawHeader: header.filter(h => h !== '__no'),
-      fileName: file.name
-    }, file)
+    if (!isPause)
+      // const _header = header.map( (k, i) => i.toString() )
+      onFinished({
+        originalIndex: index,
+        totalRawLines: no,
+        rawHeader: header.filter(h => h !== '__no'),
+        fileName: file.name
+      }, file)
   }
 
   const uploadChunk = async () => {
