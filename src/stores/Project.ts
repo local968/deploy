@@ -285,7 +285,7 @@ class Project {
   @observable dataViews: DataView | null = null;
   @observable dataViewsLoading: boolean = false;
   @observable dataViewProgress: number = 0;
-  @observable algorithmRadio: 'all' | 'none' | 'default' = 'all'
+  @observable algorithmRadio: 'all' | 'none' | 'default' = 'default'
 
   //un
   @observable weights: NumberObject = {};

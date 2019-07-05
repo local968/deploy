@@ -261,7 +261,7 @@ export default class AdvancedView extends Component {
                     <label htmlFor="number_custom">{EN.NoMoreThan}</label>
                     <InputNumber
                       value={project.kValue}
-                      max={10}
+                      max={15}
                       min={2}
                       step={1}
                       onChange={this.handleNum}
