@@ -285,7 +285,7 @@ class Project {
   @observable dataViews: DataView | null = null;
   @observable dataViewsLoading: boolean = false;
   @observable dataViewProgress: number = 0;
-  @observable algorithmRadio: 'all' | 'none' | 'default' = 'all'
+  @observable algorithmRadio: 'all' | 'none' | 'default' = 'default'
 
   //un
   @observable weights: NumberObject = {};
@@ -2036,24 +2036,26 @@ class Project {
     })
   }
 
-  clusterPreTrainImportance = () => {
+  clusterPreTrainImportance = (force: boolean) => {
     if (this.preImportanceLoading) return Promise.resolve()
     if (this.problemType !== 'Clustering') return Promise.resolve()
 
     const allLabel = [...this.dataHeader, ...this.newVariable].filter(v => v !== this.target)
-    //移除, 现由views判断
-    // const before = allLabel.reduce((prev, la) => {
-    //   prev[la] = this.weights[la] || 1
-    //   return prev
-    // }, {} as NumberObject)
-    // const after = allLabel.reduce((prev, la) => {
-    //   prev[la] = this.weightsTemp[la] || 1
-    //   return prev
-    // }, {} as NumberObject)
 
-    // const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+    // 不是点击刷新
+    if (!force) {
+      const before = allLabel.reduce((prev, la) => {
+        prev[la] = this.weights[la] || 1
+        return prev
+      }, {} as NumberObject)
+      const after = allLabel.reduce((prev, la) => {
+        prev[la] = this.weightsTemp[la] || 1
+        return prev
+      }, {} as NumberObject)
 
-    // if (!isChange) return Promise.resolve()
+      const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+      if (!isChange) return Promise.resolve()
+    }
 
     return socketStore.ready().then(api => {
       let cmd = 'clustering.preTrainImportance'
