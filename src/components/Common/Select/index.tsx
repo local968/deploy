@@ -2,19 +2,20 @@ import React from 'react';
 import styles from './styles.module.css';
 import { Select } from 'antd';
 import classnames from 'classnames';
-const Option = Select.Option;
+const {Option} = Select;
 
-export default ({
-  title,
-  width,
-  options,
-  onChange,
-  value,
-  dropdownClassName,
-  disabled,
-  selectOption,
-  getPopupContainer = () => document.body
-}) => {
+export default function Selects(props){
+  const {
+    title,
+    width,
+    options,
+    onChange,
+    value,
+    dropdownClassName,
+    disabled,
+    selectOption,
+    getPopupContainer = () => document.body
+  } = props;
   if (options) {
     return (
       <div
@@ -33,14 +34,14 @@ export default ({
             disabled={disabled}
             getPopupContainer={getPopupContainer}
             filterOption={(input, option) =>
-              option.props.children
+              typeof option.props.children === 'string' ? option.props.children
                 .toLowerCase()
-                .indexOf(input.toLowerCase()) >= 0
+                .indexOf(input.toLowerCase()) >= 0 : false
             }
             optionFilterProp="children"
             {...selectOption}
           >
-            {Object.entries(options).map(([value, label], index) => (
+            {Object.entries(options).map(([value, label]) => (
               <Option key={value} value={value}>
                 {label}
               </Option>
@@ -69,4 +70,4 @@ export default ({
       </div>
     );
   }
-};
+}

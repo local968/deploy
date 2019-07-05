@@ -1,6 +1,5 @@
 import React from 'react';
 import HistogramCategorical from "./HistogramCategorical";
-import HistogramNumerical from "./HistogramNumerical";
 import UnivariantPlots from "./UnivariantPlots";
 import CorrelationMatrixs from "./CorrelationMatrixs";
 import TSENOne from "./TSENOne";
