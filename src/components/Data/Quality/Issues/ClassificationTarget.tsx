@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from '../styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { observable } from 'mobx'
 // import * as d3 from 'd3';
 import { Icon, message } from 'antd'
@@ -11,10 +11,12 @@ import Project from 'stores/Project';
 interface ClassificationTargetProps {
   backToConnect: () => void,
   backToSchema: () => void,
-  editTarget: () => void, 
+  editTarget: () => void,
   project: Project
+  userStore?:any
 }
 
+@inject('userStore')
 class ClassificationTarget extends Component<ClassificationTargetProps> {
   @observable rename = false
   @observable temp = {}
@@ -93,7 +95,8 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
     const hasNull = !isGood && Object.keys(targetCounts).includes('')
     const error = isLess && !hasNull
     const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`
+    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`;
+    const {quality_rename=true} = this.props.userStore.info.role;
     return <div className={styles.block}>
       <div className={styles.name}>
         {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
@@ -127,12 +130,12 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                 <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}</span>
               </div>
               <div className={styles.targetPercentValue}>
-                <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}></div>
+                <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}/>
                 <span>{targetCounts['']}</span>
               </div>
             </div>
           </div>}
-          {isGood && <div className={styles.cleanTargetBlock}>
+          {isGood && <div className={styles.cleanTargetBlock} style={{display:(quality_rename?'':'none')}}>
             {!this.rename ? <div className={styles.cleanTargetRename}>
               <div className={styles.cleanTargetButton}>
                 <button onClick={this.showRename}><span>{EN.ChangeTargetVariableValue}</span></button>

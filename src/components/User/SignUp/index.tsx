@@ -7,9 +7,14 @@ import { observable, action } from 'mobx';
 
 import EN from '../../../constant/en';
 
+interface Interface {
+  userStore:any
+  history:any
+}
+
 @inject('userStore')
 @observer
-export default class SignUp extends Component {
+export default class SignUp extends Component<Interface> {
   @observable email = '';
   @observable password = '';
   @observable confirmPassword = '';
@@ -35,7 +40,7 @@ export default class SignUp extends Component {
   });
 
   componentWillMount() {
-    const {userStore} = this.props as any;
+    const {userStore} = this.props;
     userStore.getPlanList()
   };
   register = () => {
@@ -64,27 +69,26 @@ export default class SignUp extends Component {
       this.warning = warning;
       return
     }
-    const {userStore} = this.props as any;
+    const {userStore} = this.props;
 
     userStore.register({ email, password, plan_id })
   };
 
   login = () => {
-    const {history} = this.props as any;
+    const {history} = this.props;
     history.push("/")
   };
 
   show = action(() => (this.showLicense = true));
   hide = action(() => (this.showLicense = false));
 
-  onChangePlan(value){
-    this.plan_id = value;
+  onChangePlan({target}){
+    this.plan_id = target.value;
   }
 
   render() {
-    const {userStore} = this.props as any;
-    // @ts-ignore
-    return (this.showLicense ? <License back={this.hide} /> :
+    const {userStore} = this.props;
+    return (this.showLicense ? <License back={this.hide}  history={null} userStore={null}/> :
       <div className={styles.signup}>
         <div className={styles.title}><span>{EN.SignUp}</span></div>
         <div className={styles.row}>
@@ -120,8 +124,12 @@ export default class SignUp extends Component {
   }
 }
 
+
+interface Interface {
+  back:any
+}
 @observer
-class License extends Component {
+class License extends Component<Interface> {
   @observable language = 'EN';
 
   onChange = action(({target}) => this.language = target.checked ? 'CN' : 'EN');
@@ -285,7 +293,7 @@ class License extends Component {
   };
 
   render() {
-    const {back} = this.props as any;
+    const {back} = this.props;
     return <div className={styles.license}>
       <div className={styles.back} onClick={back}><Icon className={styles.icon} type="arrow-left" /></div>
       <div className={styles.checkbox}><Checkbox onChange={this.onChange.bind(this)} >查看中文</Checkbox></div>

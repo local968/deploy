@@ -18,6 +18,7 @@ interface VariableIssueProps {
 }
 
 @inject('userStore')
+@observer
 class VariableIssue extends Component<VariableIssueProps> {
   @observable visible = false
   @observable summary = false
@@ -159,7 +160,7 @@ class VariableIssue extends Component<VariableIssueProps> {
     const { project, changeTab } = this.props;
     const { issues, dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount } } = project;
     const tableData = this.formatTable();
-    const {quality_Predict_LoadaNewDataset=true,quality_Predict_Continue=true} = this.props.userStore.info.role;
+    const {quality_Predict_LoadaNewDataset=true,quality_Predict_Continue=true,quality_EdittheFixes=true } = this.props.userStore.info.role;
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
@@ -179,7 +180,10 @@ class VariableIssue extends Component<VariableIssueProps> {
           {issues.dataIssue && <div className={styles.issueText}>
             <div className={styles.point}/>
             <span className={styles.limitText}>{EN.SomeissuesarefoundR2learnhasgenerated}</span>
-            <div className={styles.button} onClick={this.editFixes}>
+            <div
+              className={styles.button}
+              style={{display:(quality_EdittheFixes?'':'none')}}
+              onClick={this.editFixes}>
               <button><span>{EN.EditTheFixes}</span></button>
             </div>
           </div>}
