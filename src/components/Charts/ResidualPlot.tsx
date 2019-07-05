@@ -13,11 +13,12 @@ export default function ResidualPlot(props){
 		num.push(x,y);
 		return [x,y];
 	});
-	// @ts-ignore
-	// const num = concat(...data);
 
 	const max:number = _.max(num);
 	const min:number = _.min(num);
+
+	const _max = (max + Math.abs(max-min)/3).toFixed(1);
+	const _min = (min - Math.abs(max-min)/3).toFixed(1);
 
 	const nameTextStyle = {
 		color:'#000',
@@ -41,11 +42,15 @@ export default function ResidualPlot(props){
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
+			max:_max,
+			min:_min,
 		},
 		yAxis: {
 			name:y_name,
 			axisLine:{show:false},
 			nameTextStyle,
+			max:_max,
+			min:_min,
 		},
 		series: [
 			{
@@ -55,7 +60,7 @@ export default function ResidualPlot(props){
 			},
 			{
 				type:'line',
-				data:[[min-1,0],[max+1,0]],
+				data:[[_min,0],[_max,0]],
 				symbolSize: 0,
 			},
 		],

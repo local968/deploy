@@ -20,6 +20,9 @@ export default function FitPlot(props){
 		color:'#000',
 	};
 
+  const _max = (max + Math.abs(max-min)/3).toFixed(1);
+  const _min = (min - Math.abs(max-min)/3).toFixed(1);
+
 	const option =  {
 		title: {
 			text: title,
@@ -38,11 +41,15 @@ export default function FitPlot(props){
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
+      max:_max,
+      min:_min,
 		},
 		yAxis: {
 			name:y_name,
 			axisLine:{show:false},
 			nameTextStyle,
+      max:_max,
+      min:_min,
 		},
 		series: [
 			{
@@ -52,7 +59,7 @@ export default function FitPlot(props){
 			},
 			{
 				type:'line',
-				data:[[min-1,min-1],[max+1,max+1]],
+				data:[[_min,_min],[_max,_max]],
 				symbolSize: 0,
 			},
 		],
