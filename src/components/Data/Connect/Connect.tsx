@@ -236,8 +236,8 @@ export default class DataConnect extends Component<DataConnectProps> {
     const charsetChange = action((charset) => {
       project.updateProject({ charset })
     });
-    const {role} =  userStore.info as any;
-    const {connect_FromR2L=true,connect_FromComp=true,connect_FromSQL=true} = role;
+    // const {role} =  userStore.info as any;
+    const {connect_FromR2L=true,connect_FromComp=true,connect_FromSQL=true} = userStore.info.role as any;
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
