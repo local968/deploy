@@ -99,13 +99,13 @@ export default class SimplifiedView extends Component {
 
   hideNewVariable = () => {
     this.visible = false
-    this.reloadTable()
+    this.reloadTable(true)
   }
 
-  reloadTable = async () => {
+  reloadTable = async (force = false) => {
     try {
       await this.props.project.dataView()
-      await this.props.project.clusterPreTrainImportance()
+      await this.props.project.clusterPreTrainImportance(force)
       this.weights = { ...this.props.project.weightsTemp }
       this.standardType = this.props.project.standardTypeTemp
     } catch (e) { }
@@ -238,7 +238,7 @@ export default class SimplifiedView extends Component {
             <div className={styles.tableSort} onClick={this.sortImportance}><span><Icon
               type={`arrow-${this.sort === 1 ? 'up' : 'down'}`} theme="outlined" /></span></div>
             <span>{EN.Importance}</span>
-            <div className={styles.tableReload} onClick={isChange ? this.reloadTable : () => { }}><span style={isChange ? { color: '#448eed' } : {}}><Icon type="reload" spin={isChange} /></span></div>
+            <div className={styles.tableReload} onClick={isChange ? this.reloadTable.bind(null, true) : () => { }}><span style={isChange ? { color: '#448eed' } : {}}><Icon type="reload" spin={isChange} /></span></div>
             <Hint themeStyle={{ fontSize: '1rem' }} content={EN.AdvancedModelingImportanceTip} />
           </div>}
           <div className={styles.tableTh}><span>{EN.DataType}</span></div>
