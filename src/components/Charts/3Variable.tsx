@@ -66,11 +66,11 @@ export default class ThreeVariable extends PureComponent<Interface>{
 
 		series.push({
 			name:EN._Average,
+			symbolSize:2,
 			type: 'scatter3D',
-			symbol:'triangle',
+			// symbol:'triangle',
+			symbol:'path://M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z',
 			itemStyle:{
-				borderWidth:1,
-				borderColor:'#000',
 				color:'#1c2b3b'
 			},
 		});
@@ -112,17 +112,12 @@ export default class ThreeVariable extends PureComponent<Interface>{
 						${z_name}:${value[2].toFixed(3)}
 					`
 				},
-				// axisPointer:{
-				// 	label:{
-				// 		precision:3
-				// 	}
-				// }
 			},
 			grid3D: {},
 			temporalSuperSampling:{
 				enable:true,
 			},
-			animation:false,
+			animation:true,
 			legend: {
 				orient: 'vertical',
 				top: 40,
