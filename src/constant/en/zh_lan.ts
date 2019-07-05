@@ -721,7 +721,7 @@ const ZH_LAN = {
   YourtargetvariableHas: '您的目标变量类别',
   Less: '少于',
   More: '多于',
-  Thantwouniquealues: '多余两个',
+  Thantwouniquealues: '多于两个',
   onlyOnevalue: '只有一个',
   Targetvariablequalityisgood: '未检测出目标变量质量问题',
   Optional: '可选的',
