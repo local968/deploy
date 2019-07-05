@@ -5,12 +5,12 @@ import EN from "../../constant/en";
 import _ from 'lodash';
 
 export default function ResidualPlot(props){
-	const {chartDate={},title='',y_name='',width=500,height=300} = props;
+	const {chartDate={},title='',width=500,height=300} = props;
 	// const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
 	const num:any = [];
 	const data = _.map(chartDate.data,itm=>{
-		const [x,,y] = itm;
-		num.push(x,y);
+		const [y,,x] = itm;
+		num.push(x);
 		return [x,y];
 	});
 
@@ -37,20 +37,20 @@ export default function ResidualPlot(props){
 			x:`${Math.floor(max+1)}`.length * 10 +20,
 		},
 		xAxis: {
-			name:EN.residual,
+			name:EN.Predictvalue,
 			axisLine:{show:false},
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
-			max:_max,
-			min:_min,
+			// max:_max,
+			// min:_min,
 		},
 		yAxis: {
-			name:y_name,
+			name:EN.residual,
 			axisLine:{show:false},
 			nameTextStyle,
-			max:_max,
-			min:_min,
+			// max:_max,
+			// min:_min,
 		},
 		series: [
 			{
