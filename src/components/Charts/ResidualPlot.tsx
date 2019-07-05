@@ -6,10 +6,9 @@ import _ from 'lodash';
 
 export default function ResidualPlot(props){
 	const {chartDate={},title='',width=500,height=300} = props;
-	// const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
 	const num:any = [];
 	const data = _.map(chartDate.data,itm=>{
-		const [y,,x] = itm;
+		const [x,,y] = itm;
 		num.push(x);
 		return [x,y];
 	});
@@ -19,6 +18,8 @@ export default function ResidualPlot(props){
 
 	const _max = (max + Math.abs(max-min)/3).toFixed(1);
 	const _min = (min - Math.abs(max-min)/3).toFixed(1);
+
+	console.log(max,min)
 
 	const nameTextStyle = {
 		color:'#000',
@@ -37,20 +38,20 @@ export default function ResidualPlot(props){
 			x:`${Math.floor(max+1)}`.length * 10 +20,
 		},
 		xAxis: {
-			name:EN.Predictvalue,
+			name:EN.ActualValues,
 			axisLine:{show:false},
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
-			// max:_max,
-			// min:_min,
+			boundaryGap:[0,0],
+			max:_max,
+			min:_min,
 		},
 		yAxis: {
 			name:EN.residual,
 			axisLine:{show:false},
 			nameTextStyle,
-			// max:_max,
-			// min:_min,
+			boundaryGap:[0,0],
 		},
 		series: [
 			{
