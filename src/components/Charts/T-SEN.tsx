@@ -161,7 +161,7 @@ export default class T_SEN extends PureComponent<DataSampleProps>{
 					},
 					label:{
 						precision:3
-					}
+					},
 				}
 			},
 			legend: {
@@ -188,6 +188,9 @@ export default class T_SEN extends PureComponent<DataSampleProps>{
 					},
 					nameLocation:'end',
 					nameGap:25,
+					axisPointer:{
+						snap:true
+					}
 				}
 			],
 			yAxis: [
@@ -206,6 +209,9 @@ export default class T_SEN extends PureComponent<DataSampleProps>{
 					},
 					nameLocation:'end',
 					nameGap:23,
+					axisPointer:{
+						snap:true
+					}
 				}
 			],
 			series,
