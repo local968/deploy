@@ -1,32 +1,32 @@
 import React, { Component, Fragment } from 'react';
-// import styles from './styles.module.css';
-import styles from '../../Modeling/Result/styles.module.css';
+import styles from './styles.module.css';
 import { observer } from 'mobx-react'
 import Next from './Next.svg'
 import { Popover, Button, Icon } from 'antd'
-import { formatNumber } from 'util'
+import { formatNumber } from '../../../util';
 import EN from '../../../constant/en';
+import _ from 'lodash';
+import { toJS } from 'mobx';
+
+interface Interface {
+	project:any
+	model:any
+}
 @observer
-export default class ModelProcessFlow extends Component {
+export default class MPF_UL extends Component<Interface> {
 
 	list(data) {
 		const _data = Object.entries(data)
-			// .filter(itm => itm[0].startsWith(type))
-			// .filter(itm => !itm[0].endsWith("__choice__"))
 			.filter(itm => itm[0].toString().toUpperCase() !== 'MODEL_NAME');
-		if (_data.length || show) {
+		if (_data.length) {
 			return <Fragment>
-				{/* <dt>{name}</dt> */}
 				{
 					_data.map((itm, index) => {
-						const key = itm[0] //.substring(type.length);
+						const key = itm[0];
 						let value = itm[1];
 						if (typeof value === 'number') {
-							value = formatNumber(value)
+							value = formatNumber(String(value))
 						}
-						// if (key === 'strategy') {
-						// 	return <dd key={index}>{value}</dd>
-						// }
 						return <dd key={index}>{'' + key}:{'' + value}</dd>
 					})
 				}
@@ -40,56 +40,23 @@ export default class ModelProcessFlow extends Component {
 		</dl>
 	}
 
-	// FP(data) {
-	// 	const name = data['preprocessor:__choice__'];
-	// 	const types = {
-	// 		'extra_trees_preproc_for_classification': EN.extremlrandtreesprepr,
-	// 		'extra_trees_preproc_for_regression': EN.extremlrandtreesprepr,
-	// 		'fast_ica': EN.ICA,
-	// 		'feature_agglomeration': EN.FeatureAgglomeration,
-	// 		'kernel_pca': EN.kernelPCA,
-	// 		'kitchen_sinks': EN.KitchenSinks,
-	// 		'linear_svc_preprocessor': EN.LinearSVMprepr,
-	// 		'no_preprocessor': EN.NoPreprocessing,
-	// 		'no_preprocessing': EN.NoPreprocessing,
-	// 		'nystroem_sampler': EN.NystroemSampler,
-	// 		'pca': EN.PCA,
-	// 		'polynomial': EN.Polynomial,
-	// 		'random_trees_embedding': EN.RandomTreesembed,
-	// 		'select_percentile_classification': EN.SelectPercentile,
-	// 		'select_percentile_regression': EN.SelectPercentile,
-	// 		'select_rates': EN.SelectRates
-	// 	};
-
-	// 	return <dl>
-	// 		{this.list(data, `preprocessor:${name}:`, types[name], true)}
-	// 	</dl>
-	// }
-
 	Third(data) {
-		// let name = data['classifier:__choice__'];
-		// let type = `classifier:${name}:`;
-		// if (!name) {
-		// 	name = data['regressor:__choice__'];
-		// 	type = `regressor:${name}:`;
-		// }
-
 		return <dl>
 			{this.list(data)}
 		</dl>;
 	}
-	
+
 	popOver(content, text) {
 		return <Popover
 			overlayClassName={styles.popover}
 			arrowPointAtCenter={true}
 			autoAdjustOverflow={false}
-			getPopupContainer={() => document.getElementsByClassName(styles.process)[0]}
+			getPopupContainer={() => (document as any).getElementsByClassName(styles.process)[0]}
 			placement="bottom" content={content} trigger="click">
 			<Button>{text}<Icon type="down" /></Button>
 		</Popover>
 	}
-	
+
 	DQF(){
 		const {
 			nullFillMethod,nullLineCounts,
@@ -99,40 +66,39 @@ export default class ModelProcessFlow extends Component {
 			target,
 			problemType,
 			otherMap,
-			mapHeader,
 		} = this.props.project;
-		
+
 		const nfm = _.cloneDeep(nullFillMethod);
 		const mfm = _.cloneDeep(mismatchFillMethod);
-		
+
 		Object.entries(nullLineCounts).filter(itm=>itm[1]&&!nullFillMethod[itm[0]]).map(itm=>{
 			nfm[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
 		});
-		
+
 		if(problemType==='Classification'){
 			Reflect.deleteProperty(nfm,target)
 		}
-		
+
 		if(otherMap.hasOwnProperty('')){
 			Reflect.deleteProperty(nfm,target);
 		}
-		
+
 		Object.entries(mismatchLineCounts).filter(itm=>colType[itm[0]] === 'Numerical'&&itm[1]&&!mismatchFillMethod[itm[0]]).map(itm=>{
 			mfm[itm[0]] = 'mean';
 		});
-		
+
 		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);//缺失值
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
-		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}(${mapHeader[target]})`,outlierLineCounts[target],true);
-		
+		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}`,outlierLineCounts[target],true);
+
 		const dqft = problemType==='Classification'&&this.DQFT();
-		
+
 		if(!mv&&!mi&&!out&&!dqft){
 			return <dl>
 				<dd>{EN.none}</dd>
 			</dl>
 		}
-		
+
 		return <dl className={styles.over}>
 			{dqft}
 			{mv}
@@ -140,14 +106,80 @@ export default class ModelProcessFlow extends Component {
 			{out}
 		</dl>
 	}
-	
+
+	DQFT(){
+		const {
+			otherMap,
+			targetArray,
+			colValueCounts,
+			target,
+			targetCounts,
+			nullFillMethod,
+			nullLineCounts,
+		} = this.props.project;
+
+		let drop = [],mapping=[];
+
+		let ta =[...targetArray];
+
+		if(!targetArray.length){
+			ta = Object.keys(targetCounts).splice(0,2)
+		}
+
+		const df = _.without(Object.keys(colValueCounts[target]),...ta);
+
+		const om = {};
+		Object.entries(toJS(otherMap)).forEach(itm=>{
+			om[itm[0]] = (itm[1]||'NULL')
+		});
+
+		df.forEach(itm=>{
+			if(om[itm]){
+				mapping.push([itm,om[itm]])
+			}else{
+				drop.push(itm);
+			}
+		});
+
+
+		if(ta.find(itm=>itm === '') === undefined){
+			const NFMT = om['']||nullFillMethod[target];
+
+			if(NFMT&&nullLineCounts[target]){
+				if(NFMT === 'drop'){
+					drop.push('NULL')
+				}else{
+					mapping.push(['NULL',NFMT])
+				}
+			}
+
+		}
+
+		if(!drop.length&&!mapping.length){
+			return null;
+		}
+
+		return <Fragment>
+			<dt>{EN.TargetMore2Unique}</dt>
+			{
+				<dd title={drop.join(',')} style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
+			}
+			{
+				<dd title={mapping.map(itm=>`${itm[0]}->${itm[1]}`).join(',')}
+				    style={{display:(mapping.length?'':'none')}}>
+					{EN.Mapping}:{mapping.map((itm,index)=>`${index?',':''}${itm[0]}->${itm[1]}`)}
+				</dd>
+			}
+		</Fragment>
+	}
+
 	DQFData(data,title,showTarget,outlier=false){
 		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.project;
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
 		const values = Object.entries(data);
-		
+
 		const mismatchArray =  [{
 			value: 'mode',
 			label: EN.Replacewithmostfrequentvalue
@@ -185,13 +217,13 @@ export default class ModelProcessFlow extends Component {
 			value: 'high',
 			label: EN.Replacewithupper
 		}];
-		
-		const result = mismatchArray.map(itm=>({
+
+		const result:any = mismatchArray.map(itm=>({
 			type:itm.value,
 			key:itm.label,
 			data:[],
 		}));
-		
+
 		values.forEach(itm=>{
 			if(!isNaN(+itm[1])){
 				if(!result.find(itm=>itm.type === itm[1])){
@@ -212,13 +244,13 @@ export default class ModelProcessFlow extends Component {
 				}
 			}
 		});
-		
+
 		const res = result.filter(itm=>itm.data&&itm.data.length);
-		
+
 		if(!res.length){
 			return null;
 		}
-		if(outlier){
+		if(outlier&&target){
 			let {low,high} = rawDataView[target];
 			if(outlierDictTemp[target]){
 				const lh = [...outlierDictTemp[target]];
@@ -252,27 +284,27 @@ export default class ModelProcessFlow extends Component {
 			}
 		</Fragment>
 	}
-	
-	
+
+
 	FS(){//新建特性与特征选择
 		const { featureLabel } = this.props.model;
 		const {rawHeader,expression,target,colType,mapHeader} = this.props.project;
-		
+
 		let drop = _.without(rawHeader,...featureLabel,target);
-		
-		const create = Object.values(expression).map(itm=>{
+
+		const create = Object.values(expression).map((itm:any)=>{
 			return `${itm.nameArray.join(',')}=${itm.exps.map(it=>it.type=== 'ID'?mapHeader[it.value]:it.value).join('')}`
 		});
-		
+
 		if(!drop.length&&!create.length){
 			return null;
 		}
-		
+
 		let raw = drop.filter(itm=>colType[itm] === "Raw");
 		drop = _.without(drop,...raw).map(itm=>mapHeader[itm]||itm);
-		
+
 		raw = raw.map(itm=>mapHeader[itm]||itm);
-		
+
 		const pop = <dl className={styles.over}>
 			{
 				drop.length?<dt>
@@ -284,7 +316,7 @@ export default class ModelProcessFlow extends Component {
 					</ul>
 				</dt>:null
 			}
-			
+
 			{
 				raw.length?<dt>
 					<label>{EN.DropTheseVariables}(raw):</label>
@@ -307,16 +339,16 @@ export default class ModelProcessFlow extends Component {
 					</dt>
 				</Fragment>:null
 			}
-		
+
 		</dl>;
-		
+
 		return <Fragment>
 			<img src={Next} alt='' />
 			{this.popOver(pop,EN.FeatureCreationSelection)}
 		</Fragment>
 	}
-	
-	
+
+
 	render() {
 		const { dataFlow, standardType } = this.props.model;
 		return <section className={styles.process}>

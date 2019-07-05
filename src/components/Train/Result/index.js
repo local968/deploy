@@ -1,11 +1,10 @@
 import React from 'react';
-import { ContinueButton, Hint, ProgressBar, Table, ProcessLoading } from 'components/Common'
+import { Hint, ProgressBar, Table, ProcessLoading } from 'components/Common'
 import classes from './styles.module.css';
 import VariableImpact from './VariableImpact'
-import ModelProcessFlow from './modelProcessFlow'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-import { Tooltip, Icon, Popover, Select, message } from 'antd'
+import { Tooltip, Icon, Popover, Select} from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
@@ -14,6 +13,7 @@ import {
   ISO,
   D3D2,
 } from "../../Charts"
+import MPF from '../../Modeling/Result/MPF';
 
 const { Option } = Select;
 
@@ -358,7 +358,7 @@ const OutlierRow = observer((props) => {
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
+    {visible && type === 'process' && <MPF project={project} model={model} />}
     {/* </div> */}
   </div>
 })
@@ -570,7 +570,7 @@ const ClusteringRow = observer((props) => {
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
+    {visible && type === 'process' && <MPF project={project} model={model} />}
     {visible && type === 'explanation' && <Explanation model={model} mapHeader={mapHeader} />}
     {/* </div> */}
   </div>
