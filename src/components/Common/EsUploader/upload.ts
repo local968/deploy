@@ -71,15 +71,18 @@ export default function EsUploader(file, option: any = {}) {
   const continuedUpload = async () => {
     while (hasNextChunk && !isPause) {
       const { promise, response } = await Promise.race(processors)
+      if (isPause) return
       // uploaded += promise.bytes
       onProgress(`${uploaded}/${file.size}`)
       processors.splice(promise.no, 1)
       processors.forEach((p, i) => p.no = i)
       await uploadChunk()
     }
+    if (isPause) return
     if (chunk.length > 0) await uploadChunk()
     while (processors.length > 0) {
       const { promise, response } = await Promise.race(processors)
+      if (isPause) return
       // uploaded += promise.bytes
       onProgress(`${uploaded}/${file.size}`)
       processors.splice(promise.no, 1)
