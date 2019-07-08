@@ -49,8 +49,10 @@ export default class ModelProcessFlow extends Component<Interface> {
 			none:'No Scaling',
 		}[data['rescaling:__choice__']];
 
-		const { featureLabel } = this.props.model;
-		const { colType ,mapHeader} = this.props.project;
+		const {
+			model:{featureLabel},
+			project:{ colType ,mapHeader}
+		} = this.props;
 
 		const variables = featureLabel.filter(itm=>colType[itm] === "Categorical").map(itm=>mapHeader[itm]||itm);
 

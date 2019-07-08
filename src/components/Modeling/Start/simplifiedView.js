@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
 import { Icon, message as antdMessage, Modal, Popover, Table } from 'antd';
@@ -13,15 +13,12 @@ import request from 'components/Request'
 import EN from '../../../constant/en';
 import CreateNewVariables from '../../CreateNewVariable'
 import {
-  HistogramCategorical,
   CorrelationMatrixs,
-  TSENOne,
-  BoxPlots,
-  UnivariantPlots,
-  HS,
 } from "../../Charts"
 
-@inject('userStore')
+import SimplifiedViewPlot from './SimplifiedViewPlot'
+import ScatterPlot from './ScatterPlot'
+
 @observer
 export default class SimplifiedView extends Component {
   @observable sort = -1;
@@ -191,8 +188,6 @@ export default class SimplifiedView extends Component {
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
-    const {schema_TargetVariable=true} = this.props.userStore.info.role;
-  
     return <div className={styles.simplified} style={{ zIndex: this.visible ? 3 : 1 }}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -206,12 +201,21 @@ export default class SimplifiedView extends Component {
         </div>
         <div className={styles.targetRow}>
           <div className={classnames(styles.targetCell, styles.targetName)} title={mapHeader[target]}><span>{mapHeader[target]}</span></div>
-          <div className={styles.targetCell} onClick={this.show}>
-            <img src={histogramIcon} className={styles.tableImage} alt='histogram' />
+          <div className={styles.targetCell} id={target} onClick={this.show}>
+            <img src={histogramIcon}  className={styles.tableImage} alt='histogram' />
             {<Popover placement='bottomLeft'
+              getPopupContainer={() => document.getElementById(target)}
               visible={this.showHistograms}
               onVisibleChange={this.hide}
               trigger="click"
+                      title={<Icon
+                        style={{
+                          float:'right',
+                          height: 23,
+                          alignItems: 'center',
+                          display: 'flex',
+                        }}
+                        onClick={this.hide} type="close-circle" />}
               content={<SimplifiedViewPlot onClose={this.hide}
                 type={colType[target]}
                 target={mapHeader[target]}
@@ -252,9 +256,8 @@ export default class SimplifiedView extends Component {
               <option value={customHeader.length}>custom_{customHeader.length + 1} ({checkedVariables.length})</option>}
           </select>
         </div>
-        <div className={styles.newVariable} style={{display:(schema_TargetVariable?'':'none')}}>
-          <div className={styles.toolButton}
-               onClick={this.showNewVariable}>
+        <div className={styles.newVariable}>
+          <div className={styles.toolButton} onClick={this.showNewVariable}>
             <span>{EN.CreateANewVariable}</span>
           </div>
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
@@ -525,6 +528,14 @@ class SimplifiedViewRow extends Component {
           onVisibleChange={this.hideHistograms}
           overlayClassName='popovers'
           trigger="click"
+                                                title={<Icon
+                                                  style={{
+                                                    float:'right',
+                                                    height: 23,
+                                                    alignItems: 'center',
+                                                    display: 'flex',
+                                                  }}
+                                                  onClick={this.hideHistograms} type="close-circle" />}
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]}
             getPath={histgramPlot.bind(null, value)}>
             <SimplifiedViewPlot onClose={this.hideHistograms}
@@ -541,13 +552,18 @@ class SimplifiedViewRow extends Component {
         onClick={this.showUnivariant}>
         <img src={univariantIcon} className={styles.tableImage} alt='univariant' />
         {(!isRaw && this.univariant) ? <Popover placement='rightTop'
-          // arrowPointAtCenter
           overlayClassName='popovers'
-          // getPopupContainer = {()=>document.getElementById('Univariant' + value)}
           visible={!isRaw && this.univariant}
-          // autoAdjustOverflow
           onVisibleChange={this.hideUnivariant}
           trigger="click"
+                                                title={<Icon
+                                                  style={{
+                                                    float:'right',
+                                                    height: 23,
+                                                    alignItems: 'center',
+                                                    display: 'flex',
+                                                  }}
+                                                  onClick={this.hideUnivariant} type="close-circle" />}
           content={<SimplePlot isNew={isNew} path={univariatePlots[value]} getPath={univariatePlot.bind(null, value)}>
             <ScatterPlot onClose={this.hideUnivariant}
               type={project.problemType}
@@ -663,37 +679,6 @@ class CorrelationPlot extends Component {
   }
 }
 
-class SimplifiedViewPlot extends Component {
-
-  render() {
-    const { type, style, data, target, result } = this.props;
-    if (type === 'Raw') return null;
-    if (type === 'Numerical') {
-      return <div className={styles.plot} style={{
-        width: 600,
-        height: 500,
-        flexDirection: 'column',
-      }}>
-        <HS
-          x_name={target}
-          y_name={'count'}
-          title={`Feature:${target}`}
-          data={data}
-          result={result}
-        />
-      </div>
-    }
-    return <div className={styles.plot} style={style}>
-      {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-      <HistogramCategorical
-        x_name={target}
-        title={`Feature:${target}`}
-        data={data}
-      />
-
-    </div>
-  }
-}
 
 @observer
 class CreateNewVariable extends Component {
@@ -1554,38 +1539,3 @@ class FunctionTips extends Component {
   }
 }
 
-class ScatterPlot extends Component {
-  render() {
-    const { type, style, data, message, colType } = this.props;
-    if (type === 'Regression') {
-      //散点图
-      if (colType === 'Numerical') {
-        return <div className={styles.plot} style={style}>
-          {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-          <TSENOne
-            x_name={message.x}
-            y_name={message.y}
-            data={data}
-          />
-        </div>
-      }
-
-      //箱线图
-      return <div className={styles.plot} style={style}>
-        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-        <BoxPlots
-          x_keys={data.x_keys}
-          value={data.value}
-        />
-      </div>
-    }
-    return <div className={styles.plot} style={style}>
-      <UnivariantPlots
-        x_name={message.x}
-        y_name={message.y}
-        result={data}
-      />
-    </div>
-
-  }
-}
