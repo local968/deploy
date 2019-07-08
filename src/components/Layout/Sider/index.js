@@ -45,7 +45,11 @@ export default class Sider extends Component {
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
-          <img className={styles.logoImg} src={logoUrl} alt="logo"/>
+          <img className={styles.logoImg} src={logoUrl} onError={()=>{
+            this.setState({
+              logoUrl:logo
+            })
+          }} alt="logo"/>
           {/*<img className={styles.logoImg} src={logo} alt="logo"/>*/}
           {/* <h2 className={styles.mrone}>R2 Learn</h2> */}
         </div>
