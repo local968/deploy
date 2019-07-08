@@ -6,7 +6,7 @@ import uuid from 'uuid';
 import { message } from 'antd';
 import EN from '../../../constant/en';
 import styles from './styles.module.css';
-import SimplifiedView from './simplifiedView';
+import SimplifiedView from './SimplifiedView';
 import AdvancedView from './advancedView';
 import classnames from 'classnames'
 import Preview from './Preview'
