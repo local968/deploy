@@ -1,7 +1,7 @@
 import React, { useState, ReactElement, ChangeEvent } from 'react';
 import styles from './MetricBased.module.css';
 import classnames from 'classnames';
-import { Modal } from 'components/Common';
+import { Modal, Hint } from 'components/Common';
 import EN from '../../../../constant/en'
 import { InputNumber, Select } from 'antd'
 
@@ -61,7 +61,7 @@ const Based = (props: MetricBasedProps) => {
   }
 
   return <div className={styles.main}>
-    <div className={styles.button} onClick={onShow}><span>{EN.MetricBased}</span></div>
+    <div className={styles.button} onClick={onShow}><span>{EN.MetricCorrection}<Hint content={EN.MetricCorrectionHint} /></span></div>
     {<Modal visible={visible} width={'1200px'} content={<MetricBased {...props} onClose={onClose} />} title={EN.MetricBased} onClose={onClose} closeByMask={false} showClose={true} />}
   </div>
 }

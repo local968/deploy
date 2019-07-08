@@ -1,25 +1,25 @@
 .main {
   display: flex;
   flex: none;
+  margin-left: auto;
 }
 
 .button {
-  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  background:linear-gradient(180deg,rgba(255,255,255,1) 0%,rgba(241,243,245,1) 100%);
+  box-shadow:0px 3px 6px 0px rgba(0,0,0,0.2);
   color: #fff;
   border: 0;
   border-radius: 5px;
   display: flex;
   justify-content: center;
   cursor: pointer;
-  padding: 10px 25px;
-  margin-left: 5px;
-  margin-bottom: 5px;
+  padding: 8px 25px;
+  align-items: center;
 }
 
 .button span {
   font-size: 1rem;
-  color: #fff;
+  color: #4A4A4A;
   font-weight: normal;
   display: flex;
   font-family: 'Source Han Sans SC';

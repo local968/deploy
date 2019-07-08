@@ -14,7 +14,7 @@
   .advancedModelResult .modelComp {
     cursor: pointer;
     display: inline-block;
-    margin-left: auto;
+    margin-left: 30px;;
   }
   .advancedModelTable {
     font-size: 0.875rem;

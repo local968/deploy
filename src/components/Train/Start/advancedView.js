@@ -378,26 +378,42 @@ export default class AdvancedView extends Component {
           </div>
         </div>}
         <div className={styles.advancedRow}>
-          <div className={styles.advancedBlock}>
-            <div className={`${styles.advancedTitle} ${styles.otherLabel}`}>
-              <span>{EN.SetMaxTrainingTime}:</span>
-              <span className={styles.advancedDesc}>
-                {EN.Maxamountoftimetoevaluatedifferentmodules}
-              </span>
-            </div>
-            <div className={styles.advancedOption}>
-              <NumberInput
-                className={styles.advancedSize}
-                value={project.searchTime}
-                onBlur={this.handleMaxTime}
-                min={5}
-                isInt={true}
-              />
-              <span style={{ paddingLeft: 10 }}>
-                {EN.Minutes}
-                {/*<br />*/}
-                ({EN.minutesorlonger})
-              </span>
+          <div className={styles.advancedSpeed}>
+            <div className={styles.advancedBox}>
+              <div className={styles.advancedTitle}>
+                <span>{EN.SpeedVSAccuracy}:<a className={styles.reset} onClick={this.resetSpeed}>{EN.Reset}</a></span>
+              </div>
+              <div className={styles.advancedPercentBlock}>
+                <div className={styles.advancedPercent}>
+                  <div className={styles.advancedPercentCross} style={{ width: ((speedVSaccuracy - 1) / 8 * 100) + '%' }}></div>
+                  <div className={styles.advancedPercentHoldout} style={{ width: ((9 - speedVSaccuracy) / 8 * 100) + '%' }}></div>
+                </div>
+                <Range
+                  range={false}
+                  step={1}
+                  min={1}
+                  max={9}
+                  onChange={this.handleSpeed}
+                  value={speedVSaccuracy}
+                  tooltipVisible={false}
+                />
+              </div>
+              <div className={styles.advancedPercentBox}>
+                <div className={styles.advancedPercentInput}>
+                  <div className={styles.advancedPercentText}>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
+                    <span>{EN.Speed}</span>
+                  </div>
+                  <NumberInput value={speedVSaccuracy} onBlur={this.changeSpeed.bind(null, true)} min={1} max={9} isInt={true} />
+                </div>
+                <div className={styles.advancedPercentInput}>
+                  <div className={styles.advancedPercentText}>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
+                    <span>{EN.Accuracy}</span>
+                  </div>
+                  <NumberInput value={10 - speedVSaccuracy} onBlur={this.changeSpeed.bind(null, false)} min={1} max={9} isInt={true} />
+                </div>
+              </div>
             </div>
           </div>
           {project.problemType === "Outlier" && <div className={styles.advancedBlock} style={{ marginLeft: "30px" }}>

@@ -88,7 +88,7 @@ export interface TrainCommand {
   kValue?: number,
   algorithms?: string[],
   standardType?: string,
-  searchTime?: number,
+  // searchTime?: number,
   metricsMethod?: string,
   featureLabel?: string[],
   randomSeed?: number,
@@ -290,7 +290,7 @@ class Project {
   //un
   @observable weights: NumberObject = {};
   @observable standardType: string = 'standard';
-  @observable searchTime: number = 5;
+  // @observable searchTime: number = 5;
   @observable kValue: number = 5;
   @observable kType: string = 'auto';
 
@@ -528,7 +528,7 @@ class Project {
       distribution: 0,
       weights: {},
       standardType: 'standard',
-      searchTime: 5,
+      // searchTime: 5,
       kValue: 5,
       kType: 'auto',
       trainModel: {},
@@ -577,7 +577,7 @@ class Project {
       distribution: number,
       weights: NumberObject,
       standardType: string,
-      searchTime: number,
+      // searchTime: number,
       kValue: number,
       kType: string,
       trainModel: unknown,
@@ -1469,7 +1469,8 @@ class Project {
           kValue: undefined,
           algorithms: algorithms,
           standardType: "standard",
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           metricsMethod: "CVNN",
           featureLabel: featureLabel,
           randomSeed: 0,
@@ -1492,7 +1493,8 @@ class Project {
             'EllipticEnvelope',
           ],
           standardType: "standard",
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           featureLabel: featureLabel,
           randomSeed: 0,
           projectId: id,
@@ -1657,7 +1659,8 @@ class Project {
           kValue: this.kValue,
           algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
           standardType: standardTypeTemp,
-          searchTime: this.searchTime,
+          speedVSaccuracy: this.speedVSaccuracy,
+          // searchTime: this.searchTime,
           metricsMethod: this.measurement,
           featureLabel: featureLabel,
           randomSeed: this.randSeed,
@@ -1674,7 +1677,8 @@ class Project {
         trainData = {
           algorithms: this.algorithms,
           standardType: standardTypeTemp,
-          searchTime: this.searchTime,
+          speedVSaccuracy: this.speedVSaccuracy,
+          // searchTime: this.searchTime,
           featureLabel: featureLabel,
           randomSeed: this.randSeed,
           projectId: id,
@@ -1780,7 +1784,7 @@ class Project {
       kValue: this.kValue,
       algorithms: this.algorithms,
       standardType: standardTypeTemp,
-      searchTime: this.searchTime,
+      // searchTime: this.searchTime,
       measurement: this.measurement,
       randSeed: this.randSeed,
       weights: weightsTemp,
@@ -1808,7 +1812,8 @@ class Project {
           measurement: 'CVNN',
           algorithms: defaultAlgorithms,
           standardType: 'standard',
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           featureLabel,
           randSeed: 0,
           weights: {},
@@ -1817,7 +1822,8 @@ class Project {
         return {
           algorithms: defaultAlgorithms,
           standardType: 'standard',
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           featureLabel,
           randSeed: 0,
           weights: {},

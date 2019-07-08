@@ -222,7 +222,7 @@ export class Project {
   //un
   weights?: unknown = {};
   standardType?: string = 'standard';
-  searchTime?: number = 5;
+  // searchTime?: number = 5;
   kValue?: number = 5;
   kType?: string = 'auto';
 
