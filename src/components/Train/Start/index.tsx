@@ -6,7 +6,7 @@ import { Modal } from 'components/Common';
 import { observable } from 'mobx';
 import { message, Icon } from 'antd';
 import AdvancedView from './advancedView';
-import SimplifiedView from './simplifiedView';
+import SimplifiedView from './SimplifiedView';
 import Preview from './Preview';
 import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
