@@ -308,6 +308,7 @@ class Project {
   @observable reportCancel: boolean = false;
   @observable isHoldout: boolean = false;
   @observable showSsPlot: boolean = false;
+  @observable metricCorrection: { metric: string, type: string, value: number } = { metric: 'default', type: '', value: 0 }
 
   constructor(id: string, args: Object) {
     this.id = id;
@@ -537,7 +538,8 @@ class Project {
       ssPlot: null,
       algorithmRadio: 'all',
       settingId: '',
-      settings: []
+      settings: [],
+      metricCorrection: { metric: 'default', type: '', value: 0 }
     } as {
       train2Finished: boolean,
       train2ing: boolean,
@@ -586,7 +588,8 @@ class Project {
       ssPlot: null,
       algorithmRadio: 'all' | 'none' | 'default',
       settingId: string,
-      settings: Settings[]
+      settings: Settings[],
+      metricCorrection: { metric: string, type: string, value: number }
     }
   }
 
@@ -1912,7 +1915,7 @@ class Project {
     return
   }
 
-  setModel = (data: Model) => {
+  setModel = (data: Model, force = false) => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     // if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
@@ -1928,7 +1931,7 @@ class Project {
       }
     }
     this.models = [...this.models.filter(m => data.id !== m.id), model]
-    if (data.chartData && this.criteria === "cost") {
+    if (!force && data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
       const [v0, v1] = Object.values(this.targetCounts)
       const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4))
@@ -1980,14 +1983,14 @@ class Project {
     when(
       () => this.init,
       () => readyModels.forEach(m => {
-        this.setModel(m)
+        this.setModel(m, true)
       })
     )
     socketStore.ready().then(api => api.queryModelList({ id: this.id }, (progressResult: BaseResponse) => {
       const { status, message, model } = progressResult
       if (status !== 200) return antdMessage.error(message)
       count++
-      if (this.init) return this.setModel(model)
+      if (this.init) return this.setModel(model, true)
       readyModels.push(model)
     })).then(result => {
       if (!show) return

@@ -3,7 +3,7 @@ import styles from './MetricBased.module.css';
 import classnames from 'classnames';
 import { Modal, Hint } from 'components/Common';
 import EN from '../../../../constant/en'
-import { InputNumber, Select } from 'antd'
+import { InputNumber, Select, Icon, message } from 'antd'
 
 const { Option } = Select;
 
@@ -40,7 +40,9 @@ const METRICS = [
 ]
 
 interface MetricBasedProps {
-
+  finished: boolean,
+  metricCorrection: MetricBasedState,
+  MetricCorrection: (obj: MetricBasedState, b: boolean) => Promise<void>
 }
 
 interface MetricBasedState {
@@ -69,17 +71,14 @@ const Based = (props: MetricBasedProps) => {
 export default Based
 
 const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
-  const { onClose } = props
-  const [state, setState] = useState({
-    metric: 'default',
-    type: '',
-    value: 0
-  } as MetricBasedState)
-  const [checked, setChecked] = useState(true)
+  const { onClose, finished, MetricCorrection, metricCorrection } = props
+  const [state, setState] = useState(metricCorrection)
+  const [checked, setChecked] = useState(finished)
+  const [loading, setLoading] = useState(false)
 
   const setMetric = (metric: string) => () => {
     if (state.metric === metric) return
-    const type = (metric === 'recall' && 'precision') || (metric === 'precision' && 'recall') || ''
+    const type = (metric === 'recall' && 'Precision') || (metric === 'precision' && 'Recall') || ''
     const value = (metric === 'fbeta' && 1) || ((metric === 'recall' || metric === 'precision') && 0.6) || 0
     setState({
       metric,
@@ -105,7 +104,21 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
   }
 
   const changeApply = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!finished) return
     setChecked(e.target.checked)
+  }
+
+  const onSave = () => {
+    const { metric, type, value } = state
+    if (metric === 'recall' || metric === 'precision') {
+      if (!type) return message.error('save error')
+      if (value < 0.01 || value > 1) return message.error('save error')
+    }
+    if (metric === 'fbeta' && (value < 0.1 || value > 10)) return message.error('save error')
+    setLoading(true)
+    MetricCorrection(state, checked).then(() => {
+      onClose()
+    })
   }
 
   const renderCondition = (value: string): ReactElement => {
@@ -117,18 +130,18 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
         </div>
       case 'recall':
         const recallList = [{
-          value: 'precision',
+          value: 'Precision',
           label: 'Precision'
         }, {
-          value: 'recall0',
+          value: 'Recall(0)',
           label: 'Recall(0)'
         }, {
-          value: 'precision0',
+          value: 'Precision(0)',
           label: 'Precision(0)'
         }].filter(l => l.value !== state.type)
         return <div className={styles.condition}>
           <span>condition: </span>
-          <Select onChange={setType} style={{ width: 120, margin: '0px 10px' }} value={state.type}>
+          <Select onChange={setType} style={{ width: 140, margin: '0px 10px' }} value={state.type}>
             {recallList.map((v, k) => {
               return <Option key={k} value={v.value}>{v.label}</Option>
             })}
@@ -138,18 +151,18 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
         </div>
       case 'precision':
         const precisionList = [{
-          value: 'recall',
+          value: 'Recall',
           label: 'Recall'
         }, {
-          value: 'precision0',
+          value: 'Precision(0)',
           label: 'Precision(0)'
         }, {
-          value: 'recall0',
+          value: 'Recall(0)',
           label: 'Recall(0)'
         }].filter(l => l.value !== state.type)
         return <div className={styles.condition}>
           <span>condition: </span>
-          <Select onChange={setType} style={{ width: 120, margin: '0px 10px' }} value={state.type}>
+          <Select onChange={setType} style={{ width: 140, margin: '0px 10px' }} value={state.type}>
             {precisionList.map((v, k) => {
               return <Option key={k} value={v.value}>{v.label}</Option>
             })}
@@ -188,7 +201,7 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
       </div>
       <div className={styles.apply}>
         <div className={styles.applyCheck}>
-          <input type='checkbox' id='applyCheck' name='applyCheck' checked={checked} onChange={changeApply} />
+          <input type='checkbox' id='applyCheck' name='applyCheck' checked={checked} disabled={!finished} onChange={finished ? changeApply : () => { }} />
           <label htmlFor='applyCheck'>{EN.ApplyAllModel}</label>
         </div>
         <div className={styles.applyNote}>
@@ -197,8 +210,8 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
       </div>
     </div>
     <footer className={styles.footer}>
-      <div className={styles.metricButton}><button><span>{EN.confirm}</span></button></div>
-      <div className={styles.metricButton}><button className={styles.cancel} onClick={onClose}><span>{EN.Cancel}</span></button></div>
+      <div className={styles.metricButton}><button onClick={loading ? () => { } : onSave}><span>{loading ? <Icon type='loading' /> : EN.confirm}</span></button></div>
+      <div className={styles.metricButton}><button className={styles.cancel} onClick={loading ? () => { } : onClose}><span>{EN.Cancel}</span></button></div>
       <div className={styles.metricButton}><button><span>{EN.Reset}</span></button></div>
     </footer>
   </section>

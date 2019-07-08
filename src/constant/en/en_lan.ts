@@ -1315,7 +1315,7 @@ const EN_LAN = {
   noteItem4: 'None means the cutoff threshold is 0.5. ',
   noteItem5: 'The optimal cutoff threshold is from the validation set.',
   ApplyAllModel: 'Applied on all models',
-  ApplyNote: '(After selecting “Applied on all models”, the operation of maximizing the metric will be applied on all models, whose cutoff threshold will be corrected.)',
+  ApplyNote: '(After selecting “Applied on all models”, the operation of maximizing the metric will be applied on all models, whose cutoff threshold will be corrected.This function is only supported after training of all models has been finished.)',
   MetricCorrection: 'Metric Correction',
   MetricCorrectionHint: 'Metric Correction allows you to maximize the selected metric by adjusting cutoff threshold.'
 };

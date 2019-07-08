@@ -89,13 +89,13 @@ button.cancel span{
   display: flex;
   flex: none;
   flex-wrap: wrap;
-  line-height: 30px;
+  line-height: 32px;
   border-bottom: #C4CBD7 dashed 1px;
 }
 
 .metric {
   display: flex;
-  flex: 0 0 33%;
+  min-width: 33%;
   align-items: center;
   margin-bottom: 30px;
   overflow: hidden;
@@ -115,7 +115,7 @@ button.cancel span{
 }
 
 .metricLarger {
-  flex: 0 0 66%;
+  min-width: 66%;
 }
 
 .metricLarger label{

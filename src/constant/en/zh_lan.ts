@@ -1174,7 +1174,7 @@ const ZH_LAN = {
   noteItem4: 'None表示阈值为0.5；',
   noteItem5: '最优阈值为在验证集上的结果。',
   ApplyAllModel: '应用到所有模型',
-  ApplyNote: '（注：选择“应用到所有模型”后，最大化度量指标的操作将会在所有模型上进行，修正阈值。）',
+  ApplyNote: '（注：选择“应用到所有模型”后，最大化度量指标的操作将会在所有模型上进行，修正阈值。该功能只有在全部所选模型训练结束后才能应用。）',
   MetricCorrection: '指标修正',
   MetricCorrectionHint: '指标修正功能可以通过调整模型阈值，最大化选定的度量指标。'
 };
