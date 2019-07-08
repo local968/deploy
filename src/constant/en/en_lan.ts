@@ -1298,7 +1298,8 @@ const EN_LAN = {
   GB_2312: 'GB-2312',
   BIG5: 'BIG5',
   residual: "residual",
-  settingNameRequired: 'setting name required'
+  settingNameRequired: 'setting name required',
+  Variableneedstostartwith: 'var - 选择一个连续变量;变量需要以@开头。[range_list1], [range_list2]…-自定义变量划分范围;第一个数值应大于该变量的最小值，最后一个数值应小于该变量的最大值;range_list的长度决定组的数量。',
 };
 
 
