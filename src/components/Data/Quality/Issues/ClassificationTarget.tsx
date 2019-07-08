@@ -117,7 +117,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       `${EN.YourtargetvariableHas}${
         error ? EN.onlyOnevalue : EN.Thantwouniquealues
         }`;
-    const {quality_rename=true} = userStore.info.role;
+    const {quality_rename=true,quality_Fixit=true,quality_ReselectTargetVariable=true} = userStore.info.role;
 
     return (
       <div className={styles.block}>
@@ -260,7 +260,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                   <div className={styles.reason}>
                     <span>{EN.Itsthewrongtargetvariable}</span>
                   </div>
-                  <div className={styles.button} onClick={backToSchema}>
+                  <div style={{display:(quality_ReselectTargetVariable?'':'none')}} className={styles.button} onClick={backToSchema}>
                     <button>
                       <span>{EN.ReselectTargetVariable}</span>
                     </button>
@@ -281,7 +281,9 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                     <div className={styles.reason}>
                       <span>{EN.Thetargetvariablehassomenoise}</span>
                     </div>
-                    <div className={styles.button} onClick={editTarget}>
+                    <div
+                      style={{display:(quality_Fixit?'':'none')}}
+                      className={styles.button} onClick={editTarget}>
                       <button>
                         <span>{EN.Fixit}</span>
                       </button>
