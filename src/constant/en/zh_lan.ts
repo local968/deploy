@@ -1156,8 +1156,25 @@ const ZH_LAN = {
   adjustRandScore: '调整兰德系数',
   ClusteringTarget: "若您的数据里包含“目标变量”列，请在这里进行选择，我们将对聚类分析的效果进行验证；若不包含，请留空。",
   OutlierTarget: "若您的数据里包含“目标变量”列，请在这里进行选择，我们将对异常值检测的效果进行验证；若不包含，请留空。",
-  residual:"残差值",
-  settingNameRequired: '设置名称不能为空'
+  residual: "残差值",
+  settingNameRequired: '设置名称不能为空',
+  confirm: '确认',
+  MaximizeYoudenIndex: 'Maximize Youden Index',
+  MaximizeKS: 'Maximize KS',
+  MaximizeFbeta: 'Maximize Fbeta',
+  MaximizeAccuracy: 'Maximize Accuracy',
+  MaximizeRecall: 'Maximize Recall',
+  None: 'None',
+  MaximizePrecision: 'Maximize Precision',
+  MetricBased: '指标修正',
+  noteTitle: '说明:',
+  noteItem1: '每次只能选择一个指标进行最大化操作； ',
+  noteItem2: '选择最大化Fbeta可填入beta的值，输入范围0.1~1.0，最小步长为0.1，默认值为1.0，Fbeta = (1+beta2) precision*recall/(beta2*precision+recall)；',
+  noteItem3: '最大化Precision或Recall时，需要选择一个条件指标，Precision, Recall为正类的指标，Precision(0), Recall(0)为负类的指标。输入范围0.01~1.0，最小步长为0.01，默认为0.60，即在选择的条件指标大于等于输入 值的范围下，最大化Precision或Recall；',
+  noteItem4: 'None表示阈值为0.5；',
+  noteItem5: '最优阈值为在验证集上的结果。',
+  ApplyAllModel: '应用到所有模型',
+  ApplyNote: '（注：选择“应用到所有模型”后，最大化度量指标的操作将会在所有模型上进行，修正阈值。）'
 };
 
 export default ZH_LAN;

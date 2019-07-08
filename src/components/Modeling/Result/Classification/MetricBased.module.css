@@ -1,0 +1,206 @@
+.main {
+  display: flex;
+  flex: none;
+}
+
+.button {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  padding: 10px 25px;
+  margin-left: 5px;
+  margin-bottom: 5px;
+}
+
+.button span {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: normal;
+  display: flex;
+  font-family: 'Source Han Sans SC';
+  line-height: normal;
+  align-items: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+}
+
+.footer {
+  position: relative;
+  display: flex;
+  flex: none;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.metricButton {
+  display: flex;
+  flex: none;
+  margin-right: 10px;
+}
+
+.metricButton:last-child {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.metricButton button {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 4px 35px;
+}
+
+.metricButton button span {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: normal;
+  font-family: 'Source Han Sans SC';
+  line-height: normal;
+}
+
+button.cancel {
+  background: #fff;
+  border: 1px solid #243448;
+}
+
+button.cancel span{
+  color: #243448;
+}
+
+.content {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+
+.metrics {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  line-height: 30px;
+  border-bottom: #C4CBD7 dashed 1px;
+}
+
+.metric {
+  display: flex;
+  flex: 0 0 33%;
+  align-items: center;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.metric input[type='radio'] {
+  cursor: pointer;
+  display: flex;
+  flex: none;
+}
+
+.metric label{
+  margin-left: 15px;
+  cursor: pointer;
+  display: flex;
+  flex: none;
+}
+
+.metricLarger {
+  flex: 0 0 66%;
+}
+
+.metricLarger label{
+  min-width: 25%
+}
+
+.condition {
+  display: flex;
+  flex: auto;
+  margin-left: 20px
+}
+
+.condition span {
+  font-size: 0.75rem;
+}
+
+.notes {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  border-bottom: #C4CBD7 dashed 1px;
+}
+
+.noteTitle {
+  display: flex;
+  flex: none;
+  margin-top: 15px;
+}
+
+.noteTitle span {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.noteList {
+  list-style: none;
+  padding-inline-start: 15px;
+}
+
+.noteItem {
+  font-size: 0.875rem;
+  list-style: decimal;
+  line-height: 30px;
+  color: #4a4a4a;
+}
+
+.apply {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  border-bottom: 2px solid #C4CBD7;
+  padding: 15px 0;
+}
+
+.applyCheck {
+  display: flex;
+  flex: none;
+  align-items: center;
+  line-height: 25px;
+}
+
+.applyCheck input[type='checkbox'] {
+  cursor: pointer;
+  display: flex;
+  flex: none;
+}
+
+.applyCheck label {
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  font-size: 1.125rem;
+  color: #000;
+  margin-left: 10px;
+}
+
+.applyNote {
+  display: flex;
+  flex: none;
+  line-height: 24px;
+  margin-left: 10px;
+}
+
+.applyNote span {
+  color: #4A4A4A;
+  font-size: 0.875rem;
+}

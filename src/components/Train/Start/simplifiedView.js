@@ -161,6 +161,8 @@ export default class SimplifiedView extends Component {
     const newVariableType = { ...colType }
     if (!!target) Reflect.deleteProperty(newVariableType, target)
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v))
+    
+    console.log([...checkedVariables], 'checkedVariables')
     const key = [allVariables, informativesLabel, ...customHeader].map(v => v.sort().toString()).indexOf(checkedVariables.sort().toString())
     const hasNewOne = key === -1
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2))

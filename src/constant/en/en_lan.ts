@@ -1298,7 +1298,24 @@ const EN_LAN = {
   GB_2312: 'GB-2312',
   BIG5: 'BIG5',
   residual: "residual",
-  settingNameRequired: 'setting name required'
+  settingNameRequired: 'setting name required',
+  confirm: 'OK',
+  MaximizeYoudenIndex: 'Maximize Youden Index',
+  MaximizeKS: 'Maximize KS',
+  MaximizeFbeta: 'Maximize Fbeta',
+  MaximizeAccuracy: 'Maximize Accuracy',
+  MaximizeRecall: 'Maximize Recall',
+  None: 'None',
+  MaximizePrecision: 'Maximize Precision',
+  MetricBased: 'Metric Based',
+  noteTitle: 'Note:',
+  noteItem1: 'Only one metric is supported for maximizing every time. ',
+  noteItem2: 'Please input the value of beta when maximizing Fbeta if necessary. Input ranges from 0.1 to 1.0, minimum step is 0.1 and default is 1.0. Fbeta = (1+beta2) precision*recall/(beta2*precision+recall) ',
+  noteItem3: 'Condition metric needs to be selected when maximizing Precision or Recall. Precision, Recall are the metric corresponding to the positive class and Precision(0), Recall(0) corresponding to the negative class. Input ranges from 0.01 to 1.0, minimum step is 0.01 and default is 0.60. Recall or Precision are maximized when the condition metric is greater than or equal to the input. ',
+  noteItem4: 'None means the cutoff threshold is 0.5. ',
+  noteItem5: 'The optimal cutoff threshold is from the validation set.',
+  ApplyAllModel: 'Applied on all models',
+  ApplyNote: '(After selecting “Applied on all models”, the operation of maximizing the metric will be applied on all models, whose cutoff threshold will be corrected.)'
 };
 
 

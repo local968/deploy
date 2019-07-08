@@ -23,13 +23,13 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
-import { computed} from 'mobx';
+import { computed } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import request from '../../Request'
-const {TabPane} = Tabs;
-const {Option} = Select;
+const { TabPane } = Tabs;
+const { Option } = Select;
 
 import {
   FitPlot,
@@ -40,6 +40,7 @@ import {
 } from "../../Charts"
 import DetailCurves from './DetailCurves';
 import Thumbnail from './Thumbnail';
+import MetricBased from '../Result/Classification/MetricBased'
 
 @inject('projectStore')
 @observer
@@ -73,11 +74,11 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort, metric,currentSettingId } = this.props;
+    const { models, project, projectStore, sort, metric, currentSettingId } = this.props;
     // const {problemType} = project;
     // problemType === "Classification"&&this.props.projectStore.project.upIsHoldout(false);
-    const {isHoldout} = this.props.projectStore.project;
-  
+    const { isHoldout } = this.props.projectStore.project;
+
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
@@ -328,7 +329,7 @@ export default class AdvancedView extends Component {
 
   constructor(props) {
     super(props);
-    props.project.problemType === "Classification"&&props.projectStore.project.upIsHoldout(false);
+    props.project.problemType === "Classification" && props.projectStore.project.upIsHoldout(false);
     // const currentSetting = props.projectStore.project.currentSetting
     // this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
     // autorun(() => {
@@ -350,15 +351,15 @@ export default class AdvancedView extends Component {
     // props.projectStore.changeStopFilter(true)
     props.projectStore.changeOldfiltedModels(undefined)
   }
-  
-  handleHoldout(){
-    const {isHoldout} = this.props.projectStore.project;
+
+  handleHoldout() {
+    const { isHoldout } = this.props.projectStore.project;
     this.props.projectStore.project.upIsHoldout(!isHoldout);
   }
 
   render() {
     const { project, sort, handleSort, handleChange, metric, handleHoldout, currentSettingId, changeSetting } = this.props;
-    const {isHoldout} = this.props.projectStore.project;
+    const { isHoldout } = this.props.projectStore.project;
     const { problemType } = project;
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
@@ -375,6 +376,7 @@ export default class AdvancedView extends Component {
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
           </div>
+          {project.problemType === 'Classification' && <MetricBased />}
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
         <div className={styles.metricSelection} >
@@ -420,7 +422,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout,project } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout, project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
@@ -489,7 +491,7 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked, isHoldout, mapHeader,project } = this.props;
+    const { model, texts, metric, checked, isHoldout, mapHeader, project } = this.props;
     const { score: { validateScore, holdoutScore }, modelName, reason } = model;
     const { detail } = this.state;
     const { validate, holdout } = reason || {}
@@ -710,7 +712,7 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   };
   render() {
-    const { model, texts, metric, checked, yes, no, isHoldout,project } = this.props;
+    const { model, texts, metric, checked, yes, no, isHoldout, project } = this.props;
     if (!model.chartData) return null;
     const { modelName, fitIndex, holdoutChartData, chartData, score } = model;
     const { detail } = this.state;
