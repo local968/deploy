@@ -20,7 +20,7 @@ interface Interface {
   colType?:any
 }
 @observer
-export default class SimplifiedView extends Component<Interface> {
+export default class SimplifiedViews extends Component<Interface> {
   @observable sort = -1;
   @observable showHistograms = false;
   @observable showCorrelation = false;
