@@ -117,7 +117,8 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       `${EN.YourtargetvariableHas}${
         error ? EN.onlyOnevalue : EN.Thantwouniquealues
         }`;
-    const {quality_rename=true,quality_Fixit=true,quality_ReselectTargetVariable=true} = userStore.info.role;
+    const {quality_rename=true,quality_Fixit=true,quality_ReselectTargetVariable=true,quality_LoadaNewDataset=true} = userStore.info.role;
+
 
     return (
       <div className={styles.block}>
@@ -270,7 +271,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                   <div className={styles.reason}>
                     <span>{EN.Itsgeneraldataqualityissue}</span>
                   </div>
-                  <div className={styles.button} onClick={backToConnect}>
+                  <div style={{display:(quality_LoadaNewDataset?'':'none')}} className={styles.button} onClick={backToConnect}>
                     <button>
                       <span>{EN.LoadaNewDataset}</span>
                     </button>
