@@ -392,8 +392,10 @@ class TargetIssue extends Component<TargetIssueInterface> {
 interface InterfaceVariableIssue {
   project:any
   changeTab?:any
+  userStore?:any
 }
 
+@inject('userStore')
 @observer
 class VariableIssue extends Component<InterfaceVariableIssue> {
   @observable visible = false;
@@ -595,7 +597,7 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
   };
 
   render() {
-    const { project, changeTab } = this.props;
+    const { project, changeTab,userStore } = this.props;
     const {
       dataHeader,
       etling,
@@ -607,6 +609,8 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
     const rowIssue = totalRawLines < 1000;
     const dataIssue = +nullCount + +mismatchCount + +outlierCount > 0;
     const tableData = this.formatTable();
+    const {quality_continue_UN=true,quality_EditTheFixes_UN=true,quality_LoadaNewDataset_UN=true} = userStore.info.role as any;
+
     return (
       <div className={styles.quality}>
         <div className={styles.issue}>
@@ -629,7 +633,9 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
                 <span className={styles.limitText}>
                   {EN.Foryourwholedataset}
                 </span>
-                <div className={styles.button} onClick={this.backToConnect}>
+                <div
+                  style={{display:(quality_LoadaNewDataset_UN?'':'none')}}
+                  className={styles.button} onClick={this.backToConnect}>
                   <button>
                     <span>{EN.LoadaNewDataset}</span>
                   </button>
@@ -642,7 +648,9 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
                 <span className={styles.limitText}>
                   {EN.SomeissuesarefoundR2learnhasgenerated}
                 </span>
-                <div className={styles.button} onClick={this.editFixes}>
+                <div
+                  style={{display:(quality_EditTheFixes_UN?'':'none')}}
+                  className={styles.button} onClick={this.editFixes}>
                   <button>
                     <span>{EN.EditTheFixes}</span>
                   </button>
@@ -712,6 +720,7 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
               onClick={this.showSummary}
               text={EN.Continue}
               width="15%"
+              show={quality_continue_UN}
             />
           </div>
         </div>
