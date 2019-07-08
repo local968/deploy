@@ -15,14 +15,16 @@ import uuid from 'uuid';
 import moment from 'moment';
 
 interface StartTrainInterface {
-  projectStore: any;
+  projectStore: any
+  userStore:any
 }
-@inject('projectStore')
+@inject('projectStore','userStore')
 @observer
 export default class StartTrain extends Component<StartTrainInterface> {
   @observable visible = false;
 
-  fastTrain = () => {
+  fastTrain(run=true){
+    if(!run)return;
     const { project } = this.props.projectStore;
     const setting = project.newSetting();
     const name = `auto.${moment().format('MM.DD.YYYY_HH:mm:ss')}`;
@@ -46,6 +48,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
   };
 
   render() {
+    const {start_AutomaticModeling_UN=true} = this.props.userStore.info.role;
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
@@ -53,7 +56,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock} onClick={this.fastTrain}>
+            <div className={styles.trainBlock} onClick={this.fastTrain.bind(this,start_AutomaticModeling_UN)}>
               <div className={styles.trainRecommend}>
                 <span>
                   <Icon
@@ -74,7 +77,9 @@ export default class StartTrain extends Component<StartTrainInterface> {
                 <span>{EN.EasyAndSimpleTip}</span>
               </div>
             </div>
-            <button className={styles.train} onClick={this.fastTrain}>
+            <button
+              style={{display:(start_AutomaticModeling_UN?'':'none')}}
+              className={styles.train} onClick={this.fastTrain.bind(this)}>
               <span>{EN.AutomaticModeling}</span>
             </button>
           </div>
@@ -118,7 +123,10 @@ export default class StartTrain extends Component<StartTrainInterface> {
 interface AdvancedModelInterface {
   project:any
   closeAdvanced:any
+  userStore?:any
 }
+
+@inject('userStore')
 @observer
 class AdvancedModel extends Component<AdvancedModelInterface> {
   @observable tab = 1;
@@ -198,12 +206,14 @@ class AdvancedModel extends Component<AdvancedModelInterface> {
   };
 
   render() {
-    const { project, closeAdvanced } = this.props;
+    const { project, closeAdvanced,userStore } = this.props;
     const { dataHeader, newVariable, trainHeader, target } = project;
     const allVariables = [...dataHeader, ...newVariable];
     const checkedVariables = allVariables.filter(
       v => !trainHeader.includes(v) && v !== target,
     );
+    const {start_AdvancedModeling_UN=true} = userStore.info.role;
+
     return (
       <div className={styles.advancedModel}>
         <div className={styles.advancedContent}>
@@ -249,6 +259,7 @@ class AdvancedModel extends Component<AdvancedModelInterface> {
             )}
             <div className={styles.bottom}>
               <button
+                style={{display:(start_AdvancedModeling_UN?'':'none')}}
                 className={classnames(styles.save, {
                   [styles.disable]: !checkedVariables.length,
                 })}
