@@ -4,7 +4,7 @@ import './echarts.config'
 import {toJS} from "mobx";
 
 export default function TSENOne(props){
-	const {x_name='',y_name='',data={},width=400,height=400} = props;
+	const {x_name='',y_name='',data={},width=400,height=380} = props;
 	const nameTextStyle = {
 		color:'#000',
 	};

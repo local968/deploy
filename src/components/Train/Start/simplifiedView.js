@@ -12,10 +12,9 @@ import EN from '../../../constant/en';
 import request from 'components/Request'
 import CreateNewVariables from '../../CreateNewVariable'
 import {
-  HS,
-  HistogramCategorical,
   CorrelationMatrixs,
 } from '../../Charts';
+import SimplifiedViewPlot from './SimplifiedViewPlot'
 
 @observer
 export default class SimplifiedView extends Component {
@@ -26,10 +25,6 @@ export default class SimplifiedView extends Component {
   @observable CorrelationMatrixData = {};
   @observable weights = {}
   @observable standardType = ''
-
-  componentDidMount() {
-    this.reloadTable()
-  }
 
   componentDidMount() {
     this.reloadTable()
@@ -368,6 +363,14 @@ class SimplifiedViewRow extends Component {
           overlayClassName='popovers'
           onVisibleChange={this.hideHistograms}
           trigger="click"
+                                                title={<Icon
+                                                  style={{
+                                                    float:'right',
+                                                    height: 23,
+                                                    alignItems: 'center',
+                                                    display: 'flex',
+                                                  }}
+                                                  onClick={this.hideHistograms} type="close-circle" />}
           content={<SimplePlot isNew={isNew} path={histgramPlots[value]} getPath={histgramPlot.bind(null, value)}>
             <SimplifiedViewPlot onClose={this.hide}
               type={colType[value]}
@@ -500,39 +503,7 @@ class CorrelationPlot extends Component {
   }
 }
 
-@observer
-class SimplifiedViewPlot extends Component {
 
-  render() {
-    const { type, style, data, value, result } = this.props;
-    if (type === 'Raw') return null;
-    if (type === 'Numerical') {
-      return <div className={styles.plot} style={{
-        width: 600,
-        height: 500,
-        flexDirection: 'column',
-      }}>
-        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-        <HS
-          x_name={value}
-          y_name={'count'}
-          title={`Feature:${value}`}
-          data={data}
-          result={result}
-        />
-      </div>
-    }
-    return <div className={styles.plot} style={style}>
-      {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-      <HistogramCategorical
-        x_name={value}
-        y_name={'count'}
-        title={`Feature:${value}`}
-        data={data}
-      />
-    </div>
-  }
-}
 
 @observer
 class CreateNewVariable extends Component {
