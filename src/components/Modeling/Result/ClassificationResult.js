@@ -627,7 +627,6 @@ class ModelDetail extends Component {
 
   render() {
     const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader,project } = this.props;
-    console.log(11,project)
     return (
       <div className={styles.rowBox}>
         <Tooltip
