@@ -1,24 +1,17 @@
 import React, { Component } from 'react';
 import styles from '../styles.module.css';
 import classnames from 'classnames';
-<<<<<<< HEAD
 import { inject, observer } from 'mobx-react';
-import { observable } from 'mobx'
-// import * as d3 from 'd3';
-import { Icon, message } from 'antd'
-=======
-import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Icon, message } from 'antd';
->>>>>>> dev
 import EN from '../../../../constant/en';
 import Project from 'stores/Project';
 
 interface ClassificationTargetProps {
-  backToConnect: () => void,
-  backToSchema: () => void,
-  editTarget: () => void,
-  project: Project
+  backToConnect: () => void;
+  backToSchema: () => void;
+  editTarget: () => void;
+  project: Project;
   userStore?:any
 }
 
@@ -106,61 +99,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
   };
 
   render() {
-<<<<<<< HEAD
-    const { backToConnect, backToSchema, editTarget, project } = this.props
-    const { targetArrayTemp, totalRawLines, renameVariable, targetCounts } = project
-    const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length < 2
-    const isMore = Object.keys(targetCounts).length > 2
-    const isGood = targetArrayTemp.length === 2 || (!isLess && !isMore)
-    const hasNull = !isGood && Object.keys(targetCounts).includes('')
-    const error = isLess && !hasNull
-    const nullPercent = (targetCounts[''] || 0) / (totalRawLines || 1) * 85
-    const text = (isGood && EN.Targetvariablequalityisgood) || `${EN.YourtargetvariableHas}${error ? EN.onlyOnevalue : EN.Thantwouniquealues}`;
-    const {quality_rename=true} = this.props.userStore.info.role;
-    return <div className={styles.block}>
-      <div className={styles.name}>
-        {isGood && <div className={styles.cleanHeaderIcon}><Icon type="check" style={{ color: '#fcfcfc', fontSize: '1.6rem' }} /></div>}
-        <span>{text}</span>
-      </div>
-      <div className={styles.desc}>
-        <div className={classnames(styles.info, {
-          [styles.goodInfo]: isGood
-        })}>
-          <div className={styles.targetTitleLabel}><span>{EN.TargetValues}</span></div>
-          <div className={styles.targetPercentBox}>
-            {Object.keys(targetCounts).filter(_k => isGood || _k !== '').map((v, k) => {
-              const percent = (targetCounts[v] || 0) / (totalRawLines || 1) * 85
-              const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
-              const value = this.temp.hasOwnProperty(v) ? this.temp[v] : (renameVariable[v] || v)
-              return <div className={styles.targetPercentRow} key={"targetPercentRow" + k}>
-                <div className={styles.targetPercentLabel}>
-                  {!this.rename ? <span title={value || 'NULL'}>{value || 'NULL'}</span> : <input value={value} onChange={this.handleRename.bind(null, v)} />}
-                </div>
-                <div className={styles.targetPercentValue}>
-                  <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                  <span>{targetCounts[v]}</span>
-                </div>
-              </div>
-            })}
-          </div>
-          {hasNull && <div className={styles.targetTitleLabel}><span>{EN.MissingValues}</span></div>}
-          {hasNull && <div className={styles.targetPercentBox}>
-            <div className={styles.targetPercentRow} key={"targetPercentRowmissing"}>
-              <div className={styles.targetPercentLabel}>
-                <span title={this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}>{this.temp.hasOwnProperty('') ? this.temp[''] : (renameVariable[''] || 'NULL')}</span>
-              </div>
-              <div className={styles.targetPercentValue}>
-                <div className={styles.targetPercent} style={{ width: nullPercent + '%', backgroundColor: '#ff97a7' }}/>
-                <span>{targetCounts['']}</span>
-              </div>
-            </div>
-          </div>}
-          {isGood && <div className={styles.cleanTargetBlock} style={{display:(quality_rename?'':'none')}}>
-            {!this.rename ? <div className={styles.cleanTargetRename}>
-              <div className={styles.cleanTargetButton}>
-                <button onClick={this.showRename}><span>{EN.ChangeTargetVariableValue}</span></button>
-=======
-    const { backToConnect, backToSchema, editTarget, project } = this.props;
+    const { backToConnect, backToSchema, editTarget, project,userStore } = this.props;
     const {
       targetArrayTemp,
       totalRawLines,
@@ -177,7 +116,9 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       (isGood && EN.Targetvariablequalityisgood) ||
       `${EN.YourtargetvariableHas}${
         error ? EN.onlyOnevalue : EN.Thantwouniquealues
-      }`;
+        }`;
+    const {quality_rename=true} = userStore.info.role;
+
     return (
       <div className={styles.block}>
         <div className={styles.name}>
@@ -242,7 +183,6 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
             {hasNull && (
               <div className={styles.targetTitleLabel}>
                 <span>{EN.MissingValues}</span>
->>>>>>> dev
               </div>
             )}
             {hasNull && (
@@ -277,7 +217,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                 </div>
               </div>
             )}
-            {isGood && (
+            {isGood &&quality_rename&& (
               <div className={styles.cleanTargetBlock}>
                 {!this.rename ? (
                   <div className={styles.cleanTargetRename}>
@@ -357,8 +297,4 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
   }
 }
 
-<<<<<<< HEAD
-export default observer(ClassificationTarget)
-=======
 export default observer(ClassificationTarget);
->>>>>>> dev
