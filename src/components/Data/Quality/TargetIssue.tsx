@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import { ContinueButton, Modal, ProcessLoading } from 'components/Common';
-import { observable } from 'mobx';
+import { observable} from 'mobx';
 import ClassificationTarget from './Issues/ClassificationTarget'
 import RegressionTarget from './Issues/RegressionTarget'
 import RowIssue from './Issues/RowIssue'
@@ -22,6 +22,7 @@ interface TargetIssueProps {
 }
 
 @inject('userStore')
+@observer
 class TargetIssue extends Component<TargetIssueProps> {
   @observable visible = false
   @observable edit = false
