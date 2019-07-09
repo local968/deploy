@@ -31,7 +31,7 @@ function getChartData(data) {
     if (Youden) {
       let max = -Infinity;
       initialFitIndex = 0;
-      for (let i = 1; i < Object.keys(Youden).length; i++) {
+      for (let i = 0; i < Object.keys(Youden).length; i++) {
         if (Youden[i] > max) {
           initialFitIndex = i;
           max = Youden[i];
