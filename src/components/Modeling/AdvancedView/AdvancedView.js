@@ -444,8 +444,6 @@ export default class AdvancedView extends Component {
           }
           break;
       }
-      console.log(curIndex, 'curIndex')
-      console.log(fitIndex, 'fitIndex')
       if (curIndex === fitIndex) return Promise.resolve()
       return m.updateModel({ fitIndex: curIndex })
     })
@@ -455,6 +453,15 @@ export default class AdvancedView extends Component {
         selectId
       })
     })
+  }
+
+  handleReset = () => {
+    const { models } = this.props.project;
+    models.forEach(m => {
+      const { initialFitIndex, fitIndex } = m
+      if (initialFitIndex === fitIndex) return
+      m.updateModel({ fitIndex: initialFitIndex })
+    });
   }
 
   render() {
@@ -476,7 +483,7 @@ export default class AdvancedView extends Component {
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
           </div>
-          {project.problemType === 'Classification' && <MetricBased finished={train2Finished} MetricCorrection={this.handleMetricCorrection} metricCorrection={metricCorrection} />}
+          {project.problemType === 'Classification' && <MetricBased finished={train2Finished} MetricCorrection={this.handleMetricCorrection} metricCorrection={metricCorrection} handleReset={this.handleReset}/>}
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
         <div className={styles.metricSelection} >
