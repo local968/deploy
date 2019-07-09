@@ -30,7 +30,7 @@ const hpm = proxy({
     '^/redirect/*': '/',
   },
   router: req => {
-    return 'http://' + req.proxyHost;
+    return '//' + req.proxyHost;
   },
   onProxyRes: (proxyRes, req, res) => {
     // const header = { ...proxyRes.headers }

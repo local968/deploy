@@ -92,7 +92,7 @@ class UserStore {
   }
 
   getPlanList() {
-    axios.get(`http://${config.host}:${config.port}/user/plans`).then(action(res => {
+    axios.get(`//${config.host}:${config.port}/user/plans`).then(action(res => {
       if (res.data.status === 200) {
         this.planList = res.data.info;
       } else {

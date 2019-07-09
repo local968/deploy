@@ -6,6 +6,7 @@ import Slider from 'rc-slider';
 import 'rc-input-number/assets/index.css';
 import 'rc-slider/assets/index.css';
 import { toJS } from 'mobx';
+import EN from '../../constant/en';
 
 interface DataSampleProps {
 	x_name:string
@@ -188,7 +189,10 @@ export default class HS extends Component<DataSampleProps>{
 							back:'image://'
 						}
 					},
-				}
+					restore:{
+						title:EN.restore,
+					},
+				},
 			}
 		};
 	}
