@@ -96,6 +96,7 @@ class Model {
   @observable featureLabel: string[] = []
   @observable holdoutChartData: ChartData;
   @observable target: string[] = [];
+  @observable esIndex: string = '';
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {
@@ -332,6 +333,11 @@ class Model {
         randomSeed: 0
       }
       return api.outlierPlot(command)
+    })
+  }
+  getOutlierData = () => {
+    return socketStore.ready().then(api => {
+      return api.getOutlierData({ id: this.id, projectId: this.projectId, rate: this.rate, esIndex: this.esIndex })
     })
   }
   // outlierPlot = (featureList) => {

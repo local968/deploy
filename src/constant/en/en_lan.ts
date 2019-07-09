@@ -1319,6 +1319,7 @@ const EN_LAN = {
   MetricCorrection: 'Metric Correction',
   MetricCorrectionHint: 'Metric Correction allows you to maximize the selected metric by adjusting cutoff threshold.',
   Variableneedstostartwith: 'var - 选择一个连续变量;变量需要以@开头。[range_list1], [range_list2]…-自定义变量划分范围;第一个数值应大于该变量的最小值，最后一个数值应小于该变量的最大值;range_list的长度决定组的数量。',
+  DisplayOutlier: 'Display Outlier'
 };
 
 

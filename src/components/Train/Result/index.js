@@ -4,7 +4,7 @@ import classes from './styles.module.css';
 import VariableImpact from './VariableImpact'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-import { Tooltip, Icon, Popover, Select} from 'antd'
+import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
@@ -14,6 +14,7 @@ import {
   D3D2,
 } from "../../Charts"
 import MPF from '../../Modeling/Result/MPF';
+import DisplayOutlier from './DisplayOutlier'
 
 const { Option } = Select;
 
@@ -265,6 +266,10 @@ const OutlierTable = observer((props) => {
           <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
           {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <Tooltip title={EN.ModelProcessFlow}>{EN.DisplayOutlier}</Tooltip>
+          {/*<span>{EN.ModelProcessFlow}</span>*/}
+        </div>
       </div>
     </div>
     <div className={classes.rowBox}>
@@ -354,11 +359,15 @@ const OutlierRow = observer((props) => {
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
         </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('display')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
+        </div>
       </div>
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
     {visible && type === 'process' && <MPF project={project} model={model} />}
+    <DisplayOutlier getOutlierData={model.getOutlierData} rate={formatNumber(model.rate, 2)} visiable={visible && type === 'display'} header={model.featureLabel.filter(h => !project.newVariable.includes(h))} mapHeader={mapHeader} colType={project.colType} />
     {/* </div> */}
   </div>
 })

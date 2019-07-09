@@ -1,0 +1,58 @@
+.detail {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  padding: 10px;
+  height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.titleCell {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0 0.1em;
+  border-right: 1px solid #d8d8d8;
+  padding-top: 3px;
+  border-bottom: 3px solid;
+}
+
+.titleCell span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.cell {
+  display: flex;
+  padding: 0.1em;
+  border-bottom: solid 1px #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  flex: 0 0 0.4em;
+  align-items: center;
+  height: 30px;
+}
+
+.cell span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.none {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  height: 100px;
+  align-items: center;
+  justify-content: center;
+}
