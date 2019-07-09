@@ -3,9 +3,10 @@ import config from '../../../config'
 const {STRAPI_TOKEN} = config;
 
 const get = (url)=>{
+  console.log(url,STRAPI_TOKEN)
   return new Promise((resolve,reject)=>{
     request.get(url)
-      .set('Authorization', `Bearer ${STRAPI_TOKEN}`)
+      // .set('Authorization', `Bearer ${STRAPI_TOKEN}`)
       .redirects(0)
       .end(function(err, res){
         if (err || !res.ok) {
