@@ -43,6 +43,7 @@ interface MetricBasedProps {
   finished: boolean,
   metricCorrection: MetricBasedState,
   MetricCorrection: (obj: MetricBasedState, b: boolean) => Promise<void>
+  handleReset: () => void
 }
 
 interface MetricBasedState {
@@ -71,7 +72,7 @@ const Based = (props: MetricBasedProps) => {
 export default Based
 
 const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
-  const { onClose, finished, MetricCorrection, metricCorrection } = props
+  const { onClose, finished, MetricCorrection, metricCorrection, handleReset } = props
   const [state, setState] = useState(metricCorrection)
   const [checked, setChecked] = useState(finished)
   const [loading, setLoading] = useState(false)
@@ -212,7 +213,7 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
     <footer className={styles.footer}>
       <div className={styles.metricButton}><button onClick={loading ? () => { } : onSave}><span>{loading ? <Icon type='loading' /> : EN.confirm}</span></button></div>
       <div className={styles.metricButton}><button className={styles.cancel} onClick={loading ? () => { } : onClose}><span>{EN.Cancel}</span></button></div>
-      <div className={styles.metricButton}><button><span>{EN.Reset}</span></button></div>
+      <div className={styles.metricButton}><button onClick={loading ? () => { } : handleReset}><span>{EN.Reset}</span></button></div>
     </footer>
   </section>
 }
