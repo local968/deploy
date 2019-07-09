@@ -16,6 +16,13 @@ const esServicePath = config.services.ETL_SERVICE;
 const userLogger = log4js.getLogger('user');
 const errorLogger = log4js.getLogger('error');
 
+async function getDataByUrl(url) {
+  const result = await axios.get(url);
+  const data = result.data;
+
+  return data
+}
+
 function getChartData(data) {
   let fitIndex = -1;
   let initialFitIndex = -1;
@@ -1345,6 +1352,7 @@ wss.register('train', async (message, socket, progress) => {
         const {
           chartData: chartDataUrl,
           holdoutChartData: holdoutChartDataUrl,
+          accuracyData: accuracyDataUrl,
           modelName,
         } = result;
         const trainModel = await getProjectField(projectId, 'trainModel');
@@ -1352,14 +1360,16 @@ wss.register('train', async (message, socket, progress) => {
         await createOrUpdate(projectId, userId, { trainModel });
         let chartData = { chartData: chartDataUrl };
         let holdoutChartData = { chartData: holdoutChartDataUrl };
+        let accuracyData = accuracyDataUrl;
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl);
-        if (holdoutChartDataUrl)
-          holdoutChartData = await parseNewChartData(holdoutChartDataUrl);
+        if (holdoutChartDataUrl) holdoutChartData = await parseNewChartData(holdoutChartDataUrl);
+        if (accuracyData) accuracyData = await getDataByUrl(accuracyData);
         const stats = await getProjectField(projectId, 'stats');
         const modelData = {
           ...result,
           ...chartData,
           ...{ holdoutChartData: holdoutChartData.chartData },
+          accuracyData,
           stats,
           featureLabel: message.featureLabel,
           target: message.targetLabel,

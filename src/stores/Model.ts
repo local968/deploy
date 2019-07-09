@@ -97,6 +97,7 @@ class Model {
   @observable holdoutChartData: ChartData;
   @observable target: string[] = [];
   @observable esIndex: string = '';
+  @observable accuracyData: NumberObject = {}
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {
