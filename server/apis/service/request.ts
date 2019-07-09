@@ -3,7 +3,6 @@ import config from '../../../config'
 const {STRAPI_TOKEN} = config;
 
 const get = (url)=>{
-  console.log(url,STRAPI_TOKEN)
   return new Promise((resolve,reject)=>{
     let req = request.get(url);
     if(STRAPI_TOKEN){

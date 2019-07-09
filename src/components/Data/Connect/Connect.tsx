@@ -170,7 +170,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.sql = false;
   };
 
-  onClick = (key: 'sample' | 'upload' | 'sql') => {
+  onClick = (key:any) => {
     const { project } = this.props.projectStore;
     if (this.uploading || project.etling) return;
     this.key = key;
@@ -205,7 +205,7 @@ export default class DataConnect extends Component<DataConnectProps> {
         className={styles.uploadBlock}
         onClick={()=>{
           if(this.props.userStore.info.role[name]!==false){
-            this.onClick.bind(null, key)
+            this.onClick(key)
           }
         }}
       >
