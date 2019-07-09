@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
 import styles from '../styles.module.css';
 import classnames from 'classnames';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Icon, message } from 'antd';
 import EN from '../../../../constant/en';
 import Project from 'stores/Project';
+import {Show} from 'components/Common';
 
 interface ClassificationTargetProps {
   backToConnect: () => void;
   backToSchema: () => void;
   editTarget: () => void;
   project: Project;
-  userStore?:any
 }
 
-@inject('userStore')
 @observer
 class ClassificationTarget extends Component<ClassificationTargetProps> {
   @observable rename = false;
@@ -99,7 +98,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
   };
 
   render() {
-    const { backToConnect, backToSchema, editTarget, project,userStore } = this.props;
+    const { backToConnect, backToSchema, editTarget, project } = this.props;
     const {
       targetArrayTemp,
       totalRawLines,
@@ -117,9 +116,6 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       `${EN.YourtargetvariableHas}${
         error ? EN.onlyOnevalue : EN.Thantwouniquealues
         }`;
-    const {quality_rename=true,quality_Fixit=true,quality_ReselectTargetVariable=true,quality_LoadaNewDataset=true} = userStore.info.role;
-
-
     return (
       <div className={styles.block}>
         <div className={styles.name}>
@@ -218,38 +214,42 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                 </div>
               </div>
             )}
-            {isGood &&quality_rename&& (
-              <div className={styles.cleanTargetBlock}>
-                {!this.rename ? (
-                  <div className={styles.cleanTargetRename}>
-                    <div className={styles.cleanTargetButton}>
-                      <button onClick={this.showRename}>
-                        <span>{EN.ChangeTargetVariableValue}</span>
-                      </button>
-                    </div>
-                    <span>({EN.Optional})</span>
-                    {!!targetArrayTemp.length && (
-                      <div className={styles.remapTargetButton}>
-                        <button onClick={editTarget}>
-                          <span>{EN.RemapTarget}</span>
+            <Show
+              name='quality_rename'
+            >
+              {isGood && (
+                <div className={styles.cleanTargetBlock}>
+                  {!this.rename ? (
+                    <div className={styles.cleanTargetRename}>
+                      <div className={styles.cleanTargetButton}>
+                        <button onClick={this.showRename}>
+                          <span>{EN.ChangeTargetVariableValue}</span>
                         </button>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className={styles.cleanTargetRename}>
-                    <div className={styles.cleanTargetButton}>
-                      <button onClick={this.handleSave} className={styles.save}>
-                        <span>{EN.Save}</span>
-                      </button>
-                      <button onClick={this.hideRename}>
-                        <span>{EN.Cancel}</span>
-                      </button>
+                      <span>({EN.Optional})</span>
+                      {!!targetArrayTemp.length && (
+                        <div className={styles.remapTargetButton}>
+                          <button onClick={editTarget}>
+                            <span>{EN.RemapTarget}</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
+                  ) : (
+                    <div className={styles.cleanTargetRename}>
+                      <div className={styles.cleanTargetButton}>
+                        <button onClick={this.handleSave} className={styles.save}>
+                          <span>{EN.Save}</span>
+                        </button>
+                        <button onClick={this.hideRename}>
+                          <span>{EN.Cancel}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Show>
           </div>
           {!isGood && (
             <div className={styles.methods}>
@@ -261,34 +261,47 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                   <div className={styles.reason}>
                     <span>{EN.Itsthewrongtargetvariable}</span>
                   </div>
-                  <div style={{display:(quality_ReselectTargetVariable?'':'none')}} className={styles.button} onClick={backToSchema}>
-                    <button>
-                      <span>{EN.ReselectTargetVariable}</span>
-                    </button>
-                  </div>
+                  <Show
+                    name='quality_ReselectTargetVariable'
+                  >
+                    <div className={styles.button} onClick={backToSchema}>
+                      <button>
+                        <span>{EN.ReselectTargetVariable}</span>
+                      </button>
+                    </div>
+                  </Show>
+
                 </div>
                 <div className={styles.method}>
                   <div className={styles.reason}>
                     <span>{EN.Itsgeneraldataqualityissue}</span>
                   </div>
-                  <div style={{display:(quality_LoadaNewDataset?'':'none')}} className={styles.button} onClick={backToConnect}>
-                    <button>
-                      <span>{EN.LoadaNewDataset}</span>
-                    </button>
-                  </div>
+                  <Show
+                    name='quality_LoadaNewDataset'
+                  >
+                    <div className={styles.button} onClick={backToConnect}>
+                      <button>
+                        <span>{EN.LoadaNewDataset}</span>
+                      </button>
+                    </div>
+                  </Show>
                 </div>
                 {!error && (
                   <div className={styles.method}>
                     <div className={styles.reason}>
                       <span>{EN.Thetargetvariablehassomenoise}</span>
                     </div>
-                    <div
-                      style={{display:(quality_Fixit?'':'none')}}
-                      className={styles.button} onClick={editTarget}>
-                      <button>
-                        <span>{EN.Fixit}</span>
-                      </button>
-                    </div>
+                    <Show
+                      name='quality_Fixit'
+                    >
+                      <div
+                        className={styles.button} onClick={editTarget}>
+                        <button>
+                          <span>{EN.Fixit}</span>
+                        </button>
+                      </div>
+                    </Show>
+
                   </div>
                 )}
               </div>

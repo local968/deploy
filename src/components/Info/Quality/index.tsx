@@ -7,6 +7,7 @@ import {
   Modal,
   ProcessLoading,
   Table,
+  Show,
   Confirm,
 } from 'components/Common';
 import { observable } from 'mobx';
@@ -392,10 +393,8 @@ class TargetIssue extends Component<TargetIssueInterface> {
 interface InterfaceVariableIssue {
   project:any
   changeTab?:any
-  userStore?:any
 }
 
-@inject('userStore')
 @observer
 class VariableIssue extends Component<InterfaceVariableIssue> {
   @observable visible = false;
@@ -597,7 +596,7 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
   };
 
   render() {
-    const { project, changeTab,userStore } = this.props;
+    const { project, changeTab } = this.props;
     const {
       dataHeader,
       etling,
@@ -609,7 +608,6 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
     const rowIssue = totalRawLines < 1000;
     const dataIssue = +nullCount + +mismatchCount + +outlierCount > 0;
     const tableData = this.formatTable();
-    const {quality_continue_UN=true,quality_EditTheFixes_UN=true,quality_LoadaNewDataset_UN=true} = userStore.info.role as any;
 
     return (
       <div className={styles.quality}>
@@ -633,13 +631,16 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
                 <span className={styles.limitText}>
                   {EN.Foryourwholedataset}
                 </span>
-                <div
-                  style={{display:(quality_LoadaNewDataset_UN?'':'none')}}
-                  className={styles.button} onClick={this.backToConnect}>
-                  <button>
-                    <span>{EN.LoadaNewDataset}</span>
-                  </button>
-                </div>
+                <Show
+                  name = 'quality_LoadaNewDataset_UN'
+                >
+                  <div
+                    className={styles.button} onClick={this.backToConnect}>
+                    <button>
+                      <span>{EN.LoadaNewDataset}</span>
+                    </button>
+                  </div>
+                </Show>
               </div>
             )}
             {dataIssue && (
@@ -648,13 +649,17 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
                 <span className={styles.limitText}>
                   {EN.SomeissuesarefoundR2learnhasgenerated}
                 </span>
-                <div
-                  style={{display:(quality_EditTheFixes_UN?'':'none')}}
-                  className={styles.button} onClick={this.editFixes}>
-                  <button>
-                    <span>{EN.EditTheFixes}</span>
-                  </button>
-                </div>
+                <Show
+                  name = 'quality_EditTheFixes_UN'
+                >
+                  <div
+                    className={styles.button} onClick={this.editFixes}>
+                    <button>
+                      <span>{EN.EditTheFixes}</span>
+                    </button>
+                  </div>
+                </Show>
+
               </div>
             )}
           </div>
@@ -715,14 +720,18 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
               data={tableData}
             />
           </div>
-          <div className={styles.variableBottom}>
-            <ContinueButton
-              onClick={this.showSummary}
-              text={EN.Continue}
-              width="15%"
-              show={quality_continue_UN}
-            />
-          </div>
+          <Show
+            name='quality_continue_UN'
+          >
+            <div className={styles.variableBottom}>
+              <ContinueButton
+                onClick={this.showSummary}
+                text={EN.Continue}
+                width="15%"
+              />
+            </div>
+          </Show>
+
         </div>
         {etling && (
           <ProcessLoading

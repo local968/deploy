@@ -12,13 +12,13 @@ import {
   Hint,
   HeaderInfo,
   Confirm,
+  Show
 } from 'components/Common';
 import EN from '../../../constant/en';
 import EditHeader from './EditHeader';
 import { ProjectStore } from 'stores/ProjectStore';
 import { UserStore } from 'stores/UserStore';
 import { SocketStore } from 'stores/SocketStore';
-import { Show } from 'components/Common';
 
 type TableCell = {
   content: string | React.ReactElement;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
-import { Modal } from 'components/Common';
+import { Modal,Show} from 'components/Common';
 import { observable } from 'mobx';
 import {  Icon } from 'antd';
 import autoIcon from './icon_automatic_modeling.svg';
@@ -74,11 +74,15 @@ export default class StartTrain extends Component<StartTrainInterface> {
                 <span>{EN.EasyAndSimpleTip}</span>
               </div>
             </div>
-            <button
-              style={{display:(start_AutomaticModeling?'':'none')}}
-              className={styles.train} onClick={this.fastTrain.bind(this)}>
-              <span>{EN.AutomaticModeling}</span>
-            </button>
+            <Show
+              name='start_AutomaticModeling'
+            >
+              <button
+                className={styles.train} onClick={this.fastTrain.bind(this)}>
+                <span>{EN.AutomaticModeling}</span>
+              </button>
+            </Show>
+
           </div>
           <div className={styles.trainSep}/>
           <div className={styles.trainBox}>

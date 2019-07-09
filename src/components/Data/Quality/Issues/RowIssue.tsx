@@ -1,20 +1,18 @@
 
 import React, { Component } from 'react';
 import styles from '../styles.module.css';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import EN from '../../../../constant/en';
+import {Show} from 'components/Common';
 
 interface RowIssueProps {
   backToConnect: () => void,
   totalRawLines: number
-  userStore?:any
 }
 
-@inject('userStore')
 export class RowIssue extends Component<RowIssueProps> {
   render() {
     const { backToConnect, totalRawLines } = this.props;
-    const {quality_LoadaNewDataset=true} = this.props.userStore.info.role;
     return <div className={styles.block}>
       <div className={styles.name}><span>{EN.Datasizeistoosmall}</span></div>
       <div className={styles.desc}>
@@ -28,12 +26,15 @@ export class RowIssue extends Component<RowIssueProps> {
           <div className={styles.methodBox}>
             <div className={styles.method}>
               <div className={styles.reason}><span>{EN.Datasize} > {EN.Rowsisrecommended}</span></div>
-              <div
-                className={styles.button}
-                style={{display:(quality_LoadaNewDataset?'':'none')}}
-                onClick={backToConnect}>
-                <button><span>{EN.LoadaNewDataset}</span></button>
-              </div>
+              <Show
+                name = 'quality_LoadaNewDataset'
+              >
+                <div
+                  className={styles.button}
+                  onClick={backToConnect}>
+                  <button><span>{EN.LoadaNewDataset}</span></button>
+                </div>
+              </Show>
             </div>
           </div>
         </div>

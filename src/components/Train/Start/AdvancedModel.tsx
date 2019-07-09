@@ -10,13 +10,13 @@ import SimplifiedViews from './SimplifiedViews';
 import AdvancedView from './advancedView';
 import classnames from 'classnames';
 import Preview from './Preview';
+import {Show} from 'components/Common';
 
 interface AdvancedModelInterface {
   project: any
   closeAdvanced: any
-  userStore?:any
 }
-@inject('userStore')
+
 @observer
 export default class AdvancedModel extends Component<AdvancedModelInterface> {
   @observable tab = 1;
@@ -100,8 +100,6 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
     const checkedVariables = allVariables.filter(
       v => !trainHeader.includes(v) && v !== target,
     );
-    const {start_AdvancedModeling_UN = true} = this.props.userStore.info.role;
-
     return (
       <div className={styles.advancedModel}>
         <div className={styles.advancedContent}>
@@ -146,15 +144,19 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
               />
             )}
             <div className={styles.bottom}>
-              <button
-                style={{display:(start_AdvancedModeling_UN?'':'none')}}
-                className={classnames(styles.save, {
-                  [styles.disable]: !checkedVariables.length,
-                })}
-                onClick={!checkedVariables.length ? null : this.modeling}
+              <Show
+                name='start_AdvancedModeling_UN'
               >
-                <span>{EN.Modeling}</span>
-              </button>
+                <button
+                  className={classnames(styles.save, {
+                    [styles.disable]: !checkedVariables.length,
+                  })}
+                  onClick={!checkedVariables.length ? null : this.modeling}
+                >
+                  <span>{EN.Modeling}</span>
+                </button>
+              </Show>
+
               <button className={styles.cancel} onClick={closeAdvanced}>
                 <span>{EN.Cancel}</span>
               </button>
