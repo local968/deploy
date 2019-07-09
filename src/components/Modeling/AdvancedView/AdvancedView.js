@@ -444,8 +444,6 @@ export default class AdvancedView extends Component {
           }
           break;
       }
-      console.log(curIndex, 'curIndex')
-      console.log(fitIndex, 'fitIndex')
       if (curIndex === fitIndex) return Promise.resolve()
       return m.updateModel({ fitIndex: curIndex })
     })
