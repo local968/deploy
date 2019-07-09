@@ -85,13 +85,14 @@ class DataSchema extends Component<DataSchemaProps> {
   }
 
   targetSelect = (value) => {
-    // const { colType } = this.props.projectStore.project
-    // this.props.projectStore.project.setProperty({ target: value })
-    this.target = value
-    this.tableRef.current.updateGrids()
-    // this.props.projectStore.project.updateProject(data).then(() => this.tableRef.current.updateGrids())
-    this.checkList = [...this.checkList.filter(v => v !== value)]
-  }
+    const {role} = this.props.userStore.info as any;
+    const {schema_TargetVariable=true} = role;
+    if(schema_TargetVariable){
+      this.target = value;
+      this.tableRef.current.updateGrids();
+      this.checkList = [...this.checkList.filter(v => v !== value)]
+    }
+  };
 
   checked = (key, e) => {
     const checked = e.target.checked
@@ -291,6 +292,8 @@ class DataSchema extends Component<DataSchemaProps> {
       if (problemType === "Classification" && this.dataType[h] === "Categorical") targetOption[h] = mapHeader[h]
       if (problemType === "Regression" && this.dataType[h] === "Numerical") targetOption[h] = mapHeader[h]
     });
+    const {role} = this.props.userStore.info as any;
+    const {schema_continue=true} = role;
 
     return project && <div className={styles.schema}>
       <div className={styles.schemaInfo}>
@@ -324,11 +327,11 @@ class DataSchema extends Component<DataSchemaProps> {
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={<div>{EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />{EN.VariableIDs} <br />{EN.Variablesthatarederivedfromthetarget} <br />{EN.Anyothervariablesyou
           }</div>} />
           {isMissed && <div className={styles.schemaMissed} >
-            <div className={styles.errorBlock}></div>
+            <div className={styles.errorBlock}/>
             <span>{EN.Missing}</span>
           </div>}
           {isDuplicated && <div className={styles.schemaDuplicated} >
-            <div className={styles.errorBlock}></div>
+            <div className={styles.errorBlock}/>
             <span>{EN.DuplicatedHeader}</span>
           </div>}
           {(isMissed || isDuplicated) && <div className={styles.schemaSelect} onClick={this.autoFix}>
@@ -351,7 +354,13 @@ class DataSchema extends Component<DataSchemaProps> {
         </div>
       </div>
       <div className={styles.bottom}>
-        <ContinueButton onClick={this.doEtl} disabled={etling || !this.target || (newDataHeader.length <= 1 && newDataHeader.indexOf(this.target) > -1)} text={EN.Continue} width={null} />
+        <ContinueButton
+          onClick={this.doEtl}
+          show={schema_continue}
+          disabled={etling || !this.target || (newDataHeader.length <= 1 && newDataHeader.indexOf(this.target) > -1)}
+          text={EN.Continue}
+          width={null}
+          />
         <div className={styles.checkBox}><input type='checkbox' id='noCompute' onChange={this.checkNoCompute} checked={noComputeTemp} />
           <label htmlFor='noCompute'>{EN.SkipDataQualityCheck}</label>
           <Hint themeStyle={{ fontSize: '1.5rem', lineHeight: '2rem', display: 'flex', alignItems: 'center' }} content={EN.Ifyouknowthedataisclean} />
@@ -363,4 +372,4 @@ class DataSchema extends Component<DataSchemaProps> {
   }
 }
 
-export default inject('projectStore')(observer(DataSchema))
+export default inject('projectStore','userStore')(observer(DataSchema))

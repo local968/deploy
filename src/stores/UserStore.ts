@@ -8,20 +8,24 @@ import socketStore from './SocketStore';
 
 class UserStore {
 
-  @observable status = 'init' // unlogin login
+  @observable status = 'init'; // unlogin login
   @observable info = {
     id: '',
     email: '',
-    level: ''
-  }
+    role:{},
+    level:0,
+  };
   @observable tabKey = '1';
   @observable videoKey = '1';
   @observable isWatchVideo = true;
   @observable isCheck = false;
+  @observable planList = [];
+  @observable labUrl = '';
+  @observable dashUrl= '';
 
   @action change = (name) => (val) => {
     this[name] = val;
-  }
+  };
 
   constructor() {
     // window.r2Report = testData
@@ -30,29 +34,45 @@ class UserStore {
       this.status = 'unlogin'
       return
     }
+    this.getStatus();
 
+    when(() => this.status === 'login', socketStore.connect.bind(socketStore))
+  }
+
+  getStatus(){
     axios.get(`/user/status`).then(action(res => {
-      if (res.data.status === 200) {
-        this.info = res.data.info
+      if (res.data.status === 200&&res.data.info.role) {
+        this.info = res.data.info;
+        if(res.data.info.role.project === false&&location.pathname==='/'){
+          location.href = '/deploy'
+        }
+        if(res.data.info.role.JupyterLab !== false){
+          axios.get('/jupyterLabUrl')
+            .then(({ data }) => this.labUrl = data)
+        }
+        if(res.data.info.role.Dashboard !== false){
+          axios.get('/dashboardUrl')
+            .then(({ data }) => this.dashUrl = data)
+        }
         this.status = 'login'
       } else {
         this.status = 'unlogin'
       }
-    }))
-    when(() => this.status === 'login', socketStore.connect.bind(socketStore))
+    }));
   }
 
   login(params, props=null) {
     axios.post(`/user/login`, params).then(action(res => {
       if (res.data.status === 200) {
-        this.info = res.data.info
-        this.status = 'login'
+        this.info = res.data.info;
+        this.status = 'login';
         props && props.history.push({
           pathname: '/support', state: {
             key
               : 'loginTo'
           }
-        })
+        });
+        this.getStatus();
       } else {
         alert(res.data.message || 'Login failure')
       }
@@ -62,8 +82,19 @@ class UserStore {
   register(params) {
     axios.post(`/user/register`, params).then(action(res => {
       if (res.data.status === 200) {
-        this.info = res.data.info
-        this.status = 'login'
+        this.info = res.data.info;
+        this.status = 'login';
+        this.getStatus();
+      } else {
+        alert(res.data.message)
+      }
+    }))
+  }
+
+  getPlanList() {
+    axios.get(`http://${config.host}:${config.port}/user/plans`).then(action(res => {
+      if (res.data.status === 200) {
+        this.planList = res.data.info;
       } else {
         alert(res.data.message)
       }
@@ -73,7 +104,9 @@ class UserStore {
   logout() {
     axios.delete(`/user/logout`).then(action(res => {
       if (res.data.status === 200) {
-        this.status = 'unlogin'
+        this.status = 'unlogin';
+        this.labUrl = '';
+        this.dashUrl= '';
         window.location.reload()
       } else {
         alert(res.data.message)

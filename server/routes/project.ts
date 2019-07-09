@@ -8,9 +8,11 @@ import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
 import { Metric, StatusData, Steps } from '../types';
-import restriction from '../restriction';
+// import restriction from '../restriction';
+const {restriction} = require("../apis/service/planService");
 
-const { userProjectRestriction, userConcurrentRestriction } = restriction;
+
+// const { userProjectRestriction, userConcurrentRestriction } = restriction;
 const userLogger = log4js.getLogger('user');
 const errorLogger = log4js.getLogger('error');
 
@@ -408,7 +410,8 @@ const checkTraningRestriction = user => {
     const restrictQuery = `user:${
       user.id
       }:duration:${duration.years()}-${duration.months()}:training`;
-    return redis.get(restrictQuery).then(count => {
+    return redis.get(restrictQuery).then(async count => {
+      const {userProjectRestriction} = await restriction();
       if (count >= userProjectRestriction[user.level]) {
         errorLogger.error({
           userId: user.id,
@@ -638,6 +641,7 @@ wss.register('addProject', async (message, socket) => {
   // const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
   const { userId } = socket.session;
   const counts = await redis.zcard(`user:${userId}:projects:createTime`);
+  const {userConcurrentRestriction} = await restriction();
   if (counts >= userConcurrentRestriction[socket.session.user.level]) {
     errorLogger.error({
       userId,

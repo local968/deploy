@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from '../styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Icon, message } from 'antd';
 import EN from '../../../../constant/en';
@@ -12,8 +12,10 @@ interface ClassificationTargetProps {
   backToSchema: () => void;
   editTarget: () => void;
   project: Project;
+  userStore?:any
 }
 
+@inject('userStore')
 @observer
 class ClassificationTarget extends Component<ClassificationTargetProps> {
   @observable rename = false;
@@ -97,7 +99,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
   };
 
   render() {
-    const { backToConnect, backToSchema, editTarget, project } = this.props;
+    const { backToConnect, backToSchema, editTarget, project,userStore } = this.props;
     const {
       targetArrayTemp,
       totalRawLines,
@@ -114,7 +116,10 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       (isGood && EN.Targetvariablequalityisgood) ||
       `${EN.YourtargetvariableHas}${
         error ? EN.onlyOnevalue : EN.Thantwouniquealues
-      }`;
+        }`;
+    const {quality_rename=true,quality_Fixit=true,quality_ReselectTargetVariable=true,quality_LoadaNewDataset=true} = userStore.info.role;
+
+
     return (
       <div className={styles.block}>
         <div className={styles.name}>
@@ -213,7 +218,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                 </div>
               </div>
             )}
-            {isGood && (
+            {isGood &&quality_rename&& (
               <div className={styles.cleanTargetBlock}>
                 {!this.rename ? (
                   <div className={styles.cleanTargetRename}>
@@ -256,7 +261,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                   <div className={styles.reason}>
                     <span>{EN.Itsthewrongtargetvariable}</span>
                   </div>
-                  <div className={styles.button} onClick={backToSchema}>
+                  <div style={{display:(quality_ReselectTargetVariable?'':'none')}} className={styles.button} onClick={backToSchema}>
                     <button>
                       <span>{EN.ReselectTargetVariable}</span>
                     </button>
@@ -266,7 +271,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                   <div className={styles.reason}>
                     <span>{EN.Itsgeneraldataqualityissue}</span>
                   </div>
-                  <div className={styles.button} onClick={backToConnect}>
+                  <div style={{display:(quality_LoadaNewDataset?'':'none')}} className={styles.button} onClick={backToConnect}>
                     <button>
                       <span>{EN.LoadaNewDataset}</span>
                     </button>
@@ -277,7 +282,9 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                     <div className={styles.reason}>
                       <span>{EN.Thetargetvariablehassomenoise}</span>
                     </div>
-                    <div className={styles.button} onClick={editTarget}>
+                    <div
+                      style={{display:(quality_Fixit?'':'none')}}
+                      className={styles.button} onClick={editTarget}>
                       <button>
                         <span>{EN.Fixit}</span>
                       </button>

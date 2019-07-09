@@ -124,7 +124,7 @@ export default class SignIn extends Component {
       <div className={styles.row}>
         <a
           className={styles.forgetPassword}
-          href="javascript:;"
+          href="javascript:"
           onClick={this.forget.bind(this)}
         >
           {EN.ForgetPassword}?

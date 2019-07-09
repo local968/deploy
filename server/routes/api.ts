@@ -5,7 +5,8 @@ import uuid from 'uuid';
 import crypto from 'crypto';
 import command from '../command';
 import api from '../scheduleApi';
-import restriction from '../restriction';
+// import restriction from '../restriction';
+const {restriction} = require("../apis/service/planService");
 import wss from '../webSocket';
 import Papa from 'papaparse';
 import config from '../../config';
@@ -14,7 +15,7 @@ import _ from 'lodash';
 
 const esServicePath = config.services.ETL_SERVICE;
 const router = express.Router();
-const { userDeployRestriction } = restriction;
+// const { userDeployRestriction } = restriction;
 
 wss.register('getDeploymentToken', (message = {}, socket) => {
   if (!message.projectId || !message.deploymentId)
@@ -136,6 +137,7 @@ router.post('/deploy', async (req, res) => {
   const duration = moment.duration(moment().unix() - createdTime);
   const restrictQuery = `user:${userId}:duration:${duration.years()}-${duration.months()}:deploy`;
   const count = await redis.get(restrictQuery);
+  const {userDeployRestriction} = await restriction();
   const left = userDeployRestriction[level] - parseInt(count);
   if (_.parseInt(_.toString(lineCount)) >= left)
     return errorRes(

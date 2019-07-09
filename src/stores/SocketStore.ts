@@ -1,4 +1,3 @@
-import axios from 'axios';
 import config from '../config';
 import EventEmitter from 'events';
 import uuid from 'uuid';

@@ -1,4 +1,4 @@
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import moment from 'moment';
@@ -14,7 +14,9 @@ import Preview from './Preview'
 interface AdvancedModelInterface {
   project:any
   closeAdvanced:any
+  userStore?:any
 }
+@inject('userStore')
 @observer
 export default class AdvancedModel extends Component<AdvancedModelInterface> {
   @observable tab = 1;
@@ -92,12 +94,14 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
   };
 
   render() {
-    const { project, closeAdvanced } = this.props;
+    const { project, closeAdvanced,userStore } = this.props;
     const { dataHeader, newVariable, trainHeader, target } = project;
     const allVariables = [...dataHeader, ...newVariable];
     const checkedVariables = allVariables.filter(
       v => !trainHeader.includes(v) && v !== target,
     );
+    const {start_AdvancedModeling=true} = userStore.info.role;
+
     return (
       <div className={styles.advancedModel}>
         <div className={styles.advancedContent}>
@@ -143,6 +147,7 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
             )}
             <div className={styles.bottom}>
               <button
+                style={{display:(start_AdvancedModeling?'':'none')}}
                 className={classnames(styles.save, {
                   [styles.disable]: !checkedVariables.length,
                 })}

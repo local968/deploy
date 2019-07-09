@@ -3,9 +3,8 @@ import wss from './webSocket';
 import moment from 'moment';
 import axios from 'axios';
 import config from '../config';
-import restriction from './restriction';
+const {restriction} = require("./apis/service/planService");
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
-const { userDeployRestriction, userStorageRestriction } = restriction;
 const setSchedule = schedule => {
   const pipeline = redis.pipeline();
   pipeline.set(`schedule:${schedule.id}`, JSON.stringify(schedule));
@@ -188,6 +187,7 @@ const api = {
     }
     if (!fileId) return restrictQuery;
     const count = await redis.get(restrictQuery);
+    const {userDeployRestriction} = await restriction();
     if (parseInt(count) + parseInt(lineCount) >= userDeployRestriction[level])
       return false;
     await redis.incrby(restrictQuery, lineCount);

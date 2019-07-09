@@ -12,14 +12,16 @@ import moment from 'moment';
 import AdvancedModel from './AdvancedModel'
 
 interface StartTrainInterface {
-  projectStore: any;
+  projectStore: any
+  userStore:any
 }
-@inject('projectStore')
+@inject('projectStore','userStore')
 @observer
 export default class StartTrain extends Component<StartTrainInterface> {
   @observable visible = false;
 
-  fastTrain = () => {
+  fastTrain(run=true){
+    if(!run)return;
     const { project } = this.props.projectStore;
     const setting = project.newSetting();
     const name = `auto.${moment().format('MM.DD.YYYY_HH:mm:ss')}`;
@@ -43,6 +45,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
   };
 
   render() {
+    const {start_AutomaticModeling_UN=true} = this.props.userStore.info.role;
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
@@ -50,7 +53,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock} onClick={this.fastTrain}>
+            <div className={styles.trainBlock} onClick={this.fastTrain.bind(this,start_AutomaticModeling_UN)}>
               <div className={styles.trainRecommend}>
                 <span>
                   <Icon
@@ -71,7 +74,9 @@ export default class StartTrain extends Component<StartTrainInterface> {
                 <span>{EN.EasyAndSimpleTip}</span>
               </div>
             </div>
-            <button className={styles.train} onClick={this.fastTrain}>
+            <button
+              style={{display:(start_AutomaticModeling_UN?'':'none')}}
+              className={styles.train} onClick={this.fastTrain.bind(this)}>
               <span>{EN.AutomaticModeling}</span>
             </button>
           </div>

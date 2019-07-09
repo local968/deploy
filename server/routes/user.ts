@@ -1,5 +1,4 @@
 import express from 'express';
-import uuid from 'uuid';
 import { redis } from '../redis';
 import moment from 'moment';
 import crypto from 'crypto';
@@ -7,6 +6,7 @@ import nodemailer from 'nodemailer';
 import config from '../../config';
 import api from '../scheduleApi';
 import wss from '../webSocket';
+const {userService,planService} = require('../apis/service');
 
 const { register } = wss;
 
@@ -42,46 +42,52 @@ const sendCodeMail = (code, to) => {
 
 const router = express.Router();
 
-router.post('/login', (req, res) => {
+router.post('/login', async(req, res) => {
   const { email, password } = req.body;
-  redis
-    .get(`userEmail:${email}`)
-    .then(id =>
-      id
-        ? redis.hmget(
-            `user:${id}`,
-            'id',
-            'email',
-            'password',
-            'level',
-            'createdTime',
-          )
-        : Promise.reject({ status: 404, message: 'user not exists.' }),
-    )
-    .then(info => {
-      if (sha256(password) === info[2]) {
-        if (info[3] === 0 || !info[3])
-          return Promise.reject({
-            status: 302,
-            message: 'Your account is not available',
-          });
-        req.session.userId = info[0];
-        req.session.user = {
-          id: info[0],
-          email: info[1],
-          level: info[3],
-          createdTime: info[4],
-        };
-        return res.send({
-          status: 200,
-          message: 'ok',
-          info: { id: info[0], email: info[1] },
-        });
-      } else {
-        return Promise.reject({ status: 400, message: 'incorrect password.' });
-      }
-    })
-    .catch(error => res.send(error));
+
+  let user = await userService.findByEmail(email);
+
+  if(!user){
+    return res.send({ status: 404, message: 'user not exists.' })
+  }
+  if(user.update_password){
+    const result = await userService.firstLogin(email,password,sha256(password));
+    if(result&&!user.plan){
+      const plan = await planService.detail('');
+      await userService.update(user.id,{
+        plan:plan._id,
+      });
+    }
+    user = await userService.findByEmail(email);
+  }else{
+    const _result = await userService.login(email,sha256(password));
+    user = _result[0];
+  }
+
+  if(!user){
+    return res.send({ status: 400, message: 'incorrect password.'})
+  }
+  const {plan:{level},id,create_time,drole:role={}} = user;
+
+  if(!level){
+    return res.send({ status:302, message: 'Your account is not available'})
+  }
+
+  req.session.userId = id;
+  req.session.user = {
+    id,
+    email,
+    level,
+    createdTime: create_time,
+  };
+  return res.send({
+    status: 200,
+    message: 'ok',
+    info: {
+      id,
+      email,
+      role,
+    }});
 });
 
 router.delete('/logout', (req, res) => {
@@ -90,125 +96,132 @@ router.delete('/logout', (req, res) => {
   res.send({ status: 200, message: 'ok' });
 });
 
-router.get('/status', (req, res) => {
-  if (!req.session || !req.session.userId)
-    return res.send({ status: 401, message: 'not login' });
-  return redis
-    .hmget('user:' + req.session.userId, 'id', 'email', 'createdTime')
-    .then(info =>
-      res.send({
-        status: 200,
-        message: 'ok',
-        info: { id: info[0], email: info[1], createdTime: info[2] },
-      }),
-    )
-    .catch(error =>
-      res.send({ status: 500, message: 'get status failed', error }),
-    );
+router.get('/status', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.send({ status: 401, message: 'not login' });
+  const {userId} = req.session;
+
+  const result = await userService.status(userId);
+
+  if(result&&result.id){
+    const {id,email,create_time,drole={},plan={}} = result;
+    Reflect.deleteProperty(drole,'_id');
+    Reflect.deleteProperty(drole,'id');
+    Reflect.deleteProperty(drole,'name');
+    Reflect.deleteProperty(drole,'createdAt');
+    Reflect.deleteProperty(drole,'updatedAt');
+    Reflect.deleteProperty(drole,'__v');
+
+    return res.send({
+      status: 200,
+      message: 'ok',
+      info: {
+        id,
+        email,
+        createdTime:create_time,
+        role:drole,
+        level:plan.level,
+      }
+    });
+  }
+
+  return res.send({ status: 500, message: 'get status failed', error:(result||{}).error });
 });
 
 register('status', data => {
   return data;
 });
 
-router.post('/register', (req, res) => {
-  const { email, level } = req.body;
-  const password = sha256(req.body.password);
-  const id = uuid.v4();
-  const createdTime = moment().unix();
-  // todo verify user info
+router.get('/plans',async (req,res)=>{
+  const list = await planService.list();
+  const result = list.map(itm=>({
+    id:itm.id,
+    name:itm.name,
+    // level:itm.level,
+  }));
+  res.send({
+    status: 200,
+    message: 'ok',
+    info: result,
+  })
+});
 
-  redis
-    .setnx(`userEmail:${email}`, id)
-    .then(success =>
-      success
-        ? redis.hmset(
-            `user:${id}`,
-            'id',
-            id,
-            'email',
-            email,
-            'password',
-            password,
-            'level',
-            level || 1,
-            'createdTime',
-            createdTime,
-          )
-        : Promise.reject({ status: 400, message: 'email exists.' }),
-    )
-    .then(
-      ok => {
-        req.session.userId = id;
-        req.session.user = { id, email, level, createdTime };
-        if (ok)
-          res.send({
-            status: 200,
-            message: 'ok',
-            info: { id, email },
-          });
-      },
-      error => res.send(error),
-    );
+router.post('/register', async (req, res) => {
+  let { email, level,plan_id } = req.body;
+
+  const password = sha256(req.body.password);
+  const createdTime = moment().unix();
+  const created_time = new Date();
+  if(!plan_id){
+    const plan = await planService.detail(plan_id);
+    plan_id = plan.id;
+  }
+
+  const result = await userService.register(res,email,plan_id,password,created_time);
+
+  const {id} = result;
+
+  req.session.userId = id;
+
+  req.session.user = { id, email, level, createdTime };
+
+  res.send({
+    status: 200,
+    message: 'ok',
+    info: { id, email,role:{} }
+  })
 });
 
 router.put('/changepassword', async (req, res) => {
-  const userId = req.session.userId;
+  const {userId} = req.session;
   const { current, newPassword } = req.body;
 
-  if (!checkPassword(newPassword))
-    return res.json({
-      status: 102,
-      message: passwordError,
-      error: passwordError,
-    });
-  const currentPassword = await redis.hget(`user:${userId}`, 'password');
-  if (sha256(current) !== currentPassword)
-    return res.json({
-      status: 101,
-      message: 'current password incorrect.',
-      error: 'current password incorrect.',
-    });
-  redis.hset(`user:${userId}`, 'password', sha256(newPassword));
-  req.session.destroy(() => {});
-  return res.json({ status: 200, message: 'ok' });
+  if (!checkPassword(newPassword)) return res.json({ status: 102, message: passwordError, error: passwordError });
+
+  const result = await userService.status(userId);
+  const {password:currentPassword} = result;
+
+  if (sha256(current) !== currentPassword) return res.json({ status: 101, message: 'current password incorrect.', error: 'current password incorrect.' });
+
+  await userService.update(userId,{
+    password:sha256(newPassword)
+  });
+
+  // @ts-ignore
+  req.session.destroy();
+  return res.json({ status: 200, message: 'ok' })
 });
 
 router.post('/forgetpassword', async (req, res) => {
   const { email } = req.body;
-  const userId = await redis.get(`userEmail:${email}`);
-  if (!userId)
-    return res.json({
-      status: 400,
-      message: 'email not exists.',
-      error: 'email not exists.',
-    });
-  const code = new Array(6)
-    .fill(0)
-    .map(() => Math.floor(Math.random() * 10).toString())
-    .join('');
-  redis.set(`forgetPassword:${code}`, userId, 'EX', 3600);
+  // const userId = await redis.get(`userEmail:${email}`);
+  const user = await userService.findByEmail(email);
+
+  if (!user){
+    return res.json({ status: 400, message: 'email not exists.', error: 'email not exists.' })
+  }
+  const code = new Array(6).fill(0).map(() => Math.floor(Math.random() * 10).toString()).join('');
+
+  redis.set(`forgetPassword:${code}`, user.id, 'EX', 3600);
   sendCodeMail(code, email);
-  return res.json({ status: 200, message: 'ok' });
+  return res.json({ status: 200, message: 'ok' })
 });
 
 router.put('/resetpassword', async (req, res) => {
   const { code, password } = req.body;
   const userId = await redis.get(`forgetPassword:${code}`);
-  if (!userId)
-    return res.json({
-      status: 101,
-      message: 'Your reset password request is invalid or expired.',
-    });
-  if (!checkPassword(password))
-    return res.json({
-      status: 102,
-      message: passwordError,
-      error: passwordError,
-    });
-  redis.hset(`user:${userId}`, 'password', sha256(password));
-  redis.del(`forgetPassword:${code}`);
-  return res.json({ status: 200, message: 'ok' });
+  if (!userId) return res.json({ status: 101, message: 'Your reset password request is invalid or expired.' });
+  if (!checkPassword(password)) return res.json({ status: 102, message: passwordError, error: passwordError });
+  // redis.hset(`user:${userId}`, 'password', sha256(password))
+
+  const result = await userService.update(userId,{
+    password:sha256(password),
+  });
+
+  if(result.id){
+    redis.del(`forgetPassword:${code}`);
+    return res.json({ status: 200, message: 'ok' })
+  }
+  return res.json({ status: 200, message: result.error })
 });
 
 router.get('/schedules', (req, res) => {

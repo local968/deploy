@@ -3,14 +3,13 @@ import styles from '../styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx'
-// import * as d3 from 'd3';
 import { Icon } from 'antd'
 import EN from '../../../../constant/en';
 import Project from 'stores/Project';
 
 interface SelectTargetProps {
-  saveTargetFixes: () => void, 
-  closeTarget: () => void, 
+  saveTargetFixes: () => void,
+  closeTarget: () => void,
   project: Project
 }
 

@@ -8,10 +8,11 @@ import { Confirm, ContinueButton, HeaderInfo, Hint, ProcessLoading, Select, Tabl
 import EN from '../../../constant/en';
 
 interface Interface {
-  projectStore: any;
+  projectStore: any
+  userStore:any
 }
 
-@inject('projectStore')
+@inject('projectStore','userStore')
 @observer
 export default class DataSchema extends Component<Interface> {
   @observable checkList = this.props.projectStore.project.rawHeader.filter(
@@ -89,9 +90,13 @@ export default class DataSchema extends Component<Interface> {
   };
 
   targetSelect = value => {
-    this.target = value;
-    this.tableRef.current.updateGrids();
-    this.checkList = [...this.checkList.filter(v => v !== value)];
+    const {role} = this.props.userStore.info as any;
+    const {schema_TargetVariable_UN=true} = role;
+    if(schema_TargetVariable_UN) {
+      this.target = value;
+      this.tableRef.current.updateGrids();
+      this.checkList = [...this.checkList.filter(v => v !== value)];
+    }
   };
 
   select = (key, e) => {
@@ -343,6 +348,8 @@ export default class DataSchema extends Component<Interface> {
       if (this.dataType[h] === 'Categorical') prev[h] = mapHeader[h];
       return prev;
     }, {});
+    const {role} = this.props.userStore.info as any;
+    const {schema_continue_UN=true} = role;
 
     return (
       project && (
@@ -454,6 +461,7 @@ export default class DataSchema extends Component<Interface> {
                 etling || newDataHeader.length < 1 || isMissed || isDuplicated
               }
               text={EN.Continue}
+              show={schema_continue_UN}
             />
             <div className={styles.checkBox}>
               <input

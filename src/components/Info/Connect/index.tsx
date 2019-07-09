@@ -143,7 +143,8 @@ export default class DataConnect extends Component<Interface> {
     this.sql = false;
   };
 
-  onClick = key => {
+  onClick = (key: 'sample' | 'upload' | 'sql',onUse) => {
+    if(!onUse)return;
     const { project } = this.props.projectStore;
     if (this.uploading || project.etling) return;
     this.key = key;
@@ -163,16 +164,18 @@ export default class DataConnect extends Component<Interface> {
     this.visiable = false;
   };
 
-  block = (label, img, key) => {
+  block = (label: string, img: string, key: string,onUse=true) => {
     return (
       <div
         className={styles.uploadBlock}
-        onClick={this.onClick.bind(null, key)}
+        onClick={this.onClick.bind(null, key,onUse)}
       >
         <div className={styles.blockImg}>
           <img src={img} alt={label} />
         </div>
-        <div className={styles.blockLabel}>
+        <div
+          style={{display:(onUse?'':'none')}}
+          className={styles.blockLabel}>
           <span>{label}</span>
         </div>
       </div>
@@ -221,6 +224,8 @@ export default class DataConnect extends Component<Interface> {
       project.updateProject({ charset });
     });
     (window as any).cn = this;
+    const {connect_FromR2L_UN=true,connect_FromComp_UN=true,connect_FromSQL_UN=true} = userStore.info.role;
+
     return (
       <div
         className={styles.connect}
@@ -241,9 +246,9 @@ export default class DataConnect extends Component<Interface> {
           </Select>
         </div>
         <div className={styles.uploadRow}>
-          {this.block(EN.FromR2L, sampleIcon, 'sample')}
-          {this.block(EN.FromComp, localFileIcon, 'upload')}
-          {this.block(EN.FromSQL, sqlIcon, 'sql')}
+          {this.block(EN.FromR2L, sampleIcon, 'sample',connect_FromR2L_UN)}
+          {this.block(EN.FromComp, localFileIcon, 'upload',connect_FromComp_UN)}
+          {this.block(EN.FromSQL, sqlIcon, 'sql',connect_FromSQL_UN)}
           <Uploader
             charset={charset}
             onStart={this.onUpload}

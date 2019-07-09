@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { ContinueButton, Modal, ProcessLoading } from 'components/Common';
-import { observable } from 'mobx';
+import { observable} from 'mobx';
 import ClassificationTarget from './Issues/ClassificationTarget'
 import RegressionTarget from './Issues/RegressionTarget'
 import RowIssue from './Issues/RowIssue'
@@ -18,8 +18,10 @@ import Project from 'stores/Project';
 interface TargetIssueProps {
   project: Project,
   changeTab: () => void
+  userStore?:any
 }
 
+@inject('userStore')
 @observer
 class TargetIssue extends Component<TargetIssueProps> {
   @observable visible = false
@@ -94,6 +96,7 @@ class TargetIssue extends Component<TargetIssueProps> {
     if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines) warnings.push(EN.Yourtargetvariableisempty)
     const cannotContinue = !!warnings.length || (problemType === 'Classification' && issues.targetIssue)
     const isClean = !warnings.length && !issues.targetIssue && !issues.rowIssue && !(problemType !== 'Classification' && issues.targetRowIssue)
+    const {quality_continue=true} = this.props.userStore.info.role;
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {!!warnings.length && <div className={styles.issueTitle}><span>{EN.Warning}!</span></div>}
@@ -168,7 +171,12 @@ class TargetIssue extends Component<TargetIssueProps> {
               })}
             </div>
           </div>
-          <ContinueButton disabled={cannotContinue} onClick={changeTab} text={EN.Continue} width="100%" />
+          <ContinueButton
+            disabled={cannotContinue}
+            onClick={changeTab}
+            text={EN.Continue}
+            show={quality_continue}
+            width="100%" />
         </div>
         <div className={styles.content}>
           {problemType === 'Classification' ?

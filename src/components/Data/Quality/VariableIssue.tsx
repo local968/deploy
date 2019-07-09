@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { ContinueButton, Modal, ProcessLoading, Table, Confirm } from 'components/Common';
 import { observable } from 'mobx';
 import FixIssue from './Issues/FixIssue'
@@ -13,9 +13,12 @@ import Project from 'stores/Project';
 
 interface VariableIssueProps {
   project: Project,
-  changeTab: () => void
+  changeTab: () => void,
+  userStore?:any
 }
 
+@inject('userStore')
+@observer
 class VariableIssue extends Component<VariableIssueProps> {
   @observable visible = false
   @observable summary = false
@@ -156,7 +159,8 @@ class VariableIssue extends Component<VariableIssueProps> {
   render() {
     const { project, changeTab } = this.props;
     const { issues, dataHeader, etling, etlProgress, variableIssueCount: { nullCount, mismatchCount, outlierCount } } = project;
-    const tableData = this.formatTable()
+    const tableData = this.formatTable();
+    const {quality_Predict_LoadaNewDataset=true,quality_Predict_Continue=true,quality_EdittheFixes=true } = this.props.userStore.info.role;
     return <div className={styles.quality}>
       <div className={styles.issue}>
         {(issues.rowIssue || issues.dataIssue) ?
@@ -164,16 +168,22 @@ class VariableIssue extends Component<VariableIssueProps> {
           <div className={styles.cleanTitle}><span>{EN.VariableQualitylooksgood}</span></div>}
         <div className={styles.issueBox}>
           {issues.rowIssue && <div className={styles.issueText}>
-            <div className={styles.point}></div>
+            <div className={styles.point}/>
             <span className={styles.limitText}>{EN.Foryourwholedataset}</span>
-            <div className={styles.button} onClick={this.backToConnect}>
+            <div
+              className={styles.button}
+              style={{display:(quality_Predict_LoadaNewDataset?'':'none')}}
+              onClick={this.backToConnect}>
               <button><span>{EN.LoadaNewDataset}</span></button>
             </div>
           </div>}
           {issues.dataIssue && <div className={styles.issueText}>
-            <div className={styles.point}></div>
+            <div className={styles.point}/>
             <span className={styles.limitText}>{EN.SomeissuesarefoundR2learnhasgenerated}</span>
-            <div className={styles.button} onClick={this.editFixes}>
+            <div
+              className={styles.button}
+              style={{display:(quality_EdittheFixes?'':'none')}}
+              onClick={this.editFixes}>
               <button><span>{EN.EditTheFixes}</span></button>
             </div>
           </div>}
@@ -212,8 +222,10 @@ class VariableIssue extends Component<VariableIssueProps> {
             data={tableData}
           />
         </div>
-        <div className={styles.variableBottom}>
-          <ContinueButton onClick={this.showSummary} text={EN.Continue} width="15%" disabled={false} />
+        <div className={styles.variableBottom} style={{display:(quality_Predict_Continue?'':'none')}}>
+          <ContinueButton
+            onClick={this.showSummary}
+            text={EN.Continue} width="15%" disabled={false} />
         </div>
       </div>
       {etling && <ProcessLoading progress={etlProgress} style={{ position: 'fixed' }} />}

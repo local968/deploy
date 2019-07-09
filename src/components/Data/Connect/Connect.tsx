@@ -1,11 +1,9 @@
 import React, { Component, DragEvent } from 'react';
 import styles from './styles.module.css';
-// import classnames from 'classnames';
 import { observer, inject } from 'mobx-react';
 import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
 import sqlIcon from './sql.svg';
-// import defileIcon from './define.svg';
 import { message } from 'antd';
 import { Uploader, ProgressBar, Confirm } from 'components/Common';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
@@ -19,7 +17,7 @@ import { UserStore } from 'stores/UserStore';
 import { SocketStore } from 'stores/SocketStore';
 import { UploadProps } from 'stores/Project';
 
-const Option = Select.Option
+const {Option} = Select;
 
 interface DataConnectProps {
   projectStore: ProjectStore,
@@ -101,19 +99,19 @@ export default class DataConnect extends Component<DataConnectProps> {
     //   msg: 'File Error: File must not exceed 50M.'
     // }
 
-    console.log(this.props.userStore.info.level, 'this.props.userStore.currentLever')
+    // console.log(this.props.userStore.info.level, 'this.props.userStore.currentLever')
 
-    if (this.props.userStore.info.level === '0') {
+    if (+this.props.userStore.info.level === 0) {
       return {
         err: true,
         msg: EN.NoAuthority,
       };
-    } else if ((this.props.userStore.info.level === '1' && file.size > 50 * 1024 * 1024) || (this.props.userStore.info.level == '2' && file.size > 50 * 1024 * 1024)) {
+    } else if ((+this.props.userStore.info.level === 1 && file.size > 50 * 1024 * 1024) || (+this.props.userStore.info.level == 2 && file.size > 50 * 1024 * 1024)) {
       return {
         err: true,
         msg: EN.FileMustNotExceed + ' 50M.',
       };
-    } else if (this.props.userStore.info.level === '3' && file.size > 200 * 1024 * 1024) {
+    } else if (+this.props.userStore.info.level === 3 && file.size > 200 * 1024 * 1024) {
       return {
         err: true,
         msg: EN.FileMustNotExceed + ' 200M.',
@@ -123,13 +121,12 @@ export default class DataConnect extends Component<DataConnectProps> {
       err: false,
       msg: 'ok'
     }
-
-  })
+  });
 
 
   showSample = action(() => {
     this.sample = true
-  })
+  });
 
   hideSample = action(() => {
     this.sample = false
@@ -167,7 +164,8 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.sql = false;
   })
 
-  onClick = (key: 'sample' | 'upload' | 'sql') => {
+  onClick = (key: 'sample' | 'upload' | 'sql',onUse) => {
+    if(!onUse)return;
     const { project } = this.props.projectStore
     if (this.uploading || project.etling) return
     this.key = key
@@ -181,19 +179,19 @@ export default class DataConnect extends Component<DataConnectProps> {
     if (this.key === 'upload') return this.uploadRef.current.show()
     this[this.key] = true
     // Reflect.defineProperty(this, this.key, { value: true })
-  }
+  };
 
   onClose = () => {
     this.visiable = false
-  }
+  };
 
-  block = (label: string, img: string, key: string) => {
+  block = (label: string, img: string, key: string,onUse=true) => {
     return (
-      <div className={styles.uploadBlock} onClick={this.onClick.bind(null, key)}>
+      <div className={styles.uploadBlock} onClick={this.onClick.bind(null, key,onUse)}>
         <div className={styles.blockImg}>
           <img src={img} alt={label} />
         </div>
-        <div className={styles.blockLabel}>
+        <div style={{display:(onUse?'':'none')}} className={styles.blockLabel}>
           <span>{label}</span>
         </div>
       </div>
@@ -237,7 +235,9 @@ export default class DataConnect extends Component<DataConnectProps> {
     const process = etling ? 50 : this.process
     const charsetChange = action((charset) => {
       project.updateProject({ charset })
-    })
+    });
+    // const {role} =  userStore.info as any;
+    const {connect_FromR2L=true,connect_FromComp=true,connect_FromSQL=true} = userStore.info.role as any;
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.title}>
@@ -250,9 +250,9 @@ export default class DataConnect extends Component<DataConnectProps> {
           </Select>
         </div>
         <div className={styles.uploadRow}>
-          {this.block(EN.FromR2L, sampleIcon, 'sample')}
-          {this.block(EN.FromComp, localFileIcon, 'upload')}
-          {this.block(EN.FromSQL, sqlIcon, 'sql')}
+          {this.block(EN.FromR2L, sampleIcon, 'sample',connect_FromR2L)}
+          {this.block(EN.FromComp, localFileIcon, 'upload',connect_FromComp)}
+          {this.block(EN.FromSQL, sqlIcon, 'sql',connect_FromSQL)}
           <Uploader
             onStart={this.onUpload}
             onComplete={this.upload}
