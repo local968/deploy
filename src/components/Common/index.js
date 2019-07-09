@@ -17,6 +17,7 @@ import Hint from './Hint';
 import Range from './Range';
 import ProgressBar from './ProgressBar';
 import HeaderInfo from './HeaderInfo';
+import Show from './Show';
 
 export {
   BlackButton,
@@ -37,5 +38,6 @@ export {
   Hint,
   Range,
   ProgressBar,
-  HeaderInfo
+  HeaderInfo,
+  Show,
 };

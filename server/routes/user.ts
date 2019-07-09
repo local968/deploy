@@ -134,9 +134,8 @@ register('status', data => {
 router.get('/plans',async (req,res)=>{
   const list = await planService.list();
   const result = list.map(itm=>({
-    id:itm.id,
+    id:itm._id,
     name:itm.name,
-    // level:itm.level,
   }));
   res.send({
     status: 200,
