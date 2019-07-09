@@ -1317,7 +1317,8 @@ const EN_LAN = {
   ApplyAllModel: 'Applied on all models',
   ApplyNote: '(After selecting “Applied on all models”, the operation of maximizing the metric will be applied on all models, whose cutoff threshold will be corrected.This function is only supported after training of all models has been finished.)',
   MetricCorrection: 'Metric Correction',
-  MetricCorrectionHint: 'Metric Correction allows you to maximize the selected metric by adjusting cutoff threshold.'
+  MetricCorrectionHint: 'Metric Correction allows you to maximize the selected metric by adjusting cutoff threshold.',
+  Variableneedstostartwith: 'var - 选择一个连续变量;变量需要以@开头。[range_list1], [range_list2]…-自定义变量划分范围;第一个数值应大于该变量的最小值，最后一个数值应小于该变量的最大值;range_list的长度决定组的数量。',
 };
 
 

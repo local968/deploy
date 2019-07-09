@@ -1,3 +1,1 @@
-import DataQuality from './Quality'
-
-export default DataQuality
+export {default} from './Quality'

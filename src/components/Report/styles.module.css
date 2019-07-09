@@ -59,6 +59,10 @@ html {
   overflow-x:auto;
 }
 
+.blockRow section{
+  width: 1300px;
+}
+
 .performance {
   font-size: 16px;
 }

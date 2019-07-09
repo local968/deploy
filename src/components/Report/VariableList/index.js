@@ -4,13 +4,9 @@ import classnames from 'classnames';
 import {observer} from 'mobx-react';
 import {Hint, ProcessLoading} from 'components/Common';
 import {observable, toJS} from 'mobx';
-import {Spin, Popover, message as antdMessage, Icon, Table, Tooltip, Modal} from 'antd';
-// import histogramIcon from './histogramIcon.svg';
-// import univariantIcon from './univariantIcon.svg';
+import {Popover, message as antdMessage, Icon, Table, Modal} from 'antd';
 import FUNCTIONS from './functions';
-import config from 'config'
 import {formatNumber} from 'util'
-import request from 'components/Request'
 import EN from '../../../constant/en';
 import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
 import HistogramNumerical from "../../Charts/HistogramNumerical";

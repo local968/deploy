@@ -20,6 +20,7 @@ interface TargetIssueProps {
   changeTab: () => void
 }
 
+@observer
 class TargetIssue extends Component<TargetIssueProps> {
   @observable visible = false
   @observable edit = false

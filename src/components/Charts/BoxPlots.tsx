@@ -9,12 +9,17 @@ initEcharts(Echarts);
 interface DataSampleProps {
 	x_keys:Array<string>
 	value:Array<string>
+	height?:number
+	width?:number
+	title?:string
+	x_name?:string
+	y_name?:string
 }
 
 export default class BoxPlots extends PureComponent<DataSampleProps>{
 
 	getOption() {
-		const {value=[],title='',x_name='',y_name='',x_keys = []} = this.props as any;
+		const {value=[],title='',x_name='',y_name='',x_keys = []} = this.props;
 
 		const data = Echarts.dataTool.prepareBoxplotData(value);
 		const nameTextStyle = {
@@ -103,9 +108,9 @@ export default class BoxPlots extends PureComponent<DataSampleProps>{
 
 	render(){
 		const {
-			height = 400,
+			height = 330,
 			width = 400,
-		} = this.props as any;
+		} = this.props;
 
 		return <ReactEcharts
 			option={this.getOption()}

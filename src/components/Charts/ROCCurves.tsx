@@ -105,7 +105,7 @@ export default class ROCCurves extends PureComponent<DataSampleProps>{
 							result,
 							myChart,
 							point,
-							ondrag: util.curry(t.onPointDragging),
+							// ondrag: util.curry(t.onPointDragging),
 							updatePoint:t.updatePoint,
 							z: 100
 						};

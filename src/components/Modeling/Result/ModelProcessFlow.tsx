@@ -5,6 +5,7 @@ import { formatNumber } from '../../../util';
 import EN from '../../../constant/en';
 import {toJS} from "mobx";
 import _ from 'lodash';
+import classnames from 'classnames'
 
 const Next = 'data:image/svg+xml;base64,DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4NCiAgICAgICAgPGcgaWQ9IjUtNS00bW9kZWxpbmctQkNsYXNzaWZpY2F0aW9uLXNpbXBsZVZpZXc1IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkyLjAwMDAwMCwgLTQ1NC4wMDAwMDApIiBmaWxsPSIjNDQ4RUVEIj4NCiAgICAgICAgICAgIDxnIGlkPSJHcm91cC00MyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjIxLjQwMDAwMCwgNDQ3LjAwMDAwMCkiPg0KICAgICAgICAgICAgICAgIDxwb2x5Z29uIGlkPSJQYWdlLTEiIHBvaW50cz0iNzcuNDg2NzM3NyA3LjE5OTkxODAzIDc3LjQ4NjczNzcgMTAuMjcwNTk0NCA3MC44IDEwLjI3MDU5NDQgNzAuOCAxOS4xMjg5MTM4IDc3LjQ4NjczNzcgMTkuMTI4OTEzOCA3Ny40ODY3Mzc3IDIyLjIgODUuODAwNDA4OSAxNC42OTk5NTkiPjwvcG9seWdvbj4NCiAgICAgICAgICAgIDwvZz4NCiAgICAgICAgPC9nPg0KICAgIDwvZz4NCjwvc3ZnPg=='
 
@@ -49,8 +50,10 @@ export default class ModelProcessFlow extends Component<Interface> {
 			none:'No Scaling',
 		}[data['rescaling:__choice__']];
 
-		const { featureLabel } = this.props.model;
-		const { colType ,mapHeader} = this.props.project;
+		const {
+			model:{featureLabel},
+			project:{ colType ,mapHeader}
+		} = this.props;
 
 		const variables = featureLabel.filter(itm=>colType[itm] === "Categorical").map(itm=>mapHeader[itm]||itm);
 
@@ -428,7 +431,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 	render() {
 		const { dataFlow, modelName = '' } = this.props.model;
 		if (dataFlow.length === 1) {
-			return <section className={styles.process}>
+			return <section className={classnames(styles.process)}>
 				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
 				{this.popOver(this.DQF(),EN.DataQualityFixing)}
@@ -443,7 +446,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 				<label>{EN.Prediction}</label>
 			</section>
 		} else if (dataFlow.length > 1) {
-			return <section className={`${styles.process} ${styles.many} many`}>
+			return <section className={classnames(styles.process,styles.many)}>
 				<label>{EN.RawData}</label>
 				<img src={Next} alt='' />
 				{this.popOver(this.DQF(),EN.DataQualityFixing)}
