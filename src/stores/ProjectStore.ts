@@ -160,6 +160,7 @@ class ProjectStore {
                 if (!result.host) return
                 this.queryProjectList()
               } else {
+                if (id !== this.currentId) return
                 if (result) project.setProperty(result)
                 if (model) project.setModel(model)
                 if (modelResult) project.setModelField(modelResult)
