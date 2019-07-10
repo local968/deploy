@@ -67,9 +67,9 @@ router.post('/login', async(req, res) => {
   if(!user){
     return res.send({ status: 400, message: 'incorrect password.'})
   }
-  const {plan:{level},id,create_time,drole:role={}} = user;
+  const {plan,id,create_time,drole:role={}} = user;
 
-  if(!level){
+  if(!(plan&&plan.level)){
     return res.send({ status:302, message: 'Your account is not available'})
   }
 
@@ -77,7 +77,7 @@ router.post('/login', async(req, res) => {
   req.session.user = {
     id,
     email,
-    level,
+    level:plan.level,
     createdTime: create_time,
   };
   return res.send({
@@ -119,7 +119,7 @@ router.get('/status', async (req, res) => {
         email,
         createdTime:create_time,
         role:drole,
-        level:plan.level,
+        level:plan&&plan.level,
       }
     });
   }

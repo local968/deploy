@@ -1,4 +1,4 @@
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import moment from 'moment';
@@ -10,13 +10,12 @@ import SimplifiedView from './SimplifiedView';
 import AdvancedView from './advancedView';
 import classnames from 'classnames'
 import Preview from './Preview'
+import {Show} from 'components/Common';
 
 interface AdvancedModelInterface {
   project:any
   closeAdvanced:any
-  userStore?:any
 }
-@inject('userStore')
 @observer
 export default class AdvancedModel extends Component<AdvancedModelInterface> {
   @observable tab = 1;
@@ -94,13 +93,12 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
   };
 
   render() {
-    const { project, closeAdvanced,userStore } = this.props;
+    const { project, closeAdvanced } = this.props;
     const { dataHeader, newVariable, trainHeader, target } = project;
     const allVariables = [...dataHeader, ...newVariable];
     const checkedVariables = allVariables.filter(
       v => !trainHeader.includes(v) && v !== target,
     );
-    const {start_AdvancedModeling=true} = userStore.info.role;
 
     return (
       <div className={styles.advancedModel}>
@@ -146,15 +144,18 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
               />
             )}
             <div className={styles.bottom}>
-              <button
-                style={{display:(start_AdvancedModeling?'':'none')}}
-                className={classnames(styles.save, {
-                  [styles.disable]: !checkedVariables.length,
-                })}
-                onClick={!checkedVariables.length ? null : this.modeling}
+              <Show
+                name = 'start_AdvancedModeling'
               >
-                <span>{EN.Modeling}</span>
-              </button>
+                <button
+                  className={classnames(styles.save, {
+                    [styles.disable]: !checkedVariables.length,
+                  })}
+                  onClick={!checkedVariables.length ? null : this.modeling}
+                >
+                  <span>{EN.Modeling}</span>
+                </button>
+              </Show>
               <button className={styles.cancel} onClick={closeAdvanced}>
                 <span>{EN.Cancel}</span>
               </button>

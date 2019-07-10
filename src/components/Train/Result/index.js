@@ -449,10 +449,12 @@ const ClusteringTable = observer((props) => {
           <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         {!!hasTarget && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('adjinfo')}>
+          <span style={{ overflow: 'visible' }}><Hint content={EN.adjustMutualInfoHint} /></span>
           <Tooltip title={EN.adjustMutualInfo} >{EN.adjustMutualInfo} </Tooltip>
           <span>{sort.key === 'adjinfo' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>}
         {!!hasTarget && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('adjScore')}>
+          <span style={{ overflow: 'visible' }}><Hint content={EN.adjustRandScoreHint} /></span>
           <Tooltip title={EN.adjustRandScore} >{EN.adjustRandScore} </Tooltip>
           <span>{sort.key === 'adjScore' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>}

@@ -4,9 +4,12 @@ const {STRAPI_TOKEN} = config;
 
 const get = (url)=>{
   return new Promise((resolve,reject)=>{
-    request.get(url)
-      .set('Authorization', `Bearer ${STRAPI_TOKEN}`)
-      .redirects(0)
+    let req = request.get(url);
+    if(STRAPI_TOKEN){
+      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
+    }
+
+    req.redirects(0)
       .end(function(err, res){
         if (err || !res.ok) {
           resolve();
@@ -24,10 +27,11 @@ const post = (params)=>{
   } = params;
 
   return new Promise((resolve,reject)=>{
-    request
-      .post(url)
-      .set('Authorization', `Bearer ${STRAPI_TOKEN}`)
-      .send(data)
+    let req = request.post(url);
+    if(STRAPI_TOKEN){
+      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
+    }
+    req.send(data)
       .set('Content-Type', 'application/json; charset=utf-8')
       .redirects(0)
       .end(function(err, res){
@@ -47,10 +51,11 @@ const put = (params)=>{
   } = params;
 
   return new Promise((resolve,reject)=>{
-    request
-      .put(url)
-      .set('Authorization', `Bearer ${STRAPI_TOKEN}`)
-      .send(data)
+    let req = request.put(url);
+    if(STRAPI_TOKEN){
+      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
+    }
+    req.send(data)
       .set('Content-Type', 'application/json; charset=utf-8')
       .redirects(0)
       .end(function(err, res){
