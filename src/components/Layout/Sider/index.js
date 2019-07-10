@@ -13,6 +13,7 @@ import { withRouter } from 'react-router';
 import EN from '../../../constant/en';
 import { message, Icon } from 'antd';
 import axios from 'axios';
+import {Show} from 'components/Common';
 
 const errorTip = message.error;
 
@@ -40,7 +41,7 @@ export default class Sider extends Component {
     const isDeploy = routing.location.pathname.includes('deploy');
     const isSupport = routing.location.pathname.includes('support');
     
-    const {support=true,JupyterLab=true,project=true,Dashboard=true} = info.role||{};
+    const {project=true} = info.role||{};
   
     return (
       <aside className={styles.sider}>
@@ -54,41 +55,56 @@ export default class Sider extends Component {
           {/* <h2 className={styles.mrone}>R2 Learn</h2> */}
         </div>
         <div className={styles.menus}>
-          <a
-            className={styles.home}
-            style={{display:(project?'':'none')}}
-            onClick={() =>
-              isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')
-            }
+          <Show
+            show = 'project'
           >
-            {!isSupport ? <img alt="home" src={homeActive} /> : <img alt="home" src={home} />}
-            <h4 className={classnames(styles.nav, {
-              [styles.active]: !isSupport
-            })}>{EN.Home}</h4>
-          </a>
-          <a className={styles.support}
-             style={{display:(support?'':'none')}}
-             onClick={() => {
-               routing.push('/support')
-             }}>
-            {isSupport ? <img alt="support" src={helpActive}/> : <img alt="support" src={help}/>}
-            <h4 className={classnames(styles.nav, {
-              [styles.active]: isSupport
-            })}>{EN.Support}</h4>
-        </a>
-          <a className={styles.support}
-             style={{display:(labUrl&&JupyterLab?'':'none')}}
-             onClick={() => labUrl && window.open(labUrl, '_blank')}>
-            <img alt="support" src={community} className={styles.community}/>
-            <h4 className={styles.nav}>JupyterLab</h4>
-          </a>
-          <a className={styles.support}
-             style={{display:(dashUrl&&Dashboard?'':'none')}}
-             onClick={() => dashUrl && window.open(dashUrl, '_blank')}>
-            <Icon style={{ fontSize: '32px', color: '#2987a4', marginBottom: '5px' }} type="dashboard" />
-            <h4 className={styles.nav}>Dashboard</h4>
-          </a>
-
+            <a
+              className={styles.home}
+              onClick={() =>
+                isDeploy && isLogin ? routing.push('/deploy') : routing.push('/')
+              }
+            >
+              {!isSupport ? <img alt="home" src={homeActive} /> : <img alt="home" src={home} />}
+              <h4 className={classnames(styles.nav, {
+                [styles.active]: !isSupport
+              })}>{EN.Home}</h4>
+            </a>
+          </Show>
+          
+          <Show
+            name = 'support'
+          >
+            <a className={styles.support}
+               onClick={() => {
+                 routing.push('/support')
+               }}>
+              {isSupport ? <img alt="support" src={helpActive}/> : <img alt="support" src={help}/>}
+              <h4 className={classnames(styles.nav, {
+                [styles.active]: isSupport
+              })}>{EN.Support}</h4>
+            </a>
+          </Show>
+          <Show
+            name = 'JupyterLab'
+          >
+            <a className={styles.support}
+               style={{display:(labUrl?'':'none')}}
+               onClick={() => labUrl && window.open(labUrl, '_blank')}>
+              <img alt="support" src={community} className={styles.community}/>
+              <h4 className={styles.nav}>JupyterLab</h4>
+            </a>
+          </Show>
+         
+          <Show
+            name = 'Dashboard'
+          >
+            <a className={styles.support}
+               style={{display:(dashUrl?'':'none')}}
+               onClick={() => dashUrl && window.open(dashUrl, '_blank')}>
+              <Icon style={{ fontSize: '32px', color: '#2987a4', marginBottom: '5px' }} type="dashboard" />
+              <h4 className={styles.nav}>Dashboard</h4>
+            </a>
+          </Show>
         </div>
         <a className={styles.bottom} onClick={this.switchClick.bind(this,project)}>
           <img alt="switch" src={switchIcon} />

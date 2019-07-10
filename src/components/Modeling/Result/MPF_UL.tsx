@@ -250,7 +250,7 @@ export default class MPF_UL extends Component<Interface> {
 		if(!res.length){
 			return null;
 		}
-		if(outlier&&target){
+		if(outlier&&target&&colType[target]!=="Categorical"){
 			let {low,high} = rawDataView[target];
 			if(outlierDictTemp[target]){
 				const lh = [...outlierDictTemp[target]];
