@@ -397,6 +397,8 @@ class Project {
       targetArrayTemp: [],
       outlierDictTemp: {},
       otherMap: {},
+      dataViews: null,
+      dataViewsLoading: false,
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -407,6 +409,8 @@ class Project {
       targetArrayTemp: string[],
       outlierDictTemp: unknown,
       otherMap: StringObject,
+      dataViews: null,
+      dataViewsLoading: boolean,
     }
   }
 
@@ -519,8 +523,6 @@ class Project {
       validationRate: 20,
       holdoutRate: 20,
       hasSendEtl: false,
-      dataViews: null,
-      dataViewsLoading: false,
       preImportanceLoading: false,
       preImportance: {},
       informativesLabel: [],
@@ -569,8 +571,6 @@ class Project {
       validationRate: number,
       holdoutRate: number,
       hasSendEtl: boolean,
-      dataViews: null,
-      dataViewsLoading: boolean,
       preImportanceLoading: boolean,
       preImportance: NumberObject,
       informativesLabel: string[],
@@ -957,15 +957,15 @@ class Project {
         }
         if (min < 5) data.crossCount = min - 1
       }
-      await this.updateProject(data)
+      await this.updateProject(Object.assign(this.defaultDataQuality, data))
       const pass = await this.newEtl()
       if (!pass) return
-      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
+      await this.updateProject(Object.assign(this.defaultTrain, {
         curStep: 3,
         mainStep: 3,
         subStepActive: 1,
         lastSubStep: 1
-      }, data))
+      }))
       // this.etling = false
     } else {
       const step = {
