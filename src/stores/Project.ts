@@ -537,7 +537,7 @@ class Project {
       stopIds: [],
       features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
       ssPlot: null,
-      algorithmRadio: 'all',
+      algorithmRadio: 'default',
       settingId: '',
       settings: [],
       metricCorrection: { metric: 'default', type: '', value: 0 }
@@ -957,15 +957,15 @@ class Project {
         }
         if (min < 5) data.crossCount = min - 1
       }
-      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data))
+      await this.updateProject(data)
       const pass = await this.newEtl()
       if (!pass) return
-      await this.updateProject({
+      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, {
         curStep: 3,
         mainStep: 3,
         subStepActive: 1,
         lastSubStep: 1
-      })
+      }, data))
       // this.etling = false
     } else {
       const step = {
@@ -998,7 +998,16 @@ class Project {
     if (!this.qualityHasChanged) return
     this.etling = true
     await this.abortTrainByEtl()
-    const data = Object.assign(this.defaultTrain, {
+    const data: {
+      targetMap: NumberObject,
+      targetArray: string[],
+      outlierDict: unknown,
+      nullFillMethod: StringObject,
+      mismatchFillMethod: StringObject,
+      outlierFillMethod: StringObject,
+      missingReason: StringObject,
+      crossCount?: number
+    } = {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
       outlierDict: toJS(this.outlierDictTemp),
@@ -1006,7 +1015,7 @@ class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp),
-    })
+    }
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
@@ -1026,7 +1035,7 @@ class Project {
       subStepActive: 3,
       lastSubStep: 3
     }
-    await this.updateProject(step)
+    await this.updateProject(Object.assign(this.defaultTrain, step))
     return true
   }
 
