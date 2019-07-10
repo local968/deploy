@@ -94,7 +94,7 @@ export default class DetailCurves extends Component<Interface> {
     const { isHoldout, mapHeader } = project;
     const { curve, show } = this.state;
     let curComponent;
-    let hasReset = false;
+    let hasReset = !isHoldout;
 
     switch (curve) {
       case EN.ROCCurve:

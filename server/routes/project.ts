@@ -7,9 +7,10 @@ import log4js from 'log4js';
 import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
-import { Metric, StatusData, Steps } from '../types';
-// import restriction from '../restriction';
-const { restriction } = require("../apis/service/planService");
+import { Metric, StatusData } from '../types';
+const { projectService,planService } = require("../apis/service");
+
+const { restriction } = planService;
 const esServicePath = config.services.ETL_SERVICE;
 
 // const { userProjectRestriction, userConcurrentRestriction } = restriction;
@@ -69,34 +70,25 @@ function parseChartData(result) {
   return getChartData(result);
 }
 
-function query(key, params) {
-  const pipeline = redis.pipeline();
-  pipeline.zcard(key);
-  pipeline.zrevrangebyscore(key, params);
-  return pipeline.exec().then(([countResult, dataResult]) => {
-    if (countResult[0] || dataResult[0]) return { count: 0, list: [] };
-    const count = countResult[1];
-    const data = dataResult[1];
+async function query(key, offset,limit,userId) {
+    const projectIdList = await projectService.list(userId);
+    const count = projectIdList.length;
     const result = { count, list: [] };
-    if (!Array.isArray(data) || !data.length) {
-      return result;
-    }
-    const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName']
+    const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName'];
 
-    const promiseArray = data.map(r => {
-      // return redis.hgetall('project:' + r);
+    const promiseArray = projectIdList.splice(offset,limit).map(r => {
       return redis.hmget("project:" + r, Field)
     });
     return Promise.all(promiseArray).then(array => {
       return Promise.all(
-        array.map(item => {
-          const obj = {}
+        array.map((item:any) => {
+          const obj = {};
           item.forEach((v, k) => {
             try {
               v = JSON.parse(v)
             } catch (e) { }
             obj[Field[k]] = v
-          })
+          });
           return Promise.resolve(obj)
         }),
       ).then(list => {
@@ -104,7 +96,7 @@ function query(key, params) {
         return result;
       });
     });
-  });
+  // });
 }
 
 export function createOrUpdate(id, userId, data, isCreate = false) {
@@ -323,7 +315,7 @@ function deleteProject(userId, id) {
     pipeline.del(`project:${id}`);
     pipeline.zrem(`user:${userId}:projects:updateTime`, id);
     pipeline.zrem(`user:${userId}:projects:createTime`, id);
-    return pipeline.exec().then(list => {
+    return pipeline.exec().then(async list => {
       const error = list.find(i => !!i[0]);
       if (error) {
         errorLogger.error({
@@ -352,6 +344,7 @@ function deleteProject(userId, id) {
         result: { exist: false },
         id,
       });
+      await projectService.remove(id);
       return deleteModels(userId, id);
     });
   });
@@ -665,6 +658,8 @@ wss.register('addProject', async (message, socket) => {
     };
   }
   const id = await redis.incr('node:project:count');
+
+  projectService.add(userId,id);
   // const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
   return createOrUpdate(id, userId, { id, userId }, true);
 });
@@ -711,17 +706,17 @@ wss.register('deleteProjects', (message, socket) => {
 
 wss.register('queryProjectList', (message, socket) => {
   const { userId } = socket.session;
-  const { limit, offset, sort } = message;
+  const { limit=10, offset=0, sort } = message;
 
   const key = `user:${userId}:projects:${
     sort === 'createTime' ? 'createTime' : 'updateTime'
     }`;
 
-  const params = ['+inf', '-inf'];
+  // const params = ['+inf', '-inf'];
 
-  if (limit) params.push('limit', offset, limit);
+  // if (limit) params.push('limit', offset, limit);
 
-  return query(key, params).then(result => {
+  return query(key, offset,limit,userId).then(result => {
     return {
       status: 200,
       message: 'ok',

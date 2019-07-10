@@ -84,14 +84,14 @@ export default function PredictionDistributions(props){
 							if(+value === 1){
 								value = 0.99;
 							}
-							// setf(value);
+							setf(value);
 							return value.toFixed(2)
 						},
 						backgroundColor: '#004E52'
 					},
 					handle: {
 						show: true,
-						size:0,
+						size:isHoldout?0:35,
 						margin:43,
 					},
 				},

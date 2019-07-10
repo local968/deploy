@@ -68,8 +68,26 @@ const put = (params)=>{
   })
 };
 
+const _delete = (url)=>{
+  return new Promise((resolve,reject)=>{
+    let req = request.del(url);
+    if(STRAPI_TOKEN){
+      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
+    }
+    req.redirects(0)
+      .end(function(err, res){
+        if (err || !res.ok) {
+          reject(err)
+        } else {
+          resolve(res.body);
+        }
+      });
+  })
+};
+
 export default {
   get,
   post,
   put,
+  delete:_delete,
 }
