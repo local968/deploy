@@ -9,12 +9,19 @@ import axios from 'axios';
 import config from '../../config';
 import { Metric, StatusData, Steps } from '../types';
 // import restriction from '../restriction';
-const {restriction} = require("../apis/service/planService");
-
+const { restriction } = require("../apis/service/planService");
+const esServicePath = config.services.ETL_SERVICE;
 
 // const { userProjectRestriction, userConcurrentRestriction } = restriction;
 const userLogger = log4js.getLogger('user');
 const errorLogger = log4js.getLogger('error');
+
+async function getDataByUrl(url) {
+  const result = await axios.get(url);
+  const data = result.data;
+
+  return data
+}
 
 function getChartData(data) {
   let fitIndex = -1;
@@ -24,7 +31,7 @@ function getChartData(data) {
     if (Youden) {
       let max = -Infinity;
       initialFitIndex = 0;
-      for (let i = 1; i < Object.keys(Youden).length; i++) {
+      for (let i = 0; i < Object.keys(Youden).length; i++) {
         if (Youden[i] > max) {
           initialFitIndex = i;
           max = Youden[i];
@@ -411,7 +418,7 @@ const checkTraningRestriction = user => {
       user.id
       }:duration:${duration.years()}-${duration.months()}:training`;
     return redis.get(restrictQuery).then(async count => {
-      const {userProjectRestriction} = await restriction();
+      const { userProjectRestriction } = await restriction();
       if (count >= userProjectRestriction[user.level]) {
         errorLogger.error({
           userId: user.id,
@@ -641,7 +648,7 @@ wss.register('addProject', async (message, socket) => {
   // const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
   const { userId } = socket.session;
   const counts = await redis.zcard(`user:${userId}:projects:createTime`);
-  const {userConcurrentRestriction} = await restriction();
+  const { userConcurrentRestriction } = await restriction();
   if (counts >= userConcurrentRestriction[socket.session.user.level]) {
     errorLogger.error({
       userId,
@@ -1345,6 +1352,7 @@ wss.register('train', async (message, socket, progress) => {
         const {
           chartData: chartDataUrl,
           holdoutChartData: holdoutChartDataUrl,
+          accuracyData: accuracyDataUrl,
           modelName,
         } = result;
         const trainModel = await getProjectField(projectId, 'trainModel');
@@ -1352,17 +1360,20 @@ wss.register('train', async (message, socket, progress) => {
         await createOrUpdate(projectId, userId, { trainModel });
         let chartData = { chartData: chartDataUrl };
         let holdoutChartData = { chartData: holdoutChartDataUrl };
+        let accuracyData = accuracyDataUrl;
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl);
-        if (holdoutChartDataUrl)
-          holdoutChartData = await parseNewChartData(holdoutChartDataUrl);
+        if (holdoutChartDataUrl) holdoutChartData = await parseNewChartData(holdoutChartDataUrl);
+        if (accuracyData) accuracyData = await getDataByUrl(accuracyData);
         const stats = await getProjectField(projectId, 'stats');
         const modelData = {
           ...result,
           ...chartData,
           ...{ holdoutChartData: holdoutChartData.chartData },
+          accuracyData,
           stats,
           featureLabel: message.featureLabel,
-          target: message.targetLabel
+          target: message.targetLabel,
+          esIndex: message.esIndex
         };
         if (message.problemType) modelData.problemType = message.problemType;
         if (message.standardType) modelData.standardType = message.standardType;
@@ -1698,5 +1709,43 @@ wss.register('ssPlot', async (message, socket, progress) => {
     return returnValue;
   });
 });
+
+wss.register('getOutlierData', (message, socket, progress) => {
+  const { id: mid, projectId, rate, esIndex } = message
+  const _rate = Math.round((+rate) * 100)
+  return redis.hget(`project:${projectId}:model:${mid}`, 'outlierData').then((outlierUrl: string) => {
+    if (!outlierUrl) return []
+    outlierUrl = JSON.parse(outlierUrl)
+    return axios.get(outlierUrl).then(result => {
+      if (result.status !== 200) return []
+      const { data } = result
+      const max = 500
+      let list = []
+      for (let i = _rate; i > 0; i--) {
+        const index = (i / 100).toString()
+        if (list.length + data[index].length > max) {
+          list = list.concat(data[index].slice(0, max - list.length))
+          break;
+        }
+        list = list.concat(data[index])
+      }
+      if (!list.length) return list
+      return axios.post(`${esServicePath}/etls/${esIndex}/terms`, { nos: list.toString() }).then(rowsResult => {
+        if (rowsResult.status !== 200) return []
+        try {
+          return rowsResult.data.result
+        } catch (e) {
+          return []
+        }
+      })
+    })
+  }).then(_list => {
+    return {
+      status: 200,
+      message: 'ok',
+      list: _list
+    }
+  })
+})
 
 export default {};

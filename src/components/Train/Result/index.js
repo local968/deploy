@@ -4,7 +4,7 @@ import classes from './styles.module.css';
 import VariableImpact from './VariableImpact'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-import { Tooltip, Icon, Popover, Select} from 'antd'
+import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
@@ -14,6 +14,7 @@ import {
   D3D2,
 } from "../../Charts"
 import MPF from '../../Modeling/Result/MPF';
+import DisplayOutlier from './DisplayOutlier'
 
 const { Option } = Select;
 
@@ -210,7 +211,7 @@ const OutlierTable = observer((props) => {
           if (hasTarget) return ((a.score.auc || 0) - (b.score.auc || 0)) * value
         // if (!!target) return (a.score.auc - b.score.auc) * value
         case "acc":
-          if (hasTarget) return ((a.score.accuracy[formatNumber(a.rate, 2)] || 0) - (b.score.accuracy[formatNumber(b.rate, 2)] || 0)) * value
+          if (hasTarget) return ((a.accuracyData[formatNumber(a.rate)] || 0) - (b.accuracyData[formatNumber(b.rate)] || 0)) * value
         // if (!!target) return (a.score.accuracy - b.score.accuracy) * value
         case "score":
           return (a.score.score - b.score.score) * value
@@ -263,6 +264,10 @@ const OutlierTable = observer((props) => {
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
           <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
+          {/*<span>{EN.ModelProcessFlow}</span>*/}
+        </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <Tooltip title={EN.ModelProcessFlow}>{EN.DisplayOutlier}</Tooltip>
           {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
       </div>
@@ -343,7 +348,7 @@ const OutlierRow = observer((props) => {
           <span>{!model.target.length ? 'null' : formatNumber(model.score.auc || 0)}</span>
         </div>}
         {hasTarget && <div className={`${classes.ccell}`}>
-          <span>{!model.target.length ? 'null' : formatNumber(model.score.accuracy[formatNumber(model.rate, 2)] || 0)}</span>
+          <span>{!model.target.length ? 'null' : formatNumber(model.accuracyData[formatNumber(model.rate)] || 0)}</span>
         </div>}
         <div className={`${classes.ccell}`}>
           <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
@@ -354,11 +359,15 @@ const OutlierRow = observer((props) => {
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
         </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('display')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
+        </div>
       </div>
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
     {visible && type === 'process' && <MPF project={project} model={model} />}
+    <DisplayOutlier getOutlierData={model.getOutlierData} rate={formatNumber(model.rate, 2)} visiable={visible && type === 'display'} header={model.featureLabel.filter(h => !project.newVariable.includes(h))} mapHeader={mapHeader} colType={project.colType} />
     {/* </div> */}
   </div>
 })

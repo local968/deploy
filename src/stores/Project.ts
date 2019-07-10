@@ -108,7 +108,8 @@ export interface TrainCommand {
   featuresPreprocessor?: string[],
   validationRate?: number,
   nfold?: number,
-  showSsPlot?: boolean
+  showSsPlot?: boolean,
+  esIndex?: string;
 }
 
 export interface DataView {
@@ -1482,7 +1483,8 @@ class Project {
           settingName: setting.name,
           applyWeights: {},
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       case 'Outlier':
@@ -1505,7 +1507,8 @@ class Project {
           settingName: setting.name,
           applyWeights: {},
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       case 'Classification':
@@ -1543,7 +1546,8 @@ class Project {
             'xgradient_boosting',
             'r2-logistics',
           ],
-          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe))
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe)),
+          esIndex: this.etlIndex
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1582,7 +1586,8 @@ class Project {
             'sgd',
             'xgradient_boosting',
           ],
-          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Regression'), fe))
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Regression'), fe)),
+          esIndex: this.etlIndex
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1672,7 +1677,8 @@ class Project {
           settingName: setting.name,
           applyWeights: weightsTemp,
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       case 'Outlier':
@@ -1689,7 +1695,8 @@ class Project {
           settingName: setting.name,
           applyWeights: weightsTemp,
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       default:
@@ -1741,7 +1748,8 @@ class Project {
           settingName: setting.name,
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
-          featuresPreprocessor
+          featuresPreprocessor,
+          esIndex: this.etlIndex
         };
         if (this.runWith === 'holdout') {
           trainData.validationRate = this.validationRate / 100

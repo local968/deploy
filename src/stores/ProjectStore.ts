@@ -252,7 +252,6 @@ class ProjectStore {
       when(
         () => this.watchList,
         () => {
-          if (this.currentId === id) return resolve(true)
           if (this.list.length) {
             const project = this.list.find(row => {
               return row.id === id
