@@ -34,7 +34,7 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
     const { project } = this.props;
     const { dataHeader, trainHeader, newVariable, colType, newType } = project
     const variableType = { ...newType, ...colType };
-    const labels = [...dataHeader, newVariable].filter(h => !trainHeader.includes(h) && variableType[h] !== 'Raw')
+    const labels = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h) && variableType[h] !== 'Raw')
     if (labels.length < 2) {
       this.warning = true
       return false
