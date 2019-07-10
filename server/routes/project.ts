@@ -350,9 +350,9 @@ function deleteProject(userId, id) {
   });
 }
 
-function checkProject(userId, id) {
+ function checkProject(userId, id) {
   const Field = ['id', 'userId', 'name', 'createTime', 'updateTime', 'description', 'fileName']
-  return redis.hmget(`project:${id}`, Field).then(result => {
+  return redis.hmget(`project:${id}`, Field).then(async result => {
     const data = Field.reduce((prev, value, key) => {
       prev[value] = JSON.parse(result[key])
       return prev
@@ -375,7 +375,9 @@ function checkProject(userId, id) {
       return { status: 444, message: `project:${id} has been deleted` };
     }
 
-    if (data.userId !== userId) {
+    const plist = await projectService.list(userId);
+
+    if(!plist.includes(id)){
       errorLogger.error({
         userId,
         message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
@@ -392,8 +394,27 @@ function checkProject(userId, id) {
         `user:${userId}, project:${id} ${!data.userId ? 'delete' : 'error'}`,
       );
       return { status: 421, message: 'project error' };
-      // return {}
     }
+
+    // if (data.userId !== userId) {
+    //   errorLogger.error({
+    //     userId,
+    //     message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
+    //     pid: id,
+    //     time: moment().unix(),
+    //   });
+    //   userLogger.error({
+    //     userId,
+    //     message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
+    //     pid: id,
+    //     time: moment().unix(),
+    //   });
+    //   console.error(
+    //     `user:${userId}, project:${id} ${!data.userId ? 'delete' : 'error'}`,
+    //   );
+    //   return { status: 421, message: 'project error' };
+    //   // return {}
+    // }
     return { status: 200, message: 'ok', data };
   });
 }
