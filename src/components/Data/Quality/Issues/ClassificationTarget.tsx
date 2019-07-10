@@ -104,7 +104,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       totalRawLines,
       renameVariable,
       targetCounts,
-    } = project;
+    } = project as any;
     const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length < 2;
     const isMore = Object.keys(targetCounts).length > 2;
     const isGood = targetArrayTemp.length === 2 || (!isLess && !isMore);
@@ -171,7 +171,7 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                           className={styles.targetPercent}
                           style={{ width: percent + '%', backgroundColor }}
                         />
-                        <span>{targetCounts[v]}</span>
+                        <span title={targetCounts[v]}>{targetCounts[v]}</span>
                       </div>
                     </div>
                   );

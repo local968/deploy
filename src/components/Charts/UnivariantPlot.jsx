@@ -6,7 +6,7 @@ export default class ROC extends PureComponent{
 		super(props);
 		this.chart = React.createRef();
 	}
-	
+
 	getOption() {
 		const result = {
 			title:'title',
@@ -21,25 +21,19 @@ export default class ROC extends PureComponent{
 				value:[2,1,3,4,5,6,2.1,3.1,1.1,5,0.9,0.1]
 			}]
 		};
-		
+
 		const {title='',data=[],x_name='',y_name='',item=[]} = result;
-		
+
 		const series = data.map(itm=>{
 			return {
 				name:itm.name,
 				data:itm.value,
 				type:'bar',
-				stack: 'sum',
-				markPoint : {
-					data : [
-						{type : 'max', name: EN.Max},
-						{type : 'min', name: EN.Min}
-					]
-				},
+				stack: 'sum'
 			}
 		});
-		
-		
+
+
 		return {
 			title : {
 				text: title,
@@ -71,9 +65,9 @@ export default class ROC extends PureComponent{
 			},
 			series,
 		};
-		
+
 	}
-	
+
 	render(){
 		return <ReactEcharts
 			option={this.getOption()}
