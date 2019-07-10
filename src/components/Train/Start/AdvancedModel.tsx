@@ -3,14 +3,15 @@ import React, { Component } from 'react';
 import { observable } from 'mobx';
 import moment from 'moment';
 import uuid from 'uuid';
-import { message } from 'antd';
+import { message, Popover } from 'antd';
 import EN from '../../../constant/en';
 import styles from './styles.module.css';
 import SimplifiedViews from './SimplifiedViews';
 import AdvancedView from './advancedView';
 import classnames from 'classnames';
 import Preview from './Preview';
-import {Show} from 'components/Common';
+import { Show } from 'components/Common';
+import WarningBlock from './WarningBlock';
 
 interface AdvancedModelInterface {
   project: any
@@ -27,6 +28,30 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
     setting: this.props.project.newSetting(),
     models: [],
   };
+  @observable warning = false
+
+  checkBeforeTrain = () => {
+    const { project } = this.props;
+    const { dataHeader, trainHeader, newVariable, colType, newType } = project
+    const variableType = { ...newType, ...colType };
+    const labels = [...dataHeader, newVariable].filter(h => !trainHeader.includes(h) && variableType[h] !== 'Raw')
+    if (labels.length < 2) {
+      this.warning = true
+      return false
+    }
+    return true
+  }
+
+  closeWarn = () => {
+    this.warning = false
+  }
+
+  backToConnect = () => {
+    const { project } = this.props;
+    const { updateProject, nextSubStep } = project;
+    updateProject(nextSubStep(1, 2));
+    this.closeWarn()
+  }
 
   switchTab = num => {
     if (num !== 1 && num !== 2) return false;
@@ -34,6 +59,8 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
   };
 
   modeling = () => {
+    const checked = this.checkBeforeTrain()
+    if (!checked) return
     const { project, closeAdvanced } = this.props;
     const {
       advancedModeling,
@@ -60,11 +87,11 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
     const disableItems =
       problemType === 'Clustering'
         ? [
-            ...(totalLines > 20000
-              ? ['Agg', 'DBSCAN', 'SpectralClustering']
-              : []),
-            ...(kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : []),
-          ]
+          ...(totalLines > 20000
+            ? ['Agg', 'DBSCAN', 'SpectralClustering']
+            : []),
+          ...(kType === 'no_more_than' ? ['DBSCAN', 'MeanShift'] : []),
+        ]
         : [];
     const trainAlgorithms = algorithms.filter(al => !disableItems.includes(al));
     if (!trainAlgorithms.length)
@@ -135,28 +162,28 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
             {this.tab === 1 ? (
               <SimplifiedViews project={project} />
             ) : (
-              <AdvancedView
-                project={project}
-                hidden={this.visiable || this.tab === 1}
-                setting={this.setting}
-                setSetting={this.setSetting}
-                setSettingName={this.setSettingName}
-              />
-            )}
+                <AdvancedView
+                  project={project}
+                  hidden={this.visiable || this.tab === 1}
+                  setting={this.setting}
+                  setSetting={this.setSetting}
+                  setSettingName={this.setSettingName}
+                />
+              )}
             <div className={styles.bottom}>
               <Show
                 name='start_AdvancedModeling_UN'
+              ><button
+                className={classnames(styles.save, {
+                  [styles.disable]: !checkedVariables.length,
+                })}
+                onClick={!checkedVariables.length ? null : this.modeling}
               >
-                <button
-                  className={classnames(styles.save, {
-                    [styles.disable]: !checkedVariables.length,
-                  })}
-                  onClick={!checkedVariables.length ? null : this.modeling}
-                >
-                  <span>{EN.Modeling}</span>
+                  {this.warning ? <Popover content={<WarningBlock backToConnect={this.backToConnect} onClose={this.closeWarn} />} placement='leftBottom' getPopupContainer={el => el.parentElement} visible={true} overlayClassName={styles.warnBlock}>
+                    <span>{EN.Modeling}</span>
+                  </Popover> : <span>{EN.Modeling}</span>}
                 </button>
               </Show>
-
               <button className={styles.cancel} onClick={closeAdvanced}>
                 <span>{EN.Cancel}</span>
               </button>

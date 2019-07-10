@@ -1153,9 +1153,9 @@ const ZH_LAN = {
   WithinGroupsSs: "组内离差平方和",
   ImportantValues: '变量中值',
   adjustMutualInfo: '调整互信息',
-  adjustMutualInfoHint:'衡量聚类结果与您选择的真实目标变量之间的相似程度，取值上限为1，越大越相似。',
+  adjustMutualInfoHint: '衡量聚类结果与您选择的真实目标变量之间的相似程度，取值上限为1，越大越相似。',
   adjustRandScore: '调整兰德系数',
-  adjustRandScoreHint:'衡量聚类结果与您选择的真实目标变量之间的相似程度，取值范围-1~1，越大越相似。',
+  adjustRandScoreHint: '衡量聚类结果与您选择的真实目标变量之间的相似程度，取值范围-1~1，越大越相似。',
   ClusteringTarget: "若您的数据里包含“目标变量”列，请在这里进行选择，我们将对聚类分析的效果进行验证；若不包含，请留空。",
   OutlierTarget: "若您的数据里包含“目标变量”列，请在这里进行选择，我们将对异常值检测的效果进行验证；若不包含，请留空。",
   residual: "残差值",
@@ -1179,7 +1179,9 @@ const ZH_LAN = {
   ApplyNote: '（注：选择“应用到所有模型”后，最大化度量指标的操作将会在所有模型上进行，修正阈值。该功能只有在全部所选模型训练结束后才能应用。）',
   MetricCorrection: '指标修正',
   MetricCorrectionHint: '指标修正功能可以通过调整模型阈值，最大化选定的度量指标。',
-  DisplayOutlier: '显示异常值'
+  DisplayOutlier: '显示异常值',
+  WarningBlock: '您的干净数据的列数小于2，我们建议您上传新数据或创建新变量。',
+  UploadNewData: '上传新数据'
 };
 
 export default ZH_LAN;

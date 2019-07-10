@@ -1288,9 +1288,9 @@ const EN_LAN = {
   WithinGroupsSs: "Within Groups SS",
   ImportantValues: "Median Value of The Variable",
   adjustMutualInfo: 'Adjust Mutual Info',
-  adjustMutualInfoHint:'It measures the degree of similarity between the clustering result and the real target you selected. The upper limit is 1, the larger the better.',
+  adjustMutualInfoHint: 'It measures the degree of similarity between the clustering result and the real target you selected. The upper limit is 1, the larger the better.',
   adjustRandScore: 'Adjust Rand Score',
-  adjustRandScoreHint:'It measures the degree of similarity between the clustering result and the real target you selected. The value ranges from -1 to 1, the larger the better.',
+  adjustRandScoreHint: 'It measures the degree of similarity between the clustering result and the real target you selected. The value ranges from -1 to 1, the larger the better.',
   ClusteringTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the clustering models. Otherwise, you can leave blank here.`,
   OutlierTarget: `If your data contains the "Target Variable" , please select. We will evaluate the performance of the outlier detection models. Otherwise, you can leave blank here.`,
   choosecharset: 'choose charset:',
@@ -1321,7 +1321,9 @@ const EN_LAN = {
   MetricCorrection: 'Metric Correction',
   MetricCorrectionHint: 'Metric Correction allows you to maximize the selected metric by adjusting cutoff threshold.',
   Variableneedstostartwith: 'var - 选择一个连续变量;变量需要以@开头。[range_list1], [range_list2]…-自定义变量划分范围;第一个数值应大于该变量的最小值，最后一个数值应小于该变量的最大值;range_list的长度决定组的数量。',
-  DisplayOutlier: 'Display Outlier'
+  DisplayOutlier: 'Display Outlier',
+  WarningBlock: 'The number of columns of your clean data is less than 2. We recommend that you upload new data or create a new variable',
+  UploadNewData: 'Upload New Data'
 };
 
 
