@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
 import moment from 'moment';
-import { Hint, NumberInput, ProgressBar} from 'components/Common';
+import { Hint, NumberInput, ProgressBar } from 'components/Common';
 import VariableImpact from "./VariableImpact"
 import Variable from './Variable.svg'
 import Process from './Process.svg'
@@ -120,7 +120,7 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader, newVariable } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader, newVariable, stopIds } = project;
     if (!current) return null;
     const { selectModel = {}, targetCounts = {} } = project;
 
@@ -187,8 +187,8 @@ export default class ClassificationView extends Component {
               <dl>
                 <dt>
                   <span>{EN.Basedonyourbizscenario}
-                  <b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}
-                  <b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}
+                    <b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}
+                    <b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}
                   </span>
                 </dt>
                 {/*<dt>*/}
@@ -351,6 +351,7 @@ export default class ClassificationView extends Component {
         sort={sort}
         handleSort={handleSort}
         mapHeader={newMapHeader}
+        stopIds={stopIds}
       />
     </div>
   }
@@ -416,7 +417,7 @@ class Predicted extends Component {
 @observer
 class PredictedProgress extends Component {
   render() {
-    const { predicted, width, label, type,failType, height } = this.props;
+    const { predicted, width, label, type, failType, height } = this.props;
     const title = label === undefined ? (
       ''
     ) : (
@@ -529,7 +530,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort, mapHeader,project } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort, mapHeader, project, stopIds } = this.props;
     // const { sortKey, sort } = this
     return (
       <div className={styles.table}>
@@ -598,11 +599,13 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && Object.values(trainModel).map((tm, k) => {
+          {!train2Finished && stopIds.map((stopId, k) => {
+            const trainingModel = trainModel[stopId]
+            if (!trainingModel) return null
             return <div className={styles.rowData} key={k}>
               <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-              <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
-              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, tm.requestId) : null}>
+              <ProgressBar progress={(trainingModel.value || 0)} />
+              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, trainingModel.requestId) : null}>
                 {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
               </div>
             </div>
@@ -632,7 +635,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader,project } = this.props;
+    const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader, project } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -702,8 +705,8 @@ class ModelDetail extends Component {
           </div>
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-        {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader}/>}
-        {this.visible && this.type === 'process'&& <MPF modelId ={model.id}  project={project} model={model} />}
+        {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
+        {this.visible && this.type === 'process' && <MPF modelId={model.id} project={project} model={model} />}
       </div >
     );
   }

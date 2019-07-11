@@ -71,7 +71,6 @@ export default class StartTrain extends Component<StartTrainInterface> {
   };
 
   render() {
-    console.log(this.warning, 'this.warning')
     const { start_AutomaticModeling_UN = true } = this.props.userStore.info.role;
     return (
       <div className={styles.modelStart}>

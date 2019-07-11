@@ -285,11 +285,13 @@ const OutlierTable = observer((props) => {
           project={project}
           hasTarget={hasTarget} />
       })}
-      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+      {!train2Finished && stopIds.map((stopId, k) => {
+        const trainingModel = trainModel[stopId]
+        if (!trainingModel) return null
         return <div className={classes.rowData} key={k}>
           <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
-          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+          <ProgressBar progress={(trainingModel.value || 0)} />
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, trainingModel.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
         </div>
@@ -375,7 +377,7 @@ const OutlierRow = observer((props) => {
 
 const ClusteringTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, measurement } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, measurement, stopIds } = project
   const hasTarget = models.some(m => !!m.target.length)
   const measurementLabel = (measurement === 'CH' && 'CH Index') || (measurement === 'silhouette_euclidean' && EN.SihouetteScore) || 'CVNN'
   const measurementHint = (measurement === 'CH' && EN.CHIndexHint) || (measurement === 'silhouette_euclidean' && EN.SihouetteScoreHint) || EN.CVNNHint
@@ -486,11 +488,13 @@ const ClusteringTable = observer((props) => {
           mapHeader={mapHeader}
           hasTarget={hasTarget} />
       })}
-      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+      {!train2Finished && stopIds.map((stopId, k) => {
+        const trainingModel = trainModel[stopId]
+        if (!trainingModel) return null
         return <div className={classes.rowData} key={k}>
           <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
-          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+          <ProgressBar progress={(trainingModel.value || 0)} />
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, trainingModel.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
         </div>

@@ -27,7 +27,7 @@ class Summary extends Component<SummaryProps> {
 
   render() {
     const { project, editFixes } = this.props;
-    const { mapHeader, target, sortHeader, colValueCounts, targetArray, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { mapHeader, target, sortHeader, colValueCounts, targetArray, targetCounts, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber((deletedCount / totalRawLines * 100).toString(), 2)
     const fixedPercent = formatNumber(((totalFixedLines - deletedCount) / totalRawLines * 100).toString(), 2)
     const cleanPercent = formatNumber((100 - +deletePercent - +fixedPercent).toString(), 2)
@@ -47,9 +47,10 @@ class Summary extends Component<SummaryProps> {
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
+    const targetArr = !targetArray.length ? Object.keys(targetCounts).slice(0, 2) : targetArray
     const targetClassesCount = problemType === 'Classification' ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
-      return sum + (targetArray.includes(k) ? v : 0)
-    }, 0) + (targetArray.includes('') ? nullLineCounts[target] : 0)) : totalRawLines
+      return sum + (targetArr.includes(k) ? v : 0)
+    }, 0) + (targetArr.includes('') ? nullLineCounts[target] : 0)) : totalRawLines
     const targetPercent = {
       classesError: (totalRawLines - targetClassesCount) / totalRawLines * 100,
       missing: (problemType === 'Classification' ? 0 : nullLineCounts[target]) / totalRawLines * 100,
