@@ -377,6 +377,7 @@ const ZH_LAN = {
   Youneedtoselectatleast: '你需要选择至少一种算法！',
   Setting: '设置',
   PrepareToModel: '无数据质量问题，可以进行模型训练！',
+  DownloadEtlData: '导出干净数据',
   AdvancedVariable: '变量',
   AdvancellcedModeling: '建模',
   Histogram: '直方图',

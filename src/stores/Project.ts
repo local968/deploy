@@ -358,6 +358,13 @@ class Project {
     })
   }
 
+  downloadCleanData = () => {
+    const map = this.mapHeader.join()
+    const header = this.dataHeader.join()
+    return `/${this.etlIndex}/download?map=${map}&header=${header}`
+
+  }
+
   readIndex = async (index: string) => {
     const maxCell = 400000
     const max = Math.min(parseInt((maxCell / (this.rawHeader.length || 1)).toString(), 10), 500)

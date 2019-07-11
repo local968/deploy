@@ -501,6 +501,7 @@ const EN_LAN = {
   Youneedtoselectatleast: 'You need to select at least one algorithm!',
   Setting: 'Setting',
   PrepareToModel: "Data looks good now. It's time to train your model!",
+  DownloadEtlData: "Download Clean Data",
   AdvancedVariable: 'Advanced Variable',
 
 
