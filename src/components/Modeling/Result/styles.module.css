@@ -857,9 +857,9 @@ span.performanceScore {
     flex: none;
     flex-direction: column;
     position: absolute;
-    top: -250%;
-    left: 60%;
-    width: 6em;
+    top: -500%;
+    left: -217%;
+    width: 4.5em;
     max-height: 6em;
     overflow-y: auto;
     overflow-x: hidden;
@@ -868,12 +868,12 @@ span.performanceScore {
     border-radius: 5px;
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.22);
     border: solid 1px #979797;
-    padding: 0.2em 0.25em;
+    padding: 0.1em 0.25em;
     height: auto;
 }
 
 .costBlock p{
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     margin-bottom: 0;
 }
 
@@ -941,7 +941,7 @@ span.performanceScore {
 .costRow {
     display: flex;
     flex: none;
-    padding: 20px 0;
+    padding: 5px 0;
     margin-bottom: -1px;
     border-bottom: 1px solid #979797
 }
@@ -1084,7 +1084,7 @@ span.performanceScore {
     border-radius: 5px;
     display: flex;
     flex: none;
-    padding: .1em .2em;
+    padding: 0.04em .2em;
     justify-content: center;
     cursor: pointer;
 }
