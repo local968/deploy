@@ -359,7 +359,7 @@ export default class DataSchema extends Component<Interface> {
               <span>i</span>
             </div>
             <div className={styles.schemaText}>
-              <span>{EN.Ifyourdatadoesnothaveaheader}</span>
+              <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
             </div>
           </div>
           <div className={styles.schemaContent} id="schemaContent">
