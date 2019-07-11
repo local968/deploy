@@ -8,7 +8,7 @@ import { Metric, Project, ProjectRedisValue } from '../types';
 import { createOrUpdate, deleteModels } from './project';
 import * as s from 'connect-redis';
 
-const esServicePath = config.services.ETL_SERVICE; 
+const esServicePath = config.services.ETL_SERVICE;
 
 wss.register('correlation', async (message, socket) => {
   const project = await getProject(message);
@@ -354,7 +354,12 @@ wss.register('newEtl', async (message, socket, process) => {
         resolve({
           status: 200,
           message: 'ok',
-          etlIndex,
+          result: {
+            etlIndex,
+            totalFixedLines: totalFixedCount,
+            deletedCount,
+            dataViews
+          }
         });
       }
     }, 1000);

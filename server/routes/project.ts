@@ -8,7 +8,7 @@ import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
 import { Metric, StatusData } from '../types';
-const { projectService,planService } = require("../apis/service");
+const { projectService, planService } = require("../apis/service");
 
 const { restriction } = planService;
 const esServicePath = config.services.ETL_SERVICE;
@@ -70,32 +70,32 @@ function parseChartData(result) {
   return getChartData(result);
 }
 
-async function query(key, offset,limit,userId) {
-    const projectIdList = await projectService.list(userId);
-    const count = projectIdList.length;
-    const result = { count, list: [] };
-    const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName'];
+async function query(key, offset, limit, userId) {
+  const projectIdList = await projectService.list(userId);
+  const count = projectIdList.length;
+  const result = { count, list: [] };
+  const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName'];
 
-    const promiseArray = projectIdList.splice(offset,limit).map(r => {
-      return redis.hmget("project:" + r, Field)
+  const promiseArray = projectIdList.splice(offset, limit).map(r => {
+    return redis.hmget("project:" + r, Field)
+  });
+  return Promise.all(promiseArray).then(array => {
+    return Promise.all(
+      array.map((item: any) => {
+        const obj = {};
+        item.forEach((v, k) => {
+          try {
+            v = JSON.parse(v)
+          } catch (e) { }
+          obj[Field[k]] = v
+        });
+        return Promise.resolve(obj)
+      }),
+    ).then(list => {
+      result.list = list;
+      return result;
     });
-    return Promise.all(promiseArray).then(array => {
-      return Promise.all(
-        array.map((item:any) => {
-          const obj = {};
-          item.forEach((v, k) => {
-            try {
-              v = JSON.parse(v)
-            } catch (e) { }
-            obj[Field[k]] = v
-          });
-          return Promise.resolve(obj)
-        }),
-      ).then(list => {
-        result.list = list;
-        return result;
-      });
-    });
+  });
   // });
 }
 
@@ -131,7 +131,7 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
           result: data,
           id,
         };
-      wss.publish(`user:${userId}:projects`, returnValue);
+      wss.publish(`user:${userId}:projects`, { ...returnValue, isCreate });
       const logData = {
         userId,
         pid: id,
@@ -350,7 +350,7 @@ function deleteProject(userId, id) {
   });
 }
 
- function checkProject(userId, id) {
+function checkProject(userId, id) {
   const Field = ['id', 'userId', 'name', 'createTime', 'updateTime', 'description', 'fileName']
   return redis.hmget(`project:${id}`, Field).then(async result => {
     const data = Field.reduce((prev, value, key) => {
@@ -377,7 +377,7 @@ function deleteProject(userId, id) {
 
     const plist = await projectService.list(userId);
 
-    if(!plist.includes(id)){
+    if (!plist.includes(id)) {
       errorLogger.error({
         userId,
         message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
@@ -680,7 +680,7 @@ wss.register('addProject', async (message, socket) => {
   }
   const id = await redis.incr('node:project:count');
 
-  projectService.add(userId,id);
+  projectService.add(userId, id);
   // const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
   return createOrUpdate(id, userId, { id, userId }, true);
 });
@@ -727,7 +727,7 @@ wss.register('deleteProjects', (message, socket) => {
 
 wss.register('queryProjectList', (message, socket) => {
   const { userId } = socket.session;
-  const { limit=10, offset=0, sort } = message;
+  const { limit = 10, offset = 0, sort } = message;
 
   const key = `user:${userId}:projects:${
     sort === 'createTime' ? 'createTime' : 'updateTime'
@@ -737,7 +737,7 @@ wss.register('queryProjectList', (message, socket) => {
 
   // if (limit) params.push('limit', offset, limit);
 
-  return query(key, offset,limit,userId).then(result => {
+  return query(key, offset, limit, userId).then(result => {
     return {
       status: 200,
       message: 'ok',

@@ -399,6 +399,7 @@ class Project {
       otherMap: {},
       dataViews: null,
       dataViewsLoading: false,
+      deletedCount: 0,
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -411,6 +412,7 @@ class Project {
       otherMap: StringObject,
       dataViews: null,
       dataViewsLoading: boolean,
+      deletedCount: number
     }
   }
 
@@ -724,7 +726,6 @@ class Project {
         if (status !== 200) return antdMessage.error(message)
         this.setProperty({ ...project, init: true })
         // Object.assign(this, project, { init: true })
-
 
         this.autorun.push(autorun(async () => {
           if (!this.originalIndex) {
@@ -1041,9 +1042,11 @@ class Project {
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    const { status, message } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
+    const { status, message, result } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
       this.etlProgress = progress
     })
+    // 同步
+    this.setProperty(result)
     this.etlProgress = 0
     this.etling = false
     if (status !== 200) antdMessage.error(message)

@@ -18,7 +18,8 @@ export interface WatchResult {
   id: string,
   result: Partial<Project>,
   model: Model,
-  modelResult: Partial<Model>
+  modelResult: Partial<Model>,
+  isCreate?: boolean
 }
 
 class ProjectStore {
@@ -28,6 +29,7 @@ class ProjectStore {
   @observable watchList: boolean = false;
   @observable currentId: string = "";
   @observable projectInit: boolean = false
+  @observable initList: boolean = false
 
   @observable list: Project[] = [];
   @observable total: number = 0;
@@ -107,6 +109,7 @@ class ProjectStore {
   offline = () => {
     this.watchList = false;
     this.init = false
+    this.initList = false
     this.isOnline = false
     this.projectInit = false
     if (this.project) this.project.clean();
@@ -152,12 +155,12 @@ class ProjectStore {
           this.watchList = true
           this.init = true
           api.on(watch.id, (data: WatchResult) => {
-            const { status, id, result, model, modelResult } = data
+            const { status, id, result, model, modelResult, isCreate } = data
             if (status === 200) {
               const project = this.list.find(p => p.id === id)
               if (!project) {
                 if (!result) return
-                if (!result.host) return
+                if (!isCreate) return
                 this.queryProjectList()
               } else {
                 if (id !== this.currentId) return
@@ -200,8 +203,10 @@ class ProjectStore {
           newList.push(current)
         }
         this.list = [...newList]
+        // this.list = list.map(row => new Project(row.id + "", row))
         this.total = count
         this.loading = false;
+        this.initList = true
       })
     })
   }
@@ -251,7 +256,7 @@ class ProjectStore {
     this.projectInit = true
     return new Promise(resolve => {
       when(
-        () => this.watchList,
+        () => this.initList,
         () => {
           if (this.list.length) {
             const project = this.list.find(row => {
