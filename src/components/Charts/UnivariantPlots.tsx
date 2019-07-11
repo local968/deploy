@@ -25,13 +25,7 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 				name:itm.name,
 				data:itm.value,
 				type:'bar',
-				stack: 'sum',
-				markPoint : {
-					data : [
-						{type : 'max', name: EN.Max},
-						{type : 'min', name: EN.Min},
-					],
-				},
+				stack: 'sum'
 			}
 		});
 

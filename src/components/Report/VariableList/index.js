@@ -4,13 +4,9 @@ import classnames from 'classnames';
 import {observer} from 'mobx-react';
 import {Hint, ProcessLoading} from 'components/Common';
 import {observable, toJS} from 'mobx';
-import {Spin, Popover, message as antdMessage, Icon, Table, Tooltip, Modal} from 'antd';
-// import histogramIcon from './histogramIcon.svg';
-// import univariantIcon from './univariantIcon.svg';
+import {Popover, message as antdMessage, Icon, Table, Modal} from 'antd';
 import FUNCTIONS from './functions';
-import config from 'config'
 import {formatNumber} from 'util'
-import request from 'components/Request'
 import EN from '../../../constant/en';
 import CorrelationMatrixs from "../../Charts/CorrelationMatrixs";
 import HistogramNumerical from "../../Charts/HistogramNumerical";
@@ -562,7 +558,7 @@ class CorrelationPlot extends Component {
 //
 //   render() {
 //     const { onClose, path, type, id, style } = this.props;
-//     const imgPath = path ? `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
+//     const imgPath = path ? `//${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
 //     return <div className={styles.plot} style={style}>
 //       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
 //       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}

@@ -7,12 +7,22 @@ import log4js from 'log4js';
 import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
-import { Metric, StatusData, Steps } from '../types';
-import restriction from '../restriction';
+import { Metric, StatusData } from '../types';
+const { projectService, planService } = require("../apis/service");
 
-const { userProjectRestriction, userConcurrentRestriction } = restriction;
+const { restriction } = planService;
+const esServicePath = config.services.ETL_SERVICE;
+
+// const { userProjectRestriction, userConcurrentRestriction } = restriction;
 const userLogger = log4js.getLogger('user');
 const errorLogger = log4js.getLogger('error');
+
+async function getDataByUrl(url) {
+  const result = await axios.get(url);
+  const data = result.data;
+
+  return data
+}
 
 function getChartData(data) {
   let fitIndex = -1;
@@ -22,7 +32,7 @@ function getChartData(data) {
     if (Youden) {
       let max = -Infinity;
       initialFitIndex = 0;
-      for (let i = 1; i < Object.keys(Youden).length; i++) {
+      for (let i = 0; i < Object.keys(Youden).length; i++) {
         if (Youden[i] > max) {
           initialFitIndex = i;
           max = Youden[i];
@@ -60,42 +70,33 @@ function parseChartData(result) {
   return getChartData(result);
 }
 
-function query(key, params) {
-  const pipeline = redis.pipeline();
-  pipeline.zcard(key);
-  pipeline.zrevrangebyscore(key, params);
-  return pipeline.exec().then(([countResult, dataResult]) => {
-    if (countResult[0] || dataResult[0]) return { count: 0, list: [] };
-    const count = countResult[1];
-    const data = dataResult[1];
-    const result = { count, list: [] };
-    if (!Array.isArray(data) || !data.length) {
-      return result;
-    }
-    const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName']
+async function query(key, offset, limit, userId) {
+  const projectIdList = await projectService.list(userId);
+  const count = projectIdList.length;
+  const result = { count, list: [] };
+  const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName'];
 
-    const promiseArray = data.map(r => {
-      // return redis.hgetall('project:' + r);
-      return redis.hmget("project:" + r, Field)
-    });
-    return Promise.all(promiseArray).then(array => {
-      return Promise.all(
-        array.map(item => {
-          const obj = {}
-          item.forEach((v, k) => {
-            try {
-              v = JSON.parse(v)
-            } catch (e) { }
-            obj[Field[k]] = v
-          })
-          return Promise.resolve(obj)
-        }),
-      ).then(list => {
-        result.list = list;
-        return result;
-      });
+  const promiseArray = projectIdList.splice(offset, limit).map(r => {
+    return redis.hmget("project:" + r, Field)
+  });
+  return Promise.all(promiseArray).then(array => {
+    return Promise.all(
+      array.map((item: any) => {
+        const obj = {};
+        item.forEach((v, k) => {
+          try {
+            v = JSON.parse(v)
+          } catch (e) { }
+          obj[Field[k]] = v
+        });
+        return Promise.resolve(obj)
+      }),
+    ).then(list => {
+      result.list = list;
+      return result;
     });
   });
+  // });
 }
 
 export function createOrUpdate(id, userId, data, isCreate = false) {
@@ -130,7 +131,7 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
           result: data,
           id,
         };
-      wss.publish(`user:${userId}:projects`, returnValue);
+      wss.publish(`user:${userId}:projects`, { ...returnValue, isCreate });
       const logData = {
         userId,
         pid: id,
@@ -314,7 +315,7 @@ function deleteProject(userId, id) {
     pipeline.del(`project:${id}`);
     pipeline.zrem(`user:${userId}:projects:updateTime`, id);
     pipeline.zrem(`user:${userId}:projects:createTime`, id);
-    return pipeline.exec().then(list => {
+    return pipeline.exec().then(async list => {
       const error = list.find(i => !!i[0]);
       if (error) {
         errorLogger.error({
@@ -337,14 +338,34 @@ function deleteProject(userId, id) {
         pid: id,
         time: moment().unix(),
       });
+      wss.publish(`user:${userId}:projects`, {
+        status: 200,
+        message: `delete project success`,
+        result: { exist: false },
+        id,
+      });
+      await projectService.remove(id);
       return deleteModels(userId, id);
     });
   });
 }
 
 function checkProject(userId, id) {
-  return redis.hgetall(`project:${id}`).then(result => {
-    if (!result) {
+  const Field = ['id', 'userId', 'name', 'createTime', 'updateTime', 'description', 'fileName']
+  return redis.hmget(`project:${id}`, Field).then(async result => {
+    const data = Field.reduce((prev, value, key) => {
+      prev[value] = JSON.parse(result[key])
+      return prev
+    }, {} as {
+      id: string | null,
+      userId: string | null,
+      name: string | null,
+      createTime: string | null,
+      updateTime: string | null,
+      description: string | null,
+      fileName: string | null
+    })
+    if (!data.id) {
       errorLogger.error({
         userId,
         message: `project:${id} has been deleted`,
@@ -353,32 +374,48 @@ function checkProject(userId, id) {
       });
       return { status: 444, message: `project:${id} has been deleted` };
     }
-    Reflect.deleteProperty(result, 'stats')
-    for (let key in result) {
-      try {
-        result[key] = JSON.parse(result[key]);
-      } catch (e) { }
-    }
-    if (result.userId !== userId) {
+
+    const plist = await projectService.list(userId);
+
+    if (!plist.includes(id)) {
       errorLogger.error({
         userId,
-        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
         pid: id,
         time: moment().unix(),
       });
       userLogger.error({
         userId,
-        message: `project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
         pid: id,
         time: moment().unix(),
       });
       console.error(
-        `user:${userId}, project:${id} ${!result.userId ? 'delete' : 'error'}`,
+        `user:${userId}, project:${id} ${!data.userId ? 'delete' : 'error'}`,
       );
       return { status: 421, message: 'project error' };
-      // return {}
     }
-    return { status: 200, message: 'ok', data: result };
+
+    // if (data.userId !== userId) {
+    //   errorLogger.error({
+    //     userId,
+    //     message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
+    //     pid: id,
+    //     time: moment().unix(),
+    //   });
+    //   userLogger.error({
+    //     userId,
+    //     message: `project:${id} ${!data.userId ? 'delete' : 'error'}`,
+    //     pid: id,
+    //     time: moment().unix(),
+    //   });
+    //   console.error(
+    //     `user:${userId}, project:${id} ${!data.userId ? 'delete' : 'error'}`,
+    //   );
+    //   return { status: 421, message: 'project error' };
+    //   // return {}
+    // }
+    return { status: 200, message: 'ok', data };
   });
 }
 
@@ -394,7 +431,8 @@ const checkTraningRestriction = user => {
     const restrictQuery = `user:${
       user.id
       }:duration:${duration.years()}-${duration.months()}:training`;
-    return redis.get(restrictQuery).then(count => {
+    return redis.get(restrictQuery).then(async count => {
+      const { userProjectRestriction } = await restriction();
       if (count >= userProjectRestriction[user.level]) {
         errorLogger.error({
           userId: user.id,
@@ -624,6 +662,7 @@ wss.register('addProject', async (message, socket) => {
   // const projects = await redis.zrevrangebyscore(`user:${userId}:projects:createTime`, endTime.unix(), startTime.unix())
   const { userId } = socket.session;
   const counts = await redis.zcard(`user:${userId}:projects:createTime`);
+  const { userConcurrentRestriction } = await restriction();
   if (counts >= userConcurrentRestriction[socket.session.user.level]) {
     errorLogger.error({
       userId,
@@ -640,6 +679,8 @@ wss.register('addProject', async (message, socket) => {
     };
   }
   const id = await redis.incr('node:project:count');
+
+  projectService.add(userId, id);
   // const { result } = await command({ command: "create", projectId: id.toString(), userId, requestId: message._id }, null, true)
   return createOrUpdate(id, userId, { id, userId }, true);
 });
@@ -686,17 +727,17 @@ wss.register('deleteProjects', (message, socket) => {
 
 wss.register('queryProjectList', (message, socket) => {
   const { userId } = socket.session;
-  const { limit, offset, sort } = message;
+  const { limit = 10, offset = 0, sort } = message;
 
   const key = `user:${userId}:projects:${
     sort === 'createTime' ? 'createTime' : 'updateTime'
     }`;
 
-  const params = ['+inf', '-inf'];
+  // const params = ['+inf', '-inf'];
 
-  if (limit) params.push('limit', offset, limit);
+  // if (limit) params.push('limit', offset, limit);
 
-  return query(key, params).then(result => {
+  return query(key, offset, limit, userId).then(result => {
     return {
       status: 200,
       message: 'ok',
@@ -1327,6 +1368,7 @@ wss.register('train', async (message, socket, progress) => {
         const {
           chartData: chartDataUrl,
           holdoutChartData: holdoutChartDataUrl,
+          accuracyData: accuracyDataUrl,
           modelName,
         } = result;
         const trainModel = await getProjectField(projectId, 'trainModel');
@@ -1334,17 +1376,20 @@ wss.register('train', async (message, socket, progress) => {
         await createOrUpdate(projectId, userId, { trainModel });
         let chartData = { chartData: chartDataUrl };
         let holdoutChartData = { chartData: holdoutChartDataUrl };
+        let accuracyData = accuracyDataUrl;
         if (chartDataUrl) chartData = await parseNewChartData(chartDataUrl);
-        if (holdoutChartDataUrl)
-          holdoutChartData = await parseNewChartData(holdoutChartDataUrl);
+        if (holdoutChartDataUrl) holdoutChartData = await parseNewChartData(holdoutChartDataUrl);
+        if (accuracyData) accuracyData = await getDataByUrl(accuracyData);
         const stats = await getProjectField(projectId, 'stats');
         const modelData = {
           ...result,
           ...chartData,
           ...{ holdoutChartData: holdoutChartData.chartData },
+          accuracyData,
           stats,
           featureLabel: message.featureLabel,
-          target: message.targetLabel
+          target: message.targetLabel,
+          esIndex: message.esIndex
         };
         if (message.problemType) modelData.problemType = message.problemType;
         if (message.standardType) modelData.standardType = message.standardType;
@@ -1680,5 +1725,43 @@ wss.register('ssPlot', async (message, socket, progress) => {
     return returnValue;
   });
 });
+
+wss.register('getOutlierData', (message, socket, progress) => {
+  const { id: mid, projectId, rate, esIndex } = message
+  const _rate = Math.round((+rate) * 1000)
+  return redis.hget(`project:${projectId}:model:${mid}`, 'outlierData').then((outlierUrl: string) => {
+    if (!outlierUrl) return []
+    outlierUrl = JSON.parse(outlierUrl)
+    return axios.get(outlierUrl).then(result => {
+      if (result.status !== 200) return []
+      const { data, index } = result.data
+      const count = Math.min(index[_rate / 1000], 500)
+      let list = data.slice(0, count)
+      // for (let i = 1; i <= _rate; i++) {
+      //   const index = (i / 1000).toString()
+      //   if (list.length + data[index].length > max) {
+      //     list = list.concat(data[index].slice(0, max - list.length))
+      //     break;
+      //   }
+      //   list = list.concat(data[index])
+      // }
+      if (!list.length) return list
+      return axios.post(`${esServicePath}/etls/${esIndex}/terms`, { nos: list.toString() }).then(rowsResult => {
+        if (rowsResult.status !== 200) return []
+        try {
+          return rowsResult.data.result
+        } catch (e) {
+          return []
+        }
+      })
+    })
+  }).then(_list => {
+    return {
+      status: 200,
+      message: 'ok',
+      list: _list
+    }
+  })
+})
 
 export default {};

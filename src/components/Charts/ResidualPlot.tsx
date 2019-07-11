@@ -1,16 +1,22 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
-import {concat} from 'lodash'
 import EN from "../../constant/en";
+import _ from 'lodash';
 
 export default function ResidualPlot(props){
-	const {chartDate={},title='',y_name='',width=500,height=300} = props;
-	const data = chartDate.data.map(itm=>[itm[0],itm[2]]);
-	// @ts-ignore
-	const num = concat(...data);
+	const {chartDate={},title='',width=500,height=300} = props;
+	const num:any = [];
+	const data = _.map(chartDate.data,itm=>{
+		const [,x,y] = itm;
+		num.push(x);
+		return [x,y];
+	});
 
-	const max = Math.max(...num);
-	const min = Math.min(...num);
+	const max:number = _.max(num);
+	const min:number = _.min(num);
+
+	const _max = (max + Math.abs(max-min)/3).toFixed(1);
+	const _min = (min - Math.abs(max-min)/3).toFixed(1);
 
 	const nameTextStyle = {
 		color:'#000',
@@ -29,16 +35,20 @@ export default function ResidualPlot(props){
 			x:`${Math.floor(max+1)}`.length * 10 +20,
 		},
 		xAxis: {
-			name:EN.residual,
+			name:EN.Predictvalue,
 			axisLine:{show:false},
 			nameLocation:'middle',
 			nameGap:25,
 			nameTextStyle,
+			boundaryGap:[0,0],
+			max:_max,
+			min:_min,
 		},
 		yAxis: {
-			name:y_name,
+			name:EN.residual,
 			axisLine:{show:false},
 			nameTextStyle,
+			boundaryGap:[0,0],
 		},
 		series: [
 			{
@@ -48,7 +58,7 @@ export default function ResidualPlot(props){
 			},
 			{
 				type:'line',
-				data:[[min-1,0],[max+1,0]],
+				data:[[_min,0],[_max,0]],
 				symbolSize: 0,
 			},
 		],

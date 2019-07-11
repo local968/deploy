@@ -27,7 +27,7 @@
     display: flex;
     flex-direction: column;
     flex: none;
-    width: 12em;
+    width: 1200px;
     border-radius: 4px;
     box-shadow: 0 12px 20px 0 rgba(0, 0, 0, 0.3);
     position: relative;
@@ -44,7 +44,7 @@
     background-color: #445167;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    padding: 0.1em 0;
+    padding: 10px 0;
 }
 
 #titleText {
@@ -58,13 +58,13 @@
     display: flex;
     position: absolute;
     right: 0;
-    margin-right: 0.1em;
+    margin-right: 10px;
     cursor: pointer;
 }
 
 .content {
     display: flex;
     flex: none;
-    margin: 0.2em 0.5em;
+    margin: 20px 50px;
     flex-direction: column;
 }

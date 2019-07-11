@@ -14,31 +14,31 @@ const REDIS_HOST = process.env.REDIS_HOST || "127.0.0.1:6379";
 const REDIS_TYPE = process.env.REDIS_TYPE || "1"; // 1 standalone 2 sentinel
 const PASSWORD = process.env.PASSWORD || "7788414";
 const BACKEND = process.env.REACT_APP_NGINX_BACKEND || "1";
-const HOST = process.env.R2HOST || "http://127.0.0.1:3000/";
+const HOST = process.env.R2HOST || "//127.0.0.1:3000/";
 
-const APP_LOGIN_BFF = process.env.APP_LOGIN_BFF || "http://192.168.0.88:4001";
-const AUTH_SERVICE = process.env.AUTH_SERVICE || "http://192.168.0.88:4002";
+const APP_LOGIN_BFF = process.env.APP_LOGIN_BFF || "//192.168.0.88:4001";
+const AUTH_SERVICE = process.env.AUTH_SERVICE || "//192.168.0.88:4002";
 const DEPLOYMENT_SERVICE =
-  process.env.DEPLOYMENT_SERVICE || "http://192.168.0.88:4003";
-const DSL_SERVICE = process.env.DSL_SERVICE || "http://192.168.0.88:4004";
-const ETL_SERVICE = process.env.ETL_SERVICE || "http://192.168.0.88:4005";// http://127.0.0.1:9201  http://192.168.0.23:9200
+  process.env.DEPLOYMENT_SERVICE || "//192.168.0.88:4003";
+const DSL_SERVICE = process.env.DSL_SERVICE || "//192.168.0.88:4004";
+const ETL_SERVICE = process.env.ETL_SERVICE || "//192.168.0.88:4005";// //127.0.0.1:9201  //192.168.0.23:9200
 const GRAPHIC_SERVICE =
-  process.env.GRAPHIC_SERVICE || "http://192.168.0.88:4006";
-const JOB_SERVICE = process.env.JOB_SERVICE || "http://192.168.0.88:4007";
-const MODEL_SERVICE = process.env.MODEL_SERVICE || "http://192.168.0.88:4008";
-const PLAN_SERVICE = process.env.PLAN_SERVICE || "http://192.168.0.88:4009";
+  process.env.GRAPHIC_SERVICE || "//192.168.0.88:4006";
+const JOB_SERVICE = process.env.JOB_SERVICE || "//192.168.0.88:4007";
+const MODEL_SERVICE = process.env.MODEL_SERVICE || "//192.168.0.88:4008";
+const PLAN_SERVICE = process.env.PLAN_SERVICE || "//192.168.0.88:4009";
 const PROJECT_SERVICE =
-  process.env.PROJECT_SERVICE || "http://192.168.0.88:4010";
-const PROPELLER_BFF = process.env.PROPELLER_BFF || "http://192.168.0.88:4011";
-const SAAS_BFF = process.env.SAAS_BFF || "http://192.168.0.88:4012";
+  process.env.PROJECT_SERVICE || "//192.168.0.88:4010";
+const PROPELLER_BFF = process.env.PROPELLER_BFF || "//192.168.0.88:4011";
+const SAAS_BFF = process.env.SAAS_BFF || "//192.168.0.88:4012";
 const SAAS_LOGIN_BFF =
-  process.env.SAAS_LOGIN_BFF || "http://192.168.0.88:4013";
+  process.env.SAAS_LOGIN_BFF || "//192.168.0.88:4013";
 const SCHEDULE_SERVICE =
-  process.env.SCHEDULE_SERVICE || "http://192.168.0.88:4014";
+  process.env.SCHEDULE_SERVICE || "//192.168.0.88:4014";
 const SCHEMA_SERVICE =
-  process.env.SCHEMA_SERVICE || "http://192.168.0.88:4015";
-const TASK_SERVICE = process.env.TASK_SERVICE || "http://192.168.0.88:4016";
-const USER_SERVICE = process.env.USER_SERVICE || "http://192.168.0.88:4017";
+  process.env.SCHEMA_SERVICE || "//192.168.0.88:4015";
+const TASK_SERVICE = process.env.TASK_SERVICE || "//192.168.0.88:4016";
+const USER_SERVICE = process.env.USER_SERVICE || "//192.168.0.88:4017";
 
 const AMQPLIB_PROTOCOL = process.env.AMQPLIB_PROTOCOL || "amqp.ts";
 const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "127.0.0.1";
@@ -51,12 +51,14 @@ const AMQPLIB_HEARTBEAT = process.env.AMQPLIB_HEARTBEAT || "0";
 const AMQPLIB_VHOST = process.env.AMQPLIB_VHOST || "/";
 
 const QUEUE_RESULT = process.env.QUEUE_RESULT || "result.top.pipeline;result.top.ping;result.top.listCommand;result.top.histgramPlot;result.top.etlBase;result.top.dataView;result.top.createNewVariable;result.top.correlationMatrix;result.top.univariatePlot;result.outlier.train;result.outlier.preTrainImportance;result.outlier.ping;result.outlier.outlierPlot;result.outlier.listCommand;result.outlier.etl;result.outlier.deploy;result.outlier.applyWeights;result.clustering.train;result.clustering.ssPlot;result.clustering.preTrainImportance;result.clustering.ping;result.clustering.listCommand;result.clustering.etlOutlier;result.clustering.etl;result.clustering.doOutlier;result.clustering.deploy;result.clustering.applyWeights;result.clfreg.univariatePlot;result.clfreg.train;result.clfreg.preTrainImportance;result.clfreg.permutationImportance;result.clfreg.etl;result.clfreg.deploy";
-const BACK_API_SERVICE = process.env.BACK_API_SERVICE  || 'http://192.168.0.88:8081';
+const BACK_API_SERVICE = process.env.BACK_API_SERVICE  || '//192.168.0.88:8081';
 const IS_EN = process.env.IS_EN || false;
 const YOUR_AGE = process.env.YOUR_AGE || '部署行数已达到出当前权限最大限制。';
 const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前权限最大限制。';
 const YOUR_USAGE = process.env.YOUR_USAGE  || '您的并发项目数量已达到当前许可证的最大限制。。';
 const SPLIT_COMMAND = process.env.SPLIT_COMMAND || false;
+const STRAPI = process.env.STRAPI || '//192.168.0.23';
+const STRAPI_TOKEN = process.env.STRAPI_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDIzMTQ4YTkwZDhkZjAwMWY3NTJhNDMiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE1NjI2NTY0NTMsImV4cCI6MTU2NTI0ODQ1M30.O2Os3lzu-Dw9mIJcet_cfKcPJCj7GLk3RIWlpCq7vQY';
 const redis =
   REDIS_TYPE === "2"
     ? {
@@ -132,7 +134,9 @@ const config = {
     AMQPLIB_VHOST,
     QUEUE_RESULT
   },
-  splitCommand: SPLIT_COMMAND
+  splitCommand: SPLIT_COMMAND,
+  STRAPI,
+  STRAPI_TOKEN,
 };
 
 module.exports = config;

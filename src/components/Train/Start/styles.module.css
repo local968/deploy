@@ -125,7 +125,7 @@
   display: flex;
   flex: none;
   flex-direction: column;
-  margin: -0.2em -0.5em;
+  margin: -20px -50px;
 }
 
 .tabBox {
@@ -498,6 +498,7 @@
 }
 
 .save {
+  position: relative;
   background-image: linear-gradient(to bottom, #5b657b, #243448);
 }
 
@@ -1240,4 +1241,17 @@ button.disable {
   position: absolute;
   right: 18px;
   top: 18px;
+}
+
+.advancedSpeed {
+  display: flex;
+  flex: auto;
+  align-items: flex-end;
+  margin: 0.15em 0;
+  max-width: 50%;
+}
+
+.warnBlock {
+  display: flex;
+  flex: none;
 }

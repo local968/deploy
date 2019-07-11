@@ -6,17 +6,27 @@ import Slider from 'rc-slider';
 import 'rc-input-number/assets/index.css';
 import 'rc-slider/assets/index.css';
 import { toJS } from 'mobx';
+import EN from '../../constant/en';
 
 interface DataSampleProps {
 	x_name:string
 	y_name:string
 	title:string
 	data:any
-	result:any
+	result?:any
 }
 
 export default class HS extends Component<DataSampleProps>{
 	private chart: any;
+	state:{
+		data:object
+		sliderValue:Array<number>
+		ready:boolean
+		step:number
+		min:number
+		max:number
+		interval:number
+	};
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
@@ -24,8 +34,11 @@ export default class HS extends Component<DataSampleProps>{
 		const {result,data} = props;
 		const {min=0,max=0,interval=1} =result||data;
 		const _data = result?data:data.data;
+
+		const _min = _.min(_.map(data,itm=>itm[0]));
+		const _max = _.max(_.map(data,itm=>itm[0]));
 		this.state = {
-			sliderValue : [min,max],
+			sliderValue : [_min,_max],
 			ready:true,
 			step:1,
 			data:toJS(_data),
@@ -36,14 +49,14 @@ export default class HS extends Component<DataSampleProps>{
 	}
 
 	componentDidMount() {
-		const {data} = this.state as any;
+		const {data} = this.state;
 		if(_.size(data)>1){
 			this.chart.getEchartsInstance().showLoading();
 		}
 	}
 
 	async setSlider(sliderValue){
-		const {sliderValue:_sliderValue} = this.state as any;
+		const {sliderValue:_sliderValue} = this.state;
 		const [start,end] = _sliderValue;
 		const [_start,_end] = sliderValue;
 		if(this.chart){
@@ -61,8 +74,8 @@ export default class HS extends Component<DataSampleProps>{
 	}
 
 	getOption() {
-		const {ready,step,sliderValue:_sliderValue,data,min,max} = this.state as any;
-		let {title,x_name,y_name} = this.props as any;
+		const {ready,step,sliderValue:_sliderValue,data,min,max} = this.state;
+		let {title,x_name,y_name} = this.props;
 		if(!ready){
 			return {
 				xAxis:{},
@@ -71,7 +84,7 @@ export default class HS extends Component<DataSampleProps>{
 		}
 
 		const sliderValue = _.cloneDeep(_sliderValue);
-		let _data = _.cloneDeep(data);
+		let _data:any = _.cloneDeep(data);
 		let [start,end] = sliderValue;
 
 		const series = [{
@@ -104,13 +117,15 @@ export default class HS extends Component<DataSampleProps>{
 			nameGap:25,
 			nameTextStyle,
 			axisLabel:{
-				interval:Math.floor((data.length/5)),
+				interval:Math.floor((len/5)),
 				formatter: (value)=>value.toFixed(2),
 			},
+			// min:_.min(_.map(data,itm=>itm[0]))-1,
+			// max:_.max(_.map(data,itm=>itm[0]))+1,
 		};
 
 		if(len<=1){
-			const val = data[0][0];
+			const val = data[0]&&data[0][0];
 			xAxis.min = val - 1;
 			xAxis.max = val + 1;
 			start = -1;
@@ -174,13 +189,16 @@ export default class HS extends Component<DataSampleProps>{
 							back:'image://'
 						}
 					},
-				}
+					restore:{
+						title:EN.restore,
+					},
+				},
 			}
 		};
 	}
 
 	render(){
-		const {step,data,interval} = this.state as any;
+		const {step,data,interval} = this.state;
 		const len = _.size(data);
 		return [
 			<ReactEcharts
@@ -209,7 +227,7 @@ export default class HS extends Component<DataSampleProps>{
 				比例:
 				<Slider
 					min={1}
-					max={data.length}
+					max={len}
 					step={1}
 					value = {step}
 					onChange={step=>{

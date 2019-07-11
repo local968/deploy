@@ -15,6 +15,7 @@ interface DataSampleProps {
 @observer
 export default class PRCharts extends PureComponent<DataSampleProps>{
 	private chart: any;
+	state:any;
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
@@ -63,7 +64,8 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 	}
 
 	getOption() {
-		const {ready,result,_data} = this.state as any;
+		const {ready,result,_data} = this.state;
+		const {isHoldout} = this.props.project;
 		if(!ready){
 			return {
 				xAxis: {},
@@ -108,7 +110,8 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 							point,
 							ondrag: util.curry(t.onPointDragging),
 							updatePoint:t.updatePoint,
-							z: 100
+							z: 100,
+							isHoldout,
 						};
 					})
 				});
@@ -140,7 +143,8 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 	}
 
 	onPointDragging(){
-		let {result,myChart,point} = this as any;
+		let {result,myChart,point,isHoldOut} = this as any;
+		if(isHoldOut)return;
 		let {data} = result;
 
 		const _data = data.filter(itm=>itm[0] === point)||data[0];

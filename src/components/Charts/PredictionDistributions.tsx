@@ -91,7 +91,7 @@ export default function PredictionDistributions(props){
 					},
 					handle: {
 						show: true,
-						size:35,
+						size:isHoldout?0:35,
 						margin:43,
 					},
 				},

@@ -1,11 +1,10 @@
 import React from 'react';
-import { ContinueButton, Hint, ProgressBar, Table, ProcessLoading } from 'components/Common'
+import { Hint, ProgressBar, Table, ProcessLoading } from 'components/Common'
 import classes from './styles.module.css';
 import VariableImpact from './VariableImpact'
-import ModelProcessFlow from './modelProcessFlow'
 import Explanation from './explanation'
 import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
-import { Tooltip, Icon, Popover, Select, message } from 'antd'
+import { Tooltip, Icon, Popover, Select } from 'antd'
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
@@ -14,6 +13,8 @@ import {
   ISO,
   D3D2,
 } from "../../Charts"
+import MPF from '../../Modeling/Result/MPF';
+import DisplayOutlier from './DisplayOutlier'
 
 const { Option } = Select;
 
@@ -35,7 +36,7 @@ function ModelResult(props) {
   const [view, setView] = React.useState('simple')
   const { resetSide, projectStore } = props
   const { project } = projectStore
-  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings, loadModel } = project;
+  const { problemType, models, selectModel, colType, dataHeader, trainHeader, id, etlIndex, fileName, mapHeader, newVariable, settings, loadModel, measurement } = project;
   const list = Object.entries(colType).filter(t => (t[1] === 'Categorical' && dataHeader.includes(t[0]) && !trainHeader.includes(t[0]))).map(c => c[0])
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   React.useEffect(() => {
@@ -43,6 +44,8 @@ function ModelResult(props) {
   })
   let filterModels = [...models]
   const currentSetting = currentSettingId === 'all' ? null : settings.find(setting => setting.id === currentSettingId)
+  const measurementLabel = (measurement === 'CH' && 'CH Index') || (measurement === 'silhouette_euclidean' && EN.SihouetteScore) || 'CVNN'
+  const measurementHint = (measurement === 'CH' && EN.CHIndexHint) || (measurement === 'silhouette_euclidean' && EN.SihouetteScoreHint) || EN.CVNNHint
   if (currentSetting && currentSetting.models)
     filterModels = filterModels.filter(model => currentSetting.models.find(id => model.id === id))
 
@@ -135,8 +138,8 @@ function ModelResult(props) {
           </div>}
           {problemType === 'Clustering' && <div className={classes.scores}>
             <div className={classes.cvnn}>
-              <div className={classes.orange}>{formatNumber(selectModel.score.CVNN)}</div>
-              <span className={classes.label}>CVNN <Hint content={EN.CVNNHint} /></span>
+              <div className={classes.orange}>{formatNumber(selectModel.score[measurement])}</div>
+              <span className={classes.label}>{measurementLabel} <Hint content={measurementHint} /></span>
             </div>
             <div className={classes.cluster}>
               <div className={classes.blood}>{Object.keys(selectModel.labelWithImportance).length}</div>
@@ -198,7 +201,7 @@ export default inject('projectStore', 'deploymentStore', 'routing')(observer(Mod
 
 const OutlierTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, stopIds } = project
   const hasTarget = models.some(m => !!m.target.length)
   const sortModels = React.useMemo(() => {
     const { key, value } = sort
@@ -208,7 +211,7 @@ const OutlierTable = observer((props) => {
           if (hasTarget) return ((a.score.auc || 0) - (b.score.auc || 0)) * value
         // if (!!target) return (a.score.auc - b.score.auc) * value
         case "acc":
-          if (hasTarget) return ((a.score.auc || 0) - (b.score.auc || 0)) * value
+          if (hasTarget) return ((a.accuracyData[formatNumber(a.rate)] || 0) - (b.accuracyData[formatNumber(b.rate)] || 0)) * value
         // if (!!target) return (a.score.accuracy - b.score.accuracy) * value
         case "score":
           return (a.score.score - b.score.score) * value
@@ -263,6 +266,11 @@ const OutlierTable = observer((props) => {
           <Tooltip title={EN.ModelProcessFlow}>{EN.ModelProcessFlow}</Tooltip>
           {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
+        <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span style={{ overflow: 'visible' }}><Hint content={EN.DisplayOutlierHint} /></span>
+          <Tooltip title={EN.ModelProcessFlow}>{EN.DisplayOutlier}</Tooltip>
+          {/*<span>{EN.ModelProcessFlow}</span>*/}
+        </div>
       </div>
     </div>
     <div className={classes.rowBox}>
@@ -277,11 +285,13 @@ const OutlierTable = observer((props) => {
           project={project}
           hasTarget={hasTarget} />
       })}
-      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+      {!train2Finished && stopIds.map((stopId, k) => {
+        const trainingModel = trainModel[stopId]
+        if (!trainingModel) return null
         return <div className={classes.rowData} key={k}>
           <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
-          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+          <ProgressBar progress={(trainingModel.value || 0)} />
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, trainingModel.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
         </div>
@@ -341,7 +351,7 @@ const OutlierRow = observer((props) => {
           <span>{!model.target.length ? 'null' : formatNumber(model.score.auc || 0)}</span>
         </div>}
         {hasTarget && <div className={`${classes.ccell}`}>
-          <span>{!model.target.length ? 'null' : formatNumber(model.score.accuracy || 0)}</span>
+          <span>{!model.target.length ? 'null' : formatNumber(model.accuracyData[formatNumber(model.rate)] || 0)}</span>
         </div>}
         <div className={`${classes.ccell}`}>
           <span>{model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''}</span>
@@ -352,18 +362,22 @@ const OutlierRow = observer((props) => {
         <div className={`${classes.ccell} ${classes.compute}`}>
           <span onClick={() => toggleImpact('process')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
         </div>
+        <div className={`${classes.ccell} ${classes.compute}`}>
+          <span onClick={() => toggleImpact('display')}><img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}</span>
+        </div>
       </div>
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
+    {visible && type === 'process' && <MPF project={project} model={model} />}
+    <DisplayOutlier getOutlierData={model.getOutlierData} rate={formatNumber(model.rate, 2)} visiable={visible && type === 'display'} header={model.featureLabel.filter(h => !project.newVariable.includes(h))} mapHeader={mapHeader} colType={project.colType} />
     {/* </div> */}
   </div>
 })
 
 const ClusteringTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, measurement } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, measurement, stopIds } = project
   const hasTarget = models.some(m => !!m.target.length)
   const measurementLabel = (measurement === 'CH' && 'CH Index') || (measurement === 'silhouette_euclidean' && EN.SihouetteScore) || 'CVNN'
   const measurementHint = (measurement === 'CH' && EN.CHIndexHint) || (measurement === 'silhouette_euclidean' && EN.SihouetteScoreHint) || EN.CVNNHint
@@ -438,10 +452,12 @@ const ClusteringTable = observer((props) => {
           <span>{sort.key === 'cluster' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>
         {!!hasTarget && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('adjinfo')}>
+          <span style={{ overflow: 'visible' }}><Hint content={EN.adjustMutualInfoHint} /></span>
           <Tooltip title={EN.adjustMutualInfo} >{EN.adjustMutualInfo} </Tooltip>
           <span>{sort.key === 'adjinfo' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>}
         {!!hasTarget && <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('adjScore')}>
+          <span style={{ overflow: 'visible' }}><Hint content={EN.adjustRandScoreHint} /></span>
           <Tooltip title={EN.adjustRandScore} >{EN.adjustRandScore} </Tooltip>
           <span>{sort.key === 'adjScore' ? <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} /> : <Icon type='minus' />}</span>
         </div>}
@@ -472,11 +488,13 @@ const ClusteringTable = observer((props) => {
           mapHeader={mapHeader}
           hasTarget={hasTarget} />
       })}
-      {!train2Finished && Object.values(trainModel).map((tm, k) => {
+      {!train2Finished && stopIds.map((stopId, k) => {
+        const trainingModel = trainModel[stopId]
+        if (!trainingModel) return null
         return <div className={classes.rowData} key={k}>
           <div className={classes.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-          <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
-          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, tm.requestId) : null}>
+          <ProgressBar progress={(trainingModel.value || 0)} />
+          <div className={classes.abortButton} onClick={!isAbort ? abortTrain.bind(null, trainingModel.requestId) : null}>
             {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
           </div>
         </div>
@@ -568,7 +586,7 @@ const ClusteringRow = observer((props) => {
     </Tooltip>
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
-    {visible && type === 'process' && <ModelProcessFlow project={project} model={model} />}
+    {visible && type === 'process' && <MPF project={project} model={model} />}
     {visible && type === 'explanation' && <Explanation model={model} mapHeader={mapHeader} />}
     {/* </div> */}
   </div>

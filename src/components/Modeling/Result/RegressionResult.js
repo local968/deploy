@@ -28,7 +28,7 @@ export default class RegressionView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target, newVariable,selectModel } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, isAbort, recommendModel, mapHeader, target, newVariable, selectModel, stopIds } = project;
     if (!current) return null
     const currentPerformance = current ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) || EN.NotAcceptable : '';
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
@@ -52,11 +52,11 @@ export default class RegressionView extends Component {
           <Performance current={current} />
         </div>
         <PVA
-            key='pva'
-            x_name = {EN.PointNumber}
-            y_name = {isEN?`${EN.Groupaverage} ${mapHeader[target]}`:`${mapHeader[target]} ${EN.Groupaverage}`}
-            model={selectModel}
-            project={project}
+          key='pva'
+          x_name={EN.PointNumber}
+          y_name={isEN ? `${EN.Groupaverage} ${mapHeader[target]}` : `${mapHeader[target]} ${EN.Groupaverage}`}
+          model={selectModel}
+          project={project}
         />
       </div>
       <div className={styles.line} />
@@ -83,6 +83,7 @@ export default class RegressionView extends Component {
         sort={sort}
         handleSort={handleSort}
         mapHeader={newMapHeader}
+        stopIds={stopIds}
       />
     </div>
   }
@@ -167,7 +168,7 @@ class ModelTable extends Component {
 
   render() {
     // const { sortKey, sort } = this
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, exportReport, sort, handleSort, mapHeader,project } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, exportReport, sort, handleSort, mapHeader, project, stopIds } = this.props;
     return (
       <div className={styles.table}>
         <div className={styles.rowHeader}>
@@ -181,7 +182,7 @@ class ModelTable extends Component {
               onClick={handleSort.bind(null, 'name')}
             >
               <span>{EN.ModelName}
-              {sort.key !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'name' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'rmse')}>
@@ -197,19 +198,19 @@ class ModelTable extends Component {
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'speed')}>
               <span>{EN.ExecutionSpeed}
-              {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'speed' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)} onClick={handleSort.bind(null, 'time')}>
               <span>{EN.Time}
-              {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
+                {sort.key !== 'time' ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>{EN.VariableImpact}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
-             <span>{EN.ModelProcessFlow}</span>
+              <span>{EN.ModelProcessFlow}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>{EN.Report}</span>
@@ -231,11 +232,13 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && Object.values(trainModel).map((tm, k) => {
+          {!train2Finished && stopIds.map((stopId, k) => {
+            const trainingModel = trainModel[stopId]
+            if (!trainingModel) return null
             return <div className={styles.rowData} key={k}>
               <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-              <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true}/>
-              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, tm.requestId) : null}>
+              <ProgressBar progress={(trainingModel.value || 0)} />
+              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, trainingModel.requestId) : null}>
                 {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
               </div>
             </div>
@@ -265,7 +268,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isRecommend, exportReport, isSelect, mapHeader,project } = this.props;
+    const { model, onSelect, isRecommend, exportReport, isSelect, mapHeader, project } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip

@@ -3,10 +3,9 @@ import styles from "./styles.module.css";
 import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
-import { NumberInput, Hint } from "components/Common";
+import { NumberInput, Hint, Range } from "components/Common";
 import { Select, message, Tooltip, Popover, Icon } from "antd";
 import Algorithms from "./algorithms";
-import moment from "moment";
 import InputNumber from "antd/es/input-number";
 import EN from '../../../constant/en';
 import Button from "@material-ui/core/Button";
@@ -17,17 +16,14 @@ import {
 
 @observer
 export default class AdvancedView extends Component {
-  constructor(props) {
-    super(props);
+  handleName = e => {
+    const { setSettingName } = this.props;
+    setSettingName(e.target.value)
   }
-  handleName = action(e => {
-    const { project } = this.props;
-    project.settings.find(s => s.id === project.settingId).name =
-      e.target.value || `custom.${moment().format("MM.DD.YYYY_HH:mm:ss")}`;
-  });
 
   handleMaxTime = value => {
     this.props.project.searchTime = value
+    this.props.setSetting({ searchTime: value })
     // const { project } = this.props;
     // project.setProperty({
     //   searchTime: value
@@ -36,6 +32,7 @@ export default class AdvancedView extends Component {
 
   handleRandSeed = value => {
     this.props.project.randSeed = value
+    this.props.setSetting({ randSeed: value })
     // const { project } = this.props;
     // project.setProperty({
     //   randSeed: value
@@ -44,6 +41,7 @@ export default class AdvancedView extends Component {
 
   handleMeasurement = value => {
     this.props.project.measurement = value
+    this.props.setSetting({ measurement: value })
     // const { project } = this.props;
     // project.setProperty({
     //   measurement: value
@@ -62,6 +60,7 @@ export default class AdvancedView extends Component {
     }
     this.props.project.algorithmRadio = value
     this.props.project.algorithms = algorithms
+    this.props.setSetting({ algorithms })
     // project.setProperty({
     //   algorithms
     // });
@@ -80,6 +79,7 @@ export default class AdvancedView extends Component {
       _algorithms = algorithms.filter(v => v !== key);
     }
     this.props.project.algorithms = _algorithms
+    this.props.setSetting({ algorithms: _algorithms })
     // project.setProperty({
     //   algorithms: _algorithms
     // });
@@ -92,38 +92,32 @@ export default class AdvancedView extends Component {
   //   // });
   // };
 
-  changeSetting = e => {
-    const { project } = this.props;
-    if (e.target.value === "default") return this.resetSetting();
-    const selectedSetting = project.settings.find(s => s.id === e.target.value);
+  changeSetting = action((e) => {
+    const { project, setSetting } = this.props
+    const selectedSetting = project.settings.find(s => s.id === e.target.value)
     if (selectedSetting) {
-      project.settingId = e.target.value;
       Object.entries(selectedSetting.setting).forEach(([key, value]) => {
-        project[key] = value;
-      });
+        project[key] = value
+      })
+      setSetting(selectedSetting.setting)
     } else {
-      project.settingId = "default";
+      setSetting(this.resetSetting(project))
     }
-  };
+  })
 
-  resetSetting = () => {
-    const { project } = this.props;
-    const defaultSetting = {
-      kType: "auto",
-      algorithms: project.defaultAlgorithms,
-      standardType: "standard",
-      searchTime: 5,
-      measurement: "CVNN",
-      randomSeed: 0
-    };
-    Object.entries(defaultSetting).forEach(([key, value]) => {
-      project[key] = value;
-    });
-    message.info(EN.YourAdvancedModeling);
-  };
+  resetSetting = action((project) => {
+    const setting = this.props.project.newSetting()
+    Object.entries(setting).forEach(([key, value]) => {
+      project[key] = value
+    })
+    message.destroy();
+    message.info(EN.YourAdvancedModeling)
+    return setting
+  })
 
   handleNum = value => {
     this.props.project.kValue = value
+    this.props.setSetting({ kValue: value })
     // const { project } = this.props;
     // project.setProperty({
     //   kValue: value
@@ -132,6 +126,7 @@ export default class AdvancedView extends Component {
 
   handleMode = type => () => {
     this.props.project.kType = type
+    this.props.setSetting({ kType: type })
     // const { project } = this.props;
     // project.setProperty({
     //   kType: type
@@ -140,6 +135,7 @@ export default class AdvancedView extends Component {
 
   handleType = (e) => {
     this.props.project.kType = e.target.value
+    this.props.setSetting({ kType: e.target.value })
     // const { project } = this.props
     // const value = e.target.value;
     // project.setProperty({
@@ -147,11 +143,26 @@ export default class AdvancedView extends Component {
     // })
   }
 
+  handleSpeed = value => {
+    this.props.project.speedVSaccuracy = value
+    this.props.setSetting({ speedVSaccuracy: value })
+  }
+
+  changeSpeed = (isSpeed, value) => {
+    if (!isSpeed) value = 10 - value
+    if (value < 1 || value > 9) return
+    this.props.project.speedVSaccuracy = value
+    this.props.setSetting({ speedVSaccuracy: value })
+  }
+
+  resetSpeed = () => {
+    this.props.project.speedVSaccuracy = 5
+    this.props.setSetting({ speedVSaccuracy: 5 })
+  }
+
   render() {
-    const { project, hidden } = this.props;
-    const { algorithms, defaultAlgorithms, settingId, settings = [], problemType, settingName, showSsPlot, algorithmRadio } = project;
-    // const isAll = Algorithms[problemType].length === algorithms.length;
-    // const isDefault = algorithms.every(al => defaultAlgorithms.includes(al)) && defaultAlgorithms.every(al => algorithms.includes(al));
+    const { project, hidden, setting } = this.props;
+    const { settings, problemType, showSsPlot, algorithmRadio, speedVSaccuracy } = project;
     const measurementList =
       problemType === "Outlier"
         ? [{ value: "score", label: EN.Accuracy, hint: EN.ScoreHint }]
@@ -169,13 +180,16 @@ export default class AdvancedView extends Component {
                 <span>{EN.SelectFromPreviousSettings}:</span>
               </div>
               <div className={styles.advancedOption}>
-                <select value={settingId} onChange={this.changeSetting}>
+                <select value={setting.id} onChange={this.changeSetting}>
                   <option value={"default"}>{EN.Default}</option>
                   {settings.map(setting => (
                     <option key={setting.id} value={setting.id}>
                       {setting.name}
                     </option>
                   ))}
+                  <option key={setting.id} value={setting.id}>
+                    {setting.name}
+                  </option>
                 </select>
               </div>
             </div>
@@ -188,7 +202,7 @@ export default class AdvancedView extends Component {
               <div className={styles.advancedOption}>
                 <input
                   type="text"
-                  value={settingName}
+                  value={setting.name}
                   onChange={this.handleName}
                 />
               </div>
@@ -247,7 +261,7 @@ export default class AdvancedView extends Component {
                     <label htmlFor="number_custom">{EN.NoMoreThan}</label>
                     <InputNumber
                       value={project.kValue}
-                      max={10}
+                      max={15}
                       min={2}
                       step={1}
                       onChange={this.handleNum}
@@ -364,26 +378,42 @@ export default class AdvancedView extends Component {
           </div>
         </div>}
         <div className={styles.advancedRow}>
-          <div className={styles.advancedBlock}>
-            <div className={`${styles.advancedTitle} ${styles.otherLabel}`}>
-              <span>{EN.SetMaxTrainingTime}:</span>
-              <span className={styles.advancedDesc}>
-                {EN.Maxamountoftimetoevaluatedifferentmodules}
-              </span>
-            </div>
-            <div className={styles.advancedOption}>
-              <NumberInput
-                className={styles.advancedSize}
-                value={project.searchTime}
-                onBlur={this.handleMaxTime}
-                min={5}
-                isInt={true}
-              />
-              <span style={{ paddingLeft: 10 }}>
-                {EN.Minutes}
-                {/*<br />*/}
-                ({EN.minutesorlonger})
-              </span>
+          <div className={styles.advancedSpeed}>
+            <div className={styles.advancedBox}>
+              <div className={styles.advancedTitle}>
+                <span>{EN.SpeedVSPerformance}:<a className={styles.reset} onClick={this.resetSpeed}>{EN.Reset}</a></span>
+              </div>
+              <div className={styles.advancedPercentBlock}>
+                <div className={styles.advancedPercent}>
+                  <div className={styles.advancedPercentCross} style={{ width: ((speedVSaccuracy - 1) / 8 * 100) + '%' }}></div>
+                  <div className={styles.advancedPercentHoldout} style={{ width: ((9 - speedVSaccuracy) / 8 * 100) + '%' }}></div>
+                </div>
+                <Range
+                  range={false}
+                  step={1}
+                  min={1}
+                  max={9}
+                  onChange={this.handleSpeed}
+                  value={speedVSaccuracy}
+                  tooltipVisible={false}
+                />
+              </div>
+              <div className={styles.advancedPercentBox}>
+                <div className={styles.advancedPercentInput}>
+                  <div className={styles.advancedPercentText}>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentCross)}></div>
+                    <span>{EN.Speed}</span>
+                  </div>
+                  <NumberInput value={speedVSaccuracy} onBlur={this.changeSpeed.bind(null, true)} min={1} max={9} isInt={true} />
+                </div>
+                <div className={styles.advancedPercentInput}>
+                  <div className={styles.advancedPercentText}>
+                    <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
+                    <span>{EN.sPerformance}</span>
+                  </div>
+                  <NumberInput value={10 - speedVSaccuracy} onBlur={this.changeSpeed.bind(null, false)} min={1} max={9} isInt={true} />
+                </div>
+              </div>
             </div>
           </div>
           {project.problemType === "Outlier" && <div className={styles.advancedBlock} style={{ marginLeft: "30px" }}>
@@ -406,7 +436,7 @@ export default class AdvancedView extends Component {
           </div>}
         </div>
         {project.problemType === "Outlier" && <div className={styles.empty}></div>}
-      </div>
+      </div >
     );
   }
 }

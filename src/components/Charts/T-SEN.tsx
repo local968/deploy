@@ -1,20 +1,44 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import config from 'config'
+import _ from 'lodash';
 import EN from '../../constant/en';
 const {isEN} = config;
+
+const color = [
+	"#80bdfd",
+	"#b0e39b",
+	"#fec571",
+	"#5bdcef",
+	"#ff9595",
+	"#a89fec",
+	"#52b4ee",
+	"#ddf07a",
+	"#ed85a5",
+	"#828de5",
+	"#afe39b",
+	"#fc8b89",
+	"#ffe169",
+	"#82ddc1",
+	"#ffb287",
+	"#de80b9"
+];
 
 interface DataSampleProps {
 	x_name : string
 	y_name : string
-	width : number
-	height :number
+	width?: number
+	height?:number
 	data : any
-	title : string
+	title?: string
+	average?:boolean
 }
 
-export default class TSEN extends PureComponent<DataSampleProps>{
+export default class T_SEN extends PureComponent<DataSampleProps>{
 	private chart: any;
+	state:{
+		loading:boolean
+	};
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
@@ -32,8 +56,8 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 	}
 
 	getOption() {
-		const {x_name,y_name,data=[],title=''} = this.props as any;
-		const {loading} = this.state as any;
+		const {x_name,y_name,data=[],title='',average} = this.props;
+		const {loading} = this.state;
 
 		if(data.length&&!loading){
 			const chart = this.chart.getEchartsInstance();
@@ -45,21 +69,60 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 			}
 		}
 
-		const series = data.sort((a,b)=>a.name - b.name).map(itm=>{
+		const series = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
+			if(!color[ind]){
+				color.push('#'+Math.random().toString(16).substring(2,8))
+			}
 			return {
 				name:itm.name,
 				data:itm.value,
 				type:'scatter',
 				symbolSize:5,
+				itemStyle:{
+					color:color[ind]
+				},
 			}
 		});
+
+		if(average){
+			series.push({
+				name:EN._Average,
+				type: 'scatter',
+				symbol:'triangle',
+				itemStyle:{
+					borderWidth:1,
+					borderColor:'#000',
+					color:'#1c2b3b'
+				},
+			});
+			series.forEach((itm,ind)=>{
+				const mean = _.unzip(itm.data).map(itm=>_.mean(itm));
+				series.push({
+					name:EN._Average,
+					symbolSize:8,
+					type: 'scatter',
+					data:[mean],
+					symbol:'triangle',
+					emphasis:{
+						label:{
+							show:false
+						}
+					},
+					itemStyle:{
+						borderWidth:1,
+						borderColor:'#000',
+						color:color[ind]
+					},
+				})
+			});
+		}
+
 		return {
 			title: {
 				text: title,
 				textStyle:{
 					fontSize:isEN?11:15,
 				},
-				// padding:[5,5,5,40],
 				left:40,
 			},
 			grid: {
@@ -74,14 +137,19 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 			tooltip: {
 				showDelay: 0,
 				formatter: function (params) {
+					let {seriesName,value,name,color,marker} = params;
+					if(seriesName === EN._Average){
+						const list= series.filter(itm=>itm.itemStyle.color === color);
+						seriesName = list[0].name + EN._NewAverage
+					}
 					if (params.value.length > 1) {
-						return params.seriesName + '<br/>'
+						return marker+seriesName + '<br/>'
 							+ x_name +':'+ params.value[0].toFixed(3) + '<br/>'
 							+ y_name +':'+ params.value[1].toFixed(3);
 					} else {
-						return params.seriesName + ' :<br/>'
-							+ params.name + ' : '
-							+ params.value;
+						return marker+seriesName + ' :<br/>'
+							+ name + ' : '
+							+ value;
 					}
 				},
 				axisPointer:{
@@ -93,7 +161,7 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 					},
 					label:{
 						precision:3
-					}
+					},
 				}
 			},
 			legend: {
@@ -120,6 +188,9 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 					},
 					nameLocation:'end',
 					nameGap:25,
+					axisPointer:{
+						snap:true
+					}
 				}
 			],
 			yAxis: [
@@ -138,6 +209,9 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 					},
 					nameLocation:'end',
 					nameGap:23,
+					axisPointer:{
+						snap:true
+					}
 				}
 			],
 			series,
@@ -158,7 +232,7 @@ export default class TSEN extends PureComponent<DataSampleProps>{
 	}
 
 	render(){
-		const {width=550,height=400} = this.props as any;
+		const {width=550,height=400} = this.props;
 		return <ReactEcharts
 			option={this.getOption()}
 			ref = {chart=>this.chart=chart}

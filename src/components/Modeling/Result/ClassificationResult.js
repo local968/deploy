@@ -5,14 +5,13 @@ import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
 import moment from 'moment';
-import { Hint, NumberInput, ProgressBar, HeaderInfo } from 'components/Common';
+import { Hint, NumberInput, ProgressBar } from 'components/Common';
 import VariableImpact from "./VariableImpact"
-import ModelProcessFlow from "./ModelProcessFlow"
 import Variable from './Variable.svg'
 import Process from './Process.svg'
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
-import ModelProcessFlow2 from "./ModelProcessFlow2";
+import MPF from './MPF';
 const AccuracyHint = EN.Givenaparticularpopulation
 
 @observer
@@ -121,7 +120,7 @@ export default class ClassificationView extends Component {
 
   render() {
     const { models, project = {}, exportReport, sort, handleSort } = this.props;
-    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader, newVariable } = project;
+    const { train2Finished, trainModel, abortTrain, selectModel: current, recommendModel, criteria, costOption: { TP, FN, FP, TN }, targetColMap, targetArrayTemp, renameVariable, isAbort, distribution, mapHeader, newVariable, stopIds } = project;
     if (!current) return null;
     const { selectModel = {}, targetCounts = {} } = project;
 
@@ -187,10 +186,16 @@ export default class ClassificationView extends Component {
               <label>{EN.Input}</label>
               <dl>
                 <dt>
-                  <span>{EN.Basedonyourbizscenario}</span>
-                  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>
-                  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>
+                  <span>{EN.Basedonyourbizscenario}
+                    <b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}
+                    <b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}
+                  </span>
                 </dt>
+                {/*<dt>*/}
+                {/*  <span>{EN.Basedonyourbizscenario}</span>*/}
+                {/*  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>*/}
+                {/*  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>*/}
+                {/*</dt>*/}
               </dl>
               <dl style={{ margin: '0.1em 0' }}>
                 <dt>
@@ -346,6 +351,7 @@ export default class ClassificationView extends Component {
         sort={sort}
         handleSort={handleSort}
         mapHeader={newMapHeader}
+        stopIds={stopIds}
       />
     </div>
   }
@@ -363,6 +369,7 @@ class Predicted extends Component {
             width={3.5}
             label={no}
             type={'success'}
+            failType={'fail'}
           />
         </div>
         <div className={styles.progressBlock}>
@@ -371,6 +378,7 @@ class Predicted extends Component {
             width={3.5}
             label={yes}
             type={'predicted'}
+            failType={'failPredicted'}
           />
         </div>
         <div className={styles.progressMeans}>
@@ -382,10 +390,24 @@ class Predicted extends Component {
             <div className={classnames(styles.progressSquare, styles.predicted)} />
             <div className={styles.progressMeanText} title={`${EN.Actual}: ${yes} ${EN.Predicted}: ${yes}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {yes}</span></div>
           </div>
+
           <div className={styles.progressMean}>
-            <div className={classnames(styles.progressSquare, styles.different)} />
-            <div className={styles.progressMeanText} title={`${EN.Actual} & ${EN.Predicted} ${EN.Different}`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>
+            <div className={classnames(styles.progressSquare, styles.fail)} />
+            <div className={styles.progressMeanText} title={`${EN.Actual}: ${no} ${EN.Predicted}: ${yes}`}><span>{EN.Actual}: {no}</span><span>{EN.Predicted}: {yes}</span></div>
           </div>
+
+
+          <div className={styles.progressMean}>
+            <div className={classnames(styles.progressSquare, styles.failPredicted)} />
+            <div className={styles.progressMeanText} title={`${EN.Actual}: ${yes} ${EN.Predicted}: ${no}`}><span>{EN.Actual}: {yes}</span><span>{EN.Predicted}: {no}</span></div>
+          </div>
+
+
+
+          {/*<div className={styles.progressMean}>*/}
+          {/*  <div className={classnames(styles.progressSquare, styles.different)} />*/}
+          {/*  <div className={styles.progressMeanText} title={`${EN.Actual} & ${EN.Predicted} ${EN.Different}`}><span>{EN.Actual} &</span><span>{EN.Predicted}</span><span>{EN.Different}</span></div>*/}
+          {/*</div>*/}
         </div>
       </div>
     );
@@ -395,7 +417,7 @@ class Predicted extends Component {
 @observer
 class PredictedProgress extends Component {
   render() {
-    const { predicted, width, label, type, height } = this.props;
+    const { predicted, width, label, type, failType, height } = this.props;
     const title = label === undefined ? (
       ''
     ) : (
@@ -406,6 +428,7 @@ class PredictedProgress extends Component {
     const predictedPercent = Math.round(predicted * 100);
     const failedPercent = 100 - predictedPercent
     const isSmaller = (!!predictedPercent && predictedPercent < 10) || (!!failedPercent && failedPercent < 10)
+
     return (
       <div className={styles.progressLine}>
         {title}
@@ -422,7 +445,7 @@ class PredictedProgress extends Component {
           <span>{predictedPercent + '%'}</span>
         </div>}
         {!!failedPercent && <div
-          className={classnames(styles.progress, styles.different, {
+          className={classnames(styles.progress, styles[failType], {
             [styles.progressLarge]: !predictedPercent,
             [styles.progressSmall]: isSmaller
           })}
@@ -507,7 +530,7 @@ class ModelTable extends Component {
   }
 
   render() {
-    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort, mapHeader,project } = this.props;
+    const { onSelect, train2Finished, current, trainModel, isAbort, recommendId, text, exportReport, sort, handleSort, mapHeader, project, stopIds } = this.props;
     // const { sortKey, sort } = this
     return (
       <div className={styles.table}>
@@ -576,11 +599,13 @@ class ModelTable extends Component {
               />
             );
           })}
-          {!train2Finished && Object.values(trainModel).map((tm, k) => {
+          {!train2Finished && stopIds.map((stopId, k) => {
+            const trainingModel = trainModel[stopId]
+            if (!trainingModel) return null
             return <div className={styles.rowData} key={k}>
               <div className={styles.trainingModel}><Tooltip title={EN.TrainingNewModel}>{EN.TrainingNewModel}</Tooltip></div>
-              <ProgressBar progress={((tm || {}).value || 0)} allowRollBack={true} />
-              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, tm.requestId) : null}>
+              <ProgressBar progress={(trainingModel.value || 0)} />
+              <div className={styles.abortButton} onClick={!isAbort ? this.abortTrain.bind(null, trainingModel.requestId) : null}>
                 {isAbort ? <Icon type='loading' /> : <span>{EN.AbortTraining}</span>}
               </div>
             </div>
@@ -610,8 +635,7 @@ class ModelDetail extends Component {
   }
 
   render() {
-    const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader,project } = this.props;
-    console.log(11,project)
+    const { model, onSelect, isSelect, isRecommend, text, exportReport, mapHeader, project } = this.props;
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -640,6 +664,7 @@ class ModelDetail extends Component {
                 width={1.5}
                 height={0.2}
                 type={'success'}
+                failType={'fail'}
               />
               <div className={styles.space} />
               <PredictedProgress
@@ -647,6 +672,7 @@ class ModelDetail extends Component {
                 width={1.5}
                 height={0.2}
                 type={'predicted'}
+                failType={'failPredicted'}
               />
             </div>
             <div className={styles.cell}>
@@ -679,9 +705,8 @@ class ModelDetail extends Component {
           </div>
         </Tooltip>
         {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
-        {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader}/>}
-        {this.visible && this.type === 'process' && !model.id.includes('Logistic') && <ModelProcessFlow project={project} model={model} />}
-        {this.visible && this.type === 'process' && model.id.includes('Logistic') && <ModelProcessFlow2 project={project} model={model} />}
+        {this.visible && this.type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
+        {this.visible && this.type === 'process' && <MPF modelId={model.id} project={project} model={model} />}
       </div >
     );
   }

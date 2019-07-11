@@ -87,7 +87,7 @@ export default class Operation extends Component {
                     <a
                       className={styles.results}
                       target="_blank"
-                      href={`http://${config.host}:${config.port}/upload/download/${s.schedule.id}?filename=${typeof cddo.file === 'string' ? cddo.file : cddo.sourceOptions.databaseType}-${moment
+                      href={`/upload/download/${s.schedule.id}?filename=${typeof cddo.file === 'string' ? cddo.file : cddo.sourceOptions.databaseType}-${moment
                         .unix(
                           s.schedule.actualTime || s.schedule.estimatedTime
                         )

@@ -1,4 +1,4 @@
-import { observable, action, when, computed, autorun } from "mobx";
+import { observable, action, when, computed } from "mobx";
 import socketStore from "./SocketStore";
 import Project from "./Project";
 import Model from './Model'
@@ -18,7 +18,8 @@ export interface WatchResult {
   id: string,
   result: Partial<Project>,
   model: Model,
-  modelResult: Partial<Model>
+  modelResult: Partial<Model>,
+  isCreate?: boolean
 }
 
 class ProjectStore {
@@ -28,6 +29,7 @@ class ProjectStore {
   @observable watchList: boolean = false;
   @observable currentId: string = "";
   @observable projectInit: boolean = false
+  @observable initList: boolean = false
 
   @observable list: Project[] = [];
   @observable total: number = 0;
@@ -75,13 +77,13 @@ class ProjectStore {
     }
     this.initWatch()
     this.initReload()
-    autorun(() => {
-      if (this.project) {
-        this.project.clean();
-        this.queryProjectList();
-        this.project.initProject()
-      }
-    })
+    // autorun(() => {
+    //   if (this.project) {
+    //     this.project.clean();
+    //     this.queryProjectList();
+    //     this.project.initProject()
+    //   }
+    // })
   }
 
   initReload = () => {
@@ -107,6 +109,7 @@ class ProjectStore {
   offline = () => {
     this.watchList = false;
     this.init = false
+    this.initList = false
     this.isOnline = false
     this.projectInit = false
     if (this.project) this.project.clean();
@@ -152,14 +155,15 @@ class ProjectStore {
           this.watchList = true
           this.init = true
           api.on(watch.id, (data: WatchResult) => {
-            const { status, id, result, model, modelResult } = data
+            const { status, id, result, model, modelResult, isCreate } = data
             if (status === 200) {
               const project = this.list.find(p => p.id === id)
               if (!project) {
                 if (!result) return
-                if (!result.host) return
+                if (!isCreate) return
                 this.queryProjectList()
               } else {
+                if (id !== this.currentId) return
                 if (result) project.setProperty(result)
                 if (model) project.setModel(model)
                 if (modelResult) project.setModelField(modelResult)
@@ -199,8 +203,10 @@ class ProjectStore {
           newList.push(current)
         }
         this.list = [...newList]
+        // this.list = list.map(row => new Project(row.id + "", row))
         this.total = count
         this.loading = false;
+        this.initList = true
       })
     })
   }
@@ -250,9 +256,8 @@ class ProjectStore {
     this.projectInit = true
     return new Promise(resolve => {
       when(
-        () => this.watchList,
+        () => this.initList,
         () => {
-          if (this.currentId === id) return resolve(true)
           if (this.list.length) {
             const project = this.list.find(row => {
               return row.id === id
@@ -273,7 +278,14 @@ class ProjectStore {
                 antdMessage.error(message)
                 return resolve(false)
               }
-              const hiddenProject = new Project(id + '', { ...data, visiable: false })
+              const hiddenProject = new Project(id + '', {
+                id: data.id,
+                fileName: data.fileName,
+                createTime: data.createTime,
+                updateTime: data.updateTime,
+                name: data.name,
+                visiable: false
+              })
               this.list.push(hiddenProject)
               hiddenProject.initProject()
               hiddenProject.initModels()

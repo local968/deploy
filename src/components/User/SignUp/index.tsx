@@ -7,13 +7,18 @@ import { observable, action } from 'mobx';
 
 import EN from '../../../constant/en';
 
+interface Interface {
+  userStore:any
+  history:any
+}
+
 @inject('userStore')
 @observer
-export default class SignUp extends Component {
+export default class SignUp extends Component<Interface> {
   @observable email = '';
   @observable password = '';
   @observable confirmPassword = '';
-  @observable level = 1;
+  @observable plan_id = '';
   @observable warning = {
     email: '',
     password: '',
@@ -34,12 +39,12 @@ export default class SignUp extends Component {
     this.confirmPassword = target.value
   });
 
-  onChangeLevel = action(({target}) => {
-    this.level = target.value
-  });
-
+  componentWillMount() {
+    const {userStore} = this.props;
+    userStore.getPlanList()
+  };
   register = () => {
-    const { email, password, confirmPassword, warning, level } = this;
+    const { email, password, confirmPassword, warning, plan_id } = this;
     if (!email) {
       warning.email = EN.Enteryouremail;
     } else if (!new RegExp(/^[a-zA-Z0-9_-]+(\.([a-zA-Z0-9_-])+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/).test(email)) {
@@ -64,23 +69,26 @@ export default class SignUp extends Component {
       this.warning = warning;
       return
     }
+    const {userStore} = this.props;
 
-    const {userStore} = this.props as any;
-
-    userStore.register({ email, password, level })
+    userStore.register({ email, password, plan_id })
   };
 
   login = () => {
-    const {history} = this.props as any;
+    const {history} = this.props;
     history.push("/")
   };
 
   show = action(() => (this.showLicense = true));
   hide = action(() => (this.showLicense = false));
 
+  onChangePlan({target}){
+    this.plan_id = target.value;
+  }
+
   render() {
-    // @ts-ignore
-    return (this.showLicense ? <License back={this.hide} /> :
+    const {userStore} = this.props;
+    return (this.showLicense ? <License back={this.hide}  history={null} userStore={null}/> :
       <div className={styles.signup}>
         <div className={styles.title}><span>{EN.SignUp}</span></div>
         <div className={styles.row}>
@@ -97,12 +105,12 @@ export default class SignUp extends Component {
         </div>
         <div className={styles.row}>
           <div className={styles.warning}>{this.warning.level && <span><img src={warnIcon} alt='warning' />{this.warning.level}</span>}</div>
-          <select value={this.level} onChange={this.onChangeLevel.bind(this)}>
-            <option value='0'>{EN.Unavailable}</option>
-            <option value='1'>{EN.FreeTrial}</option>
-            <option value='2'>{EN.Basic}</option>
-            <option value='3'>{EN.Essential}</option>
-            <option value='4'>{EN.Enterprise}</option>
+          <select value={this.plan_id} onChange={this.onChangePlan.bind(this)}>
+              {
+                  userStore.planList.map(itm=><option
+                      key={itm.id}
+                      value={itm.id}>{EN[itm.name]}</option>)
+              }
           </select>
         </div>
         <div className={styles.text}><span>{EN.ByclickingSign}&nbsp;<span className={styles.bold} onClick={this.show}>{EN.EndUserLicense}</span></span></div>
@@ -116,8 +124,12 @@ export default class SignUp extends Component {
   }
 }
 
+
+interface Interface {
+  back:any
+}
 @observer
-class License extends Component {
+class License extends Component<Interface> {
   @observable language = 'EN';
 
   onChange = action(({target}) => this.language = target.checked ? 'CN' : 'EN');
@@ -281,7 +293,7 @@ class License extends Component {
   };
 
   render() {
-    const {back} = this.props as any;
+    const {back} = this.props;
     return <div className={styles.license}>
       <div className={styles.back} onClick={back}><Icon className={styles.icon} type="arrow-left" /></div>
       <div className={styles.checkbox}><Checkbox onChange={this.onChange.bind(this)} >查看中文</Checkbox></div>

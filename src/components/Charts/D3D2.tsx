@@ -10,6 +10,7 @@ import {inject} from "mobx-react";
 
 interface DataSampleProps {
 	url:string
+	projectStore:any
 }
 
 @inject('projectStore')
@@ -37,7 +38,6 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		}
 	}
 
-	//@ts-ignore
 	async componentDidMount(url=this.props.url) {
 		const result = await request.post({
 			url: '/graphics/residual-plot-diagnosis',
@@ -66,14 +66,13 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 	selection(order){
 		const {result,show_name} = this.state as any;
 		const {featuresLabel} = result;
-		const {projectStore} = this.props as any;
 
-		const {mapHeader} = projectStore.project;
+		const {mapHeader} = this.props.projectStore.project;
 
 		const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
-		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} value={itm}>
-			<Tooltip title={mapHeader[itm]}>{mapHeader[itm]}</Tooltip>
+		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} title={mapHeader[itm]} value={itm}>
+			{mapHeader[itm]}
 		</Option>);
 		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
 		return <Select
@@ -97,9 +96,7 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 	chart(){
 		const {x_name,y_name,z_name,result} = this.state as any;
 		const { featuresLabel, featureData, labels } = result;
-		const {projectStore} = this.props as any;
-		const {mapHeader} = projectStore.project;
-
+		const {mapHeader} = this.props.projectStore.project;
 
 		const data = [...new Set(labels)].map(itm => {
 			return {
@@ -124,11 +121,12 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 				data={data}
 			/>
 		}
-		//@ts-ignore
 		return <TSEN
 			x_name={mapHeader[names[0]]}
 			y_name={mapHeader[names[1]]}
-			data={data}/>
+			data={data}
+			average={true}
+		/>
 	}
 
 	save(){

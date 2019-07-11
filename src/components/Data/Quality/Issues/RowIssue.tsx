@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import styles from '../styles.module.css';
 import { observer } from 'mobx-react';
 import EN from '../../../../constant/en';
+import {Show} from 'components/Common';
 
 interface RowIssueProps {
   backToConnect: () => void,
@@ -18,16 +19,22 @@ export class RowIssue extends Component<RowIssueProps> {
         <div className={styles.info}>
           <div className={styles.progressBox}>
             <div className={styles.progressText}><span>{EN.AllDatatotalRawLinesrows} ({totalRawLines} {EN.Rows})</span><span>{EN.Rowsminimum}</span></div>
-            <div className={styles.progress} style={{ width: totalRawLines / 10 + "%" }}></div>
+            <div className={styles.progress} style={{ width: totalRawLines / 10 + '%' }}/>
           </div>
         </div>
         <div className={styles.methods}>
           <div className={styles.methodBox}>
             <div className={styles.method}>
               <div className={styles.reason}><span>{EN.Datasize} > {EN.Rowsisrecommended}</span></div>
-              <div className={styles.button} onClick={backToConnect}>
-                <button><span>{EN.LoadaNewDataset}</span></button>
-              </div>
+              <Show
+                name = 'quality_LoadaNewDataset'
+              >
+                <div
+                  className={styles.button}
+                  onClick={backToConnect}>
+                  <button><span>{EN.LoadaNewDataset}</span></button>
+                </div>
+              </Show>
             </div>
           </div>
         </div>

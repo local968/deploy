@@ -23,13 +23,13 @@ import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
 import randomlyImg from './img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
-import { computed} from 'mobx';
+import { computed } from 'mobx';
 import moment from 'moment';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import request from '../../Request'
-const {TabPane} = Tabs;
-const {Option} = Select;
+const { TabPane } = Tabs;
+const { Option } = Select;
 
 import {
   FitPlot,
@@ -40,6 +40,7 @@ import {
 } from "../../Charts"
 import DetailCurves from './DetailCurves';
 import Thumbnail from './Thumbnail';
+import MetricBased from '../Result/Classification/MetricBased'
 
 @inject('projectStore')
 @observer
@@ -73,11 +74,11 @@ export default class AdvancedView extends Component {
 
   @computed
   get filtedModels() {
-    const { models, project, projectStore, sort, metric,currentSettingId } = this.props;
+    const { models, project, projectStore, sort, metric, currentSettingId } = this.props;
     // const {problemType} = project;
     // problemType === "Classification"&&this.props.projectStore.project.upIsHoldout(false);
-    const {isHoldout} = this.props.projectStore.project;
-  
+    const { isHoldout } = this.props.projectStore.project;
+
     let _filtedModels = [...models];
     // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
     // const metricKey = this.metric.key;
@@ -328,7 +329,7 @@ export default class AdvancedView extends Component {
 
   constructor(props) {
     super(props);
-    props.project.problemType === "Classification"&&props.projectStore.project.upIsHoldout(false);
+    props.project.problemType === "Classification" && props.projectStore.project.upIsHoldout(false);
     // const currentSetting = props.projectStore.project.currentSetting
     // this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
     // autorun(() => {
@@ -350,15 +351,122 @@ export default class AdvancedView extends Component {
     // props.projectStore.changeStopFilter(true)
     props.projectStore.changeOldfiltedModels(undefined)
   }
-  
-  handleHoldout(){
-    const {isHoldout} = this.props.projectStore.project;
+
+  handleHoldout() {
+    const { isHoldout } = this.props.projectStore.project;
     this.props.projectStore.project.upIsHoldout(!isHoldout);
+  }
+
+  handleMetricCorrection = (correction, isAll) => {
+    const { selectModel, models } = this.props.project;
+    //不应用到全部  保存当前选择模型ID
+    const selectId = selectModel.id
+    const curModels = isAll ? models : [selectModel]
+
+    const promises = curModels.map(m => {
+      const { chartData: { roc }, initialFitIndex, fitIndex } = m
+      const { TP, TN, FP, FN, Threshold } = roc
+      const Length = 100
+      const Tpr = index => TP[index] / (TP[index] + FN[index])
+      const Fpr = index => FP[index] / (FP[index] + TN[index])
+      const Recall = index => TP[index] / (TP[index] + FN[index])
+      const Recall0 = index => TN[index] / (TN[index] + FP[index])
+      const Precision = index => TP[index] / (TP[index] + FP[index])
+      const Precision0 = index => TN[index] / (TN[index] + FN[index])
+      const KS = index => Tpr(index) - Fpr(index)
+      const Fbeta = (index, beta) => (1 + beta * beta) * Precision(index) * Recall(index) / (beta * beta * Precision(index) + Recall(index))
+      const Accuracy = index => (TN[index] + TP[index]) / (TN[index] + TP[index] + FN[index] + FP[index])
+      let curIndex = fitIndex
+
+      switch (correction.metric) {
+        case 'default':
+          curIndex = initialFitIndex
+          break;
+        case 'ks':
+          curIndex = 0
+          for (let i = 1; i < Length; i++) {
+            const prevKs = KS(curIndex)
+            const newKs = KS(i)
+            if (newKs > prevKs) curIndex = i
+          }
+          break;
+        case 'fbeta':
+          curIndex = 0
+          for (let i = 1; i < Length; i++) {
+            const prevFbeta = Fbeta(curIndex, correction.value)
+            const newFbeta = Fbeta(i, correction.value)
+            if (newFbeta > prevFbeta) curIndex = i
+          }
+          break;
+        case 'acc':
+          curIndex = 0
+          for (let i = 1; i < Length; i++) {
+            const prevAcc = Accuracy(curIndex)
+            const newAcc = Accuracy(i)
+            if (newAcc > prevAcc) curIndex = i
+          }
+          break;
+        case 'recall':
+          curIndex = 0
+          let reacallAllFilter = true
+          const recallFn = (correction.type === 'Precision' && Precision) || (correction.type === 'Recall(0)' && Recall0) || (correction.type === 'Precision(0)' && Precision0)
+          for (let i = 1; i < Length; i++) {
+            if (recallFn(i) < correction.value) continue
+            reacallAllFilter = false
+            const prevRecall = Recall(curIndex)
+            const newRecall = Recall(i)
+            if (newRecall > prevRecall) curIndex = i
+          }
+          if (reacallAllFilter) {
+            const firstRecall = Recall(curIndex)
+            const lastRecall = Recall(Length - 1)
+            if (lastRecall > firstRecall) curIndex = Length - 1
+          }
+          break;
+        case 'none':
+          curIndex = Object.values(Threshold).findIndex(c => c === 0.5)
+          break;
+        case 'precision':
+          curIndex = 0
+          let precisionAllFilter = true
+          const precisionFn = (correction.type === 'Recall' && Recall) || (correction.type === 'Recall(0)' && Recall0) || (correction.type === 'Precision(0)' && Precision0)
+          for (let i = 1; i < Length; i++) {
+            if (precisionFn(i) < correction.value) continue
+            precisionAllFilter = false
+            const prevPrecision = Precision(curIndex)
+            const newPrecision = Precision(i)
+            if (newPrecision > prevPrecision) curIndex = i
+          }
+          if (precisionAllFilter) {
+            const firstPrecision = Precision(curIndex)
+            const lastPrecision = Precision(Length - 1)
+            if (lastPrecision > firstPrecision) curIndex = Length - 1
+          }
+          break;
+      }
+      if (curIndex === fitIndex) return Promise.resolve()
+      return m.updateModel({ fitIndex: curIndex })
+    })
+    return Promise.all(promises).then(() => {
+      return this.props.project.updateProject({
+        metricCorrection: correction,
+        selectId
+      })
+    })
+  }
+
+  handleReset = () => {
+    const { models } = this.props.project;
+    models.forEach(m => {
+      const { initialFitIndex, fitIndex } = m
+      if (initialFitIndex === fitIndex) return
+      m.updateModel({ fitIndex: initialFitIndex })
+    });
   }
 
   render() {
     const { project, sort, handleSort, handleChange, metric, handleHoldout, currentSettingId, changeSetting } = this.props;
-    const {isHoldout} = this.props.projectStore.project;
+    const { isHoldout, train2Finished, metricCorrection } = this.props.projectStore.project;
     const { problemType } = project;
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (
@@ -375,6 +483,7 @@ export default class AdvancedView extends Component {
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
           </div>
+          {project.problemType === 'Classification' && <MetricBased finished={train2Finished} MetricCorrection={this.handleMetricCorrection} metricCorrection={metricCorrection} handleReset={this.handleReset}/>}
           {project.problemType === 'Classification' && <ModelComp models={this.filtedModels} />}
         </div>
         <div className={styles.metricSelection} >
@@ -420,7 +529,7 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout,project } = this.props;
+    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, mapHeader, newVariable }, sort, handleSort, metric, isHoldout, project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
@@ -489,7 +598,7 @@ class AdvancedModelTable extends Component {
     this.setState({ detail: !this.state.detail });
   }
   render() {
-    const { model, texts, metric, checked, isHoldout, mapHeader,project } = this.props;
+    const { model, texts, metric, checked, isHoldout, mapHeader, project } = this.props;
     const { score: { validateScore, holdoutScore }, modelName, reason } = model;
     const { detail } = this.state;
     const { validate, holdout } = reason || {}
@@ -710,7 +819,7 @@ class ClassificationModelRow extends Component {
     this.setState({ detail: !this.state.detail });
   };
   render() {
-    const { model, texts, metric, checked, yes, no, isHoldout,project } = this.props;
+    const { model, texts, metric, checked, yes, no, isHoldout, project } = this.props;
     if (!model.chartData) return null;
     const { modelName, fitIndex, holdoutChartData, chartData, score } = model;
     const { detail } = this.state;

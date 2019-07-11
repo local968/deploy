@@ -3,14 +3,13 @@ import styles from '../styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx'
-// import * as d3 from 'd3';
 import { Icon } from 'antd'
 import EN from '../../../../constant/en';
 import Project from 'stores/Project';
 
 interface SelectTargetProps {
-  saveTargetFixes: () => void, 
-  closeTarget: () => void, 
+  saveTargetFixes: () => void,
+  closeTarget: () => void,
   project: Project
 }
 
@@ -89,7 +88,7 @@ class SelectTarget extends Component<SelectTargetProps> {
   render() {
     const { closeTarget, project } = this.props;
 
-    const { targetColMap, target, colValueCounts, totalRawLines, nullLineCounts } = project
+    const { targetColMap, target, colValueCounts, totalRawLines, nullLineCounts } = project as any
     const { checked } = this
     const [v0, v1] = checked
     const currentBelong = [...this.belongTo0, ...this.belongTo1]
@@ -116,7 +115,7 @@ class SelectTarget extends Component<SelectTargetProps> {
               </div>
               <div className={styles.targetPercentValue}>
                 <div className={styles.targetPercent} style={{ width: percent + '%', backgroundColor }}></div>
-                <span>{colValueCounts[target][v] || 0}</span>
+                <span title={colValueCounts[target][v]}>{colValueCounts[target][v] || 0}</span>
               </div>
             </div>
           })}

@@ -11,31 +11,7 @@ import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
-
-export interface Numerical {
-  missingValue?: number;
-  mismatch?: number;
-  outlierCount?: number;
-}
-
-export interface Metric {
-  name: string,
-  type: 'Categorical' | 'Numerical' | 'Raw',
-  isTarget?: boolean,
-  originalStats: Stats,
-  etlStats?: Stats,
-  mismatchFillMethod?: FillMethod,
-  missingValueFillMethod?: FillMethod,
-  outlierFillMethod?: FillMethod,
-  mapFillMethod?: { [value: string]: FillMethod },
-  categoricalMap?: { key: string, doc_count: number }[]
-  originalCategoricalMap?: { key: string, doc_count: number }[]
-}
-
-export interface FillMethod {
-  type: 'delete' | 'replace',
-  value?: string
-}
+import { when } from "q";
 
 export interface Stats {
   took: number,
@@ -112,7 +88,7 @@ export interface TrainCommand {
   kValue?: number,
   algorithms?: string[],
   standardType?: string,
-  searchTime?: number,
+  // searchTime?: number,
   metricsMethod?: string,
   featureLabel?: string[],
   randomSeed?: number,
@@ -132,7 +108,8 @@ export interface TrainCommand {
   featuresPreprocessor?: string[],
   validationRate?: number,
   nfold?: number,
-  showSsPlot?: boolean
+  showSsPlot?: boolean,
+  esIndex?: string;
 }
 
 export interface DataView {
@@ -309,12 +286,12 @@ class Project {
   @observable dataViews: DataView | null = null;
   @observable dataViewsLoading: boolean = false;
   @observable dataViewProgress: number = 0;
-  @observable algorithmRadio: 'all' | 'none' | 'default' = 'all'
+  @observable algorithmRadio: 'all' | 'none' | 'default' = 'default'
 
   //un
   @observable weights: NumberObject = {};
   @observable standardType: string = 'standard';
-  @observable searchTime: number = 5;
+  // @observable searchTime: number = 5;
   @observable kValue: number = 5;
   @observable kType: string = 'auto';
 
@@ -332,6 +309,7 @@ class Project {
   @observable reportCancel: boolean = false;
   @observable isHoldout: boolean = false;
   @observable showSsPlot: boolean = false;
+  @observable metricCorrection: { metric: string, type: string, value: number } = { metric: 'default', type: '', value: 0 }
 
   constructor(id: string, args: Object) {
     this.id = id;
@@ -340,7 +318,7 @@ class Project {
   }
 
   readData = (path: string) => {
-    const url = `http://${config.host}:${config.port}/redirect/download/${path}?projectId=${this.id}`;
+    const url = `/redirect/download/${path}?projectId=${this.id}`;
     return new Promise((resolve, reject) => {
       Papa.parse(url, {
         download: true,
@@ -393,7 +371,7 @@ class Project {
       dataHeader: [],
       rawHeader: [],
       colType: {},
-      totalLines: 0,
+      // totalLines: 0,
       totalRawLines: 0,
       firstEtl: true,
       target: '',
@@ -404,7 +382,7 @@ class Project {
       dataHeader: string[],
       rawHeader: string[],
       colType: StringObject,
-      totalLines: number,
+      // totalLines: number,
       totalRawLines: number,
       firstEtl: boolean,
       target: string,
@@ -426,6 +404,9 @@ class Project {
       targetArrayTemp: [],
       outlierDictTemp: {},
       otherMap: {},
+      dataViews: null,
+      dataViewsLoading: false,
+      deletedCount: 0,
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -436,6 +417,9 @@ class Project {
       targetArrayTemp: string[],
       outlierDictTemp: unknown,
       otherMap: StringObject,
+      dataViews: null,
+      dataViewsLoading: boolean,
+      deletedCount: number
     }
   }
 
@@ -461,8 +445,21 @@ class Project {
         'IsolationForest',
         'MCD',
         'EllipticEnvelope',
+        'OneClassSVM',
+        'LocalOutlierFactor',
+        'ABOD',
+        'FB',
       ]
-      disableList = (this.totalLines > 300000 && ['IsolationForest', 'MCD', 'EllipticEnvelope']) || []
+      disableList = (this.totalLines > 300000 && ['OneClassSVM',
+        'LocalOutlierFactor',
+        'ABOD',
+        'FB',
+        'IsolationForest',
+        'MCD',
+        'EllipticEnvelope']) || (this.totalLines > 30000 && ['OneClassSVM',
+          'LocalOutlierFactor',
+          'ABOD',
+          'FB']) || []
     } else if (this.problemType === "Classification") {
       algorithms = [
         'adaboost',
@@ -535,24 +532,26 @@ class Project {
       validationRate: 20,
       holdoutRate: 20,
       hasSendEtl: false,
-      dataViews: null,
-      dataViewsLoading: false,
       preImportanceLoading: false,
       preImportance: {},
+      informativesLabel: [],
       mappingKey: '',
       newVariablePath: '',
       newVariableViews: {},
       distribution: 0,
       weights: {},
       standardType: 'standard',
-      searchTime: 5,
+      // searchTime: 5,
       kValue: 5,
       kType: 'auto',
       trainModel: {},
       stopIds: [],
       features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
       ssPlot: null,
-      algorithmRadio: 'all'
+      algorithmRadio: 'default',
+      settingId: '',
+      settings: [],
+      metricCorrection: { metric: 'default', type: '', value: 0 }
     } as {
       train2Finished: boolean,
       train2ing: boolean,
@@ -581,24 +580,26 @@ class Project {
       validationRate: number,
       holdoutRate: number,
       hasSendEtl: boolean,
-      dataViews: null,
-      dataViewsLoading: boolean,
       preImportanceLoading: boolean,
       preImportance: NumberObject,
+      informativesLabel: string[],
       mappingKey: string,
       newVariablePath: string,
       newVariableViews: unknown,
       distribution: number,
       weights: NumberObject,
       standardType: string,
-      searchTime: number,
+      // searchTime: number,
       kValue: number,
       kType: string,
       trainModel: unknown,
       stopIds: string[],
       features: string[],
       ssPlot: null,
-      algorithmRadio: 'all' | 'none' | 'default'
+      algorithmRadio: 'all' | 'none' | 'default',
+      settingId: string,
+      settings: Settings[],
+      metricCorrection: { metric: string, type: string, value: number }
     }
   }
 
@@ -732,7 +733,6 @@ class Project {
         if (status !== 200) return antdMessage.error(message)
         this.setProperty({ ...project, init: true })
         // Object.assign(this, project, { init: true })
-
 
         this.autorun.push(autorun(async () => {
           if (!this.originalIndex) {
@@ -965,15 +965,15 @@ class Project {
         }
         if (min < 5) data.crossCount = min - 1
       }
-      await this.updateProject(Object.assign(this.defaultDataQuality, this.defaultTrain, data))
+      await this.updateProject(Object.assign(this.defaultDataQuality, data))
       const pass = await this.newEtl()
       if (!pass) return
-      await this.updateProject({
+      await this.updateProject(Object.assign(this.defaultTrain, {
         curStep: 3,
         mainStep: 3,
         subStepActive: 1,
         lastSubStep: 1
-      })
+      }))
       // this.etling = false
     } else {
       const step = {
@@ -989,16 +989,16 @@ class Project {
 
   @computed
   get qualityHasChanged() {
-    return true
-    // let hasChange = false
-    // const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
-    // for (const item of list) {
-    //   const before = this[item]
-    //   const after = this[item + "Temp"]
-    //   hasChange = this.hasChanged(before, after)
-    //   if (hasChange) break
-    // }
-    // return hasChange
+    if (!this.etlIndex) return true
+    let hasChange = false
+    const list = ['targetMap', 'outlierDict', 'nullFillMethod', 'mismatchFillMethod', 'outlierFillMethod']
+    for (const item of list) {
+      const before = this[item]
+      const after = this[item + "Temp"]
+      hasChange = this.hasChanged(before, after)
+      if (hasChange) break
+    }
+    return hasChange
   }
 
   @action
@@ -1006,7 +1006,16 @@ class Project {
     if (!this.qualityHasChanged) return
     this.etling = true
     await this.abortTrainByEtl()
-    const data = Object.assign(this.defaultTrain, {
+    const data: {
+      targetMap: NumberObject,
+      targetArray: string[],
+      outlierDict: unknown,
+      nullFillMethod: StringObject,
+      mismatchFillMethod: StringObject,
+      outlierFillMethod: StringObject,
+      missingReason: StringObject,
+      crossCount?: number
+    } = {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
       outlierDict: toJS(this.outlierDictTemp),
@@ -1014,7 +1023,7 @@ class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp),
-    })
+    }
 
     if (this.problemType === 'Classification') {
       const min = Math.min(...Object.values(this.targetCounts))
@@ -1034,15 +1043,17 @@ class Project {
       subStepActive: 3,
       lastSubStep: 3
     }
-    await this.updateProject(step)
+    await this.updateProject(Object.assign(this.defaultTrain, step))
     return true
   }
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    const { status, message } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
+    const { status, message, result } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
       this.etlProgress = progress
     })
+    // 同步
+    this.setProperty(result)
     this.etlProgress = 0
     this.etling = false
     if (status !== 200) antdMessage.error(message)
@@ -1481,7 +1492,8 @@ class Project {
           kValue: undefined,
           algorithms: algorithms,
           standardType: "standard",
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           metricsMethod: "CVNN",
           featureLabel: featureLabel,
           randomSeed: 0,
@@ -1490,7 +1502,8 @@ class Project {
           settingName: setting.name,
           applyWeights: {},
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       case 'Outlier':
@@ -1504,7 +1517,8 @@ class Project {
             'EllipticEnvelope',
           ],
           standardType: "standard",
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           featureLabel: featureLabel,
           randomSeed: 0,
           projectId: id,
@@ -1512,7 +1526,8 @@ class Project {
           settingName: setting.name,
           applyWeights: {},
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       case 'Classification':
@@ -1550,7 +1565,8 @@ class Project {
             'xgradient_boosting',
             'r2-logistics',
           ],
-          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe))
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe)),
+          esIndex: this.etlIndex
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1589,7 +1605,8 @@ class Project {
             'sgd',
             'xgradient_boosting',
           ],
-          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Regression'), fe))
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Regression'), fe)),
+          esIndex: this.etlIndex
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1669,7 +1686,8 @@ class Project {
           kValue: this.kValue,
           algorithms: this.algorithms.filter(al => !disableItems.includes(al)),
           standardType: standardTypeTemp,
-          searchTime: this.searchTime,
+          speedVSaccuracy: this.speedVSaccuracy,
+          // searchTime: this.searchTime,
           metricsMethod: this.measurement,
           featureLabel: featureLabel,
           randomSeed: this.randSeed,
@@ -1678,7 +1696,8 @@ class Project {
           settingName: setting.name,
           applyWeights: weightsTemp,
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       case 'Outlier':
@@ -1686,7 +1705,8 @@ class Project {
         trainData = {
           algorithms: this.algorithms,
           standardType: standardTypeTemp,
-          searchTime: this.searchTime,
+          speedVSaccuracy: this.speedVSaccuracy,
+          // searchTime: this.searchTime,
           featureLabel: featureLabel,
           randomSeed: this.randSeed,
           projectId: id,
@@ -1694,7 +1714,8 @@ class Project {
           settingName: setting.name,
           applyWeights: weightsTemp,
           problemType,
-          targetLabel: target ? [target] : []
+          targetLabel: target ? [target] : [],
+          esIndex: this.etlIndex
         };
         break;
       default:
@@ -1746,7 +1767,8 @@ class Project {
           settingName: setting.name,
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
-          featuresPreprocessor
+          featuresPreprocessor,
+          esIndex: this.etlIndex
         };
         if (this.runWith === 'holdout') {
           trainData.validationRate = this.validationRate / 100
@@ -1792,7 +1814,7 @@ class Project {
       kValue: this.kValue,
       algorithms: this.algorithms,
       standardType: standardTypeTemp,
-      searchTime: this.searchTime,
+      // searchTime: this.searchTime,
       measurement: this.measurement,
       randSeed: this.randSeed,
       weights: weightsTemp,
@@ -1807,69 +1829,37 @@ class Project {
     }, this.nextSubStep(2, 3)))
   }
 
-  newSetting = (type = 'auto') => {
-    const { features, problemType, kType, kValue, weights, standardType, searchTime, dataHeader, newVariable, trainHeader, version, validationRate, holdoutRate, randSeed, measurement, runWith, resampling, crossCount, dataRange, customField, customRange, algorithms, speedVSaccuracy, ensembleSize } = this;
+  newSetting = () => {
+    const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
-
-    let setting
+    const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
 
     switch (problemType) {
       case 'Clustering':
-        setting = type === 'auto' ? {
-          kType,
-          kValue,
-          measurement,
-          algorithms: [
-            'KMeans',
-            'GMM',
-            'Birch',
-            'Agg',
-            'SpectralClustering',
-            'DBSCAN',
-            'MeanShift',
-          ],
+        return {
+          kType: 'auto',
+          kValue: 5,
+          measurement: 'CVNN',
+          algorithms: defaultAlgorithms,
           standardType: 'standard',
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           featureLabel,
           randSeed: 0,
           weights: {},
-        } : {
-            kType,
-            kValue,
-            measurement,
-            algorithms,
-            standardType,
-            searchTime,
-            featureLabel,
-            randSeed,
-            weights,
-          };
-        break;
+        }
       case 'Outlier':
-        setting = type === 'auto' ? {
-          algorithms: [
-            'HBOS',
-            'PCA',
-            'IsolationForest',
-            'MCD',
-            'EllipticEnvelope',
-          ],
+        return {
+          algorithms: defaultAlgorithms,
           standardType: 'standard',
-          searchTime: 5,
+          speedVSaccuracy: 5,
+          // searchTime: 5,
           featureLabel,
           randSeed: 0,
           weights: {},
-        } : {
-            algorithms,
-            standardType,
-            searchTime,
-            featureLabel,
-            randSeed,
-            weights,
-          };
-        break;
+        }
       default:
-        setting = type === 'auto' ? {
+        return {
           version: [1, 2, 4],
           validationRate: 20,
           holdoutRate: 20,
@@ -1877,76 +1867,27 @@ class Project {
           measurement: problemType === "Classification" ? "auc" : "r2",
           runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
           resampling: 'no',
-          crossCount: '5',
+          crossCount: Math.min((min - 1), 5),
           dataRange: 'all',
           customField: '',
           customRange: [],
           features: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'],
-          algorithms: problemType === "Classification" ? [
-            'adaboost',
-            'bernoulli_nb',
-            'decision_tree',
-            'extra_trees',
-            'gaussian_nb',
-            'gradient_boosting',
-            'k_nearest_neighbors',
-            'lda',
-            'liblinear_svc',
-            'libsvm_svc',
-            'multinomial_nb',
-            'passive_aggressive',
-            'qda',
-            'random_forest',
-            'sgd',
-            'xgradient_boosting',
-            'r2-logistics',
-          ] : [
-              'adaboost',
-              'ard_regression',
-              'decision_tree',
-              'extra_trees',
-              'gaussian_process',
-              'gradient_boosting',
-              'k_nearest_neighbors',
-              'liblinear_svr',
-              'libsvm_svr',
-              'random_forest',
-              'ridge_regression',
-              'sgd',
-              'xgradient_boosting',
-            ],
+          algorithms: defaultAlgorithms,
           speedVSaccuracy: 5,
           ensembleSize: 20,
           featureLabel
-        } : {
-            version,
-            validationRate,
-            holdoutRate,
-            randSeed,
-            measurement,
-            runWith,
-            resampling,
-            crossCount,
-            dataRange,
-            customField,
-            customRange,
-            algorithms,
-            speedVSaccuracy,
-            ensembleSize,
-            featureLabel,
-            features
-          }
+        }
     }
 
-    const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
-    const id = uuid.v4()
-    this.settingId = id
-    this.settings.push({
-      id,
-      name: name,
-      setting,
-      models: []
-    })
+    // const name = `${type}.${moment().format('MM.DD.YYYY_HH:mm:ss')}`
+    // const id = uuid.v4()
+    // this.settingId = id
+    // this.settings.push({
+    //   id,
+    //   name: name,
+    //   setting,
+    //   models: []
+    // })
   }
 
   removeCurSetting = () => {
@@ -2001,7 +1942,7 @@ class Project {
     return
   }
 
-  setModel = (data: Model) => {
+  setModel = (data: Model, force = false) => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
     if (this.isAbort) return
     // if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
@@ -2017,7 +1958,7 @@ class Project {
       }
     }
     this.models = [...this.models.filter(m => data.id !== m.id), model]
-    if (data.chartData && this.criteria === "cost") {
+    if (!force && data.chartData && this.criteria === "cost") {
       const { TP, FP, FN, TN } = this.costOption
       const [v0, v1] = Object.values(this.targetCounts)
       const percent0 = parseFloat(formatNumber((v1 / (v0 + v1)).toString(), 4))
@@ -2065,11 +2006,19 @@ class Project {
       }
     }, 60000)
     this.models = []
+    const readyModels = []
+    when(
+      () => this.init,
+      () => readyModels.forEach(m => {
+        this.setModel(m, true)
+      })
+    )
     socketStore.ready().then(api => api.queryModelList({ id: this.id }, (progressResult: BaseResponse) => {
       const { status, message, model } = progressResult
       if (status !== 200) return antdMessage.error(message)
       count++
-      this.setModel(model)
+      if (this.init) return this.setModel(model, true)
+      readyModels.push(model)
     })).then(result => {
       if (!show) return
       clearTimeout(so)
@@ -2129,24 +2078,26 @@ class Project {
     })
   }
 
-  clusterPreTrainImportance = () => {
+  clusterPreTrainImportance = (force: boolean) => {
     if (this.preImportanceLoading) return Promise.resolve()
     if (this.problemType !== 'Clustering') return Promise.resolve()
 
     const allLabel = [...this.dataHeader, ...this.newVariable].filter(v => v !== this.target)
-    //移除, 现由views判断
-    // const before = allLabel.reduce((prev, la) => {
-    //   prev[la] = this.weights[la] || 1
-    //   return prev
-    // }, {} as NumberObject)
-    // const after = allLabel.reduce((prev, la) => {
-    //   prev[la] = this.weightsTemp[la] || 1
-    //   return prev
-    // }, {} as NumberObject)
 
-    // const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+    // 不是点击刷新
+    if (!force) {
+      const before = allLabel.reduce((prev, la) => {
+        prev[la] = this.weights[la] || 1
+        return prev
+      }, {} as NumberObject)
+      const after = allLabel.reduce((prev, la) => {
+        prev[la] = this.weightsTemp[la] || 1
+        return prev
+      }, {} as NumberObject)
 
-    // if (!isChange) return Promise.resolve()
+      const isChange = !Object.keys(this.preImportance).length || this.hasChanged(before, after) || this.standardTypeTemp !== this.standardType
+      if (!isChange) return Promise.resolve()
+    }
 
     return socketStore.ready().then(api => {
       let cmd = 'clustering.preTrainImportance'
@@ -2364,7 +2315,7 @@ class Project {
 
   translateToBase64 = (imagePath: string) => {
     if (!imagePath) return Promise.resolve('')
-    const url = `http://${config.host}:${config.port}/redirect/download/${imagePath}?projectId=${this.id}`
+    const url = `/redirect/download/${imagePath}?projectId=${this.id}`
     return new Promise((resolve, reject) => {
       var img = document.createElement('img');
       img.src = url
@@ -2438,19 +2389,22 @@ class Project {
   }
 
   histogram(field: string) {
-    const { colType, dataViews, etlIndex } = this;
-    const value: Stats = Reflect.get(dataViews, field)
+    const { colType, dataViews, etlIndex, rawDataView } = this;
+    const value: Stats = Reflect.get(dataViews, field);
     if (!value) {
       return {}
     }
     if (colType[field] === 'Numerical') {
-      const { min, max } = value;
+      const { max, min, std_deviation_bounds: { lower, upper } } = rawDataView[field];
+      const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
       return {
         "name": "histogram-numerical",
         "data": {
           field,
           id: etlIndex,
-          interval: (max - min) / 100
+          interval,
+          max,
+          min,
         }
       }
     } else {

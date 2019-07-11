@@ -5,8 +5,8 @@ import { formatNumber } from 'util'
 export default (file, config = {}) => {
   config = {
     headers: { backend: _config.uploadBackend },
-    // path: `http://${(config.host || _config.uploadServer)}:${_config.nginxPort}/upload`,
-    path: `http://${_config.host}:${_config.port}/redirect/upload`,
+    // path: `//${(config.host || _config.uploadServer)}:${_config.nginxPort}/upload`,
+    path: `//${_config.host}:${_config.port}/redirect/upload`,
     ...config
   }
   const uploader = new Uploader(file, config)

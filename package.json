@@ -31,7 +31,8 @@
     "tslib": "^1.10.0",
     "typescript": "^3.5.2",
     "uuid": "^3.3.2",
-    "ws": "^6.1.0"
+    "ws": "^6.1.0",
+    "superagent": "^5.0.5"
   },
   "proxy": "http://localhost:8080",
   "scripts": {
@@ -44,10 +45,9 @@
     "ts-node": "ts-node --project server/tsconfig.json server/server.ts",
     "nodemon": "nodemon server",
     "build": "yarn build-server && react-app-rewired build && rm -rf static && mv build static && yarn docker:build",
-    "build-local": "react-app-rewired build",
+    "build-local": "yarn build-server && react-app-rewired build && rm -rf static && mv build static",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
-    "nodemon": "nodemon",
     "docker:build": "docker build -t harbor-dev.r2ai.com.cn/next-test/next-deploy2:latest . && docker push harbor-dev.r2ai.com.cn/next-test/next-deploy2:latest"
   },
   "devDependencies": {
@@ -94,8 +94,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "^2.1.8",
     "react-virtualized": "^9.21.0",
-    "react-waypoint": "^8.1.0",
-    "superagent": "^5.0.5"
+    "react-waypoint": "^8.1.0"
   },
   "_moduleAliases": {
     "wss": "server/webSocket",

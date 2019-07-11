@@ -10,22 +10,24 @@ import Papa from 'papaparse';
 import http from 'http';
 import command from '../command';
 import scheduleApi from '../scheduleApi';
-import Restriction from '../restriction';
+// import Restriction from '../restriction';
 import config from '../../config';
 import axios from 'axios';
 import _ from 'lodash';
 import uploader from './uploader';
+const {restriction} = require("../apis/service/planService");
 
 import { getProjectField } from './project';
 
-const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
+const esServicePath = config.services.ETL_SERVICE; 
 const router = express.Router();
-const { userModelingRestriction, userStorageRestriction } = Restriction;
+// const { userModelingRestriction, userStorageRestriction } = Restriction;
 
 router.post('/check', async (req, res) => {
   const { fileSize, type, projectId } = req.body;
   const { userId } = req.session;
   const host = JSON.parse(await redis.hget(`project:${projectId}`, 'host'));
+  const {userModelingRestriction,userStorageRestriction} = await restriction();
   if (!fileSize || !userId || !type)
     return res.json({
       status: 404,
