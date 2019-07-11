@@ -267,6 +267,7 @@ const OutlierTable = observer((props) => {
           {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>
         <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`}>
+          <span style={{ overflow: 'visible' }}><Hint content={EN.DisplayOutlierHint} /></span>
           <Tooltip title={EN.ModelProcessFlow}>{EN.DisplayOutlier}</Tooltip>
           {/*<span>{EN.ModelProcessFlow}</span>*/}
         </div>

@@ -1180,6 +1180,7 @@ const ZH_LAN = {
   MetricCorrection: '指标修正',
   MetricCorrectionHint: '指标修正功能可以通过调整模型阈值，最大化选定的度量指标。',
   DisplayOutlier: '显示异常值',
+  DisplayOutlierHint:'展示当前异常值比例下的异常样本，按照异常程度的高低降序排列。显示上限为500行，更多的信息可以使用“导出模型结果”查看。',
   WarningBlock: '您的干净数据的列数小于2，我们建议您上传新数据或创建新变量。',
   UploadNewData: '上传新数据',
   SpeedVSPerformance: '速度VS效果',

@@ -857,8 +857,8 @@ span.performanceScore {
     flex: none;
     flex-direction: column;
     position: absolute;
-    top: -500%;
-    left: -217%;
+    top: -421%;
+    left: -205%;
     width: 4.5em;
     max-height: 6em;
     overflow-y: auto;
@@ -1098,7 +1098,7 @@ span.performanceScore {
     display: flex;
     flex: none;
     flex-direction: column;
-    margin-top: 1rem;
+    /*margin-top: 1rem;*/
 }
 
 .costText {
