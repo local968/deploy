@@ -103,6 +103,9 @@ span.deploymentStyle {
   text-decoration: underline;
   cursor: pointer;
 }
+.project .emptyResults {
+  text-decoration: none;
+}
 .issue {
   color: #ff3151;
   cursor: pointer;

@@ -92,7 +92,7 @@ export default class Operation extends Component {
                           s.schedule.actualTime || s.schedule.estimatedTime
                         )
                         .format('MM-DD-YYYY_hh-mm')}-predict.csv`}
-                    >{EN.Download}</a>) : (<span className={styles.results}> - </span>)}
+                    >{EN.Download}</a>) : (<span className={styles.emptyResults}> - </span>)}
                 </div>
               ))}
 

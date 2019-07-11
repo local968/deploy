@@ -174,3 +174,10 @@
   color: #c4cbd7;
   margin-top: 1.5rem;
 }
+.results {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.emptyResults {
+  text-decoration: none;
+}

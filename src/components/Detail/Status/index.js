@@ -246,7 +246,7 @@ export default class List extends Component {
                         {EN.Download}
                       </a>
                     ) : (
-                        <span className={styles.results}> - </span>
+                        <span className={styles.emptyResults}> - </span>
                       )}
                   </div>
                 ))}
