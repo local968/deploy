@@ -2,7 +2,8 @@ const FRONTEND_HOST = process.env.REACT_APP_FRONTEND_HOST || window.location.hos
 const FRONTEND_PORT = process.env.REACT_APP_FRONTEND_PORT || window.location.port;
 const NGINX_BACKEND = process.env.REACT_APP_NGINX_BACKEND || 1;
 const IS_EN = process.env.IS_EN || false;
-const REGISTER = !process.env.REGISTER || true;
+// const REGISTER = !process.env.REGISTER || true;
+const REGISTER = false;
 
 const config = {
   uploadBackend: NGINX_BACKEND,
