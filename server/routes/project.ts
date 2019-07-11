@@ -1728,7 +1728,7 @@ wss.register('ssPlot', async (message, socket, progress) => {
 
 wss.register('getOutlierData', (message, socket, progress) => {
   const { id: mid, projectId, rate, esIndex } = message
-  const _rate = Math.round((+rate) * 100)
+  const _rate = Math.round((+rate) * 1000)
   return redis.hget(`project:${projectId}:model:${mid}`, 'outlierData').then((outlierUrl: string) => {
     if (!outlierUrl) return []
     outlierUrl = JSON.parse(outlierUrl)
@@ -1737,8 +1737,8 @@ wss.register('getOutlierData', (message, socket, progress) => {
       const { data } = result
       const max = 500
       let list = []
-      for (let i = _rate; i > 0; i--) {
-        const index = (i / 100).toString()
+      for (let i = 1; i <= _rate; i++) {
+        const index = (i / 1000).toString()
         if (list.length + data[index].length > max) {
           list = list.concat(data[index].slice(0, max - list.length))
           break;

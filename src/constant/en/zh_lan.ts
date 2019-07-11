@@ -1184,6 +1184,7 @@ const ZH_LAN = {
   UploadNewData: '上传新数据',
   SpeedVSPerformance: '速度VS效果',
   sPerformance: '效果',
+  TargetClassesError: '类别个数异常'
 };
 
 export default ZH_LAN;

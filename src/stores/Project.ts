@@ -443,16 +443,16 @@ class Project {
         'ABOD',
         'FB',
       ]
-      disableList = (this.totalLines > 30000 && ['OneClassSVM',
+      disableList = (this.totalLines > 300000 && ['OneClassSVM',
         'LocalOutlierFactor',
         'ABOD',
-        'FB']) || (this.totalLines > 300000 && ['OneClassSVM',
+        'FB',
+        'IsolationForest',
+        'MCD',
+        'EllipticEnvelope']) || (this.totalLines > 30000 && ['OneClassSVM',
           'LocalOutlierFactor',
           'ABOD',
-          'FB',
-          'IsolationForest',
-          'MCD',
-          'EllipticEnvelope']) || []
+          'FB']) || []
     } else if (this.problemType === "Classification") {
       algorithms = [
         'adaboost',

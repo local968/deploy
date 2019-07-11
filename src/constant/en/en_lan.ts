@@ -1326,6 +1326,7 @@ const EN_LAN = {
   UploadNewData: 'Upload New Data',
   SpeedVSPerformance: 'Speed VS Performance',
   sPerformance: 'Performance',
+  TargetClassesError: 'incorrect number of classes'
 };
 
 

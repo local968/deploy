@@ -1049,7 +1049,7 @@ span.fixesEdit {
 	display: flex;
 	flex: none;
 	justify-content: space-around;
-	margin-left: 35%;
+	/* margin-left: 35%; */
 	margin-top: 0.3em;
 }
 
