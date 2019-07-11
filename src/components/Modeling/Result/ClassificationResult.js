@@ -186,10 +186,16 @@ export default class ClassificationView extends Component {
               <label>{EN.Input}</label>
               <dl>
                 <dt>
-                  <span>{EN.Basedonyourbizscenario}</span>
-                  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>
-                  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>
+                  <span>{EN.Basedonyourbizscenario}
+                  <b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}
+                  <b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}
+                  </span>
                 </dt>
+                {/*<dt>*/}
+                {/*  <span>{EN.Basedonyourbizscenario}</span>*/}
+                {/*  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Pleaseenterbenefitandcostin}</span></span>*/}
+                {/*  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Noteifacorrectpredictionbringsyouprofit}</span></span>*/}
+                {/*</dt>*/}
               </dl>
               <dl style={{ margin: '0.1em 0' }}>
                 <dt>
