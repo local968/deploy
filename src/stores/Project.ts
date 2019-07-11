@@ -348,7 +348,7 @@ class Project {
     const max = Math.min(parseInt((maxCell / (this.rawHeader.length || 1)).toString(), 10), 500)
     const url = `/etls/${index}/preview?end=${max - 1}`
     const { data } = await axios.get(url)
-    const result = data.result.map((row: StringObject) => this.rawHeader.map(h => row[h]))
+    const result = data.result && data.result.map((row: StringObject) => this.rawHeader.map(h => row[h]))
     return result
   }
 
