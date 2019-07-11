@@ -201,7 +201,7 @@ export default inject('projectStore', 'deploymentStore', 'routing')(observer(Mod
 
 const OutlierTable = observer((props) => {
   const { models, sort, handleSort, project, abortTrain, onSelect, mapHeader } = props
-  const { train2Finished, trainModel, isAbort, recommendModel, selectModel } = project
+  const { train2Finished, trainModel, isAbort, recommendModel, selectModel, stopIds } = project
   const hasTarget = models.some(m => !!m.target.length)
   const sortModels = React.useMemo(() => {
     const { key, value } = sort

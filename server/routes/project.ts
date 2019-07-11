@@ -1734,17 +1734,17 @@ wss.register('getOutlierData', (message, socket, progress) => {
     outlierUrl = JSON.parse(outlierUrl)
     return axios.get(outlierUrl).then(result => {
       if (result.status !== 200) return []
-      const { data } = result
-      const max = 500
-      let list = []
-      for (let i = 1; i <= _rate; i++) {
-        const index = (i / 1000).toString()
-        if (list.length + data[index].length > max) {
-          list = list.concat(data[index].slice(0, max - list.length))
-          break;
-        }
-        list = list.concat(data[index])
-      }
+      const { data, index } = result.data
+      const count = Math.min(index[_rate / 1000], 500)
+      let list = data.slice(0, count)
+      // for (let i = 1; i <= _rate; i++) {
+      //   const index = (i / 1000).toString()
+      //   if (list.length + data[index].length > max) {
+      //     list = list.concat(data[index].slice(0, max - list.length))
+      //     break;
+      //   }
+      //   list = list.concat(data[index])
+      // }
       if (!list.length) return list
       return axios.post(`${esServicePath}/etls/${esIndex}/terms`, { nos: list.toString() }).then(rowsResult => {
         if (rowsResult.status !== 200) return []
