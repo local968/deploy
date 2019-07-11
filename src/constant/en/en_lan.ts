@@ -1323,7 +1323,9 @@ const EN_LAN = {
   Variableneedstostartwith: 'var - 选择一个连续变量;变量需要以@开头。[range_list1], [range_list2]…-自定义变量划分范围;第一个数值应大于该变量的最小值，最后一个数值应小于该变量的最大值;range_list的长度决定组的数量。',
   DisplayOutlier: 'Display Outlier',
   WarningBlock: 'The number of columns of your clean data is less than 2. We recommend that you upload new data or create a new variable',
-  UploadNewData: 'Upload New Data'
+  UploadNewData: 'Upload New Data',
+  SpeedVSPerformance: 'Speed VS Performance',
+  sPerformance: 'Performance',
 };
 
 

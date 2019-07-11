@@ -1181,7 +1181,9 @@ const ZH_LAN = {
   MetricCorrectionHint: '指标修正功能可以通过调整模型阈值，最大化选定的度量指标。',
   DisplayOutlier: '显示异常值',
   WarningBlock: '您的干净数据的列数小于2，我们建议您上传新数据或创建新变量。',
-  UploadNewData: '上传新数据'
+  UploadNewData: '上传新数据',
+  SpeedVSPerformance: '速度VS效果',
+  sPerformance: '效果',
 };
 
 export default ZH_LAN;

@@ -381,7 +381,7 @@ export default class AdvancedView extends Component {
           <div className={styles.advancedSpeed}>
             <div className={styles.advancedBox}>
               <div className={styles.advancedTitle}>
-                <span>{EN.SpeedVSAccuracy}:<a className={styles.reset} onClick={this.resetSpeed}>{EN.Reset}</a></span>
+                <span>{EN.SpeedVSPerformance}:<a className={styles.reset} onClick={this.resetSpeed}>{EN.Reset}</a></span>
               </div>
               <div className={styles.advancedPercentBlock}>
                 <div className={styles.advancedPercent}>
@@ -409,7 +409,7 @@ export default class AdvancedView extends Component {
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
                     <div className={classnames(styles.advancedPercetColor, styles.advancedPercentHoldout)}></div>
-                    <span>{EN.Accuracy}</span>
+                    <span>{EN.sPerformance}</span>
                   </div>
                   <NumberInput value={10 - speedVSaccuracy} onBlur={this.changeSpeed.bind(null, false)} min={1} max={9} isInt={true} />
                 </div>
