@@ -366,3 +366,41 @@
     color: #aaaaaa;
     background-image: none;
 }
+
+.schemaInfo {
+    background-color: #f1f4f6;
+    border: solid 1px #c4cbd7;
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.schemaText {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+    line-height: 0.25em;
+    margin: 0.2em 0;
+}
+
+.schemaText span {
+    font-size: 1.125rem;
+    color: #4a4a4a;
+    display: flex;
+}
+
+.schemaI {
+    width: 0.28em;
+    height: 0.28em;
+    margin: 0.2em 0.1em 0.2em 0.2em;
+    background-color: #9fabb5;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.schemaI span {
+    font-size: 1.25rem;
+    color: #fff;
+    font-weight: bold;
+}

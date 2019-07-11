@@ -296,7 +296,6 @@ class DataSchema extends Component<DataSchemaProps> {
       <div className={styles.schemaInfo}>
         <div className={styles.schemaI}><span>i</span></div>
         <div className={styles.schemaText}>
-          <span>{EN.Ifyourdatadoesnothaveaheader}</span>
           <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
         </div>
       </div>

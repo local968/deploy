@@ -240,6 +240,12 @@ export default class DataConnect extends Component<DataConnectProps> {
     })
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
+      <div className={styles.schemaInfo}>
+        <div className={styles.schemaI}><span>i</span></div>
+        <div className={styles.schemaText}>
+          <span>{EN.Ifyourdatadoesnothaveaheader}</span>
+        </div>
+      </div>
         <div className={styles.title}>
           <span>{EN.Pleasechooseadata}</span>
           <label className={styles.chooseCharset}>{EN.choosecharset}</label>
