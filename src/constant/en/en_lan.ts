@@ -868,6 +868,7 @@ const EN_LAN = {
   Replacewithmedianvalue: 'Replace with median value',
   ReplaceWith0: 'Replace With 0',
   Replacewithothers: 'Replace with others',
+  ReplaceRespective: 'Replace with lower/upper boundary',
   MissingReason: 'Missing Reason',
   QuantityofMissingValue: 'Quantityof Missing Value',
   Idonknow: "I don`t know",

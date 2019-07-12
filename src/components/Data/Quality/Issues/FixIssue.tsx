@@ -347,6 +347,9 @@ class FixIssue extends Component<FixIssueProps> {
                   value: 'zero',
                   label: EN.ReplaceWith0
                 }, {
+                  value: 'respective',
+                  label: EN.ReplaceRespective
+                }, {
                   value: 'others',
                   label: EN.Replacewithothers
                 }]

@@ -235,6 +235,7 @@ wss.register('newEtl', async (message, socket, process) => {
       stats[key].outlierFillMethod = { type: 'replace', value: +outlier };
     } else {
       if (outlier === 'drop') stats[key].outlierFillMethod = { type: 'delete' };
+      else if (outlier === 'respective') stats[key].outlierFillMethod = { type: 'replaceRespective' };
       else if (outlier === 'zero')
         stats[key].outlierFillMethod = { type: 'replace', value: 0 };
       else if (outlier && outlier !== 'ignore')

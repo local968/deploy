@@ -1378,12 +1378,8 @@ export class FixIssue extends Component<FixIssueInterface> {
                         label: EN.Replacewithmedianvalue,
                       },
                       {
-                        value: 'low',
-                        label: EN.Replacewithlower,
-                      },
-                      {
-                        value: 'high',
-                        label: EN.Replacewithupper,
+                        value: 'respective',
+                        label: EN.ReplaceRespective,
                       },
                       {
                         value: 'zero',

@@ -709,6 +709,7 @@ const ZH_LAN = {
   Replacewithmedianvalue: '替换为中位数',
   ReplaceWith0: '替换为“0”',
   Replacewithothers: '替换为其它值',
+  ReplaceRespective: '替换为上/下界',
   MissingReason: '缺失原因',
   QuantityofMissingValue: '缺失值数量',
   Idonknow: '原因不明',
