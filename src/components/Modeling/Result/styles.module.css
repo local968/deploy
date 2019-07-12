@@ -864,7 +864,7 @@ span.performanceScore {
     overflow-y: auto;
     overflow-x: hidden;
     background: #fff;
-    z-index: 2;
+    z-index: 999;
     border-radius: 5px;
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.22);
     border: solid 1px #979797;

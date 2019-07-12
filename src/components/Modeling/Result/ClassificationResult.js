@@ -260,10 +260,15 @@ export default class ClassificationView extends Component {
               <label>{EN.Input}</label>
               <dl>
                 <dt>
-                  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Boththebenefitandcost}</span></span>
-                  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Eventdistributioninputranges}</span></span>
-                  <span style={{ color: '#f5a623', fontStyle: 'italic' }}>{EN.NoteAllinputsentered}</span>
+                 <b>{EN.A}</b>{EN.Boththebenefitandcost}
+                 <b>{EN.B}</b>{EN.Eventdistributioninputranges}
+                 <span style={{ color: '#f5a623', fontStyle: 'italic' }}>{EN.NoteAllinputsentered}</span>
                 </dt>
+                {/*<dt>*/}
+                {/*  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Boththebenefitandcost}</span></span>*/}
+                {/*  <span><span style={{ display: 'block' }}><b>{EN.B}</b>{EN.Eventdistributioninputranges}</span></span>*/}
+                {/*  <span style={{ color: '#f5a623', fontStyle: 'italic' }}>{EN.NoteAllinputsentered}</span>*/}
+                {/*</dt>*/}
               </dl>
               <label>{EN.BenefitCost}</label>
               <dl>
