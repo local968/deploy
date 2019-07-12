@@ -3,6 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import 'echarts-gl'
 import EN from "../../constant/en";
 import config from 'config'
+import { inject } from 'mobx-react';
 const {isEN} = config;
 
 interface DataSampleProps {
@@ -10,8 +11,9 @@ interface DataSampleProps {
 	x_name:string
 	y_name:string
 	fields:any
+	projectStore?:any
 }
-
+@inject('projectStore')
 export default class PCS extends PureComponent<DataSampleProps>{
 	private chart: any;
 	constructor(props){
@@ -25,8 +27,7 @@ export default class PCS extends PureComponent<DataSampleProps>{
 	}
 
 	getOption() {
-
-		const {data=[],x_name='',y_name='',fields} = this.props as any;
+		const {data=[],x_name='',y_name='',fields,projectStore:{project:{mapHeader}}} = this.props;
 
 		if(data.length){
 			const chart = this.chart.getEchartsInstance();
@@ -78,7 +79,7 @@ export default class PCS extends PureComponent<DataSampleProps>{
 					if(seriesData){
 						const {data,dataIndex} = seriesData;
 						return `
-									${fields[dataIndex]}<br />
+									${mapHeader[fields[dataIndex]]}<br />
 									x:${data[0].toFixed(3)}<br />
 									y:${data[1].toFixed(3)}
 							`
