@@ -34,6 +34,10 @@ export default class Home extends Component {
   state = {
     visible: false,
   }
+  deleteConfirm = (deployment) => () => {
+    deploymentStore.delete(deployment.id);
+    this.setState({ visible: false })
+  }
   toggle = (currentType, targetType) => () => {
     if (currentType === targetType) {
       this.props.deploymentStore.changeSort(
@@ -200,8 +204,7 @@ export default class Home extends Component {
                   className={styles.createdDate}
                   title={moment.unix(deployment.createdDate).format('M/D/YYYY')}
                   onClick={() =>
-                    routing.push(`/deploy/project/${deployment.id}`)
-                  }
+                    routing.push(`/deploy/project/${deployment.id}`) }
                 >
                   {moment.unix(deployment.createdDate).format('M/D/YYYY')}
                 </span>
@@ -213,16 +216,15 @@ export default class Home extends Component {
                   onClick={() => {
                     // if (message.info(EN.Areyousuretodeletethismodeldeployment))
                     //   deploymentStore.delete(deployment.id);
-                    this.setState({ visible: true })
+                    this.setState({ visible: deployment.id })
                   }}
                 >
                   <Icon type="delete"/>
                 </span>
-                <Confirm width={'6em'} visible={this.state.visible} title={EN.Warning}
-                  content={EN.Areyousuretodeletethismodeldeployment} onClose={() => this.setState({ visible: false })} onConfirm={() => {
-                    deploymentStore.delete(deployment.id);
-                    this.setState({ visible: false })
-                  }}
+                <Confirm width={'6em'} visible={this.state.visible === deployment.id} title={EN.Warning}
+                  content={EN.Areyousuretodeletethismodeldeployment}
+                  onClose={() => this.setState({ visible: false })}
+                  onConfirm={this.deleteConfirm(deployment)}
                   confirmText={EN.Continue} closeText={EN.CANCEL} />
               </div>
             ))}
