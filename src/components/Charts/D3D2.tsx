@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import TSEN from './T-SEN'
 import request from '../Request'
-import {Select, Tooltip} from 'antd';
+import {Select} from 'antd';
 const {Option} = Select;
 import styles from './charts.module.css';
 import THREE from './3Variable';
@@ -15,30 +15,41 @@ interface DataSampleProps {
 
 @inject('projectStore')
 export default class D3D2 extends PureComponent<DataSampleProps>{
+	state:any;
+	show_name:any;
 	constructor(props) {
 		super(props);
 		this.state = {
 			ready: false,
+			show:false,
 			x_name:'',
 			y_name:'',
 			z_name:'',
 			result:null,
-			show_name:{
-				x_name:'',
-				y_name:'',
-				z_name:'',
-			},
+			// show_name:{
+			// 	x_name:'',
+			// 	y_name:'',
+			// 	z_name:'',
+			// },
+		};
+		this.show_name = {
+			x_name:'',
+			y_name:'',
+			z_name:'',
 		}
 	}
 
 	componentWillReceiveProps(nextProps) {
-		const {url} = this.props as any;
+		const {url} = this.props;
 		if(nextProps.url !== url){
-			return this.componentDidMount(nextProps.url);
+			this.setState({
+				show:false,
+			},()=>this.componentDidMount(nextProps.url));
 		}
 	}
 
 	async componentDidMount(url=this.props.url) {
+
 		const result = await request.post({
 			url: '/graphics/residual-plot-diagnosis',
 			data: {
@@ -49,22 +60,32 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 
 		const [x_name,y_name,z_name=''] = featuresLabel;
 
-		this.setState({
-			result,
-			ready:true,
+		this.show_name = {
 			x_name,
 			y_name,
 			z_name,
-			show_name:{
-				x_name,
-				y_name,
-				z_name,
-			},
-		})
+		};
+
+		this.setState({
+			result,
+			ready:true,
+			show:true,
+			x_name,
+			y_name,
+			z_name,
+			// show_name:{
+			// 	x_name,
+			// 	y_name,
+			// 	z_name,
+			// },
+		});
+
+		console.log(11,this.show_name)
 	}
 
 	selection(order){
-		const {result,show_name} = this.state as any;
+		const {result} = this.state;
+		const {show_name} = this;
 		const {featuresLabel} = result;
 
 		const {mapHeader} = this.props.projectStore.project;
@@ -76,16 +97,20 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		</Option>);
 		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
 		return <Select
-			value={show_name[order]}
+			defaultValue={show_name[order]}
 			style={{ width: 120 }}
 			getPopupContainer={() => document.getElementById(order)}
 			onChange={name=>{
-				this.setState({
-					show_name:{
-						...show_name,
+				this.show_name = {
+						...this.show_name,
 						[order]:name,
-					},
-				})
+				}
+				// this.setState({
+				// 	show_name:{
+				// 		...show_name,
+				// 		[order]:name,
+				// 	},
+				// })
 			}}>
 			{
 				options
@@ -94,7 +119,7 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 	}
 
 	chart(){
-		const {x_name,y_name,z_name,result} = this.state as any;
+		const {x_name,y_name,z_name,result} = this.state;
 		const { featuresLabel, featureData, labels } = result;
 		const {mapHeader} = this.props.projectStore.project;
 
@@ -130,34 +155,45 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 	}
 
 	save(){
-		const {show_name} = this.state as any;
+		// const {show_name} = this.state;
+		const {show_name} = this;
 		const {x_name,y_name,z_name} = show_name;
 		this.setState({
 			x_name,
 			y_name,
 			z_name,
+			show:true,
 		})
 	}
 
 	render() {
-		const {ready} = this.state as any;
+		const {ready,show} = this.state;
+		console.log(this.show_name)
 		if (!ready) {
 			return <div/>
 		}
 
 		return <section className={styles.d3d2}>
 			<dl>
-				<dt>{EN.Choose2or3Variables}</dt>
-				<dd id='x_name'>Var1:{this.selection('x_name')}</dd>
-				<dd id='y_name'>Var2:{this.selection('y_name')}</dd>
-				<dd id='z_name'>Var3:{this.selection('z_name')}</dd>
-				<dd>
-					<button className={styles.button} onClick={this.save.bind(this)}>
-						<span>{EN.Save}</span>
-					</button>
-				</dd>
+				{
+					show&&<React.Fragment>
+						<dt>{EN.Choose2or3Variables}</dt>
+						{
+							['x_name','y_name','z_name'].map((itm,index)=><dd key={itm} id={itm}>Var{index+1}:{this.selection(itm)}</dd>)
+						}
+						<dd>
+							<button className={styles.button} onClick={()=>{
+								this.setState({
+									show:false,
+								},()=>this.save());
+							}}>
+								<span>{EN.Save}</span>
+							</button>
+						</dd>
+					</React.Fragment>
+				}
 			</dl>
-			{this.chart()}
+			{show&&this.chart()}
 		</section>
 	}
 }

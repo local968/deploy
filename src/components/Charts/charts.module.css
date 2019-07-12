@@ -17,6 +17,7 @@
     flex: 0 0 180px;
     justify-content: center;
     border-right:1px solid rgba(196,203,215,1);
+    height: 400px;
 }
 
 .d3d2 dt {
