@@ -6,14 +6,16 @@ interface Interface {
   type:any
   style?:any
   data:any
-  target:any
+  target?:any
+  value?:any
   result:any
+  renameVariable?:any
 }
 
 export default class SimplifiedViewPlot extends Component<Interface> {
 
   render() {
-    const { type, style, data, target, result } = this.props;
+    const { type, style, data, target,value,result,renameVariable={}} = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={{
@@ -22,9 +24,9 @@ export default class SimplifiedViewPlot extends Component<Interface> {
         flexDirection: 'column',
       }}>
         <HS
-          x_name={target}
+          x_name={target||value}
           y_name={'count'}
-          title={`Feature:${target}`}
+          title={`Feature:${target||value}`}
           data={data}
           result={result}
         />
@@ -32,11 +34,12 @@ export default class SimplifiedViewPlot extends Component<Interface> {
     }
     return <div className={styles.plot} style={style}>
       <HistogramCategorical
-        x_name={target}
-        title={`Feature:${target}`}
+        x_name={target||value}
+        title={`Feature:${target||value}`}
         data={data}
+        xAxisName = {data.map((itm)=>target?(renameVariable[itm.name]||itm.name):itm.name)}
       />
-
     </div>
   }
 }
+

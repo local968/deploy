@@ -192,7 +192,7 @@ export default class SimplifiedView extends Component<Interface> {
       mapHeader,
       target,
       colType,
-      targetMap,
+      renameVariable,
       dataViews,
       dataViewsLoading,
       preImportance,
@@ -307,6 +307,7 @@ export default class SimplifiedView extends Component<Interface> {
                       target={mapHeader[target]}
                       result={this.result[target]}
                       data={this.chartData[target]}
+                      renameVariable={renameVariable}
                     />
                   }
                 />

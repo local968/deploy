@@ -315,7 +315,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
                 >
                   <SimplifiedViewPlot
                     type={colType[value]}
-                    target={mapHeader[value]}
+                    value={mapHeader[value]}
                     result={this.result[value]}
                     data={this.chartData[value]}
                   />

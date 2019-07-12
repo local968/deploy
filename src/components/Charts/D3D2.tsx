@@ -73,14 +73,7 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 			x_name,
 			y_name,
 			z_name,
-			// show_name:{
-			// 	x_name,
-			// 	y_name,
-			// 	z_name,
-			// },
 		});
-
-		console.log(11,this.show_name)
 	}
 
 	selection(order){
@@ -92,8 +85,8 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 
 		const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
 
-		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} title={mapHeader[itm]} value={itm}>
-			{mapHeader[itm]}
+		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} title={mapHeader[itm]||itm} value={itm}>
+			{mapHeader[itm]||itm}
 		</Option>);
 		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
 		return <Select
@@ -140,15 +133,15 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		const names = [x_name, y_name, z_name].filter(itm=>itm);
 		if (names.length === 3) {
 			return <THREE
-				x_name={mapHeader[x_name]}
-				y_name={mapHeader[y_name]}
-				z_name={mapHeader[z_name]}
+				x_name={mapHeader[x_name]||x_name}
+				y_name={mapHeader[y_name]||y_name}
+				z_name={mapHeader[z_name]||z_name}
 				data={data}
 			/>
 		}
 		return <TSEN
-			x_name={mapHeader[names[0]]}
-			y_name={mapHeader[names[1]]}
+			x_name={mapHeader[names[0]]||names[0]}
+			y_name={mapHeader[names[1]]||names[1]}
 			data={data}
 			average={true}
 		/>
@@ -168,7 +161,6 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 
 	render() {
 		const {ready,show} = this.state;
-		console.log(this.show_name)
 		if (!ready) {
 			return <div/>
 		}

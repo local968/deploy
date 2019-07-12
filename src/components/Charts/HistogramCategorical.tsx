@@ -15,6 +15,7 @@ export default function HistogramCategorical(props){
     title='',
     height = 330,
     width = 500,
+    xAxisName = data.map((itm)=>itm.name),
   } = props;
 
   const max = Math.max(...data.map(itm=>itm[1]));
@@ -37,7 +38,7 @@ export default function HistogramCategorical(props){
     xAxis: {
       name:x_name,
       type: 'category',
-      data: data.map((itm)=>itm.name),
+      data: xAxisName,
       nameLocation:'middle',
       nameTextStyle,
       nameGap:25,
