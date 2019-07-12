@@ -365,8 +365,10 @@ const etl = async (schedule, index, stats) => {
         const status = data.task.status;
         const progress =
           (100 * (status.created + status.deleted)) / status.total || 0;
-        schedule.status = `ETL: ${progress.toFixed(2)}%`;
-        await api.upsertSchedule(schedule);
+        if(progress !== 0) {
+          schedule.status = `ETL: ${progress.toFixed(2)}%`;
+          await api.upsertSchedule(schedule);
+        }
       } else {
         schedule.status = `Progressing`;
         schedule.index = index;
