@@ -128,7 +128,7 @@ const DisplayOutlier = (props: DisplayOutlierProps) => {
 
   if (!visiable) return null
 
-  return (!loading && !tableRows.length) ? <div className={styles.none}><span>null</span></div> : <div className={styles.detail}>
+  return (!loading && !tableRows.length) ? <div className={styles.none}><span>{EN.dispalyNull}</span></div> : <div className={styles.detail}>
     <Table
       columnWidth={110}
       rowHeight={34}
