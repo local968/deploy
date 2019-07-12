@@ -291,10 +291,8 @@ export default class MPF_UL extends Component<Interface> {
 										} = std_deviation_bounds;
 										const data = `${mapHeader[it]} ${EN.ValidRange}:[${lower.toFixed(2)},${upper.toFixed(2)}]`;
 										return <li key={ind} title={data}>
-											<dfn style={{
+											<dfn className={styles.dfn} style={{
 												width:7*len,
-												display:'inline-block',
-												fontStyle: "normal",
 											}}>{mapHeader[it]}</dfn>{EN.ValidRange}:[{lower.toFixed(2)},{upper.toFixed(2)}]
 										</li>
 									})
