@@ -67,7 +67,7 @@ router.post('/login', async(req, res) => {
   if(!user){
     return res.send({ status: 400, message: 'incorrect password.'})
   }
-  const {plan,id,create_time,drole:role={}} = user;
+  const {plan,id,createdAt,drole:role={}} = user;
 
   if(!(plan&&plan.level)){
     return res.send({ status:302, message: 'Your account is not available'})
@@ -78,7 +78,7 @@ router.post('/login', async(req, res) => {
     id,
     email,
     level:plan.level,
-    createdTime: create_time,
+    createdTime: createdAt,
   };
   return res.send({
     status: 200,
@@ -103,7 +103,7 @@ router.get('/status', async (req, res) => {
   const result = await userService.status(userId);
 
   if(result&&result.id){
-    const {id,email,create_time,drole={},plan={}} = result;
+    const {id,email,createdAt:createdTime,drole={},plan={}} = result;
     Reflect.deleteProperty(drole,'_id');
     Reflect.deleteProperty(drole,'id');
     Reflect.deleteProperty(drole,'name');
@@ -117,7 +117,7 @@ router.get('/status', async (req, res) => {
       info: {
         id,
         email,
-        createdTime:create_time,
+        createdTime,
         role:drole,
         level:plan&&plan.level,
       }
@@ -149,13 +149,12 @@ router.post('/register', async (req, res) => {
 
   const password = sha256(req.body.password);
   const createdTime = moment().unix();
-  const created_time = new Date();
   if(!plan_id){
     const plan = await planService.detail(plan_id);
     plan_id = plan.id;
   }
 
-  const result = await userService.register(res,email,plan_id,password,created_time);
+  const result = await userService.register(res,email,plan_id,password);
 
   const {id} = result;
 

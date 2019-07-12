@@ -1,9 +1,7 @@
 import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
-import EN from '../../constant/en';
 import {toJS} from "mobx";
-
 
 interface DataSampleProps {
 	x_name:string
@@ -16,7 +14,7 @@ interface DataSampleProps {
 
 export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 	getOption() {
-		const {title='',x_name='',y_name='',result={}} = this.props;
+		const {title='',x_name='',result={}} = this.props;
 
 		let {data=[],item=[]} = toJS(result);
 
@@ -44,14 +42,12 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 				},
 			},
 			legend: {},
-			// toolbox: {
-			// 	show : true,
-			// 	feature : {
-			// 		magicType : {show: true, type: ['line', 'bar']},
-			// 		restore : {show: true},
-			// 		saveAsImage : {show: true},
-			// 	},
-			// },
+			toolbox: {
+				show : true,
+				feature : {
+					restore : {show: true},
+				},
+			},
 			calculable : true,
 			xAxis : {
 				type : 'category',
@@ -64,7 +60,6 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 			yAxis:  {
 				type: 'value',
 				nameTextStyle,
-				// name:y_name,
 			},
 			series,
 		};

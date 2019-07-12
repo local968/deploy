@@ -250,21 +250,58 @@ export default class MPF_UL extends Component<Interface> {
 		if(!res.length){
 			return null;
 		}
-		if(outlier&&target&&colType[target]!=="Categorical"){
-			let {low,high} = rawDataView[target];
-			if(outlierDictTemp[target]){
-				const lh = [...outlierDictTemp[target]];
-				low = lh[0];
-				high = lh[1];
-			}else{
-				low = +low.toFixed(2);
-				high = +high.toFixed(2);
+		if(outlier&&target){
+			if(colType[target]!=="Categorical"){
+				let {low,high} = rawDataView[target];
+				if(outlierDictTemp[target]){
+					const lh = [...outlierDictTemp[target]];
+					low = lh[0];
+					high = lh[1];
+				}else{
+					low = +low.toFixed(2);
+					high = +high.toFixed(2);
+				}
+				return <Fragment>
+					<dt>{title}</dt>
+					<dd>{EN.ValidRange}:[{low},{high}]</dd>
+					{
+						res.map(itm=><dd key={itm.key} title={itm.data.map(itm=>mapHeader[itm]).join(',')}>{itm.key}</dd>)
+					}
+				</Fragment>
 			}
+
 			return <Fragment>
 				<dt>{title}</dt>
-				<dd>{EN.ValidRange}:[{low},{high}]</dd>
 				{
-					res.map(itm=><dd key={itm.key} title={itm.data.map(itm=>mapHeader[itm]).join(',')}>{itm.key}</dd>)
+					res.map((itm,ind)=>{
+						let len = 0;
+						return <dd key={ind}>
+							<label>{itm.key}:</label>
+							<ul>
+								{
+									itm.data.filter(it=>{
+										if(colType[it] === "Numerical"){
+											return len = Math.max(len,mapHeader[it].length);
+										}
+									}).map((it,ind)=>{
+										let {std_deviation_bounds} = rawDataView[it];
+										const {
+											lower,
+											upper,
+										} = std_deviation_bounds;
+										const data = `${mapHeader[it]} ${EN.ValidRange}:[${lower.toFixed(2)},${upper.toFixed(2)}]`;
+										return <li key={ind} title={data}>
+											<dfn style={{
+												width:7*len,
+												display:'inline-block',
+												fontStyle: "normal",
+											}}>{mapHeader[it]}</dfn>{EN.ValidRange}:[{lower.toFixed(2)},{upper.toFixed(2)}]
+										</li>
+									})
+								}
+							</ul>
+						</dd>
+					})
 				}
 			</Fragment>
 		}
