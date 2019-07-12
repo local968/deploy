@@ -35,7 +35,7 @@ export default class Home extends Component {
     visible: false,
   }
   deleteConfirm = (deployment) => () => {
-    deploymentStore.delete(deployment.id);
+    this.props.deploymentStore.delete(deployment.id);
     this.setState({ visible: false })
   }
   toggle = (currentType, targetType) => () => {
