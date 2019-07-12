@@ -251,12 +251,14 @@ export default class SimplifiedViewRow extends Component<Interface> {
       lines,
       isNew,
       mapHeader,
+
     } = this.props;
     const {
       univariatePlots,
       histgramPlots,
       univariatePlot,
       histgramPlot,
+      renameVariable,
     } = project;
     const valueType =
       colType[value] === 'Numerical' ? 'Numerical' : 'Categorical';
@@ -364,6 +366,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
                     data={this.scatterData[value]}
                     message={this.scatterData[`${value}-msg`]}
                     colType={colType[value]}
+                    renameVariable={renameVariable}
                   />
                 </SimplePlot>
               }

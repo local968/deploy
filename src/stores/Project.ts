@@ -310,6 +310,7 @@ class Project {
   @observable isHoldout: boolean = false;
   @observable showSsPlot: boolean = false;
   @observable metricCorrection: { metric: string, type: string, value: number } = { metric: 'default', type: '', value: 0 }
+  @observable fbeta: number = 1
 
   constructor(id: string, args: Object) {
     this.id = id;
@@ -551,7 +552,8 @@ class Project {
       algorithmRadio: 'default',
       settingId: '',
       settings: [],
-      metricCorrection: { metric: 'default', type: '', value: 0 }
+      metricCorrection: { metric: 'default', type: '', value: 0 },
+      fbeta: 1
     } as {
       train2Finished: boolean,
       train2ing: boolean,
@@ -599,7 +601,8 @@ class Project {
       algorithmRadio: 'all' | 'none' | 'default',
       settingId: string,
       settings: Settings[],
-      metricCorrection: { metric: string, type: string, value: number }
+      metricCorrection: { metric: string, type: string, value: number },
+      fbeta: number
     }
   }
 

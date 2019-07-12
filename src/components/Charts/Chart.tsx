@@ -43,6 +43,7 @@ export default function Chart(props){
 				x_name={x_name}
 				y_name={y_name}
 				result={data}
+				renameVariable={project.renameVariable}
 			/>;
 			break;
 		case 'classification-categorical':
@@ -50,6 +51,7 @@ export default function Chart(props){
 				x_name={x_name}
 				y_name={y_name}
 				result={data}
+				renameVariable={project.renameVariable}
 			/>;
 			break;
 		case 'correlation-matrix':

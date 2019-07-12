@@ -101,15 +101,15 @@ export default class Uploader extends Component {
     }
   };
 
-  retry = (error, times) => {
+  retry = (error) => {
     const { onError } = this.props;
-    if (times > 3) {
-      if (onError && typeof onError === 'function') {
-        onError(error, times);
-      }
-      return
+    // if (times > 3) {
+    if (onError && typeof onError === 'function') {
+      onError(error, 1);
     }
-    this.uploader && this.uploader.resume()
+    return
+    // }
+    // this.uploader && this.uploader.resume()
   };
 
   resume = () => {

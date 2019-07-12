@@ -235,7 +235,9 @@ const ZH_LAN = {
   Itrepresentsthecompleteness: 'Recall =TP/(TP+FN) 召回率度量分类器正确判为阳类占实际所有阳类的百分比。它代表了分类器的完整性。召回越高，分类器捕获实际阳类的数量越多。',
   Manyclassifiersareabletoproduce: '截断阈值是一个决定预测结果为正例或负例的临界概率。大于等于截断阈值的样本会被判断为正例，小于截断阈值的样本则会被判断为负例。',
   TheF1scoreistheharmonicmean: 'F1是精确度和召回率的调和平均值. F1值最佳值为1 (精确度和召回率为完美) , 最差值为0。',
+  TheFbetascoreistheharmonicmean: 'Fbeta是精准率和召回率上的调和平均值.。beta 值可通过上方Beta Value设定。',
   PrecisionRecall: 'F1 = 2*Precision*Recall / (Precision+Recall)',
+  PrecisionRecallbeta: 'Fbeta = (1+beta^2^)*precision*recall/(beta^2^*precision+recall)',
   Itmeasureshowmanytruepositivesamong: '它衡量所有预测（包括真假）阳类中有多少实际阳类,方程为真阳(tp) / (真阳(tp) + 假阳(fp))。从计算中可以看出，当值越大，分类器的误报越少。它有点代表分类器的准确性。',
   Efficientwaytodetermine: 'KS = TPR - FPR。KS用来判断两个类别之间是否存在显著差异。为所有阈值上真阳性率与假阳性率之差的最大值。k值越高，两个类别的的区分度就越大。',
   RootMeanSquareError: '均方根误差（RMSE）测量模型的预测误差。RMSE将帮助您比较模型性能：越小越好。',
@@ -1182,12 +1184,15 @@ const ZH_LAN = {
   MetricCorrection: '指标修正',
   MetricCorrectionHint: '指标修正功能可以通过调整模型阈值，最大化选定的度量指标。',
   DisplayOutlier: '显示异常值',
-  DisplayOutlierHint:'展示当前异常值比例下的异常样本，按照异常程度的高低降序排列。显示上限为500行，更多的信息可以使用“导出模型结果”查看。',
+  DisplayOutlierHint: '展示当前异常值比例下的异常样本，按照异常程度的高低降序排列。显示上限为500行，更多的信息可以使用“导出模型结果”查看。',
   WarningBlock: '您的干净数据的列数小于2，我们建议您上传新数据或创建新变量。',
   UploadNewData: '上传新数据',
   SpeedVSPerformance: '速度VS效果',
   sPerformance: '效果',
-  TargetClassesError: '类别个数异常'
+  TargetClassesError: '类别个数异常',
+  FbetaValue: 'Beta Value',
+  FbetaValueHint: 'beta的输入范围是0.1~10.0，最小步长为0.1，默认为1.0。',
+  dispalyNull: '（空）'
 };
 
 export default ZH_LAN;

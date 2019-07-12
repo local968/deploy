@@ -8,11 +8,12 @@ interface Interface {
   data:any
   message:any
   colType:any
+  renameVariable:any
 }
 
 export default class ScatterPlot extends Component<Interface> {
   render() {
-    const { type, style, data, message, colType } = this.props;
+    const { type, style, data, message, colType,renameVariable } = this.props;
     if (type === 'Regression') {
       //散点图
       if (colType === 'Numerical') {
@@ -38,6 +39,7 @@ export default class ScatterPlot extends Component<Interface> {
         x_name={message.x}
         y_name={message.y}
         result={data}
+        renameVariable={renameVariable}
       />
     </div>
 

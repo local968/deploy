@@ -9,7 +9,7 @@ import './echarts.config'
 import request from '../Request'
 import styles from './charts.module.css';
 import EN from "../../constant/en";
-import {Select, Tooltip} from 'antd';
+import {Select} from 'antd';
 import {inject, observer} from "mobx-react";
 const {Option} = Select;
 
@@ -106,6 +106,8 @@ export default class Iso extends PureComponent<DataSampleProps>{
 
     getOption() {
         let {ready,xRange,yRange,value,dot,point,var1,var2,url} = this.state as any;
+
+        const {mapHeader} = this.props.projectStore.project;
 
         if(!ready){
             return {
@@ -223,10 +225,10 @@ export default class Iso extends PureComponent<DataSampleProps>{
                     boundaryGap:false,
                     alignWithLabel:true,
                     offset:1,
-                    name:var1,
+                    name:mapHeader[var1],
                     nameLocation:'middle',
                     nameGap:25,
-	                nameTextStyle,
+	                  nameTextStyle,
                 },
                 yAxis: {
                     type: 'category',
@@ -236,7 +238,7 @@ export default class Iso extends PureComponent<DataSampleProps>{
                     },
                     boundaryGap:false,
                     offset:3,
-                    name:var2,
+                    name:mapHeader[var2],
                     nameLocation:'middle',
                     nameGap:25,
 	                  nameTextStyle,
@@ -276,15 +278,23 @@ export default class Iso extends PureComponent<DataSampleProps>{
             {mapHeader[itm]}
         </Option>);
 
+        const id = Math.random().toString(16).substring(2,5);
+
         return <Select
-          value={show_name[order]} style={{ width: 120 }} onChange={name=>{
-            this.setState({
-                show_name:{
-                    ...show_name,
-                    [order]:name,
-                },
-            })
-        }}>
+            id={id}
+            value={show_name[order]}
+            style={{ width: 120 }}
+            getPopupContainer={() =>
+              document.getElementById(id)
+            }
+            onChange={name=>{
+                this.setState({
+                    show_name:{
+                        ...show_name,
+                        [order]:name,
+                    },
+                })
+            }}>
             {
                 options
             }

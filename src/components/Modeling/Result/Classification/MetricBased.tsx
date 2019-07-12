@@ -43,7 +43,7 @@ interface MetricBasedProps {
   finished: boolean,
   metricCorrection: MetricBasedState,
   MetricCorrection: (obj: MetricBasedState, b: boolean) => Promise<void>
-  handleReset: () => void
+  handleReset: (b: boolean) => void
 }
 
 interface MetricBasedState {
@@ -74,13 +74,13 @@ export default Based
 const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
   const { onClose, finished, MetricCorrection, metricCorrection, handleReset } = props
   const [state, setState] = useState(metricCorrection)
-  const [checked, setChecked] = useState(finished)
+  const [checked, setChecked] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const setMetric = (metric: string) => () => {
     if (state.metric === metric) return
     const type = (metric === 'recall' && 'Precision') || (metric === 'precision' && 'Recall') || ''
-    const value = (metric === 'fbeta' && 1) || ((metric === 'recall' || metric === 'precision') && 0.6) || 0
+    const value = ((metric === 'recall' || metric === 'precision') && 0.6) || 0 //(metric === 'fbeta' && 1) || 
     setState({
       metric,
       type,
@@ -109,13 +109,18 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
     setChecked(e.target.checked)
   }
 
+  const onReset = () => {
+    setMetric('default')()
+    handleReset(checked)
+  }
+
   const onSave = () => {
     const { metric, type, value } = state
     if (metric === 'recall' || metric === 'precision') {
       if (!type) return message.error('save error')
       if (value < 0.01 || value > 1) return message.error('save error')
     }
-    if (metric === 'fbeta' && (value < 0.1 || value > 10)) return message.error('save error')
+    // if (metric === 'fbeta' && (value < 0.1 || value > 10)) return message.error('save error')
     setLoading(true)
     MetricCorrection(state, checked).then(() => {
       onClose()
@@ -124,11 +129,11 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
 
   const renderCondition = (value: string): ReactElement => {
     switch (value) {
-      case 'fbeta':
-        return <div className={styles.condition}>
-          <span>condition: beta</span>
-          <InputNumber min={0.1} max={10} step={0.1} style={{ marginLeft: 10 }} onChange={setValue} value={state.value} />
-        </div>
+      // case 'fbeta':
+      //   return <div className={styles.condition}>
+      //     <span>condition: beta</span>
+      //     <InputNumber min={0.1} max={10} step={0.1} style={{ marginLeft: 10 }} onChange={setValue} value={state.value} />
+      //   </div>
       case 'recall':
         const recallList = [{
           value: 'Precision',
@@ -213,7 +218,7 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
     <footer className={styles.footer}>
       <div className={styles.metricButton}><button onClick={loading ? () => { } : onSave}><span>{loading ? <Icon type='loading' /> : EN.confirm}</span></button></div>
       <div className={styles.metricButton}><button className={styles.cancel} onClick={loading ? () => { } : onClose}><span>{EN.Cancel}</span></button></div>
-      <div className={styles.metricButton}><button onClick={loading ? () => { } : handleReset}><span>{EN.Reset}</span></button></div>
+      <div className={styles.metricButton}><button onClick={loading ? () => { } : onReset}><span>{EN.Reset}</span></button></div>
     </footer>
   </section>
 }

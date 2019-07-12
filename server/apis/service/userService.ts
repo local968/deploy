@@ -13,7 +13,7 @@ const findByEmail = async email=>{
 	return result&&result[0];
 };
 
-const register = async (res,email,plan,password,create_time)=>{
+const register = async (res,email,plan,password)=>{
 	const had = await exist(email);
 
 	if(had){
@@ -27,9 +27,8 @@ const register = async (res,email,plan,password,create_time)=>{
 		data:{
 			email,
 			password,
-			create_time,
 			plan,
-			plan_used:{},
+			// plan_used:{},
 			// drole:'master'
 		},
 	})
@@ -62,14 +61,14 @@ const update = async (id,data)=>{
 };
 
 const addUse = async (user_id,type,multi)=>{
-	const user:any = await status(user_id);
-	const {plan_used} = user;
-
-	plan_used[type] = plan_used[type] || 0 + multi;
-
-	return update(user_id,{
-		plan_used,
-	})
+	// const user:any = await status(user_id);
+	// const {plan_used} = user;
+	//
+	// plan_used[type] = plan_used[type] || 0 + multi;
+	//
+	// return update(user_id,{
+	// 	plan_used,
+	// })
 };
 
 module.exports = {

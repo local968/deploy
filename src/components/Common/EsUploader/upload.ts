@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 import papa from 'papaparse'
 
 const chunkSize = 1 * 1024 * 1024
@@ -68,25 +68,30 @@ export default function EsUploader(file, option: any = {}) {
     continuedUpload()
   }
 
+  const handleChunkDOne = async () => {
+    const { promise, response: { data } } = await Promise.race(processors)
+    if (isPause) return
+    const { status, message } = data
+    if (status !== 200) {
+      isPause = true
+      onError(new Error(message))
+      return
+    }
+    // uploaded += promise.bytes
+    onProgress(`${uploaded}/${file.size}`)
+    processors.splice(promise.no, 1)
+    processors.forEach((p, i) => p.no = i)
+  }
+
   const continuedUpload = async () => {
     while (hasNextChunk && !isPause) {
-      const { promise, response } = await Promise.race(processors)
-      if (isPause) return
-      // uploaded += promise.bytes
-      onProgress(`${uploaded}/${file.size}`)
-      processors.splice(promise.no, 1)
-      processors.forEach((p, i) => p.no = i)
+      await handleChunkDOne()
       await uploadChunk()
     }
     if (isPause) return
     if (chunk.length > 0) await uploadChunk()
     while (processors.length > 0) {
-      const { promise, response } = await Promise.race(processors)
-      if (isPause) return
-      // uploaded += promise.bytes
-      onProgress(`${uploaded}/${file.size}`)
-      processors.splice(promise.no, 1)
-      processors.forEach((p, i) => p.no = i)
+      await handleChunkDOne()
     }
     if (!isPause)
       // const _header = header.map( (k, i) => i.toString() )
