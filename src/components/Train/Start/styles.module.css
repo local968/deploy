@@ -1255,3 +1255,26 @@ button.disable {
   display: flex;
   flex: none;
 }
+
+.downloadEtlData {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-image: -webkit-gradient(linear,left top, left, bottom, from(#ffffff),to(#f1f3f5));
+  background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+  padding: 0.05em 0.3em;
+  margin: .05em auto;
+  cursor: pointer;
+  box-shadow:0 5px 10px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  padding: 10px 30px;
+  font-size: 16px;
+  color: #4a4a4a;
+}
+
+.downloadEtlData i {
+  font-size: 24px;
+  margin-right: 10px;
+}

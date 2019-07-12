@@ -75,7 +75,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
-          <span>{EN.PrepareToModel}</span>
+          <span>{EN.PrepareToModel}<a href={this.props.projectStore.project.downloadCleanData()} target="_blank" className={styles.downloadEtlData}><Icon type="cloud-download" />{EN.DownloadEtlData}</a></span>
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
