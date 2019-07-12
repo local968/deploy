@@ -273,10 +273,15 @@ export default class ClassificationView extends Component {
               <label>{EN.BenefitCost}</label>
               <dl>
                 <dt>
-                  <span>{EN.Benefitcostiscalculated}</span>
-                  <span><span style={{ display: 'block' }}>(r<sub>modified</sub>/r<sub>0</sub>)*({EN.Benefits}*TP–{EN.Costs}*FN)+(1-r<sub>modified</sub>) /(1-r<sub>0</sub>)*({EN.Benefits}*TN–{EN.Costs}*FP);</span></span>
-                  <span>{EN.TPTruePositiveTNTrueNegative}</span>
+                  <span>{EN.Benefitcostiscalculated}
+                  (r<sub>modified</sub>/r<sub>0</sub>)*({EN.Benefits}*TP–{EN.Costs}*FN)+(1-r<sub>modified</sub>) /(1-r<sub>0</sub>)*({EN.Benefits}*TN–{EN.Costs}*FP);
+                  {EN.TPTruePositiveTNTrueNegative}</span>
                 </dt>
+                {/*<dt>*/}
+                {/*  <span>{EN.Benefitcostiscalculated}</span>*/}
+                {/*  <span><span style={{ display: 'block' }}>(r<sub>modified</sub>/r<sub>0</sub>)*({EN.Benefits}*TP–{EN.Costs}*FN)+(1-r<sub>modified</sub>) /(1-r<sub>0</sub>)*({EN.Benefits}*TN–{EN.Costs}*FP);</span></span>*/}
+                {/*  <span>{EN.TPTruePositiveTNTrueNegative}</span>*/}
+                {/*</dt>*/}
               </dl>
               <label>{EN.EventDistribution}</label>
               <dl>

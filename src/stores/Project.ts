@@ -340,7 +340,7 @@ class Project {
   downloadCleanData = () => {
     const map = this.mapHeader.join()
     const header = this.dataHeader.join()
-    return `/${this.etlIndex}/download?map=${map}&header=${header}`
+    return `/etls/${this.etlIndex}/download?map=${map}&header=${header}`
 
   }
 
