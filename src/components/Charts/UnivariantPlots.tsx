@@ -43,12 +43,12 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 				},
 			},
 			legend: {},
-			toolbox: {
-				show : true,
-				feature : {
-					restore : {show: true},
-				},
-			},
+			// toolbox: {
+			// 	show : true,
+			// 	feature : {
+			// 		restore : {show: true},
+			// 	},
+			// },
 			calculable : true,
 			xAxis : {
 				type : 'category',
