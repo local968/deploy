@@ -10,17 +10,18 @@ interface DataSampleProps {
 	title?:string
 	height?:number
 	width?:number
+  renameVariable:any
 }
 
 export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 	getOption() {
-		const {title='',x_name='',result={}} = this.props;
+		const {title='',x_name='',result={},renameVariable} = this.props;
 
 		let {data=[],item=[]} = toJS(result);
 
 		const series = data.map((itm)=>{
 			return {
-				name:itm.name,
+				name:renameVariable[itm.name]||itm.name,
 				data:itm.value,
 				type:'bar',
 				stack: 'sum'
