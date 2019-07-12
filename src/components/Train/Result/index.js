@@ -370,7 +370,7 @@ const OutlierRow = observer((props) => {
     {/* <div className={classes.rowData}> */}
     {visible && type === 'impact' && <VariableImpact model={model} mapHeader={mapHeader} />}
     {visible && type === 'process' && <MPF project={project} model={model} />}
-    <DisplayOutlier getOutlierData={model.getOutlierData} rate={formatNumber(model.rate, 2)} visiable={visible && type === 'display'} header={model.featureLabel.filter(h => !project.newVariable.includes(h))} mapHeader={mapHeader} colType={project.colType} />
+    <DisplayOutlier getOutlierData={model.getOutlierData} rate={formatNumber(model.rate)} visiable={visible && type === 'display'} header={model.featureLabel.filter(h => !project.newVariable.includes(h))} mapHeader={mapHeader} colType={project.colType} />
     {/* </div> */}
   </div>
 })
