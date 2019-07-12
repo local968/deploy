@@ -55,10 +55,7 @@
   .tableHeader {
     margin-right: 17px;
   }
-.advancedModelTableDiv {
-  /* width: 100%; */
-  /* overflow-x: scroll; */
-}
+
   .adrow .adcell {
     padding: 0.2em;
     border: 0.5px solid #d8d8d8;
@@ -254,7 +251,7 @@
   .metricSelection {
     display: flex;
     text-align: right;
-    justify-content: flex-end;
+    /* justify-content: flex-end; */
     margin-bottom: 1rem;
   }
   .metricSelection .text {
@@ -280,7 +277,32 @@
   flex: none;
   align-items: center;
   margin-right: 15px;
+  margin-left: auto;
 }
 .metricSwitch span {
   margin: 0 10px;
+}
+.metricFbeta {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+.metricFbetaBlock {
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 10px;;
+}
+.metricFbetaBtn {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  padding: .5rem 1rem;
+}
+.metricFbetaBtn:hover {
+  color: white;
 }

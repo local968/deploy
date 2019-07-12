@@ -233,6 +233,30 @@ class Model {
     return TP[this.fitIndex] / (TP[this.fitIndex] + FN[this.fitIndex])
   }
   @computed
+  get fprValidation() {
+    const data = this.chartData
+    const roc = data.roc
+    const { FP, TN } = roc
+    if (!FP || !TN) return this.score.validateScore.precision
+    return FP[this.fitIndex] / (FP[this.fitIndex] + TN[this.fitIndex])
+  }
+  @computed
+  get fprHoldout() {
+    const data = this.holdoutChartData
+    const roc = data.roc
+    const { FP, TN } = roc
+    if (!FP || !TN) return this.score.holdoutScore.precision
+    return FP[this.fitIndex] / (FP[this.fitIndex] + TN[this.fitIndex])
+  }
+  @computed
+  get ksValidation() {
+    return this.recallValidation - this.fprValidation
+  }
+  @computed
+  get ksHoldout() {
+    return this.recallHoldout - this.fprHoldout
+  }
+  @computed
   get f1Validation() {
     const { precisionValidation, recallValidation } = this
     return 2 * precisionValidation * recallValidation / (precisionValidation + recallValidation)
@@ -241,6 +265,12 @@ class Model {
   get f1Holdout() {
     const { precisionHoldout, recallHoldout } = this
     return 2 * precisionHoldout * recallHoldout / (precisionHoldout + recallHoldout)
+  }
+  fbeta = (beta = 1, type = 'Validation') => {
+    beta = +beta
+    if (type !== 'Validation' && type !== 'Holdout') type = 'Validation'
+    if (isNaN(beta) || beta < 0.1 || beta > 10) beta = 1
+    return (1 + beta * beta) * this[`precision${type}`] * this[`recall${type}`] / ((beta * beta * this[`precision${type}`]) + this[`recall${type}`])
   }
   modelProcessFlow(dataFlow: StringObject) {
     const rawPara = dataFlow || this.dataFlow;

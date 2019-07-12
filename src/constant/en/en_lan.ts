@@ -347,7 +347,9 @@ const EN_LAN = {
   Itrepresentsthecompleteness: 'Recall=TP/(TP+FN). It measures the percentage of positives the classifier labeled as positive. It represents the completeness of the classifier. The higher the recall is the more positives the classifier captures.',
   Manyclassifiersareabletoproduce: 'Cutoff Threshold is a critical probability which divides the prediction results into an event group and non-event group. A prediction result that is larger than the threshold goes into the event group, and a prediction result that is smaller than the threshold goes into the non-event group.',
   TheF1scoreistheharmonicmean: 'The F1-score is the harmonic mean of Precision and Recall, where an F1-score reaches its best value at 1 (perfect precision and recall) and worst at 0.',
+  TheFbetascoreistheharmonicmean: 'Fbeta is the harmonic mean of precision and recall. Beta value could be manually set through Beta Value above.',
   PrecisionRecall: "It's 2*Precision*Recall / (Precision+Recall).",
+  PrecisionRecallbeta: 'Fbeta = (1+beta^2^)*precision*recall/(beta^2^*precision+recall)',
   Itmeasureshowmanytruepositivesamong: 'It measures how many true positives among all predicted (including true and false)  positives. It\'s TP/(TP+FP). From the calculation, one can tell that the bigger the value is the fewer false positive by the classifier. It sort of represents the exactness of the classifier.',
   Efficientwaytodetermine: 'KS = TPR - FPR. KS is an efficient way to determine if two classes are significantly different from each other. It\'s calculated as the maximum of the difference of true positive rate and false positive rate over all thresholds. The higher KS the more distinct one class is from the other.',
   RootMeanSquareError: 'Root Mean Square Error (RMSE) measures prediction errors of the model. Normalized RMSE will help you compare model performance: the smaller the better.',
@@ -1323,12 +1325,15 @@ const EN_LAN = {
   MetricCorrectionHint: 'Metric Correction allows you to maximize the selected metric by adjusting cutoff threshold.',
   Variableneedstostartwith: 'var - 选择一个连续变量;变量需要以@开头。[range_list1], [range_list2]…-自定义变量划分范围;第一个数值应大于该变量的最小值，最后一个数值应小于该变量的最大值;range_list的长度决定组的数量。',
   DisplayOutlier: 'Display Outlier',
-  DisplayOutlierHint:'The abnormal samples under the current anormaly ratio are displayed in descending order of the degree of abnormality. The display limit is 500 lines, and more information can be viewed using “Export Model Results”.',
+  DisplayOutlierHint: 'The abnormal samples under the current anormaly ratio are displayed in descending order of the degree of abnormality. The display limit is 500 lines, and more information can be viewed using “Export Model Results”.',
   WarningBlock: 'The number of columns of your clean data is less than 2. We recommend that you upload new data or create a new variable',
   UploadNewData: 'Upload New Data',
   SpeedVSPerformance: 'Speed VS Performance',
   sPerformance: 'Performance',
-  TargetClassesError: 'incorrect number of classes'
+  TargetClassesError: 'incorrect number of classes',
+  FbetaValue: 'Beta Value',
+  FbetaValueHint: 'Beta value ranges from 0.1 to 10.0, minimum step is 0.1, the default value of it is 1.0.',
+  dispalyNull: '(Null)'
 };
 
 
