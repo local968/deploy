@@ -1360,3 +1360,11 @@ span.performanceScore {
     color: #445167;
     text-decoration: underline;
 }
+
+.dfn{
+    display:inline-block;
+    font-style: normal;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
