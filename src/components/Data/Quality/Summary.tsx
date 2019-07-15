@@ -207,7 +207,7 @@ class Summary extends Component<SummaryProps> {
             })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
           </Show>
           <Show
-            name = 'schema_LoadaBetterDataset'
+            name = 'quality_LoadaBetterDataset'
           >
             <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>
           </Show>

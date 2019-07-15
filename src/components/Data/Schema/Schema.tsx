@@ -397,7 +397,7 @@ class DataSchema extends Component<DataSchemaProps> {
                 }
               />
               <Show
-                name = 'Schema_VariableSelection'
+                name = 'schema_VariableSelection'
               >
                 {isMissed || isDuplicated ? (
                   <div
