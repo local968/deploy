@@ -2,6 +2,8 @@ import React, {PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
 import {toJS} from "mobx";
+import EN from '../../constant/en';
+import _ from 'lodash';
 
 interface DataSampleProps {
 	x_name:string
@@ -31,28 +33,49 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 			color:'#000',
 		};
 
+		const sum = _.sum(item.map(itm=>itm.count));
+
 		return {
 			title : {
 				text: title,
+			},
+			dataZoom:{
+				type: 'inside',
+				zoomLock:true,
+				start: 0,
+				end: 100 / item.length * 8
+			},
+			toolbox:{
+				show : item.length>8,
+				right:30,
+				itemSize:20,
+				feature : {
+					restore:{
+						title:EN.restore,
+					},
+				},
 			},
 			tooltip : {
 				trigger: 'axis',
 				axisPointer : {
 					type : 'shadow',
 				},
+				formatter: params=> {
+					const [o,t] = params;
+					const k = item.find(itm=>itm.key === o.axisValue);
+					return `
+						${o.axisValue}:${(100*k.count/sum).toFixed(3)}%<br/>
+						${o.marker}${o.seriesName}:${o.value}<br/>
+						${t.marker}${t.seriesName}:${t.value}<br/>
+					`
+				},
 			},
 			legend: {},
-			// toolbox: {
-			// 	show : true,
-			// 	feature : {
-			// 		restore : {show: true},
-			// 	},
-			// },
 			calculable : true,
 			xAxis : {
 				type : 'category',
 				name:x_name,
-				data:item,
+				data:item.map(itm=>itm.key),
 				nameTextStyle,
 				nameLocation:'middle',
 				nameGap:25,

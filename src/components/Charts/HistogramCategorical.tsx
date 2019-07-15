@@ -43,7 +43,7 @@ export default function HistogramCategorical(props){
       showDelay: 0,
       formatter: function (params) {
         const {name,value} = params;
-        return `${name}:${(value/sum).toFixed(3)}%`
+        return `${name}:${(100*value/sum).toFixed(3)}%`
       }
     },
     toolbox:{
