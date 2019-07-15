@@ -438,7 +438,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const {data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines,chartDatas} = this.props;
+    const {data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines,chartDatas,mapHeader} = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
@@ -446,7 +446,10 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
                                                                             onChange={handleCheck}/></div>
-      <div className={styles.tableTd} title={value}><span>{value}</span></div>
+      {/*<div className={styles.tableTd} title={value}><span>{value}</span></div>*/}
+      <div className={styles.tableTd} title={mapHeader[value]}>
+        <span>{mapHeader[value]}</span>
+      </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })} onClick={this.showHistograms}>
