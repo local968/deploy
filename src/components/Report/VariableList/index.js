@@ -143,7 +143,7 @@ export default class SimplifiedView extends Component {
     const {target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading,
       histgramPlots, dataHeader, addNewVariable, addNewVariable2, newVariable, newType, newVariableViews,
       id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress,
-	    models,
+	    models,mapHeader = [],
     } = project;
     const {graphicList:lists} = models[0];
     const graphicList = JSON.parse(JSON.stringify(lists));
@@ -157,6 +157,11 @@ export default class SimplifiedView extends Component {
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2));
     const top1 = graphicList.shift();
     const top2 = graphicList.shift();
+
+    const newMapHeader = {
+      ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}),
+      ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}),
+    };
     return <div className={styles.simplified} style={{zIndex: this.visible ? 3 : 1}}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -267,6 +272,7 @@ export default class SimplifiedView extends Component {
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
               return <SimplifiedViewRow
+                  mapHeader={newMapHeader}
                   chartDatas = {[graphicList.shift(),graphicList.shift()]}
                   key={i} value={h} data={data} map={map} importance={importance}
                                         colType={variableType} project={project}
