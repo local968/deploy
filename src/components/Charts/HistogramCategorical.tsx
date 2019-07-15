@@ -2,6 +2,7 @@ import React from 'react'
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
 import _ from 'lodash';
+import EN from '../../constant/en';
 
 /**
  * Histogram-Categorical
@@ -18,7 +19,10 @@ export default function HistogramCategorical(props){
     xAxisName = data.map((itm)=>itm.name),
   } = props;
 
-  const max = Math.max(...data.map(itm=>itm[1]));
+  const dt = data.map(itm=>itm.value);
+
+  const max = _.max(dt);
+  const sum = _.sum(dt);
 
   const nameTextStyle = {
     color:'#000',
@@ -34,6 +38,23 @@ export default function HistogramCategorical(props){
       textStyle:{
         fontSize,
       }
+    },
+    tooltip: {
+      showDelay: 0,
+      formatter: function (params) {
+        const {name,value} = params;
+        return `${name}:${(value/sum).toFixed(3)}%`
+      }
+    },
+    toolbox:{
+      show : data.length>8,
+      right:30,
+      itemSize:20,
+      feature : {
+        restore:{
+          title:EN.restore,
+        },
+      },
     },
     xAxis: {
       name:x_name,
@@ -52,8 +73,14 @@ export default function HistogramCategorical(props){
       nameTextStyle,
       type: 'value',
     },
+    dataZoom:{
+      type: 'inside',
+      zoomLock:true,
+      start: 0,
+      end: 100 / data.length * 8
+    },
     grid:{
-      x:`${Math.floor(max+1)}`.length * 10 +20,
+      x:`${Math.floor(+max+1)}`.length * 10 +20,
     },
     series: [{
       data: data.map((itm)=>itm.value),

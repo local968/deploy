@@ -326,7 +326,7 @@ function ModelResult(props) {
               className={`${classes.button} ${classes.disable}`}
               onMouseOver={() => setShowTips(true)}
               onMouseOut={() => setShowTips(false)}
-            >1
+            >
               <span>{EN.DeployTheModel}</span>
             </button>
           </Tooltip>

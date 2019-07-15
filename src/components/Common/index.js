@@ -18,8 +18,14 @@ import Range from './Range';
 import ProgressBar from './ProgressBar';
 import HeaderInfo from './HeaderInfo';
 import Show from './Show';
+import DatabaseConfig from './DatabaseConfig'
+import AutoRepeat from './AutoRepeat'
+import OneTime from './OneTime'
 
 export {
+  OneTime,
+  AutoRepeat,
+  DatabaseConfig,
   BlackButton,
   Bread,
   Select,

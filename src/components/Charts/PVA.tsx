@@ -7,7 +7,7 @@ import 'rc-input-number/assets/index.css';
 import request from "../Request";
 import EN from "../../constant/en";
 import styles from './charts.module.css';
-import { Button } from 'antd';
+import {Button} from 'antd';
 import { Hint, Switch } from 'components/Common';
 import {observer} from "mobx-react";
 
@@ -212,7 +212,7 @@ export default class PVA extends Component<DataSampleProps>{
 					if(!isNaN(Number(`${value}`))){
 						sliderValue.shift();
 						sliderValue.push(value);
-						 this.setSlider(sliderValue);
+						this.setSlider(sliderValue);
 						return value.toFixed(3);
 					}
 				},
@@ -360,15 +360,18 @@ export default class PVA extends Component<DataSampleProps>{
 						value={x}
 						style={{ width: 100,marginLeft:20 }}
 						onChange={min=>{
+							if(min>=y){
+								min = y - 0.0001
+							}
 							let start = _.indexOf(act,_.find(act,itm=>itm>min));
 							start = start > 0 ? start-1:start;
 							this.setState({
 								yRange:[start,y_end],
 								range:[min,y]
 							});
-							// this.updatePoint(slider_value)
 						}}
-					/>~
+					/>
+					~
 					<InputNum
 						min={x}
 						max={yMax}
@@ -377,6 +380,9 @@ export default class PVA extends Component<DataSampleProps>{
 						value={y}
 						style={{ width: 100 }}
 						onChange={max=>{
+							if(max<=x){
+								max = x + 0.0001
+							}
 							let end = _.indexOf(act,_.max(_.filter(act,itm=>itm<max)));
 							this.setState({
 								yRange:[y_start,end+1],

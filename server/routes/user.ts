@@ -103,12 +103,13 @@ router.get('/status', async (req, res) => {
 
   if(result&&result.id){
     const {id,email,createdAt:createdTime,drole={},plan={}} = result;
-    Reflect.deleteProperty(drole,'_id');
-    Reflect.deleteProperty(drole,'id');
-    Reflect.deleteProperty(drole,'name');
-    Reflect.deleteProperty(drole,'createdAt');
-    Reflect.deleteProperty(drole,'updatedAt');
-    Reflect.deleteProperty(drole,'__v');
+    const role = drole === null ? {}:drole;
+    Reflect.deleteProperty(role,'_id');
+    Reflect.deleteProperty(role,'id');
+    Reflect.deleteProperty(role,'name');
+    Reflect.deleteProperty(role,'createdAt');
+    Reflect.deleteProperty(role,'updatedAt');
+    Reflect.deleteProperty(role,'__v');
 
     return res.send({
       status: 200,
@@ -117,7 +118,7 @@ router.get('/status', async (req, res) => {
         id,
         email,
         createdTime,
-        role:drole,
+        role,
         level:plan&&plan.level,
       }
     });

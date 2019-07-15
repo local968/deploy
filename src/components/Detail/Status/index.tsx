@@ -7,33 +7,47 @@ import styles from './list.module.css';
 import emptyIcon from './icon-no-report.svg';
 import alertIcon from './fail.svg';
 import { Popover } from 'antd';
-import config from 'config'
-import { formatNumber } from 'util';
+import { formatNumber } from '../../../util';
 import EN from '../../../constant/en';
+import {
+  Show,
+} from 'components/Common';
 
-const transferR2 = (str) => str === 'R2' ? 'R²' : str
+const transferR2 = str => (str === 'R2' ? 'R²' : str);
+
+interface Interface {
+  deploymentStore:any
+  scheduleStore:any
+  routing:any
+  match:any
+}
 
 @inject('scheduleStore', 'deploymentStore', 'routing')
 @observer
-export default class List extends Component {
+export default class List extends Component<Interface> {
   @action
   selectionOption = (key, value) => () => {
-    this.props.deploymentStore.currentDeployment.performanceOptions[key] = value;
-    this.props.deploymentStore.currentDeployment.save();
+    this.props.deploymentStore.currentDeployment.performanceOptions[
+      key
+    ] = value;
+    return this.props.deploymentStore.currentDeployment.save();
   };
 
   showScore = (score, type) => {
-    let s
-    if (score && score[type]) s = formatNumber(score[type], 2)
-    return s || 0
-  }
+    let s;
+    if (score && score[type]) s = formatNumber(score[type], 2);
+    return s || 0;
+  };
 
   render() {
     const { deploymentStore, scheduleStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
     const cdpo = cd.performanceOptions;
     const selectionOption = this.selectionOption;
-    console.log(scheduleStore.sortedPerformanceSchedules, 'scheduleStore.sortedPerformanceSchedules')
+    console.log(
+      scheduleStore.sortedPerformanceSchedules,
+      'scheduleStore.sortedPerformanceSchedules',
+    );
     return (
       <div className={styles.status}>
         <div className={styles.list}>
@@ -60,21 +74,31 @@ export default class List extends Component {
                 </span>
               </div>
               <div className={styles.item}>
-                <span className={styles.label}>{EN.ValidationDataDefinition}</span>
-                <a href={`/upload/dataDefinition?projectId=${cd.projectId}&type=performance`} className={classnames(styles.text, styles.download)}>
+                <span className={styles.label}>
+                  {EN.ValidationDataDefinition}
+                </span>
+                <a
+                  href={`/upload/dataDefinition?projectId=${cd.projectId}&type=performance`}
+                  className={classnames(styles.text, styles.download)}
+                >
                   {EN.Download}
                 </a>
               </div>
             </div>
-            <a
-              className={styles.edit}
-              onClick={() => {
-                selectionOption('enable', false)();
-                routing.push(`/deploy/project/${match.params.id}/performance`);
-              }}
+            <Show
+              name = 'status_operate'
             >
-              {EN.Edit}
-            </a>
+              <a
+                className={styles.edit}
+                onClick={() => {
+                  selectionOption('enable', false)();
+                  routing.push(`/deploy/project/${match.params.id}/performance`);
+                }}
+              >
+                {EN.Edit}
+              </a>
+            </Show>
+
           </div>
           {scheduleStore.sortedPerformanceSchedules.length === 0 && <Empty />}
           {scheduleStore.sortedPerformanceSchedules.length > 0 && (
@@ -84,8 +108,12 @@ export default class List extends Component {
                 <span className={styles.modelInvokeTime}>
                   {EN.ModelInvokeTime}
                 </span>
-                <span className={styles.deploymentStyle}>{EN.DeploymentStyle}</span>
-                <span className={styles.executionSpeed}>{EN.ExecutionSpeed} <small>{EN.Rowss}</small></span>
+                <span className={styles.deploymentStyle}>
+                  {EN.DeploymentStyle}
+                </span>
+                <span className={styles.executionSpeed}>
+                  {EN.ExecutionSpeed} <small>{EN.Rowss}</small>
+                </span>
                 <span className={styles.performance}>{EN.Performance}</span>
                 <span className={styles.threshold}>{EN.Threshold}</span>
                 <span className={styles.status}>{EN.Status}</span>
@@ -94,20 +122,24 @@ export default class List extends Component {
               <div className={styles.list}>
                 {scheduleStore.sortedPerformanceSchedules.map(s => (
                   <div className={styles.project} key={s.schedule.id}>
-                    <span className={styles.modelName} title={s.schedule.modelName}>{s.schedule.modelName}</span>
+                    <span
+                      className={styles.modelName}
+                      title={s.schedule.modelName}
+                    >
+                      {s.schedule.modelName}
+                    </span>
                     <span className={styles.modelInvokeTime}>
                       {isNaN(s.schedule.actualTime || s.schedule.estimatedTime)
                         ? s.schedule.actualTime || s.schedule.estimatedTime
                         : moment
-                          .unix(
-                            s.schedule.actualTime || s.schedule.estimatedTime
-                          )
-                          .format('MM/DD/YYYY-hh:mma')}
+                            .unix(
+                              s.schedule.actualTime || s.schedule.estimatedTime,
+                            )
+                            .format('MM/DD/YYYY-hh:mma')}
                     </span>
 
-
                     <span className={styles.deploymentStyle}>
-                      {EN.Predictwith}{' '}{EN.DataSource}
+                      {EN.Predictwith} {EN.DataSource}
                       {/* {s.deployment.performanceOptions.source === 'file' || s.deployment.performanceOptions.source === 'database'
                         ? EN.DataSource
                         : EN.APISource} */}
@@ -118,69 +150,89 @@ export default class List extends Component {
                         : ' - '}
                     </span>
 
-                    {
-                      s.deployment.modelType === 'Classification' && (
-                        <span
-                          className={classnames(styles.performance, {
-                            [styles.issue]: isExcessThreshold(s.schedule)
-                          })}
-                        >
-                          {
-                            s.schedule.result && s.schedule.status === 'finished' ?
-                              `Accuracy:${this.showScore(s.schedule.result.score, 'acc')} AUC:${this.showScore(s.schedule.result.score, 'auc')} F1:${this.showScore(s.schedule.result.score, 'f1')} Precision:${this.showScore(s.schedule.result.score, 'precision')} Recall:${this.showScore(s.schedule.result.score, 'recall')}`
-                              : ' - '
-                          }
-                        </span>
-                      )
-                    }
+                    {s.deployment.modelType === 'Classification' && (
+                      <span
+                        className={classnames(styles.performance, {
+                          [styles.issue]: isExcessThreshold(s.schedule),
+                        })}
+                      >
+                        {s.schedule.result && s.schedule.status === 'finished'
+                          ? `Accuracy:${this.showScore(
+                              s.schedule.result.score,
+                              'acc',
+                            )} AUC:${this.showScore(
+                              s.schedule.result.score,
+                              'auc',
+                            )} F1:${this.showScore(
+                              s.schedule.result.score,
+                              'f1',
+                            )} Precision:${this.showScore(
+                              s.schedule.result.score,
+                              'precision',
+                            )} Recall:${this.showScore(
+                              s.schedule.result.score,
+                              'recall',
+                            )}`
+                          : ' - '}
+                      </span>
+                    )}
 
-                    {
-                      s.deployment.modelType === 'Regression' && (
-                        <span
-                          className={classnames(styles.performance, {
-                            [styles.issue]: isExcessThreshold(s.schedule)
-                          })}
-                        >
-                          {
-                            s.schedule.result && s.schedule.status === 'finished' ?
-                              `MSE:${this.showScore(s.schedule.result.score, 'mse')} RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`
-                              : ' - '
-                          }
-                        </span>
-                      )
-                    }
+                    {s.deployment.modelType === 'Regression' && (
+                      <span
+                        className={classnames(styles.performance, {
+                          [styles.issue]: isExcessThreshold(s.schedule),
+                        })}
+                      >
+                        {s.schedule.result && s.schedule.status === 'finished'
+                          ? `MSE:${this.showScore(
+                              s.schedule.result.score,
+                              'mse',
+                            )} RMSE:${this.showScore(
+                              s.schedule.result.score,
+                              'rmse',
+                            )} R²:${this.showScore(
+                              s.schedule.result.score,
+                              'r2',
+                            )}`
+                          : ' - '}
+                      </span>
+                    )}
 
-                    {
-                      s.deployment.modelType === 'Outlier' && (
-                        <span
-                          className={classnames(styles.performance, {
-                            [styles.issue]: isExcessThreshold(s.schedule)
-                          })}
-                        >
-                          {
-                            s.schedule.result && s.schedule.status === 'finished' ?
-                              `Accuracy:${this.showScore(s.schedule.result.score, 'score')}` : ' - '
+                    {s.deployment.modelType === 'Outlier' && (
+                      <span
+                        className={classnames(styles.performance, {
+                          [styles.issue]: isExcessThreshold(s.schedule),
+                        })}
+                      >
+                        {s.schedule.result && s.schedule.status === 'finished'
+                          ? `Accuracy:${this.showScore(
+                              s.schedule.result.score,
+                              'score',
+                            )}`
+                          : ' - '}
+                      </span>
+                    )}
 
-                          }
-                        </span>
-                      )
-                    }
-
-                    {
-                      s.deployment.modelType === 'Clustering' && (
-                        <span
-                          className={classnames(styles.performance, {
-                            [styles.issue]: isExcessThreshold(s.schedule)
-                          })}
-                        >
-                          {
-                            s.schedule.result && s.schedule.status === 'finished' ?
-                              `CVNN:${this.showScore(s.schedule.result.score, 'CVNN')} CH:${this.showScore(s.schedule.result.score, 'CH')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_euclidean')}`
-                              : ' - '
-                          }
-                        </span>
-                      )
-                    }
+                    {s.deployment.modelType === 'Clustering' && (
+                      <span
+                        className={classnames(styles.performance, {
+                          [styles.issue]: isExcessThreshold(s.schedule),
+                        })}
+                      >
+                        {s.schedule.result && s.schedule.status === 'finished'
+                          ? `CVNN:${this.showScore(
+                              s.schedule.result.score,
+                              'CVNN',
+                            )} CH:${this.showScore(
+                              s.schedule.result.score,
+                              'CH',
+                            )} Silhouette Score:${this.showScore(
+                              s.schedule.result.score,
+                              'silhouette_euclidean',
+                            )}`
+                          : ' - '}
+                      </span>
+                    )}
 
                     {/*<span*/}
                     {/*  className={classnames(styles.performance, {*/}
@@ -206,13 +258,11 @@ export default class List extends Component {
                       <span>
                         {s.schedule.threshold &&
                           `${transferR2(s.schedule.threshold.type)}:`}
-                      {/*</span>*/}
-                      {/*<br />*/}
-                      {/*<span>*/}
+                        {/*</span>*/}
+                        {/*<br />*/}
+                        {/*<span>*/}
                         {s.schedule.threshold &&
-                          `${
-                          s.schedule.threshold.value
-                          }`}
+                          `${s.schedule.threshold.value}`}
                       </span>
                     </span>
                     {s.schedule.status !== 'issue' && (
@@ -227,8 +277,11 @@ export default class List extends Component {
                         overlayClassName={styles.popover}
                         content={
                           <Alert text={s.schedule.result['processError']} />
-                        } >
-                        <span className={classnames(styles.status, styles.issue)} >
+                        }
+                      >
+                        <span
+                          className={classnames(styles.status, styles.issue)}
+                        >
                           {EN.Issue}
                         </span>
                       </Popover>
@@ -237,17 +290,21 @@ export default class List extends Component {
                       <a
                         className={styles.results}
                         target="_blank"
-                        href={`/upload/download/${s.schedule.id}?filename=${typeof cdpo.file === 'string' ? cdpo.file : cdpo.sourceOptions.databaseType}-${moment
+                        href={`/upload/download/${s.schedule.id}?filename=${
+                          typeof cdpo.file === 'string'
+                            ? cdpo.file
+                            : cdpo.sourceOptions.databaseType
+                        }-${moment
                           .unix(
-                            s.schedule.actualTime || s.schedule.estimatedTime
+                            s.schedule.actualTime || s.schedule.estimatedTime,
                           )
                           .format('MM-DD-YYYY_hh-mm')}-predict.csv`}
                       >
                         {EN.Download}
                       </a>
                     ) : (
-                        <span className={styles.emptyResults}> - </span>
-                      )}
+                      <span className={styles.emptyResults}> - </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -282,8 +339,25 @@ const Alert = ({ text }) => (
 
 const isExcessThreshold = schedule => {
   if (!schedule.result || !schedule.result.score) return false;
-  if (!schedule.threshold || !schedule.threshold.type || !schedule.threshold.value) return false
-  const nameMap = { R2: 'r2', RMSE: 'rmse', MSE: 'mse', AUC: 'auc', Accuracy: 'acc', F1: 'f1', Precision: 'precision', Recall: 'recall', CVNN: 'CVNN', CH: 'CH', Silhouette_Score: 'silhouette_euclidean' };
+  if (
+    !schedule.threshold ||
+    !schedule.threshold.type ||
+    !schedule.threshold.value
+  )
+    return false;
+  const nameMap = {
+    R2: 'r2',
+    RMSE: 'rmse',
+    MSE: 'mse',
+    AUC: 'auc',
+    Accuracy: 'acc',
+    F1: 'f1',
+    Precision: 'precision',
+    Recall: 'recall',
+    CVNN: 'CVNN',
+    CH: 'CH',
+    Silhouette_Score: 'silhouette_euclidean',
+  };
   return {
     R2: (threshold, real) => threshold > real,
     RMSE: (threshold, real) => threshold < real,
@@ -298,6 +372,6 @@ const isExcessThreshold = schedule => {
     silhouette_euclidean: (threshold, real) => threshold > real,
   }[schedule.threshold.type](
     schedule.threshold.value,
-    schedule.result.score[nameMap[schedule.threshold.type]]
+    schedule.result.score[nameMap[schedule.threshold.type]],
   );
 };

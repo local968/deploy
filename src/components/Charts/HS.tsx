@@ -180,15 +180,15 @@ export default class HS extends Component<DataSampleProps>{
 				y2:80,
 			},
 			toolbox:{
-				show : true,
+				show : len>1,
 				right:30,
 				itemSize:20,
 				feature : {
-					dataZoom: {
-						icon:{
-							back:'image://'
-						}
-					},
+					// dataZoom: {
+					// 	icon:{
+					// 		back:'image://'
+					// 	}
+					// },
 					restore:{
 						title:EN.restore,
 					},
