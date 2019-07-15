@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import styles from './styles.module.css';
+import styles from '../styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Progress, Tooltip, Icon } from 'antd';
 import { observable, computed } from 'mobx';
 import moment from 'moment';
 import { Hint, NumberInput, ProgressBar } from 'components/Common';
-import VariableImpact from "./VariableImpact"
-import Variable from './Variable.svg'
-import Process from './Process.svg'
+import VariableImpact from "../VariableImpact"
+import Variable from '../Variable.svg'
+import Process from '../Process.svg'
 import { formatNumber } from 'util'
-import EN from '../../../constant/en';
-import MPF from './MPF';
+import EN from '../../../../constant/en';
+import MPF from '../MPF';
 const AccuracyHint = EN.Givenaparticularpopulation
 
 @observer

@@ -1,22 +1,22 @@
 import React, { Component } from 'react';
-import styles from './styles.module.css';
+import styles from '../styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable, computed } from 'mobx';
 import moment from 'moment';
-import VariableImpact from "./VariableImpact"
+import VariableImpact from "../VariableImpact"
 import { Tooltip, Icon } from 'antd'
-import ModelProcessFlow from "./ModelProcessFlow";
-import Process from "./Process.svg";
-import Variable from "./Variable.svg";
+import ModelProcessFlow from "../ModelProcessFlow";
+import Process from "../Process.svg";
+import Variable from "../Variable.svg";
 import { ProgressBar, Hint } from 'components/Common';
 import { formatNumber } from 'util'
-import EN from '../../../constant/en';
+import EN from '../../../../constant/en';
 import config from 'config'
 const isEN = config.isEN;
 import {
   PVA
-} from "../../Charts"
+} from "../../../Charts"
 
 @observer
 export default class RegressionView extends Component {
