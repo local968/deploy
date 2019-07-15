@@ -12,6 +12,7 @@ import moment from 'moment';
 import { ISO, D3D2 } from '../../Charts';
 import MPF from '../../Modeling/Result/MPF';
 import DisplayOutlier from './DisplayOutlier';
+import { Show } from '../../Common';
 
 const { Option } = Select;
 
@@ -597,20 +598,24 @@ const OutlierTable = observer(props => {
                   </Tooltip>
                 </div>
                 <ProgressBar progress={trainingModel.value || 0} />
-                <div
-                  className={classes.abortButton}
-                  onClick={
-                    !isAbort
-                      ? abortTrain.bind(null, trainingModel.requestId)
-                      : null
-                  }
+                <Show
+                  name = 'result_abortButton_UN_OUT'
                 >
-                  {isAbort ? (
-                    <Icon type="loading" />
-                  ) : (
-                    <span>{EN.AbortTraining}</span>
-                  )}
-                </div>
+                  <div
+                    className={classes.abortButton}
+                    onClick={
+                      !isAbort
+                        ? abortTrain.bind(null, trainingModel.requestId)
+                        : null
+                    }
+                  >
+                    {isAbort ? (
+                      <Icon type="loading" />
+                    ) : (
+                      <span>{EN.AbortTraining}</span>
+                    )}
+                  </div>
+                </Show>
               </div>
             );
           })}
@@ -1031,20 +1036,25 @@ const ClusteringTable = observer(props => {
                   </Tooltip>
                 </div>
                 <ProgressBar progress={trainingModel.value || 0} />
-                <div
-                  className={classes.abortButton}
-                  onClick={
-                    !isAbort
-                      ? abortTrain.bind(null, trainingModel.requestId)
-                      : null
-                  }
+                <Show
+                  name = 'result_abortButton_UN_AGGRE'
                 >
-                  {isAbort ? (
-                    <Icon type="loading" />
-                  ) : (
-                    <span>{EN.AbortTraining}</span>
-                  )}
-                </div>
+                  <div
+                    className={classes.abortButton}
+                    onClick={
+                      !isAbort
+                        ? abortTrain.bind(null, trainingModel.requestId)
+                        : null
+                    }
+                  >
+                    {isAbort ? (
+                      <Icon type="loading" />
+                    ) : (
+                      <span>{EN.AbortTraining}</span>
+                    )}
+                  </div>
+                </Show>
+
               </div>
             );
           })}

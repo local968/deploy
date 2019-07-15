@@ -13,9 +13,7 @@ export default class Loading extends Component {
     return (
       <div className={styles.loading}>
         <div className={styles.training}>
-          <ProgressBar
-            progress={((curModel || {}).value || 0)}
-          />
+          <ProgressBar progress={((curModel || {}).value || 0)} />
         </div>
         <div className={styles.trainingText}>
           <span>{EN.TrainingS}</span>
