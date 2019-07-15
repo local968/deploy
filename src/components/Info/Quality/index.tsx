@@ -1064,29 +1064,43 @@ class Summary extends Component<SummaryInterface> {
             </div>
           </div>
           <div className={styles.summaryBottom}>
-            <div
-              className={classnames(
-                styles.summaryButton,
-                styles.summaryConfirm,
-                {
-                  [styles.disabled]: totalLines === 0,
-                },
-              )}
-              onClick={totalLines === 0 ? null : this.startTrain}
+            <Show
+              name = 'quality_WillFixtheIssues_Continue_UN'
             >
-              <span>{EN.Continue}</span>
-            </div>
-            <div
-              className={classnames(styles.summaryButton, {
-                [styles.disabled]: !issues.dataIssue,
-              })}
-              onClick={issues.dataIssue ? editFixes : null}
+              <div
+                className={classnames(
+                  styles.summaryButton,
+                  styles.summaryConfirm,
+                  {
+                    [styles.disabled]: totalLines === 0,
+                  },
+                )}
+                onClick={totalLines === 0 ? null : this.startTrain}
+              >
+                <span>{EN.Continue}</span>
+              </div>
+            </Show>
+
+            <Show
+              name = 'quality_WillFixtheIssues_EdittheFixes'
             >
-              <span>{EN.EditTheFixes}</span>
-            </div>
-            <div className={styles.summaryButton} onClick={this.backToConnect}>
-              <span>{EN.LoadaBetterDataset}</span>
-            </div>
+              <div
+                className={classnames(styles.summaryButton, {
+                  [styles.disabled]: !issues.dataIssue,
+                })}
+                onClick={issues.dataIssue ? editFixes : null}
+              >
+                <span>{EN.EditTheFixes}</span>
+              </div>
+            </Show>
+
+            <Show
+              name = 'quality_LoadaBetterDataset_UN'
+            >
+              <div className={styles.summaryButton} onClick={this.backToConnect}>
+                <span>{EN.LoadaBetterDataset}</span>
+              </div>
+            </Show>
           </div>
         </div>
       </div>

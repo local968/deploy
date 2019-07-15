@@ -27,6 +27,7 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 				stack: 'sum'
 			}
 		});
+		console.log(renameVariable)
 
 		const nameTextStyle = {
 			color:'#000',

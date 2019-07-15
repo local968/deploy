@@ -1,19 +1,10 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
-import { observer, inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Checkbox, message } from 'antd';
-import {
-  Select,
-  ContinueButton,
-  ProcessLoading,
-  Table,
-  Hint,
-  HeaderInfo,
-  Confirm,
-  Show
-} from 'components/Common';
+import { Confirm, ContinueButton, HeaderInfo, Hint, ProcessLoading, Select, Show, Table } from 'components/Common';
 import EN from '../../../constant/en';
 import EditHeader from './EditHeader';
 import { ProjectStore } from 'stores/ProjectStore';
@@ -96,8 +87,8 @@ class DataSchema extends Component<DataSchemaProps> {
   };
 
   targetSelect = value => {
-    const { role } = this.props.userStore.info as any;
-    const { schema_TargetVariable = true } = role;
+    const { role }  = this.props.userStore.info;
+    const { schema_TargetVariable = true } = role as any;
     if (schema_TargetVariable) {
       this.target = value;
       this.tableRef.current.updateGrids();
@@ -116,9 +107,7 @@ class DataSchema extends Component<DataSchemaProps> {
   };
 
   select = (key, e) => {
-    const v = e.target.value;
-    this.dataType[key] = v;
-    // this.props.projectStore.project.colType[key] = v
+    this.dataType[key] = e.target.value;
     this.tableRef.current.updateGrids();
   };
 
@@ -180,7 +169,7 @@ class DataSchema extends Component<DataSchemaProps> {
      */
     const index = {
       checkRow: -1 + (showSelect ? 1 : 0),
-      headerRow: 0 + (showSelect ? 1 : 0),
+      headerRow: (showSelect ? 1 : 0),
       selectRow: 1 + (showSelect ? 1 : 0),
       columnHeader: 1,
       rowHeader: 2 + (showSelect ? 1 : 0),
@@ -407,36 +396,41 @@ class DataSchema extends Component<DataSchemaProps> {
                   document.getElementById('schemaContent')
                 }
               />
-              {isMissed || isDuplicated ? (
-                <div
-                  className={classnames(styles.schemaSelect, styles.disabled)}
-                >
-                  <span>{EN.UnselectUndesirableVariables}</span>
-                </div>
-              ) : (
-                <div
-                  className={styles.schemaSelect}
-                  onClick={this.toggleSelect}
-                >
-                  <span>{EN.UnselectUndesirableVariables}</span>
-                </div>
-              )}
-              <Hint
-                themeStyle={{
-                  fontSize: '1.5rem',
-                  lineHeight: '2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                content={
-                  <div>
-                    {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
-                    {EN.VariableIDs} <br />
-                    {EN.Variablesthatarederivedfromthetarget} <br />
-                    {EN.Anyothervariablesyou}
+              <Show
+                name = 'schema_VariableSelection'
+              >
+                {isMissed || isDuplicated ? (
+                  <div
+                    className={classnames(styles.schemaSelect, styles.disabled)}
+                  >
+                    <span>{EN.UnselectUndesirableVariables}</span>
                   </div>
-                }
-              />
+                ) : (
+                  <div
+                    className={styles.schemaSelect}
+                    onClick={this.toggleSelect}
+                  >
+                    <span>{EN.UnselectUndesirableVariables}</span>
+                  </div>
+                )}
+                <Hint
+                  themeStyle={{
+                    fontSize: '1.5rem',
+                    lineHeight: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  content={
+                    <div>
+                      {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
+                      {EN.VariableIDs} <br />
+                      {EN.Variablesthatarederivedfromthetarget} <br />
+                      {EN.Anyothervariablesyou}
+                    </div>
+                  }
+                />
+              </Show>
+
               {isMissed && (
                 <div className={styles.schemaMissed}>
                   <div className={styles.errorBlock} />
@@ -488,24 +482,28 @@ class DataSchema extends Component<DataSchemaProps> {
               />
             </Show>
 
-            <div className={styles.checkBox}>
-              <input
-                type="checkbox"
-                id="noCompute"
-                onChange={this.checkNoCompute}
-                checked={noComputeTemp}
-              />
-              <label htmlFor="noCompute">{EN.SkipDataQualityCheck}</label>
-              <Hint
-                themeStyle={{
-                  fontSize: '1.5rem',
-                  lineHeight: '2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                content={EN.Ifyouknowthedataisclean}
-              />
-            </div>
+            <Show
+              name = 'schema_SkipDataQualityCheck'
+            >
+              <div className={styles.checkBox}>
+                <input
+                  type="checkbox"
+                  id="noCompute"
+                  onChange={this.checkNoCompute}
+                  checked={noComputeTemp}
+                />
+                <label htmlFor="noCompute">{EN.SkipDataQualityCheck}</label>
+                <Hint
+                  themeStyle={{
+                    fontSize: '1.5rem',
+                    lineHeight: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  content={EN.Ifyouknowthedataisclean}
+                />
+              </div>
+            </Show>
           </div>
           {etling && (
             <ProcessLoading

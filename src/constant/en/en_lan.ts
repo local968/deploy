@@ -491,6 +491,7 @@ const EN_LAN = {
   Weaimtogetyouasense: ' We aim to get you a sense of how accurate the model is by comparing the predicted V.S actual value. Also you may find some pattern.',
   PredictedValues: 'Predicted Values',
   ActualValues: 'Actual Values',
+  ActualValuesRange: 'Range of Actual Values',
   GoodnessofFit: 'Goodness of Fit',
 
   // /app-bff/src/components/Modeling/Start

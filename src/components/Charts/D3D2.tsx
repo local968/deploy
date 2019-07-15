@@ -10,7 +10,7 @@ import {inject} from "mobx-react";
 
 interface DataSampleProps {
 	url:string
-	projectStore:any
+	projectStore?:any
 }
 
 @inject('projectStore')

@@ -6,6 +6,7 @@ import { observable } from 'mobx';
 import { Checkbox, Icon, message } from 'antd';
 import { Confirm, ContinueButton, HeaderInfo, Hint, ProcessLoading, Select, Table } from 'components/Common';
 import EN from '../../../constant/en';
+import { Show } from '../../Common';
 
 interface Interface {
   projectStore: any
@@ -390,36 +391,41 @@ export default class DataSchema extends Component<Interface> {
                 }}
                 content={EN[`${problemType}Target`]}
               />
-              {isMissed || isDuplicated ? (
-                <div
-                  className={classnames(styles.schemaSelect, styles.disabled)}
-                >
-                  <span>{EN.UnselectUndesirableVariables}</span>
-                </div>
-              ) : (
-                <div
-                  className={styles.schemaSelect}
-                  onClick={this.toggleSelect}
-                >
-                  <span>{EN.UnselectUndesirableVariables}</span>
-                </div>
-              )}
-              <Hint
-                themeStyle={{
-                  fontSize: '1.5rem',
-                  lineHeight: '2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                content={
-                  <div>
-                    {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
-                    {EN.VariableIDs} <br />
-                    {EN.Variablesthatarederivedfromthetarget} <br />
-                    {EN.Anyothervariablesyou}
+              <Show
+                name = 'schema_VariableSelection_UN'
+              >
+                {isMissed || isDuplicated ? (
+                  <div
+                    className={classnames(styles.schemaSelect, styles.disabled)}
+                  >
+                    <span>{EN.UnselectUndesirableVariables}</span>
                   </div>
-                }
-              />
+                ) : (
+                  <div
+                    className={styles.schemaSelect}
+                    onClick={this.toggleSelect}
+                  >
+                    <span>{EN.UnselectUndesirableVariables}</span>
+                  </div>
+                )}
+                <Hint
+                  themeStyle={{
+                    fontSize: '1.5rem',
+                    lineHeight: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  content={
+                    <div>
+                      {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
+                      {EN.VariableIDs} <br />
+                      {EN.Variablesthatarederivedfromthetarget} <br />
+                      {EN.Anyothervariablesyou}
+                    </div>
+                  }
+                />
+              </Show>
+
               {isMissed && (
                 <div className={styles.schemaMissed}>
                   <div className={styles.errorBlock}/>
@@ -463,24 +469,28 @@ export default class DataSchema extends Component<Interface> {
               text={EN.Continue}
               show={schema_continue_UN}
             />
-            <div className={styles.checkBox}>
-              <input
-                type="checkbox"
-                id="noCompute"
-                onChange={this.checkNoCompute}
-                checked={noComputeTemp}
-              />
-              <label htmlFor="noCompute">{EN.SkipDataQualityCheck}</label>
-              <Hint
-                themeStyle={{
-                  fontSize: '1.5rem',
-                  lineHeight: '2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                content={EN.Ifyouknowthedataisclean}
-              />
-            </div>
+            <Show
+              name = 'schema_SkipDataQualityCheck_UN'
+            >
+              <div className={styles.checkBox}>
+                <input
+                  type="checkbox"
+                  id="noCompute"
+                  onChange={this.checkNoCompute}
+                  checked={noComputeTemp}
+                />
+                <label htmlFor="noCompute">{EN.SkipDataQualityCheck}</label>
+                <Hint
+                  themeStyle={{
+                    fontSize: '1.5rem',
+                    lineHeight: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  content={EN.Ifyouknowthedataisclean}
+                />
+              </div>
+            </Show>
           </div>
           {etling && (
             <ProcessLoading
