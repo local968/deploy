@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, Checkbox, Progress, Select, Modal } from 'antd';
 import { action, observable } from 'mobx';
@@ -58,6 +58,7 @@ export default class Deployment extends Component {
   @observable uploadSpeed = '0 Kb/s';
   @observable modelEditing = false;
   @observable tempModelName = false;
+  @observable charset = 'utf-8'
 
   @action
   selectionOption = (key, value) => () => {
@@ -82,6 +83,11 @@ export default class Deployment extends Component {
     this.props.deploymentStore.currentDeployment.email = this.localEmail;
     this.props.deploymentStore.currentDeployment.save();
   };
+
+  @action
+  charsetChange = value => {
+    this.charset = value
+  }
 
   show = key => action(() => (this.dialog = key));
 
@@ -146,7 +152,8 @@ export default class Deployment extends Component {
         this.uploadOperator = opeartor
       },
       params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy'},
-      mapHeader: cd.mapHeader
+      mapHeader: cd.mapHeader,
+      charset: this.charset
     }
     return (
       <div className={styles.deployment} >
@@ -162,6 +169,16 @@ export default class Deployment extends Component {
           <span className={styles.data}>{EN.DeploymentDataDefinition}</span>
           <Hint themeStyle={{ fontSize: '1rem' }} content={EN.ValidationDataDefinitionTip} />
           <a className={styles.download} target="_blank" href={`/upload/dataDefinition?projectId=${cd.projectId}`}>{EN.Download}</a>
+          <label className={styles.chooseCharset}>{EN.choosecharset}</label>
+          <Select
+            style={{ width: '8rem' }}
+            value={this.charset}
+            onChange={this.charsetChange}
+          >
+            <Option value="utf-8">{EN.UTF_8}</Option>
+            <Option value="gbk">{EN.GBK}</Option>
+            <Option value="big5">{EN.BIG5}</Option>
+          </Select>
           {/* <span className={styles.email}>
             Email to Receive Alert: {!this.emailEditing && (cd.email || 'empty')}
             {this.emailEditing && (
