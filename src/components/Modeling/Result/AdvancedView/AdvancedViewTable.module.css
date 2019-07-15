@@ -1,0 +1,47 @@
+.main {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.main span{
+  font-size: 1rem;
+}
+
+.option {
+  display: flex;
+  flex: none;
+  height: 40px;
+  margin-bottom: 20px;
+}
+
+.metricFbeta {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+.metricFbetaBlock {
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 10px;;
+}
+.metricFbetaBtn {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  border: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  padding: 4px 14px;
+}
+.metricFbetaBtn span {
+  color: #fff;
+}
+
+.table {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+}

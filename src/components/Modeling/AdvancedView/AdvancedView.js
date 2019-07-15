@@ -5,23 +5,23 @@ import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
 import styles from './AdvancedView.module.css';
 import { Hint, Switch } from 'components/Common';
-import FitPlotHover from './iconMR-FitPlot-Hover.svg';
-import FitPlotNormal from './iconMR-FitPlot-Normal.svg';
-import FitPlotSelected from './iconMR-FitPlot-Selected.svg';
-import ResidualHover from './iconMR-Residual-Hover.svg';
-import ResidualNormal from './iconMR-Residual-Normal.svg';
-import ResidualSelected from './iconMR-ResidualPlot-Selected.svg';
-import varImpactHover from './icon-variable-impact-linear-hover.svg';
-import varImpactSelected from './icon-variable-impact-selected.svg';
-import varImpactNormal from './icon-variable-impact-linear-normal.svg';
+import FitPlotHover from './svg/iconMR-FitPlot-Hover.svg';
+import FitPlotNormal from './svg/iconMR-FitPlot-Normal.svg';
+import FitPlotSelected from './svg/iconMR-FitPlot-Selected.svg';
+import ResidualHover from './svg/iconMR-Residual-Hover.svg';
+import ResidualNormal from './svg/iconMR-Residual-Normal.svg';
+import ResidualSelected from './svg/iconMR-ResidualPlot-Selected.svg';
+import varImpactHover from './svg/icon-variable-impact-linear-hover.svg';
+import varImpactSelected from './svg/icon-variable-impact-selected.svg';
+import varImpactNormal from './svg/icon-variable-impact-linear-normal.svg';
 
-import nonlinearImg from './img-residual-plot-nonlinear.svg';
-import heteroscedasticityImg from './img-residual-plot-heteroscedasticity.svg';
-import largeImg from './img-residual-plot-large-y.svg';
-import yAxisUnbalancedImg from './img-residual-plot-y-axis-unbalanced.svg';
-import outliersImg from './img-residual-plot-outliers.svg';
-import xAxisUnbalancedImg from './img-residual-plot-x-axis-unbalanced.svg';
-import randomlyImg from './img-residual-plot-randomly.svg';
+import nonlinearImg from './svg/img-residual-plot-nonlinear.svg';
+import heteroscedasticityImg from './svg/img-residual-plot-heteroscedasticity.svg';
+import largeImg from './svg/img-residual-plot-large-y.svg';
+import yAxisUnbalancedImg from './svg/img-residual-plot-y-axis-unbalanced.svg';
+import outliersImg from './svg/img-residual-plot-outliers.svg';
+import xAxisUnbalancedImg from './svg/img-residual-plot-x-axis-unbalanced.svg';
+import randomlyImg from './svg/img-residual-plot-randomly.svg';
 
 import VariableImpact from '../Result/VariableImpact';
 import { computed } from 'mobx';
@@ -245,7 +245,7 @@ export default class AdvancedView extends Component {
         }, {
           key: "log_loss",
           display: 'LogLoss'
-        }]: [{
+        }] : [{
           display: 'MSE',
           key: 'mse'
         }, {

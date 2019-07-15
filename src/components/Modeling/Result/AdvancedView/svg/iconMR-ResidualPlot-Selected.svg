@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="52px" height="52px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54 (76480) - https://sketchapp.com -->
+    <title>iconResidual-Normal</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="5-4-4-Model-Selection_Advanced-View_Model-Expand_ROC-Cure-Copy" transform="translate(-177.000000, -360.000000)">
+            <g id="Group-17" transform="translate(177.000000, 313.000000)">
+                <g id="iconResidual-Selected" transform="translate(0.000000, 47.333333)">
+                    <g>
+                        <path d="M0.0837425508,2.42640416 C0.0837425508,1.10442762 1.15945512,0.0327538979 2.47739281,0.0327538979 L26.9400923,0.0327538979 C28.2620688,0.0327538979 29.3337426,1.10846646 29.3337426,2.42640416 L29.3337426,26.8891036 C29.3337426,28.2110802 28.25803,29.2827539 26.9400923,29.2827539 L2.47739281,29.2827539 C1.15541628,29.2827539 0.0837425508,28.2070413 0.0837425508,26.8891036 L0.0837425508,2.42640416 Z" id="Rectangle-7-Copy" fill="#1D2B3C"></path>
+                        <g id="Arrow" transform="translate(2.250000, 3.375000)" stroke="#FFFFFF" stroke-linecap="square" stroke-width="0.6">
+                            <path d="M1.17544909,0.208890381 L2.11580836,1.04445191" id="Line"></path>
+                            <path d="M0.235089818,0.208890381 L1.17544909,1.04445191" id="Line-Copy-2" transform="translate(0.705269, 0.626671) scale(-1, 1) translate(-0.705269, -0.626671) "></path>
+                        </g>
+                        <g id="Arrow-Copy" transform="translate(26.706923, 25.108691) rotate(90.000000) translate(-26.706923, -25.108691) translate(25.300673, 24.264941)" stroke="#FFFFFF" stroke-linecap="square" stroke-width="0.6">
+                            <path d="M1.17544909,0.208890381 L2.11580836,1.04445191" id="Line"></path>
+                            <path d="M0.235089818,0.208890381 L1.17544909,1.04445191" id="Line-Copy-2" transform="translate(0.705269, 0.626671) scale(-1, 1) translate(-0.705269, -0.626671) "></path>
+                        </g>
+                        <path d="M3.42544909,24.8907093 L26.9344309,24.8907093" id="Line" stroke="#FFFFFF" stroke-width="0.6" stroke-linecap="square"></path>
+                        <path d="M3.42544909,24.8907093 L3.42544909,4.00167114" id="Line-Copy" stroke="#FFFFFF" stroke-width="0.6" stroke-linecap="square"></path>
+                        <path d="M3.78643799,13.78125 L26.8269653,13.78125" id="Line-4" stroke="#FFFFFF" stroke-width="0.9" stroke-linecap="square"></path>
+                        <path d="M7.76953486,10.9343514 L10.2381628,17.3821895 L13.5296667,12.223919 L15.1754187,15.4478381 L20.1126745,9 L11.8839147,9 L20.1126745,17.3821895 L13.9411047,18.6717571 L24.2270544,10.9343514 L24.2270544,15.4478381" id="Path-4" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.6,4.2"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

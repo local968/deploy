@@ -1,0 +1,89 @@
+.main {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  flex: none;
+}
+
+.cell {
+  display: flex;
+  flex: 1 1;
+  justify-content: center;
+  align-items: center;
+  width: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+span.text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+}
+
+.toolCell {
+  display: flex;
+  width: 0;
+  flex: 2 2;
+  align-items: center;
+  position: relative;
+  background: #ccc;
+}
+
+.tools {
+  position: absolute;
+  top: -60px;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  flex: none;
+}
+
+.metric {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.metricText {
+  display: flex;
+  flex: none;
+  padding-right: 10px;
+  background: #fff;
+}
+
+.metricBg {
+  position: absolute;
+  top: 30px;
+  height: 30px;
+  width: 100%;
+  border: 1px #000 solid;
+  border-bottom: none;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.metricSwitch {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  height: 60px;
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin-right: 15px;
+}
+.metricSwitch span {
+  margin: 0 10px;
+  white-space: nowrap;
+}

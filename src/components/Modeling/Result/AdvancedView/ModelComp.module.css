@@ -1,0 +1,25 @@
+.modelComp {
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 30px;;
+}
+.comparison {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  border: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  padding: 10px 24px;
+}
+.comparison span{
+  color: #fff;
+}
+.mccb{
+  display: flex;
+  justify-content: flex-end;
+}
+.mccb button{
+  margin-left: 20px;
+}

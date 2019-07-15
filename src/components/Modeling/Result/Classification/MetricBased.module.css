@@ -112,6 +112,7 @@ button.cancel span{
   cursor: pointer;
   display: flex;
   flex: none;
+  font-size: 1rem;
 }
 
 .metricLarger {

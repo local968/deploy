@@ -1,0 +1,52 @@
+.main {
+  min-width: 1600px;
+  min-height: 600px;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+
+.main span{
+  font-size: 1rem;
+}
+
+.title {
+  display: flex;
+  flex: none;
+  margin-top: 40px;
+}
+
+.model {
+  display: flex;
+  flex: none;
+}
+
+.label {
+  margin-right: 10px;
+}
+
+.status {
+  color:#f5a623;
+}
+
+.options {
+  display: flex;
+  flex: none;
+  margin-top: 20px;
+}
+
+.filter {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.settingsSelect {
+  min-width: 220px;
+}
+
+.table {
+  display: flex;
+  flex: none;
+  margin-top: 20px;
+}
