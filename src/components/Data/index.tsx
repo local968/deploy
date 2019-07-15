@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, RefObject } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
 import { ProjectSide } from 'components/Common';
@@ -6,12 +6,21 @@ import { Route, Switch } from 'react-router-dom';
 import DataConnect from './Connect';
 import DataSchema from './Schema';
 import DataQuality from './Quality';
-import { autorun, observable } from 'mobx'
+import { autorun, observable, IReactionDisposer } from 'mobx'
+import { ProjectStore } from 'stores/ProjectStore';
+import { RouterStore } from 'mobx-react-router';
+
+interface DataProps {
+  projectStore: ProjectStore,
+  routing: RouterStore,
+}
 
 @inject('projectStore', 'routing')
 @observer
-export default class Data extends Component {
+export default class Data extends Component<DataProps> {
   @observable right = 0
+  sideRef: RefObject<ProjectSide>
+  autorun: IReactionDisposer
 
   constructor(props) {
     super(props);
