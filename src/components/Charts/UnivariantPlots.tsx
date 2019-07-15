@@ -63,8 +63,9 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 				formatter: params=> {
 					const [o,t] = params;
 					const k = item.find(itm=>itm.key === o.axisValue);
+					const s = k?`${o.axisValue}:${(100*k.count/sum).toFixed(3)}%`:o.axisValue;
 					return `
-						${o.axisValue}:${(100*k.count/sum).toFixed(3)}%<br/>
+						${s}<br/>
 						${o.marker}${o.seriesName}:${o.value}<br/>
 						${t.marker}${t.seriesName}:${t.value}<br/>
 					`
@@ -75,7 +76,7 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 			xAxis : {
 				type : 'category',
 				name:x_name,
-				data:item.map(itm=>itm.key),
+				data:item.map(itm=>itm.key||itm),
 				nameTextStyle,
 				nameLocation:'middle',
 				nameGap:25,
