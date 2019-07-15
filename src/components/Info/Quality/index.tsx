@@ -43,21 +43,22 @@ export default class DataQuality extends Component<DataQualityInterface> {
     const { project } = this.props.projectStore;
     const { problemType, target } = project;
     if (problemType === 'Clustering' || !target)
-      return <VariableIssue project={project} />;
+      return <VariableIssue project={project} hasTab={false} />;
     return this.step === 1 ? (
       <TargetIssue project={project} changeTab={this.changeTab.bind(null, 2)} />
     ) : (
-      <VariableIssue
-        project={project}
-        changeTab={this.changeTab.bind(null, 1)}
-      />
-    );
+        <VariableIssue
+          project={project}
+          changeTab={this.changeTab.bind(null, 1)}
+          hasTab={true}
+        />
+      );
   }
 }
 
 interface TargetIssueInterface {
-  project:any
-  changeTab:any
+  project: any
+  changeTab: any
 }
 @observer
 class TargetIssue extends Component<TargetIssueInterface> {
@@ -143,20 +144,20 @@ class TargetIssue extends Component<TargetIssueInterface> {
         nullCount === 0
           ? 0
           : (nullCount * 100) / (totalRawLines || 1) < 0.01
-          ? '<0.01'
-          : formatNumber(String((nullCount * 100) / (totalRawLines || 1)), 2),
+            ? '<0.01'
+            : formatNumber(String((nullCount * 100) / (totalRawLines || 1)), 2),
       mismatch:
         mismatchCount === 0
           ? 0
           : (mismatchCount * 100) / (totalRawLines || 1) < 0.01
-          ? '<0.01'
-          : formatNumber(String((mismatchCount * 100) / (totalRawLines || 1)), 2),
+            ? '<0.01'
+            : formatNumber(String((mismatchCount * 100) / (totalRawLines || 1)), 2),
       outlier:
         outlierCount === 0
           ? 0
           : (outlierCount * 100) / (totalRawLines || 1) < 0.01
-          ? '<0.01'
-          : formatNumber(String((outlierCount * 100) / (totalRawLines || 1)), 2),
+            ? '<0.01'
+            : formatNumber(String((outlierCount * 100) / (totalRawLines || 1)), 2),
     };
     const warnings = [];
     const unique = targetArrayTemp.length || rawDataView[target].uniqueValues;
@@ -185,7 +186,7 @@ class TargetIssue extends Component<TargetIssueInterface> {
             <div className={styles.issueBox}>
               {warnings.map((v, k) => (
                 <div className={styles.issueText} key={k}>
-                  <div className={styles.point}/>
+                  <div className={styles.point} />
                   <span>{v}</span>
                 </div>
               ))}
@@ -205,13 +206,13 @@ class TargetIssue extends Component<TargetIssueInterface> {
             <div className={styles.issueBox}>
               {issues.targetIssue && (
                 <div className={styles.issueText}>
-                  <div className={styles.point}/>
+                  <div className={styles.point} />
                   <span>{EN.Yourtargetvariablehasmorethantwouniquevalues}</span>
                 </div>
               )}
               {issues.rowIssue && (
                 <div className={styles.issueText}>
-                  <div className={styles.point}/>
+                  <div className={styles.point} />
                   <span>{EN.Datasizeistoosmall}</span>
                 </div>
               )}
@@ -391,8 +392,9 @@ class TargetIssue extends Component<TargetIssueInterface> {
 }
 
 interface InterfaceVariableIssue {
-  project:any
-  changeTab?:any
+  project: any
+  changeTab?: any
+  hasTab: boolean
 }
 
 @observer
@@ -441,7 +443,7 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
     this.props.project
       .endQuality()
       .then(() => (this.summary = true))
-      .catch(() => {});
+      .catch(() => { });
     this.onClose();
   };
 
@@ -596,7 +598,7 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
   };
 
   render() {
-    const { project, changeTab } = this.props;
+    const { project, changeTab, hasTab } = this.props;
     const {
       dataHeader,
       etling,
@@ -620,19 +622,19 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
               </span>
             </div>
           ) : (
-            <div className={styles.cleanTitle}>
-              <span>{EN.VariableQualitylooksgood}</span>
-            </div>
-          )}
+              <div className={styles.cleanTitle}>
+                <span>{EN.VariableQualitylooksgood}</span>
+              </div>
+            )}
           <div className={styles.issueBox}>
             {rowIssue && (
               <div className={styles.issueText}>
-                <div className={styles.point}/>
+                <div className={styles.point} />
                 <span className={styles.limitText}>
                   {EN.Foryourwholedataset}
                 </span>
                 <Show
-                  name = 'quality_LoadaNewDataset_UN'
+                  name='quality_LoadaNewDataset_UN'
                 >
                   <div
                     className={styles.button} onClick={this.backToConnect}>
@@ -645,12 +647,12 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
             )}
             {dataIssue && (
               <div className={styles.issueText}>
-                <div className={styles.point}/>
+                <div className={styles.point} />
                 <span className={styles.limitText}>
                   {EN.SomeissuesarefoundR2learnhasgenerated}
                 </span>
                 <Show
-                  name = 'quality_EditTheFixes_UN'
+                  name='quality_EditTheFixes_UN'
                 >
                   <div
                     className={styles.button} onClick={this.editFixes}>
@@ -691,9 +693,9 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
           )}
           {problemType === 'Outlier' && (
             <div className={styles.issueTabs}>
-              <div className={styles.issueTab} onClick={changeTab}>
+              {hasTab && <div className={styles.issueTab} onClick={changeTab}>
                 <span>{EN.TargetVariable}</span>
-              </div>
+              </div>}
               <div
                 className={styles.issueTab}
                 style={{ borderBottomColor: '#1d2b3c' }}
@@ -790,10 +792,10 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
   }
 }
 interface SummaryInterface {
-  project:any
-  editFixes:any
-  dataIssue:any
-  closeSummary:any
+  project: any
+  editFixes: any
+  dataIssue: any
+  closeSummary: any
 }
 @observer
 class Summary extends Component<SummaryInterface> {
@@ -862,15 +864,15 @@ class Summary extends Component<SummaryInterface> {
       totalFixedLines,
       issues,
     } = project;
-    const deletePercent:any = formatNumber(String((deletedCount / totalRawLines) * 100), 2);
-    const fixedPercent:any = formatNumber(
+    const deletePercent: any = formatNumber(String((deletedCount / totalRawLines) * 100), 2);
+    const fixedPercent: any = formatNumber(
       String(((totalFixedLines - deletedCount) / totalRawLines) * 100),
       2,
     );
     const cleanPercent = formatNumber(String(100 - deletePercent - fixedPercent), 2);
     const variableList = dataHeader;
     const percentList = dataHeader.map(v => {
-      const percent:any = {
+      const percent: any = {
         missing: nullRow[v] || 0,
         mismatch: mismatchRow[v] || 0,
         outlier: outlierRow[v] || 0,
@@ -1019,43 +1021,43 @@ class Summary extends Component<SummaryInterface> {
               <div className={styles.summaryPart}>
                 <div className={styles.summaryPartText}>
                   <div
-                      className={styles.summaryCube}
-                      style={{ backgroundColor: '#9cebff' }}
-                      />
-                     <span style={{ fontWeight: 'bold' }}>
+                    className={styles.summaryCube}
+                    style={{ backgroundColor: '#9cebff' }}
+                  />
+                  <span style={{ fontWeight: 'bold' }}>
                     {EN.RowsWillBeFixed}
                   </span>
                 </div>
                 <div className={styles.summaryPartText}>
-                  <div className={styles.summaryCube}/>
+                  <div className={styles.summaryCube} />
                   <span>{fixedPercent}%</span>
                 </div>
               </div>
               <div className={styles.summaryPart}>
                 <div className={styles.summaryPartText}>
                   <div
-                      className={styles.summaryCube}
-                      style={{ backgroundColor: '#c4cbd7' }}
-                      />
+                    className={styles.summaryCube}
+                    style={{ backgroundColor: '#c4cbd7' }}
+                  />
                   <span style={{ fontWeight: 'bold' }}>
                     {EN.RowsWillBeDeleted}
                   </span>
                 </div>
                 <div className={styles.summaryPartText}>
-                  <div className={styles.summaryCube}/>
+                  <div className={styles.summaryCube} />
                   <span>{deletePercent}%</span>
                 </div>
               </div>
               <div className={styles.summaryPart}>
                 <div className={styles.summaryPartText}>
                   <div
-                      className={styles.summaryCube}
-                      style={{ backgroundColor: '#00c855' }}
-                      />
+                    className={styles.summaryCube}
+                    style={{ backgroundColor: '#00c855' }}
+                  />
                   <span style={{ fontWeight: 'bold' }}>{EN.CleanData}</span>
                 </div>
                 <div className={styles.summaryPartText}>
-                  <div className={styles.summaryCube}/>
+                  <div className={styles.summaryCube} />
                   <span>{cleanPercent}%</span>
                 </div>
               </div>

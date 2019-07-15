@@ -71,7 +71,7 @@ function parseChartData(result) {
 }
 
 async function query(key, offset, limit, userId) {
-  const projectIdList = await projectService.list(userId)||[];
+  const projectIdList = await projectService.list(userId) || [];
   const count = projectIdList.length;
   const result = { count, list: [] };
   const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName'];
@@ -1749,7 +1749,7 @@ wss.register('getOutlierData', (message, socket, progress) => {
       return axios.post(`${esServicePath}/etls/${esIndex}/terms`, { nos: list.toString() }).then(rowsResult => {
         if (rowsResult.status !== 200) return []
         try {
-          return rowsResult.data.result
+          return list.map(i => rowsResult.data.result.find(r => r.__no === i)) 
         } catch (e) {
           return []
         }
