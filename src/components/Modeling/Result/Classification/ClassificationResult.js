@@ -259,7 +259,7 @@ export default class ClassificationView extends Component {
             <section className={styles.newTitle}>
               <label>{EN.Input}</label>
               <dl>
-                <dt>
+                <dt style={{ fontSize:'12px',display:'block !important'}}>
                  <b>{EN.A}</b>{EN.Boththebenefitandcost}
                  <b>{EN.B}</b>{EN.Eventdistributioninputranges}
                  <span style={{ color: '#f5a623', fontStyle: 'italic' }}>{EN.NoteAllinputsentered}</span>
