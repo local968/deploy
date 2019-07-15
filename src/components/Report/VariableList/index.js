@@ -143,7 +143,7 @@ export default class SimplifiedView extends Component {
     const {target, colType, targetMap, dataViews, dataViewsLoading, preImportance, preImportanceLoading,
       histgramPlots, dataHeader, addNewVariable, addNewVariable2, newVariable, newType, newVariableViews,
       id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress,
-	    models,
+	    models,mapHeader = [],
     } = project;
     const {graphicList:lists} = models[0];
     const graphicList = JSON.parse(JSON.stringify(lists));
@@ -157,6 +157,11 @@ export default class SimplifiedView extends Component {
     const selectValue = hasNewOne ? customHeader.length : (key === 0 ? 'all' : (key === 1 ? 'informatives' : key - 2));
     const top1 = graphicList.shift();
     const top2 = graphicList.shift();
+
+    const newMapHeader = {
+      ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}),
+      ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}),
+    };
     return <div className={styles.simplified} style={{zIndex: this.visible ? 3 : 1}}>
       <div className={styles.targetTable}>
         <div className={styles.targetHead}>
@@ -219,9 +224,6 @@ export default class SimplifiedView extends Component {
           </select>
         </div>
         <div className={styles.newVariable}>
-          {/*<div className={styles.toolButton} onClick={this.showNewVariable}>*/}
-          {/*  <span>{EN.CreateANewVariable}</span>*/}
-          {/*</div>*/}
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType} expression={expression}/>
           </Modal>
@@ -270,6 +272,7 @@ export default class SimplifiedView extends Component {
               const map = targetMap || {};
               const importance = preImportance ? (preImportance[h] || 0) : 0.01;
               return <SimplifiedViewRow
+                  mapHeader={newMapHeader}
                   chartDatas = {[graphicList.shift(),graphicList.shift()]}
                   key={i} value={h} data={data} map={map} importance={importance}
                                         colType={variableType} project={project}
@@ -435,7 +438,7 @@ class SimplifiedViewRow extends Component {
   }
 
   render() {
-    const {data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines,chartDatas} = this.props;
+    const {data = {}, importance, colType, value, project, isChecked, handleCheck, id, lines,chartDatas,mapHeader} = this.props;
     const valueType = colType[value] === 'Numerical' ? 'Numerical' : 'Categorical'
     const isRaw = colType[value] === 'Raw'
     const unique = (isRaw && `${lines}+`) || (valueType === 'Numerical' && 'N/A') || data.uniqueValues;
@@ -443,7 +446,10 @@ class SimplifiedViewRow extends Component {
     return <div className={styles.tableRow}>
       <div className={classnames(styles.tableTd, styles.tableCheck)}><input type='checkbox' checked={isChecked}
                                                                             onChange={handleCheck}/></div>
-      <div className={styles.tableTd} title={value}><span>{value}</span></div>
+      {/*<div className={styles.tableTd} title={value}><span>{value}</span></div>*/}
+      <div className={styles.tableTd} title={mapHeader[value]}>
+        <span>{mapHeader[value]}</span>
+      </div>
       <div className={classnames(styles.tableTd, {
         [styles.notAllow]: isRaw
       })} onClick={this.showHistograms}>

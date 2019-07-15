@@ -351,6 +351,7 @@ export default class PVA extends Component<DataSampleProps>{
 					/>
 				<div className={styles.pva} id='pva'>
 					{EN.InputRanges}:
+					<Hint content={<p>{EN.ActualValuesRange}</p>} />
 					<InputNum
 						min={yMin}
 						max={y}
@@ -399,7 +400,6 @@ export default class PVA extends Component<DataSampleProps>{
 						disabled={loading === 'change'}
 						onClick={()=>this.setSlider([0,100],'reset')}
 					>{EN.Reset}</Button>
-
 				</div>
 			</div>
 		]

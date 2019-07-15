@@ -5,8 +5,8 @@ import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
 import { observable, action } from 'mobx';
 import AdvancedView from '../AdvancedView/AdvancedView';
-import ClassificationResult from './ClassificationResult';
-import RegressionResult from './RegressionResult';
+import ClassificationResult from './Classification/ClassificationResult';
+import RegressionResult from './Regression/RegressionResult';
 import { ProgressBar, ProcessLoading } from 'components/Common';
 import { Modal, message, Button } from 'antd'
 import EN from '../../../constant/en';

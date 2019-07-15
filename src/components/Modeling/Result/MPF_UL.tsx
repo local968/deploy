@@ -250,8 +250,8 @@ export default class MPF_UL extends Component<Interface> {
 		if(!res.length){
 			return null;
 		}
-		if(outlier&&target){
-			if(colType[target]!=="Categorical"){
+		if(outlier){
+			if(target&&colType[target]!=="Categorical"){
 				let {low,high} = rawDataView[target];
 				if(outlierDictTemp[target]){
 					const lh = [...outlierDictTemp[target]];
@@ -290,9 +290,9 @@ export default class MPF_UL extends Component<Interface> {
 											upper,
 										} = std_deviation_bounds;
 										const data = `${mapHeader[it]} ${EN.ValidRange}:[${lower.toFixed(2)},${upper.toFixed(2)}]`;
-										return <li key={ind} title={data}>
-											<dfn className={styles.dfn} style={{
-												width:7*len,
+										return <li className={styles.dfn} key={ind} title={data}>
+											<dfn style={{
+												width:8*len,
 											}}>{mapHeader[it]}</dfn>{EN.ValidRange}:[{lower.toFixed(2)},{upper.toFixed(2)}]
 										</li>
 									})
