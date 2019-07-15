@@ -132,7 +132,7 @@ const DisplayOutlier = (props: DisplayOutlierProps) => {
     <Table
       columnWidth={110}
       rowHeight={34}
-      columnCount={header.length}
+      columnCount={header.length + 1}
       rowCount={tableData.length}
       fixedColumnCount={1}
       fixedRowCount={2}

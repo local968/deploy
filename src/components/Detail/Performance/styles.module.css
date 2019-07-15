@@ -291,3 +291,13 @@
   font-size: 1rem;
   color: #ff3151;
 }
+
+.chooseCharset {
+  font-size: 1rem;
+  margin-left: 4rem;
+  margin-right: 1rem;
+}
+
+.charsets {
+  width: 10rem;
+}
