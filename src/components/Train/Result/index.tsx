@@ -326,7 +326,7 @@ function ModelResult(props) {
               className={`${classes.button} ${classes.disable}`}
               onMouseOver={() => setShowTips(true)}
               onMouseOut={() => setShowTips(false)}
-            >
+            >1
               <span>{EN.DeployTheModel}</span>
             </button>
           </Tooltip>
@@ -335,9 +335,6 @@ function ModelResult(props) {
             <span>{EN.DeployTheModel}</span>
           </button>
         )}
-        {/* {<button className={`${classes.button}`} onClick={download} style={{ marginLeft: '.1em' }}>
-        <span>导出模型结果</span>
-      </button>} */}
         {problemType === 'Clustering' && (
           <a
             href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(

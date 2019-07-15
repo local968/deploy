@@ -91,7 +91,6 @@ router.post('/login', async(req, res) => {
 });
 
 router.delete('/logout', (req, res) => {
-  // console.log('Destroying session');
   req.session.destroy(() => {});
   res.send({ status: 200, message: 'ok' });
 });
