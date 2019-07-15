@@ -18,7 +18,7 @@ const classes = styles;
 const color:any = ['#b7cbf8','#ffffff','green','red'];//背景(开始)/背景(结束）/正常点/异常点
 
 interface DataSampleProps {
-    projectStore:any
+    projectStore?:any
 }
 
 @inject('projectStore')

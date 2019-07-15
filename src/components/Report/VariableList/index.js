@@ -219,9 +219,6 @@ export default class SimplifiedView extends Component {
           </select>
         </div>
         <div className={styles.newVariable}>
-          {/*<div className={styles.toolButton} onClick={this.showNewVariable}>*/}
-          {/*  <span>{EN.CreateANewVariable}</span>*/}
-          {/*</div>*/}
           <Modal visible={this.visible} footer={null} closable={false} width={'65%'}>
             <CreateNewVariables onClose={this.hideNewVariable} addNewVariable={addNewVariable2} colType={colType} expression={expression}/>
           </Modal>

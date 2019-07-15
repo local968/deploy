@@ -67,9 +67,7 @@ export default class PredictTable extends Component<Interface> {
         className={styles.predictTable}
         columns={column}
         bordered
-        rowKey={re => {
-          return re.rowName;
-        }}
+        rowKey={({rowName}) => rowName}
         dataSource={data}
         pagination={false}
       />

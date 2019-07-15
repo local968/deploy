@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Table, Tabs, Modal, Select, Radio, Button, Tooltip, Icon, InputNumber } from 'antd';
+import { Tabs, Modal, Select, Radio, Button, Tooltip, Icon, InputNumber } from 'antd';
 import { observer, inject } from 'mobx-react';
 import { observable } from 'mobx'
 import styles from './AdvancedView.module.css';
@@ -48,43 +48,11 @@ import MetricBased from '../Result/Classification/MetricBased'
 export default class AdvancedView extends Component {
 
   @observable fbeta = this.props.project.fbeta
-  // undefined = can not sort, false = no sort ,1 = asc, -1 = desc
-  // @observable sortState = {
-  //   'Model Name': 1,
-  //   'Fbeta': false,
-  //   'Precision': false,
-  //   'Recall': false,
-  //   'LogLoss': false,
-  //   'Cutoff Threshold': false,
-  //   'Validation': false,
-  //   'Holdout': false,
-  //   'Normalized RMSE': false,
-  //   'RMSE': false,
-  //   'MSLE': false,
-  //   'RMSLE': false,
-  //   'MSE': false,
-  //   'MAE': false,
-  //   'R2': false,
-  //   'AdjustR2': false,
-  //   'KS': false,
-  //   'Time': false
-  // };
-  // @observable metric = {
-  //   key: '',
-  //   display: ''
-  // };
-
   @computed
   get filtedModels() {
     const { models, project, projectStore, sort, metric, currentSettingId } = this.props;
-    // const {problemType} = project;
-    // problemType === "Classification"&&this.props.projectStore.project.upIsHoldout(false);
     const { isHoldout, fbeta } = this.props.projectStore.project;
-
     let _filtedModels = [...models];
-    // const currentSort = Object.keys(this.sortState).find(key => this.sortState[key])
-    // const metricKey = this.metric.key;
-
     let { stopFilter, oldfiltedModels } = projectStore;
     const sortMethods = (aModel, bModel) => {
       switch (sort.key) {
@@ -277,18 +245,7 @@ export default class AdvancedView extends Component {
         }, {
           key: "log_loss",
           display: 'LogLoss'
-        }]
-        // [{
-        //   display: 'AUC',
-        //   key: 'auc'
-        // }, {
-        //   display: 'F1',
-        //   key: 'f1'
-        // }, {
-        //   key: "log_loss",
-        //   display: 'LogLoss'
-        // }]
-        : [{
+        }]: [{
           display: 'MSE',
           key: 'mse'
         }, {
@@ -302,47 +259,9 @@ export default class AdvancedView extends Component {
     return []
   }
 
-  // changeSort = (type) => action(() => {
-  //   const currentActive = Object.keys(this.sortState).find(key => this.sortState[key]);
-  //   if (type === currentActive) {
-  //     this.sortState[type] = this.sortState[type] === 1 ? 2 : 1;
-  //   } else {
-  //     this.sortState[currentActive] = false;
-  //     this.sortState[type] = 1
-  //   }
-  //   if (window.localStorage)
-  //     window.localStorage.setItem(`advancedViewSort:${this.props.project.id}`, JSON.stringify(this.sortState))
-
-  // });
-
-  // handleChange = action(value => {
-  //   this.metric = this.metricOptions.find(m => m.key === value);
-  //   // if (window.localStorage)
-  //   //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
-  // });
-
   constructor(props) {
     super(props);
     props.project.problemType === "Classification" && props.projectStore.project.upIsHoldout(false);
-    // const currentSetting = props.projectStore.project.currentSetting
-    // this.metric = (currentSetting && currentSetting.setting) ? this.metricOptions.find(m => m.key === currentSetting.setting.measurement) : this.metricOptions[0]
-    // autorun(() => {
-    //   const { project } = props;
-    //   if (project && project.measurement)
-    //     this.metric = this.metricOptions.find(metric => metric.key === project.measurement) || this.metricOptions[0]
-    // });
-
-    // if (window.localStorage) {
-    //   runInAction(() => {
-    //     try {
-    //       const storagedSort = JSON.parse(window.localStorage.getItem(`advancedViewSort:${props.project.id}`))
-    //       const storagedMetric = window.localStorage.getItem(`advancedViewMetric:${props.project.id}`)
-    //       // if (storagedSort) this.sortState = storagedSort
-    //       // if (storagedMetric) this.metric = this.metricOptions.find(m => m.key === storagedMetric);
-    //     } catch (e) { }
-    //   })
-    // }
-    // props.projectStore.changeStopFilter(true)
     props.projectStore.changeOldfiltedModels(undefined)
   }
 

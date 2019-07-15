@@ -8,6 +8,7 @@ import {
   PIE
 } from "../../Charts"
 import Project from 'stores/Project';
+import { Show } from '../../Common';
 
 interface SummaryProps {
   project: Project,
@@ -191,13 +192,25 @@ class Summary extends Component<SummaryProps> {
           </div>
         </div>
         <div className={styles.summaryBottom}>
-          <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
-            [styles.disabled]: totalLines === 0
-          })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
-          <div className={classnames(styles.summaryButton, {
-            [styles.disabled]: !issues.dataIssue
-          })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
-          <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>
+          <Show
+            name = 'quality_WillFixtheIssues_Continue'
+          >
+            <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
+              [styles.disabled]: totalLines === 0
+            })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
+          </Show>
+          <Show
+            name = 'quality_WillFixtheIssues_EdittheFixes'
+          >
+            <div className={classnames(styles.summaryButton, {
+              [styles.disabled]: !issues.dataIssue
+            })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
+          </Show>
+          <Show
+            name = 'schema_LoadaBetterDataset'
+          >
+            <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>
+          </Show>
         </div>
       </div>
     </div>

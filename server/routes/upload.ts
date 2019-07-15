@@ -10,7 +10,8 @@ import Papa from 'papaparse';
 import http from 'http';
 import command from '../command';
 import scheduleApi from '../scheduleApi';
-// import Restriction from '../restriction';
+const {userService} = require('../apis/service');
+
 import config from '../../config';
 import axios from 'axios';
 import _ from 'lodash';
@@ -19,7 +20,7 @@ const {restriction} = require("../apis/service/planService");
 
 import { getProjectField } from './project';
 
-const esServicePath = config.services.ETL_SERVICE; 
+const esServicePath = config.services.ETL_SERVICE;
 const router = express.Router();
 // const { userModelingRestriction, userStorageRestriction } = Restriction;
 
@@ -185,11 +186,21 @@ router.get('/test', async (req, res) => {
   res.json(host);
 });
 
-router.get('/reload', (req, res) => {
-  saveSample(true);
-  res.json({
-    status: 100,
-    msg: 'ok',
+router.get('/reload', async (req, res) => {
+  const { userId } = req.session;
+  const result = await userService.status(userId);
+
+  if(result&&result.drole&&result.drole.Reload){
+    await saveSample(true);
+    return res.json({
+      status: 100,
+      msg: 'ok',
+    });
+  }
+
+  return res.json({
+    status: 500,
+    msg: 'No Permission!',
   });
 });
 

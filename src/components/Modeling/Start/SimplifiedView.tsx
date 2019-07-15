@@ -13,6 +13,7 @@ import CreateNewVariables from '../../CreateNewVariable';
 import SimplifiedViewPlot from './SimplifiedViewPlot';
 import SimplifiedViewRow from './SimplifiedViewRow';
 import CorrelationPlot from './CorrelationPlot';
+import { Show } from '../../Common';
 interface Interface {
   project: any;
 }
@@ -406,9 +407,14 @@ export default class SimplifiedView extends Component<Interface> {
             </select>
           </div>
           <div className={styles.newVariable}>
-            <div className={styles.toolButton} onClick={this.showNewVariable}>
-              <span>{EN.CreateANewVariable}</span>
-            </div>
+            <Show
+              name = 'start_CreateANewVariable'
+            >
+              <div className={styles.toolButton} onClick={this.showNewVariable}>
+                <span>{EN.CreateANewVariable}</span>
+              </div>
+            </Show>
+
             <Modal
               visible={this.visible}
               footer={null}

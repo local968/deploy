@@ -366,6 +366,7 @@ const ZH_LAN = {
   Weaimtogetyouasense: '我们的目的是通过比较预测值和实际值来让您了解模型的准确程度。或许您也可以从中发现一些模式。',
   PredictedValues: '预测值',
   ActualValues: '真实值',
+  ActualValuesRange: '真实值的范围',
   GoodnessofFit: 'Goodness of Fit',
   EasyAndSimple: '简易',
   EasyAndSimpleTip: '如果您需要R2 Learn 自动建模．',
