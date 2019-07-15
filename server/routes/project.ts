@@ -1329,7 +1329,7 @@ wss.register('train', async (message, socket, progress) => {
     console.log('finish etl');
 
     const processFn = async queueValue => {
-      const stopIds = await getProjectField(projectId, 'stopIds');
+      const stopIds = await getProjectField(projectId, 'stopIds') || [];
       const { status, result, requestId: trainId } = queueValue;
       if (status < 0 || status === 100) {
         userLogger.info({
