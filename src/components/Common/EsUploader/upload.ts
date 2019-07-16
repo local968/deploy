@@ -78,7 +78,7 @@ export default function EsUploader(file, option: any = {}) {
       return
     }
     // uploaded += promise.bytes
-    onProgress(`${uploaded}/${file.size}`)
+    onProgress(`${uploaded > file.size ? file.size : uploaded}/${file.size}`)
     processors.splice(promise.no, 1)
     processors.forEach((p, i) => p.no = i)
   }

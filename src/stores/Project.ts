@@ -408,6 +408,7 @@ class Project {
       dataViews: null,
       dataViewsLoading: false,
       deletedCount: 0,
+      etlIndex: ''
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -420,7 +421,8 @@ class Project {
       otherMap: StringObject,
       dataViews: null,
       dataViewsLoading: boolean,
-      deletedCount: number
+      deletedCount: number,
+      etlIndex: string
     }
   }
 
