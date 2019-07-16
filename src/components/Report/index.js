@@ -223,7 +223,7 @@ class Report extends Component {
             {/*<h3 className={styles.blockTitle}>{EN.Metrics}</h3>*/}
             {list[0].problemType === 'Regression' && <div className={styles.metrics}>
               <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
-                <span className={styles.metricsCell}></span>
+                <span className={styles.metricsCell}/>
                 <span className={styles.metricsCell}>R²</span>
                 <span className={styles.metricsCell}>Adjusted R²</span>
                 <span className={styles.metricsCell}>MSE</span>

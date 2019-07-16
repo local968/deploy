@@ -402,7 +402,7 @@ export default class AdvancedView extends Component {
   }
 
   render() {
-    const { project, sort, handleSort, handleChange, metric, handleHoldout, currentSettingId, changeSetting } = this.props;
+    const { project, sort, handleSort, handleChange, metric, currentSettingId, changeSetting } = this.props;
     const { isHoldout, train2Finished, metricCorrection, problemType } = this.props.projectStore.project;
     const currMetric = this.metricOptions.find(m => m.key === (metric || (problemType === 'Classification' ? 'auc' : 'r2'))) || {}
     return (

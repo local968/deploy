@@ -56,7 +56,7 @@ export default class Sider extends Component {
         </div>
         <div className={styles.menus}>
           <Show
-            show = 'project'
+            name = 'project'
           >
             <a
               className={styles.home}
