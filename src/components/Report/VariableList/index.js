@@ -181,6 +181,18 @@ export default class SimplifiedView extends Component {
                       visible={this.showHistograms}
                       onVisibleChange={this.hide}
                       trigger="click"
+                      title={
+                        <Icon
+                          style={{
+                            float: 'right',
+                            height: 23,
+                            alignItems: 'center',
+                            display: 'flex',
+                          }}
+                          onClick={this.hide}
+                          type="close-circle"
+                        />
+                      }
                       content={<Chart
                           x_name={newMapHeader[target]}
                           y_name={'count'}
@@ -233,6 +245,18 @@ export default class SimplifiedView extends Component {
                                             visible={this.showCorrelation}
                                             onVisibleChange={this.hideCorrelationMatrix}
                                             trigger="click"
+                                            title={
+                                              <Icon
+                                                style={{
+                                                  float: 'right',
+                                                  height: 23,
+                                                  alignItems: 'center',
+                                                  display: 'flex',
+                                                }}
+                                                onClick={this.hideCorrelationMatrix}
+                                                type="close-circle"
+                                              />
+                                            }
                                             content={this.matrix(top2)}/>}
           <span>{EN.CheckCorrelationMatrix}</span>
         </div>
@@ -458,6 +482,18 @@ class SimplifiedViewRow extends Component {
                                                 visible={!isRaw && this.histograms}
                                                 onVisibleChange={this.hideHistograms}
                                                 trigger="click"
+                                                title={
+                                                  <Icon
+                                                    style={{
+                                                      float: 'right',
+                                                      height: 23,
+                                                      alignItems: 'center',
+                                                      display: 'flex',
+                                                    }}
+                                                    onClick={this.hideHistograms}
+                                                    type="close-circle"
+                                                  />
+                                                }
                                                 content={<Chart
                                                     x_name={mapHeader[value]}
                                                     y_name={'count'}
@@ -474,6 +510,18 @@ class SimplifiedViewRow extends Component {
                                                 visible={!isRaw && this.univariant}
                                                 onVisibleChange={this.hideUnivariant}
                                                 trigger="click"
+                                                title={
+                                                  <Icon
+                                                    style={{
+                                                      float: 'right',
+                                                      height: 23,
+                                                      alignItems: 'center',
+                                                      display: 'flex',
+                                                    }}
+                                                    onClick={this.hideUnivariant}
+                                                    type="close-circle"
+                                                  />
+                                                }
                                                 content={<Chart
                                                     data={chartDatas[1]}
                                                     project={project}
