@@ -60,13 +60,13 @@ const Headers: TableHeader[] = [
     hint: EN.MeanAbsoluteError
   },
   {
-    label: <span>R<sup>2</sup></span>,
+    label: 'R²',
     value: 'r2',
     sort: true,
     hint: EN.R2isastatisticalmeasure
   },
   {
-    label: <span>adjust R<sup>2</sup></span>,
+    label: 'Adjust R²',
     value: 'adjustR2',
     sort: true,
     hint: EN.TheadjustedR2tells
@@ -125,7 +125,7 @@ const RegressionTable = (props: RegressionTableProps) => {
         }
         return <div className={`${styles.headerCell} ${h.value === 'name' ? styles.name : ''}`} onClick={sortBy(h.value)} key={i}>
           <span>{hintElement}</span>
-          <span className={styles.text}>{h.label}</span>
+          <span className={styles.text} title={h.label}>{h.label}</span>
           <span>{sortElement}</span>
         </div>
       })}
@@ -145,11 +145,11 @@ const RegressionTable = (props: RegressionTableProps) => {
           </div>
         </div>
         <div className={styles.headerCell} onClick={sortBy('validation')}>
-          <span className={styles.text}>{EN.Validation}</span>
+          <span className={styles.text} title={EN.Validation}>{EN.Validation}</span>
           <span>{'validation' !== sort.key ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}</span>
         </div>
         <div className={styles.headerCell} onClick={sortBy('holdout')}>
-          <span className={styles.text}>{EN.Holdout}</span>
+          <span className={styles.text} title={EN.Holdout}>{EN.Holdout}</span>
           <span>{'holdout' !== sort.key ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}</span>
         </div>
       </div>
@@ -201,21 +201,21 @@ const RegressionTableRow = observer((props: RegressionTableRowProps) => {
       <div className={styles.row} onClick={handleResult(model.id)}>
         <div className={styles.check}><input type='radio' name='modelRadio' checked={selectModel.id === model.id} onClick={handleClick} onChange={() => { }} /></div>
         <div className={`${styles.cell} ${styles.name}`}>
-          <span className={styles.text}>{model.id}</span>
+          <span className={styles.text} title={model.id}>{model.id}</span>
           <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
         </div>
-        <div className={styles.cell}><span className={styles.text}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.nrmse.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.rmse.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.msle.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.rmsle.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.mse.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.mae.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.r2.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.adjustR2.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.nrmse.toString())}>{formatNumber(modelScore.nrmse.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.rmse.toString())}>{formatNumber(modelScore.rmse.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.msle.toString())}>{formatNumber(modelScore.msle.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.rmsle.toString())}>{formatNumber(modelScore.rmsle.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.mse.toString())}>{formatNumber(modelScore.mse.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.mae.toString())}>{formatNumber(modelScore.mae.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.r2.toString())}>{formatNumber(modelScore.r2.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.adjustR2.toString())}>{formatNumber(modelScore.adjustR2.toString())}</span></div>
         <div className={styles.scoreCell}>
-          <div className={styles.cell}><span className={styles.text}>{formatNumber(model.score.validateScore[metric].toString())}</span></div>
-          <div className={styles.cell}><span className={styles.text}>{formatNumber(model.score.holdoutScore[metric].toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber(model.score.validateScore[metric].toString())}>{formatNumber(model.score.validateScore[metric].toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber(model.score.holdoutScore[metric].toString())}>{formatNumber(model.score.holdoutScore[metric].toString())}</span></div>
         </div>
       </div>
     </Tooltip>

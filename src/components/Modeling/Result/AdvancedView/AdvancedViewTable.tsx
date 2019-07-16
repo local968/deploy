@@ -22,7 +22,7 @@ interface AdvancedViewTableProps {
 }
 
 export interface TableHeader {
-  label: string | ReactElement,
+  label: string,
   value: string,
   sort: boolean,
   hint?: string | ReactElement
