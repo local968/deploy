@@ -429,13 +429,13 @@ export default class ClassificationView extends Component<Interface> {
                       className={styles.newTitleDt}
                       style={{ fontSize: '12px', display: 'block !important'}}
                     >
-                      <b>{EN.A}</b>
-                      {EN.Boththebenefitandcost}
-                      <b>{EN.B}</b>
-                      {EN.Eventdistributioninputranges}
-                      <span style={{ color: '#f5a623', fontStyle: 'italic' }}>
+                      <p><b>{EN.A}</b>
+                        {EN.Boththebenefitandcost}</p>
+                      <p><b>{EN.B}</b>
+                        {EN.Eventdistributioninputranges}</p>
+                      <p><span style={{ color: '#f5a623', fontStyle: 'italic' }}>
                         {EN.NoteAllinputsentered}
-                      </span>
+                      </span></p>
                     </dt>
                     {/*<dt>*/}
                     {/*  <span><span style={{ display: 'block' }}><b>{EN.A}</b>{EN.Boththebenefitandcost}</span></span>*/}
