@@ -123,7 +123,7 @@ const ClassificationTable = (props: ClassificationTableProps) => {
         }
         return <div className={`${styles.headerCell} ${h.value === 'name' ? styles.name : ''}`} onClick={sortBy(h.value)} key={i}>
           <span>{hintElement}</span>
-          <span className={styles.text}>{h.label}</span>
+          <span className={styles.text} title={h.label}>{h.label}</span>
           <span>{sortElement}</span>
         </div>
       })}
@@ -143,11 +143,11 @@ const ClassificationTable = (props: ClassificationTableProps) => {
           </div>
         </div>
         <div className={styles.headerCell} onClick={sortBy('validation')}>
-          <span className={styles.text}>{EN.Validation}</span>
+          <span className={styles.text} title={EN.Validation}>{EN.Validation}</span>
           <span>{'validation' !== sort.key ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}</span>
         </div>
         <div className={styles.headerCell} onClick={sortBy('holdout')}>
-          <span className={styles.text}>{EN.Holdout}</span>
+          <span className={styles.text} title={EN.Holdout}>{EN.Holdout}</span>
           <span>{'holdout' !== sort.key ? <Icon type='minus' /> : <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />}</span>
         </div>
       </div>
@@ -203,19 +203,19 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
       <div className={styles.row} onClick={handleResult(model.id)}>
         <div className={styles.check}><input type='radio' name='modelRadio' checked={selectModel.id === model.id} onClick={handleClick} onChange={() => { }} /></div>
         <div className={`${styles.cell} ${styles.name}`}>
-          <span className={styles.text}>{model.id}</span>
+          <span className={styles.text} title={model.id}>{model.id}</span>
           <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
         </div>
-        <div className={styles.cell}><span className={styles.text}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model.fbeta(fbeta, type).toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`precision${type}`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`recall${type}`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`logloss${type}`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model.cutoff.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`ks${type}`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(model.fbeta(fbeta, type).toString())}>{formatNumber(model.fbeta(fbeta, type).toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`precision${type}`].toString())}>{formatNumber(model[`precision${type}`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`recall${type}`].toString())}>{formatNumber(model[`recall${type}`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`logloss${type}`].toString())}>{formatNumber(model[`logloss${type}`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(model.cutoff.toString())}>{formatNumber(model.cutoff.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`ks${type}`].toString())}>{formatNumber(model[`ks${type}`].toString())}</span></div>
         <div className={styles.scoreCell}>
-          <div className={styles.cell}><span className={styles.text}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric}Validation`].toString())}</span></div>
-          <div className={styles.cell}><span className={styles.text}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric}Holdout`].toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric}Validation`].toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric}Validation`].toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric}Holdout`].toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric}Holdout`].toString())}</span></div>
         </div>
       </div>
     </Tooltip>
