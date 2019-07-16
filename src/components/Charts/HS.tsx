@@ -14,7 +14,6 @@ import styles from './charts.module.css';
 interface DataSampleProps {
 	x_name:string
 	y_name:string
-	title:string
 	data:any
 	result?:any
 }
@@ -57,7 +56,7 @@ export default class HS extends Component<DataSampleProps>{
 
 	componentDidMount() {
 		const {data} = this.state;
-		if(_.size(data)>1){
+		if(_.size(data)>6){
 			this.chart.getEchartsInstance().showLoading();
 		}
 	}
@@ -82,7 +81,8 @@ export default class HS extends Component<DataSampleProps>{
 
 	getOption() {
 		const {ready,step,sliderValue:_sliderValue,data,min,max,interval} = this.state;
-		let {title,x_name,y_name} = this.props;
+		let {x_name,y_name} = this.props;
+		let title = `Feature:${x_name}`;
 		if(!ready){
 			return {
 				xAxis:{},
@@ -142,16 +142,16 @@ export default class HS extends Component<DataSampleProps>{
 
 		let dataZoom = [];
 
-		if(len>1){
+		if(len>6){
 			dataZoom = [{
 				type: 'slider',
 				rangeMode:['value','value'],
 				labelPrecision:2,
-				labelFormatter: (value)=> {
+				labelFormatter: async (value)=> {
 						if(!isNaN(Number(`${value}`))){
 							sliderValue.shift();
 							sliderValue.push(value);
-							this.setSlider(sliderValue);
+							await this.setSlider(sliderValue);
 							return value.toFixed(3);
 						}
 				},
@@ -181,9 +181,9 @@ export default class HS extends Component<DataSampleProps>{
 					type : 'shadow',
 				},
 				formatter: params=> {
-					const {marker,value,axisValueLabel} = params[0];
+					const {marker,value,axisValue} = params[0];
 					return `
-					  ${marker}[${(+axisValueLabel).toFixed(2)},${(+axisValueLabel+step * interval).toFixed(2)}):${(100*value[1]/sum).toFixed(3)}%
+					  ${marker}[${(+axisValue).toFixed(2)},${(+axisValue+step * interval).toFixed(2)}):${(100*value[1]/sum).toFixed(3)}%
 					`
 				},
 			},
@@ -214,7 +214,13 @@ export default class HS extends Component<DataSampleProps>{
 		const {step,data,interval} = this.state;
 		const len = _.size(data);
 		return [
-			<div className={styles.restore} key = 'restore' onClick={this.restore.bind(this)}>
+			<div
+				className={styles.restore}
+				key = 'restore'
+				style={{
+					display:(len>6?"":"none")
+				}}
+				onClick={this.restore.bind(this)}>
 				{EN.restore}:
 				<Icon type="reload" />
 			</div>,
@@ -231,7 +237,7 @@ export default class HS extends Component<DataSampleProps>{
 			     style={{
 			     	 textAlign:'left',
 				     width:550,
-				     display:(len>1?"":"none")
+				     display:(len>6?"":"none")
 			     }}>
 				当前比例：{step * interval}
 			</div>,
@@ -239,7 +245,7 @@ export default class HS extends Component<DataSampleProps>{
 			     style={{
 						 width:550,
 				     whiteSpace:'nowrap',
-				     display:(len>1?"flex":"none")
+				     display:(len>6?"flex":"none")
 				}}>
 				比例:
 				<Slider
