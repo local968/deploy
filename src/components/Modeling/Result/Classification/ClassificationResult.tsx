@@ -280,14 +280,12 @@ export default class ClassificationView extends Component<Interface> {
                 <section className={styles.newTitle}>
                   <label>{EN.Input}</label>
                   <dl>
-                    <dt>
-                      <span>
-                        {EN.Basedonyourbizscenario}
-                        <b>{EN.A}</b>
-                        {EN.Pleaseenterbenefitandcostin}
-                        <b>{EN.B}</b>
-                        {EN.Noteifacorrectpredictionbringsyouprofit}
-                      </span>
+                    <dt className={styles.newTitleDt}>
+                      <p>{EN.Basedonyourbizscenario}</p>
+                      <p><b>{EN.A}</b>
+                        {EN.Pleaseenterbenefitandcostin}</p>
+                      <p><b>{EN.B}</b>
+                        {EN.Noteifacorrectpredictionbringsyouprofit}</p>
                     </dt>
                     {/*<dt>*/}
                     {/*  <span>{EN.Basedonyourbizscenario}</span>*/}
