@@ -426,7 +426,8 @@ export default class ClassificationView extends Component<Interface> {
                   <label>{EN.Input}</label>
                   <dl>
                     <dt
-                      style={{ fontSize: '12px', display: 'block !important' }}
+                      className={styles.newTitleDt}
+                      style={{ fontSize: '12px', display: 'block !important'}}
                     >
                       <b>{EN.A}</b>
                       {EN.Boththebenefitandcost}

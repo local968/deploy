@@ -101,7 +101,7 @@ const ZH_LAN = {
   RowsWillBeFixed: '修复行数',
   RowsWillBeDeleted: '删除行数',
   LoadaBetterDataset: '上传一份高质量数据',
-  Ifyourdatadoesnothaveaheader: '如果你的数据没有列名，请重新上传一个有列名的数据。',
+  Ifyourdatadoesnothaveaheader: '请上传一个有列名的数据。如果数据没有列名，请在上传之前对数据增加列名。',
   Pleaseselectavariableasthetargetvariable: '请选择一个目标变量，也可以取消选择不需要的变量。',
   UnselectUndesirableVariables: '变量选择',
   Missing: '缺失',

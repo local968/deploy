@@ -1263,6 +1263,11 @@ span.performanceScore {
     font-size: 0.75rem;
 }
 
+.newTitleDt{
+  font-size: 12px;
+  display: block !important;
+}
+
 .newTitle label{
     display: block;
     font-weight: bold;
