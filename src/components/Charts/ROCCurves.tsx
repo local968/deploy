@@ -23,7 +23,7 @@ export default class ROCCurves extends PureComponent<DataSampleProps>{
 			position:null,
 			startIndex:props.model.fitIndex,
 		};
-		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
+		this.updatePoint = _.debounce(this.updatePoint.bind(this),200);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -214,7 +214,7 @@ export default class ROCCurves extends PureComponent<DataSampleProps>{
 
 	updatePoint(point){
 		const {model} = this.props;
-		const {_x} = this.state as any;
+		const {_x} = this.state;
 		model.setFitIndex(_x.indexOf(point));
 	}
 

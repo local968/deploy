@@ -147,11 +147,11 @@ export default class HS extends Component<DataSampleProps>{
 				type: 'slider',
 				rangeMode:['value','value'],
 				labelPrecision:2,
-				labelFormatter: async (value)=> {
+				labelFormatter: (value)=> {
 						if(!isNaN(Number(`${value}`))){
 							sliderValue.shift();
 							sliderValue.push(value);
-							await this.setSlider(sliderValue);
+							this.setSlider(sliderValue);
 							return value.toFixed(3);
 						}
 				},

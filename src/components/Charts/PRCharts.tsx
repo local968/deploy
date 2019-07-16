@@ -24,7 +24,7 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 			position:null,
 			startIndex:props.model.fitIndex,
 		};
-		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
+		this.updatePoint = _.debounce(this.updatePoint.bind(this),300);
 	}
 
 	componentWillReceiveProps(nextProps) {
