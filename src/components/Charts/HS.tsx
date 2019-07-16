@@ -7,6 +7,9 @@ import 'rc-input-number/assets/index.css';
 import 'rc-slider/assets/index.css';
 import { toJS } from 'mobx';
 import EN from '../../constant/en';
+import { Icon } from 'antd';
+import styles from './charts.module.css';
+
 
 interface DataSampleProps {
 	x_name:string
@@ -26,6 +29,8 @@ export default class HS extends Component<DataSampleProps>{
 		min:number
 		max:number
 		interval:number
+		_min:number
+		_max:number
 	};
 	constructor(props){
 		super(props);
@@ -35,8 +40,8 @@ export default class HS extends Component<DataSampleProps>{
 		const {min=0,max=0,interval=1} =result||data;
 		const _data = result?data:data.data;
 
-		const _min = _.min(_.map(data,itm=>itm[0]));
-		const _max = _.max(_.map(data,itm=>itm[0]));
+		const _min = _.min(_.map(_data,itm=>itm[0]));
+		const _max = _.max(_.map(_data,itm=>itm[0]));
 		this.state = {
 			sliderValue : [_min,_max],
 			ready:true,
@@ -45,6 +50,8 @@ export default class HS extends Component<DataSampleProps>{
 			min,
 			max,
 			interval,
+			_min,
+			_max,
 		}
 	}
 
@@ -74,7 +81,7 @@ export default class HS extends Component<DataSampleProps>{
 	}
 
 	getOption() {
-		const {ready,step,sliderValue:_sliderValue,data,min,max} = this.state;
+		const {ready,step,sliderValue:_sliderValue,data,min,max,interval} = this.state;
 		let {title,x_name,y_name} = this.props;
 		if(!ready){
 			return {
@@ -123,8 +130,6 @@ export default class HS extends Component<DataSampleProps>{
 				interval:Math.floor((len/5)),
 				formatter: (value)=>value.toFixed(2),
 			},
-			// min:_.min(_.map(data,itm=>itm[0]))-1,
-			// max:_.max(_.map(data,itm=>itm[0]))+1,
 		};
 
 		if(len<=1){
@@ -178,7 +183,7 @@ export default class HS extends Component<DataSampleProps>{
 				formatter: params=> {
 					const {marker,value,axisValueLabel} = params[0];
 					return `
-					  ${marker}${axisValueLabel}:${(100*value[1]/sum).toFixed(3)}%
+					  ${marker}[${(+axisValueLabel).toFixed(2)},${(+axisValueLabel+step * interval).toFixed(2)}):${(100*value[1]/sum).toFixed(3)}%
 					`
 				},
 			},
@@ -194,23 +199,25 @@ export default class HS extends Component<DataSampleProps>{
 			grid:{
 				y2:80,
 			},
-			toolbox:{
-				show : len>1,
-				right:30,
-				itemSize:20,
-				feature : {
-					restore:{
-						title:EN.restore,
-					},
-				},
-			}
 		};
+	}
+
+	restore(){
+		const {_min,_max} = this.state;
+		this.setState({
+			step:1,
+			sliderValue:[_min,_max],
+		})
 	}
 
 	render(){
 		const {step,data,interval} = this.state;
 		const len = _.size(data);
 		return [
+			<div className={styles.restore} key = 'restore' onClick={this.restore.bind(this)}>
+				{EN.restore}:
+				<Icon type="reload" />
+			</div>,
 			<ReactEcharts
 				key='echart'
 				option={this.getOption()}
