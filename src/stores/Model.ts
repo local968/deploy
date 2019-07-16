@@ -71,7 +71,10 @@ class Model {
   initialFitIndex: number
   dataFlow: StringObject
   graphicList: graphicListItem[]
+  createTime: number;
   validatePlotData: string
+  holdoutPlotData: string;
+  residualPlotPath: string
   @observable score: Score;
   @observable backend: string;
   @observable featureImportance: NumberObject;
@@ -271,6 +274,31 @@ class Model {
     if (type !== 'Validation' && type !== 'Holdout') type = 'Validation'
     if (isNaN(beta) || beta < 0.1 || beta > 10) beta = 1
     return (1 + beta * beta) * this[`precision${type}`] * this[`recall${type}`] / ((beta * beta * this[`precision${type}`]) + this[`recall${type}`])
+  }
+  @computed
+  get cutoff() {
+    const { chartData: { roc: { Threshold } }, fitIndex } = this
+    return Threshold[fitIndex]
+  }
+  @computed
+  get loglossValidation() {
+    const { chartData: { roc: { LOGLOSS } }, fitIndex } = this
+    return LOGLOSS[fitIndex]
+  }
+  @computed
+  get loglossHoldout() {
+    const { holdoutChartData: { roc: { LOGLOSS } }, fitIndex } = this
+    return LOGLOSS[fitIndex]
+  }
+  @computed
+  get aucValidation() {
+    const { score: { validateScore: { auc } } } = this
+    return auc
+  }
+  @computed
+  get aucHoldout() {
+    const { score: { holdoutScore: { auc } } } = this
+    return auc
   }
   modelProcessFlow(dataFlow: StringObject) {
     const rawPara = dataFlow || this.dataFlow;

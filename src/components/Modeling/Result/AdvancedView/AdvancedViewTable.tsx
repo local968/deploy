@@ -7,6 +7,7 @@ import Model from 'stores/Model';
 import { Hint } from 'components/Common';
 import { observer } from 'mobx-react';
 import ClassificationTable from './ClassificationTable'
+import RegressionTable from './RegressionTable'
 
 interface AdvancedViewTableProps {
   project: Project,
@@ -16,18 +17,19 @@ interface AdvancedViewTableProps {
   }
   handleSort: (k: string) => void,
   metric: string,
-  handleChange: (k: string) => void
+  handleChange: (k: string) => void,
+  models: Model[]
 }
 
 export interface TableHeader {
-  label: string,
+  label: string | ReactElement,
   value: string,
   sort: boolean,
   hint?: string | ReactElement
 }
 
 const AdvancedViewTable = (props: AdvancedViewTableProps) => {
-  const { project, sort, handleSort, metric, handleChange } = props
+  const { project, sort, handleSort, metric, handleChange, models } = props
   const { problemType } = project
   const [fbeta, setFbeta] = useState(project.fbeta)
 
@@ -51,8 +53,8 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
     </div>
     <div className={styles.table}>
       {problemType === 'Classification' ?
-        <ClassificationTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} /> :
-        <ClassificationTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} />}
+        <ClassificationTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} /> :
+        <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} />}
     </div>
   </div>
 }

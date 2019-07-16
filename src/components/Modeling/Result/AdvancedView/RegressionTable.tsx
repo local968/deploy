@@ -9,7 +9,7 @@ import { observer } from 'mobx-react';
 import { TableHeader } from './AdvancedViewTable';
 import moment from 'moment';
 import { formatNumber } from '../../../../util'
-import DetailCurves from './DetailCurves';
+import RegressionDetailCurves from './RegressionDetailCurves';
 
 const Option = Select.Option
 
@@ -25,64 +25,66 @@ const Headers: TableHeader[] = [
     sort: true,
   },
   {
-    label: 'Fbeta',
-    value: 'fbeta',
+    label: 'Normalized RMSE',
+    value: 'nrmse',
     sort: true,
-    hint: <p>{EN.TheFbetascoreistheharmonicmean}<br /><br />{EN.PrecisionRecallbeta}</p>
+    hint: EN.RootMeanSquareErrorRMSEmeasures
   },
   {
-    label: 'Precision',
-    value: 'precision',
+    label: 'RMSE',
+    value: 'rmse',
     sort: true,
-    hint: <p>{EN.Itmeasureshowmanytruepositivesamong}</p>
+    hint: EN.RootMeanSquareErrorprediction
   },
   {
-    label: 'Recall',
-    value: 'recall',
+    label: 'MSLE',
+    value: 'msle',
     sort: true,
-    hint: EN.Itrepresentsthecompleteness
   },
   {
-    label: 'LogLoss',
-    value: 'logLoss',
+    label: 'RMSLE',
+    value: 'rmsle',
     sort: true,
-    hint: <p>{EN.LogLossis}<br /><br />{EN.Thelikelihoodfunctionanswers}</p>
+    hint: EN.RMSLEissimilarwithRMSE
   },
   {
-    label: 'Cutoff Threshold',
-    value: 'cutoff',
+    label: 'MSE',
+    value: 'mse',
     sort: true,
-    hint: EN.Manyclassifiersareabletoproduce
+    hint: EN.MeanSquaredErro
   },
   {
-    label: 'KS',
-    value: 'ks',
+    label: 'MAE',
+    value: 'mae',
     sort: true,
-    hint: EN.Efficientwaytodetermine
+    hint: EN.MeanAbsoluteError
+  },
+  {
+    label: <span>R<sup>2</sup></span>,
+    value: 'r2',
+    sort: true,
+    hint: EN.R2isastatisticalmeasure
+  },
+  {
+    label: <span>adjust R<sup>2</sup></span>,
+    value: 'adjustR2',
+    sort: true,
+    hint: EN.TheadjustedR2tells
   }
 ]
 
 const MetricOptions = [{
-  display: 'Accuracy',
-  key: 'acc'
+  display: 'MSE',
+  key: 'mse'
 }, {
-  display: 'AUC',
-  key: 'auc'
+  display: 'RMSE',
+  key: 'rmse'
 }, {
-  display: 'F1',
-  key: 'f1'
-}, {
-  display: 'Precision',
-  key: 'precision'
-}, {
-  display: 'Recall',
-  key: 'recall'
-}, {
-  key: "log_loss",
-  display: 'LogLoss'
+  display: <div>R<sup>2</sup></div>,
+  key: 'r2'
 }]
 
-interface ClassificationTableProps {
+interface RegressionTableProps {
   project: Project,
   metric: string,
   handleChange: (k: string) => void
@@ -94,7 +96,7 @@ interface ClassificationTableProps {
   models: Model[]
 }
 
-const ClassificationTable = (props: ClassificationTableProps) => {
+const RegressionTable = (props: RegressionTableProps) => {
   const { sort, handleSort, project, metric, handleChange, models } = props
   const { isHoldout } = project
 
@@ -147,26 +149,26 @@ const ClassificationTable = (props: ClassificationTableProps) => {
       </div>
     </div>
     <div className={styles.body}>
-      {models.map((m, i) => <ClassificationRow model={m} project={project} metric={metric} key={i} />)}
+      {models.map((m, i) => <RegressionTableRow model={m} project={project} metric={metric} key={i} />)}
     </div>
   </div>
 }
 
-export default observer(ClassificationTable)
+export default observer(RegressionTable)
 
-interface ClassificationRowProps {
+interface RegressionTableRowProps {
   model: Model,
   metric: string,
   project: Project,
 }
 
-const ClassificationRow = observer((props: ClassificationRowProps) => {
+const RegressionTableRow = observer((props: RegressionTableRowProps) => {
   const { model, project, metric } = props
-  const { isHoldout, fbeta, targetArray, targetColMap, renameVariable, mapHeader, newVariable } = project
-  const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
-  const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+  const { isHoldout, mapHeader, newVariable } = project
+  const { score } = model
+  const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
 
-  const type = isHoldout ? 'Holdout' : 'Validation'
+  const modelScore = isHoldout ? score.holdoutScore : score.validateScore
   const [detail, setDetail] = useState(false)
 
   const handleResult = () => {
@@ -179,22 +181,23 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
         <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
       </div>
       <div className={styles.cell}><span className={styles.text}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
-      <div className={styles.cell}><span className={styles.text}>{formatNumber(model.fbeta(fbeta, type).toString())}</span></div>
-      <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`precision${type}`].toString())}</span></div>
-      <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`recall${type}`].toString())}</span></div>
-      <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`logloss${type}`].toString())}</span></div>
-      <div className={styles.cell}><span className={styles.text}>{formatNumber(model.cutoff.toString())}</span></div>
-      <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`ks${type}`].toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.nrmse.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.rmse.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.msle.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.rmsle.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.mse.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.mae.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.r2.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text}>{formatNumber(modelScore.adjustR2.toString())}</span></div>
       <div className={styles.scoreCell}>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`${metric}Validation`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`${metric}Holdout`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text}>{formatNumber(model.score.validateScore[metric].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text}>{formatNumber(model.score.holdoutScore[metric].toString())}</span></div>
       </div>
     </div>
-    {detail && <DetailCurves
-      model={model}
-      yes={yes}
-      no={no}
+    {detail && <RegressionDetailCurves
       project={project}
+      model={model}
+      mapHeader={newMapHeader}
     />}
   </div>
 })

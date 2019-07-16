@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import styles from './DetailCurves.module.css';
-import EN from '../../../constant/en';
+import EN from '../../../../constant/en';
 import { Table } from 'antd';
 
 interface Interface {
@@ -67,7 +67,7 @@ export default class PredictTable extends Component<Interface> {
         className={styles.predictTable}
         columns={column}
         bordered
-        rowKey={({ rowName }) => rowName}
+        rowKey={({rowName}) => rowName}
         dataSource={data}
         pagination={false}
       />

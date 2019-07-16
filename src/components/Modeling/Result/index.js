@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
 import { observable, action } from 'mobx';
-import AdvancedView from '../AdvancedView';
+import AdvancedView from './AdvancedView';
 import ClassificationResult from './Classification/ClassificationResult';
 import RegressionResult from './Regression/RegressionResult';
 import { ProgressBar, ProcessLoading } from 'components/Common';

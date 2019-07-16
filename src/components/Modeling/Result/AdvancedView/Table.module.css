@@ -2,16 +2,20 @@
   display: flex;
   flex: auto;
   flex-direction: column;
+  border: #d8d8d8 1px solid;
+  max-height: 50vh;
 }
 
 .header {
   display: flex;
   flex: none;
+  border-bottom: 1px solid #d8d8d8;
 }
 
-.cell {
+.headerCell {
   display: flex;
   flex: 1 1;
+  padding: 10px 10px;
   justify-content: center;
   align-items: center;
   width: 0;
@@ -33,7 +37,8 @@ span.text {
   flex: 2 2;
   align-items: center;
   position: relative;
-  background: #ccc;
+  background: #f0f2f6;
+  padding-right: 17px;
 }
 
 .tools {
@@ -86,4 +91,49 @@ span.text {
 .metricSwitch span {
   margin: 0 10px;
   white-space: nowrap;
+}
+
+.body {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  padding: 10px 0;
+  overflow-y: scroll;
+}
+
+.rowBody {
+  display: flex;
+  flex: auto;
+  flex-direction: column
+}
+
+.row {
+  display: flex;
+  flex: none;
+}
+
+.cell {
+  display: flex;
+  flex: 1 1;
+  padding: 10px 0;
+  margin: 0 10px;
+  justify-content: center;
+  align-items: center;
+  width: 0;
+  cursor: pointer;
+  position: relative;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.scoreCell {
+  display: flex;
+  width: 0;
+  flex: 2 2;
+  align-items: center;
+  position: relative;
+}
+
+.name {
+  flex: 0 0 260px;
+  margin: 0 10px;
 }

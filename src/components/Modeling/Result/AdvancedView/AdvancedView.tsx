@@ -27,11 +27,151 @@ interface AdvancedViewProps {
 
 const AdvancedView = (props: AdvancedViewProps) => {
   const { project, currentSettingId, changeSetting, models, sort, handleSort, metric, handleChange } = props
-  const { selectModel, problemType, train2Finished, metricCorrection } = project
+  const { selectModel, problemType, train2Finished, metricCorrection, isHoldout, fbeta } = project
+
+  const sortMethods = (aModel, bModel) => {
+    switch (sort.key) {
+      case 'Fbeta':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel.fbeta(fbeta, dataKey)
+          const bModelData = bModel.fbeta(fbeta, dataKey)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'Precision':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel[`precision${dataKey}`]
+          const bModelData = bModel[`precision${dataKey}`]
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'Recall':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel[`recall${dataKey}`]
+          const bModelData = bModel[`recall${dataKey}`]
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'LogLoss':
+        {
+          const aFitIndex = aModel.fitIndex
+          const bFitIndex = bModel.fitIndex
+          const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+          const aModelData = (aModel[dataKey].roc.LOGLOSS[aFitIndex])
+          const bModelData = (bModel[dataKey].roc.LOGLOSS[bFitIndex])
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'Cutoff Threshold':
+        {
+          const aFitIndex = aModel.fitIndex;
+          const bFitIndex = bModel.fitIndex;
+          const dataKey = isHoldout ? 'holdoutChartData' : 'chartData';
+          const aModelData = (aModel[dataKey].roc.Threshold[aFitIndex]);
+          const bModelData = (bModel[dataKey].roc.Threshold[bFitIndex]);
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'Normalized RMSE':
+        {
+          const aModelData = isHoldout ? aModel.score.holdoutScore.nrmse : aModel.score.validateScore.nrmse
+          const bModelData = isHoldout ? bModel.score.holdoutScore.nrmse : bModel.score.validateScore.nrmse
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'RMSE':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.rmse) : (aModel.score.validateScore.rmse)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.rmse) : (bModel.score.validateScore.rmse)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'MSLE':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.msle) : (aModel.score.validateScore.msle)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.msle) : (bModel.score.validateScore.msle)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'RMSLE':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.rmsle) : (aModel.score.validateScore.rmsle)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.rmsle) : (bModel.score.validateScore.rmsle)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'MSE':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.mse) : (aModel.score.validateScore.mse)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.mse) : (bModel.score.validateScore.mse)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'MAE':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.mae) : (aModel.score.validateScore.mae)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.mae) : (bModel.score.validateScore.mae)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'R2':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.r2) : (aModel.score.validateScore.r2)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.r2) : (bModel.score.validateScore.r2)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'AdjustR2':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.adjustR2) : (aModel.score.validateScore.adjustR2)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.adjustR2) : (bModel.score.validateScore.adjustR2)
+          return (aModelData - bModelData) * sort.value
+        }
+      case EN.Validation:
+        {
+          const { problemType } = project
+          let aModelData, bModelData
+          if (problemType === 'Regression') {
+            aModelData = (aModel.score.validateScore[metric || 'r2'])
+            bModelData = (bModel.score.validateScore[metric || 'r2'])
+          } else {
+            aModelData = metric === 'log_loss' ? aModel.chartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
+            bModelData = metric === 'log_loss' ? bModel.chartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
+          }
+          return (aModelData - bModelData) * sort.value
+        }
+      case EN.Holdout:
+        {
+          const { problemType } = project
+          let aModelData, bModelData
+          if (problemType === 'Regression') {
+            aModelData = (aModel.score.holdoutScore[metric || 'r2'])
+            bModelData = (bModel.score.holdoutScore[metric || 'r2'])
+          } else {
+            aModelData = metric === 'log_loss' ? aModel.holdoutChartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
+            bModelData = metric === 'log_loss' ? bModel.holdoutChartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
+          }
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'KS':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel[`ks${dataKey}`]
+          const bModelData = bModel[`ks${dataKey}`]
+          return (aModelData - bModelData) * sort.value
+        }
+      case EN.Time:
+        return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
+      case EN.ModelName:
+      default:
+        return (aModel.modelName > bModel.modelName ? 1 : -1) * (sort.value === 1 ? 1 : -1)
+      // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
+      // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
+      // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      // return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
+    }
+  };
 
   const filtedModels = useMemo(() => {
-    return models
-  }, [models])
+    let _models = [...models];
+    if (currentSettingId !== 'all') {
+      const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
+      if (currentSetting && currentSetting.models) _models.filter(model => currentSetting.models.find(id => model.id === id))
+    }
+    return _models.sort(sortMethods)
+  }, [models, sort.key, sort.value, currentSettingId])
 
   const performance = useMemo(() => {
     try {
@@ -183,7 +323,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
       {problemType === 'Classification' && <ModelComp models={filtedModels} />}
     </div>
     <div className={styles.table}>
-      <AdvancedViewTable project={project} sort={sort} handleSort={handleSort} metric={metric} handleChange={handleChange}/>
+      <AdvancedViewTable project={project} sort={sort} handleSort={handleSort} metric={metric} handleChange={handleChange} models={filtedModels} />
     </div>
   </div>
 }

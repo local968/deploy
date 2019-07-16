@@ -18,6 +18,7 @@
   }
   .detailCurves {
     display: flex;
+    font-size: 1rem;
   }
   .detailCurves .rightPanel {
     flex: 2;
@@ -87,3 +88,55 @@
   .detailCurves .leftPanel .predictTable tr td {
     white-space: nowrap;
   }
+
+  .residualDiagnose {
+    padding-bottom: 0.5em;
+  }
+  .residualDiagnose .plot {
+    display: inline-block;
+    width: 30%;
+  }
+  .residualDiagnose .choosePlot {
+    display: inline-block;
+    width: 70%;
+    vertical-align: top;
+  }
+  .residualDiagnose .choosePlot .radioWrapper {
+    display: inline-block;
+    margin: 0.1em;
+  }
+
+  .diagnoseResult {
+    display: inline-block;
+    width: 500px;
+    vertical-align: top;
+    margin-top: 1em;
+  }
+  .diagnoseResult .content {
+    margin-top: 1em;
+  }
+  .diagnoseResult .content .items {
+    /*margin-left: 2em;*/
+    list-style-type: initial;
+  }
+  .diagnoseResult .content .action {
+    margin-top: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .diagnoseResult .content .action span {
+    display: inline-block;
+    width: 250px;
+    font-size: 8px;
+  }
+  .diagnoseResult .content .action button {
+    width: 205px;
+    float: right;
+  }
+  .diagnoseResult .header {
+    font-weight: bold;
+  }
+.diagnoseResult .header +div{
+  padding: 10px 0;
+}
