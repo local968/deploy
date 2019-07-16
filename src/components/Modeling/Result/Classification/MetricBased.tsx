@@ -199,7 +199,7 @@ const MetricBased = (props: MetricBasedProps & { onClose: () => void }) => {
         <div className={styles.noteTitle}><span>{EN.noteTitle}</span></div>
         <ul className={styles.noteList}>
           <li className={styles.noteItem}>{EN.noteItem1}</li>
-          <li className={styles.noteItem}>{EN.noteItem2}</li>
+          {/* <li className={styles.noteItem}>{EN.noteItem2}</li> */}
           <li className={styles.noteItem}>{EN.noteItem3}</li>
           <li className={styles.noteItem}>{EN.noteItem4}</li>
           <li className={styles.noteItem}>{EN.noteItem5}</li>

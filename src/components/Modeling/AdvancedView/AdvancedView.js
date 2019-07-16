@@ -271,7 +271,7 @@ export default class AdvancedView extends Component {
   }
 
   handleMetricCorrection = (correction, isAll) => {
-    const { selectModel, models } = this.props.project;
+    const { selectModel, models, fbeta } = this.props.project;
     //不应用到全部  保存当前选择模型ID
     const selectId = selectModel.id
     const curModels = isAll ? models : [selectModel]
@@ -306,8 +306,8 @@ export default class AdvancedView extends Component {
         case 'fbeta':
           curIndex = 0
           for (let i = 1; i < Length; i++) {
-            const prevFbeta = Fbeta(curIndex, correction.value)
-            const newFbeta = Fbeta(i, correction.value)
+            const prevFbeta = Fbeta(curIndex, fbeta)
+            const newFbeta = Fbeta(i, fbeta)
             if (newFbeta > prevFbeta) curIndex = i
           }
           break;
