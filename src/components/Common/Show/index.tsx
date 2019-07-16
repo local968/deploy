@@ -8,8 +8,8 @@ interface ShowProps {
 }
 
 function Show(props:ShowProps){
-  const {name,userStore,children} = props;
-  const show = userStore.info.role[name];
+  const {name,userStore:{info:{role={}}},children} = props;
+  const show = role[name];
 
   if(show!==false){
       return children;

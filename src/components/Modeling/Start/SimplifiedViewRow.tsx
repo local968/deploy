@@ -156,7 +156,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
       } else {
         //Univariant
         const { min, max } = _data;
-        const data = {
+        const data:any = {
           target,
           value,
           id: etlIndex,
@@ -182,7 +182,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
               this.univariant = true;
             });
         } else {
-          //?
+          data.uniqueValues = _data.uniqueValues;
           request
             .post({
               url: '/graphics/classification-categorical',

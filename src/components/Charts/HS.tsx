@@ -87,12 +87,15 @@ export default class HS extends Component<DataSampleProps>{
 		let _data:any = _.cloneDeep(data);
 		let [start,end] = sliderValue;
 
+		let sum = 0;
+
 		const series = [{
 			yAxisIndex: 0,
 			type: 'bar',
 			data:_.map(_.chunk(_data,step),(itm)=>{
 				let x=[],y=0;
 				_.forEach(itm,it=>{
+					sum += +it[1];
 					x.push(it[0]);
 					y+=it[1];
 				});
@@ -167,6 +170,18 @@ export default class HS extends Component<DataSampleProps>{
 					fontSize
 				}
 			},
+			tooltip : {
+				trigger: 'axis',
+				axisPointer : {
+					type : 'shadow',
+				},
+				formatter: params=> {
+					const {marker,value,axisValueLabel} = params[0];
+					return `
+					  ${marker}${axisValueLabel}:${(100*value[1]/sum).toFixed(3)}%
+					`
+				},
+			},
 			dataZoom,
 			xAxis,
 			yAxis: {
@@ -184,11 +199,6 @@ export default class HS extends Component<DataSampleProps>{
 				right:30,
 				itemSize:20,
 				feature : {
-					// dataZoom: {
-					// 	icon:{
-					// 		back:'image://'
-					// 	}
-					// },
 					restore:{
 						title:EN.restore,
 					},
