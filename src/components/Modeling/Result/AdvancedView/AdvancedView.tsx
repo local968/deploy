@@ -15,7 +15,7 @@ interface AdvancedViewProps {
   project: Project,
   models: Model[],
   currentSettingId: string,
-  changeSetting: () => void,
+  changeSetting: (s: string) => void,
   sort: {
     key: string,
     value: number
@@ -165,11 +165,13 @@ const AdvancedView = (props: AdvancedViewProps) => {
   };
 
   const filtedModels = useMemo(() => {
+
     let _models = [...models];
     if (currentSettingId !== 'all') {
       const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
-      if (currentSetting && currentSetting.models) _models.filter(model => currentSetting.models.find(id => model.id === id))
+      if (currentSetting && currentSetting.models) _models = _models.filter(model => currentSetting.models.find(id => model.id === id))
     }
+    // console.log(_models.length, models.length, "111")
     return _models.sort(sortMethods)
   }, [models, sort.key, sort.value, currentSettingId])
 
