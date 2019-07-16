@@ -271,7 +271,7 @@ class VariableIssue extends Component<VariableIssueProps> {
                   {EN.SomeissuesarefoundR2learnhasgenerated}
                 </span>
                 <Show
-                  name='quality_EdittheFixes'
+                  name='quality_Predict_EdittheFixes'
                 >
                   <div
                     className={styles.button}
