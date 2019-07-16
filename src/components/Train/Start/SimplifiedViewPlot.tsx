@@ -25,7 +25,6 @@ export default class SimplifiedViewPlot extends Component<Interface> {
         <HS
           x_name={value}
           y_name={'count'}
-          title={`Feature:${value}`}
           data={data}
           result={result}
         />

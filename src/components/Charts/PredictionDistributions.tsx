@@ -3,7 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import config from 'config'
 
-const isEN = config.isEN;
+const {isEN} = config;
 
 export default function PredictionDistributions(props){
 	const {x_name='',y_name='',width=500,height=400,model,isHoldout} = props;
@@ -19,7 +19,7 @@ export default function PredictionDistributions(props){
 	useEffect(()=>{
 		const s:any = +(Threshold[fitIndex].toFixed(3));
 		setPoint(s);
-	},[]);
+	},[fitIndex]);
 
 	const data =  [{
 		name:'False',

@@ -28,8 +28,12 @@ export default class ROCCurves extends PureComponent<DataSampleProps>{
 
 	componentWillReceiveProps(nextProps) {
 		const {isHoldout} = this.props;
-		if(nextProps.isHoldout!==isHoldout){
-			this.prePair(undefined,nextProps.isHoldout)
+		const {startIndex} = this.state;
+		if(nextProps.isHoldout!==isHoldout||nextProps.model.fitIndex!==startIndex){
+			this.setState({
+				startIndex:nextProps.model.fitIndex
+			});
+			this.prePair(nextProps.model.fitIndex,nextProps.isHoldout)
 		}
 	}
 

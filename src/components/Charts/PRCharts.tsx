@@ -22,20 +22,25 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 		this.state = {
 			ready:false,
 			position:null,
+			startIndex:props.model.fitIndex,
 		};
 		this.updatePoint = _.debounce(this.updatePoint.bind(this),5);
 	}
 
 	componentWillReceiveProps(nextProps) {
 		const {isHoldout} = this.props.project;
-		if(nextProps.project.isHoldout!==isHoldout){
-			this.prePair(nextProps.isHoldout)
+		const {startIndex} = this.state;
+		if(nextProps.isHoldout!==isHoldout||nextProps.model.fitIndex!==startIndex){
+			this.setState({
+				startIndex:nextProps.model.fitIndex
+			});
+			this.prePair(nextProps.model.fitIndex,nextProps.isHoldout)
 		}
 	}
 
-	prePair(isHoldout=this.props.project.isHoldout){
+	prePair(fitIndex=this.props.model.fitIndex,isHoldout=this.props.project.isHoldout){
 		const {x_name='',y_name='',model} = this.props;
-		const {chartData,fitIndex=0,holdoutChartData} = model;
+		const {chartData,holdoutChartData} = model;
 		const {roc} = isHoldout?holdoutChartData:chartData;
 		const {Recall:x,Precision:y} = roc;
 

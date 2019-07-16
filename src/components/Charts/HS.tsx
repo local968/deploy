@@ -14,7 +14,6 @@ import styles from './charts.module.css';
 interface DataSampleProps {
 	x_name:string
 	y_name:string
-	title:string
 	data:any
 	result?:any
 }
@@ -82,7 +81,8 @@ export default class HS extends Component<DataSampleProps>{
 
 	getOption() {
 		const {ready,step,sliderValue:_sliderValue,data,min,max,interval} = this.state;
-		let {title,x_name,y_name} = this.props;
+		let {x_name,y_name} = this.props;
+		let title = `Feature:${x_name}`;
 		if(!ready){
 			return {
 				xAxis:{},
@@ -147,11 +147,11 @@ export default class HS extends Component<DataSampleProps>{
 				type: 'slider',
 				rangeMode:['value','value'],
 				labelPrecision:2,
-				labelFormatter: (value)=> {
+				labelFormatter: async (value)=> {
 						if(!isNaN(Number(`${value}`))){
 							sliderValue.shift();
 							sliderValue.push(value);
-							this.setSlider(sliderValue);
+							await this.setSlider(sliderValue);
 							return value.toFixed(3);
 						}
 				},

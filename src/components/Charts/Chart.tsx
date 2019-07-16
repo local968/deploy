@@ -34,7 +34,6 @@ export default function Chart(props){
 			chart = <HS
 				x_name={x_name}
 				y_name={y_name}
-				title={title}
 				data={data}
 			/>;
 			break;
