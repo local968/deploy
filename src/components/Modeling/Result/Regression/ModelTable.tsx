@@ -224,7 +224,7 @@ export default class ModelTable extends Component<Interface> {
                       {EN.TrainingNewModel}
                     </Tooltip>
                   </div>
-                  <ProgressBar progress={trainingModel.value || 0} />7
+                  <ProgressBar progress={trainingModel.value || 0} />
                   <Show
                     name = 'result_abortButton_REGRESSION'
                   >

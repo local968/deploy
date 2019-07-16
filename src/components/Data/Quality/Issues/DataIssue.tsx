@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { formatNumber } from '../../../../util'
 import EN from '../../../../constant/en';
+import { Show } from '../../../Common';
 
 interface DataIssueProps {
   backToConnect: () => void,
@@ -60,9 +61,14 @@ export class DataIssue extends Component<DataIssueProps> {
           <div className={styles.methodBox}>
             <div className={styles.method}>
               <div className={styles.reason}><span>{EN.R2Learnwillfixtheseissuesautomatically}</span></div>
-              <div className={styles.button} onClick={editFixes}>
-                <button><span>{EN.EdittheFixes}</span></button>
-              </div>
+              <Show
+                name = 'quality_EdittheFixes'
+              >
+                <div className={styles.button} onClick={editFixes}>
+                  <button><span>{EN.EdittheFixes}</span></button>
+                </div>
+              </Show>
+
             </div>
             {(totalRawLines > 1000 && totalLines < 1000) && <div className={styles.method}>
               <div className={styles.reason}><span>{EN.Datasizewillbesmallerthantheminimumsizeafterdelete}</span></div>
