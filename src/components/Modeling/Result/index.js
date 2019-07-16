@@ -115,7 +115,6 @@ export default class ModelResult extends Component {
 
     const type = isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
-    console.log(this.currentSettingId, 'this.currentSettingId')
     let filterModels = [...models]
     const currentSetting = this.currentSettingId === 'all' ? null : settings.find(setting => setting.id === this.currentSettingId)
     if (currentSetting && currentSetting.models)

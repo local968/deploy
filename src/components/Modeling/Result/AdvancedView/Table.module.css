@@ -10,6 +10,7 @@
   display: flex;
   flex: none;
   border-bottom: 1px solid #d8d8d8;
+  padding-left: 20px;
 }
 
 .headerCell {
@@ -106,7 +107,8 @@ span.text {
 .rowBody {
   display: flex;
   flex: auto;
-  flex-direction: column
+  flex-direction: column;
+  position: relative;
 }
 
 .row {
@@ -114,6 +116,7 @@ span.text {
   flex: none;
   position: relative;
   align-items: center;
+  padding-left: 20px;
 }
 
 .cell {
@@ -146,9 +149,19 @@ span.text {
   position: absolute;
   display: flex;
   flex: none;
-  left: -20px;
+  left: 10px;
 }
 
 .check input[type='radio']{
   cursor: pointer;
+}
+
+.recommendLabel {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.recommendLabel :global(.ant-tooltip-inner) {
+  min-height: 0;
 }
