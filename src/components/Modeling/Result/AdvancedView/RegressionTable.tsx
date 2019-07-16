@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, ChangeEvent, MouseEvent } from 'react'
+import React, { ReactElement, useState, MouseEvent } from 'react'
 import styles from './Table.module.css'
 import EN from '../../../../constant/en'
 import { Icon, Switch, Select, Radio } from 'antd'

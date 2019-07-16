@@ -147,5 +147,8 @@ span.text {
   display: flex;
   flex: none;
   left: -20px;
+}
+
+.check input[type='radio']{
   cursor: pointer;
 }

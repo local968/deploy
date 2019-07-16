@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement, useState, MouseEvent } from 'react'
 import styles from './Table.module.css'
 import EN from '../../../../constant/en'
 import { Icon, Switch, Select } from 'antd'
@@ -162,18 +162,27 @@ interface ClassificationRowProps {
 
 const ClassificationRow = observer((props: ClassificationRowProps) => {
   const { model, project, metric } = props
-  const { isHoldout, fbeta, targetArray, targetColMap, renameVariable, mapHeader, newVariable } = project
+  const { isHoldout, fbeta, targetArray, targetColMap, renameVariable, selectModel } = project
   const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
   const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
 
   const type = isHoldout ? 'Holdout' : 'Validation'
   const [detail, setDetail] = useState(false)
 
-  const handleResult = () => {
+
+  const handleResult = (e: MouseEvent<HTMLDivElement>) => {
     setDetail(!detail);
   }
+
+  const handleClick = (e: MouseEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    if (selectModel.id === model.id) return
+    project.updateProject({ selectId: model.id })
+  }
+
   return <div className={styles.rowBody}>
     <div className={styles.row} onClick={handleResult}>
+      <div className={styles.check}><input type='radio' name='modelRadio' checked={selectModel.id === model.id} onClick={handleClick} onChange={() => { }} /></div>
       <div className={`${styles.cell} ${styles.name}`}>
         <span className={styles.text}>{model.id}</span>
         <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
