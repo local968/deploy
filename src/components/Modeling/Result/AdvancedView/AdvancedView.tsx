@@ -31,28 +31,28 @@ const AdvancedView = (props: AdvancedViewProps) => {
 
   const sortMethods = (aModel, bModel) => {
     switch (sort.key) {
-      case 'Fbeta':
+      case 'fbeta':
         {
           const dataKey = isHoldout ? 'Holdout' : 'Validation'
           const aModelData = aModel.fbeta(fbeta, dataKey)
           const bModelData = bModel.fbeta(fbeta, dataKey)
           return (aModelData - bModelData) * sort.value
         }
-      case 'Precision':
+      case 'precision':
         {
           const dataKey = isHoldout ? 'Holdout' : 'Validation'
           const aModelData = aModel[`precision${dataKey}`]
           const bModelData = bModel[`precision${dataKey}`]
           return (aModelData - bModelData) * sort.value
         }
-      case 'Recall':
+      case 'recall':
         {
           const dataKey = isHoldout ? 'Holdout' : 'Validation'
           const aModelData = aModel[`recall${dataKey}`]
           const bModelData = bModel[`recall${dataKey}`]
           return (aModelData - bModelData) * sort.value
         }
-      case 'LogLoss':
+      case 'logLoss':
         {
           const aFitIndex = aModel.fitIndex
           const bFitIndex = bModel.fitIndex
@@ -61,7 +61,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
           const bModelData = (bModel[dataKey].roc.LOGLOSS[bFitIndex])
           return (aModelData - bModelData) * sort.value
         }
-      case 'Cutoff Threshold':
+      case 'cutoff':
         {
           const aFitIndex = aModel.fitIndex;
           const bFitIndex = bModel.fitIndex;
@@ -70,49 +70,49 @@ const AdvancedView = (props: AdvancedViewProps) => {
           const bModelData = (bModel[dataKey].roc.Threshold[bFitIndex]);
           return (aModelData - bModelData) * sort.value
         }
-      case 'Normalized RMSE':
+      case 'nrmse':
         {
           const aModelData = isHoldout ? aModel.score.holdoutScore.nrmse : aModel.score.validateScore.nrmse
           const bModelData = isHoldout ? bModel.score.holdoutScore.nrmse : bModel.score.validateScore.nrmse
           return (aModelData - bModelData) * sort.value
         }
-      case 'RMSE':
+      case 'rmse':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.rmse) : (aModel.score.validateScore.rmse)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.rmse) : (bModel.score.validateScore.rmse)
           return (aModelData - bModelData) * sort.value
         }
-      case 'MSLE':
+      case 'msle':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.msle) : (aModel.score.validateScore.msle)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.msle) : (bModel.score.validateScore.msle)
           return (aModelData - bModelData) * sort.value
         }
-      case 'RMSLE':
+      case 'rmsle':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.rmsle) : (aModel.score.validateScore.rmsle)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.rmsle) : (bModel.score.validateScore.rmsle)
           return (aModelData - bModelData) * sort.value
         }
-      case 'MSE':
+      case 'mse':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.mse) : (aModel.score.validateScore.mse)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.mse) : (bModel.score.validateScore.mse)
           return (aModelData - bModelData) * sort.value
         }
-      case 'MAE':
+      case 'mae':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.mae) : (aModel.score.validateScore.mae)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.mae) : (bModel.score.validateScore.mae)
           return (aModelData - bModelData) * sort.value
         }
-      case 'R2':
+      case 'r2':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.r2) : (aModel.score.validateScore.r2)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.r2) : (bModel.score.validateScore.r2)
           return (aModelData - bModelData) * sort.value
         }
-      case 'AdjustR2':
+      case 'adjustR2':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.adjustR2) : (aModel.score.validateScore.adjustR2)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.adjustR2) : (bModel.score.validateScore.adjustR2)
@@ -144,7 +144,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
           }
           return (aModelData - bModelData) * sort.value
         }
-      case 'KS':
+      case 'ks':
         {
           const dataKey = isHoldout ? 'Holdout' : 'Validation'
           const aModelData = aModel[`ks${dataKey}`]
@@ -165,15 +165,13 @@ const AdvancedView = (props: AdvancedViewProps) => {
   };
 
   const filtedModels = useMemo(() => {
-
     let _models = [...models];
     if (currentSettingId !== 'all') {
       const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
       if (currentSetting && currentSetting.models) _models = _models.filter(model => currentSetting.models.find(id => model.id === id))
     }
-    // console.log(_models.length, models.length, "111")
     return _models.sort(sortMethods)
-  }, [models, sort.key, sort.value, currentSettingId])
+  }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   const performance = useMemo(() => {
     try {
@@ -239,7 +237,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
           curIndex = undefined
           let reacallAllFilter = true
           const recallFn = (correction.type === 'Precision' && Precision) || (correction.type === 'Recall(0)' && Recall0) || (correction.type === 'Precision(0)' && Precision0)
-          for (let i = 1; i < Length; i++) {
+          for (let i = 0; i < Length; i++) {
             if (recallFn(i) < correction.value) continue
             if (curIndex === undefined) {
               curIndex = i
@@ -264,7 +262,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
           curIndex = undefined
           let precisionAllFilter = true
           const precisionFn = (correction.type === 'Recall' && Recall) || (correction.type === 'Recall(0)' && Recall0) || (correction.type === 'Precision(0)' && Precision0)
-          for (let i = 1; i < Length; i++) {
+          for (let i = 0; i < Length; i++) {
             if (precisionFn(i) < correction.value) continue
             if (curIndex === undefined) {
               curIndex = i

@@ -234,8 +234,8 @@ export default class AdvancedView extends Component {
           display: 'AUC',
           key: 'auc'
         }, {
-          display: 'F1',
-          key: 'f1'
+          display: 'Fbeta',
+          key: 'fbeta'
         }, {
           display: 'Precision',
           key: 'precision'
@@ -323,7 +323,7 @@ export default class AdvancedView extends Component {
           curIndex = undefined
           let reacallAllFilter = true
           const recallFn = (correction.type === 'Precision' && Precision) || (correction.type === 'Recall(0)' && Recall0) || (correction.type === 'Precision(0)' && Precision0)
-          for (let i = 1; i < Length; i++) {
+          for (let i = 0; i < Length; i++) {
             if (recallFn(i) < correction.value) continue
             if (curIndex === undefined) {
               curIndex = i
@@ -348,7 +348,7 @@ export default class AdvancedView extends Component {
           curIndex = undefined
           let precisionAllFilter = true
           const precisionFn = (correction.type === 'Recall' && Recall) || (correction.type === 'Recall(0)' && Recall0) || (correction.type === 'Precision(0)' && Precision0)
-          for (let i = 1; i < Length; i++) {
+          for (let i = 0; i < Length; i++) {
             if (precisionFn(i) < correction.value) continue
             if (curIndex === undefined) {
               curIndex = i
@@ -797,9 +797,9 @@ class ClassificationModelRow extends Component {
               case 'KS':
                 return <RowCell key={7} data={model[`ks${isHoldout ? 'Holdout' : 'Validation'}`]} />;
               case EN.Validation:
-                return <RowCell key={8} data={metric === 'log_loss' ? chartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
+                return <RowCell key={8} data={metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : metric === 'log_loss' ? chartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
               case EN.Holdout:
-                return <RowCell key={9} data={metric === 'log_loss' ? holdoutChartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
+                return <RowCell key={9} data={metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : metric === 'log_loss' ? holdoutChartData.roc.LOGLOSS[fitIndex] : metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
               case EN.Time:
                 return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:

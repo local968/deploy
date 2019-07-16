@@ -195,8 +195,8 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
       <div className={styles.cell}><span className={styles.text}>{formatNumber(model.cutoff.toString())}</span></div>
       <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`ks${type}`].toString())}</span></div>
       <div className={styles.scoreCell}>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`${metric}Validation`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text}>{formatNumber(model[`${metric}Holdout`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric}Validation`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric}Holdout`].toString())}</span></div>
       </div>
     </div>
     {detail && <DetailCurves
