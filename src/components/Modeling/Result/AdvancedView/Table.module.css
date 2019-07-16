@@ -99,6 +99,8 @@ span.text {
   flex-direction: column;
   padding: 10px 0;
   overflow-y: scroll;
+  padding-left: 200px;
+  margin-left: -200px;
 }
 
 .rowBody {
@@ -110,6 +112,8 @@ span.text {
 .row {
   display: flex;
   flex: none;
+  position: relative;
+  align-items: center;
 }
 
 .cell {
@@ -136,4 +140,12 @@ span.text {
 .name {
   flex: 0 0 260px;
   margin: 0 10px;
+}
+
+.check {
+  position: absolute;
+  display: flex;
+  flex: none;
+  left: -20px;
+  cursor: pointer;
 }

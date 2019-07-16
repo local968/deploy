@@ -1,7 +1,7 @@
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement, useState, ChangeEvent, MouseEvent } from 'react'
 import styles from './Table.module.css'
 import EN from '../../../../constant/en'
-import { Icon, Switch, Select } from 'antd'
+import { Icon, Switch, Select, Radio } from 'antd'
 import Project from 'stores/Project';
 import Model from 'stores/Model';
 import { Hint } from 'components/Common';
@@ -164,18 +164,26 @@ interface RegressionTableRowProps {
 
 const RegressionTableRow = observer((props: RegressionTableRowProps) => {
   const { model, project, metric } = props
-  const { isHoldout, mapHeader, newVariable } = project
+  const { isHoldout, mapHeader, newVariable, selectModel } = project
   const { score } = model
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
 
   const modelScore = isHoldout ? score.holdoutScore : score.validateScore
   const [detail, setDetail] = useState(false)
 
-  const handleResult = () => {
+  const handleResult = (e: MouseEvent<HTMLDivElement>) => {
     setDetail(!detail);
   }
+
+  const handleClick = (e: MouseEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    if (selectModel.id === model.id) return
+    project.updateProject({ selectId: model.id })
+  }
+
   return <div className={styles.rowBody}>
     <div className={styles.row} onClick={handleResult}>
+      <div className={styles.check}><input type='radio' name='modelRadio' checked={selectModel.id === model.id} onClick={handleClick} onChange={() => { }} /></div>
       <div className={`${styles.cell} ${styles.name}`}>
         <span className={styles.text}>{model.id}</span>
         <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
