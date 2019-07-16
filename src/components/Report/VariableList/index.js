@@ -174,7 +174,7 @@ export default class SimplifiedView extends Component {
           <div className={styles.targetCell}><span>{EN.Max}</span></div>
         </div>
         <div className={styles.targetRow}>
-          <div className={classnames(styles.targetCell, styles.targetName)} title={target}><span>{target}</span></div>
+          <div className={classnames(styles.targetCell, styles.targetName)} title={newMapHeader[target]}><span>{newMapHeader[target]}</span></div>
           <div className={styles.targetCell} onClick={this.show}>
           <img src={histogramIcon} className={styles.tableImage} />
             {<Popover placement='bottomLeft'
@@ -182,7 +182,7 @@ export default class SimplifiedView extends Component {
                       onVisibleChange={this.hide}
                       trigger="click"
                       content={<Chart
-                          x_name={target}
+                          x_name={newMapHeader[target]}
                           y_name={'count'}
                           title={`Feature:${target}`}
                           data={top1}
@@ -459,7 +459,7 @@ class SimplifiedViewRow extends Component {
                                                 onVisibleChange={this.hideHistograms}
                                                 trigger="click"
                                                 content={<Chart
-                                                    x_name={value}
+                                                    x_name={mapHeader[value]}
                                                     y_name={'count'}
                                                     title={`Feature:${value}`}
                                                     data={chartDatas[0]}

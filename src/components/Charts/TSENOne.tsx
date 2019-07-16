@@ -4,7 +4,7 @@ import './echarts.config'
 import {toJS} from "mobx";
 
 export default function TSENOne(props){
-	const {x_name='',y_name='',data={},width=400,height=380} = props;
+	const {x_name='',y_name='',data={},width=400,height=360} = props;
 	const nameTextStyle = {
 		color:'#000',
 	};
@@ -16,8 +16,6 @@ export default function TSENOne(props){
 		grid: {
 			left: '6%',
 			top:'25%',
-			// right: '10%',
-			// bottom: '4%',
 			containLabel: true,
 		},
 		tooltip: {
