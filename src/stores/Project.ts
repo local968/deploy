@@ -1835,9 +1835,10 @@ class Project {
   }
 
   newSetting = () => {
-    const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms } = this;
+    const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms ,informativesLabel} = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
     const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
+
 
     switch (problemType) {
       case 'Clustering':
@@ -1850,6 +1851,7 @@ class Project {
           speedVSaccuracy: 5,
           // searchTime: 5,
           featureLabel,
+          informativesLabel,
           randSeed: 0,
           weights: {},
         }
@@ -1860,6 +1862,7 @@ class Project {
           speedVSaccuracy: 5,
           // searchTime: 5,
           featureLabel,
+          informativesLabel,
           randSeed: 0,
           weights: {},
         }
@@ -1880,7 +1883,8 @@ class Project {
           algorithms: defaultAlgorithms,
           speedVSaccuracy: 5,
           ensembleSize: 20,
-          featureLabel
+          featureLabel,
+          informativesLabel
         }
     }
 
