@@ -20,6 +20,7 @@ interface DataSampleProps {
 
 export default class HS extends Component<DataSampleProps>{
 	private chart: any;
+	minLength=1;
 	state:{
 		data:object
 		sliderValue:Array<number>
@@ -56,7 +57,7 @@ export default class HS extends Component<DataSampleProps>{
 
 	componentDidMount() {
 		const {data} = this.state;
-		if(_.size(data)>6){
+		if(_.size(data)>this.minLength){
 			this.chart.getEchartsInstance().showLoading();
 		}
 	}
@@ -80,7 +81,7 @@ export default class HS extends Component<DataSampleProps>{
 	}
 
 	getOption() {
-		const {ready,step,sliderValue:_sliderValue,data,min,max,interval} = this.state;
+		const {ready,step,sliderValue:_sliderValue,data,min,max,interval,_max,_min} = this.state;
 		let {x_name,y_name} = this.props;
 		let title = `Feature:${x_name}`;
 		if(!ready){
@@ -118,7 +119,7 @@ export default class HS extends Component<DataSampleProps>{
 
 		const len = _.size(data);
 
-		const minValueSpan = (max-min)/len * step;//最少显示3个点
+		const minValueSpan = (_max-_min)/len * step;//最少显示3个点
 
 		const xAxis:any = {
 			name:x_name,
@@ -141,8 +142,9 @@ export default class HS extends Component<DataSampleProps>{
 		}
 
 		let dataZoom = [];
+		console.log(123,minValueSpan)
 
-		if(len>6){
+		if(len>this.minLength){
 			dataZoom = [{
 				type: 'slider',
 				rangeMode:['value','value'],
@@ -218,7 +220,7 @@ export default class HS extends Component<DataSampleProps>{
 				className={styles.restore}
 				key = 'restore'
 				style={{
-					display:(len>6?"":"none")
+					display:(len>this.minLength?"":"none")
 				}}
 				onClick={this.restore.bind(this)}>
 				{EN.restore}:
@@ -237,7 +239,7 @@ export default class HS extends Component<DataSampleProps>{
 			     style={{
 			     	 textAlign:'left',
 				     width:550,
-				     display:(len>6?"":"none")
+				     display:(len>this.minLength?"":"none")
 			     }}>
 				当前比例：{step * interval}
 			</div>,
@@ -245,7 +247,7 @@ export default class HS extends Component<DataSampleProps>{
 			     style={{
 						 width:550,
 				     whiteSpace:'nowrap',
-				     display:(len>6?"flex":"none")
+				     display:(len>this.minLength?"flex":"none")
 				}}>
 				比例:
 				<Slider
