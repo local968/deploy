@@ -708,7 +708,7 @@ class PredictTable extends Component {
     return <div className={styles.costTd}>
       <div className={classnames(styles.costColor, styles[`cost${row}${col}`])}/>
       <div className={styles.costName}><span>{isCost ? EN.Cost : EN.Benefit}</span></div>
-      <div className={styles.costInput}><NumberInput value={project.costOption[field]} onBlur={this.handleChange.bind(null, field)} min={0} max={100} isInt={true} /></div>
+      <div className={styles.costInput}><NumberInput value={project.costOption[field]} min={0} max={100} isInt={true} /></div>
       <div className={styles.costUnits}><span>{EN.Units}</span></div>
     </div>
   };
