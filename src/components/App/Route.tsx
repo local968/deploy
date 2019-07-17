@@ -26,5 +26,4 @@ class defaultRouter extends Component {
     )
   }
 }
-{/* <Route exact path="/community" component={Community} /> */ }
 export default defaultRouter

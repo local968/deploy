@@ -7,7 +7,6 @@ import SignUp from 'components/User/SignUp';
 import SignActive from 'components/User/SignActive';
 import ResetPassword from 'components/User/ResetPassword';
 import ForgetPassword from 'components/User/ForgetPassword';
-// import Community from 'components/Community';
 import Support from 'components/Support';
 import config from 'config'
 
