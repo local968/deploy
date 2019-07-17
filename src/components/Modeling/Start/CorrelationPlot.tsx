@@ -18,16 +18,18 @@ export default class CorrelationPlot extends Component<Interface> {
         <div
           onClick={onClose}
           style={{ zIndex: 5 }}
-          className={styles.plotClose}><span><Icon
-          style={{
-            float: 'right',
-            height: 23,
-            alignItems: 'center',
-            display: 'flex',
-          }}
-          onClick={onClose}
-          type="close"
-        /></span></div>
+          className={styles.plotClose}><span>
+          <Icon
+            style={{
+              float: 'right',
+              height: 23,
+              alignItems: 'center',
+              display: 'flex',
+            }}
+            onClick={onClose}
+            type="close"
+          />
+          </span></div>
 
         <CorrelationMatrixs
           value={value}

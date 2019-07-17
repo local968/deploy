@@ -142,7 +142,6 @@ export default class HS extends Component<DataSampleProps>{
 		}
 
 		let dataZoom = [];
-		console.log(123,minValueSpan)
 
 		if(len>this.minLength){
 			dataZoom = [{
@@ -241,7 +240,7 @@ export default class HS extends Component<DataSampleProps>{
 				     width:550,
 				     display:(len>this.minLength?"":"none")
 			     }}>
-				当前比例：{step * interval}
+				{EN.CurrentScale}：{step * interval}
 			</div>,
 			<div key='y' id='pva'
 			     style={{
@@ -249,7 +248,7 @@ export default class HS extends Component<DataSampleProps>{
 				     whiteSpace:'nowrap',
 				     display:(len>this.minLength?"flex":"none")
 				}}>
-				比例:
+				{EN.Scale}:
 				<Slider
 					min={1}
 					max={len}

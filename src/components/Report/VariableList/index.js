@@ -566,23 +566,6 @@ class SimplifiedViewRow extends Component {
   }
 }
 
-// @observer
-// class CorrelationPlot extends Component {
-//   constructor(props) {
-//     super(props)
-//     if (!props.fetch) props.getPath()
-//   }
-//   render() {
-//     const { data, header, onClose } = this.props;
-//     return (
-//       <div className={styles.correlationPlot} >
-//         <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-//         {data ? <CorrelationMatrix header={header} data={data} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
-//       </div>
-//     )
-//   }
-// }
-
 @observer
 class CorrelationPlot extends Component {
   render() {
@@ -593,7 +576,18 @@ class CorrelationPlot extends Component {
         <div
           onClick={onClose}
           style={{zIndex: 5}}
-          className={styles.plotClose}><span>X</span></div>
+          className={styles.plotClose}><span>
+           <Icon
+             style={{
+               float: 'right',
+               height: 23,
+               alignItems: 'center',
+               display: 'flex',
+             }}
+             onClick={onClose}
+             type="close"
+           />
+        </span></div>
         <CorrelationMatrixs
           value={value}
           type={type}
@@ -602,23 +596,6 @@ class CorrelationPlot extends Component {
     )
   }
 }
-
-// @observer
-// class SimplifiedViewPlot extends Component {
-//   constructor(props) {
-//     super(props)
-//     if (!props.fetch) props.getPath()
-//   }
-//
-//   render() {
-//     const { onClose, path, type, id, style } = this.props;
-//     const imgPath = path ? `//${config.host}:${config.port}/redirect/download/${path}?projectId=${id}` : ''
-//     return <div className={styles.plot} style={style}>
-//       <div onClick={onClose} className={styles.plotClose}><span>X</span></div>
-//       {path ? <img src={imgPath} alt={type} /> : <div className={styles.plotLoad}><Spin size="large" /></div>}
-//     </div>
-//   }
-// }
 
 class SimplifiedViewPlot extends Component {
 

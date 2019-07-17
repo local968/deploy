@@ -1194,7 +1194,9 @@ const ZH_LAN = {
   TargetClassesError: '类别个数异常',
   FbetaValue: 'Beta Value',
   FbetaValueHint: 'beta的输入范围是0.1~10.0，最小步长为0.1，默认为1.0。',
-  dispalyNull: '（空）'
+  dispalyNull: '（空）',
+  CurrentScale:"当前比例",
+  Scale:"比例",
 };
 
 export default ZH_LAN;

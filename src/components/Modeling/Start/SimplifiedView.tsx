@@ -277,7 +277,7 @@ export default class SimplifiedView extends Component<Interface> {
             >
               <span>{mapHeader[target]}</span>
             </div>
-            <div className={styles.targetCell} id={target} onClick={this.show}>
+            <div className={styles.targetCell}  onClick={this.show}>
               <img
                 src={histogramIcon}
                 className={styles.tableImage}
@@ -286,7 +286,7 @@ export default class SimplifiedView extends Component<Interface> {
               {
                 <Popover
                   placement="bottomLeft"
-                  getPopupContainer={() => document.getElementById(target)}
+                  // getPopupContainer={() => document.getElementById(target)}
                   visible={this.showHistograms}
                   onVisibleChange={this.hide}
                   trigger="click"

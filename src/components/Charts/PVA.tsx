@@ -322,7 +322,7 @@ export default class PVA extends Component<DataSampleProps>{
 			<div className={styles.predictActual} key='predictActual'>
 				<div className={styles.title}>
 					{EN.PredictedVSActualPlotSorted}
-					<Hint content={<p><strong>{EN.ChartDescription}</strong><br/>
+					<Hint content={<section><strong>{EN.ChartDescription}</strong><br/>
 						{EN.ChartOrder}<br/>
 						{EN.ChartSplit}<br/>
 						{EN.ChartSHowWhat}<br/>
@@ -332,7 +332,7 @@ export default class PVA extends Component<DataSampleProps>{
 							{EN.ChartZoneB}<br/>
 							{EN.ChartZoneC}<br/>
 						</div>
-						{EN.ChartReset}</p>}
+						{EN.ChartReset}</section>}
 						/>
 				</div>
 				<div className={styles.metricSwitch} style={{top:-25}}>

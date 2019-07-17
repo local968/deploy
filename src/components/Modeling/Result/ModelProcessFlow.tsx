@@ -346,7 +346,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 						<label>{itm.key}:</label>
 						<ul>
 							{
-								itm.data.map(it=><li title={mapHeader[it]}>{mapHeader[it]}</li>)
+								itm.data.map((it,ind)=><li key={ind} title={mapHeader[it]}>{mapHeader[it]}</li>)
 							}
 						</ul>
 					</dd>
