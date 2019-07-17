@@ -190,7 +190,7 @@ export default class SimplifiedView extends Component {
                             display: 'flex',
                           }}
                           onClick={this.hide}
-                          type="close-circle"
+                          type="close"
                         />
                       }
                       content={<Chart
@@ -254,7 +254,7 @@ export default class SimplifiedView extends Component {
                                                   display: 'flex',
                                                 }}
                                                 onClick={this.hideCorrelationMatrix}
-                                                type="close-circle"
+                                                type="close"
                                               />
                                             }
                                             content={this.matrix(top2)}/>}
@@ -491,7 +491,7 @@ class SimplifiedViewRow extends Component {
                                                       display: 'flex',
                                                     }}
                                                     onClick={this.hideHistograms}
-                                                    type="close-circle"
+                                                    type="close"
                                                   />
                                                 }
                                                 content={<Chart
@@ -519,7 +519,7 @@ class SimplifiedViewRow extends Component {
                                                       display: 'flex',
                                                     }}
                                                     onClick={this.hideUnivariant}
-                                                    type="close-circle"
+                                                    type="close"
                                                   />
                                                 }
                                                 content={<Chart

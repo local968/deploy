@@ -170,7 +170,7 @@ export default class SimplifiedViewRow extends Component<
                     display: 'flex',
                   }}
                   onClick={this.hideHistograms}
-                  type="close-circle"
+                  type="close"
                 />
               }
               content={

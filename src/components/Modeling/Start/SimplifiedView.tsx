@@ -299,7 +299,7 @@ export default class SimplifiedView extends Component<Interface> {
                         display: 'flex',
                       }}
                       onClick={this.hide}
-                      type="close-circle"
+                      type="close"
                     />
                   }
                   content={

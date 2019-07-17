@@ -1325,7 +1325,7 @@ const EN_LAN = {
   ApplyNote: '(After selecting “Applied on all models”, the operation of maximizing the metric will be applied on all models, whose cutoff threshold will be corrected.This function is only supported after training of all models has been finished.)',
   MetricCorrection: 'Metric Correction',
   MetricCorrectionHint: 'Metric Correction allows you to maximize the selected metric by adjusting cutoff threshold.',
-  Variableneedstostartwith: 'var - 选择一个连续变量;变量需要以@开头。[range_list1], [range_list2]…-自定义变量划分范围;第一个数值应大于该变量的最小值，最后一个数值应小于该变量的最大值;range_list的长度决定组的数量。',
+  Variableneedstostartwith: 'Var-Select a continuous variable; the variable needs to start with @. [range_list1], [range_list2]. -Custom variable partition range; the first value should be greater than the minimum value of the variable, and the last value should be less than the maximum value of the variable; the length of the range_list determines the number of groups.',
   DisplayOutlier: 'Display Outlier',
   DisplayOutlierHint: 'The abnormal samples under the current anormaly ratio are displayed in descending order of the degree of abnormality. The display limit is 500 lines, and more information can be viewed using “Export Model Results”.',
   WarningBlock: 'The number of columns of your clean data is less than 2. We recommend that you upload new data or create a new variable',
@@ -1335,7 +1335,8 @@ const EN_LAN = {
   TargetClassesError: 'incorrect number of classes',
   FbetaValue: 'Beta Value',
   FbetaValueHint: 'Beta value ranges from 0.1 to 10.0, minimum step is 0.1, the default value of it is 1.0.',
-  dispalyNull: '(Null)'
+  dispalyNull: '(Null)',
+  Pleaseenterbenefitandcostins:'The number entered supports up to two decimals and must be positive.',
 };
 
 

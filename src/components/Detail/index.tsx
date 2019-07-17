@@ -58,7 +58,6 @@ export default class Detail extends Component<Interface> {
                 </div>
               </Show>
 
-
               <div
                 className={classnames([styles.tab, styles.operation], {
                   [styles.active]: location.pathname.indexOf('operation') >= 0,
@@ -111,23 +110,26 @@ export default class Detail extends Component<Interface> {
 
           {isUnsupervised && (
             <div style={{ display: 'flex' }}>
-              <div
-                className={classnames([styles.tab, styles.performance], {
-                  [styles.active]:
-                    location.pathname.indexOf('performance') >= 0,
-                })}
-                onClick={() =>
-                  routing.push(`/deploy/project/${match.params.id}/performance`)
-                }
+              <Show
+                name = 'performance'
               >
-                <img
-                  className={styles.icon}
-                  src={performanceIcon}
-                  alt="performance"
-                />
-                <span className={styles.text}>{EN.Deployment}</span>
-              </div>
-
+                <div
+                  className={classnames([styles.tab, styles.performance], {
+                    [styles.active]:
+                      location.pathname.indexOf('performance') >= 0,
+                  })}
+                  onClick={() =>
+                    routing.push(`/deploy/project/${match.params.id}/performance`)
+                  }
+                >
+                  <img
+                    className={styles.icon}
+                    src={performanceIcon}
+                    alt="performance"
+                  />
+                  <span className={styles.text}>{EN.Deployment}</span>
+                </div>
+              </Show>
               <div
                 className={classnames([styles.tab, styles.status], {
                   [styles.active]: location.pathname.indexOf('status') >= 0,
@@ -170,25 +172,13 @@ export default class Detail extends Component<Interface> {
               render={() => (
                 <Redirect
                   to={`/deploy/project/${match.params.id}/${
-                    !isUnsupervised ? (deployment?'deployment':'operation') : 'performance'
+                    !isUnsupervised ? (deployment?'deployment':'operation') : (performance?'performance':"status")
                   }`}
                 />
               )}
             />
           </Switch>
         </div>
-        {/* <div className={styles.enableWrap}>
-          <span className={styles.enableText}>Enable</span>
-          <span className={styles.enable}>
-            <Switch
-              checked={cd.enable}
-              onChange={() => {
-                deploymentStore.toggleEnable(cd.id);
-              }}
-            />
-          </span>
-          <span className={styles.enableText}>{cd.enable ? 'On' : 'Off'}</span>
-        </div> */}
       </div>
     );
   }

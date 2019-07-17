@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { CorrelationMatrixs } from '../../Charts';
+import { Icon } from 'antd';
 
 interface Interface {
   onClose:any
@@ -17,7 +18,17 @@ export default class CorrelationPlot extends Component<Interface> {
         <div
           onClick={onClose}
           style={{ zIndex: 5 }}
-          className={styles.plotClose}><span>X</span></div>
+          className={styles.plotClose}><span><Icon
+          style={{
+            float: 'right',
+            height: 23,
+            alignItems: 'center',
+            display: 'flex',
+          }}
+          onClick={onClose}
+          type="close"
+        /></span></div>
+
         <CorrelationMatrixs
           value={value}
           type={type}

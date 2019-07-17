@@ -304,7 +304,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
                     display: 'flex',
                   }}
                   onClick={this.hideHistograms}
-                  type="close-circle"
+                  type="close"
                 />
               }
               content={
@@ -352,7 +352,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
                     display: 'flex',
                   }}
                   onClick={this.hideUnivariant}
-                  type="close-circle"
+                  type="close"
                 />
               }
               content={

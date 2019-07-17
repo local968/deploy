@@ -118,3 +118,8 @@ body {
 #pva button{
   margin-left: 20px;
 }
+
+
+.ant-popover-title{
+  border-bottom: 0 !important;
+}
