@@ -7,11 +7,21 @@ import LoginRouter from 'components/App/LoginRoute';
 import styles from './styles.module.css';
 import { Spin } from 'antd';
 import EN from '../../constant/en'
+import { UserStore } from "stores/UserStore";
+import { ProjectStore } from "stores/ProjectStore";
 
-@withRouter
+interface LayoutProps {
+  userStore: UserStore,
+  projectStore: ProjectStore
+}
+
 @inject('userStore', 'projectStore')
 @observer
-export default class Layout extends Component {
+class Layout extends Component<LayoutProps> {
+  constructor(props) {
+    super(props)
+  }
+
   render() {
     const { userStore, projectStore } = this.props;
     const { status } = userStore;
@@ -28,7 +38,14 @@ export default class Layout extends Component {
   }
 }
 
-class Mask extends Component {
+export default withRouter(Layout)
+
+interface MaskProps {
+  style: null | StringObject,
+  text: string
+}
+
+class Mask extends Component<MaskProps> {
   render() {
     const { style, text } = this.props
     return <div className={styles.load} style={style}><Spin tip={text} size="large"></Spin></div>

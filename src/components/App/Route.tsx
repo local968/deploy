@@ -3,7 +3,7 @@ import { Route, Redirect, Switch } from 'react-router-dom';
 import { inject } from "mobx-react";
 import Detail from 'components/Detail';
 import Deploy from 'components/Deploy';
-import Main from 'components/Main/index.tsx';
+import Main from 'components/Main/index';
 import Home from 'components/Home';
 import Test from 'components/Test';
 import ChangePassword from 'components/User/ChangePassword';
