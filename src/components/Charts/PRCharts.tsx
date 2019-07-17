@@ -33,8 +33,7 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 		if(nextProps.isHoldout!==isHoldout||nextProps.model.fitIndex!==startIndex){
 			this.setState({
 				startIndex:nextProps.model.fitIndex
-			});
-			this.prePair(nextProps.model.fitIndex,nextProps.isHoldout)
+			},()=>this.prePair(nextProps.model.fitIndex,nextProps.isHoldout));
 		}
 	}
 
