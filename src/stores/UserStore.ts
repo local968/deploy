@@ -12,7 +12,7 @@ class UserStore {
   @observable info = {
     id: '',
     email: '',
-    role:{},
+    role:{} as any,
     level:0,
   };
   @observable tabKey = '1';

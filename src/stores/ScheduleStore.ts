@@ -172,4 +172,6 @@ class ScheduleStore {
     );
 }
 
+export { ScheduleStore }
+
 export default new ScheduleStore();
