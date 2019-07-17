@@ -4,17 +4,18 @@ import { observer, inject } from 'mobx-react';
 import { Icon } from 'antd';
 import { ProgressBar } from 'components/Common';
 import EN from '../../../constant/en';
+import { ProjectStore } from 'stores/ProjectStore';
 interface Interface {
-  projectStore:any
+  projectStore?: ProjectStore
 }
 @inject('projectStore')
 @observer
 export default class Loading extends Component<Interface> {
   render() {
-    const {project={}} = this.props.projectStore;
+    const { project = {} } = this.props.projectStore;
     const { trainModel, isAbort, abortTrainByEtl } = project as any;
     const curModel = Object.values(trainModel).sort(
-      (a:any, b:any) => (b.value || 0) - (a.value || 0),
+      (a: any, b: any) => (b.value || 0) - (a.value || 0),
     )[0];
     return (
       <div className={styles.loading}>
@@ -32,8 +33,8 @@ export default class Loading extends Component<Interface> {
                   <Icon type="loading" />
                 </span>
               ) : (
-                <span>{EN.AbortTraining}</span>
-              )}
+                  <span>{EN.AbortTraining}</span>
+                )}
             </div>
           </div>
         }

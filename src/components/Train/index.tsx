@@ -1,13 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, RefObject } from 'react';
 import styles from './styles.module.css';
 import { observer, inject } from 'mobx-react';
 import { Route, Switch } from 'react-router-dom';
-import { autorun, observable, action } from 'mobx'
+import { autorun, observable, IReactionDisposer } from 'mobx'
 import StartTrain from './Start';
 import Loading from './Loading';
 import ModelError from './Error';
 import ModelResult from './Result';
 import { ProjectSide } from 'components/Common';
+import { ProjectStore } from 'stores/ProjectStore';
+import { RouterStore } from 'mobx-react-router';
+import Project from 'stores/Project';
 // import r2Loading from './R2 LearnLoading2.gif';
 // import { when } from 'mobx';
 
@@ -15,12 +18,19 @@ import { ProjectSide } from 'components/Common';
 //     defualt: 'defualt',
 //     costBased: 'costBased'
 // }
+
+interface ModelingProps {
+  projectStore: ProjectStore,
+  routing: RouterStore
+}
+
 @inject('projectStore', 'routing')
 @observer
-export default class Modeling extends Component {
+export default class Modeling extends Component<ModelingProps> {
   @observable right = 0
 
-
+  sideRef: RefObject<ProjectSide>
+  autorun: IReactionDisposer
   constructor(props) {
     super(props);
     this.sideRef = React.createRef();
@@ -85,8 +95,13 @@ export default class Modeling extends Component {
   }
 }
 
+interface TrainResultProps {
+  project: Project,
+  resetSide: () => void
+}
+
 @observer
-class TrainResult extends Component {
+class TrainResult extends Component<TrainResultProps> {
   render() {
     const { project, resetSide } = this.props;
     const { models, train2Error, train2ing } = project;

@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React, { Component, ChangeEvent } from "react";
 import styles from "./styles.module.css";
 import classnames from "classnames";
 import { observer } from "mobx-react";
 import { action } from "mobx";
 import { NumberInput, Hint, Range } from "components/Common";
 import { Select, message, Tooltip, Popover, Icon } from "antd";
-import Algorithms from "./algorithms";
+import Algorithms from "./algorithms.json";
 import InputNumber from "antd/es/input-number";
 import EN from '../../../constant/en';
 import Button from "@material-ui/core/Button";
@@ -13,24 +13,25 @@ const { Option } = Select;
 import {
   SSPlot
 } from "../../Charts"
+import Project, { Settings } from "stores/Project";
+
+interface AdvancedViewProps {
+  setSettingName: (s: string) => void,
+  setSetting: (o: unknown) => void
+  project: Project,
+  hidden: boolean,
+  setting: Settings
+}
 
 @observer
-export default class AdvancedView extends Component {
-  handleName = e => {
+export default class AdvancedView extends Component<AdvancedViewProps> {
+  handleName = (e: ChangeEvent<HTMLInputElement>) => {
     const { setSettingName } = this.props;
     setSettingName(e.target.value)
   }
 
-  handleMaxTime = value => {
-    this.props.project.searchTime = value
-    this.props.setSetting({ searchTime: value })
-    // const { project } = this.props;
-    // project.setProperty({
-    //   searchTime: value
-    // });
-  };
 
-  handleRandSeed = value => {
+  handleRandSeed = (value: number) => {
     this.props.project.randSeed = value
     this.props.setSetting({ randSeed: value })
     // const { project } = this.props;
@@ -92,7 +93,7 @@ export default class AdvancedView extends Component {
   //   // });
   // };
 
-  changeSetting = action((e) => {
+  changeSetting = action((e: ChangeEvent<HTMLSelectElement>) => {
     const { project, setSetting } = this.props
     const selectedSetting = project.settings.find(s => s.id === e.target.value)
     if (selectedSetting) {

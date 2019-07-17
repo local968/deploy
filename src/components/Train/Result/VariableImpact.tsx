@@ -1,16 +1,22 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
-import { formatNumber } from 'util'
+import { formatNumber } from '../../../util'
 import { Spin } from 'antd'
+import Model from 'stores/Model';
+
+interface VariableImpactProps {
+  model: Model,
+  mapHeader: StringObject
+}
 
 @observer
-export default class VariableImpact extends Component {
+export default class VariableImpact extends Component<VariableImpactProps> {
   constructor(props) {
     super(props)
     const { featureImportance = {}, permutationImportance, importanceLoading } = props.model
     const keys = Object.keys(featureImportance)
-    if(!keys.length && !importanceLoading) permutationImportance()
+    if (!keys.length && !importanceLoading) permutationImportance()
   }
 
   render() {
@@ -34,7 +40,7 @@ export default class VariableImpact extends Component {
                 style={{ width: row[1] * 7 + 'em' }}
               />
               <div className={styles.detailNum}>
-                <span title={formatNumber(row[1])}>{formatNumber(row[1])}</span>
+                <span title={formatNumber(row[1].toString())}>{formatNumber(row[1].toString())}</span>
               </div>
             </div>
           );

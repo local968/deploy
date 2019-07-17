@@ -2,8 +2,14 @@ import classes from "./styles.module.css";
 import { Table } from "components/Common";
 import React from 'react'
 import EN from '../../../constant/en';
+import Model from "stores/Model";
 // import { formatNumber } from 'util'
-const Explanation = (props) => {
+interface ExplanationProps {
+  model: Model,
+  mapHeader: StringObject
+}
+
+const Explanation = (props: ExplanationProps) => {
   const { model, mapHeader } = props;
   const { labelWithImportance } = model
   const tableData = React.useMemo(() => {
@@ -17,7 +23,7 @@ const Explanation = (props) => {
       values.push({ content: <span title={curValues.join(',')}>{curValues.join(',')}</span>, cn: classes.explanationCell })
     })
     return [fields, indexes, values]
-  })
+  }, [])
 
   return <div className={classes.explanation}>
     <Table
