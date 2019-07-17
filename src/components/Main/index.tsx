@@ -37,7 +37,7 @@ function Main(props: MainProps) {
         routing.push("/")
       }
       _autorun = autorun(() => {
-        if (!project) return
+        if (!project || !project.init) return
         const { curStep = 0, id = '', problemType = '' } = project || {};
         if (curStep === step) return
         step = curStep
