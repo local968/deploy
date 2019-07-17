@@ -448,7 +448,7 @@ const EN_LAN = {
   Selectyourmodelbasedonyourown: 'Select your model based on your own criteria:',
   R2LearnsDefaultSelection: 'R2 Learn\'s Default Selection',
   Input: 'Input:',
-  Pleaseenterbenefitandcostin: 'Please enter benefit and cost in the range of 0.00 to 1,000,000,000.00. The number entered can have 2 decimal places max. Both the benefit and cost inputs must be in positive values.',
+  Pleaseenterbenefitandcostin: 'Please enter benefit and cost in the range of 0.00 to 1,000,000,000.00.',
   Noteifacorrectpredictionbringsyouprofit: 'Note: if a correct prediction brings you profit, it is a benefit. If an incorrect prediction brings you loss, it is a cost. All inputs should be measured in the same units.',
   Tips: 'Tips',
   Benefit: 'Benefit:',
@@ -1336,7 +1336,7 @@ const EN_LAN = {
   FbetaValue: 'Beta Value',
   FbetaValueHint: 'Beta value ranges from 0.1 to 10.0, minimum step is 0.1, the default value of it is 1.0.',
   dispalyNull: '(Null)',
-  Pleaseenterbenefitandcostins:'The number entered supports up to two decimals and must be positive.',
+  Pleaseenterbenefitandcostins:'The number entered can have 2 decimal places max. Both the benefit and cost inputs must be in positive values.',
 };
 
 
