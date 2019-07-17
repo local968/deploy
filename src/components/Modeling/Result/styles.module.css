@@ -859,7 +859,7 @@ span.performanceScore {
     position: absolute;
     top: -480%;
     left: 60%;
-    width: 7em;
+    width: 6em;
     max-height: 6em;
     overflow-y: auto;
     overflow-x: hidden;

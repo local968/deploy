@@ -52,7 +52,7 @@ export default class SimplifiedView extends Component<Interface> {
               interval,
             },
           })
-          .then(result =>
+          .then((result:any) =>
             this.showback(target, result.data, { min, max, interval }),
           );
       } else {
@@ -66,7 +66,7 @@ export default class SimplifiedView extends Component<Interface> {
               size: uniqueValues > 8 ? 8 : uniqueValues,
             },
           })
-          .then(result => this.showback(target, result.data));
+          .then((result:any) => this.showback(target, result.data));
       }
       return;
     }
@@ -118,7 +118,7 @@ export default class SimplifiedView extends Component<Interface> {
           id: project.etlIndex,
         },
       })
-      .then(CorrelationMatrixData => {
+      .then((CorrelationMatrixData:any) => {
         this.showCorrelation = true;
         let { type } = CorrelationMatrixData;
         CorrelationMatrixData.type = type.map(itm => project.mapHeader[itm]);

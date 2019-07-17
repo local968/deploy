@@ -50,7 +50,7 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 
 	async componentDidMount(url=this.props.url) {
 
-		const result = await request.post({
+		const result:any = await request.post({
 			url: '/graphics/residual-plot-diagnosis',
 			data: {
 				url,

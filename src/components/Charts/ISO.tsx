@@ -76,7 +76,7 @@ export default class Iso extends PureComponent<DataSampleProps>{
              var2 = list[1][0];
         }
 
-        const result = await request.post({
+        const result:any = await request.post({
             url: '/graphics/outlier',
             data: {
                 url,

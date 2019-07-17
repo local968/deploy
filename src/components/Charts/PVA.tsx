@@ -63,7 +63,7 @@ export default class PVA extends Component<DataSampleProps>{
 						url: holdoutPlotData,
 					}
 				}]
-			}).then(data => {
+			}).then((data:Array<any>) => {
 				const [chartDate, holdOutChartDate] = data;
 				this.setState({
 					chartDate:chartDate.data,
