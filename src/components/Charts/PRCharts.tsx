@@ -148,8 +148,8 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 	}
 
 	onPointDragging(){
-		let {result,myChart,point,isHoldOut} = this as any;
-		if(isHoldOut)return;
+		let {result,myChart,point,isHoldout} = this as any;
+		if(isHoldout)return;
 		let {data} = result;
 
 		const _data = data.filter(itm=>itm[0] === point)||data[0];
