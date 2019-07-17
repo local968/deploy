@@ -13,11 +13,11 @@ export default function HistogramCategorical(props){
     x_name='',
     y_name='',
     data=[],
-    title='',
     height = 330,
     width = 500,
     xAxisName = data.map((itm)=>itm.name),
   } = props;
+  let title = `Feature:${x_name}`;
 
   const dt = data.map(itm=>itm.value);
 

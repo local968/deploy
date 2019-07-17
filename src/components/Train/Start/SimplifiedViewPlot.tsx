@@ -34,7 +34,6 @@ export default class SimplifiedViewPlot extends Component<Interface> {
       <HistogramCategorical
         x_name={value}
         y_name={'count'}
-        title={`Feature:${value}`}
         data={data}
       />
     </div>

@@ -20,38 +20,44 @@ interface Interface {
   match:any
   location:any
   deploymentStore:any
+  userStore?:any
 }
 
-@inject('routing', 'deploymentStore')
+@inject('routing', 'deploymentStore','userStore')
 @observer
 export default class Detail extends Component<Interface> {
   render() {
-    const { routing, match, location, deploymentStore } = this.props;
+    const { routing, match, location, deploymentStore,userStore:{info:{role:{deployment=true,performance=true}}} } = this.props;
     runInAction(() => (deploymentStore.currentId = match.params.id));
     const cd = deploymentStore.currentDeployment || {};
     const isUnsupervised = ['Clustering', 'Outlier'].includes(cd.modelType);
-    console.log(cd.modelType, 'cd.modelType ', isUnsupervised);
+
     return (
       <div className={styles.detail}>
         <Bread list={[EN.Home]} />
         <div className={styles.tabs}>
           {!isUnsupervised && (
             <div style={{ display: 'flex' }}>
-              <div
-                className={classnames([styles.tab, styles.deployment], {
-                  [styles.active]: location.pathname.indexOf('deployment') >= 0,
-                })}
-                onClick={() =>
-                  routing.push(`/deploy/project/${match.params.id}/deployment`)
-                }
+              <Show
+                name = 'deployment'
               >
-                <img
-                  className={styles.icon}
-                  src={deploymentIcon}
-                  alt="deployment"
-                />
-                <span className={styles.text}>{EN.Deployments}</span>
-              </div>
+                <div
+                  className={classnames([styles.tab, styles.deployment], {
+                    [styles.active]: location.pathname.indexOf('deployment') >= 0,
+                  })}
+                  onClick={() =>
+                    routing.push(`/deploy/project/${match.params.id}/deployment`)
+                  }
+                >
+                  <img
+                    className={styles.icon}
+                    src={deploymentIcon}
+                    alt="deployment"
+                  />
+                  <span className={styles.text}>{EN.Deployments}</span>
+                </div>
+              </Show>
+
 
               <div
                 className={classnames([styles.tab, styles.operation], {
@@ -69,22 +75,26 @@ export default class Detail extends Component<Interface> {
                 <span className={styles.text}>{EN.OperationMonitor}</span>
               </div>
 
-              <div
-                className={classnames([styles.tab, styles.performance], {
-                  [styles.active]:
-                    location.pathname.indexOf('performance') >= 0,
-                })}
-                onClick={() =>
-                  routing.push(`/deploy/project/${match.params.id}/performance`)
-                }
+              <Show
+                name = 'performance'
               >
-                <img
-                  className={styles.icon}
-                  src={performanceIcon}
-                  alt="performance"
-                />
-                <span className={styles.text}>{EN.PerformanceMonitor}</span>
-              </div>
+                <div
+                  className={classnames([styles.tab, styles.performance], {
+                    [styles.active]:
+                    location.pathname.indexOf('performance') >= 0,
+                  })}
+                  onClick={() =>
+                    routing.push(`/deploy/project/${match.params.id}/performance`)
+                  }
+                >
+                  <img
+                    className={styles.icon}
+                    src={performanceIcon}
+                    alt="performance"
+                  />
+                  <span className={styles.text}>{EN.PerformanceMonitor}</span>
+                </div>
+              </Show>
               <div
                 className={classnames([styles.tab, styles.status], {
                   [styles.active]: location.pathname.indexOf('status') >= 0,
@@ -134,12 +144,13 @@ export default class Detail extends Component<Interface> {
         </div>
         <div className={styles.content}>
           <Switch>
-            {!isUnsupervised && (
-              <Route
-                path="/deploy/project/:id/deployment"
-                component={props => <Deployment {...props} />}
-              />
+            {!isUnsupervised && deployment && (
+                <Route
+                  path="/deploy/project/:id/deployment"
+                  component={props => <Deployment {...props} />}
+                />
             )}
+
             {!isUnsupervised && (
               <Route
                 path="/deploy/project/:id/operation"
@@ -147,10 +158,10 @@ export default class Detail extends Component<Interface> {
               />
             )}
 
-            <Route
+            {performance&&<Route
               path="/deploy/project/:id/performance"
               component={props => <Performance {...props} />}
-            />
+            />}
             <Route
               path="/deploy/project/:id/status"
               component={props => <Status {...props} />}
@@ -159,7 +170,7 @@ export default class Detail extends Component<Interface> {
               render={() => (
                 <Redirect
                   to={`/deploy/project/${match.params.id}/${
-                    !isUnsupervised ? 'deployment' : 'performance'
+                    !isUnsupervised ? (deployment?'deployment':'operation') : 'performance'
                   }`}
                 />
               )}

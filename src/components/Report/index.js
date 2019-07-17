@@ -258,7 +258,7 @@ class Report extends Component {
                 <span className={styles.metricsCell}>{EN.Accuracy}</span>
                 <span className={styles.metricsCell}>{EN.Precision}</span>
                 <span className={styles.metricsCell}>{EN.Recall}</span>
-                <span className={styles.metricsCell}>F1 Score</span>
+                <span className={styles.metricsCell}>Fbeta</span>
                 <span className={styles.metricsCell}>KS</span>
                 <span className={styles.metricsCell}>{EN.LogLoss}</span>
               </div>
