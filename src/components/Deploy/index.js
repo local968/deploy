@@ -52,7 +52,7 @@ export default class Home extends Component {
   };
 
   render() {
-    const {deploymentStore, routing, scheduleStore, userStore,userStore:{info:{role:{deploy_enable=false}}}} = this.props;
+    const {deploymentStore, routing, scheduleStore, userStore,userStore:{info:{role:{deploy_enable=true}}}} = this.props;
   
     return (
       <div className={styles.home}>
