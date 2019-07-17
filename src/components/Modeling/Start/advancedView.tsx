@@ -1,18 +1,27 @@
-import React, { Component } from 'react';
+import React, { Component, ChangeEvent } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { action } from 'mobx';
 import { NumberInput, Range } from 'components/Common';
 import { Select, message, Tooltip } from 'antd';
-import Algorithms from './algorithms';
-import Feature from './feature';
+import Algorithms from './algorithms.json';
+import Feature from './feature.json';
 import EN from '../../../constant/en';
+import Project, { Settings, DataView, Stats } from 'stores/Project';
 
 const Option = Select.Option;
 
+interface AdvancedViewProps {
+  setSettingName: (s: string) => void,
+  project: Project,
+  setSetting: (a: unknown) => void,
+  hidden: boolean,
+  setting: Settings
+}
+
 @observer
-export default class AdvancedView extends Component {
+export default class AdvancedView extends Component<AdvancedViewProps> {
 
   handleName = e => {
     const { setSettingName } = this.props;
@@ -24,7 +33,7 @@ export default class AdvancedView extends Component {
     this.props.setSetting({ ensembleSize: value })
   }
 
-  handleSlider = value => {
+  handleSlider = (value: [number, number]) => {
     const [min, max] = value
     if (max === min) return
     this.props.project.holdoutRate = 100 - max;
@@ -32,12 +41,12 @@ export default class AdvancedView extends Component {
     this.props.setSetting({ holdoutRate: 100 - max, validationRate: max - min })
   }
 
-  handleDrag = value => {
+  handleDrag = (value: number) => {
     this.props.project.holdoutRate = 100 - value;
     this.props.setSetting({ holdoutRate: 100 - value })
   }
 
-  changeValidationRate = value => {
+  changeValidationRate = (value: number) => {
     const { validationRate, holdoutRate } = this.props.project;
     if (value < 1) value = 1;
     if (value + holdoutRate > 99) value = 99 - holdoutRate;
@@ -46,7 +55,7 @@ export default class AdvancedView extends Component {
     this.props.setSetting({ validationRate: value })
   }
 
-  changeHoldoutRate = value => {
+  changeHoldoutRate = (value: number) => {
     const { holdoutRate, validationRate, runWith } = this.props.project;
     const num = runWith === 'holdout' ? validationRate : 0;
     if (value < 1) value = 1;
@@ -207,7 +216,7 @@ export default class AdvancedView extends Component {
     this.props.setSetting({ speedVSaccuracy: 5 })
   })
 
-  changeSetting = action((e) => {
+  changeSetting = action((e: ChangeEvent<HTMLSelectElement>) => {
     const { project, setSetting } = this.props
     const selectedSetting = project.settings.find(s => s.id === e.target.value)
     if (selectedSetting) {
@@ -303,7 +312,7 @@ export default class AdvancedView extends Component {
             </div>
             <div className={styles.advancedOption}>
               <div className={styles.advancedOptionBox}>
-                <input id="algorithmSelect1" type='radio' name="algorithmSelect" checked={algorithms.length} onClick={this.handleSelectAll.bind(null, true)} readOnly />
+                <input id="algorithmSelect1" type='radio' name="algorithmSelect" checked={!!algorithms.length} onClick={this.handleSelectAll.bind(null, true)} readOnly />
                 <label htmlFor="algorithmSelect1">{EN.SelectAll}</label>
               </div>
               <div className={styles.advancedOptionBox}>
@@ -483,7 +492,7 @@ export default class AdvancedView extends Component {
                   min={1}
                   max={99}
                   onChange={this.handleSlider}
-                  value={[100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10), 100 - parseInt(holdoutRate, 10)]}
+                  value={[100 - parseInt(validationRate.toString(), 10) - parseInt(holdoutRate.toString(), 10), 100 - parseInt(holdoutRate.toString(), 10)]}
                   tooltipVisible={false}
                 />
               </div> : <div className={styles.advancedPercentBlock} >
@@ -497,7 +506,7 @@ export default class AdvancedView extends Component {
                     min={1}
                     max={99}
                     onChange={this.handleDrag}
-                    value={100 - parseInt(holdoutRate, 10)}
+                    value={100 - parseInt(holdoutRate.toString(), 10)}
                     tooltipVisible={false}
                   />
                 </div>}
@@ -508,7 +517,7 @@ export default class AdvancedView extends Component {
                     <span>{EN.Training}</span>
                   </div>
                   {/* <input disabled={true} value={100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)} /> */}
-                  <span>{100 - parseInt(validationRate, 10) - parseInt(holdoutRate, 10)}%</span>
+                  <span>{100 - parseInt(validationRate.toString(), 10) - parseInt(holdoutRate.toString(), 10)}%</span>
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
@@ -516,7 +525,7 @@ export default class AdvancedView extends Component {
                     <span>{EN.Validation}</span>
                   </div>
                   {/* <NumberInput value={parseInt(validationRate, 10)} onBlur={this.changeValidationRate} min={1} max={99} isInt={true} /> */}
-                  <span>{parseInt(validationRate, 10)}%</span>
+                  <span>{parseInt(validationRate.toString(), 10)}%</span>
                 </div>
                 <div className={styles.advancedPercentInput}>
                   <div className={styles.advancedPercentText}>
@@ -524,7 +533,7 @@ export default class AdvancedView extends Component {
                     <span>{EN.Holdout}</span>
                   </div>
                   {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
-                  <span>{parseInt(holdoutRate, 10)}%</span>
+                  <span>{parseInt(holdoutRate.toString(), 10)}%</span>
                 </div>
               </div> : <div className={styles.advancedPercentBox}>
                   <div className={styles.advancedPercentInput}>
@@ -541,7 +550,7 @@ export default class AdvancedView extends Component {
                       <span>{EN.Holdout}</span>
                     </div>
                     {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
-                    <span>{parseInt(holdoutRate, 10)}%</span>
+                    <span>{parseInt(holdoutRate.toString(), 10)}%</span>
                   </div>
                 </div>}
             </div>
@@ -919,18 +928,27 @@ export default class AdvancedView extends Component {
   }
 }
 
+
+interface CustomRangeProps {
+  project: Project,
+  dataViews: DataView,
+  customField: string,
+  customRange: [] | [number, number]
+  customFieldList: string[]
+}
+
 @observer
-class CustomRange extends Component {
+class CustomRange extends Component<CustomRangeProps> {
   handleCustomField = e => {
     this.props.project.customField = e.target.value
     this.props.project.customRange = []
   }
 
-  handleSlider = value => {
+  handleSlider = (value: [number, number]) => {
     const [minValue, maxValue] = value
     if (minValue === maxValue) return
     const { dataViews, customField } = this.props
-    const data = customField ? (dataViews[customField] || {}) : {}
+    const data = customField ? dataViews[customField] : {} as Stats
     const min = data.min || 0
     const max = data.max || 0
     const total = max - min || 1
@@ -939,7 +957,7 @@ class CustomRange extends Component {
 
   render() {
     const { dataViews, customRange, customFieldList, customField } = this.props
-    const data = customField ? (dataViews[customField] || {}) : {}
+    const data = customField ? dataViews[customField] : {} as Stats
     const min = data.min || 0
     const max = data.max || 0
     const total = max - min || 1

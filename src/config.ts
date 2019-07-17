@@ -13,6 +13,4 @@ const config = {
   register: REGISTER
 };
 
-window.config = config;
-
 export default config

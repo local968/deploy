@@ -4,9 +4,15 @@ import { observer, inject } from 'mobx-react';
 import { Icon } from 'antd';
 import { ProgressBar } from 'components/Common';
 import EN from '../../../constant/en';
+import { ProjectStore } from 'stores/ProjectStore';
+
+interface LoadingProps {
+  projectStore?: ProjectStore
+}
+
 @inject('projectStore')
 @observer
-export default class Loading extends Component {
+export default class Loading extends Component<LoadingProps> {
   render() {
     const { trainModel, isAbort, abortTrainByEtl } = this.props.projectStore.project
     const curModel = Object.values(trainModel).sort((a, b) => (b.value || 0) - (a.value || 0))[0]

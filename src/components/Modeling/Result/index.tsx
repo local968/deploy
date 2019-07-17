@@ -10,11 +10,23 @@ import RegressionResult from './Regression/RegressionResult';
 import { ProgressBar, ProcessLoading } from 'components/Common';
 import { Modal, message, Button } from 'antd'
 import EN from '../../../constant/en';
+import { DeploymentStore } from 'stores/DeploymentStore';
+import { ProjectStore } from 'stores/ProjectStore';
+import { RouterStore } from 'mobx-react-router';
+import Model from 'stores/Model';
+import Project from 'stores/Project';
 const Classification = 'Classification';
+
+interface ModelResultProps {
+  deploymentStore?: DeploymentStore,
+  projectStore?: ProjectStore,
+  routing?: RouterStore,
+  resetSide: () => void
+}
 
 @inject('deploymentStore', 'routing', 'projectStore')
 @observer
-export default class ModelResult extends Component {
+export default class ModelResult extends Component<ModelResultProps> {
   @observable view = 'simple'
   @observable show = false
   @observable sort = {
@@ -30,6 +42,7 @@ export default class ModelResult extends Component {
   @observable metric = this.props.projectStore.project.measurement
   // @observable isHoldout = false
   @observable currentSettingId = 'all';
+  cancel?: () => void
 
   changeView = view => {
     this.view = view
@@ -46,7 +59,7 @@ export default class ModelResult extends Component {
     this.sort = { ...this.sort, [view]: sort }
   }
 
-  handleChange = action(value => {
+  handleChange = action((value: string) => {
     this.metric = value;
     // if (window.localStorage)
     //   window.localStorage.setItem(`advancedViewMetric:${this.props.project.id}`, value)
@@ -87,9 +100,9 @@ export default class ModelResult extends Component {
     this.props.resetSide()
   }
 
-  exportReport = (modelId) => () => {
+  exportReport = (modelId) => async () => {
     try {
-      this.cancel = this.props.projectStore.project.generateReport(modelId)
+      this.cancel = await this.props.projectStore.project.generateReport(modelId)
     } catch (e) {
       message.destroy();
       message.error('导出报告错误。')
@@ -98,7 +111,7 @@ export default class ModelResult extends Component {
     }
   }
 
-  changeSetting = action((settingId) => {
+  changeSetting = action((settingId: string) => {
     this.currentSettingId = settingId
   });
 
@@ -138,7 +151,7 @@ export default class ModelResult extends Component {
           </button>
         </div> */}
         {this.view === 'simple' ?
-          <SimpleView models={filterModels} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} currentSettingId={this.currentSettingId} /> :
+          <SimpleView models={filterModels} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} /> :
           <AdvancedView models={models}
             project={project}
             exportReport={this.exportReport}
@@ -174,7 +187,7 @@ export default class ModelResult extends Component {
           <div className={styles.reportProgress}>
             <ProgressBar progress={project.reportProgress} allowRollBack={true} />
             <span className={styles.reportProgressText}>{project.reportProgressText}</span>
-            <Button onClick={this.cancel} className={styles.reportCancel} >{EN.CANCEL}</Button>
+            <Button onClick={() => this.cancel()} className={styles.reportCancel} >{EN.CANCEL}</Button>
           </div>
         </Modal>
       </div>
@@ -182,9 +195,22 @@ export default class ModelResult extends Component {
   }
 }
 
-@withRouter
+interface SimpleViewProps {
+  models: Model[],
+  project: Project,
+  exportReport: (s: string) => void,
+  sort: {
+    key: string,
+    value: number
+  },
+  handleSort: (k: string) => void
+}
+
 @observer
-class SimpleView extends Component {
+class SimpleViewv extends Component<SimpleViewProps> {
+  constructor(props) {
+    super(props)
+  }
   render() {
     const { models, project, exportReport, sort, handleSort } = this.props;
     const { problemType } = project;
@@ -193,6 +219,8 @@ class SimpleView extends Component {
       <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort} />
   }
 }
+
+const SimpleView = withRouter(SimpleViewv)
 
 // @observer
 // class ModelInsights extends Component {
