@@ -4,8 +4,9 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { formatNumber } from '../../../util';
 interface Interface {
-  progress:any
-  style?:any
+  progress: any
+  style?: any,
+  allowRollBack?: boolean
 }
 @observer
 export default class ProgressBar extends Component<Interface> {

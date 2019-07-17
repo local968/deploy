@@ -10,17 +10,26 @@ import SimplifiedView from './SimplifiedView';
 import AdvancedView from './advancedView';
 import classnames from 'classnames'
 import Preview from './Preview'
-import {Show} from 'components/Common';
+import { Show } from 'components/Common';
+import Project from 'stores/Project';
 
 interface AdvancedModelInterface {
-  project:any
-  closeAdvanced:any
+  project: Project
+  closeAdvanced: () => void
 }
+
+export interface AdvancedSetting {
+  name: string,
+  id: string,
+  setting: unknown,
+  models: string[],
+};
+
 @observer
 export default class AdvancedModel extends Component<AdvancedModelInterface> {
   @observable tab = 1;
   @observable visiable = false;
-  @observable setting = {
+  @observable setting: AdvancedSetting = {
     name: `custom.${moment().format('MM.DD.YYYY_HH:mm:ss')}`,
     id: uuid.v4(),
     setting: this.props.project.newSetting(),
@@ -135,17 +144,17 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
             {this.tab === 1 ? (
               <SimplifiedView project={project} />
             ) : (
-              <AdvancedView
-                project={project}
-                hidden={this.visiable || this.tab === 1}
-                setting={this.setting}
-                setSetting={this.setSetting}
-                setSettingName={this.setSettingName}
-              />
-            )}
+                <AdvancedView
+                  project={project}
+                  hidden={this.visiable || this.tab === 1}
+                  setting={this.setting}
+                  setSetting={this.setSetting}
+                  setSettingName={this.setSettingName}
+                />
+              )}
             <div className={styles.bottom}>
               <Show
-                name = 'start_AdvancedModeling'
+                name='start_AdvancedModeling'
               >
                 <button
                   className={classnames(styles.save, {

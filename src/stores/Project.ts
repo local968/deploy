@@ -238,7 +238,7 @@ class Project {
   @observable train2Error: boolean = false;
   // 不需要参加训练的label
   @observable trainHeader: string[] = [];
-  @observable customHeader: string[] = [];
+  @observable customHeader: string[][] = [];
   @observable criteria: string = 'defualt';
   @observable costOption: CostOption = {
     TP: 0,
@@ -265,7 +265,7 @@ class Project {
   @observable crossCount: number = 5;
   @observable dataRange: string = 'all';
   @observable customField: string = '';
-  @observable customRange: unknown[] = [];
+  @observable customRange: [] | [number, number] = [];
   @observable algorithms: string[] = [];
   @observable selectId: string = '';
   @observable version: number[] = [1, 2, 4];
@@ -1835,7 +1835,7 @@ class Project {
   }
 
   newSetting = () => {
-    const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms ,informativesLabel} = this;
+    const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms, informativesLabel } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
     const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
 
