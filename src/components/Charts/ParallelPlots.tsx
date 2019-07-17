@@ -6,6 +6,7 @@ import { inject } from 'mobx-react';
 
 interface DataSampleProps {
 	url:string
+	projectStore?:any
 }
 
 @inject('projectStore')
@@ -67,10 +68,10 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 			color:'#000',
 		};
 
-		const {projectStore} = this.props as any;
+		const {projectStore:{project:{mapHeader}}} = this.props;
 
 		schema.forEach((itm,index)=>{
-			const name = projectStore.project.mapHeader[itm];
+			const name = mapHeader[itm]||itm;
 			parallelAxis.push({
 				dim:index+1,
 				nameLocation:'start',
