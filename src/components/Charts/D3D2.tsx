@@ -1,12 +1,11 @@
 import React, {PureComponent} from 'react'
 import TSEN from './T-SEN'
 import request from '../Request'
-import {Select} from 'antd';
-const {Option} = Select;
 import styles from './charts.module.css';
 import THREE from './3Variable';
 import EN from "../../constant/en";
-import {inject} from "mobx-react";
+import { inject, observer } from 'mobx-react';
+import D3D2List from './D3D2List'
 
 interface DataSampleProps {
 	url:string
@@ -14,9 +13,9 @@ interface DataSampleProps {
 }
 
 @inject('projectStore')
+@observer
 export default class D3D2 extends PureComponent<DataSampleProps>{
 	state:any;
-	show_name:any;
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -26,17 +25,8 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 			y_name:'',
 			z_name:'',
 			result:null,
-			// show_name:{
-			// 	x_name:'',
-			// 	y_name:'',
-			// 	z_name:'',
-			// },
+			changing:false,
 		};
-		this.show_name = {
-			x_name:'',
-			y_name:'',
-			z_name:'',
-		}
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -44,12 +34,12 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		if(nextProps.url !== url){
 			this.setState({
 				show:false,
+				changing:true,
 			},()=>this.componentDidMount(nextProps.url));
 		}
 	}
 
 	async componentDidMount(url=this.props.url) {
-
 		const result:any = await request.post({
 			url: '/graphics/residual-plot-diagnosis',
 			data: {
@@ -60,12 +50,6 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 
 		const [x_name,y_name,z_name=''] = featuresLabel;
 
-		this.show_name = {
-			x_name,
-			y_name,
-			z_name,
-		};
-
 		this.setState({
 			result,
 			ready:true,
@@ -73,42 +57,8 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 			x_name,
 			y_name,
 			z_name,
+			changing:false,
 		});
-	}
-
-	selection(order){
-		const {result} = this.state;
-		const {show_name} = this;
-		const {featuresLabel} = result;
-
-		const {mapHeader} = this.props.projectStore.project;
-
-		const disable = Object.values(show_name).filter(itm=>itm !== show_name[order]);
-
-		const options = featuresLabel.map(itm=><Option key={itm} disabled={disable.includes(itm)} title={mapHeader[itm]||itm} value={itm}>
-			{mapHeader[itm]||itm}
-		</Option>);
-		options.unshift(<Option key='-000' disabled={disable.includes('')} value=''>none</Option>);
-		return <Select
-			defaultValue={show_name[order]}
-			style={{ width: 120 }}
-			getPopupContainer={() => document.getElementById(order)}
-			onChange={name=>{
-				this.show_name = {
-						...this.show_name,
-						[order]:name,
-				}
-				// this.setState({
-				// 	show_name:{
-				// 		...show_name,
-				// 		[order]:name,
-				// 	},
-				// })
-			}}>
-			{
-				options
-			}
-		</Select>
 	}
 
 	chart(){
@@ -147,10 +97,13 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		/>
 	}
 
-	save(){
+	async save(show_name){
 		// const {show_name} = this.state;
-		const {show_name} = this;
+		// const {show_name} = this;
 		const {x_name,y_name,z_name} = show_name;
+		await this.setState({
+			show:false,
+		});
 		this.setState({
 			x_name,
 			y_name,
@@ -160,7 +113,8 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 	}
 
 	render() {
-		const {ready,show} = this.state;
+		const {ready,show,result,changing} = this.state;
+		const {projectStore:{project:{mapHeader}}} = this.props;
 		if (!ready) {
 			return <div/>
 		}
@@ -168,20 +122,13 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		return <section className={styles.d3d2}>
 			<dl>
 				{
-					show&&<React.Fragment>
+					!changing&&<React.Fragment>
 						<dt>{EN.Choose2or3Variables}</dt>
-						{
-							['x_name','y_name','z_name'].map((itm,index)=><dd key={itm} id={itm}>Var{index+1}:{this.selection(itm)}</dd>)
-						}
-						<dd>
-							<button className={styles.button} onClick={()=>{
-								this.setState({
-									show:false,
-								},()=>this.save());
-							}}>
-								<span>{EN.Save}</span>
-							</button>
-						</dd>
+						<D3D2List
+							featuresLabel = {result.featuresLabel}
+							mapHeader = {mapHeader}
+							update = {this.save.bind(this)}
+						/>
 					</React.Fragment>
 				}
 			</dl>
