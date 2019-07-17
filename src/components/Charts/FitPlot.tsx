@@ -11,8 +11,6 @@ export default function FitPlot(props){
 		num.push(x,y);
 		return [x,y];
 	});
-	// @ts-ignore
-	// const num = _.concat(...data);
 
 	const max:number = _.max(num);
 	const min:number = _.min(num);

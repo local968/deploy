@@ -14,22 +14,19 @@ import varImpactNormal from './svg/icon-variable-impact-linear-normal.svg';
 
 import VariableImpact from '../../Result/VariableImpact';
 import EN from '../../../../constant/en';
-import request from '../../../Request'
+import request from '../../../Request';
 
-import {
-  FitPlot,
-  ResidualPlot,
-} from "../../../Charts"
+import { FitPlot, ResidualPlot } from '../../../Charts';
 import Thumbnail from './Thumbnail';
-import DiagnoseResult from './DiagnoseResult'
-import ResidualDiagnose from './ResidualDiagnose'
+import DiagnoseResult from './DiagnoseResult';
+import ResidualDiagnose from './ResidualDiagnose';
 import Project from 'stores/Project';
 import Model from 'stores/Model';
 
 interface RegressionDetailCurvesProps {
-  project: Project,
-  model: Model,
-  mapHeader: StringObject
+  project: Project;
+  model: Model;
+  mapHeader: StringObject;
 }
 
 @observer
@@ -40,61 +37,69 @@ class RegressionDetailCurves extends Component<RegressionDetailCurvesProps> {
     diagnoseType: null,
     chartDate: null,
     show: false,
-    holdOutChartDate: null
-  }
+    holdOutChartDate: null,
+  };
 
   handleClick = val => {
     this.setState({ curve: val });
-  }
+  };
 
   handleDiagnose = () => {
     this.setState({ visible: true });
-  }
+  };
 
   handleDiagnoseType = e => {
     this.setState({ diagnoseType: e.target.value });
-  }
+  };
 
   componentDidMount() {
-    this.setChartDate()
+    this.setChartDate();
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isHoldout !== this.props.project.isHoldout) {
-      this.setState({
-        show: false
-      }, () => {
-        this.setState({
-          show: true
-        })
-      });
+      this.setState(
+        {
+          show: false,
+        },
+        () => {
+          this.setState({
+            show: true,
+          });
+        },
+      );
     }
   }
 
-  setChartDate(isHoldout = this.props.project.isHoldout) {
+  setChartDate() {
     const { validatePlotData, holdoutPlotData } = this.props.model;
 
-    request.post({
-      url: '/graphics/list',
-      data: [{
-        name: 'fit-plot',
-        data: {
-          url: validatePlotData,
-        }
-      }, {
-        name: 'fit-plot',
-        data: {
-          url: holdoutPlotData,
-        }
-      }]
-    }).then(data => {
-      const [chartDate, holdOutChartDate] = data;
-      this.setState({
-        chartDate,
-        holdOutChartDate,
-        show: true,
+    request
+      .post({
+        url: '/graphics/list',
+        data: [
+          {
+            name: 'fit-plot',
+            data: {
+              url: validatePlotData,
+            },
+          },
+          {
+            name: 'fit-plot',
+            data: {
+              url: holdoutPlotData,
+            },
+          },
+        ],
       })
-    });
+      .then((data:Array<any>) => {
+        const [chartDate, holdOutChartDate] = data;
+        this.setState({
+          chartDate,
+          holdOutChartDate,
+          show: true,
+        });
+      });
 
     // request.post({
     //   url: '/graphics/fit-plot',
@@ -110,32 +115,48 @@ class RegressionDetailCurves extends Component<RegressionDetailCurvesProps> {
 
   render() {
     const { model, mapHeader, project } = this.props;
-    const { isHoldout } = project
-    const { curve, diagnoseType, chartDate, show, holdOutChartDate } = this.state;
+    const { isHoldout } = project;
+    const {
+      curve,
+      diagnoseType,
+      chartDate,
+      show,
+      holdOutChartDate,
+    } = this.state;
     let curComponent;
     switch (curve) {
       case EN.VariableImpact:
-        curComponent = <div style={{ fontSize: 60 }} ><VariableImpact model={model} mapHeader={mapHeader} /></div>
+        curComponent = (
+          <div style={{ fontSize: 60 }}>
+            <VariableImpact model={model} mapHeader={mapHeader} />
+          </div>
+        );
         break;
       case EN.FitPlot:
-        curComponent = <div className={styles.plot} style={{ height: 300, width: 500 }}>
-          {show && <FitPlot
-            title={EN.FitPlot}
-            x_name={EN.Truevalue}
-            y_name={EN.Predictvalue}
-            chartDate={isHoldout ? holdOutChartDate : chartDate}
-          />}
-        </div>;
+        curComponent = (
+          <div className={styles.plot} style={{ height: 300, width: 500 }}>
+            {show && (
+              <FitPlot
+                title={EN.FitPlot}
+                x_name={EN.Truevalue}
+                y_name={EN.Predictvalue}
+                chartDate={isHoldout ? holdOutChartDate : chartDate}
+              />
+            )}
+          </div>
+        );
         break;
       case EN.ResidualPlot:
-        const Plot = show && <ResidualPlot
-          title={EN.ResidualPlot}
-          // x_name={EN.Truevalue}
-          y_name={EN.Predictvalue}
-          chartDate={isHoldout ? holdOutChartDate : chartDate}
-        />;
+        const Plot = show && (
+          <ResidualPlot
+            title={EN.ResidualPlot}
+            // x_name={EN.Truevalue}
+            y_name={EN.Predictvalue}
+            chartDate={isHoldout ? holdOutChartDate : chartDate}
+          />
+        );
         curComponent = (
-          <div className={styles.plot} >
+          <div className={styles.plot}>
             {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
             {/*<ResidualPlot/>*/}
             {chartDate && Plot}
@@ -150,44 +171,59 @@ class RegressionDetailCurves extends Component<RegressionDetailCurvesProps> {
                 handleDiagnoseType={this.handleDiagnoseType}
                 diagnoseType={diagnoseType}
                 Plot={Plot}
-                residualplot={model.residualPlotPath} />
+                residualplot={model.residualPlotPath}
+              />
             </Modal>
-            <DiagnoseResult project={this.props.project} handleDiagnose={this.handleDiagnose} diagnoseType={diagnoseType} />
+            <DiagnoseResult
+              project={this.props.project}
+              handleDiagnose={this.handleDiagnose}
+              diagnoseType={diagnoseType}
+            />
           </div>
         );
         break;
       default:
-        break
+        break;
     }
-    const thumbnails = [{
-      text: EN.FitPlot,
-      hoverIcon: FitPlotHover,
-      normalIcon: FitPlotNormal,
-      selectedIcon: FitPlotSelected,
-      type: 'fitplot'
-    }, {
-      text: EN.ResidualPlot,
-      hoverIcon: ResidualHover,
-      normalIcon: ResidualNormal,
-      selectedIcon: ResidualSelected,
-      type: 'residualplot'
-    }, {
-      normalIcon: varImpactNormal,
-      hoverIcon: varImpactHover,
-      selectedIcon: varImpactSelected,
-      text: EN.VariableImpact
-    }]
+    const thumbnails = [
+      {
+        text: EN.FitPlot,
+        hoverIcon: FitPlotHover,
+        normalIcon: FitPlotNormal,
+        selectedIcon: FitPlotSelected,
+        type: 'fitplot',
+      },
+      {
+        text: EN.ResidualPlot,
+        hoverIcon: ResidualHover,
+        normalIcon: ResidualNormal,
+        selectedIcon: ResidualSelected,
+        type: 'residualplot',
+      },
+      {
+        normalIcon: varImpactNormal,
+        hoverIcon: varImpactHover,
+        selectedIcon: varImpactSelected,
+        text: EN.VariableImpact,
+      },
+    ];
     return (
-      <div className={styles.detailCurves} >
-        <div className={styles.leftPanel} style={{ minWidth: 210 }} >
-          {thumbnails.map((tn, i) => <Thumbnail curSelected={curve} key={i} thumbnail={tn} onClick={this.handleClick} value={tn.text} />)}
+      <div className={styles.detailCurves}>
+        <div className={styles.leftPanel} style={{ minWidth: 210 }}>
+          {thumbnails.map((tn, i) => (
+            <Thumbnail
+              curSelected={curve}
+              key={i}
+              thumbnail={tn}
+              onClick={this.handleClick}
+              value={tn.text}
+            />
+          ))}
         </div>
-        <div className={styles.rightPanel} >
-          {curComponent}
-        </div>
+        <div className={styles.rightPanel}>{curComponent}</div>
       </div>
-    )
+    );
   }
 }
 
-export default RegressionDetailCurves
+export default RegressionDetailCurves;

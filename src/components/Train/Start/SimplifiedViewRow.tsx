@@ -57,7 +57,7 @@ export default class SimplifiedViewRow extends Component<
             url: '/graphics/histogram-numerical',
             data,
           })
-          .then(result =>
+          .then((result:any) =>
             this.showback(result.data, value, {
               min,
               max,
@@ -66,14 +66,13 @@ export default class SimplifiedViewRow extends Component<
           );
       } else {
         const { uniqueValues } = project.dataViews[value];
-        // data.size = uniqueValues > 8 ? 8 : uniqueValues;
         data.size = uniqueValues;
         request
           .post({
             url: '/graphics/histogram-categorical',
             data,
           })
-          .then(result => this.showback(result.data, value));
+          .then((result:any) => this.showback(result.data, value));
       }
     } else {
       this.histograms = true;

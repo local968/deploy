@@ -59,7 +59,7 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 				id,
 				interval:+interval,
 			},
-		}).then((result) => {
+		}).then((result:any) => {
 			this.setState({
 				title,
 				min:(Math.min(+(min-zoom),low)).toFixed(3),

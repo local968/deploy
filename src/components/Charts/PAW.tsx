@@ -42,7 +42,7 @@ export default function PAW(props){
 
 	useEffect( function() {
 		async function fetchData() {
-			const result = await request.post({
+			const result:any = await request.post({
 				url: '/graphics/paw',
 				data: {
 					url,

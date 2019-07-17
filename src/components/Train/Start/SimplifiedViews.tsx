@@ -66,7 +66,7 @@ export default class SimplifiedViews extends Component<Interface> {
           id: project.etlIndex,
         },
       })
-      .then(CorrelationMatrixData => {
+      .then((CorrelationMatrixData:any) => {
         this.showCorrelation = true;
         let { type } = CorrelationMatrixData;
         CorrelationMatrixData.type = type.map(itm => project.mapHeader[itm]);
