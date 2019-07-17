@@ -285,7 +285,10 @@ export default class ClassificationView extends Component<Interface> {
                       <p><b>{EN.A}</b>
                         {EN.Pleaseenterbenefitandcostin}</p>
                       <p><b>{EN.B}</b>
-                        {EN.Noteifacorrectpredictionbringsyouprofit}</p>
+                        {EN.Pleaseenterbenefitandcostins}</p>
+                      <p><span style={{ color: '#f5a623', fontStyle: 'italic' }}>
+                        {EN.Noteifacorrectpredictionbringsyouprofit}
+                      </span></p>
                     </dt>
                     {/*<dt>*/}
                     {/*  <span>{EN.Basedonyourbizscenario}</span>*/}
