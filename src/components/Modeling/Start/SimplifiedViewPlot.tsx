@@ -34,7 +34,6 @@ export default class SimplifiedViewPlot extends Component<Interface> {
     return <div className={styles.plot} style={style}>
       <HistogramCategorical
         x_name={target||value}
-        title={`Feature:${target||value}`}
         data={data}
         xAxisName = {data.map((itm)=>target?(renameVariable[itm.name]||itm.name):itm.name)}
       />

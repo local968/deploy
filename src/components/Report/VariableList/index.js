@@ -640,7 +640,6 @@ class SimplifiedViewPlot extends Component {
       {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
       <HistogramCategorical
         x_name={target}
-        title={`Feature:${target}`}
         data={data}
       />
     </div>

@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import styles from './styles.module.css';
 import {inject, observer} from 'mobx-react';
 import moment from 'moment';
-import {Bread, Select, Pagination, Switch, Search, Confirm} from 'components/Common';
-import {Icon, Modal} from 'antd';
+import {Bread, Select, Pagination, Switch, Search, Confirm,Show} from 'components/Common';
+import {Icon} from 'antd';
 import issueIcon from './fail.svg';
 import runningIcon from './running.svg';
 import normalIcon from './success.svg';
@@ -52,7 +52,8 @@ export default class Home extends Component {
   };
 
   render() {
-    const {deploymentStore, routing, scheduleStore, userStore} = this.props;
+    const {deploymentStore, routing, scheduleStore, userStore,userStore:{info:{role:{deploy_enable=false}}}} = this.props;
+  
     return (
       <div className={styles.home}>
         <Bread list={[EN.Home]}/>
@@ -148,7 +149,7 @@ export default class Home extends Component {
                   <Switch
                     checked={deployment && deployment.enable}
                     onChange={() => {
-                      deploymentStore.toggleEnable(deployment.id);
+                      deploy_enable&&deploymentStore.toggleEnable(deployment.id);
                     }}
                   />
                 </span>
@@ -182,24 +183,6 @@ export default class Home extends Component {
                   ).status
                     ] || deploymentStatus['normal']}
                 </span>
-                {/* <span
-                  className={styles.operationAlert}
-                  title={deployment.operationAlert || 0}
-                  onClick={() =>
-                    history.push(`/deploy/project/${deployment.id}`)
-                  }
-                >
-                  {deployment.operationAlert || 0}
-                </span>
-                <span
-                  className={styles.performanceAlert}
-                  title={deployment.performanceAlert || 0}
-                  onClick={() =>
-                    history.push(`/deploy/project/${deployment.id}`)
-                  }
-                >
-                  {deployment.performanceAlert || 0}
-                </span> */}
                 <span
                   className={styles.createdDate}
                   title={moment.unix(deployment.createdDate).format('M/D/YYYY')}
@@ -211,16 +194,17 @@ export default class Home extends Component {
                 <span className={styles.owner} title={deployment.owner}>
                   {userStore.info.email}
                 </span>
-                <span
-                  className={styles.delete}
-                  onClick={() => {
-                    // if (message.info(EN.Areyousuretodeletethismodeldeployment))
-                    //   deploymentStore.delete(deployment.id);
-                    this.setState({ visible: deployment.id })
-                  }}
+                <Show
+                  name = 'deploy_delete'
                 >
+                  <span
+                    className={styles.delete}
+                    onClick={() =>this.setState({ visible: deployment.id })}
+                  >
                   <Icon type="delete"/>
                 </span>
+                </Show>
+                
                 <Confirm width={'6em'} visible={this.state.visible === deployment.id} title={EN.Warning}
                   content={EN.Areyousuretodeletethismodeldeployment}
                   onClose={() => this.setState({ visible: false })}

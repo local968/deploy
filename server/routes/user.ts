@@ -86,7 +86,7 @@ router.post('/login', async(req, res) => {
     info: {
       id,
       email,
-      role,
+      role:role === null ? {}:role,
     }});
 });
 
