@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, MouseEvent, ReactElement } from 'react';
 import classnames from 'classnames';
 import { Select, Radio, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
 import { Hint } from 'components/Common';
-import { computed} from 'mobx';
+import { computed } from 'mobx';
 import moment from 'moment';
-import { formatNumber } from 'util'
+import { formatNumber } from '../../../util'
 import EN from '../../../constant/en';
 import ParallelPlot from './parallel-plot.png'
 import ParallelPlotOn from './parallel-plot-on.png'
@@ -19,10 +19,26 @@ import {
   PAW,
   ParallelPlots,
 } from "../../Charts"
+import Model from 'stores/Model';
+import Project from 'stores/Project';
+import { ProjectStore } from 'stores/ProjectStore';
+
+interface AdvancedViewProps {
+  models: Model[],
+  project: Project,
+  projectStore?: ProjectStore,
+  sort: {
+    key: string,
+    value: number
+  },
+  currentSettingId: string,
+  handleSort: (s: string) => void,
+  changeSetting: (s: string) => void
+}
 
 @inject('projectStore')
 @observer
-export default class AdvancedView extends Component {
+export default class AdvancedView extends Component<AdvancedViewProps> {
 
   @computed
   get filtedModels() {
@@ -109,7 +125,7 @@ export default class AdvancedView extends Component {
         <div className={styles.middle}>
           <div className={styles.settings}>
             <span className={styles.label}>{EN.ModelNameContains}:</span>
-            <Select className={styles.settingsSelect} value={currentSettingId} onChange={changeSetting} getPopupContainer={() => document.getElementsByClassName(styles.settings)[0]}>
+            <Select className={styles.settingsSelect} value={currentSettingId} onChange={changeSetting} getPopupContainer={el => el.parentElement}>
               <Option value={'all'}>{EN.All}</Option>
               {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
             </Select>
@@ -131,10 +147,20 @@ const questMarks = {
   PCA: EN.PCAIntro,
 };
 
-@observer
-class AdvancedModelTable extends Component {
+interface AdvancedModelTableProps {
+  models: Model[],
+  project: Project,
+  sort: {
+    key: string,
+    value: number
+  },
+  handleSort: (s: string) => void
+}
 
-  onClickCheckbox = (modelId) => (e) => {
+@observer
+class AdvancedModelTable extends Component<AdvancedModelTableProps> {
+
+  onClickCheckbox = (modelId) => (e: MouseEvent<HTMLElement>) => {
     this.props.project.setSelectModel(modelId);
     e.stopPropagation()
   };
@@ -188,7 +214,16 @@ class AdvancedModelTable extends Component {
   }
 }
 
-@observer class RegressionModleRow extends Component {
+interface RegressionModleRowProps {
+  project: Project,
+  key: string,
+  texts: string[],
+  onClickCheckbox: (event: MouseEvent<HTMLElement>) => void,
+  checked: boolean,
+  model: Model
+}
+
+@observer class RegressionModleRow extends Component<RegressionModleRowProps> {
   state = {
     detail: false,
     type: '',
@@ -214,7 +249,7 @@ class AdvancedModelTable extends Component {
                   <RowCell key={1} data={<div key={1} >
                     <Radio checked={checked} onClick={this.props.onClickCheckbox} />
                     <Tooltip title={modelName}>
-                      <span className={styles.modelName} alt={modelName}>{modelName}</span>
+                      <span className={styles.modelName}>{modelName}</span>
                     </Tooltip>
                   </div>}
                   />
@@ -226,11 +261,11 @@ class AdvancedModelTable extends Component {
               case 'RMSSTD':
                 return <RowCell key={11} data={score.RMSSTD} />;
               case 'CH Index':
-                return <RowCell key={9} data={score.CH} title={score.CH === 'inf' ? EN.ClusterInfReason : score.CH === 'null' ? EN.ClusterReason : score.CH} />;
+                return <RowCell key={9} data={score.CH} title={score.CH === 'inf' ? EN.ClusterInfReason : score.CH === 'null' ? EN.ClusterReason : score.CH.toString()} />;
               case 'Silhouette Cosine':
-                return <RowCell key={3} data={score.silhouette_cosine} title={score.silhouette_cosine === 'inf' ? EN.ClusterInfReason : score.silhouette_cosine === 'null' ? EN.ClusterReason : score.silhouette_cosine} />;
+                return <RowCell key={3} data={score.silhouette_cosine} title={score.silhouette_cosine === 'inf' ? EN.ClusterInfReason : score.silhouette_cosine === 'null' ? EN.ClusterReason : score.silhouette_cosine.toString()} />;
               case 'Silhouette Euclidean':
-                return <RowCell key={4} data={score.silhouette_euclidean} title={score.silhouette_euclidean === 'inf' ? EN.ClusterInfReason : score.silhouette_euclidean === 'null' ? EN.ClusterReason : score.silhouette_euclidean} />;
+                return <RowCell key={4} data={score.silhouette_euclidean} title={score.silhouette_euclidean === 'inf' ? EN.ClusterInfReason : score.silhouette_euclidean === 'null' ? EN.ClusterReason : score.silhouette_euclidean.toString()} />;
               case EN.Time:
                 return <RowCell key={12} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} />;
               default:
@@ -264,14 +299,24 @@ class AdvancedModelTable extends Component {
   }
 }
 
+interface RegressionDetailCurvesProps {
+  project: Project
+  model: Model
+  type: string
+}
+
+interface RegressionDetailCurvesState {
+  curve: string,
+  visible: boolean,
+}
+
 @observer
-class RegressionDetailCurves extends Component {
+class RegressionDetailCurves extends Component<RegressionDetailCurvesProps, RegressionDetailCurvesState> {
   constructor(props) {
     super(props);
     this.state = {
       curve: props.type,
       visible: false,
-      diagnoseType: null
     }
   }
 
@@ -281,7 +326,7 @@ class RegressionDetailCurves extends Component {
     }
   }
 
-  handleClick = val => {
+  handleClick = (val: string) => {
     this.setState({ curve: val });
   };
 
@@ -338,7 +383,20 @@ class RegressionDetailCurves extends Component {
   }
 }
 
-class Thumbnail extends Component {
+interface ThumbnailProps {
+  curSelected: string,
+  thumbnail: {
+    text: string,
+    hoverIcon: string,
+    normalIcon: string,
+    selectedIcon: string,
+    type: string
+  },
+  onClick: (s: string) => void,
+  value: string
+}
+
+class Thumbnail extends Component<ThumbnailProps> {
   state = {
     clickActive: false,
     hoverActive: false
@@ -380,7 +438,11 @@ class Thumbnail extends Component {
   }
 }
 
-class Row extends Component {
+interface RowProps {
+  rowStyle?: unknown
+}
+
+class Row extends Component<RowProps> {
   render() {
     const { children, rowStyle, ...other } = this.props;
     return (
@@ -391,7 +453,15 @@ class Row extends Component {
   }
 }
 
-class RowCell extends Component {
+interface RowCellProps {
+  data?: unknown,
+  cellStyle?: unknown,
+  cellClassName?: string,
+  title?: string,
+  onClick?: (e: MouseEvent<HTMLElement>) => void
+}
+
+class RowCell extends Component<RowCellProps> {
   render() {
     const { data, cellStyle, cellClassName, title, ...rest } = this.props;
     return (
@@ -399,9 +469,9 @@ class RowCell extends Component {
         {...rest}
         style={cellStyle}
         className={classnames(styles.adcell, cellClassName)}
-        title={title ? title : typeof data === 'object' ? '' : formatNumber(data)}
+        title={title ? title : typeof data === 'object' ? '' : formatNumber(data.toString())}
       >
-        {formatNumber(data)}
+        {formatNumber(data.toString())}
       </div>
     );
   }

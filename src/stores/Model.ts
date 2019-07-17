@@ -61,8 +61,21 @@ export interface Score {
   auc?: number,
   validateScore?: ClaregScore,
   holdoutScore?: ClaregScore,
-  trainScore?: ClaregScore
+  trainScore?: ClaregScore,
+  CVNN?: number | 'null' | 'inf',
+  RSquared?: number | 'null' | 'inf',
+  RMSSTD?: number | 'null' | 'inf',
+  CH?: number | 'null' | 'inf',
+  silhouette_cosine?: number | 'null' | 'inf',
+  silhouette_euclidean?: number | 'null' | 'inf',
 }
+
+export interface LabelWithImportance {
+  [key: string]: {
+    indexes?: string[];
+    values?: number[];
+  };
+};
 
 class Model {
   projectId: string
@@ -85,7 +98,7 @@ class Model {
   @observable chartData: ChartData;
   @observable problemType: string
   @observable importanceLoading: boolean = false
-  @observable labelWithImportance: NumberObject = {}
+  @observable labelWithImportance: LabelWithImportance = {}
   @observable multiVarPlotData: string = ''
   @observable parallelPlotData: string = ''
   @observable outlierPlotData: string = '';
