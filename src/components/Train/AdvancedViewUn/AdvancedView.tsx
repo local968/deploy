@@ -454,7 +454,7 @@ class Row extends Component<RowProps> {
 }
 
 interface RowCellProps {
-  data?: unknown,
+  data?: string | number | ReactElement,
   cellStyle?: unknown,
   cellClassName?: string,
   title?: string,
@@ -471,7 +471,7 @@ class RowCell extends Component<RowCellProps> {
         className={classnames(styles.adcell, cellClassName)}
         title={title ? title : typeof data === 'object' ? '' : formatNumber(data.toString())}
       >
-        {formatNumber(data.toString())}
+        {typeof data === 'object' ? data : formatNumber(data.toString())}
       </div>
     );
   }
