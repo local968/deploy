@@ -7,6 +7,8 @@ import EN from '../../../constant/en';
 import { observable } from 'mobx';
 import { formatNumber } from '../../../util';
 import Project from 'stores/Project';
+import Axios from 'axios';
+import { message } from 'antd';
 
 interface DataSampleProps {
   project: Project,
@@ -41,12 +43,18 @@ class DataSample extends Component<DataSampleProps> {
     // const sample = this.files[project.problemType + 'Sample'];
     const file = (this.files || [])[this.select];
     if (!file) return;
-    selectSample({
-      rawHeader: file.header,
-      totalRawLines: file.lines,
-      originalIndex: file.index,
-      fileName: file.name
-    });
+    this.loading = true
+    Axios.post('/upload/sample', { filename: file.name }).then((result: any) => {
+      if (result.status !== 200) return message.error("select sample error")
+      const data = result.data.data
+      selectSample({
+        rawHeader: data.header,
+        totalRawLines: data.lines,
+        originalIndex: data.index,
+        fileName: data.name
+      });
+      this.loading = false
+    })
   };
 
   formatSize = (size: number) => {

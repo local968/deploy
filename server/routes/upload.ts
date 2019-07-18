@@ -137,7 +137,7 @@ router.post('/sample', (req, res) => {
   redis.get(`file:sample:${filename}`, (err, data) => {
     if (err) return res.json({ status: 201, message: 'file error' });
     if (!data) return res.json({ status: 202, message: 'file not exist' });
-    return res.json({ status: 200, message: 'ok', fileId: data });
+    return res.json({ status: 200, message: 'ok', data: JSON.parse(data) });
   });
   return undefined;
 });
@@ -232,7 +232,6 @@ async function saveSample(force: boolean = false) {
       const pipeline = redis.pipeline();
       const [type, target, name] = f.split('__');
       const filePath = path.join(samplePath, f);
-      const id = uuid.v4();
       try {
         if (!force) {
           try {
@@ -250,7 +249,6 @@ async function saveSample(force: boolean = false) {
           fileSize,
         } = (await uploader(fs.createReadStream(filePath))) as any;
         const fileData = {
-          id,
           name,
           size: fileSize,
           ext: '.csv',
@@ -262,9 +260,9 @@ async function saveSample(force: boolean = false) {
           index: originalIndex,
           header: rawHeader,
         }
+        console.log(JSON.stringify(fileData))
         pipeline.sadd(`file:${type}:samples`, JSON.stringify(fileData));
-        pipeline.set(`file:sample:${name}`, id);
-        pipeline.set(`file:${id}`, JSON.stringify({ ...fileData, ...data }));
+        pipeline.set(`file:sample:${name}`, JSON.stringify({ ...fileData, ...data }));
         await pipeline.exec();
         console.info('file:' + f + ' end');
       } catch (e) {
