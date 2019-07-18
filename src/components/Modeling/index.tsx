@@ -104,7 +104,7 @@ interface TrainResultProps {
 class TrainResult extends Component<TrainResultProps> {
   render() {
     const { project, resetSide } = this.props;
-    const { models, train2Error, train2ing, problemType } = project;
+    const { models, train2Error, train2ing } = project;
     if (train2Error) return <ModelError />;
     if (!models.length && train2ing) return <Loading />;
     return <ModelResult

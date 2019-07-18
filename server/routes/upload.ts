@@ -10,13 +10,13 @@ import Papa from 'papaparse';
 import http from 'http';
 import command from '../command';
 import scheduleApi from '../scheduleApi';
-const {userService} = require('../apis/service');
+const { userService } = require('../apis/service');
 
 import config from '../../config';
 import axios from 'axios';
 import _ from 'lodash';
 import uploader from './uploader';
-const {restriction} = require("../apis/service/planService");
+const { restriction } = require("../apis/service/planService");
 
 import { getProjectField } from './project';
 
@@ -28,7 +28,7 @@ router.post('/check', async (req, res) => {
   const { fileSize, type, projectId } = req.body;
   const { userId } = req.session;
   const host = JSON.parse(await redis.hget(`project:${projectId}`, 'host'));
-  const {userModelingRestriction,userStorageRestriction} = await restriction();
+  const { userModelingRestriction, userStorageRestriction } = await restriction();
   if (!fileSize || !userId || !type)
     return res.json({
       status: 404,
@@ -190,7 +190,7 @@ router.get('/reload', async (req, res) => {
   const { userId } = req.session;
   const result = await userService.status(userId);
 
-  if(result&&result.drole&&result.drole.Reload){
+  if (result && result.drole && result.drole.Reload) {
     await saveSample(true);
     return res.json({
       status: 100,
@@ -249,20 +249,22 @@ async function saveSample(force: boolean = false) {
           rawHeader,
           fileSize,
         } = (await uploader(fs.createReadStream(filePath))) as any;
-        const data = {
+        const fileData = {
           id,
           name,
-          createdTime: +new Date(),
           size: fileSize,
           ext: '.csv',
           target,
-          index: originalIndex,
           lines: totalRawLines,
-          header: rawHeader,
         };
-        pipeline.sadd(`file:${type}:samples`, JSON.stringify(data));
+        const data = {
+          createdTime: +new Date(),
+          index: originalIndex,
+          header: rawHeader,
+        }
+        pipeline.sadd(`file:${type}:samples`, JSON.stringify(fileData));
         pipeline.set(`file:sample:${name}`, id);
-        pipeline.set(`file:${id}`, JSON.stringify(data));
+        pipeline.set(`file:${id}`, JSON.stringify({ ...fileData, ...data }));
         await pipeline.exec();
         console.info('file:' + f + ' end');
       } catch (e) {
