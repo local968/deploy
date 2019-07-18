@@ -74,6 +74,18 @@
   .detailCurves .leftPanel .predictTable td {
     padding: 0 8px !important;
   }
+
+  .predictTable td{
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+  .predictTable span{
+    overflow: auto;
+    display: -webkit-box;
+     max-height: 100px;
+  }
   .detailCurves .leftPanel .predictTable :global(.ant-table-tbody) :global(.ant-table-row):first-child td:nth-of-type(1),
   .detailCurves .leftPanel .predictTable :global(.ant-table-tbody) :global(.ant-table-row):nth-of-type(2) td:nth-of-type(1) {
     background-color: #eaeff5;

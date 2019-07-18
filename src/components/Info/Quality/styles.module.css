@@ -111,8 +111,8 @@
 	border: solid 1px #00b570;
 	flex-direction: column;
 	width: 100%;
-  flex: auto;
-  min-height: 0;
+    flex: auto;
+    min-height: 0;
 }
 
 .cell {
