@@ -1,7 +1,7 @@
 import request from './request'
 import config from '../../../config'
 
-const url = `${config.STRAPI}/strapi/dusers`;
+const url = `${config.STRAPI}/dusers`;
 
 const exist = async email=>{
 	const had:any = await request.get(`${url}?email=${email}`);
