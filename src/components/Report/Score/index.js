@@ -53,7 +53,7 @@ export default class AdvancedView extends Component {
 
     const sortMethods = (aModel, bModel) => {
       switch (sort.key) {
-        case 'F1-Score':
+        case 'Fbeta':
           {
             const aFitIndex = aModel.fitIndex;
             const bFitIndex = bModel.fitIndex;
@@ -286,7 +286,7 @@ const questMarks = {
   Accuracy: EN.Givenaparticularpopulation,
   Recall: EN.Itrepresentsthecompleteness,
   'Cutoff Threshold': EN.Manyclassifiersareabletoproduce,
-  'F1-Score': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
+  'Fbeta': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
   Precision: <p>{EN.Itmeasureshowmanytruepositivesamong}</p>,
   KS: EN.Efficientwaytodetermine,
   'Normalized RMSE': EN.RootMeanSquareError,
@@ -314,7 +314,7 @@ class AdvancedModelTable extends Component {
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     const texts = problemType === 'Classification' ?
-      [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
+      [EN.ModelName, EN.Time, 'Fbeta', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
       [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
     const arr = []
     const replaceR2 = str => str.replace(/R2/g, 'R²');
@@ -568,7 +568,7 @@ class ClassificationModelRow extends Component {
                   </div>}
                   />
                 );
-              case 'F1-Score':
+              case 'Fbeta':
                 return <RowCell key={2} data={model.f1Validation} />;
               case 'Precision':
                 return <RowCell key={3} data={model.precisionValidation} />;
