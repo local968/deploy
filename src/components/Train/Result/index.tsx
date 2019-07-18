@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import { Hint, ProgressBar, Table, ProcessLoading } from 'components/Common';
 import classes from './styles.module.css';
 import VariableImpact from './VariableImpact';
@@ -76,10 +76,8 @@ function ModelResult(props) {
     (measurement === 'CH' && EN.CHIndexHint) ||
     (measurement === 'silhouette_euclidean' && EN.SihouetteScoreHint) ||
     EN.CVNNHint;
-  if (currentSetting && currentSetting.models)
-    filterModels = filterModels.filter(model =>
-      currentSetting.models.find(id => model.id === id),
-    );
+  if (currentSetting)
+    filterModels = filterModels.filter(model => model.settingId === currentSetting.id);
 
   const [visible, setVisible] = React.useState(false);
   // console.log('selectModel',selectModel,selectModel.multiVarPlotData);
@@ -159,7 +157,7 @@ function ModelResult(props) {
           <span
             className={`${classes.tab} ${
               view === 'simple' ? classes.active : ''
-            }`}
+              }`}
             onClick={() => changeView('simple')}
           >
             {EN.SimpleView}
@@ -167,7 +165,7 @@ function ModelResult(props) {
           <span
             className={`${classes.tab} ${
               view === 'advanced' ? classes.active : ''
-            }`}
+              }`}
             onClick={() => changeView('advanced')}
           >
             {EN.AdvancedView}
@@ -282,8 +280,8 @@ function ModelResult(props) {
               {project.problemType === 'Outlier' ? (
                 <ISO />
               ) : (
-                <D3D2 url={selectModel.multiVarPlotData} />
-              )}
+                  <D3D2 url={selectModel.multiVarPlotData} />
+                )}
             </div>
           </div>
           {problemType === 'Clustering' && (
@@ -332,10 +330,10 @@ function ModelResult(props) {
             </button>
           </Tooltip>
         ) : (
-          <button className={`${classes.button}`} onClick={deploy}>
-            <span>{EN.DeployTheModel}</span>
-          </button>
-        )}
+            <button className={`${classes.button}`} onClick={deploy}>
+              <span>{EN.DeployTheModel}</span>
+            </button>
+          )}
         {problemType === 'Clustering' && (
           <a
             href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(
@@ -444,8 +442,8 @@ const OutlierTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}
+                  <Icon type="minus" />
+                )}
             </span>
           </div>
           <div
@@ -462,8 +460,8 @@ const OutlierTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}
+                  <Icon type="minus" />
+                )}
             </span>
           </div>
           <div
@@ -483,8 +481,8 @@ const OutlierTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}
+                  <Icon type="minus" />
+                )}
             </span>
           </div>
           {hasTarget && (
@@ -503,8 +501,8 @@ const OutlierTable = observer(props => {
                     }
                   />
                 ) : (
-                  <Icon type="minus" />
-                )}
+                    <Icon type="minus" />
+                  )}
               </span>
             </div>
           )}
@@ -524,8 +522,8 @@ const OutlierTable = observer(props => {
                     }
                   />
                 ) : (
-                  <Icon type="minus" />
-                )}
+                    <Icon type="minus" />
+                  )}
               </span>
             </div>
           )}
@@ -544,8 +542,8 @@ const OutlierTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}
+                  <Icon type="minus" />
+                )}
             </span>
           </div>
           <div
@@ -599,7 +597,7 @@ const OutlierTable = observer(props => {
                 </div>
                 <ProgressBar progress={trainingModel.value || 0} />
                 <Show
-                  name = 'result_abortButton_UN_OUT'
+                  name='result_abortButton_UN_OUT'
                 >
                   <div
                     className={classes.abortButton}
@@ -612,8 +610,8 @@ const OutlierTable = observer(props => {
                     {isAbort ? (
                       <Icon type="loading" />
                     ) : (
-                      <span>{EN.AbortTraining}</span>
-                    )}
+                        <span>{EN.AbortTraining}</span>
+                      )}
                   </div>
                 </Show>
               </div>
@@ -696,8 +694,8 @@ const OutlierRow = observer(props => {
                 {!model.target.length
                   ? 'null'
                   : formatNumber(
-                      model.accuracyData[formatNumber(model.rate)] || 0,
-                    )}
+                    model.accuracyData[formatNumber(model.rate)] || 0,
+                  )}
               </span>
             </div>
           )}
@@ -842,8 +840,8 @@ const ClusteringTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}
+                  <Icon type="minus" />
+                )}
             </span>
           </div>
           <div
@@ -863,8 +861,8 @@ const ClusteringTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}{' '}
+                  <Icon type="minus" />
+                )}{' '}
             </span>
           </div>
           {/* <div className={`${classes.ccell} ${classes.cname} ${classes.ccellHeader}`} onClick={() => handleSort('cvnn')}>
@@ -899,8 +897,8 @@ const ClusteringTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}{' '}
+                  <Icon type="minus" />
+                )}{' '}
             </span>
           </div>
           <div
@@ -917,8 +915,8 @@ const ClusteringTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}
+                  <Icon type="minus" />
+                )}
             </span>
           </div>
           {!!hasTarget && (
@@ -941,8 +939,8 @@ const ClusteringTable = observer(props => {
                     }
                   />
                 ) : (
-                  <Icon type="minus" />
-                )}
+                    <Icon type="minus" />
+                  )}
               </span>
             </div>
           )}
@@ -966,8 +964,8 @@ const ClusteringTable = observer(props => {
                     }
                   />
                 ) : (
-                  <Icon type="minus" />
-                )}
+                    <Icon type="minus" />
+                  )}
               </span>
             </div>
           )}
@@ -985,8 +983,8 @@ const ClusteringTable = observer(props => {
                   }
                 />
               ) : (
-                <Icon type="minus" />
-              )}
+                  <Icon type="minus" />
+                )}
             </span>
           </div>
           <div
@@ -1037,7 +1035,7 @@ const ClusteringTable = observer(props => {
                 </div>
                 <ProgressBar progress={trainingModel.value || 0} />
                 <Show
-                  name = 'result_abortButton_UN_AGGRE'
+                  name='result_abortButton_UN_AGGRE'
                 >
                   <div
                     className={classes.abortButton}
@@ -1050,8 +1048,8 @@ const ClusteringTable = observer(props => {
                     {isAbort ? (
                       <Icon type="loading" />
                     ) : (
-                      <span>{EN.AbortTraining}</span>
-                    )}
+                        <span>{EN.AbortTraining}</span>
+                      )}
                   </div>
                 </Show>
 

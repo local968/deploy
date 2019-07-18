@@ -168,7 +168,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
     let _models = [...models];
     if (currentSettingId !== 'all') {
       const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
-      if (currentSetting && currentSetting.models) _models = _models.filter(model => currentSetting.models.find(id => model.id === id))
+      if (currentSetting) _models = _models.filter(model => model.settingId === currentSetting.id)
     }
     return _models.sort(sortMethods)
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
@@ -220,8 +220,8 @@ const AdvancedView = (props: AdvancedViewProps) => {
         case 'fbeta':
           curIndex = 0
           for (let i = 1; i < Length; i++) {
-            const prevFbeta = Fbeta(curIndex, correction.value)
-            const newFbeta = Fbeta(i, correction.value)
+            const prevFbeta = Fbeta(curIndex, fbeta)
+            const newFbeta = Fbeta(i, fbeta)
             if (newFbeta > prevFbeta) curIndex = i
           }
           break;

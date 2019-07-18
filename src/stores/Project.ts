@@ -75,7 +75,6 @@ export interface Settings {
   id: string,
   name: string,
   setting: unknown,
-  models: string[]
 }
 
 export interface SsPlot {
@@ -110,6 +109,7 @@ export interface TrainCommand {
   nfold?: number,
   showSsPlot?: boolean,
   esIndex?: string;
+  settingId?: string;
 }
 
 export interface DataView {
@@ -1419,7 +1419,8 @@ class Project {
     const { currentSetting, models, measurement, problemType } = this
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
-    return models.filter(_m => (currentSetting && currentSetting.models && currentSetting.models.length) ? currentSetting.models.includes(_m.id) : true)
+    const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
+    return (!currentModels.length ? models : currentModels)
       .map(m => {
         const { score } = m
         const { validateScore, holdoutScore } = score
@@ -1505,6 +1506,7 @@ class Project {
           projectId: id,
           command,
           settingName: setting.name,
+          settingId: setting.id,
           applyWeights: {},
           problemType,
           targetLabel: target ? [target] : [],
@@ -1529,6 +1531,7 @@ class Project {
           projectId: id,
           command,
           settingName: setting.name,
+          settingId: setting.id,
           applyWeights: {},
           problemType,
           targetLabel: target ? [target] : [],
@@ -1550,6 +1553,7 @@ class Project {
           randSeed: 0,
           measurement: "auc",
           settingName: setting.name,
+          settingId: setting.id,
           holdoutRate: 0.2,
           algorithms: [
             'adaboost',
@@ -1594,6 +1598,7 @@ class Project {
           randSeed: 0,
           measurement: "r2",
           settingName: setting.name,
+          settingId: setting.id,
           holdoutRate: 0.2,
           algorithms: [
             'adaboost',
@@ -1699,6 +1704,7 @@ class Project {
           projectId: id,
           command,
           settingName: setting.name,
+          settingId: setting.id,
           applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : [],
@@ -1717,6 +1723,7 @@ class Project {
           projectId: id,
           command,
           settingName: setting.name,
+          settingId: setting.id,
           applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : [],
@@ -1770,6 +1777,7 @@ class Project {
           randSeed: this.randSeed,
           measurement: this.measurement,
           settingName: setting.name,
+          settingId: setting.id,
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
           featuresPreprocessor,

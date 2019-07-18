@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router'
 import { observable, action } from 'mobx';
-import AdvancedView from '../AdvancedView';
+import AdvancedView from './AdvancedView';
 import ClassificationResult from './Classification/ClassificationResult';
 import RegressionResult from './Regression/RegressionResult';
 import { ProgressBar, ProcessLoading } from 'components/Common';
@@ -130,8 +130,8 @@ export default class ModelResult extends Component<ModelResultProps> {
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
     let filterModels = [...models]
     const currentSetting = this.currentSettingId === 'all' ? null : settings.find(setting => setting.id === this.currentSettingId)
-    if (currentSetting && currentSetting.models)
-      filterModels = filterModels.filter(model => currentSetting.models.find(id => model.id === id))
+    if (currentSetting)
+      filterModels = filterModels.filter(model => model.settingId === currentSetting.id)
     return (
       <div className={styles.modelResult}>
         <div className={styles.tabBox}>
@@ -154,13 +154,15 @@ export default class ModelResult extends Component<ModelResultProps> {
           <SimpleView models={filterModels} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} /> :
           <AdvancedView models={models}
             project={project}
-            exportReport={this.exportReport}
+            // exportReport={this.exportReport}
             sort={this.sort.advanced}
-            handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange}
-            isHoldout={isHoldout}
-            handleHoldout={this.handleHoldout}
-            currentSettingId={this.currentSettingId
-            } changeSetting={this.changeSetting} />}
+            handleSort={this.handleSort.bind(null, 'advanced')} 
+            metric={this.metric} 
+            handleChange={this.handleChange}
+            // isHoldout={isHoldout}
+            // handleHoldout={this.handleHoldout}
+            currentSettingId={this.currentSettingId}
+            changeSetting={this.changeSetting} />}
         <div className={styles.buttonBlock}>
           {/* <button className={styles.button} onClick={this.showInsights}>
             <span>Check Model Insights</span>
