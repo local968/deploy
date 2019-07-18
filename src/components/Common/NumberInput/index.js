@@ -41,7 +41,8 @@ export default class NumberInput extends Component {
   render() {
     const { props, isFocus, temp } = this
     const { value, style, className } = props
-    return <input className={className} onBlur={this.handleBlur} value={isFocus ? temp : value} onChange={this.handleChange} style={style} onFocus={this.handleFocus} />
+    // return <input className={className} onBlur={this.handleBlur} value={isFocus ? temp : value} onChange={this.handleChange} style={style} onFocus={this.handleFocus} />
+    return <input className={className} value={isFocus ? temp : value} onChange={this.handleChange} style={style} onFocus={this.handleFocus} />
   }
 }
 

@@ -358,7 +358,7 @@ function checkProject(userId, id) {
       return { status: 444, message: `project:${id} has been deleted` };
     }
 
-    const plist = await projectService.list(userId);
+    const plist = await projectService.list(userId)||[];
 
     if (!plist.includes(id)) {
       errorLogger.error({
