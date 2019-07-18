@@ -3,7 +3,7 @@ import config from '../../../config'
 
 
 const add = async (duser,project_id)=>{
-  const url = `${config.STRAPI}/projects`;
+  const url = `${config.STRAPI}/strapi/projects`;
   return request.post({
     url,
     data:{
