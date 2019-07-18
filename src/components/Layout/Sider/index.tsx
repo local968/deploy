@@ -37,13 +37,7 @@ class Sider extends Component<SiderProps> {
     // dashUrl:''
   };
 
-  componentDidMount() {
-    axios.get('/image/logo')
-      .then(({ data }) => this.setState({ logoUrl: data }))
-  }
-
   render() {
-    const { logoUrl } = this.state;
     const { userStore, routing } = this.props;
     const { labUrl, dashUrl, info } = userStore;
     const isLogin = userStore.status === 'login';
@@ -56,11 +50,7 @@ class Sider extends Component<SiderProps> {
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
-          <img className={styles.logoImg} src={logoUrl} onError={() => {
-            this.setState({
-              logoUrl: logo
-            })
-          }} alt="logo" />
+          <img className={styles.logoImg} src={logo}   alt="logo" />
           {/*<img className={styles.logoImg} src={logo} alt="logo"/>*/}
           {/* <h2 className={styles.mrone}>R2 Learn</h2> */}
         </div>

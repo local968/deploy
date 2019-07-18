@@ -867,6 +867,7 @@ class ModelComp extends Component {
           visible={this.state.modelCompVisible}
           onCancel={this.handleCancel}
           closable={false}
+          zIndex={10000000}
           footer={
             <Button key="cancel" type="primary" onClick={this.handleCancel}>{EN.Close}</Button>
           }
