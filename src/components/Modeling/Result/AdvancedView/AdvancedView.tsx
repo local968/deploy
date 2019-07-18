@@ -220,8 +220,8 @@ const AdvancedView = (props: AdvancedViewProps) => {
         case 'fbeta':
           curIndex = 0
           for (let i = 1; i < Length; i++) {
-            const prevFbeta = Fbeta(curIndex, correction.value)
-            const newFbeta = Fbeta(i, correction.value)
+            const prevFbeta = Fbeta(curIndex, fbeta)
+            const newFbeta = Fbeta(i, fbeta)
             if (newFbeta > prevFbeta) curIndex = i
           }
           break;
