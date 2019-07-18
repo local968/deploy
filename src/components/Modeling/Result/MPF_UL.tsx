@@ -211,11 +211,8 @@ export default class MPF_UL extends Component<Interface> {
 			value: 'others',
 			label: EN.Replacewithothers
 		},{
-			value: 'low',
-			label: EN.Replacewithlower
-		}, {
-			value: 'high',
-			label: EN.Replacewithupper
+			value: 'respective',
+			label: EN.ReplaceRespective
 		}];
 
 		const result:any = mismatchArray.map(itm=>({
