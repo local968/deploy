@@ -168,7 +168,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
     let _models = [...models];
     if (currentSettingId !== 'all') {
       const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
-      if (currentSetting && currentSetting.models) _models = _models.filter(model => currentSetting.models.find(id => model.id === id))
+      if (currentSetting) _models = _models.filter(model => model.settingId === currentSetting.id)
     }
     return _models.sort(sortMethods)
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])

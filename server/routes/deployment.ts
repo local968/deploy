@@ -143,6 +143,7 @@ wss.register('getAllModels', async message => {
         `project:${projectId}:model:${modelId}`,
         'modelName',
         'score',
+        'settingId',
         'chartData',
         'fitIndex',
       );
@@ -152,6 +153,7 @@ wss.register('getAllModels', async message => {
         `project:${projectId}:model:${modelId}`,
         'modelName',
         'score',
+        'settingId',
       );
     }
   });
@@ -164,11 +166,12 @@ wss.register('getAllModels', async message => {
         throw { status: 500, message: 'model query failed', error: curr[0] };
       if (!curr[1] || curr[1].length < resultCount) return void 0;
       const score = JSON.parse(curr[1][1]);
+      const settingId = JSON.parse(curr[1][2]);
       let performance;
       if (modelType === 'Classification') {
         const auc = (score.validateScore || {}).auc;
-        const chartData = JSON.parse(curr[1][2]);
-        const fitIndex = JSON.parse(curr[1][3]);
+        const chartData = JSON.parse(curr[1][3]);
+        const fitIndex = JSON.parse(curr[1][4]);
         const notShowArr = [
           'AUCROC',
           'AUCPR',
@@ -205,6 +208,7 @@ wss.register('getAllModels', async message => {
         score,
         modelId: modelIds[index],
         performance,
+        settingId
       });
       return _result;
     },
@@ -217,14 +221,15 @@ wss.register('getAllModels', async message => {
     settings,
     (prev, curr) => {
       const _result = { ...prev };
-      _result[curr.name] = curr.models.map(name =>
-        _.find(models, model => model.name === name),
-      );
+      _result[curr.name] = models.filter(m => m.settingId === curr.id)
+      // curr.models.map(name =>
+      //   _.find(models, model => model.name === name),
+      // );
       return _result;
     },
     {},
   );
-  return { modelList: result || {} };
+  return { modelList: result };
 });
 
 wss.register('getProjectDeployment', async (message, socket) => {

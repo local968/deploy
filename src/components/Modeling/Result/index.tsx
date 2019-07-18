@@ -130,8 +130,8 @@ export default class ModelResult extends Component<ModelResultProps> {
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
     let filterModels = [...models]
     const currentSetting = this.currentSettingId === 'all' ? null : settings.find(setting => setting.id === this.currentSettingId)
-    if (currentSetting && currentSetting.models)
-      filterModels = filterModels.filter(model => currentSetting.models.find(id => model.id === id))
+    if (currentSetting)
+      filterModels = filterModels.filter(model => model.settingId === currentSetting.id)
     return (
       <div className={styles.modelResult}>
         <div className={styles.tabBox}>

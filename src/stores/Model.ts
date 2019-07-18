@@ -88,6 +88,7 @@ class Model {
   validatePlotData: string
   holdoutPlotData: string;
   residualPlotPath: string
+  settingId: string;
   @observable score: Score;
   @observable backend: string;
   @observable featureImportance: NumberObject;

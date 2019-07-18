@@ -146,23 +146,6 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
   });
 }
 
-function addSettingModel(userId, projectId) {
-  return function (result) {
-    const { modelName } = result.model;
-    redis
-      .hmget(`project:${projectId}`, 'settingId', 'settings')
-      .then(([settingId, settings]) => {
-        if (settingId && settings) {
-          settingId = JSON.parse(settingId);
-          settings = JSON.parse(settings);
-          settings.find(s => s.id === settingId).models.push(modelName);
-          return createOrUpdate(projectId, userId, { settings });
-        }
-      }, console.error);
-    return result;
-  };
-}
-
 function createModel(userId, id, modelId, params) {
   const mid = uuid.v4();
   const pipeline = redis.pipeline();
@@ -1389,18 +1372,25 @@ wss.register('train', async (message, socket, progress) => {
           stats,
           featureLabel: message.featureLabel,
           target: message.targetLabel,
-          esIndex: message.esIndex
+          esIndex: message.esIndex,
+          settingId: message.settingId
         };
         if (message.problemType) modelData.problemType = message.problemType;
         if (message.standardType) modelData.standardType = message.standardType;
         if (modelData.rate) modelData.initRate = modelData.rate;
-        const modelResult = await createModel(
+        processValue = await createModel(
           userId,
           projectId,
           modelName,
           modelData,
         );
-        processValue = await addSettingModel(userId, projectId)(modelResult);
+        // const modelResult = await createModel(
+        //   userId,
+        //   projectId,
+        //   modelName,
+        //   modelData,
+        // );
+        // processValue = await addSettingModel(userId, projectId, settingId)(modelResult);
         // return progress(model)
       } else if (result.data) {
         const { model: mid, action, data } = result;
@@ -1749,7 +1739,7 @@ wss.register('getOutlierData', (message, socket, progress) => {
       return axios.post(`${esServicePath}/etls/${esIndex}/terms`, { nos: list.toString() }).then(rowsResult => {
         if (rowsResult.status !== 200) return []
         try {
-          return list.map(i => rowsResult.data.result.find(r => r.__no === i)) 
+          return list.map(i => rowsResult.data.result.find(r => r.__no === i))
         } catch (e) {
           return []
         }
