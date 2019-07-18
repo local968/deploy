@@ -40,12 +40,12 @@ export default class Preview extends Component {
     if (this.loading) return []
     if (!cleanData.length) return []
     if (!!newVariable.length && !newVariableData.length) return []
-    const headerList = [target, ...rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target), ...newVariable].filter(h => !trainHeader.includes(h))
+    const headerList = target ? [target, ...rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target), ...newVariable].filter(h => !trainHeader.includes(h)) : [...rawHeader.filter(_h => dataHeader.includes(_h)), ...newVariable].filter(h => !trainHeader.includes(h))
     const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
 
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
     // const notShowIndex = rawHeader.filter(v => !headerList.includes(v))
-    const targetIndex = headerList.indexOf(target)
+    const targetIndex = target ? headerList.indexOf(target) : -1
     const data = cleanData.map((row, index) => showIndex.map(ind => row.concat(newVariable.map(n => newVariableData[index][n]))[ind]))
 
     const types = { ...colType, ...newType }
