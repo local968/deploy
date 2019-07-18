@@ -1,0 +1,677 @@
+.root {
+  text-align: center;
+  padding-top: 8px;
+  background: white;
+  padding: 0 10%;
+  width: 100%;
+  min-width: 1350px;
+}
+
+.root span {
+  font-size: 1.125rem;
+  display: flex;
+  font-family: 'Source Han Sans SC';
+  line-height: 1.2;
+  align-items: center;
+  color: #1d2b3c;
+}
+
+.header {
+  font-size: 24px;
+  color: black;
+  text-align: left;
+  padding: 12px 0;
+  border-bottom: 1px #1D2B3C solid;
+  margin-bottom: 30px
+}
+
+.body {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+
+.top {
+  display: flex;
+  margin-bottom: 40px
+}
+
+.left {
+  flex: 1 1 0
+}
+
+.right {
+  flex: 2 1 0;
+  font-size: 50px;
+  /*border:1px solid rgba(196,203,215,1);*/
+}
+
+.descriptions {
+  font-size: 18px;
+  color: #1D2B3C;
+  text-align: left;
+  line-height: 40px;
+  margin-bottom: 40px
+}
+
+.modelName {
+  color: #448EED
+}
+
+.scores {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 40px
+}
+
+.score {
+  flex: 0 0 200px
+}
+
+.rate {
+  flex: 0 0 200px
+}
+
+.cvnn {
+  flex: 0 0 150px
+}
+
+.cluster {
+  flex: 0 0 240px
+}
+
+.rSquared {
+  flex: 0 0 200px;
+}
+
+.blood {
+  font-size: 48px;
+  color: #D0021B;
+}
+
+.orange {
+  font-size: 48px;
+  color: #FF8000;
+  text-align: left
+}
+
+.green {
+  font-size: 48px;
+  color: #4EC078;
+}
+
+.label {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+  display: block
+}
+
+.rateLabel {
+  font-size: 18px;
+  font-weight: bold;
+  display: block
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  border: solid 0.5px #979797;
+  /* overflow: auto; */
+  /* max-height: 6em; */
+}
+
+.rowBody {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  padding: 5px 0;
+  position: relative;
+}
+
+.rowData {
+  display: flex;
+  padding: 0 20px;
+  position: relative;
+  align-items: center;
+  flex: auto;
+}
+
+.rowBox {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  position: relative;
+  overflow-y: scroll;
+  overflow-x: visible;
+  margin-left: -200px;
+  padding-left: 200px;
+  max-height: 4em;
+}
+
+.modelSelect {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 5px;
+}
+
+.cell {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #979797;
+  min-width: 140px;
+  margin: 0 5px;
+  position: relative;
+  flex: 0 0 230px;
+}
+
+.cell span {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 16px;
+}
+
+.cell .progress span {
+  font-size: 12px;
+  color: #000;
+  font-weight: normal;
+}
+
+.ccell {
+  display: flex;
+  width: 0;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #979797;
+  /* min-width: 200px; */
+  margin: 0 5px;
+  position: relative;
+  flex: 1 1 125px;
+  justify-content: center;
+}
+
+.ccell span {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 16px;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.ccell .progress span {
+  font-size: 12px;
+  color: #000;
+  font-weight: normal;
+}
+
+.cname {
+  width: 125px;
+  flex: 1 1 125px;
+}
+
+.cname span {
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block
+}
+
+.rowHeader {
+  display: flex;
+  flex: none;
+  padding-right: .2em;
+}
+
+.data {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  overflow-y: auto;
+  overflow-x: visible;
+  max-height: 500px;
+  margin-left: -200px;
+  padding-left: 200px;
+}
+
+.cellHeader {
+  border: none;
+  cursor: pointer;
+}
+
+.ccellHeader {
+  border: none;
+  cursor: pointer;
+  padding: 20px 0;
+  border-bottom: solid 1px #9b9b9b;
+  width: 0;
+}
+
+.name {
+  width: 230px;
+  flex: none;
+}
+
+.name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block
+}
+
+.compute {
+  border: none;
+  cursor: pointer;
+}
+
+.compute span {
+  color: #448eed;
+  text-decoration: underline
+}
+
+.tabs {
+  border-bottom: 1px #1D2B3C solid;
+  display: flex;
+  /* justify-content: flex-end; */
+  margin-bottom: 40px
+}
+
+.tab {
+  color: #979797 !important;
+  font-size: 18px;
+  width: 250px;
+  padding: 10px 0;
+  margin-bottom: -1px;
+  cursor: pointer;
+  justify-content: center;
+}
+
+.active {
+  /*font-weight: bold;*/
+  color: #1d2b3c !important;
+  border-bottom: 4px #1d2b3c solid
+}
+
+.trainingModel {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  padding: 0.08em 0;
+  border-bottom: 1px solid #979797;
+  width: 2.3em;
+  margin: 0 0.05em;
+  position: relative;
+}
+
+.trainingModel span {
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+  overflow: hidden;
+}
+
+.trainingAbort {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  margin-top: 0.1em;
+}
+
+.abortButton {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+  padding: 0.05em 0.3em;
+  margin: .05em auto;
+  cursor: pointer;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.abortButton :global(.anticon) {
+  font-size: 1rem;
+}
+
+.abortButton span {
+  font-size: .875rem;
+  font-weight: bold;
+  color: #1d2b3c;
+  font-family: 'Source Han Sans SC';
+}
+
+.detail {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  padding: 0.1em 0;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.detailNone {
+  display: flex;
+  flex: none;
+  justify-content: center;
+}
+
+.detailNone span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  max-width: 100%;
+  display: block;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.detailRow {
+  display: flex;
+  padding: 0 0.25em;
+  flex: none;
+  align-items: center;
+}
+
+.detailRow span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  max-width: 100%;
+  display: block;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.detailName {
+  display: flex;
+  flex: 0 0 1em;
+  width: 1em;
+}
+
+.detailNum {
+  display: flex;
+  flex: 0 0 1em;
+  margin-left: 0.1em;
+}
+
+.detailProcess {
+  height: 0.875rem;
+  background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
+  border-radius: 0.875rem;
+}
+
+.process {
+  /*height: 1em;*/
+  padding: 0.2em;
+  border: 1px solid #C4CBD7;
+  margin: 0.2em;
+  background-color: #FAFBFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.process label {
+  font-size: 0.2em;
+}
+
+.process img {
+  width: .3em;
+  margin: 0 .2em;
+}
+
+.process button {
+  display: flex;
+  align-items: center;
+}
+
+.process button i {
+  display: flex;
+}
+
+.process label {
+  text-transform: capitalize;
+}
+
+.many img {
+  width: 15px;
+  margin: 0 5px;
+}
+
+.process label {
+  font-size: 0.15em;
+}
+
+.process button span {
+  font-size: 0.875rem;
+  float: left;
+}
+
+.process dl {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.process dd {
+  display: flex;
+  margin-bottom: 0.1em;
+  align-items: center;
+}
+
+.process dd div {
+  margin-left: 15px;
+}
+
+.process dd button {
+  display: flex;
+}
+
+.buttonBlock {
+  display: flex;
+  margin-top: 0.3em;
+  margin-bottom: 0.6em;
+  align-items: baseline;
+}
+
+.button {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.1em 0.25em;
+  margin-right: .25em;
+}
+
+.button span {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: normal;
+}
+
+.dict {
+  display: block;
+  text-align: left;
+  position: relative;
+}
+
+.dictBlock {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  position: relative;
+  width: 600px;
+  height: 300px;
+}
+
+.titleCell {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0 30px;
+  border-right: 1px solid #d8d8d8;
+  padding-top: 3px;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.titleCell span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
+  height: 34px;
+  font-weight: bold;
+}
+
+.cell {
+  display: flex;
+  flex: none;
+  align-items: center;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: none;
+  padding: 0 20px;
+  margin: 0;
+}
+
+.cell span {
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 10px;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  border-bottom: solid 1px #d8d8d8;
+  width: 100%;
+  height: 34px;
+}
+
+.dictClose {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 32px;
+  width: 32px;
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dictClose span {
+  transform: rotate(45deg);
+  height: 32px;
+  width: 32px;
+  font-size: 32px;
+  line-height: 1;
+  display: flex;
+  flex: none;
+}
+
+.dictSelect {
+  display: flex;
+  flex: none;
+  margin: 20px 15px;
+  align-items: center;
+}
+
+.dictTable {
+  display: flex;
+  flex: auto;
+}
+
+.explanation {
+  display: flex;
+  flex: auto;
+  height: 160px;
+  margin: 20px;
+}
+
+.explanationCell {
+  display: flex;
+  padding: 0.1em;
+  border: solid 1px #d8d8d8;
+  /* border-right: 1px solid #d8d8d8; */
+  flex: 0 0 0.4em;
+  align-items: center;
+  height: 30px;
+}
+
+.explanationCell span {
+  display: inline-block;
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.modelName {
+  width: 2.3em;
+  flex: none;
+}
+
+button.disable {
+  cursor: not-allowed;
+  background-color: #d3d3d3;
+  color: #aaaaaa;
+  background-image: none;
+  border-color: transparent;
+}
+
+.mapCell {
+  display: flex;
+  padding: 0.1em;
+  border: solid 1px #d8d8d8;
+  /* border-right: 1px solid #d8d8d8; */
+  flex: 0 0 0.4em;
+  align-items: center;
+  height: 30px;
+  padding: 0 30px;
+}
+
+.mapCell span {
+  display: inline-block;
+  font-size: 0.875rem;
+  overflow: hidden;
+  padding: 0.5em 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+span.ccellHeaderSpan{
+  max-width: 60%;
+}
+
+.inputBox {
+  display: flex;
+  flex: auto;
+  justify-content: space-around;
+}
