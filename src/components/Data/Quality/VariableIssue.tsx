@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
-import { ContinueButton, Modal, ProcessLoading, Table, Confirm,Show } from 'components/Common';
+import { ContinueButton, Modal, ProcessLoading, Table, Confirm, Show } from 'components/Common';
 import { observable } from 'mobx';
 import FixIssue from './Issues/FixIssue'
 import Summary from './Summary'
@@ -62,29 +62,30 @@ class VariableIssue extends Component<VariableIssueProps> {
     this.props.project
       .endQuality()
       .then(() => (this.summary = true))
-      .catch(() => {});
+      .catch(() => { });
     this.onClose();
   };
 
   formatTable = () => {
     const {
-      target,
       colType,
-      sortData,
-      sortHeader,
+      uploadData,
+      rawHeader,
       dataHeader,
-      variableIssues,
       etling,
       rawDataView,
+      variableIssues,
+      problemType,
       mapHeader,
+      target
     } = this.props.project;
     if (etling) return [];
-    if (!sortData.length) return [];
+    if (!uploadData.length) return [];
     const headerList = [...dataHeader.filter(v => v !== target)];
-    const notShowIndex = sortHeader
+    const notShowIndex = rawHeader
       .filter(v => !headerList.includes(v))
-      .map(v => sortHeader.indexOf(v));
-    const data = sortData.map(row =>
+      .map(v => rawHeader.indexOf(v));
+    const data = uploadData.map(row =>
       row.filter((k, i) => !notShowIndex.includes(i)),
     );
     /**
@@ -195,11 +196,11 @@ class VariableIssue extends Component<VariableIssueProps> {
         };
 
         const isNum = colType[header] === 'Numerical';
-        const { low = NaN, high = NaN } = rawDataView[header];
+        const { low = NaN, high = NaN } = isNum ? rawDataView[header] : {};
         const isMissing = isNaN(+v) ? !v : false;
         const isMismatch = isNum ? isNaN(+v) : false;
         const isOutlier =
-          header === target && isNum ? +v < low || +v > high : false;
+          (problemType === 'Clustering' && isNum) ? +v < low || +v > high : false;
         if (isMissing) {
           itemData.cn = classnames(itemData.cn, styles.missing);
         }
@@ -221,6 +222,7 @@ class VariableIssue extends Component<VariableIssueProps> {
   render() {
     const { project, changeTab } = this.props;
     const {
+      target,
       issues,
       dataHeader,
       etling,
@@ -239,10 +241,10 @@ class VariableIssue extends Component<VariableIssueProps> {
               </span>
             </div>
           ) : (
-            <div className={styles.cleanTitle}>
-              <span>{EN.VariableQualitylooksgood}</span>
-            </div>
-          )}
+              <div className={styles.cleanTitle}>
+                <span>{EN.VariableQualitylooksgood}</span>
+              </div>
+            )}
           <div className={styles.issueBox}>
             {issues.rowIssue && (
               <div className={styles.issueText}>
@@ -312,7 +314,7 @@ class VariableIssue extends Component<VariableIssueProps> {
               <span>{EN.Outlier}</span>
             </div>
           )}
-          <div className={styles.issueTabs}>
+          {!!target && <div className={styles.issueTabs}>
             <div className={styles.issueTab} onClick={changeTab}>
               <span>{EN.TargetVariable}</span>
             </div>
@@ -324,14 +326,14 @@ class VariableIssue extends Component<VariableIssueProps> {
                 {EN.PredictorVariables}
               </span>
             </div>
-          </div>
+          </div>}
         </div>
         <div className={styles.variableIssue}>
           <div className={styles.contentBox}>
             <Table
               columnWidth={160}
               rowHeight={34}
-              columnCount={dataHeader.length - 1}
+              columnCount={dataHeader.filter(h => h !== target).length}
               rowCount={tableData.length}
               fixedColumnCount={0}
               fixedRowCount={4}
@@ -351,7 +353,6 @@ class VariableIssue extends Component<VariableIssueProps> {
                 onClick={this.showSummary}
                 text={EN.Continue}
                 width="15%"
-                disabled={false}
               />
             </div>
           </Show>

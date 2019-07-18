@@ -41,17 +41,16 @@ function Main(props: MainProps) {
         const { curStep = 0, id = '', problemType = '' } = project || {};
         if (curStep === step) return
         step = curStep
-        const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType)
         let url = ''
         switch (curStep) {
           case 1:
             url = `/project/${id}/problem`
             break
           case 2:
-            url = `/project/${id}/${isUnsupervised ? 'info' : 'data'}`
+            url = `/project/${id}/data`
             break
           case 3:
-            url = `/project/${id}/${isUnsupervised ? 'train' : 'modeling'}`
+            url = `/project/${id}/modeling`
             break
           case 0:
             url = `/project/${id}/project`

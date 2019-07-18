@@ -1336,6 +1336,7 @@ button.activeButton span {
 	white-space: nowrap;
 	text-decoration: none;
 	text-overflow: ellipsis;
+	max-width: 100%;
 }
 
 .errorBox {

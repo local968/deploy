@@ -28,12 +28,12 @@ class Summary extends Component<SummaryProps> {
 
   render() {
     const { project, editFixes } = this.props;
-    const { mapHeader, target, sortHeader, colValueCounts, targetArray, targetCounts, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { mapHeader, target, colType, colValueCounts, targetArray, targetCounts, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber((deletedCount / totalRawLines * 100).toString(), 2)
     const fixedPercent = formatNumber(((totalFixedLines - deletedCount) / totalRawLines * 100).toString(), 2)
     const cleanPercent = formatNumber((100 - +deletePercent - +fixedPercent).toString(), 2)
-    const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
-    const variableList = currentHeader.slice(1)
+    const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
+    const variableList = dataHeader.filter(h => h !== target)
     const percentList = variableList.map(v => {
       const percent: {
         missing: number
@@ -43,20 +43,21 @@ class Summary extends Component<SummaryProps> {
       } = {
         missing: nullRow[v] || 0,
         mismatch: mismatchRow[v] || 0,
-        outlier: outlierRow[v] || 0
+        outlier: outlierRow[v] || 0,
       }
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
     const targetArr = !targetArray.length ? Object.keys(targetCounts).slice(0, 2) : targetArray
-    const targetClassesCount = problemType === 'Classification' ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
+    const targetIsNum = colType[target] === 'Numerical'
+    const targetClassesCount = (!isUnsupervised && !targetIsNum) ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
       return sum + (targetArr.includes(k) ? v : 0)
     }, 0) + (targetArr.includes('') ? nullLineCounts[target] : 0)) : totalRawLines
     const targetPercent = {
       classesError: (totalRawLines - targetClassesCount) / totalRawLines * 100,
-      missing: (problemType === 'Classification' ? 0 : nullLineCounts[target]) / totalRawLines * 100,
-      mismatch: (problemType === 'Classification' ? 0 : mismatchLineCounts[target]) / totalRawLines * 100,
-      outlier: (problemType === 'Classification' ? 0 : outlierLineCounts[target]) / totalRawLines * 100,
+      missing: (!targetIsNum ? 0 : nullLineCounts[target]) / totalRawLines * 100,
+      mismatch: (!targetIsNum ? 0 : mismatchLineCounts[target]) / totalRawLines * 100,
+      outlier: (!targetIsNum ? 0 : outlierLineCounts[target]) / totalRawLines * 100,
     }
 
     return <div className={styles.summary}>
@@ -79,12 +80,12 @@ class Summary extends Component<SummaryProps> {
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
           </div>}
-          {(problemType !== 'Classification' && (!!targetIssuesCountsOrigin.outlierRow || !!outlierCount)) && <div className={styles.summaryType}>
+          {(!!targetIssuesCountsOrigin.outlierRow || !!outlierCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
             <span>{EN.Outlier}</span>
           </div>}
         </div>
-        <div className={styles.summaryTable}>
+        {!isUnsupervised && <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
@@ -104,13 +105,13 @@ class Summary extends Component<SummaryProps> {
                 <div className={styles.summaryProgress} style={{ width: (100 - targetPercent.classesError - targetPercent.missing - targetPercent.mismatch - targetPercent.outlier) + '%', backgroundColor: '#00c855' }} />
                 <div className={styles.summaryProgress} style={{ width: targetPercent.mismatch + '%', backgroundColor: '#819ffc' }} />
                 <div className={styles.summaryProgress} style={{ width: targetPercent.missing + '%', backgroundColor: '#ff97a7' }} />
-                {problemType === 'Classification' && <div className={styles.summaryProgress} style={{ width: targetPercent.classesError + '%', backgroundColor: '#e72424' }} />}
-                {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: targetPercent.outlier + '%', backgroundColor: '#f9cf37' }} />}
+                <div className={styles.summaryProgress} style={{ width: targetPercent.classesError + '%', backgroundColor: '#e72424' }} />
+                <div className={styles.summaryProgress} style={{ width: targetPercent.outlier + '%', backgroundColor: '#f9cf37' }} />
               </div>
             </div>
           </div>
-        </div>
-        <div className={styles.summaryTable} style={{ paddingRight: '.2em' }}>
+        </div>}
+        <div className={styles.summaryTable} style={{ paddingRight: '.2em', maxHeight: isUnsupervised ? '4em' : '3em' }}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
@@ -193,21 +194,21 @@ class Summary extends Component<SummaryProps> {
         </div>
         <div className={styles.summaryBottom}>
           <Show
-            name = 'quality_WillFixtheIssues_Continue'
+            name='quality_WillFixtheIssues_Continue'
           >
             <div className={classnames(styles.summaryButton, styles.summaryConfirm, {
               [styles.disabled]: totalLines === 0
-            })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>
+            })} onClick={totalLines === 0 ? () => { } : this.startTrain}><span>{EN.Continue}</span></div>
           </Show>
           <Show
-            name = 'quality_WillFixtheIssues_EdittheFixes'
+            name='quality_WillFixtheIssues_EdittheFixes'
           >
             <div className={classnames(styles.summaryButton, {
               [styles.disabled]: !issues.dataIssue
-            })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>
+            })} onClick={issues.dataIssue ? editFixes : () => { }}><span>{EN.EditTheFixes}</span></div>
           </Show>
           <Show
-            name = 'quality_LoadaBetterDataset'
+            name='quality_LoadaBetterDataset'
           >
             <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>
           </Show>

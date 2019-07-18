@@ -17,13 +17,16 @@ class DataQuality extends Component<DataQualityProps> {
   }
 
   render() {
-    // const { project } = this.props.projectStore;
+    const { project } = this.props.projectStore;
+    if (!project.target) return <VariableIssue
+      project={project}
+      changeTab={this.changeTab.bind(null, 1)} />
     return this.step !== 1 ? <VariableIssue
-      project={this.props.projectStore.project}
+      project={project}
       changeTab={this.changeTab.bind(null, 1)} />
       : <TargetIssue
-      project={this.props.projectStore.project}
-      changeTab={this.changeTab.bind(null, 2)} />
+        project={project}
+        changeTab={this.changeTab.bind(null, 2)} />
   }
 }
 
