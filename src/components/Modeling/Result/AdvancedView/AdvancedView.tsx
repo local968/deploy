@@ -5,7 +5,7 @@ import { Select } from 'antd'
 import Project from 'stores/Project';
 import Model from 'stores/Model';
 import AdvancedViewTable from './AdvancedViewTable'
-import MetricBased from '../Classification/MetricBased'
+import MetricBased from '../SimpleView/Classification/MetricBased'
 import ModelComp from './ModelComp'
 import { observer } from 'mobx-react';
 

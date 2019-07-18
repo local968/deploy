@@ -1,29 +1,31 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { observable } from 'mobx';
-import styles from '../styles.module.css';
+import styles from '../../styles.module.css';
 import { Tooltip } from 'antd';
-import EN from '../../../../constant/en';
-import { formatNumber } from '../../../../util';
+import EN from '../../../../../constant/en';
+import { formatNumber } from '../../../../../util';
 import moment from 'moment';
-import Variable from '../Variable.svg';
-import Process from '../Process.svg';
-import VariableImpact from '../VariableImpact';
-import ModelProcessFlow from '../ModelProcessFlow';
+import Variable from '../../Variable.svg';
+import Process from '../../Process.svg';
+import VariableImpact from '../../VariableImpact';
+import MPF from '../../MPF';
 import classnames from 'classnames'
-
+import PredictedProgress from './PredictedProgress'
+import Model from 'stores/Model';
+import Project from 'stores/Project';
 interface Interface {
-  model:any
-  onSelect:any
-  isRecommend:any
-  exportReport:any
-  isSelect:any
-  mapHeader:any
-  project:any
+  model: Model
+  onSelect: (m: Model) => void
+  isSelect: boolean
+  isRecommend: boolean
+  text: string
+  exportReport: () => void
+  mapHeader: StringObject
+  project: Project
 }
-
 @observer
-export default class ModelDetail extends Component<Interface>{
+export default class ModelDetail extends Component<Interface> {
   @observable type = '';
   @observable visible = false;
 
@@ -45,9 +47,10 @@ export default class ModelDetail extends Component<Interface>{
     const {
       model,
       onSelect,
-      isRecommend,
-      exportReport,
       isSelect,
+      isRecommend,
+      text,
+      exportReport,
       mapHeader,
       project,
     } = this.props;
@@ -55,7 +58,7 @@ export default class ModelDetail extends Component<Interface>{
       <div className={styles.rowBox}>
         <Tooltip
           placement="left"
-          title={isRecommend ? EN.Recommended : EN.Selected}
+          title={isRecommend ? text : EN.Selected}
           visible={isSelect || isRecommend}
           overlayClassName={styles.recommendLabel}
           autoAdjustOverflow={false}
@@ -74,14 +77,31 @@ export default class ModelDetail extends Component<Interface>{
             <div className={classnames(styles.cell, styles.name)}>
               <Tooltip title={model.modelName}>{model.modelName}</Tooltip>
             </div>
-            <div className={styles.cell}>
-              <span>{formatNumber(model.score.validateScore.rmse)}</span>
+            <div className={classnames(styles.cell, styles.predict)}>
+              <PredictedProgress
+                predicted={model.predicted[0]}
+                width={1.5}
+                height={0.2}
+                type={'success'}
+                failType={'fail'}
+              />
+              <div className={styles.space} />
+              <PredictedProgress
+                predicted={model.predicted[1]}
+                width={1.5}
+                height={0.2}
+                type={'predicted'}
+                failType={'failPredicted'}
+              />
             </div>
             <div className={styles.cell}>
-              <span>{formatNumber(model.score.validateScore.r2)}</span>
+              <span>{formatNumber(model.accValidation.toString())}</span>
             </div>
             <div className={styles.cell}>
-              <span>{formatNumber(model.executeSpeed) + EN.Rowss}</span>
+              <span>{formatNumber(model.score.validateScore.auc.toString())}</span>
+            </div>
+            <div className={styles.cell}>
+              <span>{formatNumber(model.executeSpeed.toString()) + EN.Rowss}</span>
             </div>
             <div className={styles.cell}>
               <span>
@@ -107,11 +127,12 @@ export default class ModelDetail extends Component<Interface>{
             </div>
           </div>
         </Tooltip>
+        {/* <div className={classnames(styles.cell, styles.compute)}><span>Compute</span></div> */}
         {this.visible && this.type === 'impact' && (
           <VariableImpact model={model} mapHeader={mapHeader} />
         )}
         {this.visible && this.type === 'process' && (
-          <ModelProcessFlow project={project} model={model} />
+          <MPF modelId={model.id} project={project} model={model} />
         )}
       </div>
     );

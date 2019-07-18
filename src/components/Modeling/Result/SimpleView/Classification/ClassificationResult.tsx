@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
-import styles from '../styles.module.css';
+import styles from '../../styles.module.css';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Hint, NumberInput } from 'components/Common';
-import { formatNumber } from '../../../../util';
-import EN from '../../../../constant/en';
+import { formatNumber } from '../../../../../util';
+import EN from '../../../../../constant/en';
 import ModelTable from './ModelTable'
 import Performance from './Performance'
 interface Interface {
-  project:any
-  models:any
-  exportReport:any
-  sort:any
-  handleSort:any
+  project: any
+  models: any
+  exportReport: any
+  sort: any
+  handleSort: any
 }
 @observer
 export default class ClassificationView extends Component<Interface> {
@@ -27,7 +27,7 @@ export default class ClassificationView extends Component<Interface> {
     const criteria = e.target.value;
     this.showCost = criteria === 'cost';
     this.showTip = false;
-    const data:any = { criteria };
+    const data: any = { criteria };
     if (!this.showCost) {
       const { models } = this.props;
       data.selectId = '';
@@ -50,7 +50,7 @@ export default class ClassificationView extends Component<Interface> {
     this.showTip = false;
   };
 
-  costInput = (row, col, defaultValue:any = false) => {
+  costInput = (row, col, defaultValue: any = false) => {
     const field = (row === col ? 'T' : 'F') + (col === 1 ? 'P' : 'N');
     const { project = {} } = this.props;
     const target = project.targetArray.length
@@ -168,7 +168,7 @@ export default class ClassificationView extends Component<Interface> {
 
     const Threshold = (roc.Threshold && roc.Threshold[fitIndex]) || -1;
 
-    const tc:any = Object.values(targetCounts);
+    const tc: any = Object.values(targetCounts);
     // const event = (tc[1] / (tc[0] + tc[1]) * 100).toFixed(3);
     const event = parseInt(String((tc[1] / (tc[0] + tc[1])) * 10000), 0);
     const target = project.targetArray.length
@@ -184,8 +184,8 @@ export default class ClassificationView extends Component<Interface> {
 
     const currentPerformance = current
       ? (current.score.validateScore.auc > 0.8 && EN.GOOD) ||
-        (current.score.validateScore.auc > 0.6 && EN.OK) ||
-        EN.NotSatisfied
+      (current.score.validateScore.auc > 0.6 && EN.OK) ||
+      EN.NotSatisfied
       : '';
     const [v0, v1] = !targetArrayTemp.length
       ? Object.keys(targetColMap)
@@ -378,7 +378,7 @@ export default class ClassificationView extends Component<Interface> {
                             typeof distribution === 'number'
                               ? distribution
                               : event / 100
-                          }%>`}
+                            }%>`}
                           {EN.Events}
                         </b>
                       </span>
@@ -396,7 +396,7 @@ export default class ClassificationView extends Component<Interface> {
                           curBenefit.benefit > Math.pow(10, 7)
                             ? curBenefit.benefit.toPrecision(3)
                             : formatNumber(curBenefit.benefit, 2)
-                        }>`}
+                          }>`}
                       </span>
                     </div>
                     {/* <div className={styles.costText}><span>{curBenefit.text}</span></div> */}
@@ -428,7 +428,7 @@ export default class ClassificationView extends Component<Interface> {
                   <dl>
                     <dt
                       className={styles.newTitleDt}
-                      style={{ fontSize: '12px', display: 'block !important'}}
+                      style={{ fontSize: '12px', display: 'block !important' }}
                     >
                       <p><b>{EN.A}</b>
                         {EN.Boththebenefitandcost}</p>
@@ -493,7 +493,7 @@ export default class ClassificationView extends Component<Interface> {
                         <span style={{ marginRight: '0.5em' }}>
                           {EN.EventDistribution}
                         </span>
-                        <input value={20} onChange={null} />
+                        <input value={20} onChange={() => { }} />
                         <span style={{ marginLeft: '0.5em' }}>%</span>
                       </div>
                     </dt>

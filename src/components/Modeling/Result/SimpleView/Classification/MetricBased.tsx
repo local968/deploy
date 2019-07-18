@@ -2,9 +2,9 @@ import React, { useState, ReactElement, ChangeEvent } from 'react';
 import styles from './MetricBased.module.css';
 import classnames from 'classnames';
 import { Modal, Hint } from 'components/Common';
-import EN from '../../../../constant/en';
+import EN from '../../../../../constant/en';
 import { InputNumber, Select, Icon, message } from 'antd';
-import { Show } from '../../../Common';
+import { Show } from '../../../../Common';
 
 const { Option } = Select;
 

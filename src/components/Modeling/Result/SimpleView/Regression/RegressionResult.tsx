@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import styles from '../styles.module.css';
+import styles from '../../styles.module.css';
 import { observer } from 'mobx-react';
-import EN from '../../../../constant/en';
+import EN from '../../../../../constant/en';
 import config from 'config';
 import Performance from './Performance';
 import ModelTable from './ModelTable';
 const { isEN } = config;
-import { PVA } from '../../../Charts';
+import { PVA } from '../../../../Charts';
 interface Interface {
   project: any;
   models: any;

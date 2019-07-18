@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import styles from '../styles.module.css';
-import EN from '../../../../constant/en';
+import styles from '../../styles.module.css';
+import EN from '../../../../../constant/en';
 import PredictedProgress from './PredictedProgress'
 import classnames from 'classnames'
 interface Interface {

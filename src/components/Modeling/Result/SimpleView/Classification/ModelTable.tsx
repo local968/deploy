@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
-import styles from '../styles.module.css';
-import EN from '../../../../constant/en';
+import styles from '../../styles.module.css';
+import EN from '../../../../../constant/en';
 import { Icon, Tooltip } from 'antd';
 import ModelDetail from './ModelDetail';
 import classnames from 'classnames'
 import {Hint} from 'components/Common'
-import { ProgressBar, Show } from '../../../Common';
+import { ProgressBar, Show } from '../../../../Common';
 interface Interface {
   abortTrain: any;
   models:any

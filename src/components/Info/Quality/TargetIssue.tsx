@@ -16,9 +16,7 @@ interface ClassificationTargetInterface {
   editTarget: any;
 }
 @observer
-export class ClassificationTarget extends Component<
-  ClassificationTargetInterface
-> {
+export class ClassificationTarget extends Component<ClassificationTargetInterface> {
   @observable rename = false;
   @observable temp = {};
 
@@ -113,7 +111,7 @@ export class ClassificationTarget extends Component<
     const text =
       (isGood && EN.Targetvariablequalityisgood) ||
       `${EN.YourtargetvariableHas}${
-        error ? EN.onlyOnevalue : EN.Thantwouniquealues
+      error ? EN.onlyOnevalue : EN.Thantwouniquealues
       }`;
     return (
       <div className={styles.block}>
@@ -159,11 +157,11 @@ export class ClassificationTarget extends Component<
                         {!this.rename ? (
                           <span title={value || 'NULL'}>{value || 'NULL'}</span>
                         ) : (
-                          <input
-                            value={value}
-                            onChange={this.handleRename.bind(null, v)}
-                          />
-                        )}
+                            <input
+                              value={value}
+                              onChange={this.handleRename.bind(null, v)}
+                            />
+                          )}
                       </div>
                       <div className={styles.targetPercentValue}>
                         <div
@@ -232,17 +230,17 @@ export class ClassificationTarget extends Component<
                     )}
                   </div>
                 ) : (
-                  <div className={styles.cleanTargetRename}>
-                    <div className={styles.cleanTargetButton}>
-                      <button onClick={this.handleSave} className={styles.save}>
-                        <span>{EN.Save}</span>
-                      </button>
-                      <button onClick={this.hideRename}>
-                        <span>{EN.Cancel}</span>
-                      </button>
+                    <div className={styles.cleanTargetRename}>
+                      <div className={styles.cleanTargetButton}>
+                        <button onClick={this.handleSave} className={styles.save}>
+                          <span>{EN.Save}</span>
+                        </button>
+                        <button onClick={this.hideRename}>
+                          <span>{EN.Cancel}</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             )}
           </div>
@@ -492,9 +490,9 @@ export class SelectTarget extends Component<SelectTargetInterface> {
                       </div>
                       <div className={styles.targetPercentValue}>
                         <div
-  className={styles.targetPercent}
-  style={{ width: percent + '%', backgroundColor }}
-  />
+                          className={styles.targetPercent}
+                          style={{ width: percent + '%', backgroundColor }}
+                        />
                         <span>{colValueCounts[target][v] || 0}</span>
                       </div>
                     </div>
@@ -537,7 +535,7 @@ export class SelectTarget extends Component<SelectTargetInterface> {
               </div>
             )}
             <div className={styles.fixesTips}>
-              <span/>
+              <span />
             </div>
           </div>
         )}
@@ -586,35 +584,35 @@ export class SelectTarget extends Component<SelectTargetInterface> {
               {!!Object.keys(targetColMap)
                 .filter(_k => _k !== '')
                 .filter(v => !checked.includes(v)).length && (
-                <div className={styles.fixesCheckBox}>
-                  {Object.keys(targetColMap)
-                    .filter(_k => _k !== '')
-                    .filter(v => !checked.includes(v))
-                    .map((t, i) => {
-                      const disabled = disabledArray.includes(t);
-                      return (
-                        <div className={styles.fixesCheck} key={i}>
-                          <input
-                            type="checkbox"
-                            value={t}
-                            id={`belong${t}`}
-                            checked={currentBelong.includes(t)}
-                            disabled={disabled}
-                            onChange={disabled ? null : this.handleCheck}
-                          />
-                          <label
-                            className={classnames(styles.fixesCheckBoxLabel, {
-                              [styles.disabledText]: disabled,
-                            })}
-                            htmlFor={`belong${t}`}
-                          >
-                            {t}
-                          </label>
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
+                  <div className={styles.fixesCheckBox}>
+                    {Object.keys(targetColMap)
+                      .filter(_k => _k !== '')
+                      .filter(v => !checked.includes(v))
+                      .map((t, i) => {
+                        const disabled = disabledArray.includes(t);
+                        return (
+                          <div className={styles.fixesCheck} key={i}>
+                            <input
+                              type="checkbox"
+                              value={t}
+                              id={`belong${t}`}
+                              checked={currentBelong.includes(t)}
+                              disabled={disabled}
+                              onChange={disabled ? null : this.handleCheck}
+                            />
+                            <label
+                              className={classnames(styles.fixesCheckBoxLabel, {
+                                [styles.disabledText]: disabled,
+                              })}
+                              htmlFor={`belong${t}`}
+                            >
+                              {t}
+                            </label>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
               {hasNull && !checked.includes('') && (
                 <div className={styles.fixesText}>
                   <span>{EN.Doyouwanttotreatnull}</span>
@@ -799,7 +797,7 @@ export class FixIssue extends Component<FixIssueInterface> {
 
   save = () => {
     const { project } = this.props;
-    const realFillMethod:any = {};
+    const realFillMethod: any = {};
     Object.keys(this.fillMethod).forEach(k => {
       realFillMethod[k] = {};
       Object.keys(this.fillMethod[k]).forEach(field => {
@@ -928,7 +926,7 @@ export class FixIssue extends Component<FixIssueInterface> {
                       return null;
                     }
                     const num = mismatchLineCounts[k] || 0;
-                    const showType:any =
+                    const showType: any =
                       colType[k] === 'Numerical' ? 'Numerical' : 'Categorical';
                     if (showType !== 'Numerical') return null;
                     const percnet = (num / (totalRawLines || 1)) * 100;
@@ -938,77 +936,77 @@ export class FixIssue extends Component<FixIssueInterface> {
                       (percnet === 0
                         ? 0
                         : percnet < 0.01
-                        ? '<0.01'
-                        : formatNumber(String(percnet), 2)) +
+                          ? '<0.01'
+                          : formatNumber(String(percnet), 2)) +
                       '%)';
                     const mode = !rawDataView
                       ? 'N/A'
                       : showType === 'Numerical'
-                      ? 'N/A'
-                      : rawDataView[k].mode;
+                        ? 'N/A'
+                        : rawDataView[k].mode;
                     const mean = !rawDataView
                       ? 'N/A'
                       : showType === 'Numerical'
-                      ? rawDataView[k].mean
-                      : 'N/A';
+                        ? rawDataView[k].mean
+                        : 'N/A';
                     const median = !rawDataView
                       ? 'N/A'
                       : showType === 'Numerical'
-                      ? rawDataView[k].median
-                      : 'N/A';
+                        ? rawDataView[k].median
+                        : 'N/A';
                     const mismatchArray =
                       showType === 'Categorical'
                         ? [
-                            {
-                              value: 'mode',
-                              label: EN.Replacewithmostfrequentvalue,
-                            },
-                            {
-                              value: 'drop',
-                              label: EN.Deletetherows,
-                            },
-                            {
-                              value: 'ignore',
-                              label: EN.Replacewithauniquevalue,
-                            },
-                          ]
+                          {
+                            value: 'mode',
+                            label: EN.Replacewithmostfrequentvalue,
+                          },
+                          {
+                            value: 'drop',
+                            label: EN.Deletetherows,
+                          },
+                          {
+                            value: 'ignore',
+                            label: EN.Replacewithauniquevalue,
+                          },
+                        ]
                         : [
-                            {
-                              value: 'mean',
-                              label: EN.Replacewithmeanvalue,
-                            },
-                            {
-                              value: 'drop',
-                              label: EN.Deletetherows,
-                            },
-                            {
-                              value: 'min',
-                              label: EN.Replacewithminvalue,
-                            },
-                            {
-                              value: 'max',
-                              label: EN.Replacewithmaxvalue,
-                            },
-                            {
-                              value: 'median',
-                              label: EN.Replacewithmedianvalue,
-                            },
-                            {
-                              value: 'zero',
-                              label: EN.ReplaceWith0,
-                            },
-                            {
-                              value: 'others',
-                              label: EN.Replacewithothers,
-                            },
-                          ];
+                          {
+                            value: 'mean',
+                            label: EN.Replacewithmeanvalue,
+                          },
+                          {
+                            value: 'drop',
+                            label: EN.Deletetherows,
+                          },
+                          {
+                            value: 'min',
+                            label: EN.Replacewithminvalue,
+                          },
+                          {
+                            value: 'max',
+                            label: EN.Replacewithmaxvalue,
+                          },
+                          {
+                            value: 'median',
+                            label: EN.Replacewithmedianvalue,
+                          },
+                          {
+                            value: 'zero',
+                            label: EN.ReplaceWith0,
+                          },
+                          {
+                            value: 'others',
+                            label: EN.Replacewithothers,
+                          },
+                        ];
                     const method = this.fillMethod.mismatch.hasOwnProperty(k)
                       ? this.fillMethod.mismatch[k]
                       : mismatchFillMethodTemp.hasOwnProperty(k)
-                      ? mismatchFillMethodTemp[k]
-                      : showType === 'Categorical'
-                      ? 'mode'
-                      : 'mean';
+                        ? mismatchFillMethodTemp[k]
+                        : showType === 'Categorical'
+                          ? 'mode'
+                          : 'mean';
                     const isOthers = !mismatchArray.find(
                       _a => _a.value === method,
                     );
@@ -1141,79 +1139,79 @@ export class FixIssue extends Component<FixIssueInterface> {
                       (percnet === 0
                         ? 0
                         : percnet < 0.01
-                        ? '<0.01'
-                        : formatNumber(String(percnet), 2)) +
+                          ? '<0.01'
+                          : formatNumber(String(percnet), 2)) +
                       '%)';
                     const mode = !rawDataView
                       ? 'N/A'
                       : showType === 'Numerical'
-                      ? 'N/A'
-                      : rawDataView[k].mode === 'nan'
-                      ? (rawDataView[k].modeNotNull || [])[1]
-                      : rawDataView[k].mode;
+                        ? 'N/A'
+                        : rawDataView[k].mode === 'nan'
+                          ? (rawDataView[k].modeNotNull || [])[1]
+                          : rawDataView[k].mode;
                     const mean = !rawDataView
                       ? 'N/A'
                       : showType === 'Numerical'
-                      ? rawDataView[k].mean
-                      : 'N/A';
+                        ? rawDataView[k].mean
+                        : 'N/A';
                     const median = !rawDataView
                       ? 'N/A'
                       : showType === 'Numerical'
-                      ? rawDataView[k].median
-                      : 'N/A';
+                        ? rawDataView[k].median
+                        : 'N/A';
                     const nullArray =
                       showType === 'Categorical'
                         ? [
-                            {
-                              value: 'mode',
-                              label: EN.Replacewithmostfrequentvalue,
-                            },
-                            {
-                              value: 'drop',
-                              label: EN.Deletetherows,
-                            },
-                            {
-                              value: 'ignore',
-                              label: EN.Replacewithauniquevalue,
-                            },
-                          ]
+                          {
+                            value: 'mode',
+                            label: EN.Replacewithmostfrequentvalue,
+                          },
+                          {
+                            value: 'drop',
+                            label: EN.Deletetherows,
+                          },
+                          {
+                            value: 'ignore',
+                            label: EN.Replacewithauniquevalue,
+                          },
+                        ]
                         : [
-                            {
-                              value: 'mean',
-                              label: EN.Replacewithmeanvalue,
-                            },
-                            {
-                              value: 'drop',
-                              label: EN.Deletetherows,
-                            },
-                            {
-                              value: 'min',
-                              label: EN.Replacewithminvalue,
-                            },
-                            {
-                              value: 'max',
-                              label: EN.Replacewithmaxvalue,
-                            },
-                            {
-                              value: 'median',
-                              label: EN.Replacewithmedianvalue,
-                            },
-                            {
-                              value: 'zero',
-                              label: EN.ReplaceWith0,
-                            },
-                            {
-                              value: 'others',
-                              label: EN.Replacewithothers,
-                            },
-                          ];
+                          {
+                            value: 'mean',
+                            label: EN.Replacewithmeanvalue,
+                          },
+                          {
+                            value: 'drop',
+                            label: EN.Deletetherows,
+                          },
+                          {
+                            value: 'min',
+                            label: EN.Replacewithminvalue,
+                          },
+                          {
+                            value: 'max',
+                            label: EN.Replacewithmaxvalue,
+                          },
+                          {
+                            value: 'median',
+                            label: EN.Replacewithmedianvalue,
+                          },
+                          {
+                            value: 'zero',
+                            label: EN.ReplaceWith0,
+                          },
+                          {
+                            value: 'others',
+                            label: EN.Replacewithothers,
+                          },
+                        ];
                     const method = this.fillMethod.missing.hasOwnProperty(k)
                       ? this.fillMethod.missing[k]
                       : nullFillMethodTemp.hasOwnProperty(k)
-                      ? nullFillMethodTemp[k]
-                      : showType === 'Categorical'
-                      ? 'mode'
-                      : 'mean';
+                        ? nullFillMethodTemp[k]
+                        : showType === 'Categorical'
+                          ? 'mode'
+                          : 'mean';
                     const isOthers = !nullArray.find(_a => _a.value === method);
                     return (
                       <div className={styles.fixesRow} key={i}>
@@ -1355,8 +1353,8 @@ export class FixIssue extends Component<FixIssueInterface> {
                       (percnet === 0
                         ? 0
                         : percnet < 0.01
-                        ? '<0.01'
-                        : formatNumber(String(percnet), 2)) +
+                          ? '<0.01'
+                          : formatNumber(String(percnet), 2)) +
                       '%)';
                     const mean = !rawDataView ? 'N/A' : rawDataView[k].mean;
                     const median = !rawDataView ? 'N/A' : rawDataView[k].median;
@@ -1393,8 +1391,8 @@ export class FixIssue extends Component<FixIssueInterface> {
                     const method = this.fillMethod.outlier.hasOwnProperty(k)
                       ? this.fillMethod.outlier[k]
                       : outlierFillMethodTemp.hasOwnProperty(k)
-                      ? outlierFillMethodTemp[k]
-                      : 'ignore';
+                        ? outlierFillMethodTemp[k]
+                        : 'ignore';
                     const isOthers = !outlierArray.find(
                       _a => _a.value === method,
                     );

@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import styles from '../styles.module.css';
+import styles from '../../styles.module.css';
 import { Progress } from 'antd';
-import { formatNumber } from '../../../../util';
-import EN from '../../../../constant/en';
+import { formatNumber } from '../../../../../util';
+import EN from '../../../../../constant/en';
 import {Hint} from 'components/Common'
 import Predicted from './Predicted'
 interface Interface {

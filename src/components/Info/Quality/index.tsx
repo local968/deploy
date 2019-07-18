@@ -23,9 +23,11 @@ import { formatNumber } from '../../../util';
 import EN from '../../../constant/en';
 import { PIE } from '../../Charts';
 import _ from 'lodash';
+import { ProjectStore } from 'stores/ProjectStore';
+import Project from 'stores/Project';
 
 interface DataQualityInterface {
-  projectStore: any;
+  projectStore: ProjectStore;
 }
 
 @inject('projectStore')
@@ -57,8 +59,8 @@ export default class DataQuality extends Component<DataQualityInterface> {
 }
 
 interface TargetIssueInterface {
-  project: any
-  changeTab: any
+  project: Project
+  changeTab: () => void
 }
 @observer
 class TargetIssue extends Component<TargetIssueInterface> {
@@ -196,7 +198,7 @@ class TargetIssue extends Component<TargetIssueInterface> {
             <div className={styles.issueTitle}>
               <span>
                 {EN.IssueS}
-                {issues.targetIssue + issues.rowIssue + issues.targetRowIssue >
+                {+issues.targetIssue + +issues.rowIssue + +issues.targetRowIssue >
                   1 && EN.SS}{' '}
                 {EN.Found}!
               </span>
@@ -306,7 +308,7 @@ class TargetIssue extends Component<TargetIssueInterface> {
                     const { low = NaN, high = NaN } = rawDataView[target];
                     const isMissing = isNaN(+v) ? !v : false;
                     const isMismatch = isNum ? isNaN(+v) : false;
-                    const isOutlier = isNum ? v < low || v > high : false;
+                    const isOutlier = isNum ? +v < low || +v > high : false;
                     return (
                       <div
                         key={k}
@@ -392,8 +394,8 @@ class TargetIssue extends Component<TargetIssueInterface> {
 }
 
 interface InterfaceVariableIssue {
-  project: any
-  changeTab?: any
+  project: Project
+  changeTab?: () => void
   hasTab: boolean
 }
 
@@ -578,7 +580,7 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
         const isMissing = isNaN(+v) ? !v : false;
         const isMismatch = isNum ? isNaN(+v) : false;
         const isOutlier =
-          problemType === 'Clustering' && isNum ? v < low || v > high : false;
+          problemType === 'Clustering' && isNum ? +v < low || +v > high : false;
 
         if (isMissing) {
           itemData.cn = classnames(itemData.cn, styles.missing);
@@ -792,10 +794,10 @@ class VariableIssue extends Component<InterfaceVariableIssue> {
   }
 }
 interface SummaryInterface {
-  project: any
-  editFixes: any
-  dataIssue: any
-  closeSummary: any
+  project: Project
+  editFixes: () => void
+  dataIssue: boolean
+  closeSummary: () => void
 }
 @observer
 class Summary extends Component<SummaryInterface> {
@@ -1065,7 +1067,7 @@ class Summary extends Component<SummaryInterface> {
           </div>
           <div className={styles.summaryBottom}>
             <Show
-              name = 'quality_WillFixtheIssues_Continue_UN'
+              name='quality_WillFixtheIssues_Continue_UN'
             >
               <div
                 className={classnames(
@@ -1082,7 +1084,7 @@ class Summary extends Component<SummaryInterface> {
             </Show>
 
             <Show
-              name = 'quality_WillFixtheIssues_EdittheFixes'
+              name='quality_WillFixtheIssues_EdittheFixes'
             >
               <div
                 className={classnames(styles.summaryButton, {
@@ -1095,7 +1097,7 @@ class Summary extends Component<SummaryInterface> {
             </Show>
 
             <Show
-              name = 'quality_LoadaBetterDataset_UN'
+              name='quality_LoadaBetterDataset_UN'
             >
               <div className={styles.summaryButton} onClick={this.backToConnect}>
                 <span>{EN.LoadaBetterDataset}</span>
