@@ -176,7 +176,7 @@ export default class ModelProcessFlow_Logistic extends Component<Interface> {
 	}
 
 	DQFData(data,title,showTarget,outlier=false){
-		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.project;
+		const { colType,target,dataViews,outlierDictTemp,mapHeader} = this.props.project;
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
@@ -250,7 +250,7 @@ export default class ModelProcessFlow_Logistic extends Component<Interface> {
 			return null;
 		}
 		if(outlier){
-			let {low,high} = rawDataView[target];
+			let {low,high} = dataViews[target];
 			if(outlierDictTemp[target]){
 				const lh = [...outlierDictTemp[target]];
 				low = lh[0];
