@@ -87,6 +87,7 @@ const Based = (props: MetricBasedProps) => {
           onClose={onClose}
           closeByMask={false}
           showClose={true}
+          zIndex={10000000}
         />
       </Show>
     </div>
