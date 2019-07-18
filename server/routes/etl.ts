@@ -3,7 +3,6 @@ import { redis } from '../redis';
 import axios from 'axios';
 import config from '../../config';
 import _ from 'lodash';
-import Bluebird from 'bluebird';
 import { Metric, Project, ProjectRedisValue } from '../types';
 import { createOrUpdate, deleteModels } from './project';
 import * as s from 'connect-redis';
@@ -50,7 +49,7 @@ wss.register('originalStats', async (message, socket) => {
     )
     .reduce(
       (result, hds: string[]) => result.then(getStats(index, hds)),
-      _.gte(headersLn, 1) ? Bluebird.resolve({}) : getStats(index)(),
+      _.gte(headersLn, 1) ? Promise.resolve({}) : getStats(index)(),
     );
 
   function getStats(index, hds?: string[]) {
@@ -62,7 +61,7 @@ wss.register('originalStats', async (message, socket) => {
       }
       : undefined;
     return (data = {}) => {
-      return Bluebird.resolve(
+      return Promise.resolve(
         axios
           .get(`${esServicePath}/etls/${index}/stats`, options)
           .then(getData)

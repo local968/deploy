@@ -1,4 +1,3 @@
-import 'bluebird';
 import events from 'events';
 import axios from 'axios';
 import './log';

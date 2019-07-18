@@ -9,11 +9,6 @@ import Modeling from 'components/Modeling';
 import { ProcessLoading, Confirm } from 'components/Common';
 import { message } from 'antd';
 import styles from './styles.module.css';
-
-import { StoreProvider } from 'easy-peasy'
-import newStores from 'stores/new'
-import Info from 'components/Info';
-import Train from 'components/Train';
 import EN from '../../constant/en';
 interface MainProps {
   userStore: any,
@@ -100,10 +95,6 @@ function Main(props: MainProps) {
       <Route path="/project/:id/data" component={(props) => <Data {...props} />} />
       <Route path="/project/:id/modeling" component={(props) => <Modeling {...props} />} />
       <Route path="/project/:id/project" component={(props) => <Project {...props} />} />
-      <StoreProvider store={newStores}>
-        <Route path="/project/:id/info" component={(props) => <Info {...props} />} />
-        <Route path="/project/:id/train" component={(props) => <Train {...props} />} />
-      </StoreProvider>
     </Switch>}
     {<Confirm
       width="6em"
