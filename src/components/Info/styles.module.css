@@ -1,7 +1,0 @@
-.data {
-    display: flex;
-    flex: auto;
-    background-color: #fff;
-    position: relative;
-    overflow: auto;
-}
