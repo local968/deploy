@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { CorrelationMatrixs } from '../../Charts';
+import { CorrelationMatrixs } from '../../../Charts';
 import { Icon } from 'antd';
 
 interface Interface {

@@ -6,14 +6,14 @@ import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
 import { Icon, Modal, Popover} from 'antd';
 import histogramIcon from './histogramIcon.svg';
-import { formatNumber } from '../../../util';
+import { formatNumber } from '../../../../util';
 import request from 'components/Request';
-import EN from '../../../constant/en';
-import CreateNewVariables from '../../CreateNewVariable';
+import EN from '../../../../constant/en';
+import CreateNewVariables from '../../../CreateNewVariable';
 import SimplifiedViewPlot from './SimplifiedViewPlot';
 import SimplifiedViewRow from './SimplifiedViewRow';
 import CorrelationPlot from './CorrelationPlot';
-import { Show } from '../../Common';
+import { Show } from '../../../Common';
 interface Interface {
   project: any;
 }

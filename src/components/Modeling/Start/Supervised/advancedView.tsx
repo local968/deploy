@@ -7,7 +7,7 @@ import { NumberInput, Range } from 'components/Common';
 import { Select, message, Tooltip } from 'antd';
 import Algorithms from './algorithms.json';
 import Feature from './feature.json';
-import EN from '../../../constant/en';
+import EN from '../../../../constant/en';
 import Project, { Settings, DataView, Stats } from 'stores/Project';
 
 const Option = Select.Option;

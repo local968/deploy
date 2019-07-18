@@ -1,14 +1,14 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { observable } from 'mobx';
-import { formatNumber } from '../../../util';
+import { formatNumber } from '../../../../util';
 import styles from './styles.module.css';
 import histogramIcon from './histogramIcon.svg';
 import { Icon, Popover } from 'antd';
 import SimplifiedViewPlot from './SimplifiedViewPlot';
 import univariantIcon from './univariantIcon.svg';
 import ScatterPlot from './ScatterPlot';
-import EN from '../../../constant/en';
+import EN from '../../../../constant/en';
 import request from 'components/Request'
 import classnames from 'classnames'
 import SimplePlot from './SimplePlot'

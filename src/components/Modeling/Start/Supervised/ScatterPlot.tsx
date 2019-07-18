@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { BoxPlots, TSENOne, UnivariantPlots } from '../../Charts';
+import { BoxPlots, TSENOne, UnivariantPlots } from '../../../Charts';
 
 interface Interface {
   type:any

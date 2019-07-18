@@ -1,21 +1,20 @@
+import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { HistogramCategorical, HS } from '../../Charts';
+import { HistogramCategorical, HS } from '../../../Charts';
 
 interface Interface {
   type:any
   style?:any
   data:any
-  target?:any
-  value?:any
+  value:any
   result:any
-  renameVariable?:any
 }
-
+@observer
 export default class SimplifiedViewPlot extends Component<Interface> {
 
   render() {
-    const { type, style, data, target,value,result,renameVariable={}} = this.props;
+    const { type, style, data, value, result } = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={{
@@ -24,7 +23,7 @@ export default class SimplifiedViewPlot extends Component<Interface> {
         flexDirection: 'column',
       }}>
         <HS
-          x_name={target||value}
+          x_name={value}
           y_name={'count'}
           data={data}
           result={result}
@@ -33,11 +32,10 @@ export default class SimplifiedViewPlot extends Component<Interface> {
     }
     return <div className={styles.plot} style={style}>
       <HistogramCategorical
-        x_name={target||value}
+        x_name={value}
+        y_name={'count'}
         data={data}
-        xAxisName = {data.map((itm)=>target?(renameVariable[itm.name]||itm.name):itm.name)}
       />
     </div>
   }
 }
-

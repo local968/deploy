@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import EN from '../../../constant/en';
+import EN from '../../../../constant/en';
 import { Table } from 'antd';
 
 interface Interface {
