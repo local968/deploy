@@ -19,14 +19,14 @@ const list = async (user_id)=>{
 };
 
 const findId = async project_id=>{
-  const url = `${config.STRAPI}/projects?project_id=${project_id}`;
+  const url = `${config.STRAPI}/strapi/projects?project_id=${project_id}`;
   const project = await request.get(url);
   return project[0]&&project[0].id;
 };
 
 const remove = async (project_id)=>{
   const id = await findId(project_id);
-  const url = `${config.STRAPI}/projects/${id}`;
+  const url = `${config.STRAPI}/strapi/projects/${id}`;
   return request.delete(url)
 };
 
