@@ -375,7 +375,7 @@ function checkProject(userId, id) {
       return { status: 444, message: `project:${id} has been deleted` };
     }
 
-    const plist = await projectService.list(userId);
+    const plist = await projectService.list(userId)||[];
 
     if (!plist.includes(id)) {
       errorLogger.error({
@@ -1749,7 +1749,7 @@ wss.register('getOutlierData', (message, socket, progress) => {
       return axios.post(`${esServicePath}/etls/${esIndex}/terms`, { nos: list.toString() }).then(rowsResult => {
         if (rowsResult.status !== 200) return []
         try {
-          return list.map(i => rowsResult.data.result.find(r => r.__no === i)) 
+          return list.map(i => rowsResult.data.result.find(r => r.__no === i))
         } catch (e) {
           return []
         }

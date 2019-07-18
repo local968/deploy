@@ -1,7 +1,7 @@
 import request from './request'
 import config from '../../../config'
 
-const url = `${config.STRAPI}/images`;
+const url = `${config.STRAPI}/strapi/images`;
 
 const detail = async name =>{
 	// const _name = name.substring(0,name.lastIndexOf('.'));
