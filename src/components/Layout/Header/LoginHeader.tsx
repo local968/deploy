@@ -3,6 +3,9 @@ import styles from './styles.module.css';
 import loginIcon from './login.svg';
 import EN from '../../../constant/en';
 import { RouterStore } from 'mobx-react-router';
+import config from 'config'
+
+const {register} = config;
 
 interface LoginHeaderProps {
   pathname: string,
@@ -14,7 +17,7 @@ const LoginHeader = (props: LoginHeaderProps) => (
     <div className={styles.wheader}>
       <span className={styles.welcome}>{EN.WelcometoR2ai}</span>
     </div>
-    <div
+    {!(props.pathname === '/'&&!register)&&<div
       className={styles.auth}
       onClick={() =>
         props.pathname === '/'
@@ -26,7 +29,7 @@ const LoginHeader = (props: LoginHeaderProps) => (
         <img src={loginIcon} alt="login" />
       </div>
       <span>{props.pathname === '/' ? EN.SignUp : EN.SignIn}</span>
-    </div>
+    </div>}
   </div>
 );
 

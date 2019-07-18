@@ -174,7 +174,7 @@ class ProjectStore {
             const { id, broadcastId } = data
             if (broadcastId === this.broadcastId) return
             if (id !== this.currentId) return
-            this.showConflict()
+            // this.showConflict()
           })
         }
       })
@@ -345,7 +345,7 @@ class ProjectStore {
   clean = () => {
     if (this.currentId) {
       const projectIndex = this.list.findIndex(p => p.id === this.currentId)
-      //重新初始化 
+      //重新初始化
       this.list[projectIndex] = new Project(this.currentId, {
         id: this.list[projectIndex].id,
         fileName: this.list[projectIndex].fileName,
