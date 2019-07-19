@@ -3,11 +3,11 @@ import styles from './styles.module.css';
 import classnames from 'classnames'
 import { observer, inject } from 'mobx-react';
 import { observable, action } from 'mobx';
-import AdvancedView from './AdvancedView';
+import AdvancedView from '../AdvancedView';
 import SimpleView from './SimpleView';
 import { ProgressBar, ProcessLoading } from 'components/Common';
 import { Modal, message, Button } from 'antd'
-import EN from '../../../constant/en';
+import EN from '../../../../constant/en';
 import { DeploymentStore } from 'stores/DeploymentStore';
 import { ProjectStore } from 'stores/ProjectStore';
 import { RouterStore } from 'mobx-react-router';

@@ -10,7 +10,7 @@ import { formatNumber } from '../../../../util';
 import EN from '../../../../constant/en';
 import moment from 'moment';
 import { ISO, D3D2 } from '../../../Charts';
-import MPF from '../../../Modeling/Result/MPF';
+import MPF from '../MPF';
 import DisplayOutlier from './DisplayOutlier';
 import { Show } from '../../../Common';
 

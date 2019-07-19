@@ -3,7 +3,7 @@ import { redis } from '../redis';
 import axios from 'axios';
 import config from '../../config';
 import _ from 'lodash';
-import { Metric, Project, ProjectRedisValue } from '../types';
+import { Metric, Project, ProjectRedisValue, Stats } from '../types';
 import { createOrUpdate, deleteModels } from './project';
 import * as s from 'connect-redis';
 
@@ -61,17 +61,32 @@ wss.register('originalStats', async (message, socket) => {
       }
       : undefined;
     return (data = {}) => {
-      return Promise.resolve(
+      return new Promise(resolve => {
         axios
           .get(`${esServicePath}/etls/${index}/stats`, options)
           .then(getData)
-          .then((current = {}) => {
-            return {
-              ...data,
-              ...current,
-            };
-          }),
-      ).delay(500);
+          .then((current = {}) =>
+            setTimeout(() => {
+              resolve({
+                ...data,
+                ...current,
+              })
+            }, 500)
+          )
+      })
+
+
+      // return Promise.resolve(
+      //   axios
+      //     .get(`${esServicePath}/etls/${index}/stats`, options)
+      //     .then(getData)
+      //     .then((current = {}) => {
+      //       return {
+      //         ...data,
+      //         ...current,
+      //       };
+      //     }),
+      // ).delay(500);
     };
 
     function getData({ data }) {
@@ -136,7 +151,7 @@ wss.register('originalStats', async (message, socket) => {
       nullLineCounts,
       mismatchLineCounts,
       outlierLineCounts,
-      stats: data,
+      stats: data as Stats,
       originalIndex: index,
 
       mainStep: 2,
