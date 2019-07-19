@@ -77,7 +77,6 @@ class TargetIssue extends Component<TargetIssueProps> {
       nullLineCounts,
       mismatchLineCounts,
       outlierLineCounts,
-      problemType,
       totalRawLines,
       totalLines,
       etling,
@@ -146,7 +145,7 @@ class TargetIssue extends Component<TargetIssueProps> {
       !warnings.length &&
       !issues.targetIssue &&
       !issues.rowIssue &&
-      !(!isNum && issues.targetRowIssue);
+      !(issues.targetRowIssue);
     return (
       <div className={styles.quality}>
         <div className={styles.issue}>
@@ -167,7 +166,7 @@ class TargetIssue extends Component<TargetIssueProps> {
           )}
           {(issues.targetIssue ||
             issues.rowIssue ||
-            (!isNum && issues.targetRowIssue)) && (
+            issues.targetRowIssue) && (
               <div className={styles.issueTitle}>
                 <span>
                   {EN.IssueS}
@@ -181,7 +180,7 @@ class TargetIssue extends Component<TargetIssueProps> {
             )}
           {(issues.targetIssue ||
             issues.rowIssue ||
-            (!isNum && issues.targetRowIssue)) && (
+            issues.targetRowIssue) && (
               <div className={styles.issueBox}>
                 {issues.targetIssue && (
                   <div className={styles.issueText}>
@@ -205,7 +204,7 @@ class TargetIssue extends Component<TargetIssueProps> {
                     <span>{EN.Datasizeistoosmall}</span>
                   </div>
                 )}
-                {!isNum && issues.targetRowIssue && (
+                {issues.targetRowIssue && (
                   <div className={styles.issueText}>
                     <div className={styles.point} />
                     <span>{EN.Somedataissueshighlightedincolor}</span>
@@ -354,7 +353,7 @@ class TargetIssue extends Component<TargetIssueProps> {
                 totalRawLines={totalRawLines}
               />
             )}
-            {!isNum && issues.targetRowIssue && (
+            {issues.targetRowIssue && (
               <DataIssue
                 backToConnect={this.backToConnect}
                 editFixes={this.editFixes}

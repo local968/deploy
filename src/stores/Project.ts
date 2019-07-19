@@ -1108,11 +1108,11 @@ class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { problemType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, outlierLineCounts, mismatchLineCounts, nullLineCounts } = this;
+    const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, targetIssuesCountsOrigin } = this;
 
-    if (problemType === "Classification") {
+    if (colType[target] === "Categorical") {
       data.targetIssue = Object.keys(targetCounts).length > 2;
-    } else if (problemType === "Regression") {
+    } else if (colType[target] === "Numerical") {
       const dataview = Reflect.get(rawDataView, target)
       const unique = dataview.uniqueValues || 1000
       data.targetIssue = unique < Math.min((rawHeader.length - 1) * 6, 1000)
@@ -1122,7 +1122,7 @@ class Project {
       data.rowIssue = true;
     }
 
-    if (target && (+outlierLineCounts[target] + +mismatchLineCounts[target] + +nullLineCounts[target]) > 0) {
+    if (target && (targetIssuesCountsOrigin.mismatchRow + targetIssuesCountsOrigin.nullRow + targetIssuesCountsOrigin.outlierRow) > 0) {
       data.targetRowIssue = true
     }
 
@@ -1184,7 +1184,7 @@ class Project {
     const { target, outlierLineCounts, mismatchLineCounts, nullLineCounts, colType } = this;
     const arr = {
       mismatchRow: colType[target] !== "Categorical" ? (mismatchLineCounts[target] || 0) : 0,
-      nullRow: nullLineCounts[target] || 0,
+      nullRow: colType[target] !== "Categorical" ? (nullLineCounts[target] || 0) : 0,
       outlierRow: colType[target] !== "Categorical" ? (outlierLineCounts[target] || 0) : 0,
     }
     return arr

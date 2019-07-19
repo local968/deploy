@@ -314,7 +314,7 @@ class VariableIssue extends Component<VariableIssueProps> {
               <span>{EN.Outlier}</span>
             </div>
           )}
-          {!!target && <div className={styles.issueTabs}>
+          {(project.problemType !== 'Clustering' && !!target) && <div className={styles.issueTabs}>
             <div className={styles.issueTab} onClick={changeTab}>
               <span>{EN.TargetVariable}</span>
             </div>

@@ -18,7 +18,7 @@ class DataQuality extends Component<DataQualityProps> {
 
   render() {
     const { project } = this.props.projectStore;
-    if (!project.target) return <VariableIssue
+    if (project.problemType === 'Clustering' || !project.target) return <VariableIssue
       project={project}
       changeTab={this.changeTab.bind(null, 1)} />
     return this.step !== 1 ? <VariableIssue
