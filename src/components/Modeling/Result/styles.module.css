@@ -217,3 +217,8 @@
     background: linear-gradient(to right, #b3e993 0%, #91c771 100%);
     border-radius: 0.875rem;
 }
+
+.variables{
+    display:flex;
+    margin-left: 0;
+}
