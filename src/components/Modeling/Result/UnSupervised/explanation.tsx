@@ -2,10 +2,9 @@ import classes from "./styles.module.css";
 import { Table } from "components/Common";
 import EN from '../../../../constant/en';
 import React,{Fragment} from 'react'
-// import EN from '../../../constant/en';
 import Model from "stores/Model";
 import { Popover } from 'antd';
-import {TwinBar} from '../../Charts';
+import {TwinBar} from 'components/Charts';
 interface ExplanationProps {
   model: Model,
   mapHeader: StringObject
