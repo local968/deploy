@@ -109,6 +109,7 @@ class TrainResult extends Component<TrainResultProps> {
     if (!models.length && train2ing) return <Loading />;
     return <ModelResult
       resetSide={resetSide}
+      project={project}
     />
   }
 }

@@ -5,9 +5,11 @@ import moment from 'moment';
 import uuid from 'uuid';
 import { message } from 'antd';
 import EN from '../../../constant/en';
-import styles from './styles.module.css';
-import SimplifiedView from './SimplifiedView';
-import AdvancedView from './advancedView';
+import styles from './Start.module.css';
+import SimplifiedView from './Supervised/SimplifiedView';
+import AdvancedView from './Supervised/advancedView';
+import UnSimplifiedView from './UnSupervised/SimplifiedView';
+import UnAdvancedView from './UnSupervised/advancedView';
 import classnames from 'classnames'
 import Preview from './Preview'
 import { Show } from 'components/Common';
@@ -103,11 +105,12 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
 
   render() {
     const { project, closeAdvanced } = this.props;
-    const { dataHeader, newVariable, trainHeader, target } = project;
+    const { dataHeader, newVariable, trainHeader, target, problemType } = project;
     const allVariables = [...dataHeader, ...newVariable];
     const checkedVariables = allVariables.filter(
       v => !trainHeader.includes(v) && v !== target,
     );
+    const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
 
     return (
       <div className={styles.advancedModel}>
@@ -142,15 +145,21 @@ export default class AdvancedModel extends Component<AdvancedModelInterface> {
               hideTable={this.hideTable}
             />
             {this.tab === 1 ? (
-              <SimplifiedView project={project} />
+              isUnsupervised ? <UnSimplifiedView project={project} /> : <SimplifiedView project={project} />
             ) : (
-                <AdvancedView
+                isUnsupervised ? <UnAdvancedView
                   project={project}
                   hidden={this.visiable || this.tab === 1}
                   setting={this.setting}
                   setSetting={this.setSetting}
                   setSettingName={this.setSettingName}
-                />
+                /> : <AdvancedView
+                    project={project}
+                    hidden={this.visiable || this.tab === 1}
+                    setting={this.setting}
+                    setSetting={this.setSetting}
+                    setSettingName={this.setSettingName}
+                  />
               )}
             <div className={styles.bottom}>
               <Show

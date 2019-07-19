@@ -3,13 +3,12 @@ import styles from './styles.module.css';
 import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import { observable } from 'mobx';
-import { Checkbox, message } from 'antd';
+import { Checkbox, message, Icon } from 'antd';
 import { Confirm, ContinueButton, HeaderInfo, Hint, ProcessLoading, Select, Show, Table } from 'components/Common';
 import EN from '../../../constant/en';
 import EditHeader from './EditHeader';
 import { ProjectStore } from 'stores/ProjectStore';
 import { UserStore } from 'stores/UserStore';
-import { SocketStore } from 'stores/SocketStore';
 
 type TableCell = {
   content: string | React.ReactElement;
@@ -20,12 +19,11 @@ type TableCell = {
 interface DataSchemaProps {
   projectStore: ProjectStore;
   userStore: UserStore;
-  socketStore: SocketStore;
 }
 
 class DataSchema extends Component<DataSchemaProps> {
   @observable checkList = this.props.projectStore.project.rawHeader.filter(
-    r => !this.props.projectStore.project.dataHeader.includes(r),
+    r => !this.props.projectStore.project.dataHeader.includes(r) && this.props.projectStore.project.target !== r
   );
   @observable showSelect = false;
   @observable dataType = { ...this.props.projectStore.project.colType };
@@ -51,31 +49,43 @@ class DataSchema extends Component<DataSchemaProps> {
 
   onConfirm = () => {
     const { project } = this.props.projectStore;
-    const { rawHeader } = project;
-    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
-    const data: {
-      target: string;
-      dataHeader: string[];
-      colType: StringObject;
-      outlierFillMethod?: StringObject;
-      outlierFillMethodTemp?: StringObject;
-      nullFillMethod?: StringObject;
-      nullFillMethodTemp?: StringObject;
-    } = {
+    const { rawHeader, problemType, outlierLineCounts, nullLineCounts } = project;
+    const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
+    //无监督删除target
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
+
+    let nullFillMethod = {}
+    let outlierFillMethod = {}
+
+    // 回归默认设置为drop
+    if (this.target && this.dataType[this.target] === 'Numerical') {
+      if (!!nullLineCounts[this.target]) {
+        nullFillMethod[this.target] = 'drop'
+      }
+      if (!!outlierLineCounts[this.target]) {
+        outlierFillMethod[this.target] = 'drop'
+      }
+    }
+
+    //聚类设置为drop
+    if (problemType === 'Clustering') {
+      outlierFillMethod = newDataHeader.reduce((prev, h) => {
+        if (this.dataType[h] === 'Numerical' && !!outlierLineCounts[h])
+          prev[h] = 'drop';
+        return prev;
+      }, outlierFillMethod);
+    }
+
+    const data = {
       target: this.target || '',
       dataHeader: newDataHeader,
       colType: { ...this.dataType },
+      outlierFillMethod: outlierFillMethod,
+      outlierFillMethodTemp: outlierFillMethod,
+      nullFillMethod: nullFillMethod,
+      nullFillMethodTemp: nullFillMethod
     };
-    // 回归默认设置为drop
-    if (this.target && this.dataType[this.target] === 'Numerical') {
-      data.outlierFillMethod = { [this.target]: 'drop' };
-      data.outlierFillMethodTemp = { [this.target]: 'drop' };
-      data.nullFillMethod = { [this.target]: 'drop' };
-      data.nullFillMethodTemp = { [this.target]: 'drop' };
-    } else {
-      data.nullFillMethod = { [this.target]: 'drop' };
-      data.nullFillMethodTemp = { [this.target]: 'drop' };
-    }
+
     project.setProperty(data);
     try {
       this.props.projectStore.project.endSchema();
@@ -87,7 +97,7 @@ class DataSchema extends Component<DataSchemaProps> {
   };
 
   targetSelect = value => {
-    const { role }  = this.props.userStore.info;
+    const { role } = this.props.userStore.info;
     const { schema_TargetVariable = true } = role as any;
     if (schema_TargetVariable) {
       this.target = value;
@@ -149,13 +159,13 @@ class DataSchema extends Component<DataSchemaProps> {
     const data =
       targetIndex > -1
         ? uploadData.map(row => {
-            const value = row[targetIndex];
-            return [
-              value,
-              ...row.slice(0, targetIndex),
-              ...row.slice(targetIndex + 1),
-            ];
-          })
+          const value = row[targetIndex];
+          return [
+            value,
+            ...row.slice(0, targetIndex),
+            ...row.slice(targetIndex + 1),
+          ];
+        })
         : uploadData;
     // if(!sortData.length) return []
     /**
@@ -355,57 +365,70 @@ class DataSchema extends Component<DataSchemaProps> {
       headerTemp: { isMissed, isDuplicated },
       mapHeader,
     } = project;
-    const targetOption = {};
+    // const targetOption = {};
     const tableData = this.formatTable();
-    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d));
+    const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
 
     //target选择列表
-    rawHeader.forEach(h => {
+    const targetOption = rawHeader.reduce((prev, h) => {
       h = h.trim();
-      if (
-        problemType === 'Classification' &&
-        this.dataType[h] === 'Categorical'
-      )
-        targetOption[h] = mapHeader[h];
-      if (problemType === 'Regression' && this.dataType[h] === 'Numerical')
-        targetOption[h] = mapHeader[h];
-    });
+      if (problemType === 'Regression') {
+        if (this.dataType[h] === 'Numerical') prev[h] = mapHeader[h];
+      } else {
+        if (this.dataType[h] === 'Categorical') prev[h] = mapHeader[h];
+      }
+      return prev;
+    }, {});
+
     return (
-      project && (
-        <div className={styles.schema}>
-          <div className={styles.schemaInfo}>
-            <div className={styles.schemaI}>
-              <span>i</span>
-            </div>
-            <div className={styles.schemaText}>
-              <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
-            </div>
+      <div className={styles.schema}>
+        <div className={styles.schemaInfo}>
+          <div className={styles.schemaI}>
+            <span>i</span>
           </div>
-          <div className={styles.schemaContent} id="schemaContent">
-            <div className={styles.schemaTools}>
-              <Select
-                title={EN.TargetVariable}
-                dropdownClassName={'targetSelect'}
-                width={'1.6em'}
-                options={targetOption}
-                onChange={this.targetSelect}
-                value={this.target}
-                disabled={isMissed || isDuplicated}
-                selectOption={{ showSearch: true }}
-                getPopupContainer={() =>
-                  document.getElementById('schemaContent')
-                }
-              />
-              <Show
-                name = 'schema_VariableSelection'
-              >
-                {isMissed || isDuplicated ? (
-                  <div
-                    className={classnames(styles.schemaSelect, styles.disabled)}
-                  >
-                    <span>{EN.UnselectUndesirableVariables}</span>
-                  </div>
-                ) : (
+          <div className={styles.schemaText}>
+            <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
+          </div>
+        </div>
+        <div className={styles.schemaContent} id="schemaContent">
+          <div className={styles.schemaTools}>
+            <Select
+              title={EN.TargetVariable}
+              dropdownClassName={'targetSelect'}
+              width={'1.6em'}
+              options={targetOption}
+              onChange={this.targetSelect}
+              value={this.target}
+              disabled={isMissed || isDuplicated}
+              selectOption={{
+                showSearch: true,
+                allowClear: !!this.target,
+                clearIcon: <Icon type="close" />,
+              }}
+              getPopupContainer={() =>
+                document.getElementById('schemaContent')
+              }
+            />
+            {isUnsupervised && <Hint
+              themeStyle={{
+                fontSize: '1.5rem',
+                lineHeight: '2rem',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              content={EN[`${problemType}Target`]}
+            />}
+            <Show
+              name='schema_VariableSelection'
+            >
+              {isMissed || isDuplicated ? (
+                <div
+                  className={classnames(styles.schemaSelect, styles.disabled)}
+                >
+                  <span>{EN.UnselectUndesirableVariables}</span>
+                </div>
+              ) : (
                   <div
                     className={styles.schemaSelect}
                     onClick={this.toggleSelect}
@@ -413,119 +436,119 @@ class DataSchema extends Component<DataSchemaProps> {
                     <span>{EN.UnselectUndesirableVariables}</span>
                   </div>
                 )}
-                <Hint
-                  themeStyle={{
-                    fontSize: '1.5rem',
-                    lineHeight: '2rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                  content={
-                    <div>
-                      {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
-                      {EN.VariableIDs} <br />
-                      {EN.Variablesthatarederivedfromthetarget} <br />
-                      {EN.Anyothervariablesyou}
-                    </div>
-                  }
-                />
-              </Show>
-
-              {isMissed && (
-                <div className={styles.schemaMissed}>
-                  <div className={styles.errorBlock} />
-                  <span>{EN.Missing}</span>
-                </div>
-              )}
-              {isDuplicated && (
-                <div className={styles.schemaDuplicated}>
-                  <div className={styles.errorBlock} />
-                  <span>{EN.DuplicatedHeader}</span>
-                </div>
-              )}
-              {(isMissed || isDuplicated) && (
-                <div className={styles.schemaSelect} onClick={this.autoFix}>
-                  <span>{EN.AutoHeaderRepair}</span>
-                </div>
-              )}
-            </div>
-            <div className={styles.content}>
-              <Table
-                ref={this.tableRef}
-                columnWidth={110}
-                rowHeight={34}
-                columnCount={rawHeader.length + 1}
-                rowCount={tableData.length}
-                fixedColumnCount={1}
-                fixedRowCount={this.showSelect ? 3 : 2}
-                checked={this.checked}
-                select={this.select}
-                style={{ border: '1px solid #ccc' }}
-                data={tableData}
-              />
-            </div>
-          </div>
-          <div className={styles.bottom}>
-            <Show
-              name='schema_continue'
-            >
-              <ContinueButton
-                onClick={this.doEtl}
-                disabled={
-                  etling ||
-                  !this.target ||
-                  (newDataHeader.length <= 1 &&
-                    newDataHeader.indexOf(this.target) > -1)
+              <Hint
+                themeStyle={{
+                  fontSize: '1.5rem',
+                  lineHeight: '2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                content={
+                  <div>
+                    {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
+                    {EN.VariableIDs} <br />
+                    {EN.Variablesthatarederivedfromthetarget} <br />
+                    {EN.Anyothervariablesyou}
+                  </div>
                 }
-                text={EN.Continue}
-                width={null}
               />
             </Show>
 
-            <Show
-              name = 'schema_SkipDataQualityCheck'
-            >
-              <div className={styles.checkBox}>
-                <input
-                  type="checkbox"
-                  id="noCompute"
-                  onChange={this.checkNoCompute}
-                  checked={noComputeTemp}
-                />
-                <label htmlFor="noCompute">{EN.SkipDataQualityCheck}</label>
-                <Hint
-                  themeStyle={{
-                    fontSize: '1.5rem',
-                    lineHeight: '2rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                  content={EN.Ifyouknowthedataisclean}
-                />
+            {isMissed && (
+              <div className={styles.schemaMissed}>
+                <div className={styles.errorBlock} />
+                <span>{EN.Missing}</span>
               </div>
-            </Show>
+            )}
+            {isDuplicated && (
+              <div className={styles.schemaDuplicated}>
+                <div className={styles.errorBlock} />
+                <span>{EN.DuplicatedHeader}</span>
+              </div>
+            )}
+            {(isMissed || isDuplicated) && (
+              <div className={styles.schemaSelect} onClick={this.autoFix}>
+                <span>{EN.AutoHeaderRepair}</span>
+              </div>
+            )}
           </div>
-          {etling && (
-            <ProcessLoading
-              progress={etlProgress}
-              style={{ position: 'fixed' }}
+          <div className={styles.content}>
+            <Table
+              ref={this.tableRef}
+              columnWidth={110}
+              rowHeight={34}
+              columnCount={rawHeader.length + 1}
+              rowCount={tableData.length}
+              fixedColumnCount={1}
+              fixedRowCount={this.showSelect ? 3 : 2}
+              checked={this.checked}
+              select={this.select}
+              style={{ border: '1px solid #ccc' }}
+              data={tableData}
             />
-          )}
-          {
-            <Confirm
-              width={'6em'}
-              visible={this.visiable}
-              title={EN.Warning}
-              content={EN.Thisactionmaywipeoutallofyourprevious}
-              onClose={this.onClose}
-              onConfirm={this.onConfirm}
-              confirmText={EN.Continue}
-              closeText={EN.Cancel}
-            />
-          }
+          </div>
         </div>
-      )
-    );
+        <div className={styles.bottom}>
+          <Show
+            name='schema_continue'
+          >
+            <ContinueButton
+              onClick={this.doEtl}
+              disabled={
+                etling ||
+                (isUnsupervised ? false : !this.target) ||
+                (newDataHeader.length < 1) ||
+                isMissed ||
+                isDuplicated
+              }
+              text={EN.Continue}
+              width={null}
+            />
+          </Show>
+
+          <Show
+            name='schema_SkipDataQualityCheck'
+          >
+            <div className={styles.checkBox}>
+              <input
+                type="checkbox"
+                id="noCompute"
+                onChange={this.checkNoCompute}
+                checked={noComputeTemp}
+              />
+              <label htmlFor="noCompute">{EN.SkipDataQualityCheck}</label>
+              <Hint
+                themeStyle={{
+                  fontSize: '1.5rem',
+                  lineHeight: '2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                content={EN.Ifyouknowthedataisclean}
+              />
+            </div>
+          </Show>
+        </div>
+        {etling && (
+          <ProcessLoading
+            progress={etlProgress}
+            style={{ position: 'fixed' }}
+          />
+        )}
+        {
+          <Confirm
+            width={'6em'}
+            visible={this.visiable}
+            title={EN.Warning}
+            content={EN.Thisactionmaywipeoutallofyourprevious}
+            onClose={this.onClose}
+            onConfirm={this.onConfirm}
+            confirmText={EN.Continue}
+            closeText={EN.Cancel}
+          />
+        }
+      </div>
+    )
   }
 }
 

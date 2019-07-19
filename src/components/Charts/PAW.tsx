@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import styles from "../Train/AdvancedViewUn/AdvancedView.module.css";
+import styles from "./PAW.module.css";
 import {Select} from "antd";
 import PCS from "./PCS";
 import request from "../Request";

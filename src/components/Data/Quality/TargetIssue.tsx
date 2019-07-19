@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
-import { ContinueButton, Modal, ProcessLoading,Show } from 'components/Common';
+import { ContinueButton, Modal, ProcessLoading, Show } from 'components/Common';
 import { observable } from 'mobx';
 import ClassificationTarget from './Issues/ClassificationTarget';
 import RegressionTarget from './Issues/RegressionTarget';
@@ -77,7 +77,6 @@ class TargetIssue extends Component<TargetIssueProps> {
       nullLineCounts,
       mismatchLineCounts,
       outlierLineCounts,
-      problemType,
       totalRawLines,
       totalLines,
       etling,
@@ -89,29 +88,18 @@ class TargetIssue extends Component<TargetIssueProps> {
       targetArrayTemp,
     } = project;
     const targetIndex = sortHeader.findIndex(h => h === target);
-    const recomm =
-      problemType === 'Classification'
-        ? 2
-        : Math.min((sortHeader.length - 1) * 6, 1000);
     const isNum = colType[target] === 'Numerical';
-    const nullCount = Number.isInteger(nullLineCounts[target])
-      ? nullLineCounts[target]
-      : 0;
-    const mismatchCount =
-      isNum && Number.isInteger(mismatchLineCounts[target])
-        ? mismatchLineCounts[target]
-        : 0;
-    const outlierCount =
-      isNum && Number.isInteger(outlierLineCounts[target])
-        ? outlierLineCounts[target]
-        : 0;
+    const recomm = !isNum ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
+    const nullCount = Number.isInteger(nullLineCounts[target]) ? nullLineCounts[target] : 0;
+    const mismatchCount = isNum ? mismatchLineCounts[target] : 0;
+    const outlierCount = isNum ? outlierLineCounts[target] : 0;
     const targetPercent = {
       missing:
         nullCount === 0
           ? 0
           : (nullCount * 100) / (totalRawLines || 1) < 0.01
-          ? '<0.01'
-          : formatNumber(
+            ? '<0.01'
+            : formatNumber(
               ((nullCount * 100) / (totalRawLines || 1)).toString(),
               2,
             ),
@@ -119,8 +107,8 @@ class TargetIssue extends Component<TargetIssueProps> {
         mismatchCount === 0
           ? 0
           : (mismatchCount * 100) / (totalRawLines || 1) < 0.01
-          ? '<0.01'
-          : formatNumber(
+            ? '<0.01'
+            : formatNumber(
               ((mismatchCount * 100) / (totalRawLines || 1)).toString(),
               2,
             ),
@@ -128,8 +116,8 @@ class TargetIssue extends Component<TargetIssueProps> {
         outlierCount === 0
           ? 0
           : (outlierCount * 100) / (totalRawLines || 1) < 0.01
-          ? '<0.01'
-          : formatNumber(
+            ? '<0.01'
+            : formatNumber(
               ((outlierCount * 100) / (totalRawLines || 1)).toString(),
               2,
             ),
@@ -138,7 +126,7 @@ class TargetIssue extends Component<TargetIssueProps> {
     // const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
     const unique = targetArrayTemp.length || rawDataView[target].uniqueValues;
     const hasNull = !targetArrayTemp.length ? !!nullCount : false;
-    if (problemType === 'Classification') {
+    if (!isNum) {
       if (hasNull)
         warnings.push(`${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`);
       if (unique < 2 && !hasNull)
@@ -152,12 +140,12 @@ class TargetIssue extends Component<TargetIssueProps> {
       warnings.push(EN.Yourtargetvariableisempty);
     const cannotContinue =
       !!warnings.length ||
-      (problemType === 'Classification' && issues.targetIssue);
+      (!isNum && issues.targetIssue);
     const isClean =
       !warnings.length &&
       !issues.targetIssue &&
       !issues.rowIssue &&
-      !(problemType !== 'Classification' && issues.targetRowIssue);
+      !(issues.targetRowIssue);
     return (
       <div className={styles.quality}>
         <div className={styles.issue}>
@@ -170,7 +158,7 @@ class TargetIssue extends Component<TargetIssueProps> {
             <div className={styles.issueBox}>
               {warnings.map((v, k) => (
                 <div className={styles.issueText} key={k}>
-                  <div className={styles.point}/>
+                  <div className={styles.point} />
                   <span>{v}</span>
                 </div>
               ))}
@@ -178,52 +166,52 @@ class TargetIssue extends Component<TargetIssueProps> {
           )}
           {(issues.targetIssue ||
             issues.rowIssue ||
-            (problemType !== 'Classification' && issues.targetRowIssue)) && (
-            <div className={styles.issueTitle}>
-              <span>
-                {EN.IssueS}
-                {+issues.targetIssue +
-                  +issues.rowIssue +
-                  +issues.targetRowIssue >
-                  1 && EN.SS}{' '}
-                {EN.Found}!
+            issues.targetRowIssue) && (
+              <div className={styles.issueTitle}>
+                <span>
+                  {EN.IssueS}
+                  {+issues.targetIssue +
+                    +issues.rowIssue +
+                    +issues.targetRowIssue >
+                    1 && EN.SS}{' '}
+                  {EN.Found}!
               </span>
-            </div>
-          )}
+              </div>
+            )}
           {(issues.targetIssue ||
             issues.rowIssue ||
-            (problemType !== 'Classification' && issues.targetRowIssue)) && (
-            <div className={styles.issueBox}>
-              {issues.targetIssue && (
-                <div className={styles.issueText}>
-                  <div className={styles.point}/>
-                  {problemType === 'Classification' ? (
-                    <span>
-                      {EN.Yourtargetvariablehasmorethantwouniquevalues}
-                    </span>
-                  ) : (
-                    <span>
-                      {EN.Yourtargetvariablehaslessthan}
-                      {recomm}
-                      {EN.Uniquevalueswhichisnot}
-                    </span>
-                  )}
-                </div>
-              )}
-              {issues.rowIssue && (
-                <div className={styles.issueText}>
-                  <div className={styles.point}/>
-                  <span>{EN.Datasizeistoosmall}</span>
-                </div>
-              )}
-              {problemType !== 'Classification' && issues.targetRowIssue && (
-                <div className={styles.issueText}>
-                  <div className={styles.point}/>
-                  <span>{EN.Somedataissueshighlightedincolor}</span>
-                </div>
-              )}
-            </div>
-          )}
+            issues.targetRowIssue) && (
+              <div className={styles.issueBox}>
+                {issues.targetIssue && (
+                  <div className={styles.issueText}>
+                    <div className={styles.point} />
+                    {!isNum ? (
+                      <span>
+                        {EN.Yourtargetvariablehasmorethantwouniquevalues}
+                      </span>
+                    ) : (
+                        <span>
+                          {EN.Yourtargetvariablehaslessthan}
+                          {recomm}
+                          {EN.Uniquevalueswhichisnot}
+                        </span>
+                      )}
+                  </div>
+                )}
+                {issues.rowIssue && (
+                  <div className={styles.issueText}>
+                    <div className={styles.point} />
+                    <span>{EN.Datasizeistoosmall}</span>
+                  </div>
+                )}
+                {issues.targetRowIssue && (
+                  <div className={styles.issueText}>
+                    <div className={styles.point} />
+                    <span>{EN.Somedataissueshighlightedincolor}</span>
+                  </div>
+                )}
+              </div>
+            )}
           {isClean && (
             <div className={styles.cleanTitle}>
               <span>{EN.Targetvariablequalitylooksgood}</span>
@@ -343,7 +331,7 @@ class TargetIssue extends Component<TargetIssueProps> {
 
           </div>
           <div className={styles.content}>
-            {problemType === 'Classification' ? (
+            {!isNum ? (
               <ClassificationTarget
                 project={project}
                 backToConnect={this.backToConnect}
@@ -351,21 +339,21 @@ class TargetIssue extends Component<TargetIssueProps> {
                 editTarget={this.editTarget}
               />
             ) : (
-              <RegressionTarget
-                backToConnect={this.backToConnect}
-                backToSchema={this.backToSchema}
-                hasIssue={issues.targetIssue}
-                unique={unique}
-                recomm={recomm}
-              />
-            )}
+                <RegressionTarget
+                  backToConnect={this.backToConnect}
+                  backToSchema={this.backToSchema}
+                  hasIssue={issues.targetIssue}
+                  unique={unique}
+                  recomm={recomm}
+                />
+              )}
             {issues.rowIssue && (
               <RowIssue
                 backToConnect={this.backToConnect}
                 totalRawLines={totalRawLines}
               />
             )}
-            {problemType !== 'Classification' && issues.targetRowIssue && (
+            {issues.targetRowIssue && (
               <DataIssue
                 backToConnect={this.backToConnect}
                 editFixes={this.editFixes}

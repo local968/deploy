@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styles from './styles.module.css';
+import styles from './Start.module.css';
 import { observer, inject } from 'mobx-react';
 import { Modal,Show} from 'components/Common';
 import { observable } from 'mobx';

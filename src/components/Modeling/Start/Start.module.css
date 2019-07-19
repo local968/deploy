@@ -1,0 +1,238 @@
+.modelStart {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  padding: 0 10%;
+}
+
+.startTitle {
+  display: flex;
+  margin: 0.45em 0;
+  font-family: 'Source Han Sans SC';
+}
+
+.startTitle span {
+  font-size: 1.5rem;
+}
+
+.trainBox {
+  display: flex;
+  flex-direction: column;
+  width: 4.5em;
+  height: 4.5em;
+  border-radius: 5px;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
+  border: solid 1px #c4cbd7;
+  position: relative;
+  margin: 0 auto
+}
+
+.train {
+  display: flex;
+  flex: 0 0 0.4em;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  width: 100%;
+  border: none;
+  outline: none;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.train span {
+  font-family: Arial;
+  font-size: 1rem;
+  color: #ffffff;
+  display: flex;
+}
+
+.trainBlock {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.trainRecommend {
+  display: flex;
+  position: absolute;
+  left: 0.3em;
+  top: 0.2em;
+}
+
+.trainRecommend span {
+  font-size: 0.875rem;
+}
+
+.trainImg {
+  display: flex;
+  margin-top: 1.1em;
+  flex: none;
+}
+
+.trainImg img {
+  width: 130px;
+  height: 120px;
+}
+
+.trainName {
+  display: flex;
+  justify-content: center;
+  margin: 0.2em 0;
+}
+
+.trainName span {
+  display: flex;
+  font-size: 1.5rem;
+}
+
+.trainDesc {
+  display: flex;
+  justify-content: center;
+  margin: 0.13em 0.5em;
+}
+
+.trainDesc span {
+  font-size: 0.875rem;
+  display: flex;
+  line-height: 1.43;
+  color: #747473;
+}
+
+.trainWarp {
+  display: flex;
+  flex: none;
+}
+
+.trainSep {
+  display: flex;
+  flex: none;
+  width: 0.4em;
+}
+
+.advancedModel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+
+.advancedContent {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  margin: -20px -50px;
+}
+
+.tabBox {
+  background-color: #ffffff;
+  box-shadow: 0 -3px 20px 0 rgba(0, 0, 0, 0.27);
+  display: flex;
+  flex: none;
+  justify-content: center;
+  padding-top: 0.15em;
+  z-index: 2;
+}
+
+.tab {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  width: 3.2em;
+  border-bottom: 4px solid transparent;
+  cursor: pointer;
+  padding: 0.15em 0;
+}
+
+.tab.active {
+  border-bottom-color: #1d2b3c;
+}
+
+.tab span {
+  font-family: 'Source Han Sans SC';
+  font-size: 1.125rem;
+  line-height: 1.15;
+  color: #979797;
+}
+
+.tab.active span {
+  color: #1d2b3c;
+}
+
+.downloadEtlData {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-image: -webkit-gradient(linear,left top, left, bottom, from(#ffffff),to(#f1f3f5));
+  background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+  padding: 0.05em 0.3em;
+  margin: .05em auto;
+  cursor: pointer;
+  box-shadow:0 5px 10px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  padding: 10px 30px;
+  font-size: 16px;
+  color: #4a4a4a;
+}
+
+.downloadEtlData i {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.viewBox {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.bottom {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.2em;
+  flex: none;
+}
+
+.bottom button {
+  display: flex;
+  padding: 0.1em 0;
+  width: 1.5em;
+  outline: none;
+  border: none;
+  margin: 0 0.1em;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid #4a4a4a;
+  border-radius: 5px;
+}
+
+.save {
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+}
+
+.save span {
+  font-family: Arial;
+  font-size: 0.875rem;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.cancel {
+  background: #fff;
+  color: #4a4a4a;
+}
+
+.cancel span {
+  font-family: Arial;
+  font-size: 0.875rem;
+  color: #4a4a4a;
+  line-height: 1.1;
+}
