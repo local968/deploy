@@ -675,3 +675,9 @@ span.ccellHeaderSpan{
   flex: auto;
   justify-content: space-around;
 }
+
+.dfn{
+  font-style:normal;
+  font-size: 14px;
+  width: 100%;
+}
