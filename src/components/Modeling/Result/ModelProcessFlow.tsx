@@ -339,7 +339,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 			<dt>{title}</dt>
 			{
 				res.map(itm=>{
-					return <dd>
+					return <dd key={itm.key}>
 						<label>{itm.key}:</label>
 						<ul>
 							{
