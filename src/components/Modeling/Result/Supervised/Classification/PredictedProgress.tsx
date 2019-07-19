@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import styles from '../../styles.module.css';
+import styles from '../styles.module.css';
 import classnames from 'classnames'
 interface Interface {
   predicted:any

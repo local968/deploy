@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { observable } from 'mobx';
-import styles from '../../styles.module.css';
+import styles from '../styles.module.css';
 import { Tooltip } from 'antd';
 import EN from '../../../../../constant/en';
 import { formatNumber } from '../../../../../util';

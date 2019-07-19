@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
-import styles from '../../styles.module.css';
+import styles from '../styles.module.css';
 import EN from '../../../../../constant/en';
 import { Icon, Tooltip } from 'antd';
 import ModelDetail from './ModelDetail';

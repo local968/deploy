@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styles from '../../styles.module.css';
+import styles from '../styles.module.css';
 import { observer } from 'mobx-react';
 import EN from '../../../../../constant/en';
 import config from 'config';
