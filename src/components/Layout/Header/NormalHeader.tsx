@@ -7,15 +7,20 @@ import EN from '../../../constant/en';
 import { DeploymentStore } from 'stores/DeploymentStore';
 import { ScheduleStore } from 'stores/ScheduleStore';
 import { RouterStore } from 'mobx-react-router';
+import mockAvatar from '../Sider/mr-one-copy.svg';
+import { Dropdown, Icon, Menu } from 'antd';
+import down from './combined-shape-copy.svg';
+import { UserStore } from 'stores/UserStore';
 
 
 interface NormalHeaderProps {
   deploymentStore?: DeploymentStore,
   scheduleStore?: ScheduleStore,
   routing?: RouterStore
+  userStore?: UserStore,
 }
 
-@inject('deploymentStore', 'scheduleStore', 'routing')
+@inject('deploymentStore', 'scheduleStore', 'routing','userStore')
 @observer
 class NormalHeader extends Component<NormalHeaderProps> {
   @computed
@@ -32,8 +37,27 @@ class NormalHeader extends Component<NormalHeaderProps> {
     return deploymentStore.deployments.filter(_d => isNormal(_d.id)).length;
   }
 
+  changepassword = () => {
+    this.props.routing.push('/changepassword')
+  };
+
+  logout = () => {
+    this.props.routing.push('/');
+    this.props.userStore.logout();
+  };
+
   render() {
-    const { deploymentStore, routing } = this.props;
+    const { deploymentStore, routing,userStore } = this.props;
+    const menu = (
+      <Menu className={styles.logout}>
+        <Menu.Item key="0">
+          <a onClick={this.changepassword}><Icon type='unlock' />{EN.ChangePassword}</a>
+        </Menu.Item>
+        <Menu.Item key="1">
+          <a onClick={this.logout}><Icon type='logout' />{EN.LogOut}</a>
+        </Menu.Item>
+      </Menu>
+    );
     return (
       <div className={styles.header} onClick={() => routing.push('/deploy')}>
         <div className={classnames(styles.block, styles.total)}>
@@ -64,6 +88,17 @@ class NormalHeader extends Component<NormalHeaderProps> {
           <span className={styles.text}>{EN.Issue}</span>
         </div>
         <div className={styles.empty} />
+        <div className={styles.user}>
+          <img src={mockAvatar} alt="avatar" className={styles.avatar} />
+          <div className={styles.userBottom}>
+            <span className={styles.name}>{userStore.info.email}</span>
+            <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+              <div className={styles.down}>
+                <img src={down} alt="down" />
+              </div>
+            </Dropdown>
+          </div>
+        </div>
         {/* <div className={styles.user}>
           <img src={mockAvatar} alt="avatar" className={styles.avatar} />
           <div className={styles.userBottom}>

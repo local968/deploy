@@ -37,7 +37,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
 
   showHistograms = () => {
     const { value, project, isNew } = this.props;
-    const { colType, etlIndex, rawDataView } = project;
+    const { colType, etlIndex, dataViews } = project;
     if (isNew) {
       return this.histograms = true;
     }
@@ -51,7 +51,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
           max,
           min,
           std_deviation_bounds: { lower, upper },
-        } = rawDataView[value];
+        } = dataViews[value];
         data.interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
 
         request

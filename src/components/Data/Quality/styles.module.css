@@ -112,6 +112,7 @@
 	width: 100%;
 	flex: auto;
 	min-height: 0;
+	max-width: 200px;
 }
 
 .cell {

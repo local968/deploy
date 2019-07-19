@@ -190,8 +190,8 @@ router.get('/reload', async (req, res) => {
   const { userId } = req.session;
   const result = await userService.status(userId);
 
-  if (result && result.drole && result.drole.Reload) {
-    await saveSample(true);
+  if(result&&result.drole&&result.drole.Reload){
+    saveSample(true);
     return res.json({
       status: 100,
       msg: 'ok',

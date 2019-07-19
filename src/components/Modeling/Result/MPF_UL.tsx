@@ -174,7 +174,7 @@ export default class MPF_UL extends Component<Interface> {
 	}
 
 	DQFData(data,title,showTarget,outlier=false){
-		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.project;
+		const { colType,target,dataViews,outlierDictTemp,mapHeader} = this.props.project;
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
@@ -211,11 +211,8 @@ export default class MPF_UL extends Component<Interface> {
 			value: 'others',
 			label: EN.Replacewithothers
 		},{
-			value: 'low',
-			label: EN.Replacewithlower
-		}, {
-			value: 'high',
-			label: EN.Replacewithupper
+			value: 'respective',
+			label: EN.ReplaceRespective
 		}];
 
 		const result:any = mismatchArray.map(itm=>({
@@ -252,7 +249,7 @@ export default class MPF_UL extends Component<Interface> {
 		}
 		if(outlier){
 			if(target&&colType[target]!=="Categorical"){
-				let {low,high} = rawDataView[target];
+				let {low,high} = dataViews[target];
 				if(outlierDictTemp[target]){
 					const lh = [...outlierDictTemp[target]];
 					low = lh[0];
@@ -284,7 +281,7 @@ export default class MPF_UL extends Component<Interface> {
 											return len = Math.max(len,mapHeader[it].length);
 										}
 									}).map((it,ind)=>{
-										let {std_deviation_bounds} = rawDataView[it];
+										let {std_deviation_bounds} = dataViews[it];
 										const {
 											lower,
 											upper,

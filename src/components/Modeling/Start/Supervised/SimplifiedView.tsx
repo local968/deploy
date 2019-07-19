@@ -33,7 +33,7 @@ export default class SimplifiedView extends Component<Interface> {
 
   show = () => {
     const { project = {} } = this.props;
-    const { target, colType, etlIndex, rawDataView } = project;
+    const { target, colType, etlIndex, dataViews } = project;
 
     if (!this.chartData[target]) {
       if (colType[target] === 'Numerical') {
@@ -41,7 +41,7 @@ export default class SimplifiedView extends Component<Interface> {
           max,
           min,
           std_deviation_bounds: { lower, upper },
-        } = rawDataView[target];
+        } = dataViews[target];
         const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
         request
           .post({
