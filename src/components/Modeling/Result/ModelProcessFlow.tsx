@@ -60,14 +60,16 @@ export default class ModelProcessFlow extends Component<Interface> {
 		return <dl className={styles.over}>
 			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
 			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd>
-				<p style={{display:(variables.length?'':'none')}}>
+				<div
+					className = {styles.variables}
+					style={{display:(variables.length?'':'none')}}>
 					<label>variables:</label>
 					<ul>
 						{
 							variables.map(it=><li title={it}>{it}</li>)
 						}
 					</ul>
-				</p>
+				</div>
 			</dd>}
 
 			{/*{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}*/}

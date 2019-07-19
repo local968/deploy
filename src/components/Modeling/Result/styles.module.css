@@ -157,3 +157,8 @@
 .title {
     display: flex;
 }
+
+.variables{
+    display:flex;
+    margin-left: 0;
+}
