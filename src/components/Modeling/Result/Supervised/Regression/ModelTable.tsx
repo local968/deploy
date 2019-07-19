@@ -6,23 +6,28 @@ import EN from '../../../../../constant/en';
 import { Icon, Tooltip } from 'antd';
 import ModelDetail from './ModelDetail';
 import classnames from 'classnames'
-import { ProgressBar, Hint,Show } from 'components/Common';
+import { ProgressBar, Hint, Show } from 'components/Common';
+import Model from 'stores/Model';
+import Project from 'stores/Project';
 
 interface Interface {
-  onSelect:any
-  train2Finished:any
-  current:any
-  trainModel:any
-  isAbort:any
-  recommendId:any
-  exportReport:any
-  sort:any
-  handleSort:any
-  mapHeader:any
-  project:any
-  stopIds:any
-  abortTrain:any
-  models:any
+  onSelect: (s: string) => void
+  train2Finished: boolean
+  current: Model
+  trainModel: unknown
+  isAbort: boolean
+  recommendId: string
+  exportReport: (s: string) => () => void
+  sort: {
+    key: string,
+    value: number
+  }
+  handleSort: (s: string) => void
+  mapHeader: StringObject
+  project: Project
+  stopIds: string[]
+  abortTrain: (s: string) => void
+  models: Model[]
 }
 @observer
 export default class ModelTable extends Component<Interface> {
@@ -103,13 +108,13 @@ export default class ModelTable extends Component<Interface> {
                 {sort.key !== 'name' ? (
                   <Icon type="minus" />
                 ) : (
-                  <Icon
-                    type="up"
-                    style={
-                      sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
-                    }
-                  />
-                )}
+                    <Icon
+                      type="up"
+                      style={
+                        sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
+                      }
+                    />
+                  )}
               </span>
             </div>
             <div
@@ -123,13 +128,13 @@ export default class ModelTable extends Component<Interface> {
                 {sort.key !== 'rmse' ? (
                   <Icon type="minus" />
                 ) : (
-                  <Icon
-                    type="up"
-                    style={
-                      sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
-                    }
-                  />
-                )}
+                    <Icon
+                      type="up"
+                      style={
+                        sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
+                      }
+                    />
+                  )}
               </span>
             </div>
             <div
@@ -142,13 +147,13 @@ export default class ModelTable extends Component<Interface> {
                 {sort.key !== 'r2' ? (
                   <Icon type="minus" />
                 ) : (
-                  <Icon
-                    type="up"
-                    style={
-                      sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
-                    }
-                  />
-                )}
+                    <Icon
+                      type="up"
+                      style={
+                        sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
+                      }
+                    />
+                  )}
               </span>
             </div>
             <div
@@ -160,13 +165,13 @@ export default class ModelTable extends Component<Interface> {
                 {sort.key !== 'speed' ? (
                   <Icon type="minus" />
                 ) : (
-                  <Icon
-                    type="up"
-                    style={
-                      sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
-                    }
-                  />
-                )}
+                    <Icon
+                      type="up"
+                      style={
+                        sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
+                      }
+                    />
+                  )}
               </span>
             </div>
             <div
@@ -178,13 +183,13 @@ export default class ModelTable extends Component<Interface> {
                 {sort.key !== 'time' ? (
                   <Icon type="minus" />
                 ) : (
-                  <Icon
-                    type="up"
-                    style={
-                      sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
-                    }
-                  />
-                )}
+                    <Icon
+                      type="up"
+                      style={
+                        sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }
+                      }
+                    />
+                  )}
               </span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
@@ -226,7 +231,7 @@ export default class ModelTable extends Component<Interface> {
                   </div>
                   <ProgressBar progress={trainingModel.value || 0} />
                   <Show
-                    name = 'result_abortButton_REGRESSION'
+                    name='result_abortButton_REGRESSION'
                   >
                     <div
                       className={styles.abortButton}
@@ -239,8 +244,8 @@ export default class ModelTable extends Component<Interface> {
                       {isAbort ? (
                         <Icon type="loading" />
                       ) : (
-                        <span>{EN.AbortTraining}</span>
-                      )}
+                          <span>{EN.AbortTraining}</span>
+                        )}
                     </div>
                   </Show>
                 </div>

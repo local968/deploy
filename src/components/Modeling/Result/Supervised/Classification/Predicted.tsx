@@ -4,10 +4,11 @@ import styles from '../styles.module.css';
 import EN from '../../../../../constant/en';
 import PredictedProgress from './PredictedProgress'
 import classnames from 'classnames'
+import Model from 'stores/Model';
 interface Interface {
-  model:any
-  yes:any
-  no:any
+  model: Model
+  yes: string
+  no: string
 }
 @observer
 export default class Predicted extends Component<Interface> {

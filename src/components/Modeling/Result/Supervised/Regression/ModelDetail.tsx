@@ -11,15 +11,17 @@ import Process from '../../Process.svg';
 import VariableImpact from '../../VariableImpact';
 import MPF from '../../MPF';
 import classnames from 'classnames'
+import Model from 'stores/Model';
+import Project from 'stores/Project';
 
 interface Interface {
-  model:any
-  onSelect:any
-  isRecommend:any
-  exportReport:any
-  isSelect:any
-  mapHeader:any
-  project:any
+  model: Model
+  onSelect: (s: string) => void
+  isRecommend: boolean
+  exportReport: () => void
+  isSelect: boolean
+  mapHeader: StringObject
+  project: Project
 }
 
 @observer
@@ -75,13 +77,13 @@ export default class ModelDetail extends Component<Interface>{
               <Tooltip title={model.modelName}>{model.modelName}</Tooltip>
             </div>
             <div className={styles.cell}>
-              <span>{formatNumber(model.score.validateScore.rmse)}</span>
+              <span>{formatNumber(model.score.validateScore.rmse.toString())}</span>
             </div>
             <div className={styles.cell}>
-              <span>{formatNumber(model.score.validateScore.r2)}</span>
+              <span>{formatNumber(model.score.validateScore.r2.toString())}</span>
             </div>
             <div className={styles.cell}>
-              <span>{formatNumber(model.executeSpeed) + EN.Rowss}</span>
+              <span>{formatNumber(model.executeSpeed.toString()) + EN.Rowss}</span>
             </div>
             <div className={styles.cell}>
               <span>

@@ -10,7 +10,7 @@ const Classification = 'Classification';
 interface SimpleViewProps {
   models: Model[],
   project: Project,
-  exportReport: (s: string) => void,
+  exportReport: (s: string) => () => void,
   sort: {
     key: string,
     value: number

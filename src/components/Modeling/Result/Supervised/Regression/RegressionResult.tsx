@@ -7,12 +7,17 @@ import Performance from './Performance';
 import ModelTable from './ModelTable';
 const { isEN } = config;
 import { PVA } from '../../../../Charts';
+import Project from 'stores/Project';
+import Model from 'stores/Model';
 interface Interface {
-  project: any;
-  models: any;
-  exportReport: any;
-  sort: any;
-  handleSort: any;
+  project: Project;
+  models: Model[];
+  exportReport: (s: string) => () => void;
+  sort: {
+    key: string,
+    value: number
+  };
+  handleSort: (s: string) => void;
 }
 
 @observer
@@ -23,7 +28,7 @@ export default class RegressionView extends Component<Interface> {
   };
 
   render() {
-    const { models, project = {}, exportReport, sort, handleSort } = this.props;
+    const { models, project, exportReport, sort, handleSort } = this.props;
     const {
       train2Finished,
       trainModel,
@@ -40,7 +45,7 @@ export default class RegressionView extends Component<Interface> {
     if (!current) return null;
     const currentPerformance = current
       ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) ||
-        EN.NotAcceptable
+      EN.NotAcceptable
       : '';
     const newMapHeader = {
       ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}),

@@ -4,9 +4,10 @@ import styles from '../styles.module.css';
 import { formatNumber } from '../../../../../util';
 import EN from '../../../../../constant/en';
 import { Hint } from 'components/Common';
+import Model from 'stores/Model';
 
 interface Interface {
-  current:any
+  current: Model
 }
 @observer
 export default class Performance extends Component<Interface> {
@@ -16,7 +17,7 @@ export default class Performance extends Component<Interface> {
       <div className={styles.performanceBox}>
         <div className={styles.performance}>
           <div className={styles.rmsePerformance}>
-            <span>{formatNumber(current.score.validateScore.nrmse)}</span>
+            <span>{formatNumber(current.score.validateScore.nrmse.toString())}</span>
           </div>
           <div className={styles.performanceText}>
             <span>
@@ -28,7 +29,7 @@ export default class Performance extends Component<Interface> {
         <div className={styles.space} />
         <div className={styles.performance}>
           <div className={styles.r2Performance}>
-            <span>{formatNumber(current.score.validateScore.r2)}</span>
+            <span>{formatNumber(current.score.validateScore.r2.toString())}</span>
           </div>
           <div className={styles.performanceText}>
             <span>

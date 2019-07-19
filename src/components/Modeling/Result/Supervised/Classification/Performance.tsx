@@ -4,12 +4,13 @@ import styles from '../styles.module.css';
 import { Progress } from 'antd';
 import { formatNumber } from '../../../../../util';
 import EN from '../../../../../constant/en';
-import {Hint} from 'components/Common'
+import { Hint } from 'components/Common'
 import Predicted from './Predicted'
+import Model from 'stores/Model';
 interface Interface {
-  current:any
-  yes:any
-  no:any
+  current: Model
+  yes: string
+  no: string
 }
 @observer
 export default class Performance extends Component<Interface> {

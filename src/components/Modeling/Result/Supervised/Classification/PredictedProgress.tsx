@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import styles from '../styles.module.css';
 import classnames from 'classnames'
 interface Interface {
-  predicted:any
-  width:any
-  label?:any
-  type:any
-  failType:any
-  height?:any
+  predicted: number
+  width: number
+  label?: string
+  type: string
+  failType: string
+  height?: number
 }
 @observer
 export default class PredictedProgress extends Component<Interface> {
@@ -18,10 +18,10 @@ export default class PredictedProgress extends Component<Interface> {
       label === undefined ? (
         ''
       ) : (
-        <div className={styles.progressTitle}>
-          <span title={label}>{label}</span>
-        </div>
-      );
+          <div className={styles.progressTitle}>
+            <span title={label}>{label}</span>
+          </div>
+        );
     const predictedPercent = Math.round(predicted * 100);
     const failedPercent = 100 - predictedPercent;
     const isSmaller =

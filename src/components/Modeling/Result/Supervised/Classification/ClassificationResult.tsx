@@ -8,12 +8,17 @@ import { formatNumber } from '../../../../../util';
 import EN from '../../../../../constant/en';
 import ModelTable from './ModelTable'
 import Performance from './Performance'
+import Project from 'stores/Project';
+import Model from 'stores/Model';
 interface Interface {
-  project: any
-  models: any
-  exportReport: any
-  sort: any
-  handleSort: any
+  project: Project
+  models: Model[]
+  exportReport: (s: string) => () => void
+  sort: {
+    key: string,
+    value: number
+  }
+  handleSort: (s: string) => void
 }
 @observer
 export default class ClassificationView extends Component<Interface> {
@@ -52,7 +57,7 @@ export default class ClassificationView extends Component<Interface> {
 
   costInput = (row, col, defaultValue: any = false) => {
     const field = (row === col ? 'T' : 'F') + (col === 1 ? 'P' : 'N');
-    const { project = {} } = this.props;
+    const { project } = this.props;
     const target = project.targetArray.length
       ? project.targetArray
       : Object.keys(project.targetColMap);
@@ -142,7 +147,7 @@ export default class ClassificationView extends Component<Interface> {
   };
 
   render() {
-    const { models, project = {}, exportReport, sort, handleSort } = this.props;
+    const { models, project, exportReport, sort, handleSort } = this.props;
     const {
       train2Finished,
       trainModel,
@@ -161,10 +166,10 @@ export default class ClassificationView extends Component<Interface> {
       stopIds,
     } = project;
     if (!current) return null;
-    const { selectModel = {}, targetCounts = {} } = project;
+    const { selectModel, targetCounts } = project;
 
-    const { fitIndex = 1, chartData = {} } = selectModel;
-    const { roc = {} } = chartData;
+    const { fitIndex, chartData } = selectModel;
+    const { roc } = chartData;
 
     const Threshold = (roc.Threshold && roc.Threshold[fitIndex]) || -1;
 
