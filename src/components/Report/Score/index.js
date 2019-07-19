@@ -834,7 +834,7 @@ class PredictTable extends Component {
     }];
 
 
-    console.log(data, '--------------------------' ,project.criteria , '123')
+    console.log(data, '--------------------------' ,project.criteria , '123.js')
 
     return (
       <div className={styles.costbase}>
