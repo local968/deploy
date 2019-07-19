@@ -597,31 +597,31 @@ class CorrelationPlot extends Component {
   }
 }
 
-class SimplifiedViewPlot extends Component {
-
-  render() {
-    const {type, style, data, target} = this.props;
-    if (type === 'Raw') return null
-    if (type === 'Numerical') {
-      return <div className={styles.plot} style={style}>
-        {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-        <HistogramNumerical
-          x_name={target}
-          y_name={'count'}
-          title={`Feature:${target}`}
-          data={data}
-        />
-      </div>
-    }
-    return <div className={styles.plot} style={style}>
-      {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
-      <HistogramCategorical
-        x_name={target}
-        data={data}
-      />
-    </div>
-  }
-}
+// class SimplifiedViewPlot extends Component {
+//
+//   render() {
+//     const {type, style, data, target} = this.props;
+//     if (type === 'Raw') return null
+//     if (type === 'Numerical') {
+//       return <div className={styles.plot} style={style}>
+//         {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+//         <HistogramNumerical
+//           x_name={target}
+//           y_name={'count'}
+//           title={`Feature:${target}`}
+//           data={data}
+//         />
+//       </div>
+//     }
+//     return <div className={styles.plot} style={style}>
+//       {/*<div onClick={onClose} className={styles.plotClose}><span>X</span></div>*/}
+//       <HistogramCategorical
+//         x_name={target}
+//         data={data}
+//       />
+//     </div>
+//   }
+// }
 
 @observer
 class CreateNewVariable extends Component {
