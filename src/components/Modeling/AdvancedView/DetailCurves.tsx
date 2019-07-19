@@ -91,7 +91,7 @@ export default class DetailCurves extends Component<Interface> {
       no,
       project,
     } = this.props;
-    const { isHoldout, mapHeader } = project;
+    const { isHoldout, mapHeader,metricCorrection:{metric} } = project;
     const { curve, show } = this.state;
     let curComponent;
     let hasReset = !isHoldout;
@@ -118,6 +118,7 @@ export default class DetailCurves extends Component<Interface> {
             y_name={EN.ProbabilityDensity}
             model={model}
             isHoldout={isHoldout}
+            metric = {metric}
           />
         );
         break;
