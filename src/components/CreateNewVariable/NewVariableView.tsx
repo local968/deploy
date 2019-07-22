@@ -8,7 +8,7 @@ import { Container, Grid, Typography } from '@material-ui/core';
 // modules
 import Variables from './modules/Variables';
 import Functions from './modules/Functions';
-import Summary from './modules/Summary';
+// import Summary from './modules/Summary';
 
 import EN from '../../constant/en';
 import { Coordinate, Type } from './types/Coordinate';
@@ -90,7 +90,7 @@ export class NewVariableView extends React.Component<InterfaceNewVariableProps> 
           </Grid>
           <Grid item xs={6} md={4} component={MyGrid}>
             <Subtitle>{EN.ProjectDescription}</Subtitle>
-            <Summary detailKey={state.detailKey} />
+            {/*<Summary detailKey={state.detailKey} />*/}
           </Grid>
         </Grid>
       </>
