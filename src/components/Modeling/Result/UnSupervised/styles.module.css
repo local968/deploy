@@ -3,13 +3,14 @@
   padding-top: 8px;
   background: white;
   padding: 0 10%;
-  width: 100%;
-  min-width: 1350px;
+  display: flex;
+  flex: auto;
+  flex-direction: column;
 }
 
 .root span {
-  font-size: 1.125rem;
-  display: flex;
+  /* font-size: 1.125rem; */
+  /* display: flex; */
   font-family: 'Source Han Sans SC';
   line-height: 1.2;
   align-items: center;
@@ -29,6 +30,7 @@
   display: flex;
   flex: none;
   flex-direction: column;
+  min-width: 1350px;
 }
 
 .top {
@@ -606,7 +608,7 @@
 .explanation {
   display: flex;
   flex: auto;
-  height: 160px;
+  height: 200px;
   margin: 20px;
 }
 
@@ -680,4 +682,13 @@ span.ccellHeaderSpan{
   font-style:normal;
   font-size: 14px;
   width: 100%;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+
+.disabled span {
+  color: #ccc;
 }

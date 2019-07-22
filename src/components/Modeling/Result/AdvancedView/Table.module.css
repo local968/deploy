@@ -143,6 +143,7 @@ span.text {
 .name {
   flex: 0 0 260px;
   margin: 0 10px;
+  justify-content: space-between;
 }
 
 .check {

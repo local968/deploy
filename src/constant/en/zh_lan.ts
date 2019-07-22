@@ -326,7 +326,7 @@ const ZH_LAN = {
   R2LearnsDefaultSelection: 'R2 Learn 的默认推荐',
   Input: '输入:',
   Pleaseenterbenefitandcostin: '请在0.00到1000,000,000.00范围内输入收益和损失。',
-  Pleaseenterbenefitandcostins:'输入的数字最多支持两位小数，必须是正值。',
+  Pleaseenterbenefitandcostins: '输入的数字最多支持两位小数，必须是正值。',
   Noteifacorrectpredictionbringsyouprofit: '注意：如果正确的预测为您带来利润，那么这是一种有效收益。如果不正确的预测为您带来损失，那就是成本。所有输入都应以相同的单位进行测量。',
   Tips: '提示',
   Benefit: '收益:',
@@ -1195,8 +1195,10 @@ const ZH_LAN = {
   FbetaValue: 'Beta Value',
   FbetaValueHint: 'beta的输入范围是0.1~10.0，最小步长为0.1，默认为1.0。',
   dispalyNull: '（空）',
-  CurrentScale:"当前比例",
-  Scale:"比例",
+  CurrentScale: "当前比例",
+  Scale: "比例",
+  distanceInsideCluster: "与类中点的平均距离",
+  numberInsideCluster: "样本量"
 };
 
 export default ZH_LAN;
