@@ -167,28 +167,14 @@ const RegressionTable = (props: RegressionTableProps) => {
         }
       case 'validation':
         {
-          const { problemType } = project
-          let aModelData, bModelData
-          if (problemType === 'Regression') {
-            aModelData = (aModel.score.validateScore[metric || 'r2'])
-            bModelData = (bModel.score.validateScore[metric || 'r2'])
-          } else {
-            aModelData = metric === 'log_loss' ? aModel.chartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
-            bModelData = metric === 'log_loss' ? bModel.chartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
-          }
+          const aModelData = (aModel.score.validateScore[metric || 'r2'])
+          const bModelData = (bModel.score.validateScore[metric || 'r2'])
           return (aModelData - bModelData) * sort.value
         }
       case 'holdout':
         {
-          const { problemType } = project
-          let aModelData, bModelData
-          if (problemType === 'Regression') {
-            aModelData = (aModel.score.holdoutScore[metric || 'r2'])
-            bModelData = (bModel.score.holdoutScore[metric || 'r2'])
-          } else {
-            aModelData = metric === 'log_loss' ? aModel.holdoutChartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
-            bModelData = metric === 'log_loss' ? bModel.holdoutChartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
-          }
+          const aModelData = (aModel.score.holdoutScore[metric || 'r2'])
+          const bModelData = (bModel.score.holdoutScore[metric || 'r2'])
           return (aModelData - bModelData) * sort.value
         }
       case 'time':

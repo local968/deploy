@@ -143,28 +143,14 @@ const ClassificationTable = (props: ClassificationTableProps) => {
         }
       case 'validation':
         {
-          const { problemType } = project
-          let aModelData, bModelData
-          if (problemType === 'Regression') {
-            aModelData = (aModel.score.validateScore[metric || 'r2'])
-            bModelData = (bModel.score.validateScore[metric || 'r2'])
-          } else {
-            aModelData = metric === 'log_loss' ? aModel.chartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
-            bModelData = metric === 'log_loss' ? bModel.chartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
-          }
+          const aModelData = metric === 'fbeta' ? aModel.fbeta(fbeta, 'Validation') : aModel[(metric === 'log_loss' ? 'logloss' : metric) + 'Validation']
+          const bModelData = metric === 'fbeta' ? bModel.fbeta(fbeta, 'Validation') : bModel[(metric === 'log_loss' ? 'logloss' : metric) + 'Validation']
           return (aModelData - bModelData) * sort.value
         }
       case 'holdout':
         {
-          const { problemType } = project
-          let aModelData, bModelData
-          if (problemType === 'Regression') {
-            aModelData = (aModel.score.holdoutScore[metric || 'r2'])
-            bModelData = (bModel.score.holdoutScore[metric || 'r2'])
-          } else {
-            aModelData = metric === 'log_loss' ? aModel.holdoutChartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
-            bModelData = metric === 'log_loss' ? bModel.holdoutChartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
-          }
+          const aModelData = metric === 'fbeta' ? aModel.fbeta(fbeta, 'Holdout') : aModel[(metric === 'log_loss' ? 'logloss' : metric) + 'Holdout']
+          const bModelData = metric === 'fbeta' ? bModel.fbeta(fbeta, 'Holdout') : bModel[(metric === 'log_loss' ? 'logloss' : metric) + 'Holdout']
           return (aModelData - bModelData) * sort.value
         }
       case 'ks':
@@ -286,7 +272,6 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
     if (selectModel.id === model.id) return
     project.updateProject({ selectId: model.id })
   }
-
   return <div className={styles.rowBody}>
     <Tooltip
       placement="left"
@@ -311,8 +296,8 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
         <div className={styles.cell}><span className={styles.text} title={formatNumber(model.cutoff.toString())}>{formatNumber(model.cutoff.toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`ks${type}`].toString())}>{formatNumber(model[`ks${type}`].toString())}</span></div>
         <div className={styles.scoreCell}>
-          <div className={styles.cell}><span className={styles.text} title={formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric}Validation`].toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric}Validation`].toString())}</span></div>
-          <div className={styles.cell}><span className={styles.text} title={formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric}Holdout`].toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric}Holdout`].toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber((metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric === 'log_loss' ? 'logloss' : metric}Validation`]).toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric === 'log_loss' ? 'logloss' : metric}Validation`].toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber((metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric === 'log_loss' ? 'logloss' : metric}Holdout`]).toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric === 'log_loss' ? 'logloss' : metric}Holdout`].toString())}</span></div>
         </div>
       </div>
     </Tooltip>
