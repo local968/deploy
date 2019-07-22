@@ -198,7 +198,7 @@ const ClusteringTableRow = observer((props: ClusteringTableRowProps) => {
   const handleResult = (id: string, type: string) => () => {
     handleDetail(id, type)
   }
-
+  console.log(isRecommend ? EN.Recommended : EN.Selected)
   const handleClick = (e: MouseEvent<HTMLInputElement>) => {
     e.stopPropagation();
     if (selectModel.id === model.id) return

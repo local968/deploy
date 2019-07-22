@@ -1426,14 +1426,14 @@ class Project {
         const { validateScore, holdoutScore } = score
         let validate, holdout
         if (problemType === 'Classification') {
-          validate = currentMeasurement === 'auc' ? validateScore.auc : Reflect.get(m, currentMeasurement + 'Validation')  //m[currentMeasurement + 'Validation']
-          holdout = currentMeasurement === 'auc' ? holdoutScore.auc : Reflect.get(m, currentMeasurement + 'Holdout') //m[currentMeasurement + 'Holdout']
+          validate = Reflect.get(m, (currentMeasurement === 'log_loss' ? 'logloss' : currentMeasurement) + 'Validation')  //m[currentMeasurement + 'Validation']
+          holdout = Reflect.get(m, (currentMeasurement === 'log_loss' ? 'logloss' : currentMeasurement) + 'Holdout') //m[currentMeasurement + 'Holdout']
         } else if (problemType === 'Regression') {
           validate = Reflect.get(validateScore, currentMeasurement) //validateScore[currentMeasurement]
           holdout = Reflect.get(holdoutScore, currentMeasurement) //holdoutScore[currentMeasurement]
         } else if (problemType === 'Clustering' || problemType === 'Outlier') {
-          validate = Reflect.get(score, currentMeasurement) //score[currentMeasurement]
-          holdout = Reflect.get(score, currentMeasurement) //score[currentMeasurement]
+          validate = Reflect.get(score, currentMeasurement) || 0 //score[currentMeasurement]
+          holdout = Reflect.get(score, currentMeasurement) || 0 //score[currentMeasurement]
         }
         if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
