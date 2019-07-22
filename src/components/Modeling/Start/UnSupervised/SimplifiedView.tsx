@@ -5,12 +5,12 @@ import { observer } from 'mobx-react';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
 import { Popover, Icon } from 'antd';
-import EN from '../../../constant/en';
+import EN from '../../../../constant/en';
 import request from 'components/Request';
-import CreateNewVariables from '../../CreateNewVariable';
+import CreateNewVariables from '../../../CreateNewVariable';
 import SimplifiedViewRow from './SimplifiedViewRow';
 import CorrelationPlot from './CorrelationPlot';
-import { Show } from '../../Common';
+import { Show } from '../../../Common';
 interface Interface {
   project: any;
   dataHeader?: any;
@@ -62,7 +62,7 @@ export default class SimplifiedViews extends Component<Interface> {
           id: project.etlIndex,
         },
       })
-      .then(CorrelationMatrixData => {
+      .then((CorrelationMatrixData:any) => {
         this.showCorrelation = true;
         let { type } = CorrelationMatrixData;
         CorrelationMatrixData.type = type.map(itm => project.mapHeader[itm]);
