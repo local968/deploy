@@ -73,7 +73,12 @@ export interface Score {
 export interface LabelWithImportance {
   [key: string]: {
     indexes?: string[];
-    values?: number[];
+    values?: string[];
+    distanceInsideCluster?: number
+    numberInsideCluster?: number
+    histogramIndex?: (string | number)[][]
+    originalDiffCluster?: number[][]
+    originalSameCluster?: number[][]
   };
 };
 

@@ -1336,9 +1336,11 @@ const EN_LAN = {
   FbetaValue: 'Beta Value',
   FbetaValueHint: 'Beta value ranges from 0.1 to 10.0, minimum step is 0.1, the default value of it is 1.0.',
   dispalyNull: '(Null)',
-  Pleaseenterbenefitandcostins:'The number entered can have 2 decimal places max. Both the benefit and cost inputs must be in positive values.',
-  CurrentScale:"Current scale",
-  Scale:"Scale",
+  Pleaseenterbenefitandcostins: 'The number entered can have 2 decimal places max. Both the benefit and cost inputs must be in positive values.',
+  CurrentScale: "Current scale",
+  Scale: "Scale",          
+  distanceInsideCluster: "Average Distance of Samples Inside the Cluster",
+  numberInsideCluster: "Sample Size"
 };
 
 
