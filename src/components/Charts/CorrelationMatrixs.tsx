@@ -31,7 +31,7 @@ export default function CorrelationMatrixs(props){
 		tooltip:{
 			formatter:data=>{
 				const {marker,value} = data;
-				return `${marker}:${value[2].toFixed(3)}`
+				return `${marker}${value[2].toFixed(3)}`
 			}
 		}
 	};

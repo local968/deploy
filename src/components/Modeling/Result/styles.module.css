@@ -28,7 +28,7 @@
 
 .popover{
     max-height:200px;
-    overflow: scroll;
+    overflow: auto;
     box-shadow: 0 10px 8px rgba(0, 0, 0, 0.15);
 }
 
