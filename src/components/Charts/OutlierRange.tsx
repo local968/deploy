@@ -305,7 +305,7 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 	render(){
 		const {selectArea,sliderValue,interval=0,bin} = this.state;
     const {field,project} = this.props;
-    const {min,max,low,high} = project.rawDataView[field];
+    const {min,max} = project.rawDataView[field];
 		const [start,end] = selectArea;
 		const {closeEdit,saveEdit} = this.props;
 		const _low = Math.max(min,start).toFixed(2);
