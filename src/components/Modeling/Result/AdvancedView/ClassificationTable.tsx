@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, MouseEvent } from 'react'
+import React, { ReactElement, useState, MouseEvent, useMemo } from 'react'
 import styles from './Table.module.css'
 import EN from '../../../../constant/en'
 import { Icon, Switch, Select, Tooltip } from 'antd'
@@ -91,13 +91,110 @@ interface ClassificationTableProps {
     value: number
   },
   handleSort: (k: string) => void,
-  models: Model[]
+  models: Model[],
+  currentSettingId: string
 }
 
 const ClassificationTable = (props: ClassificationTableProps) => {
-  const { sort, handleSort, project, metric, handleChange, models } = props
-  const { isHoldout } = project
+  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props
+  const { isHoldout, fbeta } = project
   const [detailArr, setDetail] = useState([] as string[])
+
+  const sortMethods = (aModel, bModel) => {
+    switch (sort.key) {
+      case 'fbeta':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel.fbeta(fbeta, dataKey)
+          const bModelData = bModel.fbeta(fbeta, dataKey)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'precision':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel[`precision${dataKey}`]
+          const bModelData = bModel[`precision${dataKey}`]
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'recall':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel[`recall${dataKey}`]
+          const bModelData = bModel[`recall${dataKey}`]
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'logLoss':
+        {
+          const aFitIndex = aModel.fitIndex
+          const bFitIndex = bModel.fitIndex
+          const dataKey = isHoldout ? 'holdoutChartData' : 'chartData'
+          const aModelData = (aModel[dataKey].roc.LOGLOSS[aFitIndex])
+          const bModelData = (bModel[dataKey].roc.LOGLOSS[bFitIndex])
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'cutoff':
+        {
+          const aFitIndex = aModel.fitIndex;
+          const bFitIndex = bModel.fitIndex;
+          const dataKey = isHoldout ? 'holdoutChartData' : 'chartData';
+          const aModelData = (aModel[dataKey].roc.Threshold[aFitIndex]);
+          const bModelData = (bModel[dataKey].roc.Threshold[bFitIndex]);
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'validation':
+        {
+          const { problemType } = project
+          let aModelData, bModelData
+          if (problemType === 'Regression') {
+            aModelData = (aModel.score.validateScore[metric || 'r2'])
+            bModelData = (bModel.score.validateScore[metric || 'r2'])
+          } else {
+            aModelData = metric === 'log_loss' ? aModel.chartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
+            bModelData = metric === 'log_loss' ? bModel.chartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
+          }
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'holdout':
+        {
+          const { problemType } = project
+          let aModelData, bModelData
+          if (problemType === 'Regression') {
+            aModelData = (aModel.score.holdoutScore[metric || 'r2'])
+            bModelData = (bModel.score.holdoutScore[metric || 'r2'])
+          } else {
+            aModelData = metric === 'log_loss' ? aModel.holdoutChartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
+            bModelData = metric === 'log_loss' ? bModel.holdoutChartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
+          }
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'ks':
+        {
+          const dataKey = isHoldout ? 'Holdout' : 'Validation'
+          const aModelData = aModel[`ks${dataKey}`]
+          const bModelData = bModel[`ks${dataKey}`]
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'time':
+        return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
+      case 'name':
+      default:
+        return (aModel.modelName > bModel.modelName ? 1 : -1) * (sort.value === 1 ? 1 : -1)
+      // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
+      // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
+      // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      // return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
+    }
+  };
+
+  const filtedModels = useMemo(() => {
+    let _models = [...models];
+    if (currentSettingId !== 'all') {
+      const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
+      if (currentSetting) _models = _models.filter(model => model.settingId === currentSetting.id)
+    }
+    return _models.sort(sortMethods)
+  }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   const sortBy = (key: string) => () => {
     handleSort(key)
@@ -153,7 +250,7 @@ const ClassificationTable = (props: ClassificationTableProps) => {
       </div>
     </div>
     <div className={styles.body}>
-      {models.map((m, i) => <ClassificationRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
+      {filtedModels.map((m, i) => <ClassificationRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
     </div>
   </div>
 }

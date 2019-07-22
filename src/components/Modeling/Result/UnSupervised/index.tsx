@@ -3,7 +3,7 @@ import { Hint, ProgressBar, Table, ProcessLoading } from 'components/Common';
 import classes from './styles.module.css';
 import VariableImpact from '../VariableImpact';
 import Explanation from './explanation';
-import AdvancedViewUn from '../AdvancedViewUn/AdvancedView';
+import AdvancedView from '../AdvancedView';
 import { Tooltip, Icon, Popover, Select } from 'antd';
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from '../../../../util';
@@ -88,6 +88,8 @@ function ModelResult(props) {
     problemType === 'Clustering' && !selectModel.supportDeploy;
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName;
   // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
+
+  const cannotDownload = problemType === 'Clustering' && selectModel.dbscanClusters < 2
 
   const changeView = view => {
     setView(view);
@@ -309,7 +311,7 @@ function ModelResult(props) {
         </div>
       )}
       {view === 'advanced' && (
-        <AdvancedViewUn
+        <AdvancedView
           project={project}
           models={models}
           sort={sort.advanced}
@@ -334,7 +336,12 @@ function ModelResult(props) {
               <span>{EN.DeployTheModel}</span>
             </button>
           )}
-        {problemType === 'Clustering' && (
+        {problemType === 'Clustering' && cannotDownload ? <button
+          className={`${classes.button} ${classes.disable}`}
+          style={{ marginLeft: '.1em' }}
+        >
+          <span>{EN.Exportmodelresults}</span>
+        </button> :
           <a
             href={`/upload/download/model?projectId=${id}&filename=${encodeURIComponent(
               `${realName}-${selectModel.modelName}-predict.csv`,
@@ -348,7 +355,7 @@ function ModelResult(props) {
               <span>{EN.Exportmodelresults}</span>
             </button>
           </a>
-        )}
+        }
         {problemType === 'Outlier' && (
           <a
             href={`/upload/download/outlier?projectId=${id}&filename=${encodeURIComponent(
@@ -819,7 +826,8 @@ const ClusteringTable = observer(props => {
           return a.modelName > b.modelName ? value : -value;
       }
     };
-    return models.sort(fn);
+    const _models = models.filter(m => m.dbscanClusters >= 2).sort(fn)
+    return [..._models, ...models.filter(m => m.dbscanClusters < 2)]
   }, [models, sort.key, sort.value]);
 
   return (
@@ -1071,8 +1079,8 @@ const ClusteringRow = observer(props => {
     hasTarget,
     project,
   } = props;
-  const { realLabelScore, target } = model;
-  const { adjust_mutual_info = '', adjust_rand_score = '' } = realLabelScore;
+  const { realLabelScore, target, dbscanClusters, labelWithImportance } = model;
+  // const { adjust_mutual_info = '', adjust_rand_score = '' } = realLabelScore;
   const [type, setType] = React.useState('');
   const [visible, setVisible] = React.useState(false);
   const toggleImpact = _type => {
@@ -1088,8 +1096,8 @@ const ClusteringRow = observer(props => {
       setType(_type);
     }
   };
-
-  const clusters = Object.keys(model.labelWithImportance).length;
+  const isNull = dbscanClusters < 2
+  const clusters = isNull ? dbscanClusters : Object.keys(labelWithImportance || {}).length;
   return (
     <div className={classes.rowBody}>
       <Tooltip
@@ -1117,7 +1125,7 @@ const ClusteringRow = observer(props => {
             {/*<span>{formatNumber(model.modelName)}</span>*/}
           </div>
           <div className={`${classes.ccell}`}>
-            <span>{formatNumber(model.score[project.measurement])}</span>
+            <span>{isNull ? 'null' : formatNumber(model.score[project.measurement])}</span>
           </div>
           {/* <div className={`${classes.ccell}`}>
           <span>{formatNumber(model.score.CVNN)}</span>
@@ -1129,7 +1137,7 @@ const ClusteringRow = observer(props => {
           <span>{formatNumber(model.score.CH)}</span>
         </div> */}
           <div className={`${classes.ccell}`}>
-            <span>{formatNumber(model.score.RSquared)}</span>
+            <span>{isNull ? 'null' : formatNumber(model.score.RSquared)}</span>
           </div>
           <div className={`${classes.ccell}`}>
             <span>{clusters}</span>
@@ -1137,14 +1145,14 @@ const ClusteringRow = observer(props => {
           {hasTarget && (
             <div className={`${classes.ccell}`}>
               <span>
-                {!target.length ? 'null' : formatNumber(adjust_mutual_info)}
+                {(!target.length || isNull) ? 'null' : formatNumber(realLabelScore.adjust_mutual_info)}
               </span>
             </div>
           )}
           {hasTarget && (
             <div className={`${classes.ccell}`}>
               <span>
-                {!target.length ? 'null' : formatNumber(adjust_rand_score)}
+                {(!target.length || isNull) ? 'null' : formatNumber(realLabelScore.adjust_rand_score)}
               </span>
             </div>
           )}
@@ -1155,8 +1163,8 @@ const ClusteringRow = observer(props => {
                 : ''}
             </span>
           </div>
-          <div className={`${classes.ccell} ${classes.compute}`}>
-            <span onClick={() => toggleImpact('impact')}>
+          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disabled : ''}`}>
+            <span onClick={() => isNull ? null : toggleImpact('impact')}>
               <img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}
             </span>
           </div>
@@ -1165,8 +1173,8 @@ const ClusteringRow = observer(props => {
               <img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}
             </span>
           </div>
-          <div className={`${classes.ccell} ${classes.compute}`}>
-            <span onClick={() => toggleImpact('explanation')}>
+          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disabled : ''}`}>
+            <span onClick={() => isNull ? null : toggleImpact('explanation')}>
               <img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}
             </span>
           </div>

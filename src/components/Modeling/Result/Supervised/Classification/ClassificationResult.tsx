@@ -167,7 +167,6 @@ export default class ClassificationView extends Component<Interface> {
     } = project;
     if (!current) return null;
     const { selectModel, targetCounts } = project;
-
     const { fitIndex, chartData } = selectModel;
     const { roc } = chartData;
 
@@ -498,7 +497,7 @@ export default class ClassificationView extends Component<Interface> {
                         <span style={{ marginRight: '0.5em' }}>
                           {EN.EventDistribution}
                         </span>
-                        <input value={20} onChange={() => { }} />
+                        <input disabled value={20} onChange={() => { }} />
                         <span style={{ marginLeft: '0.5em' }}>%</span>
                       </div>
                     </dt>

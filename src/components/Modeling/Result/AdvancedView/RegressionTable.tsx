@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, MouseEvent } from 'react'
+import React, { ReactElement, useState, MouseEvent, useMemo } from 'react'
 import styles from './Table.module.css'
 import EN from '../../../../constant/en'
 import { Icon, Switch, Select, Tooltip } from 'antd'
@@ -93,11 +93,12 @@ interface RegressionTableProps {
     value: number
   },
   handleSort: (k: string) => void,
-  models: Model[]
+  models: Model[],
+  currentSettingId: string
 }
 
 const RegressionTable = (props: RegressionTableProps) => {
-  const { sort, handleSort, project, metric, handleChange, models } = props
+  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props
   const { isHoldout } = project
   const [detailArr, setDetail] = useState([] as string[])
 
@@ -113,6 +114,104 @@ const RegressionTable = (props: RegressionTableProps) => {
     if (detailArr.includes(s)) return setDetail(detailArr.filter(d => s !== s))
     return setDetail([...detailArr, s])
   }
+
+  const sortMethods = (aModel, bModel) => {
+    switch (sort.key) {
+      case 'nrmse':
+        {
+          const aModelData = isHoldout ? aModel.score.holdoutScore.nrmse : aModel.score.validateScore.nrmse
+          const bModelData = isHoldout ? bModel.score.holdoutScore.nrmse : bModel.score.validateScore.nrmse
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'rmse':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.rmse) : (aModel.score.validateScore.rmse)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.rmse) : (bModel.score.validateScore.rmse)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'msle':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.msle) : (aModel.score.validateScore.msle)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.msle) : (bModel.score.validateScore.msle)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'rmsle':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.rmsle) : (aModel.score.validateScore.rmsle)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.rmsle) : (bModel.score.validateScore.rmsle)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'mse':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.mse) : (aModel.score.validateScore.mse)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.mse) : (bModel.score.validateScore.mse)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'mae':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.mae) : (aModel.score.validateScore.mae)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.mae) : (bModel.score.validateScore.mae)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'r2':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.r2) : (aModel.score.validateScore.r2)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.r2) : (bModel.score.validateScore.r2)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'adjustR2':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.adjustR2) : (aModel.score.validateScore.adjustR2)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.adjustR2) : (bModel.score.validateScore.adjustR2)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'validation':
+        {
+          const { problemType } = project
+          let aModelData, bModelData
+          if (problemType === 'Regression') {
+            aModelData = (aModel.score.validateScore[metric || 'r2'])
+            bModelData = (bModel.score.validateScore[metric || 'r2'])
+          } else {
+            aModelData = metric === 'log_loss' ? aModel.chartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.validateScore[metric]) : (aModel[metric + 'Validation'])
+            bModelData = metric === 'log_loss' ? bModel.chartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.validateScore[metric]) : (bModel[metric + 'Validation'])
+          }
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'holdout':
+        {
+          const { problemType } = project
+          let aModelData, bModelData
+          if (problemType === 'Regression') {
+            aModelData = (aModel.score.holdoutScore[metric || 'r2'])
+            bModelData = (bModel.score.holdoutScore[metric || 'r2'])
+          } else {
+            aModelData = metric === 'log_loss' ? aModel.holdoutChartData.roc.LOGLOSS[aModel.fitIndex] : metric === 'auc' ? (aModel.score.holdoutScore[metric]) : (aModel[metric + 'Holdout'])
+            bModelData = metric === 'log_loss' ? bModel.holdoutChartData.roc.LOGLOSS[bModel.fitIndex] : metric === 'auc' ? (bModel.score.holdoutScore[metric]) : (bModel[metric + 'Holdout'])
+          }
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'time':
+        return (sort.value === 1 ? 1 : -1) * ((aModel.createTime || 0) - (bModel.createTime || 0))
+      case 'name':
+      default:
+        return (aModel.modelName > bModel.modelName ? 1 : -1) * (sort.value === 1 ? 1 : -1)
+      // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
+      // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
+      // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
+      // return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
+    }
+  };
+
+  const filtedModels = useMemo(() => {
+    let _models = [...models];
+    if (currentSettingId !== 'all') {
+      const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
+      if (currentSetting) _models = _models.filter(model => model.settingId === currentSetting.id)
+    }
+    return _models.sort(sortMethods)
+  }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   return <div className={styles.main}>
     <div className={styles.header}>
@@ -155,7 +254,7 @@ const RegressionTable = (props: RegressionTableProps) => {
       </div>
     </div>
     <div className={styles.body}>
-      {models.map((m, i) => <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
+      {filtedModels.map((m, i) => <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
     </div>
   </div>
 }

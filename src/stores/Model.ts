@@ -94,6 +94,8 @@ class Model {
   holdoutPlotData: string;
   residualPlotPath: string
   settingId: string;
+  dbscanClusters: number
+  realLabelScore = {}
   @observable score: Score;
   @observable backend: string;
   @observable featureImportance: NumberObject;
@@ -101,7 +103,7 @@ class Model {
   @observable modelName: string = "";
   // @observable modelInsightsData = null;
   @observable fitIndex: number = 0;
-  @observable chartData: ChartData;
+  @observable chartData?: ChartData;
   @observable problemType: string
   @observable importanceLoading: boolean = false
   @observable labelWithImportance: LabelWithImportance = {}
