@@ -1,9 +1,9 @@
 import React from 'react';
 import { Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import details from './details';
-import { Detail } from './types/Coordinate';
-import FunctionTips from './FunctionTips';
+import details from '../details';
+import { Detail } from '../types/Coordinate';
+import FunctionTips from '../FunctionTips';
 
 const useStyles = makeStyles({
   detail: {

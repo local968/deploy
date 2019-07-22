@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { MuiDialog } from './modules/MuiModule';
 import NewVariableView from './NewVariableView';
 
-import store from './NewVariableStore';
+import stores from './NewVariableStore';
 
 // types
 import { DialogProps } from '@material-ui/core/Dialog';
@@ -34,8 +34,6 @@ export default class CreateNewVariableModule extends React.Component<
       addNewVariable,
     } = this.props;
 
-    console.log(store);
-
     return (
       <MuiDialog
         {...{
@@ -53,6 +51,7 @@ export default class CreateNewVariableModule extends React.Component<
             expression,
             addNewVariable,
           }}
+          stores={stores}
         />
       </MuiDialog>
     );

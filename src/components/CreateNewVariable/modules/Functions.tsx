@@ -22,14 +22,17 @@ import { Coordinate } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   list: {
-    height: '500px',
+    height: 500,
     overflowY: 'auto',
-    overflowX: 'hidden',
   },
   textFiled: {
-    width: 200,
-    display: 'flex',
-    paddingLeft: 16,
+    width: '100%',
+    marginTop: 8,
+    padding: '0 16px',
+  },
+  listItemTitle: {
+    fontWeight: 'bold',
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
   nested: {
     paddingLeft: 44,
@@ -70,8 +73,8 @@ function Functions(props: InterfaceFunctionProps) {
   };
 
   const onCosClick = (k: string) => {
-    const { [k]: value } = state;
-    setState({ ...state, [k]: !value });
+    // const { [k]: value } = state;
+    // setState({ ...state, [k]: !value });
   };
 
   // filter
@@ -97,36 +100,35 @@ function Functions(props: InterfaceFunctionProps) {
         }}
       />
       <List component={'div'} dense disablePadding className={classes.list}>
-        {_.map(values, (v: Coordinate, k: number) => {
-          return (
+        {_.map(values, (v, k) => (
+          <>
             <ListItem
               button
               component={'div'}
               key={k}
               onClick={() => onCosClick(k)}
             >
-              <ListItemText primary={Reflect.get(EN, k)} />
+              <ListItemText primary={Reflect.get(EN, k)} className={classes.listItemTitle} disableTypography={true}/>
               {state[k] ? <ExpandMore /> : <ExpandLess />}
-
-              {/*<Collapse in={state[k]} unmountOnExit key={k + 'col'}>*/}
-              {/*  <List disablePadding>*/}
-              {/*    {_.map(v, (coor: Coordinate, i: number) => {*/}
-              {/*      return (*/}
-              {/*        <ListItem*/}
-              {/*          button*/}
-              {/*          component={'div'}*/}
-              {/*          key={i}*/}
-              {/*          className={classes.nested}*/}
-              {/*        >*/}
-              {/*          <ListItemText primary={coor.name} />*/}
-              {/*        </ListItem>*/}
-              {/*      );*/}
-              {/*    })}*/}
-              {/*  </List>*/}
-              {/*</Collapse>*/}
             </ListItem>
-          );
-        })}
+            <Collapse in={state[k]} unmountOnExit key={k + 'col'}>
+              <List component={'div'} dense disablePadding>
+                {_.map(v, (coor: Coordinate, i: number) => {
+                  return (
+                    <ListItem
+                      button
+                      component={'div'}
+                      key={i}
+                      className={classes.nested}
+                    >
+                      <ListItemText primary={coor.name} />
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </Collapse>
+          </>
+        ))}
       </List>
     </MuiCard>
   );

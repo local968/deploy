@@ -8,6 +8,7 @@ import { Container, Grid, Typography } from '@material-ui/core';
 // modules
 import Variables from './modules/Variables';
 import Functions from './modules/Functions';
+import Summary from './modules/Summary';
 
 import EN from '../../constant/en';
 import { Coordinate, Type } from './types/Coordinate';
@@ -19,6 +20,7 @@ interface InterfaceNewVariableProps {
   mapHeader;
   expression;
   addNewVariable: (newVariables: any[], type) => Promise<boolean>;
+  stores;
 }
 
 const Subtitle = props => (
@@ -83,12 +85,12 @@ export class NewVariableView extends React.Component<InterfaceNewVariableProps> 
             <Functions
               onClick={this.handleFunctions}
               onMouseOver={this.onMouseOver}
-              functions={this.props.FUNCTIONS}
+              functions={this.props.stores.variables}
             />
           </Grid>
           <Grid item xs={6} md={4} component={MyGrid}>
             <Subtitle>{EN.ProjectDescription}</Subtitle>
-            {/*<Summary detailKey={state.detailKey} />*/}
+            <Summary detailKey={state.detailKey} />
           </Grid>
         </Grid>
       </>

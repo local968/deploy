@@ -20,7 +20,7 @@ import { Coordinate } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   list: {
-    height: 360,
+    height: 500,
     overflowY: 'auto',
   },
   textFiled: {
@@ -79,21 +79,19 @@ function Variables(props: VariablesProps) {
         }}
       />
       <List component={'div'} dense disablePadding className={classes.list}>
-        {_.map(values, (v: Coordinate, i: number) => {
-          return (
-            <ListItem
-              button
-              component={'div'}
-              key={'functions' + i}
-              onClick={handleClick.bind(null, v, null)}
-            >
-              <ListItemText primary={v.name} />
-              <ListItemSecondaryAction>
-                <span className={classes.textBadge}>连续变量</span>
-              </ListItemSecondaryAction>
-            </ListItem>
-          );
-        })}
+        {_.map(values, (v: Coordinate, i: number) => (
+          <ListItem
+            button
+            component={'div'}
+            key={i}
+            onClick={handleClick.bind(null, v, null)}
+          >
+            <ListItemText primary={v.name} />
+            <ListItemSecondaryAction>
+              <span className={classes.textBadge}>连续变量</span>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
       </List>
     </MuiCard>
   );
