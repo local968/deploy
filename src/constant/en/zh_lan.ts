@@ -1198,7 +1198,11 @@ const ZH_LAN = {
   CurrentScale: "当前比例",
   Scale: "比例",
   distanceInsideCluster: "与类中点的平均距离",
-  numberInsideCluster: "样本量"
+  numberInsideCluster: "样本量",
+  ChartDisplayRange:"图表显示范围",
+  NumberOfCartons:"分箱数量",
+  SetToMinimum:"设置为最小值",
+  SetToMaximum:"设置为最大值",
 };
 
 export default ZH_LAN;

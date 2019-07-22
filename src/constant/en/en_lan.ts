@@ -1338,9 +1338,13 @@ const EN_LAN = {
   dispalyNull: '(Null)',
   Pleaseenterbenefitandcostins: 'The number entered can have 2 decimal places max. Both the benefit and cost inputs must be in positive values.',
   CurrentScale: "Current scale",
-  Scale: "Scale",          
+  Scale: "Scale",
   distanceInsideCluster: "Average Distance of Samples Inside the Cluster",
-  numberInsideCluster: "Sample Size"
+  numberInsideCluster: "Sample Size",
+  ChartDisplayRange:"Chart display range",
+  NumberOfCartons:"Number of cartons",
+  SetToMinimum:"Set to minimum",
+  SetToMaximum:"Set to maximum",
 };
 
 

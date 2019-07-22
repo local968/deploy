@@ -1345,3 +1345,35 @@ button.activeButton span {
     justify-content: space-around;
     font-size:16px;
 }
+
+.outlierRanged{
+    font-size: 14px;
+    margin-left: 100px;
+    margin-bottom: 20px;
+}
+
+.minmax{
+    display: flex;
+}
+
+.minmax section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.minmax section >div{
+    margin-left: 14px !important;
+}
+
+.minmax section a{
+    padding: 5px 0;
+}
+
+.minmax span{
+    margin: 5px -3px 0 14px;
+}
+
+.outlierRanged >div+div div{
+    margin:0 14px;
+}
