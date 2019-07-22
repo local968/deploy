@@ -69,8 +69,8 @@ const MetricOptions = [{
   display: 'AUC',
   key: 'auc'
 }, {
-  display: 'F1',
-  key: 'f1'
+  display: 'Fbeta',
+  key: 'fbeta'
 }, {
   display: 'Precision',
   key: 'precision'
