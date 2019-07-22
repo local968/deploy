@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
-import { Icon, Modal, Popover} from 'antd';
+import { Icon, Popover } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import { formatNumber } from '../../../../util';
 import request from 'components/Request';
@@ -22,13 +22,15 @@ export default class SimplifiedView extends Component<Interface> {
   @observable sort = -1;
   @observable showHistograms = false;
   @observable showCorrelation = false;
-  @observable visible = false;
+  @observable visible = true;
   @observable chartData = {};
   @observable result = {};
   @observable CorrelationMatrixData = {};
 
   componentDidMount() {
-    this.props.project.dataView().then(() => this.props.project.preTrainImportance());
+    this.props.project
+      .dataView()
+      .then(() => this.props.project.preTrainImportance());
   }
 
   show = () => {
@@ -74,7 +76,7 @@ export default class SimplifiedView extends Component<Interface> {
     this.showHistograms = true;
   };
 
-  showback = (target, result, message?:any) => {
+  showback = (target, result, message?: any) => {
     this.chartData = {
       ...this.chartData,
       [target]: result,
@@ -152,7 +154,9 @@ export default class SimplifiedView extends Component<Interface> {
   };
 
   reloadTable = () => {
-    this.props.project.dataView().then(() => this.props.project.preTrainImportance());
+    this.props.project
+      .dataView()
+      .then(() => this.props.project.preTrainImportance());
   };
 
   handleChange = e => {
@@ -407,28 +411,20 @@ export default class SimplifiedView extends Component<Interface> {
             </select>
           </div>
           <div className={styles.newVariable}>
-            <Show
-              name = 'start_CreateANewVariable'
-            >
+            <Show name="start_CreateANewVariable">
               <div className={styles.toolButton} onClick={this.showNewVariable}>
                 <span>{EN.CreateANewVariable}</span>
               </div>
             </Show>
-
-            <Modal
-              visible={this.visible}
-              footer={null}
-              closable={false}
-              width={'65%'}
-            >
-              <CreateNewVariables
-                onClose={this.hideNewVariable}
-                addNewVariable={addNewVariable2}
-                colType={newVariableType}
-                expression={expression}
-                mapHeader={newMapHeader}
-              />
-            </Modal>
+            <CreateNewVariables
+              open={this.visible}
+              title={EN.CreateANewVariable}
+              onClose={this.hideNewVariable}
+              addNewVariable={addNewVariable2}
+              variables={newVariableType}
+              expression={expression}
+              mapHeader={newMapHeader}
+            />
           </div>
           <div
             className={classnames(styles.toolButton, styles.toolCheck)}
