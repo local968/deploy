@@ -1,7 +1,7 @@
 import React,{PureComponent} from 'react'
 import ReactEcharts from 'echarts-for-react';
 import InputNum from 'rc-input-number';
-import { debounce } from 'lodash'
+import { default as _, debounce } from 'lodash';
 import {Button} from 'antd'
 import './echarts.config'
 import EN from '../../constant/en';
@@ -16,26 +16,66 @@ interface DataSampleProps {
 	field:any
 	id:string
 	project:any
+	title?:string
 }
 
 export default class OutlierRange extends PureComponent<DataSampleProps>{
 	private chart: any;
+	state:any;
 	constructor(props){
 		super(props);
+		const {field,project} = props;
+		const {rawDataView={}} = project;
+		let {low,high} = rawDataView[field];
+		const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 10);
+		// const interval = (Math.max((high-low)/bin,(max-min)/9999)).toFixed(2);
+		// const interval = (Math.max((high-low)/bin,(re-rs)/9999)).toFixed(2);
+
+		const startValue =  +low-Math.abs(low)*0.1;
+		const endValue =  +high+Math.abs(high)*0.1;
 		this.state = {
 			max:null,
 			min:0,
 			ready:false,
 			selectArea:[],
+			low:0,
+			high:0,
+			sliderValue:[startValue,endValue],
+			bin,
+			// interval,
 		};
 		this.chart = React.createRef();
-		this.setSelectArea = debounce(this.setSelectArea, 10)
+		this.setSelectArea = debounce(this.setSelectArea, 10);
+		this.setSlider = debounce(this.setSlider, 1000);
 	}
 
 	componentDidMount() {
-		const {title='',field,id,project} = this.props as any;
+		this.getData();
+	}
+
+	async setSlider(sliderValue){
+		const {sliderValue:_sliderValue} = this.state;
+		const [start,end] = _sliderValue;
+		const [_start,_end] = sliderValue;
+		if(this.chart){
+			const chart = this.chart.getEchartsInstance();
+			chart.hideLoading();
+			if(start!==_start||end!==_end){
+				this.setState({
+					sliderValue,
+				},()=>{
+					this.getData();
+					chart.showLoading();
+				});
+			}
+		}
+	}
+
+	getData() {
+		const {title='',field,id,project,} = this.props;
+		const {sliderValue,bin} = this.state;
 		const {rawDataView={}} = project;
-		let {min,max,low,high} = rawDataView[field] as any;
+		let {min,max,low,high} = rawDataView[field];
 
 		low = low.toFixed(2);
 		high = high.toFixed(2);
@@ -47,9 +87,10 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		}
 
 		let selectArea = [+low,+high];
-		const zoom=0.1*(max-min);
-		const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 15);
-		const interval = ((max-min)/bin).toFixed(2);
+		// const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 10);
+		// const interval = (Math.max((high-low)/bin,(max-min)/9999)).toFixed(2);
+		const [rs,re] = sliderValue;
+		const interval = (Math.max((high-low)/bin,(re-rs)/9999)).toFixed(2);
 		const chart = this.chart.getEchartsInstance();
 
 		request.post({
@@ -58,18 +99,22 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 				field:field + '.double',
 				id,
 				interval:+interval,
+				range:sliderValue,
 			},
 		}).then((result:any) => {
+
 			this.setState({
 				title,
-				min:(Math.min(+(min-zoom),low)).toFixed(3),
-				max:(Math.max(+(min+zoom),high)).toFixed(3),
+				min:(Math.min(+(min),low)).toFixed(3),
+				max:(Math.max(+(min),high)).toFixed(3),
 				selectArea,
 				data:result.data,
 				chart,
 				ready:true,
 				low,
 				high,
+				interval,
+				// sliderValue:[startValue,endValue],
 			},this.setBrush);
 			chart.on('brushselected',  (params)=> {
 				const {areas=[]} = params.batch[0];
@@ -77,7 +122,7 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 					return
 				}
 				const area =  areas[0];
-				const {selectArea} = this.state as any;
+				const {selectArea} = this.state;
 				const [start,end] = selectArea;
 				const [_start,_end] = area.coordRange;
 				if(start!==_start||end!==_end){
@@ -95,7 +140,7 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 	}
 
 	setBrush(){
-		const {chart,selectArea} = this.state as any;
+		const {chart,selectArea} = this.state;
 
 		chart.dispatchAction({
 			type: 'brush',
@@ -109,21 +154,25 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		});
 	}
 
+
+
 	getOption() {
-		const {ready,data,min,max} = this.state as any;
+		const {ready,data,interval,sliderValue:_sliderValue} = this.state;
+		const {field,project} = this.props;
+		const {min,max,low,high} = project.rawDataView[field];
 		if(!ready){
 			return {
 				xAxis:{},
 				yAxis:{},
 			}
 		}
+		const sliderValue = _.cloneDeep(_sliderValue);
 
 		const _data = data.map(itm=>{
 			const _min = Math.max(itm[0],min);
 			const _max = Math.min(itm[1],max);
 			return [_min,_max,itm[2]]
 		});
-
 
 		function renderItem(params, api) {
 			const yValue = api.value(2);
@@ -145,10 +194,11 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const nameTextStyle = {
 			color:'#000',
 		};
+		const [startValue,endValue] = sliderValue;
 		return {
 			xAxis: {
-				min,
-				max,
+				min:Math.min(startValue,+min- +interval),
+				max:Math.max(endValue,+max+ +interval),
 				scale: true,
 				nameTextStyle,
 				axisLabel:{
@@ -158,12 +208,12 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 						if(+num>100000){
 							const p = Math.floor(Math.log(+num) / Math.LN10).toFixed(3);
 							const n = (+num * Math.pow(10, -p)).toFixed(3);
-							return +n + 'e' + +p;
+							return +n + 'e+' + +p;
 						}else if(+num<-100000){
 							num = -num;
 							const p = Math.floor(Math.log(+num) / Math.LN10).toFixed(3);
 							const n = (+num * Math.pow(10, -p)).toFixed(3);
-							return '-'+n + 'e' + +p;
+							return '-'+n + 'e+' + +p;
 						}
 						return num;
 					}
@@ -189,6 +239,27 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 				},
 				data:_data,
 			}],
+			dataZoom: [{
+				type: 'inside',
+				rangeMode:['value','value'],
+				startValue,
+				endValue,
+			},{
+				type: 'slider',
+				rangeMode:['value','value'],
+				startValue,
+				endValue,
+				labelPrecision:2,
+				backgroundColor:"rgba(204,204,204,0.2)",
+				labelFormatter: (value)=> {
+					if(!isNaN(Number(`${value}`))){
+						sliderValue.shift();
+						sliderValue.push(value);
+						this.setSlider(sliderValue);
+						return value.toFixed(3);
+					}
+				},
+			}],
 			brush: {
 				xAxisIndex: 'all',
 				brushLink: 'all',
@@ -203,26 +274,31 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 					borderColor: 'rgba(254, 197, 113, 0.8)',
 				},
 			},
-			// dataZoom: {
-			// 	type: 'inside',
-			// 	xAxisIndex: [0, 1],
-			// 	start: 98,
-			// 	end: 100
-			// },
 		};
 	}
 
-	reset(){
-		const {low,high} = this.state as any;
+	reset(force=false){
+		const {field,project} = this.props;
+		const {rawDataView={}} = project;
+		let {low,high} = rawDataView[field];
+		const startValue =  +low-Math.abs(low)*0.1;
+		const endValue =  +high+Math.abs(high)*0.1;
 		this.setState({
 			selectArea:[low,high],
 		},this.setBrush);
+		if(force){
+			this.setState({
+				sliderValue:[startValue,endValue],
+			},()=>{
+				this.getData();
+			});
+		}
 	}
 
 	render(){
-		const {max,min,selectArea} = this.state as any;
+		const {max,min,selectArea} = this.state;
 		const [start,end] = selectArea;
-		const {closeEdit,saveEdit} = this.props as any;
+		const {closeEdit,saveEdit} = this.props;
 		const _low = Math.max(min,start).toFixed(2);
 		const _high = Math.min(max,end).toFixed(2);
 		return [
@@ -253,7 +329,7 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 						},this.setBrush);
 					}}
 				/></div>
-			<Button onClick={this.reset.bind(this)}>{EN.Reset}</Button>
+			<Button onClick={this.reset.bind(this,true)}>{EN.Reset}</Button>
 			</div>,
 			<ReactEcharts
 			ref = {chart=>this.chart=chart}

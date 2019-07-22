@@ -2409,13 +2409,13 @@ class Project {
   }
 
   histogram(field: string) {
-    const { colType, dataViews, etlIndex, rawDataView } = this;
+    const { colType, dataViews, etlIndex } = this;
     const value: Stats = Reflect.get(dataViews, field);
     if (!value) {
       return {}
     }
     if (colType[field] === 'Numerical') {
-      const { max, min, std_deviation_bounds: { lower, upper } } = rawDataView[field];
+      const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
       const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
       return {
         "name": "histogram-numerical",
