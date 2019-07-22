@@ -94,7 +94,7 @@ class Model {
   holdoutPlotData: string;
   residualPlotPath: string
   settingId: string;
-  dbscanClusters: number
+  dbscanClusters: number = 2
   realLabelScore = {}
   @observable score: Score;
   @observable backend: string;

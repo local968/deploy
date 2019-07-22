@@ -167,6 +167,7 @@ class Project {
   @observable statement: string = '';
   @observable business: string = '';
   @observable changeProjectType: string = '';
+  @observable targetUnique: number = 2
 
   //etl
   @observable etling: boolean = false;
@@ -818,11 +819,13 @@ class Project {
       statement: string
       business: string
       problemType: string
-      measurement?: string
+      measurement?: string,
+      targetUnique: number
     } = {
       statement: this.statement,
       business: this.business,
-      problemType: this.changeProjectType
+      problemType: this.changeProjectType,
+      targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || ((this.changeProjectType === 'Regression' || this.changeProjectType === 'Clustering') && NaN)
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {

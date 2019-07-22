@@ -10,6 +10,7 @@ import { TableHeader } from './AdvancedViewTable';
 import moment from 'moment';
 import { formatNumber } from '../../../../util'
 import DetailCurves from './DetailCurves';
+import { computed } from 'mobx'
 
 const Option = Select.Option
 
@@ -173,14 +174,14 @@ const ClassificationTable = (props: ClassificationTableProps) => {
     }
   };
 
-  const filtedModels = useMemo(() => {
+  const filtedModels = computed(() => {
     let _models = [...models];
     if (currentSettingId !== 'all') {
       const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
       if (currentSetting) _models = _models.filter(model => model.settingId === currentSetting.id)
     }
     return _models.sort(sortMethods)
-  }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
+  })//[models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId]
 
   const sortBy = (key: string) => () => {
     handleSort(key)
@@ -236,7 +237,7 @@ const ClassificationTable = (props: ClassificationTableProps) => {
       </div>
     </div>
     <div className={styles.body}>
-      {filtedModels.map((m, i) => <ClassificationRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
+      {filtedModels.get().map((m, i) => <Row model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
     </div>
   </div>
 }
@@ -248,15 +249,13 @@ interface ClassificationRowProps {
   metric: string,
   project: Project,
   detail: boolean,
-  handleDetail: (s: string) => void
+  handleDetail: (s: string) => void,
 }
 
 const ClassificationRow = observer((props: ClassificationRowProps) => {
   const { model, project, metric, detail, handleDetail } = props
-  const { isHoldout, fbeta, targetArray, targetColMap, renameVariable, selectModel, defualtRecommendModel, criteria, costOption: { TP, FN, FP, TN } } = project
+  const { isHoldout, fbeta, selectModel, defualtRecommendModel, criteria, costOption: { TP, FN, FP, TN } } = project
   const isRecommend = defualtRecommendModel[0] ? defualtRecommendModel[0].id === model.id : false
-  const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
-  const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
   const text =
     criteria === 'cost' && (TP || FN || FP || TN)
       ? EN.BenefitCost
@@ -272,35 +271,43 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
     if (selectModel.id === model.id) return
     project.updateProject({ selectId: model.id })
   }
-  return <div className={styles.rowBody}>
-    <Tooltip
-      placement="left"
-      title={isRecommend ? text : EN.Selected}
-      visible={selectModel.id === model.id || isRecommend}
-      overlayClassName={styles.recommendLabel}
-      autoAdjustOverflow={false}
-      arrowPointAtCenter={true}
-      getPopupContainer={el => el.parentElement}
-    >
-      <div className={styles.row} onClick={handleResult(model.id)}>
-        <div className={styles.check}><input type='radio' name='modelRadio' checked={selectModel.id === model.id} onClick={handleClick} onChange={() => { }} /></div>
-        <div className={`${styles.cell} ${styles.name}`}>
-          <span className={styles.text} title={model.id}>{model.id}</span>
-          <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
-        </div>
-        <div className={styles.cell}><span className={styles.text} title={moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(model.fbeta(fbeta, type).toString())}>{formatNumber(model.fbeta(fbeta, type).toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`precision${type}`].toString())}>{formatNumber(model[`precision${type}`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`recall${type}`].toString())}>{formatNumber(model[`recall${type}`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`logloss${type}`].toString())}>{formatNumber(model[`logloss${type}`].toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(model.cutoff.toString())}>{formatNumber(model.cutoff.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`ks${type}`].toString())}>{formatNumber(model[`ks${type}`].toString())}</span></div>
-        <div className={styles.scoreCell}>
-          <div className={styles.cell}><span className={styles.text} title={formatNumber((metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric === 'log_loss' ? 'logloss' : metric}Validation`]).toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric === 'log_loss' ? 'logloss' : metric}Validation`].toString())}</span></div>
-          <div className={styles.cell}><span className={styles.text} title={formatNumber((metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric === 'log_loss' ? 'logloss' : metric}Holdout`]).toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric === 'log_loss' ? 'logloss' : metric}Holdout`].toString())}</span></div>
-        </div>
+  return <Tooltip
+    placement="left"
+    title={isRecommend ? text : EN.Selected}
+    visible={selectModel.id === model.id || isRecommend}
+    overlayClassName={styles.recommendLabel}
+    autoAdjustOverflow={false}
+    arrowPointAtCenter={true}
+    getPopupContainer={el => el.parentElement}
+  >
+    <div className={styles.row} onClick={handleResult(model.id)}>
+      <div className={styles.check}><input type='radio' name='modelRadio' checked={selectModel.id === model.id} onClick={handleClick} onChange={() => { }} /></div>
+      <div className={`${styles.cell} ${styles.name}`}>
+        <span className={styles.text} title={model.id}>{model.id}</span>
+        <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
       </div>
-    </Tooltip>
+      <div className={styles.cell}><span className={styles.text} title={moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
+      <div className={styles.cell}><span className={styles.text} title={formatNumber(model.fbeta(fbeta, type).toString())}>{formatNumber(model.fbeta(fbeta, type).toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`precision${type}`].toString())}>{formatNumber(model[`precision${type}`].toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`recall${type}`].toString())}>{formatNumber(model[`recall${type}`].toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`logloss${type}`].toString())}>{formatNumber(model[`logloss${type}`].toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text} title={formatNumber(model.cutoff.toString())}>{formatNumber(model.cutoff.toString())}</span></div>
+      <div className={styles.cell}><span className={styles.text} title={formatNumber(model[`ks${type}`].toString())}>{formatNumber(model[`ks${type}`].toString())}</span></div>
+      <div className={styles.scoreCell}>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber((metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric === 'log_loss' ? 'logloss' : metric}Validation`]).toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Validation') : model[`${metric === 'log_loss' ? 'logloss' : metric}Validation`].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber((metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric === 'log_loss' ? 'logloss' : metric}Holdout`]).toString())}>{formatNumber(metric === 'fbeta' ? model.fbeta(fbeta, 'Holdout') : model[`${metric === 'log_loss' ? 'logloss' : metric}Holdout`].toString())}</span></div>
+      </div>
+    </div>
+  </Tooltip>
+})
+
+const Row = (props: ClassificationRowProps) => {
+  const { model, project, detail } = props
+  const { targetArray, targetColMap, renameVariable } = project
+  const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
+  const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
+  return <div className={styles.rowBody}>
+    <ClassificationRow {...props} />
     {detail && <DetailCurves
       model={model}
       yes={yes}
@@ -308,4 +315,4 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
       project={project}
     />}
   </div>
-})
+}
