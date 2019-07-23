@@ -282,7 +282,7 @@ function ModelResult(props) {
               {project.problemType === 'Outlier' ? (
                 <ISO />
               ) : (
-                  <D3D2 url={selectModel.multiVarPlotData} />
+                isNull?null:<D3D2 url={selectModel.multiVarPlotData} />
                 )}
             </div>
           </div>
