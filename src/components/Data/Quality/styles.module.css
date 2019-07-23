@@ -430,10 +430,12 @@
 	display: flex;
 	flex: none;
 	flex-wrap: wrap;
-	margin: 0.1em 0;
-	height: 1.3em;
+	margin: 0.2em 0 0.1em;
+	max-height: 1.3em;
+	min-height: 0.8em;
 	overflow-x: hidden;
 	overflow-y: auto;
+	position: relative;
 }
 
 .fixesCheck {
@@ -816,6 +818,7 @@ span.fixesEdit {
 .cleanTargetButton {
 	display: flex;
 	flex: none;
+	flex-wrap: wrap
 }
 
 .cleanTargetButton button {
@@ -828,7 +831,7 @@ span.fixesEdit {
 	border: none;
 	outline: none;
 	cursor: pointer;
-	margin-right: .2em;
+	margin: 10px 10px 10px 0;
 }
 
 .cleanTargetButton span {

@@ -217,7 +217,7 @@ export default class SimplifiedView extends Component<Interface> {
       importanceProgress,
       targetUnique
     } = project;
-    // const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A';
+    const targetUniques = targetUnique || NaN
     const targetData =
       colType[target] !== 'Categorical' && dataViews
         ? dataViews[target] || {}
@@ -347,7 +347,7 @@ export default class SimplifiedView extends Component<Interface> {
                 [styles.none]: colType[target] !== 'Categorical',
               })}
             >
-              <span>{isNaN(targetUnique) ? 'N/A' : targetUnique}</span>
+              <span>{isNaN(targetUniques) ? 'N/A' : targetUniques}</span>
             </div>
             <div
               className={classnames(styles.targetCell, {

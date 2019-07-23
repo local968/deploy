@@ -145,9 +145,9 @@ export default class SimplifiedView extends Component {
       id, informativesLabel, trainHeader, expression, customHeader, totalLines, dataViewProgress, importanceProgress,
       models, mapHeader, targetUnique
     } = project;
+    const targetUniques = targetUnique || NaN
     const { graphicList: lists } = models[0];
     const graphicList = JSON.parse(JSON.stringify(lists));
-    // const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A'
     const targetData = (colType[target] !== 'Categorical' && dataViews) ? (dataViews[target] || {}) : {}
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable]
     const variableType = { ...newType, ...colType }
@@ -210,7 +210,7 @@ export default class SimplifiedView extends Component {
           </div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] !== 'Categorical'
-          })}><span>{isNaN(targetUnique) ? 'N/A' : targetUnique}</span></div>
+          })}><span>{isNaN(targetUniques) ? 'N/A' : targetUniques}</span></div>
           <div className={classnames(styles.targetCell, {
             [styles.none]: colType[target] === 'Categorical'
           })} title={this.renderCell(targetData.min, colType[target] === 'Categorical')}>

@@ -690,7 +690,9 @@ const ZH_LAN = {
   R2Learnwillfixtheseissuesautomatically: 'R2 Learn将自动修复这些问题',
   EdittheFixes: '质量修复',
   Datasizewillbesmallerthantheminimumsizeafterdelete: '删除后，数据大小将小于最小行数',
-  Pleaseselecttwovalid: '请选择两个有效类别',
+  Pleaseselect: '请选择',
+  twovalid: '有效类别',
+  ge: '个',
   Selectallvaluesthatmatchas: '请选择把其它类别映射成',
   MATAHC: '',
   Matchas: '映射为',
@@ -1199,10 +1201,10 @@ const ZH_LAN = {
   Scale: "比例",
   distanceInsideCluster: "与类中点的平均距离",
   numberInsideCluster: "样本量",
-  ChartDisplayRange:"图表显示范围",
-  NumberOfCartons:"分箱数量",
-  SetToMinimum:"设置为最小值",
-  SetToMaximum:"设置为最大值",
+  ChartDisplayRange: "图表显示范围",
+  NumberOfCartons: "分箱数量",
+  SetToMinimum: "设置为最小值",
+  SetToMaximum: "设置为最大值",
 };
 
 export default ZH_LAN;

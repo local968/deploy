@@ -848,7 +848,9 @@ const EN_LAN = {
   R2Learnwillfixtheseissuesautomatically: 'R2 Learn will fix these issues automatically',
   EdittheFixes: 'Edit the Fixes',
   Datasizewillbesmallerthantheminimumsizeafterdelete: 'Data size will be smaller than the minimum size after delete',
-  Pleaseselecttwovalid: 'Please select two valid values from all unique values in your target variable',
+  Pleaseselect: 'Please select',
+  twovalid: ' values from all unique values in your target variable',
+  ge: ' ',
   Selectallvaluesthatmatchas: 'Select all values that match as',
   MATAHC: '',
   Matchas: 'Match as ',
@@ -1341,10 +1343,10 @@ const EN_LAN = {
   Scale: "Scale",
   distanceInsideCluster: "Average Distance of Samples Inside the Cluster",
   numberInsideCluster: "Sample Size",
-  ChartDisplayRange:"Chart display range",
-  NumberOfCartons:"Number of cartons",
-  SetToMinimum:"Set to minimum",
-  SetToMaximum:"Set to maximum",
+  ChartDisplayRange: "Chart display range",
+  NumberOfCartons: "Number of cartons",
+  SetToMinimum: "Set to minimum",
+  SetToMaximum: "Set to maximum",
 };
 
 

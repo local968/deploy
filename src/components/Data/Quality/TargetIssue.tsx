@@ -86,7 +86,9 @@ class TargetIssue extends Component<TargetIssueProps> {
       rawDataView,
       targetIssuesCountsOrigin,
       targetArrayTemp,
+      targetUnique
     } = project;
+    const targetUniques = targetUnique || NaN
     const targetIndex = sortHeader.findIndex(h => h === target);
     const isNum = colType[target] === 'Numerical';
     const recomm = !isNum ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
@@ -123,15 +125,17 @@ class TargetIssue extends Component<TargetIssueProps> {
             ),
     };
     const warnings: string[] = [];
+    const unique = rawDataView[target].uniqueValues;
     // const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
-    const unique = targetArrayTemp.length || rawDataView[target].uniqueValues;
-    const hasNull = !targetArrayTemp.length ? !!nullCount : false;
     if (!isNum) {
+      const curUnique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
+      const hasNull = !targetArrayTemp.length ? !!nullCount : false;
+      const isNa = isNaN(targetUniques)
       if (hasNull)
-        warnings.push(`${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`);
-      if (unique < 2 && !hasNull)
-        warnings.push(`${EN.YourtargetvariableHas}${EN.onlyOnevalue}`);
-      if (unique === 2 && !hasNull) {
+        warnings.push(isNa ? EN.Thetargetvariablehassomenoise : `${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`);
+      if (curUnique < targetUniques && !hasNull)
+        warnings.push(targetUniques === 2 ? `${EN.YourtargetvariableHas}${EN.onlyOnevalue}` : `error`);
+      if (curUnique === targetUniques && !hasNull) {
         const min = Math.min(...Object.values(targetCounts));
         if (min < 3) warnings.push(EN.Itisrecommendedthatyou);
       }

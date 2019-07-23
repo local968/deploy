@@ -825,7 +825,7 @@ class Project {
       statement: this.statement,
       business: this.business,
       problemType: this.changeProjectType,
-      targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || ((this.changeProjectType === 'Regression' || this.changeProjectType === 'Clustering') && NaN)
+      targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || ((this.changeProjectType === 'Regression' || this.changeProjectType === 'Clustering') && 0)
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
@@ -1112,9 +1112,9 @@ class Project {
       targetRowIssue: false
     }
     const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, targetIssuesCountsOrigin, targetUnique } = this;
-
+    const targetUniques = targetUnique || NaN
     if (colType[target] === "Categorical") {
-      data.targetIssue = Object.keys(targetCounts).length > targetUnique;
+      data.targetIssue = Object.keys(targetCounts).length > targetUniques;
     } else if (colType[target] === "Numerical") {
       const dataview = Reflect.get(rawDataView, target)
       const unique = dataview.uniqueValues || 1000

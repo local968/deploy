@@ -6,7 +6,7 @@ import { observable } from 'mobx';
 import { Icon, message } from 'antd';
 import EN from '../../../../constant/en';
 import Project from 'stores/Project';
-import {Show} from 'components/Common';
+import { Show } from 'components/Common';
 
 interface ClassificationTargetProps {
   backToConnect: () => void;
@@ -104,18 +104,21 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       totalRawLines,
       renameVariable,
       targetCounts,
-    } = project as any;
-    const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length < 2;
-    const isMore = Object.keys(targetCounts).length > 2;
-    const isGood = targetArrayTemp.length === 2 || (!isLess && !isMore);
+      targetUnique
+    } = project
+    const targetUniques = targetUnique || NaN
+    const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length === 1;
+    const isMore = Object.keys(targetCounts).length > targetUniques;
+    const isNa = isNaN(targetUniques)
+    const isGood = targetArrayTemp.length || (isNaN(targetUniques) ? !Object.keys(targetCounts).includes('') : (!isLess && !isMore));
     const hasNull = !isGood && Object.keys(targetCounts).includes('');
     const error = isLess && !hasNull;
     const nullPercent = ((targetCounts[''] || 0) / (totalRawLines || 1)) * 85;
     const text =
-      (isGood && EN.Targetvariablequalityisgood) ||
-      `${EN.YourtargetvariableHas}${
+      (isGood && EN.Targetvariablequalityisgood) || (isNa ? EN.Thetargetvariablehassomenoise :
+        `${EN.YourtargetvariableHas}${
         error ? EN.onlyOnevalue : EN.Thantwouniquealues
-        }`;
+        }`);
     return (
       <div className={styles.block}>
         <div className={styles.name}>
@@ -160,18 +163,18 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                         {!this.rename ? (
                           <span title={value || 'NULL'}>{value || 'NULL'}</span>
                         ) : (
-                          <input
-                            value={value}
-                            onChange={this.handleRename.bind(null, v)}
-                          />
-                        )}
+                            <input
+                              value={value}
+                              onChange={this.handleRename.bind(null, v)}
+                            />
+                          )}
                       </div>
                       <div className={styles.targetPercentValue}>
                         <div
                           className={styles.targetPercent}
                           style={{ width: percent + '%', backgroundColor }}
                         />
-                        <span title={targetCounts[v]}>{targetCounts[v]}</span>
+                        <span title={targetCounts[v].toString()}>{targetCounts[v]}</span>
                       </div>
                     </div>
                   );
@@ -227,26 +230,26 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
                         </button>
                       </div>
                       <span>({EN.Optional})</span>
-                      {!!targetArrayTemp.length && (
+                      {(!!targetArrayTemp.length || isNa) && (
                         <div className={styles.remapTargetButton}>
                           <button onClick={editTarget}>
-                            <span>{EN.RemapTarget}</span>
+                            <span>{!targetArrayTemp.length ? EN.Fixit : EN.RemapTarget}</span>
                           </button>
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className={styles.cleanTargetRename}>
-                      <div className={styles.cleanTargetButton}>
-                        <button onClick={this.handleSave} className={styles.save}>
-                          <span>{EN.Save}</span>
-                        </button>
-                        <button onClick={this.hideRename}>
-                          <span>{EN.Cancel}</span>
-                        </button>
+                      <div className={styles.cleanTargetRename}>
+                        <div className={styles.cleanTargetButton}>
+                          <button onClick={this.handleSave} className={styles.save}>
+                            <span>{EN.Save}</span>
+                          </button>
+                          <button onClick={this.hideRename}>
+                            <span>{EN.Cancel}</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               )}
             </Show>
