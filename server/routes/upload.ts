@@ -137,7 +137,7 @@ router.post('/sample', (req, res) => {
   redis.get(`file:sample:${filename}`, (err, data) => {
     if (err) return res.json({ status: 201, message: 'file error' });
     if (!data) return res.json({ status: 202, message: 'file not exist' });
-    return res.json({ status: 200, message: 'ok', data: JSON.parse(data) });
+    return res.json({ status: 200, message: 'ok', data: _.isPlainObject(data) ? JSON.parse(data) : data });
   });
   return undefined;
 });
