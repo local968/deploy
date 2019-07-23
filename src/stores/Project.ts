@@ -1435,8 +1435,8 @@ class Project {
           validate = Reflect.get(validateScore, currentMeasurement) //validateScore[currentMeasurement]
           holdout = Reflect.get(holdoutScore, currentMeasurement) //holdoutScore[currentMeasurement]
         } else if (problemType === 'Clustering' || problemType === 'Outlier') {
-          validate = Reflect.get(score, currentMeasurement) || 0 //score[currentMeasurement]
-          holdout = Reflect.get(score, currentMeasurement) || 0 //score[currentMeasurement]
+          validate = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
+          holdout = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
         }
         if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }

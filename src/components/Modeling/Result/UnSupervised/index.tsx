@@ -89,7 +89,7 @@ function ModelResult(props) {
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName;
   // const isDownload = ['DBSCAN', 'Agg', 'MeanShift'].some(v => selectModel.modelName.toString().toLowerCase().startsWith(v.toLowerCase()))
 
-  const cannotDownload = problemType === 'Clustering' && selectModel.dbscanClusters < 2
+  const isNull = problemType === 'Clustering' && selectModel.dbscanClusters < 2
 
   const changeView = view => {
     setView(view);
@@ -223,7 +223,7 @@ function ModelResult(props) {
                 <div className={classes.scores}>
                   <div className={classes.cvnn}>
                     <div className={classes.orange}>
-                      {formatNumber(selectModel.score[measurement])}
+                      {isNull ? 'null' : formatNumber(selectModel.score[measurement])}
                     </div>
                     <span className={classes.label}>
                       {measurementLabel} <Hint content={measurementHint} />
@@ -231,7 +231,7 @@ function ModelResult(props) {
                   </div>
                   <div className={classes.cluster}>
                     <div className={classes.blood}>
-                      {Object.keys(selectModel.labelWithImportance).length}
+                      {isNull ? selectModel.dbscanClusters : Object.keys(selectModel.labelWithImportance).length}
                     </div>
                     <span
                       className={classes.rateLabel}
@@ -242,7 +242,7 @@ function ModelResult(props) {
                   </div>
                   <div className={classes.rSquared}>
                     <div className={classes.green}>
-                      {formatNumber(selectModel.score.RSquared)}
+                      {isNull ? 'null' : formatNumber(selectModel.score.RSquared)}
                     </div>
                     <span
                       className={classes.rateLabel}
@@ -336,7 +336,7 @@ function ModelResult(props) {
               <span>{EN.DeployTheModel}</span>
             </button>
           )}
-        {problemType === 'Clustering' && cannotDownload ? <button
+        {problemType === 'Clustering' && isNull ? <button
           className={`${classes.button} ${classes.disable}`}
           style={{ marginLeft: '.1em' }}
         >
