@@ -75,8 +75,8 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 	}
 
 	getData() {
-		const {title='',field,id,project,} = this.props;
-		const {sliderValue,bin} = this.state;
+		const {title='',field,id,project} = this.props;
+		const {sliderValue,bin,chart=this.chart.getEchartsInstance()} = this.state;
 		const {rawDataView={}} = project;
 		let {min,max,low,high} = rawDataView[field];
 
@@ -95,7 +95,6 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const [rs,re] = sliderValue;
 		// console.log(high,low,bin)
 		// const interval = (Math.max((re-rs)/bin,(re-rs)/9999)).toFixed(2);
-		const chart = this.chart.getEchartsInstance();
 
 		// const interval = Math.max((re-rs) / bin,(re-rs)/9999));
 
@@ -284,6 +283,7 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 	}
 
 	reset(force=false){
+		const {chart} = this.state;
 		const {field,project} = this.props;
 		const {rawDataView={}} = project;
 		let {low,high} = rawDataView[field];
@@ -295,13 +295,15 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		},this.setBrush);
 		if(force){
 			const bin = Math.min(rawDataView[field].doubleUniqueValue, 14);
-      const interval = ((high-low)/bin).toFixed(2);
-      const startValue =  +low - +interval;
-      const endValue =  +high + +interval;
+      // const interval = ((high-low)/bin).toFixed(2);
+			const interval = (high-low)/ 10;
+      const startValue =  +low - 2*+interval;
+      const endValue =  +high + 2*+interval;
       this.setState({
 				sliderValue:[startValue,endValue],
         bin,
       },()=>{
+	      chart.showLoading();
 				this.getData();
 			});
 		}
