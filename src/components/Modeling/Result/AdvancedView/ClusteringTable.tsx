@@ -221,7 +221,9 @@ const ClusteringTableRow = observer((props: ClusteringTableRowProps) => {
         <div className={styles.check}><input type='radio' name='modelRadio' checked={selectModel.id === model.id} onClick={handleClick} onChange={() => { }} /></div>
         <div className={`${styles.cell} ${styles.name}`}>
           <span className={styles.text} title={model.id}>{model.id}</span>
-          <span className={styles.icon}><Icon type='down' style={!!detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
+          <span className={styles.icon} style={isNull ? { cursor: 'not-allowed', color: '#ccc' } : {}} onClick={isNull ? () => { } : handleResult(model.id, 'parallel')}>
+            <Icon type='down' style={!!detail ? { transform: 'rotateZ(180deg)' } : {}} />
+          </span>
         </div>
         <div className={styles.cell}><span className={styles.text} title={moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber((modelScore.CVNN || "null").toString())}>{formatNumber((modelScore.CVNN || "null").toString())}</span></div>

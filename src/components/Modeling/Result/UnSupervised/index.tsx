@@ -282,7 +282,7 @@ function ModelResult(props) {
               {project.problemType === 'Outlier' ? (
                 <ISO />
               ) : (
-                  <D3D2 url={selectModel.multiVarPlotData} />
+                  isNull ? null : <D3D2 url={selectModel.multiVarPlotData} />
                 )}
             </div>
           </div>
@@ -336,7 +336,7 @@ function ModelResult(props) {
               <span>{EN.DeployTheModel}</span>
             </button>
           )}
-        {problemType === 'Clustering' && isNull ? <button
+        {problemType === 'Clustering' && (isNull ? <button
           className={`${classes.button} ${classes.disable}`}
           style={{ marginLeft: '.1em' }}
         >
@@ -354,7 +354,7 @@ function ModelResult(props) {
             >
               <span>{EN.Exportmodelresults}</span>
             </button>
-          </a>
+          </a>)
         }
         {problemType === 'Outlier' && (
           <a
