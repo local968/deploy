@@ -1111,10 +1111,10 @@ class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, targetIssuesCountsOrigin } = this;
+    const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, targetIssuesCountsOrigin, targetUnique } = this;
 
     if (colType[target] === "Categorical") {
-      data.targetIssue = Object.keys(targetCounts).length > 2;
+      data.targetIssue = Object.keys(targetCounts).length > targetUnique;
     } else if (colType[target] === "Numerical") {
       const dataview = Reflect.get(rawDataView, target)
       const unique = dataview.uniqueValues || 1000

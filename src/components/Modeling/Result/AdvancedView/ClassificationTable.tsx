@@ -254,8 +254,8 @@ interface ClassificationRowProps {
 
 const ClassificationRow = observer((props: ClassificationRowProps) => {
   const { model, project, metric, detail, handleDetail } = props
-  const { isHoldout, fbeta, selectModel, defualtRecommendModel, criteria, costOption: { TP, FN, FP, TN } } = project
-  const isRecommend = defualtRecommendModel[0] ? defualtRecommendModel[0].id === model.id : false
+  const { isHoldout, fbeta, selectModel, recommendModel, criteria, costOption: { TP, FN, FP, TN } } = project
+  const isRecommend = recommendModel.id === model.id
   const text =
     criteria === 'cost' && (TP || FN || FP || TN)
       ? EN.BenefitCost

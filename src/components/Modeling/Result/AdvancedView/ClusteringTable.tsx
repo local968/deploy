@@ -190,11 +190,11 @@ interface ClusteringTableRowProps {
 
 const ClusteringTableRow = observer((props: ClusteringTableRowProps) => {
   const { model, project, detail, handleDetail } = props
-  const { selectModel, defualtRecommendModel } = project
+  const { selectModel, recommendModel } = project
   const { score, dbscanClusters } = model
   const isNull = dbscanClusters < 2
   const modelScore = isNull ? {} as Score : score
-  const isRecommend = defualtRecommendModel[0] ? defualtRecommendModel[0].id === model.id : false
+  const isRecommend = recommendModel.id === model.id
   const handleResult = (id: string, type: string) => () => {
     handleDetail(id, type)
   }

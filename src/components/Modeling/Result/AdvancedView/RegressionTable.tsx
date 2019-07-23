@@ -257,12 +257,12 @@ interface RegressionTableRowProps {
 
 const RegressionTableRow = observer((props: RegressionTableRowProps) => {
   const { model, project, metric, detail, handleDetail } = props
-  const { isHoldout, mapHeader, newVariable, selectModel, defualtRecommendModel } = project
+  const { isHoldout, mapHeader, newVariable, selectModel, recommendModel } = project
   const { score } = model
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
 
   const modelScore = isHoldout ? score.holdoutScore : score.validateScore
-  const isRecommend = defualtRecommendModel[0] ? defualtRecommendModel[0].id === model.id : false
+  const isRecommend = recommendModel.id === model.id
   const handleResult = (id) => () => {
     handleDetail(id)
   }
