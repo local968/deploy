@@ -35,6 +35,9 @@ class SelectTarget extends Component<SelectTargetProps> {
     if (!(arr.length > targetUniques) && !(arr.length < targetUniques)) {
       canSave = true
     }
+    //修改后重置
+    this.belongTo = []
+    this.belong = -1
     this.checked = arr
     this.canSave = canSave
   }
@@ -103,6 +106,16 @@ class SelectTarget extends Component<SelectTargetProps> {
     this.step--
   }
 
+  handleSelectAll = (e) => {
+    const checked = e.target.checked
+    if (!checked) return this.belongTo = { ...this.belongTo, [this.belong]: [] }
+    const { project } = this.props
+    const allKeys: string[] = Object.keys(project.targetColMap).filter(k => !this.checked.includes(k))
+    const currentBelong: string[] = Object.values(this.belongTo).reduce((prev: string[], item: undefined | string[], index: number) => index === this.belong ? prev : [...prev, ...(item || [])], [] as string[])
+    const belongs = allKeys.filter(k => !currentBelong.includes(k))
+    this.belongTo = { ...this.belongTo, [this.belong]: belongs }
+  }
+
   render() {
     const { closeTarget, project } = this.props;
 
@@ -115,6 +128,8 @@ class SelectTarget extends Component<SelectTargetProps> {
     const hasNull = Object.keys(targetColMap).includes('')
     const nullPercent = (nullLineCounts[target] || 0) / (totalRawLines || 1) * 85
     const disabledArray: string[] = this.belong < 0 ? Object.keys(targetColMap) : currentBelong.filter(b => !(this.belongTo[this.belong] || []).includes(b))
+    const isSelectAll = (currentBelong.length + this.checked.length) === Object.keys(targetColMap).length
+    const disableSelectAll = this.belong < 0 || (isSelectAll && (!this.belongTo[this.belong] || !this.belongTo[this.belong].length))
 
     return <div className={styles.fixesContent}>
       {this.step === 1 && <div className={styles.fixesBox}>
@@ -171,6 +186,10 @@ class SelectTarget extends Component<SelectTargetProps> {
             </div>
           })}
           {!!Object.keys(targetColMap).filter(_k => _k !== '').filter(v => !checked.includes(v)).length && <div className={styles.fixesCheckBox}>
+            <div className={styles.fixedSelectAll}>
+              <input type='checkbox' id={'fixedSelectAll'} checked={!disableSelectAll && isSelectAll} disabled={disableSelectAll} onChange={disableSelectAll ? null : this.handleSelectAll} />
+              <label htmlFor={'fixedSelectAll'}>{EN.SelectAll}</label>
+            </div>
             {Object.keys(targetColMap).filter(_k => _k !== '').filter(v => !checked.includes(v)).map((t, i) => {
               const disabled = disabledArray.includes(t)
               return <div className={styles.fixesCheck} key={i}>

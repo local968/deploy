@@ -430,9 +430,9 @@
 	display: flex;
 	flex: none;
 	flex-wrap: wrap;
-	margin: 0.2em 0 0.1em;
-	max-height: 1.3em;
-	min-height: 0.8em;
+	padding: 0.2em 0 0.1em;
+	max-height: 1.6em;
+	min-height: 1.1em;
 	overflow-x: hidden;
 	overflow-y: auto;
 	position: relative;
@@ -1349,4 +1349,27 @@ button.activeButton span {
 	margin: 0 -.05em;
 	flex-wrap: nowrap;
 	justify-content: space-around;
+}
+
+.fixedSelectAll {
+	display: flex;
+	flex: none;
+	position: absolute;
+	align-items: center;
+	right: 0;
+	top: 0;
+}
+
+.fixedSelectAll input {
+	width: 0.16em;
+	height: 0.16em;
+	cursor: pointer;
+}
+
+.fixedSelectAll label {
+	font-family: Arial;
+	font-size: 0.875rem;
+	color: #4a4a4a;
+	line-height: 1.2;
+	cursor: pointer;
 }
