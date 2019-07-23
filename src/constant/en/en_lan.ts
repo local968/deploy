@@ -1262,8 +1262,8 @@ const EN_LAN = {
   Groupby_example: 'Groupby(@duration, [@job], [sum, median])',
   Groupby_example1: 'Groupby(@duration, [@job, @education], [mean, min])',
   Groupby_example2: 'Groupby(@job, [@education])',
-  Minimum: 'Minimum',
-  Maximum: 'Maximum',
+  Minimum: 'Minimum lower bound',
+  Maximum: 'Maximum upper bound',
   TargetMore2Unique: "Target has more than 2 unique values",
   Areyousuretodeletethismodeldeployment: 'Are you sure to delete this model deployment? This action cannot be recovered.',
   DropTheRows: 'Drop the rows',
@@ -1338,9 +1338,13 @@ const EN_LAN = {
   dispalyNull: '(Null)',
   Pleaseenterbenefitandcostins: 'The number entered can have 2 decimal places max. Both the benefit and cost inputs must be in positive values.',
   CurrentScale: "Current scale",
-  Scale: "Scale",          
+  Scale: "Scale",
   distanceInsideCluster: "Average Distance of Samples Inside the Cluster",
-  numberInsideCluster: "Sample Size"
+  numberInsideCluster: "Sample Size",
+  ChartDisplayRange:"Chart display range",
+  NumberOfCartons:"Number of cartons",
+  SetToMinimum:"Set to minimum",
+  SetToMaximum:"Set to maximum",
 };
 
 

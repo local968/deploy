@@ -997,8 +997,8 @@ const ZH_LAN = {
   PrecisionRecallTradeoff: '精准率召回率曲线',
   KindlyReminder: '提示',
   Null: '缺失值',
-  VariableFormula: '创建新变量',
-  FormField: '变量',
+  VariableFormula: '新建变量',
+  FormField: '可选变量',
   ProjectDescription: '函数功能说明',
   base: '基础函数',
   senior: 'R2自定义函数',
@@ -1128,8 +1128,8 @@ const ZH_LAN = {
   Groupby_example: 'Groupby(@duration, [@job], [sum, median])',
   Groupby_example1: 'Groupby(@duration, [@job, @education], [mean, min])',
   Groupby_example2: 'Groupby(@job, [@education])',
-  Minimum: '最小值',
-  Maximum: '最大值',
+  Minimum: '最小值下界',
+  Maximum: '最大值上界',
   TargetMore2Unique: "目标变量类别数量超过2个",
   Areyousuretodeletethismodeldeployment: '您确定要删除此模型部署吗？ 此操作无法恢复。',
   DropTheRows: '删除整行',
@@ -1198,7 +1198,11 @@ const ZH_LAN = {
   CurrentScale: "当前比例",
   Scale: "比例",
   distanceInsideCluster: "与类中点的平均距离",
-  numberInsideCluster: "样本量"
+  numberInsideCluster: "样本量",
+  ChartDisplayRange:"图表显示范围",
+  NumberOfCartons:"分箱数量",
+  SetToMinimum:"设置为最小值",
+  SetToMaximum:"设置为最大值",
 };
 
 export default ZH_LAN;

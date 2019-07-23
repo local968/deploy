@@ -2,7 +2,7 @@ import React, { ChangeEvent, KeyboardEvent, Fragment, MouseEvent } from 'react';
 import { makeStyles } from '@material-ui/styles';  //Coordinate
 import { FormControl, Input } from '@material-ui/core';//Input, InputAdornment,
 // import Fade from '@material-ui/core/Fade';
-import { Exp, Coordinate, Type } from './model/Coordinate';
+import { Exp, Coordinate, Type } from './types/Coordinate';
 import _ from 'lodash'
 // import Suggestion from './Suggestion';
 

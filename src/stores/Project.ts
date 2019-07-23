@@ -10,7 +10,7 @@ import axios from 'axios'
 import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
-import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
+import { Coordinate } from "components/CreateNewVariable/types/Coordinate";
 import { when } from "q";
 
 export interface Stats {

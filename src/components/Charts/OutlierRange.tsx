@@ -28,11 +28,11 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const {rawDataView={}} = project;
 		let {low,high} = rawDataView[field];
 		const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 10);
-		// const interval = (Math.max((high-low)/bin,(max-min)/9999)).toFixed(2);
+		const interval = ((high-low)/bin).toFixed(2);
 		// const interval = (Math.max((high-low)/bin,(re-rs)/9999)).toFixed(2);
 
-		const startValue =  +low-Math.abs(low)*0.1;
-		const endValue =  +high+Math.abs(high)*0.1;
+		const startValue =  +low - +interval;
+		const endValue =  +high + +interval;
 		this.state = {
 			max:null,
 			min:0,
@@ -46,7 +46,8 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		};
 		this.chart = React.createRef();
 		this.setSelectArea = debounce(this.setSelectArea, 10);
-		this.setSlider = debounce(this.setSlider, 1000);
+    this.setSlider = debounce(this.setSlider, 1000);
+    this.getData = debounce(this.getData, 1000);
 	}
 
 	componentDidMount() {
@@ -197,8 +198,8 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const [startValue,endValue] = sliderValue;
 		return {
 			xAxis: {
-				min:Math.min(startValue,+min- +interval),
-				max:Math.max(endValue,+max+ +interval),
+				min:Math.min(startValue,+min- 2 * +interval),
+				max:Math.max(endValue,+max+ 2 * +interval),
 				scale: true,
 				nameTextStyle,
 				axisLabel:{
@@ -281,27 +282,37 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const {field,project} = this.props;
 		const {rawDataView={}} = project;
 		let {low,high} = rawDataView[field];
-		const startValue =  +low-Math.abs(low)*0.1;
-		const endValue =  +high+Math.abs(high)*0.1;
-		this.setState({
+		// const startValue =  +low-Math.abs(low)*0.1;
+		// const endValue =  +high+Math.abs(high)*0.1;
+
+    this.setState({
 			selectArea:[low,high],
 		},this.setBrush);
 		if(force){
-			this.setState({
+      const bin = Math.min(rawDataView[field].doubleUniqueValue, 10);
+      const interval = ((high-low)/bin).toFixed(2);
+      const startValue =  +low - +interval;
+      const endValue =  +high + +interval;
+      this.setState({
 				sliderValue:[startValue,endValue],
-			},()=>{
+        bin,
+      },()=>{
 				this.getData();
 			});
 		}
 	}
 
 	render(){
-		const {max,min,selectArea} = this.state;
+		const {selectArea,sliderValue,interval=0,bin} = this.state;
+    const {field,project} = this.props;
+    const {min,max} = project.rawDataView[field];
 		const [start,end] = selectArea;
 		const {closeEdit,saveEdit} = this.props;
 		const _low = Math.max(min,start).toFixed(2);
 		const _high = Math.min(max,end).toFixed(2);
-		return [
+    const [startValue,endValue] = sliderValue;
+
+    return [
 			<div key="div" className={styles.outlierTop}>
 				<div>{EN.Minimum}:<InputNum
 					min={+min}
@@ -340,6 +351,60 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 			theme='customed'
 			key="'chart"
 			/>,
+      <div className={styles.outlierRanged} key='pva' id='pva'>
+        <div className={styles.minmax}>
+          {EN.ChartDisplayRange}:
+          <section>
+            <InputNum
+              min={+(Math.min(startValue,+min- 2 * +interval))}
+              max={endValue}
+              precision={3}
+              value={startValue}
+              style={{ minWidth: 100,marginLeft:20 }}
+              onChange={min=>{
+                if(min>=endValue){
+                  min = endValue - 0.0001
+                }
+                return this.setSlider([min,endValue]);
+              }}
+            />
+            <a href="javascript:" onClick={()=>this.setSlider([+(Math.min(startValue,+min- 2 * +interval)),endValue])}>{EN.SetToMinimum}</a>
+          </section>
+          <span>~</span>
+          <section>
+            <InputNum
+              min={startValue}
+              max={+(Math.max(endValue,+max+ 2 * +interval))}
+              precision={3}
+              value={endValue}
+              style={{ minWidth: 100 }}
+              onChange={max=>{
+                if(max<=startValue){
+                  max = startValue + 0.0001
+                }
+                return this.setSlider([startValue,max]);
+              }}
+            />
+            <a href="javascript:" onClick={()=>this.setSlider([startValue,+(Math.max(endValue,+max+ 2 * +interval))])}>{EN.SetToMaximum}</a>
+          </section>
+        </div>
+
+        <div>
+          {EN.NumberOfCartons}:<InputNum
+          min={1}
+          max={10000}
+          precision={0}
+          value={bin}
+          style={{ width: 100 }}
+          onChange={bin=>{
+            this.setState({
+              bin
+            },()=>this.getData())
+          }}
+        />(&lt;=10,000)
+          {/*<button className={styles.save} onClick={()=>saveEdit([_low,_high])}><span style={{color:'#fff'}}>{EN.Apply}</span></button>*/}
+        </div>
+      </div>,
 			<div key='bottom' className={styles.fixesBottom}>
 				<button className={styles.save} onClick={()=>saveEdit([_low,_high])}><span style={{color:'#fff'}}>{EN.Apply}</span></button>
 				<button className={styles.cancel} onClick={closeEdit}><span>{EN.Cancel}</span></button>

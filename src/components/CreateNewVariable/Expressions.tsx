@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
-import {Exp, Coordinate, Type} from './model/Coordinate';
+import {Exp, Coordinate, Type} from './types/Coordinate';
 import Expression from './Expression'
 import _ from 'lodash'
 import EN from '../../constant/en'
