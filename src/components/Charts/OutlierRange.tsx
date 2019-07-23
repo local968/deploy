@@ -317,8 +317,6 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const _high = Math.min(_max,end).toFixed(2);
     const [startValue,endValue] = sliderValue;
 
-    console.log(_low,_min,start)
-
     return [
 			<div key="div" className={styles.outlierTop}>
 				<div>{EN.Minimum}:<InputNum
