@@ -271,8 +271,7 @@ wss.register('newEtl', async (message, socket, process) => {
   if (project.target) {
     stats[project.target].isTarget = true;
     if (
-      project.problemType === 'Classification' ||
-      project.problemType === 'Outlier'
+      project.problemType !== 'Regression'
     ) {
       let deletedValues = [];
       if (project.targetArray && project.targetArray.length > 1) {
