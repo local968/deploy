@@ -27,12 +27,14 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const {field,project} = props;
 		const {rawDataView={}} = project;
 		let {low,high} = rawDataView[field];
-		const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 10);
-		const interval = ((high-low)/bin).toFixed(2);
+		const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 14);
+		const interval = (high-low)/ 10;
+		// const interval = ((high-low)/bin).toFixed(2);
 		// const interval = (Math.max((high-low)/bin,(re-rs)/9999)).toFixed(2);
 
-		const startValue =  +low - +interval;
-		const endValue =  +high + +interval;
+		const startValue =  +low - 2 * +interval;
+		const endValue =  +high + 2 *+interval;
+		// interval = (endValue-startValue) / bin;
 		this.state = {
 			max:null,
 			min:0,
@@ -91,8 +93,13 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		// const bin = Math.min(project.rawDataView[field].doubleUniqueValue, 10);
 		// const interval = (Math.max((high-low)/bin,(max-min)/9999)).toFixed(2);
 		const [rs,re] = sliderValue;
-		const interval = (Math.max((high-low)/bin,(re-rs)/9999)).toFixed(2);
+		// console.log(high,low,bin)
+		// const interval = (Math.max((re-rs)/bin,(re-rs)/9999)).toFixed(2);
 		const chart = this.chart.getEchartsInstance();
+
+		// const interval = Math.max((re-rs) / bin,(re-rs)/9999));
+
+		const interval = (re-rs) / bin;
 
 		request.post({
 			url: '/graphics/outlier-range',
@@ -106,8 +113,8 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 
 			this.setState({
 				title,
-				min:(Math.min(+(min),low)).toFixed(3),
-				max:(Math.max(+(min),high)).toFixed(3),
+				min:(Math.max(+min,+low)).toFixed(3),
+				max:(Math.min(+max,+high)).toFixed(3),
 				selectArea,
 				data:result.data,
 				chart,
@@ -155,12 +162,10 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		});
 	}
 
-
-
 	getOption() {
 		const {ready,data,interval,sliderValue:_sliderValue} = this.state;
 		const {field,project} = this.props;
-		const {min,max,low,high} = project.rawDataView[field];
+		const {min,max} = project.rawDataView[field];
 		if(!ready){
 			return {
 				xAxis:{},
@@ -206,17 +211,17 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 					interval:0,
 					rotate:10,
 					formatter:num=>{
-						if(+num>100000){
+						if(+num>1000000){
 							const p = Math.floor(Math.log(+num) / Math.LN10).toFixed(3);
 							const n = (+num * Math.pow(10, -p)).toFixed(3);
 							return +n + 'e+' + +p;
-						}else if(+num<-100000){
+						}else if(+num<-1000000){
 							num = -num;
 							const p = Math.floor(Math.log(+num) / Math.LN10).toFixed(3);
 							const n = (+num * Math.pow(10, -p)).toFixed(3);
 							return '-'+n + 'e+' + +p;
 						}
-						return num;
+						return num.toFixed(3);
 					}
 				},
 			},
@@ -289,7 +294,7 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 			selectArea:[low,high],
 		},this.setBrush);
 		if(force){
-      const bin = Math.min(rawDataView[field].doubleUniqueValue, 10);
+			const bin = Math.min(rawDataView[field].doubleUniqueValue, 14);
       const interval = ((high-low)/bin).toFixed(2);
       const startValue =  +low - +interval;
       const endValue =  +high + +interval;
@@ -303,20 +308,22 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 	}
 
 	render(){
-		const {selectArea,sliderValue,interval=0,bin} = this.state;
+		const {selectArea,sliderValue,interval=0,bin,min:_min,max:_max} = this.state;
     const {field,project} = this.props;
     const {min,max} = project.rawDataView[field];
 		const [start,end] = selectArea;
 		const {closeEdit,saveEdit} = this.props;
-		const _low = Math.max(min,start).toFixed(2);
-		const _high = Math.min(max,end).toFixed(2);
+		const _low = Math.max(_min,start).toFixed(2);
+		const _high = Math.min(_max,end).toFixed(2);
     const [startValue,endValue] = sliderValue;
+
+    console.log(_low,_min,start)
 
     return [
 			<div key="div" className={styles.outlierTop}>
 				<div>{EN.Minimum}:<InputNum
-					min={+min}
-					max={+max}
+					min={+_min}
+					max={+_max}
 					step={0.01}
 					precision={2}
 					value={+_low||0}
@@ -328,8 +335,8 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 					}}
 				/></div>
 				<div>{EN.Maximum}:<InputNum
-					min={+min}
-					max={+max}
+					min={+_min}
+					max={+_max}
 					step={0.01}
 					precision={2}
 					value={+_high||0}
