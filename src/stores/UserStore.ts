@@ -40,7 +40,7 @@ class UserStore {
   }
 
   getStatus(){
-    axios.get(`/user/status`).then(action(res => {
+    axios.get(`/user/status`).then(action((res: any) => {
       if (res.data.status === 200&&res.data.info.role) {
         this.info = res.data.info;
         if(res.data.info.role.project === false&&location.pathname==='/'){
@@ -62,25 +62,11 @@ class UserStore {
   }
 
   login(params, props=null) {
-    axios.post(`/user/login`, params).then(action(res => {
-      if (res.data.status === 200) {
-        this.info = res.data.info;
-        this.status = 'login';
-        props && props.history.push({
-          pathname: '/support', state: {
-            key
-              : 'loginTo'
-          }
-        });
-        this.getStatus();
-      } else {
-        alert(res.data.message || 'Login failure')
-      }
-    }))
+    return axios.post(`/user/login`, params)
   }
 
   register(params) {
-    axios.post(`/user/register`, params).then(action(res => {
+    axios.post(`/user/register`, params).then(action((res: any) => {
       if (res.data.status === 200) {
         this.info = res.data.info;
         this.status = 'login';
@@ -92,7 +78,7 @@ class UserStore {
   }
 
   getPlanList() {
-    axios.get(`//${config.host}:${config.port}/user/plans`).then(action(res => {
+    axios.get(`//${config.host}:${config.port}/user/plans`).then(action((res: any) => {
       if (res.data.status === 200) {
         this.planList = res.data.info;
       } else {
@@ -102,7 +88,7 @@ class UserStore {
   }
 
   logout() {
-    axios.delete(`/user/logout`).then(action(res => {
+    axios.delete(`/user/logout`).then(action((res: any) => {
       if (res.data.status === 200) {
         this.status = 'unlogin';
         this.labUrl = '';
