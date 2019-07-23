@@ -741,12 +741,13 @@ span.fixesEdit {
 .targetPercentBox {
 	display: flex;
 	flex: none;
-	margin: .2em 0;
+	padding: .2em 0;
 	flex-direction: column;
-	max-height: 4em;
+	max-height: 4.4em;
 	overflow-x: hidden;
 	overflow-y: auto;
 	width: 100%;
+	position: relative;
 }
 
 .targetPercentRow {

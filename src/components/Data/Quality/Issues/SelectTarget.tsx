@@ -116,6 +116,24 @@ class SelectTarget extends Component<SelectTargetProps> {
     this.belongTo = { ...this.belongTo, [this.belong]: belongs }
   }
 
+  handleCheckedAll = (e) => {
+    const checked = e.target.checked
+    //修改后重置
+    this.belongTo = []
+    this.belong = -1
+    if (!checked) {
+      this.checked = []
+      this.canSave = false
+      return
+    }
+    const { project } = this.props
+    const allKeys: string[] = Object.keys(project.targetColMap)
+    this.checked = allKeys
+    this.canSave = true
+  }
+
+  emFn = () => { }
+
   render() {
     const { closeTarget, project } = this.props;
 
@@ -130,11 +148,16 @@ class SelectTarget extends Component<SelectTargetProps> {
     const disabledArray: string[] = this.belong < 0 ? Object.keys(targetColMap) : currentBelong.filter(b => !(this.belongTo[this.belong] || []).includes(b))
     const isSelectAll = (currentBelong.length + this.checked.length) === Object.keys(targetColMap).length
     const disableSelectAll = this.belong < 0 || (isSelectAll && (!this.belongTo[this.belong] || !this.belongTo[this.belong].length))
+    const checkedAll = this.checked.length === Object.keys(targetColMap).length
 
     return <div className={styles.fixesContent}>
       {this.step === 1 && <div className={styles.fixesBox}>
         <div className={styles.fixesText}><span>{EN.Pleaseselect}{isNa ? '' : `${targetUniques}${EN.ge}`}{EN.twovalid}</span></div>
         <div className={styles.targetPercentBox}>
+          {isNa && <div className={styles.fixedSelectAll}>
+            <input type='checkbox' id={'fixedSelectAll'} checked={checkedAll} onChange={isNa ? this.handleCheckedAll : this.emFn} />
+            <label htmlFor={'fixedSelectAll'}>{EN.SelectAll}</label>
+          </div>}
           {Object.keys(targetColMap).filter(_k => _k !== '').map((v, k) => {
             const percent = (colValueCounts[target][v] || 0) / (totalRawLines || 1) * 85
             const backgroundColor = (k === 0 && '#9be44b') || (k === 1 && '#adaafc') || '#c4cbd7'
@@ -170,7 +193,7 @@ class SelectTarget extends Component<SelectTargetProps> {
         <div className={styles.fixesTips}><span></span></div>
       </div>}
       {this.step === 2 && <div className={styles.fixesBox}>
-        <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{checked.map(v => v || 'NULL').join(EN.Or)}{EN.MATAHC} </span></div>
+        <div className={styles.fixesText}><span>{EN.Selectallvaluesthatmatchas}{checked.slice(0, -1).map(v => ` ${v || 'NULL'}`).join(',')}{EN.MATAHC}{EN.Or}{EN.MATAHC}{checked[checked.length - 1] || 'NULL'}</span></div>
         <div className={styles.targetPercentBox}>
           {this.checked.map((t, i) => {
             const percent = ((t === '' ? nullLineCounts[target] : colValueCounts[target][t]) || 0) / (totalRawLines || 1) * 85
@@ -187,13 +210,13 @@ class SelectTarget extends Component<SelectTargetProps> {
           })}
           {!!Object.keys(targetColMap).filter(_k => _k !== '').filter(v => !checked.includes(v)).length && <div className={styles.fixesCheckBox}>
             <div className={styles.fixedSelectAll}>
-              <input type='checkbox' id={'fixedSelectAll'} checked={!disableSelectAll && isSelectAll} disabled={disableSelectAll} onChange={disableSelectAll ? null : this.handleSelectAll} />
+              <input type='checkbox' id={'fixedSelectAll'} checked={!disableSelectAll && isSelectAll} disabled={disableSelectAll} onChange={disableSelectAll ? this.emFn : this.handleSelectAll} />
               <label htmlFor={'fixedSelectAll'}>{EN.SelectAll}</label>
             </div>
             {Object.keys(targetColMap).filter(_k => _k !== '').filter(v => !checked.includes(v)).map((t, i) => {
               const disabled = disabledArray.includes(t)
               return <div className={styles.fixesCheck} key={i}>
-                <input type='checkbox' value={t} id={`belong${t}`} checked={currentBelong.includes(t)} disabled={disabled} onChange={disabled ? null : this.handleCheck} />
+                <input type='checkbox' value={t} id={`belong${t}`} checked={currentBelong.includes(t)} disabled={disabled} onChange={disabled ? this.emFn : this.handleCheck} />
                 <label className={classnames(styles.fixesCheckBoxLabel, {
                   [styles.disabledText]: disabled
                 })} htmlFor={`belong${t}`}>{t}</label>
@@ -204,7 +227,7 @@ class SelectTarget extends Component<SelectTargetProps> {
           {(hasNull && !checked.includes('')) && <div className={styles.targetPercentBox}>
             <div className={styles.targetPercentRow} key={`missing${this.step}`}>
               <div className={styles.targetPercentCheckBox}>
-                <input type='checkbox' value={''} id={`belong`} checked={currentBelong.includes('')} disabled={disabledArray.includes('')} onChange={disabledArray.includes('') ? null : this.handleCheck} />
+                <input type='checkbox' value={''} id={`belong`} checked={currentBelong.includes('')} disabled={disabledArray.includes('')} onChange={disabledArray.includes('') ? this.emFn : this.handleCheck} />
               </div>
               <div className={styles.targetPercentLabel}>
                 <span>{'NULL'}</span>
