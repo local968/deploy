@@ -111,7 +111,7 @@ class Summary extends Component<SummaryProps> {
             </div>
           </div>
         </div>}
-        <div className={styles.summaryTable} style={{ paddingRight: '.2em', maxHeight: isUnsupervised ? '4em' : '3em' }}>
+        <div className={styles.summaryTable} style={{ paddingRight: '.2em', maxHeight: isUnsupervised ? '4em' : '3em', marginTop: isUnsupervised ? '10px' : 0 }}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
@@ -124,7 +124,7 @@ class Summary extends Component<SummaryProps> {
             </div>
           </div>
         </div>
-        <div className={styles.summaryTable} style={{ overflow: 'scroll' }}>
+        <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
             {variableList.map((v, k) => {
               const percent = percentList[k]

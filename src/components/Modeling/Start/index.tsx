@@ -18,7 +18,7 @@ interface StartTrainInterface {
 @inject('projectStore','userStore')
 @observer
 export default class StartTrain extends Component<StartTrainInterface> {
-  @observable visible = true;
+  @observable visible = false;
 
   fastTrain(run=true){
     if(!run)return;

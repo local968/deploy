@@ -135,7 +135,7 @@ class Summary extends Component {
             </div>
           </div>
         </div>
-        <div className={styles.summaryTable} style={{ overflow: 'scroll' }}>
+        <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
             {variableList.map((v, k) => {
               const percent = percentList[k + 1]

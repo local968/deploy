@@ -22,7 +22,7 @@ export default class SimplifiedView extends Component<Interface> {
   @observable sort = -1;
   @observable showHistograms = false;
   @observable showCorrelation = false;
-  @observable visible = true;
+  @observable visible = false;
   @observable chartData = {};
   @observable result = {};
   @observable CorrelationMatrixData = {};
