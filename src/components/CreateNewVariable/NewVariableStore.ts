@@ -3,8 +3,13 @@ import { observable } from 'mobx';
 import { Type } from './types/Coordinate';
 import EN from '../../constant/en';
 
-class NewVariableStore {
-  @observable variables = {
+export interface InterfaceFunctions {
+  base: any;
+  senior: any;
+}
+
+export class NewVariableStore {
+  @observable functions: InterfaceFunctions = {
     base: [
       {
         name: 'Exp',

@@ -15,6 +15,7 @@ import {
 import { MuiCard } from './MuiModule';
 
 import { Search } from '@material-ui/icons';
+import { blue, cyan, orange } from '@material-ui/core/colors';
 
 import { Coordinate } from '../types/Coordinate';
 
@@ -25,15 +26,25 @@ const useStyles = makeStyles({
   },
   textFiled: {
     width: '100%',
-    marginTop: 8,
-    padding: '0 16px',
+    marginTop: '0.5rem',
+    padding: '0 1rem',
   },
   textBadge: {
     display: 'inline-block',
-    color: '#0DB3A6',
-    background: 'rgba(13,179,166,.1)',
-    padding: '0 8px',
-    borderRadius: 10,
+    paddingRight: '0.5rem',
+    paddingLeft: '0.5rem',
+    borderRadius: '0.75rem',
+    fontSize: '0.875rem',
+    color: '#000',
+  },
+  categorical: {
+    backgroundColor: blue[100],
+  },
+  numerical: {
+    backgroundColor: cyan[100],
+  },
+  raw: {
+    backgroundColor: orange[100],
   },
 });
 
@@ -88,7 +99,9 @@ function Variables(props: VariablesProps) {
           >
             <ListItemText primary={v.name} />
             <ListItemSecondaryAction>
-              <span className={classes.textBadge}>连续变量</span>
+              <span className={`${classes.textBadge} ${classes[v.varType]}`}>
+                {v.varType}
+              </span>
             </ListItemSecondaryAction>
           </ListItem>
         ))}

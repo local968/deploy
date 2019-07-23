@@ -28,7 +28,7 @@ const useStyles = makeStyles({
   textFiled: {
     width: '100%',
     marginTop: 8,
-    padding: '0 16px',
+    padding: '0 1rem',
   },
   listItemTitle: {
     fontWeight: 'bold',
@@ -100,34 +100,34 @@ function Functions(props: InterfaceFunctionProps) {
         }}
       />
       <List component={'div'} dense disablePadding className={classes.list}>
-        {_.map(values, (v, k) => (
-          <>
+        {_.map(values, (v, i) => (
+          <div key={i}>
             <ListItem
               button
               component={'div'}
-              key={k}
-              onClick={() => onCosClick(k)}
+              onClick={() => onCosClick(i)}
             >
-              <ListItemText primary={Reflect.get(EN, k)} className={classes.listItemTitle} disableTypography={true}/>
-              {state[k] ? <ExpandMore /> : <ExpandLess />}
+              <ListItemText primary={Reflect.get(EN, i)} className={classes.listItemTitle} disableTypography={true}/>
+              {state[i] ? <ExpandMore /> : <ExpandLess />}
             </ListItem>
-            <Collapse in={state[k]} unmountOnExit key={k + 'col'}>
+            <Collapse in={state[i]} unmountOnExit>
               <List component={'div'} dense disablePadding>
-                {_.map(v, (coor: Coordinate, i: number) => {
+                {_.map(v, (val: Coordinate, index: number) => {
                   return (
                     <ListItem
                       button
                       component={'div'}
-                      key={i}
+                      key={`${i}-${index}`}
                       className={classes.nested}
+                      onMouseOver={() => onMouseOver(val.value)}
                     >
-                      <ListItemText primary={coor.name} />
+                      <ListItemText primary={val.name} />
                     </ListItem>
                   );
                 })}
               </List>
             </Collapse>
-          </>
+          </div>
         ))}
       </List>
     </MuiCard>

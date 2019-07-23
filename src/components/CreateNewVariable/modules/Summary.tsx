@@ -1,17 +1,23 @@
-import React from 'react';
-import { Paper } from '@material-ui/core';
+import * as React from 'react';
+
 import { makeStyles } from '@material-ui/styles';
+
+import { MuiCard } from './MuiModule';
+import { Paper } from '@material-ui/core';
+
 import details from '../details';
+
 import { Detail } from '../types/Coordinate';
 import FunctionTips from '../FunctionTips';
 
 const useStyles = makeStyles({
   detail: {
-    height: '500px',
+    height: 526,
     overflowY: 'auto',
     overflowX: 'hidden',
     textAlign: 'left',
-    paddingLeft: 16,
+    margin: '.75rem 0',
+    padding: '1rem'
   },
 });
 
@@ -21,20 +27,24 @@ export interface SummaryProps {
 
 function Summary(props: SummaryProps) {
   const classes = useStyles({});
+
   const { detailKey } = props;
+
   const current: Detail | undefined = details.find(d => d.name === detailKey);
-  // console.log(current)
+
   return (
-    <Paper className={classes.detail} elevation={0} square={true}>
-      {current ? (
-        <div>
-          <h3>{current.name}</h3>
-          <p dangerouslySetInnerHTML={{ __html: current.value }} />
-        </div>
-      ) : (
-        <FunctionTips value={detailKey} />
-      )}
-    </Paper>
+    <MuiCard>
+      <Paper className={classes.detail} elevation={0} square={true}>
+        {current ? (
+          <>
+            <h3>{current.name}</h3>
+            <p dangerouslySetInnerHTML={{ __html: current.value }} />
+          </>
+        ) : (
+          <FunctionTips value={detailKey} />
+        )}
+      </Paper>
+    </MuiCard>
   );
 }
 

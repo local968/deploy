@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles({
   card: {
-    paddingBottom: 8,
+    paddingBottom: '.5rem',
     border: '1px solid #b5c2d8',
   },
 });

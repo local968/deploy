@@ -1,11 +1,12 @@
 import * as React from 'react';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 
 // modules
 import { MuiDialog } from './modules/MuiModule';
 import NewVariableView from './NewVariableView';
 
-import stores from './NewVariableStore';
+import varStores, { NewVariableStore } from './NewVariableStore';
 
 // types
 import { DialogProps } from '@material-ui/core/Dialog';
@@ -40,6 +41,8 @@ export default class CreateNewVariableModule extends React.Component<
           open,
           title,
           onClose,
+          maxWidth: 'lg',
+          fullWidth: true,
         }}
         disableBackdropClick
       >
@@ -51,7 +54,7 @@ export default class CreateNewVariableModule extends React.Component<
             expression,
             addNewVariable,
           }}
-          stores={stores}
+          {...toJS(varStores as NewVariableStore)}
         />
       </MuiDialog>
     );

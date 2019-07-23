@@ -73,7 +73,8 @@ export default class MuiDialog extends React.Component<
       scroll = 'body',
       onClose,
       disableBackdropClick = false,
-      maxWidth = 'lg',
+      maxWidth = 'sm',
+      fullWidth = false,
     } = this.props;
 
     return (
@@ -82,6 +83,7 @@ export default class MuiDialog extends React.Component<
         scroll={scroll}
         disableBackdropClick={disableBackdropClick}
         open={open}
+        fullWidth={fullWidth}
         maxWidth={maxWidth}
         onClose={onClose}
       >
