@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
-import { ContinueButton, Modal, ProcessLoading, Table, Confirm, Show } from 'components/Common';
+import { ContinueButton, Modal, ProcessLoading, Switch, Table, Confirm, Show } from 'components/Common';
 import { observable } from 'mobx';
 import FixIssue from './Issues/FixIssue'
 import Summary from './Summary'
@@ -21,6 +21,10 @@ class VariableIssue extends Component<VariableIssueProps> {
   @observable visible = false;
   @observable summary = false;
   @observable warning = false;
+  @observable missing = [];
+  @observable mismatch = [];
+  @observable outlier = [];
+  @observable multiMode = false;
 
   backToConnect = () => {
     const { updateProject, nextSubStep } = this.props.project;
@@ -77,10 +81,23 @@ class VariableIssue extends Component<VariableIssueProps> {
       variableIssues,
       problemType,
       mapHeader,
-      target
+      target,
+      reloadData
     } = this.props.project;
+    const updateCondition = (column, type) => () => {
+
+      const index = this[type].indexOf(column)
+      if ( index !== -1 ) this[type].splice(index,1)
+      if(!this.multiMode) {
+        this.missing = []
+        this.mismatch = []
+        this.outlier = []
+      }
+      if( index === -1 ) this[type].push(column)
+      reloadData(0, 500, this.missing, this.mismatch, this.outlier)
+    }
     if (etling) return [];
-    if (!uploadData.length) return [];
+    // if (!uploadData.length) return [];
     const headerList = [...dataHeader.filter(v => v !== target)];
     const notShowIndex = rawHeader
       .filter(v => !headerList.includes(v))
@@ -136,9 +153,14 @@ class VariableIssue extends Component<VariableIssueProps> {
       if (isNum && variableIssues.mismatchRow[header]) {
         issues.push(
           <div
-            className={classnames(styles.errorBlock, styles.mismatch)}
+            className={styles.errorBlock}
             key={'mismatch' + header}
+            onClick={updateCondition(header, 'mismatch')}
           >
+            <div className={styles.issueBackground}>
+              <div className={styles.mismatch}></div>
+              <div className={classnames({[styles.issueActive]: this.mismatch.indexOf(header) !== -1 })}></div>
+            </div>
             <span>
               {variableIssues.mismatchRow[header] < 0.01
                 ? '<0.01'
@@ -151,9 +173,14 @@ class VariableIssue extends Component<VariableIssueProps> {
       if (variableIssues.nullRow[header]) {
         issues.push(
           <div
-            className={classnames(styles.errorBlock, styles.missing)}
+            className={styles.errorBlock}
             key={'missing' + header}
+            onClick={updateCondition(header, 'missing')}
           >
+            <div className={styles.issueBackground}>
+              <div className={styles.missing}></div>
+              <div className={classnames({[styles.issueActive]: this.missing.indexOf(header) !== -1 })}></div>
+            </div>
             <span>
               {variableIssues.nullRow[header] < 0.01
                 ? '<0.01'
@@ -166,9 +193,14 @@ class VariableIssue extends Component<VariableIssueProps> {
       if (isNum && variableIssues.outlierRow[header]) {
         issues.push(
           <div
-            className={classnames(styles.errorBlock, styles.outlier)}
+            className={styles.errorBlock}
             key={'outlier' + header}
+            onClick={updateCondition(header, 'outlier')}
           >
+            <div className={styles.issueBackground}>
+              <div className={styles.outlier}></div>
+              <div className={classnames({[styles.issueActive]: this.outlier.indexOf(header) !== -1 })}></div>
+            </div>
             <span>
               {variableIssues.outlierRow[header] < 0.01
                 ? '<0.01'
@@ -198,7 +230,7 @@ class VariableIssue extends Component<VariableIssueProps> {
         const isNum = colType[header] === 'Numerical';
         const { low = NaN, high = NaN } = isNum ? rawDataView[header] : {};
         const isMissing = isNaN(+v) ? !v : false;
-        const isMismatch = isNum ? isNaN(+v) : false;
+        const isMismatch = isNum ? isNaN(+v) || isNaN(parseFloat(v.toString())) : false;
         const isOutlier =
           (problemType === 'Clustering' && isNum) ? +v < low || +v > high : false;
         if (isMissing) {
@@ -218,6 +250,13 @@ class VariableIssue extends Component<VariableIssueProps> {
       row => row.length === realColumn,
     );
   };
+
+  toggleMultiMode = () => {
+    this.multiMode = !this.multiMode
+    this.missing = []
+    this.mismatch = []
+    this.outlier = []
+  }
 
   render() {
     const { project, changeTab } = this.props;
@@ -314,6 +353,13 @@ class VariableIssue extends Component<VariableIssueProps> {
               <span>{EN.Outlier}</span>
             </div>
           )}
+            <div className={styles.multiMode}>
+              <span>{EN.MultiMode}</span>
+              <Switch
+                checked={this.multiMode}
+                onChange={this.toggleMultiMode}
+              />
+            </div>
           {(project.problemType !== 'Clustering' && !!target) && <div className={styles.issueTabs}>
             <div className={styles.issueTab} onClick={changeTab}>
               <span>{EN.TargetVariable}</span>

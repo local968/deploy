@@ -353,6 +353,22 @@ class Project {
     return result
   }
 
+  reloadData = async (start: number, end: number, missing: string[], mismatch: string[], outlier: string[]) => {
+    const complement = (key) => key + '.' + (this.colType[key] === 'Numerical' ? 'double' : 'keyword')
+    let query = [`start=${start}`, `end=${end}`]
+    if(missing.length > 0) query.push('missing=' + missing.map(complement).join(','))
+    if(mismatch.length > 0) query.push('mismatch=' + mismatch.map(complement).join(','))
+    if(outlier.length > 0) {
+      query.push('outlier=' + outlier.map(complement).join(','))
+      query.push('outlierValue=' + outlier.map(key => this.rawDataView[key].low + '|' + this.rawDataView[key].high).join(','))
+    }
+    this.uploadData = []
+    const url = `/etls/${this.originalIndex}/advancedPreview?${query.join('&')}`
+    const { data } = await axios.get(url)
+    const result = data.result ? data.result.map((row: StringObject) => this.rawHeader.map(h => row[h])) : []
+    this.uploadData = result
+  }
+
   @computed
   get totalLines() {
     return this.totalRawLines - this.deletedCount

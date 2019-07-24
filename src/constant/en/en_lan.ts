@@ -861,6 +861,7 @@ const EN_LAN = {
   QuantityofMismatch: 'Quantity of Mismatch',
   MostFrequentValue: 'Most Frequent Value',
   Fix: 'Fix',
+  MultiMode: 'Multiple selection mode',
   Replacewithmostfrequentvalue: 'Replace with most frequent value',
   Deletetherows: 'Delete the rows',
   Replacewith: "Replace with ",

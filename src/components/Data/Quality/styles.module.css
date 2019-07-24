@@ -162,8 +162,41 @@
 .errorBlock {
 	display: flex;
 	flex: none;
-	padding: 0 0.05em;
-	border-radius: 0.15em;
+	border-radius: 5px;
+  cursor: pointer;
+  width: 48px;
+  text-align: center;
+  position: relative;
+}
+
+.errorBox .errorBlock span{
+  font-size: 13px;
+}
+
+.issueBackground,
+.issueBackground div{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 5px;
+  z-index: -2;
+}
+
+.issueActive {
+  z-index: -1;
+  /* border-bottom: 5px solid #bd4d4d; */
+  opacity: .5;
+  background: white;
+}
+
+.multiMode {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.multiMode span{
+  margin-right: 10px;
 }
 
 .tableBody {
