@@ -1123,7 +1123,7 @@ class Project {
       nullRow: {},
       outlierRow: {}
     }
-    const variables = [...dataHeader, ...deleteColumns]
+    const variables = [...dataHeader.filter(h => h !== target), ...deleteColumns]
     variables.forEach(h => {
       if (colType[h] === "Numerical" && mismatchLineCounts[h]) {
         obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
@@ -1131,7 +1131,7 @@ class Project {
       if (nullLineCounts[h]) {
         obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
-      if ((problemType === 'Clustering' || h === target) && colType[h] === "Numerical" && outlierLineCounts[h]) {
+      if (problemType === 'Clustering' && colType[h] === "Numerical" && outlierLineCounts[h]) {
         obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
     })
