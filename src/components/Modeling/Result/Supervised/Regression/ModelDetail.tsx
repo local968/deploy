@@ -9,10 +9,10 @@ import moment from 'moment';
 import Variable from '../../Variable.svg';
 import Process from '../../Process.svg';
 import VariableImpact from '../../VariableImpact';
-import ModelProcessFlow from '../../ModelProcessFlow';
 import classnames from 'classnames'
 import Model from 'stores/Model';
 import Project from 'stores/Project';
+import MPF from '../../MPF';
 
 interface Interface {
   model: Model
@@ -113,7 +113,7 @@ export default class ModelDetail extends Component<Interface>{
           <VariableImpact model={model} mapHeader={mapHeader} />
         )}
         {this.visible && this.type === 'process' && (
-          <ModelProcessFlow project={project} model={model} />
+          <MPF project={project} model={model} modelId={model.id}/>
         )}
       </div>
     );
