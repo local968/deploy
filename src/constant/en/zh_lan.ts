@@ -705,6 +705,7 @@ const ZH_LAN = {
   QuantityofMismatch: '不匹配的数量',
   MostFrequentValue: '众数',
   Fix: '修复方案',
+  BatchFix: '批量修复',
   Replacewithmostfrequentvalue: '替换为众数',
   Deletetherows: '删除整行',
   Deletethecolumn: '删除整列',
