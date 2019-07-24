@@ -1346,11 +1346,7 @@ button.activeButton span {
     font-size:16px;
 }
 
-.outlierRanged{
-    font-size: 14px;
-    margin-left: 100px;
-    margin-bottom: 20px;
-}
+
 
 .minmax{
     display: flex;
@@ -1367,16 +1363,22 @@ button.activeButton span {
 }
 
 .minmax section a{
-    padding: 5px 0;
-    font-size: 13px;
+    padding: 3px 0;
+    font-size: 10px;
 }
 
 .minmax span{
-    margin: 5px -3px 0 14px;
+    margin: 5px -3px 0 12px;
+}
+
+.outlierRanged{
+    font-size: 12px;
+    margin-left: 100px;
+    margin-bottom: 20px;
 }
 
 .outlierRanged >div+div div{
-    margin:0 14px;
+    margin:0 12px;
 }
 .disable{
     color:#ccc !important;
