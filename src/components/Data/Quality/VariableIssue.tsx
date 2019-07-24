@@ -72,6 +72,7 @@ class VariableIssue extends Component<VariableIssueProps> {
       uploadData,
       rawHeader,
       dataHeader,
+      deleteColumns,
       etling,
       rawDataView,
       variableIssues,
@@ -81,7 +82,7 @@ class VariableIssue extends Component<VariableIssueProps> {
     } = this.props.project;
     if (etling) return [];
     if (!uploadData.length) return [];
-    const headerList = [...dataHeader.filter(v => v !== target)];
+    const headerList = rawHeader.filter(h => h !== target && (dataHeader.includes(h) || deleteColumns.includes(h)))
     const notShowIndex = rawHeader
       .filter(v => !headerList.includes(v))
       .map(v => rawHeader.indexOf(v));
@@ -227,8 +228,10 @@ class VariableIssue extends Component<VariableIssueProps> {
       dataHeader,
       etling,
       etlProgress,
+      deleteColumns,
       variableIssueCount: { nullCount, mismatchCount, outlierCount },
     } = project;
+    const header = [...dataHeader.filter(h => h !== target), ...deleteColumns]
     const tableData = this.formatTable();
     return (
       <div className={styles.quality}>
@@ -333,7 +336,7 @@ class VariableIssue extends Component<VariableIssueProps> {
             <Table
               columnWidth={160}
               rowHeight={34}
-              columnCount={dataHeader.filter(h => h !== target).length}
+              columnCount={header.length}
               rowCount={tableData.length}
               fixedColumnCount={0}
               fixedRowCount={4}

@@ -234,6 +234,8 @@ export class Project {
   reportProgress?: number = 0;
   reportProgressText?: string = 'init';
   reportCancel?: boolean = false;
+  targetUnique?: number;
+  deleteColumns?: string[];
 }
 
 export type ProjectRedisValue = {

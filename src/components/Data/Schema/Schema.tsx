@@ -23,7 +23,7 @@ interface DataSchemaProps {
 
 class DataSchema extends Component<DataSchemaProps> {
   @observable checkList = this.props.projectStore.project.rawHeader.filter(
-    r => !this.props.projectStore.project.dataHeader.includes(r) && this.props.projectStore.project.target !== r
+    r => !this.props.projectStore.project.dataHeader.includes(r) && this.props.projectStore.project.target !== r && !this.props.projectStore.project.deleteColumns.includes(r)
   );
   @observable showSelect = false;
   @observable dataType = { ...this.props.projectStore.project.colType };
@@ -38,7 +38,7 @@ class DataSchema extends Component<DataSchemaProps> {
 
   doEtl = () => {
     const { project } = this.props.projectStore;
-    if (project.train2ing || !!project.models.length)
+    if (project.etlIndex || project.train2ing || !!project.models.length)
       return (this.visiable = true);
     this.onConfirm();
   };
@@ -148,14 +148,10 @@ class DataSchema extends Component<DataSchemaProps> {
     if (etling) return [];
     const { showSelect, checkList } = this;
     if (!uploadData.length) return [];
-    // return []
-    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
-    // const { checkList, showSelect } = this.state;
     const headerList = target
       ? [target, ...rawHeader.filter(v => v !== target)]
       : rawHeader;
     const targetIndex = target ? rawHeader.indexOf(target) : -1;
-    // const notShowIndex = sortHeader.filter(v => !sortHeader.includes(v)).map(v => sortHeader.indexOf(v))
     const data =
       targetIndex > -1
         ? uploadData.map(row => {
@@ -167,7 +163,6 @@ class DataSchema extends Component<DataSchemaProps> {
           ];
         })
         : uploadData;
-    // if(!sortData.length) return []
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框

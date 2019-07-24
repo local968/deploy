@@ -707,6 +707,7 @@ const ZH_LAN = {
   Fix: '修复方案',
   Replacewithmostfrequentvalue: '替换为众数',
   Deletetherows: '删除整行',
+  Deletethecolumn: '删除整列',
   Replacewith: "替换为",
   Replacewithauniquevalue: '替换为新类别',
   Replacewithmeanvalue: '替换为平均值',

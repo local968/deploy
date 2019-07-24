@@ -72,13 +72,16 @@ class FixIssue extends Component<FixIssueProps> {
   save = () => {
     const { project } = this.props
     const realFillMethod: { missing?: { [key: string]: string }, mismatch?: { [key: string]: string }, outlier?: { [key: string]: string } } = {}
+    const deleteColumns: Set<string> = new Set<string>()
     Object.keys(this.fillMethod).forEach(k => {
       realFillMethod[k] = {}
       Object.keys(this.fillMethod[k]).forEach(field => {
         const value = this.fillMethod[k][field]
+        if (value === 'column') deleteColumns.add(field)
         if (value === 0 || !!value) realFillMethod[k][field] = value
       })
     })
+    project.deleteColumns = [...deleteColumns]
     project.nullFillMethodTemp = { ...project.nullFillMethodTemp, ...realFillMethod.missing }
     project.mismatchFillMethodTemp = { ...project.mismatchFillMethodTemp, ...realFillMethod.mismatch }
     project.outlierFillMethodTemp = { ...project.outlierFillMethodTemp, ...realFillMethod.outlier }
@@ -115,7 +118,8 @@ class FixIssue extends Component<FixIssueProps> {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, dataHeader } = project
+    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, dataHeader, deleteColumns } = project
+    const variables = [...dataHeader, ...deleteColumns]
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -137,7 +141,7 @@ class FixIssue extends Component<FixIssueProps> {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(mismatchLineCounts).map((k, i) => {
-                if (!dataHeader.includes(k)) return null
+                if (!variables.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
                 const originNum = mismatchLineCounts[k]
@@ -158,6 +162,9 @@ class FixIssue extends Component<FixIssueProps> {
                 }, {
                   value: 'drop',
                   label: EN.Deletetherows
+                }, {
+                  value: 'column',
+                  label: EN.Deletethecolumn
                 }, {
                   value: 'min',
                   label: EN.Replacewithminvalue
@@ -189,6 +196,7 @@ class FixIssue extends Component<FixIssueProps> {
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={isOthers ? 'others' : method} onChange={this.mismatchSelect.bind(null, k)}>
                       {mismatchArray.map(item => {
+                        if (isTarget && item.value === 'column') return null
                         return <option value={item.value} key={item.value}>{item.label}</option>
                       })}
                     </select>
@@ -219,7 +227,7 @@ class FixIssue extends Component<FixIssueProps> {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(nullLineCounts).map((k, i) => {
-                if (!dataHeader.includes(k)) return null
+                if (!variables.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
                 const originNum = nullLineCounts[k]
@@ -240,6 +248,9 @@ class FixIssue extends Component<FixIssueProps> {
                   value: 'drop',
                   label: EN.Deletetherows
                 }, {
+                  value: 'column',
+                  label: EN.Deletethecolumn
+                }, {
                   value: 'ignore',
                   label: EN.Replacewithauniquevalue
                 }] : [{
@@ -248,6 +259,9 @@ class FixIssue extends Component<FixIssueProps> {
                 }, {
                   value: 'drop',
                   label: EN.Deletetherows
+                }, {
+                  value: 'column',
+                  label: EN.Deletethecolumn
                 }, {
                   value: 'min',
                   label: EN.Replacewithminvalue
@@ -285,6 +299,7 @@ class FixIssue extends Component<FixIssueProps> {
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={isOthers ? 'others' : method} onChange={this.nullSelect.bind(null, k)}>
                       {nullArray.map(item => {
+                        if (isTarget && item.value === 'column') return null
                         return <option value={item.value} key={item.value}>{item.label}</option>
                       })}
                     </select>
@@ -314,7 +329,7 @@ class FixIssue extends Component<FixIssueProps> {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(outlierLineCounts).map((k, i) => {
-                if (!dataHeader.includes(k)) return null
+                if (!variables.includes(k)) return null
                 if (isTarget && k !== target) return null
                 if (!isTarget && k === target) return null
                 const originNum = outlierLineCounts[k]
@@ -337,6 +352,9 @@ class FixIssue extends Component<FixIssueProps> {
                 }, {
                   value: 'drop',
                   label: EN.Deletetherows
+                }, {
+                  value: 'column',
+                  label: EN.Deletethecolumn
                 }, {
                   value: 'mean',
                   label: EN.Replacewithmeanvalue
@@ -372,6 +390,7 @@ class FixIssue extends Component<FixIssueProps> {
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={isOthers ? 'others' : method} onChange={this.outlierSelect.bind(null, k)}>
                       {outlierArray.map(item => {
+                        if (isTarget && item.value === 'column') return null
                         return <option value={item.value} key={item.value}>{item.label}</option>
                       })}
                     </select>

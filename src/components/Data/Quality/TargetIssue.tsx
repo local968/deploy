@@ -69,11 +69,11 @@ class TargetIssue extends Component<TargetIssueProps> {
     const { project, changeTab } = this.props;
     const {
       issues,
-      sortData,
+      uploadData,
       mapHeader,
       target,
       colType,
-      sortHeader,
+      rawHeader,
       nullLineCounts,
       mismatchLineCounts,
       outlierLineCounts,
@@ -89,9 +89,9 @@ class TargetIssue extends Component<TargetIssueProps> {
       targetUnique
     } = project;
     const targetUniques = targetUnique || NaN
-    const targetIndex = sortHeader.findIndex(h => h === target);
+    const targetIndex = rawHeader.findIndex(h => h === target);
     const isNum = colType[target] === 'Numerical';
-    const recomm = !isNum ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
+    const recomm = !isNum ? 2 : Math.min((rawHeader.length - 1) * 6, 1000);
     const nullCount = Number.isInteger(nullLineCounts[target]) ? nullLineCounts[target] : 0;
     const mismatchCount = isNum ? mismatchLineCounts[target] : 0;
     const outlierCount = isNum ? outlierLineCounts[target] : 0;
@@ -298,8 +298,8 @@ class TargetIssue extends Component<TargetIssueProps> {
                 )}
               </div>
               <div className={styles.tableBody}>
-                {!!sortData.length &&
-                  sortData.map((r, k) => {
+                {!!uploadData.length &&
+                  uploadData.map((r, k) => {
                     const v = r[targetIndex];
                     const { low = NaN, high = NaN } = rawDataView[target];
                     const isMissing = isNaN(+v) ? !v : false;

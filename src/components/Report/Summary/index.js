@@ -31,8 +31,8 @@ class Summary extends Component {
     const innerRadius = 0;             // 内半径
     //弧生成器
     const arc = d3.arc()
-        .innerRadius(innerRadius)
-        .outerRadius(outerRadius)
+      .innerRadius(innerRadius)
+      .outerRadius(outerRadius)
     const { totalRawLines, deletedCount, totalFixedLines } = this.props.project
     const deleteRows = deletedCount
     const fixedRows = totalFixedLines - deletedCount
@@ -42,32 +42,31 @@ class Summary extends Component {
     const dataset = d3.pie()(data);
 
     const svg = d3.select(`.${styles.summaryChart}`)
-        .append("svg")
-        .attr("width", 120)
-        .attr("height", 120)
+      .append("svg")
+      .attr("width", 120)
+      .attr("height", 120)
 
     svg.selectAll(`g`)
-        .data(dataset)
-        .enter()
-        .append("g")
-        .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")")
-        .append("path")
-        .attr("fill", (d, i) => color[i])
-        .attr("d", (d) => {
-          return arc(d);   //调用弧生成器，得到路径值
-        });
+      .data(dataset)
+      .enter()
+      .append("g")
+      .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")")
+      .append("path")
+      .attr("fill", (d, i) => color[i])
+      .attr("d", (d) => {
+        return arc(d);   //调用弧生成器，得到路径值
+      });
   }
 
   render() {
-    const { project, editFixes } = this.props;
-    const { mapHeader, target, sortHeader, colType, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { project } = this.props;
+    const { mapHeader, target, dataHeader, totalRawLines, deletedCount, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
     const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
     const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
-    const currentHeader = sortHeader.filter(h => dataHeader.includes(h))
-    const variableList = currentHeader.slice(1)
+    const currentHeader = dataHeader
+    const variableList = currentHeader.filter(h => h !== target)
     const percentList = currentHeader.map(v => {
-      const isNum = colType[v] === 'Numerical'
       const percent = {
         missing: nullRow[v] || 0,
         mismatch: mismatchRow[v] || 0,
@@ -166,9 +165,9 @@ class Summary extends Component {
           {/*<div className={styles.summaryChart}>*/}
           {/*</div>*/}
           <PIE
-              RowsWillBeFixed={fixedPercent}
-              RowsWillBeDeleted={deletePercent}
-              CleanData={cleanPercent}
+            RowsWillBeFixed={fixedPercent}
+            RowsWillBeDeleted={deletePercent}
+            CleanData={cleanPercent}
           />
           <div className={styles.summaryParts}>
             <div className={styles.summaryPart}>

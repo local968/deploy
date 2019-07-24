@@ -865,6 +865,7 @@ const EN_LAN = {
   Fix: 'Fix',
   Replacewithmostfrequentvalue: 'Replace with most frequent value',
   Deletetherows: 'Delete the rows',
+  Deletethecolumn: 'Delete the column',
   Replacewith: "Replace with ",
   Replacewithauniquevalue: 'Replace with au nique value',
   Replacewithmeanvalue: 'Replace with mean value',

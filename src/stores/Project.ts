@@ -1,17 +1,13 @@
-import { observable, action, computed, toJS, autorun, IReactionDisposer } from "mobx";
+import { observable, action, computed, toJS, autorun, IReactionDisposer, when } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
-import moment from 'moment';
-import config from 'config';
-import uuid from 'uuid';
 import Papa from 'papaparse';
-import { message as antdMessage, Modal } from 'antd';
+import { message as antdMessage } from 'antd';
 import axios from 'axios'
 import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/types/Coordinate";
-import { when } from "q";
 
 export interface Stats {
   took: number,
@@ -231,6 +227,7 @@ class Project {
   @observable nullFillMethodTemp: StringObject = {};
   @observable outlierFillMethodTemp: StringObject = {};
   @observable outlierDictTemp: unknown = {};
+  @observable deleteColumns: string[] = []
 
   // train
   // 训练状态
@@ -409,7 +406,8 @@ class Project {
       dataViews: null,
       dataViewsLoading: false,
       deletedCount: 0,
-      etlIndex: ''
+      etlIndex: '',
+      deleteColumns: []
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -423,7 +421,8 @@ class Project {
       dataViews: null,
       dataViewsLoading: boolean,
       deletedCount: number,
-      etlIndex: string
+      etlIndex: string,
+      deleteColumns: string[]
     }
   }
 
@@ -618,28 +617,6 @@ class Project {
   @computed
   get currentSetting(): Settings | undefined {
     return this.settings.find((s: any) => s.id === this.settingId)
-  }
-
-  @computed
-  get sortHeader(): string[] {
-    const { target, dataHeader } = this
-    if (!target) return dataHeader
-    return [target, ...dataHeader.filter(v => target !== v)]
-  }
-
-  @computed
-  get sortData(): string[][] {
-    const { target, sortHeader, uploadData, rawHeader } = this
-    if (!uploadData.length) return []
-    if (!target) return uploadData
-    return uploadData.map(row => {
-      const newRow: string[] = []
-      sortHeader.forEach(v => {
-        const index = rawHeader.indexOf(v)
-        if (index > -1) newRow.push(row[index])
-      })
-      return newRow
-    })
   }
 
   @action
@@ -957,7 +934,7 @@ class Project {
     } = {
       target: this.target,
       colType: { ...this.colType },
-      dataHeader: [...this.dataHeader],
+      dataHeader: [...this.dataHeader, ...this.deleteColumns],
       noCompute: this.noComputeTemp,
       nullFillMethod: this.nullFillMethod,
       nullFillMethodTemp: this.nullFillMethodTemp,
@@ -1022,7 +999,8 @@ class Project {
       mismatchFillMethod: StringObject,
       outlierFillMethod: StringObject,
       missingReason: StringObject,
-      crossCount?: number
+      crossCount?: number,
+      dataHeader: string[]
     } = {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
@@ -1031,6 +1009,7 @@ class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp),
+      dataHeader: this.dataHeader.filter(h => !this.deleteColumns.includes(h))
     }
 
     if (this.problemType === 'Classification') {
@@ -1138,14 +1117,14 @@ class Project {
 
   @computed
   get variableIssues() {
-    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines, problemType, target } = this;
+    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines, problemType, target, deleteColumns } = this;
     const obj = {
       mismatchRow: {},
       nullRow: {},
       outlierRow: {}
     }
-
-    dataHeader.forEach(h => {
+    const variables = [...dataHeader, ...deleteColumns]
+    variables.forEach(h => {
       if (colType[h] === "Numerical" && mismatchLineCounts[h]) {
         obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
@@ -1161,10 +1140,11 @@ class Project {
 
   @computed
   get variableIssueCount() {
-    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType, dataHeader } = this
-    const nullCount = Object.entries(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
+    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType, dataHeader, deleteColumns } = this
+    const variables = [...dataHeader, ...deleteColumns]
+    const nullCount = Object.entries(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).filter(([_k]) => variables.includes(_k)).reduce((sum, [k, v]) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).filter(([_k]) => variables.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).filter(([_k]) => variables.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
 
     return { nullCount, mismatchCount, outlierCount }
   }
@@ -1250,7 +1230,8 @@ class Project {
       nullFillMethodTemp: toJS(this.nullFillMethodTemp),
       mismatchFillMethodTemp: toJS(this.mismatchFillMethodTemp),
       outlierFillMethodTemp: toJS(this.outlierFillMethodTemp),
-      missingReasonTemp: toJS(this.missingReasonTemp)
+      missingReasonTemp: toJS(this.missingReasonTemp),
+      deleteColumns: [...this.deleteColumns]
     })
   }
 
