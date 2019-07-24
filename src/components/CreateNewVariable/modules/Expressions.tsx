@@ -3,6 +3,8 @@ import * as _ from 'lodash';
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import { MuiCard } from './MuiModule';
+
 import {
   List,
   ListItem,
@@ -49,9 +51,8 @@ const useStyles = makeStyles({
     zIndex: 1111,
   },
   list: {
-    maxHeight: '300px',
+    maxHeight: '20rem',
     overflowY: 'auto',
-    backgroundColor: '#fff',
   },
   suggPape: {
     maxHeight: '300px',
@@ -134,7 +135,9 @@ function Expressions(props: ExpressionsProps) {
     });
     input.focus();
   };
-  const changeInput = (k: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeInput = (k: number) => (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     changeExpLabel(e.target.value);
   };
   const deleteOne = (k: number) => (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -232,97 +235,108 @@ function Expressions(props: ExpressionsProps) {
     : null;
   const expSize = _.size(exps);
   return (
-    <List
-      className={classes.list}
-      subheader={
-        <ListSubheader>
-          <form className={classes.form}>
-            <ListItemText
-              className={classes.label}
-              primary={EN.Variablename}
-              primaryTypographyProps={{ align: 'left' }}
-            />
-            <ListItemText className={classes.text} primary=" " />
-            <ListItemText
-              primary={EN.formula}
-              primaryTypographyProps={{ align: 'left' }}
-            />
-          </form>
-        </ListSubheader>
-      }
-    >
-      {exps.map((exp: Exp, k: number) => (
-        <ListItem key={k} selected={k === index} onClick={e => selectOne(k)(e)}>
-          <form className={classes.form}>
-            <Input
-              className={classes.label}
-              value={exp.label}
-              onChange={changeInput(k)}
-              inputProps={{ style: { backgroundColor: '#fff' } }}
-            />
-            <ListItemText primary="=" className={classes.text} />
-            <Expression
-              exp={exp}
-              setRange={setRange}
-              deleteExp={deleteExp}
-              left={left}
-              right={right}
-              addExp={addExp}
-              onFocus={onFocus(k)}
-              sign={k}
-              setIndex={() => setIndex(k)}
-              toogleTooltip={() => setState({ ...state, isTipOpen: true })}
-            />
-            <div className={classes.tools}>
-              <IconButton onClick={deleteOne(k)} disabled={expSize === 1}>
-                <DeleteIcon />
-              </IconButton>
-              <IconButton
-                onClick={addLine}
-                disabled={!!estimateAdd(exp, k, expSize)}
-              >
-                <AddIcon />
-              </IconButton>
-            </div>
-          </form>
-        </ListItem>
-      ))}
-      {/* <ListItem>
+    <MuiCard>
+      <List
+        component={'div'}
+        disablePadding
+        dense
+        className={classes.list}
+        subheader={
+          <ListSubheader>
+            <form className={classes.form}>
+              <ListItemText
+                className={classes.label}
+                primary={EN.Variablename}
+                primaryTypographyProps={{ align: 'left' }}
+              />
+              <ListItemText className={classes.text} primary=" " />
+              <ListItemText
+                primary={EN.formula}
+                primaryTypographyProps={{ align: 'left' }}
+              />
+            </form>
+          </ListSubheader>
+        }
+      >
+        {exps.map((exp: Exp, k: number) => (
+          <ListItem
+            key={k}
+            selected={k === index}
+            onClick={e => selectOne(k)(e)}
+          >
+            <form className={classes.form}>
+              <Input
+                className={classes.label}
+                value={exp.label}
+                onChange={changeInput(k)}
+                inputProps={{ style: { backgroundColor: '#fff' } }}
+              />
+              <ListItemText primary="=" className={classes.text} />
+              <Expression
+                exp={exp}
+                setRange={setRange}
+                deleteExp={deleteExp}
+                left={left}
+                right={right}
+                addExp={addExp}
+                onFocus={onFocus(k)}
+                sign={k}
+                setIndex={() => setIndex(k)}
+                toogleTooltip={() => setState({ ...state, isTipOpen: true })}
+              />
+              <div className={classes.tools}>
+                <IconButton onClick={deleteOne(k)} disabled={expSize === 1}>
+                  <DeleteIcon />
+                </IconButton>
+                <IconButton
+                  onClick={addLine}
+                  disabled={!!estimateAdd(exp, k, expSize)}
+                >
+                  <AddIcon />
+                </IconButton>
+              </div>
+            </form>
+          </ListItem>
+        ))}
+        {/* <ListItem>
       <Button fullWidth size='large' color='primary' variant="contained" onClick={addLine}>+</Button>
     </ListItem> */}
-      <Popper
-        open={state.isOpen && !!recommend.value}
-        anchorEl={input}
-        placement="bottom-start"
-        className={classes.popper}
-      >
-        <Paper className={classes.suggPape}>
-          <ClickAwayListener onClickAway={handleClickAway}>
-            <MenuList>
-              {getSuggestions().map((item: Coordinate, k: number) => {
-                return (
-                  <MenuItem key={k} onClick={selectItem(item)}>
-                    {item.name}
-                  </MenuItem>
-                );
-              })}
-            </MenuList>
-          </ClickAwayListener>
-        </Paper>
-      </Popper>
-      <Popper
-        open={!!func && state.isTipOpen}
-        anchorEl={input}
-        placement="bottom-end"
-        className={classes.popper}
-      >
-        <Paper>
-          <ClickAwayListener onClickAway={hideGrammarTip}>
-            <div className={classes.grammar}>{func ? func.grammar : null}</div>
-          </ClickAwayListener>
-        </Paper>
-      </Popper>
-    </List>
+        <Popper
+          open={state.isOpen && !!recommend.value}
+          anchorEl={input}
+          placement="bottom-start"
+          className={classes.popper}
+        >
+          <Paper className={classes.suggPape}>
+            <ClickAwayListener onClickAway={handleClickAway}>
+              <MenuList>
+                {getSuggestions().map((item: Coordinate, k: number) => {
+                  return (
+                    <MenuItem key={k} onClick={selectItem(item)}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            </ClickAwayListener>
+          </Paper>
+        </Popper>
+        <Popper
+          open={!!func && state.isTipOpen}
+          anchorEl={input}
+          placement="bottom-end"
+          className={classes.popper}
+        >
+          <Paper>
+            <ClickAwayListener onClickAway={hideGrammarTip}>
+              <div className={classes.grammar}>
+                {func ? func.grammar : null}
+              </div>
+            </ClickAwayListener>
+          </Paper>
+        </Popper>
+      </List>
+    </MuiCard>
   );
 }
 
