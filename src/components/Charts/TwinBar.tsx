@@ -20,7 +20,7 @@ export default function TwinBar(props) {
         b = Number(b).toFixed(3);
       }
       _x_values.push(`[${b},${a})`);
-      return b
+      return true
     })
   }
 
@@ -32,6 +32,7 @@ export default function TwinBar(props) {
       nameLocation:'middle',
       nameGap:20,
       axisLabel: {
+        // interval:2,
         formatter: value=>{
           if(!isNaN(value)&&!String(value).includes('e')){
             return Number(value).toFixed(3);

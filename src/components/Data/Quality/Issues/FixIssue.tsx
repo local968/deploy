@@ -5,11 +5,12 @@ import { observer } from 'mobx-react';
 import { Modal, NumberInput } from 'components/Common';
 import { observable } from 'mobx'
 // import * as d3 from 'd3';
-import { Icon, message } from 'antd'
+import { Icon, message, Select } from 'antd'
 import { formatNumber } from '../../../../util'
 import EN from '../../../../constant/en';
 import OutlierRange from "../../../Charts/OutlierRange";
 import Project from 'stores/Project';
+const Option = Select.Option
 
 interface FixIssueProps {
   saveDataFixes: () => void,
@@ -26,6 +27,7 @@ class FixIssue extends Component<FixIssueProps> {
   @observable visible = false
   @observable progress = 0
   @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
+  @observable checked = { null: [], mismatch: [], outlier: [] }
   // @observable outLier = {};
 
   editRange(key) {
@@ -116,10 +118,124 @@ class FixIssue extends Component<FixIssueProps> {
     this.fillMethod[key][field] = value
   }
 
+  handleCheckAll = (type) => (e) => {
+    const checked = e.target.checked
+    if (!checked) return this.checked = { ...this.checked, [type]: [] }
+    const { project, isTarget } = this.props
+    const { target, targetIssuesCountsOrigin, variableIssues } = project
+    const dataRow = isTarget ? { [target]: targetIssuesCountsOrigin[`${type}Row`] } : variableIssues[`${type}Row`]
+    this.checked = { ...this.checked, [type]: Object.keys(dataRow) }
+  }
+
+  handleCheck = (type, field) => (e) => {
+    const checked = e.target.checked
+    let arr = this.checked[type]
+    if (!checked && arr.includes(field)) arr = arr.filter(h => h !== field)
+    if (checked && !arr.includes(field)) arr.push(field)
+    this.checked = { ...this.checked, [type]: arr }
+  }
+
+  handleReset = (type) => () => {
+    const { project, isTarget } = this.props
+    const { target, targetIssuesCountsOrigin, variableIssues, colType } = project
+    const dataRow = isTarget ? { [target]: targetIssuesCountsOrigin[`${type}Row`] } : variableIssues[`${type}Row`]
+    Object.keys(dataRow).forEach(k => {
+      if (type === 'null') {
+        const isNum = colType[k] === 'Numerical'
+        this.fillMethod.missing[k] = isNum ? 'mean' : 'mode'
+      } else {
+        this.fillMethod[type][k] = type === 'mismatch' ? 'mean' : 'drop'
+      }
+    })
+  }
+
+  handleSelect = (type, isNum = true) => (value) => {
+    const { project } = this.props
+    const { colType } = project
+    if (type === 'null') {
+      this.checked.null
+        .filter(k => isNum ? colType[k] === 'Numerical' : colType[k] !== 'Numerical')
+        .forEach(k => {
+          this.fillMethod.missing = { ...this.fillMethod.missing, [k]: value }
+        })
+    } else {
+      this.checked[type].forEach(k => {
+        this.fillMethod[type] = { ...this.fillMethod[type], [k]: value }
+      })
+    }
+  }
+
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, nullLineCounts, mismatchLineCounts, outlierLineCounts, missingReasonTemp, dataHeader, deleteColumns } = project
+    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, missingReasonTemp, dataHeader, deleteColumns, variableIssues, targetIssuesCountsOrigin } = project
+    const mismatchRow = isTarget ? { [target]: targetIssuesCountsOrigin.mismatchRow } : variableIssues.mismatchRow
+    const nullRow = isTarget ? { [target]: targetIssuesCountsOrigin.nullRow } : variableIssues.nullRow
+    const outlierRow = isTarget ? { [target]: targetIssuesCountsOrigin.outlierRow } : variableIssues.outlierRow
     const variables = [...dataHeader, ...deleteColumns]
+
+    const strArray = [{
+      value: 'mode',
+      label: EN.Replacewithmostfrequentvalue
+    }, {
+      value: 'drop',
+      label: EN.Deletetherows
+    }, {
+      value: 'column',
+      label: EN.Deletethecolumn
+    }, {
+      value: 'ignore',
+      label: EN.Replacewithauniquevalue
+    }]
+
+    const numArray = [{
+      value: 'mean',
+      label: EN.Replacewithmeanvalue
+    }, {
+      value: 'drop',
+      label: EN.Deletetherows
+    }, {
+      value: 'column',
+      label: EN.Deletethecolumn
+    }, {
+      value: 'min',
+      label: EN.Replacewithminvalue
+    }, {
+      value: 'max',
+      label: EN.Replacewithmaxvalue
+    }, {
+      value: 'median',
+      label: EN.Replacewithmedianvalue
+    }, {
+      value: 'zero',
+      label: EN.ReplaceWith0
+    }, {
+      value: 'others',
+      label: EN.Replacewithothers
+    }]
+
+    const outArray = [{
+      value: 'ignore',
+      label: EN.DoNothing
+    }, {
+      value: 'drop',
+      label: EN.Deletetherows
+    }, {
+      value: 'mean',
+      label: EN.Replacewithmeanvalue
+    }, {
+      value: 'median',
+      label: EN.Replacewithmedianvalue
+    }, {
+      value: 'zero',
+      label: EN.ReplaceWith0
+    }, {
+      value: 'respective',
+      label: EN.ReplaceRespective
+    }, {
+      value: 'others',
+      label: EN.Replacewithothers
+    }]
+
     return <div className={styles.fixesContent}>
       <div className={styles.fixesBlock}>
         {!!mismatchCount && <div className={styles.fixesArea}>
@@ -128,27 +244,34 @@ class FixIssue extends Component<FixIssueProps> {
               <div className={classnames(styles.typeBlock, styles.mismatch)} />
               <span>{EN.DataTypeMismatch}</span>
             </div>
+            {Object.keys(mismatchRow).length > 1 && <div className={styles.batch}>
+              <Select placeholder={EN.BatchFix} value={undefined} onSelect={this.handleSelect('mismatch')} className={styles.batchSelect} >
+                {numArray.map(item => {
+                  if (isTarget && item.value === 'column') return null
+                  return <Option value={item.value} key={item.value}>{item.label}</Option>
+                })}
+              </Select>
+            </div>}
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
+              {Object.keys(mismatchRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" defaultChecked={false} onChange={this.handleCheckAll('mismatch')} /></div>}
               <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.VariableName}</span></div>
               <div className={styles.fixesTd}><span>{EN.DataType}</span></div>
               <div className={styles.fixesTd}><span>{EN.QuantityofMismatch}</span></div>
               <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
               <div className={styles.fixesTd}><span>{EN.Median}</span></div>
               <div className={styles.fixesTd}><span>{EN.MostFrequentValue}</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}>
+                <span>{EN.Fix}</span>
+                <span className={styles.reset} onClick={this.handleReset('mismatch')}>{EN.Reset}</span>
+              </div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(mismatchLineCounts).map((k, i) => {
-                if (!variables.includes(k)) return null
-                if (isTarget && k !== target) return null
-                if (!isTarget && k === target) return null
-                const originNum = mismatchLineCounts[k]
-                if (!originNum) {
-                  return null;
-                }
-                const num = mismatchLineCounts[k] || 0
+              {Object.keys(mismatchRow).map((k, i) => {
+                const originNum = mismatchRow[k]
+                if (!originNum) return null
+                const num = mismatchRow[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 if (showType !== 'Numerical') return null
                 const percnet = num / (totalRawLines || 1) * 100
@@ -156,37 +279,13 @@ class FixIssue extends Component<FixIssueProps> {
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : rawDataView[k].mode)
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
-                const mismatchArray = [{
-                  value: 'mean',
-                  label: EN.Replacewithmeanvalue
-                }, {
-                  value: 'drop',
-                  label: EN.Deletetherows
-                }, {
-                  value: 'column',
-                  label: EN.Deletethecolumn
-                }, {
-                  value: 'min',
-                  label: EN.Replacewithminvalue
-                }, {
-                  value: 'max',
-                  label: EN.Replacewithmaxvalue
-                }, {
-                  value: 'median',
-                  label: EN.Replacewithmedianvalue
-                }, {
-                  value: 'zero',
-                  label: EN.ReplaceWith0
-                }, {
-                  value: 'others',
-                  label: EN.Replacewithothers
-                }]
                 const method = this.fillMethod.mismatch.hasOwnProperty(k) ?
                   this.fillMethod.mismatch[k] :
                   mismatchFillMethodTemp.hasOwnProperty(k) ?
                     mismatchFillMethodTemp[k] : 'mean'
-                const isOthers = !mismatchArray.find(_a => _a.value === method)
+                const isOthers = !numArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
+                  {Object.keys(mismatchRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" checked={this.checked.mismatch.includes(k)} onChange={this.handleCheck('mismatch', k)} /></div>}
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}><span title={mapHeader[k]}>{mapHeader[k]}</span></div>
                   <div className={styles.fixesCell}><span>{showType === 'Numerical' ? EN.Numerical : EN.Categorical}</span></div>
                   <div className={styles.fixesCell}><span title={rowText}>{rowText}</span></div>
@@ -195,7 +294,7 @@ class FixIssue extends Component<FixIssueProps> {
                   <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={isOthers ? 'others' : method} onChange={this.mismatchSelect.bind(null, k)}>
-                      {mismatchArray.map(item => {
+                      {numArray.map(item => {
                         if (isTarget && item.value === 'column') return null
                         return <option value={item.value} key={item.value}>{item.label}</option>
                       })}
@@ -213,9 +312,24 @@ class FixIssue extends Component<FixIssueProps> {
               <div className={classnames(styles.typeBlock, styles.missing)} />
               <span>{EN.MissingValue}</span>
             </div>
+            {Object.keys(nullRow).length > 1 && <div className={styles.batch}>
+              <Select placeholder={`${EN.BatchFix}(${EN.Numerical})`} value={undefined} onSelect={this.handleSelect('null', true)} className={styles.batchSelect} >
+                {numArray.map(item => {
+                  if (isTarget && item.value === 'column') return null
+                  return <Option value={item.value} key={item.value}>{item.label}</Option>
+                })}
+              </Select>
+              <Select placeholder={`${EN.BatchFix}(${EN.Categorical})`} value={undefined} onSelect={this.handleSelect('null', false)} className={styles.batchSelect} >
+                {strArray.map(item => {
+                  if (isTarget && item.value === 'column') return null
+                  return <Option value={item.value} key={item.value}>{item.label}</Option>
+                })}
+              </Select>
+            </div>}
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
+              {Object.keys(nullRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" defaultChecked={false} onChange={this.handleCheckAll('null')} /></div>}
               <div className={styles.fixesTd}><span>{EN.VariableName}</span></div>
               <div className={styles.fixesTd}><span>{EN.MissingReason}</span></div>
               <div className={styles.fixesTd}><span>{EN.Data}</span></div>
@@ -223,68 +337,31 @@ class FixIssue extends Component<FixIssueProps> {
               <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
               <div className={styles.fixesTd}><span>{EN.Median}</span></div>
               <div className={styles.fixesTd}><span>{EN.MostFrequentValue}</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}>
+                <span>{EN.Fix}</span>
+                <span className={styles.reset} onClick={this.handleReset('null')}>{EN.Reset}</span>
+              </div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(nullLineCounts).map((k, i) => {
-                if (!variables.includes(k)) return null
-                if (isTarget && k !== target) return null
-                if (!isTarget && k === target) return null
-                const originNum = nullLineCounts[k]
-                if (!originNum) {
-                  return null;
-                }
-                const num = nullLineCounts[k] || 0
+              {Object.keys(nullRow).map((k, i) => {
+                const originNum = nullRow[k]
+                if (!originNum) return null
+                const num = nullRow[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
+                const options = showType === 'Numerical' ? numArray : strArray
                 const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet.toString(), 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : rawDataView[k].mode)
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
-                const nullArray = showType === 'Categorical' ? [{
-                  value: 'mode',
-                  label: EN.Replacewithmostfrequentvalue
-                }, {
-                  value: 'drop',
-                  label: EN.Deletetherows
-                }, {
-                  value: 'column',
-                  label: EN.Deletethecolumn
-                }, {
-                  value: 'ignore',
-                  label: EN.Replacewithauniquevalue
-                }] : [{
-                  value: 'mean',
-                  label: EN.Replacewithmeanvalue
-                }, {
-                  value: 'drop',
-                  label: EN.Deletetherows
-                }, {
-                  value: 'column',
-                  label: EN.Deletethecolumn
-                }, {
-                  value: 'min',
-                  label: EN.Replacewithminvalue
-                }, {
-                  value: 'max',
-                  label: EN.Replacewithmaxvalue
-                }, {
-                  value: 'median',
-                  label: EN.Replacewithmedianvalue
-                }, {
-                  value: 'zero',
-                  label: EN.ReplaceWith0
-                }, {
-                  value: 'others',
-                  label: EN.Replacewithothers
-                }]
                 const method = this.fillMethod.missing.hasOwnProperty(k) ?
                   this.fillMethod.missing[k] :
                   nullFillMethodTemp.hasOwnProperty(k) ?
                     nullFillMethodTemp[k] :
                     (showType === 'Categorical' ? 'mode' : 'mean')
-                const isOthers = !nullArray.find(_a => _a.value === method)
+                const isOthers = !options.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
+                  {Object.keys(nullRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" checked={this.checked.null.includes(k)} onChange={this.handleCheck('null', k)} /></div>}
                   <div className={styles.fixesCell}><span title={mapHeader[k]}>{mapHeader[k]}</span></div>
                   <div className={styles.fixesCell}><select value={missingReasonTemp[k]} onChange={this.reasonSelect.bind(null, k)}>
                     <option value='none' key="none">{EN.Idonknow}</option>
@@ -298,7 +375,7 @@ class FixIssue extends Component<FixIssueProps> {
                   <div className={styles.fixesCell}><span title={this.formatCell(mode)}>{this.formatCell(mode)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={isOthers ? 'others' : method} onChange={this.nullSelect.bind(null, k)}>
-                      {nullArray.map(item => {
+                      {options.map(item => {
                         if (isTarget && item.value === 'column') return null
                         return <option value={item.value} key={item.value}>{item.label}</option>
                       })}
@@ -316,27 +393,34 @@ class FixIssue extends Component<FixIssueProps> {
               <div className={classnames(styles.typeBlock, styles.outlier)} />
               <span>{EN.Outlier}</span>
             </div>
+            {Object.keys(outlierRow).length > 1 && <div className={styles.batch}>
+              <Select className={styles.batchSelect} placeholder={EN.BatchFix} value={undefined} onSelect={this.handleSelect('outlier')}>
+                {strArray.map(item => {
+                  if (isTarget && item.value === 'column') return null
+                  return <Option value={item.value} key={item.value}>{item.label}</Option>
+                })}
+              </Select>
+            </div>}
           </div>
           <div className={styles.fixesTable}>
             <div className={classnames(styles.fixesRow, styles.fixesHeader)}>
+              {Object.keys(outlierRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" defaultChecked={false} onChange={this.handleCheckAll('outlier')} /></div>}
               <div className={styles.fixesTd}><span>{EN.VariableName}</span></div>
               <div className={styles.fixesTd}><span>{EN.ValidRange}</span></div>
               <div className={styles.fixesTd}><span>{EN.DataType}</span></div>
               <div className={styles.fixesTd}><span>{EN.QuantityofOutlier}</span></div>
               <div className={styles.fixesTd}><span>{EN.Mean}</span></div>
               <div className={styles.fixesTd}><span>{EN.Median}</span></div>
-              <div className={classnames(styles.fixesTd, styles.fixesLarge)}><span>{EN.Fix}</span></div>
+              <div className={classnames(styles.fixesTd, styles.fixesLarge)}>
+                <span>{EN.Fix}</span>
+                <span className={styles.reset} onClick={this.handleReset('outlier')}>{EN.Reset}</span>
+              </div>
             </div>
             <div className={styles.fixesBody}>
-              {Object.keys(outlierLineCounts).map((k, i) => {
-                if (!variables.includes(k)) return null
-                if (isTarget && k !== target) return null
-                if (!isTarget && k === target) return null
-                const originNum = outlierLineCounts[k]
-                if (!originNum) {
-                  return null;
-                }
-                const num = outlierLineCounts[k] || 0
+              {Object.keys(outlierRow).map((k, i) => {
+                const originNum = outlierRow[k]
+                if (!originNum) return null
+                const num = outlierRow[k] || 0
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 if (showType !== 'Numerical') return null
                 const isShow = showType === 'Numerical';
@@ -346,37 +430,13 @@ class FixIssue extends Component<FixIssueProps> {
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet.toString(), 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median
-                const outlierArray = [{
-                  value: 'ignore',
-                  label: EN.DoNothing
-                }, {
-                  value: 'drop',
-                  label: EN.Deletetherows
-                }, {
-                  value: 'column',
-                  label: EN.Deletethecolumn
-                }, {
-                  value: 'mean',
-                  label: EN.Replacewithmeanvalue
-                }, {
-                  value: 'median',
-                  label: EN.Replacewithmedianvalue
-                }, {
-                  value: 'zero',
-                  label: EN.ReplaceWith0
-                }, {
-                  value: 'respective',
-                  label: EN.ReplaceRespective
-                }, {
-                  value: 'others',
-                  label: EN.Replacewithothers
-                }]
                 const method = this.fillMethod.outlier.hasOwnProperty(k) ?
                   this.fillMethod.outlier[k] :
                   outlierFillMethodTemp.hasOwnProperty(k) ?
                     outlierFillMethodTemp[k] : 'ignore'
-                const isOthers = !outlierArray.find(_a => _a.value === method)
+                const isOthers = !outArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
+                  {Object.keys(outlierRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" checked={this.checked.outlier.includes(k)} onChange={this.handleCheck('outlier', k)} /></div>}
                   <div className={styles.fixesCell}><span title={mapHeader[k]}>{mapHeader[k]}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesBwtween)}>
                     <span title={formatNumber(outlier[0], 2) + "-" + formatNumber(outlier[1], 2)}>
@@ -389,7 +449,7 @@ class FixIssue extends Component<FixIssueProps> {
                   <div className={styles.fixesCell}><span title={this.formatCell(median)}>{this.formatCell(median)}</span></div>
                   <div className={classnames(styles.fixesCell, styles.fixesLarge)}>
                     <select value={isOthers ? 'others' : method} onChange={this.outlierSelect.bind(null, k)}>
-                      {outlierArray.map(item => {
+                      {outArray.map(item => {
                         if (isTarget && item.value === 'column') return null
                         return <option value={item.value} key={item.value}>{item.label}</option>
                       })}
